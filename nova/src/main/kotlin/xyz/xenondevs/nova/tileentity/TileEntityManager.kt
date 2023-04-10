@@ -4,8 +4,9 @@ import org.bukkit.Location
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -14,22 +15,23 @@ import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
 import java.util.logging.Level
-import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
 @Suppress("DEPRECATION")
 val Material?.requiresLight: Boolean
     get() = this != null && !isTransparent && isOccluding
 
-object TileEntityManager : Initializable(), ITileEntityManager {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(CustomItemServiceManager)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [CustomItemServiceManager::class]
+)
+object TileEntityManager {
     
     private val tileEntityMap = HashMap<ChunkPos, HashMap<BlockPos, TileEntity>>()
     val tileEntities: Sequence<TileEntity>
         get() = tileEntityMap.asSequence().filter { it.key.isLoaded() }.flatMap { it.value.values }
     
-    override fun init() {
+    @InitFun
+    private fun init() {
         fun handleTick(tickHandler: (TileEntity) -> Unit) {
             val tileEntities = synchronized(this) { tileEntities.toList() }
             tileEntities.forEach { tileEntity ->
@@ -57,7 +59,7 @@ object TileEntityManager : Initializable(), ITileEntityManager {
         tileEntityMap[state.pos.chunkPos]?.remove(state.pos)
     }
     
-    override fun getTileEntity(location: Location): TileEntity? {
+    fun getTileEntity(location: Location): TileEntity? {
         return getTileEntity(location, true)
     }
     
@@ -66,7 +68,7 @@ object TileEntityManager : Initializable(), ITileEntityManager {
     }
     
     fun getTileEntity(pos: BlockPos, additionalHitboxes: Boolean = true): TileEntity? {
-        val blockState = BlockManager.getBlock(pos, additionalHitboxes)
+        val blockState = BlockManager.getBlockState(pos, additionalHitboxes)
         return if (blockState is NovaTileEntityState) blockState.tileEntity else null
     }
     

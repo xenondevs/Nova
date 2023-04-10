@@ -1,26 +1,33 @@
 package xyz.xenondevs.nova.data.resources.builder.content
 
 import com.google.gson.JsonObject
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.util.NumberFormatUtils
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.parseJson
-import java.io.File
 import java.util.logging.Level
+import kotlin.io.path.createDirectories
+import kotlin.io.path.extension
+import kotlin.io.path.isDirectory
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.walk
+import kotlin.io.path.writeText
 
 internal class LanguageContent : PackContent {
     
+    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    
     private val languageLookup = HashMap<String, HashMap<String, String>>()
     
-    init {
+    override fun init() {
         try {
-            ResourcePackBuilder.LANGUAGE_DIR.walkTopDown()
-                .filter { it.isFile && it.extension == "json" }
+            ResourcePackBuilder.LANGUAGE_DIR.walk()
+                .filter { !it.isDirectory() && it.extension == "json" }
                 .forEach {
-                    languageLookup[it.nameWithoutExtension] = 
+                    languageLookup[it.nameWithoutExtension] =
                         it.parseJson().asJsonObject.entrySet().associateTo(HashMap()) { (key, value) -> key to value.asString }
                 }
         } catch (t: Throwable) {
@@ -28,11 +35,13 @@ internal class LanguageContent : PackContent {
         }
     }
     
-    override fun addFromPack(pack: AssetPack) {
-        pack.langDir?.listFiles()?.forEach { lang ->
-            if (lang.isFile && lang.extension.equals("json", true)) {
+    override fun includePack(pack: AssetPack) {
+        val langDir = pack.langDir ?: return
+        
+        langDir.walk().forEach { lang ->
+            if (lang.extension.equals("json", true)) {
                 val langObj = lang.parseJson() as JsonObject
-                val langMap = languageLookup.getOrPut(lang.nameWithoutExtension) { HashMap() }
+                val langMap = languageLookup.getOrPut(lang.nameWithoutExtension, ::HashMap)
                 langObj.entrySet().forEach { (key, value) -> langMap[key] = value.asString }
             }
         }
@@ -42,8 +51,8 @@ internal class LanguageContent : PackContent {
         extractRomanNumerals(languageLookup["en_us"]!!)
         Resources.updateLanguageLookup(languageLookup)
         languageLookup.forEach { (name, content) ->
-            val file = File(ResourcePackBuilder.LANGUAGE_DIR, "$name.json")
-            file.parentFile.mkdirs()
+            val file = ResourcePackBuilder.LANGUAGE_DIR.resolve("$name.json")
+            file.parent.createDirectories()
             file.writeText(GSON.toJson(content))
         }
     }

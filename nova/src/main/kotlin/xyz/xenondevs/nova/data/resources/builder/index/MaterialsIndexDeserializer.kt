@@ -3,19 +3,21 @@ package xyz.xenondevs.nova.data.resources.builder.index
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
+import xyz.xenondevs.commons.gson.getAllInts
+import xyz.xenondevs.commons.gson.getAllStrings
+import xyz.xenondevs.commons.gson.getIntOrNull
+import xyz.xenondevs.commons.gson.getOrNull
+import xyz.xenondevs.commons.gson.getStringOrNull
+import xyz.xenondevs.commons.gson.isString
+import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockDirection
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockModelInformation
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockModelType
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.ItemModelInformation
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.RegisteredMaterial
 import xyz.xenondevs.nova.util.addNamespace
-import xyz.xenondevs.nova.util.data.getAllInts
-import xyz.xenondevs.nova.util.data.getAllStrings
-import xyz.xenondevs.nova.util.data.getInt
-import xyz.xenondevs.nova.util.data.getOrNull
-import xyz.xenondevs.nova.util.data.getString
-import xyz.xenondevs.nova.util.data.isString
 
 private fun String.toMaterial(): Material? = Material.getMaterial(uppercase())
 
@@ -29,7 +31,8 @@ internal object MaterialsIndexDeserializer {
         json.entrySet().forEach { (name, element) ->
             val itemInfo: ItemModelInformation?
             val blockInfo: BlockModelInformation?
-            val id = name.addNamespace(namespace)
+            val armorInfo: ResourceLocation?
+            val id = ResourceLocation(namespace, name)
             
             if (element is JsonObject) {
                 val item = element.get("item")
@@ -54,20 +57,23 @@ internal object MaterialsIndexDeserializer {
                     (block.getOrNull("models")?.let(MaterialsIndexDeserializer::deserializeModelList) ?: itemModelList)
                         ?.map { it.addNamespace(namespace) }
                         ?.let {
-                            val blockType = block.getString("type")?.uppercase()?.let(BlockModelType::valueOf)
-                            val hitboxType = block.getString("hitbox")?.toMaterial()
-                            val directions = block.getString("directions")?.let(BlockDirection::of)
-                            val priority = block.getInt("priority", 0)
+                            val blockType = block.getStringOrNull("type")?.uppercase()?.let(BlockModelType::valueOf)
+                            val hitboxType = block.getStringOrNull("hitbox")?.toMaterial()
+                            val directions = block.getStringOrNull("directions")?.let(BlockDirection::of)
+                            val priority = block.getIntOrNull("priority") ?: 0
                             BlockModelInformation(id, blockType, hitboxType, it, directions, priority)
                         }
                 } else null
                 
+                armorInfo = element.getStringOrNull("armor")?.let { NamespacedId.of(it, namespace).resourceLocation }
+                
             } else if (element.isString()) {
                 itemInfo = ItemModelInformation(id, listOf(element.asString.addNamespace(namespace)))
                 blockInfo = null
+                armorInfo = null
             } else throw UnsupportedOperationException()
             
-            index += RegisteredMaterial(id, itemInfo, blockInfo ?: itemInfo.toBlockInfo())
+            index += RegisteredMaterial(id, itemInfo, blockInfo ?: itemInfo.toBlockInfo(), armorInfo)
         }
         
         return index

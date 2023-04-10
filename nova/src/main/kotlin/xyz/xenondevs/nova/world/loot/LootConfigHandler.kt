@@ -1,16 +1,17 @@
 package xyz.xenondevs.nova.world.loot
 
+import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.data.UpdatableFile
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.data.serialization.json.GSON
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
-import xyz.xenondevs.nova.util.data.GSON
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.data.HashUtils
-import xyz.xenondevs.nova.util.data.fromJson
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
 import java.io.File
@@ -18,12 +19,14 @@ import java.io.File
 private val LOOT_DIRECTORY = File(NOVA.dataFolder, "loot")
 private val LOOT_FILE_PATTERN = Regex("""^[a-z][a-z\d_]*.json$""")
 
-internal object LootConfigHandler : Initializable() {
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class]
+)
+internal object LootConfigHandler {
     
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer)
-    
-    override fun init() {
+    @InitFun
+    private fun init() {
         extractLootTables()
         loadLootTables()
     }

@@ -1,27 +1,32 @@
 package xyz.xenondevs.nova.ui.item
 
-import de.studiocode.invui.gui.impl.PagedGUI
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.impl.controlitem.PageItem
-import net.md_5.bungee.api.ChatColor
-import xyz.xenondevs.nova.material.CoreGUIMaterial
-import xyz.xenondevs.nova.util.data.addLoreLines
-import xyz.xenondevs.nova.util.data.localized
-import xyz.xenondevs.nova.util.data.setLocalizedName
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import xyz.xenondevs.invui.gui.PagedGui
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.builder.addLoreLines
+import xyz.xenondevs.invui.item.builder.setDisplayName
+import xyz.xenondevs.invui.item.impl.controlitem.PageItem
+import xyz.xenondevs.nova.item.DefaultGuiItems
 
 class PageBackItem : PageItem(false) {
     
-    override fun getItemProvider(gui: PagedGUI): ItemProvider {
-        val itemBuilder = (if (gui.hasPageBefore()) CoreGUIMaterial.ARROW_1_LEFT else CoreGUIMaterial.LIGHT_ARROW_1_LEFT).createClientsideItemBuilder()
-        itemBuilder.setLocalizedName(ChatColor.GRAY, "menu.nova.paged.back")
+    override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+        val itemBuilder = (if (gui.hasPreviousPage()) DefaultGuiItems.ARROW_1_LEFT else DefaultGuiItems.LIGHT_ARROW_1_LEFT).createClientsideItemBuilder()
+        itemBuilder.setDisplayName(Component.translatable("menu.nova.paged.back", NamedTextColor.GRAY))
         itemBuilder.addLoreLines(
             if (gui.hasInfinitePages()) {
-                if (gui.currentPageIndex == 0) localized(ChatColor.DARK_GRAY, "menu.nova.paged.limit_min")
-                else localized(ChatColor.DARK_GRAY, "menu.nova.paged.go_infinite", gui.currentPageIndex)
+                if (gui.currentPage == 0) Component.translatable("menu.nova.paged.limit_min", NamedTextColor.DARK_GRAY)
+                else Component.translatable("menu.nova.paged.go_infinite", NamedTextColor.DARK_GRAY, Component.text(gui.currentPage))
             } else {
-                if (gui.hasPageBefore()) localized(ChatColor.DARK_GRAY, "menu.nova.paged.go", gui.currentPageIndex, gui.pageAmount)
-                    .apply { color = ChatColor.DARK_GRAY }
-                else localized(ChatColor.DARK_GRAY, "menu.nova.paged.limit_min")
+                if (gui.hasPreviousPage())
+                    Component.translatable(
+                        "menu.nova.paged.go",
+                        NamedTextColor.DARK_GRAY,
+                        Component.text(gui.currentPage),
+                        Component.text(gui.pageAmount)
+                    )
+                else Component.translatable("menu.nova.paged.limit_min", NamedTextColor.DARK_GRAY)
             }
         )
         return itemBuilder
@@ -31,16 +36,25 @@ class PageBackItem : PageItem(false) {
 
 class PageForwardItem : PageItem(true) {
     
-    override fun getItemProvider(gui: PagedGUI): ItemProvider {
-        val itemBuilder = (if (gui.hasNextPage()) CoreGUIMaterial.ARROW_1_RIGHT else CoreGUIMaterial.LIGHT_ARROW_1_RIGHT).createClientsideItemBuilder()
-        itemBuilder.setLocalizedName(ChatColor.GRAY, "menu.nova.paged.forward")
+    override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+        val itemBuilder = (if (gui.hasNextPage()) DefaultGuiItems.ARROW_1_RIGHT else DefaultGuiItems.LIGHT_ARROW_1_RIGHT).createClientsideItemBuilder()
+        itemBuilder.setDisplayName(Component.translatable("menu.nova.paged.forward", NamedTextColor.GRAY))
         itemBuilder.addLoreLines(
             if (gui.hasInfinitePages()) {
-                localized(ChatColor.DARK_GRAY, "menu.nova.paged.go_infinite", gui.currentPageIndex + 2)
+                Component.translatable(
+                    "menu.nova.paged.go_infinite",
+                    NamedTextColor.DARK_GRAY,
+                    Component.text(gui.currentPage + 2)
+                )
             } else {
-                if (gui.hasNextPage()) localized(ChatColor.DARK_GRAY, "menu.nova.paged.go", gui.currentPageIndex + 2, gui.pageAmount)
-                    .apply { color = ChatColor.DARK_GRAY }
-                else localized(ChatColor.DARK_GRAY, "menu.nova.paged.limit_max")
+                if (gui.hasNextPage())
+                    Component.translatable(
+                        "menu.nova.paged.go",
+                        NamedTextColor.DARK_GRAY,
+                        Component.text(gui.currentPage + 2),
+                        Component.text(gui.pageAmount)
+                    )
+                else Component.translatable("menu.nova.paged.limit_max", NamedTextColor.DARK_GRAY)
             }
         )
         return itemBuilder

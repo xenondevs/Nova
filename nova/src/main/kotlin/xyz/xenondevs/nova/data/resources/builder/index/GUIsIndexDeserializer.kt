@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.util.addNamespace
 
-internal object GUIsIndexDeserializer {
+internal object GuisIndexDeserializer {
     
     fun deserialize(namespace: String, json: JsonElement): Map<String, ResourcePath> {
         require(json is JsonObject)

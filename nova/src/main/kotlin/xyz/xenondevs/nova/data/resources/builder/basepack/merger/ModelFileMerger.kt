@@ -4,18 +4,22 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import org.bukkit.Material
+import xyz.xenondevs.commons.gson.getIntOrNull
+import xyz.xenondevs.commons.gson.getStringOrNull
+import xyz.xenondevs.commons.gson.parseJson
+import xyz.xenondevs.commons.gson.set
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.getInt
-import xyz.xenondevs.nova.util.data.getString
-import xyz.xenondevs.nova.util.data.parseJson
-import xyz.xenondevs.nova.util.data.set
-import java.io.File
+import xyz.xenondevs.nova.data.serialization.json.GSON
+import java.nio.file.Path
 import java.util.*
+import kotlin.io.path.copyTo
+import kotlin.io.path.exists
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.writeText
 
-internal class ModelFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/models") {
+internal class ModelFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/models") {
     
-    override fun merge(source: File, destination: File) {
+    override fun merge(source: Path, destination: Path) {
         if (destination.exists()) {
             val sourceObj = source.parseJson() as? JsonObject ?: return
             val sourceOverrides = sourceObj.get("overrides") as? JsonArray ?: return
@@ -37,13 +41,13 @@ internal class ModelFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "as
         processOverrides(destination)
     }
     
-    private fun processOverrides(file: File) {
+    private fun processOverrides(file: Path) {
         val obj = file.parseJson() as? JsonObject ?: return
         val array = obj.get("overrides") as? JsonArray ?: return
         processOverrides(file, array)
     }
     
-    private fun processOverrides(file: File, array: JsonArray): JsonArray {
+    private fun processOverrides(file: Path, array: JsonArray): JsonArray {
         val matName = file.nameWithoutExtension.uppercase()
         val material = Material.values().firstOrNull { it.name == matName } ?: return array
         
@@ -85,8 +89,8 @@ internal class ModelFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "as
         fun getModelConfig(element: JsonElement): Pair<Int, String>? {
             val obj = element as? JsonObject ?: return null
             val predicate = obj.get("predicate") as? JsonObject ?: return null
-            val customModelData = predicate.getInt("custom_model_data") ?: return null
-            val model = obj.getString("model") ?: return null
+            val customModelData = predicate.getIntOrNull("custom_model_data") ?: return null
+            val model = obj.getStringOrNull("model") ?: return null
             
             return customModelData to model
         }

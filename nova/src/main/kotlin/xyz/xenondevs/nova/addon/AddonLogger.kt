@@ -7,7 +7,7 @@ import java.util.logging.Level
 import java.util.logging.LogRecord
 import java.util.logging.Logger
 
-class AddonLogger(name: String) : Logger("Nova", null) {
+internal class AddonLogger(name: String) : Logger("Nova", null) {
     
     // On Paper, [logger.name] is appended in front of each log message
     private val prefix = if (ServerSoftware.PAPER in ServerUtils.SERVER_SOFTWARE.tree) "[$name] " else "[Nova] [$name] "

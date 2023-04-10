@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.BaseComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
@@ -11,31 +12,25 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
-import xyz.xenondevs.nova.util.data.ComponentUtils
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.util.component.adventure.sendMessage
 import xyz.xenondevs.nova.util.data.Version
-import xyz.xenondevs.nova.util.data.coloredText
-import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import java.net.URL
 
-internal object UpdateReminder : Initializable(), Listener {
+@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC, dependsOn = [NovaConfig::class])
+internal object UpdateReminder : Listener {
     
     private const val NOVA_RESOURCE_ID = 93648
-    
-    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
-    override val dependsOn = setOf(NovaConfig)
     
     private var task: BukkitTask? = null
     private val needsUpdate = ArrayList<Addon?>()
     private val alreadyNotified = ArrayList<Addon?>()
     
-    override fun init() {
-        reload()
-    }
-    
+    @InitFun
     fun reload() {
         val enabled = DEFAULT_CONFIG.getBoolean("update_reminder.enabled")
         if (task == null && enabled) {
@@ -107,14 +102,20 @@ internal object UpdateReminder : Initializable(), Listener {
     private fun handleJoin(event: PlayerJoinEvent) {
         val player = event.player
         if (player.hasPermission("nova.misc.updateReminder") && needsUpdate.isNotEmpty()) {
-            needsUpdate.forEach { player.spigot().sendMessage(getOutdatedMessage(it)) }
+            needsUpdate.forEach { player.sendMessage(getOutdatedMessage(it)) }
         }
     }
     
-    private fun getOutdatedMessage(addon: Addon?): BaseComponent {
-        val addonName = coloredText(ChatColor.AQUA, addon?.description?.name ?: "Nova")
+    private fun getOutdatedMessage(addon: Addon?): Component {
+        val name = addon?.description?.name ?: "Nova"
         val url = "https://spigotmc.org/resources/" + (addon?.description?.spigotResourceId ?: NOVA_RESOURCE_ID)
-        return localized(ChatColor.RED, "nova.outdated_version", addonName, ComponentUtils.createLinkComponent(url))
+        
+        return Component.translatable(
+            "nova.outdated_version",
+            NamedTextColor.RED,
+            Component.text(name, NamedTextColor.AQUA),
+            Component.text(url).clickEvent(ClickEvent.openUrl(url))
+        )
     }
     
 }

@@ -1,13 +1,16 @@
 package xyz.xenondevs.nova.tileentity.network
 
+import net.minecraft.core.particles.ParticleTypes
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
+import xyz.xenondevs.nmsutils.particle.color
+import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.util.advance
-import xyz.xenondevs.nova.util.particleBuilder
+import xyz.xenondevs.nova.util.filterInRange
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.particle.ParticleEffect
+import xyz.xenondevs.nova.util.sendTo
 import java.awt.Color
 import java.util.*
 
@@ -55,9 +58,13 @@ internal object NetworkDebugger {
         if (blockFace != null)
             particleLocation.add(0.0, 0.5, 0.0).advance(blockFace, 0.5)
         
-        particleBuilder(ParticleEffect.REDSTONE, particleLocation) {
+        val receivingPlayers = players.filterInRange(particleLocation, 64.0)
+        if (receivingPlayers.isEmpty())
+            return
+        
+        particle(ParticleTypes.DUST, particleLocation) {
             color(color)
-        }.display(players)
+        }.sendTo(receivingPlayers)
     }
     
 }

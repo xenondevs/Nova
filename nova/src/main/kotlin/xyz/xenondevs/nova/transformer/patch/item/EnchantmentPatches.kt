@@ -14,16 +14,15 @@ import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.behavior.Enchantable
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.bukkitMirror
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaCompound
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethodByName
 import kotlin.math.min
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
 
 @Suppress("unused")
-internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::class, MojangItem::class, ExperienceOrb::class), computeFrames = true) {
+internal object EnchantmentPatches : MultiTransformer(EnchantmentHelper::class, MojangItem::class, ExperienceOrb::class) {
     
     override fun transform() {
         patchEnchantmentTableEnchanting()
@@ -31,38 +30,38 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
     }
     
     private fun patchEnchantmentTableEnchanting() {
-        VirtualClassPath[ReflectionRegistry.ENCHANTMENT_HELPER_GET_AVAILABLE_ENCHANTMENT_RESULTS_METHOD]!!
+        VirtualClassPath[EnchantmentHelper::getAvailableEnchantmentResults]
             .replaceFirst(1, 0, buildInsnList {
                 aLoad(1)
-                invokeStatic(getMethodByName(EnchantmentPatches::class.java, false, "canEnchantItemWith"))
-            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ReflectionRegistry.ENCHANTMENT_CATEGORY_CAN_ENCHANT_METHOD) }
+                invokeStatic(::canEnchantItemWith)
+            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(EnchantmentCategory::canEnchant) }
         
         val enchantmentValueAccessingMethods = mapOf(
-            VirtualClassPath[ReflectionRegistry.ENCHANTMENT_HELPER_GET_ENCHANTMENT_COST_METHOD] to 3,
-            VirtualClassPath[ReflectionRegistry.ENCHANTMENT_HELPER_SELECT_ENCHANTMENT_METHOD] to 1
+            VirtualClassPath[EnchantmentHelper::getEnchantmentCost] to 3,
+            VirtualClassPath[EnchantmentHelper::selectEnchantment] to 1
         )
         
         enchantmentValueAccessingMethods.forEach { (method, localIdx) ->
             method.replaceFirst(1, 0, buildInsnList {
                 aLoad(localIdx)
-                invokeStatic(getMethodByName(EnchantmentPatches::class.java, false, "getEnchantmentValue"))
-            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ReflectionRegistry.ITEM_GET_ENCHANTMENT_VALUE_METHOD) }
+                invokeStatic(::getEnchantmentValue)
+            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(MojangItem::getEnchantmentValue) }
         }
     
-        VirtualClassPath[ReflectionRegistry.ITEM_IS_ENCHANTABLE_METHOD]
+        VirtualClassPath[MojangItem::isEnchantable]
             .instructions = buildInsnList {
             aLoad(1)
             aLoad(0)
-            invokeStatic(getMethodByName(EnchantmentPatches::class.java, false, "isEnchantable"))
+            invokeStatic(::isEnchantable)
             ireturn()
         }
     }
     
     @JvmStatic
     fun canEnchantItemWith(category: EnchantmentCategory, itemStack: MojangStack): Boolean {
-        val novaMaterial = itemStack.novaMaterial
-        if (novaMaterial != null) {
-            val categories = itemStack.novaMaterial?.novaItem?.getBehavior(Enchantable::class)?.options?.enchantmentCategories
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) {
+            val categories = itemStack.novaItem?.getBehavior(Enchantable::class)?.options?.enchantmentCategories
             return categories != null && category in categories
         }
         
@@ -71,9 +70,9 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
     
     @JvmStatic
     fun getEnchantmentValue(itemStack: MojangStack): Int {
-        val novaMaterial = itemStack.novaMaterial
-        if (novaMaterial != null) {
-            return novaMaterial.novaItem.getBehavior(Enchantable::class)?.options?.enchantmentValue ?: 0
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) {
+            return novaItem.getBehavior(Enchantable::class)?.options?.enchantmentValue ?: 0
         }
         
         return itemStack.item.enchantmentValue
@@ -81,9 +80,9 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
     
     @JvmStatic
     fun isEnchantable(itemStack: MojangStack, item: MojangItem): Boolean {
-        val novaMaterial = itemStack.novaMaterial
-        if (novaMaterial != null) {
-            return novaMaterial.novaItem.hasBehavior(Enchantable::class)
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) {
+            return novaItem.hasBehavior(Enchantable::class)
         }
         
         return item.maxStackSize == 1 && item.canBeDepleted()
@@ -95,7 +94,7 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
             aLoad(0)
             aLoad(1)
             iLoad(2)
-            invokeStatic(getMethodByName(EnchantmentPatches::class.java, false, "repairPlayerItems"))
+            invokeStatic(::repairPlayerItems)
             ireturn()
         }
     }
@@ -103,9 +102,9 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
     @JvmStatic
     fun repairPlayerItems(orb: ExperienceOrb, player: Player, exp: Int): Int {
         val itemStack = EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, player) {
-            val novaMaterial = it.novaMaterial
-            if (novaMaterial != null) {
-                val damage = novaMaterial.novaItem.getBehavior(Damageable::class)?.getDamage(it.bukkitMirror)
+            val novaItem = it.novaItem
+            if (novaItem != null) {
+                val damage = novaItem.getBehavior(Damageable::class)?.getDamage(it.novaCompound)
                 return@getRandomItemWith damage != null && damage > 0
             }
             
@@ -113,14 +112,14 @@ internal object EnchantmentPatches : MultiTransformer(setOf(EnchantmentHelper::c
         }?.value
         
         if (itemStack != null) {
-            val damageable = itemStack.novaMaterial?.novaItem?.getBehavior(Damageable::class)
+            val damageable = itemStack.novaItem?.getBehavior(Damageable::class)
             
             val repair: Int
             if (damageable != null) {
-                val bukkitMirror = itemStack.bukkitMirror
-                val damageValue = damageable.getDamage(bukkitMirror)
+                val novaCompound = itemStack.novaCompound
+                val damageValue = damageable.getDamage(novaCompound)
                 repair = min(orb.value * 2, damageValue)
-                damageable.setDamage(bukkitMirror, damageValue - repair)
+                damageable.setDamage(novaCompound, damageValue - repair)
             } else {
                 repair = min(orb.value * 2, itemStack.damageValue)
                 itemStack.damageValue -= repair

@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT")
+    implementation("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
     implementation("net.lingala.zip4j:zip4j:2.11.1")
 }
 

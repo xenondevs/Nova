@@ -1,8 +1,6 @@
 package xyz.xenondevs.nova.data.recipe
 
 import org.bukkit.Keyed
-import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.Recipe
 
 class RecipeContainer(val recipe: Any) {
     
@@ -12,8 +10,7 @@ class RecipeContainer(val recipe: Any) {
         else -> throw IllegalArgumentException("Could not find a recipe key")
     }
     
-    val result: ItemStack? = if (recipe is Recipe) recipe.result else if (recipe is ResultingRecipe) recipe.result else null
-    val type = RecipeTypeRegistry.getType(recipe)
+    val type = RecipeType.of(recipe)
     
     override fun equals(other: Any?): Boolean {
         return other is RecipeContainer && key == other.key

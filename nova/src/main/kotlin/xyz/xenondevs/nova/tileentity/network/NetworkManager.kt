@@ -8,14 +8,21 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkUnloadEvent
+import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.commons.collections.filterIsInstanceValues
+import xyz.xenondevs.commons.collections.flatMap
+import xyz.xenondevs.commons.collections.poll
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
@@ -26,10 +33,6 @@ import xyz.xenondevs.nova.util.concurrent.ObservableLock
 import xyz.xenondevs.nova.util.concurrent.lockAndRun
 import xyz.xenondevs.nova.util.concurrent.mapToAllFuture
 import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
-import xyz.xenondevs.nova.util.emptyEnumMap
-import xyz.xenondevs.nova.util.filterIsInstanceValues
-import xyz.xenondevs.nova.util.flatMap
-import xyz.xenondevs.nova.util.pollFirst
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.serverTick
@@ -46,7 +49,7 @@ typealias NetworkManagerTask = (NetworkManager) -> Unit
 
 private typealias PartialTask = () -> Unit
 
-class NoNetworkDataException(override val message: String? = null) : Exception()
+private class NoNetworkDataException(override val message: String? = null) : Exception()
 
 private var NETWORK_MANAGER = NetworkManagerImpl()
 
@@ -64,7 +67,11 @@ interface NetworkManager {
     
     fun reloadNetworks()
     
-    companion object : Initializable(), Listener {
+    @InternalInit(
+        stage = InitializationStage.POST_WORLD,
+        dependsOn = [LegacyFileConverter::class, DefaultNetworkTypes::class]
+    )
+    companion object : Listener {
         
         /**
          * Schedules loading the network in that chunk
@@ -124,16 +131,15 @@ interface NetworkManager {
             }
         }
         
-        override val initializationStage = InitializationStage.POST_WORLD
-        override val dependsOn = setOf(LegacyFileConverter)
-        
-        override fun init() {
+        @InitFun
+        private fun init() {
             LOGGER.info("Starting network threads")
             NETWORK_MANAGER.init()
             registerEvents()
         }
         
-        override fun disable() {
+        @DisableFun
+        private fun disable() {
             LOGGER.info("Unloading networks")
             PermanentStorage.store("legacyNetworkChunks", NETWORK_MANAGER.legacyNetworkChunks)
             Bukkit.getWorlds().flatMap(World::getLoadedChunks).forEach { unloadChunk(it.pos) }
@@ -206,7 +212,7 @@ private class NetworkManagerImpl : NetworkManager {
                         
                         // only load chunks if the other queues are empty
                         while (chunkLoadQueue.isNotEmpty() && asyncQueue.isEmpty() && partialTaskQueue.isEmpty()) {
-                            val pos = chunkLoadQueue.pollFirst() ?: break
+                            val pos = chunkLoadQueue.poll() ?: break
                             lock.lockAndRun { loadChunk(pos) }
                         }
                     }
@@ -324,7 +330,7 @@ private class NetworkManagerImpl : NetworkManager {
         loadNetworkNode(endPoint)
         val serializedNetworks = endPoint.retrieveSerializedNetworks() ?: throw NoNetworkDataException()
         
-        val networks = emptyEnumMap<BlockFace, MutableList<Network>>()
+        val networks = enumMap<BlockFace, MutableList<Network>>()
         
         serializedNetworks.forEach { (networkType, faceMap) ->
             faceMap.forEach faces@{ (face, networkUUID) ->
@@ -338,6 +344,9 @@ private class NetworkManagerImpl : NetworkManager {
                 networks.getOrPut(face) { ArrayList() } += network
             }
         }
+        
+        // Mark as initialized
+        endPoint.isNetworkInitialized = true
         
         return networks
     }
@@ -362,6 +371,9 @@ private class NetworkManagerImpl : NetworkManager {
             
             return@map network
         }
+        
+        // Mark as initialized
+        bridge.isNetworkInitialized = true
         
         return networks
     }
@@ -441,7 +453,7 @@ private class NetworkManagerImpl : NetworkManager {
         // add endPoint to nodesById
         nodesById[endPoint.uuid] = endPoint
         
-        return NetworkTypeRegistry.types.mapToAllFuture networks@{ networkType ->
+        return NETWORK_TYPE.mapToAllFuture networks@{ networkType ->
             val allowedFaces = endPoint.allowedFaces[networkType]
             if (allowedFaces != null) { // does the endpoint want to have any connections?
                 // loop over all bridges nearby to possibly connect to
@@ -456,7 +468,7 @@ private class NetworkManagerImpl : NetworkManager {
                     }
                 }
             } else return@networks null
-        }
+        }.thenRun { endPoint.isNetworkInitialized = true }
     }
     
     private fun connectEndPoint(endPoint: NetworkEndPoint, neighborNode: NetworkNode, networkType: NetworkType, face: BlockFace, updateBridges: Boolean) {
@@ -530,6 +542,9 @@ private class NetworkManagerImpl : NetworkManager {
             
             // update itself
             bridge.handleNetworkUpdate()
+            
+            // mark as initialized
+            bridge.isNetworkInitialized = true
         }
     }
     

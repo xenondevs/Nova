@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.type.Repeater
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 
@@ -17,8 +17,8 @@ internal object RepeaterWailaInfoProvider : VanillaWailaInfoProvider(setOf(Mater
         return info
     }
     
-    private fun getIconName(repeater: Repeater): NamespacedId {
-        return NamespacedId(
+    private fun getIconName(repeater: Repeater): ResourceLocation {
+        return ResourceLocation(
             "minecraft",
             "repeater_${repeater.delay}tick"
                 + (if (repeater.isPowered) "_on" else "")

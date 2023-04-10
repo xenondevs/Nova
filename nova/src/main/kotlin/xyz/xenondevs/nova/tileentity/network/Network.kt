@@ -1,13 +1,15 @@
 package xyz.xenondevs.nova.tileentity.network
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.Reloadable
-import xyz.xenondevs.nova.tileentity.network.NetworkTypeRegistry.register
+import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidNetwork
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
+import xyz.xenondevs.nova.util.set
 import java.util.*
 
 interface Network : Reloadable {
@@ -82,33 +84,7 @@ interface Network : Reloadable {
 
 private typealias NetworkConstructor = (UUID, Boolean) -> Network
 
-object NetworkTypeRegistry {
-    
-    private val _types = HashMap<String, NetworkType>()
-    val types: List<NetworkType>
-        get() = _types.values.toList()
-    
-    fun register(addon: Addon, name: String, networkConstructor: NetworkConstructor): NetworkType {
-        val id = NamespacedId.of(name, addon.description.id)
-        val type = NetworkType(id, networkConstructor)
-        _types[id.toString()] = type
-        return type
-    }
-    
-    internal fun register(name: String, networkConstructor: NetworkConstructor): NetworkType {
-        val id = NamespacedId.of(name, "nova")
-        val type = NetworkType(id, networkConstructor)
-        _types[id.toString()] = type
-        return type
-    }
-    
-    fun of(id: String): NetworkType? = _types[id]
-    
-    fun of(id: NamespacedId): NetworkType? = _types[id.toString()]
-    
-}
-
-class NetworkType internal constructor(val id: NamespacedId, val networkConstructor: NetworkConstructor) {
+class NetworkType internal constructor(val id: ResourceLocation, val networkConstructor: NetworkConstructor) {
     
     override fun toString(): String {
         return id.toString()
@@ -122,10 +98,20 @@ class NetworkType internal constructor(val id: NamespacedId, val networkConstruc
         return id.hashCode()
     }
     
-    companion object {
-        val ENERGY = register("energy") { uuid, _ -> EnergyNetwork(uuid) }
-        val ITEMS = register("item", ::ItemNetwork)
-        val FLUID = register("fluid") { uuid, _ -> FluidNetwork(uuid)}
+}
+
+@InternalInit(stage = InitializationStage.PRE_WORLD)
+object DefaultNetworkTypes {
+    
+    val ENERGY = register("energy") { uuid, _ -> EnergyNetwork(uuid) }
+    val ITEMS = register("item", ::ItemNetwork)
+    val FLUID = register("fluid") { uuid, _ -> FluidNetwork(uuid) }
+    
+    private fun register(name: String, networkConstructor: NetworkConstructor): NetworkType {
+        val id = ResourceLocation("nova", name)
+        val type = NetworkType(id, networkConstructor)
+        NovaRegistries.NETWORK_TYPE[id] = type
+        return type
     }
     
 }
@@ -142,7 +128,19 @@ enum class NetworkConnectionType(val insert: Boolean, val extract: Boolean, incl
     
     companion object {
         
-        fun of(insert: Boolean, extract: Boolean) = values().first { it.insert == insert && it.extract == extract }
+        fun of(insert: Boolean, extract: Boolean): NetworkConnectionType =
+            values().first { it.insert == insert && it.extract == extract }
+        
+        fun of(types: Iterable<NetworkConnectionType>): NetworkConnectionType {
+            var insert = false
+            var extract = false
+            types.forEach {
+                insert = insert or it.insert
+                extract = extract or it.extract
+            }
+            
+            return of(insert, extract)
+        }
         
     }
     

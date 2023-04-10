@@ -11,8 +11,8 @@ import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 class BlockStateBlockModelProvider(val blockState: NovaBlockState) : BlockModelProvider {
     
     private val pos = blockState.pos
-    private val material = blockState.material
-    private val modelData = material.block as BlockStateBlockModelData
+    private val material = blockState.block
+    private val modelData = material.model as BlockStateBlockModelData
     
     override var currentSubId = 0
         private set

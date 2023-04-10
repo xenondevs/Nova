@@ -1,28 +1,42 @@
 package xyz.xenondevs.nova.ui.waila
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.minecraft.resources.ResourceLocation
+import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.resources.CharSizes
-import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_INFO_PROVIDER
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
-import xyz.xenondevs.nova.ui.waila.info.WailaInfoProviderRegistry
+import xyz.xenondevs.nova.ui.waila.info.NovaWailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
-import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
-import xyz.xenondevs.nova.ui.waila.overlay.WailaImageOverlay
-import xyz.xenondevs.nova.ui.waila.overlay.WailaLineOverlay
+import xyz.xenondevs.nova.ui.waila.info.line.ToolLine
+import xyz.xenondevs.nova.ui.waila.overlay.WailaOverlayCompound
+import xyz.xenondevs.nova.util.data.WildcardUtils
 import xyz.xenondevs.nova.util.id
+import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
 
 private val POS_UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getInt("waila.pos_update_interval") }
 private val DATA_UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getInt("waila.data_update_interval") }
 
 private val BLACKLISTED_BLOCKS by configReloadable {
-    DEFAULT_CONFIG.getStringList("waila.blacklisted_blocks")
-        .mapTo(HashSet()) { NamespacedId.of(it, "minecraft") }
+    DEFAULT_CONFIG.getStringList("waila.blacklisted_blocks").map {
+        val parts = it.split(':')
+        if (parts.size == 1) {
+            Regex("minecraft") to WildcardUtils.toRegex(it)
+        } else {
+            WildcardUtils.toRegex(parts[0]) to WildcardUtils.toRegex(parts[1])
+        }
+    }
 }
 
 internal class Waila(val player: Player) {
@@ -32,8 +46,9 @@ internal class Waila(val player: Player) {
     private var lookingAt: BlockPos? = null
     
     private var active = false
-    private val imageOverlay = WailaImageOverlay()
-    private val lineOverlays = Array(10, ::WailaLineOverlay).toList()
+    private val overlay = WailaOverlayCompound(player)
+    
+    private var prevInfo: WailaInfo? = null
     
     fun setActive(active: Boolean) {
         if (this.active == active)
@@ -42,9 +57,9 @@ internal class Waila(val player: Player) {
         this.active = active
         
         if (active) {
-            BossBarOverlayManager.registerBackgroundOverlay(player, imageOverlay)
+            BossBarOverlayManager.registerOverlay(player, overlay)
         } else {
-            BossBarOverlayManager.unregisterOverlayIf(player) { it == imageOverlay || it in lineOverlays }
+            BossBarOverlayManager.unregisterOverlay(player, overlay)
         }
     }
     
@@ -72,35 +87,15 @@ internal class Waila(val player: Player) {
     private fun tryUpdate(pos: BlockPos?): Boolean {
         if (pos != null) {
             val blockId = pos.block.id
-            if (blockId in BLACKLISTED_BLOCKS)
+            if (isBlacklisted(blockId))
                 return false
             
-            val info = WailaInfoProviderRegistry.getInfo(player, pos) ?: return false
-            val lines = info.lines
-            require(lines.size <= 10) { "Waila text can't be longer than 10 lines" }
+            val info = getInfo(player, pos)
+                ?: return false
             
-            val icon = Resources.getWailaIconCharOrNull(info.icon)
-            val (beginX, centerX) = imageOverlay.update(icon, lines.size, lines.maxOf { CharSizes.calculateComponentWidth(it.components, player.locale) })
-            
-            BossBarOverlayManager.unregisterOverlays(player, lineOverlays)
-            lineOverlays.forEachIndexed { idx, overlay ->
-                if (lines.size <= idx) {
-                    overlay.clear()
-                    return@forEachIndexed
-                }
-                
-                val (text, alignment) = lines[idx]
-                overlay.text = text
-                overlay.centered = alignment == Alignment.CENTERED
-                overlay.x = when (alignment) {
-                    Alignment.LEFT -> beginX
-                    Alignment.CENTERED -> centerX
-                    Alignment.FIRST_LINE -> getBeginX(lines, 0, beginX, centerX)
-                    Alignment.PREVIOUS_LINE -> getBeginX(lines, idx - 1, beginX, centerX)
-                }
-                overlay.changed = true
-                
-                BossBarOverlayManager.registerOverlay(player, overlay)
+            if (info != prevInfo) {
+                prevInfo = info
+                overlay.update(info.icon, info.lines)
             }
             
             return true
@@ -109,19 +104,42 @@ internal class Waila(val player: Player) {
         return false
     }
     
-    private fun getBeginX(lines: List<WailaLine>, lineNumber: Int, beginX: Int, centerX: Int): Int {
-        var currentLineNumber = lineNumber
-        while (true) {
-            val line = lines[currentLineNumber]
+    private fun getInfo(player: Player, pos: BlockPos): WailaInfo? {
+        val novaState = BlockManager.getBlockState(pos)
+        if (novaState is NovaBlockState) {
+            val material = novaState.block
             
-            when (line.alignment) {
-                Alignment.LEFT -> return beginX
-                Alignment.CENTERED -> return centerX - CharSizes.calculateComponentWidth(line.components, player.locale) / 2
-                
-                Alignment.FIRST_LINE -> currentLineNumber = 0
-                Alignment.PREVIOUS_LINE -> currentLineNumber--
-            }
+            return WAILA_INFO_PROVIDER.asSequence()
+                .filterIsInstance<NovaWailaInfoProvider>()
+                .lastOrNull { it.blocks == null || material in it.blocks }
+                ?.getInfo(player, novaState)
+        } else {
+            val block = pos.block
+            val type = block.type
+            
+            return getCustomItemServiceInfo(player, block)
+                ?: WAILA_INFO_PROVIDER.asSequence()
+                    .filterIsInstance<VanillaWailaInfoProvider>()
+                    .lastOrNull { it.materials == null || type in it.materials }
+                    ?.getInfo(player, block)
         }
     }
+    
+    private fun getCustomItemServiceInfo(player: Player, block: Block): WailaInfo? {
+        val blockId = CustomItemServiceManager.getId(block)?.let { runCatching { ResourceLocation.of(it, ':') }.getOrNull() } ?: return null
+        val blockName = CustomItemServiceManager.getName(block, player.locale) ?: return null
+        
+        val lines = ArrayList<WailaLine>()
+        lines += WailaLine(blockName, WailaLine.Alignment.CENTERED)
+        lines += WailaLine(Component.text(blockId.toString(), NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
+        lines += ToolLine.getCustomItemServiceToolLine(player, block)
+        
+        return WailaInfo(blockId, lines)
+    }
+    
+    private fun isBlacklisted(id: ResourceLocation) =
+        BLACKLISTED_BLOCKS.any { (namespaceRegex, nameRegex) ->
+            namespaceRegex.matches(id.namespace) && nameRegex.matches(id.name)
+        }
     
 }

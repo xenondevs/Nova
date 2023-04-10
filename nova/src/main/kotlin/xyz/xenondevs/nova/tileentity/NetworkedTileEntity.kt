@@ -7,7 +7,9 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.reflection.getRuntimeDelegate
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
@@ -22,8 +24,6 @@ import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.BlockFaceUtils
-import xyz.xenondevs.nova.util.getTargetLocation
-import xyz.xenondevs.nova.util.reflection.actualDelegate
 import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import java.util.*
@@ -32,13 +32,14 @@ import kotlin.reflect.KProperty
 
 abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity(blockState), NetworkEndPoint {
     
+    final override var isNetworkInitialized = false
     final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> = HashMap()
     final override val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>> = HashMap()
     final override val holders: MutableMap<NetworkType, EndPointDataHolder> by lazy {
         val map = HashMap<NetworkType, EndPointDataHolder>()
-        if (::energyHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.ENERGY] = energyHolder
-        if (::itemHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.ITEMS] = itemHolder
-        if (::fluidHolder.actualDelegate !is PlaceholderProperty) map[NetworkType.FLUID] = fluidHolder
+        if (::energyHolder.getRuntimeDelegate() !is PlaceholderProperty) map[DefaultNetworkTypes.ENERGY] = energyHolder
+        if (::itemHolder.getRuntimeDelegate() !is PlaceholderProperty) map[DefaultNetworkTypes.ITEMS] = itemHolder
+        if (::fluidHolder.getRuntimeDelegate() !is PlaceholderProperty) map[DefaultNetworkTypes.FLUID] = fluidHolder
         return@lazy map
     }
     
@@ -58,21 +59,17 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     override fun saveData() {
         super.saveData()
         holders.values.forEach(EndPointDataHolder::saveData)
-        storeData("networks", serializeNetworks())
-        storeData("connectedNodes", serializeConnectedNodes())
+        serializeNetworks()
+        serializeConnectedNodes()
     }
     
     override fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? {
         return retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
     }
     
-    override fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>? {
-        return retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
-    }
-    
     final override fun handleRightClick(ctx: BlockInteractContext): Boolean {
         val item = ctx.item
-        val holder = holders[NetworkType.FLUID]
+        val holder = holders[DefaultNetworkTypes.FLUID]
         if (holder is NovaFluidHolder && ctx.source is Player && ctx.hand != null) {
             val success = when (item?.type) {
                 Material.BUCKET -> fillBucket(holder, ctx.source, ctx.hand)
@@ -104,8 +101,7 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     
     private fun fillBucket(holder: NovaFluidHolder, player: Player, hand: EquipmentSlot): Boolean {
         val inventory = player.inventory
-        val targetLocation = player.eyeLocation.getTargetLocation(0.25, 8.0)
-        val face = BlockFaceUtils.determineBlockFace(location.block, targetLocation)
+        val face = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation)
         
         val container = holder.containerConfig[face]
             ?.takeUnless { holder.connectionConfig[face] != NetworkConnectionType.NONE || it.amount < 1000 || !holder.allowedConnectionTypes[it]!!.extract }
@@ -147,7 +143,7 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
         
         if (!unload) {
             NetworkManager.queueAsync { it.removeEndPoint(this, true) }
-            val itemHolder = holders[NetworkType.ITEMS]
+            val itemHolder = holders[DefaultNetworkTypes.ITEMS]
             if (itemHolder is ItemHolder) {
                 itemHolder.insertFilters.clear()
                 itemHolder.extractFilters.clear()
@@ -157,7 +153,7 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     
     override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
         val drops = super.getDrops(includeSelf)
-        val itemHolder = holders[NetworkType.ITEMS]
+        val itemHolder = holders[DefaultNetworkTypes.ITEMS]
         if (itemHolder is ItemHolder)
             drops += (itemHolder.insertFilters.values.asSequence() + itemHolder.extractFilters.values.asSequence())
                 .map(ItemFilter::createFilterItem)

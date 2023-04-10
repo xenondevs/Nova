@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.api.tileentity.TileEntity
 import xyz.xenondevs.nova.integration.InternalIntegration
 import xyz.xenondevs.nova.integration.protection.FakeOnlinePlayer
 
-object Residence : ProtectionIntegration, InternalIntegration {
+internal object Residence : ProtectionIntegration, InternalIntegration {
     
     private val RESIDENCE = if (Bukkit.getPluginManager().getPlugin("Residence") != null) Residence.getInstance() else null
     override val isInstalled = RESIDENCE != null
@@ -41,11 +41,11 @@ object Residence : ProtectionIntegration, InternalIntegration {
     }
     
     override fun canBreak(tileEntity: TileEntity, item: ItemStack?, location: Location): Boolean {
-        return getResidencePlayer(tileEntity.owner, location).canBreakBlock(location.block, false)
+        return getResidencePlayer(tileEntity.owner!!, location).canBreakBlock(location.block, false)
     }
     
     override fun canPlace(tileEntity: TileEntity, item: ItemStack, location: Location): Boolean {
-        return getResidencePlayer(tileEntity.owner, location).canPlaceBlock(location.block, false)
+        return getResidencePlayer(tileEntity.owner!!, location).canPlaceBlock(location.block, false)
     }
     
     override fun canUseBlock(tileEntity: TileEntity, item: ItemStack?, location: Location): Boolean {
@@ -61,7 +61,7 @@ object Residence : ProtectionIntegration, InternalIntegration {
     }
     
     override fun canHurtEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): Boolean {
-        return getResidencePlayer(tileEntity.owner, entity.location).canDamageEntity(entity, false)
+        return getResidencePlayer(tileEntity.owner!!, entity.location).canDamageEntity(entity, false)
     }
     
     private fun getResidencePlayer(player: OfflinePlayer, location: Location) =

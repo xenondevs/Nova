@@ -2,11 +2,45 @@ package xyz.xenondevs.nova.item.vanilla
 
 enum class HideableFlag {
     
+    /**
+     * Hides enchantments.
+     */
     ENCHANTMENTS,
+    
+    /**
+     * Hides attribute modifiers like damage or attack speed.
+     */
     MODIFIERS,
+    
+    /**
+     * Hides the unbreakable state.
+     */
     UNBREAKABLE,
+    
+    /**
+     * Hides which blocks an item can destroy.
+     */
     CAN_DESTROY,
-    CAN_PLACE;
+    
+    /**
+     * Hides where this block can be placed on.
+     */
+    CAN_PLACE,
+    
+    /**
+     * Hides additional information like potion effects, book and firework information, map tooltips,
+     * patterns of banners, and enchantments of enchanted books.
+     */
+    ADDITIONAL,
+    
+    /**
+     * Hides leather armor dye color.
+     */
+    DYE;
+    
+    val mask: Int = 1 shl ordinal
+    
+    fun isHidden(flags: Int): Boolean = flags and mask != 0
     
     companion object {
         

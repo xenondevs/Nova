@@ -1,14 +1,13 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.type.PistonHead
 import org.bukkit.block.data.type.TechnicalPiston
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
@@ -21,15 +20,14 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
         val material = block.type
         val mainMaterial = getMainMaterial(block)
         
-        val translate = TranslatableComponent(mainMaterial.localizedName ?: "block.minecraft.${mainMaterial.name.lowercase()}")
-        translate.color = ChatColor.WHITE
+        val translate = mainMaterial.localizedName ?: "block.minecraft.${mainMaterial.name.lowercase()}"
         
         val lines = ArrayList<WailaLine>()
-        lines += WailaLine(ComponentBuilder().append(translate).color(ChatColor.WHITE).create(), WailaLine.Alignment.CENTERED)
-        lines += WailaLine(ComponentBuilder("minecraft:${material.name.lowercase()}").color(ChatColor.DARK_GRAY).create(), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(Component.translatable(translate), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(Component.text("minecraft:${material.name.lowercase()}", NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
         lines += ToolLine.getToolLine(player, block)
         
-        return WailaInfo(NamespacedId("minecraft", mainMaterial.name.lowercase()), lines)
+        return WailaInfo(ResourceLocation("minecraft", mainMaterial.name.lowercase()), lines)
     }
     
     private fun getMainMaterial(block: Block): Material {
@@ -54,6 +52,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
             Material.CRIMSON_WALL_SIGN -> Material.CRIMSON_SIGN
             Material.WARPED_WALL_SIGN -> Material.WARPED_SIGN
             Material.BAMBOO_WALL_SIGN -> Material.BAMBOO_SIGN
+            Material.CHERRY_WALL_SIGN -> Material.CHERRY_SIGN
             Material.OAK_WALL_HANGING_SIGN -> Material.OAK_HANGING_SIGN
             Material.SPRUCE_WALL_HANGING_SIGN -> Material.SPRUCE_HANGING_SIGN
             Material.BIRCH_WALL_HANGING_SIGN -> Material.BIRCH_HANGING_SIGN
@@ -64,6 +63,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
             Material.CRIMSON_WALL_HANGING_SIGN -> Material.CRIMSON_HANGING_SIGN
             Material.WARPED_WALL_HANGING_SIGN -> Material.WARPED_HANGING_SIGN
             Material.BAMBOO_WALL_HANGING_SIGN -> Material.BAMBOO_HANGING_SIGN
+            Material.CHERRY_WALL_HANGING_SIGN -> Material.CHERRY_HANGING_SIGN
             
             // plant
             Material.WEEPING_VINES_PLANT -> Material.WEEPING_VINES

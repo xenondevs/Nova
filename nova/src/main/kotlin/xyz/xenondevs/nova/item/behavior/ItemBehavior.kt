@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.item.behavior
 
-import de.studiocode.invui.item.builder.ItemBuilder
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -12,19 +11,23 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
-import xyz.xenondevs.nova.data.provider.Provider
-import xyz.xenondevs.nova.data.provider.provider
-import xyz.xenondevs.nova.item.PacketItemData
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.material.ItemNovaMaterial
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
+import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 
 abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     
-    open val vanillaMaterialProperties: Provider<List<VanillaMaterialProperty>> = provider(emptyList())
-    open val attributeModifiers: Provider<List<AttributeModifier>> = provider(emptyList())
+    lateinit var item: NovaItem
+        internal set
+    
+    open fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> = emptyList()
+    open fun getAttributeModifiers(): List<AttributeModifier> = emptyList()
     
     open fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) = Unit
     open fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
@@ -36,20 +39,31 @@ abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     open fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     open fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     open fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
+    open fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
     open fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
     
     open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
-    open fun updatePacketItemData(itemStack: ItemStack, itemData: PacketItemData) = Unit
+    open fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) = Unit
     
-    final override fun get(material: ItemNovaMaterial): ItemBehavior = this
+    final override fun get(item: NovaItem): ItemBehavior {
+        setMaterial(item)
+        return this
+    }
+    
+    internal fun setMaterial(item: NovaItem) {
+        if (this::item.isInitialized)
+            throw IllegalStateException("The same item behavior instance cannot be used for multiple materials")
+        
+        this.item = item
+    }
     
 }
 
 abstract class ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder<T>() {
-    internal abstract fun create(material: ItemNovaMaterial): T
-    final override fun get(material: ItemNovaMaterial) = create(material)
+    abstract fun create(item: NovaItem): T
+    final override fun get(item: NovaItem) = create(item).apply { setMaterial(item) }
 }
 
 abstract class ItemBehaviorHolder<T : ItemBehavior> internal constructor() {
-    internal abstract fun get(material: ItemNovaMaterial): T
+    internal abstract fun get(item: NovaItem): T
 }

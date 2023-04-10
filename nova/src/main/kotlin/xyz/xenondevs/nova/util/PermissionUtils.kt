@@ -51,7 +51,7 @@ object PermissionUtils {
         
         if (permissionMap.containsKey(permission)) {
             return permissionMap[permission] ?: false
-        } else if (minecraftServer.serverThread != Thread.currentThread()) {
+        } else if (MINECRAFT_SERVER.serverThread != Thread.currentThread()) {
             val result = PERMISSIONS.playerHas(world.name, player, permission)
             permissionMap[permission] = result
             return result

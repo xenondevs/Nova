@@ -1,5 +1,8 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package xyz.xenondevs.nova.player.attachment
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -15,11 +18,13 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetPassengers
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.registry.NovaRegistries.ATTACHMENT_TYPE
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -27,22 +32,25 @@ import kotlin.collections.set
 
 private val ATTACHMENTS_KEY = NamespacedKey(NOVA, "attachments1")
 
-object AttachmentManager : Initializable(), Listener {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class]
+)
+object AttachmentManager :  Listener {
     
     private val activeAttachments = HashMap<Player, HashMap<AttachmentType<*>, Attachment>>()
-    private val inactiveAttachments = HashMap<Player, HashSet<NamespacedId>>()
+    private val inactiveAttachments = HashMap<Player, HashSet<ResourceLocation>>()
     
-    override fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
         PacketEventManager.registerListener(this)
         Bukkit.getOnlinePlayers().forEach(::loadAttachments)
         runTaskTimer(0, 1) { activeAttachments.values.flatMap(Map<*, Attachment>::values).forEach(Attachment::handleTick) }
     }
     
-    override fun disable() {
+    @DisableFun
+    private fun disable() {
         LOGGER.info("Saving attachments")
         Bukkit.getOnlinePlayers().forEach { saveAndRemoveAttachments(it) }
     }
@@ -51,13 +59,17 @@ object AttachmentManager : Initializable(), Listener {
         check(!player.isDead) { "Attachments cannot be added to dead players" }
         
         val attachmentsMap = activeAttachments.getOrPut(player, ::HashMap)
-        check(type !in attachmentsMap) { "An attachment with that type is already active" }
+        if (type in attachmentsMap)
+            return attachmentsMap[type] as A
         
         val attachment = type.constructor(player)
         attachmentsMap[type] = attachment
         
         return attachment
     }
+    
+    fun hasAttachment(player: Player, type: AttachmentType<*>): Boolean =
+        activeAttachments[player]?.contains(type) ?: false || inactiveAttachments[player]?.contains(type.id) ?: false
     
     fun removeAttachment(player: Player, type: AttachmentType<*>) {
         val inactiveAttachmentsMap = inactiveAttachments[player]
@@ -122,9 +134,9 @@ object AttachmentManager : Initializable(), Listener {
         inactiveAttachments -= player
     }
     
-    private fun activateAttachments(player: Player, attachmentIds: Set<NamespacedId>) {
+    private fun activateAttachments(player: Player, attachmentIds: Set<ResourceLocation>) {
         attachmentIds.forEach {
-            val type = AttachmentTypeRegistry.of<AttachmentType<*>>(it)
+            val type = ATTACHMENT_TYPE[it]
             if (type != null) {
                 addAttachment(player, type)
             } else LOGGER.severe("Unknown attachment type $it on player ${player.name}")
@@ -133,7 +145,7 @@ object AttachmentManager : Initializable(), Listener {
     
     private fun loadAttachments(player: Player) {
         val attachmentIds = player.persistentDataContainer
-            .get<HashSet<NamespacedId>>(ATTACHMENTS_KEY)
+            .get<HashSet<ResourceLocation>>(ATTACHMENTS_KEY)
             ?: return
         
         if (player.isDead) {
@@ -145,7 +157,7 @@ object AttachmentManager : Initializable(), Listener {
     
     private fun saveAttachments(player: Player) {
         val dataContainer = player.persistentDataContainer
-        val attachmentIds = HashSet<NamespacedId>()
+        val attachmentIds = HashSet<ResourceLocation>()
         activeAttachments[player]?.forEach { attachmentIds += it.key.id }
         inactiveAttachments[player]?.let { attachmentIds += it }
         if (attachmentIds.isNotEmpty()) {

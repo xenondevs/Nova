@@ -7,17 +7,17 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.WorldLoadEvent
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.PreVarIntConverter
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.VersionRange
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.removeIf
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -27,16 +27,15 @@ import java.util.logging.Level
 
 private val WORLD_VERSION_KEY = NamespacedKey(NOVA, "regionVersion")
 
-internal object LegacyFileConverter : Initializable(), Listener {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer, VanillaTileEntityManager)
-    
+@InternalInit(stage = InitializationStage.POST_WORLD, dependsOn = [AddonsInitializer::class, VanillaTileEntityManager::class])
+internal object LegacyFileConverter : Listener {
+
     private val converters = TreeMap<VersionRange, VersionConverter>()
     
     private val futures: MutableMap<World, CompletableFuture<Unit>> = Collections.synchronizedMap(HashMap())
     
-    override fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
         registerConverters()
         LOGGER.info("Running legacy conversions...")
@@ -45,7 +44,6 @@ internal object LegacyFileConverter : Initializable(), Listener {
     }
     
     private fun registerConverters() {
-        register(Version("0.9")..Version("0.9.11"), PreVarIntConverter)
     }
     
     private fun register(versionRange: VersionRange, converter: VersionConverter) {

@@ -1,9 +1,11 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     kotlin("jvm") version libs.versions.kotlin
-    id("org.jetbrains.dokka") version "1.7.20"
+    id("org.jetbrains.dokka") version libs.versions.dokka
     id("xyz.xenondevs.jar-loader-gradle-plugin")
     `maven-publish`
 }
@@ -21,6 +23,16 @@ dependencies {
 subprojects {
     group = "xyz.xenondevs.nova"
     version = properties["version"] as String
+    
+    // The following excludes the deprecated kotlin-stdlib-jdk8 and kotlin-stdlib-jdk7
+    // Since Kotlin 1.8.0, those are merged into kotlin-stdlib
+    // Due to the way our library loader works, excluding these is required to prevent version conflicts
+    dependencies {
+        configurations.all {
+            exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
+            exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+        }
+    }
     
     repositories {
         mavenLocal()
@@ -41,10 +53,13 @@ subprojects {
         }
     }
     
-    tasks.withType<KotlinCompile>().all {
-        kotlinOptions {
-            jvmTarget = "17"
-            freeCompilerArgs = listOf("-Xjvm-default=all")
+    tasks.withType<KotlinJvmCompile>().all {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.addAll(
+                "-Xjvm-default=all",
+                "-opt-in=kotlin.io.path.ExperimentalPathApi"
+            )
         }
     }
 }

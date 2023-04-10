@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.util.data
 
 import com.google.common.collect.HashBiMap
 import org.bukkit.Bukkit
-import xyz.xenondevs.nova.util.mapToIntArray
+import xyz.xenondevs.commons.collections.mapToIntArray
 import kotlin.math.max
 
 private val RELEASE_STAGES = HashBiMap.create<String, Int>().apply {
@@ -12,33 +12,35 @@ private val RELEASE_STAGES = HashBiMap.create<String, Int>().apply {
     this["snapshot"] = -4
 }
 
-private val VERSION_REGEX = Regex("""^([\d.]*)(-([a-z]*)(\d*))?$""")
+private val VERSION_REGEX = Regex("""^([\d.]+)(?:-(snapshot|alpha|beta|rc)(?:\.?([\d.]+))?)?$""")
 
 class Version : Comparable<Version> {
     
     private val version: IntArray
+    private val stageVersion: IntArray
     
     constructor(vararg version: Int) {
         this.version = version
+        this.stageVersion = intArrayOf()
     }
     
+    @Suppress("RemoveExplicitTypeArguments")
     constructor(version: String) {
         val result = VERSION_REGEX.matchEntire(version.lowercase())
             ?: throw IllegalArgumentException("${version.lowercase()} does not match version regex $VERSION_REGEX")
         
         val ver = result.groupValues[1]
-        val stage = result.groupValues[3].takeUnless(String::isBlank)
-        val stageNum = result.groupValues[4].takeUnless(String::isBlank)
+        val stage = result.groupValues[2].takeUnless(String::isBlank)
+        val stageVer = result.groupValues[3].takeUnless(String::isBlank)
+        
+        this.version = ver.split('.').mapToIntArray { it.toIntOrNull() ?: 0}
         
         if (stage != null) {
-            this.version = buildList<Int> {
-                this += ver.split('.').map(String::toInt)
+            this.stageVersion = buildList<Int> {
                 this += RELEASE_STAGES[stage] ?: throw IllegalArgumentException("Unknown release stage: $stage")
-                this += stageNum?.toInt() ?: 1
+                if (stageVer != null) this += stageVer.split('.').map { it.toIntOrNull() ?: 0 }
             }.toIntArray()
-        } else {
-            this.version = ver.split('.').mapToIntArray { it.toIntOrNull() ?: 0 }
-        }
+        } else this.stageVersion = intArrayOf()
     }
     
     override fun toString(): String =
@@ -47,27 +49,29 @@ class Version : Comparable<Version> {
     fun toString(separator: String = ".", omitZeros: Boolean = false): String {
         val sb = StringBuilder()
         
-        var i = 0
-        while (i <= version.lastIndex) {
-            val v = version[i]
-            if (v < 0) {
-                val stage = RELEASE_STAGES.inverse()[v]
-                if (stage != null) {
-                    if (i > 0)
-                        sb.deleteCharAt(sb.lastIndex)
-                    sb.append("-$stage")
-                    i++
-                    sb.append(version.getOrNull(i) ?: 1)
-                } else sb.append(v)
-            } else sb.append(v)
-            
-            if (i < version.lastIndex) {
-                if (omitZeros && version.copyOfRange(i + 1, version.size).all { it == 0 })
-                    break
-                sb.append(separator)
+        fun isAllZeros(start: Int, array: IntArray) =
+            array.copyOfRange(start, array.size).all { it == 0 }
+        
+        fun appendVersion(start: Int, array: IntArray) {
+            for (i in start..array.lastIndex) {
+                sb.append(array[i])
+                if (i < array.lastIndex) {
+                    if (omitZeros && isAllZeros(i + 1, array))
+                        break
+                    sb.append(separator)
+                }
             }
-            
-            i++
+        }
+        
+        appendVersion(0, version)
+        
+        if (stageVersion.isNotEmpty()) {
+            sb.append("-")
+            sb.append(RELEASE_STAGES.inverse()[stageVersion[0]])
+            if (stageVersion.size > 1 && (!omitZeros || !isAllZeros(1, stageVersion))) {
+                sb.append(".")
+                appendVersion(1, stageVersion)
+            }
         }
         
         return sb.toString()
@@ -82,14 +86,22 @@ class Version : Comparable<Version> {
      * (Example: with ignoreIdx = 2, 1.0.1 and 1.0.2 would be considered equal.)
      */
     fun compareTo(other: Version, ignoreIdx: Int): Int {
-        val size = max(version.size, other.version.size)
+        val compare = compareVersionArray(version, other.version, ignoreIdx)
+        if (compare != 0 || ignoreIdx != -1) // only compare stage version if an exact comparison (ignoreIdx = -1) was requested
+            return compare
+        
+        return compareVersionArray(stageVersion, other.stageVersion, -1)
+    }
+    
+    private fun compareVersionArray(a: IntArray, b: IntArray, ignoreIdx: Int): Int {
+        val size = max(a.size, b.size)
         
         for (i in 0 until size) {
             if (i == ignoreIdx)
                 return 0
             
-            val myPart = version.getOrElse(i) { 0 }
-            val otherPart = other.version.getOrElse(i) { 0 }
+            val myPart = a.getOrElse(i) { 0 }
+            val otherPart = b.getOrElse(i) { 0 }
             
             val compare = myPart.compareTo(otherPart)
             if (compare != 0)

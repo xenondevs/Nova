@@ -3,10 +3,18 @@
 package xyz.xenondevs.nova.util
 
 import com.mojang.datafixers.util.Either
+import com.mojang.serialization.JsonOps
+import com.mojang.serialization.Lifecycle
 import net.minecraft.core.Direction
+import net.minecraft.core.Holder
+import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
+import net.minecraft.core.Registry
 import net.minecraft.core.Rotations
+import net.minecraft.core.WritableRegistry
 import net.minecraft.network.protocol.Packet
+import net.minecraft.resources.RegistryOps
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
@@ -14,6 +22,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.server.players.PlayerList
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
@@ -25,25 +34,37 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.World
+import org.bukkit.attribute.Attribute
+import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.craftbukkit.v1_19_R2.CraftServer
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_19_R2.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer
+import org.bukkit.craftbukkit.v1_19_R3.CraftWorld
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.util.Vector
+import xyz.xenondevs.cbf.adapter.BinaryAdapter
+import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
+import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
+import net.minecraft.world.entity.ai.attributes.Attribute as MojangAttribute
+import net.minecraft.world.entity.ai.attributes.AttributeModifier as MojangAttributeModifier
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.level.block.Block as MojangBlock
@@ -74,8 +95,11 @@ val MojangStack.bukkitMirror: ItemStack
 val Location.blockPos: MojangBlockPos
     get() = MojangBlockPos(blockX, blockY, blockZ)
 
-val BlockPos.nmsPos: MojangBlockPos
-    get() = MojangBlockPos(x, y, z)
+val Location.vec3: Vec3
+    get() = Vec3(x, y, z)
+
+val Vector.vec3: Vec3
+    get() = Vec3(x, y, z)
 
 val MojangBlockPos.vec3: Vec3
     get() = Vec3(x.toDouble(), y.toDouble(), z.toDouble())
@@ -96,7 +120,13 @@ val NamespacedKey.resourceLocation: ResourceLocation
 val ResourceLocation.namespacedKey: NamespacedKey
     get() = NamespacedKey(namespace, path)
 
-val InteractionHand.bukkitSlot: EquipmentSlot
+val ResourceLocation.namespacedId: NamespacedId
+    get() = NamespacedId(namespace, path)
+
+internal val ResourceLocation.name: String
+    get() = path
+
+val InteractionHand.bukkitEquipmentSlot: EquipmentSlot
     get() = when (this) {
         InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
         InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
@@ -109,6 +139,12 @@ val EquipmentSlot.interactionHand: InteractionHand
         else -> throw UnsupportedOperationException()
     }
 
+val InteractionHand.equipmentSlot: EquipmentSlot
+    get() = when (this) {
+        InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
+        InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
+    }
+
 val EquipmentSlot.nmsEquipmentSlot: MojangEquipmentSlot
     get() = when (this) {
         EquipmentSlot.HAND -> MojangEquipmentSlot.MAINHAND
@@ -117,6 +153,16 @@ val EquipmentSlot.nmsEquipmentSlot: MojangEquipmentSlot
         EquipmentSlot.LEGS -> MojangEquipmentSlot.LEGS
         EquipmentSlot.CHEST -> MojangEquipmentSlot.CHEST
         EquipmentSlot.HEAD -> MojangEquipmentSlot.HEAD
+    }
+
+val MojangEquipmentSlot.bukkitEquipmentSlot: EquipmentSlot
+    get() = when (this) {
+        MojangEquipmentSlot.MAINHAND -> EquipmentSlot.HAND
+        MojangEquipmentSlot.OFFHAND -> EquipmentSlot.OFF_HAND
+        MojangEquipmentSlot.FEET -> EquipmentSlot.FEET
+        MojangEquipmentSlot.LEGS -> EquipmentSlot.LEGS
+        MojangEquipmentSlot.CHEST -> EquipmentSlot.CHEST
+        MojangEquipmentSlot.HEAD -> EquipmentSlot.HEAD
     }
 
 val BlockFace.nmsDirection: Direction
@@ -128,6 +174,40 @@ val BlockFace.nmsDirection: Direction
         BlockFace.UP -> Direction.UP
         BlockFace.DOWN -> Direction.DOWN
         else -> throw UnsupportedOperationException()
+    }
+
+val Direction.blockFace: BlockFace
+    get() = when (this) {
+        Direction.NORTH -> BlockFace.NORTH
+        Direction.EAST -> BlockFace.EAST
+        Direction.SOUTH -> BlockFace.SOUTH
+        Direction.WEST -> BlockFace.WEST
+        Direction.UP -> BlockFace.UP
+        Direction.DOWN -> BlockFace.DOWN
+    }
+
+val Attribute.nmsAttribute: MojangAttribute
+    get() = when (this) {
+        Attribute.GENERIC_MAX_HEALTH -> Attributes.MAX_HEALTH
+        Attribute.GENERIC_FOLLOW_RANGE -> Attributes.FOLLOW_RANGE
+        Attribute.GENERIC_KNOCKBACK_RESISTANCE -> Attributes.KNOCKBACK_RESISTANCE
+        Attribute.GENERIC_MOVEMENT_SPEED -> Attributes.MOVEMENT_SPEED
+        Attribute.GENERIC_FLYING_SPEED -> Attributes.FLYING_SPEED
+        Attribute.GENERIC_ATTACK_DAMAGE -> Attributes.ATTACK_DAMAGE
+        Attribute.GENERIC_ATTACK_KNOCKBACK -> Attributes.ATTACK_KNOCKBACK
+        Attribute.GENERIC_ATTACK_SPEED -> Attributes.ATTACK_SPEED
+        Attribute.GENERIC_ARMOR -> Attributes.ARMOR
+        Attribute.GENERIC_ARMOR_TOUGHNESS -> Attributes.ARMOR_TOUGHNESS
+        Attribute.GENERIC_LUCK -> Attributes.LUCK
+        Attribute.HORSE_JUMP_STRENGTH -> Attributes.JUMP_STRENGTH
+        Attribute.ZOMBIE_SPAWN_REINFORCEMENTS -> Attributes.SPAWN_REINFORCEMENTS_CHANCE
+    }
+
+val AttributeModifier.Operation.nmsOperation: MojangAttributeModifier.Operation
+    get() = when (this) {
+        AttributeModifier.Operation.ADD_NUMBER -> MojangAttributeModifier.Operation.ADDITION
+        AttributeModifier.Operation.ADD_SCALAR -> MojangAttributeModifier.Operation.MULTIPLY_BASE
+        AttributeModifier.Operation.MULTIPLY_SCALAR_1 -> MojangAttributeModifier.Operation.MULTIPLY_TOTAL
     }
 
 val Material.nmsBlock: MojangBlock
@@ -147,16 +227,29 @@ fun Player.send(vararg packets: Packet<*>) {
     packets.forEach { connection.send(it) }
 }
 
+fun Player.send(packets: Iterable<Packet<*>>) {
+    val connection = connection
+    packets.forEach { connection.send(it) }
+}
+
+fun Packet<*>.sendTo(vararg players: Player) {
+    players.forEach { it.send(this) }
+}
+
+fun Packet<*>.sendTo(players: Iterable<Player>) {
+    players.forEach { it.send(this) }
+}
+
 fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
     Rotations(x ?: this.x, y ?: this.y, z ?: this.z)
 
 fun Rotations.add(x: Float, y: Float, z: Float) =
     Rotations(this.x + x, this.y + y, this.z + z)
 
-val minecraftServer: DedicatedServer = (Bukkit.getServer() as CraftServer).server
+val MINECRAFT_SERVER: DedicatedServer = (Bukkit.getServer() as CraftServer).server
 
 val serverTick: Int
-    get() = minecraftServer.tickCount
+    get() = MINECRAFT_SERVER.tickCount
 
 @Suppress("FunctionName")
 fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
@@ -242,6 +335,51 @@ fun PlayerList.broadcast(exclude: Player?, location: Location, maxDistance: Doub
 fun PlayerList.broadcast(exclude: Player?, block: Block, maxDistance: Double, packet: Packet<*>) =
     broadcast(exclude?.serverPlayer, block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), maxDistance, block.world.serverLevel.dimension(), packet)
 
+fun <T> Registry<T>.byNameBinaryAdapter(): BinaryAdapter<T> {
+    return RegistryBinaryAdapter(this)
+}
+
+operator fun <T> Registry<T>.get(key: String): T? {
+    return get(ResourceLocation.of(key, ':'))
+}
+
+fun <T> Registry<T>.getOrCreateHolder(id: ResourceLocation): Holder<T> {
+    val key = ResourceKey.create(key(), id)
+    val holder = getHolder(key)
+    
+    if (holder.isPresent)
+        return holder.get()
+    
+    if (this !is MappedRegistry<T>)
+        throw IllegalStateException("Can't create holder for non MappedRegistry ${this.key()}")
+    
+    return this.createRegistrationLookup().getOrThrow(key)
+}
+
+operator fun Registry<*>.contains(key: String): Boolean {
+    return contains(ResourceLocation.of(key, ':'))
+}
+
+internal operator fun <T> WritableRegistry<T>.set(name: String, value: T) {
+    register(ResourceKey.create(key(), ResourceLocation.of(name, ':')), value, Lifecycle.stable())
+}
+
+internal operator fun <T> WritableRegistry<T>.set(id: ResourceLocation, value: T) {
+    register(ResourceKey.create(key(), id), value, Lifecycle.stable())
+}
+
+operator fun <T> WritableRegistry<T>.set(addon: Addon, key: String, value: T) {
+    register(ResourceKey.create(key(), ResourceLocation(addon, key)), value, Lifecycle.stable())
+}
+
+fun ResourceLocation.toString(separator: String): String {
+    return namespace + separator + path
+}
+
+fun ResourceLocation(addon: Addon, name: String): ResourceLocation {
+    return ResourceLocation(addon.description.id, name)
+}
+
 fun preventPacketBroadcast(run: () -> Unit) {
     BroadcastPacketPatch.dropAll = true
     try {
@@ -276,5 +414,26 @@ object NMSUtils {
         true,
         "SRF(net.minecraft.world.entity.Entity ENTITY_COUNTER)"
     ).get(null) as AtomicInteger
+    
+    val REGISTRY_ACCESS = MINECRAFT_SERVER.registryAccess()!!
+    val REGISTRY_OPS = RegistryOps.create(JsonOps.INSTANCE, VanillaRegistryAccess)!!
+    
+    fun freezeRegistry(registry: Registry<*>) {
+        if (registry !is MappedRegistry) return
+        ReflectionRegistry.MAPPED_REGISTRY_FROZEN_FIELD[registry] = true
+    }
+    
+    fun unfreezeRegistry(registry: Registry<*>) {
+        if (registry !is MappedRegistry) return
+        ReflectionRegistry.MAPPED_REGISTRY_FROZEN_FIELD[registry] = false
+    }
+    
+    fun <T, R : Registry<T>> getRegistry(location: ResourceKey<R>) =
+        REGISTRY_ACCESS.registry(location).getOrNull() ?: throw IllegalArgumentException("Registry $location does not exist!")
+    
+    fun <T, R : Registry<T>> getHolder(key: ResourceKey<T>): Holder.Reference<T> {
+        val registry = ResourceKey.createRegistryKey<T>(key.registry())
+        return REGISTRY_ACCESS.registryOrThrow(registry).getHolderOrThrow(key)
+    }
     
 }

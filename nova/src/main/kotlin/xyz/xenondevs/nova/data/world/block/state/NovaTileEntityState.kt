@@ -2,70 +2,56 @@ package xyz.xenondevs.nova.data.world.block.state
 
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.cbf.buffer.ByteBuffer
-import xyz.xenondevs.nova.data.serialization.persistentdata.get
-import xyz.xenondevs.nova.data.serialization.persistentdata.getLegacy
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
-import xyz.xenondevs.nova.material.TileEntityNovaMaterial
+import xyz.xenondevs.cbf.io.ByteBuffer
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.TileEntity.Companion.LEGACY_TILE_ENTITY_KEY
-import xyz.xenondevs.nova.tileentity.TileEntity.Companion.TILE_ENTITY_KEY
 import xyz.xenondevs.nova.tileentity.TileEntityManager
+import xyz.xenondevs.nova.util.UUIDUtils
+import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.*
-import xyz.xenondevs.nova.api.block.NovaTileEntityState as INovaTileEntityState
 
-class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
+class NovaTileEntityState : NovaBlockState {
     
-    override val material: TileEntityNovaMaterial
+    override val block: NovaTileEntityBlock
     
     @Volatile
     lateinit var uuid: UUID
     
     @Volatile
-    lateinit var ownerUUID: UUID
+    var ownerUUID: UUID? = null
     
     @Volatile
     lateinit var data: Compound
     
     @Volatile
-    internal var legacyData: LegacyCompound? = null
-    
-    @Volatile
     private var _tileEntity: TileEntity? = null
-    override var tileEntity: TileEntity
+    var tileEntity: TileEntity
         get() = _tileEntity ?: throw IllegalStateException("TileEntity is not initialized")
         internal set(value) {
             _tileEntity = value
         }
     
-    constructor(pos: BlockPos, material: TileEntityNovaMaterial) : super(pos, material) {
-        this.material = material
+    internal constructor(pos: BlockPos, material: NovaTileEntityBlock) : super(pos, material) {
+        this.block = material
     }
     
-    constructor(material: TileEntityNovaMaterial, ctx: BlockPlaceContext) : super(material, ctx) {
-        this.material = material
+    internal constructor(material: NovaTileEntityBlock, ctx: BlockPlaceContext) : super(material, ctx) {
+        this.block = material
         this.uuid = UUID.randomUUID()
         this.ownerUUID = ctx.ownerUUID
         this.data = Compound()
         
         val item = ctx.item
-        val itemMeta = item.itemMeta!!
-        val dataContainer = itemMeta.persistentDataContainer
-        
-        val legacyGlobalData = dataContainer.getLegacy<LegacyCompound>(LEGACY_TILE_ENTITY_KEY)
-        if (legacyGlobalData != null) {
-            legacyData = LegacyCompound()
-            legacyData!!["global"] = legacyGlobalData
-        } else {
-            val globalData = ctx.item.itemMeta?.persistentDataContainer?.get<Compound>(TILE_ENTITY_KEY)
-            if (globalData != null) data["global"] = globalData
+        val globalData = item.novaCompoundOrNull?.get<Compound>(TileEntity.TILE_ENTITY_DATA_KEY)
+        if (globalData != null) {
+            data["global"] = globalData
         }
     }
     
     override fun handleInitialized(placed: Boolean) {
-        _tileEntity = material.tileEntityConstructor(this)
+        _tileEntity = block.tileEntityConstructor(this)
         tileEntity.handleInitialized(placed)
         
         TileEntityManager.registerTileEntity(this)
@@ -87,14 +73,14 @@ class NovaTileEntityState : NovaBlockState, INovaTileEntityState {
     override fun read(buf: ByteBuffer) {
         super.read(buf)
         uuid = buf.readUUID()
-        ownerUUID = buf.readUUID()
+        ownerUUID = buf.readUUID().takeUnless(UUIDUtils.ZERO::equals)
         data = CBF.read(buf)!!
     }
     
     override fun write(buf: ByteBuffer) {
         super.write(buf)
         buf.writeUUID(uuid)
-        buf.writeUUID(ownerUUID)
+        buf.writeUUID(ownerUUID ?: UUIDUtils.ZERO)
         
         if (_tileEntity != null)
             tileEntity.saveData()

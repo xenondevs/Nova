@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.type.Comparator
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 
@@ -17,8 +17,8 @@ internal object ComparatorWailaInfoProvider : VanillaWailaInfoProvider(setOf(Mat
         return info
     }
     
-    private fun getComparatorIcon(comparator: Comparator): NamespacedId {
-        return NamespacedId(
+    private fun getComparatorIcon(comparator: Comparator): ResourceLocation {
+        return ResourceLocation(
             "minecraft",
             "comparator"
                 + (if (comparator.isPowered) "_on" else "")

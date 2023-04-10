@@ -2,34 +2,89 @@
 
 package xyz.xenondevs.nova.data.resources.builder
 
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.RegisteredMaterial
-import xyz.xenondevs.nova.data.resources.builder.index.GUIsIndexDeserializer
+import xyz.xenondevs.nova.data.resources.builder.index.ArmorIndexDeserializer
+import xyz.xenondevs.nova.data.resources.builder.index.GuisIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.MaterialsIndexDeserializer
-import xyz.xenondevs.nova.util.data.parseJson
-import java.io.File
+import xyz.xenondevs.nova.data.resources.builder.index.MovedFontsIndexDeserializer
+import java.io.InputStream
+import java.nio.file.Path
+import kotlin.io.path.CopyActionResult
+import kotlin.io.path.copyTo
+import kotlin.io.path.copyToRecursively
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.extension
+import kotlin.io.path.inputStream
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.isDirectory
+import kotlin.io.path.outputStream
+import kotlin.io.path.relativeTo
 
-internal class AssetPack(val directory: File, val namespace: String) {
+internal class AssetPack(val namespace: String, val assetsDir: Path) {
     
-    val materialsFile = File(directory, "materials.json")
-    val guisFile = File(directory, "guis.json")
+    val modelsDir: Path? = assetsDir.resolve("models/").takeIf(Path::exists)
+    val texturesDir: Path? = assetsDir.resolve("textures/").takeIf(Path::exists)
+    val fontsDir: Path? = assetsDir.resolve("fonts/").takeIf(Path::exists)
+    val langDir: Path? = assetsDir.resolve("lang/").takeIf(Path::exists)
+    val soundsDir: Path? = assetsDir.resolve("sounds/").takeIf(Path::exists)
+    val soundsFile: Path? = assetsDir.resolve("sounds.json").takeIf(Path::exists)
+    val wailaTexturesDir: Path? = assetsDir.resolve("textures/waila/").takeIf(Path::exists)
+    val atlasesDir: Path? = assetsDir.resolve("atlases/").takeIf(Path::exists)
     
-    // Sub-folders
-    val modelsDir = File(directory, "models").takeIf(File::exists)
-    val texturesDir = File(directory, "textures").takeIf(File::exists)
-    val fontsDir = File(directory, "fonts").takeIf(File::exists)
-    val soundsDir = File(directory, "sounds").takeIf(File::exists)
-    val langDir = File(directory, "lang").takeIf(File::exists)
-    val atlasesDir = File(directory, "atlases").takeIf(File::exists)
-    val wailaTexturesDir = File(texturesDir, "waila").takeIf(File::exists)
-    val soundsFile = File(directory, "sounds.json").takeIf(File::exists)
+    val materialsIndex: List<RegisteredMaterial>? = assetsDir.resolve("materials.json")
+        .takeIf(Path::exists)
+        ?.let { MaterialsIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
-    val materialsIndex: List<RegisteredMaterial>? = if (materialsFile.exists())
-        MaterialsIndexDeserializer.deserialize(namespace, materialsFile.parseJson())
-    else null
+    val guisIndex: Map<String, ResourcePath>? = assetsDir.resolve("guis.json")
+        .takeIf(Path::exists)
+        ?.let { GuisIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
-    val guisIndex: Map<String, ResourcePath>? = if (guisFile.exists())
-        GUIsIndexDeserializer.deserialize(namespace, guisFile.parseJson())
-    else null
+    val armorIndex: List<RegisteredArmor>? = assetsDir.resolve("armor.json")
+        .takeIf(Path::exists)
+        ?.let { ArmorIndexDeserializer.deserialize(namespace, it.parseJson()) }
+    
+    val movedFontsIndex: Map<ResourcePath, Set<Int>>? = assetsDir.resolve("moved_fonts.json")
+        .takeIf(Path::exists)
+        ?.let { MovedFontsIndexDeserializer.deserialize(namespace, it.parseJson()) }
+    
+    fun getInputStream(path: String): InputStream? =
+        assetsDir.resolve(path).takeIf(Path::exists)?.inputStream()
+    
+    fun extract(namespaceDir: Path, fileFilter: (String) -> Boolean) {
+        fun extractDir(sourceDir: Path, dirName: String) {
+            sourceDir.copyToRecursively(
+                target = namespaceDir.resolve("$dirName/"),
+                followLinks = false,
+            ) { source, target ->
+                if (source.isDirectory())
+                    return@copyToRecursively CopyActionResult.CONTINUE
+                
+                val relPath = source.relativeTo(sourceDir).invariantSeparatorsPathString
+                if (!fileFilter(relPath))
+                    return@copyToRecursively CopyActionResult.SKIP_SUBTREE
+                
+                source.inputStream().use { ins ->
+                    target.parent.createDirectories()
+                    target.outputStream().use { out ->
+                        if (source.extension.equals("png", true))
+                            PNGMetadataRemover.remove(ins, out)
+                        else ins.transferTo(out)
+                    }
+                }
+                
+                return@copyToRecursively CopyActionResult.CONTINUE
+            }
+        }
+        
+        texturesDir?.let { extractDir(it, "textures") }
+        modelsDir?.let { extractDir(it, "models") }
+        fontsDir?.let { extractDir(it, "font") }
+        soundsDir?.let { extractDir(it, "sounds") }
+        soundsFile?.copyTo(namespaceDir.resolve("sounds.json"))
+    }
     
 }

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.util
 
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
@@ -14,7 +14,7 @@ import xyz.xenondevs.nmsutils.advancement.advancement
 import xyz.xenondevs.nmsutils.advancement.predicate.ItemPredicate
 import xyz.xenondevs.nmsutils.advancement.predicate.NbtPredicate
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.item.NovaItem
 
 fun ItemPredicate.Builder.nbt(compound: CompoundTag) {
     nbt(NbtPredicate(compound))
@@ -26,11 +26,11 @@ fun ItemPredicate.Builder.nbt(init: CompoundTag.() -> Unit) {
     nbt(tag)
 }
 
-fun Display.Builder.icon(icon: ItemNovaMaterial) {
+fun Display.Builder.icon(icon: NovaItem) {
     icon(icon.clientsideProvider.get())
 }
 
-fun CriteriaBuilder.obtainNovaItem(item: ItemNovaMaterial): Criterion {
+fun CriteriaBuilder.obtainNovaItem(item: NovaItem): Criterion {
     return inventoryChanged("obtain_${item.id}") {
         item {
             nbt {
@@ -48,7 +48,7 @@ fun advancement(addon: Addon, name: String, init: Advancement.Builder.() -> Unit
 fun obtainNovaItemAdvancement(
     addon: Addon,
     parent: Advancement?,
-    item: ItemNovaMaterial,
+    item: NovaItem,
     frameType: FrameType = FrameType.TASK
 ): Advancement {
     require(addon.description.id == item.id.namespace) { "The specified item is from a different addon" }
@@ -60,8 +60,8 @@ fun obtainNovaItemAdvancement(
         display {
             icon(item.clientsideProvider.get())
             frame(frameType)
-            title(TranslatableComponent("advancement.${id.namespace}.${id.name}.title"))
-            description(TranslatableComponent("advancement.${id.namespace}.${id.name}.description"))
+            title(Component.translatable("advancement.${id.namespace}.${id.name}.title"))
+            description(Component.translatable("advancement.${id.namespace}.${id.name}.description"))
         }
         
         criteria { obtainNovaItem(item) }
@@ -72,7 +72,7 @@ fun obtainNovaItemsAdvancement(
     addon: Addon,
     name: String,
     parent: Advancement?,
-    items: List<ItemNovaMaterial>, requireAll: Boolean,
+    items: List<NovaItem>, requireAll: Boolean,
     frameType: FrameType = FrameType.TASK
 ): Advancement {
     require(items.all { it.id.namespace == addon.description.id }) { "At least one of the specified items is from a different addon" }
@@ -84,8 +84,8 @@ fun obtainNovaItemsAdvancement(
         display {
             icon(items[0].clientsideProvider.get())
             frame(frameType)
-            title(TranslatableComponent("advancement.$namespace.$name.title"))
-            description(TranslatableComponent("advancement.$namespace.$name.description"))
+            title(Component.translatable("advancement.$namespace.$name.title"))
+            description(Component.translatable("advancement.$namespace.$name.description"))
         }
         
         val criteria = ArrayList<Criterion>()

@@ -1,38 +1,20 @@
 package xyz.xenondevs.nova.tileentity.network.item
 
-import org.bukkit.NamespacedKey
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.serialization.persistentdata.get
-import xyz.xenondevs.nova.data.serialization.persistentdata.getLegacy
-import xyz.xenondevs.nova.data.serialization.persistentdata.set
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.tileentity.network.item.ItemFilter.Companion.ITEM_FILTER_KEY
+import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.util.item.retrieveData
+import xyz.xenondevs.nova.util.item.storeData
 
-private val LEGACY_ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter")
-private val ITEM_FILTER_KEY = NamespacedKey(NOVA, "itemFilter1")
+fun ItemStack.getFilterConfigOrNull(): ItemFilter? =
+    retrieveData(ITEM_FILTER_KEY)
 
-fun ItemStack.getFilterConfigOrNull(): ItemFilter? {
-    val itemMeta = itemMeta!!
-    val container = itemMeta.persistentDataContainer
-    
-    val legacyFilter = container.getLegacy<ItemFilter>(LEGACY_ITEM_FILTER_KEY)
-    if (legacyFilter != null) {
-        container.remove(LEGACY_ITEM_FILTER_KEY)
-        setItemMeta(itemMeta)
-        saveFilterConfig(legacyFilter)
-        return legacyFilter
-    }
-    
-    return container.get(ITEM_FILTER_KEY)
-}
+fun ItemStack.getOrCreateFilterConfig(size: Int): ItemFilter =
+    getFilterConfigOrNull() ?: ItemFilter(size)
 
-fun ItemStack.getOrCreateFilterConfig(size: Int): ItemFilter = getFilterConfigOrNull() ?: ItemFilter(size)
-
-fun ItemStack.saveFilterConfig(itemFilter: ItemFilter) {
-    val itemMeta = itemMeta!!
-    itemMeta.persistentDataContainer.set(ITEM_FILTER_KEY, itemFilter)
-    setItemMeta(itemMeta)
-}
+fun ItemStack.saveFilterConfig(itemFilter: ItemFilter): Unit =
+    storeData(ITEM_FILTER_KEY, itemFilter)
 
 class ItemFilter(
     var whitelist: Boolean,
@@ -50,8 +32,8 @@ class ItemFilter(
     
     private fun ItemStack.checkFilterSimilarity(other: ItemStack): Boolean {
         return if (!nbt) {
-            val novaMaterial = novaMaterial
-            if (novaMaterial != null) novaMaterial == other.novaMaterial
+            val novaItem = novaItem
+            if (novaItem != null) novaItem == other.novaItem
             else type == other.type
         } else isSimilar(other)
     }
@@ -61,6 +43,7 @@ class ItemFilter(
     }
     
     companion object {
+        val ITEM_FILTER_KEY = ResourceLocation("nova", "itemfilter1")
         lateinit var creatorFun: (ItemFilter) -> ItemStack
     }
     

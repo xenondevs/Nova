@@ -25,6 +25,12 @@ fun String.capitalizeAll(): String {
 
 fun String.insert(offset: Int, charSequence: CharSequence) = StringBuilder(this).insert(offset, charSequence).toString()
 
+fun String.insertAfter(char: Char, charSequence: CharSequence, ignoreCase: Boolean = false) =
+    insert(indexOf(char, ignoreCase = ignoreCase) + 1, charSequence)
+
+fun String.insertAfterLast(char: Char, charSequence: CharSequence, ignoreCase: Boolean = false) =
+    insert(lastIndexOf(char, ignoreCase = ignoreCase) + 1, charSequence)
+
 fun String.Companion.formatSafely(format: String, vararg args: Any?): String {
     return try {
         String.format(format, *args)
@@ -52,6 +58,12 @@ fun String.removeNamespace(namespace: String): String =
 fun String.startsWithAny(vararg prefixes: String): Boolean {
     for (prefix in prefixes)
         if (startsWith(prefix)) return true
+    return false
+}
+
+fun String.equalsAny(vararg strings: String, ignoreCase: Boolean = false): Boolean {
+    for (string in strings)
+        if (equals(string, ignoreCase)) return true
     return false
 }
 

@@ -1,21 +1,28 @@
+@file:Suppress("MemberVisibilityCanBePrivate", "DEPRECATION", "UNCHECKED_CAST")
+
 package xyz.xenondevs.nova.util.item
 
 import com.mojang.brigadier.StringReader
-import de.studiocode.invui.item.builder.ItemBuilder
 import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
-import net.minecraft.world.item.Items
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
+import net.minecraft.world.item.ArmorItem
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Tag
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.meta.ItemMeta
-import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.ComplexTest
 import xyz.xenondevs.nova.data.recipe.CustomRecipeChoice
@@ -23,24 +30,40 @@ import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.data.recipe.NovaIdTest
 import xyz.xenondevs.nova.data.recipe.NovaNameTest
 import xyz.xenondevs.nova.data.recipe.TagTest
+import xyz.xenondevs.nova.data.serialization.cbf.CBFCompoundTag
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
-import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.material.NovaMaterialRegistry
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.behavior.Wearable
+import xyz.xenondevs.nova.item.vanilla.AttributeModifier
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.bukkitMirror
+import xyz.xenondevs.nova.util.data.getCBFCompoundTag
+import xyz.xenondevs.nova.util.data.getOrPutCBFCompoundTag
+import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.name
+import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import java.util.logging.Level
+import kotlin.collections.set
 import net.minecraft.nbt.Tag as NBTTag
+import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.item.ItemStack as MojangStack
 
-val ItemStack.novaMaterial: ItemNovaMaterial?
+val ItemStack.novaItem: NovaItem?
     get() = (itemMeta?.unhandledTags?.get("nova") as? CompoundTag)
         ?.getString("id")
-        ?.let(NovaMaterialRegistry::getOrNull)
+        ?.let(NovaRegistries.ITEM::get)
 
-val MojangStack.novaMaterial: ItemNovaMaterial?
+val MojangStack.novaItem: NovaItem?
     get() = tag?.getCompound("nova")
         ?.getString("id")
-        ?.let(NovaMaterialRegistry::getOrNull)
+        ?.let(NovaRegistries.ITEM::get)
+
+val ItemStack.novaMaxStackSize: Int
+    get() = novaItem?.maxStackSize ?: type.maxStackSize
 
 val ItemStack.customModelData: Int
     get() {
@@ -63,7 +86,7 @@ val ItemStack.displayName: String?
     }
 
 val ItemStack.localizedName: String?
-    get() = novaMaterial?.localizedName ?: type.localizedName
+    get() = novaItem?.localizedName ?: type.localizedName
 
 val ItemStack.namelessCopyOrSelf: ItemStack
     get() {
@@ -79,17 +102,31 @@ val ItemStack.namelessCopyOrSelf: ItemStack
         return itemStack
     }
 
-val ItemStack.novaMaxStackSize: Int
-    get() = novaMaterial?.maxStackSize ?: type.maxStackSize
-
-@Suppress("UNCHECKED_CAST")
 val ItemMeta.unhandledTags: MutableMap<String, NBTTag>
     get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, NBTTag>
 
 val ItemStack.canDestroy: List<Material>
     get() {
         val tag = itemMeta?.unhandledTags?.get("CanDestroy") as? ListTag ?: return emptyList()
-        return tag.mapNotNull { runCatching { NamespacedId.of(it.asString) }.getOrNull()?.let { Material.valueOf(it.name) } }
+        return tag.mapNotNull { runCatching { ResourceLocation.of(it.asString, ':') }.getOrNull()?.let { Material.valueOf(it.name) } }
+    }
+
+val ItemStack.craftingRemainingItem: ItemStack?
+    get() {
+        val novaItem = novaItem
+        if (novaItem != null)
+            return novaItem.craftingRemainingItem?.get()
+        
+        return type.craftingRemainingItem?.let(::ItemStack)
+    }
+
+val ItemStack.equipSound: String?
+    get() {
+        val novaItem = novaItem
+        if (novaItem != null)
+            return novaItem.getBehavior(Wearable::class)?.options?.equipSound
+        
+        return (CraftMagicNumbers.getItem(type) as? ArmorItem)?.material?.equipSound?.location?.toString()
     }
 
 fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
@@ -99,73 +136,158 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
     return first.isSimilar(second)
 }
 
+fun ItemStack.takeUnlessEmpty(): ItemStack? =
+    if (type.isAir || amount <= 0) null else this
+
+//<editor-fold desc="nova item data storage", defaultstate="collapsed">
+
+//<editor-fold desc="BukkitStack - Nova Compound", defaultstate="collapsed">
+var ItemStack.novaCompound: NamespacedCompound
+    get() {
+        val unhandledTags = itemMeta!!.unhandledTags
+        val tag = unhandledTags.getOrPutCBFCompoundTag("nova_cbf", ::CBFCompoundTag) as? CBFCompoundTag
+        return tag!!.compound
+    }
+    set(value) {
+        itemMeta!!.unhandledTags["nova_cbf"] = CBFCompoundTag(value)
+    }
+
+val ItemStack.novaCompoundOrNull: NamespacedCompound?
+    get() = itemMeta?.unhandledTags?.getCBFCompoundTag("nova_cbf")?.compound
+//</editor-fold>
+
+//<editor-fold desc="MojangStack - Nova Compound", defaultstate="collapsed">
+var MojangStack.novaCompound: NamespacedCompound
+    get() = orCreateTag.getOrPutCBFCompoundTag("nova_cbf", ::CBFCompoundTag).compound
+    set(value) {
+        orCreateTag.put("nova_cbf", CBFCompoundTag(value))
+    }
+
+val MojangStack.novaCompoundOrNull: NamespacedCompound?
+    get() = tag?.getCBFCompoundTag("nova_cbf")?.compound
+//</editor-fold>
+
+//<editor-fold desc="BukkitStack - retrieve", defaultstate="collapsed">
+inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, key: String): T? {
+    // TODO: Remove legacy support at some point
+    //<editor-fold desc="legacy support", defaultstate="collapsed">
+    val itemMeta = itemMeta
+    val dataContainer = itemMeta?.persistentDataContainer
+    if (dataContainer != null) {
+        val namespacedKey = NamespacedKey(namespace, key)
+        val value = dataContainer.get<T>(namespacedKey)
+        if (value != null) {
+            dataContainer.remove(namespacedKey)
+            storeData(namespace, key, value)
+            return value
+        }
+        
+        this.itemMeta = itemMeta
+    }
+    //</editor-fold>
+    
+    return novaCompoundOrNull?.get(namespace, key)
+}
+
+inline fun <reified T : Any> ItemStack.retrieveData(key: NamespacedKey): T? {
+    return retrieveData(key.namespace, key.key)
+}
+
+inline fun <reified T : Any> ItemStack.retrieveData(id: ResourceLocation): T? {
+    return retrieveData(id.namespace, id.path)
+}
+
+inline fun <reified T : Any> ItemStack.retrieveData(addon: Addon, key: String): T? {
+    return retrieveData(addon.description.id, key)
+}
+//</editor-fold>
+
+//<editor-fold desc="BukkitStack - store", defaultstate="collapsed">
+inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String, data: T?) {
+    // TODO: Remove legacy support at some point
+    //<editor-fold desc="legacy support", defaultstate="collapsed">
+    val itemMeta = itemMeta
+    val dataContainer = itemMeta?.persistentDataContainer
+    if (dataContainer != null) {
+        dataContainer.remove(NamespacedKey(namespace, key))
+        this.itemMeta = itemMeta
+    }
+    //</editor-fold>
+    
+    novaCompound[namespace, key] = data
+}
+
+inline fun <reified T : Any> ItemStack.storeData(key: NamespacedKey, data: T?) {
+    storeData(key.namespace, key.key, data)
+}
+
+inline fun <reified T : Any> ItemStack.storeData(id: ResourceLocation, data: T?) {
+    storeData(id.namespace, id.path, data)
+}
+
+inline fun <reified T : Any> ItemStack.storeData(addon: Addon, key: String, data: T?) {
+    storeData(addon.description.id, key, data)
+}
+//</editor-fold>
+
+//<editor-fold desc="MojangStack - retrieve", defaultstate="collapsed">
+inline fun <reified T : Any> MojangStack.retrieveData(namespace: String, key: String): T? {
+    // TODO: Remove legacy support at some point
+    // For legacy support, we convert the MojangStack to a Bukkit ItemStack to access the persistent data container
+    return bukkitMirror.retrieveData(namespace, key)
+}
+
+inline fun <reified T : Any> MojangStack.retrieveData(key: NamespacedKey): T? {
+    return retrieveData(key.namespace, key.key)
+}
+
+inline fun <reified T : Any> MojangStack.retrieveData(id: ResourceLocation): T? {
+    return retrieveData(id.namespace, id.path)
+}
+
+inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String): T? {
+    return retrieveData(addon.description.id, key)
+}
+//</editor-fold>
+
+//<editor-fold desc="MojangStack - store", defaultstate="collapsed">
+@PublishedApi
+internal inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: String, data: T?) {
+    // TODO: Remove legacy support at some point
+    // For legacy support, we convert the MojangStack to a Bukkit ItemStack to access the persistent data container
+    bukkitMirror.storeData(namespace, key, data)
+}
+
+inline fun <reified T : Any> MojangStack.storeData(key: NamespacedKey, data: T?) {
+    storeData(key.namespace, key.key, data)
+}
+
+inline fun <reified T : Any> MojangStack.storeData(id: ResourceLocation, data: T?) {
+    storeData(id.namespace, id.path, data)
+}
+
+inline fun <reified T : Any> MojangStack.storeData(addon: Addon, key: String, data: T?) {
+    storeData(addon.description.id, key, data)
+}
+//</editor-fold>
+
+//</editor-fold>
+
+//<editor-fold desc="deprecated", defaultstate="collapsed">
+@Deprecated("Replaced by ItemStack.takeUnlessEmpty", ReplaceWith("takeUnlessEmpty()"))
 fun ItemStack.takeUnlessAir(): ItemStack? =
     if (type.isAir) null else this
-
-inline fun <reified K> ItemStack.retrieveData(key: NamespacedKey, getAlternative: () -> K): K {
-    val persistentDataContainer = itemMeta?.persistentDataContainer ?: return getAlternative()
-    return if (persistentDataContainer.has(key, PersistentDataType.BYTE_ARRAY)) persistentDataContainer.get(key)!! else getAlternative();
-}
-
-inline fun <reified K> ItemStack.retrieveDataOrNull(key: NamespacedKey): K? {
-    return itemMeta?.persistentDataContainer?.get(key)
-}
-
-fun <T> ItemStack.retrieveDataOrNull(key: NamespacedKey, persistentDataType: PersistentDataType<*, T>): T? {
-    return itemMeta?.persistentDataContainer?.get(key, persistentDataType)
-}
-
-inline fun <reified T> ItemStack.storeData(key: NamespacedKey, data: T?) {
-    val itemMeta = itemMeta
-    val dataContainer = itemMeta?.persistentDataContainer
-    if (dataContainer != null) {
-        if (data != null) dataContainer.set(key, data)
-        else dataContainer.remove(key)
-        
-        this.itemMeta = itemMeta
-    }
-}
-
-fun <T> ItemStack.storeData(key: NamespacedKey, dataType: PersistentDataType<*, T>, data: T?) {
-    val itemMeta = itemMeta
-    val dataContainer = itemMeta?.persistentDataContainer
-    if (dataContainer != null) {
-        if (data != null) dataContainer.set(key, dataType, data)
-        else dataContainer.remove(key)
-        
-        this.itemMeta = itemMeta
-    }
-}
+//</editor-fold>
 
 object ItemUtils {
-    
-    val SHULKER_BOX_ITEMS = setOf(
-        Items.SHULKER_BOX,
-        Items.BLUE_SHULKER_BOX,
-        Items.BLACK_SHULKER_BOX,
-        Items.CYAN_SHULKER_BOX,
-        Items.BROWN_SHULKER_BOX,
-        Items.GREEN_SHULKER_BOX,
-        Items.GRAY_SHULKER_BOX,
-        Items.LIGHT_BLUE_SHULKER_BOX,
-        Items.LIGHT_GRAY_SHULKER_BOX,
-        Items.LIME_SHULKER_BOX,
-        Items.MAGENTA_SHULKER_BOX,
-        Items.ORANGE_SHULKER_BOX,
-        Items.PINK_SHULKER_BOX,
-        Items.PURPLE_SHULKER_BOX,
-        Items.RED_SHULKER_BOX,
-        Items.WHITE_SHULKER_BOX,
-        Items.YELLOW_SHULKER_BOX
-    )
     
     fun isIdRegistered(id: String): Boolean {
         try {
             val nid = NamespacedId.of(id, "minecraft")
             return when (nid.namespace) {
                 "minecraft" -> runCatching { Material.valueOf(nid.name.uppercase()) }.isSuccess
-                "nova" -> NovaMaterialRegistry.getNonNamespaced(nid.name).isNotEmpty()
-                else -> NovaMaterialRegistry.getOrNull(id) != null || CustomItemServiceManager.getItemByName(id) != null
+                "nova" -> NovaRegistries.ITEM.getByName(nid.name).isNotEmpty()
+                else -> NovaRegistries.ITEM[id] != null || CustomItemServiceManager.getItemByName(id) != null
             }
         } catch (ignored: Exception) {
         }
@@ -195,16 +317,16 @@ object ItemUtils {
                     
                     "nova" -> {
                         val name = id.substringAfter(':')
-                        val novaMaterials = NovaMaterialRegistry.getNonNamespaced(name)
-                        if (novaMaterials.isNotEmpty()) {
-                            return@map NovaNameTest(name, novaMaterials.map { it.createItemStack() })
+                        val novaItems = NovaRegistries.ITEM.getByName(name)
+                        if (novaItems.isNotEmpty()) {
+                            return@map NovaNameTest(name, novaItems.map { it.createItemStack() })
                         } else throw IllegalArgumentException("Not an item name in Nova: $name")
                     }
                     
                     else -> {
-                        val novaMaterial = NovaMaterialRegistry.getOrNull(id)
-                        if (novaMaterial != null) {
-                            return@map NovaIdTest(id, novaMaterial.createItemStack())
+                        val novaItems = NovaRegistries.ITEM[id]
+                        if (novaItems != null) {
+                            return@map NovaIdTest(id, novaItems.createItemStack())
                         } else {
                             return@map CustomItemServiceManager.getItemTest(id)!!
                         }
@@ -218,24 +340,23 @@ object ItemUtils {
         return CustomRecipeChoice(tests)
     }
     
-    @Suppress("LiftReturnOrAssignment")
     fun getItemBuilder(id: String, basicClientSide: Boolean = false): ItemBuilder {
         try {
             return when (id.substringBefore(':')) {
                 "minecraft" -> ItemBuilder(toItemStack(id))
                 "nova" -> {
                     val name = id.substringAfter(':')
-                    val novaMaterial = NovaMaterialRegistry.getNonNamespaced(name).first()
+                    val novaItems = NovaRegistries.ITEM.getByName(name).first()
                     
-                    if (basicClientSide) novaMaterial.item.createClientsideItemBuilder()
-                    else novaMaterial.createItemBuilder()
+                    if (basicClientSide) novaItems.model.createClientsideItemBuilder()
+                    else novaItems.createItemBuilder()
                 }
                 
                 else -> {
-                    val novaMaterial = NovaMaterialRegistry.getOrNull(id)
-                    if (novaMaterial != null) {
-                        if (basicClientSide) novaMaterial.item.createClientsideItemBuilder()
-                        else novaMaterial.createItemBuilder()
+                    val novaItem = NovaRegistries.ITEM[id]
+                    if (novaItem != null) {
+                        if (basicClientSide) novaItem.model.createClientsideItemBuilder()
+                        else novaItem.createItemBuilder()
                     } else CustomItemServiceManager.getItemByName(id)!!.let(::ItemBuilder)
                 }
             }
@@ -257,16 +378,16 @@ object ItemUtils {
                 
                 "nova" -> {
                     val name = id.substringAfter(':')
-                    val novaMaterial = NovaMaterialRegistry.getNonNamespaced(name).first()
-                    itemStack = novaMaterial.createItemStack()
-                    localizedName = novaMaterial.localizedName
+                    val novaItem = NovaRegistries.ITEM.getByName(name).first()
+                    itemStack = novaItem.createItemStack()
+                    localizedName = novaItem.localizedName
                 }
                 
                 else -> {
-                    val novaMaterial = NovaMaterialRegistry.getOrNull(id)
-                    if (novaMaterial != null) {
-                        localizedName = novaMaterial.localizedName
-                        itemStack = novaMaterial.createItemStack()
+                    val novaItem = NovaRegistries.ITEM[id]
+                    if (novaItem != null) {
+                        localizedName = novaItem.localizedName
+                        itemStack = novaItem.createItemStack()
                     } else {
                         itemStack = CustomItemServiceManager.getItemByName(id)!!
                         localizedName = itemStack.displayName ?: ""
@@ -287,13 +408,71 @@ object ItemUtils {
     }
     
     fun getId(itemStack: ItemStack): String {
-        val novaMaterial = itemStack.novaMaterial
-        if (novaMaterial != null) return novaMaterial.id.toString()
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) return novaItem.id.toString()
         
-        val customNameKey = CustomItemServiceManager.getNameKey(itemStack)
+        val customNameKey = CustomItemServiceManager.getId(itemStack)
         if (customNameKey != null) return customNameKey
         
         return "minecraft:${itemStack.type.name.lowercase()}"
+    }
+    
+    /**
+     * Gets the custom attribute modifiers that are configured in the NBT-data of this [ItemStack] for the given [slot].
+     */
+    fun getCustomAttributeModifiers(itemStack: ItemStack, slot: EquipmentSlot?): List<AttributeModifier> {
+        return getCustomAttributeModifiers(itemStack.nmsCopy, slot?.nmsEquipmentSlot)
+    }
+    
+    /**
+     * Gets the custom attribute modifiers that are configured in the NBT-data of this [ItemStack] for the given [slot].
+     */
+    internal fun getCustomAttributeModifiers(itemStack: MojangStack, slot: MojangEquipmentSlot?): List<AttributeModifier> {
+        val tag = itemStack.tag ?: return emptyList()
+        return getCustomAttributeModifiers(tag, slot)
+    }
+    
+    /**
+     * Gets the custom attribute modifiers that are configured in the given [tag] for the given [slot].
+     * The provided [tag] must be the item tag, not the item stack itself.
+     */
+    internal fun getCustomAttributeModifiers(tag: CompoundTag, slot: MojangEquipmentSlot?): List<AttributeModifier> {
+        if (tag.contains("AttributeModifiers", NBTTag.TAG_LIST.toInt())) {
+            val attributeModifiers = ArrayList<AttributeModifier>()
+            
+            tag.getList("AttributeModifiers", NBTTag.TAG_COMPOUND.toInt()).forEach { modifier ->
+                modifier as CompoundTag
+                
+                try {
+                    val modifierSlot = modifier.getString("Slot").takeUnless(String::isBlank)
+                    
+                    if (slot == null || modifierSlot == null || modifierSlot.equals(slot.name, true)) {
+                        val slots = modifierSlot
+                            ?.let { MojangEquipmentSlot.valueOf(it.uppercase()) }
+                            ?.let { arrayOf(it) }
+                            ?: MojangEquipmentSlot.values()
+                        
+                        val attribute = BuiltInRegistries.ATTRIBUTE.get(ResourceLocation.tryParse(modifier.getString("AttributeName")))
+                            ?: return@forEach
+                        
+                        val name = modifier.getString("Name")
+                        val amount = modifier.getDouble("Amount")
+                        val operation = Operation.fromValue(modifier.getInt("Operation"))
+                        val uuid = modifier.getUUID("UUID")
+                            .takeUnless { it.mostSignificantBits == 0L && it.leastSignificantBits == 0L }
+                            ?: return@forEach
+                        
+                        attributeModifiers += AttributeModifier(uuid, name, attribute, operation, amount, true, *slots)
+                    }
+                } catch (e: Exception) {
+                    LOGGER.log(Level.WARNING, "Could not read attribute modifier: $modifier", e)
+                }
+            }
+            
+            return attributeModifiers
+        }
+        
+        return emptyList()
     }
     
 }

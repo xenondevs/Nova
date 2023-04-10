@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.world.block.limits
 
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.material.TileEntityNovaMaterial
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
 import java.util.logging.Level
@@ -35,11 +35,11 @@ internal object TileEntityLimits {
     
     
     fun canPlace(ctx: BlockPlaceContext): PlaceResult {
-        val material = ctx.item.novaMaterial as? TileEntityNovaMaterial
+        val block = ctx.item.novaItem?.block as? NovaTileEntityBlock
             ?: return ALLOWED
         
         limiters.forEach {
-            val result = it.canPlace(material, ctx)
+            val result = it.canPlace(block, ctx)
             if (!result.allowed)
                 return result
         }

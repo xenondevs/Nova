@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.tileentity.vanilla
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.util.Instrument
 
-internal class VanillaNoteBlockTileEntity constructor(blockState: VanillaTileEntityState) : VanillaTileEntity(blockState) {
+internal class VanillaNoteBlockTileEntity(blockState: VanillaTileEntityState) : VanillaTileEntity(blockState) {
     
     override val type = Type.NOTE_BLOCK
     

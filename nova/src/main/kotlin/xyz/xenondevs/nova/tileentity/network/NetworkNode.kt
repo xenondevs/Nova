@@ -2,7 +2,8 @@ package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.util.getNeighboringTileEntitiesOfType
 import java.util.*
 
@@ -19,20 +20,20 @@ sealed interface NetworkNode {
     val uuid: UUID
     
     /**
+     * If this [NetworkNode] has been loaded by the [NetworkManager].
+     */
+    var isNetworkInitialized: Boolean
+    
+    /**
      * Stores the [NetworkNodes][NetworkNode] that are connected to this [NetworkNode].
      */
     val connectedNodes: MutableMap<NetworkType, MutableMap<BlockFace, NetworkNode>>
     
     /**
-     * Retrieves the serialized connectedNodes map from internal storage or null if not present.
-     */
-    fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>?
-    
-    /**
      * Sets given the [node] as a connected [NetworkNode] at the given [face] for the specified [networkType].
      */
     fun setConnectedNode(networkType: NetworkType, face: BlockFace, node: NetworkNode) {
-        connectedNodes.getOrPut(networkType) { emptyEnumMap() }[face] = node
+        connectedNodes.getOrPut(networkType, ::enumMap)[face] = node
     }
     
     /**
@@ -129,12 +130,27 @@ sealed interface NetworkNode {
         getNearbyBridges().forEach { (_, bridge) -> bridge.handleNetworkUpdate() }
     
     /**
-     * Converts the [connectedNodes] map to a serializable version.
+     * Serializes and writes the [connectedNodes] map to internal storage.
      */
-    fun serializeConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>> {
-        return connectedNodes.mapValuesTo(HashMap()) { faceMap ->
-            faceMap.value.mapValuesTo(emptyEnumMap()) { it.value.uuid }
+    fun serializeConnectedNodes() {
+        require(this is DataHolder)
+        
+        if (!isNetworkInitialized)
+            return
+        
+        val serializedConnectedNodes = connectedNodes.mapValuesTo(HashMap()) { faceMap ->
+            faceMap.value.mapValuesTo(enumMap()) { it.value.uuid }
         }
+        
+        storeData("connectedNodes", serializedConnectedNodes)
+    }
+    
+    /**
+     * Retrieves the serialized connectedNodes map from internal storage or null if not present.
+     */
+    fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>? {
+        require(this is DataHolder)
+        return retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
     }
     
 }

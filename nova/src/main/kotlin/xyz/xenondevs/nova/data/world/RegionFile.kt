@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.data.world
 
 import org.bukkit.World
-import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.adapter.NettyBufferProvider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
@@ -112,7 +111,7 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
                 chunk.lock.read {
                     dos.writeByte(1)
                     dos.writeShort(chunk.packedCoords)
-                    val buffer = CBF.buffer()
+                    val buffer = NettyBufferProvider.getBuffer()
                     chunk.write(buffer)
                     val bytes = buffer.toByteArray()
                     dos.writeVarInt(bytes.size)

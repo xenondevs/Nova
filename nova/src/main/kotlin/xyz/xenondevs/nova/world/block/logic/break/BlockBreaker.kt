@@ -16,7 +16,7 @@ import org.bukkit.Material
 import org.bukkit.SoundCategory
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory
+import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockExpEvent
@@ -29,7 +29,7 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.tool.ToolCategory
-import xyz.xenondevs.nova.item.tool.ToolLevel
+import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.advance
@@ -38,7 +38,7 @@ import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.damageToolBreakBlock
-import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.removeInternal
@@ -48,6 +48,7 @@ import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 
@@ -62,8 +63,8 @@ internal class NovaBlockBreaker(
     blockedUntil: Int
 ) : BlockBreaker(player, block, sequence, blockedUntil) {
     
-    val material = blockState.material
-    override val requiresToolForDrops: Boolean = material.requiresToolForDrops
+    val material = blockState.block
+    override val requiresToolForDrops: Boolean = material.options.requiresToolForDrops
     
     override fun createBreakMethod(clientsidePrediction: Boolean): BreakMethod =
         BreakMethod.of(block, material, if (clientsidePrediction) player else null)
@@ -75,8 +76,8 @@ internal class NovaBlockBreaker(
     }
     
     private fun spawnHitParticles() {
-        val texture = material.breakParticles ?: return
-        val side = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation, 6.0, 0.2) ?: BlockFace.UP
+        val texture = material.options.breakParticles ?: return
+        val side = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation) ?: BlockFace.UP
         
         val particlePacket = particle(ParticleTypes.ITEM, block.location.add(0.5, 0.5, 0.5).advance(side, 0.6)) {
             Axis.values().forEach { if (it != side.axis) offset(it, 0.2) }
@@ -114,17 +115,17 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
     protected val breakMethod: BreakMethod by lazy {
         val damage = calculateDamage()
         val clientsideDamage = calculateClientsideDamage()
-        // Clientside predictions are turned of for blocks broken instantaneously, as there is no second packet being sent.
+        // Clientside predictions are turned off for blocks broken instantaneously, as there is no second packet being sent.
         createBreakMethod(CLIENTSIDE_PREDICTIONS && clientsideDamage == damage && damage < 1.0)
     }
     protected abstract val requiresToolForDrops: Boolean
     
     protected val soundGroup: SoundGroup? = block.soundGroup
     protected val hardness: Double = block.hardness
-    protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessAir()
+    protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
     protected val toolCategory: ToolCategory? = ToolCategory.ofItem(tool)
     protected val correctCategory: Boolean = toolCategory != null && toolCategory.isCorrectToolCategoryForBlock(block)
-    protected val correctLevel: Boolean = ToolLevel.isCorrectLevel(block, tool)
+    protected val correctLevel: Boolean = ToolTier.isCorrectLevel(block, tool)
     protected val drops: Boolean by lazy { !requiresToolForDrops || (correctCategory && correctLevel) } // lazy because accessing abstract val
     
     var destroyTicks = 0
@@ -137,6 +138,10 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
     var isStopped: Boolean = false
         private set
     
+    init {
+        callEvent(BlockBreakActionEvent(player, block, BlockBreakActionEvent.Action.START))
+    }
+    
     fun handleTick() {
         if (isDone)
             return
@@ -145,7 +150,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         val clientsideDamage = calculateClientsideDamage()
         
         if (clientsideDamage >= 1 && damage < 1) {
-            stop(startSequence)
+            stop(false, startSequence)
             return
         }
         
@@ -177,14 +182,14 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             // Check if the breaker is still done. (This will not be the case when the BlockBreakEvent was cancelled)
             if (isDone) {
                 // Stop break animation and mining fatigue effect
-                stop()
+                stop(true)
             }
         } else {
             // break tick logic of subclasses (i.e. spawning particles for barrier nova blocks)
             handleBreakTick()
             
             // set the break stage
-            breakMethod.breakStage = (progress * 10).toInt() - 1
+            breakMethod.breakStage = (progress.coerceAtMost(1.0) * 10).toInt()
             
             if (!breakMethod.hasClientsidePrediction) {
                 // re-send mining fatigue every tick to ensure that the player actually has it
@@ -217,7 +222,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         val ctx = BlockBreakContext(
             block.pos,
             player, player.location,
-            BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation, 8.0, 0.2),
+            BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation),
             tool
         )
         
@@ -228,7 +233,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         val event = BlockBreakEvent(block, player)
         if (drops) {
             event.expToDrop = when (this) {
-                is NovaBlockBreaker -> material.novaBlock.getExp(blockState, ctx)
+                is NovaBlockBreaker -> material.logic.getExp(blockState, ctx)
                 is VanillaBlockBreaker -> BlockUtils.getVanillaBlockExp(level, blockPos, tool.nmsCopy)
             }
         }
@@ -263,12 +268,15 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             if (player.gameMode != GameMode.CREATIVE && toolCategory != null && hardness > 0)
                 player.damageToolBreakBlock()
             
+            // capture state
+            val state = block.state
+            
             // remove block
             val itemEntities = block.removeInternal(ctx, event.isDropItems && drops, true, !brokenClientside)
             
             // drop items
             if (event.isDropItems) {
-                CraftEventFactory.handleBlockDropItemEvent(block, block.state, player.serverPlayer, itemEntities)
+                CraftEventFactory.handleBlockDropItemEvent(block, state, player.serverPlayer, itemEntities)
             }
         } else {
             // If the block wasn't broken clientside, the client will keep breaking the block and not send
@@ -283,7 +291,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         BlockBreaking.setBreakCooldown(player)
     }
     
-    fun stop(sequence: Int? = null) {
+    fun stop(blockBroken: Boolean, sequence: Int? = null) {
         isStopped = true
         breakMethod.stop()
         
@@ -308,6 +316,8 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         if (sequence != null) {
             player.send(ClientboundBlockChangedAckPacket(sequence))
         }
+        
+        callEvent(BlockBreakActionEvent(player, block, if (blockBroken) BlockBreakActionEvent.Action.FINISH else BlockBreakActionEvent.Action.CANCEL))
     }
     
     private fun calculateClientsideDamage(): Double {

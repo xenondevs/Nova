@@ -23,14 +23,13 @@ import xyz.xenondevs.nova.util.item.DamageableUtils.isDamageable
 import xyz.xenondevs.nova.util.item.DamageableUtils.isValidRepairItem
 import xyz.xenondevs.nova.util.item.DamageableUtils.setDamage
 import xyz.xenondevs.nova.util.item.localizedName
-import xyz.xenondevs.nova.util.item.novaMaterial
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import kotlin.math.max
 import kotlin.math.min
 
 @Suppress("unused")
-internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_MENU_CREATE_RESULT_METHOD, computeFrames = true) {
+internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
     
     override fun transform() {
         methodNode.instructions = buildInsnList {
@@ -39,7 +38,7 @@ internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_ME
             getField(ReflectionRegistry.ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD)
             aLoad(0)
             getField(ReflectionRegistry.ITEM_COMBINER_MENU_PLAYER_FIELD)
-            invokeStatic(ReflectionUtils.getMethodByName(AnvilResultPatch::class.java, false, "createResult"))
+            invokeStatic(::createResult)
             _return()
         }
         methodNode.localVariables.clear()
@@ -216,8 +215,8 @@ internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_ME
     }
     
     private fun getLocalizedNovaName(player: Player, itemStack: ItemStack): String? {
-        val novaMaterial = itemStack.novaMaterial ?: return null
-        return LocaleManager.getTranslationOrNull((player as? ServerPlayer)?.locale ?: "en_us", novaMaterial.localizedName)
+        val novaItem = itemStack.novaItem ?: return null
+        return LocaleManager.getTranslationOrNull((player as? ServerPlayer)?.locale ?: "en_us", novaItem.localizedName)
     }
     
     private fun getHoverName(player: Player, itemStack: ItemStack): String {
@@ -231,9 +230,9 @@ internal object AnvilResultPatch : MethodTransformer(ReflectionRegistry.ANVIL_ME
     }
     
     private fun isSameItemType(first: ItemStack, second: ItemStack): Boolean {
-        val novaMaterial = first.novaMaterial
-        if (novaMaterial != null) {
-            return novaMaterial == second.novaMaterial
+        val novaItem = first.novaItem
+        if (novaItem != null) {
+            return novaItem == second.novaItem
         }
         
         return first.item == second.item

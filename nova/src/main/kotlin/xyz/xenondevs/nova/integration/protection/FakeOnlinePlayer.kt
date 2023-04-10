@@ -76,7 +76,7 @@ import java.util.*
  * This [Player] is also granted access to the [hasPermission]
  * method via Vault.
  */
-class FakeOnlinePlayer(
+internal class FakeOnlinePlayer(
     private val offlinePlayer: OfflinePlayer,
     private val location: Location
 ) : Player, OfflinePlayer by offlinePlayer {
@@ -317,7 +317,19 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun sendEquipmentChange(p0: LivingEntity, p1: EquipmentSlot, p2: ItemStack) {
+    override fun sendBlockDamage(location: Location, progress: Float, entity: Entity) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendBlockDamage(location: Location, progress: Float, sourceId: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendEquipmentChange(entity: LivingEntity, slot: EquipmentSlot, item: ItemStack?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendEquipmentChange(entity: LivingEntity, items: MutableMap<EquipmentSlot, ItemStack>) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -336,6 +348,22 @@ class FakeOnlinePlayer(
     }
     
     override fun sendMap(map: MapView) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendHurtAnimation(yaw: Float) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun addCustomChatCompletions(completions: MutableCollection<String>) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun removeCustomChatCompletions(completions: MutableCollection<String>) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setCustomChatCompletions(completions: MutableCollection<String>) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1398,6 +1426,14 @@ class FakeOnlinePlayer(
     }
     
     override fun isCustomNameVisible(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setVisibleByDefault(visible: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isVisibleByDefault(): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
     

@@ -1,76 +1,92 @@
 package xyz.xenondevs.nova.ui.waila.info.line
 
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.TextComponent
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.GameMode
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.tool.ToolCategory
-import xyz.xenondevs.nova.item.tool.ToolLevel
+import xyz.xenondevs.nova.item.tool.ToolTier
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
-import xyz.xenondevs.nova.util.data.MovingComponentBuilder
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.item.ToolUtils
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
-private const val CHECK_MARK = "✔"
-private const val CROSS = "❌"
+private val CHECK_MARK = Component.text("✔", NamedTextColor.GREEN)
+private val CROSS = Component.text("❌", NamedTextColor.RED)
 
 object ToolLine {
     
     fun getToolLine(player: Player, block: Block): WailaLine {
-        val tool = player.inventory.itemInMainHand
+        val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
         return getToolLine(
             player,
             ToolCategory.ofBlock(block),
-            ToolLevel.ofBlock(block),
+            ToolTier.ofBlock(block),
             block.hardness,
             ToolUtils.isCorrectToolForDrops(block, tool)
         )
     }
     
+    fun getCustomItemServiceToolLine(player: Player, block: Block): WailaLine {
+        val tool = player.inventory.itemInMainHand.takeUnlessEmpty()
+        return getToolLine(
+            player,
+            null,
+            null,
+            1.0,
+            CustomItemServiceManager.canBreakBlock(block, tool)
+        )
+    }
+    
     fun getToolLine(
         player: Player,
-        blockToolCategories: List<ToolCategory>,
-        blockToolLevel: ToolLevel?,
+        blockToolCategories: List<ToolCategory>?,
+        blockToolLevel: ToolTier?,
         hardness: Double,
-        correctToolForDrops: Boolean
+        correctToolForDrops: Boolean?
     ): WailaLine {
-        val builder = MovingComponentBuilder(player.locale)
+        val builder = Component.text()
         if (hardness < 0) {
             return WailaLine(
                 builder
-                    .append(TranslatableComponent("waila.nova.required_tool.unbreakable"))
-                    .color(ChatColor.RED),
+                    .append(Component.translatable("waila.nova.required_tool.unbreakable", NamedTextColor.RED))
+                    .build(),
                 Alignment.CENTERED
             )
         }
         
-        val canBreak = player.gameMode == GameMode.CREATIVE || correctToolForDrops
-        
-        if (blockToolCategories.isNotEmpty()) {
-            builder.append(TranslatableComponent("waila.nova.required_tool")).color(ChatColor.GRAY)
-            
-            blockToolCategories.forEach {
-                builder.append(getToolIcon(blockToolLevel, it)).color(ChatColor.WHITE)
+        fun appendCanBreak() {
+            builder.append(Component.space())
+            if (player.gameMode == GameMode.CREATIVE || correctToolForDrops == true) {
+                builder.append(CHECK_MARK)
+            } else if (correctToolForDrops != null) {
+                builder.append(CROSS)
             }
-            
-            builder.append(" ").font("default")
-            
-            if (canBreak) builder.append(CHECK_MARK).color(ChatColor.GREEN)
-            else builder.append(CROSS).color(ChatColor.RED)
-        } else {
-            builder.append(TranslatableComponent("waila.nova.required_tool.none")).color(ChatColor.GRAY)
         }
         
-        return WailaLine(builder, Alignment.CENTERED)
+        if (blockToolCategories == null) {
+            appendCanBreak()
+        } else if (blockToolCategories.isNotEmpty()) {
+            builder.append(Component.translatable("waila.nova.required_tool", NamedTextColor.GRAY))
+            blockToolCategories.forEach { builder.append(getToolIcon(blockToolLevel, it)) }
+            appendCanBreak()
+        } else {
+            builder.append(Component.translatable("waila.nova.required_tool.none", NamedTextColor.GRAY))
+        }
+        
+        return WailaLine(builder.build(), Alignment.CENTERED)
     }
     
-    private fun getToolIcon(level: ToolLevel?, category: ToolCategory): TextComponent {
-        val fontChar = Resources.getTextureIconChar(category.getIcon(level))
-        return TextComponent(fontChar.char.toString()).apply { color = ChatColor.WHITE; font = fontChar.font }
-    }
+    private fun getToolIcon(tier: ToolTier?, category: ToolCategory): Component =
+        NovaRegistries.WAILA_TOOL_ICON_PROVIDER
+            .firstNotNullOfOrNull { it.getIcon(category, tier) }
+            ?.let(Resources::getTextureIconChar)
+            ?.component
+            ?: Component.empty()
     
 }

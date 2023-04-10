@@ -1,21 +1,21 @@
 package xyz.xenondevs.nova.data.world.block.state
 
-import xyz.xenondevs.cbf.buffer.ByteBuffer
-import xyz.xenondevs.nova.data.NamespacedId
+import net.minecraft.resources.ResourceLocation
+import xyz.xenondevs.cbf.io.ByteBuffer
 import xyz.xenondevs.nova.world.BlockPos
 
-sealed interface BlockState {
+abstract class BlockState internal constructor() {
     
-    val pos: BlockPos
-    val id: NamespacedId
-    val isLoaded: Boolean
+    abstract val pos: BlockPos
+    abstract val id: ResourceLocation
+    abstract val isLoaded: Boolean
     
-    fun handleInitialized(placed: Boolean)
+    internal abstract fun handleInitialized(placed: Boolean)
     
-    fun handleRemoved(broken: Boolean)
+    internal abstract fun handleRemoved(broken: Boolean)
     
-    fun read(buf: ByteBuffer)
+    internal abstract fun read(buf: ByteBuffer)
     
-    fun write(buf: ByteBuffer)
+    internal abstract fun write(buf: ByteBuffer)
     
 }

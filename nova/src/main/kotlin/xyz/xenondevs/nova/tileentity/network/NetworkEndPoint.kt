@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.util.emptyEnumMap
+import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.nova.data.serialization.DataHolder
 import java.util.*
 
 interface NetworkEndPoint : NetworkNode {
@@ -17,11 +18,6 @@ interface NetworkEndPoint : NetworkNode {
     val holders: Map<NetworkType, EndPointDataHolder>
     
     /**
-     * Retrieves the serialized networks from internal storage or null if not present.
-     */
-    fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>?
-    
-    /**
      * The [BlockFaces][BlockFace] at which connections are allowed for a specific [NetworkType].
      */
     val allowedFaces: Map<NetworkType, Set<BlockFace>>
@@ -31,7 +27,7 @@ interface NetworkEndPoint : NetworkNode {
         networks.values.flatMap { networkMap -> networkMap.map { faceMap -> faceMap.key to faceMap.value } }
     
     fun getFaceMap(networkType: NetworkType): MutableMap<BlockFace, Network> {
-        return networks.getOrPut(networkType) { emptyEnumMap() }
+        return networks.getOrPut(networkType, ::enumMap)
     }
     
     fun setNetwork(networkType: NetworkType, face: BlockFace, network: Network) {
@@ -46,12 +42,27 @@ interface NetworkEndPoint : NetworkNode {
     }
     
     /**
-     * Converts the [networks] map to a serializable version.
+     * Serializes ands writes the [networks] map to internal storage.
      */
-    fun serializeNetworks(): Map<NetworkType, Map<BlockFace, UUID>> {
-        return networks.entries.associateTo (HashMap()) { entry ->
-            entry.key to entry.value.mapValuesTo(emptyEnumMap()) { it.value.uuid }
+    fun serializeNetworks() {
+        require(this is DataHolder)
+        
+        if (!isNetworkInitialized)
+            return
+        
+        val serializedNetworks = networks.entries.associateTo (HashMap()) { entry ->
+            entry.key to entry.value.mapValuesTo(enumMap()) { it.value.uuid }
         }
+        
+        storeData("networks", serializedNetworks)
+    }
+    
+    /**
+     * Retrieves the serialized networks from internal storage or null if not present.
+     */
+    fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? {
+        require(this is DataHolder)
+        return retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
     }
     
 }

@@ -6,10 +6,8 @@ import net.minecraft.server.players.PlayerList
 import net.minecraft.world.entity.player.Player
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.nova.transformer.MethodTransformer
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 
-internal object BroadcastPacketPatch : MethodTransformer(ReflectionRegistry.PLAYER_LIST_BROADCAST_METHOD, computeFrames = true) {
+internal object BroadcastPacketPatch : MethodTransformer(PlayerList::broadcast) {
     
     var dropAll = false
     var ignoreExcludedPlayer = false
@@ -25,7 +23,7 @@ internal object BroadcastPacketPatch : MethodTransformer(ReflectionRegistry.PLAY
             dLoad(8) // max distance
             aLoad(10) // dimension
             aLoad(11) // packet
-            invokeStatic(ReflectionUtils.getMethodByName(BroadcastPacketPatch::class, false,"broadcast"))
+            invokeStatic(::broadcast)
             _return()
         }
     }

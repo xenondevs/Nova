@@ -1,16 +1,11 @@
 package xyz.xenondevs.nova.tileentity
 
-import de.studiocode.invui.gui.GUI
-import de.studiocode.invui.virtualinventory.VirtualInventory
-import de.studiocode.invui.virtualinventory.event.InventoryUpdatedEvent
-import de.studiocode.invui.virtualinventory.event.ItemUpdateEvent
-import de.studiocode.invui.virtualinventory.event.UpdateReason
-import de.studiocode.invui.window.impl.single.SimpleWindow
-import net.md_5.bungee.api.chat.TranslatableComponent
+import net.kyori.adventure.text.Component
+import net.minecraft.network.protocol.Packet
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Location
-import org.bukkit.NamespacedKey
 import org.bukkit.OfflinePlayer
 import org.bukkit.Sound
 import org.bukkit.World
@@ -18,15 +13,20 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.inventory.VirtualInventory
+import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent
+import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
+import xyz.xenondevs.invui.inventory.event.UpdateReason
+import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.data.config.Reloadable
-import xyz.xenondevs.nova.data.provider.Provider
 import xyz.xenondevs.nova.data.serialization.DataHolder
-import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.data.world.legacy.impl.v0_10.cbf.LegacyCompound
-import xyz.xenondevs.nova.material.TileEntityNovaMaterial
+import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
@@ -34,20 +34,21 @@ import xyz.xenondevs.nova.tileentity.network.fluid.container.NovaFluidContainer
 import xyz.xenondevs.nova.tileentity.upgrade.Upgradable
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeHolder
 import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
-import xyz.xenondevs.nova.ui.overlay.character.gui.GUITexture
+import xyz.xenondevs.nova.ui.overlay.character.gui.GuiTexture
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.LocationUtils
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.center
-import xyz.xenondevs.nova.util.emptyEnumMap
 import xyz.xenondevs.nova.util.getYaw
 import xyz.xenondevs.nova.util.hasInventoryOpen
+import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
-import xyz.xenondevs.nova.world.block.TileEntityBlock
+import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
+import xyz.xenondevs.nova.world.block.TileEntityBlockBehavior
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.region.DynamicRegion
@@ -57,25 +58,27 @@ import xyz.xenondevs.nova.world.region.StaticRegion
 import xyz.xenondevs.nova.world.region.UpgradableRegion
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
-import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
+import kotlin.reflect.full.hasAnnotation
+import xyz.xenondevs.nova.tileentity.menu.TileEntityMenuClass as TileEntityMenuAnnotation
 
-abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true), Reloadable, ITileEntity {
+abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true), Reloadable {
     
     companion object {
         val SELF_UPDATE_REASON = object : UpdateReason {}
-        internal val LEGACY_TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntity")
-        val TILE_ENTITY_KEY = NamespacedKey(NOVA, "tileEntityData")
+        
+        val TILE_ENTITY_DATA_KEY = ResourceLocation("nova", "tileentity")
     }
-    
-    override var legacyData: LegacyCompound? = blockState.legacyData
     
     val pos: BlockPos = blockState.pos
     val uuid: UUID = blockState.uuid
-    val ownerUUID: UUID = blockState.ownerUUID
+    val ownerUUID: UUID? = blockState.ownerUUID
     final override val data: Compound = blockState.data
-    final override val material: TileEntityNovaMaterial = blockState.material
+    val block: NovaTileEntityBlock = blockState.block
     
-    override val owner: OfflinePlayer by lazy { Bukkit.getOfflinePlayer(ownerUUID) }
+    val owner: OfflinePlayer? by lazy { ownerUUID?.let(Bukkit::getOfflinePlayer) }
     
     val location: Location
         get() = Location(pos.world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), facing.getYaw(BlockFace.NORTH), 0f)
@@ -94,10 +97,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     var isValid: Boolean = true
         private set
     
-    abstract val gui: Lazy<TileEntityGUI>?
-    
-    internal val multiModels = ArrayList<MultiModel>()
-    internal val particleTasks = ArrayList<TileEntityParticleTask>()
+    internal val packetTasks = ArrayList<TileEntityPacketTask>()
     private val regions = HashMap<String, ReloadableRegion>()
     
     private val _inventories = HashMap<VirtualInventory, Boolean>()
@@ -107,6 +107,16 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         get() = _inventories.keys.toList()
     val fluidContainers: List<FluidContainer>
         get() = _fluidContainers.keys.toList()
+    
+    lateinit var menuContainer: MenuContainer
+    
+    init {
+        val guiClass = this::class.nestedClasses.firstOrNull { it.hasAnnotation<TileEntityMenuAnnotation>() }
+        if (guiClass != null) {
+            @Suppress("LeakingThis")
+            menuContainer = MenuContainer.of(this, guiClass)
+        }
+    }
     
     override fun reload() {
         regions.values.forEach(ReloadableRegion::reload)
@@ -144,22 +154,22 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     /**
      * Gets a list of [ItemStacks][ItemStack] to be dropped when this [TileEntity] is destroyed.
      */
-    override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
+    open fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
         val drops = ArrayList<ItemStack>()
         if (includeSelf) {
             saveData()
             
-            val item = material.createItemStack()
-            if (globalData.isNotEmpty()) {
-                val itemMeta = item.itemMeta!!
-                itemMeta.persistentDataContainer.set(TILE_ENTITY_KEY, globalData)
-                item.itemMeta = itemMeta
+            val item = block.item?.createItemStack()
+            if (item != null) {
+                if (globalData.isNotEmpty()) {
+                    item.novaCompound[TILE_ENTITY_DATA_KEY] = globalData
+                }
+                
+                drops += item
             }
-            
-            drops += item
         }
         
-        if (this is Upgradable) drops += this.upgradeHolder.dropUpgrades()
+        if (this is Upgradable) drops += this.upgradeHolder.getUpgradeItems()
         _inventories.forEach { (inv, global) -> if (!global) drops += inv.items.filterNotNull() }
         return drops
     }
@@ -197,15 +207,14 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     open fun handleRemoved(unload: Boolean) {
         isValid = false
-        if (gui?.isInitialized() == true) gui!!.value.closeWindows()
-        
-        multiModels.forEach { it.close() }
-        particleTasks.forEach { it.stop() }
+        packetTasks.forEach { it.stop() }
         regions.values.forEach { VisualRegion.removeRegion(it.uuid) }
+        if (::menuContainer.isInitialized) menuContainer.closeWindows()
+        if (this is Upgradable) upgradeHolder.handleRemoved()
     }
     
     /**
-     * Called when a [TileEntityBlock] is interacted with.
+     * Called when a [TileEntityBlockBehavior] is interacted with.
      *
      * Might be called twice for each hand.
      *
@@ -213,15 +222,17 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      */
     open fun handleRightClick(ctx: BlockInteractContext): Boolean {
         val player = ctx.source as? Player ?: return false
-        if (gui != null && !player.hasInventoryOpen) {
-            gui!!.value.openWindow(player)
+        if (::menuContainer.isInitialized && !player.hasInventoryOpen) {
+            menuContainer.openWindow(player)
             return true
         }
         return false
     }
     
-    fun getUpgradeHolder(vararg allowed: UpgradeType<*>): UpgradeHolder =
-        UpgradeHolder(this, gui!!, ::reload, *allowed)
+    fun getUpgradeHolder(vararg allowed: UpgradeType<*>): UpgradeHolder {
+        check(::menuContainer.isInitialized) { "A TileEntityMenu class must be present to create an UpgradeHolder" }
+        return UpgradeHolder(this, menuContainer, ::reload, allowed.toHashSet())
+    }
     
     /**
      * Gets a [VirtualInventory] for this [TileEntity].
@@ -229,18 +240,16 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     fun getInventory(
         salt: String,
         size: Int,
-        stackSizes: IntArray,
+        maxStackSizes: IntArray,
         global: Boolean = false,
-        preUpdateHandler: ((ItemUpdateEvent) -> Unit)? = null,
-        afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null,
+        preUpdateHandler: ((ItemPreUpdateEvent) -> Unit)? = null,
+        postUpdateHandler: ((ItemPostUpdateEvent) -> Unit)? = null,
     ): VirtualInventory {
         val invUUID = uuid.salt(salt)
-        val inventory = retrieveData("inventory.$invUUID") {
-            VirtualInventory(invUUID, size, arrayOfNulls(size), stackSizes)
-        }
-        
-        if (preUpdateHandler != null) inventory.setItemUpdateHandler(preUpdateHandler)
-        if (afterUpdateHandler != null) inventory.setInventoryUpdatedHandler(afterUpdateHandler)
+        val inventory = retrieveData("inventory.$invUUID") { VirtualInventory(invUUID, size) }
+        inventory.maxStackSizes = maxStackSizes
+        if (preUpdateHandler != null) inventory.setPreUpdateHandler(preUpdateHandler)
+        if (postUpdateHandler != null) inventory.setPostUpdateHandler(postUpdateHandler)
         
         _inventories[inventory] = global
         return inventory
@@ -252,9 +261,9 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     fun getInventory(
         salt: String,
         size: Int,
-        preUpdateHandler: ((ItemUpdateEvent) -> Unit)? = null,
-        afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null,
-    ) = getInventory(salt, size, IntArray(size) { 64 }, false, preUpdateHandler, afterUpdateHandler)
+        preUpdateHandler: ((ItemPreUpdateEvent) -> Unit)? = null,
+        postUpdateHandler: ((ItemPostUpdateEvent) -> Unit)? = null,
+    ): VirtualInventory = getInventory(salt, size, IntArray(size) { 64 }, false, preUpdateHandler, postUpdateHandler)
     
     /**
      * Gets a [VirtualInventory] for this [TileEntity].
@@ -263,9 +272,49 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         salt: String,
         size: Int,
         global: Boolean = false,
-        preUpdateHandler: ((ItemUpdateEvent) -> Unit)? = null,
-        afterUpdateHandler: ((InventoryUpdatedEvent) -> Unit)? = null,
-    ) = getInventory(salt, size, IntArray(size) { 64 }, global, preUpdateHandler, afterUpdateHandler)
+        preUpdateHandler: ((ItemPreUpdateEvent) -> Unit)? = null,
+        postUpdateHandler: ((ItemPostUpdateEvent) -> Unit)? = null,
+    ): VirtualInventory = getInventory(salt, size, IntArray(size) { 64 }, global, preUpdateHandler, postUpdateHandler)
+    
+    /**
+     * Gets a [FluidContainer] for this [TileEntity].
+     */
+    @JvmName("getFluidContainerInternal")
+    private fun getFluidContainer(
+        name: String,
+        types: Set<FluidType>,
+        capacity: Provider<Long>,
+        defaultAmount: Long = 0,
+        updateHandler: (() -> Unit)? = null,
+        upgradeHolder: UpgradeHolder? = null,
+        upgradeType: UpgradeType<Double>? = null,
+        global: Boolean = true
+    ): FluidContainer {
+        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        
+        val storedAmount: Long?
+        val storedType: FluidType?
+        
+        val fluidData = retrieveDataOrNull<Compound>("fluidContainer.$uuid")
+        storedAmount = fluidData?.get<Long>("amount")
+        storedType = fluidData?.get<FluidType>("type")
+        
+        val container = NovaFluidContainer(
+            uuid,
+            types,
+            storedType ?: FluidType.NONE,
+            storedAmount ?: defaultAmount,
+            capacity,
+            upgradeHolder,
+            upgradeType
+        )
+        
+        if (updateHandler != null)
+            container.updateHandlers += updateHandler
+        
+        _fluidContainers[container] = global
+        return container
+    }
     
     /**
      * Gets a [FluidContainer] for this [TileEntity].
@@ -276,31 +325,23 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         capacity: Provider<Long>,
         defaultAmount: Long = 0,
         updateHandler: (() -> Unit)? = null,
-        upgradeHolder: UpgradeHolder? = null,
+        upgradeHolder: UpgradeHolder,
+        upgradeType: UpgradeType<Double>,
         global: Boolean = true
-    ): FluidContainer {
-        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
-        
-        val storedAmount: Long?
-        val storedType: FluidType?
-        
-        if (legacyData != null) {
-            val fluidData = retrieveDataOrNull<LegacyCompound>("fluidContainer.$uuid")
-            storedAmount = fluidData?.get<Long>("amount")
-            storedType = fluidData?.get<FluidType>("type")
-        } else {
-            val fluidData = retrieveDataOrNull<Compound>("fluidContainer.$uuid")
-            storedAmount = fluidData?.get<Long>("amount")
-            storedType = fluidData?.get<FluidType>("type")
-        }
-        
-        val container = NovaFluidContainer(uuid, types, storedType ?: FluidType.NONE, storedAmount
-            ?: defaultAmount, capacity, upgradeHolder)
-        
-        updateHandler?.apply(container.updateHandlers::add)
-        _fluidContainers[container] = global
-        return container
-    }
+    ) = getFluidContainer(name, types, capacity, defaultAmount, updateHandler, upgradeHolder as UpgradeHolder?, upgradeType as UpgradeType<Double>?, global)
+    
+    
+    /**
+     * Gets a [FluidContainer] for this [TileEntity].
+     */
+    fun getFluidContainer(
+        name: String,
+        types: Set<FluidType>,
+        capacity: Provider<Long>,
+        defaultAmount: Long = 0,
+        updateHandler: (() -> Unit)? = null,
+        global: Boolean = true
+    ) = getFluidContainer(name, types, capacity, defaultAmount, updateHandler, null, null, global)
     
     /**
      * Creates a new [StaticRegion] with a reloadable [size] under the name "default".
@@ -320,7 +361,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     ): StaticRegion {
         check(name !in regions) { "Another region is already registered under the name $name." }
         
-        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        val uuid = uuid.salt(name)
         val region = StaticRegion(uuid, size, createRegion)
         regions[name] = region
         
@@ -355,7 +396,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     ): DynamicRegion {
         check(name !in regions) { "Another region is already registered under the name $name." }
         
-        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        val uuid = uuid.salt(name)
         val size = retrieveDataOrNull<Int>("region.$name") ?: defaultSize
         val region = DynamicRegion(uuid, minSize, maxSize, size, createRegion)
         regions[name] = region
@@ -396,7 +437,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         check(name !in regions) { "Another region is already registered under the name $name." }
         check(this is Upgradable) { "Can't create an UpgradableRegion for a TileEntity that isn't Upgradable" }
         
-        val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
+        val uuid = uuid.salt(name)
         val size = retrieveDataOrNull<Int>("region.$name") ?: defaultSize
         val region = UpgradableRegion(uuid, upgradeHolder, upgradeType, minSize, maxSize, size, createRegion)
         regions[name] = region
@@ -405,22 +446,13 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     }
     
     /**
-     * Creates a new [MultiModel] for this [TileEntity].
-     * When the [TileEntity] is removed, all [Models][Model] belonging
-     * to this [MultiModel] will be removed.
+     * Creates a new [TileEntityPacketTask] for this [TileEntity].
+     * All [packets] will be sent to this [TileEntity's][TileEntity] [viewers][getViewers] every [interval] ticks.
+     * When the [TileEntity] is removed, the [TileEntityPacketTask] will automatically be stopped as well.
      */
-    fun createMultiModel(): MultiModel {
-        return MultiModel().also(multiModels::add)
-    }
-    
-    /**
-     * Creates a new [TileEntityParticleTask] for this [TileEntity].
-     * When the [TileEntity] is removed, the [TileEntityParticleTask]
-     * will automatically be stopped as well.
-     */
-    fun createParticleTask(particles: List<Any>, tickDelay: Int): TileEntityParticleTask {
-        val task = TileEntityParticleTask(this, particles, tickDelay)
-        particleTasks += task
+    fun createPacketTask(packets: List<Packet<*>>, interval: Long): TileEntityPacketTask {
+        val task = TileEntityPacketTask(this, packets, interval)
+        packetTasks += task
         return task
     }
     
@@ -479,7 +511,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     ): EnumMap<BlockFace, NetworkConnectionType> {
         
         val sideFaces = sides.map(::getFace)
-        return CUBE_FACES.associateWithTo(emptyEnumMap()) {
+        return CUBE_FACES.associateWithTo(enumMap()) {
             if (it in sideFaces) type else NetworkConnectionType.NONE
         }
     }
@@ -490,8 +522,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     fun getSurroundingRegion(size: Int): Region {
         val d = size + 0.5
         return Region(
-            location.clone().center().subtract(d, d, d),
-            location.clone().center().add(d, d, d)
+            location.clone().add(.5, .5, .5).subtract(d, d, d),
+            location.clone().add(.5, .5, .5).add(d, d, d)
         )
     }
     
@@ -542,38 +574,53 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     }
     
     override fun toString(): String {
-        return "${javaClass.name}(Material: $material, Location: ${pos}, UUID: $uuid)"
+        return "${javaClass.name}(Material: $block, Location: ${pos}, UUID: $uuid)"
     }
     
-    abstract inner class TileEntityGUI(private val texture: GUITexture? = null) {
+    abstract inner class TileEntityMenu internal constructor(protected val texture: GuiTexture? = null) {
         
-        /**
-         * The main [GUI] of a [TileEntity] to be opened when it is right-clicked and closed when
-         * the owning [TileEntity] is destroyed.
-         */
-        abstract val gui: GUI
-        
-        /**
-         * A list of [GUIs][GUI] that are not a part of [gui] but should still be closed
-         * when the [TileEntity] is destroyed.
-         */
-        val subGUIs = ArrayList<GUI>()
-        
-        /**
-         * Opens a Window of the [gui] to the specified [player].
-         */
-        fun openWindow(player: Player) {
-            val title = texture?.getTitle(material.localizedName)
-                ?: arrayOf(TranslatableComponent(material.localizedName))
-            SimpleWindow(player, title, gui).show()
+        open fun getTitle(): Component {
+            return texture?.getTitle(block.localizedName)
+                ?: Component.translatable(block.localizedName)
         }
         
-        /**
-         * Closes all Windows connected to this [TileEntityGUI].
-         */
-        fun closeWindows() {
-            gui.closeForAllViewers()
-            subGUIs.forEach(GUI::closeForAllViewers)
+    }
+    
+    abstract inner class GlobalTileEntityMenu(
+        texture: GuiTexture? = null
+    ) : TileEntityMenu(texture) {
+        
+        abstract val gui: Gui
+        open val windowBuilder: Window.Builder<*, *> by lazy {
+            Window.single()
+                .setGui(gui)
+                .setTitle(getTitle())
+        }
+        
+        open fun openWindow(player: Player) {
+            val window = windowBuilder.build(player)
+            menuContainer.registerWindow(window)
+            window.open()
+        }
+        
+    }
+    
+    abstract inner class IndividualTileEntityMenu(
+        protected val player: Player,
+        texture: GuiTexture? = null
+    ) : TileEntityMenu(texture) {
+        
+        abstract val gui: Gui
+        open val windowBuilder: Window.Builder<*, *> by lazy {
+            Window.single()
+                .setGui(gui)
+                .setTitle(getTitle())
+        }
+        
+        open fun openWindow() {
+            val window = windowBuilder.build(player)
+            menuContainer.registerWindow(window)
+            window.open()
         }
         
     }

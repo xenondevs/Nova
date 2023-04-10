@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.material.PacketItems
+import xyz.xenondevs.nova.item.logic.PacketItems
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.fromFixedPoint
 import xyz.xenondevs.nova.util.nmsCopy
@@ -33,8 +33,9 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     protected abstract val entityType: EntityType<*>
     
     private var registered = false
-    val viewers: List<Player>
-        get() = FakeEntityManager.getChunkViewers(chunk)
+    private val _viewers = Collections.newSetFromMap<Player>(WeakHashMap())
+    val viewers: Set<Player>
+        get() = _viewers
     
     val entityId = NMSUtils.ENTITY_COUNTER.incrementAndGet()
     private val uuid = UUID.randomUUID()
@@ -91,6 +92,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
             player.send(spawnBuf, dataBuf, equipmentBuf)
         }
         
+        _viewers += player
         spawnHandler?.invoke(player)
     }
     
@@ -99,6 +101,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
      */
     fun despawn(player: Player) {
         player.send(despawnBuf)
+        _viewers -= player
         despawnHandler?.invoke(player)
     }
     
@@ -130,10 +133,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         equipmentBuf = null
         
         // update the equipment array
-        var nmsStack = bukkitStack.nmsCopy
-        if (PacketItems.isNovaItem(nmsStack))
-            nmsStack = PacketItems.getFakeItem(null, nmsStack)
-        equipment[slot.ordinal] = nmsStack
+        equipment[slot.ordinal] = PacketItems.getClientSideStack(null, bukkitStack.nmsCopy)
         
         // rebuild buf and send packet if requested
         if (sendPacket) {

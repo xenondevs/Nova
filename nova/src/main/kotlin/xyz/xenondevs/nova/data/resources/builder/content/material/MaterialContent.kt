@@ -2,15 +2,17 @@ package xyz.xenondevs.nova.data.resources.builder.content.material
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.mapToIntArray
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.resources.ModelData
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
-import xyz.xenondevs.nova.data.resources.builder.BlockSoundOverrides
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.ModelFileMerger
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockDirection
@@ -20,33 +22,35 @@ import xyz.xenondevs.nova.data.resources.builder.content.material.info.Registere
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
-import xyz.xenondevs.nova.data.resources.model.data.ArmorStandBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
+import xyz.xenondevs.nova.data.resources.model.data.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.parseJson
-import xyz.xenondevs.nova.util.mapToIntArray
-import java.io.File
+import xyz.xenondevs.nova.data.serialization.json.GSON
+import java.nio.file.Path
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.writeText
 
-private val USE_SOLID_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.use_solid_blocks") }
+private val USE_SOLID_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks") }
 
 internal class MaterialContent(
-    private val basePacks: BasePacks,
-    private val soundOverrides: BlockSoundOverrides
+    private val builder: ResourcePackBuilder
 ) : PackContent {
     
-    private val novaMaterials = HashMap<String, RegisteredMaterial>()
+    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    
+    private val novaMaterials = HashMap<ResourceLocation, RegisteredMaterial>()
     
     private val modelDataPosition = HashMap<Material, Int>()
     
     private val blockStatePosition = HashMap<BlockStateConfigType<*>, Int>()
     private val remainingBlockStates = HashMap<BlockStateConfigType<*>, Int>()
     
-    override fun addFromPack(pack: AssetPack) {
+    override fun includePack(pack: AssetPack) {
         val materialsIndex = pack.materialsIndex ?: return
         
         materialsIndex.forEach { registeredMaterial ->
@@ -58,25 +62,31 @@ internal class MaterialContent(
     private fun createDefaultModelFiles(pack: AssetPack, info: ModelInformation) {
         info.models.forEach {
             val namespace = pack.namespace
-            val file = File(ResourcePackBuilder.ASSETS_DIR, "$namespace/models/${it.removePrefix("$namespace:")}.json")
+            val file = ResourcePackBuilder.ASSETS_DIR.resolve("$namespace/models/${it.removePrefix("$namespace:")}.json")
             if (!file.exists())
                 createDefaultModelFile(file, it)
         }
     }
     
-    private fun createDefaultModelFile(file: File, texturePath: String) {
+    private fun createDefaultModelFile(file: Path, texturePath: String) {
         val modelObj = JsonObject()
         modelObj.addProperty("parent", "item/generated")
-        modelObj.add("textures", JsonObject().apply { addProperty("layer0", texturePath) })
+        modelObj.add(
+            "textures",
+            JsonObject().apply {
+                addProperty("layer0", "nova:item/empty") // this fixes issues with leather armor colors
+                addProperty("layer1", texturePath)
+            }
+        )
         
-        file.parentFile.mkdirs()
+        file.parent.createDirectories()
         file.writeText(GSON.toJson(modelObj))
     }
     
     @Suppress("ReplaceWithEnumMap")
     override fun write() {
         // the general lookup later passed to Resources
-        val modelDataLookup = HashMap<String, Pair<HashMap<Material, ItemModelData>?, BlockModelData?>>()
+        val modelDataLookup = HashMap<ResourceLocation, ModelData>()
         
         // stores the custom model id overrides, used to prevent duplicate registration of armor stand models and for writing to the respective file
         val customItemModels = HashMap<Material, HashMap<String, Int>>()
@@ -90,7 +100,7 @@ internal class MaterialContent(
             val info = regMat.itemInfo
             // create map containing all ItemModelData instances for each vanilla material of this item
             val materialsMap: HashMap<Material, ItemModelData> = HashMap()
-            modelDataLookup[id] = materialsMap to null
+            modelDataLookup[id] = ModelData(materialsMap, null, regMat.armor)
             // register that item model under the required vanilla materials
             val materials = info.material?.let(::listOf) ?: VanillaMaterialTypes.MATERIALS
             materials.forEach { material ->
@@ -105,7 +115,7 @@ internal class MaterialContent(
             .sortedByDescending { it.value.blockInfo.priority }
             .forEach { (id, regMat) ->
                 val info = regMat.blockInfo
-                val itemModelData = modelDataLookup[id]!!.first
+                val modelData = modelDataLookup[id]!!
                 
                 val blockModelData: BlockModelData
                 if (getRemainingBlockStateIdAmount(info.type) < info.models.size) {
@@ -113,10 +123,10 @@ internal class MaterialContent(
                     val material = VanillaMaterialTypes.DEFAULT_MATERIAL
                     val registeredModels = customItemModels.getOrPut(material, ::HashMap)
                     val dataArray = info.models.mapToIntArray { registeredModels.getOrPut(it) { getNextCustomModelData(material) } }
-                    blockModelData = ArmorStandBlockModelData(id, info.hitboxType, dataArray)
+                    blockModelData = DisplayEntityBlockModelData(id, info.hitboxType, dataArray)
                     
                     // note hitbox type as used material for sound overrides
-                    soundOverrides.useMaterial(info.hitboxType)
+                    builder.soundOverrides.useMaterial(info.hitboxType)
                 } else {
                     val configs = HashMap<BlockFace, ArrayList<BlockStateConfig>>()
                     info.models.forEach { model ->
@@ -130,14 +140,14 @@ internal class MaterialContent(
                             faceList += blockConfig
                             
                             // note block type as used material for sound overrides
-                            soundOverrides.useMaterial(blockConfig.type.material)
+                            builder.soundOverrides.useMaterial(blockConfig.type.material)
                         }
                     }
                     
                     blockModelData = BlockStateBlockModelData(id, configs)
                 }
                 
-                modelDataLookup[id] = itemModelData to blockModelData
+                modelDataLookup[id] = modelData.copy(block = blockModelData)
             }
         
         // pass modelDataLookup to Resources
@@ -156,7 +166,7 @@ internal class MaterialContent(
             
             modelObj.add("overrides", ModelFileMerger.sortOverrides(overrides))
             
-            file.parentFile.mkdirs()
+            file.parent.createDirectories()
             file.writeText(GSON.toJson(modelObj))
         }
         
@@ -173,7 +183,7 @@ internal class MaterialContent(
                 variants.add(cfg.variantString, variant)
             }
             
-            file.parentFile.mkdirs()
+            file.parent.createDirectories()
             file.writeText(GSON.toJson(mainObj))
         }
     }
@@ -181,7 +191,7 @@ internal class MaterialContent(
     private fun getNextCustomModelData(material: Material): Int {
         var pos = modelDataPosition.getOrPut(material) { 0 } + 1
         
-        val occupiedSet = basePacks.occupiedModelData[material]
+        val occupiedSet = builder.basePacks.occupiedModelData[material]
         if (occupiedSet != null) {
             while (pos in occupiedSet) {
                 pos++
@@ -201,7 +211,7 @@ internal class MaterialContent(
     private fun getNextBlockConfig(type: BlockStateConfigType<*>): BlockStateConfig {
         var pos = blockStatePosition.getOrPut(type) { -1 } + 1
         
-        val occupiedSet = basePacks.occupiedSolidIds[type]
+        val occupiedSet = builder.basePacks.occupiedSolidIds[type]
         val blockedSet = type.blockedIds
         
         while (pos in blockedSet || (occupiedSet != null && pos in occupiedSet)) {
@@ -224,7 +234,7 @@ internal class MaterialContent(
         return remainingBlockStates.getOrPut(type) {
             var count = 0
             
-            val occupiedSet = basePacks.occupiedSolidIds[type]
+            val occupiedSet = builder.basePacks.occupiedSolidIds[type]
             val blockedSet = type.blockedIds
             
             for (pos in 0..type.maxId) {
@@ -236,33 +246,19 @@ internal class MaterialContent(
         }
     }
     
-    private fun getModelFile(material: Material): Triple<File, JsonObject, JsonArray> {
-        val file = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/models/item/${material.name.lowercase()}.json")
-        if (!file.exists()) {
-            val modelObj = JsonObject()
-            
-            // fixme: This does not cover all cases
-            if (material.isBlock) {
-                modelObj.addProperty("parent", "block/${material.name.lowercase()}")
-            } else {
-                modelObj.addProperty("parent", "item/generated")
-                val textures = JsonObject().apply { addProperty("layer0", "item/${material.name.lowercase()}") }
-                modelObj.add("textures", textures)
-            }
-            
-            val overrides = JsonArray().also { modelObj.add("overrides", it) }
-            
-            return Triple(file, modelObj, overrides)
-        } else {
-            val modelObj = file.parseJson() as JsonObject
-            val overrides = (modelObj.get("overrides") as? JsonArray) ?: JsonArray().also { modelObj.add("overrides", it) }
-            
-            return Triple(file, modelObj, overrides)
-        }
+    private fun getModelFile(material: Material): Triple<Path, JsonObject, JsonArray> {
+        val path = "minecraft/models/item/${material.name.lowercase()}.json"
+        val destFile = ResourcePackBuilder.ASSETS_DIR.resolve(path)
+        val sourceFile = destFile.takeIf(Path::exists) ?: ResourcePackBuilder.MCASSETS_ASSETS_DIR.resolve(path)
+        require(sourceFile.exists()) { "Source model file does not exist: $sourceFile" }
+        
+        val modelObj = sourceFile.parseJson() as JsonObject
+        val overrides = (modelObj.get("overrides") as? JsonArray) ?: JsonArray().also { modelObj.add("overrides", it) }
+        return Triple(destFile, modelObj, overrides)
     }
     
-    private fun getBlockStateFile(type: BlockStateConfigType<*>): Triple<File, JsonObject, JsonObject> {
-        val file = File(ResourcePackBuilder.ASSETS_DIR, "minecraft/blockstates/${type.fileName}.json")
+    private fun getBlockStateFile(type: BlockStateConfigType<*>): Triple<Path, JsonObject, JsonObject> {
+        val file = ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/blockstates/${type.fileName}.json")
         
         val mainObj: JsonObject
         val variants: JsonObject

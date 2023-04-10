@@ -16,21 +16,18 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerResourcePackStatusEvent
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status.*
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEventsFirst
 
-internal object PlayerFreezer : Initializable(), Listener {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = emptySet<Initializable>()
+@InternalInit(stage = InitializationStage.POST_WORLD)
+internal object PlayerFreezer : Listener {
     
     private val frozenPlayers = HashMap<Player, Boolean>() // Player -> prevAllowFlight
     
-    override fun init() {
-        reload()
-    }
-    
+    @InitFun
     internal fun reload() {
         HandlerList.unregisterAll(this)
         if (DEFAULT_CONFIG.getBoolean("resource_pack.freeze_loading_players")) {
@@ -40,10 +37,7 @@ internal object PlayerFreezer : Initializable(), Listener {
         }
     }
     
-    override fun disable() {
-        clearPlayers()
-    }
-    
+    @DisableFun
     private fun clearPlayers() {
         frozenPlayers.forEach { (player, prevAllowFlight) -> player.allowFlight = prevAllowFlight }
         frozenPlayers.clear()

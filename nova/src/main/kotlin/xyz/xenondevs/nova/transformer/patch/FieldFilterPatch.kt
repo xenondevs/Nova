@@ -5,9 +5,8 @@ package xyz.xenondevs.nova.transformer.patch
 import jdk.internal.reflect.Reflection
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.nova.transformer.ReversibleMethodTransformer
-import kotlin.reflect.jvm.javaMethod
 
-internal object FieldFilterPatch : ReversibleMethodTransformer(Reflection::filterFields.javaMethod!!) {
+internal object FieldFilterPatch : ReversibleMethodTransformer(Reflection::filterFields) {
     
     override fun transform() {
         methodNode.instructions = buildInsnList {

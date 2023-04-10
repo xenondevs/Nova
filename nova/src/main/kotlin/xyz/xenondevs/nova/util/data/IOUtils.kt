@@ -1,6 +1,9 @@
 package xyz.xenondevs.nova.util.data
 
 import xyz.xenondevs.nova.NOVA
+import java.awt.Dimension
+import java.awt.image.BufferedImage
+import java.awt.image.RenderedImage
 import java.io.Closeable
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -8,8 +11,14 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.RandomAccessFile
+import java.nio.file.FileSystems
+import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import javax.imageio.ImageIO
+import kotlin.io.path.extension
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 import kotlin.math.max
 import kotlin.streams.asSequence
 
@@ -26,6 +35,7 @@ internal fun getResources(directory: String = ""): Sequence<String> {
     }.map(ZipEntry::getName)
 }
 
+// FIXME: resource leak
 internal fun getResources(file: File, directory: String = ""): Sequence<String> {
     return ZipFile(file).stream().asSequence().filter {
         it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class")
@@ -67,8 +77,10 @@ fun InputStream.transferTo(output: OutputStream, amount: Int) {
  * Appends the given [bytes] to the file at the given [pos].
  */
 internal fun RandomAccessFile.append(pos: Long, bytes: ByteArray) {
-    if (length() == 0L)
+    if (length() == 0L) {
         write(bytes)
+        return
+    }
     var toWrite = bytes.copyOf()
     val buffer = ByteArray(max(bytes.size, 1024))
     seek(pos)
@@ -220,16 +232,32 @@ inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {
     }
 }
 
-//<editor-fold desc="Legacy functions" defaultstate="collapsed">
-
-internal fun RandomAccessFile.readStringLegacy(): String {
-    val bytes = ByteArray(readUnsignedShort())
-    read(bytes)
-    return bytes.decodeToString()
+internal fun Path.readImageDimensions(): Dimension {
+    inputStream().use { 
+        val imageIn = ImageIO.createImageInputStream(it)
+        val reader = ImageIO.getImageReadersBySuffix(extension).next()
+        try {
+            reader.input = imageIn
+            return Dimension(reader.getWidth(0), reader.getHeight(0))
+        } finally {
+            reader.dispose()
+        }
+    }
 }
 
-internal fun RandomAccessFile.readStringListLegacy(): List<String> {
-    return Array(readInt()) { readStringLegacy() }.asList()
+internal fun Path.readImage(): BufferedImage {
+    return inputStream().use(ImageIO::read)
 }
 
-//</editor-fold>
+internal fun Path.writeImage(image: RenderedImage, formatName: String) {
+    outputStream().use { ImageIO.write(image, formatName, it) }
+}
+
+internal fun File.openZip(): Path {
+    return toPath().openZip()
+}
+
+internal fun Path.openZip(): Path {
+    val fs = FileSystems.newFileSystem(this)
+    return fs.rootDirectories.first()
+}

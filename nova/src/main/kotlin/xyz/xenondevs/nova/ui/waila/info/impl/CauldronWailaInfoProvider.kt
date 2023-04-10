@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.Levelled
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 
@@ -24,7 +24,7 @@ internal object CauldronWailaInfoProvider : VanillaWailaInfoProvider(
             3 -> "full"
             else -> throw IllegalStateException("Cauldron level is not 1, 2 or 3")
         }
-        info.icon = NamespacedId("minecraft", block.type.name.lowercase() + "_$level")
+        info.icon = ResourceLocation("minecraft", block.type.name.lowercase() + "_$level")
         return info
     }
     

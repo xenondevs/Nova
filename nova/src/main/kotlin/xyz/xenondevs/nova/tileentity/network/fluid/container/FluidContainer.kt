@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network.fluid.container
 
+import xyz.xenondevs.nova.tileentity.network.EndPointContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import java.util.*
 import kotlin.math.min
@@ -10,7 +11,7 @@ abstract class FluidContainer(
     type: FluidType?,
     amount: Long,
     capacity: Long
-) {
+) : EndPointContainer {
     
     /**
      * A set of allowed fluid types the [type] can be set to.

@@ -2,21 +2,29 @@ package xyz.xenondevs.nova.data.recipe
 
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.CraftingContainer
+import net.minecraft.world.item.crafting.BlastingRecipe
+import net.minecraft.world.item.crafting.CampfireCookingRecipe
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe
+import net.minecraft.world.item.crafting.SmokingRecipe
+import net.minecraft.world.item.crafting.StonecutterRecipe
 import net.minecraft.world.level.Level
 import org.bukkit.inventory.Recipe
+import org.bukkit.inventory.StonecuttingRecipe
+import xyz.xenondevs.commons.collections.removeFirstWhere
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.data.nmsCategory
 import xyz.xenondevs.nova.util.data.nmsIngredient
 import xyz.xenondevs.nova.util.nmsCopy
-import xyz.xenondevs.nova.util.removeFirstWhere
 import xyz.xenondevs.nova.util.resourceLocation
+import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
+import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
 import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
 import org.bukkit.inventory.ShapedRecipe as BukkitShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe
+import org.bukkit.inventory.SmokingRecipe as BukkitSmokingRecipe
 
 internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : ShapedRecipe(
     optimizedRecipe.recipe.key.resourceLocation,
@@ -99,6 +107,91 @@ internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) 
     bukkitRecipe.result.nmsCopy,
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
+) {
+    
+    private val choice = bukkitRecipe.inputChoice
+    
+    override fun matches(container: Container, level: Level): Boolean {
+        return choice.test(container.getItem(0).bukkitCopy)
+    }
+    
+    override fun toBukkitRecipe(): Recipe {
+        return bukkitRecipe
+    }
+    
+}
+
+internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRecipe) : BlastingRecipe(
+    bukkitRecipe.key.resourceLocation,
+    "",
+    bukkitRecipe.category.nmsCategory,
+    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.result.nmsCopy,
+    bukkitRecipe.experience,
+    bukkitRecipe.cookingTime
+) {
+    
+    private val choice = bukkitRecipe.inputChoice
+    
+    override fun matches(container: Container, level: Level): Boolean {
+        return choice.test(container.getItem(0).bukkitCopy)
+    }
+    
+    override fun toBukkitRecipe(): Recipe {
+        return bukkitRecipe
+    }
+    
+}
+
+internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) : SmokingRecipe(
+    bukkitRecipe.key.resourceLocation,
+    "",
+    bukkitRecipe.category.nmsCategory,
+    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.result.nmsCopy,
+    bukkitRecipe.experience,
+    bukkitRecipe.cookingTime
+) {
+    
+    private val choice = bukkitRecipe.inputChoice
+    
+    override fun matches(container: Container, level: Level): Boolean {
+        return choice.test(container.getItem(0).bukkitCopy)
+    }
+    
+    override fun toBukkitRecipe(): Recipe {
+        return bukkitRecipe
+    }
+    
+}
+
+internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe) : CampfireCookingRecipe(
+    bukkitRecipe.key.resourceLocation,
+    "",
+    bukkitRecipe.category.nmsCategory,
+    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.result.nmsCopy,
+    bukkitRecipe.experience,
+    bukkitRecipe.cookingTime
+) {
+    
+    private val choice = bukkitRecipe.inputChoice
+    
+    override fun matches(container: Container, level: Level): Boolean {
+        return choice.test(container.getItem(0).bukkitCopy)
+    }
+    
+    override fun toBukkitRecipe(): Recipe {
+        return bukkitRecipe
+    }
+    
+}
+
+internal class NovaStonecutterRecipe(private val bukkitRecipe: StonecuttingRecipe) : StonecutterRecipe(
+    bukkitRecipe.key.resourceLocation,
+    "",
+    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.result.nmsCopy
 ) {
     
     private val choice = bukkitRecipe.inputChoice

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.region
 
-import xyz.xenondevs.nova.data.provider.Provider
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem

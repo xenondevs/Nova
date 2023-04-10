@@ -1,25 +1,24 @@
 package xyz.xenondevs.nova.tileentity.network.fluid.holder
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.container.NovaFluidContainer
 import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.associateWithToEnumMap
-import xyz.xenondevs.nova.util.emptyEnumMap
 import java.util.*
 
-private val DEFAULT_CONNECTION_CONFIG = { CUBE_FACES.associateWithToEnumMap { NetworkConnectionType.NONE } }
-private val DEFAULT_CHANNEL_CONFIG = { CUBE_FACES.associateWithToEnumMap { 0 } }
-private val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithToEnumMap { 50 } }
+private val DEFAULT_CONNECTION_CONFIG = { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.NONE } }
+private val DEFAULT_CHANNEL_CONFIG = { CUBE_FACES.associateWithTo(enumMap()) { 0 } }
+private val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithTo(enumMap()) { 50 } }
 
 fun <T> NovaFluidHolder(
     endPoint: T,
     defaultContainer: Pair<FluidContainer, NetworkConnectionType>,
     vararg otherContainers: Pair<FluidContainer, NetworkConnectionType>,
-    defaultContainerConfig: () -> MutableMap<BlockFace, FluidContainer> = { CUBE_FACES.associateWithToEnumMap { defaultContainer.first } },
+    defaultContainerConfig: () -> MutableMap<BlockFace, FluidContainer> = { CUBE_FACES.associateWithTo(enumMap()) { defaultContainer.first } },
     defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
 ): NovaFluidHolder where T : NetworkEndPoint, T : DataHolder {
     val containers = hashMapOf(defaultContainer).also { it.putAll(otherContainers) }
@@ -61,7 +60,7 @@ class NovaFluidHolder(
     
     override val containerConfig: MutableMap<BlockFace, FluidContainer> =
         (dataHolder.retrieveDataOrNull<EnumMap<BlockFace, UUID>>("fluidContainerConfig")
-            ?.mapValuesTo(emptyEnumMap()) { availableContainers[it.value] })
+            ?.mapValuesTo(enumMap()) { availableContainers[it.value] })
             ?: defaultContainerConfig()
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
@@ -87,7 +86,7 @@ class NovaFluidHolder(
         dataHolder.storeData("fluidExtractPriorities", extractPriorities)
         
         if (availableContainers.isNotEmpty()) {
-            dataHolder.storeData("fluidContainerConfig", containerConfig.mapValuesTo(emptyEnumMap()) { it.value.uuid })
+            dataHolder.storeData("fluidContainerConfig", containerConfig.mapValuesTo(enumMap()) { it.value.uuid })
         }
     }
     

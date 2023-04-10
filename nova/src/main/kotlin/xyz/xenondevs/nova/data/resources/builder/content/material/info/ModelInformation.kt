@@ -1,12 +1,15 @@
 package xyz.xenondevs.nova.data.resources.builder.content.material.info
 
+import net.minecraft.resources.ResourceLocation
+
 internal class RegisteredMaterial(
-    val id: String,
+    val id: ResourceLocation,
     val itemInfo: ItemModelInformation,
-    val blockInfo: BlockModelInformation
+    val blockInfo: BlockModelInformation,
+    val armor: ResourceLocation?
 )
 
 internal interface ModelInformation {
-    val id: String
+    val id: ResourceLocation
     val models: List<String>
 }

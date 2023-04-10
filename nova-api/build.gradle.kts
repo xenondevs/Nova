@@ -3,11 +3,12 @@ description = "nova-api"
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     kotlin("jvm") version libs.versions.kotlin
-    id("org.jetbrains.dokka") version "1.7.20"
+    id("org.jetbrains.dokka") version libs.versions.dokka
     `maven-publish`
 }
 
 dependencies {
+    implementation(libs.bundles.kotlin)
     compileOnly(project(":nova-loader"))
     compileOnly(libs.spigot.api)
 }

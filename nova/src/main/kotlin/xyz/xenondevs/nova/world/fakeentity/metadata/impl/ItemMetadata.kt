@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.world.fakeentity.metadata.impl
 
+import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.world.item.ItemStack
-import xyz.xenondevs.nova.world.fakeentity.metadata.MetadataSerializers
 
 class ItemMetadata : EntityMetadata() {
     
-    var item by entry(8, MetadataSerializers.ITEM_STACK, ItemStack.EMPTY)
+    var item: ItemStack by entry(8, EntityDataSerializers.ITEM_STACK, ItemStack.EMPTY)
     
 }

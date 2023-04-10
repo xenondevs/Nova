@@ -10,8 +10,10 @@ import org.bukkit.event.block.BlockPlaceEvent
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
@@ -22,15 +24,17 @@ import java.util.*
 /**
  * Manages wrappers for vanilla TileEntities
  */
-internal object VanillaTileEntityManager : Initializable(), Listener {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class]
+)
+internal object VanillaTileEntityManager : Listener {
     
     private val tileEntityMap: MutableMap<ChunkPos, MutableMap<BlockPos, VanillaTileEntity>> =
         Collections.synchronizedMap(HashMap())
     
-    override fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
     }
     
@@ -88,6 +92,10 @@ internal object VanillaTileEntityManager : Initializable(), Listener {
     }
     
     private fun tryCreateVTE(pos: BlockPos): VanillaTileEntityState? {
+        // Prevent creation of vanilla tile entities for custom item service blocks
+        if (CustomItemServiceManager.getBlockType(pos.block) != null)
+            return null
+        
         val block = pos.block
         val type = VanillaTileEntity.Type.of(block) ?: return null
         

@@ -2,6 +2,9 @@ package xyz.xenondevs.nova.data.resources.builder.basepack.merger
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import xyz.xenondevs.commons.gson.addAll
+import xyz.xenondevs.commons.gson.getStringOrNull
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
@@ -9,11 +12,17 @@ import xyz.xenondevs.nova.data.resources.model.blockstate.BrownMushroomBlockStat
 import xyz.xenondevs.nova.data.resources.model.blockstate.MushroomStemBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.NoteBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.RedMushroomBlockStateConfig
-import xyz.xenondevs.nova.util.data.GSON
-import xyz.xenondevs.nova.util.data.addAll
-import xyz.xenondevs.nova.util.data.parseJson
-import java.io.File
+import xyz.xenondevs.nova.data.serialization.json.GSON
+import java.nio.file.Path
 import java.util.logging.Level
+import kotlin.io.path.copyTo
+import kotlin.io.path.exists
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.writeText
+
+private val IGNORABLE_MODELS: Set<String> = hashSetOf(
+    "minecraft:block/original/brown_mushroom_block_true" // ItemsAdder
+)
 
 private val MERGEABLE_STATE_CONFIGS = listOf(
     NoteBlockStateConfig,
@@ -22,9 +31,9 @@ private val MERGEABLE_STATE_CONFIGS = listOf(
     MushroomStemBlockStateConfig
 )
 
-internal class BlockStateFileMerger(basePacks: BasePacks) : FileMerger(basePacks, "assets/minecraft/blockstates") {
+internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/blockstates") {
     
-    override fun merge(source: File, destination: File) {
+    override fun merge(source: Path, destination: Path) {
         val configType = MERGEABLE_STATE_CONFIGS.firstOrNull { it.fileName == source.nameWithoutExtension }
         if (configType != null) {
             val variants = getVariants(source)
@@ -42,7 +51,7 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileMerger(basePacks
         source.copyTo(destination)
     }
     
-    private fun getVariants(file: File): JsonObject {
+    private fun getVariants(file: Path): JsonObject {
         val sourceObj = file.parseJson() as JsonObject
         return sourceObj.get("variants") as? JsonObject
             ?: (sourceObj.get("multipart") as? JsonArray)?.let(::convertMultipartToVariants)
@@ -72,8 +81,15 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileMerger(basePacks
     private fun processVariants(configType: BlockStateConfigType<*>, obj: JsonObject) {
         try {
             val occupied = basePacks.occupiedSolidIds.getOrPut(configType, ::HashSet)
-            obj.entrySet().forEach { (variant, _) ->
+            obj.entrySet().removeIf { (variant, obj) ->
+                obj as JsonObject
+                val model = obj.getStringOrNull("model")
+                if (model in IGNORABLE_MODELS)
+                    return@removeIf true
+                
                 occupied += configType.of(variant).id
+                
+                return@removeIf false
             }
     
             configType.handleMerged(occupied)

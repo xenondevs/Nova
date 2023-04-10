@@ -14,16 +14,16 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
-import xyz.xenondevs.nova.data.provider.map
-import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.material.options.FoodOptions
-import xyz.xenondevs.nova.material.options.FoodOptions.FoodType
+import xyz.xenondevs.nmsutils.util.removeIf
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.options.FoodOptions
+import xyz.xenondevs.nova.item.options.FoodOptions.FoodType
+import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.util.getPlayersNearby
 import xyz.xenondevs.nova.util.intValue
 import xyz.xenondevs.nova.util.isRightClick
 import xyz.xenondevs.nova.util.item.genericMaxHealth
 import xyz.xenondevs.nova.util.playSoundNearby
-import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
@@ -38,8 +38,6 @@ data class Eater(val itemStack: ItemStack, val hand: EquipmentSlot, val startTim
 
 class Consumable(private val options: FoodOptions) : ItemBehavior() {
     
-    override val vanillaMaterialProperties = options.typeProvider.map { listOf(it.vanillaMaterialProperty) }
-    
     private val eaters = HashMap<Player, Eater>()
     
     init {
@@ -53,6 +51,10 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
                 return@removeIf false
             }
         }
+    }
+    
+    override fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> {
+        return listOf(options.type.vanillaMaterialProperty)
     }
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
@@ -149,8 +151,8 @@ class Consumable(private val options: FoodOptions) : ItemBehavior() {
     }
     
     companion object : ItemBehaviorFactory<Consumable>() {
-        override fun create(material: ItemNovaMaterial): Consumable =
-            Consumable(FoodOptions.configurable(material))
+        override fun create(item: NovaItem): Consumable =
+            Consumable(FoodOptions.configurable(item))
     }
     
 }

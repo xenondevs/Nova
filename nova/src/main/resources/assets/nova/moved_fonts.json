@@ -1,0 +1,11 @@
+{
+  "minecraft:default": {
+    "range": [1, 19]
+  },
+  "nova:bossbar": {
+    "range": [1, 19]
+  },
+  "nova:waila": {
+    "range": [1, 19]
+  }
+}

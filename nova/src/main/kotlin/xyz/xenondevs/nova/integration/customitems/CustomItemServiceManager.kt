@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.integration.customitems
 
+import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
@@ -7,21 +8,21 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.InternalIntegration
 import xyz.xenondevs.nova.integration.customitems.plugin.ItemsAdder
 import xyz.xenondevs.nova.integration.customitems.plugin.MMOItems
 import xyz.xenondevs.nova.integration.customitems.plugin.Oraxen
 
-object CustomItemServiceManager : Initializable() {
+@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC)
+object CustomItemServiceManager {
     
     internal val PLUGINS: List<CustomItemService> by lazy { listOf(ItemsAdder, Oraxen, MMOItems).filter(InternalIntegration::isInstalled) }
     
-    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
-    override val dependsOn = emptySet<Initializable>()
-    
-    override fun init() {
+    @InitFun
+    private fun init() {
         PLUGINS.forEach(CustomItemService::awaitLoad)
     }
     
@@ -29,12 +30,8 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.any { it.placeBlock(item, location, playSound) }
     }
     
-    fun removeBlock(block: Block, playSound: Boolean, showParticles: Boolean): Boolean {
-        return PLUGINS.any { it.removeBlock(block, playSound, showParticles) }
-    }
-    
-    fun breakBlock(block: Block, tool: ItemStack?, playSound: Boolean, showParticles: Boolean): List<ItemStack>? {
-        return PLUGINS.firstNotNullOfOrNull { it.breakBlock(block, tool, playSound, showParticles) }
+    fun removeBlock(block: Block, breakEffects: Boolean): Boolean {
+        return PLUGINS.any { it.removeBlock(block, breakEffects) }
     }
     
     fun getDrops(block: Block, tool: ItemStack?): List<ItemStack>? {
@@ -50,7 +47,7 @@ object CustomItemServiceManager : Initializable() {
     }
     
     fun getItemByName(name: String): ItemStack? {
-        return PLUGINS.firstNotNullOfOrNull { it.getItemByName(name) }
+        return PLUGINS.firstNotNullOfOrNull { it.getItemById(name) }
     }
     
     fun getItemTest(name: String): SingleItemTest? {
@@ -65,20 +62,20 @@ object CustomItemServiceManager : Initializable() {
         return PLUGINS.firstNotNullOfOrNull { it.getId(block) }
     }
     
-    fun getName(item: ItemStack, locale: String): String? {
+    fun getName(item: ItemStack, locale: String): Component? {
         return PLUGINS.firstNotNullOfOrNull { it.getName(item, locale) }
     }
     
-    fun getName(block: Block, locale: String): String? {
+    fun getName(block: Block, locale: String): Component? {
         return PLUGINS.firstNotNullOfOrNull { it.getName(block, locale) }
-    }
-    
-    fun getNameKey(item: ItemStack): String? {
-        return PLUGINS.firstNotNullOfOrNull { it.getId(item) }
     }
     
     fun hasRecipe(key: NamespacedKey): Boolean {
         return PLUGINS.any { it.hasRecipe(key) }
+    }
+    
+    fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {
+        return PLUGINS.firstNotNullOfOrNull { it.canBreakBlock(block, tool) }
     }
     
     fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {

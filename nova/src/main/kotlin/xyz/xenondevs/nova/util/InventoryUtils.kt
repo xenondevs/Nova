@@ -1,8 +1,5 @@
 package xyz.xenondevs.nova.util
 
-import de.studiocode.invui.util.InventoryUtils
-import de.studiocode.invui.virtualinventory.VirtualInventory
-import de.studiocode.invui.virtualinventory.event.UpdateReason
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.CraftingInventory
@@ -12,23 +9,16 @@ import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.nova.util.item.takeUnlessAir
+import xyz.xenondevs.invui.inventory.VirtualInventory
+import xyz.xenondevs.invui.inventory.event.UpdateReason
+import xyz.xenondevs.invui.util.InventoryUtils
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
 /**
  * Adds a [List] of [ItemStack]s to a [VirtualInventory].
  */
 fun VirtualInventory.addAll(reason: UpdateReason?, items: List<ItemStack>) =
     items.forEach { addItem(reason, it) }
-
-/**
- * Checks if a [VirtualInventory] is full.
- */
-fun VirtualInventory.isFull(): Boolean {
-    for ((index, item) in items.withIndex())
-        if (item == null || item.amount < getMaxStackSize(index, -1))
-            return false
-    return true
-}
 
 /**
  * Checks if an [Inventory] is full.
@@ -39,12 +29,6 @@ fun Inventory.isFull(): Boolean {
             return false
     return true
 }
-
-/**
- * Checks if a [VirtualInventory] has an empty slot.
- */
-fun VirtualInventory.hasEmptySlot(): Boolean =
-    items.any { it == null }
 
 /**
  * Adds an [ItemStack] to an [Inventory] while respecting both
@@ -132,7 +116,7 @@ fun Inventory.getFirstEmptySlot(): Int? = InventoryUtils.getFirstEmptySlot(this)
  * if the given slot is occupied.
  */
 fun PlayerInventory.addPrioritized(prioritizedSlot: EquipmentSlot, itemStack: ItemStack) {
-    if (getItem(prioritizedSlot)?.takeUnlessAir() == null) setItem(prioritizedSlot, itemStack)
+    if (getItem(prioritizedSlot)?.takeUnlessEmpty() == null) setItem(prioritizedSlot, itemStack)
     else addItem(itemStack)
 }
 
@@ -158,50 +142,9 @@ val Player.hasInventoryOpen: Boolean
 fun InventoryView.isPlayerView() = topInventory is CraftingInventory && topInventory.size == 5
 
 /**
- * Tries to remove the first ItemStack#amount items from the first slots that have a similar item.
- * @return How many items could not be removed
+ * A [VirtualInventory] implementation that does not store any items, but voids them.
  */
-fun VirtualInventory.removeFirstMatching(toMatch: ItemStack, updateReason: UpdateReason? = null): Int {
-    var leftOver = toMatch.amount
-    
-    for (i in 0 until size) {
-        val item = getUnsafeItemStack(i)
-        if (toMatch.isSimilar(item)) {
-            leftOver += addItemAmount(updateReason, i, -leftOver)
-            
-            if (leftOver <= 0) break
-        }
-    }
-    
-    return leftOver
-}
-
-/**
- * Checks if that [VirtualInventory] has ItemStack#amount items.
- */
-fun VirtualInventory.contains(toCheck: ItemStack): Boolean {
-    var amount = toCheck.amount
-    for (i in 0 until size) {
-        val item = getUnsafeItemStack(i)
-        if (toCheck.isSimilar(item)) {
-            amount -= item.amount
-            if (amount <= 0) return true
-        }
-    }
-    
-    return false
-}
-
 class VoidingVirtualInventory(size: Int) : VirtualInventory(null, size) {
-    override fun setItemStackSilently(slot: Int, itemStack: ItemStack?) = Unit
-    override fun forceSetItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack?) = true
-    override fun setItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack?) = true
-    override fun putItemStack(updateReason: UpdateReason?, slot: Int, itemStack: ItemStack) = 0
-    override fun setItemAmount(updateReason: UpdateReason?, slot: Int, amount: Int) = amount
-    override fun addItemAmount(updateReason: UpdateReason?, slot: Int, amount: Int) = amount
-    override fun addItem(updateReason: UpdateReason?, itemStack: ItemStack?) = 0
-    override fun collectToCursor(updateReason: UpdateReason?, itemStack: ItemStack?) = 0
-    override fun simulateAdd(itemStacks: MutableList<ItemStack>) = IntArray(itemStacks.size)
-    override fun simulateAdd(itemStack: ItemStack, vararg itemStacks: ItemStack) = IntArray(1 + itemStacks.size)
-    override fun canHold(itemStacks: MutableList<ItemStack>) = true
+    override fun setCloneBackingItem(slot: Int, itemStack: ItemStack?) = Unit
+    override fun setDirectBackingItem(slot: Int, itemStack: ItemStack?) = Unit
 }

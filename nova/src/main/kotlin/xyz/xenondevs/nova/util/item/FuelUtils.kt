@@ -1,93 +1,66 @@
 package xyz.xenondevs.nova.util.item
 
+import net.minecraft.world.item.Item
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import org.bukkit.Material
-import org.bukkit.Tag
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers
+import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.nova.item.behavior.Fuel
+import net.minecraft.world.item.ItemStack as MojangStack
 
-val Material.burnTime: Int
+val Material.burnTime: Int?
     get() = FuelUtils.getBurnTime(this)
 
-val Material.fuel: Fuel?
-    get() = FuelUtils.getFuel(this)
+val ItemStack.isFuel: Boolean
+    get() = FuelUtils.isFuel(this)
 
-class Fuel(val material: Material, val burnTime: Int, val remains: Material? = null)
+val ItemStack.burnTime: Int?
+    get() = FuelUtils.getBurnTime(this)
 
-private object FuelUtils {
+object FuelUtils {
     
-    private val FUELS: Map<Material, Fuel>
+    private val NMS_VANILLA_FUELS: Map<Item, Int> = AbstractFurnaceBlockEntity.getFuel()
+    private val VANILLA_FUELS: Map<Material, Int> = NMS_VANILLA_FUELS
+        .mapKeysTo(enumMap()) { (item, _) -> CraftMagicNumbers.getMaterial(item) }
     
-    init {
+    fun isFuel(material: Material): Boolean = material in VANILLA_FUELS
+    fun getBurnTime(material: Material): Int? = VANILLA_FUELS[material]
+    
+    fun isFuel(itemStack: ItemStack): Boolean {
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) {
+            return novaItem.hasBehavior(Fuel::class)
+        }
         
-        val fuels = mutableListOf(
-            Fuel(Material.LAVA_BUCKET, 20000, Material.BUCKET),
-            Fuel(Material.COAL_BLOCK, 16000),
-            Fuel(Material.BLAZE_ROD, 2400),
-            Fuel(Material.COAL, 1600),
-            Fuel(Material.CHARCOAL, 1600),
-            Fuel(Material.OAK_FENCE, 300),
-            Fuel(Material.BIRCH_FENCE, 300),
-            Fuel(Material.SPRUCE_FENCE, 300),
-            Fuel(Material.JUNGLE_FENCE, 300),
-            Fuel(Material.DARK_OAK_FENCE, 300),
-            Fuel(Material.ACACIA_FENCE, 300),
-            Fuel(Material.OAK_FENCE_GATE, 300),
-            Fuel(Material.BIRCH_FENCE_GATE, 300),
-            Fuel(Material.SPRUCE_FENCE_GATE, 300),
-            Fuel(Material.JUNGLE_FENCE_GATE, 300),
-            Fuel(Material.DARK_OAK_FENCE_GATE, 300),
-            Fuel(Material.ACACIA_FENCE_GATE, 300),
-            Fuel(Material.NOTE_BLOCK, 300),
-            Fuel(Material.BOOKSHELF, 300),
-            Fuel(Material.LECTERN, 300),
-            Fuel(Material.JUKEBOX, 300),
-            Fuel(Material.CHEST, 300),
-            Fuel(Material.TRAPPED_CHEST, 300),
-            Fuel(Material.CRAFTING_TABLE, 300),
-            Fuel(Material.DAYLIGHT_DETECTOR, 300),
-            Fuel(Material.BOW, 300),
-            Fuel(Material.FISHING_ROD, 300),
-            Fuel(Material.LADDER, 300),
-            Fuel(Material.WOODEN_SHOVEL, 200),
-            Fuel(Material.WOODEN_SWORD, 200),
-            Fuel(Material.WOODEN_HOE, 200),
-            Fuel(Material.WOODEN_AXE, 200),
-            Fuel(Material.WOODEN_PICKAXE, 200),
-            Fuel(Material.STICK, 100),
-            Fuel(Material.BOWL, 100),
-            Fuel(Material.DRIED_KELP_BLOCK, 4001),
-            Fuel(Material.CROSSBOW, 300),
-            Fuel(Material.BAMBOO, 50),
-            Fuel(Material.DEAD_BUSH, 100),
-            Fuel(Material.SCAFFOLDING, 400),
-            Fuel(Material.LOOM, 300),
-            Fuel(Material.BARREL, 300),
-            Fuel(Material.CARTOGRAPHY_TABLE, 300),
-            Fuel(Material.FLETCHING_TABLE, 300),
-            Fuel(Material.SMITHING_TABLE, 300),
-            Fuel(Material.COMPOSTER, 300),
-        )
-        
-        fun addToList(tag: Tag<Material>, burnTime: Int) = tag.values.forEach { fuels += Fuel(it, burnTime) }
-        
-        addToList(Tag.LOGS, 300)
-        addToList(Tag.PLANKS, 300)
-        addToList(Tag.WOODEN_STAIRS, 300)
-        addToList(Tag.WOODEN_SLABS, 150)
-        addToList(Tag.WOODEN_TRAPDOORS, 300)
-        addToList(Tag.WOODEN_PRESSURE_PLATES, 300)
-        addToList(Tag.BANNERS, 300)
-        addToList(Tag.SIGNS, 200)
-        addToList(Tag.WOODEN_DOORS, 200)
-        addToList(Tag.ITEMS_BOATS, 1200)
-        addToList(Tag.WOOL, 100)
-        addToList(Tag.WOODEN_BUTTONS, 100)
-        addToList(Tag.SAPLINGS, 100)
-        addToList(Tag.WOOL_CARPETS, 67)
-        
-        FUELS = fuels.associateBy { it.material }
+        return itemStack.type in VANILLA_FUELS
     }
     
-    fun getBurnTime(material: Material) = FUELS[material]?.burnTime ?: 0
+    fun getBurnTime(itemStack: ItemStack): Int? {
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) {
+            return novaItem.getBehavior(Fuel::class)?.options?.burnTime
+        }
+        
+        return getBurnTime(itemStack.type)
+    }
     
-    fun getFuel(material: Material): Fuel? = FUELS[material]
+    fun isFuel(itemStack: MojangStack): Boolean {
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) {
+            return novaItem.hasBehavior(Fuel::class)
+        }
+        
+        return itemStack.item in NMS_VANILLA_FUELS
+    }
+    
+    fun getBurnTime(itemStack: MojangStack): Int? {
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) {
+            return novaItem.getBehavior(Fuel::class)?.options?.burnTime
+        }
+        
+        return NMS_VANILLA_FUELS[itemStack.item]
+    }
     
 }

@@ -5,29 +5,31 @@ import net.minecraft.locale.Language
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 import org.bukkit.entity.Player
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
-import xyz.xenondevs.nova.material.ItemNovaMaterial
-import xyz.xenondevs.nova.util.data.parseJson
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.formatSafely
 import xyz.xenondevs.nova.util.runAsyncTask
-import java.io.File
 
-object LocaleManager : Initializable() {
-    
-    override val initializationStage = InitializationStage.POST_WORLD_ASYNC
-    override val dependsOn = setOf(ResourceGeneration.PreWorld)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD_ASYNC,
+    dependsOn = [ResourceGeneration.PreWorld::class]
+)
+object LocaleManager {
     
     private val loadedLangs = HashSet<String>()
     private val loadingLangs = HashSet<String>()
     
     private lateinit var translationProviders: MutableMap<String, HashMap<String, String>>
     
-    override fun init() {
+    @InitFun
+    private fun init() {
         translationProviders = Resources.languageLookup.entries.associateTo(HashMap()) { (key, value) -> key to HashMap(value) }
         loadLang("en_us")
         Language.inject(NovaLanguage)
@@ -40,7 +42,7 @@ object LocaleManager : Initializable() {
         loadingLangs += lang
         
         if (NOVA.isEnabled) runAsyncTask {
-            val file = File(ResourcePackBuilder.MCASSETS_DIR, "assets/minecraft/lang/$lang.json")
+            val file = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/lang/$lang.json")
             val json = file.parseJson() as JsonObject
             val translations = json.entrySet().associateTo(HashMap()) { it.key to it.value.asString }
             
@@ -53,8 +55,37 @@ object LocaleManager : Initializable() {
     }
     
     @Synchronized
-    fun getAllTranslations(key: String, vararg args: Any): Set<String> {
-        return loadedLangs.mapTo(HashSet()) { getTranslation(it, key, *args) }
+    fun hasTranslation(lang: String, key: String): Boolean {
+        if (!::translationProviders.isInitialized) return false
+        if (lang !in loadedLangs) loadLang(lang)
+        return translationProviders[lang]?.containsKey(key) ?: false
+    }
+    
+    @Synchronized
+    fun getFormatStringOrNull(lang: String, key: String): String? {
+        if (!::translationProviders.isInitialized) return null
+        if (lang !in loadedLangs) loadLang(lang)
+        return translationProviders[lang]?.get(key)
+    }
+    
+    @Synchronized
+    fun getFormatString(lang: String, key: String): String {
+        var formatString = getFormatStringOrNull(lang, key)
+        if (formatString == null && lang != "en_us")
+            formatString = getFormatStringOrNull("en_us", key)
+        return formatString ?: key
+    }
+    
+    @Synchronized
+    fun getAllFormatStrings(key: String): Set<String> {
+        return loadedLangs.mapTo(HashSet()) { getFormatString(it, key) }
+    }
+    
+    @Synchronized
+    fun getTranslationOrNull(lang: String, key: String, vararg args: Any): String? {
+        if (!::translationProviders.isInitialized) return null
+        if (lang !in loadedLangs) loadLang(lang)
+        return translationProviders[lang]?.get(key)?.let { String.formatSafely(it, *args) }
     }
     
     @Synchronized
@@ -66,17 +97,8 @@ object LocaleManager : Initializable() {
     }
     
     @Synchronized
-    fun getTranslationOrNull(lang: String, key: String, vararg args: Any): String? {
-        if (!::translationProviders.isInitialized) return null
-        if (lang !in loadedLangs) loadLang(lang)
-        return translationProviders[lang]?.get(key)?.let { String.formatSafely(it, *args) }
-    }
-    
-    @Synchronized
-    fun hasTranslation(lang: String, key: String): Boolean {
-        if (!::translationProviders.isInitialized) return false
-        if (lang !in loadedLangs) loadLang(lang)
-        return translationProviders[lang]?.containsKey(key) ?: false
+    fun getAllTranslations(key: String, vararg args: Any): Set<String> {
+        return loadedLangs.mapTo(HashSet()) { getTranslation(it, key, *args) }
     }
     
     @Synchronized
@@ -85,13 +107,13 @@ object LocaleManager : Initializable() {
     }
     
     @Synchronized
-    fun getTranslatedName(lang: String, material: ItemNovaMaterial): String {
-        return getTranslation(lang, material.localizedName)
+    fun getTranslatedName(lang: String, item: NovaItem): String {
+        return getTranslation(lang, item.localizedName)
     }
     
     @Synchronized
-    fun getTranslatedName(player: Player, material: ItemNovaMaterial): String {
-        return getTranslation(player, material.localizedName)
+    fun getTranslatedName(player: Player, item: NovaItem): String {
+        return getTranslation(player, item.localizedName)
     }
     
     private object NovaLanguage : Language() {
@@ -100,6 +122,10 @@ object LocaleManager : Initializable() {
         
         override fun getOrDefault(key: String): String {
             return getTranslationOrNull("en_us", key) ?: delegate.getOrDefault(key)
+        }
+        
+        override fun getOrDefault(key: String, fallback: String): String {
+            return getTranslationOrNull("en_us", key) ?: delegate.getOrDefault(key, fallback)
         }
         
         override fun has(key: String): Boolean {

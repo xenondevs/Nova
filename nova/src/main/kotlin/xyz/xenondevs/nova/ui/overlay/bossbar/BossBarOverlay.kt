@@ -1,41 +1,38 @@
 package xyz.xenondevs.nova.ui.overlay.bossbar
 
-import net.md_5.bungee.api.chat.BaseComponent
+import net.kyori.adventure.text.Component
 import xyz.xenondevs.nova.data.resources.CharSizes
 
-abstract class BossBarOverlay {
+interface BossBarOverlay {
     
     /**
-     * Which boss bar should be used. For every bar level, the text will be rendered 20px lower.
+     * The vertical offset of this overlay, relative to the offset of the [BossBarOverlayCompound]. Gui-scale affected.
      */
-    abstract val barLevel: Int
+    val offset: Int
     
     /**
-     * The components to display.
+     * At which x-coordinate the [Component] should be centered at. Gui-scale affected.
+     * Can be null if they shouldn't be centered.
      */
-    abstract val components: Array<out BaseComponent>
+    val centerX: Int?
     
     /**
-     * At which x-coordinate the [text][components] should be centered at.
-     * Null if there should they shouldn't be centered.
+     * The [Component] of this [BossBarOverlay].
      */
-    abstract val centerX: Int?
+    val component: Component
     
     /**
-     * If the [components] have been changed and an update should be sent in the next tick.
+     * Gets the width of the [Component] in pixels.
      */
-    var changed: Boolean = true
+    fun getWidth(locale: String): Int =
+        CharSizes.calculateComponentWidth(component, locale)
     
     /**
-     * The width of the [components] in pixels.
+     * Gets the vertical range of this overlay in pixels, relative from the [offset] position.
      */
-    open fun getWidth(locale: String): Int =
-        CharSizes.calculateComponentWidth(components, locale)
-    
-    /**
-     * The last relative y position that this [BossBarOverlay] draws at.
-     */
-    open fun getEndY(locale: String): Int =
-        CharSizes.calculateComponentSize(components, locale).yRange.last
+    fun getVerticalRange(locale: String): IntRange {
+        val componentRange = CharSizes.calculateComponentSize(component, locale).yRange
+        return IntRange(offset + componentRange.first, offset + componentRange.last)
+    }
     
 }

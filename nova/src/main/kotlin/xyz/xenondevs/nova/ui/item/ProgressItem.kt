@@ -1,14 +1,14 @@
 package xyz.xenondevs.nova.ui.item
 
-import de.studiocode.invui.item.ItemProvider
-import de.studiocode.invui.item.impl.BaseItem
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.impl.AbstractItem
+import xyz.xenondevs.nova.item.NovaItem
 import kotlin.math.roundToInt
 
-open class ProgressItem(val material: ItemNovaMaterial, private val maxState: Int) : BaseItem() {
+open class ProgressItem(val item: NovaItem, private val maxState: Int) : AbstractItem() {
     
     var percentage: Double = 0.0
         set(value) {
@@ -17,7 +17,7 @@ open class ProgressItem(val material: ItemNovaMaterial, private val maxState: In
         }
     
     override fun getItemProvider(): ItemProvider {
-        return material.item.createItemBuilder((percentage * maxState).roundToInt())
+        return item.model.createItemBuilder((percentage * maxState).roundToInt())
     }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit

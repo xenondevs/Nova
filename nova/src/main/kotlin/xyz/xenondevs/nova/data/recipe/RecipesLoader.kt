@@ -2,19 +2,20 @@ package xyz.xenondevs.nova.data.recipe
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import xyz.xenondevs.commons.gson.getAllJsonObjects
+import xyz.xenondevs.commons.gson.getBooleanOrNull
+import xyz.xenondevs.commons.gson.hasArray
+import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.data.UpdatableFile
-import xyz.xenondevs.nova.data.serialization.json.RecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer
+import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.util.data.HashUtils
-import xyz.xenondevs.nova.util.data.getAllJsonObjects
-import xyz.xenondevs.nova.util.data.getBoolean
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
-import xyz.xenondevs.nova.util.data.hasArray
-import xyz.xenondevs.nova.util.data.parseJson
 import java.io.File
 import java.util.logging.Level
 
@@ -67,10 +68,9 @@ internal object RecipesLoader {
     }
     
     fun loadRecipes(): List<Any> {
-        return RecipeTypeRegistry.types.flatMap {
-            val dirName = it.dirName
+        return RECIPE_TYPE.flatMap {
             val deserializer = it.deserializer
-            if (dirName != null && deserializer != null) {
+            if (deserializer != null) {
                 loadRecipes(it.dirName, it.deserializer)
             } else emptyList()
         }
@@ -88,16 +88,16 @@ internal object RecipesLoader {
         val fallbacks = when (val element = file.parseJson()) {
             is JsonArray -> element.getAllJsonObjects()
             is JsonObject -> if (element.hasArray("recipes")) {
-                failSilently = element.getBoolean("failSilently", false)
+                failSilently = element.getBooleanOrNull("failSilently") ?: false
                 element.getAsJsonArray("recipes").getAllJsonObjects()
             } else {
-                failSilently = element.getBoolean("failSilently", false)
+                failSilently = element.getBooleanOrNull("failSilently") ?: false
                 listOf(element)
             }
             else -> null
         }
         
-        if (fallbacks != null && fallbacks.isNotEmpty()) {
+        if (!fallbacks.isNullOrEmpty()) {
             // store exceptions in case no fallback works
             val exceptions = ArrayList<Exception>()
             

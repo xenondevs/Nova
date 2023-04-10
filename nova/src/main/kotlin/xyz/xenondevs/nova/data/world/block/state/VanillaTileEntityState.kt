@@ -1,15 +1,15 @@
 package xyz.xenondevs.nova.data.world.block.state
 
+import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.cbf.buffer.ByteBuffer
-import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.cbf.io.ByteBuffer
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.world.BlockPos
 
-internal class VanillaTileEntityState(override val pos: BlockPos, override val id: NamespacedId) : BlockState {
+internal class VanillaTileEntityState(override val pos: BlockPos, override val id: ResourceLocation) : BlockState() {
     
     @Volatile
     lateinit var data: Compound
@@ -21,7 +21,7 @@ internal class VanillaTileEntityState(override val pos: BlockPos, override val i
     override var isLoaded = false
         private set
     
-    constructor(pos: BlockPos, id: String) : this(pos, NamespacedId.of(id))
+    constructor(pos: BlockPos, id: String) : this(pos, ResourceLocation.of(id, ':'))
     
     override fun handleInitialized(placed: Boolean) {
         if (!::data.isInitialized) data = Compound()

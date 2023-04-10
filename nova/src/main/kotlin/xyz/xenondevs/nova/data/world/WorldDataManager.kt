@@ -2,8 +2,11 @@
 
 package xyz.xenondevs.nova.data.world
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.World
+import org.bukkit.block.BlockFace
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -11,24 +14,31 @@ import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.event.world.WorldUnloadEvent
+import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.pollFirstWhere
+import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.block.state.BlockState
+import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
-import xyz.xenondevs.nova.initialize.Initializable
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.concurrent.Latch
-import xyz.xenondevs.nova.util.pollFirstWhere
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.removeIf
 import xyz.xenondevs.nova.util.runTask
+import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.pos
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -36,11 +46,20 @@ import java.util.logging.Level
 import kotlin.concurrent.read
 import kotlin.concurrent.thread
 import kotlin.concurrent.write
+import net.minecraft.core.BlockPos as MojangBlockPos
+import net.minecraft.world.level.Level as MojangWorld
 
-internal object WorldDataManager : Initializable(), Listener {
-    
-    override val initializationStage = InitializationStage.POST_WORLD
-    override val dependsOn = setOf(AddonsInitializer, LegacyFileConverter, TileEntityManager, VanillaTileEntityManager, NetworkManager)
+@InternalInit(
+    stage = InitializationStage.POST_WORLD,
+    dependsOn = [
+        AddonsInitializer::class,
+        LegacyFileConverter::class,
+        TileEntityManager::class,
+        VanillaTileEntityManager::class,
+        NetworkManager.Companion::class
+    ]
+)
+internal object WorldDataManager : Listener {
     
     private val worlds: MutableMap<UUID, WorldDataStorage> = Collections.synchronizedMap(HashMap()) // TODO: removing entries of unloaded worlds
     
@@ -48,7 +67,10 @@ internal object WorldDataManager : Initializable(), Listener {
     private val chunkTasks: MutableMap<ChunkPos, Boolean> = Collections.synchronizedMap(HashMap())
     private val chunkLocks: MutableMap<ChunkPos, Latch> = Collections.synchronizedMap(HashMap())
     
-    override fun init() {
+    private val pendingOrphanBlocks = Object2ObjectOpenHashMap<ChunkPos, MutableMap<BlockPos, NovaBlock>>()
+    
+    @InitFun
+    private fun init() {
         LOGGER.info("Initializing WorldDataManager")
         registerEvents()
         Bukkit.getWorlds().forEach(::queueWorldLoad)
@@ -90,7 +112,8 @@ internal object WorldDataManager : Initializable(), Listener {
         }
     }
     
-    override fun disable() {
+    @DisableFun
+    private fun disable() {
         Bukkit.getWorlds().forEach(::saveWorld)
     }
     
@@ -126,6 +149,10 @@ internal object WorldDataManager : Initializable(), Listener {
             runTask {
                 try {
                     if (pos.isLoaded()) {
+                        if (pos in pendingOrphanBlocks) {
+                            pendingOrphanBlocks[pos]?.forEach(::placeOrphanBlock)
+                            pendingOrphanBlocks -= pos
+                        }
                         val blockStates = chunk.lock.write {
                             // is RegionChunk already loaded?
                             if (chunk.isLoaded)
@@ -204,10 +231,42 @@ internal object WorldDataManager : Initializable(), Listener {
     fun removeBlockState(pos: BlockPos) =
         writeChunk(pos.chunkPos) { it.blockStates -= pos }
     
-    fun getWorldStorage(world: World): WorldDataStorage =
+    @Synchronized
+    internal fun addOrphanBlock(world: MojangWorld, x: Int, y: Int, z: Int, material: NovaBlock) {
+        return addOrphanBlock(BlockPos(world.world, x, y, z), material)
+    }
+    
+    internal fun addOrphanBlock(pos: BlockPos, material: NovaBlock) {
+        val chunk = pos.chunkPos
+        if (chunk.isLoaded()) {
+            placeOrphanBlock(pos, material)
+        } else {
+            pendingOrphanBlocks.getOrPut(chunk, ::Object2ObjectOpenHashMap)[pos] = material
+        }
+    }
+    
+    @Synchronized
+    private fun placeOrphanBlock(pos: BlockPos, material: NovaBlock) {
+        val ctx = BlockPlaceContext(pos, material.item?.createItemStack(0) ?: ItemStack(Material.AIR), null, null, null, pos.below, BlockFace.UP)
+        val state = material.createNewBlockState(ctx)
+        setBlockState(pos, state)
+        state.handleInitialized(true)
+        material.logic.handlePlace(state, ctx)
+    }
+    
+    @Synchronized
+    internal fun getWorldGenMaterial(pos: MojangBlockPos, world: MojangWorld): NovaBlock? {
+        val novaPos = pos.toNovaPos(world.world)
+        val chunk = novaPos.chunkPos
+        return if (chunk.isLoaded()) (getBlockState(novaPos) as? NovaBlockState)?.block else pendingOrphanBlocks[chunk]?.get(novaPos)
+    }
+    
+    @Synchronized
+    private fun getWorldStorage(world: World): WorldDataStorage =
         worlds.getOrPut(world.uid) { WorldDataStorage(world) }
     
-    fun getRegion(pos: ChunkPos): RegionFile =
+    @Synchronized
+    private fun getRegion(pos: ChunkPos): RegionFile =
         getWorldStorage(pos.world!!).getRegion(pos)
     
     inline fun <T> readChunk(pos: ChunkPos, read: (RegionChunk) -> T): T {

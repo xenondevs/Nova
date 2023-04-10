@@ -3,12 +3,10 @@ package xyz.xenondevs.nova.command.impl
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.context.CommandContext
 import kotlinx.coroutines.runBlocking
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
-import net.md_5.bungee.api.chat.HoverEvent
-import net.md_5.bungee.api.chat.HoverEvent.Action
-import net.md_5.bungee.api.chat.TextComponent
-import net.md_5.bungee.api.chat.hover.content.Text
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.event.HoverEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.selector.EntitySelector
@@ -30,26 +28,28 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.material.AdvancedTooltips
-import xyz.xenondevs.nova.material.ItemCategories
-import xyz.xenondevs.nova.material.ItemNovaMaterial
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.logic.AdvancedTooltips
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkType
-import xyz.xenondevs.nova.tileentity.network.NetworkTypeRegistry
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.addItemCorrectly
-import xyz.xenondevs.nova.util.data.ComponentUtils
-import xyz.xenondevs.nova.util.data.coloredText
-import xyz.xenondevs.nova.util.data.localized
 import xyz.xenondevs.nova.util.getSurroundingChunks
+import xyz.xenondevs.nova.util.item.localizedName
+import xyz.xenondevs.nova.util.item.novaCompoundOrNull
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.block.BlockManager
-import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorManager
+import xyz.xenondevs.nova.world.block.backingstate.BackingStateManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
+import xyz.xenondevs.nova.world.block.hitbox.HitboxManager
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MAX_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.fakeentity.fakeEntityRenderDistance
@@ -63,12 +63,14 @@ internal object NovaCommand : Command("nova") {
                 .requiresPermission("nova.command.give")
                 .then(argument("player", EntityArgument.players())
                     .apply {
-                        ItemCategories.OBTAINABLE_MATERIALS.forEach { material ->
-                            then(literal(material.id.toString())
-                                .executesCatching { giveTo(it, material, 1) }
-                                .then(argument("amount", IntegerArgumentType.integer())
-                                    .executesCatching { giveTo(it, material) }))
-                        }
+                        NovaRegistries.ITEM.asSequence()
+                            .filterNot { it.isHidden }
+                            .forEach { material ->
+                                then(literal(material.id.toString())
+                                    .executesCatching { giveTo(it, material, 1) }
+                                    .then(argument("amount", IntegerArgumentType.integer())
+                                        .executesCatching { giveTo(it, material) }))
+                            }
                     }))
             .then(literal("debug")
                 .requiresPermission("nova.command.debug")
@@ -81,6 +83,12 @@ internal object NovaCommand : Command("nova") {
                 .then(literal("getTileEntityData")
                     .requiresPlayer()
                     .executesCatching(::showTileEntityData))
+                .then(literal("listBlocks")
+                    .requiresPlayer()
+                    .executesCatching(::listBlocks))
+                .then(literal("getItemData")
+                    .requiresPlayer()
+                    .executesCatching(::showItemData))
                 .then(literal("reloadNetworks")
                     .executesCatching(::reloadNetworks))
                 .then(literal("updateChunkSearchId")
@@ -88,21 +96,26 @@ internal object NovaCommand : Command("nova") {
                 .then(literal("showNetwork")
                     .requiresPlayer()
                     .apply {
-                        NetworkTypeRegistry.types.forEach { type ->
+                        NETWORK_TYPE.forEach { type ->
                             then(literal(type.id.toString())
                                 .executesCatching { toggleNetworkDebugging(it, type) })
                         }
                     }
-                ))
+                )
+                .then(literal("showHitboxes")
+                    .requiresPlayer()
+                    .executesCatching(::toggleHitboxDebugging)))
             .then(literal("items")
                 .requiresPlayerPermission("nova.command.items")
                 .executesCatching(::openItemInventory))
             .then(literal("advancedTooltips")
                 .requiresPlayerPermission("nova.command.advancedTooltips")
-                .then(literal("on")
-                    .executesCatching { toggleAdvancedTooltips(it, true) })
                 .then(literal("off")
-                    .executesCatching { toggleAdvancedTooltips(it, false) }))
+                    .executesCatching { toggleAdvancedTooltips(it, AdvancedTooltips.Type.OFF) })
+                .then(literal("nova")
+                    .executesCatching { toggleAdvancedTooltips(it, AdvancedTooltips.Type.NOVA) })
+                .then(literal("all")
+                    .executesCatching { toggleAdvancedTooltips(it, AdvancedTooltips.Type.ALL) }))
             .then(literal("waila")
                 .requiresPlayerPermission("nova.command.waila")
                 .then(literal("on")
@@ -131,45 +144,40 @@ internal object NovaCommand : Command("nova") {
     }
     
     private fun updateChunkSearchId(ctx: CommandContext<CommandSourceStack>) {
-        BlockBehaviorManager.updateChunkSearchId()
-        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.update_chunk_search_id.success"))
+        BackingStateManager.updateChunkSearchId()
+        ctx.source.sendSuccess(Component.translatable("command.nova.update_chunk_search_id.success", NamedTextColor.GRAY))
     }
     
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {
-        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.reload_configs.start"))
+        ctx.source.sendSuccess(Component.translatable("command.nova.reload_configs.start", NamedTextColor.GRAY))
         NovaConfig.reload()
-        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.reload_configs.success"))
+        ctx.source.sendSuccess(Component.translatable("command.nova.reload_configs.success", NamedTextColor.GRAY))
     }
     
     private fun reloadRecipes(ctx: CommandContext<CommandSourceStack>) {
-        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.reload_recipes.start"))
+        ctx.source.sendSuccess(Component.translatable("command.nova.reload_recipes.start", NamedTextColor.GRAY))
         RecipeManager.reload()
-        ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.reload_recipes.success"))
+        ctx.source.sendSuccess(Component.translatable("command.nova.reload_recipes.success", NamedTextColor.GRAY))
     }
     
     private fun createResourcePack(ctx: CommandContext<CommandSourceStack>) {
         runAsyncTask {
-            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.resource_pack.create.start"))
+            ctx.source.sendSuccess(Component.translatable("command.nova.resource_pack.create.start", NamedTextColor.GRAY))
             ResourceGeneration.createResourcePack()
-            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.resource_pack.create.success"))
+            ctx.source.sendSuccess(Component.translatable("command.nova.resource_pack.create.success", NamedTextColor.GRAY))
         }
     }
     
-    private fun toggleAdvancedTooltips(ctx: CommandContext<CommandSourceStack>, state: Boolean) {
+    private fun toggleAdvancedTooltips(ctx: CommandContext<CommandSourceStack>, type: AdvancedTooltips.Type) {
         val player = ctx.player
-        val changed = AdvancedTooltips.toggle(player, state)
+        val changed = AdvancedTooltips.setType(player, type)
         
-        val onOff = if (state) "on" else "off"
+        val typeName = type.name.lowercase()
         if (changed) {
-            ctx.source.sendSuccess(localized(
-                ChatColor.GRAY,
-                "command.nova.advanced_tooltips.$onOff"
-            ))
+            ctx.source.sendSuccess(Component.translatable("command.nova.advanced_tooltips.$typeName.success", NamedTextColor.GRAY))
+            player.updateInventory()
         } else {
-            ctx.source.sendFailure(localized(
-                ChatColor.RED,
-                "command.nova.advanced_tooltips.already_$onOff"
-            ))
+            ctx.source.sendFailure(Component.translatable("command.nova.advanced_tooltips.$typeName.failure", NamedTextColor.RED))
         }
     }
     
@@ -179,80 +187,78 @@ internal object NovaCommand : Command("nova") {
         
         val onOff = if (state) "on" else "off"
         if (changed) {
-            ctx.source.sendSuccess(localized(
-                ChatColor.GRAY,
-                "command.nova.waila.$onOff"
-            ))
+            ctx.source.sendSuccess(Component.translatable("command.nova.waila.$onOff", NamedTextColor.GRAY))
         } else {
-            ctx.source.sendFailure(localized(
-                ChatColor.RED,
-                "command.nova.waila.already_$onOff"
-            ))
+            ctx.source.sendFailure(Component.translatable("command.nova.waila.already_$onOff", NamedTextColor.RED))
         }
     }
     
     private fun reuploadResourcePack(ctx: CommandContext<CommandSourceStack>) {
         runAsyncTask {
             runBlocking {
-                ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.resource_pack.reupload.start"))
+                ctx.source.sendSuccess(Component.translatable("command.nova.resource_pack.reupload.start", NamedTextColor.GRAY))
                 val url = AutoUploadManager.uploadPack(ResourcePackBuilder.RESOURCE_PACK_FILE)
                 
                 if (url != null)
-                    ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.resource_pack.reupload.success", ComponentUtils.createLinkComponent(url)))
-                else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.resource_pack.reupload.fail"))
+                    ctx.source.sendSuccess(Component.translatable(
+                        "command.nova.resource_pack.reupload.success",
+                        NamedTextColor.GRAY,
+                        Component.text(url).clickEvent(ClickEvent.openUrl(url))
+                    ))
+                else ctx.source.sendFailure(Component.translatable("command.nova.resource_pack.reupload.fail", NamedTextColor.RED))
             }
         }
     }
     
-    private fun giveTo(ctx: CommandContext<CommandSourceStack>, material: ItemNovaMaterial) =
-        giveTo(ctx, material, ctx["amount"])
+    private fun giveTo(ctx: CommandContext<CommandSourceStack>, item: NovaItem) =
+        giveTo(ctx, item, ctx["amount"])
     
-    private fun giveTo(ctx: CommandContext<CommandSourceStack>, material: ItemNovaMaterial, amount: Int) {
-        val itemName = material.localizedName.ifBlank { material.id.toString() }
+    private fun giveTo(ctx: CommandContext<CommandSourceStack>, item: NovaItem, amount: Int) {
+        val itemName = item.localizedName.ifBlank { item.id.toString() }
         
         val targetPlayers = ctx.getArgument("player", EntitySelector::class.java).findPlayers(ctx.source)
         
         if (targetPlayers.isNotEmpty()) {
             targetPlayers.forEach {
                 val player = it.bukkitEntity
-                player.inventory.addItemCorrectly(material.createItemStack(amount))
+                player.inventory.addItemCorrectly(item.createItemStack(amount))
                 
-                ctx.source.sendSuccess(localized(
-                    ChatColor.GRAY,
+                ctx.source.sendSuccess(Component.translatable(
                     "command.nova.give.success",
-                    amount,
-                    localized(ChatColor.AQUA, itemName),
-                    player.name
+                    NamedTextColor.GRAY,
+                    Component.text(amount).color(NamedTextColor.AQUA),
+                    Component.translatable(itemName).color(NamedTextColor.AQUA),
+                    Component.text(player.name).color(NamedTextColor.AQUA)
                 ))
             }
-        } else ctx.source.sendFailure(localized(ChatColor.RED, "command.nova.no-players"))
+        } else ctx.source.sendFailure(Component.translatable("command.nova.no-players", NamedTextColor.RED))
     }
     
     private fun removeNovaBlocks(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         val chunks = player.location.chunk.getSurroundingChunks(ctx["range"], true)
         val novaBlocks = chunks.flatMap { WorldDataManager.getBlockStates(it.pos).values.filterIsInstance<NovaBlockState>() }
-        novaBlocks.forEach { BlockManager.removeBlock(BlockBreakContext(it.pos)) }
+        novaBlocks.forEach { BlockManager.removeBlockState(BlockBreakContext(it.pos)) }
         
-        ctx.source.sendSuccess(localized(
-            ChatColor.GRAY,
+        ctx.source.sendSuccess(Component.translatable(
             "command.nova.remove_tile_entities.success",
-            coloredText(ChatColor.AQUA, novaBlocks.count())
+            NamedTextColor.GRAY,
+            Component.text(novaBlocks.count()).color(NamedTextColor.AQUA)
         ))
     }
     
     private fun removeInvalidVTEs(ctx: CommandContext<CommandSourceStack>) {
         val count = VanillaTileEntityManager.removeInvalidVTEs()
         if (count > 0) {
-            ctx.source.sendSuccess(localized(
-                ChatColor.GRAY,
+            ctx.source.sendSuccess(Component.translatable(
                 "command.nova.remove_invalid_vtes.success",
-                coloredText(ChatColor.AQUA, count)
+                NamedTextColor.GRAY,
+                Component.text(count).color(NamedTextColor.AQUA)
             ))
         } else {
-            ctx.source.sendFailure(localized(
-                ChatColor.RED,
-                "command.nova.remove_invalid_vtes.failure"
+            ctx.source.sendSuccess(Component.translatable(
+                "command.nova.remove_invalid_vtes.failure",
+                NamedTextColor.RED
             ))
         }
     }
@@ -260,30 +266,30 @@ internal object NovaCommand : Command("nova") {
     private fun reloadNetworks(ctx: CommandContext<CommandSourceStack>) {
         NetworkManager.queueAsync {
             it.reloadNetworks()
-            ctx.source.sendSuccess(localized(ChatColor.GRAY, "command.nova.network_reload.success"))
+            ctx.source.sendSuccess(Component.translatable("command.nova.network_reload.success", NamedTextColor.GRAY))
         }
     }
     
     private fun showTileEntityData(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         
-        fun sendFailure() = ctx.source.sendFailure(localized(
-            ChatColor.RED,
-            "command.nova.show_tile_entity_data.failure"
+        fun sendFailure() = ctx.source.sendFailure(Component.translatable(
+            "command.nova.show_tile_entity_data.failure",
+            NamedTextColor.RED
         ))
         
-        fun sendSuccess(name: String, data: Compound) = ctx.source.sendSuccess(localized(
-            ChatColor.GRAY,
+        fun sendSuccess(name: String, data: Compound) = ctx.source.sendSuccess(Component.translatable(
             "command.nova.show_tile_entity_data.success",
-            localized(ChatColor.AQUA, name),
-            coloredText(ChatColor.WHITE, data.toString())
+            NamedTextColor.GRAY,
+            Component.text(name).color(NamedTextColor.AQUA),
+            Component.text(data.toString(), NamedTextColor.WHITE)
         ))
         
         val location = player.getTargetBlockExact(8)?.location
         if (location != null) {
             val tileEntity = TileEntityManager.getTileEntity(location, true)
             if (tileEntity != null) {
-                sendSuccess(tileEntity.material.localizedName, tileEntity.data)
+                sendSuccess(tileEntity.block.localizedName, tileEntity.data)
             } else {
                 val vanillaTileEntity = VanillaTileEntityManager.getTileEntityAt(location)
                 if (vanillaTileEntity != null) sendSuccess(vanillaTileEntity.block.type.name, vanillaTileEntity.data)
@@ -293,13 +299,53 @@ internal object NovaCommand : Command("nova") {
         
     }
     
+    private fun listBlocks(ctx: CommandContext<CommandSourceStack>) {
+        val chunk = ctx.player.location.chunkPos
+        val states = WorldDataManager.getBlockStates(chunk)
+        
+        ctx.source.sendSuccess(Component.translatable(
+            "command.nova.list_blocks.success",
+            NamedTextColor.GRAY,
+            Component.text(states.size, NamedTextColor.AQUA)
+        ))
+        states.forEach { ctx.source.sendSuccess(Component.text(it.key.toString(), NamedTextColor.GRAY)) }
+    }
+    
+    private fun showItemData(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        
+        val item = player.inventory.itemInMainHand.takeUnlessEmpty()
+        
+        if (item != null) {
+            val novaCompound = item.novaCompoundOrNull
+            if (novaCompound != null) {
+                ctx.source.sendSuccess(Component.translatable(
+                    "command.nova.show_item_data.success",
+                    NamedTextColor.GRAY,
+                    Component.translatable(item.localizedName ?: item.type.name.lowercase(), NamedTextColor.AQUA),
+                    Component.text(novaCompound.toString(), NamedTextColor.WHITE)
+                ))
+            } else ctx.source.sendFailure(Component.translatable("command.nova.show_item.no_data", NamedTextColor.RED))
+        } else ctx.source.sendFailure(Component.translatable("command.nova.show_item_data.no_item", NamedTextColor.RED))
+    }
+    
     private fun toggleNetworkDebugging(ctx: CommandContext<CommandSourceStack>, type: NetworkType) {
         val player = ctx.player
         NetworkDebugger.toggleDebugger(type, player)
         
-        ctx.source.sendSuccess(localized(
-            ChatColor.GRAY,
-            "command.nova.network_debug." + type.id.toString(".")
+        ctx.source.sendSuccess(Component.translatable(
+            "command.nova.network_debug." + type.id.toLanguageKey(),
+            NamedTextColor.GRAY
+        ))
+    }
+    
+    private fun toggleHitboxDebugging(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        HitboxManager.toggleVisualizer(player)
+        
+        ctx.source.sendSuccess(Component.translatable(
+            "command.nova.hitbox_debug",
+            NamedTextColor.GRAY
         ))
     }
     
@@ -312,36 +358,34 @@ internal object NovaCommand : Command("nova") {
         val distance: Int = ctx["distance"]
         player.fakeEntityRenderDistance = distance
         
-        ctx.source.sendSuccess(localized(
-            ChatColor.GRAY,
+        ctx.source.sendSuccess(Component.translatable(
             "command.nova.render_distance",
-            coloredText(ChatColor.AQUA, distance)
+            NamedTextColor.GRAY,
+            Component.text(distance).color(NamedTextColor.AQUA)
         ))
     }
     
     private fun sendAddons(ctx: CommandContext<CommandSourceStack>) {
         val addons = AddonManager.addons.values.toList()
-        val builder = ComponentBuilder()
+        val builder = Component.text()
         
-        builder.append(localized(
-            ChatColor.WHITE,
-            "command.nova.addons.header",
-            addons.size
-        ))
+        builder.append(Component.translatable("command.nova.addons.header", Component.text(addons.size)))
         
         for (i in addons.indices) {
             val addon = addons[i]
             val desc = addon.description
             
-            val hoverText = TextComponent("§a${desc.name} v${desc.version} by ${desc.authors.joinToString("§f,§a ")}")
-            val component = coloredText(ChatColor.GREEN, desc.name)
-            component.hoverEvent = HoverEvent(Action.SHOW_TEXT, Text(arrayOf(hoverText)))
+            builder.append(
+                Component.text(desc.name, NamedTextColor.GREEN).hoverEvent(HoverEvent.showText(
+                    Component.text("§a${desc.name} v${desc.version} by ${desc.authors.joinToString("§f,§a ")}")
+                ))
+            )
             
-            builder.append(component)
-            if (i < addons.size - 1) builder.append("§f, ")
+            if (i < addons.size - 1)
+                builder.append(Component.text("§f, "))
         }
         
-        ctx.source.sendSuccess(builder.create())
+        ctx.source.sendSuccess(builder.build())
     }
     
 }
