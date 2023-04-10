@@ -14,6 +14,9 @@ import xyz.xenondevs.nova.tileentity.TileEntity.Companion.SELF_UPDATE_REASON
 import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.ui.UpgradesGui
 import xyz.xenondevs.nova.util.item.novaItem
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 import kotlin.math.min
 
 private fun ItemStack.getUpgradeType(): UpgradeType<*>? =
@@ -32,7 +35,10 @@ class UpgradeHolder internal constructor(
     internal val input = VirtualInventory(null, 1).apply { setPreUpdateHandler(::handlePreInvUpdate); setPostUpdateHandler(::handlePostInvUpdate) }
     internal val upgrades: HashMap<UpgradeType<*>, Int> =
         tileEntity.retrieveData<Map<ResourceLocation, Int>>("upgrades", ::HashMap)
-            .mapKeysNotNullTo(HashMap()) { NovaRegistries.UPGRADE_TYPE[it.key] }
+            .mapKeysNotNullTo(HashMap()) { (key, _) ->
+                val newKey = ResourceLocation(key.namespace.replace("nova", "simple_upgrades"), key.path)
+                NovaRegistries.UPGRADE_TYPE[newKey]
+            }
     
     val gui by lazy { UpgradesGui(this) { menuContainer.openWindow(it) } }
     
