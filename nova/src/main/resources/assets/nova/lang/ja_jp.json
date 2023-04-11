@@ -101,7 +101,6 @@
   "menu.nova.region.size": "領域サイズ: %s",
   "menu.nova.region.increase": "領域を拡大",
   "menu.nova.region.decrease": "領域を縮小",
-  "command.nova.advanced_tooltips.on": "高度なツールチップを有効にしました。",
   "command.nova.update_chunk_search_id.success": "チャンク検索 ID が更新されました。",
   "command.nova.waila.off": "WAILAを無効にしました。",
   "command.nova.waila.already_off": "WAILAはすでに無効になっています。",
