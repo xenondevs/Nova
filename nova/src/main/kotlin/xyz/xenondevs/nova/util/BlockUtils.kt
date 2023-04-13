@@ -250,7 +250,7 @@ fun Block.placeVanilla(player: ServerPlayer, itemStack: ItemStack, playSound: Bo
  */
 fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
     val itemTag = CompoundTag()
-    ReflectionRegistry.CB_CRAFT_META_APPLY_TO_METHOD.invoke(itemStack.itemMeta, itemTag)
+    ReflectionRegistry.CB_CRAFT_META_APPLY_TO_ITEM_METHOD.invoke(itemStack.itemMeta, itemTag)
     
     val tileEntityTag = itemTag.getCompound("BlockEntityTag")?.let { if (it.isEmpty) itemTag else it }
     if (tileEntityTag != null) {

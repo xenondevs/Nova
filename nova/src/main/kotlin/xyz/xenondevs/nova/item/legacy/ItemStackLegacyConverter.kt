@@ -45,7 +45,7 @@ internal class ItemStackPersistentDataConverter(
             ?.asByteArray
             ?: return
         
-        itemStack.novaCompound[newKey] = CBF.read(type, serializedValue)
+        itemStack.novaCompound.set(type, newKey, CBF.read(type, serializedValue))
     }
     
 }

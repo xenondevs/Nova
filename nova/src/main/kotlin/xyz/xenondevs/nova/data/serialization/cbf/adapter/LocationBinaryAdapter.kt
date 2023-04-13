@@ -31,4 +31,8 @@ internal object LocationBinaryAdapter : BinaryAdapter<Location> {
         writer.writeFloat(obj.pitch)
     }
     
+    override fun copy(obj: Location, type: KType): Location {
+        return obj.clone()
+    }
+    
 }

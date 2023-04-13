@@ -20,4 +20,8 @@ internal object VirtualInventoryBinaryAdapter : BinaryAdapter<VirtualInventory> 
         writer.writeBytes(data)
     }
     
+    override fun copy(obj: VirtualInventory, type: KType): VirtualInventory {
+        return VirtualInventory(obj)
+    }
+    
 }

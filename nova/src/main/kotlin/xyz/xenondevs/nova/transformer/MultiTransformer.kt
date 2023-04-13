@@ -12,9 +12,9 @@ internal abstract class MultiTransformer(final override val classes: Set<KClass<
     
     protected val classWrappers = classes.associate { it.internalName to VirtualClassPath[it] }
     
-    fun dumpAll() {
-        classWrappers.forEach { (name, wrapper) ->
-            File(wrapper.className.addSuffix(".class")).writeBytes(wrapper.assemble())
+    fun dumpAll(computeFrames: Boolean = false) {
+        classWrappers.forEach { (_, wrapper) ->
+            File(wrapper.className.addSuffix(".class")).writeBytes(wrapper.assemble(computeFrames))
         }
     }
     

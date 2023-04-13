@@ -65,6 +65,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 import org.bukkit.event.block.BlockPhysicsEvent
@@ -89,6 +90,7 @@ import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 import net.minecraft.world.entity.player.Inventory as MojangInventory
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
+import org.bukkit.inventory.ItemStack as BukkitStack
 import java.util.function.Function as JavaFunction
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -120,7 +122,7 @@ internal object ReflectionRegistry {
     // Methods
     val CLASS_LOADER_PARENT_FIELD by lazy { getField(ClassLoader::class.java, true, "parent") }
     val CLASS_LOADER_DEFINE_CLASS_METHOD by lazy { getMethod(ClassLoader::class, true, "defineClass", String::class, ByteArray::class, Int::class, Int::class, ProtectionDomain::class) }
-    val CB_CRAFT_META_APPLY_TO_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class)
+    val CB_CRAFT_META_APPLY_TO_ITEM_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "applyToItem", CompoundTag::class)
     val FEATURE_SORTER_BUILD_FEATURES_PER_STEP_METHOD = getMethod(FeatureSorter::class, true, "SRM(net.minecraft.world.level.biome.FeatureSorter buildFeaturesPerStep)", List::class, JavaFunction::class, Boolean::class)
     val LEVEL_CHUNK_SECTION_SET_BLOCK_STATE_METHOD = getMethod(LevelChunkSection::class, true, "SRM(net.minecraft.world.level.chunk.LevelChunkSection setBlockState)", Int::class, Int::class, Int::class, BlockState::class, Boolean::class)
     val CRAFT_BLOCK_DATA_IS_PREFERRED_TOOL_METHOD = getMethod(CraftBlockData::class, true, "isPreferredTool", BlockState::class, MojangStack::class)
@@ -153,6 +155,7 @@ internal object ReflectionRegistry {
     val NOISE_ROUTER_DATA_OVERWORLD_METHOD = getMethod(NoiseRouterData::class, true, "SRM(net.minecraft.world.level.levelgen.NoiseRouterData overworld)", HolderGetter::class, HolderGetter::class, Boolean::class, Boolean::class)
     val SEMAPHORE_ACQUIRE_METHOD = getMethod(Semaphore::class, false, "acquire")
     val INVENTORY_ADD_RESOURCE_METHOD = getMethod(MojangInventory::class, true, "SRM(net.minecraft.world.inventory.Inventory addResource)", Int::class, MojangStack::class)
+    val CRAFT_META_ITEM_CLONE_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "clone")
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
@@ -194,5 +197,7 @@ internal object ReflectionRegistry {
     val INVENTORY_ITEMS_FIELD = getField(MojangInventory::class, true, "SRF(net.minecraft.world.entity.player.Inventory items)")
     val THREADING_DETECTOR_LOCK_FIELD = getField(ThreadingDetector::class, true, "SRF(net.minecraft.util.ThreadingDetector lock)")
     val ITEM_STACK_COUNT_FIELD = getField(MojangStack::class, true, "SRF(net.minecraft.world.item.ItemStack count)")
+    val ITEM_STACK_ITEM_META_FIELD = getField(BukkitStack::class, true, "meta")
+    val CRAFT_ITEM_STACK_HANDLE_FIELD = getField(CraftItemStack::class, true, "handle")
     
 }

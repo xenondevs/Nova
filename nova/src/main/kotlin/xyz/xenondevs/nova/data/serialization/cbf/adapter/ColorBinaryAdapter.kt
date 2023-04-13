@@ -16,4 +16,8 @@ internal object ColorBinaryAdapter : BinaryAdapter<Color> {
         writer.writeInt(obj.rgb)
     }
     
+    override fun copy(obj: Color, type: KType): Color {
+        return Color(obj.rgb, true)
+    }
+    
 }
