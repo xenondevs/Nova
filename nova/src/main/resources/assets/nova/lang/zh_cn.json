@@ -103,7 +103,6 @@
   "menu.nova.region.decrease": "缩小区域",
   "waila.nova.required_tool.none": "不需要任何工具",
   "waila.nova.required_tool.unbreakable": "不可破坏",
-  "command.nova.advanced_tooltips.already_on": "高级工具提示已处于开启状态。",
   "command.nova.waila.off": "禁用WAILA.",
   "command.nova.waila.already_off": "WAILA早已被禁用.",
   "command.nova.waila.on": "启用WAILA.",

@@ -104,7 +104,6 @@
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "你在這個區塊不能再放置更多實體",
   "menu.nova.region.increase": "擴展區域",
   "menu.nova.region.decrease": "縮小區域",
-  "command.nova.advanced_tooltips.already_on": "進階提示已是開啟狀態",
   "command.nova.waila.off": "關閉提示窗",
   "command.nova.waila.already_off": "提示窗已是關閉狀態",
   "command.nova.waila.on": "開啟提示窗",
