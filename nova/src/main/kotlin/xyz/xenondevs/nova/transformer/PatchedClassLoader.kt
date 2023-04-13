@@ -4,7 +4,9 @@ import org.bukkit.Bukkit
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.loader.NovaClassLoader
 
-// The class loader responsible for loading all bukkit and minecraft classes
+/**
+ * The class loader that is responsible for loading all Bukkit and Minecraft classes.
+ */
 private val SPIGOT_CLASS_LOADER = Bukkit::class.java.classLoader
 
 /**
@@ -50,10 +52,23 @@ internal class PatchedClassLoader : ClassLoader(SPIGOT_CLASS_LOADER.parent) {
     }
     
     /**
-     * Looks for the NovaClassLoader in the stack trace to prevent recursion.
+     * Checks the stacktrace for the NovaClassLoader and PatchedClassLoader to prevent recursion.
+     *
+     * This method must also not cause any class loads.
      */
-    private fun checkNonRecursive(): Boolean =
-        Thread.currentThread().stackTrace.none { it.className == "xyz.xenondevs.nova.loader.NovaClassLoader" }
+    private fun checkNonRecursive(): Boolean {
+        val stackTrace = Thread.currentThread().stackTrace
+        for (i in 3..stackTrace.lastIndex) { // skip the first three elements: Thread.getStackTrace(), checkNonRecursive(), loadClass()
+            val className = stackTrace[i].className
+            
+            // check whether the stack trace element is NovaClassLoader or PatchedClassLoader
+            // if yes, this indicates a recursive call (PatchedClassLoader) or a call that will become recursive (NovaClassLoader)
+            if (className == "xyz.xenondevs.nova.loader.NovaClassLoader" || className == "xyz.xenondevs.nova.transformer.PatchedClassLoader")
+                return false
+        }
+        
+        return true
+    }
     
     /**
      * Checks that the class initiating the class loading process is loaded by the SpigotClassLoader.
@@ -62,22 +77,30 @@ internal class PatchedClassLoader : ClassLoader(SPIGOT_CLASS_LOADER.parent) {
         findLoadingClass().classLoader == SPIGOT_CLASS_LOADER
     
     /**
-     * Steps through the stack frames to find the class that triggered the class loading process.
+     * Steps through the stack frames to find the first class that triggered a class loading process.
      */
     private fun findLoadingClass(): Class<*> {
-        var foundLoadClass = false // used to filter out the methods after loadClass (checkSpigotLoader, findLoadingClass) 
-        var clazz: Class<*>? = null
+        var takeNext = false
+        var loadingClass: Class<*>? = null
+        
         StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).forEach {
-            if (clazz == null) {
-                if (it.methodName == "loadClass") {
-                    foundLoadClass = true
-                } else if (foundLoadClass) {
-                    clazz = it.declaringClass
+            var clazz = it.declaringClass
+            
+            if (takeNext) {
+                loadingClass = clazz
+                takeNext = false
+            }
+            
+            while (clazz != null) {
+                if (clazz == ClassLoader::class.java) {
+                    takeNext = true
+                    break
                 }
+                clazz = clazz.superclass
             }
         }
         
-        return clazz ?: throw IllegalStateException("Could not find the loading class")
+        return loadingClass!!
     }
     
 }
