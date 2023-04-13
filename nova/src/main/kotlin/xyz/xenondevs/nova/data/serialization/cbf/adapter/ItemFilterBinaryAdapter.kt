@@ -5,6 +5,7 @@ import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
+import xyz.xenondevs.invui.util.ItemUtils
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import kotlin.reflect.KType
 
@@ -24,6 +25,10 @@ internal object ItemFilterBinaryAdapter : BinaryAdapter<ItemFilter> {
         writer.writeBoolean(obj.nbt)
         writer.writeVarInt(obj.size)
         obj.items.forEach { CBF.write(it, writer) }
+    }
+    
+    override fun copy(obj: ItemFilter, type: KType): ItemFilter {
+        return ItemFilter(obj.whitelist, obj.nbt, obj.size, ItemUtils.clone(obj.items))
     }
     
 }

@@ -21,20 +21,38 @@ class NamespacedCompound internal constructor(
     
     constructor() : this(HashMap())
     
-    operator fun set(namespace: String, key: String, value: Any?) {
-        map.getOrPut(namespace, ::Compound)[key] = value
+    fun set(type: KType, namespace: String, key: String, value: Any?) {
+        val compound = map.getOrPut(namespace, ::Compound)
+        compound.set(type, key, value)
     }
     
-    operator fun set(id: ResourceLocation, value: Any?) {
-        set(id.namespace, id.name, value)
+    fun set(type: KType, id: ResourceLocation, value: Any?) {
+        set(type, id.namespace, id.name, value)
     }
     
-    operator fun set(key: NamespacedKey, value: Any?) {
-        set(key.namespace, key.key, value)
+    fun set(type: KType, key: NamespacedKey, value: Any?) {
+        set(type, key.namespace, key.key, value)
     }
     
-    operator fun set(addon: Addon, key: String, value: Any?) {
-        set(addon.description.id, key, value)
+    fun set(type: KType, addon: Addon, key: String, value: Any?) {
+        set(type, addon.description.id, key, value)
+    }
+    
+    
+    inline operator fun <reified T> set(namespace: String, key: String, value: T) {
+        set(typeOf<T>(), namespace, key, value)
+    }
+    
+    inline operator fun <reified T> set(id: ResourceLocation, value: T) {
+        set(typeOf<T>(), id, value)
+    }
+    
+    inline operator fun <reified T> set(key: NamespacedKey, value: T) {
+        set(typeOf<T>(), key, value)
+    }
+    
+    inline operator fun <reified T> set(addon: Addon, key: String, value: T) {
+        set(typeOf<T>(), addon, key, value)
     }
     
     
@@ -134,13 +152,11 @@ class NamespacedCompound internal constructor(
     }
     
     
+    fun copy(): NamespacedCompound = NamespacedCompound(map.mapValuesTo(HashMap()) { (_, value) -> value.copy() })
+    
     fun isEmpty(): Boolean = map.isNotEmpty()
     
     fun isNotEmpty(): Boolean = map.isNotEmpty()
-    
-    fun copy(): NamespacedCompound {
-        return NamespacedCompound(HashMap(map))
-    }
     
     override fun toString(): String {
         val builder = StringBuilder()
@@ -175,6 +191,10 @@ class NamespacedCompound internal constructor(
             }
             
             return NamespacedCompound(map)
+        }
+        
+        override fun copy(obj: NamespacedCompound, type: KType): NamespacedCompound {
+            return obj.copy()
         }
         
     }

@@ -335,7 +335,7 @@ fun PlayerList.broadcast(exclude: Player?, location: Location, maxDistance: Doub
 fun PlayerList.broadcast(exclude: Player?, block: Block, maxDistance: Double, packet: Packet<*>) =
     broadcast(exclude?.serverPlayer, block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), maxDistance, block.world.serverLevel.dimension(), packet)
 
-fun <T> Registry<T>.byNameBinaryAdapter(): BinaryAdapter<T> {
+fun <T : Any> Registry<T>.byNameBinaryAdapter(): BinaryAdapter<T> {
     return RegistryBinaryAdapter(this)
 }
 

@@ -27,7 +27,7 @@ internal class TileEntityItemBehavior : ItemBehavior() {
                 if (key.startsWith("fluidContainer.")) {
                     val fluidData = tileEntityData.get<Compound>(key)!!
                     val amount = fluidData.get<Long>("amount")!!
-                    val type = fluidData.get<FluidType?>("type")
+                    val type = fluidData.get<FluidType>("type")
                     
                     if (type != null) {
                         val amountStr = if (amount != Long.MAX_VALUE)

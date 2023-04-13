@@ -12,7 +12,7 @@ dependencyResolutionManagement {
             version("dokka", "1.8.10")
             version("ktor", "2.2.4")
             version("spigot", "1.19.4-R0.1-SNAPSHOT")
-            version("cbf", "0.4")
+            version("cbf", "0.5")
             version("xenondevs-commons", "1.0")
             
             // lib - kotlin

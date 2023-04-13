@@ -102,6 +102,26 @@ val ItemStack.namelessCopyOrSelf: ItemStack
         return itemStack
     }
 
+internal val ItemStack.backingItemMeta: ItemMeta?
+    get() {
+        var backingMeta = ReflectionRegistry.ITEM_STACK_ITEM_META_FIELD.get(this) as? ItemMeta
+        
+        if (backingMeta == null) {
+            backingMeta = Bukkit.getItemFactory().getItemMeta(type)
+            ReflectionRegistry.ITEM_STACK_ITEM_META_FIELD.set(this, backingMeta)
+        }
+        
+        return backingMeta
+    }
+
+internal val ItemStack.handle: MojangStack?
+    get() {
+        if (this is CraftItemStack)
+            return ReflectionRegistry.CRAFT_ITEM_STACK_HANDLE_FIELD.get(this) as MojangStack?
+        
+        return null
+    }
+
 val ItemMeta.unhandledTags: MutableMap<String, NBTTag>
     get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, NBTTag>
 
@@ -144,16 +164,31 @@ fun ItemStack.takeUnlessEmpty(): ItemStack? =
 //<editor-fold desc="BukkitStack - Nova Compound", defaultstate="collapsed">
 var ItemStack.novaCompound: NamespacedCompound
     get() {
-        val unhandledTags = itemMeta!!.unhandledTags
+        val handle = handle
+        if (handle != null)
+            return handle.novaCompound
+        
+        val unhandledTags = backingItemMeta!!.unhandledTags
         val tag = unhandledTags.getOrPutCBFCompoundTag("nova_cbf", ::CBFCompoundTag) as? CBFCompoundTag
         return tag!!.compound
     }
     set(value) {
-        itemMeta!!.unhandledTags["nova_cbf"] = CBFCompoundTag(value)
+        val handle = handle
+        if (handle != null) {
+            handle.novaCompound = value
+        } else {
+            backingItemMeta!!.unhandledTags["nova_cbf"] = CBFCompoundTag(value)
+        }
     }
 
 val ItemStack.novaCompoundOrNull: NamespacedCompound?
-    get() = itemMeta?.unhandledTags?.getCBFCompoundTag("nova_cbf")?.compound
+    get() {
+        val handle = handle
+        if (handle != null)
+            return handle.novaCompoundOrNull
+        
+        return backingItemMeta?.unhandledTags?.getCBFCompoundTag("nova_cbf")?.compound
+    }
 //</editor-fold>
 
 //<editor-fold desc="MojangStack - Nova Compound", defaultstate="collapsed">
@@ -254,7 +289,7 @@ inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String)
 @PublishedApi
 internal inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: String, data: T?) {
     // TODO: Remove legacy support at some point
-    // For legacy support, we convert the MojangStack to a Bukkit ItemStack to access the persistent data container
+    // For legacy support, we convert the MojangStack to a CraftItemStack to access the persistent data container
     bukkitMirror.storeData(namespace, key, data)
 }
 

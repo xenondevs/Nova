@@ -7,7 +7,7 @@ import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.inventoryaccess.InventoryAccess
 import kotlin.reflect.KType
 
-internal object ItemStackBinaryAdapter: BinaryAdapter<ItemStack> {
+internal object ItemStackBinaryAdapter : BinaryAdapter<ItemStack> {
     
     override fun read(type: KType, reader: ByteReader): ItemStack {
         val data = ByteArray(reader.readVarInt())
@@ -21,5 +21,8 @@ internal object ItemStackBinaryAdapter: BinaryAdapter<ItemStack> {
         writer.writeBytes(data)
     }
     
+    override fun copy(obj: ItemStack, type: KType): ItemStack {
+        return obj.clone()
+    }
     
 }

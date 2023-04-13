@@ -5,7 +5,7 @@ import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.cbf.CBF
 
-inline fun <reified T> PersistentDataContainer.set(key: NamespacedKey, obj: T) =
+inline fun <reified T : Any> PersistentDataContainer.set(key: NamespacedKey, obj: T) =
     set(key, PersistentDataType.BYTE_ARRAY, CBF.write(obj))
 
 inline fun <reified T : Any> PersistentDataContainer.get(key: NamespacedKey): T? =

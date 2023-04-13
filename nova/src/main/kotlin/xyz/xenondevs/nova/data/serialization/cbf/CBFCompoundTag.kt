@@ -58,7 +58,7 @@ internal class CBFCompoundTag(val compound: NamespacedCompound) : Tag {
         out.write(bytes)
     }
     
-    @Suppress("unused") // Accessed via reflection
+    // also accessed via reflection
     fun compoundToByteArray(): ByteArray {
         return CBF.write(compound)
     }

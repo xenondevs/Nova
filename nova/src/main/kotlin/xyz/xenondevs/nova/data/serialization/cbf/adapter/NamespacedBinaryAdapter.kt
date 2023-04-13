@@ -18,8 +18,13 @@ internal object NamespacedKeyBinaryAdapter : BinaryAdapter<NamespacedKey> {
         writer.writeString(obj.toString())
     }
     
+    override fun copy(obj: NamespacedKey, type: KType): NamespacedKey {
+        return obj
+    }
+    
 }
 
+@Suppress("DEPRECATION")
 internal object NamespacedIdBinaryAdapter : BinaryAdapter<NamespacedId> {
     
     override fun read(type: KType, reader: ByteReader): NamespacedId {
@@ -28,6 +33,10 @@ internal object NamespacedIdBinaryAdapter : BinaryAdapter<NamespacedId> {
     
     override fun write(obj: NamespacedId, type: KType, writer: ByteWriter) {
         writer.writeString(obj.toString())
+    }
+    
+    override fun copy(obj: NamespacedId, type: KType): NamespacedId {
+        return obj
     }
     
 }
@@ -40,6 +49,10 @@ internal object ResourceLocationBinaryAdapter : BinaryAdapter<ResourceLocation> 
     
     override fun write(obj: ResourceLocation, type: KType, writer: ByteWriter) {
         writer.writeString(obj.toString())
+    }
+    
+    override fun copy(obj: ResourceLocation, type: KType): ResourceLocation {
+        return obj
     }
     
 }

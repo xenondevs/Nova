@@ -7,7 +7,7 @@ import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import kotlin.reflect.KType
 
-internal class RegistryBinaryAdapter<T>(val registry: Registry<T>): BinaryAdapter<T> {
+internal class RegistryBinaryAdapter<T : Any>(val registry: Registry<T>): BinaryAdapter<T> {
     
     override fun read(type: KType, reader: ByteReader): T {
         val id = ResourceLocation.of(reader.readString(), ':')
@@ -17,6 +17,10 @@ internal class RegistryBinaryAdapter<T>(val registry: Registry<T>): BinaryAdapte
     override fun write(obj: T, type: KType, writer: ByteWriter) {
         val id = registry.getKey(obj)!!
         writer.writeString(id.toString())
+    }
+    
+    override fun copy(obj: T, type: KType): T {
+        return obj
     }
     
 }

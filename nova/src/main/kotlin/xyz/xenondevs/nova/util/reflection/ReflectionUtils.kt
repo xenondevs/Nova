@@ -56,6 +56,9 @@ object ReflectionUtils {
     fun getMethod(clazz: Class<*>, declared: Boolean, methodName: String, vararg args: KClass<*>): Method =
         getMethod(clazz, declared, methodName, *args.mapToArray(KClass<*>::java))
     
+    fun getMethod(clazz: Class<*>, declared: Boolean, methodName: String): Method =
+        getMethod(clazz, declared, methodName, *arrayOf<Class<*>>())
+    
     fun getMethod(clazz: Class<*>, declared: Boolean, methodName: String, vararg args: Class<*>): Method {
         val method = if (declared) clazz.getDeclaredMethod(methodName, *args) else clazz.getMethod(methodName, *args)
         if (declared) method.isAccessible = true
