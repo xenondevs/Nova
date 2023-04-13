@@ -49,7 +49,6 @@ internal object PlayerInventoryUpdateEventPatch : MultiTransformer(Inventory::cl
         patchInventory()
         patchPlayerDataStorage()
         patchItemStackSetCount()
-        dumpAll()
     }
     
     /**
