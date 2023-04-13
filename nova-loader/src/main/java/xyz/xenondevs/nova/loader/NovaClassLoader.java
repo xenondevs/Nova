@@ -16,6 +16,10 @@ public class NovaClassLoader extends URLClassLoader {
     
     @Override
     public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        return loadClass(name, resolve, true);
+    }
+    
+    public Class<?> loadClass(String name, boolean resolve, boolean checkParents) throws ClassNotFoundException {
         Class<?> c = null;
         
         // workaround library conflict for kyori-adventure on paper servers (fixme)
@@ -41,8 +45,12 @@ public class NovaClassLoader extends URLClassLoader {
         }
         
         // check parent loader
-        if (c == null) {
+        if (c == null && checkParents) {
             c = getParent().loadClass(name);
+        }
+        
+        if (c == null) {
+            throw new ClassNotFoundException(name);
         }
         
         if (resolve) {

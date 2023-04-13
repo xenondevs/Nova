@@ -36,7 +36,7 @@ internal class PatchedClassLoader : ClassLoader(SPIGOT_CLASS_LOADER.parent) {
         // Load class from Nova & libraries
         if (c == null && checkNonRecursive() && checkSpigotLoader()) {
             // Restarts the class loading process at the NovaClassLoader
-            return novaClassLoader.loadClass(name, resolve)
+            return novaClassLoader.loadClass(name, resolve, false)
         }
         
         if (c == null) {
