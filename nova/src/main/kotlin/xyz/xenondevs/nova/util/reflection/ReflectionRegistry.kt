@@ -12,6 +12,7 @@ import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
 import net.minecraft.core.Registry
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.TagType
 import net.minecraft.resources.RegistryFileCodec
@@ -114,6 +115,7 @@ internal object ReflectionRegistry {
     val BIOME_GENERATION_SETTINGS_CONSTRUCTOR = getConstructor(BiomeGenerationSettings::class, true, Map::class, List::class)
     val MOB_SPAWN_SETTINGS_CONSTRUCTOR = getConstructor(MobSpawnSettings::class, true, Float::class, Map::class, Map::class)
     val BIOME_CONSTRUCTOR = getConstructor(Biome::class, true, ClimateSettings::class, BiomeSpecialEffects::class, BiomeGenerationSettings::class, MobSpawnSettings::class)
+    val LIST_TAG_EMPTY_CONSTRUCTOR = getConstructor(ListTag::class, false)
     
     // Methods
     val CLASS_LOADER_PARENT_FIELD by lazy { getField(ClassLoader::class.java, true, "parent") }
@@ -150,6 +152,7 @@ internal object ReflectionRegistry {
     val HOLDER_REFERENCE_BIND_VALUE_METHOD = getMethod(Holder.Reference::class, true, "SRM(net.minecraft.core.Holder\$Reference bindValue)", Any::class)
     val NOISE_ROUTER_DATA_OVERWORLD_METHOD = getMethod(NoiseRouterData::class, true, "SRM(net.minecraft.world.level.levelgen.NoiseRouterData overworld)", HolderGetter::class, HolderGetter::class, Boolean::class, Boolean::class)
     val SEMAPHORE_ACQUIRE_METHOD = getMethod(Semaphore::class, false, "acquire")
+    val INVENTORY_ADD_RESOURCE_METHOD = getMethod(MojangInventory::class, true, "SRM(net.minecraft.world.inventory.Inventory addResource)", Int::class, MojangStack::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
@@ -188,6 +191,8 @@ internal object ReflectionRegistry {
     val PROCESSOR_RULE_POS_PREDICATE_FIELD = getField(ProcessorRule::class, true, "SRF(net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule posPredicate)")
     val TARGET_BLOCK_STATE_TARGET_FIELD = getField(TargetBlockState::class, false, "SRF(net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration\$TargetBlockState target)")
     val INVENTORY_ARMOR_FIELD = getField(MojangInventory::class, true, "SRF(net.minecraft.world.entity.player.Inventory armor)")
+    val INVENTORY_ITEMS_FIELD = getField(MojangInventory::class, true, "SRF(net.minecraft.world.entity.player.Inventory items)")
     val THREADING_DETECTOR_LOCK_FIELD = getField(ThreadingDetector::class, true, "SRF(net.minecraft.util.ThreadingDetector lock)")
+    val ITEM_STACK_COUNT_FIELD = getField(MojangStack::class, true, "SRF(net.minecraft.world.item.ItemStack count)")
     
 }

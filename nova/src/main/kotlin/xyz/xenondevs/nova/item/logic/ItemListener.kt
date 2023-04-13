@@ -12,24 +12,26 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
+import xyz.xenondevs.nova.event.ArmorEquipEvent
+import xyz.xenondevs.nova.event.BlockBreakActionEvent
+import xyz.xenondevs.nova.event.PlayerInventoryItemChangeEvent
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
-import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import java.util.*
 
 @InternalInit(stage = InitializationStage.POST_WORLD_ASYNC)
@@ -98,7 +100,7 @@ internal object ItemListener : Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    private fun handleInteract(event: InventoryClickEvent) {
+    private fun handleClick(event: InventoryClickEvent) {
         val player = event.whoClicked as Player
         val clickedItem = event.currentItem
         val cursorItem = event.cursor
@@ -118,6 +120,26 @@ internal object ItemListener : Listener {
         val item = event.player.inventory.itemInMainHand
         
         item.logic?.handleBlockBreakAction(player, item, event)
+    }
+    
+    @EventHandler
+    private fun handleInventoryItemChange(event: PlayerInventoryItemChangeEvent) {
+        val player = event.player
+        val oldItem = event.oldItemStack
+        val newItem = event.newItemStack
+        
+        oldItem?.logic?.handleDeselect(player, oldItem)
+        newItem?.logic?.handleSelect(player, newItem)
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private fun handleHotbarSwap(event: PlayerItemHeldEvent) {
+        val player = event.player
+        val oldItem = player.inventory.getItem(event.previousSlot)
+        val newItem = player.inventory.getItem(event.newSlot)
+        
+        oldItem?.logic?.handleDeselect(player, oldItem)
+        newItem?.logic?.handleSelect(player, newItem)
     }
     
     // This method stores the last used item for the RELEASE_USE_ITEM action below

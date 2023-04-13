@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.player.equipment
+package xyz.xenondevs.nova.event
 
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable

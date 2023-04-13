@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ArmorItem
 import net.minecraft.world.item.BlockItem
@@ -24,9 +25,9 @@ import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.puts
 import xyz.xenondevs.bytebase.util.replaceFirst
+import xyz.xenondevs.nova.event.ArmorEquipEvent
+import xyz.xenondevs.nova.event.EquipAction
 import xyz.xenondevs.nova.item.behavior.Wearable
-import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
-import xyz.xenondevs.nova.player.equipment.EquipAction
 import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.item.novaItem
@@ -35,7 +36,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.DISPENSER_BLOCK_GET
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.INVENTORY_ARMOR_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.INVENTORY_CONSTRUCTOR
 
-internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity::class, DispenserBlock::class) {
+internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity::class, DispenserBlock::class, Inventory::class) {
     
     override fun transform() {
         // makes nova wearables equipable
@@ -112,13 +113,16 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
     
 }
 
+// TODO: Abstraction with WatchedItemList
 internal class WatchedArmorList(player: Player) : NonNullList<ItemStack>(
     Array<ItemStack>(4) { ItemStack.EMPTY }.asList(),
     ItemStack.EMPTY
 ) {
     
+    @JvmField
+    var initialized = false
+    
     private val player = player as? ServerPlayer
-    private var initialized = false
     private val previousStacks = Array<ItemStack>(4) { ItemStack.EMPTY }
     
     override fun set(index: Int, element: ItemStack?): ItemStack {
@@ -141,9 +145,6 @@ internal class WatchedArmorList(player: Player) : NonNullList<ItemStack>(
                 if (equipEvent.isCancelled)
                     return item // return the item that was tried to set if the event was cancelled
             }
-        } else if (index == 3) {
-            // When the player first joins, the players inventory is loaded from nbt, with slot 3 being initialized last
-            initialized = true
         }
         
         previousStacks[index] = item.copy()

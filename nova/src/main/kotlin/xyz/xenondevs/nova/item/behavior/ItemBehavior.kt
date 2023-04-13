@@ -18,8 +18,8 @@ import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
-import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
+import xyz.xenondevs.nova.event.ArmorEquipEvent
+import xyz.xenondevs.nova.event.BlockBreakActionEvent
 
 abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     
@@ -41,6 +41,8 @@ abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     open fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     open fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
     open fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
+    open fun handleSelect(player: Player, itemStack: ItemStack) = Unit
+    open fun handleDeselect(player: Player, itemStack: ItemStack) = Unit
     
     open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
     open fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) = Unit

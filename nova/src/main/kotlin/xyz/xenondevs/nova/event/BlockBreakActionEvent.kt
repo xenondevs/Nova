@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.block.event
+package xyz.xenondevs.nova.event
 
 import org.bukkit.block.Block
 import org.bukkit.entity.Player

@@ -42,14 +42,14 @@ import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
-import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
+import xyz.xenondevs.nova.event.ArmorEquipEvent
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.data.getDoubleOrNull
 import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.serverPlayer
-import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
+import xyz.xenondevs.nova.event.BlockBreakActionEvent
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
@@ -166,6 +166,14 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder<*
     
     fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) {
         behaviors.forEach { it.handleRelease(player, itemStack, event) }
+    }
+    
+    fun handleSelect(player: Player, itemStack: ItemStack) {
+        behaviors.forEach { it.handleSelect(player, itemStack) }
+    }
+    
+    fun handleDeselect(player: Player, itemStack: ItemStack) {
+        behaviors.forEach { it.handleDeselect(player, itemStack) }
     }
     //</editor-fold>
     

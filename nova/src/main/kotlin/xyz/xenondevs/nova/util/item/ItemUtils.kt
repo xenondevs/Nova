@@ -139,6 +139,16 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
 fun ItemStack.takeUnlessEmpty(): ItemStack? =
     if (type.isAir || amount <= 0) null else this
 
+fun MojangStack.isSimilar(other: MojangStack): Boolean {
+    if (this.item !== other.item) return false
+    if (this.hasTag() xor other.hasTag()) return false
+    
+    return !this.hasTag() || this.tag == other.tag
+}
+
+fun MojangStack.takeUnlessEmpty(): MojangStack? =
+    if (isEmpty) null else this
+
 //<editor-fold desc="nova item data storage", defaultstate="collapsed">
 
 //<editor-fold desc="BukkitStack - Nova Compound", defaultstate="collapsed">

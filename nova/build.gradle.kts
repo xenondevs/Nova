@@ -31,7 +31,7 @@ dependencies {
     novaLoader(libs.bundles.minecraft.assets)
     novaLoader("xyz.xenondevs.invui:invui-resourcepack:1.0") { exclude("xyz.xenondevs.invui", "invui") }
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
-    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.4")
+    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.5")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
     novaLoader("software.amazon.awssdk:s3:2.18.35")
     novaLoader("com.google.jimfs:jimfs:1.2")
