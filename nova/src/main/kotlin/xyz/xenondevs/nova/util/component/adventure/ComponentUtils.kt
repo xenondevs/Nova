@@ -27,6 +27,10 @@ fun Player.sendMessage(type: ChatMessageType, component: Component) {
     spigot().sendMessage(type, *component.toBungeeComponent())
 }
 
+fun String.toAdventureComponent(): Component {
+    return GsonComponentSerializer.gson().deserialize(this)
+}
+
 fun MojangComponent.toAdventureComponent(): Component {
     return GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(this))
 }

@@ -41,11 +41,10 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
     
     override fun getItemProvider(): ItemProvider {
         val number = getNumber().coerceIn(0..999)
-        val builder = DefaultGuiItems.NUMBER.model.createClientsideItemBuilder(modelId = number)
-        if (localizedName != null)
-            builder.setDisplayName(Component.translatable(localizedName, Component.text(number)))
-        
-        return builder
+        return if (localizedName != null) {
+            DefaultGuiItems.NUMBER.model.createClientsideItemBuilder(modelId = number)
+                .setDisplayName(Component.translatable(localizedName, Component.text(number)))
+        } else DefaultGuiItems.NUMBER.clientsideProviders[number]
     }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
