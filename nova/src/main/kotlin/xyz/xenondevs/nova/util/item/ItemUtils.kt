@@ -3,10 +3,12 @@
 package xyz.xenondevs.nova.util.item
 
 import com.mojang.brigadier.StringReader
+import net.kyori.adventure.text.Component
 import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.StringTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.item.ArmorItem
@@ -39,7 +41,12 @@ import xyz.xenondevs.nova.item.behavior.Wearable
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.bukkitMirror
+import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
+import xyz.xenondevs.nova.util.component.adventure.toJson
+import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getCBFCompoundTag
+import xyz.xenondevs.nova.util.data.getOrNull
+import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.data.getOrPutCBFCompoundTag
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.name
@@ -158,6 +165,27 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
 
 fun ItemStack.takeUnlessEmpty(): ItemStack? =
     if (type.isAir || amount <= 0) null else this
+
+internal var MojangStack.adventureName: Component
+    get() = tag
+        ?.getOrNull<CompoundTag>("display")
+        ?.getOrNull<StringTag>("Name")
+        ?.asString
+        ?.toAdventureComponent()
+        ?: Component.empty()
+    set(value) {
+        orCreateTag.getOrPut("display", ::CompoundTag).putString("Name", value.toJson())
+    }
+
+internal var MojangStack.adventureLore: List<Component>
+    get() = tag
+        ?.getOrNull<CompoundTag>("display")
+        ?.getOrNull<ListTag>("Lore")
+        ?.map { (it as StringTag).asString.toAdventureComponent() }
+        ?: emptyList()
+    set(value) {
+        orCreateTag.getOrPut("display", ::CompoundTag).put("Lore",  NBTUtils.createStringList(value.map(Component::toJson)))
+    }
 
 //<editor-fold desc="nova item data storage", defaultstate="collapsed">
 

@@ -4,7 +4,6 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.util.data.LazyArray
@@ -25,11 +24,8 @@ class DisplayEntityBlockModelData(
     
     override val modelProviderType = DisplayEntityModelProvider
     
-    private val blockProviders: LazyArray<ItemProvider> by lazy {
-        LazyArray(dataArray.size) { subId ->
-            ItemWrapper(createClientsideItemBuilder(null, null, subId).get())
-        }
-    }
+    private val blockProviders: LazyArray<ItemProvider> = 
+        LazyArray({ dataArray.size }, ::createBlockDisplayItemProvider)
     
     operator fun get(index: Int): ItemProvider = blockProviders[index]
     

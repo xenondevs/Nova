@@ -121,7 +121,7 @@ class UpgradeHolder internal constructor(
         if (event.updateReason == SELF_UPDATE_REASON || event.isRemove || event.newItem == null)
             return
         
-        val upgradeType = event.newItem.getUpgradeType()
+        val upgradeType = event.newItem!!.getUpgradeType()
         if (upgradeType == null || upgradeType !in allowed) {
             event.isCancelled = true
             return
@@ -138,7 +138,7 @@ class UpgradeHolder internal constructor(
         var addedAmount = event.addedAmount
         if (addedAmount + currentAmount > limit) {
             addedAmount = limit - currentAmount
-            event.newItem.amount = addedAmount
+            event.newItem!!.amount = addedAmount
         }
     }
     

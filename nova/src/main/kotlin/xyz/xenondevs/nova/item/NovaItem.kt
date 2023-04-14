@@ -1,21 +1,17 @@
-@file:Suppress("MemberVisibilityCanBePrivate", "LeakingThis", "unused")
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
 package xyz.xenondevs.nova.item
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.logic.ItemLogic
-import xyz.xenondevs.nova.item.logic.PacketItems
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.LazyArray
-import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.world.block.NovaBlock
 import kotlin.math.min
 import kotlin.reflect.KClass
@@ -50,42 +46,21 @@ class NovaItem internal constructor(
         return@lazy itemModelData[logic.vanillaMaterial]!!
     }
     
-    //<editor-fold desc="ItemProviders">
     /**
      * An array of [ItemProviders][ItemProvider] for each subId of this [NovaItem].
-     * 
+     *
      * The items are in client-side format and do not have any other special data except their display name (hence "basic").
      */
-    val basicClientsideProviders: LazyArray<ItemProvider> by lazy {
-        LazyArray(model.dataArray.size) { subId ->
-            ItemWrapper(
-                model.createClientsideItemBuilder(
-                    logic.getPacketItemData(null, null).name,
-                    null,
-                    subId
-                ).get()
-            )
-        }
-    }
+    val basicClientsideProviders: LazyArray<ItemProvider> =
+        LazyArray({ model.dataArray.size }) { model.createClientsideItemProvider(logic, true, it) }
     
     /**
      * An array of [ItemProviders][ItemProvider] for each subId of this [NovaItem].
-     * 
+     *
      * The items are in client-side format and have all special data (lore, other nbt tags, etc.) applied.
      */
-    val clientsideProviders: LazyArray<ItemProvider> by lazy {
-        LazyArray(model.dataArray.size) { subId ->
-            val itemStack = model.createItemBuilder(subId).get()
-            val clientsideItemStack = PacketItems.getClientSideStack(
-                player = null,
-                itemStack = itemStack.nmsCopy,
-                useName = true,
-                storeServerSideTag = false
-            )
-            clientsideItemStack.tag?.remove("nova")
-            ItemWrapper(clientsideItemStack.bukkitMirror)
-        }
-    }
+    val clientsideProviders: LazyArray<ItemProvider> =
+        LazyArray({ model.dataArray.size }) { model.createClientsideItemProvider(logic, false, it) }
     
     /**
      * The basic client-side provider for the first subId of this [NovaItem].
@@ -98,7 +73,6 @@ class NovaItem internal constructor(
      * @see [clientsideProviders]
      */
     val clientsideProvider: ItemProvider by lazy { clientsideProviders[0] }
-    //</editor-fold>
     
     init {
         logic.setMaterial(this)
@@ -112,7 +86,7 @@ class NovaItem internal constructor(
     
     /**
      * Creates an [ItemStack] of this [NovaItem] in server-side format.
-     * 
+     *
      * Functionally equivalent to: `createItemBuilder().setAmount(amount).get()`
      */
     fun createItemStack(amount: Int = 1): ItemStack =
@@ -126,7 +100,7 @@ class NovaItem internal constructor(
     
     /**
      * Creates an [ItemStack] of this [NovaItem] in client-side format.
-     * 
+     *
      * Functionally equivalent to: `createClientsideItemBuilder().setAmount(amount).get()`
      */
     fun createClientsideItemStack(amount: Int): ItemStack =
@@ -135,13 +109,13 @@ class NovaItem internal constructor(
     /**
      * Checks whether this [NovaItem] has an [ItemBehavior] of the reified type [T], or a subclass of it.
      */
-    inline fun <reified T: ItemBehavior> hasBehavior(): Boolean =
+    inline fun <reified T : ItemBehavior> hasBehavior(): Boolean =
         hasBehavior(T::class)
     
     /**
      * Checks whether this [NovaItem] has an [ItemBehavior] of the specified class [behavior], or a subclass of it.
      */
-    fun <T: ItemBehavior> hasBehavior(behavior: KClass<T>): Boolean =
+    fun <T : ItemBehavior> hasBehavior(behavior: KClass<T>): Boolean =
         logic.hasBehavior(behavior)
     
     /**
@@ -161,9 +135,6 @@ class NovaItem internal constructor(
     companion object {
         
         val CODEC = NovaRegistries.ITEM.byNameCodec()
-        
-        internal fun of(block: NovaBlock, item: ItemLogic, maxStackSize: Int, craftingRemainingItem: ItemBuilder? = null, isHidden: Boolean = false) =
-            NovaItem(block.id, block.localizedName, item, maxStackSize, craftingRemainingItem, isHidden, block)
         
     }
     
