@@ -61,6 +61,7 @@ import java.util.*
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
 import xyz.xenondevs.nova.tileentity.menu.TileEntityMenuClass as TileEntityMenuAnnotation
 
@@ -111,7 +112,15 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     lateinit var menuContainer: MenuContainer
     
     init {
-        val guiClass = this::class.nestedClasses.firstOrNull { it.hasAnnotation<TileEntityMenuAnnotation>() }
+        // look through the nested classes of this::class and all its superclasses for a class annotated with @TileEntityMenuClass
+        var guiClass: KClass<*>? = null
+        var clazz: KClass<*>? = this::class
+        while (clazz != null && guiClass == null) {
+            guiClass = clazz.nestedClasses.firstOrNull { it.hasAnnotation<TileEntityMenuAnnotation>() }
+            clazz = clazz.java.superclass?.kotlin
+        }
+        
+        // if a class was found, create a MenuContainer for it
         if (guiClass != null) {
             @Suppress("LeakingThis")
             menuContainer = MenuContainer.of(this, guiClass)
