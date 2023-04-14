@@ -17,7 +17,7 @@ public class InventoryUpdateEventCaller {
         if (invData == null) return;
         var player = invData.player;
         var slot = invData.slot;
-        var oldItem = oldAmount <= 0 ? null : CraftItemStack.asCraftMirror(item.copyWithCount(oldAmount));
+        var oldItem = oldAmount <= 0 ? null : CraftItemStack.asCraftMirror(item.copyWithCount(oldAmount)); // FIXME: wrong novaCompound reference
         var newItem = newAmount <= 0 ? null : CraftItemStack.asCraftMirror(item.copyWithCount(newAmount));
         var updateEvent = new PlayerInventoryUpdateEvent(player, slot, oldItem, newItem);
         Bukkit.getPluginManager().callEvent(updateEvent);
