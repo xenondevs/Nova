@@ -19,9 +19,7 @@ dependencies {
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
     novaLoaderApi(libs.bundles.kyori.adventure)
-    novaLoaderApi("xyz.xenondevs.invui:invui:1.2") { for (i in 1..13) exclude("xyz.xenondevs.invui", "inventory-access-r$i") }
-    novaLoaderApi("xyz.xenondevs.invui:inventory-access-r13:1.2:remapped-mojang")
-    novaLoaderApi("xyz.xenondevs.invui:invui-kotlin:1.2")
+    novaLoaderApi(libs.invui.kotlin)
     novaLoaderApi("xyz.xenondevs:nms-utilities:0.8:remapped-mojang")
     
     // internal dependencies
@@ -29,7 +27,8 @@ dependencies {
     compileOnly(project(":nova-loader"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
-    novaLoader("xyz.xenondevs.invui:invui-resourcepack:1.2") { exclude("xyz.xenondevs.invui", "invui") }
+    novaLoader(libs.invui.resourcepack)
+    novaLoader(variantOf(libs.inventoryaccess) { classifier("remapped-mojang") })
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
     novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.5")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
