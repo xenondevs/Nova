@@ -120,7 +120,7 @@ internal object PacketItems : Listener {
     @PacketHandler
     private fun handleSetEquipment(event: ClientboundSetEquipmentPacketEvent) {
         val player = event.player
-        val slots = event.slots
+        val slots = ArrayList(event.slots).also { event.slots = it }
         
         slots.forEachIndexed { i, pair ->
             slots[i] = MojangPair(

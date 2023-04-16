@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.ui.menu.item.creative
 
+import me.xdrop.fuzzywuzzy.FuzzySearch
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
@@ -21,6 +22,7 @@ import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.item.ItemCategories
+import xyz.xenondevs.nova.item.ItemCategories.OBTAINABLE_ITEMS
 import xyz.xenondevs.nova.item.ItemCategory
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.item.clickableItem
@@ -30,7 +32,6 @@ import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.moveToStart
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.runTask
-import xyz.xenondevs.nova.util.searchFor
 
 private val TAB_BUTTON_TEXTURES = arrayOf(
     DefaultGuiTextures.ITEMS_0,
@@ -114,7 +115,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     init {
         val tabButtons = ItemCategories.CATEGORIES
             .withIndex()
-            .map { (index, category) -> CreativeTabItem(index, category).apply { setGui(mainGui) } }
+            .map { (index, category) -> CreativeTabItem(index, category).apply { gui = mainGui } }
         tabPagesGui.setContent(tabButtons)
         
         updateFilteredItems()
@@ -126,13 +127,23 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     }
     
     private fun updateFilteredItems() {
-        filteredItems = if (filter.isEmpty()) {
-            ItemCategories.OBTAINABLE_ITEMS.toList()
-        } else {
-            ItemCategories.OBTAINABLE_ITEMS.searchFor(filter) {
-                LocaleManager.getTranslation(player, it.localizedName)
+        filteredItems = if (filter.isNotEmpty()) {
+            val names = OBTAINABLE_ITEMS
+                .asSequence()
+                .map { it to LocaleManager.getTranslation(player, it.localizedName) }
+                .filter { (_, name) -> name.contains(filter, true) }
+                .toMap(HashMap())
+            val scores = FuzzySearch.extractAll(filter, names.values).associateTo(HashMap()) { it.string to it.score }
+            names.keys.sortedWith { o1, o2 ->
+                val s1 = scores[names[o1]]!!
+                val s2 = scores[names[o2]]!!
+                if (s1 == s2) {
+                    val i1 = OBTAINABLE_ITEMS.indexOf(o1)
+                    val i2 = OBTAINABLE_ITEMS.indexOf(o2)
+                    i1.compareTo(i2)
+                } else s1.compareTo(s2)
             }
-        }
+        } else OBTAINABLE_ITEMS.toList()
         
         searchResultsGui.setContent(filteredItems)
         searchPreviewGui.setContent(filteredItems)

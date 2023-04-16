@@ -14,6 +14,7 @@ dependencyResolutionManagement {
             version("spigot", "1.19.4-R0.1-SNAPSHOT")
             version("cbf", "0.5")
             version("xenondevs-commons", "1.0")
+            version("invui", "1.3")
             
             // lib - kotlin
             library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").versionRef("kotlin")
@@ -63,6 +64,11 @@ dependencyResolutionManagement {
             library("adventure-text-serializer-gson", "net.kyori:adventure-text-serializer-gson:4.12.0")
             library("adventure-text-serializer-plain", "net.kyori:adventure-text-serializer-plain:4.12.0")
             library("adventure-platform-bukkit", "net.kyori:adventure-platform-bukkit:4.2.0")
+            
+            // lib - invui
+            library("invui-kotlin", "xyz.xenondevs.invui", "invui-kotlin").versionRef("invui")
+            library("invui-resourcepack", "xyz.xenondevs.invui", "invui-resourcepack").versionRef("invui")
+            library("inventoryaccess", "xyz.xenondevs.invui", "inventory-access-r13").versionRef("invui")
             
             // bundles
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
