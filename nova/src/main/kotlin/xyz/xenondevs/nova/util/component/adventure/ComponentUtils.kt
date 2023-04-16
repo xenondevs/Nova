@@ -99,6 +99,10 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
     return move(-CharSizes.calculateComponentWidth(build(), lang))
 }
 
+fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveToStart(lang: String = "en_us", margin: Int): B {
+    return move(-CharSizes.calculateComponentWidth(build(), lang) + margin)
+}
+
 fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveToCenter(lang: String = "en_us"): B {
     return move(-CharSizes.calculateComponentWidth(build(), lang))
 }
