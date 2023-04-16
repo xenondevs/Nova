@@ -28,4 +28,12 @@ internal object ReflectionUtils {
         return field
     }
     
+    fun getFieldOrNull(clazz: Class<*>, declared: Boolean, name: String): Field? {
+        return runCatching { 
+            val field = if (declared) clazz.getDeclaredField(name) else clazz.getField(name)
+            if (declared) field.isAccessible = true
+            field
+        }.getOrNull()
+    }
+    
 }

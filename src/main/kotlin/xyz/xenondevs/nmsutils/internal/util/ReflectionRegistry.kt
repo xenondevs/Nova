@@ -8,6 +8,8 @@ import net.minecraft.network.ConnectionProtocol
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
+import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.server.network.ServerConnectionListener
 import net.minecraft.server.network.ServerGamePacketListenerImpl
@@ -17,6 +19,7 @@ import org.bukkit.craftbukkit.v1_19_R3.tag.CraftTag
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getClass
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getConstructor
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getField
+import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getFieldOrNull
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getMethod
 import java.util.*
 
@@ -80,5 +83,10 @@ internal object ReflectionRegistry {
     val SERVERBOUND_INTERACT_PACKET_INTERACTION_ACTION_HAND_FIELD = getField(SERVERBOUND_INTERACT_PACKET_INTERACTION_ACTION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ServerboundInteractPacket\$InteractionAction hand)")
     val SERVERBOUND_INTERACT_PACKET_INTERACTION_AT_LOCATION_ACTION_HAND_FIELD = getField(SERVERBOUND_INTERACT_PACKET_INTERACTION_AT_LOCATION_ACTION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ServerboundInteractPacket\$InteractionAtLocationAction hand)")
     val SERVERBOUND_INTERACT_PACKET_INTERACTION_AT_LOCATION_ACTION_LOCATION_FIELD = getField(SERVERBOUND_INTERACT_PACKET_INTERACTION_AT_LOCATION_ACTION_CLASS, true, "SRF(net.minecraft.network.protocol.game.ServerboundInteractPacket\$InteractionAtLocationAction location)")
+    
+    // Paper exclusive fields
+    val CLIENTBOUND_SYSTEM_CHAT_PACKET_ADVENTURE_CONTENT_FIELD = getFieldOrNull(ClientboundSystemChatPacket::class.java, true, "adventure\$content")
+    val CLIENTBOUND_SET_ACTION_BAR_TEXT_PACKET_ADVENTURE_TEXT_FIELD = getFieldOrNull(ClientboundSetActionBarTextPacket::class.java, true, "adventure\$text")
+    val CLIENTBOUND_SET_ACTION_BAR_TEXT_PACKET_COMPONENTS_FIELD = getFieldOrNull(ClientboundSetActionBarTextPacket::class.java, true, "components")
     
 }
