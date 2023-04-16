@@ -333,7 +333,7 @@ internal fun Block.removeInternal(ctx: BlockBreakContext, drops: Boolean, breakE
     }
     
     if (BlockManager.getBlockState(pos) != null) {
-        val itemEntities = BlockManager.getDrops(ctx)!!.let(::createDroppedItemEntities)
+        val itemEntities = if (drops) BlockManager.getDrops(ctx)!!.let(::createDroppedItemEntities) else emptyList()
         BlockManager.removeBlockStateInternal(ctx, breakEffects, sendEffectsToBreaker)
         return itemEntities
     }
