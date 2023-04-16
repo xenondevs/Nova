@@ -7,7 +7,6 @@ import com.google.common.cache.CacheBuilder
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
@@ -15,6 +14,7 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.component.adventure.chars
+import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
@@ -285,9 +285,9 @@ internal class CharSizeTable(
     companion object {
         
         fun load(file: File): CharSizeTable {
-            LOGGER.info("Loading char size table: $file...")
             file.inputStream().use {
-                val din = DataInputStream(it)
+                val bytes = it.readAllBytes()
+                val din = DataInputStream(ByteArrayInputStream(bytes))
                 val sizes = Int2ObjectOpenHashMap<IntArray>()
                 
                 while (din.available() >= 16) {
