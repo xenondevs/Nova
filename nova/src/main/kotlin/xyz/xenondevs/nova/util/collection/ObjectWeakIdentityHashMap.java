@@ -9,6 +9,10 @@ import java.lang.ref.ReferenceQueue;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * An {@link Object2ObjectMap} implementation that uses {@code System.identityHashCode} and {@code ==} to compare keys
+ * instead of {@code hashCode} and {@code equals}.
+ */
 public class ObjectWeakIdentityHashMap<K, V> implements Object2ObjectMap<K, V>, WeakIdentityMap {
     
     private final Object2ObjectMap<WeakKey<K>, V> map = new Object2ObjectOpenHashMap<>();
