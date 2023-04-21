@@ -31,13 +31,13 @@ internal abstract class BackingState(configType: DefaultingBlockStateConfigType<
             runTask {
                 positions.forEach {
                     if (!BlockManager.hasBlockState(it) && CustomItemServiceManager.getBlockType(it.block) == null)
-                        it.setBlockStateSilently(defaultState)
+                        it.setBlockStateSilently(defaultState) // TODO: Fix for DaylightDetector (inverted ones would be set to normal ones)
                 }
             }
         }
     }
     
-    fun getCorrectBlockState(pos: BlockPos): BlockState? {
+    open fun getCorrectBlockState(pos: BlockPos): BlockState? {
         var state = WorldDataManager.getBlockState(pos)
         
         if (state is LinkedBlockState)

@@ -29,6 +29,7 @@ import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.util.world.ChunkSearchQuery
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.backingstate.impl.BrownMushroomBlockBackingState
+import xyz.xenondevs.nova.world.block.backingstate.impl.DaylightDetectorBackingState
 import xyz.xenondevs.nova.world.block.backingstate.impl.MushroomStemBackingState
 import xyz.xenondevs.nova.world.block.backingstate.impl.NoteBlockBackingState
 import xyz.xenondevs.nova.world.block.backingstate.impl.RedMushroomBlockBackingState
@@ -56,7 +57,8 @@ internal object BackingStateManager : Listener {
     
     private val backingStates: List<BackingState> = listOf(
         NoteBlockBackingState,
-        RedMushroomBlockBackingState, BrownMushroomBlockBackingState, MushroomStemBackingState
+        RedMushroomBlockBackingState, BrownMushroomBlockBackingState, MushroomStemBackingState,
+        DaylightDetectorBackingState
     )
     
     private val queries: List<ChunkSearchQuery> =

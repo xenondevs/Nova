@@ -40,6 +40,7 @@ import net.minecraft.world.level.biome.BiomeSpecialEffects.GrassColorModifier
 import net.minecraft.world.level.biome.FeatureSorter
 import net.minecraft.world.level.biome.MobSpawnSettings
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.DaylightDetectorBlock
 import net.minecraft.world.level.block.DispenserBlock
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
@@ -156,6 +157,7 @@ internal object ReflectionRegistry {
     val SEMAPHORE_ACQUIRE_METHOD = getMethod(Semaphore::class, false, "acquire")
     val INVENTORY_ADD_RESOURCE_METHOD = getMethod(MojangInventory::class, true, "SRM(net.minecraft.world.inventory.Inventory addResource)", Int::class, MojangStack::class)
     val CRAFT_META_ITEM_CLONE_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "clone")
+    val DAYLIGHT_DETECTOR_BLOCK_UPDATE_SIGNAL_STRENGTH_METHOD = getMethod(DaylightDetectorBlock::class, true, "SRM(net.minecraft.world.level.block.DaylightDetectorBlock updateSignalStrength)", BlockState::class, Level::class, BlockPos::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")

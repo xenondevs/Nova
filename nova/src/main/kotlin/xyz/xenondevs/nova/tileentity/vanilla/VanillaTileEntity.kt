@@ -42,7 +42,8 @@ internal abstract class VanillaTileEntity internal constructor(val blockState: V
         FURNACE("minecraft:furnace", ::VanillaFurnaceTileEntity, { it.state is Furnace }),
         CONTAINER("minecraft:container", ::VanillaContainerTileEntity, { it.state is Container }),
         CAULDRON("minecraft:cauldron", ::VanillaCauldronTileEntity, { it.type.isCauldron() }),
-        NOTE_BLOCK("minecraft:note_block", ::VanillaNoteBlockTileEntity, { it.type == Material.NOTE_BLOCK });
+        NOTE_BLOCK("minecraft:note_block", ::VanillaNoteBlockTileEntity, { it.type == Material.NOTE_BLOCK }),
+        DAYLIGHT_DETECTOR("minecraft:daylight_detector", ::VanillaDaylightDetectorTileEntity, { it.type == Material.DAYLIGHT_DETECTOR });
         
         companion object {
             
