@@ -5,6 +5,7 @@ import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.data.resources.model.blockstate.BrownMushroomBlockStateConfig
+import xyz.xenondevs.nova.data.resources.model.blockstate.DaylightDetectorBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.MushroomStemBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.NoteBlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.RedMushroomBlockStateConfig
@@ -12,7 +13,8 @@ import xyz.xenondevs.nova.data.resources.model.blockstate.RedMushroomBlockStateC
 internal enum class BlockModelType(vararg val configTypes: BlockStateConfigType<*>?) {
     
     DEFAULT(null),
-    SOLID(RedMushroomBlockStateConfig, BrownMushroomBlockStateConfig, MushroomStemBlockStateConfig, NoteBlockStateConfig, null);
+    SOLID(RedMushroomBlockStateConfig, BrownMushroomBlockStateConfig, MushroomStemBlockStateConfig, NoteBlockStateConfig, null),
+    SLAB(DaylightDetectorBlockStateConfig);
     
 }
 

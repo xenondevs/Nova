@@ -25,7 +25,6 @@ import net.minecraft.core.BlockPos as MojangBlockPos
 internal object DaylightDetectorBackingState : BackingState(DaylightDetectorBlockStateConfig, false) {
     
     fun updatePower(vdd: VanillaDaylightDetectorTileEntity, world: Level, pos: MojangBlockPos, state: BlockState) {
-        
         // Convert sun angle to value between 0 and 15
         var brightness = world.getBrightness(LightLayer.SKY, pos) - world.skyDarken
         var sunAngle = world.getSunAngle(1.0f)

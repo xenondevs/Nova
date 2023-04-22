@@ -14,7 +14,7 @@ internal class DaylightDetectorBlockStateConfig(
     
     override val type = DaylightDetectorBlockStateConfig
     override val id = getIdOf(power, inverted)
-    override val variantString = "power=$power,inverted=$inverted"
+    override val variantString = "inverted=$inverted,power=$power"
     override val blockState: BlockState = Blocks.DAYLIGHT_DETECTOR.defaultBlockState()
         .setValue(DaylightDetectorBlock.POWER, power)
         .setValue(DaylightDetectorBlock.INVERTED, inverted)
