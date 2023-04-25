@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.adapter.ResourceLocationBinaryA
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.VirtualInventoryBinaryAdapter
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.registry.NovaRegistries.UPGRADE_TYPE
+import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
 import xyz.xenondevs.nova.util.byNameBinaryAdapter
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -47,6 +48,8 @@ internal object CBFAdapters {
     private class CBFAddonSecurityManager : CBFSecurityManager {
         
         override fun <T : Any> canRegisterAdapter(type: KType, adapter: BinaryAdapter<T>): Boolean {
+            if (adapter is RegistryBinaryAdapter)
+                return true
             return type.classifierClass!!.java.classLoader == adapter.javaClass.classLoader
         }
         

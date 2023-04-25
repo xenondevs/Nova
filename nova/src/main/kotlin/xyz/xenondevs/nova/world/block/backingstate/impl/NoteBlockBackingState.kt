@@ -43,10 +43,10 @@ internal object NoteBlockBackingState : BackingState(NoteBlockStateConfig, false
         val instrument = vnb.instrument
         if (instrument.isTunable) {
             vnb.cycleNote()
-            
-            if (vnb.instrument.requiresAirAbove && vnb.pos.location.add(0.0, 1.0, 0.0).block.type.isAir)
-                playNote(vnb)
         }
+        
+        if (!vnb.instrument.requiresAirAbove || vnb.pos.location.add(0.0, 1.0, 0.0).block.type.isAir)
+            playNote(vnb)
     }
     
     fun playNote(vnb: VanillaNoteBlockTileEntity) {
