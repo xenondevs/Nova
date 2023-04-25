@@ -20,7 +20,7 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacket
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.hooks.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot

@@ -59,7 +59,7 @@ import net.minecraft.world.level.Level as MojangWorld
         NetworkManager.Companion::class
     ]
 )
-internal object WorldDataManager : Listener {
+object WorldDataManager : Listener {
     
     private val worlds: MutableMap<UUID, WorldDataStorage> = Collections.synchronizedMap(HashMap()) // TODO: removing entries of unloaded worlds
     
@@ -231,12 +231,11 @@ internal object WorldDataManager : Listener {
     fun removeBlockState(pos: BlockPos) =
         writeChunk(pos.chunkPos) { it.blockStates -= pos }
     
-    @Synchronized
-    internal fun addOrphanBlock(world: MojangWorld, x: Int, y: Int, z: Int, material: NovaBlock) {
+    fun addOrphanBlock(world: MojangWorld, x: Int, y: Int, z: Int, material: NovaBlock) {
         return addOrphanBlock(BlockPos(world.world, x, y, z), material)
     }
     
-    internal fun addOrphanBlock(pos: BlockPos, material: NovaBlock) {
+    fun addOrphanBlock(pos: BlockPos, material: NovaBlock) {
         val chunk = pos.chunkPos
         if (chunk.isLoaded()) {
             placeOrphanBlock(pos, material)
@@ -245,7 +244,6 @@ internal object WorldDataManager : Listener {
         }
     }
     
-    @Synchronized
     private fun placeOrphanBlock(pos: BlockPos, material: NovaBlock) {
         val ctx = BlockPlaceContext(pos, material.item?.createItemStack(0) ?: ItemStack(Material.AIR), null, null, null, pos.below, BlockFace.UP)
         val state = material.createNewBlockState(ctx)
@@ -254,22 +252,19 @@ internal object WorldDataManager : Listener {
         material.logic.handlePlace(state, ctx)
     }
     
-    @Synchronized
     internal fun getWorldGenMaterial(pos: MojangBlockPos, world: MojangWorld): NovaBlock? {
         val novaPos = pos.toNovaPos(world.world)
         val chunk = novaPos.chunkPos
         return if (chunk.isLoaded()) (getBlockState(novaPos) as? NovaBlockState)?.block else pendingOrphanBlocks[chunk]?.get(novaPos)
     }
     
-    @Synchronized
     private fun getWorldStorage(world: World): WorldDataStorage =
         worlds.getOrPut(world.uid) { WorldDataStorage(world) }
     
-    @Synchronized
     private fun getRegion(pos: ChunkPos): RegionFile =
         getWorldStorage(pos.world!!).getRegion(pos)
     
-    inline fun <T> readChunk(pos: ChunkPos, read: (RegionChunk) -> T): T {
+    private inline fun <T> readChunk(pos: ChunkPos, read: (RegionChunk) -> T): T {
         val region = getRegion(pos)
         val chunk = region.getChunk(pos)
         chunk.lock.read {
@@ -277,7 +272,7 @@ internal object WorldDataManager : Listener {
         }
     }
     
-    inline fun <T> writeChunk(pos: ChunkPos, write: (RegionChunk) -> T): T {
+    private inline fun <T> writeChunk(pos: ChunkPos, write: (RegionChunk) -> T): T {
         val region = getRegion(pos)
         val chunk = region.getChunk(pos)
         chunk.lock.write {

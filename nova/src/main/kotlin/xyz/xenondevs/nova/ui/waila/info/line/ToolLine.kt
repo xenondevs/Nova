@@ -6,7 +6,7 @@ import org.bukkit.GameMode
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.data.resources.Resources
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.hooks.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.registry.NovaRegistries

@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.resources.upload
 import org.bukkit.configuration.ConfigurationSection
 import java.io.File
 
-internal interface UploadService {
+interface UploadService {
     
     val name: String
     
