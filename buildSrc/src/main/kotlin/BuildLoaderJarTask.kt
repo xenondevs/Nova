@@ -39,8 +39,6 @@ private const val MAVEN_CENTRAL = "https://repo1.maven.org/maven2/"
 
 abstract class BuildLoaderJarTask : DefaultTask() {
     
-    private val mojangMapped = project.hasProperty("mojang-mapped") || System.getProperty("mojang-mapped") != null
-    
     @get:Input
     abstract var nova: Project
     
@@ -256,7 +254,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     }
     
     private fun getArtifactCoords(dependency: DefaultExternalModuleDependency): String {
-        val artifact = dependency.artifacts.firstOrNull()?.takeUnless { it.classifier == "remapped-mojang" && !mojangMapped }
+        val artifact = dependency.artifacts.firstOrNull()?.takeUnless { it.classifier == "remapped-mojang" && remap }
         return if (artifact != null)
             "${dependency.group}:${dependency.name}:${artifact.extension}:${artifact.classifier}:${dependency.version}"
         else "${dependency.group}:${dependency.name}:${dependency.version}"
