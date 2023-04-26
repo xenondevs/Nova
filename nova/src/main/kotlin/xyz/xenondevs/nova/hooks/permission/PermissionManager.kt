@@ -1,65 +1,131 @@
 package xyz.xenondevs.nova.hooks.permission
 
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.LoadingCache
+import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
-import org.bukkit.craftbukkit.v1_19_R3.CraftServer
-import xyz.xenondevs.nova.util.runAsyncTask
-import xyz.xenondevs.nova.util.runAsyncTaskTimer
+import org.bukkit.entity.Player
+import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.hooks.HooksLoader
+import xyz.xenondevs.nova.hooks.protection.ProtectionManager
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
+import java.time.Duration
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
+private data class PermissionArgs(val world: World, val player: OfflinePlayer, val permission: String)
+
+/**
+ * A permission manager that can retrieve permissions for offline players via registered [PermissionIntegrations][PermissionIntegration].
+ *
+ * [OfflinePlayer] permissions will be cached for 30 minutes after the last access and commonly accessed permissions will be refreshed every minute.
+ */
+@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC, dependsOn = [HooksLoader::class])
 object PermissionManager {
     
     internal val integrations = ArrayList<PermissionIntegration>()
-    private val offlinePermissionCache = ConcurrentHashMap<UUID, ConcurrentHashMap<UUID, ConcurrentHashMap<String, Boolean>>>()
     
-    init {
-        runAsyncTaskTimer(6000L, 6000L, ::updateOfflinePermissions)
-    }
+    private lateinit var executor: ExecutorService
+    private lateinit var offlinePermissionCache: LoadingCache<PermissionArgs, Boolean>
     
-    fun hasPermission(world: World, player: OfflinePlayer, permission: String): Boolean {
-        println("getting permission for ${player.name}: $permission")
-        return if (player.isOnline) player.player!!.hasPermission(permission)
-        else hasOfflinePermission(world, player, permission)
-    }
-    
-    fun hasPermission(world: World, uuid: UUID, permission: String): Boolean {
-        return hasPermission(world, Bukkit.getOfflinePlayer(uuid), permission)
-    }
-    
-    private fun updateOfflinePermissions() {
-        offlinePermissionCache.forEach { (playerUUID, worldMap) ->
-            val player = Bukkit.getOfflinePlayer(playerUUID)
-            worldMap.forEach { (worldUUID, permissionMap) ->
-                val world = Bukkit.getWorld(worldUUID)
-                if (world != null)
-                    permissionMap.keys.forEach { permissionMap[it] = checkPermissionIntegrations(world, player, it) }
-                else worldMap -= worldUUID
-            }
-        }
-    }
-    
-    @Suppress("LiftReturnOrAssignment")
-    private fun hasOfflinePermission(world: World, player: OfflinePlayer, permission: String): Boolean {
-        println("checking permission for offline player ${player.name}: $permission")
-        val permissionMap = offlinePermissionCache
-            .getOrPut(player.uniqueId, ::ConcurrentHashMap)
-            .getOrPut(world.uid, ::ConcurrentHashMap)
+    @InitFun
+    private fun init() {
+        executor = ThreadPoolExecutor(
+            ProtectionManager.integrations.size, ProtectionManager.integrations.size,
+            0, TimeUnit.MILLISECONDS,
+            LinkedBlockingQueue(),
+            ThreadFactoryBuilder().setNameFormat("Nova Protection Worker - %s").build()
+        )
         
-        if (permissionMap.containsKey(permission)) {
-            return permissionMap[permission] ?: false
-        } else if ((Bukkit.getServer() as CraftServer).server.serverThread != Thread.currentThread()) {
-            val result = checkPermissionIntegrations(world, player, permission)
-            permissionMap[permission] = result
-            return result
-        } else {
-            runAsyncTask { permissionMap[permission] = checkPermissionIntegrations(world, player, permission) }
+        offlinePermissionCache = Caffeine.newBuilder()
+            .expireAfterAccess(Duration.ofMinutes(30))
+            .refreshAfterWrite(Duration.ofMinutes(1))
+            .build { hasOfflinePermission(it.world, it.player, it.permission) }
+        
+        if (integrations.size > 1)
+            LOGGER.warning("Multiple permission integrations have been registered: ${integrations.joinToString { it::class.simpleName!! }}, Nova will use the first one")
+    }
+    
+    @DisableFun
+    private fun disable() {
+        executor.shutdown()
+    }
+    
+    /**
+     * Checks whether the player under the given [UUID][player] has the given [permission] in the given [world].
+     *
+     * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline
+     * permission cache. If the permission is not cached yet, this method will return false and initiate a cache load.
+     */
+    fun hasPermission(world: World, player: UUID, permission: String): Boolean =
+        hasPermission(world, Bukkit.getOfflinePlayer(player), permission)
+    
+    /**
+     * Checks whether the given [player] has the given [permission] in the given [world].
+     *
+     * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline
+     * permission cache. If the permission is not cached yet, this method will return false and initiate a cache load.
+     */
+    fun hasPermission(world: World, player: OfflinePlayer, permission: String): Boolean {
+        // online-player permissions are cached by the permissions plugin
+        if (player.isOnline)
+            return player.player!!.hasPermission(permission)
+        
+        val args = PermissionArgs(world, player, permission)
+        
+        // don't initiate cache loads, as that would cause lag spikes due to database access from the main thread
+        val cachedResult = offlinePermissionCache.getIfPresent(args)
+        if (cachedResult == null) {
+            // load cache async
+            offlinePermissionCache.refresh(args)
+            // return false as we don't know the result yet
             return false
         }
+        
+        return cachedResult
     }
     
-    private fun checkPermissionIntegrations(world: World, player: OfflinePlayer, permission: String): Boolean =
-        integrations.firstNotNullOfOrNull { it.hasPermission(world, player, permission) } ?: false
+    /**
+     * Checks whether the player under the given [UUID][player] has the given [permission] in the given [world].
+     * 
+     * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline permission cache,
+     * which accessed the registered [PermissionIntegrations][PermissionIntegration] asynchronously.
+     */
+    fun hasPermissionAsync(world: World, player: UUID, permission: String): CompletableFuture<Boolean> =
+        hasPermissionAsync(world, Bukkit.getOfflinePlayer(player), permission)
+    
+    /**
+     * Checks whether the given [player] has the given [permission] in the given [world].
+     * 
+     * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline permission cache,
+     * which accessed the registered [PermissionIntegrations][PermissionIntegration] asynchronously.
+     */
+    fun hasPermissionAsync(world: World, player: OfflinePlayer, permission: String): CompletableFuture<Boolean> {
+        // online-player permissions are cached by the permissions plugin
+        if (player.isOnline)
+            return CompletableFuture.completedFuture(player.player!!.hasPermission(permission))
+        
+        val args = PermissionArgs(world, player, permission)
+        val cachedResult = offlinePermissionCache.getIfPresent(args)
+        if (cachedResult != null)
+            return CompletableFuture.completedFuture(cachedResult)
+        
+        return offlinePermissionCache.refresh(args)
+    }
+    
+    private fun hasOfflinePermission(world: World, player: OfflinePlayer, permission: String): Boolean {
+        require(Thread.currentThread() != MINECRAFT_SERVER.serverThread) { "Offline player permissions should never be checked from the main thread" }
+        return integrations[0].hasPermission(world, player, permission).get() ?: false
+    }
     
 }

@@ -28,6 +28,7 @@ dependencies {
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
     novaLoader("software.amazon.awssdk:s3:2.18.35")
     novaLoader("com.google.jimfs:jimfs:1.2")
+    novaLoader("com.github.ben-manes.caffeine:caffeine:3.1.6")
     
     // spigot runtime dependencies
     spigotRuntime(libs.bundles.maven.resolver)

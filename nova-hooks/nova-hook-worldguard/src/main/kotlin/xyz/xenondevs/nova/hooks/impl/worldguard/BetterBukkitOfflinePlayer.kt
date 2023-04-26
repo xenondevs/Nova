@@ -44,8 +44,7 @@ internal class BetterBukkitOfflinePlayer(
     }
     
     override fun hasPermission(perm: String): Boolean {
-        if (player.isOp) return platform.globalStateManager[world].opPermissions
-        return PermissionManager.hasPermission(bukkitWorld, player, perm)
+        return (player.isOp && platform.globalStateManager[world].opPermissions) || PermissionManager.hasPermission(bukkitWorld, player, perm)
     }
     
     override fun getWorld(): World {
