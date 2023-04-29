@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.hooks.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.hook.customitems.CustomItemServiceManager
 import xyz.xenondevs.renderer.MinecraftModelRenderer
 import java.util.logging.Level
 import kotlin.io.path.copyTo
