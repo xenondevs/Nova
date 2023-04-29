@@ -50,8 +50,8 @@ If you would like to help translate Nova, you can do so [here](https://translate
 
 # Building
 
-To build Nova, run the `loaderJar` gradle task.  
-You can specify an output directory with the VM option `"-DoutDir<path>"` and build a mojang-mapped jar with `-Dmojang-mapped`.
+To build Nova, run the `loaderJarSpigot` task for a spigot-mapped jar or `loaderJarMojang` for a mojang-mapped jar.  
+You can specify an output directory using the `outDir` property: `-PoutDir="<path>"`.
 
 # Plugin- and Addon API
 
