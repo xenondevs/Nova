@@ -67,7 +67,7 @@ import org.bukkit.util.BoundingBox
 import org.bukkit.util.RayTraceResult
 import org.bukkit.util.Vector
 import org.jetbrains.annotations.Contract
-import xyz.xenondevs.nova.hook.permission.PermissionManager
+import xyz.xenondevs.nova.integration.permission.PermissionManager
 import java.net.InetSocketAddress
 import java.util.*
 

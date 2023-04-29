@@ -13,7 +13,7 @@ import com.sk89q.worldedit.world.block.BaseBlock
 import com.sk89q.worldedit.world.block.BlockStateHolder
 import com.sk89q.worldedit.world.block.BlockTypes
 import xyz.xenondevs.nova.data.world.WorldDataManager
-import xyz.xenondevs.nova.hook.Hook
+import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.contains
 import xyz.xenondevs.nova.util.get

@@ -6,8 +6,8 @@ import net.luckperms.api.query.QueryOptions
 import net.luckperms.api.util.Tristate
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
-import xyz.xenondevs.nova.hook.Hook
-import xyz.xenondevs.nova.hook.permission.PermissionIntegration
+import xyz.xenondevs.nova.integration.Hook
+import xyz.xenondevs.nova.integration.permission.PermissionIntegration
 import java.util.concurrent.CompletableFuture
 
 @Hook(plugins = ["LuckPerms"])

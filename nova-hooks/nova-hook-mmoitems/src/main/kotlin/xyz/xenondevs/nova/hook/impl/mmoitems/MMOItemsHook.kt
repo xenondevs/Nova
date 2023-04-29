@@ -13,10 +13,10 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.hook.Hook
-import xyz.xenondevs.nova.hook.customitems.CustomBlockType
-import xyz.xenondevs.nova.hook.customitems.CustomItemService
-import xyz.xenondevs.nova.hook.customitems.CustomItemType
+import xyz.xenondevs.nova.integration.Hook
+import xyz.xenondevs.nova.integration.customitems.CustomBlockType
+import xyz.xenondevs.nova.integration.customitems.CustomItemService
+import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.displayName
 import net.Indyuce.mmoitems.MMOItems as MMOItemsPlugin
 

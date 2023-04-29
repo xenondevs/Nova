@@ -1,6 +1,6 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package xyz.xenondevs.nova.hook
+package xyz.xenondevs.nova.integration
 
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.LOGGER
@@ -8,11 +8,11 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.resources.upload.UploadService
-import xyz.xenondevs.nova.hook.customitems.CustomItemService
-import xyz.xenondevs.nova.hook.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.hook.permission.PermissionIntegration
-import xyz.xenondevs.nova.hook.permission.PermissionManager
-import xyz.xenondevs.nova.hook.protection.ProtectionManager
+import xyz.xenondevs.nova.integration.customitems.CustomItemService
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.integration.permission.PermissionIntegration
+import xyz.xenondevs.nova.integration.permission.PermissionManager
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -25,7 +25,7 @@ internal object HooksLoader {
     
     @InitFun
     private fun loadHooks() {
-        JarUtils.findAnnotatedClasses(NOVA.pluginFile, Hook::class, "xyz/xenondevs/nova/hook/impl/").forEach { (className, annotation) ->
+        JarUtils.findAnnotatedClasses(NOVA.pluginFile, Hook::class, "xyz/xenondevs/nova/integration/impl/").forEach { (className, annotation) ->
             try {
                 val plugins = annotation["plugins"] as? List<String> ?: emptyList()
                 val unless = annotation["unless"] as? List<String> ?: emptyList()

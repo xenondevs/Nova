@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.hook.protection
+package xyz.xenondevs.nova.integration.protection
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.api.ApiTileEntityWrapper
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
-import xyz.xenondevs.nova.hook.HooksLoader
+import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage

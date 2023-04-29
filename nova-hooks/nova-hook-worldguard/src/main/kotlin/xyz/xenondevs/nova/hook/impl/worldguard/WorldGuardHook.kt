@@ -14,7 +14,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
-import xyz.xenondevs.nova.hook.Hook
+import xyz.xenondevs.nova.integration.Hook
 
 @Hook(plugins = ["WorldGuard"])
 internal object WorldGuardHook : ProtectionIntegration {

@@ -6,7 +6,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
-import xyz.xenondevs.nova.hook.Hook
+import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.util.FakeOnlinePlayer
 
 @Hook(plugins = ["GriefPrevention"])

@@ -4,7 +4,7 @@ import io.th0rgal.oraxen.config.Settings
 import io.th0rgal.oraxen.pack.upload.hosts.Polymath
 import org.bukkit.configuration.ConfigurationSection
 import xyz.xenondevs.nova.data.resources.upload.UploadService
-import xyz.xenondevs.nova.hook.Hook
+import xyz.xenondevs.nova.integration.Hook
 import java.io.File
 
 @Hook(plugins = ["Oraxen"])

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.hook.permission
+package xyz.xenondevs.nova.integration.permission
 
 import org.bukkit.OfflinePlayer
 import org.bukkit.World

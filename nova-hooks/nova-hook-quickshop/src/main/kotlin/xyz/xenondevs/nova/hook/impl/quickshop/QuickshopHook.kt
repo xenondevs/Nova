@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack
 import org.maxgamer.quickshop.QuickShop
 import org.maxgamer.quickshop.api.shop.AbstractDisplayItem
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
-import xyz.xenondevs.nova.hook.Hook
+import xyz.xenondevs.nova.integration.Hook
 
 @Hook(plugins = ["QuickShop"])
 internal object QuickshopHook : ProtectionIntegration {

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.hook.customitems
+package xyz.xenondevs.nova.integration.customitems
 
 import net.kyori.adventure.text.Component
 import org.bukkit.Location

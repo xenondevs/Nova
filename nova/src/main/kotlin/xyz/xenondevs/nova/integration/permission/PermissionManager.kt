@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.hook.permission
+package xyz.xenondevs.nova.integration.permission
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
@@ -8,7 +8,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.World
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.hook.HooksLoader
+import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage

@@ -15,7 +15,7 @@ import com.sk89q.worldguard.bukkit.BukkitPlayer
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform
 import org.bukkit.OfflinePlayer
-import xyz.xenondevs.nova.hook.permission.PermissionManager
+import xyz.xenondevs.nova.integration.permission.PermissionManager
 import java.util.*
 import org.bukkit.World as BukkitWorld
 

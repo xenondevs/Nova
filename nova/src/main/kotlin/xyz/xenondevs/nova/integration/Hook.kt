@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.hook
+package xyz.xenondevs.nova.integration
 
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass

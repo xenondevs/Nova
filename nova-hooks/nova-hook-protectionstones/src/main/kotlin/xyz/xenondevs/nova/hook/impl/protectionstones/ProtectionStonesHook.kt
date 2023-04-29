@@ -7,7 +7,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.tileentity.TileEntity
-import xyz.xenondevs.nova.hook.Hook
+import xyz.xenondevs.nova.integration.Hook
 
 // ProtectionStones uses WorldGuard for regions, this integration is only preventing tile entities from breaking the protection stone.
 @Hook(plugins = ["ProtectionStones"])

@@ -6,7 +6,7 @@ import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent
 import dev.lone.itemsadder.api.ItemsAdder
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import xyz.xenondevs.nova.hook.LoadListener
+import xyz.xenondevs.nova.integration.LoadListener
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.unregisterEvents
 import java.util.concurrent.CompletableFuture
