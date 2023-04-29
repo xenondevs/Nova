@@ -9,7 +9,6 @@ import org.bukkit.World
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.hooks.HooksLoader
-import xyz.xenondevs.nova.hooks.protection.ProtectionManager
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
@@ -41,7 +40,7 @@ object PermissionManager {
     @InitFun
     private fun init() {
         executor = ThreadPoolExecutor(
-            ProtectionManager.integrations.size, ProtectionManager.integrations.size,
+            10, 10,
             0, TimeUnit.MILLISECONDS,
             LinkedBlockingQueue(),
             ThreadFactoryBuilder().setNameFormat("Nova Protection Worker - %s").build()

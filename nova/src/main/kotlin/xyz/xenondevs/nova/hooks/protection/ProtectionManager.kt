@@ -93,7 +93,7 @@ object ProtectionManager {
     private fun init() {
         //<editor-fold desc="executor service">
         executor = ThreadPoolExecutor(
-            integrations.size, integrations.size,
+            10, 10,
             0, TimeUnit.MILLISECONDS,
             LinkedBlockingQueue(),
             ThreadFactoryBuilder().setNameFormat("Nova Protection Worker - %s").build()
