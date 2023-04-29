@@ -1,24 +1,15 @@
 description = "nova-api"
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm") version libs.versions.kotlin
-    id("org.jetbrains.dokka") version libs.versions.dokka
     `maven-publish`
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.dokka)
 }
 
 dependencies {
     implementation(libs.bundles.kotlin)
     compileOnly(project(":nova-loader"))
     compileOnly(libs.spigot.api)
-}
-
-tasks {
-    register<Jar>("sources") {
-        dependsOn(JavaPlugin.CLASSES_TASK_NAME)
-        from("src/main/kotlin")
-        archiveClassifier.set("sources")
-    }
 }
 
 publishing {

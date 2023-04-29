@@ -13,12 +13,12 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.hooks.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.component.adventure.sendMessage
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
-import xyz.xenondevs.nova.util.concurrent.runIfTrue
+import xyz.xenondevs.nova.util.concurrent.runIfTrueOnSimilarThread
 import xyz.xenondevs.nova.util.facing
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
@@ -115,9 +115,9 @@ internal object BlockPlacing : Listener {
             ?.invoke(player, handItem, placeLoc.apply { yaw = playerLocation.facing.oppositeFace.yaw })
             ?.also(futures::add)
         
-        CombinedBooleanFuture(futures).runIfTrue {
+        CombinedBooleanFuture(futures).runIfTrueOnSimilarThread {
             if (!placeLoc.block.type.isReplaceable() || WorldDataManager.getBlockState(placeLoc.pos) != null)
-                return@runIfTrue
+                return@runIfTrueOnSimilarThread
             
             val ctx = BlockPlaceContext(
                 placeLoc.pos, handItem,
@@ -149,7 +149,7 @@ internal object BlockPlacing : Listener {
         
         // check if the player is allowed to place a block there
         if (replaceLocation.isInsideWorldRestrictions()) {
-            ProtectionManager.canPlace(player, handItem, replaceLocation).runIfTrue {
+            ProtectionManager.canPlace(player, handItem, replaceLocation).runIfTrueOnSimilarThread {
                 // check that there isn't already a block there (which is not replaceable)
                 if (replaceBlock.type.isReplaceable() && WorldDataManager.getBlockState(replaceBlock.pos) == null) {
                     val placed = replaceBlock.placeVanilla(player.serverPlayer, handItem, true)

@@ -30,7 +30,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Build Spigot-Mapped
-        run: ./gradlew loaderJar "-DoutDir=artifacts/"
+        run: ./gradlew loaderJarSpigot "-DoutDir=artifacts/"
 
       - name: Upload Artifacts
         id: upload
@@ -39,7 +39,7 @@ jobs:
           name: Artifacts
           path: ./artifacts/*.jar
 
-      - name: Attach Artifacts
+      - name: Attach Artifacts to Release
         if: github.event_name == 'release'
         uses: skx/github-action-publish-binaries@release-2.0
         env:
@@ -48,4 +48,4 @@ jobs:
           args: ./artifacts/*.jar
 
       - name: Build & Publish Mojang-Mapped
-        run: ./gradlew clean publishNovaPublicationToXenondevsRepository publishNovaAPIPublicationToXenondevsRepository publishNovaGradlePluginPublicationToXenondevsRepository publishNova-gradle-pluginPluginMarkerMavenPublicationToXenondevsRepository -PxenondevsUsername=${{ secrets.MAVEN_USERNAME }} -PxenondevsPassword=${{ secrets.MAVEN_PASSWORD }} -Dmojang-mapped
+        run: ./gradlew publishNovaPublicationToXenondevsRepository publishNovaAPIPublicationToXenondevsRepository publishNovaGradlePluginPublicationToXenondevsRepository publishNova-gradle-pluginPluginMarkerMavenPublicationToXenondevsRepository -PxenondevsUsername=${{ secrets.MAVEN_USERNAME }} -PxenondevsPassword=${{ secrets.MAVEN_PASSWORD }}

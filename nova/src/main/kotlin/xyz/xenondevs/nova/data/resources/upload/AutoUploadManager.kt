@@ -5,16 +5,15 @@ import net.md_5.bungee.api.chat.TextComponent
 import xyz.xenondevs.invui.resourcepack.ForceResourcePack
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.service.CustomMultiPart
-import xyz.xenondevs.nova.data.resources.upload.service.OraxenUpload
 import xyz.xenondevs.nova.data.resources.upload.service.S3
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
+import xyz.xenondevs.nova.hooks.HooksLoader
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
@@ -26,11 +25,11 @@ import java.util.logging.Level
 
 @InternalInit(
     stage = InitializationStage.POST_WORLD_ASYNC,
-    dependsOn = [NovaConfig::class, ResourceGeneration.PostWorld::class]
+    dependsOn = [HooksLoader::class, ResourceGeneration.PostWorld::class]
 )
 internal object AutoUploadManager {
     
-    private val SERVICES: List<UploadService> = listOf(Xenondevs, SelfHost, CustomMultiPart, S3, OraxenUpload)
+    internal val services = arrayListOf(Xenondevs, SelfHost, CustomMultiPart, S3)
     
     private val config by configReloadable { DEFAULT_CONFIG.getConfigurationSection("resource_pack.auto_upload")!! }
     
@@ -89,13 +88,13 @@ internal object AutoUploadManager {
         
         val serviceName = config.getString("service")
         if (serviceName != null) {
-            val service = SERVICES.find { it.name.equals(serviceName, ignoreCase = true) }
+            val service = services.find { it.name.equals(serviceName, ignoreCase = true) }
             checkNotNull(service) { "Service $serviceName not found!" }
             service.loadConfig(config)
             
             selectedService = service
         } else {
-            LOGGER.warning("No uploading service specified! Available: " + SERVICES.joinToString(transform = UploadService::name))
+            LOGGER.warning("No uploading service specified! Available: " + services.joinToString(transform = UploadService::name))
             return
         }
         

@@ -35,7 +35,7 @@ import xyz.xenondevs.nova.data.recipe.TagTest
 import xyz.xenondevs.nova.data.serialization.cbf.CBFCompoundTag
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.hooks.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.Wearable
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier

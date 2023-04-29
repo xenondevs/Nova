@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.util.item
 
-import io.lumine.mythic.utils.config.properties.Property.Material
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.SoundGroup

@@ -13,11 +13,13 @@ import kotlin.reflect.KClass
 
 object JarUtils {
     
-    fun <A : Annotation> findAnnotatedClasses(file: File, annotationClass: KClass<A>): Map<String, Map<String, Any?>> {
+    // TODO: find annotated classes during build and write them to a file 
+    
+    fun <A : Annotation> findAnnotatedClasses(file: File, annotationClass: KClass<A>, path: String = ""): Map<String, Map<String, Any?>> {
         val result = Object2ObjectOpenHashMap<String, Map<String, Any?>>()
         val classDesc = Type.getDescriptor(annotationClass.java)
         
-        loopClasses(file, filter = { it.name.endsWith(".class") }) { _, ins ->
+        loopClasses(file, filter = { it.name.endsWith(".class") && it.name.startsWith(path) }) { _, ins ->
             val clazz = ClassNode().apply { ClassReader(ins).accept(this, ClassReader.SKIP_CODE) }
             val annotation = clazz.visibleAnnotations?.firstOrNull { it.desc == classDesc } ?: return@loopClasses
             result[clazz.name] = annotation.toMap()

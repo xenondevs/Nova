@@ -59,12 +59,12 @@ interface ProtectionIntegration {
         canUseItem(tileEntity.owner!!, item, location)
     
     /**
-     * Checks if the [player] can interact with the [entity] while holding [item]
+     * Checks if the [player] can interact with the [entity] while holding that [item]
      */
     fun canInteractWithEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): Boolean
     
     /**
-     * Checks if the [tileEntity] can interact with the [entity] wile holding [item]
+     * Checks if the [tileEntity] can interact with the [entity] wile holding that [item]
      */
     fun canInteractWithEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): Boolean =
         canInteractWithEntity(tileEntity.owner!!, entity, item)
@@ -80,6 +80,9 @@ interface ProtectionIntegration {
     fun canHurtEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): Boolean =
         canHurtEntity(tileEntity.owner!!, entity, item)
     
+    /**
+     * Defines how methods in this protection integration are allowed to be called
+     */
     enum class ExecutionMode {
         
         /**
@@ -93,7 +96,7 @@ interface ProtectionIntegration {
         SERVER,
         
         /**
-         * The methods are always called from async threads
+         * The methods are never called from the server thread
          */
         ASYNC
         

@@ -4,10 +4,10 @@ import org.bukkit.Location
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.hooks.HooksLoader
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
@@ -22,7 +22,7 @@ val Material?.requiresLight: Boolean
 
 @InternalInit(
     stage = InitializationStage.POST_WORLD,
-    dependsOn = [CustomItemServiceManager::class]
+    dependsOn = [HooksLoader::class]
 )
 object TileEntityManager {
     

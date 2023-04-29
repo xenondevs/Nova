@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.data.resources.model.blockstate.DefaultingBlockStateCo
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.hooks.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.world.BlockPos
@@ -25,7 +25,7 @@ internal abstract class BackingState(configType: DefaultingBlockStateConfigType<
     open fun init() = Unit
     
     fun handleQueryResult(positions: List<BlockPos>) {
-        if (CustomItemServiceManager.PLUGINS.isEmpty()) {
+        if (CustomItemServiceManager.services.isEmpty()) {
             positions.forEach { if (!BlockManager.hasBlockState(it)) it.setBlockStateSilently(defaultState) }
         } else {
             runTask {

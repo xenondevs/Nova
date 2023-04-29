@@ -32,11 +32,14 @@ internal open class InitializableClass(
                 }
             
             initialization.complete(true)
-        } catch (e: InitializationException) {
-            LOGGER.severe(e.message)
         } catch (e: Exception) {
             val cause = if (e is InvocationTargetException) e.targetException else e
-            LOGGER.log(Level.SEVERE, "An exception occurred trying to initialize $this", cause)
+            
+            if (cause is InitializationException) {
+                LOGGER.severe(cause.message)
+            } else {
+                LOGGER.log(Level.SEVERE, "An exception occurred trying to initialize $this", cause)
+            }
         }
         initialization.complete(false)
     }

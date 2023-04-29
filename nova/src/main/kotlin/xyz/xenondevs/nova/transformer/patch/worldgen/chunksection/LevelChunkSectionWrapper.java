@@ -82,7 +82,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     public BlockState setBlockState(int relX, int relY, int relZ, BlockState state, boolean sync) {
         if (state instanceof WrapperBlockState wrappedState) {
             var chunkPos = this.chunkPos;
-            WorldDataManager.INSTANCE.addOrphanBlock$nova(level,
+            WorldDataManager.INSTANCE.addOrphanBlock(level,
                 relX + chunkPos.getMinBlockX(),
                 relY + bottomBlockY(),
                 relZ + chunkPos.getMinBlockZ(),
