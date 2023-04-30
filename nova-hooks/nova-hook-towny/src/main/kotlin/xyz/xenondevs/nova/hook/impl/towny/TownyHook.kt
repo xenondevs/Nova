@@ -7,13 +7,14 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
+import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
 import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.util.FakeOnlinePlayer
 
 @Hook(plugins = ["Towny"])
 internal object TownyHook : ProtectionIntegration {
     
-    override val executionMode = ProtectionIntegration.ExecutionMode.NONE
+    override fun getExecutionMode(): ExecutionMode = ExecutionMode.NONE
     
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) =
         hasPermission(player, location, TownyPermission.ActionType.DESTROY)

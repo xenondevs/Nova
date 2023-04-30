@@ -49,9 +49,6 @@ internal class PatchedClassLoader : ClassLoader(SPIGOT_CLASS_LOADER.parent) {
             if (c == null) {
                 c = runCatching { novaClassLoader.loadClass(name, resolve, false) }.getOrNull()
             }
-            
-            // fixme: calling the NovaClassLoader with checkParents=false will not find Kotlin classes that aren't
-            //  in NovaClassLoader#findLoadedClass, because Kotlin is loaded using Spigot's library loader
         }
         
         if (c == null)

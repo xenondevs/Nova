@@ -21,7 +21,8 @@ internal object WorldGuardHook : ProtectionIntegration {
     
     private val PLUGIN = WorldGuardPlugin.inst()
     private val PLATFORM = WorldGuard.getInstance().platform
-    override val executionMode = ExecutionMode.NONE
+    
+    override fun getExecutionMode(): ExecutionMode = ExecutionMode.NONE
     
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) =
         runQuery(player, location, Flags.BLOCK_BREAK)

@@ -9,7 +9,7 @@ plugins {
 dependencies {
     // api dependencies
     spigotRuntimeApi(variantOf(libs.spigot.server) { classifier("remapped-mojang") })
-    spigotLoaderApi(libs.bundles.kotlin)
+    novaLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
     novaLoaderApi(libs.bundles.kyori.adventure)

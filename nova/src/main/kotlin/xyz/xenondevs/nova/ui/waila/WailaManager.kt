@@ -42,15 +42,9 @@ internal object WailaManager : Listener, IWailaManager {
     private val overlays = HashMap<Player, Waila>()
     
     //<editor-fold desc="Nova-API", defaultstate="collapsed">
-    override val isCompletelyDisabled: Boolean
-        get() = !ENABLED
-    
-    override fun getState(player: Player): Boolean =
-        player.isWailaEnabled
-    
-    override fun setState(player: Player, enabled: Boolean): Boolean {
-        return if (toggle(player, enabled)) enabled else !enabled
-    }
+    override fun isCompletelyDisabled(): Boolean = !ENABLED
+    override fun getState(player: Player): Boolean = player.isWailaEnabled
+    override fun setState(player: Player, enabled: Boolean): Boolean = if (toggle(player, enabled)) enabled else !enabled
     //</editor-fold>
     
     @InitFun

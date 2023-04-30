@@ -11,8 +11,8 @@ import xyz.xenondevs.nova.api.block.NovaBlockState as INovaBlockStae
 internal class ApiNovaBlockStateWrapper(private val state: NovaBlockState): INovaBlockStae {
     
     @Deprecated("Use NovaBlock instead", replaceWith = ReplaceWith("block"))
-    override val material: NovaMaterial get() = LegacyMaterialWrapper(Either.right(state.block))
-    override val block: NovaBlock get() = ApiBlockWrapper(state.block)
-    override val location: Location = state.location
+    override fun getMaterial(): NovaMaterial = LegacyMaterialWrapper(Either.right(state.block))
+    override fun getBlock(): NovaBlock = ApiBlockWrapper(state.block)
+    override fun getLocation(): Location = state.location
     
 }

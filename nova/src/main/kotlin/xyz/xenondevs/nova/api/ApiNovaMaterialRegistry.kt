@@ -18,8 +18,7 @@ import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegi
 internal class LegacyMaterialWrapper(val material: Either<NovaItem, NovaBlock>) : INovaMaterial {
     
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
-    override val id: INamespacedID
-        get() = material.map(NovaItem::id, NovaBlock::id).namespacedId
+    override fun getId(): INamespacedID = material.map(NovaItem::id, NovaBlock::id).namespacedId
     
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
     override fun getLocalizedName(locale: String): String {

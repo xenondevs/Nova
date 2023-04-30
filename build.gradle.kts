@@ -4,6 +4,10 @@ plugins {
     id("xyz.xenondevs.loader-jar-plugin")
 }
 
+repositories {
+    mavenCentral()
+}
+
 loaderJar {
     spigotVersion.set(libs.versions.spigot)
 }
@@ -31,7 +35,7 @@ subprojects {
     tasks {
         register<Jar>("sources") {
             dependsOn(JavaPlugin.CLASSES_TASK_NAME)
-            from("src/main/kotlin")
+            from("src/main/java", "src/main/kotlin")
             archiveClassifier.set("sources")
         }
         
