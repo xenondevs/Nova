@@ -1,0 +1,255 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>CustomItemService</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../index.html">
+<span>nova-parent</span>            </a>    </div>
+    <div>0.13-alpha.7
+    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova:dokkaHtmlPartial/main">jvm</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.integration.customitems/CustomItemService///PointingToDeclaration//2031297628">
+  <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.integration.customitems</a><span class="delimiter">/</span><span class="current">CustomItemService</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Custom</span><wbr><span>Item</span><wbr><span><span>Service</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">CustomItemService</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,FUNCTION,PROPERTY">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="866083503%2FFunctions%2F2031297628" anchor-label="canBreakBlock" id="866083503%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="can-break-block.html"><span>can</span><wbr><span>Break</span><wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="866083503%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="can-break-block.html"><span class="token function">canBreakBlock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span><span class="token punctuation">, </span></span><span class="parameter ">tool<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Checks if the specified <a href="can-break-block.html">tool</a> is good enough for the <a href="can-break-block.html">block</a> to drop items.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1654987481%2FFunctions%2F2031297628" anchor-label="getBlockItemModelPaths" id="1654987481%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-block-item-model-paths.html"><span>get</span><wbr><span>Block</span><wbr><span>Item</span><wbr><span>Model</span><wbr><span><span>Paths</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1654987481%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-block-item-model-paths.html"><span class="token function">getBlockItemModelPaths</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.data/-namespaced-id/index.html">NamespacedId</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.data.resources/-resource-path/index.html">ResourcePath</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Gets the paths of all item models that are blocks.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="781279185%2FFunctions%2F2031297628" anchor-label="getBlockType" id="781279185%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-block-type.html"><span>get</span><wbr><span>Block</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="781279185%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-block-type.html"><span class="token function">getBlockType</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-custom-block-type/index.html">CustomBlockType</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets the <a href="../-custom-block-type/index.html">CustomBlockType</a> of this <span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span> or null if the <span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span> is not from this <a href="index.html">CustomItemService</a></p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1600934859%2FFunctions%2F2031297628" anchor-label="getDrops" id="-1600934859%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-drops.html"><span>get</span><wbr><span><span>Drops</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1600934859%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-drops.html"><span class="token function">getDrops</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span><span class="token punctuation">, </span></span><span class="parameter ">tool<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets all drops of a block from this <a href="index.html">CustomItemService</a></p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1225929493%2FFunctions%2F2031297628" anchor-label="getId" id="1225929493%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-id.html"><span>get</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1225929493%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-id.html"><span class="token function">getId</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets a namespaced if from a placed <span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span></p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-id.html"><span class="token function">getId</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">item<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets a namespaced name from an <span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span></p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1179549197%2FFunctions%2F2031297628" anchor-label="getItemById" id="1179549197%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-item-by-id.html"><span>get</span><wbr><span>Item</span><wbr><span>By</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1179549197%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-item-by-id.html"><span class="token function">getItemById</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets an <span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span> from a namespaced name</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1444817203%2FFunctions%2F2031297628" anchor-label="getItemTest" id="-1444817203%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-item-test.html"><span>get</span><wbr><span>Item</span><wbr><span><span>Test</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1444817203%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-item-test.html"><span class="token function">getItemTest</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">id<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.data.recipe/-single-item-test/index.html">SingleItemTest</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets an <a href="../../xyz.xenondevs.nova.data.recipe/-single-item-test/index.html">SingleItemTest</a> from a namespaced name</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1709194002%2FFunctions%2F2031297628" anchor-label="getItemType" id="1709194002%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-item-type.html"><span>get</span><wbr><span>Item</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1709194002%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-item-type.html"><span class="token function">getItemType</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">item<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-custom-item-type/index.html">CustomItemType</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets the <a href="../-custom-item-type/index.html">CustomItemType</a> of this <span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span> or null if the <span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span> is not from this <a href="index.html">CustomItemService</a></p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1032043061%2FFunctions%2F2031297628" anchor-label="getName" id="1032043061%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-name.html"><span>get</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1032043061%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-name.html"><span class="token function">getName</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span><span class="token punctuation">, </span></span><span class="parameter ">locale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text/Component///PointingToDeclaration/">Component</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets a localized name from a placed <span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span></p></div><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-name.html"><span class="token function">getName</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">item<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">locale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text/Component///PointingToDeclaration/">Component</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets a localized name for an <span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span></p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-862642150%2FFunctions%2F2031297628" anchor-label="hasRecipe" id="-862642150%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="has-recipe.html"><span>has</span><wbr><span><span>Recipe</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-862642150%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="has-recipe.html"><span class="token function">hasRecipe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">key<span class="token operator">: </span><span data-unresolved-link="org.bukkit/NamespacedKey///PointingToDeclaration/">NamespacedKey</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks if this <a href="index.html">CustomItemService</a> registered a recipe with that <a href="has-recipe.html">key</a></p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1841111159%2FFunctions%2F2031297628" anchor-label="placeBlock" id="1841111159%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="place-block.html"><span>place</span><wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1841111159%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="place-block.html"><span class="token function">placeBlock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">item<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">location<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Location///PointingToDeclaration/">Location</span><span class="token punctuation">, </span></span><span class="parameter ">playSound<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Places an item from this <a href="index.html">CustomItemService</a></p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1087893567%2FFunctions%2F2031297628" anchor-label="removeBlock" id="-1087893567%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-block.html"><span>remove</span><wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1087893567%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="remove-block.html"><span class="token function">removeBlock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span><span class="token punctuation">, </span></span><span class="parameter ">breakEffects<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Remove a block from the world</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>
+
