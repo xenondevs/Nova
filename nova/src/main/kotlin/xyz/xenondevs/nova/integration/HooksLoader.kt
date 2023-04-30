@@ -3,6 +3,7 @@
 package xyz.xenondevs.nova.integration
 
 import org.bukkit.Bukkit
+import org.objectweb.asm.Type
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
@@ -30,13 +31,13 @@ internal object HooksLoader {
                 val plugins = annotation["plugins"] as? List<String> ?: emptyList()
                 val unless = annotation["unless"] as? List<String> ?: emptyList()
                 val requireAll = annotation["requireAll"] as? Boolean ?: false
-                val loadListener = annotation["loadListener"] as? Class<out LoadListener>
+                val loadListener = annotation["loadListener"] as? Type
                 
                 if (plugins.isEmpty())
                     throw IllegalStateException("Hook annotation on $className does not specify any plugins")
                 
                 if (shouldLoadHook(plugins, unless, requireAll))
-                    loadHook(className.replace('/', '.'), loadListener?.kotlin)
+                    loadHook(className.replace('/', '.'), loadListener)
             } catch (t: Throwable) {
                 LOGGER.log(Level.SEVERE, "Failed to load hook $className", t)
             }
@@ -56,9 +57,9 @@ internal object HooksLoader {
         }
     }
     
-    private fun loadHook(className: String, loadListener: KClass<out LoadListener>?) {
+    private fun loadHook(className: String, loadListener: Type?) {
         if (loadListener != null) {
-            val obj = loadListener.objectInstance
+            val obj = (Class.forName(loadListener.className).kotlin as KClass<out LoadListener>).objectInstance
                 ?: throw IllegalStateException("LoadListener $loadListener is not an object")
             
             if (!obj.loaded.get())
