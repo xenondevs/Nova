@@ -58,7 +58,7 @@
   "command.nova.network_debug.nova.energy": "Налагоджувальний перегляд увімкнено для Енергетичних Мереж.",
   "command.nova.resource_pack.create.success": "Пакет ресурсів створено. Рекомендується перезавантажити сервер.",
   "command.nova.resource_pack.reupload.start": "Завантаженя ресурс пака... будь ласка зачекайте",
-  "nova.outdated_version": "Ви використовуєте застарілу версію %s.\nБудь ласка, завантажте останню версію на %s",
+  "nova.outdated_version": "Ви використовуєте застарілу версію %s. \nЗавантажте останню версію за посиланням %s.",
   "item.nova.wrench.mode.nova.energy": "Режим: Енергія",
   "item.nova.wrench.mode.nova.fluid": "Режим: Рідкий",
   "item.nova.wrench.mode.nova.item": "Режим: Елементи",
@@ -120,5 +120,16 @@
   "command.nova.remove_invalid_vtes.success": "Успішно видалено %s недійсних ванільних об'єктів.",
   "command.nova.waila.already_on": "WAILA вже ввімкнено.",
   "command.nova.list_blocks.success": "Усього: %s",
-  "waila.nova.required_tool": "Інструмент: "
+  "waila.nova.required_tool": "Інструмент: ",
+  "nova.tile_entity_limits.world_blacklist.deny": "Вам не дозволяється розміщувати будь-які об'єкти з Nova в цьому світі.",
+  "nova.tile_entity_limits.amount_per_world.deny": "Досягнуто ліміту розміщених об'єктів цього типу в цьому світі.",
+  "nova.tile_entity_limits.amount_global_total.deny": "Досягнуто ліміт розміщених об'єктів Nova.",
+  "nova.tile_entity_limits.amount_per_world_total.deny": "Досягнуто ліміт розміщених об'єктів Nova в цьому світі.",
+  "nova.tile_entity_limits.type_blacklist.deny": "Вам не дозволено розміщувати об'єкти цього типу.",
+  "nova.tile_entity_limits.type_world_blacklist.deny": "Вам не дозволено розміщувати цей об'єкт у цьому світі.",
+  "nova.tile_entity_limits.amount_global.deny": "Досягнуто ліміту розміщених об'єктів цього типу.",
+  "nova.tile_entity_limits.amount_per_chunk.deny": "Досягнуто ліміту розміщених об'єктів цього типу в цьому чанку.",
+  "waila.nova.required_tool.none": "Інструмент не потрібен",
+  "waila.nova.required_tool.unbreakable": "Незламний",
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Досягнуто ліміт розміщених об'єктів Nova в цьому чанку."
 }
