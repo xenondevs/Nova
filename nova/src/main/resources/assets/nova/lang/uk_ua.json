@@ -113,7 +113,7 @@
   "command.nova.advanced_tooltips.all.success": "Увімкнено розширені підказки для всіх елементів.",
   "command.nova.advanced_tooltips.all.failure": "Розширені підказки для всіх елементів вже увімкнено.",
   "command.nova.update_chunk_search_id.success": "Ідентифікатор чанка оновлено.",
-  "command.nova.waila.off": "В имкнено WAILA.",
+  "command.nova.waila.off": "Вимкнено WAILA.",
   "command.nova.waila.already_off": "WAILA вже вимкнено.",
   "command.nova.waila.on": "WAILA ввімкнено.",
   "command.nova.remove_invalid_vtes.failure": "Не знайдено жодного недійсного ванільного об'єкта.",
