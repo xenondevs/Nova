@@ -115,5 +115,10 @@
   "command.nova.update_chunk_search_id.success": "Ідентифікатор чанка оновлено.",
   "command.nova.waila.off": "В имкнено WAILA.",
   "command.nova.waila.already_off": "WAILA вже вимкнено.",
-  "command.nova.waila.on": "WAILA ввімкнено."
+  "command.nova.waila.on": "WAILA ввімкнено.",
+  "command.nova.remove_invalid_vtes.failure": "Не знайдено жодного недійсного ванільного об'єкта.",
+  "command.nova.remove_invalid_vtes.success": "Успішно видалено %s недійсних ванільних об'єктів.",
+  "command.nova.waila.already_on": "WAILA вже ввімкнено.",
+  "command.nova.list_blocks.success": "Усього: %s",
+  "waila.nova.required_tool": "Інструмент: "
 }
