@@ -4,9 +4,23 @@ plugins {
     id("xyz.xenondevs.loader-jar-plugin")
 }
 
-repositories {
+fun RepositoryHandler.configureRepos() {
+    mavenLocal()
     mavenCentral()
+    maven("https://repo.xenondevs.xyz/releases")
+    
+    // include xenondevs-nms repository if requested
+    if (project.hasProperty("xenondevsNms")) {
+        maven("https://repo.papermc.io/repository/maven-public/") // authlib, brigadier, etc.
+        maven {
+            name = "xenondevsNms"
+            url = uri("https://repo.xenondevs.xyz/nms/")
+            credentials(PasswordCredentials::class)
+        }
+    }
 }
+
+repositories { configureRepos() }
 
 loaderJar {
     spigotVersion.set(libs.versions.spigot)
@@ -16,11 +30,7 @@ subprojects {
     group = "xyz.xenondevs.nova"
     version = properties["version"] as String
     
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven("https://repo.xenondevs.xyz/releases")
-    }
+    repositories { configureRepos() }
     
     // The following excludes the deprecated kotlin-stdlib-jdk8 and kotlin-stdlib-jdk7
     // Since Kotlin 1.8.0, those are merged into kotlin-stdlib

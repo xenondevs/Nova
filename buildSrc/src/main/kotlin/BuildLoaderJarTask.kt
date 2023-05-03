@@ -18,7 +18,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.component.external.model.DefaultModuleComponentIdentifier
 import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.repositories
 import xyz.xenondevs.stringremapper.FileRemapper
 import xyz.xenondevs.stringremapper.Mappings
 import xyz.xenondevs.stringremapper.RemapGoal
@@ -170,7 +169,6 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     }
     
     private fun resolveMappings(version: String): Pair<Path, Path> {
-        project.repositories { mavenLocal() }
         val mojangMappings = project.dependencies.create("org.spigotmc:minecraft-server:$version:maps-mojang@txt").getFile(project)
         val spigotMappings = project.dependencies.create("org.spigotmc:minecraft-server:$version:maps-spigot@csrg").getFile(project)
         return Pair(mojangMappings, spigotMappings)
