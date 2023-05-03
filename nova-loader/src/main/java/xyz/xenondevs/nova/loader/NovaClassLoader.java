@@ -25,17 +25,20 @@ public class NovaClassLoader extends URLClassLoader {
             
             c = findLoadedClass(name);
             
-            if (c == null && checkParents) {
+            // check Nova classes and libraries before parent to:
+            //   - prevent accessing classes of other plugins
+            //   - prevent the usage of old patch classes (which stay in memory after reloading)
+            if (c == null && !injectedClasses.contains(name)) {
                 try {
-                    c = getParent().loadClass(name);
+                    c = findClass(name);
                 } catch (ClassNotFoundException e) {
                     // ignored
                 }
             }
             
-            if (c == null && !injectedClasses.contains(name)) {
+            if (c == null && checkParents) {
                 try {
-                    c = findClass(name);
+                    c = getParent().loadClass(name);
                 } catch (ClassNotFoundException e) {
                     // ignored
                 }
