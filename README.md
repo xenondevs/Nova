@@ -1,4 +1,4 @@
-[![Banner](https://i.imgur.com/HiDAPmf.png)](https://www.spigotmc.org/resources/93648/)
+[![Banner](https://i.imgur.com/HiDAPmf.png)](https://hangar.papermc.io/xenondevs/Nova)
 
 <p align="center">
   <a href="https://www.spigotmc.org/resources/93648/reviews">
