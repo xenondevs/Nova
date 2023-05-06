@@ -31,7 +31,7 @@ dependencyResolutionManagement {
             version("spigot", "1.19.4-R0.1-SNAPSHOT")
             version("cbf", "0.5")
             version("xenondevs-commons", "1.1")
-            version("invui", "1.5")
+            version("invui", "1.6")
             
             // plugins
             plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
