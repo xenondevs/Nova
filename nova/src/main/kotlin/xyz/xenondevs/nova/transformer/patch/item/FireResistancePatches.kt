@@ -8,7 +8,6 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
-import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.replaceEvery
@@ -23,7 +22,7 @@ internal object FireResistancePatches : MultiTransformer(ItemEntity::class, Inve
         
         VirtualClassPath[Inventory::hurtArmor].replaceEvery(
             1, 0,
-            buildInsnList { invokeStatic(::isFireResistant) }
+            { invokeStatic(::isFireResistant) }
         ) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Item::isFireResistant) }
     }
     

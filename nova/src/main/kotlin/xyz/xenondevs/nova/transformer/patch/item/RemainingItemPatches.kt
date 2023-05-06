@@ -16,7 +16,6 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
-import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.isClass
@@ -67,7 +66,7 @@ internal object RemainingItemPatches : MultiTransformer(
             { it.opcode == Opcodes.NEW && (it as TypeInsnNode).isClass(MojangStack::class) },
             { it.opcode == Opcodes.INVOKESPECIAL && (it as MethodInsnNode).calls(ITEM_STACK_CONSTRUCTOR) },
             0, 0,
-            buildInsnList {
+            {
                 aLoad(4)
                 invokeStatic(::getRemainingItemStack)
             }
@@ -82,7 +81,7 @@ internal object RemainingItemPatches : MultiTransformer(
      * invokevirtual net/minecraft/world/item/Item.hasCraftingRemainingItem()Z
      */
     private fun patchHasCraftingRemainingItem(node: MethodNode) {
-        node.replaceEvery(1, 0, buildInsnList {
+        node.replaceEvery(1, 0, {
             invokeStatic(::hasCraftingRemainingItem)
         }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Item::hasCraftingRemainingItem) }
     }
@@ -98,7 +97,7 @@ internal object RemainingItemPatches : MultiTransformer(
             { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(MojangStack::getItem) },
             { it.opcode == Opcodes.INVOKESPECIAL && (it as MethodInsnNode).calls(ITEM_STACK_CONSTRUCTOR) },
             0, 0,
-            buildInsnList {
+            {
                 invokeStatic(::getRemainingItemStack)
                 aLoad(2) // NonNullList
                 swap()
@@ -118,7 +117,7 @@ internal object RemainingItemPatches : MultiTransformer(
             { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Item::getCraftingRemainingItem) },
             { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(NON_NULL_LIST_SET_METHOD) },
             1, -1,
-            buildInsnList {
+            {
                 aLoad(3) // AbstractFurnaceBlockEntity
                 getField(ABSTRACT_FURNACE_BLOCK_ENTITY_ITEMS_FIELD)
                 aLoad(6) // ItemStack
@@ -139,7 +138,7 @@ internal object RemainingItemPatches : MultiTransformer(
             { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(MojangStack::getItem) },
             { it.opcode == Opcodes.INVOKESTATIC && (it as MethodInsnNode).calls(CraftItemStack::asBukkitCopy) },
             0, 3,
-            buildInsnList {
+            {
                 invokeStatic(::getRemainingBukkitItemStack)
                 aLoad(1) // ItemStack[]
                 swap()

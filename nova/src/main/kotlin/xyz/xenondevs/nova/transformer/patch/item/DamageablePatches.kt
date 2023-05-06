@@ -60,11 +60,11 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
      */
     private fun transformItemStackHurtEnemy() {
         VirtualClassPath[ItemStack::hurtEnemy].instructions = buildInsnList {
-                aLoad(0)
-                aLoad(2)
-                invokeStatic(::hurtEnemy)
-                _return()
-            }
+            aLoad(0)
+            aLoad(2)
+            invokeStatic(::hurtEnemy)
+            _return()
+        }
     }
     
     @JvmStatic
@@ -89,7 +89,7 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
      * Patches the Inventory#hurtArmor method to recognize Nova's armor.
      */
     private fun transformInventoryHurtArmor() {
-        VirtualClassPath[Inventory::hurtArmor].replaceEvery(1, 0, buildInsnList { 
+        VirtualClassPath[Inventory::hurtArmor].replaceEvery(1, 0, {
             invokeStatic(::isArmorItem)
         }) { it.opcode == Opcodes.INSTANCEOF && (it as TypeInsnNode).isClass(ArmorItem::class) }
     }
