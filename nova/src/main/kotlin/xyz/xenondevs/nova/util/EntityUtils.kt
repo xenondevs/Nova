@@ -22,7 +22,7 @@ import java.io.ByteArrayOutputStream
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import net.minecraft.world.entity.Entity as MojangEntity
-import net.minecraft.world.entity.EntityType as NMSEntityType
+import net.minecraft.world.entity.EntityType as MojangEntityType
 
 /**
  * The current block destroy progress of the player.
@@ -53,7 +53,7 @@ fun Entity.teleport(modifyLocation: Location.() -> Unit) {
 }
 
 /**
- * The translation key for the name of this [Entity]. 
+ * The translation key for the name of this [Entity].
  */
 val Entity.localizedName: String?
     get() = (this as CraftEntity).handle.type.descriptionId
@@ -150,7 +150,7 @@ object EntityUtils {
         if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag)
         
         // deserialize compound tag to entity
-        return NMSEntityType.loadEntityRecursive(compoundTag, level) { entity ->
+        return MojangEntityType.loadEntityRecursive(compoundTag, level) { entity ->
             // assign new uuid
             entity.uuid = UUID.randomUUID()
             
@@ -173,6 +173,19 @@ object EntityUtils {
         val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
         return FakePlayer(server, world, gameProfile, hasEvents)
+    }
+    
+    fun <T : MojangEntity> spawnEntity(
+        type: MojangEntityType<T>,
+        location: Location,
+        builder: (T) -> Unit = {}
+    ): T {
+        val level = location.world?.serverLevel ?: throw IllegalArgumentException("Location has no world")
+        val entity = type.create(level) ?: throw IllegalArgumentException("Failed to create entity of type ${type.descriptionId}")
+        entity.moveTo(location.x, location.y, location.z, location.yaw, location.pitch)
+        builder(entity)
+        level.addFreshEntity(entity)
+        return entity
     }
     
 }
