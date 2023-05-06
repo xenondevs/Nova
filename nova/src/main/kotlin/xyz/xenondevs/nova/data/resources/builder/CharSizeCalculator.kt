@@ -58,11 +58,11 @@ internal class CharSizeCalculator {
                         return@inner
                     
                     CharSizes.deleteTable(font)
-                    fontHashes[font] = fileHash
                     
                     val table = CharSizes.getTable(font) ?: CharSizeTable()
                     calculateCharSizes(file, table)
                     CharSizes.storeTable(font, table)
+                    fontHashes[font] = fileHash
                 }
         }
         
