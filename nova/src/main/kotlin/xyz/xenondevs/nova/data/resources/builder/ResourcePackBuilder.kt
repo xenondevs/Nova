@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Stage
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
@@ -231,6 +232,7 @@ internal class ResourcePackBuilder {
             // calculate char sizes
             LOGGER.info("Calculating char sizes")
             CharSizeCalculator().calculateCharSizes()
+            CharSizes.invalidateCache()
             
             // write metadata
             writeMetadata(assetPacks.size, basePacks.packAmount)
