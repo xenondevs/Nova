@@ -263,4 +263,12 @@ internal class CharSizeCalculator {
         return file
     }
     
+    companion object {
+        
+        internal fun invalidateFontHashesStorage() {
+            PermanentStorage.remove(FONT_HASHES_STORAGE_KEY)
+        }
+        
+    }
+    
 }
