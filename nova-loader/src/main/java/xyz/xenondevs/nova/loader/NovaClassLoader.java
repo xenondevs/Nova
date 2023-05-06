@@ -21,27 +21,22 @@ public class NovaClassLoader extends URLClassLoader {
     
     public Class<?> loadClass(String name, boolean resolve, boolean checkParents) throws ClassNotFoundException {
         synchronized (getClassLoadingLock(name)) {
-            Class<?> c;
+            Class<?> c = findLoadedClass(name);
             
-            c = findLoadedClass(name);
+            // workaround library conflict for kyori-adventure on paper servers (fixme)
+            if (c == null && name.startsWith("net.kyori.adventure") && checkParents) {
+                c = loadClassFromParentOrNull(name);
+            }
             
             // check Nova classes and libraries before parent to:
             //   - prevent accessing classes of other plugins
             //   - prevent the usage of old patch classes (which stay in memory after reloading)
             if (c == null && !injectedClasses.contains(name)) {
-                try {
-                    c = findClass(name);
-                } catch (ClassNotFoundException e) {
-                    // ignored
-                }
+                c = findClassOrNull(name);
             }
             
             if (c == null && checkParents) {
-                try {
-                    c = getParent().loadClass(name);
-                } catch (ClassNotFoundException e) {
-                    // ignored
-                }
+                c = loadClassFromParentOrNull(name);
             }
             
             if (c == null) {
@@ -53,6 +48,22 @@ public class NovaClassLoader extends URLClassLoader {
             }
             
             return c;
+        }
+    }
+    
+    private Class<?> findClassOrNull(String name) {
+        try {
+            return findClass(name);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+    
+    private Class<?> loadClassFromParentOrNull(String name) {
+        try {
+            return getParent().loadClass(name);
+        } catch (ClassNotFoundException e) {
+            return null;
         }
     }
     
