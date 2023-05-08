@@ -182,19 +182,25 @@ class MutableBlockLocation(world: World, x: Int, y: Int, z: Int) : BlockLocation
     override fun mutableLocation() = this
     
     var x: Int
+        @JvmName("getX_")
         get() = super.getX()
+        @JvmName("setX_")
         set(value) {
             super.setX(value)
         }
     
     var y: Int
+        @JvmName("getY_")
         get() = super.getY()
+        @JvmName("setY_")
         set(value) {
             super.setY(value)
         }
     
     var z: Int
+        @JvmName("getZ_")
         get() = super.getZ()
+        @JvmName("setZ_")
         set(value) {
             super.setZ(value)
         }
