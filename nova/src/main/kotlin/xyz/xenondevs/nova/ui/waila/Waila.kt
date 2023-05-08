@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.util.data.WildcardUtils
 import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.serverTick
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
 
@@ -43,7 +43,7 @@ internal class Waila(val player: Player) {
     
     private var lastPosUpdate: Int = 0
     private var lastDataUpdate: Int = 0
-    private var lookingAt: BlockPos? = null
+    private var lookingAt: BlockLocation? = null
     
     private var active = false
     private val overlay = WailaOverlayCompound(player)
@@ -79,12 +79,12 @@ internal class Waila(val player: Player) {
         }
     }
     
-    private fun update(pos: BlockPos?) {
+    private fun update(pos: BlockLocation?) {
         lookingAt = pos
         setActive(tryUpdate(pos))
     }
     
-    private fun tryUpdate(pos: BlockPos?): Boolean {
+    private fun tryUpdate(pos: BlockLocation?): Boolean {
         if (pos != null) {
             val blockId = pos.block.id
             if (isBlacklisted(blockId))
@@ -104,7 +104,7 @@ internal class Waila(val player: Player) {
         return false
     }
     
-    private fun getInfo(player: Player, pos: BlockPos): WailaInfo? {
+    private fun getInfo(player: Player, pos: BlockLocation): WailaInfo? {
         val novaState = BlockManager.getBlockState(pos)
         if (novaState is NovaBlockState) {
             val material = novaState.block

@@ -31,7 +31,7 @@ import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.util.toNovaPos
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.block.BlockManager
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
@@ -50,7 +50,7 @@ internal object BlockBreaking : Listener {
         runTaskTimer(0, 1, BlockBreaking::handleTick)
     }
     
-    fun setBreakStage(pos: BlockPos, entityId: Int, stage: Int) {
+    fun setBreakStage(pos: BlockLocation, entityId: Int, stage: Int) {
         val blockState = BlockManager.getBlockState(pos) ?: return
         
         val block = pos.block
@@ -101,7 +101,7 @@ internal object BlockBreaking : Listener {
         }
     }
     
-    private fun handleDestroyStart(player: Player, packet: ServerboundPlayerActionPacket, pos: BlockPos, direction: Direction, sequence: Int) {
+    private fun handleDestroyStart(player: Player, packet: ServerboundPlayerActionPacket, pos: BlockLocation, direction: Direction, sequence: Int) {
         val block = pos.block
         
         // pass packet further down the pipeline if the block is from a custom item service

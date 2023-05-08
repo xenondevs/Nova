@@ -26,7 +26,7 @@ import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.util.toNovaPos
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import kotlin.math.floor
 import kotlin.random.Random
@@ -88,7 +88,7 @@ internal object SoundPatches : MultiTransformer(MojangEntity::class, MojangLivin
             val y = floor(entity.y).toInt()
             val z = floor(entity.z).toInt()
             
-            val pos = BlockPos(entity.level.world, x, y, z)
+            val pos = BlockLocation(entity.level.world, x, y, z)
             val block = pos.block
             
             if (!block.type.isAir) {

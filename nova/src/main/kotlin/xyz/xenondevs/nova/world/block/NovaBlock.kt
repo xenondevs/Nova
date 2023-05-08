@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.concurrent.CompletableFuture
 
@@ -27,11 +27,11 @@ import java.util.concurrent.CompletableFuture
 typealias PlaceCheckFun = ((Player, ItemStack, Location) -> CompletableFuture<Boolean>)
 
 /**
- * A typealias for a function that is invoked when a [Player] places a [NovaBlock] at the given [BlockPos].
- * The function takes the [BlockPos] of the placed block and returns a [List] of [BlockPos] that should be occupied by 
+ * A typealias for a function that is invoked when a [Player] places a [NovaBlock] at the given [BlockLocation].
+ * The function takes the [BlockLocation] of the placed block and returns a [List] of [BlockLocation] that should be occupied by
  * the multi block as well.
  */
-typealias MultiBlockLoader = (BlockPos) -> List<BlockPos>
+typealias MultiBlockLoader = (BlockLocation) -> List<BlockLocation>
 
 /**
  * Represents a block type in Nova.
@@ -62,7 +62,7 @@ open class NovaBlock internal constructor(
             is BlockStateBlockModelData -> block[0].type.material
         }
     
-    internal open fun createBlockState(pos: BlockPos): NovaBlockState =
+    internal open fun createBlockState(pos: BlockLocation): NovaBlockState =
         NovaBlockState(pos, this)
     
     internal open fun createNewBlockState(ctx: BlockPlaceContext): NovaBlockState =

@@ -35,7 +35,7 @@ import xyz.xenondevs.nova.util.concurrent.Latch
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.toNovaPos
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
@@ -67,7 +67,7 @@ internal object WorldDataManager : Listener {
     private val chunkTasks: MutableMap<ChunkPos, Boolean> = Collections.synchronizedMap(HashMap())
     private val chunkLocks: MutableMap<ChunkPos, Latch> = Collections.synchronizedMap(HashMap())
     
-    private val pendingOrphanBlocks = Object2ObjectOpenHashMap<ChunkPos, MutableMap<BlockPos, NovaBlock>>()
+    private val pendingOrphanBlocks = Object2ObjectOpenHashMap<ChunkPos, MutableMap<BlockLocation, NovaBlock>>()
     
     @InitFun
     private fun init() {
@@ -219,24 +219,24 @@ internal object WorldDataManager : Listener {
     //</editor-fold>
     
     //<editor-fold desc="reading from / writing to chunks", defaultstate="collapsed">
-    fun getBlockStates(pos: ChunkPos, takeUnloaded: Boolean = false): Map<BlockPos, BlockState> =
+    fun getBlockStates(pos: ChunkPos, takeUnloaded: Boolean = false): Map<BlockLocation, BlockState> =
         readChunk(pos) { chunk -> HashMap(chunk.blockStates) }.apply { if (!takeUnloaded) removeIf { !it.value.isLoaded } }
     
-    fun getBlockState(pos: BlockPos, takeUnloaded: Boolean = false): BlockState? =
+    fun getBlockState(pos: BlockLocation, takeUnloaded: Boolean = false): BlockState? =
         readChunk(pos.chunkPos) { chunk -> chunk.blockStates[pos]?.takeIf { takeUnloaded || it.isLoaded } }
     
-    fun setBlockState(pos: BlockPos, state: BlockState) =
+    fun setBlockState(pos: BlockLocation, state: BlockState) =
         writeChunk(pos.chunkPos) { it.blockStates[pos] = state }
     
-    fun removeBlockState(pos: BlockPos) =
+    fun removeBlockState(pos: BlockLocation) =
         writeChunk(pos.chunkPos) { it.blockStates -= pos }
     
     @Synchronized
     internal fun addOrphanBlock(world: MojangWorld, x: Int, y: Int, z: Int, material: NovaBlock) {
-        return addOrphanBlock(BlockPos(world.world, x, y, z), material)
+        return addOrphanBlock(BlockLocation(world.world, x, y, z), material)
     }
     
-    internal fun addOrphanBlock(pos: BlockPos, material: NovaBlock) {
+    internal fun addOrphanBlock(pos: BlockLocation, material: NovaBlock) {
         val chunk = pos.chunkPos
         if (chunk.isLoaded()) {
             placeOrphanBlock(pos, material)
@@ -246,7 +246,7 @@ internal object WorldDataManager : Listener {
     }
     
     @Synchronized
-    private fun placeOrphanBlock(pos: BlockPos, material: NovaBlock) {
+    private fun placeOrphanBlock(pos: BlockLocation, material: NovaBlock) {
         val ctx = BlockPlaceContext(pos, material.item?.createItemStack(0) ?: ItemStack(Material.AIR), null, null, null, pos.below, BlockFace.UP)
         val state = material.createNewBlockState(ctx)
         setBlockState(pos, state)

@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaDaylightDetectorTileEntity
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.block.backingstate.BackingState
 import xyz.xenondevs.nova.world.block.model.BlockStateBlockModelProvider
 import kotlin.math.round
@@ -59,7 +59,7 @@ internal object DaylightDetectorBackingState : BackingState(DaylightDetectorBloc
         return InteractionResult.CONSUME
     }
     
-    override fun getCorrectBlockState(pos: BlockPos): BlockState? {
+    override fun getCorrectBlockState(pos: BlockLocation): BlockState? {
         var state = WorldDataManager.getBlockState(pos)
         
         if (state is LinkedBlockState)

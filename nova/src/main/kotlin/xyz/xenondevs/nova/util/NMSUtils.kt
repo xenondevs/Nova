@@ -57,7 +57,7 @@ import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
@@ -219,8 +219,8 @@ val Block.nmsState: BlockState
 val BlockState.id: Int
     get() = MojangBlock.getId(this)
 
-fun MojangBlockPos.toNovaPos(world: World): BlockPos =
-    BlockPos(world, x, y, z)
+fun MojangBlockPos.toNovaPos(world: World): BlockLocation =
+    BlockLocation(world, x, y, z)
 
 fun Player.send(vararg packets: Packet<*>) {
     val connection = connection
@@ -269,36 +269,36 @@ fun <T : Comparable<T>> BlockState.hasProperty(property: Property<T>, value: T):
     return hasProperty(property) && values[property] == value
 }
 
-fun BlockPos.setBlockStateNoUpdate(state: BlockState) {
+fun BlockLocation.setBlockStateNoUpdate(state: BlockState) {
     val section = chunkSection
     val old = section.getBlockState(this)
     section.setBlockStateSilently(this, state)
     world.serverLevel.sendBlockUpdated(nmsPos, old, state, 3)
 }
 
-fun BlockPos.setBlockStateSilently(state: BlockState) {
+fun BlockLocation.setBlockStateSilently(state: BlockState) {
     chunkSection.setBlockStateSilently(this, state)
 }
 
-fun BlockPos.setBlockState(state: BlockState) {
+fun BlockLocation.setBlockState(state: BlockState) {
     world.serverLevel.setBlock(nmsPos, state, 11)
 }
 
-fun BlockPos.getBlockState(): BlockState {
+fun BlockLocation.getBlockState(): BlockState {
     return chunkSection.getBlockState(this)
 }
 
-val BlockPos.chunkSection: LevelChunkSection
+val BlockLocation.chunkSection: LevelChunkSection
     get() {
         val chunk = world.serverLevel.getChunk(x shr 4, z shr 4)
         return chunk.getSection(chunk.getSectionIndex(y))
     }
 
-fun LevelChunkSection.setBlockStateSilently(pos: BlockPos, state: BlockState) {
+fun LevelChunkSection.setBlockStateSilently(pos: BlockLocation, state: BlockState) {
     setBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF, state)
 }
 
-fun LevelChunkSection.getBlockState(pos: BlockPos): BlockState {
+fun LevelChunkSection.getBlockState(pos: BlockLocation): BlockState {
     return getBlockState(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF)
 }
 

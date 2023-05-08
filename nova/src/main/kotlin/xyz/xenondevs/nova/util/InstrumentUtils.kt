@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.util
 import net.minecraft.core.Holder
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import org.bukkit.Instrument as BukkitInstrument
 
 enum class Instrument(val bukkitInstrument: BukkitInstrument, val nmsInstrument: NoteBlockInstrument) {
@@ -38,11 +38,11 @@ enum class Instrument(val bukkitInstrument: BukkitInstrument, val nmsInstrument:
     
     companion object {
         
-        fun byBlockAbove(pos: BlockPos): Instrument? {
+        fun byBlockAbove(pos: BlockLocation): Instrument? {
             return NoteBlockInstrument.byStateAbove(pos.world.serverLevel.getBlockState(pos.nmsPos)).orElse(null)?.instrument
         }
         
-        fun byBlockBelow(pos: BlockPos): Instrument {
+        fun byBlockBelow(pos: BlockLocation): Instrument {
             return NoteBlockInstrument.byStateBelow(pos.world.serverLevel.getBlockState(pos.nmsPos)).instrument
         }
         

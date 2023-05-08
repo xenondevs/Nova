@@ -1,0 +1,287 @@
+package xyz.xenondevs.nova.world
+
+import com.google.common.base.MoreObjects
+import net.minecraft.core.AxisCycle
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.Direction.Axis
+import net.minecraft.core.Vec3i
+import net.minecraft.util.Mth
+import net.minecraft.world.level.block.Rotation
+import org.bukkit.Location
+import org.bukkit.SoundCategory
+import org.bukkit.World
+import org.bukkit.block.Block
+import org.bukkit.block.BlockState
+import xyz.xenondevs.nova.util.Location
+import xyz.xenondevs.nova.util.serverLevel
+import net.minecraft.world.level.block.state.BlockState as MojangBlockState
+
+val Location.pos: BlockLocation
+    get() = BlockLocation(world!!, blockX, blockY, blockZ)
+
+val Block.pos: BlockLocation
+    get() = BlockLocation(world, x, y, z)
+
+
+@Deprecated("Overlapped naming with Mojang's BlockPos. Use BlockLocation instead", ReplaceWith("BlockLocation"))
+typealias BlockPos = BlockLocation
+
+/**
+ * [BlockPos] implementation that also stores the [World] instance.
+ */
+open class BlockLocation(val world: World, x: Int, y: Int, z: Int) : BlockPos(x, y, z) {
+    
+    val nmsPos: BlockPos
+        get() = BlockPos(x, y, z)
+    
+    val location: Location
+        get() = Location(world, x, y, z)
+    
+    val block: Block
+        get() = world.getBlockAt(x, y, z)
+    
+    val blockState: BlockState
+        get() = world.getBlockState(x, y, z)
+    
+    val nmsBlockState: MojangBlockState
+        get() = world.serverLevel.getBlockState(nmsPos)
+    
+    val chunkPos: ChunkPos
+        get() = ChunkPos(world.uid, x shr 4, z shr 4)
+    
+    val below: BlockLocation
+        get() = add(0, -1, 0)
+    
+    fun playSound(sound: String, volume: Float, pitch: Float) {
+        world.playSound(Location(world, x + .5, y + .5, z + .5), sound, volume, pitch)
+    }
+    
+    fun playSound(sound: String, category: SoundCategory, volume: Float, pitch: Float) {
+        world.playSound(Location(world, x + .5, y + .5, z + .5), sound, category, volume, pitch)
+    }
+    
+    override fun immutable() = this
+    
+    open fun mutableLocation() = MutableBlockLocation(world, x, y, z)
+    
+    //<editor-fold desc="Positioning" defaultstate="collapsed">
+    
+    override fun offset(xOff: Int, yOff: Int, zOff: Int): BlockLocation {
+        return if (xOff == 0 && yOff == 0 && zOff == 0) this else BlockLocation(world, x + xOff, y + yOff, z + zOff)
+    }
+    
+    override fun offset(off: Vec3i) = offset(off.x, off.y, off.z)
+    
+    open fun add(x: Int, y: Int, z: Int): BlockLocation = offset(x, y, z)
+    
+    open fun add(vec: Vec3i): BlockLocation = offset(vec)
+    
+    open fun subtract(x: Int, y: Int, z: Int): BlockLocation = offset(-x, -y, -z)
+    
+    override fun subtract(vec: Vec3i) = offset(-vec.x, -vec.y, -vec.z)
+    
+    override fun multiply(fac: Int) =
+        if (fac == 1) this else BlockLocation(world, x * fac, y * fac, z * fac)
+    
+    override fun above() = relative(Direction.UP)
+    
+    override fun above(steps: Int) = relative(Direction.UP, steps)
+    
+    override fun below() = relative(Direction.DOWN)
+    
+    override fun below(steps: Int) = relative(Direction.DOWN, steps)
+    
+    override fun north() = relative(Direction.NORTH)
+    
+    override fun north(steps: Int) = relative(Direction.NORTH, steps)
+    
+    override fun south() = relative(Direction.SOUTH)
+    
+    override fun south(steps: Int) = relative(Direction.SOUTH, steps)
+    
+    override fun west() = relative(Direction.WEST)
+    
+    override fun west(steps: Int) = relative(Direction.WEST, steps)
+    
+    override fun east() = relative(Direction.EAST)
+    
+    override fun east(steps: Int) = relative(Direction.EAST, steps)
+    
+    override fun relative(direction: Direction) =
+        offset(direction.stepX, direction.stepY, direction.stepZ)
+    
+    override fun relative(direction: Direction, steps: Int) =
+        if (steps == 0) this else offset(direction.stepX * steps, direction.stepY * steps, direction.stepZ * steps)
+    
+    override fun relative(axis: Axis, steps: Int): BlockLocation {
+        val x = if (axis == Axis.X) steps else 0
+        val y = if (axis == Axis.Y) steps else 0
+        val z = if (axis == Axis.Z) steps else 0
+        return offset(x, y, z)
+    }
+    
+    override fun rotate(rot: Rotation) =
+        when (rot) {
+            Rotation.NONE -> this
+            Rotation.CLOCKWISE_90 -> BlockLocation(world, -z, y, x)
+            Rotation.CLOCKWISE_180 -> BlockLocation(world, -x, y, -z)
+            Rotation.COUNTERCLOCKWISE_90 -> BlockLocation(world, z, y, -x)
+        }
+    
+    override fun cross(vec: Vec3i) =
+        BlockLocation(world, y * vec.z - z * vec.y, z * vec.x - x * vec.z, x * vec.y - y * vec.x)
+    
+    override fun atY(y: Int) = BlockLocation(world, x, y, z)
+    
+    //</editor-fold>
+    
+    //<editor-fold desc="Previously auto-generated by the data class" defaultstate="collapsed">
+    
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BlockLocation) return false
+        if (!super.equals(other)) return false
+        
+        if (world != other.world) return false
+        if (x != other.x) return false
+        if (y != other.y) return false
+        return z == other.z
+    }
+    
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + world.hashCode()
+        result = 31 * result + x
+        result = 31 * result + y
+        result = 31 * result + z
+        return result
+    }
+    
+    override fun toString() =
+        MoreObjects.toStringHelper(this)
+            .add("world", world)
+            .add("x", x)
+            .add("y", y)
+            .add("z", z)
+            .toString()
+    
+    override fun toShortString() =
+        world.uid.toString() + ", " + super.toShortString()
+    
+    fun copy(): BlockLocation = BlockLocation(world, x, y, z)
+    
+    //</editor-fold>
+    
+}
+
+class MutableBlockLocation(world: World, x: Int, y: Int, z: Int) : BlockLocation(world, x, y, z) {
+    
+    override fun immutable() = BlockLocation(world, x, y, z)
+    
+    override fun mutableLocation() = this
+    
+    var x: Int
+        get() = super.getX()
+        set(value) {
+            super.setX(value)
+        }
+    
+    var y: Int
+        get() = super.getY()
+        set(value) {
+            super.setY(value)
+        }
+    
+    var z: Int
+        get() = super.getZ()
+        set(value) {
+            super.setZ(value)
+        }
+    
+    override fun offset(xOff: Int, yOff: Int, zOff: Int) = super.offset(xOff, yOff, zOff).immutable()
+    
+    override fun multiply(fac: Int) = super.multiply(fac).immutable()
+    
+    override fun rotate(rot: Rotation) = super.rotate(rot).immutable()
+    
+    override fun cross(vec: Vec3i) = super.cross(vec).immutable()
+    
+    override fun atY(y: Int) = super.atY(y).immutable()
+    
+    //<editor-fold desc="Changing position" defaultstate="collapsed">
+    
+    fun set(x: Int, y: Int, z: Int): MutableBlockLocation {
+        this.setX(x)
+        this.setY(y)
+        this.setZ(z)
+        return this
+    }
+    
+    fun set(x: Double, y: Double, z: Double): MutableBlockLocation {
+        this.setX(Mth.floor(x))
+        this.setY(Mth.floor(y))
+        this.setZ(Mth.floor(z))
+        return this
+    }
+    
+    fun set(vec: Vec3i): MutableBlockLocation {
+        this.setX(vec.x)
+        this.setY(vec.y)
+        this.setZ(vec.z)
+        return this
+    }
+    
+    fun set(packed: Long): MutableBlockLocation {
+        this.set(getX(packed), getY(packed), getZ(packed))
+        return this
+    }
+    
+    fun set(cycle: AxisCycle, x: Int, y: Int, z: Int): MutableBlockLocation {
+        this.set(cycle.cycle(x, y, z, Axis.X), cycle.cycle(x, y, z, Axis.Y), cycle.cycle(x, y, z, Axis.Z))
+        return this
+    }
+    
+    fun setWithOffset(vec: Vec3i, direction: Direction): MutableBlockLocation {
+        this.set(vec.x + direction.stepX, vec.y + direction.stepY, vec.z + direction.stepZ)
+        return this
+    }
+    
+    fun setWithOffset(vec: Vec3i, xOff: Int, yOff: Int, zOff: Int): MutableBlockLocation {
+        this.set(vec.x + xOff, vec.y + yOff, vec.z + zOff)
+        return this
+    }
+    
+    fun setWithOffset(vec: Vec3i, offset: Vec3i): MutableBlockLocation {
+        this.set(vec.x + offset.x, vec.y + offset.y, vec.z + offset.z)
+        return this
+    }
+    
+    fun move(direction: Direction): MutableBlockLocation = move(direction, 1)
+    
+    fun move(direction: Direction, steps: Int): MutableBlockLocation {
+        if (steps != 0)
+            set(getX() + direction.stepX * steps, getY() + direction.stepY * steps, getZ() + direction.stepZ * steps)
+        return this
+    }
+    
+    fun move(x: Int, y: Int, z: Int) : MutableBlockLocation {
+        if (x != 0 || y != 0 || z != 0)
+            set(getX() + x, getY() + y, getZ() + z)
+        return this
+    }
+    
+    fun move(vec: Vec3i): MutableBlockLocation = move(vec.x, vec.y, vec.z)
+    
+    fun clamp(axis: Axis, min: Int, max: Int): MutableBlockLocation {
+        when (axis) {
+            Axis.X -> setX(Mth.clamp(x, min, max))
+            Axis.Y -> setY(Mth.clamp(y, min, max))
+            Axis.Z -> setZ(Mth.clamp(z, min, max))
+        }
+        return this
+    }
+    
+    //</editor-fold>
+    
+}

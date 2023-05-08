@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HASH_MAP_PALETTE_VALUES_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.LINEAR_PALETTE_VALUES_FIELD
 import xyz.xenondevs.nova.util.serverLevel
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.ChunkPos
 import java.util.function.Predicate
 import kotlin.reflect.jvm.jvmName
@@ -31,11 +31,11 @@ object BlockStateSearcher {
     
     private val globalPaletteCache = HashMap<ChunkSearchQuery, Set<Int>>()
     
-    fun searchChunk(pos: ChunkPos, queries: List<ChunkSearchQuery>): Array<ArrayList<BlockPos>?> {
+    fun searchChunk(pos: ChunkPos, queries: List<ChunkSearchQuery>): Array<ArrayList<BlockLocation>?> {
         val world = pos.world
         require(world != null) { "World does not exist" }
         
-        val result: Array<ArrayList<BlockPos>?> = arrayOfNulls(queries.size)
+        val result: Array<ArrayList<BlockLocation>?> = arrayOfNulls(queries.size)
         for (section in world.serverLevel.getChunk(pos.x, pos.z).sections) {
             val container = section.states
             container.acquire()
@@ -63,7 +63,7 @@ object BlockStateSearcher {
                         val z = (idx shr 4) and 0xF
                         val y = idx shr 8
                         
-                        resultList += BlockPos(world, (pos.x shl 4) + x, y + bottomY, (pos.z shl 4) + z)
+                        resultList += BlockLocation(world, (pos.x shl 4) + x, y + bottomY, (pos.z shl 4) + z)
                     }
                 }
             } finally {

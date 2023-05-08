@@ -2,11 +2,11 @@ package xyz.xenondevs.nova.data.world.block.state
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.cbf.io.ByteBuffer
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 
 abstract class BlockState internal constructor() {
     
-    abstract val pos: BlockPos
+    abstract val pos: BlockLocation
     abstract val id: ResourceLocation
     abstract val isLoaded: Boolean
     

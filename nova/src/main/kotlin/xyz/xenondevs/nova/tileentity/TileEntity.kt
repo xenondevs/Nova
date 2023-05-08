@@ -45,7 +45,7 @@ import xyz.xenondevs.nova.util.hasInventoryOpen
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.util.yaw
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.TileEntityBlockBehavior
@@ -73,7 +73,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
         val TILE_ENTITY_DATA_KEY = ResourceLocation("nova", "tileentity")
     }
     
-    val pos: BlockPos = blockState.pos
+    val pos: BlockLocation = blockState.pos
     val uuid: UUID = blockState.uuid
     val ownerUUID: UUID? = blockState.ownerUUID
     final override val data: Compound = blockState.data

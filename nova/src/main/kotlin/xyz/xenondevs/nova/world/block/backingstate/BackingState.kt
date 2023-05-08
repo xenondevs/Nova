@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.setBlockStateSilently
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.model.BlockStateBlockModelProvider
 import java.util.function.Predicate
@@ -24,7 +24,7 @@ internal abstract class BackingState(configType: DefaultingBlockStateConfigType<
     
     open fun init() = Unit
     
-    fun handleQueryResult(positions: List<BlockPos>) {
+    fun handleQueryResult(positions: List<BlockLocation>) {
         if (CustomItemServiceManager.PLUGINS.isEmpty()) {
             positions.forEach { if (!BlockManager.hasBlockState(it)) it.setBlockStateSilently(defaultState) }
         } else {
@@ -37,7 +37,7 @@ internal abstract class BackingState(configType: DefaultingBlockStateConfigType<
         }
     }
     
-    open fun getCorrectBlockState(pos: BlockPos): BlockState? {
+    open fun getCorrectBlockState(pos: BlockLocation): BlockState? {
         var state = WorldDataManager.getBlockState(pos)
         
         if (state is LinkedBlockState)

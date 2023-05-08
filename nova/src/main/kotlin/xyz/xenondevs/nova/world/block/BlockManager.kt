@@ -26,7 +26,7 @@ import xyz.xenondevs.nova.util.item.hasNoBreakParticles
 import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityTracker
@@ -51,7 +51,7 @@ object BlockManager {
         SoundEngine.init()
     }
     
-    fun getBlockState(pos: BlockPos, useLinkedStates: Boolean = true): NovaBlockState? {
+    fun getBlockState(pos: BlockLocation, useLinkedStates: Boolean = true): NovaBlockState? {
         val blockState = WorldDataManager.getBlockState(pos)
         
         if (blockState is NovaBlockState)
@@ -63,7 +63,7 @@ object BlockManager {
         return null
     }
     
-    fun hasBlockState(pos: BlockPos, useLinkedStates: Boolean = true): Boolean {
+    fun hasBlockState(pos: BlockLocation, useLinkedStates: Boolean = true): Boolean {
         return getBlockState(pos, useLinkedStates) != null
     }
     
@@ -131,7 +131,7 @@ object BlockManager {
         return true
     }
     
-    private fun playBreakEffects(state: NovaBlockState, ctx: BlockBreakContext, pos: BlockPos, sendEffectsToBreaker: Boolean) {
+    private fun playBreakEffects(state: NovaBlockState, ctx: BlockBreakContext, pos: BlockLocation, sendEffectsToBreaker: Boolean) {
         val player = ctx.source as? Player
         val material = state.block
         val level = pos.world.serverLevel

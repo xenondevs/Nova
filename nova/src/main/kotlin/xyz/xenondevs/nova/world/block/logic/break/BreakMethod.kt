@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.sendDestructionPacket
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.pos
@@ -47,14 +47,14 @@ internal interface BreakMethod {
     
 }
 
-internal abstract class VisibleBreakMethod(val pos: BlockPos, val predictionPlayer: Player? = null) : BreakMethod {
+internal abstract class VisibleBreakMethod(val pos: BlockLocation, val predictionPlayer: Player? = null) : BreakMethod {
     override val hasClientsidePrediction = predictionPlayer != null
     val block = pos.block
 }
 
-internal class PacketBreakMethod(pos: BlockPos, private val entityId: Int = Random.nextInt(), predictionPlayer: Player? = null) : VisibleBreakMethod(pos, predictionPlayer) {
+internal class PacketBreakMethod(pos: BlockLocation, private val entityId: Int = Random.nextInt(), predictionPlayer: Player? = null) : VisibleBreakMethod(pos, predictionPlayer) {
     
-    constructor(pos: BlockPos, predictionPlayer: Player) : this(pos, predictionPlayer.entityId, predictionPlayer)
+    constructor(pos: BlockLocation, predictionPlayer: Player) : this(pos, predictionPlayer.entityId, predictionPlayer)
     
     override var breakStage: Int = -1
         set(stage) {
@@ -79,7 +79,7 @@ internal class PacketBreakMethod(pos: BlockPos, private val entityId: Int = Rand
     
 }
 
-internal class DisplayEntityBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos) {
+internal class DisplayEntityBreakMethod(pos: BlockLocation) : VisibleBreakMethod(pos) {
     
     private val itemDisplay = FakeItemDisplay(pos.location.add(.5, .5, .5), true) { _, data ->
         data.itemDisplay = ItemDisplayContext.HEAD

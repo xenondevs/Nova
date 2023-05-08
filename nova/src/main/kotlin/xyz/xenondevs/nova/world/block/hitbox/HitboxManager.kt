@@ -28,7 +28,7 @@ import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.toLocation
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.util.toVec3
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeInteraction
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
@@ -42,7 +42,7 @@ internal object HitboxManager : Listener {
     private val physicalHitboxesById = HashMap<Int, PhysicalHitbox>()
     
     private val virtualHitboxes = HashSet<VirtualHitbox>()
-    private val virtualHitboxesByBlock = HashMap<BlockPos, ArrayList<VirtualHitbox>>()
+    private val virtualHitboxesByBlock = HashMap<BlockLocation, ArrayList<VirtualHitbox>>()
     
     private val visualizers = Collections.newSetFromMap<Player>(WeakHashMap())
     

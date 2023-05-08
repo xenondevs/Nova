@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.UUIDUtils
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.*
@@ -33,7 +33,7 @@ class NovaTileEntityState : NovaBlockState {
             _tileEntity = value
         }
     
-    internal constructor(pos: BlockPos, material: NovaTileEntityBlock) : super(pos, material) {
+    internal constructor(pos: BlockLocation, material: NovaTileEntityBlock) : super(pos, material) {
         this.block = material
     }
     

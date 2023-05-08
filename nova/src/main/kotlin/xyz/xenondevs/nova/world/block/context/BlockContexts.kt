@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.UUIDUtils
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.pos
 import java.util.*
 import xyz.xenondevs.nova.api.block.NovaBlock as INovaBlock
@@ -32,12 +32,12 @@ private fun getOwnerUUID(source: Any?): UUID? =
     }
 
 data class BlockPlaceContext(
-    val pos: BlockPos,
+    val pos: BlockLocation,
     val item: ItemStack,
     val source: Any?,
     val sourceLocation: Location?,
     val ownerUUID: UUID?,
-    val placedOn: BlockPos,
+    val placedOn: BlockLocation,
     val placedOnFace: BlockFace
 ) {
     
@@ -66,7 +66,7 @@ data class BlockPlaceContext(
 }
 
 data class BlockBreakContext(
-    val pos: BlockPos,
+    val pos: BlockLocation,
     val source: Any? = null,
     val sourceLocation: Location? = null,
     val clickedFace: BlockFace? = null,
@@ -94,7 +94,7 @@ data class BlockBreakContext(
 }
 
 data class BlockInteractContext(
-    val pos: BlockPos,
+    val pos: BlockLocation,
     val source: Any? = null,
     val sourceLocation: Location? = null,
     val clickedFace: BlockFace? = null,

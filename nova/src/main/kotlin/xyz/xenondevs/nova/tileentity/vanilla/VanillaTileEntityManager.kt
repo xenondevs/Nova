@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.pos
@@ -30,7 +30,7 @@ import java.util.*
 )
 internal object VanillaTileEntityManager : Listener {
     
-    private val tileEntityMap: MutableMap<ChunkPos, MutableMap<BlockPos, VanillaTileEntity>> =
+    private val tileEntityMap: MutableMap<ChunkPos, MutableMap<BlockLocation, VanillaTileEntity>> =
         Collections.synchronizedMap(HashMap())
     
     @InitFun
@@ -48,7 +48,7 @@ internal object VanillaTileEntityManager : Listener {
     }
     
     internal fun removeInvalidVTEs(): Int {
-        val invalidPositions = ArrayList<BlockPos>()
+        val invalidPositions = ArrayList<BlockLocation>()
         
         synchronized(tileEntityMap) {
             tileEntityMap.forEach { (_, blockMap) ->
@@ -68,7 +68,7 @@ internal object VanillaTileEntityManager : Listener {
     
     fun getTileEntityAt(location: Location) = tileEntityMap[location.chunkPos]?.get(location.pos)
     
-    fun getTileEntityAt(pos: BlockPos) = tileEntityMap[pos.chunkPos]?.get(pos)
+    fun getTileEntityAt(pos: BlockLocation) = tileEntityMap[pos.chunkPos]?.get(pos)
     
     fun getTileEntitiesInChunk(pos: ChunkPos): List<VanillaTileEntity> {
         val tileEntities = tileEntityMap[pos] ?: return emptyList()
@@ -91,7 +91,7 @@ internal object VanillaTileEntityManager : Listener {
         } else tryCreateVTE(pos)
     }
     
-    private fun tryCreateVTE(pos: BlockPos): VanillaTileEntityState? {
+    private fun tryCreateVTE(pos: BlockLocation): VanillaTileEntityState? {
         // Prevent creation of vanilla tile entities for custom item service blocks
         if (CustomItemServiceManager.getBlockType(pos.block) != null)
             return null
@@ -114,7 +114,7 @@ internal object VanillaTileEntityManager : Listener {
         handleBlockBreak(event.block.pos)
     }
     
-    private fun handleBlockBreak(pos: BlockPos) {
+    private fun handleBlockBreak(pos: BlockLocation) {
         val blockState = WorldDataManager.getBlockState(pos)
         if (blockState is VanillaTileEntityState) {
             WorldDataManager.removeBlockState(pos)

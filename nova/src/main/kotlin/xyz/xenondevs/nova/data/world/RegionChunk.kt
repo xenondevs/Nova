@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.get
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -31,8 +31,8 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
     val packedCoords = (relChunkX shl 5 or relChunkZ)
     val pos = ChunkPos(world.uid, chunkX, chunkZ)
     
-    var blockStates = HashMap<BlockPos, BlockState>()
-    val unknownStates = HashMap<BlockPos, Pair<String, ByteArray>>()
+    var blockStates = HashMap<BlockLocation, BlockState>()
+    val unknownStates = HashMap<BlockLocation, Pair<String, ByteArray>>()
     
     fun read(buf: ByteBuffer) {
         while (buf.readByte().toInt() == 1) {
@@ -40,7 +40,7 @@ internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChun
             val relX = relPos shr 4
             val relZ = relPos and 0xF
             val y = buf.readVarInt()
-            val pos = BlockPos(world, (chunkX shl 4) + relX, y, (chunkZ shl 4) + relZ)
+            val pos = BlockLocation(world, (chunkX shl 4) + relX, y, (chunkZ shl 4) + relZ)
             val type = buf.readString()
             val dataLength = buf.readVarInt()
             

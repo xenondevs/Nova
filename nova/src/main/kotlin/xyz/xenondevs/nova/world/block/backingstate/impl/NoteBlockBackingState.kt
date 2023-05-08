@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.block.backingstate.BackingState
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.pos
@@ -102,7 +102,7 @@ internal object NoteBlockBackingState : BackingState(NoteBlockStateConfig, false
         tryUpdateNoteBlock(pos.add(0, -1, 0))
     }
     
-    private fun tryUpdateNoteBlock(pos: BlockPos) {
+    private fun tryUpdateNoteBlock(pos: BlockLocation) {
         // is this actually a vanilla note block?
         val vnb = VanillaTileEntityManager.getTileEntityAt(pos) as? VanillaNoteBlockTileEntity ?: return
         

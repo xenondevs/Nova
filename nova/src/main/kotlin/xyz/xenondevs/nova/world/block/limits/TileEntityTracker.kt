@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
@@ -43,7 +43,7 @@ internal object TileEntityTracker {
             modifyCounters(tileEntity.ownerUUID, ctx.pos, tileEntity.block.id, -1)
     }
     
-    private fun modifyCounters(player: UUID, pos: BlockPos, id: ResourceLocation, add: Int) {
+    private fun modifyCounters(player: UUID, pos: BlockLocation, id: ResourceLocation, add: Int) {
         val playerMap = BLOCK_COUNTER.getOrPut(player, ::HashMap)
         playerMap[id] = max(0, (playerMap[id] ?: 0) + add)
         

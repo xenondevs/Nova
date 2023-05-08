@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.BlockLocation
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
@@ -26,7 +26,7 @@ val Material?.requiresLight: Boolean
 )
 object TileEntityManager {
     
-    private val tileEntityMap = HashMap<ChunkPos, HashMap<BlockPos, TileEntity>>()
+    private val tileEntityMap = HashMap<ChunkPos, HashMap<BlockLocation, TileEntity>>()
     val tileEntities: Sequence<TileEntity>
         get() = tileEntityMap.asSequence().filter { it.key.isLoaded() }.flatMap { it.value.values }
     
@@ -67,7 +67,7 @@ object TileEntityManager {
         return getTileEntity(location.pos, additionalHitboxes)
     }
     
-    fun getTileEntity(pos: BlockPos, additionalHitboxes: Boolean = true): TileEntity? {
+    fun getTileEntity(pos: BlockLocation, additionalHitboxes: Boolean = true): TileEntity? {
         val blockState = BlockManager.getBlockState(pos, additionalHitboxes)
         return if (blockState is NovaTileEntityState) blockState.tileEntity else null
     }
