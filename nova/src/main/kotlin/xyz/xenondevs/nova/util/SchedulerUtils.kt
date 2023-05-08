@@ -27,6 +27,15 @@ fun runTask(run: () -> Unit) =
 fun runTaskTimer(delay: Long, period: Long, run: () -> Unit) =
     Bukkit.getScheduler().runTaskTimer(NOVA.loader, run, delay, period)
 
+fun runTaskRepeatedly(delay: Long, period: Long, times: Int, run: () -> Unit) {
+    require(times > 0) { "Times must be greater than 0" }
+    var count = 0
+    Bukkit.getScheduler().runTaskTimer(NOVA.loader, { task ->
+        run()
+        if (++count >= times) task.cancel()
+    }, delay, period)
+}
+
 fun runTaskSynchronized(lock: Any, run: () -> Unit) =
     Bukkit.getScheduler().runTask(NOVA.loader, Runnable { synchronized(lock, run) })
 
@@ -67,6 +76,15 @@ fun runAsyncTaskTimerSynchronized(lock: Any, delay: Long, period: Long, run: () 
 
 fun runAsyncTaskTimer(delay: Long, period: Long, run: () -> Unit) =
     Bukkit.getScheduler().runTaskTimerAsynchronously(NOVA.loader, run, delay, period)
+
+fun runAsyncTaskRepeatedly(delay: Long, period: Long, times: Int, run: () -> Unit) {
+    require(times > 0) { "Times must be greater than 0" }
+    var count = 0
+    Bukkit.getScheduler().runTaskTimerAsynchronously(NOVA.loader, { task ->
+        run()
+        if (++count >= times) task.cancel()
+    }, delay, period)
+}
 
 internal object AsyncExecutor {
     
