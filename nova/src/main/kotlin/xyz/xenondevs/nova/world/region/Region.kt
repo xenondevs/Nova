@@ -1,7 +1,11 @@
 package xyz.xenondevs.nova.world.region
 
+import net.minecraft.core.BlockPos
 import org.bukkit.Location
 import org.bukkit.block.Block
+import xyz.xenondevs.nova.util.blockPos
+import xyz.xenondevs.nova.util.toNovaPos
+import xyz.xenondevs.nova.world.BlockLocation
 import java.util.*
 
 operator fun Location.rangeTo(loc: Location) = Region(this, loc)
@@ -43,4 +47,20 @@ class Region(val min: Location, val max: Location) : Iterable<Block> {
     operator fun get(index: Int) = blocks[index]
     
     override fun iterator() = blocks.iterator()
+    
+    fun posIterator(): Iterator<BlockPos> {
+        val min = min.blockPos
+        val max = max.blockPos
+        return BlockPos.withinManhattan(min, max.x, max.y, max.z).iterator()
+    }
+    
+    fun locationIterator(): Iterator<BlockLocation> {
+        val min = min.blockPos
+        val max = max.blockPos
+        return BlockPos.withinManhattan(min, max.x, max.y, max.z)
+            .asSequence()
+            .map { it.toNovaPos(world!!) }
+            .iterator()
+    }
+    
 }
