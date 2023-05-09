@@ -10,12 +10,10 @@ import java.awt.Color
 import java.awt.image.BufferedImage
 import java.nio.file.Path
 import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.readText
 
 private const val LAYER_1 = "assets/minecraft/textures/models/armor/leather_layer_1.png"
 private const val LAYER_2 = "assets/minecraft/textures/models/armor/leather_layer_2.png"
-
-private const val TEXTURE_WIDTH = 64
-private const val TEXTURE_HEIGHT = 32
 
 /**
  * Merges custom armor from the [Fancy Pants shader](https://github.com/Ancientkingg/fancyPants).
@@ -27,19 +25,36 @@ internal class FancyPantsArmorFileMerger(basePacks: BasePacks) : FileMerger(base
         return relPathStr == LAYER_1 || relPathStr == LAYER_2
     }
     
+    private fun findTextureResolution(baseDir: Path): Int? {
+        val shaderFile = baseDir.resolve("assets/minecraft/shaders/core/rendertype_armor_cutout_no_cull.fsh")
+        val text = shaderFile.readText()
+        
+        fun findDefinedProperty(name: String): Int? {
+            val regex = Regex("""#define $name (\d+)""")
+            return regex.find(text)?.groupValues?.get(1)?.toIntOrNull()
+        }
+        
+        return findDefinedProperty("TEX_RES") // unobfuscated
+            ?: findDefinedProperty("V1") // ItemsAdder 😔
+    }
+    
     // TODO: Add support for:
     //  - "full" emissivity
     //  - tint
     //  - different frame rates for layers of the same armor
-    override fun merge(source: Path, destination: Path, relPath: Path) {
+    override fun merge(source: Path, destination: Path, baseDir: Path, relPath: Path) {
+        val texRes = findTextureResolution(baseDir) ?: 16
+        val textureWidth = texRes * 4
+        val textureHeight = texRes * 2
+        
         val image = source.readImage()
         
         val width = image.width
         val height = image.height
         
         // check dimensions
-        if (width % TEXTURE_WIDTH != 0 || height % TEXTURE_HEIGHT != 0) {
-            LOGGER.warning("$source has invalid dimensions. Expected $TEXTURE_WIDTH x $TEXTURE_HEIGHT or multiples of those, got $width x $height.")
+        if (width % textureWidth != 0 || height % textureHeight != 0) {
+            LOGGER.warning("$source has invalid dimensions. Expected $textureWidth x $textureHeight or multiples of those, got $width x $height.")
             return
         }
         
@@ -53,31 +68,31 @@ internal class FancyPantsArmorFileMerger(basePacks: BasePacks) : FileMerger(base
         val layer = determineLayer(relPath)
         
         // the amount of armor sections, might also be emissivity maps
-        val armorSections = width / TEXTURE_WIDTH
+        val armorSections = width / textureWidth
         
         var frameAmount = 0
         var currentArmor: ArmorData? = null
         
         // loop over all armor sections
         for (armorSection in 0 until armorSections) {
-            val sectionImage = image.getSubimage(armorSection * TEXTURE_WIDTH, 0, TEXTURE_WIDTH, height)
+            val sectionImage = image.getSubimage(armorSection * textureWidth, 0, textureWidth, height)
             
             if (currentArmor == null) { // new armor
                 var fps = 0.0
                 var interpolationMode: InterpolationMode = InterpolationMode.NONE
                 var frames: List<BufferedImage>
-                val color = image.getRGB(armorSection * TEXTURE_WIDTH, 0) and 0xFFFFFF
-                val animationMarker = image.getRGB(armorSection * TEXTURE_WIDTH + 1, 0) // rgb(frameAmount, speed, interpolate)
-                val extraProperties = image.getRGB(armorSection * TEXTURE_WIDTH + 2, 0).asColor() // rgb(emissivity, tint, N/A)
+                val color = image.getRGB(armorSection * textureWidth, 0) and 0xFFFFFF
+                val animationMarker = image.getRGB(armorSection * textureWidth + 1, 0) // rgb(frameAmount, speed, interpolate)
+                val extraProperties = image.getRGB(armorSection * textureWidth + 2, 0).asColor() // rgb(emissivity, tint, N/A)
                 
                 if (animationMarker != 0) {
                     val animationMarkerColor = animationMarker.asColor()
                     frameAmount = animationMarkerColor.red
-                    frames = extractFrames(sectionImage, frameAmount)
+                    frames = extractFrames(textureWidth, textureHeight, sectionImage, frameAmount)
                     fps = animationMarkerColor.green / 24.0
                     interpolationMode = if (animationMarkerColor.blue > 0) InterpolationMode.LINEAR else InterpolationMode.NONE
                 } else {
-                    frames = extractFrames(sectionImage, 1)
+                    frames = extractFrames(textureWidth, textureHeight, sectionImage, 1)
                     frameAmount = 1
                 }
                 
@@ -86,7 +101,7 @@ internal class FancyPantsArmorFileMerger(basePacks: BasePacks) : FileMerger(base
                 if (extraProperties.red == 1)
                     currentArmor = armor
             } else { // emissivity map for armor
-                val frames = extractFrames(sectionImage, frameAmount)
+                val frames = extractFrames(textureWidth, textureHeight, sectionImage, frameAmount)
                 currentArmor.emissivityMapsLayers[layer] = frames
                 currentArmor = null
             }
@@ -101,9 +116,9 @@ internal class FancyPantsArmorFileMerger(basePacks: BasePacks) : FileMerger(base
             else -> throw IllegalArgumentException("Invalid path $path")
         }
     
-    private fun extractFrames(image: BufferedImage, amount: Int): List<BufferedImage> {
+    private fun extractFrames(textureWidth: Int, textureHeight: Int, image: BufferedImage, amount: Int): List<BufferedImage> {
         val frames = ArrayList<BufferedImage>()
-        repeat(amount) { frames += image.getSubimage(0, it * TEXTURE_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT) }
+        repeat(amount) { frames += image.getSubimage(0, it * textureHeight, textureWidth, textureHeight) }
         return frames
     }
     

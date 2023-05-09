@@ -89,7 +89,7 @@ internal class BasePacks(private val builder: ResourcePackBuilder) {
                 val fileMerger = mergers.firstOrNull { it.acceptsFile(relPath) }
                 if (fileMerger != null) {
                     try {
-                        fileMerger.merge(file, packFile, relPath)
+                        fileMerger.merge(file, packFile, packDir, relPath)
                     } catch (t: Throwable) {
                         LOGGER.log(Level.SEVERE, "An exception occurred trying to merge base pack file \"$file\" with \"$packFile\"", t)
                     }

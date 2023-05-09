@@ -7,7 +7,7 @@ internal abstract class FileMerger(protected val basePacks: BasePacks) {
     
     abstract fun acceptsFile(relPath: Path): Boolean
     
-    open fun merge(source: Path, destination: Path, relPath: Path) = merge(source, destination)
+    open fun merge(source: Path, destination: Path, baseDir: Path, relPath: Path) = merge(source, destination)
     open fun merge(source: Path, destination: Path) = Unit
     
     companion object {
