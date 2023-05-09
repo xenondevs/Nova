@@ -31,11 +31,12 @@ internal object EventPreventionPatch : MethodTransformer(SimplePluginManager::ca
         })
     }
     
+    @Suppress("UNNECESSARY_SAFE_CALL") // some plugins might set the player to null
     @JvmStatic
     fun shouldPreventEvent(event: Event): Boolean {
         // prevent all events of fake players
         if (event is PlayerEvent) {
-            val player = event.player.serverPlayer
+            val player = event.player?.serverPlayer
             return player is FakePlayer && !player.hasEvents
         }
         
