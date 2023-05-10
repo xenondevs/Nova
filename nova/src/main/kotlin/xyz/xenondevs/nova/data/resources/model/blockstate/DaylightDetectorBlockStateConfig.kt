@@ -31,7 +31,7 @@ internal class DaylightDetectorBlockStateConfig(
         override val blockedIds = setOf(0x00, 0x10) // states with power=0
         
         fun getIdOf(power: Int, inverted: Boolean): Int {
-            return power and (inverted.intValue shl 4)
+            return power or (inverted.intValue shl 4)
         }
         
         override fun of(id: Int): DaylightDetectorBlockStateConfig {
