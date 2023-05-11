@@ -68,8 +68,8 @@ class NamespacedId(@JvmField val namespace: String, @JvmField val name: String) 
         
         val CODEC: Codec<NamespacedId> = Codec.STRING.comapFlatMap(::ofSafe, NamespacedId::toString).stable()
         
-        val PART_PATTERN = Regex("""^[a-z][a-z\d_]*$""")
-        val COMPLETE_PATTERN = Regex("""^[a-z][a-z\d_]*:[a-z][a-z\d_]*$""")
+        val PART_PATTERN = Regex("""^[a-z][a-z\d_-]*$""")
+        val COMPLETE_PATTERN = Regex("""^[a-z][a-z\d_-]*:[a-z][a-z\d_-]*$""")
         
         fun of(id: String, fallbackNamespace: String? = null): NamespacedId {
             val namespace: String
