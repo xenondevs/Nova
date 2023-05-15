@@ -46,9 +46,9 @@ class RecipeType<T : Any> internal constructor(
     
     companion object {
         
-        fun <T : Any> of(recipe: T): RecipeType<out T> {
+        fun <T : Any> of(recipe: T): RecipeType<out T>? {
             val clazz = recipe::class
-            return NovaRegistries.RECIPE_TYPE.first { clazz == it.recipeClass || clazz.superclasses.contains(it.recipeClass) } as RecipeType<out T>
+            return NovaRegistries.RECIPE_TYPE.firstOrNull { clazz == it.recipeClass || clazz.superclasses.contains(it.recipeClass) } as RecipeType<out T>?
         }
         
     }
