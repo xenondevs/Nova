@@ -70,6 +70,9 @@ private val CORE_RESOURCE_FILTERS = configReloadable {
             this += ResourceFilter(Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/bossbar/*")
             this += ResourceFilter(Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/bars/*")
         }
+        if (!DEFAULT_CONFIG.getBoolean("debug.hide_empty_tooltip")) {
+            this += ResourceFilter(Stage.ASSET_PACK, Type.BLACKLIST, "minecraft/shaders/core/position_color*")
+        }
     }
 }
 

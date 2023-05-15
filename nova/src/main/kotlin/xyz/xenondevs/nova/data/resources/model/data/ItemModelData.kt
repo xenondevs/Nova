@@ -10,6 +10,7 @@ import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.builder.setLore
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.logic.ItemLogic
 import xyz.xenondevs.nova.item.logic.PacketItems
@@ -83,12 +84,14 @@ open class ItemModelData(val id: ResourceLocation, val material: Material, val d
             clientStack.tag?.remove("nova") // prevents the item stack from being recognized as a nova item by PacketItems
         }
         
-        /// remove tooltip if there is no name or lore
-        val clientsideName = clientStack.adventureName
-        val clientsideLore = clientStack.adventureLore
-        if (clientsideName.toPlainText().isEmpty() && clientsideLore.isEmpty()) {
-            clientStack.adventureName = REMOVE_TOOLTIP_NAME
-            clientStack.adventureLore = REMOVE_TOOLTIP_LORE
+        if (DEFAULT_CONFIG.getBoolean("debug.hide_empty_tooltip")) {
+            // remove tooltip if there is no name or lore
+            val clientsideName = clientStack.adventureName
+            val clientsideLore = clientStack.adventureLore
+            if (clientsideName.toPlainText().isEmpty() && clientsideLore.isEmpty()) {
+                clientStack.adventureName = REMOVE_TOOLTIP_NAME
+                clientStack.adventureLore = REMOVE_TOOLTIP_LORE
+            }
         }
         
         return ItemWrapper(clientStack.bukkitMirror)
