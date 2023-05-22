@@ -50,7 +50,6 @@ import xyz.xenondevs.nova.util.data.getResourceData
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_PARENT_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.reflection.defineClass
-import java.io.File
 import java.lang.System.getProperty
 import java.lang.instrument.ClassDefinition
 import java.lang.management.ManagementFactory
@@ -115,7 +114,6 @@ internal object Patcher {
                 val clazz = ClassWrapper("$name.class", bytes)
                 adapter.adapt(clazz)
                 bytes = clazz.assemble()
-                File(clazz.className + ".class").writeBytes(bytes)
             }
             
             minecraftServerClass.classLoader.defineClass(name.replace('/', '.'), bytes, minecraftServerClass.protectionDomain)
