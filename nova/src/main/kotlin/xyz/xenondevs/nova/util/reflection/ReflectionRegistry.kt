@@ -196,5 +196,6 @@ internal object ReflectionRegistry {
     val THREADING_DETECTOR_LOCK_FIELD = getField(ThreadingDetector::class, true, "SRF(net.minecraft.util.ThreadingDetector lock)")
     val ITEM_STACK_ITEM_META_FIELD = getField(BukkitStack::class, true, "meta")
     val CRAFT_ITEM_STACK_HANDLE_FIELD = getField(CraftItemStack::class, true, "handle")
+    val ITEM_STACK_ITEM_FIELD = getField(MojangStack::class, true, "SRF(net.minecraft.world.item.ItemStack item)")
     
 }

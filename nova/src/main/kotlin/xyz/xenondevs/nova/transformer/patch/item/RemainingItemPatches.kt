@@ -24,6 +24,7 @@ import xyz.xenondevs.bytebase.util.replaceEveryRange
 import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ABSTRACT_FURNACE_BLOCK_ENTITY_ITEMS_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ITEM_STACK_CONSTRUCTOR
@@ -163,7 +164,9 @@ internal object RemainingItemPatches : MultiTransformer(
         if (novaItem != null)
             return novaItem.craftingRemainingItem?.get()?.nmsCopy ?: MojangStack.EMPTY
         
-        return MojangStack(itemStack.item.craftingRemainingItem)
+        // retrieve item directly from field as count = 0 causes getItem to return air
+        val item = ReflectionRegistry.ITEM_STACK_ITEM_FIELD.get(itemStack) as Item?
+        return MojangStack(item?.craftingRemainingItem)
     }
     
     @JvmStatic
