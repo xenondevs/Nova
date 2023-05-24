@@ -357,7 +357,8 @@ fun <T> Registry<T>.getOrCreateHolder(id: ResourceLocation): Holder<T> {
 }
 
 operator fun Registry<*>.contains(key: String): Boolean {
-    return containsKey(ResourceLocation.of(key, ':'))
+    val id = ResourceLocation.tryParse(key) ?: return false
+    return containsKey(id)
 }
 
 internal operator fun <T> WritableRegistry<T>.set(name: String, value: T) {
