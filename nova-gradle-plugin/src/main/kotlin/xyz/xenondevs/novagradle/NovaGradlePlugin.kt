@@ -28,7 +28,6 @@ class NovaGradlePlugin : Plugin<Project> {
             authors.set(addonExt.authors)
             depend.set(addonExt.depend)
             softdepend.set(addonExt.softdepend)
-            spigotResourceId.set(addonExt.spigotResourceId)
             jarTask.set(addonExt.jarTask.orElse(project.tasks.getByName<Jar>("jar")))
             
             dependsOn(jarTask)

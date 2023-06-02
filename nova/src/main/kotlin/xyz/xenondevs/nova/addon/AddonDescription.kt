@@ -15,7 +15,6 @@ data class AddonDescription internal constructor(
     val authors: List<String>,
     val depend: Set<String>,
     val softdepend: Set<String>,
-    val spigotResourceId: Int,
     val repositories: List<String>,
     val libraries: List<Dependency>
 ) {
@@ -54,7 +53,6 @@ data class AddonDescription internal constructor(
                 authors,
                 cfg.getStringList("depend").toHashSet(),
                 cfg.getStringList("softdepend").toHashSet(),
-                cfg.getInt("spigotResourceId", -1),
                 cfg.getStringList("repositories"),
                 NovaLibraryLoader.readRequestedLibraries(cfg)
             )
