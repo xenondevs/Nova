@@ -30,6 +30,7 @@ import org.bukkit.block.BlockState
 import org.bukkit.block.PistonMoveReaction
 import org.bukkit.block.Sign
 import org.bukkit.block.data.BlockData
+import org.bukkit.block.sign.Side
 import org.bukkit.conversations.Conversation
 import org.bukkit.conversations.ConversationAbandonedEvent
 import org.bukkit.entity.Entity
@@ -76,7 +77,7 @@ import java.util.*
  * when methods which aren't supported by [OfflinePlayer] are called.
  *
  * This [Player] is also granted access to the [hasPermission]
- * method via Vault.
+ * method via permission integrations.
  */
 class FakeOnlinePlayer(
     private val offlinePlayer: OfflinePlayer,
@@ -670,6 +671,10 @@ class FakeOnlinePlayer(
     }
     
     override fun openSign(sign: Sign) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun openSign(sign: Sign, side: Side) {
         throw UnsupportedOperationException("Player is not online")
     }
     
