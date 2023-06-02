@@ -53,6 +53,7 @@ jobs:
           args: ./artifacts/*.jar
 
       - name: Deploy Mojang-Mapped
+        if: github.event_name == 'release'
         uses: gradle/gradle-build-action@v2
         with:
           arguments: | 
