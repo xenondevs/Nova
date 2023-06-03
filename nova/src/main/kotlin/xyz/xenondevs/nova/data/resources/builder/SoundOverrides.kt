@@ -13,6 +13,8 @@ import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.data.resources.builder.content.PackContent
+import xyz.xenondevs.nova.data.resources.builder.content.PackContentType
 import xyz.xenondevs.nova.util.item.soundGroup
 import java.nio.file.Path
 import java.util.logging.Level
@@ -22,7 +24,11 @@ import kotlin.io.path.exists
  * Removes the break, hit, step and fall sounds for blocks used by Nova to display custom blocks (note block, mushroom blocks,
  * specified armor stand hitbox blocks) and all armor equip sounds and copies them to the Nova namespace, so that they can be completely controlled by the server.
  */
-internal class SoundOverrides {
+class SoundOverrides private constructor() : PackContent {
+    
+    companion object : PackContentType<SoundOverrides> {
+        override fun create(builder: ResourcePackBuilder) = SoundOverrides()
+    }
     
     private val soundGroups = HashSet<SoundGroup>()
     private val soundEvents = ArrayList<String>()
@@ -59,7 +65,7 @@ internal class SoundOverrides {
         soundEvents += event.location.path
     }
     
-    fun write() {
+    override fun write() {
         try {
             // an index of all vanilla sounds
             val vanillaIndex = createSoundsIndex(

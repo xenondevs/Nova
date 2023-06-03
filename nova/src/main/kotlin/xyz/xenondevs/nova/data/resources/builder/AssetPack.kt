@@ -1,4 +1,4 @@
-@file:Suppress("MemberVisibilityCanBePrivate", "unused", "CanBeParameter")
+@file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
 package xyz.xenondevs.nova.data.resources.builder
 
@@ -24,7 +24,7 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.outputStream
 import kotlin.io.path.relativeTo
 
-internal class AssetPack(val namespace: String, val assetsDir: Path) {
+class AssetPack(val namespace: String, val assetsDir: Path) {
     
     val modelsDir: Path? = assetsDir.resolve("models/").takeIf(Path::exists)
     val texturesDir: Path? = assetsDir.resolve("textures/").takeIf(Path::exists)
@@ -35,26 +35,26 @@ internal class AssetPack(val namespace: String, val assetsDir: Path) {
     val wailaTexturesDir: Path? = assetsDir.resolve("textures/waila/").takeIf(Path::exists)
     val atlasesDir: Path? = assetsDir.resolve("atlases/").takeIf(Path::exists)
     
-    val materialsIndex: List<RegisteredMaterial>? = assetsDir.resolve("materials.json")
+    internal val materialsIndex: List<RegisteredMaterial>? = assetsDir.resolve("materials.json")
         .takeIf(Path::exists)
         ?.let { MaterialsIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
-    val guisIndex: Map<String, ResourcePath>? = assetsDir.resolve("guis.json")
+    internal val guisIndex: Map<String, ResourcePath>? = assetsDir.resolve("guis.json")
         .takeIf(Path::exists)
         ?.let { GuisIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
-    val armorIndex: List<RegisteredArmor>? = assetsDir.resolve("armor.json")
+    internal val armorIndex: List<RegisteredArmor>? = assetsDir.resolve("armor.json")
         .takeIf(Path::exists)
         ?.let { ArmorIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
-    val movedFontsIndex: Map<ResourcePath, Set<Int>>? = assetsDir.resolve("moved_fonts.json")
+    internal val movedFontsIndex: Map<ResourcePath, Set<Int>>? = assetsDir.resolve("moved_fonts.json")
         .takeIf(Path::exists)
         ?.let { MovedFontsIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
     fun getInputStream(path: String): InputStream? =
         assetsDir.resolve(path).takeIf(Path::exists)?.inputStream()
     
-    fun extract(namespaceDir: Path, fileFilter: (String) -> Boolean) {
+    internal fun extract(namespaceDir: Path, fileFilter: (String) -> Boolean) {
         fun extractDir(sourceDir: Path, dirName: String) {
             sourceDir.copyToRecursively(
                 target = namespaceDir.resolve("$dirName/"),

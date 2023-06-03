@@ -3,7 +3,10 @@ package xyz.xenondevs.nova.data.resources.builder.content.font
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
+import xyz.xenondevs.nova.data.resources.builder.CharSizeCalculator
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.builder.content.BuildingStage
+import xyz.xenondevs.nova.data.resources.builder.content.PackContentType
 import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.extension
@@ -14,15 +17,20 @@ import kotlin.io.path.walk
 private const val HEIGHT = 16
 private const val ASCENT = 12
 
-internal class TextureIconContent(
+class TextureIconContent private constructor(
     builder: ResourcePackBuilder
 ) : FontContent(
     "nova:texture_icons_%s",
-    Resources::updateTextureIconLookup,
-    builder.movedFonts
+    Resources::updateTextureIconLookup
 ) {
     
-    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    companion object : PackContentType<TextureIconContent> {
+        override val stage = BuildingStage.PRE_WORLD // writes to Resources
+        override val runBefore = setOf(CharSizeCalculator)
+        override fun create(builder: ResourcePackBuilder) = TextureIconContent(builder)
+    }
+    
+    override val movedFontContent by lazy { builder.getContent(MovedFontContent) }
     
     override fun write() {
         val texturesDir = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/textures/")

@@ -16,11 +16,13 @@ import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.walk
 import kotlin.io.path.writeText
 
-internal class LanguageContent : PackContent {
+class LanguageContent private constructor() : PackContent {
     
-    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    companion object : PackContentType<LanguageContent> {
+        override fun create(builder: ResourcePackBuilder) = LanguageContent()
+    }
     
-    private val languageLookup = HashMap<String, HashMap<String, String>>()
+    val languageLookup = HashMap<String, HashMap<String, String>>()
     
     override fun init() {
         try {

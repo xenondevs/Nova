@@ -6,7 +6,9 @@ import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.builder.content.BuildingStage
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
+import xyz.xenondevs.nova.data.resources.builder.content.PackContentType
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor.InterpolationMode
 import xyz.xenondevs.nova.util.data.readImage
@@ -34,11 +36,14 @@ internal class ArmorData(
     val fps: Double
 )
 
-internal class ArmorContent(
+class ArmorContent private constructor(
     private val builder: ResourcePackBuilder
 ) : PackContent {
     
-    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    companion object : PackContentType<ArmorContent> {
+        override val stage = BuildingStage.PRE_WORLD // writes to Resources
+        override fun create(builder: ResourcePackBuilder) = ArmorContent(builder)
+    }
     
     private val armor = ArrayList<ArmorData>()
     private var color = -1

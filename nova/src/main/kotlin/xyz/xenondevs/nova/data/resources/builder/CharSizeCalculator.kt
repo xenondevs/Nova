@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.CharSizeTable
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.data.resources.builder.content.PackAnalyzer
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.encodeWithBase64
 import xyz.xenondevs.nova.util.data.readImage
@@ -34,13 +35,25 @@ private const val FONT_HASHES_STORAGE_KEY = "fontHashes0.13"
 private val FONT_NAME_REGEX = Regex("""^([a-z0-9._-]+)/font/([a-z0-9/._-]+)$""")
 private val FORCE_UNICODE_FONT by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.font.force_unicode_font") }
 
-internal class CharSizeCalculator {
+class CharSizeCalculator private constructor() {
+    
+    companion object : PackAnalyzer {
+        
+        override fun analyze(builder: ResourcePackBuilder) {
+            LOGGER.info("Calculating char sizes")
+            CharSizeCalculator().calculateCharSizes()
+        }
+        
+        internal fun invalidateFontHashesStorage() {
+            PermanentStorage.remove(FONT_HASHES_STORAGE_KEY)
+        }
+        
+    }
     
     private val fontHashes: HashMap<String, String> = PermanentStorage.retrieve(FONT_HASHES_STORAGE_KEY, ::HashMap)
-    
     private val bitmaps = HashMap<ResourcePath, BufferedImage>()
     
-    fun calculateCharSizes() {
+    internal fun calculateCharSizes() {
         val fontDirs = ArrayList<Path>()
         fontDirs += ResourcePackBuilder.ASSETS_DIR.listDirectoryEntries()
             .mapNotNull { it.resolve("font/").takeIf(Path::exists) }
@@ -261,14 +274,6 @@ internal class CharSizeCalculator {
         }
         
         return file
-    }
-    
-    companion object {
-        
-        internal fun invalidateFontHashesStorage() {
-            PermanentStorage.remove(FONT_HASHES_STORAGE_KEY)
-        }
-        
     }
     
 }

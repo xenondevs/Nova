@@ -16,16 +16,17 @@ import kotlin.io.path.writeText
 
 private const val START_CHAR = '\uF000'
 
-internal abstract class FontContent(
+abstract class FontContent(
     private val fontTemplate: String,
     private val updateResources: ((Map<String, FontChar>) -> Unit)? = null,
-    private val movedFontContent: MovedFontContent? = null
 ) : PackContent {
     
     private var currentChar = START_CHAR
     private var fontId = 0
     
     private val chars = HashMap<String, BitmapFontChar>()
+    
+    protected abstract val movedFontContent: MovedFontContent?
     
     fun addFontEntry(id: String, image: ResourcePath, height: Int?, ascent: Int) {
         chars[id] = BitmapFontChar(

@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.FileMerger
 import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorData
+import xyz.xenondevs.nova.data.resources.builder.content.font.MovedFontContent
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.util.StringUtils
 import xyz.xenondevs.nova.util.data.openZip
@@ -113,7 +114,7 @@ internal class BasePacks(private val builder: ResourcePackBuilder) {
                             .substringBeforeLast('.')
                             .split('/')
                         
-                        builder.movedFonts.requestMovedFonts(
+                        builder.getContent(MovedFontContent).requestMovedFonts(
                             ResourcePath(fontNameParts[0], fontNameParts.drop(2).joinToString("/")),
                             1..19
                         )

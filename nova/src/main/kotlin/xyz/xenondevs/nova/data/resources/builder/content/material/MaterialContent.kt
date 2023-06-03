@@ -13,8 +13,11 @@ import xyz.xenondevs.nova.data.resources.ModelData
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.builder.SoundOverrides
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.ModelFileMerger
+import xyz.xenondevs.nova.data.resources.builder.content.BuildingStage
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
+import xyz.xenondevs.nova.data.resources.builder.content.PackContentType
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockDirection
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockModelType
 import xyz.xenondevs.nova.data.resources.builder.content.material.info.ModelInformation
@@ -37,11 +40,17 @@ import kotlin.io.path.writeText
 
 private val USE_SOLID_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks") }
 
-internal class MaterialContent(
+class MaterialContent private constructor(
     private val builder: ResourcePackBuilder
 ) : PackContent {
     
-    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    companion object : PackContentType<MaterialContent> {
+        override val stage = BuildingStage.PRE_WORLD // writes to Resources
+        override val runBefore = setOf(SoundOverrides)
+        override fun create(builder: ResourcePackBuilder) = MaterialContent(builder)
+    }
+    
+    private val soundOverrides by lazy { builder.getContent(SoundOverrides) }
     
     private val novaMaterials = HashMap<ResourceLocation, RegisteredMaterial>()
     
@@ -126,7 +135,7 @@ internal class MaterialContent(
                     blockModelData = DisplayEntityBlockModelData(id, info.hitboxType, dataArray)
                     
                     // note hitbox type as used material for sound overrides
-                    builder.soundOverrides.useMaterial(info.hitboxType)
+                    soundOverrides.useMaterial(info.hitboxType)
                 } else {
                     val configs = HashMap<BlockFace, ArrayList<BlockStateConfig>>()
                     info.models.forEach { model ->
@@ -140,7 +149,7 @@ internal class MaterialContent(
                             faceList += blockConfig
                             
                             // note block type as used material for sound overrides
-                            builder.soundOverrides.useMaterial(blockConfig.type.material)
+                            soundOverrides.useMaterial(blockConfig.type.material)
                         }
                     }
                     

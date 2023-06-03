@@ -13,9 +13,11 @@ import kotlin.io.path.exists
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.walk
 
-internal class AtlasContent : PackContent {
+class AtlasContent private constructor() : PackContent {
     
-    override val stage = ResourcePackBuilder.BuildingStage.PRE_WORLD
+    companion object : PackContentType<AtlasContent> {
+        override fun create(builder: ResourcePackBuilder) = AtlasContent()
+    }
     
     private val sources = HashMap<String, JsonArray>()
     

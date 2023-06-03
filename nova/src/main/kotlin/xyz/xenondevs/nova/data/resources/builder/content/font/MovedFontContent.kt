@@ -9,9 +9,10 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.BitmapFontGenerator
+import xyz.xenondevs.nova.data.resources.builder.CharSizeCalculator
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder.BuildingStage
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
+import xyz.xenondevs.nova.data.resources.builder.content.PackContentType
 import kotlin.io.path.createDirectories
 
 private val DEFAULT_FONT = ResourcePath("minecraft", "default")
@@ -25,9 +26,13 @@ private val MOVED_FONT_BLACKLIST: Set<ResourcePath> by configReloadable {
         .mapTo(HashSet(), ResourcePath::of)
 }
 
-internal class MovedFontContent : PackContent {
+class MovedFontContent private constructor() : PackContent {
     
-    override val stage = BuildingStage.POST_WORLD
+    companion object : PackContentType<MovedFontContent> {
+        override val runBefore = setOf(CharSizeCalculator)
+        override fun create(builder: ResourcePackBuilder) = MovedFontContent()
+    }
+    
     private val movingRequests = HashMap<ResourcePath, HashSet<Int>>()
     
     fun requestMovedFonts(font: ResourcePath, range: IntRange) {

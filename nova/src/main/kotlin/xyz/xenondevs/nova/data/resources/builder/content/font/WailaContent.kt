@@ -8,7 +8,10 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
+import xyz.xenondevs.nova.data.resources.builder.CharSizeCalculator
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.builder.content.BuildingStage
+import xyz.xenondevs.nova.data.resources.builder.content.PackContentType
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.renderer.MinecraftModelRenderer
 import java.util.logging.Level
@@ -194,15 +197,20 @@ private const val ASCENT = -4
 
 private val WAILA_ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("waila.enabled") }
 
-internal class WailaContent(
+class WailaContent private constructor(
     builder: ResourcePackBuilder
 ) : FontContent(
     "nova:waila_textures_%s",
-    Resources::updateWailaDataLookup,
-    builder.movedFonts
+    Resources::updateWailaDataLookup
 ) {
     
-    override val stage = ResourcePackBuilder.BuildingStage.POST_WORLD
+    companion object : PackContentType<WailaContent> {
+        override val stage = BuildingStage.POST_WORLD // requires CustomItemServices for rendering
+        override val runBefore = setOf(CharSizeCalculator)
+        override fun create(builder: ResourcePackBuilder) = WailaContent(builder)
+    }
+    
+    override val movedFontContent by lazy { builder.getContent(MovedFontContent) }
     
     override fun init() {
         if (WAILA_ENABLED) {

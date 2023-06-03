@@ -17,14 +17,17 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Stage
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.content.AtlasContent
+import xyz.xenondevs.nova.data.resources.builder.content.BuildingStage
 import xyz.xenondevs.nova.data.resources.builder.content.LanguageContent
+import xyz.xenondevs.nova.data.resources.builder.content.PackAnalyzer
 import xyz.xenondevs.nova.data.resources.builder.content.PackContent
+import xyz.xenondevs.nova.data.resources.builder.content.PackContentType
+import xyz.xenondevs.nova.data.resources.builder.content.PackTask
 import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorContent
 import xyz.xenondevs.nova.data.resources.builder.content.font.GuiContent
 import xyz.xenondevs.nova.data.resources.builder.content.font.MovedFontContent
@@ -84,7 +87,7 @@ private val IN_MEMORY_PROVIDER = configReloadable { DEFAULT_CONFIG.getBoolean("r
 private val IN_MEMORY by IN_MEMORY_PROVIDER
 
 @Suppress("MemberVisibilityCanBePrivate")
-internal class ResourcePackBuilder {
+class ResourcePackBuilder internal constructor() {
     
     companion object {
         
@@ -122,14 +125,30 @@ internal class ResourcePackBuilder {
             .flatten()
             .map { filters -> filters.groupBy { filter -> filter.stage } }
         
+        /**
+         * A set of all [PackContentTypes][PackContentType] that should be used to build the resource pack.
+         */
+        private val packTasks: MutableSet<PackTask> = mutableSetOf(
+            MaterialContent, ArmorContent, GuiContent, LanguageContent, TextureIconContent, AtlasContent,
+            WailaContent, MovedFontContent, CharSizeCalculator, SoundOverrides
+        )
+        
+        /**
+         * Adds the specified [tasks] to a set of pack tasks which are run during resource pack creation.
+          */        
+        fun addPackTasks(vararg tasks: PackTask) {
+            packTasks += tasks
+        }
+        
     }
     
-    val soundOverrides = SoundOverrides()
-    val movedFonts = MovedFontContent()
-    val basePacks = BasePacks(this)
+    internal val basePacks = BasePacks(this)
     
     private lateinit var assetPacks: List<AssetPack>
-    private lateinit var contents: List<PackContent>
+    
+    private lateinit var tasksByStage: Map<BuildingStage, List<PackTask>>
+    private lateinit var contentsByStage: Map<BuildingStage, List<PackContent>>
+    private lateinit var contentsByType: Map<PackContentType<*>, PackContent>
     
     init {
         // delete legacy resource pack files
@@ -177,28 +196,20 @@ internal class ResourcePackBuilder {
                 }
             }
             
+            // sort and instantiate pack users
+            tasksByStage = PackTask.sortGrouped(packTasks)
+            contentsByType = packTasks.filterIsInstance<PackContentType<*>>().associateWith { it.create(this) }
+            contentsByStage = tasksByStage.mapValues { (_, users) -> users.filterIsInstance<PackContentType<*>>().map { contentsByType[it]!! } }
+            LOGGER.info("Tasks (pre-world): " + tasksByStage[BuildingStage.PRE_WORLD]?.joinToString { it.javaClass.enclosingClass.simpleName })
+            LOGGER.info("Tasks (post-world): " + tasksByStage[BuildingStage.POST_WORLD]?.joinToString { it.javaClass.enclosingClass.simpleName })
+            
             // load base- and asset packs
             basePacks.include()
             assetPacks = loadAssetPacks()
             LOGGER.info("Asset packs (${assetPacks.size}): ${assetPacks.joinToString(transform = AssetPack::namespace)}")
             
-            // init content
-            contents = listOf(
-                // pre-world
-                MaterialContent(this),
-                ArmorContent(this),
-                GuiContent(),
-                LanguageContent(),
-                TextureIconContent(this),
-                AtlasContent(),
-                
-                // post-world
-                WailaContent(this),
-                movedFonts
-            )
-            
             // init pre-world content
-            val preWorldContents = contents.filter { it.stage == BuildingStage.PRE_WORLD }
+            val preWorldContents = contentsByStage[BuildingStage.PRE_WORLD]!!
             preWorldContents.forEach(PackContent::init)
             
             // extract resources
@@ -209,9 +220,7 @@ internal class ResourcePackBuilder {
             // write pre-world content
             LOGGER.info("Writing pre-world content")
             assetPacks.forEach { pack -> preWorldContents.forEach { it.includePack(pack) } }
-            preWorldContents.forEach(PackContent::write)
-            
-            writeMetadata(assetPacks.size, basePacks.packAmount)
+            tasksByStage[BuildingStage.PRE_WORLD]!!.writeAll()
         } catch (t: Throwable) {
             // Only delete build dir in case of exception as building is continued in buildPostWorld()
             deleteBuildDir()
@@ -223,19 +232,10 @@ internal class ResourcePackBuilder {
         try {
             // write post-world content
             LOGGER.info("Writing post-world content")
-            val postWorldContents = contents.filter { it.stage == BuildingStage.POST_WORLD }
+            val postWorldContents = contentsByStage[BuildingStage.POST_WORLD]!!
             postWorldContents.forEach(PackContent::init)
             assetPacks.forEach { pack -> postWorldContents.forEach { it.includePack(pack) } }
-            postWorldContents.forEach(PackContent::write)
-            
-            // write sound overrides
-            LOGGER.info("Writing sound overrides")
-            soundOverrides.write()
-            
-            // calculate char sizes
-            LOGGER.info("Calculating char sizes")
-            CharSizeCalculator().calculateCharSizes()
-            CharSizes.invalidateCache()
+            tasksByStage[BuildingStage.POST_WORLD]!!.writeAll()
             
             // write metadata
             writeMetadata(assetPacks.size, basePacks.packAmount)
@@ -251,6 +251,15 @@ internal class ResourcePackBuilder {
             deleteBuildDir()
             // re-throw t
             throw t
+        }
+    }
+    
+    private fun List<PackTask>.writeAll() {
+        for (user in this) {
+            when (user) {
+                is PackContentType<*> -> contentsByType[user]!!.write()
+                is PackAnalyzer -> user.analyze(this@ResourcePackBuilder)
+            }
         }
     }
     
@@ -308,7 +317,7 @@ internal class ResourcePackBuilder {
         pack.extract(
             ASSETS_DIR.resolve(namespace)
         ) { relPath ->
-            contents.none { it.excludesPath(ResourcePath(namespace, relPath)) }
+            contentsByType.values.none { it.excludesPath(ResourcePath(namespace, relPath)) }
                 && RESOURCE_FILTERS[Stage.ASSET_PACK]?.all { filter -> filter.allows("$namespace/$relPath") } ?: true
         }
     }
@@ -340,9 +349,8 @@ internal class ResourcePackBuilder {
         }.packZip(COMPRESSION_LEVEL)
     }
     
-    enum class BuildingStage {
-        PRE_WORLD,
-        POST_WORLD
-    }
+    @Suppress("UNCHECKED_CAST")
+    fun <T : PackContent> getContent(type: PackContentType<T>): T =
+        contentsByType[type] as T
     
 }
