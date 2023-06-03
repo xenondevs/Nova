@@ -134,10 +134,11 @@ private class ComponentCharsIterator(
     
                 // try to continue reading the new top component (for translatable components)
                 if (!readHeads.isEmpty) {
-                    val readHead = readHeads.popInt()
-                    val content = contentStrings.top()
+                    readHead = readHeads.popInt()
+                    content = contentStrings.top()
                     if (readHead < content.length) {
-                        setComponent(components.top(), styles.top(), content, readHead)
+                        this.component = components.top()
+                        this.style = styles.top()
                         break
                     }
                 }
@@ -183,18 +184,14 @@ private class ComponentCharsIterator(
         contentStrings.push(content)
         
         // set current variables
-        setComponent(component, style, content, 0)
+        this.component = component
+        this.style = style
+        this.content = content
+        this.readHead = 0
         
         // if the new component is empty, skip it
         if (content.isEmpty())
             nextComponent()
-    }
-    
-    private fun setComponent(component: Component, style: Style, content: String, readHead: Int) {
-        this.component = component
-        this.style = style
-        this.content = content
-        this.readHead = readHead
     }
     
 }

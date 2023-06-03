@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.ibm.icu.impl.CurrencyData.provider
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import xyz.xenondevs.commons.gson.addAll

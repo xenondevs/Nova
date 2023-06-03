@@ -83,12 +83,33 @@ object VanillaToolCategories {
             Material.GOLDEN_SWORD to 1.5
         ),
         specialMultipliers = mapOf(
-            Material.WOODEN_SWORD to mapOf(Material.COBWEB to 15.0),
-            Material.STONE_SWORD to mapOf(Material.COBWEB to 15.0),
-            Material.IRON_SWORD to mapOf(Material.COBWEB to 15.0),
-            Material.DIAMOND_SWORD to mapOf(Material.COBWEB to 15.0),
-            Material.NETHERITE_SWORD to mapOf(Material.COBWEB to 15.0),
-            Material.GOLDEN_SWORD to mapOf(Material.COBWEB to 15.0)
+            // Cobwebs can be broken faster with swords with a speed multiplier of 15.
+            // BambooSaplingBlock and BambooStalkBlock both always return 1.0 als the destroy progress if the tool is a sword.
+            // Since that is not possible here, we just set the multiplier to a very high value.
+            Material.WOODEN_SWORD to mapOf(
+                Predicate<Material> { it == Material.COBWEB } to 15.0,
+                Predicate<Material> { it == Material.BAMBOO || it == Material.BAMBOO_SAPLING } to 999999999.0
+            ),
+            Material.STONE_SWORD to mapOf(
+                Predicate<Material> { it == Material.COBWEB } to 15.0,
+                Predicate<Material> { it == Material.BAMBOO || it == Material.BAMBOO_SAPLING } to 999999999.0
+            ),
+            Material.IRON_SWORD to mapOf(
+                Predicate<Material> { it == Material.COBWEB } to 15.0,
+                Predicate<Material> { it == Material.BAMBOO || it == Material.BAMBOO_SAPLING } to 999999999.0
+            ),
+            Material.DIAMOND_SWORD to mapOf(
+                Predicate<Material> { it == Material.COBWEB } to 15.0,
+                Predicate<Material> { it == Material.BAMBOO || it == Material.BAMBOO_SAPLING } to 999999999.0
+            ),
+            Material.NETHERITE_SWORD to mapOf(
+                Predicate<Material> { it == Material.COBWEB } to 15.0,
+                Predicate<Material> { it == Material.BAMBOO || it == Material.BAMBOO_SAPLING } to 999999999.0
+            ),
+            Material.GOLDEN_SWORD to mapOf(
+                Predicate<Material> { it == Material.COBWEB } to 15.0,
+                Predicate<Material> { it == Material.BAMBOO || it == Material.BAMBOO_SAPLING } to 999999999.0
+            ),
         )
     )
     

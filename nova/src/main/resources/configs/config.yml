@@ -166,3 +166,6 @@ debug:
   watch_chunk_reloads: false
   # If other plugins should be allowed to overwrite the results of Nova recipes.
   allow_craft_result_overwrite: false
+  # Whether the background texture of tooltips for ui items with empty names should be hidden.
+  # This option requires regenerating the resource pack.
+  hide_empty_tooltip: true

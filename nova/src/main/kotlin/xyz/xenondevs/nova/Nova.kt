@@ -112,12 +112,12 @@ internal class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plu
     }
     
     //<editor-fold desc="nova-api", defaultstate="collapsed">
-    override val blockManager: IBlockManager = ApiBlockManager
-    override val tileEntityManager: ITileEntityManager = ApiTileEntityManager
-    override val materialRegistry: INovaMaterialRegistry = NovaMaterialRegistry
-    override val blockRegistry: INovaBlockRegistry = ApiBlockRegistry
-    override val itemRegistry: INovaItemRegistry = ApiItemRegistry
-    override val wailaManager: IWailaManager = WailaManager
+    override fun getBlockManager(): IBlockManager = ApiBlockManager
+    override fun getTileEntityManager(): ITileEntityManager = ApiTileEntityManager
+    override fun getMaterialRegistry(): INovaMaterialRegistry = NovaMaterialRegistry
+    override fun getBlockRegistry(): INovaBlockRegistry = ApiBlockRegistry
+    override fun getItemRegistry(): INovaItemRegistry = ApiItemRegistry
+    override fun getWailaManager(): IWailaManager = WailaManager
     
     override fun registerProtectionIntegration(integration: ProtectionIntegration) {
         ProtectionManager.integrations.add(integration)

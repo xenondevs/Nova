@@ -18,7 +18,7 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ServerboundInteractPacke
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
-import xyz.xenondevs.nova.util.concurrent.runIfTrue
+import xyz.xenondevs.nova.util.concurrent.runIfTrueOnSimilarThread
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isLeftClick
 import xyz.xenondevs.nova.util.registerEvents
@@ -205,7 +205,7 @@ internal object HitboxManager : Listener {
                             val relHitLoc = Vector3f(hitLoc.x - center.x, hitLoc.y - center.y, hitLoc.z - center.z)
                             
                             // check protection integrations
-                            ProtectionManager.canUseBlock(player, event.item, hitLoc.toLocation(player.world)).runIfTrue {
+                            ProtectionManager.canUseBlock(player, event.item, hitLoc.toLocation(player.world)).runIfTrueOnSimilarThread {
                                 handlers.forEach { it.invoke(player, event.hand!!, relHitLoc) }
                             }
                             

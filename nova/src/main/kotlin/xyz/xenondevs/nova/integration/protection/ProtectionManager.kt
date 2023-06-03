@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.integration.protection
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.LoadingCache
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -12,181 +12,243 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.api.ApiTileEntityWrapper
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
-import xyz.xenondevs.nova.integration.InternalIntegration
-import xyz.xenondevs.nova.integration.protection.plugin.GriefPrevention
-import xyz.xenondevs.nova.integration.protection.plugin.PlotSquared
-import xyz.xenondevs.nova.integration.protection.plugin.ProtectionStones
-import xyz.xenondevs.nova.integration.protection.plugin.QuickShop
-import xyz.xenondevs.nova.integration.protection.plugin.Residence
-import xyz.xenondevs.nova.integration.protection.plugin.Towny
-import xyz.xenondevs.nova.integration.protection.plugin.WorldGuard
+import xyz.xenondevs.nova.integration.HooksLoader
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
-import xyz.xenondevs.nova.util.data.ArrayKey
+import xyz.xenondevs.nova.util.concurrent.completeServerThread
 import xyz.xenondevs.nova.util.isBetweenXZ
-import xyz.xenondevs.nova.util.runTask
-import xyz.xenondevs.nova.world.pos
+import java.time.Duration
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 
+//<editor-fold desc="ProtectionArgs classes", defaultstate="collapsed">
+private interface ProtectionArgs {
+    val player: OfflinePlayer
+    val location: Location
+}
+
+private interface ProtectionArgsTileEntity : ProtectionArgs {
+    
+    val tileEntity: TileEntity
+    override val player get() = tileEntity.owner!!
+    val apiTileEntity get() = ApiTileEntityWrapper(tileEntity)
+}
+
+private data class CanPlaceUserArgs(override val player: OfflinePlayer, val item: ItemStack, override val location: Location) : ProtectionArgs
+private data class CanPlaceTileArgs(override val tileEntity: TileEntity, val item: ItemStack, override val location: Location) : ProtectionArgsTileEntity
+private data class CanBreakUserArgs(override val player: OfflinePlayer, val item: ItemStack?, override val location: Location) : ProtectionArgs
+private data class CanBreakTileArgs(override val tileEntity: TileEntity, val item: ItemStack?, override val location: Location) : ProtectionArgsTileEntity
+private data class CanUseBlockUserArgs(override val player: OfflinePlayer, val item: ItemStack?, override val location: Location) : ProtectionArgs
+private data class CanUseBlockTileArgs(override val tileEntity: TileEntity, val item: ItemStack?, override val location: Location) : ProtectionArgsTileEntity
+private data class CanUseItemUserArgs(override val player: OfflinePlayer, val item: ItemStack, override val location: Location) : ProtectionArgs
+private data class CanUseItemTileArgs(override val tileEntity: TileEntity, val item: ItemStack, override val location: Location) : ProtectionArgsTileEntity
+private data class CanInteractWithEntityUserArgs(override val player: OfflinePlayer, val entity: Entity, val item: ItemStack?) : ProtectionArgs {
+    override val location: Location = entity.location
+}
+private data class CanInteractWithEntityTileArgs(override val tileEntity: TileEntity, val entity: Entity, val item: ItemStack?) : ProtectionArgsTileEntity {
+    override val location: Location = entity.location
+}
+private data class CanHurtEntityUserArgs(override val player: OfflinePlayer, val entity: Entity, val item: ItemStack?) : ProtectionArgs {
+    override val location: Location = entity.location
+}
+private data class CanHurtEntityTileArgs(override val tileEntity: TileEntity, val entity: Entity, val item: ItemStack?) : ProtectionArgsTileEntity {
+    override val location: Location = entity.location
+}
+//</editor-fold>
+
+/**
+ * Handles protection checks using registered [ProtectionIntegrations][ProtectionIntegration].
+ * 
+ * Protection checks are cached for 60s after the last access.
+ * If all protection integrations [can be called asynchronously][ExecutionMode], commonly used protection checks will be refreshed
+ * every 30s.
+ */
+@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC, dependsOn = [HooksLoader::class])
 object ProtectionManager {
     
-    internal val integrations: MutableList<ProtectionIntegration> =
-        listOf(GriefPrevention, PlotSquared, WorldGuard, Towny, ProtectionStones, QuickShop, Residence)
-            .filterTo(ArrayList(), InternalIntegration::isInstalled)
+    internal val integrations = ArrayList<ProtectionIntegration>()
     
-    private val PROTECTION_CHECK_EXECUTOR = ThreadPoolExecutor(
-        10, 10,
-        0, TimeUnit.MILLISECONDS,
-        LinkedBlockingQueue(),
-        ThreadFactoryBuilder().setNameFormat("Nova Protection Worker - %s").build()
-    )
+    private lateinit var executor: ExecutorService
+    private lateinit var cacheCanPlaceUser: LoadingCache<CanPlaceUserArgs, CompletableFuture<Boolean>>
+    private lateinit var cacheCanPlaceTile: LoadingCache<CanPlaceTileArgs, CompletableFuture<Boolean>>
+    private lateinit var cacheCanBreakUser: LoadingCache<CanBreakUserArgs, CompletableFuture<Boolean>>
+    private lateinit var cacheCanBreakTile: LoadingCache<CanBreakTileArgs, CompletableFuture<Boolean>>
+    private lateinit var cacheCanUseBlockUser: LoadingCache<CanUseBlockUserArgs, CompletableFuture<Boolean>>
+    private lateinit var cacheCanUseBlockTile: LoadingCache<CanUseBlockTileArgs, CompletableFuture<Boolean>>
+    private lateinit var cacheCanUseItemUser: LoadingCache<CanUseItemUserArgs, CompletableFuture<Boolean>>
+    private lateinit var cacheCanUseItemTile: LoadingCache<CanUseItemTileArgs, CompletableFuture<Boolean>>
+    private lateinit var cacheCanInteractWithEntityUser: LoadingCache<CanInteractWithEntityUserArgs, CompletableFuture<Boolean>>
+    private lateinit var cacheCanInteractWithEntityTile: LoadingCache<CanInteractWithEntityTileArgs, CompletableFuture<Boolean>>
+    private lateinit var cacheCanHurtEntityUser: LoadingCache<CanHurtEntityUserArgs, CompletableFuture<Boolean>>
+    private lateinit var cacheCanHurtEntityTile: LoadingCache<CanHurtEntityTileArgs, CompletableFuture<Boolean>>
     
-    private val PROTECTION_CACHE: Cache<ArrayKey<Any?>, CompletableFuture<Boolean>> =
-        CacheBuilder.newBuilder()
-            .concurrencyLevel(4)
-            .expireAfterWrite(30, TimeUnit.SECONDS)
-            .build()
-    
-    init {
-        NOVA.disableHandlers += { PROTECTION_CHECK_EXECUTOR.shutdown() }
+    @InitFun
+    private fun init() {
+        //<editor-fold desc="executor service">
+        executor = ThreadPoolExecutor(
+            10, 10,
+            0, TimeUnit.MILLISECONDS,
+            LinkedBlockingQueue(),
+            ThreadFactoryBuilder().setNameFormat("Nova Protection Worker - %s").build()
+        )
+        //</editor-fold>
+        
+        //<editor-fold desc="cache">
+        val cacheBuilder = Caffeine.newBuilder()
+            .executor(executor)
+            .expireAfterAccess(Duration.ofSeconds(60))
+        
+        // only configure refreshing if the action won't block the main thread
+        if (integrations.none { it.executionMode == ExecutionMode.SERVER })
+            cacheBuilder.refreshAfterWrite(Duration.ofSeconds(30))
+        
+        cacheCanPlaceUser = cacheBuilder.build { checkProtection(it) { canPlace(it.player, it.item, it.location) } }
+        cacheCanPlaceTile = cacheBuilder.build { checkProtection(it) { canPlace(it.apiTileEntity, it.item, it.location) } }
+        cacheCanBreakUser = cacheBuilder.build { checkProtection(it) { canBreak(it.player, it.item, it.location) } }
+        cacheCanBreakTile = cacheBuilder.build { checkProtection(it) { canBreak(it.apiTileEntity, it.item, it.location) } }
+        cacheCanUseBlockUser = cacheBuilder.build { checkProtection(it) { canUseBlock(it.player, it.item, it.location) } }
+        cacheCanUseBlockTile = cacheBuilder.build { checkProtection(it) { canUseBlock(it.apiTileEntity, it.item, it.location) } }
+        cacheCanUseItemUser = cacheBuilder.build { checkProtection(it) { canUseItem(it.player, it.item, it.location) } }
+        cacheCanUseItemTile = cacheBuilder.build { checkProtection(it) { canUseItem(it.apiTileEntity, it.item, it.location) } }
+        cacheCanInteractWithEntityUser = cacheBuilder.build { checkProtection(it) { canInteractWithEntity(it.player, it.entity, it.item) } }
+        cacheCanInteractWithEntityTile = cacheBuilder.build { checkProtection(it) { canInteractWithEntity(it.apiTileEntity, it.entity, it.item) } }
+        cacheCanHurtEntityUser = cacheBuilder.build { checkProtection(it) { canHurtEntity(it.player, it.entity, it.item) } }
+        cacheCanHurtEntityTile = cacheBuilder.build { checkProtection(it) { canHurtEntity(it.apiTileEntity, it.entity, it.item) } }
+        //</editor-fold>
     }
     
+    @DisableFun
+    private fun disable() {
+        executor.shutdown()
+    }
+    
+    /**
+     * Checks if the [tileEntity] can place that [item] at that [location]
+     */
     fun canPlace(tileEntity: TileEntity, item: ItemStack, location: Location): CompletableFuture<Boolean> {
-        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
-        val wrappedTileEntity = ApiTileEntityWrapper(tileEntity)
-        return PROTECTION_CACHE.get(ArrayKey(0, tileEntity.uuid, item, location.pos)) {
-            checkProtection(owner, location) { this.canPlace(wrappedTileEntity, item, location) }
-        }
+        if (tileEntity.owner == null) return CompletableFuture.completedFuture(true)
+        return cacheCanPlaceTile.get(CanPlaceTileArgs(tileEntity, item.clone(), location.clone()))
     }
     
+    /**
+     * Checks if the [player] can place that [item] at that [location]
+     */
     fun canPlace(player: OfflinePlayer, item: ItemStack, location: Location): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(0, player.uniqueId, item, location.pos)) {
-            checkProtection(player, location) { canPlace(player, item, location) }
-        }
+        cacheCanPlaceUser.get(CanPlaceUserArgs(player, item.clone(), location.clone()))
     
+    /**
+     * Checks if that [tileEntity] can break a block at that [location] using that [item]
+     */
     fun canBreak(tileEntity: TileEntity, item: ItemStack?, location: Location): CompletableFuture<Boolean> {
-        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
-        val wrappedTileEntity = ApiTileEntityWrapper(tileEntity)
-        return PROTECTION_CACHE.get(ArrayKey(1, tileEntity.uuid, item, location.pos)) {
-            checkProtection(owner, location) { canBreak(wrappedTileEntity, item, location) }
-        }
+        if (tileEntity.owner == null) return CompletableFuture.completedFuture(true)
+        return cacheCanBreakTile.get(CanBreakTileArgs(tileEntity, item?.clone(), location.clone()))
     }
     
-    
+    /**
+     * Checks if that [player] can break a block at that [location] using that [item]
+     */
     fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(1, player.uniqueId, item, location.pos)) {
-            checkProtection(player, location) { canBreak(player, item, location) }
-        }
+        cacheCanBreakUser.get(CanBreakUserArgs(player, item?.clone(), location.clone()))
     
+    /**
+     * Checks if the [tileEntity] can interact with a block at that [location] using that [item]
+     */
     fun canUseBlock(tileEntity: TileEntity, item: ItemStack?, location: Location): CompletableFuture<Boolean> {
-        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
-        val wrappedTileEntity = ApiTileEntityWrapper(tileEntity)
-        return PROTECTION_CACHE.get(ArrayKey(2, tileEntity.uuid, item, location.pos)) {
-            checkProtection(owner, location) { canUseBlock(wrappedTileEntity, item, location) }
-        }
+        if (tileEntity.owner == null) return CompletableFuture.completedFuture(true)
+        return cacheCanUseBlockTile.get(CanUseBlockTileArgs(tileEntity, item?.clone(), location.clone()))
     }
     
-    
+    /**
+     * Checks if the [player] can interact with a block at that [location] using that [item]
+     */
     fun canUseBlock(player: OfflinePlayer, item: ItemStack?, location: Location): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(2, player.uniqueId, item, location.pos)) {
-            checkProtection(player, location) { canUseBlock(player, item, location) }
-        }
+        cacheCanUseBlockUser.get(CanUseBlockUserArgs(player, item?.clone(), location.clone()))
     
+    /**
+     * Checks if the [tileEntity] can use that [item] at that [location]
+     */
     fun canUseItem(tileEntity: TileEntity, item: ItemStack, location: Location): CompletableFuture<Boolean> {
-        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
-        val wrappedTileEntity = ApiTileEntityWrapper(tileEntity)
-        return PROTECTION_CACHE.get(ArrayKey(3, tileEntity.uuid, item, location.pos)) {
-            checkProtection(owner, location) { canUseItem(wrappedTileEntity, item, location) }
-        }
+        if (tileEntity.owner == null) return CompletableFuture.completedFuture(true)
+        return cacheCanUseItemTile.get(CanUseItemTileArgs(tileEntity, item.clone(), location.clone()))
     }
     
+    /**
+     * Checks if the [player] can use that [item] at that [location]
+     */
     fun canUseItem(player: OfflinePlayer, item: ItemStack, location: Location): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(3, player.uniqueId, item, location.pos)) {
-            checkProtection(player, location) { canUseItem(player, item, location) }
-        }
+        cacheCanUseItemUser.get(CanUseItemUserArgs(player, item.clone(), location.clone()))
     
+    /**
+     * Checks if the [tileEntity] can interact with the [entity] wile holding that [item]
+     */
     fun canInteractWithEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> {
-        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
-        val wrappedTileEntity = ApiTileEntityWrapper(tileEntity)
-        return PROTECTION_CACHE.get(ArrayKey(4, tileEntity.uuid, entity, item, entity.location.pos)) {
-            checkProtection(owner, entity.location) { canInteractWithEntity(wrappedTileEntity, entity, item) }
-        }
+        if (tileEntity.owner == null) return CompletableFuture.completedFuture(true)
+        return cacheCanInteractWithEntityTile.get(CanInteractWithEntityTileArgs(tileEntity, entity, item?.clone()))
     }
     
+    /**
+     * Checks if the [player] can interact with the [entity] while holding that [item]
+     */
     fun canInteractWithEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(4, player.uniqueId, entity, item, entity.location.pos)) {
-            checkProtection(player, entity.location) { canInteractWithEntity(player, entity, item) }
-        }
+        cacheCanInteractWithEntityUser.get(CanInteractWithEntityUserArgs(player, entity, item?.clone()))
     
+    /**
+     * Checks if the [tileEntity] can hurt the [entity] with this [item]
+     */
     fun canHurtEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> {
-        val owner = tileEntity.owner ?: return CompletableFuture.completedFuture(true)
-        val wrappedTileEntity = ApiTileEntityWrapper(tileEntity)
-        return PROTECTION_CACHE.get(ArrayKey(5, tileEntity.uuid, entity, item, entity.location.pos)) {
-            checkProtection(owner, entity.location) { canHurtEntity(wrappedTileEntity, entity, item) }
-        }
+        if (tileEntity.owner == null) return CompletableFuture.completedFuture(true)
+        return cacheCanHurtEntityTile.get(CanHurtEntityTileArgs(tileEntity, entity, item?.clone()))
     }
     
+    /**
+     * Checks if the [player] can hurt the [entity] with this [item]
+     */
     fun canHurtEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> =
-        PROTECTION_CACHE.get(ArrayKey(5, player.uniqueId, entity, item, entity.location.pos)) {
-            checkProtection(player, entity.location) { canHurtEntity(player, entity, item) }
-        }
+        cacheCanHurtEntityUser.get(CanHurtEntityUserArgs(player, entity, item?.clone()))
     
     private fun checkProtection(
-        player: OfflinePlayer,
-        location: Location,
+        args: ProtectionArgs,
         check: ProtectionIntegration.() -> Boolean
     ): CompletableFuture<Boolean> {
-        if (!NOVA.isEnabled) return CompletableFuture.completedFuture(false)
+        if (!NOVA.isEnabled)
+            return CompletableFuture.completedFuture(false)
         
-        val futures = checkIntegrations(check)
-        futures += CompletableFuture.completedFuture(!isVanillaProtected(player, location))
-        return CombinedBooleanFuture(futures)
+        if (integrations.isNotEmpty()) {
+            val futures = checkIntegrations(check)
+            futures += CompletableFuture.completedFuture(!isVanillaProtected(args.player, args.location))
+            return CombinedBooleanFuture(futures)
+        } else {
+            return CompletableFuture.completedFuture(!isVanillaProtected(args.player, args.location))
+        }
     }
     
     internal fun isVanillaProtected(player: OfflinePlayer, location: Location): Boolean {
         val spawnRadius = Bukkit.getServer().spawnRadius.toDouble()
         val world = location.world!!
+        val spawnMin = world.spawnLocation.subtract(spawnRadius, 0.0, spawnRadius)
+        val spawnMax = world.spawnLocation.add(spawnRadius, 0.0, spawnRadius)
+        
         return world.name == "world"
             && spawnRadius > 0
             && !player.isOp
-            && location.isBetweenXZ(
-            world.spawnLocation.subtract(spawnRadius, 0.0, spawnRadius),
-            world.spawnLocation.add(spawnRadius, 0.0, spawnRadius)
-        )
+            && location.isBetweenXZ(spawnMin, spawnMax)
     }
     
-    private fun checkIntegrations(check: ProtectionIntegration.() -> Boolean): MutableList<CompletableFuture<Boolean>> {
-        val isMainThread = Thread.currentThread() == MINECRAFT_SERVER.serverThread
-        val futures = ArrayList<CompletableFuture<Boolean>>()
-        
-        integrations.forEach { integration ->
-            when (integration.executionMode) {
-                
-                ExecutionMode.NONE -> futures += CompletableFuture.completedFuture(integration.check())
-                
-                ExecutionMode.ASYNC -> {
-                    val future = CompletableFuture<Boolean>()
-                    futures += future
-                    PROTECTION_CHECK_EXECUTOR.submit { future.complete(integration.check()) }
-                }
-                
-                ExecutionMode.SERVER -> {
-                    val future = CompletableFuture<Boolean>()
-                    futures += future
-                    
-                    if (isMainThread) future.complete(integration.check())
-                    else runTask { future.complete(integration.check()) }
-                }
-                
+    private fun checkIntegrations(check: ProtectionIntegration.() -> Boolean): MutableList<CompletableFuture<Boolean>> =
+        integrations.mapTo(ArrayList()) {
+            when (it.executionMode) {
+                ExecutionMode.NONE -> CompletableFuture.completedFuture(it.check())
+                ExecutionMode.ASYNC -> CompletableFuture<Boolean>().apply { completeAsync({ it.check() }, executor) }
+                ExecutionMode.SERVER -> CompletableFuture<Boolean>().apply { completeServerThread { it.check() } }
             }
         }
-        
-        return futures
-    }
     
 }
 

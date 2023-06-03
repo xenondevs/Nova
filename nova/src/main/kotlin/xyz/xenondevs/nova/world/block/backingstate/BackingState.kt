@@ -25,7 +25,7 @@ internal abstract class BackingState(configType: DefaultingBlockStateConfigType<
     open fun init() = Unit
     
     fun handleQueryResult(positions: List<BlockLocation>) {
-        if (CustomItemServiceManager.PLUGINS.isEmpty()) {
+        if (CustomItemServiceManager.services.isEmpty()) {
             positions.forEach { if (!BlockManager.hasBlockState(it)) it.setBlockStateSilently(defaultState) }
         } else {
             runTask {

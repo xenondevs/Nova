@@ -18,6 +18,7 @@ import org.bukkit.plugin.RegisteredListener
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.transformer.patch.misc.EventPreventionPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HANDLER_LIST_HANDLERS_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HANDLER_LIST_HANDLER_SLOTS_FIELD
@@ -134,5 +135,14 @@ fun registerEventsExcept(listener: Listener, vararg eventClasses: Class<out Even
         
         val handlerList = clazz.getMethod("getHandlerList").invoke(null) as HandlerList
         handlerList.registerAll(listeners)
+    }
+}
+
+inline fun preventEvents(run: () -> Unit) {
+    EventPreventionPatch.dropAll = true
+    try {
+        run()
+    } finally {
+        EventPreventionPatch.dropAll = false
     }
 }

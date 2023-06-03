@@ -10,13 +10,13 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
 @Suppress("DEPRECATION")
-internal class ApiTileEntityWrapper(private val tileEntity: TileEntity): ITileEntity {
+internal class ApiTileEntityWrapper(private val tileEntity: TileEntity) : ITileEntity {
     
     @Deprecated("Use NovaBlock instead", replaceWith = ReplaceWith("block"))
-    override val material: NovaMaterial get() = LegacyMaterialWrapper(Either.right(tileEntity.block))
-    override val block: NovaBlock get() = ApiBlockWrapper(tileEntity.block)
-    override val owner: OfflinePlayer? get() = tileEntity.owner
-    override val location: Location get() = tileEntity.location
+    override fun getMaterial(): NovaMaterial = LegacyMaterialWrapper(Either.right(tileEntity.block))
+    override fun getBlock(): NovaBlock = ApiBlockWrapper(tileEntity.block)
+    override fun getOwner(): OfflinePlayer? = tileEntity.owner
+    override fun getLocation(): Location = tileEntity.location
     override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> = tileEntity.getDrops(includeSelf)
     
 }

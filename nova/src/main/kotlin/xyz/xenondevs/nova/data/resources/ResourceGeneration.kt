@@ -11,10 +11,10 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
+import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.update
 import java.security.MessageDigest
@@ -77,7 +77,7 @@ internal object ResourceGeneration {
     
     @InternalInit(
         stage = InitializationStage.POST_WORLD_ASYNC,
-        dependsOn = [CustomItemServiceManager::class]
+        dependsOn = [HooksLoader::class]
     )
     object PostWorld {
     

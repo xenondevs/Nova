@@ -20,51 +20,48 @@ public class NovaClassLoader extends URLClassLoader {
     }
     
     public Class<?> loadClass(String name, boolean resolve, boolean checkParents) throws ClassNotFoundException {
-        Class<?> c = null;
-        
-        // workaround library conflict for kyori-adventure on paper servers (fixme)
-        if (name.startsWith("net.kyori.adventure")) {
-            try {
-                c = getParent().loadClass(name);
-            } catch(ClassNotFoundException e) {
-                // ignored
+        synchronized (getClassLoadingLock(name)) {
+            Class<?> c = findLoadedClass(name);
+            
+            // workaround library conflict for kyori-adventure on paper servers (fixme)
+            if (c == null && name.startsWith("net.kyori.adventure") && checkParents) {
+                c = loadClassFromParentOrNull(name);
             }
-        }
-        
-        if (c == null) {
-            synchronized (getClassLoadingLock(name)) {
-                // check in jvm
-                c = findLoadedClass(name);
-        
-                // check Nova classes and libraries before parent to prevent it from using old patch classes
-                // (which stay in memory after reloading because patched code references them)
-                if (c == null && !injectedClasses.contains(name) ) {
-                    c = findClassOrNull(name);
-                }
+            
+            // check Nova classes and libraries before parent to:
+            //   - prevent accessing classes of other plugins
+            //   - prevent the usage of old patch classes (which stay in memory after reloading)
+            if (c == null && !injectedClasses.contains(name)) {
+                c = findClassOrNull(name);
             }
-        }
-        
-        // check parent loader
-        if (c == null && checkParents) {
-            c = getParent().loadClass(name);
-        }
-        
-        if (c == null) {
-            throw new ClassNotFoundException(name);
-        }
-        
-        if (resolve) {
-            synchronized (getClassLoadingLock(name)) {
+            
+            if (c == null && checkParents) {
+                c = loadClassFromParentOrNull(name);
+            }
+            
+            if (c == null) {
+                throw new ClassNotFoundException(name);
+            }
+            
+            if (resolve) {
                 resolveClass(c);
             }
+            
+            return c;
         }
-        
-        return c;
     }
     
     private Class<?> findClassOrNull(String name) {
         try {
             return findClass(name);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+    
+    private Class<?> loadClassFromParentOrNull(String name) {
+        try {
+            return getParent().loadClass(name);
         } catch (ClassNotFoundException e) {
             return null;
         }

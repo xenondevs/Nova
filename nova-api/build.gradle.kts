@@ -1,23 +1,27 @@
-description = "nova-api"
+import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm") version libs.versions.kotlin
-    id("org.jetbrains.dokka") version libs.versions.dokka
+    java
     `maven-publish`
+    alias(libs.plugins.dokka)
 }
 
 dependencies {
-    implementation(libs.bundles.kotlin)
+    implementation("org.jetbrains:annotations:24.0.1")
     compileOnly(project(":nova-loader"))
     compileOnly(libs.spigot.api)
 }
 
-tasks {
-    register<Jar>("sources") {
-        dependsOn(JavaPlugin.CLASSES_TASK_NAME)
-        from("src/main/kotlin")
-        archiveClassifier.set("sources")
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType<AbstractDokkaLeafTask> {
+    dokkaSourceSets {
+        register("main") {
+            sourceRoots.from("src/main/java")
+        }
     }
 }
 
@@ -34,7 +38,7 @@ publishing {
     
     publications {
         create<MavenPublication>("novaAPI") {
-            from(components.getByName("kotlin"))
+            from(components.getByName("java"))
             artifact(tasks.getByName("sources"))
         }
     }

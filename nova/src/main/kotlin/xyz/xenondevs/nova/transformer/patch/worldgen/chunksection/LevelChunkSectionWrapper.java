@@ -35,6 +35,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     private static final long COUNT_OFFSET = ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD);
     private static final long SPECIAL_COLLIDING_BLOCKS_OFFSET = LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD == null ? - 1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD);
     private static final long KNOWN_BLOCK_COLLISION_DATA_OFFSET = LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD == null ? - 1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD);
+    private static final long TICKING_LIST_OFFSET = LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD == null ? -1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD);
     
     private final Level level;
     private final ChunkPos chunkPos;
@@ -82,7 +83,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     public BlockState setBlockState(int relX, int relY, int relZ, BlockState state, boolean sync) {
         if (state instanceof WrapperBlockState wrappedState) {
             var chunkPos = this.chunkPos;
-            WorldDataManager.INSTANCE.addOrphanBlock$nova(level,
+            WorldDataManager.INSTANCE.addOrphanBlock(level,
                 relX + chunkPos.getMinBlockX(),
                 relY + bottomBlockY(),
                 relZ + chunkPos.getMinBlockZ(),
@@ -181,6 +182,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
         if (SPECIAL_COLLIDING_BLOCKS_OFFSET != - 1) {
             ReflectionUtils.putInt$nova(this, SPECIAL_COLLIDING_BLOCKS_OFFSET, ReflectionUtils.getInt$nova(delegate, SPECIAL_COLLIDING_BLOCKS_OFFSET));
             ReflectionUtils.putReference$nova(this, KNOWN_BLOCK_COLLISION_DATA_OFFSET, ReflectionUtils.getReference$nova(delegate, KNOWN_BLOCK_COLLISION_DATA_OFFSET));
+            ReflectionUtils.putReference$nova(this, TICKING_LIST_OFFSET, ReflectionUtils.getReference$nova(delegate, TICKING_LIST_OFFSET));
         }
     }
     

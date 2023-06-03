@@ -59,7 +59,7 @@ open class ToolCategory internal constructor(
             if (Tag.MINEABLE_PICKAXE.isTagged(material)) list.add(VanillaToolCategories.PICKAXE)
             if (Tag.MINEABLE_AXE.isTagged(material)) list.add(VanillaToolCategories.AXE)
             if (Tag.MINEABLE_HOE.isTagged(material)) list.add(VanillaToolCategories.HOE)
-            if (material == Material.COBWEB || material == Material.BAMBOO) list.add(VanillaToolCategories.SWORD)
+            if (material == Material.COBWEB || material == Material.BAMBOO_SAPLING || material == Material.BAMBOO) list.add(VanillaToolCategories.SWORD)
             if (Tag.LEAVES.isTagged(material) || Tag.WOOL.isTagged(material) || material == Material.COBWEB) list.add(VanillaToolCategories.SHEARS)
             
             return list

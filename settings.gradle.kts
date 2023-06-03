@@ -1,20 +1,41 @@
 rootProject.name = "nova-parent"
+
+// core project
 include("nova")
 include("nova-api")
 include("nova-loader")
 include("nova-gradle-plugin")
+
+// hooks
+include("nova-hooks:nova-hook-fastasyncworldedit")
+include("nova-hooks:nova-hook-griefprevention")
+include("nova-hooks:nova-hook-itemsadder")
+include("nova-hooks:nova-hook-luckperms")
+include("nova-hooks:nova-hook-mmoitems")
+include("nova-hooks:nova-hook-oraxen")
+include("nova-hooks:nova-hook-plotsquared")
+include("nova-hooks:nova-hook-protectionstones")
+include("nova-hooks:nova-hook-quickshop")
+include("nova-hooks:nova-hook-residence")
+include("nova-hooks:nova-hook-towny")
+include("nova-hooks:nova-hook-vault")
+include("nova-hooks:nova-hook-worldedit")
+include("nova-hooks:nova-hook-worldguard")
 
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // versions
             version("kotlin", "1.8.20")
-            version("dokka", "1.8.10")
             version("ktor", "2.2.4")
             version("spigot", "1.19.4-R0.1-SNAPSHOT")
             version("cbf", "0.5")
-            version("xenondevs-commons", "1.0")
-            version("invui", "1.3")
+            version("xenondevs-commons", "1.1")
+            version("invui", "1.8")
+            
+            // plugins
+            plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
+            plugin("dokka", "org.jetbrains.dokka").version("1.8.10")
             
             // lib - kotlin
             library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").versionRef("kotlin")
@@ -79,9 +100,6 @@ dependencyResolutionManagement {
             bundle("maven-resolver", listOf("maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"))
             bundle("minecraft-assets", listOf("minecraft-asset-downloader", "minecraft-model-renderer", "resource-pack-obfuscator"))
             bundle("kyori-adventure", listOf("adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-plain", "adventure-platform-bukkit"))
-            
-            // plugins
-            plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
         }
     }
 }
@@ -92,5 +110,16 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         maven("https://repo.xenondevs.xyz/releases/")
+    }
+}
+
+plugins {
+    id("com.gradle.enterprise") version("3.13")
+}
+
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = "https://gradle.com/terms-of-service"
+        termsOfServiceAgree = "yes"
     }
 }

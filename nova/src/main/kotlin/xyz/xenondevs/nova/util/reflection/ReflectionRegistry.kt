@@ -186,6 +186,8 @@ internal object ReflectionRegistry {
     val LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD = getServerSoftwareField(LevelChunkSection::class, true, "specialCollidingBlocks", ServerSoftware.PAPER)
     @JvmField
     val LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD = getServerSoftwareField(LevelChunkSection::class, true, "knownBlockCollisionData", ServerSoftware.PAPER)
+    @JvmField
+    val LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD = getServerSoftwareField(LevelChunkSection::class, true, "tickingList", ServerSoftware.PAPER)
     val HOLDER_SET_DIRECT_CONTENTS_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contents)")
     val HOLDER_SET_DIRECT_CONTENTS_SET_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contentsSet)")
     val ITEM_COMBINER_MENU_INPUT_SLOTS_FIELD = getField(ItemCombinerMenu::class, true, "SRF(net.minecraft.world.inventory.ItemCombinerMenu inputSlots)")
@@ -201,5 +203,6 @@ internal object ReflectionRegistry {
     val ITEM_STACK_COUNT_FIELD = getField(MojangStack::class, true, "SRF(net.minecraft.world.item.ItemStack count)")
     val ITEM_STACK_ITEM_META_FIELD = getField(BukkitStack::class, true, "meta")
     val CRAFT_ITEM_STACK_HANDLE_FIELD = getField(CraftItemStack::class, true, "handle")
+    val ITEM_STACK_ITEM_FIELD = getField(MojangStack::class, true, "SRF(net.minecraft.world.item.ItemStack item)")
     
 }

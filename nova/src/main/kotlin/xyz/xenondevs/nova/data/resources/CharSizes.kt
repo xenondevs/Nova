@@ -179,6 +179,10 @@ object CharSizes {
         }
     }
     
+    internal fun invalidateCache() {
+        componentCache.invalidateAll()
+    }
+    
     private fun getFontName(file: File): String {
         val fontNameParts = file.relativeTo(CHAR_SIZES_DIR).invariantSeparatorsPath
             .substringBeforeLast('.')

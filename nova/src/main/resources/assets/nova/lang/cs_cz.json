@@ -131,5 +131,6 @@
   "command.nova.advanced_tooltips.nova.success": "Zapnout pokročilé nápovědy pro Nova předměty.",
   "command.nova.advanced_tooltips.nova.failure": "Pokročilé nápovědy pro Nova předměty jsou již zapnuté.",
   "command.nova.advanced_tooltips.all.failure": "Pokročilé nápovědy pro všechny předměty jsou již zapnuté.",
-  "command.nova.list_blocks.success": "Celkem: %s"
+  "command.nova.list_blocks.success": "Celkem: %s",
+  "command.nova.invalidate_char_sizes.success": "Úspěšně odvolány veškeré velikosti char polí. Při novém vytvoření modifikačního balíčku budou pole přepočítány."
 }

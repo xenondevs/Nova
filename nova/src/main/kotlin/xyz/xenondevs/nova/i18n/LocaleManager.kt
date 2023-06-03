@@ -57,15 +57,15 @@ object LocaleManager {
     @Synchronized
     fun hasTranslation(lang: String, key: String): Boolean {
         if (!::translationProviders.isInitialized) return false
-        if (lang !in loadedLangs) loadLang(lang)
-        return translationProviders[lang]?.containsKey(key) ?: false
+        if (lang !in loadedLangs) loadLang(lang.lowercase())
+        return translationProviders[lang.lowercase()]?.containsKey(key) ?: false
     }
     
     @Synchronized
     fun getFormatStringOrNull(lang: String, key: String): String? {
         if (!::translationProviders.isInitialized) return null
-        if (lang !in loadedLangs) loadLang(lang)
-        return translationProviders[lang]?.get(key)
+        if (lang !in loadedLangs) loadLang(lang.lowercase())
+        return translationProviders[lang.lowercase()]?.get(key)
     }
     
     @Synchronized
@@ -84,8 +84,8 @@ object LocaleManager {
     @Synchronized
     fun getTranslationOrNull(lang: String, key: String, vararg args: Any): String? {
         if (!::translationProviders.isInitialized) return null
-        if (lang !in loadedLangs) loadLang(lang)
-        return translationProviders[lang]?.get(key)?.let { String.formatSafely(it, *args) }
+        if (lang !in loadedLangs) loadLang(lang.lowercase())
+        return translationProviders[lang.lowercase()]?.get(key)?.let { String.formatSafely(it, *args) }
     }
     
     @Synchronized

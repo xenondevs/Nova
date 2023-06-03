@@ -35,6 +35,7 @@ import xyz.xenondevs.nova.data.recipe.impl.RepairItemRecipe
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.addToInventoryOrDrop
@@ -134,7 +135,7 @@ private val ALLOW_RESULT_OVERWRITE by configReloadable { DEFAULT_CONFIG.getBoole
 
 @InternalInit(
     stage = InitializationStage.POST_WORLD,
-    dependsOn = [AddonsInitializer::class, VanillaRecipeTypes::class]
+    dependsOn = [AddonsInitializer::class, HooksLoader::class, VanillaRecipeTypes::class]
 )
 object RecipeManager : Listener {
     

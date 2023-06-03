@@ -8,14 +8,11 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.integration.InternalIntegration
 
-internal interface CustomItemService : InternalIntegration {
-    
-    /**
-     * Blocks the thread until this [CustomItemService] has been loaded.
-     */
-    fun awaitLoad() = Unit
+enum class CustomBlockType { NORMAL, CROP }
+enum class CustomItemType { NORMAL, SEED }
+
+interface CustomItemService {
     
     /**
      * Remove a block from the world

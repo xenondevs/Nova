@@ -29,7 +29,7 @@ internal fun NamespacedId.toResourceLocation(): ResourceLocation {
 
 @Suppress("DEPRECATION")
 @Deprecated("Use ResourceLocation instead")
-class NamespacedId(override val namespace: String, override val name: String) : INamespacedId {
+class NamespacedId(@JvmField val namespace: String, @JvmField val name: String) : INamespacedId {
     
     private val id = "$namespace:$name"
     
@@ -50,13 +50,11 @@ class NamespacedId(override val namespace: String, override val name: String) : 
     @Deprecated("Use namespacedKey property", ReplaceWith("namespacedKey"))
     override fun toNamespacedKey() = namespacedKey
     
-    fun toString(separator: String): String {
-        return namespace + separator + name
-    }
+    fun toString(separator: String): String = namespace + separator + name
     
-    override fun toString(): String {
-        return id
-    }
+    override fun toString(): String = id
+    override fun getNamespace(): String = namespace
+    override fun getName(): String = name
     
     override fun equals(other: Any?): Boolean {
         return other is NamespacedId && other.id == id
@@ -70,8 +68,8 @@ class NamespacedId(override val namespace: String, override val name: String) : 
         
         val CODEC: Codec<NamespacedId> = Codec.STRING.comapFlatMap(::ofSafe, NamespacedId::toString).stable()
         
-        val PART_PATTERN = Regex("""^[a-z][a-z\d_]*$""")
-        val COMPLETE_PATTERN = Regex("""^[a-z][a-z\d_]*:[a-z][a-z\d_]*$""")
+        val PART_PATTERN = Regex("""^[a-z][a-z\d_-]*$""")
+        val COMPLETE_PATTERN = Regex("""^[a-z][a-z\d_-]*:[a-z][a-z\d_-]*$""")
         
         fun of(id: String, fallbackNamespace: String? = null): NamespacedId {
             val namespace: String

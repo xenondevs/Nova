@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data.resources.builder
 
+import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
 import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
@@ -7,6 +8,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.flatten
 import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
@@ -15,6 +17,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Stage
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
@@ -39,7 +42,6 @@ import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import kotlin.io.path.CopyActionResult
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.copyToRecursively
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
@@ -68,6 +70,9 @@ private val CORE_RESOURCE_FILTERS = configReloadable {
             this += ResourceFilter(Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/bossbar/*")
             this += ResourceFilter(Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/bars/*")
         }
+        if (!DEFAULT_CONFIG.getBoolean("debug.hide_empty_tooltip")) {
+            this += ResourceFilter(Stage.ASSET_PACK, Type.BLACKLIST, "minecraft/shaders/core/position_color*")
+        }
     }
 }
 
@@ -83,7 +88,7 @@ internal class ResourcePackBuilder {
     
     companion object {
         
-        private val FS_PROVIDER: Provider<FileSystem> = IN_MEMORY_PROVIDER.map { if (it) Jimfs.newFileSystem() else FileSystems.getDefault() }
+        private var JIMFS_PROVIDER: Provider<FileSystem?> = IN_MEMORY_PROVIDER.map { if (it) Jimfs.newFileSystem(Configuration.unix()) else null }
         
         //<editor-fold desc="never in memory">
         val RESOURCE_PACK_FILE: File = File(NOVA.dataFolder, "resource_pack/ResourcePack.zip")
@@ -94,7 +99,7 @@ internal class ResourcePackBuilder {
         //</editor-fold>
         
         //<editor-fold desc="potentially in memory">
-        private val RESOURCE_PACK_BUILD_DIR_PROVIDER: Provider<Path> = FS_PROVIDER.map { it.getPath(RESOURCE_PACK_DIR.resolve(".build/").absolutePathString()) }
+        private val RESOURCE_PACK_BUILD_DIR_PROVIDER: Provider<Path> = JIMFS_PROVIDER.map { it.rootDirectories.first() }.orElse(RESOURCE_PACK_DIR.resolve(".build"))
         private val TEMP_BASE_PACKS_DIR_PROVIDER: Provider<Path> = RESOURCE_PACK_BUILD_DIR_PROVIDER.map { it.resolve("base_packs") }
         private val PACK_DIR_PROVIDER: Provider<Path> = RESOURCE_PACK_BUILD_DIR_PROVIDER.map { it.resolve("pack") }
         private val ASSETS_DIR_PROVIDER: Provider<Path> = PACK_DIR_PROVIDER.map { it.resolve("assets") }
@@ -230,6 +235,7 @@ internal class ResourcePackBuilder {
             // calculate char sizes
             LOGGER.info("Calculating char sizes")
             CharSizeCalculator().calculateCharSizes()
+            CharSizes.invalidateCache()
             
             // write metadata
             writeMetadata(assetPacks.size, basePacks.packAmount)
@@ -249,9 +255,10 @@ internal class ResourcePackBuilder {
     }
     
     private fun deleteBuildDir() {
-        if (IN_MEMORY) {
-            FS_PROVIDER.value.close()
-            FS_PROVIDER.update() // creates a new jimfs file system
+        val provider = JIMFS_PROVIDER.value
+        if (provider != null) {
+            provider.close()
+            JIMFS_PROVIDER.update() // creates a new jimfs file system
         } else {
             RESOURCE_PACK_BUILD_DIR.toFile().deleteRecursively()
         }

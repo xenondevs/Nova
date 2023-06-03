@@ -9,12 +9,12 @@ import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.api.block.NovaTileEntityState as INovaTileEntityState
 
 @Suppress("DEPRECATION")
-internal class ApiNovaTileEntityStateWrapper(private val state: NovaTileEntityState): INovaTileEntityState {
+internal class ApiNovaTileEntityStateWrapper(private val state: NovaTileEntityState) : INovaTileEntityState {
     
     @Deprecated("Use NovaBlock instead", replaceWith = ReplaceWith("block"))
-    override val material: NovaMaterial get() = LegacyMaterialWrapper(Either.right(state.block))
-    override val tileEntity: TileEntity get() = ApiTileEntityWrapper(state.tileEntity)
-    override val block: NovaBlock get() = ApiBlockWrapper(state.block)
-    override val location: Location get() = state.location
+    override fun getMaterial(): NovaMaterial = LegacyMaterialWrapper(Either.right(state.block))
+    override fun getTileEntity(): TileEntity = ApiTileEntityWrapper(state.tileEntity)
+    override fun getBlock(): NovaBlock = ApiBlockWrapper(state.block)
+    override fun getLocation(): Location = state.location
     
 }

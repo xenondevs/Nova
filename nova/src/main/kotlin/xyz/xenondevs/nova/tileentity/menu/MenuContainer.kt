@@ -22,7 +22,7 @@ abstract class MenuContainer internal constructor() {
     }
     
     fun closeWindows() {
-        openWindows.forEach(Window::close)
+        openWindows.toList().forEach(Window::close)
     }
     
     inline fun <reified T : TileEntity.TileEntityMenu> getMenus(): Sequence<T> {

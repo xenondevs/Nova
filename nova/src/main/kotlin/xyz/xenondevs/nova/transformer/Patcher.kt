@@ -22,7 +22,6 @@ import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.block.DaylightDetectorPatch
 import xyz.xenondevs.nova.transformer.patch.block.NoteBlockPatch
 import xyz.xenondevs.nova.transformer.patch.bossbar.BossBarOriginPatch
-import xyz.xenondevs.nova.transformer.patch.event.FakePlayerEventPreventionPatch
 import xyz.xenondevs.nova.transformer.patch.event.PlayerInventoryUpdateEventPatch
 import xyz.xenondevs.nova.transformer.patch.item.AnvilResultPatch
 import xyz.xenondevs.nova.transformer.patch.item.AttributePatch
@@ -35,6 +34,8 @@ import xyz.xenondevs.nova.transformer.patch.item.RemainingItemPatches
 import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
 import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
 import xyz.xenondevs.nova.transformer.patch.item.WearablePatch
+import xyz.xenondevs.nova.transformer.patch.misc.EventPreventionPatch
+import xyz.xenondevs.nova.transformer.patch.misc.FakePlayerLastHurtPatch
 import xyz.xenondevs.nova.transformer.patch.nbt.CBFCompoundTagPatch
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.transformer.patch.sound.SoundPatches
@@ -51,7 +52,6 @@ import xyz.xenondevs.nova.util.data.getResourceData
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_PARENT_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.reflection.defineClass
-import java.io.File
 import java.lang.System.getProperty
 import java.lang.instrument.ClassDefinition
 import java.lang.management.ManagementFactory
@@ -66,8 +66,9 @@ internal object Patcher {
             FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
             StackSizePatch, FeatureSorterPatch, LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
             WrapperBlockPatch, MappedRegistryPatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches,
-            BroadcastPacketPatch, CBFCompoundTagPatch, FakePlayerEventPreventionPatch, LegacyConversionPatch, WearablePatch,
-            NovaRuleTestPatch, BossBarOriginPatch, ThreadingDetectorPatch, PlayerInventoryUpdateEventPatch, DaylightDetectorPatch
+            BroadcastPacketPatch, CBFCompoundTagPatch, EventPreventionPatch, LegacyConversionPatch, WearablePatch,
+            NovaRuleTestPatch, BossBarOriginPatch, ThreadingDetectorPatch, FakePlayerLastHurtPatch, PlayerInventoryUpdateEventPatch,
+            DaylightDetectorPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     
@@ -116,7 +117,6 @@ internal object Patcher {
                 val clazz = ClassWrapper("$name.class", bytes)
                 adapter.adapt(clazz)
                 bytes = clazz.assemble()
-                File(clazz.className + ".class").writeBytes(bytes)
             }
             
             minecraftServerClass.classLoader.defineClass(name.replace('/', '.'), bytes, minecraftServerClass.protectionDomain)
@@ -134,7 +134,11 @@ internal object Patcher {
         }
         transformers.forEach(Transformer::transform)
         val definitions = classes.map { (clazz, computeFrames) ->
-            ClassDefinition(clazz, VirtualClassPath[clazz].assemble(computeFrames))
+            try {
+                ClassDefinition(clazz, VirtualClassPath[clazz].assemble(computeFrames))
+            } catch (t: Throwable) {
+                throw AssembleException(clazz, findRelatedTransformers(clazz), t)
+            }
         }.toTypedArray()
         
         redefineClasses(definitions)
@@ -156,22 +160,24 @@ internal object Patcher {
                 INSTRUMENTATION.redefineClasses(definition)
             } catch (ex: LinkageError) {
                 val defClass = definition.definitionClass
-                val relatedPatches = transformers.filter { tf -> tf.classes.any { tfClass -> tfClass.internalName == defClass.internalName } }
                 
                 // tries to get more information by loading the classes using the ClassWrapperLoader instead of the instrumentation
                 val classLoader = ClassWrapperLoader(javaClass.classLoader)
                 try {
                     classLoader.loadClass(VirtualClassPath[defClass]).methods
                 } catch (e: LinkageError) {
-                    throw PatchingException(defClass, relatedPatches, "Type: ${e::class.simpleName}\n${e.message}")
+                    throw RedefineException(defClass, findRelatedTransformers(defClass), "Type: ${e::class.simpleName}\n${e.message}")
                 } catch (e: Throwable) {
                     // throws generic patching exception below
                 }
                 
-                throw PatchingException(defClass, relatedPatches, ex)
+                throw RedefineException(defClass, findRelatedTransformers(defClass), ex)
             }
         }
     }
+    
+    private fun findRelatedTransformers(clazz: Class<*>): List<Transformer> =
+        transformers.filter { tf -> tf.classes.any { tfClass -> tfClass.internalName == clazz.internalName } }
     
     private fun insertPatchedLoader() {
         val spigotLoader = Bukkit::class.java.classLoader
@@ -193,12 +199,15 @@ private class PatcherException(t: Throwable) : Exception("""
     Startup parameters: ${ManagementFactory.getRuntimeMXBean().inputArguments}
 """, t)
 
-private class PatchingException : Exception {
+private class RedefineException : Exception {
     
-    constructor(defClass: Class<*>, transformers: List<Transformer>, message: String) : this("Failed to apply patches", defClass, transformers, message)
-    constructor(defClass: Class<*>, transformers: List<Transformer>, t: Throwable) : this("Failed to apply patches. Could not get more information.", defClass, transformers, "", t)
+    constructor(defClass: Class<*>, transformers: List<Transformer>, message: String) : this("Failed to redefine classes", defClass, transformers, message)
+    constructor(defClass: Class<*>, transformers: List<Transformer>, t: Throwable) : this("Failed to redefine classes. Could not get more information.", defClass, transformers, "", t)
     
     private constructor(m1: String, defClass: Class<*>, transformers: List<Transformer>, m2: String, t: Throwable? = null) :
         super("$m1\nClass: ${defClass.internalName}\nRelated transformers: ${transformers.joinToString()}\n$m2", t)
     
 }
+
+private class AssembleException(clazz: Class<*>, transformers: List<Transformer>, t: Throwable) :
+    Exception("Failed to assemble class ${clazz.internalName}\nRelated transformers: ${transformers.joinToString()}", t)

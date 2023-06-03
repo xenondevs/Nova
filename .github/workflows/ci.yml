@@ -12,25 +12,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set Up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: adopt
-          server-id: xenondevs
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-
-      - name: Run BuildTools
-        run: . .github/scripts/buildtools.sh
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
-
+        with:
+          cache-disabled: true
+        
       - name: Build Spigot-Mapped
-        run: ./gradlew loaderJar "-DoutDir=artifacts/"
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: |
+            loaderJarSpigot
+            -PoutDir=artifacts
+            -PxenondevsNms
+            --scan
+        env:
+          ORG_GRADLE_PROJECT_xenondevsNmsUsername: ${{ secrets.XENONDEVS_NMS_USERNAME }}
+          ORG_GRADLE_PROJECT_xenondevsNmsPassword: ${{ secrets.XENONDEVS_NMS_PASSWORD }}
 
       - name: Upload Artifacts
         id: upload
@@ -39,7 +44,7 @@ jobs:
           name: Artifacts
           path: ./artifacts/*.jar
 
-      - name: Attach Artifacts
+      - name: Attach Artifacts to Release
         if: github.event_name == 'release'
         uses: skx/github-action-publish-binaries@release-2.0
         env:
@@ -47,5 +52,19 @@ jobs:
         with:
           args: ./artifacts/*.jar
 
-      - name: Build & Publish Mojang-Mapped
-        run: ./gradlew clean publishNovaPublicationToXenondevsRepository publishNovaAPIPublicationToXenondevsRepository publishNovaGradlePluginPublicationToXenondevsRepository publishNova-gradle-pluginPluginMarkerMavenPublicationToXenondevsRepository -PxenondevsUsername=${{ secrets.MAVEN_USERNAME }} -PxenondevsPassword=${{ secrets.MAVEN_PASSWORD }} -Dmojang-mapped
+      - name: Deploy Mojang-Mapped
+        if: github.event_name == 'release'
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: | 
+            publishNovaPublicationToXenondevsRepository
+            publishNovaAPIPublicationToXenondevsRepository
+            publishNovaGradlePluginPublicationToXenondevsRepository
+            publishNova-gradle-pluginPluginMarkerMavenPublicationToXenondevsRepository
+            -PxenondevsNms
+            --scan
+        env:
+          ORG_GRADLE_PROJECT_xenondevsNmsUsername: ${{ secrets.XENONDEVS_NMS_USERNAME }}
+          ORG_GRADLE_PROJECT_xenondevsNmsPassword: ${{ secrets.XENONDEVS_NMS_PASSWORD }}
+          ORG_GRADLE_PROJECT_xenondevsUsername: ${{ secrets.XENONDEVS_RELEASES_USERNAME }}
+          ORG_GRADLE_PROJECT_xenondevsPassword: ${{ secrets.XENONDEVS_RELEASES_PASSWORD }}

@@ -70,7 +70,6 @@ internal object Initializer : Listener {
         VanillaRegistryAccess.unfreezeAll()
         registerEvents()
         
-        System.setProperty("net.kyori.adventure.serviceLoadFailuresAreFatal", "false")
         NMSUtilities.init(NOVA)
         InvUI.getInstance().plugin = NOVA
         InvUILanguages.getInstance().enableServerSideTranslations(false)

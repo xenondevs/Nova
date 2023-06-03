@@ -2,15 +2,18 @@ package xyz.xenondevs.nova.world.block.model
 
 import net.minecraft.util.Brightness
 import net.minecraft.world.item.ItemDisplayContext
-import org.bukkit.Material
+import net.minecraft.world.level.block.Blocks
 import org.joml.Quaternionf
 import xyz.xenondevs.nova.data.resources.model.data.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.tileentity.requiresLight
 import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemDisplayMetadata
+
+private val AIR_BLOCK_STATE = Blocks.AIR.defaultBlockState()
 
 private val ROTATIONS: Array<Quaternionf?> = arrayOf(
     // NORTH
@@ -82,8 +85,8 @@ class DisplayEntityModelProvider(blockState: NovaBlockState) : BlockModelProvide
     override fun remove(broken: Boolean) {
         entities.forEach(FakeItemDisplay::remove)
         if (broken) {
-            pos.block.type = Material.AIR
-            multiBlockPositions?.forEach { it.block.type = Material.AIR }
+            pos.setBlockStateNoUpdate(AIR_BLOCK_STATE)
+            multiBlockPositions?.forEach { it.setBlockStateNoUpdate(AIR_BLOCK_STATE) }
         }
     }
     
