@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.resources.builder.content.font
 
-import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.CharSizeCalculator
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -11,7 +11,7 @@ private const val ASCENT = 13
 
 class GuiContent private constructor() : FontContent(
     "nova:gui_%s",
-    Resources::updateGuiDataLookup
+    ResourceGeneration::updateGuiDataLookup
 ) {
     
     companion object : PackContentType<GuiContent> {

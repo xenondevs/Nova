@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova.data.resources.builder.content.font
 
+import net.minecraft.resources.ResourceLocation
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.CharSizeCalculator
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -21,7 +22,7 @@ class TextureIconContent private constructor(
     builder: ResourcePackBuilder
 ) : FontContent(
     "nova:texture_icons_%s",
-    Resources::updateTextureIconLookup
+    ResourceGeneration::updateTextureIconLookup
 ) {
     
     companion object : PackContentType<TextureIconContent> {
@@ -62,7 +63,7 @@ class TextureIconContent private constructor(
                 return@forEach
             
             addFontEntry(
-                "${namespace}:${relPath.substringBeforeLast('.')}",
+                ResourceLocation(namespace, relPath.substringBeforeLast('.')),
                 ResourcePath(namespace, relPath),
                 HEIGHT,
                 ASCENT

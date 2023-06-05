@@ -6,12 +6,12 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.logic.ItemLogic
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.data.LazyArray
+import xyz.xenondevs.nova.util.getOrThrow
 import xyz.xenondevs.nova.world.block.NovaBlock
 import kotlin.math.min
 import kotlin.reflect.KClass
@@ -39,7 +39,7 @@ class NovaItem internal constructor(
      * The [ItemModelData] containing all the vanilla material and custom model data to be used for this [NovaItem].
      */
     val model: ItemModelData by lazy {
-        val itemModelData = Resources.getModelData(id).item!!
+        val itemModelData = NovaRegistries.MODEL_DATA_LOOKUP.getOrThrow(id).item!!
         if (itemModelData.size == 1)
             return@lazy itemModelData.values.first()
         

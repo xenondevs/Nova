@@ -7,14 +7,15 @@ import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.CharSizes
-import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.yaml.getDeserialized
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayCompound
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatcher
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
+import xyz.xenondevs.nova.util.getOrThrow
 
 private val BAR_MATCH_INFO = BarMatchInfo.fromAddon(ResourceLocation("nova", "waila"))
 
@@ -44,7 +45,7 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
         overlays.clear()
         overlays += imageOverlay
         
-        val iconChar = Resources.getWailaIconCharOrNull(icon)
+        val iconChar = NovaRegistries.WAILA_DATA_LOOKUP.getOrThrow(icon)
         val (beginX, centerX) = imageOverlay.update(iconChar, lines.size, lines.maxOf { CharSizes.calculateComponentWidth(it.text, player.locale) })
         
         // re-add line overlays

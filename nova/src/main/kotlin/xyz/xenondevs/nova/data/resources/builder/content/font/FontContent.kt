@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.resources.builder.content.font
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.kyori.adventure.text.Component
+import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -18,17 +19,17 @@ private const val START_CHAR = '\uF000'
 
 abstract class FontContent(
     private val fontTemplate: String,
-    private val updateResources: ((Map<String, FontChar>) -> Unit)? = null,
+    private val updateResources: ((Map<ResourceLocation, FontChar>) -> Unit)? = null,
 ) : PackContent {
     
     private var currentChar = START_CHAR
     private var fontId = 0
     
-    private val chars = HashMap<String, BitmapFontChar>()
+    private val chars = HashMap<ResourceLocation, BitmapFontChar>()
     
     protected abstract val movedFontContent: MovedFontContent?
     
-    fun addFontEntry(id: String, image: ResourcePath, height: Int?, ascent: Int) {
+    fun addFontEntry(id: ResourceLocation, image: ResourcePath, height: Int?, ascent: Int) {
         chars[id] = BitmapFontChar(
             fontTemplate.format(fontId),
             currentChar,

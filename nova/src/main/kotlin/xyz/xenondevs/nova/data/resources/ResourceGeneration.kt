@@ -1,22 +1,31 @@
 package xyz.xenondevs.nova.data.resources
 
 import kotlinx.coroutines.runBlocking
+import net.minecraft.core.Registry
+import net.minecraft.core.WritableRegistry
+import net.minecraft.resources.ResourceLocation
+import org.bukkit.Material
 import xyz.xenondevs.inventoryaccess.util.DataUtils
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.addon.AddonsLoader
+import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
+import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
+import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.integration.HooksLoader
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.update
+import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.util.toMap
 import java.security.MessageDigest
 
 private const val RESOURCES_HASH = "resourcesHash"
@@ -40,7 +49,7 @@ internal object ResourceGeneration {
     
     @InternalInit(
         stage = InitializationStage.PRE_WORLD,
-        dependsOn = [AddonsLoader::class]
+        dependsOn = [AddonsInitializer::class]
     )
     object PreWorld {
         
@@ -57,19 +66,18 @@ internal object ResourceGeneration {
                 && PermanentStorage.has(Gui_DATA_LOOKUP)
             ) {
                 // Load from PermanentStorage
-                Resources.modelDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, ModelData>>(MODEL_DATA_LOOKUP)!!
-                Resources.armorDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, ArmorTexture>>(ARMOR_DATA_LOOKUP)!!
-                Resources.languageLookup = PermanentStorage.retrieveOrNull<HashMap<String, HashMap<String, String>>>(LANGUAGE_LOOKUP)!!
-                Resources.textureIconLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(TEXTURE_ICON_LOOKUP)!!
-                Resources.wailaDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(WAILA_DATA_LOOKUP)!!
-                Resources.guiDataLookup = PermanentStorage.retrieveOrNull<HashMap<String, FontChar>>(Gui_DATA_LOOKUP)!!
+                loadLookupRegistry(MODEL_DATA_LOOKUP, NovaRegistries.MODEL_DATA_LOOKUP)
+                loadLookupRegistry(ARMOR_DATA_LOOKUP, NovaRegistries.ARMOR_DATA_LOOKUP)
+                loadLookupRegistry(LANGUAGE_LOOKUP, NovaRegistries.LANGUAGE_LOOKUP)
+                loadLookupRegistry(TEXTURE_ICON_LOOKUP, NovaRegistries.TEXTURE_ICON_LOOKUP)
+                loadLookupRegistry(WAILA_DATA_LOOKUP, NovaRegistries.WAILA_DATA_LOOKUP)
+                loadLookupRegistry(Gui_DATA_LOOKUP, NovaRegistries.GUI_DATA_LOOKUP)
             } else {
                 // Build resource pack
                 LOGGER.info("Building resource pack")
                 builder = ResourcePackBuilder()
                     .also(ResourcePackBuilder::buildPackPreWorld)
                 LOGGER.info("Pre-world resource pack building done")
-    
             }
         }
         
@@ -127,4 +135,53 @@ internal object ResourceGeneration {
         }
     }
     
+    internal fun updateModelDataLookup(modelDataLookup: Map<ResourceLocation, ModelData>) {
+        loadLookupRegistry(modelDataLookup, NovaRegistries.MODEL_DATA_LOOKUP)
+        storeLookupRegistry(MODEL_DATA_LOOKUP, NovaRegistries.MODEL_DATA_LOOKUP)
+    }
+    
+    internal fun updateArmorDataLookup(armorDataLookup: Map<ResourceLocation, ArmorTexture>) {
+        loadLookupRegistry(armorDataLookup, NovaRegistries.ARMOR_DATA_LOOKUP)
+        storeLookupRegistry(ARMOR_DATA_LOOKUP, NovaRegistries.ARMOR_DATA_LOOKUP)
+    }
+    
+    internal fun updateGuiDataLookup(guiDataLookup: Map<ResourceLocation, FontChar>) {
+        loadLookupRegistry(guiDataLookup, NovaRegistries.GUI_DATA_LOOKUP)
+        storeLookupRegistry(Gui_DATA_LOOKUP, NovaRegistries.GUI_DATA_LOOKUP)
+    }
+    
+    internal fun updateWailaDataLookup(wailaDataLookup: Map<ResourceLocation, FontChar>) {
+        loadLookupRegistry(wailaDataLookup, NovaRegistries.WAILA_DATA_LOOKUP)
+        storeLookupRegistry(WAILA_DATA_LOOKUP, NovaRegistries.WAILA_DATA_LOOKUP)
+    }
+    
+    internal fun updateTextureIconLookup(textureIconLookup: Map<ResourceLocation, FontChar>) {
+        loadLookupRegistry(textureIconLookup, NovaRegistries.TEXTURE_ICON_LOOKUP)
+        storeLookupRegistry(TEXTURE_ICON_LOOKUP, NovaRegistries.TEXTURE_ICON_LOOKUP)
+    }
+    
+    internal fun updateLanguageLookup(languageLookup: Map<ResourceLocation, Map<String, String>>) {
+        loadLookupRegistry(languageLookup, NovaRegistries.LANGUAGE_LOOKUP)
+        storeLookupRegistry(LANGUAGE_LOOKUP, NovaRegistries.LANGUAGE_LOOKUP)
+    }
+    
+    private inline fun <reified T> loadLookupRegistry(storageKey: String, registry: WritableRegistry<T>) {
+        val map: Map<ResourceLocation, T> = PermanentStorage.retrieveOrNull(storageKey)!!
+        loadLookupRegistry(map, registry)
+    }
+    
+    private fun <T> loadLookupRegistry(map: Map<ResourceLocation, T>, registry: WritableRegistry<T>) {
+        map.entries.forEach { (key, value) -> registry[key] = value }
+    }
+    
+    private fun <T> storeLookupRegistry(storageKey: String, registry: Registry<T>) {
+        PermanentStorage.store(storageKey, registry.toMap())
+    }
+    
 }
+
+data class ModelData(
+    val item: Map<Material, ItemModelData>? = null,
+    val block: BlockModelData? = null,
+    val armor: ResourceLocation? = null
+)

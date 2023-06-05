@@ -3,6 +3,9 @@ package xyz.xenondevs.nova.registry
 import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.recipe.RecipeType
+import xyz.xenondevs.nova.data.resources.ModelData
+import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
+import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
@@ -54,6 +57,24 @@ object NovaRegistries {
     
     @JvmField
     val WAILA_TOOL_ICON_PROVIDER = registerSimple<WailaToolIconProvider>("waila_tool_icon_provider")
+    
+    @JvmField
+    val MODEL_DATA_LOOKUP = registerSimple<ModelData>("model_data_lookup")
+    
+    @JvmField
+    val ARMOR_DATA_LOOKUP = registerSimple<ArmorTexture>("armor_data_lookup")
+    
+    @JvmField
+    val GUI_DATA_LOOKUP = registerSimple<FontChar>("gui_data_lookup")
+    
+    @JvmField
+    val WAILA_DATA_LOOKUP = registerSimple<FontChar>("waila_data_lookup")
+    
+    @JvmField
+    val TEXTURE_ICON_LOOKUP = registerSimple<FontChar>("texture_icon_lookup")
+    
+    @JvmField
+    val LANGUAGE_LOOKUP = registerSimple<Map<String, String>>("language_lookup") // TODO: nested registries?
     
     private fun <E : Any> registerSimple(name: String): WritableRegistry<E> {
         val resourceLocation = ResourceLocation("nova", name)

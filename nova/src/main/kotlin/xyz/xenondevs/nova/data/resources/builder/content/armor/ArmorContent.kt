@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.data.resources.builder.content.armor
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.content.BuildingStage
@@ -92,9 +92,7 @@ class ArmorContent private constructor(
             writeMCPatcherArmor()
         }
         
-        Resources.updateArmorDataLookup(
-            armor.associateTo(HashMap()) { it.id to ArmorTexture(it.color) }
-        )
+        ResourceGeneration.updateArmorDataLookup(armor.associateTo(HashMap()) { it.id to ArmorTexture(it.color) })
     }
     
     private fun writeLeatherArmorAtlas() {

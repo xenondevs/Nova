@@ -5,7 +5,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.GameMode
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
@@ -85,7 +84,7 @@ object ToolLine {
     private fun getToolIcon(tier: ToolTier?, category: ToolCategory): Component =
         NovaRegistries.WAILA_TOOL_ICON_PROVIDER
             .firstNotNullOfOrNull { it.getIcon(category, tier) }
-            ?.let(Resources::getTextureIconChar)
+            ?.let { NovaRegistries.TEXTURE_ICON_LOOKUP[it] }
             ?.component
             ?: Component.empty()
     

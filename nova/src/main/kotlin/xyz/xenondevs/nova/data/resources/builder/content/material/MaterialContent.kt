@@ -10,7 +10,7 @@ import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ModelData
-import xyz.xenondevs.nova.data.resources.Resources
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.SoundOverrides
@@ -160,7 +160,7 @@ class MaterialContent private constructor(
             }
         
         // pass modelDataLookup to Resources
-        Resources.updateModelDataLookup(modelDataLookup)
+        ResourceGeneration.updateModelDataLookup(modelDataLookup)
         
         // write item models
         customItemModels.forEach { (material, registeredModels) ->

@@ -11,6 +11,7 @@ import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.inventory.SmithingRecipe
 import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
+import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.serialization.json.serializer.BlastingRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.CampfireRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.FurnaceRecipeDeserializer
@@ -55,7 +56,7 @@ class RecipeType<T : Any> internal constructor(
     
 }
 
-@InternalInit(stage = InitializationStage.PRE_WORLD)
+@InternalInit(stage = InitializationStage.PRE_WORLD, dependsOn = [ResourceGeneration.PreWorld::class])
 object VanillaRecipeTypes {
     
     val SHAPED = register("shaped", ShapedRecipe::class, TableRecipeGroup, ShapedRecipeDeserializer)

@@ -12,7 +12,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.logic.PacketItemData
@@ -21,6 +20,7 @@ import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.player.equipment.ArmorType
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
@@ -44,8 +44,10 @@ fun Wearable(type: ArmorType, equipSound: String? = null): ItemBehaviorFactory<W
 class Wearable(val options: WearableOptions) : ItemBehavior() {
     
     private val textureColor: Int? by lazy {
-        Resources.getModelData(item.id).armor
-            ?.let { Resources.getArmorData(it) }?.color
+        NovaRegistries.MODEL_DATA_LOOKUP.get(item.id)
+            ?.armor
+            ?.let { NovaRegistries.ARMOR_DATA_LOOKUP.get(it) }
+            ?.color
     }
     
     override fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> {

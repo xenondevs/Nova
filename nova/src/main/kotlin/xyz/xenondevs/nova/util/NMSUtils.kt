@@ -52,6 +52,7 @@ import org.bukkit.util.Vector
 import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
+import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
@@ -340,7 +341,21 @@ fun <T : Any> Registry<T>.byNameBinaryAdapter(): BinaryAdapter<T> {
 }
 
 operator fun <T> Registry<T>.get(key: String): T? {
-    return get(ResourceLocation.of(key, ':'))
+    val id = ResourceLocation.tryParse(key) ?: return null
+    return get(id)
+}
+
+fun <T> Registry<T>.getOrThrow(id: ResourceLocation): T {
+    return getOrThrow(ResourceKey.create(key(), id))
+}
+
+fun <T> Registry<T>.getOrThrow(key: String): T {
+    return getOrThrow(ResourceLocation(key))
+}
+
+fun <T> Registry<T>.getHolder(id: ResourceLocation): Holder<T>? {
+    val key = ResourceKey.create(key(), id)
+    return getHolder(key).getOrNull()
 }
 
 fun <T> Registry<T>.getOrCreateHolder(id: ResourceLocation): Holder<T> {
@@ -373,12 +388,54 @@ operator fun <T> WritableRegistry<T>.set(addon: Addon, key: String, value: T) {
     register(ResourceKey.create(key(), ResourceLocation(addon, key)), value, Lifecycle.stable())
 }
 
+fun <T> Registry<T>.toHolderMap(): Map<ResourceLocation, Holder<T>> {
+    val map = HashMap<ResourceLocation, Holder<T>>()
+    for (key in registryKeySet()) {
+        val holderOptional = getHolder(key)
+        if (holderOptional.isEmpty)
+            continue
+        
+        map[key.location()] = holderOptional.get()
+    }
+    
+    return map
+}
+
+fun <T> Registry<T>.toMap(): Map<ResourceLocation, T> {
+    val map = HashMap<ResourceLocation, T>()
+    for (key in registryKeySet()) {
+        val holderOptional = getHolder(key)
+        if (holderOptional.isEmpty)
+            continue
+        
+        val holder = holderOptional.get()
+        if (!holder.isBound)
+            continue
+        
+        map[key.location()] = holder.value()
+    }
+    
+    return map
+}
+
 fun ResourceLocation.toString(separator: String): String {
     return namespace + separator + path
 }
 
 fun ResourceLocation(addon: Addon, name: String): ResourceLocation {
     return ResourceLocation(addon.description.id, name)
+}
+
+// TODO: replace with static extension once available
+internal fun parseResourceLocation(id: String, fallbackNamespace: String = "minecraft"): ResourceLocation {
+    return if (ResourcePath.NON_NAMESPACED_ENTRY.matches(id)) {
+        ResourceLocation(fallbackNamespace, id)
+    } else {
+        val match = ResourcePath.NAMESPACED_ENTRY.matchEntire(id)
+            ?: throw IllegalArgumentException("Invalid resource id: $id")
+        
+        ResourceLocation(match.groupValues[1], match.groupValues[2])
+    }
 }
 
 fun preventPacketBroadcast(run: () -> Unit) {

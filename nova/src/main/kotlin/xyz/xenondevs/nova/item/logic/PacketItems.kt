@@ -28,11 +28,10 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundUpdateRecipes
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
-import xyz.xenondevs.nova.data.resources.Resources
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.bukkitMirror
@@ -199,7 +198,7 @@ internal object PacketItems : Listener {
         val subId = novaTag.getInt("subId")
         val itemLogic = material.logic
         
-        val itemModelDataMap = Resources.getModelDataOrNull(id)?.item
+        val itemModelDataMap = NovaRegistries.MODEL_DATA_LOOKUP[id]?.item
         val data = itemModelDataMap?.get(itemLogic.vanillaMaterial)
             ?: itemModelDataMap?.values?.first()
             ?: return getUnknownItem(itemStack, id)

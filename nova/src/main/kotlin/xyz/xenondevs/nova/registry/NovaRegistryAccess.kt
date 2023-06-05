@@ -55,6 +55,11 @@ object NovaRegistryAccess : RegistryAccess {
     }
     
     internal fun <E : Any> addRegistry(
+        namespace: String,
+        path: String
+    ): WritableRegistry<E> = addRegistry(ResourceLocation(namespace, path), ::InstantBindMappedRegistry)
+    
+    internal fun <E : Any> addRegistry(
         registryName: ResourceLocation
     ): WritableRegistry<E> = addRegistry(registryName, ::InstantBindMappedRegistry)
     

@@ -6,7 +6,6 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.resources.Resources
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.DisplayEntityBlockModelData
@@ -15,6 +14,7 @@ import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.getOrThrow
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.concurrent.CompletableFuture
@@ -54,7 +54,7 @@ open class NovaBlock internal constructor(
     /**
      * The [BlockModelData] used for displaying this [NovaBlock] in the world.
      */
-    val model: BlockModelData by lazy { Resources.getModelData(id).block!! }
+    val model: BlockModelData by lazy { NovaRegistries.MODEL_DATA_LOOKUP.getOrThrow(id).block!! }
     
     internal val vanillaBlockMaterial: Material
         get() = when (val block = model) {
