@@ -5,13 +5,13 @@ import org.bukkit.Material
 import org.bukkit.Tag
 import xyz.xenondevs.commons.collections.associateWithNotNullTo
 import xyz.xenondevs.commons.collections.enumMapOf
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_CATEGORY
 import xyz.xenondevs.nova.util.set
 import java.util.function.Predicate
 
-@InternalInit(stage = InitializationStage.PRE_WORLD)
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 object VanillaToolCategories {
     
     val SHOVEL = register(

@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.transformer.Patcher
@@ -41,7 +41,7 @@ import kotlin.random.Random
 private val CHUNK_SEARCH_ID_KEY = NamespacedKey(NOVA, "chunkSearchId")
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD,
+    stage = InternalInitStage.POST_WORLD,
     dependsOn = [WorldDataManager::class, Patcher::class]
 )
 internal object BackingStateManager : Listener {

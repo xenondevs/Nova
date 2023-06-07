@@ -14,8 +14,8 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.loader.NovaClassLoader
 import xyz.xenondevs.nova.transformer.adapter.LcsWrapperAdapter
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
@@ -55,7 +55,7 @@ import java.lang.instrument.ClassDefinition
 import java.lang.management.ManagementFactory
 import java.lang.reflect.Field
 
-@InternalInit(stage = InitializationStage.PRE_WORLD)
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 internal object Patcher {
     
     private val extraOpens = setOf("java.lang", "java.lang.reflect", "java.util", "jdk.internal.misc", "jdk.internal.reflect")

@@ -17,7 +17,6 @@ import xyz.xenondevs.nova.api.ApiItemRegistry
 import xyz.xenondevs.nova.api.ApiTileEntityManager
 import xyz.xenondevs.nova.api.NovaMaterialRegistry
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
-import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -63,10 +62,8 @@ internal class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plu
         if (IS_DEV_SERVER)
             LOGGER.warning("Running in dev mode! Never use this on a production server!")
         
-        NovaConfig.loadDefaultConfig()
         if (checkStartup()) {
-            Initializer.searchClasses()
-            Initializer.initPreWorld()
+            Initializer.start()
         }
     }
     
@@ -87,12 +84,12 @@ internal class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plu
             return false
         }
         
-        // prevent reloading if this server is using an agent or Nova was updated
+        // prevent reloading
         if (!IS_DEV_SERVER && ServerUtils.isReload) {
             LOGGER.severe("============================")
             LOGGER.severe("!RELOADING IS NOT SUPPORTED!")
             LOGGER.severe("============================")
-            Bukkit.getPluginManager().disablePlugin(loader)
+            Bukkit.shutdown()
             return false
         }
         

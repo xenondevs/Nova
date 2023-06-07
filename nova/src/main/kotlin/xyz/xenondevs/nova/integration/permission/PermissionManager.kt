@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import java.time.Duration
@@ -29,7 +29,7 @@ private data class PermissionArgs(val world: World, val player: OfflinePlayer, v
  *
  * [OfflinePlayer] permissions will be cached for 30 minutes after the last access and commonly accessed permissions will be refreshed every minute.
  */
-@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC, dependsOn = [HooksLoader::class])
+@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC, dependsOn = [HooksLoader::class])
 object PermissionManager {
     
     internal val integrations = ArrayList<PermissionIntegration>()

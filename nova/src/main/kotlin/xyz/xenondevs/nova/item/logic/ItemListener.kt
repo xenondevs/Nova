@@ -18,7 +18,7 @@ import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
@@ -32,7 +32,7 @@ import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import java.util.*
 
-@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC)
+@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
 internal object ItemListener : Listener {
     
     private val usedItems = WeakHashMap<Player, ItemStack>()

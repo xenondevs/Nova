@@ -1,8 +1,11 @@
 package xyz.xenondevs.nova.world.block.limits
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
@@ -13,6 +16,7 @@ import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.lang.Integer.max
 import java.util.*
 
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 internal object TileEntityTracker {
     
     private val BLOCK_COUNTER: HashMap<UUID, HashMap<ResourceLocation, Int>> =
@@ -22,11 +26,12 @@ internal object TileEntityTracker {
     private val BLOCK_CHUNK_COUNTER: HashMap<UUID, HashMap<ChunkPos, HashMap<ResourceLocation, Int>>> =
         PermanentStorage.retrieve("block_chunk_counter", ::HashMap)
     
-    init {
+    @InitFun
+    private fun init() {
         runTaskTimer(20 * 60, 20 * 60, ::saveCounters)
-        NOVA.disableHandlers += ::saveCounters
     }
     
+    @DisableFun
     private fun saveCounters() {
         PermanentStorage.store("block_counter", BLOCK_COUNTER)
         PermanentStorage.store("block_world_counter", BLOCK_WORLD_COUNTER)

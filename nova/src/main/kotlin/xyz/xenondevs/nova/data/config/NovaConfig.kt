@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.item.ItemCategories
 import xyz.xenondevs.nova.item.NovaItem
@@ -37,7 +37,7 @@ import kotlin.reflect.KProperty
 val DEFAULT_CONFIG by configReloadable { NovaConfig["config"] }
 
 @InternalInit(
-    stage = InitializationStage.PRE_WORLD,
+    stage = InternalInitStage.PRE_WORLD,
     dependsOn = [AddonsLoader::class]
 )
 object NovaConfig {

@@ -3,7 +3,7 @@
 package xyz.xenondevs.nova.item
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.behavior.impl.WrenchBehavior
@@ -11,14 +11,14 @@ import xyz.xenondevs.nova.item.logic.ItemLogic
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.set
 
-@InternalInit(stage = InitializationStage.PRE_WORLD)
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 object DefaultItems {
     
     val WRENCH = registerCoreItem("wrench", WrenchBehavior)
     
 }
 
-@InternalInit(stage = InitializationStage.PRE_WORLD)
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 object DefaultGuiItems {
     
     val ANVIL_OVERLAY_ARROW = registerUnnamedHiddenCoreItem("gui_anvil_overlay_arrow")
@@ -127,7 +127,7 @@ object DefaultGuiItems {
     
 }
 
-@InternalInit(stage = InitializationStage.PRE_WORLD)
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 object DefaultBlockOverlays {
     
     val BREAK_STAGE_OVERLAY = registerUnnamedHiddenCoreItem("break_stage_overlay")

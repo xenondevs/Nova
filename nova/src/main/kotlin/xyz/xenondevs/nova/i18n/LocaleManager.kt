@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.toMap
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD_ASYNC,
+    stage = InternalInitStage.POST_WORLD_ASYNC,
     dependsOn = [ResourceGeneration.PreWorld::class]
 )
 object LocaleManager {

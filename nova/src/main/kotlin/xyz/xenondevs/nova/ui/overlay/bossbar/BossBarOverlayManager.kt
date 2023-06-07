@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarOrigin
@@ -50,7 +50,7 @@ private val ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("overlay.bos
 private val BAR_AMOUNT by configReloadable { DEFAULT_CONFIG.getInt("overlay.bossbar.amount") }
 private val SEND_BARS_AFTER_RESOURCE_PACK_LOADED by configReloadable { DEFAULT_CONFIG.getBoolean("overlay.bossbar.send_bars_after_resource_pack_loaded") }
 
-@InternalInit(stage = InitializationStage.POST_WORLD)
+@InternalInit(stage = InternalInitStage.POST_WORLD)
 object BossBarOverlayManager : Listener {
     
     private var tickTask: BukkitTask? = null

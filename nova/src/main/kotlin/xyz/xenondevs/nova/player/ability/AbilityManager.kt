@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries.ABILITY_TYPE
 import xyz.xenondevs.nova.util.registerEvents
@@ -26,7 +26,7 @@ import kotlin.collections.set
 private val ABILITIES_KEY = NamespacedKey(NOVA, "abilities1")
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD,
+    stage = InternalInitStage.POST_WORLD,
     dependsOn = [AddonsInitializer::class]
 )
 object AbilityManager : Listener {

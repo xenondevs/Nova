@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.BlockPos
@@ -25,7 +25,7 @@ import java.util.*
  * Manages wrappers for vanilla TileEntities
  */
 @InternalInit(
-    stage = InitializationStage.POST_WORLD,
+    stage = InternalInitStage.POST_WORLD,
     dependsOn = [AddonsInitializer::class]
 )
 internal object VanillaTileEntityManager : Listener {

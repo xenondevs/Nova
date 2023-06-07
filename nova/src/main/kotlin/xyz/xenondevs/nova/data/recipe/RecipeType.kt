@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.data.serialization.json.serializer.ShapelessRecipeDese
 import xyz.xenondevs.nova.data.serialization.json.serializer.SmithingRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.SmokingRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.StonecutterRecipeDeserializer
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.BlastingRecipeGroup
@@ -56,7 +56,7 @@ class RecipeType<T : Any> internal constructor(
     
 }
 
-@InternalInit(stage = InitializationStage.PRE_WORLD, dependsOn = [ResourceGeneration.PreWorld::class])
+@InternalInit(stage = InternalInitStage.PRE_WORLD, dependsOn = [ResourceGeneration.PreWorld::class])
 object VanillaRecipeTypes {
     
     val SHAPED = register("shaped", ShapedRecipe::class, TableRecipeGroup, ShapedRecipeDeserializer)

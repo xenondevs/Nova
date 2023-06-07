@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -33,7 +33,7 @@ private val Player.isWailaEnabled: Boolean
     get() = persistentDataContainer.get<Boolean>(WAILA_ENABLED_KEY) != false
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD,
+    stage = InternalInitStage.POST_WORLD,
     dependsOn = [ResourceGeneration.PostWorld::class, AddonsInitializer::class]
 )
 internal object WailaManager : Listener, IWailaManager {

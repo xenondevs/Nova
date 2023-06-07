@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.command.impl.NovaUsageCommand
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.item.ItemCategories
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 private val COMMAND_DISPATCHER: CommandDispatcher<CommandSourceStack> = (Bukkit.getServer() as CraftServer).server.vanillaCommandDispatcher.dispatcher
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD,
+    stage = InternalInitStage.POST_WORLD,
     dependsOn = [ItemCategories::class, RecipeRegistry::class]
 )
 object CommandManager {

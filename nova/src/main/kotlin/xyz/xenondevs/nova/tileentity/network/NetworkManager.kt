@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
@@ -68,7 +68,7 @@ interface NetworkManager {
     fun reloadNetworks()
     
     @InternalInit(
-        stage = InitializationStage.POST_WORLD,
+        stage = InternalInitStage.POST_WORLD,
         dependsOn = [LegacyFileConverter::class, DefaultNetworkTypes::class]
     )
     companion object : Listener {

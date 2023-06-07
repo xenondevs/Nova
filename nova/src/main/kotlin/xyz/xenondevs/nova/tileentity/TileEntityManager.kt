@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -21,7 +21,7 @@ val Material?.requiresLight: Boolean
     get() = this != null && !isTransparent && isOccluding
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD,
+    stage = InternalInitStage.POST_WORLD,
     dependsOn = [HooksLoader::class]
 )
 object TileEntityManager {

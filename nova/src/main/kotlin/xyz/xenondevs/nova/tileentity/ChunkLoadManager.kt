@@ -6,12 +6,12 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.world.ChunkPos
 import java.util.*
 
-@InternalInit(stage = InitializationStage.POST_WORLD)
+@InternalInit(stage = InternalInitStage.POST_WORLD)
 object ChunkLoadManager {
     
     private val forceLoadedChunks = PermanentStorage.retrieve("forceLoadedChunks") { HashMap<ChunkPos, HashSet<UUID>>() }

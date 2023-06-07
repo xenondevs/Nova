@@ -17,8 +17,8 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.recipes.handleRecipeChoiceItemClick
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
@@ -29,7 +29,7 @@ import java.io.InputStream
 import java.util.logging.Level
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD,
+    stage = InternalInitStage.POST_WORLD,
     dependsOn = [AddonsInitializer::class]
 )
 internal object ItemCategories {

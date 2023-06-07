@@ -18,8 +18,8 @@ import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.data.getResourceAsStream
@@ -48,7 +48,7 @@ internal object ResourceGeneration {
     private var builder: ResourcePackBuilder? = null
     
     @InternalInit(
-        stage = InitializationStage.PRE_WORLD,
+        stage = InternalInitStage.PRE_WORLD,
         dependsOn = [AddonsInitializer::class]
     )
     object PreWorld {
@@ -84,7 +84,7 @@ internal object ResourceGeneration {
     }
     
     @InternalInit(
-        stage = InitializationStage.POST_WORLD_ASYNC,
+        stage = InternalInitStage.POST_WORLD_ASYNC,
         dependsOn = [HooksLoader::class]
     )
     object PostWorld {

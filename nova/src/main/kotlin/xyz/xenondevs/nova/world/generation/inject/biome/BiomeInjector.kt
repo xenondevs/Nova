@@ -14,7 +14,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.world.generation.WorldGenManager
 
 @OptIn(ExperimentalWorldGen::class)
 @InternalInit(
-    stage = InitializationStage.PRE_WORLD,
+    stage = InternalInitStage.PRE_WORLD,
     dependsOn = [AddonsInitializer::class, WorldGenManager::class]
 )
 internal object BiomeInjector {

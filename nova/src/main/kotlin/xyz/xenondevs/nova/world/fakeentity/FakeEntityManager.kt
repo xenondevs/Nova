@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTask
@@ -39,7 +39,7 @@ var Player.fakeEntityRenderDistance: Int
         FakeEntityManager.updateRenderDistance(this)
     }
 
-@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC)
+@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
 internal object FakeEntityManager : Listener {
     
     val RENDER_DISTANCE_KEY = NamespacedKey(NOVA, "entity_render_distance")

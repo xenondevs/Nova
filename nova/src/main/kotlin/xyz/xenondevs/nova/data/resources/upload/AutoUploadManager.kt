@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
 import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.data.hash
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
@@ -24,7 +24,7 @@ import java.io.File
 import java.util.logging.Level
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD_ASYNC,
+    stage = InternalInitStage.POST_WORLD_ASYNC,
     dependsOn = [HooksLoader::class, ResourceGeneration.PostWorld::class]
 )
 internal object AutoUploadManager {

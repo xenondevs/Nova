@@ -29,7 +29,7 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeMo
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
@@ -70,7 +70,7 @@ private val SHULKER_BOX_ITEMS = setOf(
 )
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD,
+    stage = InternalInitStage.POST_WORLD,
     dependsOn = [ResourceGeneration.PreWorld::class]
 )
 internal object PacketItems : Listener {

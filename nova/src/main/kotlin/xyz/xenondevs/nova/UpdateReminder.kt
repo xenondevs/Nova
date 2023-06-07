@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.component.adventure.sendMessage
 import xyz.xenondevs.nova.util.data.Version
@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import java.net.URL
 
-@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC, dependsOn = [NovaConfig::class])
+@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC, dependsOn = [NovaConfig::class])
 internal object UpdateReminder : Listener {
     
     private const val NOVA_RESOURCE_ID = 93648

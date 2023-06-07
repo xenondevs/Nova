@@ -18,11 +18,11 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status.*
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEventsFirst
 
-@InternalInit(stage = InitializationStage.POST_WORLD)
+@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object PlayerFreezer : Listener {
     
     private val frozenPlayers = HashMap<Player, Boolean>() // Player -> prevAllowFlight

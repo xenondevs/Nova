@@ -3,13 +3,13 @@ package xyz.xenondevs.nova.item.tool
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.set
 
-@InternalInit(stage = InitializationStage.PRE_WORLD)
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 object VanillaToolTiers {
     
     val WOOD = register("wood")

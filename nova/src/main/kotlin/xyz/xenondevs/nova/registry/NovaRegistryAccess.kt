@@ -14,7 +14,7 @@ import java.util.stream.Stream
 import kotlin.streams.asStream
 
 @Suppress("UNCHECKED_CAST")
-object NovaRegistryAccess : RegistryAccess {
+class NovaRegistryAccess private constructor() : RegistryAccess {
     
     private val registries = Object2ObjectOpenHashMap<ResourceKey<out Registry<*>>, Registry<*>>()
     
@@ -70,6 +70,13 @@ object NovaRegistryAccess : RegistryAccess {
     
     internal fun freezeAll() {
         registries.forEach { it.value.freeze() }
+    }
+    
+    companion object {
+        
+        val DEFAULT = NovaRegistryAccess()
+        val LOOKUPS = NovaRegistryAccess()
+        
     }
     
 }

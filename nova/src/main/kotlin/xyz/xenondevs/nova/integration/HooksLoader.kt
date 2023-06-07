@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.resources.upload.UploadService
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.util.data.JarUtils
 import java.util.logging.Level
 import kotlin.reflect.KClass
 
-@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC)
+@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
 internal object HooksLoader {
     
     @InitFun

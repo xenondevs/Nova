@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
 import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
@@ -70,7 +70,7 @@ private data class CanHurtEntityTileArgs(override val tileEntity: TileEntity, va
  * If all protection integrations [can be called asynchronously][ExecutionMode], commonly used protection checks will be refreshed
  * every 30s.
  */
-@InternalInit(stage = InitializationStage.POST_WORLD_ASYNC, dependsOn = [HooksLoader::class])
+@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC, dependsOn = [HooksLoader::class])
 object ProtectionManager {
     
     internal val integrations = ArrayList<ProtectionIntegration>()

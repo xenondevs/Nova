@@ -20,70 +20,70 @@ import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 
 object NovaRegistries {
-
-    @JvmField
-    val BLOCK = registerSimple<NovaBlock>("block")
     
     @JvmField
-    val ITEM = registerFuzzy<NovaItem>("item")
+    val BLOCK = registerSimple<NovaBlock>(NovaRegistryAccess.DEFAULT, "block")
     
     @JvmField
-    val TOOL_TIER = registerSimple<ToolTier>("tool_tier")
+    val ITEM = registerFuzzy<NovaItem>(NovaRegistryAccess.DEFAULT, "item")
     
     @JvmField
-    val TOOL_CATEGORY = registerSimple<ToolCategory>("tool_category")
+    val TOOL_TIER = registerSimple<ToolTier>(NovaRegistryAccess.DEFAULT, "tool_tier")
     
     @JvmField
-    val UPGRADE_TYPE = registerSimple<UpgradeType<*>>("upgrade_type")
+    val TOOL_CATEGORY = registerSimple<ToolCategory>(NovaRegistryAccess.DEFAULT, "tool_category")
     
     @JvmField
-    val NETWORK_TYPE = registerSimple<NetworkType>("network_type")
+    val UPGRADE_TYPE = registerSimple<UpgradeType<*>>(NovaRegistryAccess.DEFAULT, "upgrade_type")
     
     @JvmField
-    val ABILITY_TYPE = registerSimple<AbilityType<*>>("ability_type")
+    val NETWORK_TYPE = registerSimple<NetworkType>(NovaRegistryAccess.DEFAULT, "network_type")
     
     @JvmField
-    val ATTACHMENT_TYPE = registerSimple<AttachmentType<*>>("attachment_type")
+    val ABILITY_TYPE = registerSimple<AbilityType<*>>(NovaRegistryAccess.DEFAULT, "ability_type")
     
     @JvmField
-    val RECIPE_TYPE = registerSimple<RecipeType<*>>("recipe_type")
+    val ATTACHMENT_TYPE = registerSimple<AttachmentType<*>>(NovaRegistryAccess.DEFAULT, "attachment_type")
+    
+    @JvmField
+    val RECIPE_TYPE = registerSimple<RecipeType<*>>(NovaRegistryAccess.DEFAULT, "recipe_type")
     
     @JvmField
     @ExperimentalWorldGen
-    val BIOME_INJECTION = registerSimple<BiomeInjection>("biome_injection")
+    val BIOME_INJECTION = registerSimple<BiomeInjection>(NovaRegistryAccess.DEFAULT, "biome_injection")
     
     @JvmField
-    val WAILA_INFO_PROVIDER = registerSimple<WailaInfoProvider<*>>("waila_info_provider")
+    val WAILA_INFO_PROVIDER = registerSimple<WailaInfoProvider<*>>(NovaRegistryAccess.DEFAULT, "waila_info_provider")
     
     @JvmField
-    val WAILA_TOOL_ICON_PROVIDER = registerSimple<WailaToolIconProvider>("waila_tool_icon_provider")
+    val WAILA_TOOL_ICON_PROVIDER = registerSimple<WailaToolIconProvider>(NovaRegistryAccess.DEFAULT, "waila_tool_icon_provider")
     
     @JvmField
-    val MODEL_DATA_LOOKUP = registerSimple<ModelData>("model_data_lookup")
+    val MODEL_DATA_LOOKUP = registerSimple<ModelData>(NovaRegistryAccess.LOOKUPS, "model_data_lookup")
     
     @JvmField
-    val ARMOR_DATA_LOOKUP = registerSimple<ArmorTexture>("armor_data_lookup")
+    val ARMOR_DATA_LOOKUP = registerSimple<ArmorTexture>(NovaRegistryAccess.LOOKUPS, "armor_data_lookup")
     
     @JvmField
-    val GUI_DATA_LOOKUP = registerSimple<FontChar>("gui_data_lookup")
+    val GUI_DATA_LOOKUP = registerSimple<FontChar>(NovaRegistryAccess.LOOKUPS, "gui_data_lookup")
     
     @JvmField
-    val WAILA_DATA_LOOKUP = registerSimple<FontChar>("waila_data_lookup")
+    val WAILA_DATA_LOOKUP = registerSimple<FontChar>(NovaRegistryAccess.LOOKUPS, "waila_data_lookup")
     
     @JvmField
-    val TEXTURE_ICON_LOOKUP = registerSimple<FontChar>("texture_icon_lookup")
+    val TEXTURE_ICON_LOOKUP = registerSimple<FontChar>(NovaRegistryAccess.LOOKUPS, "texture_icon_lookup")
     
     @JvmField
-    val LANGUAGE_LOOKUP = registerSimple<Map<String, String>>("language_lookup") // TODO: nested registries?
+    val LANGUAGE_LOOKUP = registerSimple<Map<String, String>>(NovaRegistryAccess.LOOKUPS, "language_lookup") // TODO: nested registries?
     
-    private fun <E : Any> registerSimple(name: String): WritableRegistry<E> {
+    private fun <E : Any> registerSimple(registryAccess: NovaRegistryAccess, name: String): WritableRegistry<E> {
         val resourceLocation = ResourceLocation("nova", name)
-        return NovaRegistryAccess.addRegistry(resourceLocation)
+        return registryAccess.addRegistry(resourceLocation)
     }
     
-    private fun <E: Any> registerFuzzy(name: String): FuzzyMappedRegistry<E> {
+    private fun <E : Any> registerFuzzy(registryAccess: NovaRegistryAccess, name: String): FuzzyMappedRegistry<E> {
         val resourceLocation = ResourceLocation("nova", name)
-        return NovaRegistryAccess.addFuzzyRegistry(resourceLocation)
+        return registryAccess.addFuzzyRegistry(resourceLocation)
     }
     
 }

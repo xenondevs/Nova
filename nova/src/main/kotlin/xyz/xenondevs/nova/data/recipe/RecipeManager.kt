@@ -33,8 +33,8 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.recipe.impl.RepairItemRecipe
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
@@ -134,7 +134,7 @@ annotation class HardcodedRecipes
 private val ALLOW_RESULT_OVERWRITE by configReloadable { DEFAULT_CONFIG.getBoolean("debug.allow_craft_result_overwrite") }
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD,
+    stage = InternalInitStage.POST_WORLD,
     dependsOn = [AddonsInitializer::class, HooksLoader::class, VanillaRecipeTypes::class]
 )
 object RecipeManager : Listener {

@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.dropItems
@@ -38,7 +38,7 @@ import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import kotlin.random.Random
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD,
+    stage = InternalInitStage.POST_WORLD,
     dependsOn = [AddonsInitializer::class, WorldDataManager::class]
 )
 object BlockManager {

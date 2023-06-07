@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.component.adventure.chars
 import java.io.ByteArrayInputStream
@@ -37,7 +37,7 @@ data class CharOptions(
 private val LOAD_CHAR_SIZES_ON_STARTUP by configReloadable { DEFAULT_CONFIG.getBoolean("performance.load_char_sizes_on_startup") }
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD_ASYNC,
+    stage = InternalInitStage.POST_WORLD_ASYNC,
     dependsOn = [ResourceGeneration.PostWorld::class]
 )
 object CharSizes {

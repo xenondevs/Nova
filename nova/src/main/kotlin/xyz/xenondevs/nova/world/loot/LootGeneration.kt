@@ -7,12 +7,12 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.world.LootGenerateEvent
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.registerEvents
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD_ASYNC,
+    stage = InternalInitStage.POST_WORLD_ASYNC,
     dependsOn = [LootConfigHandler::class]
 )
 internal object LootGeneration : Listener {

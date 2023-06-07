@@ -1,9 +1,6 @@
 package xyz.xenondevs.nova.initialize
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import it.unimi.dsi.fastutil.objects.ObjectLists
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
-import it.unimi.dsi.fastutil.objects.ObjectSets
+import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
 import org.bukkit.Bukkit
@@ -13,8 +10,8 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.server.ServerLoadEvent
 import org.bukkit.inventory.ItemStack
-import org.objectweb.asm.Type
 import xyz.xenondevs.commons.collections.CollectionUtils
+import xyz.xenondevs.commons.collections.poll
 import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.invui.inventory.StackSizeProvider
 import xyz.xenondevs.invui.util.InventoryUtils
@@ -24,6 +21,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
+import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.serialization.cbf.CBFAdapters
 import xyz.xenondevs.nova.registry.NovaRegistryAccess
@@ -33,94 +31,154 @@ import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTask
+import java.util.*
+import java.util.concurrent.Executors
 import java.util.logging.Level
-import kotlin.reflect.jvm.jvmName
 import xyz.xenondevs.inventoryaccess.component.i18n.Languages as InvUILanguages
 
 internal object Initializer : Listener {
     
-    private val toInit = ObjectArrayList<InternalInitializableClass>()
+    /**
+     * The thread pool used for post-world initialization.
+     */
+    private val execService = Executors.newCachedThreadPool(ThreadFactoryBuilder().setNameFormat("Nova Initializer - %d").build())
     
-    val initialized: MutableList<InternalInitializableClass> = ObjectLists.synchronize(ObjectArrayList())
+    /**
+     * A list containing all [InitializableClasses][InitializableClass] at all times.
+     */
+    private val initClasses = ArrayList<InitializableClass>()
+    
+    /**
+     * A list containing all not yet initialized [InitializableClasses][InitializableClass] for pre-world initialization
+     * in the order that they should be initialized in.
+     */
+    private var toInitPreWorld: MutableList<InitializableClass> = ArrayList()
+    
+    /**
+     * A list containing all [InitializableClasses][InitializableClass] for post-world initialization (sync and async)
+     * in the order that they should be initialized in.
+     *
+     * Unlike the pre-world variant, this list is not updated after the initialization of its elements.
+     */
+    private var toInitPostWorld: List<InitializableClass> = ArrayList()
+    
+    /**
+     * A list of successfully initialized [InitializableClasses][InitializableClass].
+     */
+    val initialized: MutableList<InitializableClass> = Collections.synchronizedList(ArrayList())
+    
+    /**
+     * Whether the pre-world initialization step has been completed successfully.
+     */
+    private var preWorldInitialized = false
+    
+    /**
+     * Whether the initialization process has been completed successfully.
+     */
     var isDone = false
         private set
     
-    private var failedPreWorld = false
-    
-    // Map structure: https://i.imgur.com/VHLkAtM.png (stage instead of initializationStage)
-    @Suppress("UNCHECKED_CAST")
-    fun searchClasses() {
-        var classes: List<InternalInitializableClass> = JarUtils.findAnnotatedClasses(NOVA.pluginFile, InternalInit::class).asSequence()
-            .map { (clazz, annotation) ->
-                val stageName = (annotation["stage"] as Array<String>?)?.get(1)
-                    ?: throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")
-                val stage = enumValueOf<InitializationStage>(stageName)
-                val dependsOn = (annotation["dependsOn"] as List<Type>?)?.mapTo(ObjectOpenHashSet()) { it.internalName } ?: ObjectSets.emptySet()
-                
-                return@map InternalInitializableClass(clazz, stage, dependsOn)
-            }.toMutableList()
-        
-        classes = CollectionUtils.sortDependenciesMapped(classes, InternalInitializableClass::dependsOn, InternalInitializableClass::className)
-        toInit.addAll(classes)
+    /**
+     * Stats the initialization process.
+     */
+    fun start() {
+        searchClasses()
+        initPreWorld()
     }
     
-    fun initPreWorld() {
+    /**
+     * Searches for classes annotated with [InternalInit] and adds stores them to be initialized.
+     */
+    private fun searchClasses() {
+        val classes = JarUtils.findAnnotatedClasses(NOVA.pluginFile, InternalInit::class)
+            .map { (clazz, annotation) -> InitializableClass.fromInternalAnnotation(clazz, annotation) }
+        addInitClasses(classes)
+    }
+    
+    /**
+     * Adds the given [InitializableClasses][InitializableClass] to the [initClasses] list and sorts them.
+     *
+     * This method can only be invoked during the pre-world initialization phase or before the [start] method is called.
+     */
+    fun addInitClasses(classes: List<InitializableClass>) {
+        check(!preWorldInitialized) { "Cannot add additional init classes after pre-world initialization!" }
+        
+        initClasses.addAll(classes)
+        initClasses.forEach { it.loadDependencies(initClasses) }
+        
+        fun combineAndSort(a: List<InitializableClass>, b: List<InitializableClass>) =
+            ArrayList(CollectionUtils.sortDependencies(a + b, InitializableClass::dependsOn))
+        
+        toInitPreWorld = combineAndSort(toInitPreWorld, classes.filter { it.stage == InternalInitStage.PRE_WORLD })
+        toInitPostWorld = combineAndSort(toInitPostWorld, classes.filter { it.stage != InternalInitStage.PRE_WORLD })
+    }
+    
+    /**
+     * Stats the pre-world initialization process.
+     */
+    private fun initPreWorld() {
+        NovaConfig.loadDefaultConfig()
         VanillaRegistryAccess.unfreezeAll()
         registerEvents()
-        
         NMSUtilities.init(NOVA)
         InvUI.getInstance().plugin = NOVA
         InvUILanguages.getInstance().enableServerSideTranslations(false)
-        
         CBFAdapters.register()
         InventoryUtils.stackSizeProvider = StackSizeProvider(ItemStack::novaMaxStackSize)
         
-        val preWorldInit = toInit.filter { it.stage == InitializationStage.PRE_WORLD }
-        val lookup = toInit.associateBy(InternalInitializableClass::className)
-        
-        preWorldInit.forEach { initializable ->
-            if (!waitForDependencies(initializable, lookup))
-                return@forEach
-            
-            initializable.initialize()
+        // pre-world initialization polls from the list because additional elements may be added by addons
+        var failed = false
+        while (toInitPreWorld.isNotEmpty()) {
+            val initClass = toInitPreWorld.poll()!!
+            if (!initClass.initialize()) {
+                failed = true
+                break
+            }
         }
         
-        preWorldInit.forEach { it.initialization.get() }
-        
-        if (initialized.size != preWorldInit.size) {
-            failedPreWorld = true
-            performAppropriateShutdown()
-            return
+        if (!failed) {
+            NovaRegistryAccess.DEFAULT.freezeAll()
+            VanillaRegistryAccess.freezeAll()
+            preWorldInitialized = true
+        } else {
+            shutdown()
         }
-        
-        NovaRegistryAccess.freezeAll()
-        VanillaRegistryAccess.freezeAll()
     }
     
+    /**
+     * Starts the post-world initialization process.
+     */
     private fun initPostWorld() {
-        runAsyncTask {
-            val postWorldInit = toInit.filter { it.stage != InitializationStage.PRE_WORLD }
-            val lookup = toInit.associateBy(InternalInitializableClass::className)
-            
-            postWorldInit.forEach { initializable ->
-                runAsyncTask initializableTask@{
-                    if (!waitForDependencies(initializable, lookup))
-                        return@initializableTask
+        execService.submit {
+            toInitPostWorld.forEach { initializable ->
+                // each InitializableClass gets its own thread in which it waits for its dependencies to be initialized
+                execService.submit initializableThread@{
+                    if (!waitForDependencies(initializable))
+                        return@initializableThread
                     
-                    if (initializable.stage == InitializationStage.POST_WORLD) {
-                        runTask { initializable.initialize() }
-                    } else {
-                        runAsyncTask { initializable.initialize() }
+                    // dependencies have been initialized, now initialize this class in the preferred thread
+                    when (initializable.stage) {
+                        // for post-world, jump to the server thread
+                        InternalInitStage.POST_WORLD -> runTask { initializable.initialize() }
+                        // for async, we can stay in the current thread
+                        InternalInitStage.POST_WORLD_ASYNC -> initializable.initialize()
+                        
+                        // should not happen
+                        else -> throw UnsupportedOperationException()
                     }
-                    
                 }
             }
             
-            postWorldInit.forEach { it.initialization.get() }
+            // block thread until everything is initialized
+            var failed = false
+            for (initClass in toInitPostWorld) {
+                if (!initClass.initialization.get()) {
+                    failed = true
+                }
+            }
             
-            if (initialized.size == toInit.size) {
+            if (!failed) {
                 isDone = true
                 callEvent(NovaLoadDataEvent())
                 
@@ -132,13 +190,16 @@ internal object Initializer : Listener {
                     LOGGER.info("Done loading")
                 }
             } else {
-                performAppropriateShutdown()
+                shutdown()
             }
         }
     }
     
+    /**
+     * Disables all [InitializableClasses][InitializableClass] in the reverse order that they were initialized in.
+     */
     fun disable() {
-        CollectionUtils.sortDependenciesMapped(initialized, InternalInitializableClass::dependsOn, InternalInitializableClass::className).reversed().forEach {
+        CollectionUtils.sortDependencies(initialized, InitializableClass::dependsOn).reversed().forEach {
             try {
                 it.disable()
             } catch (e: Exception) {
@@ -149,12 +210,12 @@ internal object Initializer : Listener {
         NMSUtilities.disable()
     }
     
-    private fun waitForDependencies(initializable: InternalInitializableClass, lookup: Map<String, InternalInitializableClass>): Boolean {
-        val dependencies = initializable.dependsOn.map { lookup[it] ?: throw IllegalStateException("Dependency $it of $initializable not found (Missing @InternalInit annotation?)") }
-        if (initializable.stage == InitializationStage.PRE_WORLD && dependencies.any { it.stage != InitializationStage.PRE_WORLD })
-            throw IllegalStateException("Initializable ${initializable::class.jvmName} has incompatible dependencies!")
-        
-        dependencies.forEach { dependency ->
+    /**
+     * Blocks the thread until all dependencies of the given [InitializableClass] have been initialized and
+     * returns true if all dependencies were successfully initialized.
+     */
+    private fun waitForDependencies(initializable: InitializableClass): Boolean {
+        initializable.dependsOn.forEach { dependency ->
             // wait for all dependencies to load and skip own initialization if one of them failed
             if (!dependency.initialization.get()) {
                 LOGGER.warning("Skipping initialization: $initializable")
@@ -165,7 +226,7 @@ internal object Initializer : Listener {
         return true
     }
     
-    private fun performAppropriateShutdown() {
+    private fun shutdown() {
         LOGGER.warning("Shutting down the server...")
         Bukkit.shutdown()
     }
@@ -179,7 +240,7 @@ internal object Initializer : Listener {
     
     @EventHandler
     private fun handleServerStarted(event: ServerLoadEvent) {
-        if (!failedPreWorld) {
+        if (preWorldInitialized) {
             initPostWorld()
         } else LOGGER.warning("Skipping post world initialization")
     }
@@ -195,18 +256,6 @@ internal object Initializer : Listener {
             
             return@DrilldownPie map
         })
-    }
-    
-}
-
-internal class InternalInitializableClass(
-    className: String,
-    val stage: InitializationStage,
-    dependsOn: Set<String>
-) : InitializableClass(Initializer::class.java.classLoader, className, dependsOn) {
-    
-    init {
-        initialization.thenRun { if (initialization.get()) Initializer.initialized += this }
     }
     
 }

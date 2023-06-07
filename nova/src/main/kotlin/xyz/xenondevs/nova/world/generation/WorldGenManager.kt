@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.DataFileParser
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 
 @OptIn(ExperimentalWorldGen::class)
 @InternalInit(
-    stage = InitializationStage.PRE_WORLD,
+    stage = InternalInitStage.PRE_WORLD,
     dependsOn = [Patcher::class, ResourceGeneration.PreWorld::class, AddonsInitializer::class, DataFileParser::class]
 )
 internal object WorldGenManager {

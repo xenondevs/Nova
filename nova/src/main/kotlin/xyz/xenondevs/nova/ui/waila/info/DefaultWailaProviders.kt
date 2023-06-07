@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.waila.info
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_INFO_PROVIDER
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_TOOL_ICON_PROVIDER
@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.ui.waila.info.impl.SeaPickleWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.SuspiciousSandWailaInfoProvider
 import xyz.xenondevs.nova.util.set
 
-@InternalInit(stage = InitializationStage.PRE_WORLD)
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 private object DefaultWailaProviders {
     
     init {

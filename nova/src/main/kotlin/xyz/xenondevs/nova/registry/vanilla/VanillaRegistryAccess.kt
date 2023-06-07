@@ -29,7 +29,6 @@ object VanillaRegistryAccess : RegistryAccess by MINECRAFT_SERVER.registryAccess
         return super.registryOrThrow(key) as WritableRegistry<E>
     }
     
-    @Suppress("UNCHECKED_CAST")
     fun <T : Any> getHolder(key: ResourceKey<T>): Holder.Reference<T> {
         val registry = registryOrThrow(ResourceKey.createRegistryKey<T>(key.registry()))
         return registry.getHolderOrThrow(key)

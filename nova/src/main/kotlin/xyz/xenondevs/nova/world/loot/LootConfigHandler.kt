@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.getResourceAsStream
@@ -20,7 +20,7 @@ private val LOOT_DIRECTORY = File(NOVA.dataFolder, "loot")
 private val LOOT_FILE_PATTERN = Regex("""^[a-z][a-z\d_]*.json$""")
 
 @InternalInit(
-    stage = InitializationStage.POST_WORLD,
+    stage = InternalInitStage.POST_WORLD,
     dependsOn = [AddonsInitializer::class]
 )
 internal object LootConfigHandler {

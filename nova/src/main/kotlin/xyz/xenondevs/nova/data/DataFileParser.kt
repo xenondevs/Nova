@@ -8,8 +8,8 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
@@ -18,7 +18,7 @@ import java.io.File
 import java.io.FileFilter
 
 @InternalInit(
-    stage = InitializationStage.PRE_WORLD,
+    stage = InternalInitStage.PRE_WORLD,
     dependsOn = [AddonsInitializer::class]
 )
 internal object DataFileParser {
