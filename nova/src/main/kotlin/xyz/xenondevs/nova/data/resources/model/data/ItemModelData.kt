@@ -10,21 +10,13 @@ import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.builder.setLore
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.logic.ItemLogic
 import xyz.xenondevs.nova.item.logic.PacketItems
-import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.util.bukkitMirror
-import xyz.xenondevs.nova.util.component.adventure.toPlainText
-import xyz.xenondevs.nova.util.item.adventureLore
-import xyz.xenondevs.nova.util.item.adventureName
 import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.nmsCopy
 import net.minecraft.world.item.ItemStack as MojangStack
-
-private val REMOVE_TOOLTIP_NAME: Component = MoveCharacters.getMovingComponent(65536)
-private val REMOVE_TOOLTIP_LORE: List<Component> = (0..200).map { Component.empty() }
 
 open class ItemModelData(val id: ResourceLocation, val material: Material, val dataArray: IntArray) {
     
@@ -82,16 +74,6 @@ open class ItemModelData(val id: ResourceLocation, val material: Material, val d
                 storeServerSideTag = false
             )
             clientStack.tag?.remove("nova") // prevents the item stack from being recognized as a nova item by PacketItems
-        }
-        
-        if (DEFAULT_CONFIG.getBoolean("debug.hide_empty_tooltip")) {
-            // remove tooltip if there is no name or lore
-            val clientsideName = clientStack.adventureName
-            val clientsideLore = clientStack.adventureLore
-            if (clientsideName.toPlainText().isEmpty() && clientsideLore.isEmpty()) {
-                clientStack.adventureName = REMOVE_TOOLTIP_NAME
-                clientStack.adventureLore = REMOVE_TOOLTIP_LORE
-            }
         }
         
         return ItemWrapper(clientStack.bukkitMirror)
