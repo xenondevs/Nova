@@ -15,7 +15,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import xyz.xenondevs.nmsutils.network.event.PacketHandler

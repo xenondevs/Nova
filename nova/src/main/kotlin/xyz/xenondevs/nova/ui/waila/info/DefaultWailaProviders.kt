@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.ui.waila.info.impl.RedstoneLampWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RepeaterWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RespawnAnchorWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.SeaPickleWailaInfoProvider
-import xyz.xenondevs.nova.ui.waila.info.impl.SuspiciousSandWailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.info.impl.BrushableWailaInfoProvider
 import xyz.xenondevs.nova.util.set
 
 @InternalInit(stage = InitializationStage.PRE_WORLD)
@@ -45,7 +45,7 @@ private object DefaultWailaProviders {
         register("daylight_detector", DaylightDetectorWailaInfoProvider)
         register("cocoa", CocoaWailaInfoProvider)
         register("redstone_lamp", RedstoneLampWailaInfoProvider)
-        register("suspicious_sand", SuspiciousSandWailaInfoProvider)
+        register("suspicious_sand", BrushableWailaInfoProvider)
     
         register("vanilla", VanillaWailaToolIconProvider)
     }

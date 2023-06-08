@@ -5,8 +5,8 @@ package xyz.xenondevs.nova.util.item
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Block
-import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot

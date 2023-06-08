@@ -34,16 +34,20 @@ enum class Instrument(val bukkitInstrument: BukkitInstrument, val nmsInstrument:
     
     val soundEvent: Holder<SoundEvent> = nmsInstrument.soundEvent
     val isTunable: Boolean = nmsInstrument.isTunable
-    val requiresAirAbove: Boolean = nmsInstrument.requiresAirAbove()
+    val worksAboveNoteBlock: Boolean = nmsInstrument.worksAboveNoteBlock()
     
     companion object {
         
-        fun byBlockAbove(pos: BlockPos): Instrument? {
-            return NoteBlockInstrument.byStateAbove(pos.world.serverLevel.getBlockState(pos.nmsPos)).orElse(null)?.instrument
-        }
-        
-        fun byBlockBelow(pos: BlockPos): Instrument {
-            return NoteBlockInstrument.byStateBelow(pos.world.serverLevel.getBlockState(pos.nmsPos)).instrument
+        fun determineInstrument(noteBlockPos: BlockPos): Instrument {
+            val aboveInstrument = noteBlockPos.add(0, 1, 0).nmsBlockState.instrument()
+            if (aboveInstrument.worksAboveNoteBlock())
+                return aboveInstrument.instrument
+            
+            val belowInstrument = noteBlockPos.add(0, -1, 0).nmsBlockState.instrument()
+            if (belowInstrument.worksAboveNoteBlock())
+                return HARP
+            
+            return belowInstrument.instrument
         }
         
     }

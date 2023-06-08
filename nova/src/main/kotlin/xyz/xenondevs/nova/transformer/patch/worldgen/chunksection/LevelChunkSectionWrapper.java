@@ -5,8 +5,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeResolver;
-import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -39,17 +37,18 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     
     private final Level level;
     private final ChunkPos chunkPos;
+    private final int bottomBlockY;
     private final LevelChunkSection delegate;
     
     @SuppressWarnings("unchecked")
-    public LevelChunkSectionWrapper(Level level, ChunkPos chunkPos, LevelChunkSection delegate) throws IllegalAccessException {
+    public LevelChunkSectionWrapper(Level level, ChunkPos chunkPos, int bottomBlockY, LevelChunkSection delegate) throws IllegalAccessException {
         super(
-            delegate.bottomBlockY() >> 4,
             (PalettedContainer<BlockState>) ReflectionRegistry.INSTANCE.getLEVEL_CHUNK_SECTION_STATES_FIELD().get(delegate),
             (PalettedContainer<Holder<Biome>>) ReflectionRegistry.INSTANCE.getLEVEL_CHUNK_SECTION_BIOMES_FIELD().get(delegate)
         );
         this.level = level;
         this.chunkPos = chunkPos;
+        this.bottomBlockY = bottomBlockY;
         this.delegate = delegate;
         recalcBlockCounts();
     }
@@ -85,7 +84,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
             var chunkPos = this.chunkPos;
             WorldDataManager.INSTANCE.addOrphanBlock(level,
                 relX + chunkPos.getMinBlockX(),
-                relY + bottomBlockY(),
+                relY + bottomBlockY,
                 relZ + chunkPos.getMinBlockZ(),
                 wrappedState.getNovaBlock());
             return Blocks.AIR.defaultBlockState();
@@ -113,11 +112,6 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     @Override
     public boolean isRandomlyTickingFluids() {
         return delegate.isRandomlyTickingFluids();
-    }
-    
-    @Override
-    public int bottomBlockY() {
-        return delegate.bottomBlockY();
     }
     
     @Override
@@ -168,13 +162,16 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
         delegate.setBiome(i, j, k, biome);
     }
     
-    @Override
-    public void fillBiomesFromNoise(BiomeResolver biomeresolver, Climate.Sampler climate_sampler, int i, int j) {
-        delegate.fillBiomesFromNoise(biomeresolver, climate_sampler, i, j);
-    }
-    
     public Level getLevel() {
         return level;
+    }
+    
+    public ChunkPos getChunkPos() {
+        return chunkPos;
+    }
+    
+    public int getBottomBlockY() {
+        return bottomBlockY;
     }
     
     private void copyBlockCounts() {

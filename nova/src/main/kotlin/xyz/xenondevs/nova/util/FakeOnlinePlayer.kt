@@ -312,6 +312,10 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun sendBlockChanges(blocks: MutableCollection<BlockState>) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun sendBlockChanges(blocks: MutableCollection<BlockState>, suppressLightUpdates: Boolean) {
         throw UnsupportedOperationException("Player is not online")
     }

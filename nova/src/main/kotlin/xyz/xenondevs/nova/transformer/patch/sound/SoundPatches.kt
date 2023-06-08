@@ -7,7 +7,6 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
-import net.minecraft.tags.BlockTags
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ArmorItem
@@ -35,42 +34,15 @@ import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.level.block.Block as MojangBlock
-import net.minecraft.world.level.block.state.BlockState as MojangBlockState
 
 internal object SoundPatches : MultiTransformer(MojangEntity::class, MojangLivingEntity::class, MojangBlock::class, MojangStack::class) {
     
     override fun transform() {
-        transformEntityPlayStepSound()
+        // TODO: Entity#playStepSound, Entity#playCombinationStepSound, Entity#playMuffledStepSound, Entity#getPrimaryStepSoundBlockPos
         transformLivingEntityPlayBlockFallSound()
         transformBlockPlayerWillDestroy()
     }
     
-    private fun transformEntityPlayStepSound() {
-        VirtualClassPath[ReflectionRegistry.ENTITY_PLAY_STEP_SOUND_METHOD]
-            .instructions = buildInsnList {
-            aLoad(0)
-            aLoad(1)
-            aLoad(2)
-            invokeStatic(::playStepSound)
-            _return()
-        }
-    }
-    
-    @JvmStatic
-    fun playStepSound(entity: MojangEntity, nmsPos: MojangBlockPos, state: MojangBlockState) {
-        if (!state.material.isLiquid) {
-            val level = entity.level
-            val above = level.getBlockState(nmsPos.above())
-            val setPos = (if (above.`is`(BlockTags.INSIDE_STEP_SOUND_BLOCKS)) nmsPos.above() else nmsPos).toNovaPos(level.world)
-            
-            val block = setPos.block
-            val soundGroup = block.soundGroup ?: return
-            val newSound = soundGroup.stepSound
-            val oldSound = block.type.soundGroup.stepSound.key.key
-            
-            playSound(entity, oldSound, newSound, soundGroup.stepVolume, soundGroup.stepPitch)
-        }
-    }
     
     private fun transformLivingEntityPlayBlockFallSound() {
         VirtualClassPath[ReflectionRegistry.LIVING_ENTITY_PLAY_BLOCK_FALL_SOUND_METHOD]
@@ -88,7 +60,7 @@ internal object SoundPatches : MultiTransformer(MojangEntity::class, MojangLivin
             val y = floor(entity.y).toInt()
             val z = floor(entity.z).toInt()
             
-            val pos = BlockPos(entity.level.world, x, y, z)
+            val pos = BlockPos(entity.level().world, x, y, z)
             val block = pos.block
             
             if (!block.type.isAir) {
@@ -103,7 +75,7 @@ internal object SoundPatches : MultiTransformer(MojangEntity::class, MojangLivin
     
     @JvmStatic
     fun playSound(entity: MojangEntity, oldSound: String, newSound: String, volume: Float, pitch: Float) {
-        val level = entity.level
+        val level = entity.level()
         val player = if (SoundEngine.overridesSound(oldSound)) null else entity as? Player
         
         val pos = entity.position()

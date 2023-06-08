@@ -45,7 +45,7 @@ internal object NoteBlockBackingState : BackingState(NoteBlockStateConfig, false
             vnb.cycleNote()
         }
         
-        if (!vnb.instrument.requiresAirAbove || vnb.pos.location.add(0.0, 1.0, 0.0).block.type.isAir)
+        if (vnb.instrument.worksAboveNoteBlock || vnb.pos.location.add(0.0, 1.0, 0.0).block.type.isAir)
             playNote(vnb)
     }
     
@@ -107,7 +107,7 @@ internal object NoteBlockBackingState : BackingState(NoteBlockStateConfig, false
         val vnb = VanillaTileEntityManager.getTileEntityAt(pos) as? VanillaNoteBlockTileEntity ?: return
         
         // update instrument
-        vnb.instrument = Instrument.byBlockAbove(pos.add(0, 1, 0)) ?: Instrument.byBlockBelow(pos.add(0, -1, 0))
+        vnb.instrument = Instrument.determineInstrument(pos)
     }
     
 }

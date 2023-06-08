@@ -8,7 +8,7 @@ import net.minecraft.stats.Stats
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.enchantment.Enchantments
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemBreakEvent

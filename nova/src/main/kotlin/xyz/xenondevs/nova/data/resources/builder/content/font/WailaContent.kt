@@ -184,7 +184,7 @@ private val TEXTURES = setOf(
     "potatoes_stage0", "potatoes_stage1", "potatoes_stage2", "potatoes_stage3",
     "sweet_berry_bush_stage0", "sweet_berry_bush_stage1", "sweet_berry_bush_stage2", "sweet_berry_bush_stage3",
     "wheat_stage0", "wheat_stage1", "wheat_stage2", "wheat_stage3", "wheat_stage4", "wheat_stage5", "wheat_stage6", "wheat_stage7",
-    "torchflower_crop_stage0", "torchflower_crop_stage1", "torchflower_crop_stage2",
+    "torchflower_crop_stage0", "torchflower_crop_stage1",
     "activator_rail", "activator_rail_on", "detector_rail", "detector_rail_on", "powered_rail", "powered_rail_on"
 )
 //</editor-fold>

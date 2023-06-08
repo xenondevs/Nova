@@ -35,7 +35,7 @@ import org.bukkit.block.data.Bisected
 import org.bukkit.block.data.Levelled
 import org.bukkit.block.data.type.Bed
 import org.bukkit.block.data.type.PistonHead
-import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory
+import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockExpEvent

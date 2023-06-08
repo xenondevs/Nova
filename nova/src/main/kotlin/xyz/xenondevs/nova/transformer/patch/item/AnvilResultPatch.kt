@@ -164,7 +164,7 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
         
         //<editor-fold desc="renaming", defaultstate="collapsed">
         var renamed = false
-        if (menu.itemName.isBlank()) {
+        if (menu.itemName.isNullOrBlank()) {
             if (inputStack.hasCustomHoverName() && inputStack.hoverName.string != getLocalizedNovaName(player, inputStack)) {
                 renamed = true
                 extraCost += 1
