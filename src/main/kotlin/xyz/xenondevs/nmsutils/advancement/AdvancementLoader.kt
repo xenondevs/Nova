@@ -3,7 +3,6 @@ package xyz.xenondevs.nmsutils.advancement
 import net.minecraft.advancements.TreeNodePosition
 import org.spigotmc.SpigotConfig
 import xyz.xenondevs.nmsutils.internal.util.DEDICATED_SERVER
-import xyz.xenondevs.nmsutils.internal.util.resourceLocation
 
 object AdvancementLoader {
     
@@ -12,7 +11,7 @@ object AdvancementLoader {
     
     fun registerAdvancements(advancements: Iterable<Advancement>, ignoreFilters: Boolean) {
         // filter advancements
-        var filtered: Iterable<Advancement>? = null
+        var filtered: List<Advancement>? = null
         if (!ignoreFilters) {
             if (SpigotConfig.disableAdvancementSaving || SpigotConfig.disabledAdvancements?.contains("*") == true)
                 return
@@ -20,7 +19,7 @@ object AdvancementLoader {
             val disabledAdvancements = SpigotConfig.disabledAdvancements
             if (disabledAdvancements != null)
                 filtered = advancements.filterNot {
-                    disabledAdvancements.contains(it.id) || disabledAdvancements.contains(it.id.split(':')[0])
+                    it.id.toString() in disabledAdvancements || it.id.namespace in disabledAdvancements
                 }
         }
         
@@ -32,9 +31,9 @@ object AdvancementLoader {
         // TODO: open positioning up to the api
         advancements
             .asSequence()
-            .filter { it.parent == null && it.display?.hidden == false }
+            .filter { it.parent == null && it.display?.isHidden == false }
             .forEach {
-                val advancement = DEDICATED_SERVER.advancements.advancements.advancements[it.id.resourceLocation]
+                val advancement = DEDICATED_SERVER.advancements.advancements.advancements[it.id]
                 if (advancement != null)
                     TreeNodePosition.run(advancement)
             }

@@ -3,6 +3,8 @@
 package xyz.xenondevs.nmsutils.internal.util
 
 import io.netty.channel.ChannelFuture
+import net.minecraft.advancements.critereon.ContextAwarePredicate
+import net.minecraft.advancements.critereon.EntityPredicate
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.protocol.Packet
@@ -18,13 +20,18 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.alchemy.Potion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
-import org.bukkit.*
-import org.bukkit.craftbukkit.v1_19_R3.CraftServer
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_19_R3.potion.CraftPotionUtil
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftMagicNumbers
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.NamespacedKey
+import org.bukkit.Tag
+import org.bukkit.World
+import org.bukkit.craftbukkit.v1_20_R1.CraftServer
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R1.potion.CraftPotionUtil
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -97,3 +104,5 @@ internal fun Player.send(vararg packets: Packet<*>) {
 internal fun <T> TagKey(key: ResourceKey<T>): TagKey<T> {
     return TagKey.create(ResourceKey.createRegistryKey(key.registry()), key.location())
 }
+
+internal fun EntityPredicate.asContextAwarePredicate(): ContextAwarePredicate = EntityPredicate.wrap(this)

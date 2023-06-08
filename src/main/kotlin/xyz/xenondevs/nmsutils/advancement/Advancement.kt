@@ -1,11 +1,9 @@
 package xyz.xenondevs.nmsutils.advancement
 
+import net.minecraft.advancements.AdvancementRewards
+import net.minecraft.advancements.DisplayInfo
 import net.minecraft.resources.ResourceLocation
-import org.bukkit.NamespacedKey
-import xyz.xenondevs.nmsutils.adapter.Adapter
-import xyz.xenondevs.nmsutils.internal.util.ReflectionRegistry.ADVANCEMENT_BUILDER_CONSTRUCTOR
-import xyz.xenondevs.nmsutils.internal.util.resourceLocation
-import xyz.xenondevs.nmsutils.util.mapToArray
+import net.minecraft.advancements.Advancement as MojangAdvancement
 
 @DslMarker
 internal annotation class AdvancementDsl
@@ -14,87 +12,79 @@ fun advancement(id: String, init: Advancement.Builder.() -> Unit): Advancement {
     return Advancement.Builder(id).apply(init).build()
 }
 
-class Advancement(
-    val id: String,
-    val parent: String?,
-    val display: Display?,
+fun advancement(id: ResourceLocation, init: Advancement.Builder.() -> Unit): Advancement {
+    return Advancement.Builder(id).apply(init).build()
+}
+
+class Advancement internal constructor(
+    val id: ResourceLocation,
+    val parent: ResourceLocation?,
+    val display: DisplayInfo?,
+    val rewards: AdvancementRewards,
     val criteria: List<Criterion>,
-    val requirements: List<List<String>>?,
-    val rewards: Rewards?
+    val requirements: Array<Array<String>>?
 ) {
     
-    companion object : Adapter<Advancement, Pair<ResourceLocation, net.minecraft.advancements.Advancement.Builder>> {
+    internal fun toNMS(): Pair<ResourceLocation, MojangAdvancement.Builder> {
+        val builder = MojangAdvancement.Builder.recipeAdvancement()
+            .parent(parent)
+            .display(display)
+            .rewards(rewards)
+            .requirements(requirements)
         
-        override fun toNMS(value: Advancement): Pair<ResourceLocation, net.minecraft.advancements.Advancement.Builder> {
-            val builder = ADVANCEMENT_BUILDER_CONSTRUCTOR.newInstance()
-            
-            val parent = value.parent
-            if (parent != null)
-                builder.parent(parent.resourceLocation)
-            
-            val rewards = value.rewards
-            if (rewards != null)
-                builder.rewards(Rewards.toNMS(rewards))
-            
-            val requirements = value.requirements
-            if (requirements != null)
-                builder.requirements(requirements.mapToArray(List<String>::toTypedArray))
-            
-            val display = value.display
-            if (display != null)
-                builder.display(Display.toNMS(display))
-            
-            value.criteria.forEach { builder.addCriterion(it.name, Criterion.toNMS(it)) }
-            
-            return value.id.resourceLocation!! to builder
-        }
+        for (criterion in criteria)
+            builder.addCriterion(criterion.name, criterion.trigger)
         
+        
+        return id to builder
     }
     
+    
     @AdvancementDsl
-    class Builder(private val id: String) {
+    class Builder(val id: ResourceLocation) {
         
-        constructor(id: NamespacedKey) : this(id.toString())
+        private var parent: ResourceLocation? = null
+        private var displayInfo: DisplayInfo? = null
+        private var rewards = AdvancementRewards.EMPTY
+        private var criteria = ArrayList<Criterion>()
+        private var requirements: Array<Array<String>>? = null
         
-        private var parent: String? = null
-        private var display: Display? = null
-        private var criteria: List<Criterion>? = null
-        private var requirements: List<List<String>>? = null
-        private var rewards: Rewards? = null
+        constructor(id: String) : this(ResourceLocation(id))
         
-        fun parent(parent: String) {
+        fun parent(advancement: Advancement) {
+            parent = advancement.id
+        }
+        
+        fun parent(advancement: MojangAdvancement) {
+            parent = advancement.id
+        }
+        
+        fun parent(parent: ResourceLocation) {
             this.parent = parent
         }
         
-        fun parent(parent: Advancement) {
-            this.parent = parent.id
+        fun parent(parent: String) {
+            this.parent = ResourceLocation(parent)
         }
         
-        fun parent(parent: NamespacedKey) {
-            this.parent = parent.toString()
+        fun display(init: DisplayInfoBuilder.() -> Unit) {
+            displayInfo = DisplayInfoBuilder().apply(init).build()
         }
         
-        fun display(init: Display.Builder.() -> Unit) {
-            display = Display.Builder().apply(init).build()
-        }
-        
-        fun rewards(init: Rewards.Builder.() -> Unit) {
-            rewards = Rewards.Builder().apply(init).build()
+        fun rewards(init: AdvancementRewardsBuilder.() -> Unit) {
+            rewards = AdvancementRewardsBuilder().apply(init).build()
         }
         
         fun criteria(init: CriteriaBuilder.() -> Unit) {
-            criteria = CriteriaBuilder().apply(init).build()
+            criteria.addAll(CriteriaBuilder().apply(init).build())
         }
         
         fun requirements(init: RequirementsBuilder.() -> Unit) {
-            requirements = RequirementsBuilder().apply(init).build()
+            this.requirements = RequirementsBuilder().apply(init).build()
         }
         
-        internal fun build(): Advancement {
-            checkNotNull(criteria) { "Advancement criteria are not set" }
-            
-            return Advancement(id, parent, display, criteria!!, requirements, rewards)
-        }
+        internal fun build(): Advancement =
+            Advancement(id, parent, displayInfo, rewards, criteria, requirements)
         
     }
     

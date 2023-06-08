@@ -22,14 +22,14 @@ class RequirementBuilder {
         this.criteria = criteria.toMutableList()
     }
     
-    internal fun build(): List<String> = criteria
+    internal fun build(): Array<String> = criteria.toTypedArray()
     
 }
 
 @AdvancementDsl
 class RequirementsBuilder {
     
-    private val requirements = ArrayList<List<String>>()
+    private val requirements = ArrayList<Array<String>>()
     
     fun requirement(init: RequirementBuilder.() -> Unit) {
         val builder = RequirementBuilder()
@@ -37,6 +37,6 @@ class RequirementsBuilder {
         requirements += builder.build()
     }
     
-    internal fun build(): List<List<String>> = requirements
+    internal fun build(): Array<Array<String>> = requirements.toTypedArray()
     
 }

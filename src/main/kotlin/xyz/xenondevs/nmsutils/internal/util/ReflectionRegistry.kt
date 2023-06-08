@@ -1,9 +1,11 @@
 package xyz.xenondevs.nmsutils.internal.util
 
-import net.minecraft.advancements.Advancement
 import net.minecraft.advancements.critereon.EntityPredicate
 import net.minecraft.advancements.critereon.LighthingBoltPredicate
+import net.minecraft.advancements.critereon.LocationPredicate
 import net.minecraft.advancements.critereon.MinMaxBounds
+import net.minecraft.advancements.critereon.StatePropertiesPredicate
+import net.minecraft.core.BlockPos
 import net.minecraft.network.ConnectionProtocol
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.chat.Component
@@ -15,7 +17,10 @@ import net.minecraft.server.network.ServerConnectionListener
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.BossEvent.BossBarColor
 import net.minecraft.world.BossEvent.BossBarOverlay
-import org.bukkit.craftbukkit.v1_19_R3.tag.CraftTag
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.storage.loot.predicates.LocationCheck
+import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition
+import org.bukkit.craftbukkit.v1_20_R1.tag.CraftTag
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getClass
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getConstructor
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getField
@@ -23,7 +28,6 @@ import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getFieldOrNull
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getMethod
 import java.util.*
 
-@Suppress("MemberVisibilityCanBePrivate")
 internal object ReflectionRegistry {
     
     // Classes
@@ -41,7 +45,6 @@ internal object ReflectionRegistry {
     val SERVERBOUND_INTERACT_PACKET_INTERACTION_AT_LOCATION_ACTION_CLASS = getClass("SRC(net.minecraft.network.protocol.game.ServerboundInteractPacket\$InteractionAtLocationAction)")
     
     // Constructors
-    val ADVANCEMENT_BUILDER_CONSTRUCTOR = getConstructor(Advancement.Builder::class.java, true)
     val STATE_PROPERTIES_PREDICATE_CONSTRUCTOR = getConstructor(STATE_PROPERTIES_PREDICATE_CLASS, true, List::class.java)
     val EXACT_PROPERTY_MATCHER_CONSTRUCTOR = getConstructor(EXACT_PROPERTY_MATCHER_CLASS, true, String::class.java, String::class.java)
     val RANGED_PROPERTY_MATCHER_CONSTRUCTOR = getConstructor(RANGED_PROPERTY_MATCHER_CLASS, true, String::class.java, String::class.java, String::class.java)
@@ -52,6 +55,8 @@ internal object ReflectionRegistry {
     val BOSS_BAR_UPDATE_NAME_OPERATION_CONSTRUCTOR = getConstructor(BOSS_BAR_UPDATE_NAME_OPERATION_CLASS, true, Component::class.java)
     val BOSS_BAR_UPDATE_STYLE_OPERATION_CONSTRUCTOR = getConstructor(BOSS_BAR_UPDATE_STYLE_OPERATION_CLASS, true, BossBarColor::class.java, BossBarOverlay::class.java)
     val BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CONSTRUCTOR = getConstructor(BOSS_BAR_UPDATE_PROPERTIES_OPERATION_CLASS, true, Boolean::class.java, Boolean::class.java, Boolean::class.java)
+    val LOCATION_CHECK_CONSTRUCTOR = getConstructor(LocationCheck::class.java, true, LocationPredicate::class.java, BlockPos::class.java)
+    val LOOT_ITEM_BLOCK_STATE_PROPERTY_CONDITION_CONSTRUCTOR = getConstructor(LootItemBlockStatePropertyCondition::class.java, true, Block::class.java, StatePropertiesPredicate::class.java)
     
     // Methods
     val PACKET_SET_GET_ID_METHOD = getMethod(CONNECTION_PROTOCOL_PACKET_SET_CLASS, true, "SRM(net.minecraft.network.ConnectionProtocol\$PacketSet getId)", Class::class.java)
