@@ -56,7 +56,7 @@ internal object NoteBlockBackingState : BackingState(NoteBlockStateConfig, false
         if (event.isCancelled)
             return
         
-        if (playSound(vnb))
+        if (playSound(vnb) && vnb.instrument.isTunable)
             spawnParticle(vnb)
     }
     
