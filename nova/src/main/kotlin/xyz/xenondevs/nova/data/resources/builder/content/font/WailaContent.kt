@@ -68,6 +68,7 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.JUNGLE_SAPLING to "block/jungle_sapling",
     Material.ACACIA_SAPLING to "block/acacia_sapling",
     Material.DARK_OAK_SAPLING to "block/dark_oak_sapling",
+    Material.CHERRY_SAPLING to "block/cherry_sapling",
     Material.MANGROVE_PROPAGULE to "block/mangrove_propagule",
     Material.BAMBOO_SAPLING to "block/bamboo_stage0",
     Material.DEAD_BUSH to "block/dead_bush",
@@ -103,6 +104,8 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.PEONY to "block/peony_top",
     Material.TORCHFLOWER to "block/torchflower",
     Material.PINK_PETALS to "item/pink_petals",
+    Material.PITCHER_CROP to "item/pitcher_plant",
+    Material.PITCHER_PLANT to "item/pitcher_plant",
     
     // mushrooms
     Material.BROWN_MUSHROOM to "block/brown_mushroom",
