@@ -29,10 +29,10 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeMo
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.Resources
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.bukkitMirror
@@ -44,7 +44,6 @@ import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
-import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 import com.mojang.datafixers.util.Pair as MojangPair
@@ -139,7 +138,7 @@ internal object PacketItems : Listener {
     private fun handleRecipes(event: ClientboundUpdateRecipesPacketEvent) {
         val packet = event.packet
         packet.recipes.forEachIndexed { i, recipe ->
-            val id = recipe.id.namespacedKey
+            val id = recipe.id
             if (id in RecipeManager.clientsideRecipes)
                 packet.recipes[i] = RecipeManager.clientsideRecipes[id]!!
         }

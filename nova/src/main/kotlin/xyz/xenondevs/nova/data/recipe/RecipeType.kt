@@ -8,7 +8,7 @@ import org.bukkit.inventory.CampfireRecipe
 import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
-import org.bukkit.inventory.SmithingRecipe
+import org.bukkit.inventory.SmithingTransformRecipe
 import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.data.serialization.json.serializer.BlastingRecipeDeserializer
@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.data.serialization.json.serializer.FurnaceRecipeDeseri
 import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.ShapedRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.ShapelessRecipeDeserializer
-import xyz.xenondevs.nova.data.serialization.json.serializer.SmithingRecipeDeserializer
+import xyz.xenondevs.nova.data.serialization.json.serializer.SmithingTransformRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.SmokingRecipeDeserializer
 import xyz.xenondevs.nova.data.serialization.json.serializer.StonecutterRecipeDeserializer
 import xyz.xenondevs.nova.initialize.InitializationStage
@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.ui.menu.item.recipes.group.BlastingRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.CampfireRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.SmeltingRecipeGroup
-import xyz.xenondevs.nova.ui.menu.item.recipes.group.SmithingRecipeGroup
+import xyz.xenondevs.nova.ui.menu.item.recipes.group.SmithingTransformRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.SmokingRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.StonecutterRecipeGroup
 import xyz.xenondevs.nova.ui.menu.item.recipes.group.TableRecipeGroup
@@ -65,7 +65,7 @@ object VanillaRecipeTypes {
     val SMOKER = register("smoker", SmokingRecipe::class, SmokingRecipeGroup, SmokingRecipeDeserializer)
     val CAMPFIRE = register("campfire", CampfireRecipe::class, CampfireRecipeGroup, CampfireRecipeDeserializer)
     val STONECUTTER = register("stonecutter", StonecuttingRecipe::class, StonecutterRecipeGroup, StonecutterRecipeDeserializer)
-    val SMITHING = register("smithing", SmithingRecipe::class, SmithingRecipeGroup, SmithingRecipeDeserializer)
+    val SMITING_TRANSFORM = register("smithing_transform", SmithingTransformRecipe::class, SmithingTransformRecipeGroup, SmithingTransformRecipeDeserializer)
     
     private fun <T : Any> register(name: String, recipeClass: KClass<T>, group: RecipeGroup<in T>, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
         val id = ResourceLocation("minecraft", name)

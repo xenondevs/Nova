@@ -1,22 +1,24 @@
 package xyz.xenondevs.nova.data.recipe
 
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Keyed
+import xyz.xenondevs.nova.util.resourceLocation
 
 class RecipeContainer(val recipe: Any) {
     
-    private val key = when (recipe) {
-        is Keyed -> recipe.key
-        is NovaRecipe -> recipe.key
+    private val id: ResourceLocation = when (recipe) {
+        is Keyed -> recipe.key.resourceLocation
+        is NovaRecipe -> recipe.id
         else -> throw IllegalArgumentException("Could not find a recipe key")
     }
     
     val type = RecipeType.of(recipe)
     
     override fun equals(other: Any?): Boolean {
-        return other is RecipeContainer && key == other.key
+        return other is RecipeContainer && id == other.id
     }
     
     override fun hashCode(): Int =
-        key.hashCode()
+        id.hashCode()
     
 }
