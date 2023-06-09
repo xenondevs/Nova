@@ -166,7 +166,7 @@ internal object RemainingItemPatches : MultiTransformer(
         
         // retrieve item directly from field as count = 0 causes getItem to return air
         val item = ReflectionRegistry.ITEM_STACK_ITEM_FIELD.get(itemStack) as Item?
-        return MojangStack(item?.craftingRemainingItem)
+        return item?.craftingRemainingItem?.let(::MojangStack) ?: MojangStack.EMPTY
     }
     
     @JvmStatic
