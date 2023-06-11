@@ -131,5 +131,6 @@
   "command.nova.show_item_data.success": "%s имеет следующие предметные данные:\n%s",
   "command.nova.show_item_data.no_item": "Попробуйте ещё раз, держа предмет в правой руке.",
   "command.nova.advanced_tooltips.off.failure": "Расширенные подсказки уже отключены.",
-  "command.nova.advanced_tooltips.all.success": "Расширенные подсказки для всех предметов включены."
+  "command.nova.advanced_tooltips.all.success": "Расширенные подсказки для всех предметов включены.",
+  "command.nova.invalidate_char_sizes.success": "Успешно отменены все размеры символов. Они будут пересчитаны при создании следующего пакета ресурсов."
 }
