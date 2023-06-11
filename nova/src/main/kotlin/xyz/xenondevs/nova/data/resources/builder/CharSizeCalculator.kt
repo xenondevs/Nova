@@ -1,112 +1,144 @@
 package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonObject
+import xyz.xenondevs.commons.collections.CollectionUtils
 import xyz.xenondevs.commons.gson.getAllStrings
 import xyz.xenondevs.commons.gson.getIntOrNull
+import xyz.xenondevs.commons.gson.getString
 import xyz.xenondevs.commons.gson.getStringOrNull
-import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.CharSizeTable
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.encodeWithBase64
+import xyz.xenondevs.nova.util.data.font.Font
+import xyz.xenondevs.nova.util.data.font.UnihexProvider
 import xyz.xenondevs.nova.util.data.readImage
 import java.awt.image.BufferedImage
 import java.io.FileNotFoundException
 import java.nio.file.Path
 import java.util.logging.Level
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
 import kotlin.io.path.extension
-import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.pathString
-import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 import kotlin.math.roundToInt
 
-private const val FONT_HASHES_STORAGE_KEY = "fontHashes0.13"
-
-private val FONT_NAME_REGEX = Regex("""^([a-z0-9._-]+)/font/([a-z0-9/._-]+)$""")
-private val FORCE_UNICODE_FONT by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.font.force_unicode_font") }
+private const val FONT_HASHES_STORAGE_KEY = "fontHashes0.14"
 
 internal class CharSizeCalculator {
     
+    /**
+     * Contains the hashes of font files from the last session.
+     */
     private val fontHashes: HashMap<String, String> = PermanentStorage.retrieve(FONT_HASHES_STORAGE_KEY, ::HashMap)
     
+    /**
+     * Stores which files affect a given font.
+     * Required for vanilla overrides.
+     * Does not include reference providers.
+     */
+    private val fontRelations = HashMap<ResourcePath, MutableList<Path>>()
+    
+    /**
+     * A cache for bitmaps in this session.
+     */
     private val bitmaps = HashMap<ResourcePath, BufferedImage>()
     
+    /**
+     * Calculates the char sizes for all fonts that need to be recalculated.
+     */
     fun calculateCharSizes() {
-        val fontDirs = ArrayList<Path>()
-        fontDirs += ResourcePackBuilder.ASSETS_DIR.listDirectoryEntries()
+        val customFontDirs = ResourcePackBuilder.ASSETS_DIR.listDirectoryEntries()
             .mapNotNull { it.resolve("font/").takeIf(Path::exists) }
-        // order is required: vanilla fonts need to be loaded after custom fonts in order to keep overridden values
-        fontDirs.add(ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/font/"))
+        val vanillaFontDir = listOf(ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/font/"))
         
-        fontDirs.forEach { dir ->
-            dir.walk()
-                .filter { !it.isDirectory() && it.extension == "json" }
-                .forEach inner@{ file ->
-                    val font = getFontName(dir.parent.parent, file)
-                    
-                    val fileHash = HashUtils.getFileHash(file, "MD5").encodeWithBase64()
-                    if (fontHashes[font] == fileHash) 
-                        return@inner
-                    
-                    CharSizes.deleteTable(font)
-                    
-                    val table = CharSizes.getTable(font) ?: CharSizeTable()
-                    calculateCharSizes(file, table)
-                    CharSizes.storeTable(font, table)
-                    fontHashes[font] = fileHash
-                }
+        // load custom fonts
+        val fonts = collectFonts(customFontDirs).associateByTo(HashMap(), Font::id)
+        
+        // merge vanilla fonts with custom fonts
+        // this is required because resource packs do not replace fonts by overriding them, they just add providers
+        collectFonts(vanillaFontDir).forEach { vanillaFont ->
+            val id = vanillaFont.id
+            
+            val fontOverride = fonts[id]
+            if (fontOverride != null) {
+                fontOverride.merge(vanillaFont)
+            } else {
+                fonts[id] = vanillaFont
+            }
         }
+        
+        // load references (maps reference provider ids to the font instance they reference)
+        for (font in fonts.values) font.loadReferences(fonts.values)
+        
+        // stores the fonts that needed to be recalculated
+        val recalculated = HashSet<Font>()
+        
+        CollectionUtils.sortDependencies(fonts.values, Font::referenceProviders)
+            .forEach { font ->
+                val id = font.id
+                
+                // hashes of files affecting this font's json
+                val fileHashes: Map<String, String> = fontRelations[font.id]!!
+                    .associate { it.absolutePathString() to HashUtils.getFileHash(it, "MD5").encodeWithBase64() }
+                
+                // if any of the affecting files changed or any of the reference providers changed, recalculate char sizes for this font
+                if (fileHashes.any { (path, hash) -> fontHashes[path] != hash } || font.referenceProviders.any { it in recalculated }) {
+                    // recalculate char sizes
+                    val table = CharSizeTable()
+                    calculateCharSizes(font, table)
+                    CharSizes.storeTable(id, table)
+                    
+                    // mark font as recalculated
+                    recalculated += font
+                    
+                    // store new file hashes
+                    fontHashes.putAll(fileHashes)
+                }
+            }
         
         PermanentStorage.store(FONT_HASHES_STORAGE_KEY, fontHashes)
     }
     
-    private fun getFontName(base: Path, file: Path): String {
-        val relPath = file.relativeTo(base)
-            .invariantSeparatorsPathString
-            .substringBeforeLast('.') // example: minecraft/font/default
-        
-        val result = FONT_NAME_REGEX.matchEntire(relPath)
-            ?: throw IllegalArgumentException("File $file is not a font file")
-        
-        return "${result.groupValues[1]}:${result.groupValues[2]}"
+    /**
+     * Collects all fonts from the given [directories][dirs].
+     */
+    private fun collectFonts(dirs: Iterable<Path>): List<Font> {
+        val fonts = ArrayList<Font>()
+        for (dir in dirs) {
+            val baseDir = dir.parent.parent
+            dir.walk()
+                .filter { !it.isDirectory() && it.extension == "json" }
+                .forEach {
+                    val font = Font.fromFile(baseDir, it)
+                    fonts += font
+                    fontRelations.getOrPut(font.id, ::ArrayList).add(it)
+                }
+        }
+        return fonts
     }
     
-    private fun calculateCharSizes(file: Path, table: CharSizeTable) {
+    private fun calculateCharSizes(font: Font, table: CharSizeTable) {
         try {
-            val obj = file.parseJson() as JsonObject
-            val providers = obj.getAsJsonArray("providers").asSequence()
-            
-            // if unicode font is forced, read legacy_unicode providers first
-            if (FORCE_UNICODE_FONT) {
-                providers.sortedBy {
-                    when (it.asJsonObject.getStringOrNull("type")) {
-                        "legacy_unicode" -> -1
-                        else -> 1
-                    }
-                }
-            }
-            
-            providers.forEach { provider ->
+            for (provider in font.providers.reversed()) { // reverse providers so that top providers override bottom providers
                 provider as JsonObject
                 when (val type = provider.getStringOrNull("type")) {
                     "space" -> readSpaceProvider(provider, table)
                     "bitmap" -> readBitmapProvider(provider, table)
-                    "legacy_unicode" -> readUnicodeProvider(provider, table)
+                    "unihex" -> readUnihexProvider(provider, table)
+                    "reference" -> readReferenceProvider(provider, table)
                     "ttf" -> LOGGER.warning("Skipping size calculation for ttf font provider: $provider")
                     else -> LOGGER.warning("Unknown font provider type: $type")
                 }
             }
         } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "Failed to calculate char sizes for $file", e)
+            LOGGER.log(Level.SEVERE, "Failed to calculate char sizes for $font", e)
         }
     }
     
@@ -114,7 +146,7 @@ internal class CharSizeCalculator {
         val advances = obj.getAsJsonObject("advances")
         advances.entrySet().forEach { (str, size) ->
             val sizeInt = size.asInt
-            readChars(str).forEach { table.setWidth(it, sizeInt) }
+            str.codePoints().forEach { table.setWidth(it, sizeInt) }
         }
     }
     
@@ -122,53 +154,58 @@ internal class CharSizeCalculator {
         val bitmap = getBitmap(ResourcePath.of(obj.getStringOrNull("file")!!, "minecraft"))
         val height = obj.getIntOrNull("height") ?: 8
         val ascent = obj.getIntOrNull("ascent") ?: 0
-        val chars = obj.getAsJsonArray("chars").getAllStrings().map(::readChars)
+        val codePoints = obj.getAsJsonArray("chars").getAllStrings().map { it.codePoints().toArray() }
         
-        val charsPerLine = chars[0].size
-        val lines = chars.size
+        val codePointsPerLine = codePoints[0].size
+        val lines = codePoints.size
         
-        require(bitmap.width % charsPerLine == 0) { "Bitmap width is not divisible by amount of chars per line" }
+        require(bitmap.width % codePointsPerLine == 0) { "Bitmap width is not divisible by amount of chars per line" }
         require(bitmap.height % lines == 0) { "Bitmap height is not divisible by amount of char lines" }
         
-        val subimageWidth = bitmap.width / charsPerLine
+        val subimageWidth = bitmap.width / codePointsPerLine
         val subimageHeight = bitmap.height / lines
         
-        chars.forEachIndexed { lineIdx, charsInLine ->
-            charsInLine.forEachIndexed { charIdx, char ->
-                if (char !in table) {
-                    val subimage = bitmap.getSubimage(charIdx * subimageWidth, lineIdx * subimageHeight, subimageWidth, subimageHeight)
-                    
-                    val yRange = calculateBitmapCharYRange(height, ascent, subimage)
-                    table.setSizes(
-                        char,
-                        intArrayOf(
-                            calculateBitmapCharWidth(height, subimage) + 1, // +1 to include space between characters
-                            height,
-                            ascent,
-                            yRange.first,
-                            yRange.last
-                        )
+        codePoints.forEachIndexed { lineIdx, codePointsInLine ->
+            codePointsInLine.forEachIndexed { codePointIdx, codePoint ->
+                val subimage = bitmap.getSubimage(codePointIdx * subimageWidth, lineIdx * subimageHeight, subimageWidth, subimageHeight)
+                
+                val yRange = calculateBitmapCharYRange(height, ascent, subimage)
+                table.setSizes(
+                    codePoint,
+                    intArrayOf(
+                        calculateBitmapCharWidth(height, subimage) + 1, // +1 to include space between characters
+                        height,
+                        ascent,
+                        yRange.first,
+                        yRange.last
                     )
-                }
+                )
             }
         }
     }
     
-    private fun readUnicodeProvider(obj: JsonObject, table: CharSizeTable) {
-        for ((char, glyph) in BitmapFontGenerator.extractGlyphs(obj)) {
-            if (char in table)
-                continue
+    private fun readUnihexProvider(obj: JsonObject, table: CharSizeTable) {
+        UnihexProvider.of(obj).glyphSequence().forEach { glyph ->
+            val (left, right) = glyph.findHorizontalBounds() ?: return@forEach
+            val (top, bottom) = glyph.findVerticalBounds() ?: return@forEach
             
-            val yRange = calculateBitmapCharYRange(glyph.height, 15, glyph)
-            // divide values by 2 because legacy_unicode fonts are made for gui scale 2, but we're calculating with gui scale 1 values
-            table.setSizes(char, intArrayOf(
-                (calculateBitmapCharWidth(glyph.height, glyph) / 2) + 1, // +1 to include space between characters
-                glyph.height / 2,
+            // unihex glyphs render at gui scale 2, but all char sizes at stored at gui scale 1, so we divide by 2
+            // fixme: if glyph sizes are not divisible by 2, this will cause issues. char sizes should be stored at gui scale 2
+            table.setSizes(glyph.codePoint, intArrayOf(
+                (right - left + 1) / 2 + 1, // +1 because bounds are inclusive, +1 to include space between characters
+                glyph.img.height / 2,
                 7, // == floor(15.0 / 2.0), same ascent as ascii bitmap characters
-                yRange.first / 2,
-                yRange.last / 2
+                top / 2,
+                bottom / 2
             ))
         }
+    }
+    
+    private fun readReferenceProvider(obj: JsonObject, table: CharSizeTable) {
+        val id = ResourcePath.of(obj.getString("id"))
+        val referencedTable = CharSizes.getTable(id)
+            ?: throw IllegalStateException("No char size table for referenced font $id")
+        table.merge(referencedTable)
     }
     
     private fun calculateBitmapCharWidth(fontHeight: Int, image: BufferedImage): Int {
@@ -206,43 +243,6 @@ internal class CharSizeCalculator {
         minY = ((minY - ascent) * rescale).roundToInt()
         maxY = ((maxY - ascent) * rescale).roundToInt()
         return minY..maxY
-    }
-    
-    private fun readChars(str: String): IntArray {
-        val chars = ArrayList<Int>()
-        
-        var highSurrogate: Char? = null
-        fun addChar(code: Int) {
-            val char = code.toChar()
-            
-            if (highSurrogate != null) {
-                if (char.isLowSurrogate()) {
-                    chars += Character.toCodePoint(highSurrogate!!, char)
-                }
-                
-                highSurrogate = null
-            } else if (char.isHighSurrogate()) {
-                highSurrogate = char
-            } else {
-                chars += code
-            }
-        }
-        
-        var i = 0
-        while (i < str.length) {
-            val c = str[i]
-            
-            if (str.lastIndex >= i + 5 && c == '\\' && str[i + 1] == 'u') {
-                addChar(Integer.valueOf(str.substring(i + 2, i + 6), 16))
-                i += 6
-                continue
-            }
-            
-            addChar(c.code)
-            i++
-        }
-        
-        return chars.toIntArray()
     }
     
     private fun getBitmap(path: ResourcePath): BufferedImage {

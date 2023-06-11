@@ -253,11 +253,18 @@ internal fun Path.writeImage(image: RenderedImage, formatName: String) {
     outputStream().use { ImageIO.write(image, formatName, it) }
 }
 
-internal fun File.openZip(): Path {
-    return toPath().openZip()
-}
+internal fun File.openZip(): Path =
+     toPath().openZip()
+
+internal fun <T> File.useZip(run: (Path) -> T): T =
+    toPath().useZip(run)
 
 internal fun Path.openZip(): Path {
     val fs = FileSystems.newFileSystem(this)
     return fs.rootDirectories.first()
 }
+
+internal inline fun <T> Path.useZip(run: (Path) -> T): T =
+    FileSystems.newFileSystem(this).use {
+        run(it.rootDirectories.first())
+    }

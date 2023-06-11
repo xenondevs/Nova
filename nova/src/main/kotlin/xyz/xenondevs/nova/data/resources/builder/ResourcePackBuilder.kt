@@ -4,7 +4,6 @@ import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
 import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
-import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.flatten
@@ -18,6 +17,7 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Stage
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
@@ -191,7 +191,7 @@ internal class ResourcePackBuilder {
                 
                 // post-world
                 WailaContent(this),
-                //movedFonts
+                movedFonts
             )
             
             // init pre-world content
@@ -229,15 +229,10 @@ internal class ResourcePackBuilder {
             LOGGER.info("Writing sound overrides")
             soundOverrides.write()
             
-            val out = ASSETS_DIR.resolve("minecraft/font/unifontbmp.json")
-            out.parent.createDirectories()
-            BitmapFontGenerator(ResourcePath("minecraft", "include/unifont"), false).generateBitmapFont()
-                .writeToFile(out)
-            
             // calculate char sizes
-//            LOGGER.info("Calculating char sizes")
-//            CharSizeCalculator().calculateCharSizes()
-//            CharSizes.invalidateCache()
+            LOGGER.info("Calculating char sizes")
+            CharSizeCalculator().calculateCharSizes()
+            CharSizes.invalidateCache()
             
             // write metadata
             writeMetadata(assetPacks.size, basePacks.packAmount)

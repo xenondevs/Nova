@@ -37,10 +37,6 @@ resource_pack:
       corrupt_entries: false
     # Settings regarding the generation of font files.
     font:
-      # If moved versions of the default font should use the legacy_unicode providers instead of Minecraft's default bitmap characters.
-      # This option affects the generated moved default fonts the same way as the "Force Unicode Font" button in Minecraft's language settings does the default font.
-      # This also affects the calculated char sizes for all fonts that use both legacy_unicode and bitmap providers.
-      force_unicode_font: false
       # A list of fonts that should not have moved versions generated.
       # Generally, all custom fonts from base packs that don't require moved versions (i.e. are not shown in the boss bar) should be added here.
       moved_font_blacklist: [ ]
@@ -55,6 +51,10 @@ resource_pack:
     # If Nova is allowed to use solid block states (e.g. mushroom, noteblock) when addons request it.
     # Please read the following documentation page before change this value: https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
     use_solid_blocks: true
+  # If Nova should use the uniform font for moved versions of the default font and calculation of char sizes for the default font.
+  # The uniform font can be activated client-side by toggling "Force Unicode Font" in Minecraft's language settings.
+  # If the players on your server are expected to have that option enabled, you should set this to true.
+  force_uniform_font: false
   # If players currently loading the resource pack should be frozen.
   freeze_loading_players: false
 

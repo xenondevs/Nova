@@ -2,33 +2,29 @@ package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import io.netty.buffer.ByteBuf
-import io.netty.buffer.Unpooled
 import xyz.xenondevs.commons.gson.addAll
 import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.util.data.readImage
+import xyz.xenondevs.nova.util.data.font.UnihexProvider
 import xyz.xenondevs.nova.util.data.writeImage
 import java.awt.image.BufferedImage
 import java.nio.file.Path
+import java.util.*
 import kotlin.io.path.createDirectories
-import kotlin.io.path.readBytes
 import kotlin.math.ceil
 
-private const val UNICODE_PAGE_FORMAT = "%02x"
 private const val FONT_TEXTURE_GLYPHS_PER_ROW = 16
 
 /**
- * Generates bitmap fonts from fonts that contain both 'bitmap' and 'legacy_unicode' font providers.
+ * Generates bitmap fonts from fonts that contain both 'bitmap' and 'unihex' font providers.
+ * Keeps reference and space providers.
  *
  * @param font The font to generate the bitmap font for.
- * @param removeBitmapProviders If existing bitmap font providers should be removed.
  */
 internal class BitmapFontGenerator(
-    private val font: ResourcePath,
-    private val removeBitmapProviders: Boolean
+    private val font: ResourcePath
 ) {
     
     private val fontFile: Path = font.findInAssets("font", "json")
@@ -43,11 +39,10 @@ internal class BitmapFontGenerator(
         val inProviders = fontObj.getAsJsonArray("providers")
         inProviders.forEach { provider ->
             provider as JsonObject
-            val type = provider.getStringOrNull("type")
-            if (type == "legacy_unicode") {
-                outProviders.addAll(convertLegacyUnicodeProvider(provider))
-            } else if (!removeBitmapProviders || type != "bitmap") {
-                outProviders.add(provider)
+            when (val type = provider.getStringOrNull("type")) {
+                "unihex" -> outProviders.addAll(convertUnihexProvider(provider))
+                "bitmap", "space", "reference" -> outProviders.add(provider)
+                else -> LOGGER.warning("Skipping unsupported font provider type: $type")
             }
         }
         
@@ -55,17 +50,11 @@ internal class BitmapFontGenerator(
     }
     
     /**
-     * Converts the given `legacy_unicode` font [provider] to a list of `bitmap` providers.
-     * Also creates the required font textures.
+     * Converts the given `unihex` font [provider] to a list of `bitmap` providers and
+     * creates the required font textures.
      */
-    private fun convertLegacyUnicodeProvider(provider: JsonObject): List<JsonObject> {
-        val sizesPath = ResourcePath.of(provider.getStringOrNull("sizes")!!, "minecraft")
-        val textureTemplate = provider.getStringOrNull("template")!!
-        
-        val glyphSizes: ByteBuf = Unpooled.wrappedBuffer(sizesPath.findInAssets().readBytes())
-        val unicodePages = getUnicodePages(textureTemplate)
-        
-        val sortedGlyphs = extractAndSortGlyphs(glyphSizes, unicodePages)
+    private fun convertUnihexProvider(provider: JsonObject): List<JsonObject> {
+        val sortedGlyphs = extractAndSortGlyphs(UnihexProvider.of(provider))
         return sortedGlyphs.map { (width, glyphs) ->
             val texture = buildFontTexture(width, glyphs)
             
@@ -79,28 +68,22 @@ internal class BitmapFontGenerator(
     }
     
     /**
-     * Reads all glyphs present in the [glyphSizes] buffer, extracts them from their [unicodePage][unicodePages]
-     * and sorts them by their width.
+     * Reads all glyphs from the given [hexFiles], draws them to a [BufferedImage], and sorts them by width.
      *
-     * @return A map in the format `Map<Width, Map<Char Code, Glyph Image>>`
+     * @return A map in the format `Map<Width, Map<Codepoint, Glyph Image>>`
      */
-    private fun extractAndSortGlyphs(glyphSizes: ByteBuf, unicodePages: Array<BufferedImage?>): Map<Int, Map<Int, BufferedImage>> {
-        val glyphs = HashMap<Int, HashMap<Int, BufferedImage>>()
+    private fun extractAndSortGlyphs(unihexProvider: UnihexProvider): Map<Int, Map<Int, BufferedImage>> {
+        val glyphs = HashMap<Int, LinkedHashMap<Int, BufferedImage>>()
         
-        for (c in 0..0xFFFF) {
-            val pageNumber = c shr 8
-            val row = c shr 4 and 0xF
-            val colum = c and 0xF
+        unihexProvider.glyphSequence().forEach { glyph ->
+            val (left, right) = glyph.findHorizontalBounds() ?: return@forEach
             
-            val size = glyphSizes.readUnsignedByte().toInt()
-            val start = size shr 4 and 0xF
-            val end = size and 0xF
-            val width = end - start + 1
+            var img = glyph.img
+            if (left > 0 || right < glyph.width) {
+                img = img.getSubimage(left, 0, right - left, 16)
+            }
             
-            val page = unicodePages[pageNumber] ?: continue
-            
-            val widthMap = glyphs.getOrPut(width, ::HashMap)
-            widthMap[c] = page.getSubimage(colum * 16 + start, row * 16, width, 16)
+            glyphs.getOrPut(img.width, ::LinkedHashMap)[glyph.codePoint] = img
         }
         
         return glyphs
@@ -142,80 +125,23 @@ internal class BitmapFontGenerator(
             add("chars", chars)
         }
         
+        var charsInRow = 0
         val sb = StringBuilder()
-        glyphs.keys.forEach { charCode ->
-            sb.append(charCode.toChar())
-            if (sb.length == FONT_TEXTURE_GLYPHS_PER_ROW) {
+        glyphs.keys.forEach { codePoint ->
+            sb.appendCodePoint(codePoint)
+            if (++charsInRow == FONT_TEXTURE_GLYPHS_PER_ROW) {
                 chars.add(sb.toString())
                 sb.clear()
+                charsInRow = 0
             }
         }
         
-        if (sb.isNotEmpty()) {
-            repeat(FONT_TEXTURE_GLYPHS_PER_ROW - sb.length) {
-                sb.append("\u0000")
-            }
+        if (charsInRow != 0) {
+            repeat(FONT_TEXTURE_GLYPHS_PER_ROW - charsInRow) { sb.appendCodePoint(0) }
             chars.add(sb.toString())
         }
         
         return provider
-    }
- 
-    // TODO: deduplicate code
-    companion object {
-    
-        /**
-         * Retrieves an array of all unicode pages used by that font.
-         */
-        fun getUnicodePages(template: String): Array<BufferedImage?> {
-            return Array(256) {
-                val hexPageNum = UNICODE_PAGE_FORMAT.format(it)
-                val path = ResourcePath.of(template.format(hexPageNum)).findInAssetsOrNull("textures")
-                path?.let(Path::readImage)
-            }
-        }
-    
-        /**
-         * Reads all glyphs defined in the `legacy_unicode` font [provider] and extracts them from their unicode pages.
-         * 
-         * @return A map in the format `Map<Char Code, Glyph Image>`
-         */
-        fun extractGlyphs(legacyUnicodeProvider: JsonObject): Map<Int, BufferedImage> {
-            val sizesPath = ResourcePath.of(legacyUnicodeProvider.getStringOrNull("sizes")!!, "minecraft")
-            val textureTemplate = legacyUnicodeProvider.getStringOrNull("template")!!
-    
-            val glyphSizes: ByteBuf = Unpooled.wrappedBuffer(sizesPath.findInAssets().readBytes())
-            val unicodePages = getUnicodePages(textureTemplate)
-            
-            return extractGlyphs(glyphSizes, unicodePages)
-        }
-    
-        /**
-         * Reads all glyphs present in the [glyphSizes] buffer and extracts them from their [unicodePage][unicodePages].
-         *
-         * @return A map in the format `Map<Char Code, Glyph Image>`
-         */
-        fun extractGlyphs(glyphSizes: ByteBuf, unicodePages: Array<BufferedImage?>): Map<Int, BufferedImage> {
-            val glyphs = HashMap<Int, BufferedImage>()
-        
-            for (c in 0..0xFFFF) {
-                val pageNumber = c shr 8
-                val row = c shr 4 and 0xF
-                val colum = c and 0xF
-            
-                val size = glyphSizes.readUnsignedByte().toInt()
-                val start = size shr 4 and 0xF
-                val end = size and 0xF
-                val width = end - start + 1
-            
-                val page = unicodePages[pageNumber] ?: continue
-            
-                glyphs[c] = page.getSubimage(colum * 16 + start, row * 16, width, 16)
-            }
-        
-            return glyphs
-        }
-        
     }
     
 }
