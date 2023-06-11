@@ -87,7 +87,7 @@ internal object UpdateReminder : Listener {
         
         for (distributor in distributors) {
             try {
-                val newVersion = distributor.getLatestVersion(true)
+                val newVersion = distributor.getLatestVersion(currentVersion.isFullRelease)
                 if (newVersion > currentVersion) {
                     needsUpdate[addon] = distributor.projectUrl
                     break
