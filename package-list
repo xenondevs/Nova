@@ -73,6 +73,7 @@ xyz.xenondevs.nova.ui.overlay.character.gui
 xyz.xenondevs.nova.ui.waila.info
 xyz.xenondevs.nova.ui.waila.info.impl
 xyz.xenondevs.nova.ui.waila.info.line
+xyz.xenondevs.nova.update
 xyz.xenondevs.nova.util
 xyz.xenondevs.nova.util.component.adventure
 xyz.xenondevs.nova.util.concurrent
