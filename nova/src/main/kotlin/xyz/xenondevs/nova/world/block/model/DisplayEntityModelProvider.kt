@@ -17,13 +17,13 @@ private val AIR_BLOCK_STATE = Blocks.AIR.defaultBlockState()
 
 private val ROTATIONS: Array<Quaternionf?> = arrayOf(
     // NORTH
-    null,
-    // EAST
-    Quaternionf().setAngleAxis((Math.PI * 1.5).toFloat(), 0f, 1f, 0f),
-    // SOUTH
     Quaternionf().setAngleAxis(Math.PI.toFloat(), 0f, 1f, 0f),
-    // WEST
+    // EAST
     Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 0f, 1f, 0f),
+    // SOUTH
+    null,
+    // WEST
+    Quaternionf().setAngleAxis((Math.PI * 1.5).toFloat(), 0f, 1f, 0f),
     // UP
     Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 1f, 0f, 0f),
     // DOWN
