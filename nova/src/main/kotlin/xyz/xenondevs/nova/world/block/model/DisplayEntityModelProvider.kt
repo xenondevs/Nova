@@ -17,13 +17,13 @@ private val AIR_BLOCK_STATE = Blocks.AIR.defaultBlockState()
 
 private val ROTATIONS: Array<Quaternionf?> = arrayOf(
     // NORTH
-    Quaternionf().setAngleAxis(Math.PI.toFloat(), 0f, 1f, 0f),
-    // EAST
-    Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 0f, 1f, 0f),
-    // SOUTH
     null,
-    // WEST
+    // EAST
     Quaternionf().setAngleAxis((Math.PI * 1.5).toFloat(), 0f, 1f, 0f),
+    // SOUTH
+    Quaternionf().setAngleAxis(Math.PI.toFloat(), 0f, 1f, 0f),
+    // WEST
+    Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 0f, 1f, 0f),
     // UP
     Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 1f, 0f, 0f),
     // DOWN
@@ -45,6 +45,7 @@ class DisplayEntityModelProvider(blockState: NovaBlockState) : BlockModelProvide
     init {
         val directional = blockState.getProperty(Directional::class)
         val location = pos.location.add(.5, .5, .5)
+        location.yaw += 180f // let blocks face north by default (otherwise north in block bench isn't north)
         
         entities += FakeItemDisplay(location, false) { _, data -> setDataValues(data, directional) }
         
