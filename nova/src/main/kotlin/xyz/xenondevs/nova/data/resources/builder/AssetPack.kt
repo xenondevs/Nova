@@ -3,6 +3,7 @@
 package xyz.xenondevs.nova.data.resources.builder
 
 import net.minecraft.resources.ResourceLocation
+import it.unimi.dsi.fastutil.ints.IntSet
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor
@@ -48,7 +49,7 @@ class AssetPack(val namespace: String, val assetsDir: Path) {
         .takeIf(Path::exists)
         ?.let { ArmorIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
-    internal val movedFontsIndex: Map<ResourcePath, Set<Int>>? = assetsDir.resolve("moved_fonts.json")
+    internal val movedFontsIndex: Map<ResourcePath, IntSet>? = assetsDir.resolve("moved_fonts.json")
         .takeIf(Path::exists)
         ?.let { MovedFontsIndexDeserializer.deserialize(namespace, it.parseJson()) }
     

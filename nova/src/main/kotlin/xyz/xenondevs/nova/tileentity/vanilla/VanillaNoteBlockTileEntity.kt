@@ -7,7 +7,7 @@ internal class VanillaNoteBlockTileEntity(blockState: VanillaTileEntityState) : 
     
     override val type = Type.NOTE_BLOCK
     
-    var instrument: Instrument by storedValue("instrument") { Instrument.byBlockAbove(pos.add(0, 1, 0)) ?: Instrument.byBlockBelow(pos.add(0, -1, 0))}
+    var instrument: Instrument by storedValue("instrument") { Instrument.determineInstrument(pos) }
     var note: Int by storedValue("note") { 0 }
     var powered: Boolean by storedValue("powered") { false }
     

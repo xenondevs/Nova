@@ -39,7 +39,7 @@ internal object BroadcastPacketPatch : MethodTransformer(PlayerList::broadcast) 
         for (player in playerList.players) {
             if (
                 (ignoreExcludedPlayer || excludedPlayer != player)
-                && player.level.dimension() == dimension
+                && player.level().dimension() == dimension
                 && (excludedPlayer == null || player.bukkitEntity.canSee(excludedPlayer.bukkitEntity))
             ) {
                 val dx = x - player.x

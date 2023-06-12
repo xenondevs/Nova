@@ -1,29 +1,17 @@
 package xyz.xenondevs.nova.data.recipe
 
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
-import org.bukkit.Bukkit
-import org.bukkit.Keyed
+import net.minecraft.world.item.crafting.Recipe
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.Tag
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.inventory.BlastingRecipe
-import org.bukkit.inventory.CampfireRecipe
 import org.bukkit.inventory.CraftingInventory
-import org.bukkit.inventory.FurnaceRecipe
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.RecipeChoice
-import org.bukkit.inventory.RecipeChoice.ExactChoice
-import org.bukkit.inventory.ShapedRecipe
-import org.bukkit.inventory.ShapelessRecipe
-import org.bukkit.inventory.SmokingRecipe
-import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nmsutils.network.ClientboundPlaceGhostRecipePacket
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlaceRecipePacketEvent
@@ -40,12 +28,8 @@ import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.addToInventoryOrDrop
 import xyz.xenondevs.nova.util.containsAll
-import xyz.xenondevs.nova.util.data.clientsideCopy
 import xyz.xenondevs.nova.util.data.key
-import xyz.xenondevs.nova.util.item.customModelData
-import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
 import xyz.xenondevs.nova.util.item.novaItem
-import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.registerEvents
@@ -57,76 +41,6 @@ import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.takeFirstOccurrence
 import net.minecraft.world.item.crafting.Recipe as MojangRecipe
 import org.bukkit.inventory.Recipe as BukkitRecipe
-
-interface ItemTest {
-    fun test(item: ItemStack): Boolean
-}
-
-interface SingleItemTest : ItemTest {
-    val example: ItemStack
-}
-
-interface MultiItemTest : ItemTest {
-    val examples: List<ItemStack>
-}
-
-class ModelDataTest(private val type: Material, private val data: IntArray, override val example: ItemStack) : SingleItemTest {
-    
-    override fun test(item: ItemStack): Boolean {
-        return item.type == type && item.customModelData in data
-    }
-    
-}
-
-class TagTest(private val tag: Tag<Material>, override val examples: List<ItemStack> = tag.values.map(::ItemStack)) : MultiItemTest {
-    
-    override fun test(item: ItemStack): Boolean {
-        return tag.isTagged(item.type) && item.customModelData == 0
-    }
-    
-}
-
-class NovaIdTest(private val id: String, override val example: ItemStack) : SingleItemTest {
-    
-    override fun test(item: ItemStack): Boolean {
-        return (item.itemMeta?.unhandledTags?.get("nova") as? CompoundTag)?.getString("id") == id
-    }
-    
-}
-
-class NovaNameTest(private val name: String, override val examples: List<ItemStack>) : MultiItemTest {
-    
-    override fun test(item: ItemStack): Boolean {
-        return (item.itemMeta?.unhandledTags?.get("nova") as? CompoundTag)?.getString("id")
-            ?.substringAfter(':') == name
-    }
-    
-}
-
-class ComplexTest(override val example: ItemStack) : SingleItemTest {
-    
-    override fun test(item: ItemStack): Boolean {
-        val testStack = item.namelessCopyOrSelf
-        return example.isSimilar(testStack)
-    }
-    
-}
-
-class CustomRecipeChoice(private val tests: List<ItemTest>) : ExactChoice(
-    tests.flatMap {
-        when (it) {
-            is SingleItemTest -> listOf(it.example)
-            is MultiItemTest -> it.examples
-            else -> throw UnsupportedOperationException()
-        }
-    }
-) {
-    
-    override fun test(item: ItemStack): Boolean {
-        return tests.any { it.test(item) }
-    }
-    
-}
 
 @RequiresOptIn
 annotation class HardcodedRecipes
@@ -143,17 +57,15 @@ object RecipeManager : Listener {
         ResourceLocation("minecraft", "repair_item") to ::RepairItemRecipe
     )
     
-    private val shapedRecipes = HashMap<NamespacedKey, OptimizedShapedRecipe>()
-    private val shapelessRecipes = HashMap<NamespacedKey, ShapelessRecipe>()
-    private val registeredVanillaRecipeKeys = HashSet<NamespacedKey>()
-    private val customVanillaRecipeKeys = HashSet<NamespacedKey>()
-    private val _clientsideRecipes = HashMap<NamespacedKey, MojangRecipe<*>>()
-    private val _novaRecipes = HashMap<RecipeType<*>, HashMap<NamespacedKey, NovaRecipe>>()
+    private val registeredVanillaRecipes = HashMap<ResourceLocation, MojangRecipe<*>>()
+    private val customVanillaRecipes = HashMap<ResourceLocation, MojangRecipe<*>>()
+    private val _clientsideRecipes = HashMap<ResourceLocation, MojangRecipe<*>>()
+    private val _novaRecipes = HashMap<RecipeType<*>, HashMap<ResourceLocation, NovaRecipe>>()
     private val hardcodedRecipes = ArrayList<Any>()
     
-    internal val clientsideRecipes: Map<NamespacedKey, MojangRecipe<*>>
+    internal val clientsideRecipes: Map<ResourceLocation, MojangRecipe<*>>
         get() = _clientsideRecipes
-    val novaRecipes: Map<RecipeType<*>, Map<NamespacedKey, NovaRecipe>>
+    val novaRecipes: Map<RecipeType<*>, Map<ResourceLocation, NovaRecipe>>
         get() = _novaRecipes
     
     @InitFun
@@ -194,9 +106,11 @@ object RecipeManager : Listener {
         return _novaRecipes[type]?.values?.firstOrNull { (it as ConversionNovaRecipe).input.test(input) } as T?
     }
     
+    fun <T : NovaRecipe> getRecipe(type: RecipeType<T>, key: NamespacedKey): T? = getRecipe(type, key.resourceLocation)
+    
     @Suppress("UNCHECKED_CAST")
-    fun <T : NovaRecipe> getRecipe(type: RecipeType<T>, key: NamespacedKey): T? {
-        return _novaRecipes[type]?.get(key) as T?
+    fun <T : NovaRecipe> getRecipe(type: RecipeType<T>, id: ResourceLocation): T? {
+        return _novaRecipes[type]?.get(id) as T?
     }
     
     private fun loadRecipes() {
@@ -207,69 +121,18 @@ object RecipeManager : Listener {
     private fun loadRecipe(recipe: Any) {
         when (recipe) {
             is BukkitRecipe -> {
-                val key = (recipe as Keyed).key
+                val serversideRecipe = ServersideRecipe.of(recipe)
+                serversideRecipe as Recipe<*> // intersection type of Recipe<*> and ServersideRecipe
                 
-                //<editor-fold desc="vanilla recipe registration", defaultstate="collapsed">
-                when (recipe) {
-                    
-                    is ShapedRecipe -> {
-                        val optimizedRecipe = OptimizedShapedRecipe(recipe)
-                        shapedRecipes[key] = optimizedRecipe
-                        
-                        val nmsRecipe = NovaShapedRecipe(optimizedRecipe)
-                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
-                        
-                        _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
-                    }
-                    
-                    is ShapelessRecipe -> {
-                        shapelessRecipes[key] = recipe
-                        
-                        val nmsRecipe = NovaShapelessRecipe(recipe)
-                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
-                        
-                        _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
-                    }
-                    
-                    is FurnaceRecipe -> {
-                        val nmsRecipe = NovaFurnaceRecipe(recipe)
-                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
-                        _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
-                    }
-                    
-                    is BlastingRecipe -> {
-                        val nmsRecipe = NovaBlastFurnaceRecipe(recipe)
-                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
-                        _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
-                    }
-                    
-                    is SmokingRecipe -> {
-                        val nmsRecipe = NovaSmokerRecipe(recipe)
-                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
-                        _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
-                    }
-                    
-                    is CampfireRecipe -> {
-                        val nmsRecipe = NovaCampfireRecipe(recipe)
-                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
-                        _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
-                    }
-                    
-                    is StonecuttingRecipe -> {
-                        val nmsRecipe = NovaStonecutterRecipe(recipe)
-                        MINECRAFT_SERVER.recipeManager.addRecipe(nmsRecipe)
-                        _clientsideRecipes[key] = nmsRecipe.clientsideCopy()
-                    }
-                    
-                    else -> Bukkit.addRecipe(recipe)
-                }
-                //</editor-fold>
+                MINECRAFT_SERVER.recipeManager.addRecipe(serversideRecipe)
                 
-                registeredVanillaRecipeKeys += key
-                customVanillaRecipeKeys += key
+                val id = serversideRecipe.id
+                _clientsideRecipes[id] = serversideRecipe.clientsideCopy()
+                registeredVanillaRecipes[id] = serversideRecipe
+                customVanillaRecipes[id] = serversideRecipe
             }
             
-            is NovaRecipe -> _novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.key] = recipe
+            is NovaRecipe -> _novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.id] = recipe
             
             else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
         }
@@ -277,20 +140,20 @@ object RecipeManager : Listener {
     
     private fun loadInternalRecipes() {
         val recipeManager = MINECRAFT_SERVER.recipeManager
-        INTERNAL_RECIPES.forEach { (resourceLocation, recipeConstructor) ->
-            recipeManager.removeRecipe(resourceLocation)
-            recipeManager.addRecipe(recipeConstructor(resourceLocation))
+        INTERNAL_RECIPES.forEach { (id, recipeConstructor) ->
+            val recipe = recipeConstructor.invoke(id)
             
-            registeredVanillaRecipeKeys += resourceLocation.namespacedKey
+            recipeManager.removeRecipe(id)
+            recipeManager.addRecipe(recipe)
+            
+            registeredVanillaRecipes[id] = recipe
         }
     }
     
     internal fun reload() {
-        customVanillaRecipeKeys.forEach { MINECRAFT_SERVER.recipeManager.removeRecipe(it.resourceLocation) }
+        customVanillaRecipes.keys.forEach(MINECRAFT_SERVER.recipeManager::removeRecipe)
         
-        shapedRecipes.clear()
-        shapelessRecipes.clear()
-        customVanillaRecipeKeys.clear()
+        customVanillaRecipes.clear()
         _clientsideRecipes.clear()
         _novaRecipes.clear()
         
@@ -301,14 +164,15 @@ object RecipeManager : Listener {
     
     @EventHandler
     private fun handleJoin(event: PlayerJoinEvent) {
-        customVanillaRecipeKeys.forEach(event.player::discoverRecipe)
+        val player = event.player
+        customVanillaRecipes.keys.forEach { player.discoverRecipe(it.namespacedKey) }
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
     private fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
         val recipe = event.recipe ?: return
         
-        var requiresContainer = recipe.key in registeredVanillaRecipeKeys
+        var requiresContainer = recipe.key.resourceLocation in registeredVanillaRecipes.keys
         if (!requiresContainer && event.inventory.contents.any { it.novaItem != null }) {
             // prevent non-Nova recipes from using Nova items
             event.inventory.result = ItemStack(Material.AIR)
@@ -323,17 +187,19 @@ object RecipeManager : Listener {
     
     @PacketHandler
     private fun handleRecipePlace(event: ServerboundPlaceRecipePacketEvent) {
-        val key = NamespacedKey.fromString(event.packet.recipe.toString())
-        if (key in shapedRecipes) {
-            runTask { fillCraftingInventory(event.player, shapedRecipes[key]!!) }
+        val id = event.recipe
+        val recipe = registeredVanillaRecipes[id] ?: return
+        
+        if (recipe is NovaShapedRecipe) {
+            runTask { fillCraftingInventory(event.player, recipe) }
             event.isCancelled = true
-        } else if (key in shapelessRecipes) {
-            runTask { fillCraftingInventory(event.player, shapelessRecipes[key]!!) }
+        } else if (recipe is NovaShapelessRecipe) {
+            runTask { fillCraftingInventory(event.player, recipe) }
             event.isCancelled = true
         }
     }
     
-    private fun fillCraftingInventory(player: Player, recipe: OptimizedShapedRecipe) {
+    private fun fillCraftingInventory(player: Player, recipe: NovaShapedRecipe) {
         val craftingInventory = player.openInventory.topInventory as CraftingInventory
         
         // clear previous items
@@ -358,12 +224,12 @@ object RecipeManager : Listener {
             
         } else {
             // send ghost recipe
-            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, recipe.key)
+            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, recipe.id)
             player.send(packet)
         }
     }
     
-    private fun fillCraftingInventory(player: Player, recipe: ShapelessRecipe) {
+    private fun fillCraftingInventory(player: Player, recipe: NovaShapelessRecipe) {
         val craftingInventory = player.openInventory.topInventory as CraftingInventory
         
         // clear previous items
@@ -384,35 +250,9 @@ object RecipeManager : Listener {
             
         } else {
             // send ghost recipe
-            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, recipe.key.toString())
+            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, recipe.id)
             player.send(packet)
         }
-    }
-    
-}
-
-/**
- * Optimizes the recipe matching algorithm by already saving an array of recipe choices in the
- * layout of a crafting inventory.
- */
-internal class OptimizedShapedRecipe(val recipe: ShapedRecipe) {
-    
-    val width = recipe.shape[0].length
-    val height = recipe.shape.size
-    val requiredChoices: List<RecipeChoice>
-    val flatChoices: Array<RecipeChoice?>
-    val choiceMatrix: Array<Array<RecipeChoice?>>
-    val key: String = recipe.key.toString()
-    
-    init {
-        val flatShape = recipe.shape.joinToString("")
-        flatChoices = Array(flatShape.length) { recipe.choiceMap[flatShape[it]] }
-        requiredChoices = recipe.shape.joinToString("").mapNotNull { recipe.choiceMap[it] }
-        choiceMatrix = Array(width) { x -> Array(height) { y -> recipe.choiceMap[recipe.shape[y][x]] } }
-    }
-    
-    fun getChoice(x: Int, y: Int): RecipeChoice? {
-        return choiceMatrix.getOrNull(x)?.getOrNull(y)
     }
     
 }

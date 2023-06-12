@@ -31,7 +31,6 @@ import xyz.xenondevs.nova.ui.overlay.character.gui.DefaultGuiTextures
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.moveToStart
 import xyz.xenondevs.nova.util.playClickSound
-import xyz.xenondevs.nova.util.runTask
 
 private val TAB_BUTTON_TEXTURES = arrayOf(
     DefaultGuiTextures.ITEMS_0,
@@ -180,10 +179,6 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         
         val anvilGui = Gui.empty(3, 1).apply {
             setItem(0, textItem)
-            setItem(2, clickableItem(
-                DefaultGuiItems.X.createClientsideItemBuilder()
-                    .setDisplayName(Component.translatable("menu.nova.items.search.clear", NamedTextColor.GRAY))
-            ) { textItem.resetText(); filter = ""; runTask { player.updateInventory() } })
         }
         
         val title = Component.text()

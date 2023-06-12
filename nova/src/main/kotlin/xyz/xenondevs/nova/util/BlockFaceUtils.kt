@@ -93,6 +93,21 @@ val BlockFace.rotation: Quaternionf
         else -> throw UnsupportedOperationException("Unsupported facing")
     }
 
+/**
+ * The rotation that needs to be applied to make something face the given [BlockFace], assuming
+ * it is facing NORTH by default.
+ */
+val BlockFace.rotationNorth: Quaternionf
+    get() = when (this) {
+        SOUTH -> Quaternionf().setAngleAxis(Math.PI.toFloat(), 0f, 1f, 0f)
+        EAST -> Quaternionf().setAngleAxis((Math.PI * 1.5).toFloat(), 0f, 1f, 0f)
+        NORTH -> Quaternionf()
+        WEST -> Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 0f, 1f, 0f)
+        UP -> Quaternionf().setAngleAxis((Math.PI / 2).toFloat(), 1f, 0f, 0f)
+        DOWN -> Quaternionf().setAngleAxis((Math.PI * 1.5).toFloat(), 1f, 0f, 0f)
+        else -> throw UnsupportedOperationException("Unsupported facing")
+    }
+
 fun BlockFace.getYaw(default: BlockFace): Float =
     (yaw + default.yaw) % 360
 

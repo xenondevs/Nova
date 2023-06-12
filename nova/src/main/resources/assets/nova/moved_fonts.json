@@ -2,6 +2,9 @@
   "minecraft:default": {
     "range": [1, 19]
   },
+  "minecraft:uniform": {
+    "range": [1, 19]
+  },
   "nova:bossbar": {
     "range": [1, 19]
   },

@@ -5,6 +5,7 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_INFO_PROVIDER
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_TOOL_ICON_PROVIDER
+import xyz.xenondevs.nova.ui.waila.info.impl.BrushableWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CakeWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CampfireWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.CandleWailaInfoProvider
@@ -15,13 +16,13 @@ import xyz.xenondevs.nova.ui.waila.info.impl.CropWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.DaylightDetectorWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.DefaultNovaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.DefaultVanillaWailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.info.impl.HatchableWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.LanternWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RailWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RedstoneLampWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RepeaterWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RespawnAnchorWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.SeaPickleWailaInfoProvider
-import xyz.xenondevs.nova.ui.waila.info.impl.SuspiciousSandWailaInfoProvider
 import xyz.xenondevs.nova.util.set
 
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
@@ -45,8 +46,9 @@ private object DefaultWailaProviders {
         register("daylight_detector", DaylightDetectorWailaInfoProvider)
         register("cocoa", CocoaWailaInfoProvider)
         register("redstone_lamp", RedstoneLampWailaInfoProvider)
-        register("suspicious_sand", SuspiciousSandWailaInfoProvider)
-    
+        register("brushable", BrushableWailaInfoProvider)
+        register("hatchable", HatchableWailaInfoProvider)
+        
         register("vanilla", VanillaWailaToolIconProvider)
     }
     

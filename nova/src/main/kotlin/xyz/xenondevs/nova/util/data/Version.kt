@@ -19,6 +19,9 @@ class Version : Comparable<Version> {
     private val version: IntArray
     private val stageVersion: IntArray
     
+    val isFullRelease: Boolean
+        get() = stageVersion.isEmpty()
+    
     constructor(vararg version: Int) {
         this.version = version
         this.stageVersion = intArrayOf()

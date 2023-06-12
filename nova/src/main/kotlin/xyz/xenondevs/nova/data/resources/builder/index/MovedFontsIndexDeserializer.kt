@@ -2,16 +2,18 @@ package xyz.xenondevs.nova.data.resources.builder.index
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet
+import it.unimi.dsi.fastutil.ints.IntSet
 import xyz.xenondevs.commons.gson.getAllInts
 import xyz.xenondevs.commons.gson.getIntOrNull
 import xyz.xenondevs.nova.data.resources.ResourcePath
 
 internal object MovedFontsIndexDeserializer {
     
-    fun deserialize(namespace: String, json: JsonElement): Map<ResourcePath, Set<Int>> {
+    fun deserialize(namespace: String, json: JsonElement): Map<ResourcePath, IntSet> {
         require(json is JsonObject)
         
-        val map = HashMap<ResourcePath, HashSet<Int>>()
+        val map = HashMap<ResourcePath, IntSet>()
         
         json.entrySet().forEach { (font, obj) ->
             require(obj is JsonObject)
@@ -22,7 +24,7 @@ internal object MovedFontsIndexDeserializer {
             val step = obj.getIntOrNull("step") ?: 1
             require(step > 0)
             
-            map.getOrPut(path, ::HashSet) += IntProgression.fromClosedRange(range[0], range[1], step)
+            map.getOrPut(path, ::IntOpenHashSet) += IntProgression.fromClosedRange(range[0], range[1], step)
         }
         
         return map

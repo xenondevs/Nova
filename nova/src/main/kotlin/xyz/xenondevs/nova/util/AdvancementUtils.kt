@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.util
 
 import net.kyori.adventure.text.Component
+import net.minecraft.advancements.FrameType
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
@@ -8,25 +9,12 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.advancement.Advancement
 import xyz.xenondevs.nmsutils.advancement.CriteriaBuilder
 import xyz.xenondevs.nmsutils.advancement.Criterion
-import xyz.xenondevs.nmsutils.advancement.Display
-import xyz.xenondevs.nmsutils.advancement.FrameType
+import xyz.xenondevs.nmsutils.advancement.DisplayInfoBuilder
 import xyz.xenondevs.nmsutils.advancement.advancement
-import xyz.xenondevs.nmsutils.advancement.predicate.ItemPredicate
-import xyz.xenondevs.nmsutils.advancement.predicate.NbtPredicate
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.item.NovaItem
 
-fun ItemPredicate.Builder.nbt(compound: CompoundTag) {
-    nbt(NbtPredicate(compound))
-}
-
-fun ItemPredicate.Builder.nbt(init: CompoundTag.() -> Unit) {
-    val tag = CompoundTag()
-    tag.init()
-    nbt(tag)
-}
-
-fun Display.Builder.icon(icon: NovaItem) {
+fun DisplayInfoBuilder.icon(icon: NovaItem) {
     icon(icon.clientsideProvider.get())
 }
 

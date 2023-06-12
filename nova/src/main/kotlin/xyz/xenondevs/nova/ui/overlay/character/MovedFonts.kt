@@ -3,8 +3,12 @@ package xyz.xenondevs.nova.ui.overlay.character
 import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentBuilder
+import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.component.adventure.fontName
+
+private val FORCE_UNIFORM_FONT by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.force_uniform_font") }
 
 object MovedFonts {
     
@@ -12,11 +16,11 @@ object MovedFonts {
     
     /**
      * Creates a copy of the given [component] with its font changed to a vertically moved font by the given [distance].
-     * 
+     *
      * If the given [component] is already vertically moved, its current and new distances will only be added together if [addDistance] is true.
-     * 
+     *
      * Depending on the [distance] and configuration settings, the font that the component was changed to might not exist.
-     * 
+     *
      * @throws IllegalArgumentException If the given [component] is not a [BuildableComponent].
      */
     fun moveVertically(component: Component, distance: Int, addDistance: Boolean = false): Component {
@@ -41,15 +45,18 @@ object MovedFonts {
             
             var font = previousFont ?: "default"
             var currentDistance = 0
-            val match = MOVED_FONT_REGEX.matchEntire(font)
-            if (match != null) {
-                font = match.groupValues[1]
-                if (addDistance) {
+            if (previousFont != null) {
+                val match = MOVED_FONT_REGEX.matchEntire(previousFont)
+                if (match != null) {
+                    font = match.groupValues[1]
                     currentDistance = match.groupValues[2].toInt()
                 }
             }
             
-            val newDistance = currentDistance + distance
+            if (FORCE_UNIFORM_FONT && (font == "default" || font == "minecraft:default"))
+                font = "uniform"
+            
+            val newDistance = if (addDistance) currentDistance + distance else distance
             if (newDistance != 0) {
                 builder.font("$font/${newDistance}")
             } else {

@@ -1,41 +1,91 @@
 package xyz.xenondevs.nova.data.recipe
 
+import net.minecraft.core.NonNullList
+import net.minecraft.core.RegistryAccess
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.CraftingContainer
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.BlastingRecipe
 import net.minecraft.world.item.crafting.CampfireCookingRecipe
+import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe
+import net.minecraft.world.item.crafting.SmithingTransformRecipe
 import net.minecraft.world.item.crafting.SmokingRecipe
 import net.minecraft.world.item.crafting.StonecutterRecipe
 import net.minecraft.world.level.Level
-import org.bukkit.inventory.Recipe
-import org.bukkit.inventory.StonecuttingRecipe
+import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.commons.collections.removeFirstWhere
+import xyz.xenondevs.nova.item.logic.PacketItems
+import xyz.xenondevs.nova.util.NMSUtils.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.bukkitCopy
+import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.nmsCategory
-import xyz.xenondevs.nova.util.data.nmsIngredient
+import xyz.xenondevs.nova.util.data.toNmsIngredient
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.resourceLocation
 import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
 import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
 import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
+import org.bukkit.inventory.Recipe as BukkitRecipe
 import org.bukkit.inventory.ShapedRecipe as BukkitShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe as BukkitShapelessRecipe
+import org.bukkit.inventory.SmithingTransformRecipe as BukkitSmithingTransformRecipe
 import org.bukkit.inventory.SmokingRecipe as BukkitSmokingRecipe
+import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
 
-internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedRecipe) : ShapedRecipe(
-    optimizedRecipe.recipe.key.resourceLocation,
-    "",
-    optimizedRecipe.recipe.category.nmsCategory,
-    optimizedRecipe.width,
-    optimizedRecipe.height,
-    NonNullList(optimizedRecipe.flatChoices.map { it.nmsIngredient }),
-    optimizedRecipe.recipe.result.nmsCopy
-) {
-    private val bukkitRecipe = optimizedRecipe.recipe
+private fun Ingredient.clientsideCopy(): Ingredient {
+    val items = items.map(ItemStack::clientsideCopy)
+    return Ingredient(items.stream().map { Ingredient.ItemValue(it) })
+}
+
+private fun ItemStack.clientsideCopy(): ItemStack =
+    PacketItems.getClientSideStack(null, this)
+
+internal sealed interface ServersideRecipe<T : Recipe<*>> {
+    
+    fun clientsideCopy(): T
+    
+    companion object {
+        
+        fun of(bukkitRecipe: BukkitRecipe): ServersideRecipe<*> = when (bukkitRecipe) {
+            is BukkitShapedRecipe -> NovaShapedRecipe.of(bukkitRecipe)
+            is BukkitShapelessRecipe -> NovaShapelessRecipe(bukkitRecipe)
+            is BukkitFurnaceRecipe -> NovaFurnaceRecipe(bukkitRecipe)
+            is BukkitBlastingRecipe -> NovaBlastFurnaceRecipe(bukkitRecipe)
+            is BukkitSmokingRecipe -> NovaSmokerRecipe(bukkitRecipe)
+            is BukkitCampfireRecipe -> NovaCampfireRecipe(bukkitRecipe)
+            is BukkitStonecuttingRecipe -> NovaStonecutterRecipe(bukkitRecipe)
+            is BukkitSmithingTransformRecipe -> NovaSmithingTransformRecipe(bukkitRecipe)
+            else -> throw UnsupportedOperationException("Unknown recipe type: ${bukkitRecipe::class.simpleName}")
+        }
+        
+    }
+    
+}
+
+internal class NovaShapedRecipe private constructor(
+    private val bukkitRecipe: BukkitShapedRecipe,
+    width: Int,
+    height: Int,
+    choices: NonNullList<Ingredient>,
+    result: ItemStack,
+    val flatChoices: Array<RecipeChoice?>,
+    val requiredChoices: List<RecipeChoice>,
+    val choiceMatrix: Array<Array<RecipeChoice?>>
+) : ShapedRecipe(
+    bukkitRecipe.key.resourceLocation,
+    "", 
+    bukkitRecipe.category.nmsCategory, 
+    width, height,
+    choices, result
+), ServersideRecipe<ShapedRecipe> {
+    
+    fun getChoice(x: Int, y: Int): RecipeChoice? =
+        choiceMatrix.getOrNull(x)?.getOrNull(y)
     
     override fun matches(container: CraftingContainer, world: Level): Boolean {
         // Iterate through all the top-left positions of all possible placements of the recipe shape.
@@ -58,7 +108,7 @@ internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedReci
                 val item = container.getItem(absX + absY * container.width)
                 // If relX and relY are in the shape, it will be the RecipeChoice at that position, or null otherwise
                 val choice = if (relX in (0 until width) && relY in (0 until height)) {
-                    optimizedRecipe.getChoice(if (horizontalFlip) width - relX - 1 else relX, relY)
+                    getChoice(if (horizontalFlip) width - relX - 1 else relX, relY)
                 } else null
                 // If choice is null, treat it as an air RecipeChoice.
                 if (choice == null) {
@@ -68,8 +118,36 @@ internal class NovaShapedRecipe(private val optimizedRecipe: OptimizedShapedReci
         return true
     }
     
-    override fun toBukkitRecipe(): BukkitShapedRecipe {
-        return bukkitRecipe
+    override fun clientsideCopy(): ShapedRecipe {
+        val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
+        val ingredients = NonNullList(ingredients.map(Ingredient::clientsideCopy))
+        return ShapedRecipe(id, group, category(), width, height, ingredients, result)
+    }
+    
+    override fun toBukkitRecipe() = bukkitRecipe
+    
+    companion object {
+        
+        fun of(recipe: BukkitShapedRecipe): NovaShapedRecipe {
+            val width = recipe.shape[0].length
+            val height = recipe.shape.size
+            
+            val flatShape: String = recipe.shape.joinToString("")
+            val flatChoices: Array<RecipeChoice?> = Array(flatShape.length) { recipe.choiceMap[flatShape[it]] }
+            val requiredChoices: List<RecipeChoice> = recipe.shape.joinToString("").mapNotNull { recipe.choiceMap[it] }
+            val choiceMatrix: Array<Array<RecipeChoice?>> = Array(width) { x -> Array(height) { y -> recipe.choiceMap[recipe.shape[y][x]] } }
+            
+            return NovaShapedRecipe(
+                recipe,
+                width, height,
+                NonNullList(flatChoices.map(RecipeChoice?::toNmsIngredient)),
+                recipe.result.nmsCopy,
+                flatChoices,
+                requiredChoices,
+                choiceMatrix
+            )
+        }
+        
     }
     
 }
@@ -79,11 +157,13 @@ internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessReci
     "",
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.result.nmsCopy,
-    NonNullList(bukkitRecipe.choiceList.map { it.nmsIngredient })
-) {
+    NonNullList(bukkitRecipe.choiceList.map(RecipeChoice?::toNmsIngredient))
+), ServersideRecipe<ShapelessRecipe> {
+    
+    val choiceList: List<RecipeChoice> = bukkitRecipe.choiceList
     
     override fun matches(container: CraftingContainer, level: Level): Boolean {
-        val choiceList = bukkitRecipe.choiceList
+        val choiceList = ArrayList(choiceList)
         
         // loop over all items in the inventory and remove matching choices from the choice list
         // if there is an item stack that does not have a matching choice or the choice list is not empty
@@ -93,9 +173,13 @@ internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessReci
         } && choiceList.isEmpty()
     }
     
-    override fun toBukkitRecipe(): org.bukkit.inventory.ShapelessRecipe {
-        return bukkitRecipe
+    override fun clientsideCopy(): ShapelessRecipe {
+        val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
+        val ingredients = NonNullList(ingredients.map(Ingredient::clientsideCopy))
+        return ShapelessRecipe(id, group, category(), result, ingredients)
     }
+    
+    override fun toBukkitRecipe() = bukkitRecipe
     
 }
 
@@ -103,11 +187,11 @@ internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) 
     bukkitRecipe.key.resourceLocation,
     "",
     bukkitRecipe.category.nmsCategory,
-    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.nmsCopy,
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
-) {
+), ServersideRecipe<SmeltingRecipe> {
     
     private val choice = bukkitRecipe.inputChoice
     
@@ -115,9 +199,13 @@ internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) 
         return choice.test(container.getItem(0).bukkitCopy)
     }
     
-    override fun toBukkitRecipe(): Recipe {
-        return bukkitRecipe
+    override fun clientsideCopy(): SmeltingRecipe {
+        val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
+        val ingredient = ingredients.first().clientsideCopy()
+        return SmeltingRecipe(id, group, category(), ingredient, result, experience, cookingTime)
     }
+    
+    override fun toBukkitRecipe() = bukkitRecipe
     
 }
 
@@ -125,11 +213,11 @@ internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRe
     bukkitRecipe.key.resourceLocation,
     "",
     bukkitRecipe.category.nmsCategory,
-    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.nmsCopy,
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
-) {
+), ServersideRecipe<BlastingRecipe> {
     
     private val choice = bukkitRecipe.inputChoice
     
@@ -137,9 +225,13 @@ internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRe
         return choice.test(container.getItem(0).bukkitCopy)
     }
     
-    override fun toBukkitRecipe(): Recipe {
-        return bukkitRecipe
+    override fun clientsideCopy(): BlastingRecipe {
+        val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
+        val ingredient = ingredient.clientsideCopy()
+        return BlastingRecipe(id, group, category(), ingredient, result, experience, cookingTime)
     }
+    
+    override fun toBukkitRecipe() = bukkitRecipe
     
 }
 
@@ -147,11 +239,11 @@ internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) :
     bukkitRecipe.key.resourceLocation,
     "",
     bukkitRecipe.category.nmsCategory,
-    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.nmsCopy,
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
-) {
+), ServersideRecipe<SmokingRecipe> {
     
     private val choice = bukkitRecipe.inputChoice
     
@@ -159,9 +251,13 @@ internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) :
         return choice.test(container.getItem(0).bukkitCopy)
     }
     
-    override fun toBukkitRecipe(): Recipe {
-        return bukkitRecipe
+    override fun clientsideCopy(): SmokingRecipe {
+        val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
+        val ingredient = ingredients.first().clientsideCopy()
+        return SmokingRecipe(id, group, category(), ingredient, result, experience, cookingTime)
     }
+    
+    override fun toBukkitRecipe() = bukkitRecipe
     
 }
 
@@ -169,11 +265,11 @@ internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe
     bukkitRecipe.key.resourceLocation,
     "",
     bukkitRecipe.category.nmsCategory,
-    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.nmsCopy,
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
-) {
+), ServersideRecipe<CampfireCookingRecipe> {
     
     private val choice = bukkitRecipe.inputChoice
     
@@ -181,18 +277,22 @@ internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe
         return choice.test(container.getItem(0).bukkitCopy)
     }
     
-    override fun toBukkitRecipe(): Recipe {
-        return bukkitRecipe
+    override fun clientsideCopy(): CampfireCookingRecipe {
+        val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
+        val ingredient = ingredients.first().clientsideCopy()
+        return CampfireCookingRecipe(id, group, category(), ingredient, result, experience, cookingTime)
     }
+    
+    override fun toBukkitRecipe() = bukkitRecipe
     
 }
 
-internal class NovaStonecutterRecipe(private val bukkitRecipe: StonecuttingRecipe) : StonecutterRecipe(
+internal class NovaStonecutterRecipe(private val bukkitRecipe: BukkitStonecuttingRecipe) : StonecutterRecipe(
     bukkitRecipe.key.resourceLocation,
     "",
-    bukkitRecipe.inputChoice.nmsIngredient,
+    bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.nmsCopy
-) {
+), ServersideRecipe<StonecutterRecipe> {
     
     private val choice = bukkitRecipe.inputChoice
     
@@ -200,8 +300,50 @@ internal class NovaStonecutterRecipe(private val bukkitRecipe: StonecuttingRecip
         return choice.test(container.getItem(0).bukkitCopy)
     }
     
-    override fun toBukkitRecipe(): Recipe {
-        return bukkitRecipe
+    override fun clientsideCopy(): StonecutterRecipe {
+        val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
+        val ingredient = ingredients.first().clientsideCopy()
+        return StonecutterRecipe(id, group, ingredient, result)
     }
+    
+    override fun toBukkitRecipe() = bukkitRecipe
+    
+}
+
+internal class NovaSmithingTransformRecipe(private val bukkitRecipe: BukkitSmithingTransformRecipe) : SmithingTransformRecipe(
+    bukkitRecipe.key.resourceLocation,
+    bukkitRecipe.template.toNmsIngredient(),
+    bukkitRecipe.base.toNmsIngredient(),
+    bukkitRecipe.addition.toNmsIngredient(),
+    bukkitRecipe.result.nmsCopy
+), ServersideRecipe<SmithingTransformRecipe> {
+    
+    private val templateChoice = bukkitRecipe.template
+    private val baseChoice = bukkitRecipe.base
+    private val additionChoice = bukkitRecipe.addition
+    
+    override fun matches(container: Container, world: Level): Boolean {
+        return templateChoice.test(container.getItem(0).bukkitMirror)
+            && baseChoice.test(container.getItem(1).bukkitMirror)
+            && additionChoice.test(container.getItem(2).bukkitMirror)
+    }
+    
+    override fun assemble(container: Container, registryAccess: RegistryAccess): ItemStack {
+        val result = bukkitRecipe.result.nmsCopy
+        val currentTag = container.getItem(1).orCreateTag.copy()
+        currentTag.remove("nova") // prevent item id override
+        result.orCreateTag.merge(currentTag)
+        return result
+    }
+    
+    override fun clientsideCopy(): SmithingTransformRecipe {
+        val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
+        val template = templateChoice.toNmsIngredient().clientsideCopy()
+        val base = baseChoice.toNmsIngredient().clientsideCopy()
+        val addition = additionChoice.toNmsIngredient().clientsideCopy()
+        return SmithingTransformRecipe(id, template, base, addition, result)
+    }
+    
+    override fun toBukkitRecipe() = bukkitRecipe
     
 }

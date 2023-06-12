@@ -22,6 +22,9 @@ import java.io.FileOutputStream
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
+private val LOAD_CHAR_SIZES_ON_STARTUP by configReloadable { DEFAULT_CONFIG.getBoolean("performance.load_char_sizes_on_startup") }
+private val FORCE_UNIFORM_FONT by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.force_uniform_font") }
+
 data class ComponentSize(
     val width: Int,
     // TODO: xRange
@@ -33,8 +36,6 @@ data class CharOptions(
     val font: String,
     val isBold: Boolean
 )
-
-private val LOAD_CHAR_SIZES_ON_STARTUP by configReloadable { DEFAULT_CONFIG.getBoolean("performance.load_char_sizes_on_startup") }
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD_ASYNC,
@@ -201,15 +202,28 @@ object CharSizes {
         return null
     }
     
+    internal fun storeTable(font: ResourcePath, table: CharSizeTable) =
+        storeTable(font.toString(), table)
+    
     internal fun storeTable(font: String, table: CharSizeTable) {
         loadedTables[font] = table
         table.write(getFile(font))
     }
     
+    internal fun getTable(font: ResourcePath) =
+        getTable(font.toString())
+    
     internal fun getTable(font: String): CharSizeTable? {
-        val namespacedFont = if (font.contains(':')) font else "minecraft:$font"
+        var namespacedFont = if (font.contains(':')) font else "minecraft:$font"
+        
+        if (FORCE_UNIFORM_FONT && namespacedFont == "minecraft:default")
+            namespacedFont = "minecraft:uniform"
+            
         return loadedTables[namespacedFont] ?: loadTable(namespacedFont)
     }
+    
+    internal fun deleteTable(font: ResourcePath) =
+        deleteTable(font.toString())
     
     internal fun deleteTable(font: String) {
         loadedTables -= font
@@ -265,6 +279,13 @@ internal class CharSizeTable(
     
     fun setSizes(char: Int, sizes: IntArray) {
         this.sizes[char] = sizes
+    }
+    
+    /**
+     * Merges [other] into this [CharSizeTable].
+     */
+    fun merge(other: CharSizeTable) {
+        sizes.putAll(other.sizes)
     }
     
     operator fun contains(char: Int): Boolean {

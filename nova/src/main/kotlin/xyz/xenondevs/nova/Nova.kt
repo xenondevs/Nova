@@ -34,7 +34,7 @@ import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegi
 import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
-private val REQUIRED_SERVER_VERSION = Version("1.19.4")..Version("1.19.4")
+private val REQUIRED_SERVER_VERSION = Version("1.20")..Version("1.20")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 internal lateinit var NOVA: Nova private set
 internal lateinit var LOGGER: Logger private set
@@ -71,7 +71,7 @@ internal class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plu
         // prevent execution on unsupported minecraft versions
         if (Version.SERVER_VERSION !in REQUIRED_SERVER_VERSION) {
             LOGGER.severe("Nova is not compatible with this version of Minecraft!")
-            LOGGER.severe("Nova only runs on $REQUIRED_SERVER_VERSION.")
+            LOGGER.severe("Nova v$version only runs on $REQUIRED_SERVER_VERSION.")
             Bukkit.getPluginManager().disablePlugin(loader)
             return false
         }

@@ -14,7 +14,7 @@ dependencies {
     novaLoaderApi(libs.bundles.xenondevs.commons)
     novaLoaderApi(libs.bundles.kyori.adventure)
     novaLoaderApi(libs.invui.kotlin)
-    novaLoaderApi("xyz.xenondevs:nms-utilities:0.9:remapped-mojang")
+    novaLoaderApi("xyz.xenondevs:nms-utilities:0.10:remapped-mojang")
     
     // internal dependencies
     compileOnly(project(":nova-api"))

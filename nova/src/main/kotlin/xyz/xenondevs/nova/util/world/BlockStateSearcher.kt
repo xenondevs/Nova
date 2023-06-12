@@ -15,6 +15,7 @@ import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.Palette
 import net.minecraft.world.level.chunk.SingleValuePalette
 import xyz.xenondevs.commons.collections.getOrSet
+import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HASH_MAP_PALETTE_VALUES_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.LINEAR_PALETTE_VALUES_FIELD
@@ -37,11 +38,13 @@ object BlockStateSearcher {
         
         val result: Array<ArrayList<BlockPos>?> = arrayOfNulls(queries.size)
         for (section in world.serverLevel.getChunk(pos.x, pos.z).sections) {
+            section as LevelChunkSectionWrapper
+            
             val container = section.states
             container.acquire()
             
             try {
-                val bottomY = section.bottomBlockY()
+                val bottomY = section.bottomBlockY
                 val data = ReflectionRegistry.PALETTED_CONTAINER_DATA_FIELD.get(container)
                 val palette = ReflectionRegistry.PALETTED_CONTAINER_DATA_PALETTE_FIELD.get(data) as Palette<BlockState>
                 var storage: BitStorage? = null

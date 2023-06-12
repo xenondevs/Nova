@@ -14,7 +14,6 @@ abstract class AddonExtension {
     abstract val authors: ListProperty<String>
     abstract val depend: ListProperty<String>
     abstract val softdepend: ListProperty<String>
-    abstract val spigotResourceId: Property<Int>
     abstract val jarTask: Property<Jar>
     
 }

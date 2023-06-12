@@ -40,9 +40,9 @@ import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.LocationUtils
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.center
-import xyz.xenondevs.nova.util.getYaw
 import xyz.xenondevs.nova.util.hasInventoryOpen
 import xyz.xenondevs.nova.util.item.novaCompound
+import xyz.xenondevs.nova.util.pitch
 import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
@@ -82,7 +82,7 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     val owner: OfflinePlayer? by lazy { ownerUUID?.let(Bukkit::getOfflinePlayer) }
     
     val location: Location
-        get() = Location(pos.world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), facing.getYaw(BlockFace.NORTH), 0f)
+        get() = Location(pos.world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), facing.yaw, facing.pitch)
     val centerLocation: Location
         get() = location.center()
     val world: World

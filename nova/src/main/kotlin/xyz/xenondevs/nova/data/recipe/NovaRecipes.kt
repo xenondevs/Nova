@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.recipe
 
-import org.bukkit.NamespacedKey
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 
@@ -8,7 +8,7 @@ import org.bukkit.inventory.RecipeChoice
  * The interface for all recipes for Nova blocks.
  */
 interface NovaRecipe {
-    val key: NamespacedKey
+    val id: ResourceLocation
     val type: RecipeType<out NovaRecipe>
 }
 
@@ -82,7 +82,7 @@ interface MultiInputChoiceRecipe : InputChoiceRecipe {
  * The abstract base class for all recipes that convert one [input] into a [result] in a defined [time].
  */
 abstract class ConversionNovaRecipe(
-    override val key: NamespacedKey,
+    override val id: ResourceLocation,
     override val input: RecipeChoice,
     override val result: ItemStack,
     val time: Int

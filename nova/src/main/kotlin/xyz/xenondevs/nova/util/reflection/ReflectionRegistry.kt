@@ -63,8 +63,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
-import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData
-import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 import org.bukkit.event.block.BlockPhysicsEvent
@@ -174,7 +174,7 @@ internal object ReflectionRegistry {
     val MAPPED_REGISTRY_FROZEN_FIELD = getField(MappedRegistry::class, true, "SRF(net.minecraft.core.MappedRegistry frozen)")
     val BIOME_GENERATION_SETTINGS_FEATURES_FIELD = getField(BiomeGenerationSettings::class, true, "SRF(net.minecraft.world.level.biome.BiomeGenerationSettings features)")
     val LEVEL_CHUNK_SECTION_STATES_FIELD = getField(LevelChunkSection::class, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection states)")
-    val LEVEL_CHUNK_SECTION_BIOMES_FIELD = getField(LevelChunkSection::class, true, if (SERVER_SOFTWARE == ServerSoftware.SPIGOT) "j" else "biomes")
+    val LEVEL_CHUNK_SECTION_BIOMES_FIELD = getField(LevelChunkSection::class, true, if (SERVER_SOFTWARE == ServerSoftware.SPIGOT) "i" else "biomes")
     @JvmField
     val LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD = getField(LevelChunkSection::class, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection nonEmptyBlockCount)")
     @JvmField

@@ -25,7 +25,7 @@ val CommandSourceStack.bukkitPlayer: Player
     get() = playerOrException.bukkitEntity
 
 fun CommandSourceStack.sendSuccess(message: Component, broadcast: Boolean = false) {
-    sendSuccess(message.toNMSComponent(), broadcast)
+    sendSuccess({ message.toNMSComponent() }, broadcast)
 }
 
 fun CommandSourceStack.sendFailure(message: Component) {

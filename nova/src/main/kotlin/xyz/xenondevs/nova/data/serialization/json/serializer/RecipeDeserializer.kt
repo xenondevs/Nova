@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.serialization.json.serializer
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -15,7 +16,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
-import org.bukkit.inventory.SmithingRecipe
+import org.bukkit.inventory.SmithingTransformRecipe
 import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import org.bukkit.inventory.recipe.CookingBookCategory
@@ -26,11 +27,12 @@ import xyz.xenondevs.commons.gson.getIntOrNull
 import xyz.xenondevs.commons.gson.getString
 import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.commons.gson.isString
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer.Companion.getRecipeId
 import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer.Companion.getRecipeKey
 import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer.Companion.parseRecipeChoice
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.ItemUtils.getItemBuilder
+import xyz.xenondevs.nova.util.namespacedKey
 import java.io.File
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -70,7 +72,10 @@ interface RecipeDeserializer<T> {
         }
         
         fun getRecipeKey(file: File): NamespacedKey =
-            NamespacedKey(NOVA, "${file.parentFile.name}.${file.nameWithoutExtension}")
+            getRecipeId(file).namespacedKey
+        
+        fun getRecipeId(file: File): ResourceLocation =
+            ResourceLocation("nova", "${file.parentFile.name}.${file.nameWithoutExtension}")
         
     }
     
@@ -170,14 +175,15 @@ internal object StonecutterRecipeDeserializer : RecipeDeserializer<StonecuttingR
     
 }
 
-internal object SmithingRecipeDeserializer : RecipeDeserializer<SmithingRecipe> {
+internal object SmithingTransformRecipeDeserializer : RecipeDeserializer<SmithingTransformRecipe> {
     
-    override fun deserialize(json: JsonObject, file: File): SmithingRecipe {
+    override fun deserialize(json: JsonObject, file: File): SmithingTransformRecipe {
+        val template = parseRecipeChoice(json.get("template"))
         val base = parseRecipeChoice(json.get("base"))
         val addition = parseRecipeChoice(json.get("addition"))
         val result = getItemBuilder(json.get("result").asString)
         result.amount = json.getIntOrNull("amount") ?: 1
-        return SmithingRecipe(getRecipeKey(file), result.get(), base, addition)
+        return SmithingTransformRecipe(getRecipeKey(file), result.get(), template, base, addition)
     }
     
 }
@@ -192,22 +198,22 @@ abstract class ConversionRecipeDeserializer<T> : RecipeDeserializer<T> {
         
         val time = json.getIntOrNull("time") ?: json.getIntOrNull("cookingTime")!! // legacy support
         
-        return createRecipe(json, getRecipeKey(file), inputChoice, result.get(), time)
+        return createRecipe(json, getRecipeId(file), inputChoice, result.get(), time)
     }
     
-    abstract fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int): T
+    abstract fun createRecipe(json: JsonObject, id: ResourceLocation, input: RecipeChoice, result: ItemStack, time: Int): T
     
 }
 
 @Suppress("FINITE_BOUNDS_VIOLATION_IN_JAVA")
 internal abstract class CookingRecipeDeserializer<T : CookingRecipe<T>>(
-    val recipeConstructor: (key: NamespacedKey, result: ItemStack, input: RecipeChoice, experience: Float, time: Int) -> T
+    val recipeConstructor: (id: NamespacedKey, result: ItemStack, input: RecipeChoice, experience: Float, time: Int) -> T
 ) : ConversionRecipeDeserializer<T>() {
     
-    override fun createRecipe(json: JsonObject, key: NamespacedKey, input: RecipeChoice, result: ItemStack, time: Int): T {
+    override fun createRecipe(json: JsonObject, id: ResourceLocation, input: RecipeChoice, result: ItemStack, time: Int): T {
         val experience = json.getFloatOrNull("experience")!!
         
-        val recipe = recipeConstructor(key, result, input, experience, time)
+        val recipe = recipeConstructor(id.namespacedKey, result, input, experience, time)
         
         val category = json.getStringOrNull("category")
             ?.let { CookingBookCategory.valueOf(it.uppercase()) }

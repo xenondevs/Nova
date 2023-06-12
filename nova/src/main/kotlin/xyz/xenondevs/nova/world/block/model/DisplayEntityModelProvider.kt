@@ -45,6 +45,7 @@ class DisplayEntityModelProvider(blockState: NovaBlockState) : BlockModelProvide
     init {
         val directional = blockState.getProperty(Directional::class)
         val location = pos.location.add(.5, .5, .5)
+        location.yaw += 180f // let blocks face north by default (otherwise north in block bench isn't north)
         
         entities += FakeItemDisplay(location, false) { _, data -> setDataValues(data, directional) }
         

@@ -7,7 +7,6 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.UpdateReminder
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
@@ -23,6 +22,7 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.ui.overlay.actionbar.ActionbarOverlayManager
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
+import xyz.xenondevs.nova.update.UpdateReminder
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.getResources
 import xyz.xenondevs.nova.world.ChunkReloadWatcher

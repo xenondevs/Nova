@@ -73,6 +73,7 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.JUNGLE_SAPLING to "block/jungle_sapling",
     Material.ACACIA_SAPLING to "block/acacia_sapling",
     Material.DARK_OAK_SAPLING to "block/dark_oak_sapling",
+    Material.CHERRY_SAPLING to "block/cherry_sapling",
     Material.MANGROVE_PROPAGULE to "block/mangrove_propagule",
     Material.BAMBOO_SAPLING to "block/bamboo_stage0",
     Material.DEAD_BUSH to "block/dead_bush",
@@ -108,6 +109,8 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.PEONY to "block/peony_top",
     Material.TORCHFLOWER to "block/torchflower",
     Material.PINK_PETALS to "item/pink_petals",
+    Material.PITCHER_CROP to "item/pitcher_plant",
+    Material.PITCHER_PLANT to "item/pitcher_plant",
     
     // mushrooms
     Material.BROWN_MUSHROOM to "block/brown_mushroom",
@@ -189,7 +192,7 @@ private val TEXTURES = setOf(
     "potatoes_stage0", "potatoes_stage1", "potatoes_stage2", "potatoes_stage3",
     "sweet_berry_bush_stage0", "sweet_berry_bush_stage1", "sweet_berry_bush_stage2", "sweet_berry_bush_stage3",
     "wheat_stage0", "wheat_stage1", "wheat_stage2", "wheat_stage3", "wheat_stage4", "wheat_stage5", "wheat_stage6", "wheat_stage7",
-    "torchflower_crop_stage0", "torchflower_crop_stage1", "torchflower_crop_stage2",
+    "torchflower_crop_stage0", "torchflower_crop_stage1",
     "activator_rail", "activator_rail_on", "detector_rail", "detector_rail_on", "powered_rail", "powered_rail_on"
 )
 //</editor-fold>
