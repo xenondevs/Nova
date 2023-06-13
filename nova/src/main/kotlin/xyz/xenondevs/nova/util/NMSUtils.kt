@@ -67,6 +67,7 @@ import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.entity.ai.attributes.Attribute as MojangAttribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier as MojangAttributeModifier
 import net.minecraft.world.entity.player.Player as MojangPlayer
+import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.level.block.Block as MojangBlock
 
@@ -213,6 +214,15 @@ val AttributeModifier.Operation.nmsOperation: MojangAttributeModifier.Operation
 
 val Material.nmsBlock: MojangBlock
     get() = CraftMagicNumbers.getBlock(this)
+
+val Material.nmsItem: MojangItem
+    get() = CraftMagicNumbers.getItem(this)
+
+val MojangBlock.bukkitMaterial: Material
+    get() = CraftMagicNumbers.getMaterial(this)
+
+val MojangItem.bukkitMaterial: Material
+    get() = CraftMagicNumbers.getMaterial(this)
 
 val Block.nmsState: BlockState
     get() = world.serverLevel.getBlockState(MojangBlockPos(x, y, z))

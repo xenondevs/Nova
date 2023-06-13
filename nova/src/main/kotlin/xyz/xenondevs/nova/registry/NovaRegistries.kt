@@ -7,6 +7,8 @@ import xyz.xenondevs.nova.data.resources.ModelData
 import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.enchantment.Enchantment
+import xyz.xenondevs.nova.item.enchantment.EnchantmentCategory
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.player.ability.AbilityType
@@ -32,6 +34,12 @@ object NovaRegistries {
     
     @JvmField
     val TOOL_CATEGORY = registerSimple<ToolCategory>(NovaRegistryAccess.DEFAULT, "tool_category")
+    
+    @JvmField
+    val ENCHANTMENT_CATEGORY = registerSimple<EnchantmentCategory>(NovaRegistryAccess.DEFAULT, "enchantment_category")
+    
+    @JvmField
+    val ENCHANTMENT = registerSimple<Enchantment>(NovaRegistryAccess.DEFAULT, "enchantment")
     
     @JvmField
     val UPGRADE_TYPE = registerSimple<UpgradeType<*>>(NovaRegistryAccess.DEFAULT, "upgrade_type")

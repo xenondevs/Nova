@@ -8,7 +8,6 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import kotlin.random.Random
-import net.minecraft.world.level.block.Block as MojangBlock
 
 val Material.fluidType: FluidType?
     get() {
@@ -22,9 +21,6 @@ val Material.fluidType: FluidType?
 
 val Material.localizedName: String?
     get() = CraftMagicNumbers.getItem(this)?.descriptionId
-
-val Material.nmsBlock : MojangBlock
-    get() = CraftMagicNumbers.getBlock(this)
 
 val Material.soundGroup: SoundGroup
     get() = createBlockData().soundGroup
