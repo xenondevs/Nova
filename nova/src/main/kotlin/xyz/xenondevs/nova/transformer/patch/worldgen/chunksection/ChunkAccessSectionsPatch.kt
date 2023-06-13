@@ -82,8 +82,6 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(CHUNK_ACCESS_CONSTR
         }) {
             it.opcode == Opcodes.PUTFIELD && (it as FieldInsnNode).desc == Type.getDescriptor(Registry::class.java) // https://i.imgur.com/sChNvVq.png
         }
-        
-        dump()
     }
     
     
