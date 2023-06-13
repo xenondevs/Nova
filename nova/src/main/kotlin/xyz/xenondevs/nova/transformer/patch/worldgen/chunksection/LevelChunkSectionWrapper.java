@@ -5,6 +5,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeResolver;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -140,6 +142,16 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     @Override
     public void write(FriendlyByteBuf packetdataserializer) {
         delegate.write(packetdataserializer);
+    }
+    
+    @Override
+    public void readBiomes(FriendlyByteBuf packetdataserializer) {
+        delegate.readBiomes(packetdataserializer);
+    }
+    
+    @Override
+    public void fillBiomesFromNoise(BiomeResolver biomeresolver, Climate.Sampler climate_sampler, int i, int j, int k) {
+        delegate.fillBiomesFromNoise(biomeresolver, climate_sampler, i, j, k);
     }
     
     @Override

@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.transformer.adapter
 
+import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.LevelChunkSection
 import org.objectweb.asm.Opcodes.ACC_PUBLIC
@@ -23,6 +24,24 @@ object LcsWrapperAdapter : Adapter {
                 invokeVirtual(LevelChunkSection::class.internalName, "updateKnownBlockInfo", "(I$blockStateName$blockStateName)V")
                 aLoad(0)
                 invokeVirtual(clazz.name, "copyBlockCounts", "()V")
+                
+                addLabel()
+                _return()
+            })
+            
+            val friendlyByteBufName = "L" + FriendlyByteBuf::class.internalName + ";"
+            val chunkPacketInfoName = "Lcom/destroystokyo/paper/antixray/ChunkPacketInfo;"
+            val writeDesc = "($friendlyByteBufName${chunkPacketInfoName}I)V"
+            clazz.methods.add(MethodNode(ACC_PUBLIC, "write", writeDesc) {
+                addLabel()
+                aLoad(0)
+                getField(clazz.name, "delegate", "L" + LevelChunkSection::class.internalName + ";")
+                
+                aLoad(1)
+                aLoad(2)
+                iLoad(3)
+                
+                invokeVirtual(LevelChunkSection::class.internalName, "write", writeDesc)
                 
                 addLabel()
                 _return()
