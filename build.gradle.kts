@@ -54,6 +54,7 @@ subprojects {
                 jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
                 freeCompilerArgs.addAll(
                     "-Xjvm-default=all",
+                    "-Xlambdas=indy",
                     "-opt-in=kotlin.io.path.ExperimentalPathApi"
                 )
             }
