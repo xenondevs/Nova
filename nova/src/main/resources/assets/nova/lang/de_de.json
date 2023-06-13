@@ -131,5 +131,6 @@
   "command.nova.advanced_tooltips.nova.failure": "Erweiterte Schnellinfos für Nova Items sind bereits aktiviert.",
   "command.nova.advanced_tooltips.all.success": "Erweiterte Schnellinfos für alle Items aktiviert.",
   "command.nova.advanced_tooltips.all.failure": "Erweiterte Schnellinfos für Nova Items sind bereits aktiviert.",
-  "command.nova.list_blocks.success": "Insgesamt: %s"
+  "command.nova.list_blocks.success": "Insgesamt: %s",
+  "command.nova.invalidate_char_sizes.success": "Char grössen wurden erfolgreich invalidiert. Sie werden beim nächsten erstellen des Resourcenpackets neu berechnet."
 }
