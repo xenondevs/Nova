@@ -70,7 +70,7 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
         val world = level.world
         
         if (player.isInWater) {
-            ENTITY_WATER_SWIM_SOUND_METHOD.invoke(this)
+            ENTITY_WATER_SWIM_SOUND_METHOD.invoke(player)
             playMuffledStepSound(player, pos.toNovaPos(world), state)
         } else {
             val primaryPos = getPrimaryStepSoundBlockPos(player, pos)
