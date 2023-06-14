@@ -5,22 +5,16 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeResolver;
-import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
-import net.minecraft.world.level.chunk.PalettedContainerRO;
-import net.minecraft.world.level.material.FluidState;
 import xyz.xenondevs.nova.data.world.WorldDataManager;
 import xyz.xenondevs.nova.transformer.Patcher;
 import xyz.xenondevs.nova.transformer.adapter.LcsWrapperAdapter;
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry;
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils;
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState;
-
-import java.util.function.Predicate;
 
 import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.*;
 
@@ -56,26 +50,6 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     }
     
     @Override
-    public BlockState getBlockState(int i, int j, int k) {
-        return delegate.getBlockState(i, j, k);
-    }
-    
-    @Override
-    public FluidState getFluidState(int i, int j, int k) {
-        return delegate.getFluidState(i, j, k);
-    }
-    
-    @Override
-    public void acquire() {
-        delegate.acquire();
-    }
-    
-    @Override
-    public void release() {
-        delegate.release();
-    }
-    
-    @Override
     public BlockState setBlockState(int relX, int relY, int relZ, BlockState state) {
         return setBlockState(relX, relY, relZ, state, true);
     }
@@ -97,26 +71,6 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     }
     
     @Override
-    public boolean hasOnlyAir() {
-        return delegate.hasOnlyAir();
-    }
-    
-    @Override
-    public boolean isRandomlyTicking() {
-        return delegate.isRandomlyTicking();
-    }
-    
-    @Override
-    public boolean isRandomlyTickingBlocks() {
-        return delegate.isRandomlyTickingBlocks();
-    }
-    
-    @Override
-    public boolean isRandomlyTickingFluids() {
-        return delegate.isRandomlyTickingFluids();
-    }
-    
-    @Override
     public void recalcBlockCounts() {
         if (delegate == null) return;
         delegate.recalcBlockCounts();
@@ -124,54 +78,9 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     }
     
     @Override
-    public PalettedContainer<BlockState> getStates() {
-        return delegate.getStates();
-    }
-    
-    @Override
-    public PalettedContainerRO<Holder<Biome>> getBiomes() {
-        return delegate.getBiomes();
-    }
-    
-    @Override
-    public void read(FriendlyByteBuf packetdataserializer) {
-        delegate.read(packetdataserializer);
+    public void read(FriendlyByteBuf buf) {
+        delegate.read(buf);
         copyBlockCounts();
-    }
-    
-    @Override
-    public void write(FriendlyByteBuf packetdataserializer) {
-        delegate.write(packetdataserializer);
-    }
-    
-    @Override
-    public void readBiomes(FriendlyByteBuf packetdataserializer) {
-        delegate.readBiomes(packetdataserializer);
-    }
-    
-    @Override
-    public void fillBiomesFromNoise(BiomeResolver biomeresolver, Climate.Sampler climate_sampler, int i, int j, int k) {
-        delegate.fillBiomesFromNoise(biomeresolver, climate_sampler, i, j, k);
-    }
-    
-    @Override
-    public int getSerializedSize() {
-        return delegate.getSerializedSize();
-    }
-    
-    @Override
-    public boolean maybeHas(Predicate<BlockState> predicate) {
-        return delegate.maybeHas(predicate);
-    }
-    
-    @Override
-    public Holder<Biome> getNoiseBiome(int i, int j, int k) {
-        return delegate.getNoiseBiome(i, j, k);
-    }
-    
-    @Override
-    public void setBiome(int i, int j, int k, Holder<Biome> biome) {
-        delegate.setBiome(i, j, k, biome);
     }
     
     public Level getLevel() {
