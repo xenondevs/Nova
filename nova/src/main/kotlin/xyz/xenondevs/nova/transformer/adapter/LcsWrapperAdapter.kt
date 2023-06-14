@@ -1,32 +1,37 @@
 package xyz.xenondevs.nova.transformer.adapter
 
-import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.LevelChunkSection
-import org.objectweb.asm.Opcodes.ACC_PUBLIC
+import org.objectweb.asm.tree.MethodNode
+import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.ClassWrapper
-import xyz.xenondevs.bytebase.util.MethodNode
+import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.internalName
-import xyz.xenondevs.nova.util.ServerUtils.SERVER_SOFTWARE
+import xyz.xenondevs.nova.util.data.AsmUtils
 
 object LcsWrapperAdapter : Adapter {
     
+    private val COPY_BLOCK_COUNTS_METHODS: Set<String> = hashSetOf("updateKnownBlockInfo")
+    
     override fun adapt(clazz: ClassWrapper) {
-        if (SERVER_SOFTWARE.isPaper()) {
-            val blockStateName = "L" + BlockState::class.internalName + ";"
-            clazz.methods.add(MethodNode(ACC_PUBLIC, "updateKnownBlockInfo", "(I$blockStateName$blockStateName)V") {
-                addLabel()
-                aLoad(0)
-                getField(clazz.name, "delegate", "L" + LevelChunkSection::class.internalName + ";")
-                iLoad(1)
-                aLoad(2)
-                aLoad(3)
-                invokeVirtual(LevelChunkSection::class.internalName, "updateKnownBlockInfo", "(I$blockStateName$blockStateName)V")
-                aLoad(0)
-                invokeVirtual(clazz.name, "copyBlockCounts", "()V")
-                
-                addLabel()
-                _return()
-            })
+        val methods = AsmUtils.listNonOverriddenMethods(clazz, VirtualClassPath[LevelChunkSection::class])
+        
+        for (method in methods) {
+            val delegatingMethod = MethodNode(method.access, method.name, method.desc, null, null)
+            delegatingMethod.instructions = AsmUtils.createDelegateInstructions(
+                buildInsnList {
+                    aLoad(0)
+                    getField(clazz.name, "delegate", "L" + LevelChunkSection::class.internalName + ";")
+                },
+                buildInsnList {
+                    invokeVirtual(LevelChunkSection::class.internalName, method.name, method.desc)
+                    if (method.name in COPY_BLOCK_COUNTS_METHODS) {
+                        aLoad(0)
+                        invokeVirtual(clazz.name, "copyBlockCounts", "()V")
+                    }
+                },
+                method
+            )
+            clazz.methods.add(delegatingMethod)
         }
     }
     

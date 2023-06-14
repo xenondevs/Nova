@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.transformer.patch.worldgen.chunksection
 
 import net.minecraft.core.Registry
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.LevelHeightAccessor
 import net.minecraft.world.level.chunk.ChunkAccess
 import net.minecraft.world.level.chunk.LevelChunkSection
 import org.eclipse.sisu.space.asm.Type
@@ -62,6 +63,9 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(CHUNK_ACCESS_CONSTR
             aLoad(0)
             getField(ChunkAccess::class.internalName, "SRF(net.minecraft.world.level.chunk.ChunkAccess chunkPos)", "LSRC/(net.minecraft.world.level.ChunkPos);")
             iLoad(11) // i
+            aLoad(3) // LevelHeightAccessor
+            invokeInterface(LevelHeightAccessor::getMinSection)
+            iadd()
             ldc(4)
             ishl()
             aLoad(10) // sections
