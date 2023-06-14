@@ -52,11 +52,21 @@ subprojects {
         withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile> {
             compilerOptions {
                 jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+                
                 freeCompilerArgs.addAll(
-                    "-Xjvm-default=all",
-                    "-Xlambdas=indy",
+                    "-Xjvm-default=all", // Emit JVM default methods for interface declarations with bodies
                     "-opt-in=kotlin.io.path.ExperimentalPathApi"
                 )
+                
+                if (project.hasProperty("release")) {
+                    freeCompilerArgs.addAll(
+                        "-Xlambdas=indy", // Generate lambdas using invokedynamic with LambdaMetafactory.metafactory
+                        "-Xsam-conversions=indy", // Generate SAM conversions using invokedynamic with LambdaMetafactory.metafactory
+                        "-Xno-call-assertions", // Don't generate not-null assertions for arguments of platform types
+                        "-Xno-receiver-assertions", // Don't generate not-null assertion for extension receiver arguments of platform types
+                        "-Xno-param-assertions", // Don't generate not-null assertions on parameters of methods accessible from Java
+                    )
+                }
             }
         }
     }

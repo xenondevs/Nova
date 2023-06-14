@@ -32,6 +32,7 @@ jobs:
             loaderJarSpigot
             -PoutDir=artifacts
             -PxenondevsNms
+            -Prelease
             --scan
         env:
           ORG_GRADLE_PROJECT_xenondevsNmsUsername: ${{ secrets.XENONDEVS_NMS_USERNAME }}
@@ -62,6 +63,7 @@ jobs:
             publishNovaGradlePluginPublicationToXenondevsRepository
             publishNova-gradle-pluginPluginMarkerMavenPublicationToXenondevsRepository
             -PxenondevsNms
+            -Prelease
             --scan
         env:
           ORG_GRADLE_PROJECT_xenondevsNmsUsername: ${{ secrets.XENONDEVS_NMS_USERNAME }}
