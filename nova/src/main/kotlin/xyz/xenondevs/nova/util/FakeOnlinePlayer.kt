@@ -29,6 +29,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockState
 import org.bukkit.block.PistonMoveReaction
 import org.bukkit.block.Sign
+import org.bukkit.block.TileState
 import org.bukkit.block.data.BlockData
 import org.bukkit.block.sign.Side
 import org.bukkit.conversations.Conversation
@@ -351,6 +352,10 @@ class FakeOnlinePlayer(
     }
     
     override fun sendSignChange(loc: Location, lines: Array<out String>?, dyeColor: DyeColor, hasGlowingText: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendBlockUpdate(location: Location, tileState: TileState) {
         throw UnsupportedOperationException("Player is not online")
     }
     
