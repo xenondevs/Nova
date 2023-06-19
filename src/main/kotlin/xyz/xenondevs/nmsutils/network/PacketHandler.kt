@@ -31,10 +31,13 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
     private val queue = ConcurrentLinkedQueue<FriendlyByteBuf>()
     private val incomingDropQueue = CopyOnWriteArrayList<PacketDropRequest>()
     private val outgoingDropQueue = CopyOnWriteArrayList<PacketDropRequest>()
+    
     var player: Player? = null
+    var loggedIn = false
     
     constructor(channel: Channel, player: Player) : this(channel) {
         this.player = player
+        this.loggedIn = true
         PacketManager.playerHandlers[player.name] = this
     }
     
@@ -89,7 +92,7 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
     
     override fun flush(ctx: ChannelHandlerContext?) {
         try {
-            if (player != null && channel.pipeline().get("compress") != null) {
+            if (loggedIn && channel.pipeline().get("compress") != null) {
                 while (queue.isNotEmpty()) {
                     channel.write(queue.poll().duplicate())
                 }

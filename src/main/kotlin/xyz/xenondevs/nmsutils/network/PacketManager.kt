@@ -10,6 +10,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerLoginEvent.Result
 import org.bukkit.event.player.PlayerQuitEvent
@@ -80,6 +81,12 @@ internal object PacketManager : Listener {
             return
         }
         handler.player = event.player
+    }
+    
+    @EventHandler
+    private fun handleJoin(event: PlayerJoinEvent) {
+        val handler = playerHandlers[event.player.name]!!
+        handler.loggedIn = true
     }
     
     @EventHandler
