@@ -10,5 +10,5 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(project(":nova"))
     implementation(project(":nova-api"))
-    compileOnly("io.th0rgal:oraxen:1.151.0") { isTransitive = false }
+    compileOnly("io.th0rgal:oraxen:1.157.2") { isTransitive = false }
 }
