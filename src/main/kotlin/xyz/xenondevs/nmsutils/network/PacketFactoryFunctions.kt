@@ -21,10 +21,10 @@ import xyz.xenondevs.nmsutils.internal.util.toPackedByte
 import xyz.xenondevs.nmsutils.network.event.clientbound.ServerboundInteractPacketEvent
 import java.util.*
 
-fun ClientboundPlaceGhostRecipePacket(containerId: Int, resourceLocation: String): ClientboundPlaceGhostRecipePacket {
+fun ClientboundPlaceGhostRecipePacket(containerId: Int, recipe: ResourceLocation): ClientboundPlaceGhostRecipePacket {
     val buffer = FriendlyByteBuf(Unpooled.buffer())
     buffer.writeByte(containerId)
-    buffer.writeResourceLocation(ResourceLocation(resourceLocation))
+    buffer.writeResourceLocation(recipe)
     return ClientboundPlaceGhostRecipePacket(buffer)
 }
 
