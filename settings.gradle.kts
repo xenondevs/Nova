@@ -47,7 +47,7 @@ dependencyResolutionManagement {
             
             // lib - ktor
             library("ktor-server-core-jvm", "io.ktor", "ktor-server-core-jvm").versionRef("ktor")
-            library("ktor-server-jetty-jvm", "io.ktor", "ktor-server-jetty-jvm").versionRef("ktor")
+            library("ktor-server-cio-jvm", "io.ktor", "ktor-server-cio-jvm").versionRef("ktor")
             library("ktor-client-core-jvm", "io.ktor", "ktor-client-core-jvm").versionRef("ktor")
             library("ktor-client-cio-jvm", "io.ktor", "ktor-client-cio-jvm").versionRef("ktor")
             library("ktor-client-content-negotiation", "io.ktor", "ktor-client-content-negotiation").versionRef("ktor")
@@ -94,7 +94,7 @@ dependencyResolutionManagement {
             // bundles
             bundle("kotlin", listOf("kotlin-stdlib", "kotlin-reflect"))
             bundle("test", listOf("kotlin-test-junit", "junit-jupiter"))
-            bundle("ktor", listOf("ktor-server-core-jvm", "ktor-server-jetty-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"))
+            bundle("ktor", listOf("ktor-server-core-jvm", "ktor-server-cio-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"))
             bundle("cbf", listOf("cosmic-binary-format", "cosmic-binary-format-netty-adapter"))
             bundle("xenondevs-commons", listOf("commons-collections", "commons-gson", "commons-provider", "commons-reflection"))
             bundle("maven-resolver", listOf("maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"))
