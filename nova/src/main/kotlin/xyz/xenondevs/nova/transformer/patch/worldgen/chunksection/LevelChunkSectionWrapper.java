@@ -26,10 +26,16 @@ import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.*;
  */
 public class LevelChunkSectionWrapper extends LevelChunkSection {
     
+    // Vanilla
     private static final long COUNT_OFFSET = ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD);
-    private static final long SPECIAL_COLLIDING_BLOCKS_OFFSET = LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD == null ? - 1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD);
-    private static final long KNOWN_BLOCK_COLLISION_DATA_OFFSET = LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD == null ? - 1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD);
+    
+    // Paper
+    private static final long SPECIAL_COLLIDING_BLOCKS_OFFSET = LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD == null ? -1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD);
+    private static final long KNOWN_BLOCK_COLLISION_DATA_OFFSET = LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD == null ? -1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD);
     private static final long TICKING_LIST_OFFSET = LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD == null ? -1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD);
+    
+    // Pufferfish
+    private static final long FLUID_STATE_COUNT_OFFSET = LEVEL_CHUNK_SECTION_FLUID_STATE_COUNT_FIELD == null ? -1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_FLUID_STATE_COUNT_FIELD);
     
     private final Level level;
     private final ChunkPos chunkPos;
@@ -97,10 +103,14 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     
     private void copyBlockCounts() {
         ReflectionUtils.putInt$nova(this, COUNT_OFFSET, ReflectionUtils.getInt$nova(delegate, COUNT_OFFSET));
-        if (SPECIAL_COLLIDING_BLOCKS_OFFSET != - 1) {
+        if (SPECIAL_COLLIDING_BLOCKS_OFFSET != -1) {
             ReflectionUtils.putInt$nova(this, SPECIAL_COLLIDING_BLOCKS_OFFSET, ReflectionUtils.getInt$nova(delegate, SPECIAL_COLLIDING_BLOCKS_OFFSET));
             ReflectionUtils.putReference$nova(this, KNOWN_BLOCK_COLLISION_DATA_OFFSET, ReflectionUtils.getReference$nova(delegate, KNOWN_BLOCK_COLLISION_DATA_OFFSET));
             ReflectionUtils.putReference$nova(this, TICKING_LIST_OFFSET, ReflectionUtils.getReference$nova(delegate, TICKING_LIST_OFFSET));
+            
+            if (FLUID_STATE_COUNT_OFFSET != -1) {
+                ReflectionUtils.putInt$nova(this, FLUID_STATE_COUNT_OFFSET, ReflectionUtils.getInt$nova(delegate, FLUID_STATE_COUNT_OFFSET));
+            }
         }
     }
     
