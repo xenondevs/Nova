@@ -24,7 +24,6 @@ import xyz.xenondevs.nova.command.sendSuccess
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
-import xyz.xenondevs.nova.data.resources.builder.CharSizeCalculator
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.world.WorldDataManager
@@ -81,8 +80,6 @@ internal object NovaCommand : Command("nova") {
                         .executesCatching(::removeNovaBlocks)))
                 .then(literal("removeInvalidVTEs")
                     .executesCatching(::removeInvalidVTEs))
-                .then(literal("invalidateCharSizes")
-                    .executesCatching(::invalidateCharSizes))
                 .then(literal("getTileEntityData")
                     .requiresPlayer()
                     .executesCatching(::showTileEntityData))
@@ -264,11 +261,6 @@ internal object NovaCommand : Command("nova") {
                 NamedTextColor.RED
             ))
         }
-    }
-    
-    private fun invalidateCharSizes(ctx: CommandContext<CommandSourceStack>) {
-        CharSizeCalculator.invalidateFontHashesStorage()
-        ctx.source.sendSuccess(Component.translatable("command.nova.invalidate_char_sizes.success", NamedTextColor.GRAY))
     }
     
     private fun reloadNetworks(ctx: CommandContext<CommandSourceStack>) {

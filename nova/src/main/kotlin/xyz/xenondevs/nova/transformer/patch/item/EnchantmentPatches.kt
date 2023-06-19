@@ -62,7 +62,7 @@ internal object EnchantmentPatches : MultiTransformer(EnchantmentHelper::class, 
         val novaItem = itemStack.novaItem
         if (novaItem != null) {
             val categories = itemStack.novaItem?.getBehavior(Enchantable::class)?.options?.enchantmentCategories
-            return categories != null && category in categories
+            return TODO()// categories != null && category in categories
         }
         
         return category.canEnchant(itemStack.item)

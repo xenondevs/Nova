@@ -19,7 +19,9 @@ object MoveCharacters {
         return buffer.toString()
     }
     
-    fun getMovingComponent(distance: Int): Component {
+    fun getMovingComponent(distance: Number): Component {
+        val distance = distance.toInt() // TODO
+        
         return componentCache.getOrPut(distance) {
             Component.text()
                 .content(getMovingString(distance))

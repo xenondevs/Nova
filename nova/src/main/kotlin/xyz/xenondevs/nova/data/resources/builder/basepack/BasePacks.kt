@@ -7,8 +7,8 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.FileMerger
-import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorData
-import xyz.xenondevs.nova.data.resources.builder.content.font.MovedFontContent
+import xyz.xenondevs.nova.data.resources.builder.task.armor.ArmorData
+import xyz.xenondevs.nova.data.resources.builder.task.font.MovedFontContent
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.util.StringUtils
 import xyz.xenondevs.nova.util.data.openZip
@@ -39,7 +39,7 @@ private val WHITELISTED_FILE_TYPES: Set<String> by configReloadable {
 
 private val BASE_PACKS by configReloadable { DEFAULT_CONFIG.getStringList("resource_pack.generation.base_packs").map(::File) }
 
-internal class BasePacks(private val builder: ResourcePackBuilder) {
+class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
     
     private val mergers = FileMerger.createMergers(this)
     private val packs = BASE_PACKS + (ResourcePackBuilder.BASE_PACKS_DIR.toFile().listFiles() ?: emptyArray())
@@ -114,7 +114,7 @@ internal class BasePacks(private val builder: ResourcePackBuilder) {
                             .substringBeforeLast('.')
                             .split('/')
                         
-                        builder.getContent(MovedFontContent).requestMovedFonts(
+                        builder.getHolder<MovedFontContent>().requestMovedFonts(
                             ResourcePath(fontNameParts[0], fontNameParts.drop(2).joinToString("/")),
                             1..19
                         )

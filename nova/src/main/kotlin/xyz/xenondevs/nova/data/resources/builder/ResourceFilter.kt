@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.resources.builder
 import org.bukkit.configuration.ConfigurationSection
 import xyz.xenondevs.nova.util.data.WildcardUtils
 
-internal class ResourceFilter(
+class ResourceFilter(
     val stage: Stage,
     val type: Type,
     val filter: Regex,
@@ -21,7 +21,7 @@ internal class ResourceFilter(
     
     companion object {
         
-        fun of(cfg: ConfigurationSection): ResourceFilter {
+        internal fun of(cfg: ConfigurationSection): ResourceFilter {
             val stage = cfg.getString("stage")?.let { Stage.valueOf(it.uppercase()) }
                 ?: throw IllegalArgumentException("Missing property 'stage' in content filter")
             val type = cfg.getString("type")?.let { Type.valueOf(it.uppercase()) }

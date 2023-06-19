@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
+import xyz.xenondevs.nova.data.resources.builder.task.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.util.data.LazyArray
 import xyz.xenondevs.nova.world.block.model.BlockModelProviderType

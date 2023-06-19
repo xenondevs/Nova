@@ -30,7 +30,7 @@ dependencyResolutionManagement {
             version("ktor", "2.2.4")
             version("spigot", "1.20.1-R0.1-SNAPSHOT")
             version("cbf", "0.5")
-            version("xenondevs-commons", "1.1")
+            version("xenondevs-commons", "1.2")
             version("invui", "1.11")
             
             // plugins

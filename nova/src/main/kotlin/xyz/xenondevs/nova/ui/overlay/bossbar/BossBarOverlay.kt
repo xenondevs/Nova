@@ -14,7 +14,7 @@ interface BossBarOverlay {
      * At which x-coordinate the [Component] should be centered at. Gui-scale affected.
      * Can be null if they shouldn't be centered.
      */
-    val centerX: Int?
+    val centerX: Float?
     
     /**
      * The [Component] of this [BossBarOverlay].
@@ -24,7 +24,7 @@ interface BossBarOverlay {
     /**
      * Gets the width of the [Component] in pixels.
      */
-    fun getWidth(locale: String): Int =
+    fun getWidth(locale: String): Float =
         CharSizes.calculateComponentWidth(component, locale)
     
     /**
@@ -32,7 +32,7 @@ interface BossBarOverlay {
      */
     fun getVerticalRange(locale: String): IntRange {
         val componentRange = CharSizes.calculateComponentSize(component, locale).yRange
-        return IntRange(offset + componentRange.first, offset + componentRange.last)
+        return IntRange(offset + componentRange.start.toInt(), offset + componentRange.endInclusive.toInt())
     }
     
 }

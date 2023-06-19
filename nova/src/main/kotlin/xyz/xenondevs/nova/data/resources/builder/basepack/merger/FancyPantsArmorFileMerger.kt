@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.data.resources.builder.basepack.merger
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.data.resources.builder.content.armor.ArmorData
-import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor.InterpolationMode
+import xyz.xenondevs.nova.data.resources.builder.task.armor.ArmorData
+import xyz.xenondevs.nova.data.resources.builder.task.armor.info.RegisteredArmor.InterpolationMode
 import xyz.xenondevs.nova.util.data.readImage
 import java.awt.Color
 import java.awt.image.BufferedImage

@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.data.resources
 
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
@@ -11,24 +12,25 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.component.adventure.chars
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
-import java.io.DataOutputStream
 import java.io.File
-import java.io.FileOutputStream
+import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 private val LOAD_CHAR_SIZES_ON_STARTUP by configReloadable { DEFAULT_CONFIG.getBoolean("performance.load_char_sizes_on_startup") }
 private val FORCE_UNIFORM_FONT by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.force_uniform_font") }
 
+private val EMPTY_FLOAT_RANGE: ClosedRange<Float> = 0f..0f
+
 data class ComponentSize(
-    val width: Int,
+    val width: Float,
     // TODO: xRange
-    val yRange: IntRange,
+    val yRange: ClosedRange<Float>,
 )
 
 data class CharOptions(
@@ -54,58 +56,34 @@ object CharSizes {
      *
      * Note: This width includes the one pixel space rendered between characters.
      */
-    fun getCharWidth(font: String, char: Int): Int =
-        getTable(font)?.getWidth(char) ?: 0
+    fun getCharWidth(font: String, char: Int): Float =
+        getTable(font)?.getWidth(char) ?: 0f
     
     /**
      * Gets the width of [char] when rendered with [font].
      *
      * Note: This width includes the one pixel space rendered between characters.
      */
-    fun getCharWidth(font: String, char: Char): Int =
+    fun getCharWidth(font: String, char: Char): Float =
         getCharWidth(font, char.code)
     
-    /**
-     * Gets the width of [char] when rendered with [font].
-     */
-    fun getCharHeight(font: String, char: Int): Int =
-        getTable(font)?.getHeight(char) ?: 0
+    fun getCharYRange(font: String, char: Int): ClosedRange<Float> =
+        getTable(font)?.getYRange(char) ?: EMPTY_FLOAT_RANGE
     
-    /**
-     * Gets the width of [char] when rendered with [font].
-     */
-    fun getCharHeight(font: String, char: Char): Int =
-        getCharHeight(font, char.code)
-    
-    /**
-     * Gets the ascent of [char] when rendered with [font].
-     */
-    fun getCharAscent(font: String, char: Int): Int =
-        getTable(font)?.getAscent(char) ?: 0
-    
-    /**
-     * Gets the ascent of [char] when rendered with [font].
-     */
-    fun getCharAscent(font: String, char: Char): Int =
-        getCharAscent(font, char.code)
-    
-    fun getCharYRange(font: String, char: Int): IntRange =
-        getTable(font)?.getYRange(char) ?: IntRange.EMPTY
-    
-    fun getCharYRange(font: String, char: Char): IntRange =
+    fun getCharYRange(font: String, char: Char): ClosedRange<Float> =
         getCharYRange(font, char.code)
     
     /**
      * Calculates the width of [string] when rendered with [font].
      */
-    fun calculateStringWidth(font: String, string: String): Int {
-        return string.toCharArray().sumOf { getCharWidth(font, it) }
+    fun calculateStringWidth(font: String, string: String): Float {
+        return string.codePoints().mapToDouble { getCharWidth(font, it).toDouble() }.sum().toFloat()
     }
     
     /**
      * Calculates the width of a component.
      */
-    fun calculateComponentWidth(component: Component, lang: String = "en_us"): Int {
+    fun calculateComponentWidth(component: Component, lang: String = "en_us"): Float {
         return calculateComponentSize(component, lang).width
     }
     
@@ -131,10 +109,10 @@ object CharSizes {
      * Calculates the [ComponentSize] from a sequence of [CharOptions].
      */
     fun calculateComponentSize(chars: Sequence<CharOptions>): ComponentSize {
-        var width = 0
+        var width = 0f
         
-        var yRangeMin = Integer.MAX_VALUE
-        var yRangeMax = Integer.MIN_VALUE
+        var yRangeMin = Float.MAX_VALUE
+        var yRangeMax = Float.MIN_VALUE
         
         chars.forEach { (char, font, isBold) ->
             // x
@@ -150,8 +128,8 @@ object CharSizes {
             
             // y
             val yRange = getCharYRange(font, char)
-            val charMinY = yRange.first
-            val charMaxY = yRange.last
+            val charMinY = yRange.start
+            val charMaxY = yRange.endInclusive
             
             if (charMinY < yRangeMin) yRangeMin = charMinY
             if (charMaxY > yRangeMax) yRangeMax = charMaxY
@@ -240,49 +218,40 @@ object CharSizes {
 }
 
 internal class CharSizeTable(
-    private val sizes: MutableMap<Int, IntArray> = Int2ObjectOpenHashMap(),
+    private val sizes: Int2ObjectMap<FloatArray> = Int2ObjectOpenHashMap(),
 ) {
     
-    fun getWidth(char: Int): Int {
-        return sizes[char]?.get(0) ?: 0
+    fun getWidth(char: Int): Float {
+        return sizes[char]?.get(0) ?: 0f
     }
     
-    fun getHeight(char: Int): Int {
-        return sizes[char]?.get(1) ?: 0
+    fun getYRange(char: Int): ClosedRange<Float> {
+        return sizes[char]?.let { it[1]..it[2] } ?: 0f..0f
     }
     
-    fun getAscent(char: Int): Int {
-        return sizes[char]?.get(2) ?: 0
+    fun setWidth(char: Int, width: Float) {
+        sizes.getOrPut(char) { FloatArray(3) }[0] = width
     }
     
-    fun getYRange(char: Int): IntRange {
-        return sizes[char]?.let { it[3]..it[4] } ?: IntRange.EMPTY
+    fun setYRange(char: Int, start: Float, end: Float) {
+        val sizes = sizes.getOrPut(char) { FloatArray(3) }
+        sizes[1] = start
+        sizes[2] = end
     }
     
-    fun setWidth(char: Int, width: Int) {
-        sizes.getOrPut(char) { IntArray(5) }[0] = width
-    }
-    
-    fun setHeight(char: Int, height: Int) {
-        sizes.getOrPut(char) { IntArray(5) }[1] = height
-    }
-    
-    fun setAscent(char: Int, ascent: Int) {
-        sizes.getOrPut(char) { IntArray(5) }[2] = ascent
-    }
-    
-    fun setYRange(char: Int, start: Int, end: Int) {
-        val sizes = sizes.getOrPut(char) { IntArray(5) }
-        sizes[3] = start
-        sizes[4] = end
-    }
-    
-    fun setSizes(char: Int, sizes: IntArray) {
+    fun setSizes(char: Int, sizes: FloatArray) {
         this.sizes[char] = sizes
     }
     
     /**
-     * Merges [other] into this [CharSizeTable].
+     * Merges [other] into this [CharSizeTable], overriding existing values.
+     */
+    fun merge(other: Int2ObjectMap<FloatArray>) {
+        sizes.putAll(other)
+    }
+    
+    /**
+     * Merges [other] into this [CharSizeTable], overriding existing values.
      */
     fun merge(other: CharSizeTable) {
         sizes.putAll(other.sizes)
@@ -293,18 +262,18 @@ internal class CharSizeTable(
     }
     
     fun write(file: File) {
-        FileOutputStream(file).use { out ->
-            val dout = DataOutputStream(out)
+        val buf = ByteBuffer.allocate(sizes.size * 16) // 1 int, 3 floats, 4 bytes each
+        for(entry in sizes.int2ObjectEntrySet()) {
+            val codePoint = entry.intKey
+            val charSizes = entry.value
             
-            sizes.forEach { (char, charSizes) ->
-                dout.writeInt(char)
-                dout.writeInt(charSizes[0]) // width
-                dout.writeInt(charSizes[1]) // height
-                dout.writeInt(charSizes[2]) // ascent
-                dout.writeInt(charSizes[3]) // yMin
-                dout.writeInt(charSizes[4]) // yMax
-            }
+            buf.putInt(codePoint)
+            buf.putFloat(charSizes[0]) // width
+            buf.putFloat(charSizes[1]) // yMin
+            buf.putFloat(charSizes[2]) // yMax
         }
+        
+        file.writeBytes(buf.array())
     }
     
     companion object {
@@ -313,11 +282,11 @@ internal class CharSizeTable(
             file.inputStream().use {
                 val bytes = it.readAllBytes()
                 val din = DataInputStream(ByteArrayInputStream(bytes))
-                val sizes = Int2ObjectOpenHashMap<IntArray>()
+                val sizes = Int2ObjectOpenHashMap<FloatArray>()
                 
                 while (din.available() >= 16) {
-                    // char code, width, height, ascent, yMin, yMax
-                    sizes[din.readInt()] = intArrayOf(din.readInt(), din.readInt(), din.readInt(), din.readInt(), din.readInt())
+                    // char code, width, yMin, yMax
+                    sizes[din.readInt()] = floatArrayOf(din.readFloat(), din.readFloat(), din.readFloat())
                 }
                 
                 return CharSizeTable(sizes)

@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui.waila.overlay
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import net.kyori.adventure.text.Component
-import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
+import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
 import xyz.xenondevs.nova.util.component.adventure.append
 import xyz.xenondevs.nova.util.component.adventure.font
@@ -33,8 +33,8 @@ private val overlayCache: Cache<OverlayCacheKey, OverlayData> = CacheBuilder.new
     .expireAfterAccess(5, TimeUnit.MINUTES)
     .build()
 
-private data class OverlayCacheKey(val icon: FontChar?, val lines: Int, val longestLineLength: Int)
-private data class OverlayData(val component: Component, val textBeginX: Int, val textCenterX: Int)
+private data class OverlayCacheKey(val icon: FontChar?, val lines: Int, val longestLineLength: Float)
+private data class OverlayData(val component: Component, val textBeginX: Float, val textCenterX: Float)
 
 /**
  * Responsible for rendering the waila block icon and background.
@@ -52,7 +52,7 @@ internal class WailaImageOverlay : BossBarOverlay {
      *
      * @return The x position for centering the text.
      */
-    fun update(icon: FontChar?, lines: Int, longestLineLength: Int): Pair<Int, Int> {
+    fun update(icon: FontChar?, lines: Int, longestLineLength: Float): Pair<Float, Float> {
         require(lines in MIN_LINES..MAX_LINES) { "Unsupported line amount: $lines" }
         
         val (components, textBeginX, textCenterX) = overlayCache.get(OverlayCacheKey(icon, lines, longestLineLength)) {
@@ -65,7 +65,7 @@ internal class WailaImageOverlay : BossBarOverlay {
             val partAmount = ceil(optimalWidth / PART_SIZE.toDouble()).toInt()
             
             val actualWidth = START_TEXTURE_SIZE + partAmount * PART_SIZE + END_TEXTURE_SIZE
-            val halfWidth = actualWidth / 2
+            val halfWidth = actualWidth / 2f
             
             val builder = Component.text()
                 .move(-halfWidth)
@@ -106,7 +106,7 @@ internal class WailaImageOverlay : BossBarOverlay {
         return textBeginX to textCenterX
     }
     
-    override fun getWidth(locale: String): Int = 0
+    override fun getWidth(locale: String): Float = 0f
     
     /**
      * Gets the correct background texture char for the given [line amount][lines] and [type].

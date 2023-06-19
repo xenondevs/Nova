@@ -12,11 +12,11 @@ import xyz.xenondevs.commons.gson.getOrNull
 import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.commons.gson.isString
 import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockDirection
-import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockModelInformation
-import xyz.xenondevs.nova.data.resources.builder.content.material.info.BlockModelType
-import xyz.xenondevs.nova.data.resources.builder.content.material.info.ItemModelInformation
-import xyz.xenondevs.nova.data.resources.builder.content.material.info.RegisteredMaterial
+import xyz.xenondevs.nova.data.resources.builder.task.material.info.BlockDirection
+import xyz.xenondevs.nova.data.resources.builder.task.material.info.BlockModelInformation
+import xyz.xenondevs.nova.data.resources.builder.task.material.info.BlockModelType
+import xyz.xenondevs.nova.data.resources.builder.task.material.info.ItemModelInformation
+import xyz.xenondevs.nova.data.resources.builder.task.material.info.RegisteredMaterial
 import xyz.xenondevs.nova.util.addNamespace
 
 private fun String.toMaterial(): Material? = Material.getMaterial(uppercase())

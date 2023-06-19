@@ -166,3 +166,5 @@ debug:
   watch_chunk_reloads: false
   # If other plugins should be allowed to overwrite the results of Nova recipes.
   allow_craft_result_overwrite: false
+  # A list of pack tasks that should be skipped during resource pack generation
+  skip_pack_tasks: []

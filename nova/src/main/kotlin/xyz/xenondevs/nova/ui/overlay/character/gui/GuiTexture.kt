@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
+import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.getOrThrow

@@ -12,8 +12,8 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
-import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
+import xyz.xenondevs.nova.data.resources.builder.task.armor.info.ArmorTexture
+import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager

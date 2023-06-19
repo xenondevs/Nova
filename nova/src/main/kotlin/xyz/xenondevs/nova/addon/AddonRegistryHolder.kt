@@ -3,6 +3,8 @@ package xyz.xenondevs.nova.addon
 import xyz.xenondevs.nova.addon.registry.AbilityTypeRegistry
 import xyz.xenondevs.nova.addon.registry.AttachmentTypeRegistry
 import xyz.xenondevs.nova.addon.registry.BlockRegistry
+import xyz.xenondevs.nova.addon.registry.EnchantmentCategoryRegistry
+import xyz.xenondevs.nova.addon.registry.EnchantmentRegistry
 import xyz.xenondevs.nova.addon.registry.ItemRegistry
 import xyz.xenondevs.nova.addon.registry.MinecraftUtilTypeRegistry
 import xyz.xenondevs.nova.addon.registry.NetworkTypeRegistry
@@ -20,6 +22,7 @@ import xyz.xenondevs.nova.addon.registry.worldgen.StructureRegistry
 
 class AddonRegistryHolder internal constructor(
     override val addon: Addon
-) : AbilityTypeRegistry, AttachmentTypeRegistry, BlockRegistry, ItemRegistry, NetworkTypeRegistry, RecipeTypeRegistry,
-    ToolCategoryRegistry, ToolTierRegistry, UpgradeTypeRegistry, WailaInfoProviderRegistry, MinecraftUtilTypeRegistry,
-    BiomeRegistry, CarverRegistry, DimensionRegistry, FeatureRegistry, NoiseRegistry, StructureRegistry
+) : AbilityTypeRegistry, AttachmentTypeRegistry, BlockRegistry, EnchantmentCategoryRegistry, EnchantmentRegistry,
+    ItemRegistry, NetworkTypeRegistry, RecipeTypeRegistry, ToolCategoryRegistry, ToolTierRegistry, UpgradeTypeRegistry,
+    WailaInfoProviderRegistry, MinecraftUtilTypeRegistry, BiomeRegistry, CarverRegistry, DimensionRegistry,
+    FeatureRegistry, NoiseRegistry, StructureRegistry

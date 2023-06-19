@@ -47,7 +47,7 @@ internal class VanillaBossBarOverlay(
     override val centerX = null
     override var component: Component = createComponent()
     
-    override fun getWidth(locale: String): Int = 0
+    override fun getWidth(locale: String): Float = 0f
     
     // this intentionally doesn't count the text itself into the vertical range, as that would result in an uneven spacing between different boss bars
     // https://i.imgur.com/MKxqciO.png

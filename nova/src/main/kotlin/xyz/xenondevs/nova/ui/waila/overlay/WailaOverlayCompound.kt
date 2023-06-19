@@ -72,7 +72,7 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
         hasChanged = true
     }
     
-    private fun getBeginX(lines: List<WailaLine>, lineNumber: Int, beginX: Int, centerX: Int): Int {
+    private fun getBeginX(lines: List<WailaLine>, lineNumber: Int, beginX: Float, centerX: Float): Float {
         var currentLineNumber = lineNumber
         while (true) {
             val line = lines[currentLineNumber]

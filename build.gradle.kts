@@ -55,7 +55,8 @@ subprojects {
                 
                 freeCompilerArgs.addAll(
                     "-Xjvm-default=all", // Emit JVM default methods for interface declarations with bodies
-                    "-opt-in=kotlin.io.path.ExperimentalPathApi"
+                    "-opt-in=kotlin.io.path.ExperimentalPathApi",
+                    "-opt-in=kotlin.time.ExperimentalTime"
                 )
                 
                 if (project.hasProperty("release")) {

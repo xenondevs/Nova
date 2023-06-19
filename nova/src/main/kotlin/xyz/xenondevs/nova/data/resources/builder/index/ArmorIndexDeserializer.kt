@@ -9,10 +9,10 @@ import xyz.xenondevs.commons.gson.getOrNull
 import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorEmissivityMapPath
-import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexturePath
-import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor
-import xyz.xenondevs.nova.data.resources.builder.content.armor.info.RegisteredArmor.InterpolationMode
+import xyz.xenondevs.nova.data.resources.builder.task.armor.info.ArmorEmissivityMapPath
+import xyz.xenondevs.nova.data.resources.builder.task.armor.info.ArmorTexturePath
+import xyz.xenondevs.nova.data.resources.builder.task.armor.info.RegisteredArmor
+import xyz.xenondevs.nova.data.resources.builder.task.armor.info.RegisteredArmor.InterpolationMode
 
 internal object ArmorIndexDeserializer {
     

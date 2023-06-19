@@ -4,8 +4,8 @@ import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.recipe.RecipeType
 import xyz.xenondevs.nova.data.resources.ModelData
-import xyz.xenondevs.nova.data.resources.builder.content.armor.info.ArmorTexture
-import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
+import xyz.xenondevs.nova.data.resources.builder.task.armor.info.ArmorTexture
+import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.enchantment.Enchantment
 import xyz.xenondevs.nova.item.enchantment.EnchantmentCategory

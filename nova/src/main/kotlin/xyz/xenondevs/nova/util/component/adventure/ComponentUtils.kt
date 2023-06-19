@@ -14,7 +14,7 @@ import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage
 import org.bukkit.entity.Player
 import xyz.xenondevs.inventoryaccess.util.AdventureComponentUtils
 import xyz.xenondevs.nova.data.resources.CharSizes
-import xyz.xenondevs.nova.data.resources.builder.content.font.FontChar
+import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import java.awt.Color
 import net.minecraft.network.chat.Component as MojangComponent
@@ -91,7 +91,7 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
     return append(fontChar.component)
 }
 
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.move(distance: Int): B {
+fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.move(distance: Number): B {
     return append(MoveCharacters.getMovingComponent(distance))
 }
 
@@ -103,6 +103,6 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
     return move(-CharSizes.calculateComponentWidth(build(), lang))
 }
 
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveTo(afterStart: Int, lang: String = "en_us"): B {
-    return move(-CharSizes.calculateComponentWidth(build(), lang) + afterStart)
+fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveTo(afterStart: Number, lang: String = "en_us"): B {
+    return move(-CharSizes.calculateComponentWidth(build(), lang) + afterStart.toFloat())
 }

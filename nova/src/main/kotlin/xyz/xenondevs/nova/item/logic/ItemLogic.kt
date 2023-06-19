@@ -34,7 +34,7 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionP
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.NovaConfig
 import xyz.xenondevs.nova.data.config.Reloadable
-import xyz.xenondevs.nova.data.resources.builder.content.material.info.VanillaMaterialTypes
+import xyz.xenondevs.nova.data.resources.builder.task.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.ItemBehavior

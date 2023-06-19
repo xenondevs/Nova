@@ -13,7 +13,7 @@ interface ActionbarOverlay {
     /**
      * The width of the [component] in pixels.
      */
-    fun getWidth(locale: String): Int =
+    fun getWidth(locale: String): Float =
         CharSizes.calculateComponentWidth(component, locale)
     
 }

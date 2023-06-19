@@ -233,7 +233,7 @@ inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {
 }
 
 internal fun Path.readImageDimensions(): Dimension {
-    inputStream().use { 
+    inputStream().buffered().use { 
         val imageIn = ImageIO.createImageInputStream(it)
         val reader = ImageIO.getImageReadersBySuffix(extension).next()
         try {
@@ -246,25 +246,25 @@ internal fun Path.readImageDimensions(): Dimension {
 }
 
 internal fun Path.readImage(): BufferedImage {
-    return inputStream().use(ImageIO::read)
+    return inputStream().buffered().use(ImageIO::read)
 }
 
 internal fun Path.writeImage(image: RenderedImage, formatName: String) {
-    outputStream().use { ImageIO.write(image, formatName, it) }
+    outputStream().buffered().use { ImageIO.write(image, formatName, it) }
 }
 
 internal fun File.openZip(): Path =
      toPath().openZip()
 
-internal fun <T> File.useZip(run: (Path) -> T): T =
-    toPath().useZip(run)
+internal fun <T> File.useZip(create: Boolean = false, run: (Path) -> T): T =
+    toPath().useZip(create, run)
 
 internal fun Path.openZip(): Path {
     val fs = FileSystems.newFileSystem(this)
     return fs.rootDirectories.first()
 }
 
-internal inline fun <T> Path.useZip(run: (Path) -> T): T =
-    FileSystems.newFileSystem(this).use {
-        run(it.rootDirectories.first())
-    }
+internal inline fun <T> Path.useZip(create: Boolean = false, run: (Path) -> T): T {
+    val env: Map<String, Any> = if (create) mapOf("create" to true) else emptyMap()
+    return FileSystems.newFileSystem(this, env).use { run(it.rootDirectories.first()) }
+}

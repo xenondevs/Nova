@@ -16,17 +16,17 @@ internal class WailaLineOverlay(line: Int) : BossBarOverlay {
                 .build()
         else text
     
-    override val centerX: Int?
+    override val centerX: Float?
         get() = if (centered) x else null
     
     var text: Component = Component.empty()
-    var x = 0
+    var x: Float = 0f
     var centered = false
     
     fun clear() {
-        if (text !== Component.empty() || x != 0) {
+        if (text !== Component.empty() || x != 0f) {
             text = Component.empty()
-            x = 0
+            x = 0f
         }
     }
     

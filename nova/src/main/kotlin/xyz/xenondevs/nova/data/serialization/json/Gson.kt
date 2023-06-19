@@ -6,6 +6,7 @@ import com.google.gson.JsonObject
 import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.commons.gson.registerTypeAdapter
 import xyz.xenondevs.commons.gson.registerTypeHierarchyAdapter
+import xyz.xenondevs.commons.gson.toJsonTreeTyped
 import xyz.xenondevs.nova.data.serialization.json.serializer.BlockModelDataSerialization
 import xyz.xenondevs.nova.data.serialization.json.serializer.EnumMapInstanceCreator
 import xyz.xenondevs.nova.data.serialization.json.serializer.FontCharSerialization
@@ -18,6 +19,7 @@ import xyz.xenondevs.nova.data.serialization.json.serializer.NamespacedIdTypeAda
 import xyz.xenondevs.nova.data.serialization.json.serializer.NamespacedKeyTypeAdapter
 import xyz.xenondevs.nova.data.serialization.json.serializer.ResourceLocationTypeAdapter
 import xyz.xenondevs.nova.data.serialization.json.serializer.ResourcePathTypeAdapter
+import xyz.xenondevs.nova.data.serialization.json.serializer.SizeOverrideSerialization
 import xyz.xenondevs.nova.data.serialization.json.serializer.UUIDTypeAdapter
 import xyz.xenondevs.nova.data.serialization.json.serializer.VersionSerialization
 import xyz.xenondevs.nova.data.serialization.json.serializer.WorldTypeAdapter
@@ -39,6 +41,7 @@ private val GSON_BUILDER = GsonBuilder()
     .registerTypeHierarchyAdapter(LootItemSerialization)
     .registerTypeHierarchyAdapter(BlockModelDataSerialization)
     .registerTypeHierarchyAdapter(VersionSerialization)
+    .registerTypeAdapter(SizeOverrideSerialization)
     .registerTypeAdapter(FontCharSerialization)
     .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
     .enableComplexMapKeySerialization()
@@ -56,3 +59,6 @@ inline fun <reified T> JsonObject.getDeserialized(key: String): T {
     return GSON.fromJson<T>(get(key))
         ?: throw NullPointerException("Could not deserialize JsonElement with key $key.")
 }
+
+inline fun <reified T> JsonObject.addSerialized(key: String, value: T) =
+    add(key, GSON.toJsonTreeTyped(value))
