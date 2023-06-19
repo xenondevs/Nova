@@ -27,10 +27,10 @@ dependencyResolutionManagement {
         create("libs") {
             // versions
             version("kotlin", "1.8.20")
-            version("ktor", "2.2.4")
+            version("ktor", "2.3.1")
             version("spigot", "1.20.1-R0.1-SNAPSHOT")
             version("cbf", "0.5")
-            version("xenondevs-commons", "1.1")
+            version("xenondevs-commons", "1.2")
             version("invui", "1.11")
             
             // plugins

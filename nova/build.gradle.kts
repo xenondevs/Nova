@@ -26,7 +26,7 @@ dependencies {
     novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
     novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.6")
     novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
-    novaLoader("software.amazon.awssdk:s3:2.18.35")
+    novaLoader("software.amazon.awssdk:s3:2.20.68")
     novaLoader("com.google.jimfs:jimfs:1.2")
     novaLoader("com.github.ben-manes.caffeine:caffeine:3.1.6")
     
