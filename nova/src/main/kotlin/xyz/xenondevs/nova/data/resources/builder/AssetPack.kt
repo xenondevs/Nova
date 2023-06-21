@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.data.resources.builder
 
-import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.index.ArmorIndexDeserializer
@@ -30,7 +29,7 @@ class AssetPack(val namespace: String, val assetsDir: Path) {
         .takeIf(Path::exists)
         ?.let { MaterialsIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
-    internal val guisIndex: Map<ResourceLocation, ResourcePath>? = assetsDir.resolve("guis.json")
+    internal val guisIndex: Map<ResourcePath, ResourcePath>? = assetsDir.resolve("guis.json")
         .takeIf(Path::exists)
         ?.let { GuisIndexDeserializer.deserialize(namespace, it.parseJson()) }
     

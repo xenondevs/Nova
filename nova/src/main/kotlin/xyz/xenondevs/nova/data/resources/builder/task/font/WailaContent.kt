@@ -1,19 +1,17 @@
 package xyz.xenondevs.nova.data.resources.builder.task.font
 
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder.Companion.ASSETS_DIR
 import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
-import xyz.xenondevs.nova.data.toResourceLocation
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.renderer.MinecraftModelRenderer
 import java.util.logging.Level
@@ -217,7 +215,7 @@ class WailaContent internal constructor(
             writeHardcodedTextures()
             builder.assetPacks.forEach(::writePackTextures)
             renderCustomItemServiceBlocks()
-            ResourceGeneration.updateWailaDataLookup(fontCharLookup)
+            ResourceLookups.WAILA_DATA_LOOKUP.set(fontCharLookup)
         }
     }
     
@@ -236,7 +234,7 @@ class WailaContent internal constructor(
                     val file = ResourcePackBuilder.PACK_DIR.resolve("assets/nova/textures/waila_generated/${id.namespace}/${id.name}.png")
                     file.parent.createDirectories()
                     renderer.renderModelToFile(path.toString(), file)
-                    addEntry(id.toResourceLocation(), ASSETS_DIR, ResourcePath("nova", "waila_generated/${id.namespace}/${id.name}.png"), SIZE, ASCENT)
+                    addEntry(id.toString(), ASSETS_DIR, ResourcePath("nova", "waila_generated/${id.namespace}/${id.name}.png"), SIZE, ASCENT)
                     count++
                 } catch (e: Exception) {
                     LOGGER.log(Level.WARNING, "Failed to render $id ($path) ", e)
@@ -263,11 +261,11 @@ class WailaContent internal constructor(
         MATERIAL_TEXTURES.forEach { (material, texture) ->
             val name = material.name.lowercase()
             val path = ResourcePath.of("$texture.png")
-            addEntry(ResourceLocation("minecraft", name), ASSETS_DIR, copyMCTexture(path), SIZE, ASCENT)
+            addEntry(ResourcePath("minecraft", name), ASSETS_DIR, copyMCTexture(path), SIZE, ASCENT)
         }
         
         TEXTURES.forEach {
-            addEntry(ResourceLocation("minecraft", it), ASSETS_DIR, copyMCTexture(ResourcePath("minecraft", "block/$it.png")), SIZE, ASCENT)
+            addEntry(ResourcePath("minecraft", it), ASSETS_DIR, copyMCTexture(ResourcePath("minecraft", "block/$it.png")), SIZE, ASCENT)
         }
     }
     
@@ -285,7 +283,7 @@ class WailaContent internal constructor(
             
             val idNamespace = pack.namespace.takeUnless { it == "nova" } ?: "minecraft" // all textures form "nova" asset pack are for minecraft blocks
             addEntry(
-                ResourceLocation(idNamespace, file.nameWithoutExtension),
+                ResourcePath(idNamespace, file.nameWithoutExtension),
                 ASSETS_DIR,
                 ResourcePath(pack.namespace, "waila/${file.name}"),
                 SIZE, ASCENT

@@ -1,11 +1,10 @@
 package xyz.xenondevs.nova.data.resources.builder.task
 
 import com.google.gson.JsonObject
-import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import java.util.logging.Level
@@ -54,10 +53,10 @@ class LanguageContent internal constructor(private val builder: ResourcePackBuil
         }
     }
     
-    @PackTask(stage = BuildStage.LATE_WRITE)
+    @PackTask(stage = BuildStage.PRE_WORLD_WRITE)
     private fun write() {
         extractRomanNumerals(getLanguage("en_us"))
-        ResourceGeneration.updateLanguageLookup(languageLookup.mapKeys { ResourceLocation(it.key) })
+        ResourceLookups.LANGUAGE_LOOKUP = languageLookup
         languageLookup.forEach { (name, content) ->
             val file = ResourcePackBuilder.LANGUAGE_DIR.resolve("$name.json")
             file.parent.createDirectories()

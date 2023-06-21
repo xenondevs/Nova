@@ -9,8 +9,6 @@ import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.resources.ModelData
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.SoundOverrides
@@ -23,6 +21,8 @@ import xyz.xenondevs.nova.data.resources.builder.task.material.info.BlockModelTy
 import xyz.xenondevs.nova.data.resources.builder.task.material.info.ModelInformation
 import xyz.xenondevs.nova.data.resources.builder.task.material.info.RegisteredMaterial
 import xyz.xenondevs.nova.data.resources.builder.task.material.info.VanillaMaterialTypes
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.data.resources.model.ModelData
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfig
 import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
@@ -155,7 +155,8 @@ class MaterialContent internal constructor(private val builder: ResourcePackBuil
             }
         
         // pass modelDataLookup to Resources
-        ResourceGeneration.updateModelDataLookup(modelDataLookup)
+        val mappedLookup = modelDataLookup.mapKeys { it.key.toString() }
+        ResourceLookups.MODEL_DATA_LOOKUP.set(mappedLookup)
         
         // write item models
         customItemModels.forEach { (material, registeredModels) ->

@@ -40,9 +40,6 @@ object MovedFonts {
         component as C
         
         fun updateFont(builder: ComponentBuilder<*, *>, previousFont: String?) {
-            if (previousFont == "nova:move")
-                return
-            
             var font = previousFont ?: "default"
             var currentDistance = 0
             if (previousFont != null) {

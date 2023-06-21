@@ -1,13 +1,12 @@
 package xyz.xenondevs.nova.data.resources.builder.task.font
 
 import net.kyori.adventure.text.Component
-import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.data.resources.builder.font.Font
 import xyz.xenondevs.nova.data.resources.builder.font.provider.bitmap.BitmapProvider
+import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.data.readImageDimensions
 import java.nio.file.Path
@@ -24,12 +23,16 @@ abstract class CustomFontContent internal constructor(
     private val fontContent by builder.getHolderLazily<FontContent>()
     private val movedFontContent by builder.getHolderLazily<MovedFontContent>()
     
-    protected val fontCharLookup = HashMap<ResourceLocation, FontChar>()
+    protected val fontCharLookup = HashMap<ResourcePath, FontChar>()
     private lateinit var currentFont: Font
     private var currentCodePoint = END_CODE_POINT
     private var currentFontNum = -1
     
-    fun addEntry(charId: ResourceLocation, assetsDir: Path, image: ResourcePath, height: Int?, ascent: Int) {
+    fun addEntry(charId: String, assetsDir: Path, image: ResourcePath, height: Int?, ascent: Int) {
+        addEntry(ResourcePath.of(charId), assetsDir, image, height, ascent)
+    }
+    
+    fun addEntry(charId: ResourcePath, assetsDir: Path, image: ResourcePath, height: Int?, ascent: Int) {
         if (++currentCodePoint > 0xF8FF) {
             currentCodePoint = START_CODE_POINT
             val id = ResourcePath.of(fontNameTemplate.format(++currentFontNum))

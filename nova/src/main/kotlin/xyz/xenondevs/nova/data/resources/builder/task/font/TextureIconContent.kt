@@ -1,11 +1,10 @@
 package xyz.xenondevs.nova.data.resources.builder.task.font
 
-import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 
 private const val HEIGHT = 16
 private const val ASCENT = 12
@@ -40,7 +39,7 @@ class TextureIconContent internal constructor(
         if (path in added)
             return
         
-        val id = ResourceLocation(path.namespace, path.path)
+        val id = ResourcePath(path.namespace, path.path)
         val assetsDir = if (path.namespace == "minecraft") ResourcePackBuilder.MCASSETS_ASSETS_DIR else ResourcePackBuilder.ASSETS_DIR
         addEntry(id, assetsDir, path.copy(path = path.path + ".png"), HEIGHT, ASCENT)
         added += path
@@ -59,7 +58,7 @@ class TextureIconContent internal constructor(
             "minecraft:item/shears"
         )
         
-        ResourceGeneration.updateTextureIconLookup(fontCharLookup)
+        ResourceLookups.TEXTURE_ICON_LOOKUP.set(fontCharLookup)
     }
     
 }

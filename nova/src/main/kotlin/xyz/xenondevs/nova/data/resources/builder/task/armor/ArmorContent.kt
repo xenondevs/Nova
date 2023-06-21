@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.resources.builder.task.armor
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -11,6 +10,7 @@ import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.data.resources.builder.task.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.builder.task.armor.info.RegisteredArmor.InterpolationMode
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.data.readImage
 import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.util.intValue
@@ -71,7 +71,9 @@ class ArmorContent internal constructor(private val builder: ResourcePackBuilder
             writeMCPatcherArmor()
         }
         
-        ResourceGeneration.updateArmorDataLookup(armor.associateTo(HashMap()) { it.id to ArmorTexture(it.color) })
+        ResourceLookups.ARMOR_DATA_LOOKUP.set(
+            armor.associateTo(HashMap()) { it.id.toString() to ArmorTexture(it.color) }
+        )
     }
     
     private fun nextColor(): Int {

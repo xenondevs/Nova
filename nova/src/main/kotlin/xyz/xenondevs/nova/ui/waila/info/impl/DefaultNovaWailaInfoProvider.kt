@@ -4,9 +4,9 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.NetworkedTileEntity
 import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.energy.holder.BufferEnergyHolder
@@ -44,7 +44,7 @@ object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
         val subId = block.modelProvider.currentSubId
         if (subId > 0) {
             val subIdTexture = ResourceLocation(id.namespace, "${id.name}_$subId")
-            if (NovaRegistries.WAILA_DATA_LOOKUP[subIdTexture] != null)
+            if (subIdTexture in ResourceLookups.WAILA_DATA_LOOKUP)
                 id = subIdTexture
         }
         

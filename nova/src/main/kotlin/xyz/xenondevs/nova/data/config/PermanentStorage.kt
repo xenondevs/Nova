@@ -5,6 +5,9 @@ import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.serialization.json.GSON
 import java.io.File
+import java.lang.reflect.Type
+import kotlin.reflect.KType
+import kotlin.reflect.jvm.javaType
 
 internal object PermanentStorage {
     
@@ -42,8 +45,24 @@ internal object PermanentStorage {
         return retrieveOrNull(key) ?: alternativeProvider()
     }
     
+    fun <T> retrieve(type: Type, key: String, alternativeProvider: () -> T): T {
+        return retrieveOrNull<T>(type, key) ?: alternativeProvider()
+    }
+    
+    fun <T> retrieve(type: KType, key: String, alternativeProvider: () -> T): T {
+        return retrieve(type.javaType, key, alternativeProvider)
+    }
+    
     inline fun <reified T> retrieveOrNull(key: String): T? {
         return GSON.fromJson<T>(mainObj.get(key))
+    }
+    
+    fun <T> retrieveOrNull(type: Type, key: String): T? {
+        return GSON.fromJson(mainObj.get(key), type) as? T
+    }
+    
+    fun <T> retrieveOrNull(type: KType, key: String): T? {
+        return retrieveOrNull(type.javaType, key)
     }
     
 }

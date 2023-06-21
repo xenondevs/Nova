@@ -138,7 +138,7 @@ internal object Initializer : Listener {
         }
         
         if (!failed) {
-            NovaRegistryAccess.DEFAULT.freezeAll()
+            NovaRegistryAccess.freezeAll()
             VanillaRegistryAccess.freezeAll()
             preWorldInitialized = true
         } else {

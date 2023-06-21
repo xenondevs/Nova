@@ -9,14 +9,13 @@ import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.formatSafely
 import xyz.xenondevs.nova.util.runAsyncTask
-import xyz.xenondevs.nova.util.toMap
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD_ASYNC,
@@ -31,7 +30,7 @@ object LocaleManager {
     
     @InitFun
     private fun init() {
-        translationProviders = NovaRegistries.LANGUAGE_LOOKUP.toMap().entries.associateTo(HashMap()) { (key, value) -> key.path to HashMap(value) }
+        translationProviders = ResourceLookups.LANGUAGE_LOOKUP.mapValuesTo(HashMap()) { HashMap(it.value) }
         loadLang("en_us")
         Language.inject(NovaLanguage)
     }

@@ -1,10 +1,6 @@
 package xyz.xenondevs.nova.data.resources
 
 import kotlinx.coroutines.runBlocking
-import net.minecraft.core.Registry
-import net.minecraft.core.WritableRegistry
-import net.minecraft.resources.ResourceLocation
-import org.bukkit.Material
 import xyz.xenondevs.inventoryaccess.util.DataUtils
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
@@ -12,30 +8,17 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.builder.task.armor.info.ArmorTexture
-import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
-import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
-import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
-import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.data.update
-import xyz.xenondevs.nova.util.set
-import xyz.xenondevs.nova.util.toMap
 import java.security.MessageDigest
 
 private const val RESOURCES_HASH = "resourcesHash"
-private const val MODEL_DATA_LOOKUP = "modelDataLookup"
-private const val ARMOR_DATA_LOOKUP = "armorDataLookup"
-private const val LANGUAGE_LOOKUP = "languageLookup"
-private const val TEXTURE_ICON_LOOKUP = "textureIconLookup"
-private const val Gui_DATA_LOOKUP = "guiDataLookup"
-private const val WAILA_DATA_LOOKUP = "wailaDataLookup"
-
 private val ASSET_INDEX_FILES = listOf("assets/materials.json", "assets/guis.json", "assets/armor.json")
 
 /**
@@ -56,27 +39,13 @@ internal object ResourceGeneration {
         @InitFun
         private fun init() {
             resourcesHash = calculateResourcesHash()
-            if (
-                PermanentStorage.retrieveOrNull<String>(RESOURCES_HASH) == resourcesHash
-                && PermanentStorage.has(MODEL_DATA_LOOKUP)
-                && PermanentStorage.has(ARMOR_DATA_LOOKUP)
-                && PermanentStorage.has(LANGUAGE_LOOKUP)
-                && PermanentStorage.has(TEXTURE_ICON_LOOKUP)
-                && PermanentStorage.has(WAILA_DATA_LOOKUP)
-                && PermanentStorage.has(Gui_DATA_LOOKUP)
-            ) {
+            if (PermanentStorage.retrieveOrNull<String>(RESOURCES_HASH) == resourcesHash && ResourceLookups.hasAllLookups()) {
                 // Load from PermanentStorage
-                loadLookupRegistry(MODEL_DATA_LOOKUP, NovaRegistries.MODEL_DATA_LOOKUP)
-                loadLookupRegistry(ARMOR_DATA_LOOKUP, NovaRegistries.ARMOR_DATA_LOOKUP)
-                loadLookupRegistry(LANGUAGE_LOOKUP, NovaRegistries.LANGUAGE_LOOKUP)
-                loadLookupRegistry(TEXTURE_ICON_LOOKUP, NovaRegistries.TEXTURE_ICON_LOOKUP)
-                loadLookupRegistry(WAILA_DATA_LOOKUP, NovaRegistries.WAILA_DATA_LOOKUP)
-                loadLookupRegistry(Gui_DATA_LOOKUP, NovaRegistries.GUI_DATA_LOOKUP)
+                ResourceLookups.loadAll()
             } else {
                 // Build resource pack
                 LOGGER.info("Building resource pack")
-                builder = ResourcePackBuilder()
-                    .also(ResourcePackBuilder::buildPackPreWorld)
+                builder = ResourcePackBuilder().also(ResourcePackBuilder::buildPackPreWorld)
                 LOGGER.info("Pre-world resource pack building done")
             }
         }
@@ -135,53 +104,4 @@ internal object ResourceGeneration {
         }
     }
     
-    internal fun updateModelDataLookup(modelDataLookup: Map<ResourceLocation, ModelData>) {
-        loadLookupRegistry(modelDataLookup, NovaRegistries.MODEL_DATA_LOOKUP)
-        storeLookupRegistry(MODEL_DATA_LOOKUP, NovaRegistries.MODEL_DATA_LOOKUP)
-    }
-    
-    internal fun updateArmorDataLookup(armorDataLookup: Map<ResourceLocation, ArmorTexture>) {
-        loadLookupRegistry(armorDataLookup, NovaRegistries.ARMOR_DATA_LOOKUP)
-        storeLookupRegistry(ARMOR_DATA_LOOKUP, NovaRegistries.ARMOR_DATA_LOOKUP)
-    }
-    
-    internal fun updateGuiDataLookup(guiDataLookup: Map<ResourceLocation, FontChar>) {
-        loadLookupRegistry(guiDataLookup, NovaRegistries.GUI_DATA_LOOKUP)
-        storeLookupRegistry(Gui_DATA_LOOKUP, NovaRegistries.GUI_DATA_LOOKUP)
-    }
-    
-    internal fun updateWailaDataLookup(wailaDataLookup: Map<ResourceLocation, FontChar>) {
-        loadLookupRegistry(wailaDataLookup, NovaRegistries.WAILA_DATA_LOOKUP)
-        storeLookupRegistry(WAILA_DATA_LOOKUP, NovaRegistries.WAILA_DATA_LOOKUP)
-    }
-    
-    internal fun updateTextureIconLookup(textureIconLookup: Map<ResourceLocation, FontChar>) {
-        loadLookupRegistry(textureIconLookup, NovaRegistries.TEXTURE_ICON_LOOKUP)
-        storeLookupRegistry(TEXTURE_ICON_LOOKUP, NovaRegistries.TEXTURE_ICON_LOOKUP)
-    }
-    
-    internal fun updateLanguageLookup(languageLookup: Map<ResourceLocation, Map<String, String>>) {
-        loadLookupRegistry(languageLookup, NovaRegistries.LANGUAGE_LOOKUP)
-        storeLookupRegistry(LANGUAGE_LOOKUP, NovaRegistries.LANGUAGE_LOOKUP)
-    }
-    
-    private inline fun <reified T> loadLookupRegistry(storageKey: String, registry: WritableRegistry<T>) {
-        val map: Map<ResourceLocation, T> = PermanentStorage.retrieveOrNull(storageKey)!!
-        loadLookupRegistry(map, registry)
-    }
-    
-    private fun <T> loadLookupRegistry(map: Map<ResourceLocation, T>, registry: WritableRegistry<T>) {
-        map.entries.forEach { (key, value) -> registry[key] = value }
-    }
-    
-    private fun <T> storeLookupRegistry(storageKey: String, registry: Registry<T>) {
-        PermanentStorage.store(storageKey, registry.toMap())
-    }
-    
 }
-
-data class ModelData(
-    val item: Map<Material, ItemModelData>? = null,
-    val block: BlockModelData? = null,
-    val armor: ResourceLocation? = null
-)
