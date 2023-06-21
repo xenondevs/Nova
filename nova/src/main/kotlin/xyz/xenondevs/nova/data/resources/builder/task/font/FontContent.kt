@@ -42,6 +42,10 @@ class FontContent internal constructor(private val builder: ResourcePackBuilder)
         return _customFonts[id]
     }
     
+    fun getOrCreate(id: ResourcePath): Font {
+        return _customFonts.getOrPut(id) { Font(id) }
+    }
+    
     fun add(font: Font){
         _customFonts[font.id] = font
     }

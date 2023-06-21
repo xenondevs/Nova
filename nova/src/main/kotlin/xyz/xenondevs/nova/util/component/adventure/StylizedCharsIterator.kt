@@ -12,6 +12,8 @@ import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.format.Style
 import xyz.xenondevs.nova.i18n.LocaleManager
 
+// TODO: code points instead of chars
+
 fun Component.chars(lang: String = "en_us"): Sequence<StylizedChar> =
     ComponentCharsIterator(null, this, lang).asSequence()
 

@@ -92,9 +92,12 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
                     
                     val rescale = height / glyphHeight.toFloat()
                     
-                    val width = glyphImageType.findRightBorder(glyph, glyphWidth, glyphHeight)
-                        ?.let { rightBorder -> ((rightBorder + 1) * rescale).roundToInt() }
-                        ?: 0
+                    var width = glyphImageType.findRightBorder(glyph, glyphWidth, glyphHeight)
+                        ?.let { rightBorder -> ((rightBorder + 1) * rescale).roundToInt().toFloat() }
+                        ?: 0f
+                    
+                    width += 1f // +1 to include space between characters
+                    if (width < 0) width += 1f
                     
                     var minY = 0f
                     var maxY = 0f
@@ -104,10 +107,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
                         maxY = ((maxY - ascent) * rescale)
                     }
                     
-                    map.put(codePoint, floatArrayOf(
-                        width + 1f, // +1 to include space between characters
-                        minY, maxY
-                    ))
+                    map.put(codePoint, floatArrayOf(width, minY, maxY))
                 }
             }
         }

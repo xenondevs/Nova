@@ -117,14 +117,8 @@ object CharSizes {
         chars.forEach { (char, font, isBold) ->
             // x
             var charWidth = getCharWidth(font, char)
-            if (charWidth < 0) charWidth += 1
             if (isBold) charWidth += 1
-            
             width += charWidth
-            
-            // ignore move font for yRange
-            if (font == "nova:move")
-                return@forEach
             
             // y
             val yRange = getCharYRange(font, char)

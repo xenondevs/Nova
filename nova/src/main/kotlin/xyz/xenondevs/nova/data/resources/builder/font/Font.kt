@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.data.resources.builder.font
 
 import com.google.gson.JsonObject
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet
+import it.unimi.dsi.fastutil.ints.IntSet
 import xyz.xenondevs.commons.gson.getArray
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.toJsonArray
@@ -82,8 +84,26 @@ class Font(
     }
     
     /**
+     * Gets all occupied code points by resolving reference providers using the given [fonts].
+     */
+    fun getCodePoints(fonts: Iterable<Font>): IntSet {
+        val codePoints = IntOpenHashSet()
+        for (provider in providers) {
+            if (provider is ReferenceProvider) {
+                val font = fonts.firstOrNull { it.id == provider.id }
+                    ?: throw IllegalArgumentException("Referenced font ${provider.id} not found")
+                codePoints.addAll(font.getCodePoints(fonts))
+            } else {
+                codePoints.addAll(provider.codePoints)
+            }
+        }
+        
+        return codePoints
+    }
+    
+    /**
      * Writes this [Font] to its corresponding file in the given [assetsDir].
-     * 
+     *
      * Depending on the providers, additional files (such as bitmaps or unihex zips) might be written to the [assetsDir].
      */
     fun write(assetsDir: Path) {
@@ -120,6 +140,26 @@ class Font(
                 ?: throw IllegalArgumentException("File $file is not a font file")
             
             return ResourcePath(result.groupValues[1], result.groupValues[2])
+        }
+        
+        /**
+         * Finds the first range of undefined characters inside the give [between] range that is [size] characters long.
+         */
+        fun findFirstUnoccupiedRange(codePoints: IntSet, between: IntRange, size: Int): IntRange {
+            var start = between.first
+            var i = start
+            
+            while (i <= between.last) {
+                if (i in codePoints) {
+                    start = i + 1
+                } else if (i - start == size) {
+                    return start..i
+                }
+                
+                i++
+            }
+            
+            throw IllegalStateException("No unoccupied range of size $size found in $between")
         }
         
     }
