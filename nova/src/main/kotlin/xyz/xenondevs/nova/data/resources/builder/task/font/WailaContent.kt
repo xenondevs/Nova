@@ -208,7 +208,7 @@ class WailaContent internal constructor(
     true
 ) {
     
-    @PackTask(stage = BuildStage.POST_WORLD_WRITE)
+    @PackTask(stage = BuildStage.POST_WORLD, runBefore = ["FontContent#write"])
     private fun write() {
         if (WAILA_ENABLED) {
             builder.getHolder<MovedFontContent>().requestMovedFonts(ResourcePath("nova", "waila"), 1..19)

@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.font.Font
 import xyz.xenondevs.nova.data.resources.builder.font.provider.ReferenceProvider
 import xyz.xenondevs.nova.data.resources.builder.font.provider.bitmap.BitmapProvider
-import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import java.util.*
@@ -58,8 +57,7 @@ class MovedFontContent internal constructor(private val builder: ResourcePackBui
         queue += pair
     }
     
-    
-    @PackTask(stage = BuildStage.LATE_WRITE, runBefore = [FontContent::class])
+    @PackTask(runAfter = ["FontContent#discoverAllFonts"], runBefore = ["FontContent#write"])
     private fun write() {
         LOGGER.info("Creating moved fonts")
         

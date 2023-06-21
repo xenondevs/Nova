@@ -5,7 +5,6 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder.Companion.ASSETS_DIR
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder.Companion.MCASSETS_ASSETS_DIR
 import xyz.xenondevs.nova.data.resources.builder.font.Font
-import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import java.nio.file.Path
@@ -70,7 +69,7 @@ class FontContent internal constructor(private val builder: ResourcePackBuilder)
         _customFonts.remove(font.id)
     }
     
-    @PackTask(stage = BuildStage.POST_EXTRACT_ASSETS)
+    @PackTask(runAfter = ["ExtractTask#extractAll"])
     private fun discoverAllFonts() {
         discoverFonts(MCASSETS_ASSETS_DIR, MCASSETS_ASSETS_DIR.resolve("minecraft/font/"), _vanillaFonts)
         discoverFonts(ASSETS_DIR, ASSETS_DIR.resolve("minecraft/font/"), _customFonts)
@@ -89,7 +88,7 @@ class FontContent internal constructor(private val builder: ResourcePackBuilder)
             }
     }
     
-    @PackTask(stage = BuildStage.LATE_WRITE)
+    @PackTask(runAfter = ["FontContent#discoverAllFonts"])
     private fun write() {
         _customFonts.values.forEach { it.write(ASSETS_DIR) }
     }

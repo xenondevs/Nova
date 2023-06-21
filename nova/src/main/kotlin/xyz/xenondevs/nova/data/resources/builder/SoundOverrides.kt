@@ -13,7 +13,6 @@ import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.util.item.soundGroup
@@ -62,7 +61,7 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
         soundEvents += event.location.path
     }
     
-    @PackTask(stage = BuildStage.LATE_WRITE)
+    @PackTask(runAfter = ["MaterialContent#write"])
     private fun write() {
         try {
             // an index of all vanilla sounds

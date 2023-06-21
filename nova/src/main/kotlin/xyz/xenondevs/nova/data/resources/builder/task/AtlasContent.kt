@@ -14,7 +14,7 @@ import kotlin.io.path.walk
 
 class AtlasContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
     
-    @PackTask(stage = BuildStage.PRE_WORLD_WRITE)
+    @PackTask(runAfter = ["ExtractTask#extractAll"])
     private fun write() {
         val sources = HashMap<String, JsonArray>()
         

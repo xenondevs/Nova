@@ -84,7 +84,7 @@ class MaterialContent internal constructor(private val builder: ResourcePackBuil
         file.writeText(GSON.toJson(modelObj))
     }
     
-    @PackTask(stage = BuildStage.PRE_WORLD_WRITE)
+    @PackTask(stage = BuildStage.PRE_WORLD, runAfter = ["ExtractTask#extractAll"])
     private fun write() {
         // include packs
         builder.assetPacks.forEach(::includePack)

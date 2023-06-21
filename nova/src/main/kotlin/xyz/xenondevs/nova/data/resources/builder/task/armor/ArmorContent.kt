@@ -41,7 +41,7 @@ class ArmorContent internal constructor(private val builder: ResourcePackBuilder
     private val armor = ArrayList<ArmorData>()
     private var color = -1
     
-    @PackTask(stage = BuildStage.PRE_WORLD_WRITE)
+    @PackTask(stage = BuildStage.PRE_WORLD, runAfter = ["ExtractTask#extractAll"])
     private fun write() {
         // add armor from base packs
         armor += builder.basePacks.customArmor.values

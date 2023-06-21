@@ -20,7 +20,12 @@ import kotlin.io.path.relativeTo
 
 class ExtractTask(private val builder: ResourcePackBuilder) : PackTaskHolder {
     
-    @PackTask(stage = BuildStage.EXTRACT_ASSETS)
+    @PackTask
+    private fun extractAll() {
+        extractMinecraftAssets()
+        extractAssetPacks()
+    }
+    
     private fun extractMinecraftAssets() {
         val zip = NOVA.pluginFile.openZip()
         val filters = builder.getResourceFilters(ResourceFilter.Stage.ASSET_PACK)
@@ -50,8 +55,7 @@ class ExtractTask(private val builder: ResourcePackBuilder) : PackTaskHolder {
             }
     }
     
-    @PackTask(stage = BuildStage.EXTRACT_ASSETS)
-    fun extractAssetPacks() {
+    private fun extractAssetPacks() {
         val filters = builder.getResourceFilters(ResourceFilter.Stage.ASSET_PACK)
         for (pack in builder.assetPacks) {
             val namespace = pack.namespace

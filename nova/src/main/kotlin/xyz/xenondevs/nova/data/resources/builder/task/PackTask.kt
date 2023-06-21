@@ -1,69 +1,28 @@
 package xyz.xenondevs.nova.data.resources.builder.task
 
 import xyz.xenondevs.commons.collections.CollectionUtils
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.nova.data.resources.builder.task.font.FontContent
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotations
 import kotlin.reflect.jvm.isAccessible
 
-/**
- * The build stages during the resource pack build process. The enums are ordered by their execution order.
- */
 enum class BuildStage {
     
     /**
-     * Before anything has been written to the build directory
+     * Pack tasks with this stage are automatically assigned a stage based on their dependencies.
      */
-    INIT,
+    AUTOMATIC,
     
     /**
-     * After base pack assets have been copied to the build directory
+     * Pack tasks with this stage will always run before the world is loaded.
      */
-    POST_BASE_PACKS,
+    PRE_WORLD,
     
     /**
-     * The stage during which assets should be extracted from asset packs to the build directory.
+     * Pack tasks with this stage will always run after the world is loaded.
      */
-    EXTRACT_ASSETS,
-    
-    /**
-     * After all assets have been copied to the build directory.
-     * [PackTasks][PackTask] should use this stage to read and handle extracted assets.
-     */
-    POST_EXTRACT_ASSETS,
-    
-    /**
-     * The pre-world writing stage.
-     * [PackTasks][PackTask] should use this stage to generate assets and data that is required for post-world operations.
-     */
-    PRE_WORLD_WRITE,
-    
-    /**
-     * The post-world writing stage.
-     *
-     * [PackTasks][PackTask] should use this stage to write all assets that require the world to be loaded or
-     * need to access hooks such as custom item services.
-     */
-    POST_WORLD_WRITE,
-    
-    /**
-     * Called immediately after the [POST_WORLD_WRITE].
-     *
-     * This stage is intended to be used by [PackTasks][PackTask] that provide an interface for other [PackTasks][PackTask],
-     * such as the [FontContent] task. If more stages are added in the future, this stage is intended to always stay the
-     * last writing stage.
-     */
-    LATE_WRITE,
-    
-    /**
-     * After post-world writing, should only be used to analyze generated assets (for example to calculate char sizes).
-     * 
-     * Writing is not allowed during this stage.
-     */
-    ANALYZE
+    POST_WORLD
     
 }
 
@@ -83,25 +42,73 @@ interface PackTaskHolder
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
 annotation class PackTask(
-    val stage: BuildStage,
-    val runAfter: Array<KClass<*>> = [],
-    val runBefore: Array<KClass<*>> = []
+    val stage: BuildStage = BuildStage.AUTOMATIC,
+    val runAfter: Array<String> = [],
+    val runBefore: Array<String> = []
 )
 
 internal class PackFunction(
     private val holder: PackTaskHolder,
     private val clazz: KClass<*>,
     private val func: KFunction<*>,
-    private val runAfterClasses: Set<KClass<*>>,
-    private val runBeforeClasses: Set<KClass<*>>
+    stage: BuildStage,
+    private val runAfterNames: Set<String>,
+    private val runBeforeNames: Set<String>
 ) {
+    
+    private var stageSource: PackFunction? = if (stage != BuildStage.AUTOMATIC) this else null
+    var stage: BuildStage = stage
+        private set
     
     lateinit var runAfter: Set<PackFunction>
     lateinit var runBefore: Set<PackFunction>
     
     private fun loadDependencies(functions: List<PackFunction>) {
-        runAfter = functions.filterTo(HashSet()) { it.clazz in runAfterClasses }
-        runBefore = functions.filterTo(HashSet()) { it.clazz in runBeforeClasses }
+        runAfter = runAfterNames.mapTo(HashSet()) { name ->
+            val thisAfter = functions.firstOrNull { func -> func.toString() == name }
+                ?: throw IllegalStateException("Could not find pack function $func, which is a runAfter of $this")
+            
+            val thisAfterStage = thisAfter.stage
+            when {
+                stage == BuildStage.PRE_WORLD && thisAfterStage == BuildStage.POST_WORLD ->
+                    throw IllegalStateException("Incompatible stages: Pack function $this, which inherited its pre-world stage from $stageSource is configured to run after $thisAfter (post-world)")
+                
+                stage == BuildStage.AUTOMATIC && thisAfterStage == BuildStage.POST_WORLD -> {
+                    stage = BuildStage.POST_WORLD
+                    stageSource = thisAfter
+                }
+                
+                stage == BuildStage.PRE_WORLD && thisAfterStage == BuildStage.AUTOMATIC -> {
+                    thisAfter.stage = BuildStage.PRE_WORLD
+                    thisAfter.stageSource = this
+                }
+            }
+            
+            return@mapTo thisAfter
+        }
+        
+        runBefore = runBeforeNames.mapTo(HashSet()) { name ->
+            val thisBefore = functions.firstOrNull { func -> func.toString() == name }
+                ?: throw IllegalStateException("Could not find pack function $func, which is a runBefore of $this")
+            val thisBeforeStage = thisBefore.stage
+            
+            when {
+                stage == BuildStage.POST_WORLD && thisBeforeStage == BuildStage.PRE_WORLD ->
+                    throw IllegalStateException("Incompatible stages: Pack function $this, which inherited its post-world stage from $stageSource is configured to run before $thisBefore (pre-world)")
+                
+                stage == BuildStage.AUTOMATIC && thisBeforeStage == BuildStage.PRE_WORLD -> {
+                    stage = BuildStage.PRE_WORLD
+                    stageSource = thisBefore
+                }
+                
+                stage == BuildStage.POST_WORLD && thisBeforeStage == BuildStage.AUTOMATIC -> {
+                    thisBefore.stage = BuildStage.POST_WORLD
+                    thisBefore.stageSource = this
+                }
+            }
+            
+            return@mapTo thisBefore
+        }
     }
     
     init {
@@ -117,49 +124,33 @@ internal class PackFunction(
     companion object {
         
         /**
-         * Extracts [PackFunctions][PackFunction] from the given [holders], groups them by their [BuildStage]
-         * and sorts them based on [PackTask.runAfter] and [PackTask.runBefore].
-         * 
-         * It is guaranteed that all [BuildStages][BuildStage] will be present in the returned map,
-         * regardless of whether there are any [PackFunctions][PackFunction] for that stage.
+         * Extracts [PackFunctions][PackFunction] from the given [holders] and sorts them based on [PackTask.runAfter] and [PackTask.runBefore].
          *
          * @throws IllegalArgumentException If a circular dependency is detected.
          */
-        fun sortGrouped(holders: Collection<PackTaskHolder>): Map<BuildStage, List<PackFunction>> {
-            val map = enumMap<BuildStage, MutableList<PackFunction>>()
+        fun getAndSortFunctions(holders: Collection<PackTaskHolder>): List<PackFunction> {
+            val functions = ArrayList<PackFunction>()
             
             // load all pack functions
             for (holder in holders) {
                 val holderClass = holder::class
                 for (func in holder::class.java.kotlin.declaredFunctions) {
                     val annotation = func.findAnnotations<PackTask>().firstOrNull() ?: continue
-                    map.getOrPut(annotation.stage, ::ArrayList) += PackFunction(
+                    functions += PackFunction(
                         holder, holderClass, func,
+                        annotation.stage,
                         annotation.runAfter.toHashSet(),
                         annotation.runBefore.toHashSet()
                     )
                 }
             }
             
-            // sort pack functions
-            for (stage in BuildStage.values()) {
-                // make sure that all stages are included in th map
-                if (stage !in map) {
-                    map[stage] = mutableListOf()
-                    continue
-                }
-                
-                val functions = map[stage]!!
-                for (func in functions) {
-                    func.loadDependencies(functions)
-                }
-                
-                map[stage] = CollectionUtils.sortDependencies(functions, PackFunction::runAfter, PackFunction::runBefore).toMutableList()
-            }
+            functions.forEach { it.loadDependencies(functions) }
+            functions.forEach { if (it.stage == BuildStage.AUTOMATIC) it.stage = BuildStage.PRE_WORLD }
             
-            return map
+            return CollectionUtils.sortDependencies(functions, PackFunction::runAfter, PackFunction::runBefore)
         }
         
     }
-
+    
 }

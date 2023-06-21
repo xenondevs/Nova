@@ -210,28 +210,19 @@ class ResourcePackBuilder internal constructor() {
             
             // sort and instantiate holders
             holders = holderCreators.map { it(this) }
-            tasksByStage = PackFunction.sortGrouped(holders)
+            tasksByStage = PackFunction.getAndSortFunctions(holders).groupBy { it.stage }
             logTaskOrder()
             
             // load asset packs
             assetPacks = loadAssetPacks()
             LOGGER.info("Asset packs (${assetPacks.size}): ${assetPacks.joinToString(transform = AssetPack::namespace)}")
             
-            // pre-assets
-            tasksByStage[BuildStage.INIT]?.forEach(::runPackFunction)
-            
             // merge base packs
             basePacks.include()
-            tasksByStage[BuildStage.POST_BASE_PACKS]?.forEach(::runPackFunction)
             
-            // extract resources
-            LOGGER.info("Extracting resources")
-            tasksByStage[BuildStage.EXTRACT_ASSETS]?.forEach(::runPackFunction)
-            tasksByStage[BuildStage.POST_EXTRACT_ASSETS]?.forEach(::runPackFunction)
-            
-            // write pre-world content
-            LOGGER.info("Writing pre-world content")
-            tasksByStage[BuildStage.PRE_WORLD_WRITE]?.forEach(::runPackFunction)
+            // run pack tasks
+            LOGGER.info("Running pre-world pack tasks")
+            tasksByStage[BuildStage.PRE_WORLD]?.forEach(::runPackFunction)
         } catch (t: Throwable) {
             // Only delete build dir in case of exception as building is continued in buildPostWorld()
             deleteBuildDir()
@@ -242,13 +233,8 @@ class ResourcePackBuilder internal constructor() {
     internal fun buildPackPostWorld() {
         try {
             // write post-world content
-            LOGGER.info("Writing post-world content")
-            tasksByStage[BuildStage.POST_WORLD_WRITE]?.forEach(::runPackFunction)
-            tasksByStage[BuildStage.LATE_WRITE]?.forEach(::runPackFunction)
-            
-            // analyze
-            LOGGER.info("Analyzing generated data")
-            tasksByStage[BuildStage.ANALYZE]?.forEach(::runPackFunction)
+            LOGGER.info("Running post-world pack tasks")
+            tasksByStage[BuildStage.POST_WORLD]?.forEach(::runPackFunction)
             
             // write metadata
             writeMetadata(assetPacks.size, basePacks.packAmount)

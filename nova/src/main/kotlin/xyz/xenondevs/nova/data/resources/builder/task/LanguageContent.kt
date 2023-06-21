@@ -27,7 +27,7 @@ class LanguageContent internal constructor(private val builder: ResourcePackBuil
         getLanguage(lang)[key] = value
     }
     
-    @PackTask(stage = BuildStage.POST_BASE_PACKS)
+    @PackTask(runAfter = ["ExtractTask#extractAll"])
     private fun loadLangFiles() {
         try {
             // load existing lang files from base packs
@@ -53,7 +53,7 @@ class LanguageContent internal constructor(private val builder: ResourcePackBuil
         }
     }
     
-    @PackTask(stage = BuildStage.PRE_WORLD_WRITE)
+    @PackTask(runAfter = ["LanguageContent#loadLangFiles"])
     private fun write() {
         extractRomanNumerals(getLanguage("en_us"))
         ResourceLookups.LANGUAGE_LOOKUP = languageLookup

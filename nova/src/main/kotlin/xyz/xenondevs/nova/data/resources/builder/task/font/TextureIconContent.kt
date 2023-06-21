@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.resources.builder.task.font
 
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 
@@ -45,7 +44,7 @@ class TextureIconContent internal constructor(
         added += path
     }
     
-    @PackTask(stage = BuildStage.PRE_WORLD_WRITE)
+    @PackTask(runBefore = ["FontContent#write"])
     private fun write() {
         // default icons
         addIcons(

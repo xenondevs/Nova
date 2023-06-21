@@ -5,7 +5,6 @@ import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.font.Font
 import xyz.xenondevs.nova.data.resources.builder.font.provider.SpaceProvider
-import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
@@ -24,7 +23,7 @@ class MoveCharactersContent(private val builder: ResourcePackBuilder) : PackTask
         
     }
     
-    @PackTask(stage = BuildStage.PRE_WORLD_WRITE)
+    @PackTask(runAfter = ["FontContent#discoverAllFonts"], runBefore = ["FontContent#write"])
     private fun write() {
         val fontContent = builder.getHolder<FontContent>()
         val mergedFonts = fontContent.mergedFonts

@@ -4,11 +4,10 @@ import xyz.xenondevs.commons.collections.CollectionUtils
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.CharSizeTable
 import xyz.xenondevs.nova.data.resources.CharSizes
-import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
+import xyz.xenondevs.nova.data.resources.builder.font.provider.ReferenceProvider
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.data.resources.builder.task.font.FontContent
-import xyz.xenondevs.nova.data.resources.builder.font.provider.ReferenceProvider
 
 class CharSizeCalculator internal constructor(builder: ResourcePackBuilder) : PackTaskHolder {
     
@@ -17,7 +16,10 @@ class CharSizeCalculator internal constructor(builder: ResourcePackBuilder) : Pa
     /**
      * Calculates the char sizes for all fonts that need to be recalculated.
      */
-    @PackTask(stage = BuildStage.ANALYZE)
+    @PackTask(runAfter = [
+        "FontContent#discoverAllFonts", "GuiContent#write", "MoveCharactersContent#write", "MovedFontContent#write",
+        "TextureIconContent#write", "WailaContent#write"
+    ])
     private fun calculateCharSizes() {
         LOGGER.info("Calculating char sizes...")
         
