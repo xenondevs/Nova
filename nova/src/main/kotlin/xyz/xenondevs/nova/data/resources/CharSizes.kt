@@ -77,7 +77,8 @@ object CharSizes {
      * Calculates the width of [string] when rendered with [font].
      */
     fun calculateStringWidth(font: String, string: String): Float {
-        return string.codePoints().mapToDouble { getCharWidth(font, it).toDouble() }.sum().toFloat()
+        val table = getTable(font) ?: return 0f
+        return string.codePoints().mapToDouble { table.getWidth(it).toDouble() }.sum().toFloat()
     }
     
     /**

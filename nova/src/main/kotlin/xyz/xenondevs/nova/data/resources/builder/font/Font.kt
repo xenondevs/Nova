@@ -121,6 +121,10 @@ class Font(
     
     companion object {
         
+        val DEFAULT = ResourcePath("minecraft", "default")
+        val UNIFORM = ResourcePath("minecraft", "uniform")
+        val PRIVATE_USE_AREA = 0xE000..0xF8FF
+        
         private val FONT_NAME_REGEX = Regex("""^([a-z0-9._-]+)/font/([a-z0-9/._-]+)$""")
         
         fun fromDisk(assetsDir: Path, fontFile: Path): Font {
@@ -160,6 +164,18 @@ class Font(
             }
             
             throw IllegalStateException("No unoccupied range of size $size found in $between")
+        }
+        
+        /**
+         * Finds the first undefined character inside the give [between] range.
+         */
+        fun findFirstUnoccupied(codePoints: IntSet, between: IntRange): Int {
+            for (i in between) {
+                if (i !in codePoints)
+                    return i
+            }
+            
+            throw IllegalStateException("No unoccupied character found in $between")
         }
         
     }

@@ -1,9 +1,11 @@
 package xyz.xenondevs.nova.data.resources.builder.task.font
 
 import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.font.Font
+import xyz.xenondevs.nova.data.resources.builder.font.provider.ReferenceProvider
 import xyz.xenondevs.nova.data.resources.builder.font.provider.SpaceProvider
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
@@ -15,21 +17,22 @@ class MoveCharactersContent(private val builder: ResourcePackBuilder) : PackTask
     
     companion object {
         
-        private val DEFAULT_FONT = ResourcePath("minecraft", "default")
-        
         internal const val SIZE = 16
         internal const val EXP_SHIFT = 2
         internal val PRECISION = 2.0.pow(EXP_SHIFT)
         
     }
     
-    @PackTask(runAfter = ["FontContent#discoverAllFonts"], runBefore = ["FontContent#write"])
+    @PackTask(runAfter = ["FontContent#discoverAllFonts"], runBefore = ["MovedFontContent#write", "FontContent#write"])
     private fun write() {
         val fontContent = builder.getHolder<FontContent>()
         val mergedFonts = fontContent.mergedFonts
-        val font = mergedFonts[DEFAULT_FONT]!!
-        val occupied = font.getCodePoints(mergedFonts.values)
-        val range = Font.findFirstUnoccupiedRange(occupied, 0xE000..0xF8FF, SIZE * 2).toIntArray()
+        
+        val codePoints = IntOpenHashSet()
+        codePoints.addAll(mergedFonts[Font.DEFAULT]!!.getCodePoints(mergedFonts.values))
+        codePoints.addAll(mergedFonts[Font.UNIFORM]!!.getCodePoints(mergedFonts.values))
+        
+        val range = Font.findFirstUnoccupiedRange(codePoints, Font.PRIVATE_USE_AREA, SIZE * 2).toIntArray()
         
         val advances = Int2FloatOpenHashMap()
         // -.25, -.5, ..., -8192
@@ -37,7 +40,13 @@ class MoveCharactersContent(private val builder: ResourcePackBuilder) : PackTask
         // .25, .5, ..., 8192
         for (i in 0 until SIZE) advances[range[i + SIZE]] = 2.0.pow(i - EXP_SHIFT).toFloat()
         
-        fontContent.getOrCreate(DEFAULT_FONT).addFirst(SpaceProvider(advances))
+        val moveFontId = ResourcePath("nova", "move")
+        val spaceFont = Font(moveFontId, listOf(SpaceProvider(advances)))
+        fontContent += spaceFont
+        
+        val spaceFontReference = ReferenceProvider(moveFontId)
+        fontContent.getOrCreate(Font.DEFAULT).addFirst(spaceFontReference)
+        fontContent.getOrCreate(Font.UNIFORM).addFirst(spaceFontReference)
         
         // update lookup
         ResourceLookups.MOVE_CHARACTERS_OFFSET = range[0]

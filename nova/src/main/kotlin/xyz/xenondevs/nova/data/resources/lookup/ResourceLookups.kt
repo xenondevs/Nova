@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.resources.lookup
 
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.data.resources.builder.task.EnchantmentData
 import xyz.xenondevs.nova.data.resources.builder.task.armor.info.ArmorTexture
 import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.data.resources.model.ModelData
@@ -16,6 +17,7 @@ object ResourceLookups {
     val WAILA_DATA_LOOKUP = idResourceLookup<FontChar>("waila_data_lookup")
     val TEXTURE_ICON_LOOKUP = idResourceLookup<FontChar>("texture_icon_lookup")
     var LANGUAGE_LOOKUP by resourceLookup<Map<String, Map<String, String>>>("language_lookup")
+    var ENCHANTMENT_DATA_LOOKUP by resourceLookup<Map<String, EnchantmentData>>("enchantment_data_lookup")
     var MOVE_CHARACTERS_OFFSET by resourceLookup<Int>("move_characters_offset")
     
     private inline fun <reified T : Any> resourceLookup(key: String): ResourceLookup<T> {

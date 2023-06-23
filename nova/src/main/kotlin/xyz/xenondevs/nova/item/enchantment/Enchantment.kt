@@ -19,6 +19,11 @@ sealed interface Enchantment {
     val id: ResourceLocation
     
     /**
+     * The localization key of this enchantment.
+     */
+    val localizedName: String
+    
+    /**
      * The minimum level of this enchantment.
      */
     val minLevel: Int
@@ -74,6 +79,8 @@ internal class NovaEnchantment(
     private val compatibility: (Enchantment) -> Boolean
 ) : Enchantment {
     
+    override val localizedName = "enchantment.${id.namespace}.${id.path}"
+    
     override fun getMinCost(level: Int): Int = minCost(level)
     override fun getMaxCost(level: Int): Int = maxCost(level)
     
@@ -96,8 +103,9 @@ internal class VanillaEnchantment(
     private val enchantment: MojangEnchantment
 ) : Enchantment {
     
-    override val minLevel = enchantment.minLevel
-    override val maxLevel = enchantment.maxLevel
+    override val localizedName: String = enchantment.descriptionId
+    override val minLevel: Int = enchantment.minLevel
+    override val maxLevel: Int = enchantment.maxLevel
     
     override fun getMinCost(level: Int): Int = enchantment.getMinCost(level)
     override fun getMaxCost(level: Int): Int = enchantment.getMaxCost(level)

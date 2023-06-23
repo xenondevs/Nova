@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.util.runAsyncTask
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD_ASYNC,
-    dependsOn = [ResourceGeneration.PreWorld::class]
+    dependsOn = [ResourceGeneration.PostWorld::class]
 )
 object LocaleManager {
     

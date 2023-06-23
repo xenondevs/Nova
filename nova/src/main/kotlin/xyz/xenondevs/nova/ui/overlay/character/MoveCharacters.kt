@@ -11,7 +11,10 @@ object MoveCharacters {
     
     private val componentCache = Float2ObjectOpenHashMap<Component>()
     
-    private fun getMovingString(distance: Float): String {
+    internal fun getMovingString(distance: Number): String =
+        getMovingString(distance.toFloat())
+    
+    internal fun getMovingString(distance: Float): String {
         val start = if (distance < 0)
             ResourceLookups.MOVE_CHARACTERS_OFFSET
         else ResourceLookups.MOVE_CHARACTERS_OFFSET + MoveCharactersContent.SIZE
