@@ -15,8 +15,10 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
+import org.bukkit.Rotation
 import org.bukkit.SoundCategory
 import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
@@ -117,7 +119,7 @@ internal object OraxenItemService : CustomItemService {
     override fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean {
         val id = getId(item) ?: return false
         OraxenBlocks.place(id, location)
-        OraxenFurniture.place(location, id, null)
+        OraxenFurniture.place(location, id, Rotation.NONE, BlockFace.NORTH)
         return true
     }
     

@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.data.resources.upload.service
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import io.ktor.server.jetty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.bukkit.configuration.ConfigurationSection
@@ -20,15 +20,13 @@ import xyz.xenondevs.nova.util.startsWithAny
 import java.io.File
 import kotlin.concurrent.thread
 
-private val SELF_HOST_DELAY by configReloadable { DEFAULT_CONFIG.getLong("debug.self_host_delay") }
-
 @Suppress("HttpUrlsUsage", "ExtractKtorModule")
 internal object SelfHost : UploadService {
     
     override val name = "SelfHost"
     internal val startedLatch = Latch()
     
-    private lateinit var server: JettyApplicationEngine
+    private lateinit var server: CIOApplicationEngine
     
     private lateinit var host: String
     private var port = 38519
@@ -53,7 +51,7 @@ internal object SelfHost : UploadService {
         appendPort = cfg.getBooleanOrNull("append_port") ?: cfg.getBooleanOrNull("portNeeded") ?: (configuredHost == null)
         
         thread(name = "ResourcePack Server", isDaemon = true) {
-            server = embeddedServer(Jetty, port = this.port) {
+            server = embeddedServer(CIO, port = this.port) {
                 routing {
                     get("*") {
                         val packFile = ResourcePackBuilder.RESOURCE_PACK_FILE

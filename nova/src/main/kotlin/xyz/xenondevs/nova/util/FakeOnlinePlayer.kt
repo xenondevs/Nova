@@ -1023,6 +1023,14 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getNoActionTicks(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setNoActionTicks(ticks: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getKiller(): Player? {
         throw UnsupportedOperationException("Player is not online")
     }

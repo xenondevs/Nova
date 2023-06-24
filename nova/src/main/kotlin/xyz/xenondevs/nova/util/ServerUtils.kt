@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.ServerSoftware.*
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 object ServerUtils {
@@ -13,6 +14,7 @@ object ServerUtils {
             "Bukkit" -> CRAFT_BUKKIT
             "Spigot" -> SPIGOT
             "Paper" -> PAPER
+            "Pufferfish" -> PUFFERFISH
             "Tuinity" -> TUINITY
             "Purpur" -> PURPUR
             "Airplane" -> AIRPLANE
@@ -24,23 +26,26 @@ object ServerUtils {
     
 }
 
-
-enum class ServerSoftware(private val superSoftware: ServerSoftware?) {
+enum class ServerSoftware(private vararg val superSoftwares: ServerSoftware = emptyArray()) {
     
-    CRAFT_BUKKIT(null),
+    CRAFT_BUKKIT,
     SPIGOT(CRAFT_BUKKIT),
     PAPER(SPIGOT),
+    PUFFERFISH(PAPER),
     TUINITY(PAPER),
-    PURPUR(TUINITY),
+    PURPUR(TUINITY, PUFFERFISH),
     AIRPLANE(PURPUR),
-    UNKNOWN(null);
+    UNKNOWN;
     
-    val tree = buildList<ServerSoftware> { 
-        var software: ServerSoftware? = this@ServerSoftware
-        while (software != null) {
-            add(software)
-            software = software.superSoftware
-        }
+    val tree: List<ServerSoftware> = buildList { 
+        val unexplored = LinkedList<ServerSoftware>()
+        unexplored += this@ServerSoftware
+        
+        generateSequence { unexplored.poll() }
+            .forEach { software -> 
+                add(software)
+                unexplored += software.superSoftwares
+            }
     }
     
     fun <K, V> getCorrectMap(): MutableMap<K, V> = if (this == PURPUR) ConcurrentHashMap() else HashMap()
