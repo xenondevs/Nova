@@ -26,7 +26,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // versions
-            version("kotlin", "1.8.20")
+            version("kotlin", "1.8.22")
             version("ktor", "2.3.1")
             version("spigot", "1.20.1-R0.1-SNAPSHOT")
             version("cbf", "0.5")
