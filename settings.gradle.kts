@@ -22,6 +22,9 @@ include("nova-hooks:nova-hook-vault")
 include("nova-hooks:nova-hook-worldedit")
 include("nova-hooks:nova-hook-worldguard")
 
+// misc
+include("catalog")
+
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs")
