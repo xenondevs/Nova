@@ -48,8 +48,8 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
     init {
         if (backupFile.exists()) {
             LOGGER.warning("Restoring region file $file from backup $backupFile")
-            val ins = DataInputStream(backupFile.inputStream())
-            val out = file.outputStream()
+            val ins = DataInputStream(backupFile.inputStream().buffered())
+            val out = file.outputStream().buffered()
             
             use(ins, out) {
                 val length = ins.readLong()
@@ -64,7 +64,7 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
     fun init() {
         try {
             if (file.length() != 0L) {
-                readFile(DataInputStream(file.inputStream()))
+                DataInputStream(file.inputStream().buffered()).use(::readFile)
             }
         } catch (e: Exception) {
             throw IllegalStateException("Could not initialize region file $file", e)
@@ -93,15 +93,15 @@ internal class RegionFile(val world: World, val file: File, val regionX: Int, va
     
     fun save() {
         if (CREATE_BACKUPS && file.exists()) {
-            val ins = file.inputStream()
-            val out = DataOutputStream(backupFile.outputStream())
+            val ins = file.inputStream().buffered()
+            val out = DataOutputStream(backupFile.outputStream().buffered())
             use(ins, out) {
                 out.writeLong(file.length())
                 ins.copyTo(out)
             }
         }
         
-        DataOutputStream(file.outputStream()).use { dos ->
+        DataOutputStream(file.outputStream().buffered()).use { dos ->
             dos.writeInt(MAGIC)
             dos.writeByte(FILE_VERSION)
             chunks.forEach { chunk ->
