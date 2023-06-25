@@ -92,7 +92,7 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
     
     override fun flush(ctx: ChannelHandlerContext?) {
         try {
-            if (loggedIn && channel.pipeline().get("compress") != null) {
+            if (loggedIn) {
                 while (queue.isNotEmpty()) {
                     channel.write(queue.poll().duplicate())
                 }
