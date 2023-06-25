@@ -62,6 +62,7 @@ jobs:
             publishNovaAPIPublicationToXenondevsRepository
             publishNovaGradlePluginPublicationToXenondevsRepository
             publishNova-gradle-pluginPluginMarkerMavenPublicationToXenondevsRepository
+            publishCatalogPublicationToXenondevsRepository
             -PxenondevsNms
             -Prelease
             --scan
