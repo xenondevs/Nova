@@ -27,6 +27,7 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
@@ -91,7 +92,7 @@ private val SHULKER_BOX_ITEMS = setOf(
 private val ATTRIBUTE_DECIMAL_FORMAT = DecimalFormat("#.##")
     .apply { decimalFormatSymbols = DecimalFormatSymbols.getInstance(Locale.ROOT) }
 
-private val GLOW_ENCHANTMENT_TAG = ListTag().apply { 
+private val GLOW_ENCHANTMENT_TAG = ListTag().apply {
     val entry = CompoundTag()
     entry.putString("id", "glow")
     entry.putInt("level", 1)
@@ -252,7 +253,7 @@ internal object PacketItems : Listener {
         // name
         var itemDisplayName = packetItemData.name
         if (useName && !displayTag.contains("Name") && itemDisplayName != null) {
-            if (itemTag.contains("Enchantments", NBTUtils.TAG_LIST) && itemDisplayName.children().isEmpty()) {
+            if (Enchantable.isEnchanted(newItemStack) && itemDisplayName.children().isEmpty()) {
                 itemDisplayName = itemDisplayName.color(NamedTextColor.AQUA)
             }
             
@@ -345,7 +346,10 @@ internal object PacketItems : Listener {
         }
         
         // hide flags
-        tag.putInt("HideFlags", HideableFlag.modifyInt(tag.getInt("HideFlags"), HideableFlag.ENCHANTMENTS, HideableFlag.MODIFIERS))
+        var hideFlags = HideableFlag.modifyInt(tag.getInt("HideFlags"), HideableFlag.ENCHANTMENTS, HideableFlag.MODIFIERS)
+        if (itemStack.item == Items.ENCHANTED_BOOK)
+            hideFlags = hideFlags or HideableFlag.ADDITIONAL.mask
+        tag.putInt("HideFlags", hideFlags)
         
         // save server-side nbt data
         if (storeServerSideTag) {
@@ -431,9 +435,9 @@ internal object PacketItems : Listener {
     
     //<editor-fold desc="tooltip", defaultstate="collapsed">
     private fun buildEnchantmentsTooltip(itemStack: MojangStack): List<Component> {
-        val enchantments = Enchantable.getEnchantments(itemStack)
-        if (enchantments.isEmpty())
-            return emptyList()
+        val enchantments = Enchantable.getEnchantments(itemStack).takeUnlessEmpty()
+            ?: Enchantable.getStoredEnchantments(itemStack).takeUnlessEmpty()
+            ?: return emptyList()
         
         val lore = ArrayList<Component>()
         for ((enchantment, level) in enchantments) {

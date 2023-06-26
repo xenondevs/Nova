@@ -91,7 +91,7 @@ internal object EnchantmentTableLogic {
                 continue
             
             random.setSeed(menu.enchantmentSeed.toLong() + slot)
-            val enchantments = selectTableEnchantments(random, itemStack, levelRequirement)
+            val enchantments = selectTableEnchantments(random, itemStack, levelRequirement, Enchantment::isTableDiscoverable)
             if (enchantments.isNotEmpty()) {
                 val clue = enchantments[random.nextInt(enchantments.size)]
                 offers[slot] = EnchantmentOffer(Enchantment.asBukkitEnchantment(clue.enchantment), clue.level, levelRequirement)
@@ -133,7 +133,8 @@ internal object EnchantmentTableLogic {
         random.setSeed(menu.enchantmentSeed.toLong() + slot)
         
         var levelRequirement = menu.costs[slot]
-        var enchantments = selectTableEnchantments(random, itemStack, levelRequirement).associateTo(HashMap()) { it.enchantment to it.level }
+        var enchantments = selectTableEnchantments(random, itemStack, levelRequirement, Enchantment::isTableDiscoverable)
+            .associateTo(HashMap()) { it.enchantment to it.level }
         val isBook = itemStack.item == Items.BOOK
         
         //<editor-fold desc="EnchantItemEvent", defaultstate="collapsed">
@@ -165,7 +166,10 @@ internal object EnchantmentTableLogic {
             return
         
         if (isBook) {
-            // TODO copy compound tag?, store enchantments
+            val enchantedBook = ItemStack(Items.ENCHANTED_BOOK)
+            enchantedBook.tag = itemStack.tag?.copy() 
+            Enchantable.setStoredEnchantments(enchantedBook, enchantments)
+            enchantSlots.setItem(0, enchantedBook)
         } else {
             Enchantable.setEnchantments(itemStack, enchantments)
         }
@@ -220,14 +224,14 @@ internal object EnchantmentTableLogic {
         }
     }
     
-    private fun selectTableEnchantments(random: RandomSource, itemStack: ItemStack, levelCost: Int): List<EnchantmentInstance> {
+    private fun selectTableEnchantments(random: RandomSource, itemStack: ItemStack, levelCost: Int, verify: (Enchantment) -> Boolean): List<EnchantmentInstance> {
         // see: EnchantmentHelper#selectEnchantment
         
         val enchantmentValue = getEnchantmentValue(itemStack)
         if (enchantmentValue <= 0)
             return emptyList()
         
-        val possibleEnchantments = getPossibleTableEnchantments(itemStack, levelCost)
+        val possibleEnchantments = getPossibleTableEnchantments(itemStack, levelCost, verify)
         if (possibleEnchantments.isEmpty())
             return emptyList()
         
@@ -261,7 +265,7 @@ internal object EnchantmentTableLogic {
         return selected
     }
     
-    private fun getPossibleTableEnchantments(itemStack: ItemStack, levelCost: Int): MutableList<EnchantmentInstance> {
+    private fun getPossibleTableEnchantments(itemStack: ItemStack, levelCost: Int, verify: (Enchantment) -> Boolean): MutableList<EnchantmentInstance> {
         // see: EnchantmentHelper#getAvailableEnchantmentResults
         
         // build a sequence of all possible enchantments for this item under the given levelCost
@@ -289,6 +293,9 @@ internal object EnchantmentTableLogic {
         // map all enchantments to an EnchantmentInstance with the highest possible level
         val enchantmentInstances = ArrayList<EnchantmentInstance>()
         for (enchantment in enchantments) {
+            if (!verify(enchantment))
+                continue
+            
             for (level in enchantment.maxLevel downTo enchantment.minLevel) {
                 if (levelCost in enchantment.getTableLevelRequirement(level)) {
                     enchantmentInstances += EnchantmentInstance(enchantment, level)
