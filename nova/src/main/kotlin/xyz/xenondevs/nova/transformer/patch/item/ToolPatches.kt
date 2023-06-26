@@ -37,8 +37,7 @@ internal object ToolPatches : MultiTransformer(CraftBlock::class, MojangPlayer::
      * Patches the CraftBlock#isPreferredTool method to properly handle Nova's tools.
      */
     private fun transformCraftBlockIsPreferredTool() {
-        VirtualClassPath[ReflectionRegistry.CRAFT_BLOCK_DATA_IS_PREFERRED_TOOL_METHOD]
-            .instructions = buildInsnList {
+        VirtualClassPath[ReflectionRegistry.CRAFT_BLOCK_DATA_IS_PREFERRED_TOOL_METHOD].replaceInstructions {
             aLoad(0)
             aLoad(1)
             aLoad(2)
@@ -77,7 +76,7 @@ internal object ToolPatches : MultiTransformer(CraftBlock::class, MojangPlayer::
      * Patches the EnchantmentHelper#getKnockbackBonus method to add the knockback bonus from Nova's tools.
      */
     private fun transformEnchantmentHelperGetKnockbackBonus() {
-        VirtualClassPath[EnchantmentHelper::getKnockbackBonus].instructions = buildInsnList {
+        VirtualClassPath[EnchantmentHelper::getKnockbackBonus].replaceInstructions {
             aLoad(0)
             invokeStatic(::getKnockbackBonus)
             ireturn()

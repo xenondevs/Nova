@@ -53,9 +53,9 @@ object VanillaEnchantments {
     
     private fun register(name: String, vanillaEnchantment: MojangEnchantment): Enchantment {
         val id = ResourceLocation("minecraft", name)
-        val category = VanillaEnchantment(id, vanillaEnchantment)
-        NovaRegistries.ENCHANTMENT[id] = category
-        return category
+        val enchantment = VanillaEnchantment(id, vanillaEnchantment)
+        NovaRegistries.ENCHANTMENT[id] = enchantment
+        return enchantment
     }
     
 }

@@ -1,10 +1,13 @@
 package xyz.xenondevs.nova.item.enchantment
 
 import net.minecraft.resources.ResourceLocation
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.set
 import net.minecraft.world.item.enchantment.EnchantmentCategory as MojangEnchantmentCategory
 
+@InternalInit(stage = InternalInitStage.PRE_WORLD, dependsOn = [VanillaEnchantments::class])
 object VanillaEnchantmentCategories {
     
     val ARMOR = register(MojangEnchantmentCategory.ARMOR)

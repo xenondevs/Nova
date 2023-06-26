@@ -25,20 +25,25 @@ internal object AsmUtils {
         return methods
     }
     
-    fun createDelegateInstructions(loadDelegate: InsnList, callDelegate: InsnList, delegateTo: MethodNode): InsnList {
+    fun createDelegateInstructions(
+        loadDelegate: InsnList,
+        callDelegate: InsnList, 
+        delegateTo: MethodNode, 
+        paramIdxStart: Int = if (delegateTo.accessWrapper.isStatic()) 0 else 1
+    ): InsnList {
         val methodType = Type.getMethodType(delegateTo.desc)
         return buildInsnList { 
             addLabel()
             add(loadDelegate.copy())
-            loadMethodParametersToStack(delegateTo.accessWrapper.isStatic(), methodType)
+            loadMethodParametersToStack(paramIdxStart, methodType)
             add(callDelegate.copy())
             addLabel()
             returnMethodResult(methodType)
         }
     }
     
-    private fun InsnBuilder.loadMethodParametersToStack(static: Boolean, methodType: Type) {
-        var idx = if (static) 0 else 1
+    private fun InsnBuilder.loadMethodParametersToStack(idxStart: Int, methodType: Type) {
+        var idx = idxStart
         
         for (argType in methodType.argumentTypes) {
             when (argType.sort) {

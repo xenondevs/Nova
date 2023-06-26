@@ -2,8 +2,6 @@ package xyz.xenondevs.nova.data.resources.builder.task
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetDataPacketEvent
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -11,14 +9,10 @@ import xyz.xenondevs.nova.data.resources.builder.font.Font
 import xyz.xenondevs.nova.data.resources.builder.font.provider.bitmap.BitmapProvider
 import xyz.xenondevs.nova.data.resources.builder.task.font.FontContent
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.item.enchantment.NovaEnchantment
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import xyz.xenondevs.nova.util.NumberFormatUtils
-import xyz.xenondevs.nova.util.registerPacketListener
 import java.awt.Color
 import java.awt.image.BufferedImage
 import kotlin.math.pow
@@ -158,26 +152,6 @@ class EnchantmentContent(builder: ResourcePackBuilder) : PackTaskHolder {
         append(enchTranslation)
         append(" ")
         append(NumberFormatUtils.getRomanNumeral(level + 1))
-    }
-    
-}
-
-@InternalInit(stage = InternalInitStage.POST_WORLD)
-object TestEnch {
-    
-    @InitFun
-    fun init() {
-        registerPacketListener()
-    }
-    
-    @PacketHandler
-    fun onPck(event: ClientboundContainerSetDataPacketEvent) {
-        if (event.id == 4) {
-            event.value = 29 // lure
-        }
-        if (event.id == 7) {
-            event.value = 256 // level
-        }
     }
     
 }

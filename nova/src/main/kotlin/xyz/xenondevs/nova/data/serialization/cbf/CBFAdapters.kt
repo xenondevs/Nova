@@ -16,7 +16,16 @@ import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedIdBinaryAdapt
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedKeyBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ResourceLocationBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.VirtualInventoryBinaryAdapter
+import xyz.xenondevs.nova.registry.NovaRegistries.ABILITY_TYPE
+import xyz.xenondevs.nova.registry.NovaRegistries.ATTACHMENT_TYPE
+import xyz.xenondevs.nova.registry.NovaRegistries.BLOCK
+import xyz.xenondevs.nova.registry.NovaRegistries.ENCHANTMENT
+import xyz.xenondevs.nova.registry.NovaRegistries.ENCHANTMENT_CATEGORY
+import xyz.xenondevs.nova.registry.NovaRegistries.ITEM
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
+import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
+import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_CATEGORY
+import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_TIER
 import xyz.xenondevs.nova.registry.NovaRegistries.UPGRADE_TYPE
 import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
 import xyz.xenondevs.nova.util.byNameBinaryAdapter
@@ -35,11 +44,20 @@ internal object CBFAdapters {
         registerBinaryAdapter(ResourceLocationBinaryAdapter)
         registerBinaryAdapter(NETWORK_TYPE.byNameBinaryAdapter())
         registerBinaryAdapter(UPGRADE_TYPE.byNameBinaryAdapter())
+        registerBinaryAdapter(ABILITY_TYPE.byNameBinaryAdapter())
+        registerBinaryAdapter(ATTACHMENT_TYPE.byNameBinaryAdapter())
+        registerBinaryAdapter(RECIPE_TYPE.byNameBinaryAdapter())
         registerBinaryAdapter(VirtualInventoryBinaryAdapter)
         registerBinaryAdapter(ItemFilterBinaryAdapter)
         
         // binary hierarchy adapters
         registerBinaryHierarchyAdapter(ItemStackBinaryAdapter)
+        registerBinaryHierarchyAdapter(BLOCK.byNameBinaryAdapter())
+        registerBinaryHierarchyAdapter(ITEM.byNameBinaryAdapter())
+        registerBinaryHierarchyAdapter(ENCHANTMENT.byNameBinaryAdapter())
+        registerBinaryHierarchyAdapter(ENCHANTMENT_CATEGORY.byNameBinaryAdapter())
+        registerBinaryHierarchyAdapter(TOOL_CATEGORY.byNameBinaryAdapter())
+        registerBinaryHierarchyAdapter(TOOL_TIER.byNameBinaryAdapter())
         
         // register security manager (this prevents addons from registering adapters / instance creators for non-addon classes)
         CBF.securityManager = CBFAddonSecurityManager()

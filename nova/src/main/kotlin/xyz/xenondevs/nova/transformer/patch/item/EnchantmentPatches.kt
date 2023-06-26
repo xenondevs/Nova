@@ -1,135 +1,51 @@
 package xyz.xenondevs.nova.transformer.patch.item
 
-import net.minecraft.world.entity.ExperienceOrb
+import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.enchantment.EnchantmentCategory
-import net.minecraft.world.item.enchantment.EnchantmentHelper
-import net.minecraft.world.item.enchantment.Enchantments
-import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.MethodInsnNode
-import xyz.xenondevs.bytebase.asm.buildInsnList
+import net.minecraft.world.inventory.EnchantmentMenu
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Level
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
-import xyz.xenondevs.bytebase.util.calls
-import xyz.xenondevs.bytebase.util.replaceFirst
-import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.behavior.Enchantable
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.item.novaCompound
-import xyz.xenondevs.nova.util.item.novaItem
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import kotlin.math.min
-import net.minecraft.world.item.Item as MojangItem
-import net.minecraft.world.item.ItemStack as MojangStack
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import xyz.xenondevs.nova.world.block.logic.tileentity.EnchantmentTableLogic
 
-@Suppress("unused")
-internal object EnchantmentPatches : MultiTransformer(EnchantmentHelper::class, MojangItem::class, ExperienceOrb::class) {
+internal object EnchantmentPatches : MultiTransformer(ItemStack::class, EnchantmentMenu::class) {
     
     override fun transform() {
-        patchEnchantmentTableEnchanting()
-        patchMending()
+        VirtualClassPath[ItemStack::isEnchantable].delegateStatic(Enchantable::isEnchantable)
+        VirtualClassPath[ItemStack::isEnchanted].delegateStatic(Enchantable::isEnchanted)
+        transformEnchantmentMenuSlotsChanged()
+        transformEnchantmentMenuClickMenuButton()
+        
+        dumpAll()
     }
     
-    private fun patchEnchantmentTableEnchanting() {
-        VirtualClassPath[EnchantmentHelper::getAvailableEnchantmentResults]
-            .replaceFirst(1, 0, buildInsnList {
-                aLoad(1)
-                invokeStatic(::canEnchantItemWith)
-            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(EnchantmentCategory::canEnchant) }
-        
-        val enchantmentValueAccessingMethods = mapOf(
-            VirtualClassPath[EnchantmentHelper::getEnchantmentCost] to 3,
-            VirtualClassPath[EnchantmentHelper::selectEnchantment] to 1
+    /**
+     * Delegates EnchantmentMenu.lambda$slotsChanged$0 to [EnchantmentTableLogic.enchantmentMenuPrepareClues].
+     */
+    private fun transformEnchantmentMenuSlotsChanged() {
+        // for future reference: https://i.imgur.com/IGlChz6.png
+        val method = ReflectionUtils.getMethod(
+            EnchantmentMenu::class, 
+            true, "SRM(net.minecraft.world.inventory.EnchantmentMenu lambda\$slotsChanged\$0)",
+            ItemStack::class, Level::class, BlockPos::class
         )
-        
-        enchantmentValueAccessingMethods.forEach { (method, localIdx) ->
-            method.replaceFirst(1, 0, buildInsnList {
-                aLoad(localIdx)
-                invokeStatic(::getEnchantmentValue)
-            }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(MojangItem::getEnchantmentValue) }
-        }
-    
-        VirtualClassPath[MojangItem::isEnchantable]
-            .instructions = buildInsnList {
-            aLoad(1)
-            aLoad(0)
-            invokeStatic(::isEnchantable)
-            ireturn()
-        }
+        VirtualClassPath[method].delegateStatic(EnchantmentTableLogic::enchantmentMenuPrepareClues)
     }
     
-    @JvmStatic
-    fun canEnchantItemWith(category: EnchantmentCategory, itemStack: MojangStack): Boolean {
-        val novaItem = itemStack.novaItem
-        if (novaItem != null) {
-            val categories = itemStack.novaItem?.getBehavior(Enchantable::class)?.options?.enchantmentCategories
-            return TODO()// categories != null && category in categories
-        }
-        
-        return category.canEnchant(itemStack.item)
-    }
-    
-    @JvmStatic
-    fun getEnchantmentValue(itemStack: MojangStack): Int {
-        val novaItem = itemStack.novaItem
-        if (novaItem != null) {
-            return novaItem.getBehavior(Enchantable::class)?.options?.enchantmentValue ?: 0
-        }
-        
-        return itemStack.item.enchantmentValue
-    }
-    
-    @JvmStatic
-    fun isEnchantable(itemStack: MojangStack, item: MojangItem): Boolean {
-        val novaItem = itemStack.novaItem
-        if (novaItem != null) {
-            return novaItem.hasBehavior(Enchantable::class)
-        }
-        
-        return item.maxStackSize == 1 && item.canBeDepleted()
-    }
-    
-    private fun patchMending() {
-        VirtualClassPath[ReflectionRegistry.EXPERIENCE_ORB_REPAIR_PLAYER_ITEMS_METHOD]
-            .instructions = buildInsnList {
-            aLoad(0)
-            aLoad(1)
-            iLoad(2)
-            invokeStatic(::repairPlayerItems)
-            ireturn()
-        }
-    }
-    
-    @JvmStatic
-    fun repairPlayerItems(orb: ExperienceOrb, player: Player, exp: Int): Int {
-        val itemStack = EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, player) {
-            val novaItem = it.novaItem
-            if (novaItem != null) {
-                val damage = novaItem.getBehavior(Damageable::class)?.getDamage(it.novaCompound)
-                return@getRandomItemWith damage != null && damage > 0
-            }
-            
-            return@getRandomItemWith it.isDamaged
-        }?.value
-        
-        if (itemStack != null) {
-            val damageable = itemStack.novaItem?.getBehavior(Damageable::class)
-            
-            val repair: Int
-            if (damageable != null) {
-                val novaCompound = itemStack.novaCompound
-                val damageValue = damageable.getDamage(novaCompound)
-                repair = min(orb.value * 2, damageValue)
-                damageable.setDamage(novaCompound, damageValue - repair)
-            } else {
-                repair = min(orb.value * 2, itemStack.damageValue)
-                itemStack.damageValue -= repair
-            }
-            
-            val remainingExp = exp - (repair / 2)
-            return if (remainingExp > 0) repairPlayerItems(orb, player, remainingExp) else 0
-        }
-        
-        return exp
+    /**
+     * Delegates EnchantmentMenu.lambda$clickMenuButton$1 to [EnchantmentTableLogic.enchantmentMenuEnchant].
+     */
+    private fun transformEnchantmentMenuClickMenuButton() {
+        // for future reference: 
+        val method = ReflectionUtils.getMethod(
+            EnchantmentMenu::class,
+            true, "SRM(net.minecraft.world.inventory.EnchantmentMenu lambda\$clickMenuButton\$1)",
+            ItemStack::class, Int::class, Player::class, Int::class, ItemStack::class, Level::class, BlockPos::class
+        )
+        VirtualClassPath[method].delegateStatic(EnchantmentTableLogic::enchantmentMenuEnchant)
     }
     
 }

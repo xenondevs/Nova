@@ -2,15 +2,17 @@ package xyz.xenondevs.nova.transformer.patch.item
 
 import net.minecraft.stats.Stats
 import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ArmorItem
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.item.enchantment.Enchantments
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.TypeInsnNode
-import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.isClass
 import xyz.xenondevs.bytebase.util.replaceEvery
@@ -22,23 +24,27 @@ import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.item.DamageableUtils
 import xyz.xenondevs.nova.util.item.ItemDamageResult
+import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ITEM_STACK_HURT_AND_BREAK_METHOD
 import java.util.function.Consumer
+import kotlin.math.min
 
-internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::class, Inventory::class) {
+internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::class, Inventory::class, ExperienceOrb::class) {
     
     override fun transform() {
         transformItemStackHurtAndBreak()
         transformItemStackHurtEnemy()
         transformInventoryHurtArmor()
+        transformExperienceOrbRepairPlayerItems()
     }
     
     /**
      * Patches the ItemStack#hurtAndBreak method to properly damage Nova's tools.
      */
     private fun transformItemStackHurtAndBreak() {
-        VirtualClassPath[ITEM_STACK_HURT_AND_BREAK_METHOD].instructions = buildInsnList {
+        VirtualClassPath[ITEM_STACK_HURT_AND_BREAK_METHOD].replaceInstructions {
             aLoad(0)
             iLoad(1)
             aLoad(2)
@@ -59,7 +65,7 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
      * Patches the ItemStack#hurtEnemy method to properly damage Nova's tools and with the proper damage values.
      */
     private fun transformItemStackHurtEnemy() {
-        VirtualClassPath[ItemStack::hurtEnemy].instructions = buildInsnList {
+        VirtualClassPath[ItemStack::hurtEnemy].replaceInstructions {
             aLoad(0)
             aLoad(2)
             invokeStatic(::hurtEnemy)
@@ -98,6 +104,49 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
     fun isArmorItem(itemStack: ItemStack): Boolean {
         val novaItem = itemStack.novaItem ?: return itemStack.item is ArmorItem
         return novaItem.hasBehavior(Wearable::class) && novaItem.hasBehavior(Damageable::class)
+    }
+    
+    private fun transformExperienceOrbRepairPlayerItems() {
+        VirtualClassPath[ReflectionRegistry.EXPERIENCE_ORB_REPAIR_PLAYER_ITEMS_METHOD].replaceInstructions {
+            aLoad(0)
+            aLoad(1)
+            iLoad(2)
+            invokeStatic(::repairPlayerItems)
+            ireturn()
+        }
+    }
+    
+    @JvmStatic
+    fun repairPlayerItems(orb: ExperienceOrb, player: Player, exp: Int): Int {
+        val itemStack = EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, player) {
+            val novaItem = it.novaItem
+            if (novaItem != null) {
+                val damage = novaItem.getBehavior(Damageable::class)?.getDamage(it.novaCompound)
+                return@getRandomItemWith damage != null && damage > 0
+            }
+            
+            return@getRandomItemWith it.isDamaged
+        }?.value
+        
+        if (itemStack != null) {
+            val damageable = itemStack.novaItem?.getBehavior(Damageable::class)
+            
+            val repair: Int
+            if (damageable != null) {
+                val novaCompound = itemStack.novaCompound
+                val damageValue = damageable.getDamage(novaCompound)
+                repair = min(orb.value * 2, damageValue)
+                damageable.setDamage(novaCompound, damageValue - repair)
+            } else {
+                repair = min(orb.value * 2, itemStack.damageValue)
+                itemStack.damageValue -= repair
+            }
+            
+            val remainingExp = exp - (repair / 2)
+            return if (remainingExp > 0) repairPlayerItems(orb, player, remainingExp) else 0
+        }
+        
+        return exp
     }
     
 }

@@ -1,7 +1,12 @@
 package xyz.xenondevs.nova.transformer
 
+import org.objectweb.asm.tree.InsnList
 import org.objectweb.asm.tree.MethodNode
+import xyz.xenondevs.bytebase.asm.InsnBuilder
+import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
+import xyz.xenondevs.bytebase.util.internalName
+import xyz.xenondevs.nova.util.data.AsmUtils
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
@@ -36,9 +41,37 @@ internal sealed interface Transformer {
     }
     
     fun MethodNode.replaceWith(other: MethodNode) {
+        clear()
         instructions = other.instructions
         tryCatchBlocks = other.tryCatchBlocks
+    }
+    
+    fun MethodNode.replaceInstructions(build: InsnBuilder.() -> Unit) {
+        clear()
+        instructions = buildInsnList(build)
+    }
+    
+    fun MethodNode.delegateStatic(other: KFunction<*>) {
+        delegateStatic(other.javaMethod!!)
+    }
+    
+    fun MethodNode.delegateStatic(other: Method) {
+        delegateStatic(other.declaringClass.internalName, VirtualClassPath[other])
+    }
+    
+    fun MethodNode.delegateStatic(owner: String, other: MethodNode) {
+        clear()
+        instructions = AsmUtils.createDelegateInstructions(
+            InsnList(),
+            buildInsnList { invokeStatic(owner, other.name, other.desc, false) },
+            other,
+            0
+        )
+    }
+    
+    private fun MethodNode.clear() {
         localVariables?.clear()
+        tryCatchBlocks?.clear()
         visibleLocalVariableAnnotations?.clear()
         invisibleLocalVariableAnnotations?.clear()
     }

@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.transformer.patch.item
 
-import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.item.novaItem
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -13,11 +12,7 @@ import net.minecraft.world.item.ItemStack as MojangStack
 internal object StackSizePatch : MethodTransformer(MojangStack::getMaxStackSize) {
     
     override fun transform() {
-        methodNode.instructions = buildInsnList {
-            aLoad(0)
-            invokeStatic(::getMaxStackSize)
-            ireturn()
-        }
+        methodNode.delegateStatic(::getMaxStackSize)
     }
     
     @JvmStatic
