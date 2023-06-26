@@ -9,12 +9,12 @@ plugins {
 dependencies {
     // api dependencies
     spigotRuntimeApi(variantOf(libs.spigot.server) { classifier("remapped-mojang") })
+    novaLoaderApi(variantOf(libs.nmsutilities) { classifier("remapped-mojang") })
     novaLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
     novaLoaderApi(libs.bundles.kyori.adventure)
     novaLoaderApi(libs.invui.kotlin)
-    novaLoaderApi("xyz.xenondevs:nms-utilities:0.12:remapped-mojang")
     
     // internal dependencies
     compileOnly(project(":nova-api"))
@@ -23,12 +23,12 @@ dependencies {
     novaLoader(libs.bundles.minecraft.assets)
     novaLoader(libs.invui.resourcepack)
     novaLoader(variantOf(libs.inventoryaccess) { classifier("remapped-mojang") })
-    novaLoader("xyz.xenondevs.bstats:bstats-bukkit:3.0.1")
-    novaLoader("xyz.xenondevs.bytebase:ByteBase-Runtime:0.4.6")
-    novaLoader("me.xdrop:fuzzywuzzy:1.4.0")
-    novaLoader("software.amazon.awssdk:s3:2.20.68")
-    novaLoader("com.google.jimfs:jimfs:1.2")
-    novaLoader("com.github.ben-manes.caffeine:caffeine:3.1.6")
+    novaLoader(libs.bstats)
+    novaLoader(libs.bytbase.runtime)
+    novaLoader(libs.fuzzywuzzy)
+    novaLoader(libs.awssdk.s3)
+    novaLoader(libs.jimfs)
+    novaLoader(libs.caffeine)
     
     // spigot runtime dependencies
     spigotRuntime(libs.bundles.maven.resolver)

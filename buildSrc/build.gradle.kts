@@ -10,10 +10,10 @@ repositories {
 }
 
 dependencies {
-    implementation("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
-    implementation("net.lingala.zip4j:zip4j:2.11.1")
-    implementation("net.md-5:SpecialSource:1.11.0")
-    implementation("xyz.xenondevs.string-remapper:string-remapper-core:1.1")
+    implementation(libs.spigot.api)
+    implementation(libs.zip4j)
+    implementation(libs.specialsource)
+    implementation(libs.stringremapper)
 }
 
 gradlePlugin {
