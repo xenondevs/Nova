@@ -191,9 +191,11 @@ internal object EnchantmentTableLogic {
         val clueLevel: Int
         
         if (enchantment is NovaEnchantment) {
-            val localeLookup = ResourceLookups.ENCHANTMENT_DATA_LOOKUP[player.locale]!!
+            val localeLookup = ResourceLookups.ENCHANTMENT_DATA_LOOKUP[player.locale]
+                ?: throw IllegalStateException("Missing enchantment lookup data for lang ${player.locale}")
             vanillaEnch = BuiltInRegistries.ENCHANTMENT.getOrThrow(localeLookup.vanillaEnchantment)
-            clueLevel = localeLookup.enchantments[enchantment.id]!![level - 1]
+            clueLevel = localeLookup.enchantments[enchantment.id]?.get(level -1)
+                ?: throw IllegalStateException("Missing enchantment lookup data for ${enchantment.id} at level $level")
         } else {
             vanillaEnch = (enchantment as VanillaEnchantment).enchantment
             clueLevel = level

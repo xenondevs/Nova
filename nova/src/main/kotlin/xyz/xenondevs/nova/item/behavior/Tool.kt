@@ -56,8 +56,8 @@ class Tool(val options: ToolOptions) : ItemBehavior() {
     
     companion object : ItemBehaviorFactory<Tool>() {
         
-        val BASE_ATTACK_DAMAGE_UUID: UUID = UUID.fromString("e63e979b-a109-4519-8b20-2ce3962e490c")
-        val BASE_ATTACK_SPEED_UUID: UUID = UUID.fromString("54277290-d821-4616-936b-eee88e98bc0b")
+        val BASE_ATTACK_DAMAGE_UUID: UUID = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF")
+        val BASE_ATTACK_SPEED_UUID: UUID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3")
         
         override fun create(item: NovaItem) =
             Tool(ToolOptions.configurable(item))

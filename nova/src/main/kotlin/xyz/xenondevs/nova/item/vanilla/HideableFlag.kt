@@ -36,7 +36,12 @@ enum class HideableFlag {
     /**
      * Hides leather armor dye color.
      */
-    DYE;
+    DYE,
+    
+    /**
+     * Hides armor trims.
+     */
+    ARMOR_TRIM;
     
     val mask: Int = 1 shl ordinal
     
@@ -47,6 +52,12 @@ enum class HideableFlag {
         fun toInt(flags: Iterable<HideableFlag>): Int {
             var i = 0
             flags.forEach { i = i or (1 shl it.ordinal) }
+            return i
+        }
+        
+        fun modifyInt(base: Int, vararg additional: HideableFlag): Int {
+            var i = base
+            additional.forEach { i = i or (1 shl it.ordinal) }
             return i
         }
         

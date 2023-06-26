@@ -33,9 +33,14 @@ class PacketItemData internal constructor(val nbt: CompoundTag) {
     var durabilityBar: Double = 1.0
     
     /**
+     * Whether this item should have an enchantment glow. Null means that this is decided by the item's enchantments.
+     */
+    var glow: Boolean? = null
+    
+    /**
      * The flags that should be hidden on this item.
      */
-    var hiddenFlags: MutableList<HideableFlag> = mutableListOf(HideableFlag.MODIFIERS)
+    var hiddenFlags: MutableList<HideableFlag> = mutableListOf(HideableFlag.ENCHANTMENTS, HideableFlag.MODIFIERS)
     
     /**
      * Adds multiple lore lines to the current lore.

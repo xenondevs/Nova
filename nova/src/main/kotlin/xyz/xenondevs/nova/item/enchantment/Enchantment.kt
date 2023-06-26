@@ -319,6 +319,9 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
      * Builds the enchantment and adds it to the specified categories.
      */
     override fun build(): Enchantment {
+        if (isCurse && maxLevel > 1)
+            throw IllegalArgumentException("Curse enchantments cannot have multiple levels")
+        
         val enchantment = NovaEnchantment(id, 1, maxLevel, weight, isTableDiscoverable, isTreasure, isTradeable, isCurse, tableLeveRequirement, compatibility)
         for (category in categories) category.enchantments += enchantment
         return enchantment

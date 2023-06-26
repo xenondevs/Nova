@@ -64,7 +64,7 @@ open class ItemModelData(val id: ResourceLocation, val material: Material, val d
         
         val clientStack: MojangStack
         if (basic) {
-            val basicName = logic.getPacketItemData(null, null).name
+            val basicName = logic.getPacketItemData(null).name
             clientStack = createClientsideItemBuilder(name = basicName, modelId = modelId).get().nmsCopy
         } else {
             clientStack = PacketItems.getClientSideStack(

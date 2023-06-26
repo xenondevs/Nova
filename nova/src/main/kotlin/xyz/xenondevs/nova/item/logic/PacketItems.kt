@@ -4,14 +4,23 @@ package xyz.xenondevs.nova.item.logic
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.IntTag
 import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.Tag
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.MobType
+import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.Material
@@ -33,6 +42,10 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.behavior.Enchantable
+import xyz.xenondevs.nova.item.behavior.Tool
+import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.bukkitMirror
@@ -43,9 +56,15 @@ import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
+import xyz.xenondevs.nova.util.serverPlayer
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.*
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -68,6 +87,16 @@ private val SHULKER_BOX_ITEMS = setOf(
     Items.WHITE_SHULKER_BOX,
     Items.YELLOW_SHULKER_BOX
 )
+
+private val ATTRIBUTE_DECIMAL_FORMAT = DecimalFormat("#.##")
+    .apply { decimalFormatSymbols = DecimalFormatSymbols.getInstance(Locale.ROOT) }
+
+private val GLOW_ENCHANTMENT_TAG = ListTag().apply { 
+    val entry = CompoundTag()
+    entry.putString("id", "glow")
+    entry.putInt("level", 1)
+    add(entry)
+}
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -215,7 +244,7 @@ internal object PacketItems : Listener {
         newItemStack.item = CraftMagicNumbers.getItem(data.material)
         newItemTag.putInt("CustomModelData", data.dataArray[subId])
         
-        val packetItemData = itemLogic.getPacketItemData(player, newItemStack)
+        val packetItemData = itemLogic.getPacketItemData(newItemStack)
         
         //<editor-fold desc="Display", defaultstate="collapsed">
         val displayTag = newItemTag.getOrPut("display", ::CompoundTag)
@@ -230,36 +259,22 @@ internal object PacketItems : Listener {
             displayTag.putString("Name", itemDisplayName.withoutPreFormatting().toJson())
         }
         
-        // lore
         val loreTag = displayTag.getOrPut("Lore", ::ListTag)
+        // enchantments
+        val enchantmentsTooltip = buildEnchantmentsTooltip(newItemStack)
+        enchantmentsTooltip.forEach { loreTag += it.withoutPreFormatting().toNBT() }
+        if (packetItemData.glow ?: enchantmentsTooltip.isNotEmpty()) {
+            newItemTag.put("Enchantments", GLOW_ENCHANTMENT_TAG)
+        }
+        // actual lore
         val itemDisplayLore = packetItemData.lore
         itemDisplayLore?.forEach { loreTag += it.withoutPreFormatting().toNBT() }
+        // attribute modifier tooltip
+        buildAttributeModifiersTooltip(player?.serverPlayer, newItemStack).forEach { loreTag += it.withoutPreFormatting().toNBT() }
+        // advanced tooltips
         if (player != null && AdvancedTooltips.hasNovaTooltips(player)) {
             packetItemData.advancedTooltipsLore?.forEach { loreTag += it.withoutPreFormatting().toNBT() }
-            loreTag += Component.text(id, NamedTextColor.DARK_GRAY).withoutPreFormatting().toNBT()
-            
-            var cbfTagCount = 0
-            var nbtTagCount = itemTag.allKeys.size - 1 // don't count 'nova' tag
-            
-            val novaCompound = itemStack.novaCompoundOrNull
-            if (novaCompound != null) {
-                cbfTagCount = novaCompound.keys.size
-                nbtTagCount -= 1 // don't count 'nova_cbf' tag
-            }
-            
-            if (cbfTagCount > 0)
-                loreTag += Component.translatable(
-                    "item.cbf_tags",
-                    NamedTextColor.DARK_GRAY,
-                    Component.text(cbfTagCount)
-                ).withoutPreFormatting().toNBT()
-            
-            if (nbtTagCount > 0)
-                loreTag += Component.translatable(
-                    "item.nbt_tags",
-                    NamedTextColor.DARK_GRAY,
-                    Component.text(nbtTagCount)
-                ).withoutPreFormatting().toNBT()
+            buildNovaAdvancedTooltip(itemStack, material).forEach { loreTag += it.withoutPreFormatting().toNBT() }
         }
         //</editor-fold>
         
@@ -294,10 +309,7 @@ internal object PacketItems : Listener {
         
         // overwrite display tag with "missing model" name
         val displayTag = CompoundTag().also { tag.put("display", it) }
-        displayTag.putString(
-            "Name",
-            Component.text("Unknown item: $id", NamedTextColor.RED).withoutPreFormatting().toJson()
-        )
+        displayTag.putString("Name", Component.text("Unknown item: $id", NamedTextColor.RED).withoutPreFormatting().toJson())
         
         return newItemStack
     }
@@ -313,53 +325,30 @@ internal object PacketItems : Listener {
             newItemStack = getColorCorrectedArmor(itemStack)
         }
         
-        //<editor-fold desc="advanced tool tips">
-        if (player != null && (itemStack.tag?.getInt("CustomModelData") ?: 0) == 0 && AdvancedTooltips.hasVanillaTooltips(player)) {
-            if (newItemStack === itemStack)
-                newItemStack = itemStack.copy()
-            
-            val tag = newItemStack.orCreateTag
-            val novaCompound = newItemStack.novaCompoundOrNull
-            
-            val nbtTagCount = tag.allKeys.size
-            val cbfTagCount = novaCompound?.keys?.size ?: 0
-            
-            val displayTag = tag.getOrPut("display", ::CompoundTag)
-            val loreTag = displayTag.getOrPut("Lore", ::ListTag)
-            
-            val maxDamage = newItemStack.item.maxDamage
-            if (maxDamage > 0) {
-                loreTag += Component.translatable(
-                    "item.durability",
-                    NamedTextColor.WHITE,
-                    Component.text(maxDamage - newItemStack.damageValue),
-                    Component.text(maxDamage)
-                ).withoutPreFormatting().toNBT()
-            }
-            
-            loreTag += Component.translatable(
-                BuiltInRegistries.ITEM.getKey(newItemStack.item).toString(),
-                NamedTextColor.DARK_GRAY
-            ).withoutPreFormatting().toNBT()
-            
-            if (cbfTagCount > 0)
-                loreTag += Component.translatable(
-                    "item.cbf_tags",
-                    NamedTextColor.DARK_GRAY,
-                    Component.text(cbfTagCount)
-                ).withoutPreFormatting().toNBT()
-            
-            if (nbtTagCount > 0)
-                loreTag += Component.translatable(
-                    "item.nbt_tags",
-                    NamedTextColor.DARK_GRAY,
-                    Component.text(nbtTagCount)
-                ).withoutPreFormatting().toNBT()
-        }
-        //</editor-fold>
+        if (newItemStack === itemStack)
+            newItemStack = itemStack.copy()
         
-        // save server-side nbt data if the item has been modified
-        if (storeServerSideTag && newItemStack != itemStack) {
+        val tag = newItemStack.orCreateTag
+        val loreTag = tag
+            .getOrPut("display", ::CompoundTag)
+            .getOrPut("Lore", ::ListTag)
+        
+        // enchantments tooltip (above normal lore text)
+        val enchantmentsTooltip = buildEnchantmentsTooltip(itemStack)
+        enchantmentsTooltip.forEachIndexed { idx, line -> loreTag.add(idx, line.withoutPreFormatting().toNBT()) }
+        if (enchantmentsTooltip.isNotEmpty()) tag.put("Enchantments", GLOW_ENCHANTMENT_TAG) // ensures glow effect
+        // attributes tooltip
+        buildAttributeModifiersTooltip(player?.serverPlayer, newItemStack).forEach { loreTag += it.withoutPreFormatting().toNBT() }
+        // advanced tooltips
+        if (player != null && tag.getInt("CustomModelData") == 0 && AdvancedTooltips.hasVanillaTooltips(player)) {
+            buildVanillaAdvancedTooltip(itemStack, itemStack.item).forEach { loreTag += it.withoutPreFormatting().toNBT() }
+        }
+        
+        // hide flags
+        tag.putInt("HideFlags", HideableFlag.modifyInt(tag.getInt("HideFlags"), HideableFlag.ENCHANTMENTS, HideableFlag.MODIFIERS))
+        
+        // save server-side nbt data
+        if (storeServerSideTag) {
             newItemStack.orCreateTag.put("NovaServerSideTag", itemStack.orCreateTag)
         }
         
@@ -437,6 +426,179 @@ internal object PacketItems : Listener {
         val display = newItem.tag!!.getCompound("display")
         display.putInt("color", display.getInt("color") and 0xFFFFFF)
         return newItem
+    }
+    //</editor-fold>
+    
+    //<editor-fold desc="tooltip", defaultstate="collapsed">
+    private fun buildEnchantmentsTooltip(itemStack: MojangStack): List<Component> {
+        val enchantments = Enchantable.getEnchantments(itemStack)
+        if (enchantments.isEmpty())
+            return emptyList()
+        
+        val lore = ArrayList<Component>()
+        for ((enchantment, level) in enchantments) {
+            lore += Component.text().apply {
+                it.color(if (enchantment.isCurse) NamedTextColor.RED else NamedTextColor.GRAY)
+                it.append(Component.translatable(enchantment.localizedName))
+                it.append(Component.text(" "))
+                if (!enchantment.isCurse) it.append(Component.translatable("enchantment.level.$level"))
+            }.build()
+        }
+        
+        return lore
+    }
+    
+    private fun buildAttributeModifiersTooltip(player: ServerPlayer?, itemStack: MojangStack): List<Component> {
+        if (HideableFlag.MODIFIERS.isHidden(itemStack.tag?.getInt("HideFlags") ?: 0))
+            return emptyList()
+        
+        // if the item has custom modifiers set, all default modifiers are ignored
+        val hasCustomModifiers = itemStack.tag?.contains("AttributeModifiers", Tag.TAG_LIST.toInt()) == true
+        
+        val lore = ArrayList<Component>()
+        EquipmentSlot.values().forEach { slot ->
+            val modifiers: List<AttributeModifier>
+            if (hasCustomModifiers) {
+                // use custom attribute modifiers from nbt data
+                modifiers = ItemUtils.getCustomAttributeModifiers(itemStack, slot)
+            } else {
+                val novaItem = itemStack.novaItem
+                if (novaItem != null) {
+                    // use base attribute modifiers from nova item
+                    modifiers = novaItem.logic.attributeModifiers[slot] ?: emptyList()
+                } else {
+                    // use base attribute modifiers from vanilla item
+                    modifiers = itemStack.item.getDefaultAttributeModifiers(slot).entries().map { (attribute, modifier) ->
+                        AttributeModifier(modifier.id, modifier.name, attribute, modifier.operation, modifier.amount, true, slot)
+                    }
+                }
+            }
+            
+            if (modifiers.isEmpty() || modifiers.none { it.showInLore && it.value != 0.0 })
+                return@forEach
+            
+            lore += Component.empty()
+            lore += Component.translatable("item.modifiers.${slot.name.lowercase()}", NamedTextColor.GRAY)
+            
+            modifiers.asSequence()
+                .filter { it.showInLore && it.value != 0.0 }
+                .forEach { modifier ->
+                    var value = modifier.value
+                    var isBaseModifier = false
+                    
+                    when (modifier.uuid) {
+                        Tool.BASE_ATTACK_DAMAGE_UUID -> {
+                            value += player?.getAttributeBaseValue(Attributes.ATTACK_DAMAGE) ?: 1.0
+                            value += EnchantmentHelper.getDamageBonus(itemStack, MobType.UNDEFINED)
+                            isBaseModifier = true
+                        }
+                        
+                        Tool.BASE_ATTACK_SPEED_UUID -> {
+                            value += player?.getAttributeBaseValue(Attributes.ATTACK_SPEED) ?: 4.0
+                            isBaseModifier = true
+                        }
+                    }
+                    
+                    var displayedValue = if (modifier.operation == Operation.ADDITION) {
+                        if (modifier.attribute == Attributes.KNOCKBACK_RESISTANCE) {
+                            value * 10.0 // vanilla behavior
+                        } else value
+                    } else value * 100.0
+                    
+                    fun appendModifier(type: String, color: TextColor) {
+                        lore += Component.text()
+                            .append(Component.text(if (isBaseModifier) " " else ""))
+                            .append(Component.translatable(
+                                "attribute.modifier.$type.${modifier.operation.ordinal}",
+                                color,
+                                Component.text(ATTRIBUTE_DECIMAL_FORMAT.format(displayedValue)),
+                                Component.translatable(modifier.attribute.descriptionId)
+                            ))
+                            .build()
+                    }
+                    
+                    if (isBaseModifier) {
+                        appendModifier("equals", NamedTextColor.DARK_GREEN)
+                    } else if (value > 0.0) {
+                        appendModifier("plus", NamedTextColor.BLUE)
+                    } else if (value < 0.0) {
+                        displayedValue *= -1
+                        appendModifier("take", NamedTextColor.RED)
+                    }
+                }
+        }
+        
+        return lore
+    }
+    
+    private fun buildVanillaAdvancedTooltip(itemStack: MojangStack, item: Item): List<Component> {
+        val tag = itemStack.orCreateTag
+        val novaCompound = itemStack.novaCompoundOrNull
+        val nbtTagCount = tag.allKeys.size
+        val cbfTagCount = novaCompound?.keys?.size ?: 0
+        
+        val lore = ArrayList<Component>()
+        
+        val maxDamage = item.maxDamage
+        if (maxDamage > 0) {
+            lore += Component.translatable(
+                "item.durability",
+                NamedTextColor.WHITE,
+                Component.text(maxDamage - itemStack.damageValue),
+                Component.text(maxDamage)
+            )
+        }
+        
+        lore += Component.translatable(
+            BuiltInRegistries.ITEM.getKey(item).toString(),
+            NamedTextColor.DARK_GRAY
+        )
+        
+        if (cbfTagCount > 0)
+            lore += Component.translatable(
+                "item.cbf_tags",
+                NamedTextColor.DARK_GRAY,
+                Component.text(cbfTagCount)
+            )
+        
+        if (nbtTagCount > 0)
+            lore += Component.translatable(
+                "item.nbt_tags",
+                NamedTextColor.DARK_GRAY,
+                Component.text(nbtTagCount)
+            )
+        
+        return lore
+    }
+    
+    private fun buildNovaAdvancedTooltip(itemStack: MojangStack, item: NovaItem): List<Component> {
+        var cbfTagCount = 0
+        var nbtTagCount = itemStack.orCreateTag.allKeys.size - 1 // don't count 'nova' tag
+        
+        val lore = ArrayList<Component>()
+        lore += Component.text(item.id.toString(), NamedTextColor.DARK_GRAY)
+        
+        val novaCompound = itemStack.novaCompoundOrNull
+        if (novaCompound != null) {
+            cbfTagCount = novaCompound.keys.size
+            nbtTagCount -= 1 // don't count 'nova_cbf' tag
+        }
+        
+        if (cbfTagCount > 0)
+            lore += Component.translatable(
+                "item.cbf_tags",
+                NamedTextColor.DARK_GRAY,
+                Component.text(cbfTagCount)
+            )
+        
+        if (nbtTagCount > 0)
+            lore += Component.translatable(
+                "item.nbt_tags",
+                NamedTextColor.DARK_GRAY,
+                Component.text(nbtTagCount)
+            )
+        
+        return lore
     }
     //</editor-fold>
     //</editor-fold>
