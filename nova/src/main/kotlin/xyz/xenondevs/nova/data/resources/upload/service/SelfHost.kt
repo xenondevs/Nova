@@ -7,8 +7,6 @@ import io.ktor.server.engine.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.bukkit.configuration.ConfigurationSection
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.UploadService
 import xyz.xenondevs.nova.util.StringUtils
@@ -23,7 +21,7 @@ import kotlin.concurrent.thread
 @Suppress("HttpUrlsUsage", "ExtractKtorModule")
 internal object SelfHost : UploadService {
     
-    override val name = "SelfHost"
+    override val names = listOf("self_host", "selfhost")
     internal val startedLatch = Latch()
     
     private lateinit var server: CIOApplicationEngine

@@ -10,7 +10,7 @@ import java.io.File
 @Hook(plugins = ["Oraxen"])
 internal object OraxenUploadService : UploadService {
     
-    override val name = "oraxen"
+    override val names = listOf("oraxen")
     
     override suspend fun upload(file: File): String {
         val polymath = Polymath(Settings.POLYMATH_SERVER.toString())

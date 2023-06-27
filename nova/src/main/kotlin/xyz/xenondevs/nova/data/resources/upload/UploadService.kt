@@ -5,7 +5,7 @@ import java.io.File
 
 interface UploadService {
     
-    val name: String
+    val names: List<String>
     
     fun loadConfig(cfg: ConfigurationSection)
     
