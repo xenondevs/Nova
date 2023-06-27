@@ -13,11 +13,11 @@ import xyz.xenondevs.nova.data.resources.upload.service.CustomMultiPart
 import xyz.xenondevs.nova.data.resources.upload.service.S3
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
-import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.util.data.hash
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import java.io.File
@@ -31,7 +31,8 @@ internal object AutoUploadManager {
     
     internal val services = arrayListOf(Xenondevs, SelfHost, CustomMultiPart, S3)
     
-    private val config by configReloadable { DEFAULT_CONFIG.getConfigurationSection("resource_pack.auto_upload")!! }
+    private val resourcePackCfg by configReloadable { DEFAULT_CONFIG.getConfigurationSection("resource_pack")!! }
+    private val autoUploadCfg by configReloadable { DEFAULT_CONFIG.getConfigurationSection("resource_pack.auto_upload")!! }
     
     var enabled = false
         private set
@@ -62,12 +63,17 @@ internal object AutoUploadManager {
             SelfHost.startedLatch.await()
     }
     
+    fun reload() {
+        disable()
+        reloadForceResourcePackSettings()
+        enable(fromReload = true)
+    }
+    
     private fun enable(fromReload: Boolean) {
-        val packConfig = DEFAULT_CONFIG.getConfigurationSection("resource_pack")!!
-        enabled = config.getBoolean("enabled")
+        enabled = autoUploadCfg.getBoolean("enabled")
         
-        if (packConfig.contains("url")) {
-            val url = packConfig.getString("url")
+        if (resourcePackCfg.contains("url")) {
+            val url = resourcePackCfg.getString("url")
             if (!url.isNullOrEmpty()) {
                 if (enabled)
                     LOGGER.warning("The resource pack url is set in the config, but the auto upload is also enabled. Defaulting to the url in the config.")
@@ -86,19 +92,19 @@ internal object AutoUploadManager {
             return
         }
         
-        val serviceName = config.getString("service")
+        val serviceName = autoUploadCfg.getString("service")?.lowercase()
         if (serviceName != null) {
-            val service = services.find { it.name.equals(serviceName, ignoreCase = true) }
+            val service = services.find { serviceName in it.names }
             checkNotNull(service) { "Service $serviceName not found!" }
-            service.loadConfig(config)
+            service.loadConfig(autoUploadCfg)
             
             selectedService = service
         } else {
-            LOGGER.warning("No uploading service specified! Available: " + services.joinToString(transform = UploadService::name))
+            LOGGER.warning("No uploading service specified! Available: " + services.joinToString { it.names[0] })
             return
         }
         
-        val configHash = config.hash()
+        val configHash = autoUploadCfg.hash()
         if (wasRegenerated || lastConfig != configHash) {
             wasRegenerated = false
             runBlocking {
@@ -119,12 +125,6 @@ internal object AutoUploadManager {
         selectedService = null
     }
     
-    fun reload() {
-        disable()
-        reloadForceResourcePackSettings()
-        enable(fromReload = true)
-    }
-    
     suspend fun uploadPack(pack: File): String? {
         try {
             if (selectedService == SelfHost)
@@ -141,7 +141,6 @@ internal object AutoUploadManager {
         return url
     }
     
-    @Suppress("LiftReturnOrAssignment")
     private fun reloadForceResourcePackSettings() {
         ForceResourcePack.getInstance().apply { 
             setPrompt(TextComponent.fromLegacyText(DEFAULT_CONFIG.getString("resource_pack.prompt.message")))

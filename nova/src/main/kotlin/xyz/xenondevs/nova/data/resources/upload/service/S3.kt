@@ -17,7 +17,7 @@ import java.net.URI
 
 internal object S3 : UploadService {
     
-    override val name = "S3"
+    override val names = listOf("amazon_s3", "s3")
     
     private var client: S3Client? = null
     private lateinit var bucket: String
