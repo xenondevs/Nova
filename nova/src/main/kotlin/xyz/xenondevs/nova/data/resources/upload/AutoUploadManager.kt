@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.service.CustomMultiPart
+import xyz.xenondevs.nova.data.resources.upload.service.ResourcePackDotHost
 import xyz.xenondevs.nova.data.resources.upload.service.S3
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
@@ -29,7 +30,7 @@ import java.util.logging.Level
 )
 internal object AutoUploadManager {
     
-    internal val services = arrayListOf(Xenondevs, SelfHost, CustomMultiPart, S3)
+    internal val services = arrayListOf(Xenondevs, SelfHost, CustomMultiPart, S3, ResourcePackDotHost)
     
     private val resourcePackCfg by configReloadable { DEFAULT_CONFIG.getConfigurationSection("resource_pack")!! }
     private val autoUploadCfg by configReloadable { DEFAULT_CONFIG.getConfigurationSection("resource_pack.auto_upload")!! }
