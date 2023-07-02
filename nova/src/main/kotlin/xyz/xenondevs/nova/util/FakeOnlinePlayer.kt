@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.util
 
+import org.bukkit.BanEntry
 import org.bukkit.DyeColor
 import org.bukkit.Effect
 import org.bukkit.EntityEffect
@@ -64,6 +65,7 @@ import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.plugin.Plugin
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.profile.PlayerProfile
 import org.bukkit.scoreboard.Scoreboard
 import org.bukkit.util.BoundingBox
 import org.bukkit.util.RayTraceResult
@@ -115,6 +117,10 @@ class FakeOnlinePlayer(
     
     override fun isOnline(): Boolean {
         return true
+    }
+    
+    override fun ban(reason: String?, expires: Date?, source: String?, kickPlayer: Boolean): BanEntry<PlayerProfile>? {
+        throw UnsupportedOperationException("Player is not online")
     }
     
     override fun getName(): String {
@@ -174,6 +180,10 @@ class FakeOnlinePlayer(
     }
     
     override fun kickPlayer(message: String?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun banIp(reason: String?, expires: Date?, source: String?, kickPlayer: Boolean): BanEntry<InetSocketAddress>? {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -571,6 +581,14 @@ class FakeOnlinePlayer(
     }
     
     override fun setWorldBorder(border: WorldBorder?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendHealthUpdate(health: Double, foodLevel: Int, saturation: Float) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendHealthUpdate() {
         throw UnsupportedOperationException("Player is not online")
     }
     
