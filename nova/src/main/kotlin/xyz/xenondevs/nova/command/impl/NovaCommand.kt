@@ -10,6 +10,9 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.selector.EntitySelector
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.command.Command
@@ -29,6 +32,8 @@ import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.behavior.Enchantable
+import xyz.xenondevs.nova.item.enchantment.Enchantment
 import xyz.xenondevs.nova.item.logic.AdvancedTooltips
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
@@ -40,6 +45,7 @@ import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.addItemCorrectly
+import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.item.localizedName
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
@@ -71,6 +77,25 @@ internal object NovaCommand : Command("nova") {
                                     .then(argument("amount", IntegerArgumentType.integer())
                                         .executesCatching { giveTo(it, material) }))
                             }
+                    }))
+            .then(literal("enchant")
+                .requiresPermission("nova.command.enchant")
+                .then(argument("player", EntityArgument.players())
+                    .apply {
+                        for (enchantment in NovaRegistries.ENCHANTMENT) {
+                            then(literal(enchantment.id.toString())
+                                .then(argument("level", IntegerArgumentType.integer(enchantment.minLevel, enchantment.maxLevel))
+                                    .executesCatching { enchant(it, enchantment) }))
+                        }
+                    }))
+            .then(literal("unenchant")
+                .requiresPermission("nova.command.unenchant")
+                .then(argument("player", EntityArgument.players())
+                    .executesCatching(::unenchant)
+                    .apply {
+                        for (enchantment in NovaRegistries.ENCHANTMENT) {
+                            then(literal(enchantment.id.toString()).executesCatching { unenchant(it, enchantment) })
+                        }
                     }))
             .then(literal("debug")
                 .requiresPermission("nova.command.debug")
@@ -230,6 +255,150 @@ internal object NovaCommand : Command("nova") {
                     Component.translatable(itemName).color(NamedTextColor.AQUA),
                     Component.text(player.name).color(NamedTextColor.AQUA)
                 ))
+            }
+        } else ctx.source.sendFailure(Component.translatable("command.nova.no-players", NamedTextColor.RED))
+    }
+    
+    private fun enchant(ctx: CommandContext<CommandSourceStack>, enchantment: Enchantment) {
+        val targetPlayers = ctx.getArgument("player", EntitySelector::class.java).findPlayers(ctx.source)
+        val level: Int = ctx["level"]
+        
+        if (targetPlayers.isNotEmpty()) {
+            for (player in targetPlayers) {
+                val itemStack = player.mainHandItem
+                val enchantments = Enchantable.getEnchantments(itemStack)
+                
+                if (enchantments.any { !it.key.isCompatibleWith(enchantment) }) {
+                    ctx.source.sendFailure(Component.translatable(
+                        "command.nova.enchant.incompatible",
+                        NamedTextColor.RED,
+                        Component.translatable(enchantment.localizedName, NamedTextColor.AQUA),
+                        Component.text(player.displayName, NamedTextColor.AQUA),
+                        Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                    ))
+                    
+                    continue
+                }
+                
+                if (itemStack.item == Items.BOOK || itemStack.item == Items.ENCHANTED_BOOK) {
+                    val enchantedBook = if (itemStack.item == Items.ENCHANTED_BOOK) itemStack else ItemStack(Items.ENCHANTED_BOOK)
+                    Enchantable.addStoredEnchantment(enchantedBook, enchantment, level)
+                    player.setItemInHand(InteractionHand.MAIN_HAND, enchantedBook)
+                } else {
+                    // verify categories for non-stored enchantments
+                    val categories = NovaRegistries.ENCHANTMENT_CATEGORY.filter { enchantment in it.enchantments }
+                    if (categories.none { it.canEnchant(itemStack) }) {
+                        ctx.source.sendFailure(Component.translatable(
+                            "command.nova.enchant.unsupported",
+                            NamedTextColor.RED,
+                            Component.translatable(enchantment.localizedName, NamedTextColor.AQUA),
+                            Component.text(player.displayName, NamedTextColor.AQUA),
+                            Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                        ))
+                        
+                        continue
+                    }
+                    
+                    Enchantable.addEnchantment(itemStack, enchantment, level)
+                }
+                
+                ctx.source.sendSuccess(Component.translatable(
+                    "command.nova.enchant.success",
+                    NamedTextColor.GRAY,
+                    Component.textOfChildren(
+                        Component.translatable(enchantment.localizedName, NamedTextColor.AQUA),
+                        Component.text(" "),
+                        Component.translatable("enchantment.level.$level", NamedTextColor.AQUA),
+                    ),
+                    Component.text(player.displayName, NamedTextColor.AQUA),
+                    Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA))
+                )
+            }
+        } else ctx.source.sendFailure(Component.translatable("command.nova.no-players", NamedTextColor.RED))
+    }
+    
+    private fun unenchant(ctx: CommandContext<CommandSourceStack>) {
+        val targetPlayers = ctx.getArgument("player", EntitySelector::class.java).findPlayers(ctx.source)
+        
+        
+        if (targetPlayers.isNotEmpty()) {
+            for (player in targetPlayers) {
+                val itemStack = player.mainHandItem
+                
+                fun sendFailure() {
+                    ctx.source.sendFailure(Component.translatable(
+                        "command.nova.unenchant_all.failure",
+                        NamedTextColor.RED,
+                        Component.text(player.displayName, NamedTextColor.AQUA),
+                        Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                    ))
+                }
+                
+                fun sendSuccess() {
+                    ctx.source.sendSuccess(Component.translatable(
+                        "command.nova.unenchant_all.success",
+                        NamedTextColor.GRAY,
+                        Component.text(player.displayName, NamedTextColor.AQUA),
+                        Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                    ))
+                }
+                
+                if (itemStack.item == Items.ENCHANTED_BOOK) {
+                    player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack(Items.BOOK))
+                    sendSuccess()
+                } else if (Enchantable.isEnchanted(itemStack)) {
+                    Enchantable.removeAllEnchantments(itemStack)
+                    sendSuccess()
+                } else {
+                    sendFailure()
+                }
+            }
+        } else ctx.source.sendFailure(Component.translatable("command.nova.no-players", NamedTextColor.RED))
+    }
+    
+    private fun unenchant(ctx: CommandContext<CommandSourceStack>, enchantment: Enchantment) {
+        val targetPlayers = ctx.getArgument("player", EntitySelector::class.java).findPlayers(ctx.source)
+        
+        if (targetPlayers.isNotEmpty()) {
+            for (player in targetPlayers) {
+                val itemStack = player.mainHandItem
+                
+                fun sendFailure(){
+                    ctx.source.sendFailure(Component.translatable(
+                        "command.nova.unenchant_single.failure",
+                        NamedTextColor.RED,
+                        Component.translatable(enchantment.localizedName, NamedTextColor.AQUA),
+                        Component.text(player.displayName, NamedTextColor.AQUA),
+                        Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                    ))
+                }
+                
+                fun sendSuccess() {
+                    ctx.source.sendSuccess(Component.translatable(
+                        "command.nova.unenchant_single.success",
+                        NamedTextColor.GRAY,
+                        Component.translatable(enchantment.localizedName, NamedTextColor.AQUA),
+                        Component.text(player.displayName, NamedTextColor.AQUA),
+                        Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                    ))
+                }
+                
+                if (itemStack.item == Items.ENCHANTED_BOOK) {
+                    val storedEnchantments = Enchantable.getStoredEnchantments(itemStack)
+                    if (enchantment in storedEnchantments) {
+                        Enchantable.removeStoredEnchantment(itemStack, enchantment)
+                        if (!Enchantable.hasStoredEnchantments(itemStack))
+                            player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack(Items.BOOK))
+                        
+                        sendSuccess()
+                    } else sendFailure()
+                } else {
+                    val enchantments = Enchantable.getEnchantments(itemStack)
+                    if (enchantment in enchantments) {
+                        Enchantable.removeEnchantment(itemStack, enchantment)
+                        sendSuccess()
+                    } else sendFailure()
+                }
             }
         } else ctx.source.sendFailure(Component.translatable("command.nova.no-players", NamedTextColor.RED))
     }

@@ -36,6 +36,8 @@ permissions:
       - nova.command.addons
       - nova.command.resourcePack
       - nova.command.reload
+      - nova.command.enchant
+      - nova.command.unenchant
   nova.command.items:
     description: Allows players to open the nova items menu.
     default: true
@@ -64,6 +66,10 @@ permissions:
     description: Allows players to create and reupload the resource pack.
   nova.command.reload:
     description: Allows players to reload configs and recipes.
+  nova.command.enchant:
+    description: Allows players to enchant items
+  nova.command.unenchant:
+    description: Allows players to unenchant items
   nova.misc.updateReminder:
     description: Players with this permission will be reminded if a new version is available
     default: false
