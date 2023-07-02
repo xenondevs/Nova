@@ -192,7 +192,7 @@ internal class VanillaEnchantment(
 class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryElementBuilder<Enchantment>(NovaRegistries.ENCHANTMENT, id) {
     
     private var maxLevel: Int = 1
-    private var weight: Int = 10
+    private var rarity: Int = 10
     
     private var tableLeveRequirement: (Int) -> IntRange = { val min = 1 + it * 10; min..(min + 5) }
     private var isTableDiscoverable: Boolean = false
@@ -240,16 +240,16 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
      * - Rare: 2
      * - Very rare: 1
      */
-    fun tableWeight(weight: Int): EnchantmentBuilder {
-        this.weight = weight
+    fun rarity(weight: Int): EnchantmentBuilder {
+        this.rarity = weight
         return this
     }
     
     /**
      * Configures the rarity of this enchantment. Defaults to `Rarity.COMMON`.
      */
-    fun tableWeight(rarity: Rarity): EnchantmentBuilder {
-        this.weight = rarity.weight
+    fun rarity(rarity: Rarity): EnchantmentBuilder {
+        this.rarity = rarity.weight
         return this
     }
     
@@ -322,7 +322,7 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
         if (isCurse && maxLevel > 1)
             throw IllegalArgumentException("Curse enchantments cannot have multiple levels")
         
-        val enchantment = NovaEnchantment(id, 1, maxLevel, weight, isTableDiscoverable, isTreasure, isTradeable, isCurse, tableLeveRequirement, compatibility)
+        val enchantment = NovaEnchantment(id, 1, maxLevel, rarity, isTableDiscoverable, isTreasure, isTradeable, isCurse, tableLeveRequirement, compatibility)
         for (category in categories) category.enchantments += enchantment
         return enchantment
     }
