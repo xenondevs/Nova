@@ -72,6 +72,7 @@ import org.bukkit.util.RayTraceResult
 import org.bukkit.util.Vector
 import org.jetbrains.annotations.Contract
 import xyz.xenondevs.nova.integration.permission.PermissionManager
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.util.*
 
@@ -183,7 +184,7 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun banIp(reason: String?, expires: Date?, source: String?, kickPlayer: Boolean): BanEntry<InetSocketAddress>? {
+    override fun banIp(reason: String?, expires: Date?, source: String?, kickPlayer: Boolean): BanEntry<InetAddress>? {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1163,6 +1164,10 @@ class FakeOnlinePlayer(
     }
     
     override fun swingOffHand() {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun playHurtAnimation(yaw: Float) {
         throw UnsupportedOperationException("Player is not online")
     }
     
