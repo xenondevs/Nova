@@ -25,8 +25,7 @@ import xyz.xenondevs.nova.util.unregisterEvents
 private val NOVA_DISTRIBUTORS = listOf(
     // GitHub is intentionally omitted because in our current setup releases are created before the jar is uploaded
     ProjectDistributor.hangar("xenondevs/Nova"),
-    ProjectDistributor.modrinth("nova-framework"),
-    ProjectDistributor.spigotmc(93648)
+    ProjectDistributor.modrinth("nova-framework")
 )
 
 private val ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("update_reminder.enabled") }
