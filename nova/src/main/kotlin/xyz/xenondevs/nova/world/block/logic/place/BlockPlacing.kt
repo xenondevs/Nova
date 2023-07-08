@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.GameMode
 import org.bukkit.Location
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -11,6 +12,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockMultiPlaceEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -23,6 +25,7 @@ import xyz.xenondevs.nova.util.facing
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
 import xyz.xenondevs.nova.util.isUnobstructed
+import xyz.xenondevs.nova.util.item.canPlaceOn
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaItem
@@ -32,6 +35,7 @@ import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.util.yaw
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
@@ -116,7 +120,7 @@ internal object BlockPlacing : Listener {
             ?.also(futures::add)
         
         CombinedBooleanFuture(futures).runIfTrueOnSimilarThread {
-            if (!placeLoc.block.type.isReplaceable() || WorldDataManager.getBlockState(placeLoc.pos) != null)
+            if (!canPlace(player, handItem, placeLoc.pos, placeLoc.advance(event.blockFace.oppositeFace).pos))
                 return@runIfTrueOnSimilarThread
             
             val ctx = BlockPlaceContext(
@@ -129,7 +133,7 @@ internal object BlockPlacing : Listener {
             if (result.allowed) {
                 BlockManager.placeBlockState(material, ctx)
                 
-                if (player.gameMode == GameMode.SURVIVAL) handItem.amount--
+                if (player.gameMode != GameMode.CREATIVE) handItem.amount--
                 runTask { player.swingHand(event.hand!!) }
             } else {
                 player.sendMessage(Component.text(result.message, NamedTextColor.RED))
@@ -142,23 +146,31 @@ internal object BlockPlacing : Listener {
         
         val player = event.player
         val handItem = event.item!!
-        val block = event.clickedBlock!!
+        val placedOn = event.clickedBlock!!.pos
+        val block = event.clickedBlock!!.location.advance(event.blockFace).pos
         
-        val replaceLocation = block.location.advance(event.blockFace)
-        val replaceBlock = replaceLocation.block
-        
-        // check if the player is allowed to place a block there
-        if (replaceLocation.isInsideWorldRestrictions()) {
-            ProtectionManager.canPlace(player, handItem, replaceLocation).runIfTrueOnSimilarThread {
-                // check that there isn't already a block there (which is not replaceable)
-                if (replaceBlock.type.isReplaceable() && WorldDataManager.getBlockState(replaceBlock.pos) == null) {
-                    val placed = replaceBlock.placeVanilla(player.serverPlayer, handItem, true)
-                    if (placed && player.gameMode != GameMode.CREATIVE) {
-                        player.inventory.setItem(event.hand!!, handItem.apply { amount -= 1 })
-                    }
+        ProtectionManager.canPlace(player, handItem, block.location).runIfTrueOnSimilarThread {
+            if (canPlace(player, handItem, block, placedOn)) {
+                val placed = block.block.placeVanilla(player.serverPlayer, handItem, true)
+                if (placed && player.gameMode != GameMode.CREATIVE) {
+                    player.inventory.setItem(event.hand!!, handItem.apply { amount -= 1 })
                 }
             }
         }
+    }
+    
+    private fun canPlace(player: Player, item: ItemStack, block: BlockPos, placedOn: BlockPos): Boolean {
+        if (
+            player.gameMode == GameMode.SPECTATOR
+            || !block.location.isInsideWorldRestrictions()
+            || !block.block.type.isReplaceable()
+            || WorldDataManager.getBlockState(block) != null
+        ) return false
+        
+        if (player.gameMode == GameMode.ADVENTURE)
+            return placedOn.block.type in item.canPlaceOn
+        
+        return true
     }
     
 }

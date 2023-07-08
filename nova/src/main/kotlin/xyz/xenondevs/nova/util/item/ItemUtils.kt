@@ -132,10 +132,18 @@ internal val ItemStack.handle: MojangStack?
 val ItemMeta.unhandledTags: MutableMap<String, NBTTag>
     get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, NBTTag>
 
-val ItemStack.canDestroy: List<Material>
+// fixme: does not work on paper because paper actually has an api for this
+val ItemStack.canDestroy: Set<Material>
     get() {
-        val tag = itemMeta?.unhandledTags?.get("CanDestroy") as? ListTag ?: return emptyList()
-        return tag.mapNotNull { runCatching { ResourceLocation.of(it.asString, ':') }.getOrNull()?.let { Material.valueOf(it.name) } }
+        val tag = itemMeta?.unhandledTags?.get("CanDestroy") as? ListTag ?: return emptySet()
+        return tag.mapNotNullTo(HashSet()) { strTag -> ResourceLocation.tryParse(strTag.asString)?.let { Material.valueOf(it.name) } }
+    }
+
+// fixme: does not work on paper because paper actually has an api for this
+val ItemStack.canPlaceOn: Set<Material>
+    get() {
+        val tag = itemMeta?.unhandledTags?.get("CanPlaceOn") as? ListTag ?: return emptySet()
+        return tag.mapNotNullTo(HashSet()) { strTag -> ResourceLocation.tryParse(strTag.asString)?.let { Material.valueOf(it.name) } }
     }
 
 val ItemStack.craftingRemainingItem: ItemStack?
