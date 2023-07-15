@@ -21,7 +21,7 @@ interface ItemRegistry : AddonGetter {
     
     fun registerItem(
         name: String,
-        vararg behaviors: ItemBehaviorHolder<*>,
+        vararg behaviors: ItemBehaviorHolder,
         localizedName: String = "item.${addon.description.id}.$name",
         isHidden: Boolean = false
     ): NovaItem {
@@ -37,7 +37,7 @@ interface ItemRegistry : AddonGetter {
     
     fun registerItem(
         block: NovaBlock,
-        vararg behaviors: ItemBehaviorHolder<*>,
+        vararg behaviors: ItemBehaviorHolder,
         localizedName: String = block.localizedName,
         isHidden: Boolean = false
     ): NovaItem {

@@ -88,14 +88,14 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
     }
     
     fun getNovaEquipable(itemStack: ItemStack): Equipable? {
-        val wearable = itemStack.novaItem?.getBehavior(Wearable::class)
+        val wearable = itemStack.novaItem?.getBehaviorOrNull(Wearable::class)
             ?: return null
         
         return object : Equipable {
             
-            override fun getEquipmentSlot() = wearable.options.armorType.equipmentSlot.nmsEquipmentSlot
+            override fun getEquipmentSlot() = wearable.slot.nmsEquipmentSlot
             
-            override fun getEquipSound() = wearable.options.equipSound?.let {
+            override fun getEquipSound() = wearable.equipSound?.let {
                 SoundEvent.createVariableRangeEvent(ResourceLocation.tryParse(it))
             } ?: SoundEvents.ARMOR_EQUIP_GENERIC
             

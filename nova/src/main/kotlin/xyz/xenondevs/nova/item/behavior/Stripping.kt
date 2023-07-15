@@ -16,7 +16,6 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.interactionHand
-import xyz.xenondevs.nova.util.item.DamageableUtils
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.serverLevel
@@ -49,7 +48,10 @@ private val STRIPPABLES: Map<Block, Block> = mapOf(
     Blocks.CHERRY_LOG to Blocks.STRIPPED_CHERRY_LOG
 )
 
-object Stripping : ItemBehavior() {
+/**
+ * Allows items to strip blocks.
+ */
+object Stripping : ItemBehavior {
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_BLOCK) {
@@ -71,7 +73,7 @@ object Stripping : ItemBehavior() {
         fun setNewState(newState: BlockState) {
             runTaskLater(1) { player.swing(hand, true) }
             level.setBlock(pos, newState, 11)
-            DamageableUtils.damageAndBreakItem(itemStack, 1, player)
+            Damageable.damageAndBreak(itemStack, 1, player) { player.broadcastBreakEvent(hand) }
         }
         
         val stripped = STRIPPABLES[block]?.defaultBlockState()?.apply { setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS)) }

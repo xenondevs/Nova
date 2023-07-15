@@ -12,10 +12,11 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
-import org.bukkit.inventory.EquipmentSlot
+import xyz.xenondevs.nova.item.behavior.Damageable
+import xyz.xenondevs.nova.item.tool.ToolCategory
+import xyz.xenondevs.nova.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.util.data.NBTUtils
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -23,45 +24,108 @@ import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EntityType as NMSEntityType
+import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
+import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
+import org.bukkit.entity.Entity as BukkitEntity
+import org.bukkit.entity.LivingEntity as BukkitLivingEntity
+import org.bukkit.entity.Player as BukkitPlayer
+import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
 
 /**
  * The current block destroy progress of the player.
  * Between 0 and 1 or null if the player is not breaking a block at the moment.
  */
-val Player.destroyProgress: Double?
+val BukkitPlayer.destroyProgress: Double?
     get() = BlockBreaking.getBreaker(this)?.progress?.coerceAtMost(1.0)
 
 /**
  * Swings the [hand] of the player.
  * @throws IllegalArgumentException If the [hand] is not a valid hand.
  */
-fun Player.swingHand(hand: EquipmentSlot) {
+fun BukkitPlayer.swingHand(hand: BukkitEquipmentSlot) {
     when (hand) {
-        EquipmentSlot.HAND -> swingMainHand()
-        EquipmentSlot.OFF_HAND -> swingOffHand()
+        BukkitEquipmentSlot.HAND -> swingMainHand()
+        BukkitEquipmentSlot.OFF_HAND -> swingOffHand()
         else -> throw IllegalArgumentException("EquipmentSlot is not a hand")
     }
 }
 
 /**
- * Teleports the [Entity] after modifying its location using the [modifyLocation] lambda.
+ * Damages the item in the [entity's][BukkitLivingEntity] main hand by [damage] amount.
  */
-fun Entity.teleport(modifyLocation: Location.() -> Unit) {
+fun BukkitLivingEntity.damageItemInMainHand(damage: Int = 1) {
+    if (damage <= 0)
+        return
+    val serverPlayer = nmsEntity as MojangLivingEntity
+    Damageable.damageAndBreak(serverPlayer.mainHandItem, damage) { serverPlayer.broadcastBreakEvent(MojangEquipmentSlot.MAINHAND) }
+}
+
+/**
+ * Damages the item in the [entity's][BukkitLivingEntity] offhand by [damage] amount.
+ */
+fun BukkitLivingEntity.damageItemInOffHand(damage: Int = 1) {
+    if (damage <= 0)
+        return
+    val serverPlayer = nmsEntity as MojangLivingEntity
+    Damageable.damageAndBreak(serverPlayer.offhandItem, damage) { serverPlayer.broadcastBreakEvent(MojangEquipmentSlot.OFFHAND) }
+}
+
+/**
+ * Damages the item in the specified [hand] by [damage] amount.
+ */
+fun BukkitLivingEntity.damageItemInHand(hand: BukkitEquipmentSlot, damage: Int = 1) {
+    when (hand) {
+        BukkitEquipmentSlot.HAND -> damageItemInMainHand(damage)
+        BukkitEquipmentSlot.OFF_HAND -> damageItemInOffHand(damage)
+        else -> throw IllegalArgumentException("Not a hand: $hand")
+    }
+}
+
+/**
+ * Damages the tool in the [entity's][BukkitLivingEntity] main hand as if they've broken a block.
+ */
+fun BukkitLivingEntity.damageToolBreakBlock() = damageToolInMainHand(Damageable::itemDamageOnBreakBlock, VanillaToolCategory::itemDamageOnBreakBlock)
+
+/**
+ * Damages the tool in the [entity's][BukkitLivingEntity] main hand as if they've attack an entity.
+ */
+fun BukkitLivingEntity.damageToolAttackEntity() = damageToolInMainHand(Damageable::itemDamageOnAttackEntity, VanillaToolCategory::itemDamageOnAttackEntity)
+
+private inline fun BukkitLivingEntity.damageToolInMainHand(getNovaDamage: (Damageable) -> Int, getVanillaDamage: (VanillaToolCategory) -> Int) {
+    val itemStack = (nmsEntity as MojangLivingEntity).mainHandItem
+    val novaItem = itemStack.novaItem
+    
+    val damage: Int
+    if (novaItem != null) {
+        val damageable = novaItem.getBehaviorOrNull<Damageable>() ?: return
+        damage = getNovaDamage(damageable)
+    } else {
+        val toolCategory = ToolCategory.ofItem(itemStack.bukkitMirror) as? VanillaToolCategory ?: return
+        damage = getVanillaDamage(toolCategory)
+    }
+    
+    damageItemInMainHand(damage)
+}
+
+/**
+ * Teleports the [BukkitEntity] after modifying its location using the [modifyLocation] lambda.
+ */
+fun BukkitEntity.teleport(modifyLocation: Location.() -> Unit) {
     val location = location
     location.modifyLocation()
     teleport(location)
 }
 
 /**
- * The translation key for the name of this [Entity]. 
+ * The translation key for the name of this [BukkitEntity]. 
  */
-val Entity.localizedName: String?
+val BukkitEntity.localizedName: String?
     get() = (this as CraftEntity).handle.type.descriptionId
 
 /**
- * If the [Entity's][Entity] eye is underwater.
+ * If the [Entity's][BukkitEntity] eye is underwater.
  */
-val Entity.eyeInWater: Boolean
+val BukkitEntity.eyeInWater: Boolean
     get() = (this as CraftEntity).handle.isEyeInFluid(FluidTags.WATER)
 
 object EntityUtils {
@@ -69,11 +133,11 @@ object EntityUtils {
     internal val DUMMY_PLAYER = createFakePlayer(Location(Bukkit.getWorlds()[0], 0.0, 0.0, 0.0), UUID.randomUUID(), "Nova Dummy Player")
     
     /**
-     * Gets a list of all passengers of this [Entity], including passengers of passengers.
+     * Gets a list of all passengers of this [BukkitEntity], including passengers of passengers.
      */
-    fun getAllPassengers(entity: Entity): List<Entity> {
-        val entitiesToCheck = CopyOnWriteArrayList<Entity>().apply { add(entity) }
-        val passengers = ArrayList<Entity>()
+    fun getAllPassengers(entity: BukkitEntity): List<BukkitEntity> {
+        val entitiesToCheck = CopyOnWriteArrayList<BukkitEntity>().apply { add(entity) }
+        val passengers = ArrayList<BukkitEntity>()
         
         while (entitiesToCheck.isNotEmpty()) {
             for (entityToCheck in entitiesToCheck) {
@@ -88,13 +152,13 @@ object EntityUtils {
     }
     
     /**
-     * Serializes an [Entity] to a [ByteArray].
+     * Serializes an [BukkitEntity] to a [ByteArray].
      *
-     * @param remove If the serialized [Entity] should be removed from the world.
+     * @param remove If the serialized [BukkitEntity] should be removed from the world.
      * @param nbtModifier Called before the [CompoundTag] gets compressed to a [ByteArray] to allow modifications.
      */
     fun serialize(
-        entity: Entity,
+        entity: BukkitEntity,
         remove: Boolean = false,
         nbtModifier: ((CompoundTag) -> CompoundTag)? = null
     ): ByteArray {
@@ -124,9 +188,9 @@ object EntityUtils {
     }
     
     /**
-     * Spawns an [Entity] based on serialized [data] and a [location].
+     * Spawns an [BukkitEntity] based on serialized [data] and a [location].
      *
-     * @param nbtModifier Called before the [Entity] gets spawned into the world to allow nbt modifications.
+     * @param nbtModifier Called before the [BukkitEntity] gets spawned into the world to allow nbt modifications.
      */
     fun deserializeAndSpawn(
         data: ByteArray,

@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 
 class NovaItemBuilder internal constructor(id: ResourceLocation): RegistryElementBuilder<NovaItem>(NovaRegistries.ITEM, id) {
     
-    private var logic: MutableList<ItemBehaviorHolder<*>> = ArrayList()
+    private var logic: MutableList<ItemBehaviorHolder> = ArrayList()
     private var localizedName = "item.${id.namespace}.${id.name}"
     private var maxStackSize = 64
     private var craftingRemainingItem: ItemBuilder? = null
@@ -35,12 +35,12 @@ class NovaItemBuilder internal constructor(id: ResourceLocation): RegistryElemen
         return this
     }
     
-    fun behaviors(vararg itemBehaviors: ItemBehaviorHolder<*>): NovaItemBuilder {
+    fun behaviors(vararg itemBehaviors: ItemBehaviorHolder): NovaItemBuilder {
         this.logic = itemBehaviors.toMutableList()
         return this
     }
     
-    fun addBehavior(vararg itemBehaviors: ItemBehaviorHolder<*>): NovaItemBuilder {
+    fun addBehavior(vararg itemBehaviors: ItemBehaviorHolder): NovaItemBuilder {
         this.logic += itemBehaviors
         return this
     }
@@ -86,7 +86,7 @@ class NovaItemBuilder internal constructor(id: ResourceLocation): RegistryElemen
                 this.block = block
                 localizedName(block.localizedName)
                 if (block is NovaTileEntityBlock)
-                    behaviors(TileEntityItemBehavior())
+                    behaviors(TileEntityItemBehavior)
             }
         }
         

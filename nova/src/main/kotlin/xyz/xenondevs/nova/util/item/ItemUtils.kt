@@ -159,7 +159,7 @@ val ItemStack.equipSound: String?
     get() {
         val novaItem = novaItem
         if (novaItem != null)
-            return novaItem.getBehavior(Wearable::class)?.options?.equipSound
+            return novaItem.getBehaviorOrNull(Wearable::class)?.equipSound
         
         return (CraftMagicNumbers.getItem(type) as? ArmorItem)?.material?.equipSound?.location?.toString()
     }
@@ -173,6 +173,9 @@ fun ItemStack.isSimilarIgnoringName(other: ItemStack?): Boolean {
 
 fun ItemStack.takeUnlessEmpty(): ItemStack? =
     if (type.isAir || amount <= 0) null else this
+
+fun ItemStack?.isEmpty(): Boolean =
+    this == null || type.isAir || amount <= 0
 
 internal var MojangStack.adventureName: Component
     get() = tag

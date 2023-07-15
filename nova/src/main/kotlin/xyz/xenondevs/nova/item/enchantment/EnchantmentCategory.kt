@@ -58,8 +58,8 @@ abstract class EnchantmentCategory {
      * Checks if this [EnchantmentCategory] can be applied to the specified [novaItem].
      */
     fun canEnchant(novaItem: NovaItem): Boolean {
-        val enchantable = novaItem.getBehavior<Enchantable>()
-        return enchantable?.options?.enchantmentCategories?.contains(this) ?: false
+        val enchantable = novaItem.getBehaviorOrNull<Enchantable>()
+        return enchantable?.enchantmentCategories?.contains(this) ?: false
     }
     
     /**

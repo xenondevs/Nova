@@ -109,26 +109,38 @@ class NovaItem internal constructor(
     /**
      * Checks whether this [NovaItem] has an [ItemBehavior] of the reified type [T], or a subclass of it.
      */
-    inline fun <reified T : ItemBehavior> hasBehavior(): Boolean =
+    inline fun <reified T : Any> hasBehavior(): Boolean =
         hasBehavior(T::class)
     
     /**
      * Checks whether this [NovaItem] has an [ItemBehavior] of the specified class [behavior], or a subclass of it.
      */
-    fun <T : ItemBehavior> hasBehavior(behavior: KClass<T>): Boolean =
+    fun <T : Any> hasBehavior(behavior: KClass<T>): Boolean =
         logic.hasBehavior(behavior)
     
     /**
-     * Gets the [ItemBehavior] instance of the reified type [T], or a subclass of it.
+     * Gets the first [ItemBehavior] that is an instance of [T], or null if there is none.
      */
-    inline fun <reified T : ItemBehavior> getBehavior(): T? =
+    inline fun <reified T : Any> getBehaviorOrNull(): T? =
+        getBehaviorOrNull(T::class)
+    
+    /**
+     * Gets the first [ItemBehavior] that is an instance of [behavior], or null if there is none.
+     */
+    fun <T : Any> getBehaviorOrNull(behavior: KClass<T>): T? =
+        logic.getBehaviorOrNull(behavior)
+    
+    /**
+     * Gets the first [ItemBehavior] that is an instance of [T], or throws an [IllegalStateException] if there is none.
+     */
+    inline fun <reified T : Any> getBehavior(): T =
         getBehavior(T::class)
     
     /**
-     * Gets the [ItemBehavior] instance of the specified class [behavior], or a subclass of it.
+     * Gets the first [ItemBehavior] that is an instance of [behavior], or throws an [IllegalStateException] if there is none.
      */
-    fun <T : ItemBehavior> getBehavior(behavior: KClass<T>): T? =
-        logic.getBehavior(behavior)
+    fun <T : Any> getBehavior(behavior: KClass<T>): T =
+        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
     
     override fun toString() = id.toString()
     

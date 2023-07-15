@@ -22,9 +22,6 @@ import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.bukkitMirror
-import xyz.xenondevs.nova.util.item.DamageableUtils
-import xyz.xenondevs.nova.util.item.ItemDamageResult
-import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ITEM_STACK_HURT_AND_BREAK_METHOD
@@ -56,9 +53,7 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
     
     @JvmStatic
     fun hurtAndBreak(itemStack: ItemStack, damage: Int, entity: LivingEntity, consumer: Consumer<LivingEntity>) {
-        if (DamageableUtils.damageAndBreakItem(itemStack, damage, entity) == ItemDamageResult.BROKEN) {
-            consumer.accept(entity)
-        }
+        Damageable.damageAndBreak(itemStack, damage, entity, consumer::accept)
     }
     
     /**
@@ -77,13 +72,14 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
     fun hurtEnemy(itemStack: ItemStack, player: Player) {
         val novaItem = itemStack.novaItem
         
-        val damage = if (novaItem != null) {
-            val damageable = novaItem.getBehavior(Damageable::class) ?: return
-            damageable.options.itemDamageOnAttackEntity
+        val damage: Int
+        if (novaItem != null) {
+            val damageable = novaItem.getBehaviorOrNull(Damageable::class) ?: return
+            damage = damageable.itemDamageOnAttackEntity
         } else {
             val category = ToolCategory.ofItem(itemStack.bukkitMirror) as? VanillaToolCategory ?: return
             player.awardStat(Stats.ITEM_USED.get(itemStack.item))
-            category.itemDamageOnAttackEntity
+            damage = category.itemDamageOnAttackEntity
         }
         
         itemStack.hurtAndBreak(damage, player) {
@@ -121,7 +117,7 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
         val itemStack = EnchantmentHelper.getRandomItemWith(Enchantments.MENDING, player) {
             val novaItem = it.novaItem
             if (novaItem != null) {
-                val damage = novaItem.getBehavior(Damageable::class)?.getDamage(it.novaCompound)
+                val damage = novaItem.getBehaviorOrNull(Damageable::class)?.getDamage(it)
                 return@getRandomItemWith damage != null && damage > 0
             }
             
@@ -129,14 +125,13 @@ internal object DamageablePatches : MultiTransformer(ItemStack::class, Item::cla
         }?.value
         
         if (itemStack != null) {
-            val damageable = itemStack.novaItem?.getBehavior(Damageable::class)
+            val damageable = itemStack.novaItem?.getBehaviorOrNull(Damageable::class)
             
             val repair: Int
             if (damageable != null) {
-                val novaCompound = itemStack.novaCompound
-                val damageValue = damageable.getDamage(novaCompound)
+                val damageValue = damageable.getDamage(itemStack)
                 repair = min(orb.value * 2, damageValue)
-                damageable.setDamage(novaCompound, damageValue - repair)
+                damageable.setDamage(itemStack, damageValue - repair)
             } else {
                 repair = min(orb.value * 2, itemStack.damageValue)
                 itemStack.damageValue -= repair

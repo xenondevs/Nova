@@ -4,16 +4,21 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.StringTag
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.nova.data.config.ConfigAccess
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.enchantment.Enchantment
+import xyz.xenondevs.nova.item.enchantment.EnchantmentCategory
 import xyz.xenondevs.nova.item.enchantment.NovaEnchantment
 import xyz.xenondevs.nova.item.enchantment.VanillaEnchantment
-import xyz.xenondevs.nova.item.options.EnchantableOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.getOrThrow
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.item.novaItem
@@ -24,12 +29,57 @@ private const val ENCHANTMENTS_NBT = "Enchantments"
 private const val STORED_ENCHANTMENTS_CBF = "stored_enchantments"
 private const val STORED_ENCHANTMENTS_NBT = "StoredEnchantments"
 
-class Enchantable(val options: EnchantableOptions) : ItemBehavior() {
+fun Enchantable(
+    enchantmentValue: Int,
+    enchantmentCategories: List<EnchantmentCategory>
+) = Enchantable.Default(provider(enchantmentValue), provider(enchantmentCategories))
+
+/**
+ * Allows items to be enchanted.
+ */
+interface Enchantable {
     
-    companion object : ItemBehaviorFactory<Enchantable>() {
+    /**
+     * The enchantment value of this item.
+     * Items with a higher enchantment value have a higher chance of getting more secondary enchantments
+     * when enchanted in the enchanting table.
+     *
+     * As an example, these are the vanilla enchantment values depending on the material:
+     *
+     * * Wood: 15
+     * * Stone: 5
+     * * Iron: 14
+     * * Diamond: 10
+     * * Gold: 22
+     * * Netherite: 15
+     */
+    val enchantmentValue: Int
+    
+    /**
+     * A list of enchantment categories that can be applied to this item.
+     */
+    val enchantmentCategories: List<EnchantmentCategory>
+    
+    class Default(
+        enchantmentValue: Provider<Int>,
+        enchantmentCategories: Provider<List<EnchantmentCategory>>,
+    ) : ItemBehavior, Enchantable {
         
-        override fun create(item: NovaItem) =
-            Enchantable(EnchantableOptions.configurable(item))
+        override val enchantmentValue by enchantmentValue
+        override val enchantmentCategories by enchantmentCategories
+        
+    }
+    
+    companion object : ItemBehaviorFactory<Default> {
+        
+        override fun create(item: NovaItem): Default {
+            val cfg = ConfigAccess(item)
+            return Default(
+                cfg.getEntry("enchantment_value"),
+                cfg.getEntry<List<String>>("enchantment_categories")
+                    .map { list -> list.map { NovaRegistries.ENCHANTMENT_CATEGORY.getOrThrow(it) } }
+            )
+        }
         
         // TODO: Bukkit methods
         

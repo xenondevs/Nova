@@ -7,7 +7,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.util.item.damageItemInMainHand
+import xyz.xenondevs.nova.util.damageItemInMainHand
 import xyz.xenondevs.nova.util.playSoundNearby
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.swingHand
@@ -21,7 +21,10 @@ private val FLATTENABLES: Set<Material> = hashSetOf(
     Material.ROOTED_DIRT
 )
 
-object Flattening : ItemBehavior() {
+/**
+ * Allows items to flatten the ground.
+ */
+object Flattening : ItemBehavior {
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_BLOCK) {
