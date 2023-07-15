@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.item.behavior
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.StringTag
+import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.map
@@ -22,7 +23,10 @@ import xyz.xenondevs.nova.util.getOrThrow
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.util.nmsCopy
 import net.minecraft.world.item.ItemStack as MojangStack
+import org.bukkit.enchantments.Enchantment as BukkitEnchantment
+import org.bukkit.inventory.ItemStack as BukkitStack
 
 private const val ENCHANTMENTS_CBF = "enchantments"
 private const val ENCHANTMENTS_NBT = "Enchantments"
@@ -81,7 +85,103 @@ interface Enchantable {
             )
         }
         
-        // TODO: Bukkit methods
+        // -- Bukkit ItemStack --
+        
+        fun isEnchantable(itemStack: BukkitStack): Boolean =
+            isEnchantable(itemStack.nmsCopy)
+        
+        fun isEnchanted(itemStack: BukkitStack): Boolean =
+            isEnchanted(itemStack.nmsCopy)
+        
+        fun hasStoredEnchantments(itemStack: BukkitStack): Boolean =
+            hasStoredEnchantments(itemStack.nmsCopy)
+        
+        fun getEnchantments(itemStack: BukkitStack): Map<Enchantment, Int> =
+            getEnchantments(itemStack.nmsCopy)
+        
+        fun getStoredEnchantments(itemStack: BukkitStack): Map<Enchantment, Int> =
+            getStoredEnchantments(itemStack.nmsCopy)
+        
+        fun setEnchantments(itemStack: BukkitStack, enchantments: Map<Enchantment, Int>) {
+            // clear vanilla enchants
+            for ((enchantment, _) in itemStack.enchantments)
+                itemStack.removeEnchantment(enchantment)
+            
+            setEnchantments(ENCHANTMENTS_CBF, itemStack::addUnsafeEnchantment, itemStack, enchantments)
+        }
+        
+        fun setStoredEnchantments(itemStack: BukkitStack, enchantments: Map<Enchantment, Int>) {
+            val meta = itemStack.itemMeta as? EnchantmentStorageMeta ?: return
+            // clear vanilla enchants
+            for ((enchantment, _) in meta.storedEnchants)
+                meta.removeStoredEnchant(enchantment)
+            
+            setEnchantments(STORED_ENCHANTMENTS_CBF, { ench, lvl -> meta.addStoredEnchant(ench, lvl, true) }, itemStack, enchantments)
+        }
+        
+        private fun setEnchantments(cbfName: String, addVanillaEnchantment: (BukkitEnchantment, Int) -> Unit, itemStack: BukkitStack, enchantments: Map<Enchantment, Int>) {
+            val novaEnchantmentsMap = HashMap<Enchantment, Int>()
+            for ((enchantment, level) in enchantments) {
+                if (enchantment is VanillaEnchantment) {
+                    addVanillaEnchantment(Enchantment.asBukkitEnchantment(enchantment), level)
+                } else {
+                    novaEnchantmentsMap[enchantment] = level
+                }
+            }
+            
+            if (novaEnchantmentsMap.isNotEmpty()) {
+                itemStack.novaCompound["nova", cbfName] = novaEnchantmentsMap
+            } else {
+                itemStack.novaCompoundOrNull?.remove("nova", cbfName)
+            }
+        }
+        
+        fun addEnchantment(itemStack: BukkitStack, enchantment: Enchantment, level: Int) =
+            addEnchantment(ENCHANTMENTS_CBF, itemStack::addUnsafeEnchantment, itemStack, enchantment, level)
+        
+        fun addStoredEnchantment(itemStack: BukkitStack, enchantment: Enchantment, level: Int) {
+            val meta = itemStack.itemMeta as? EnchantmentStorageMeta ?: return
+            addEnchantment(STORED_ENCHANTMENTS_CBF, { ench, lvl -> meta.addStoredEnchant(ench, lvl, true) }, itemStack, enchantment, level)
+        }
+        
+        private fun addEnchantment(cbfName: String, addVanillaEnchantment: (BukkitEnchantment, Int) -> Unit, itemStack: BukkitStack, enchantment: Enchantment, level: Int) {
+            if (enchantment is VanillaEnchantment) {
+                addVanillaEnchantment(Enchantment.asBukkitEnchantment(enchantment), level)
+            } else {
+                itemStack.novaCompound.getEnchantments(cbfName)[enchantment] = level
+            }
+        }
+        
+        fun removeEnchantment(itemStack: BukkitStack, enchantment: Enchantment) =
+            removeEnchantment(ENCHANTMENTS_CBF, itemStack::removeEnchantment, itemStack, enchantment)
+        
+        fun removeStoredEnchantment(itemStack: BukkitStack, enchantment: Enchantment) {
+            val meta = itemStack.itemMeta as? EnchantmentStorageMeta ?: return
+            removeEnchantment(STORED_ENCHANTMENTS_CBF, meta::removeStoredEnchant, itemStack, enchantment)
+        }
+        
+        private fun removeEnchantment(cbfName: String, removeVanillaEnchantment: (BukkitEnchantment) -> Unit, itemStack: BukkitStack, enchantment: Enchantment) {
+            if (enchantment is VanillaEnchantment) {
+                removeVanillaEnchantment(Enchantment.asBukkitEnchantment(enchantment))
+            } else {
+                itemStack.novaCompoundOrNull?.getEnchantmentsOrNull(cbfName)?.remove(enchantment)
+            }
+        }
+        
+        fun removeAllEnchantments(itemStack: BukkitStack) {
+            for ((enchantment, _) in itemStack.enchantments)
+                itemStack.removeEnchantment(enchantment)
+            itemStack.novaCompoundOrNull?.remove("nova", ENCHANTMENTS_CBF)
+        }
+        
+        fun removeAllStoredEnchantments(itemStack: BukkitStack) {
+            val meta = itemStack.itemMeta as? EnchantmentStorageMeta ?: return
+            for ((enchantment, _) in meta.enchants)
+                meta.removeStoredEnchant(enchantment)
+            itemStack.novaCompoundOrNull?.remove("nova", STORED_ENCHANTMENTS_CBF)
+        }
+        
+        // -- Mojang ItemStack --
         
         @JvmStatic
         fun isEnchantable(itemStack: MojangStack): Boolean {
@@ -103,13 +203,13 @@ interface Enchantable {
             return itemStack.tag?.getOrNull<ListTag>(nbtName).isNotNullOrEmpty()
         }
         
-        fun getEnchantments(itemStack: MojangStack): MutableMap<Enchantment, Int> =
+        fun getEnchantments(itemStack: MojangStack): Map<Enchantment, Int> =
             getEnchantments(ENCHANTMENTS_CBF, ENCHANTMENTS_NBT, itemStack)
         
-        fun getStoredEnchantments(itemStack: MojangStack): MutableMap<Enchantment, Int> =
+        fun getStoredEnchantments(itemStack: MojangStack): Map<Enchantment, Int> =
             getEnchantments(STORED_ENCHANTMENTS_CBF, STORED_ENCHANTMENTS_NBT, itemStack)
         
-        private fun getEnchantments(cbfName: String, nbtName: String, itemStack: MojangStack): MutableMap<Enchantment, Int> {
+        private fun getEnchantments(cbfName: String, nbtName: String, itemStack: MojangStack): Map<Enchantment, Int> {
             val enchantments = HashMap<Enchantment, Int>()
             itemStack.tag?.getOrNull<ListTag>(nbtName)?.asSequence()
                 ?.filterIsInstance<CompoundTag>()
@@ -123,13 +223,13 @@ interface Enchantable {
             return enchantments
         }
         
-        fun setEnchantments(itemStack: MojangStack, enchantments: MutableMap<Enchantment, Int>) =
+        fun setEnchantments(itemStack: MojangStack, enchantments: Map<Enchantment, Int>) =
             setEnchantments(ENCHANTMENTS_CBF, ENCHANTMENTS_NBT, itemStack, enchantments)
         
-        fun setStoredEnchantments(itemStack: MojangStack, enchantments: MutableMap<Enchantment, Int>) =
+        fun setStoredEnchantments(itemStack: MojangStack, enchantments: Map<Enchantment, Int>) =
             setEnchantments(STORED_ENCHANTMENTS_CBF, STORED_ENCHANTMENTS_NBT, itemStack, enchantments)
         
-        private fun setEnchantments(cbfName: String, nbtName: String, itemStack: MojangStack, enchantments: MutableMap<Enchantment, Int>) {
+        private fun setEnchantments(cbfName: String, nbtName: String, itemStack: MojangStack, enchantments: Map<Enchantment, Int>) {
             val vanillaEnchantmentsTag = ListTag()
             val novaEnchantmentsMap = HashMap<Enchantment, Int>()
             
@@ -145,11 +245,17 @@ interface Enchantable {
                 }
             }
             
-            if (vanillaEnchantmentsTag.isNotEmpty())
+            if (vanillaEnchantmentsTag.isNotEmpty()) {
                 itemStack.orCreateTag.put(nbtName, vanillaEnchantmentsTag)
+            } else {
+                itemStack.tag?.remove(nbtName)
+            }
             
-            if (novaEnchantmentsMap.isNotEmpty())
+            if (novaEnchantmentsMap.isNotEmpty()) {
                 itemStack.novaCompound["nova", cbfName] = novaEnchantmentsMap
+            } else {
+                itemStack.novaCompoundOrNull?.remove("nova", cbfName)
+            }
         }
         
         fun addEnchantment(itemStack: MojangStack, enchantment: Enchantment, level: Int) =
@@ -199,17 +305,13 @@ interface Enchantable {
             itemStack.novaCompoundOrNull?.remove("nova", cbfName)
         }
         
+        // -- Misc --
+        
         private fun NamespacedCompound.getEnchantmentsOrNull(name: String): MutableMap<Enchantment, Int>? =
             get("nova", name)
         
         private fun NamespacedCompound.getEnchantments(name: String): MutableMap<Enchantment, Int> =
             getOrPut("nova", name, ::HashMap)
-        
-        private fun CompoundTag.getEnchantmentsOrNull(name: String): ListTag? =
-            getOrNull(name)
-        
-        private fun CompoundTag.getEnchantments(name: String): ListTag =
-            getOrPut(name, ::ListTag)
         
     }
     
