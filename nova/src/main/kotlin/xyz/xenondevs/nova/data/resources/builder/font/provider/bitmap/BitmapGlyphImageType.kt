@@ -34,7 +34,7 @@ interface BitmapGlyphImageType<T> {
             // TODO: consider moving these to ImageUtils as well?
             override fun findRightBorder(image: IntArray, width: Int, height: Int): Int? {
                 fun isColumnEmpty(x: Int): Boolean {
-                    for (y in 0 until height) {
+                    for (y in 0..<height) {
                         if (image[y * width + x] ushr 24 != 0)
                             return false
                     }
@@ -48,7 +48,7 @@ interface BitmapGlyphImageType<T> {
             
             override fun findHorizontalBorders(image: IntArray, width: Int, height: Int): Pair<Int, Int>? {
                 fun isRowEmpty(y: Int): Boolean {
-                    for (x in 0 until width) {
+                    for (x in 0..<width) {
                         if (image[y * width + x] ushr 24 != 0)
                             return false
                     }

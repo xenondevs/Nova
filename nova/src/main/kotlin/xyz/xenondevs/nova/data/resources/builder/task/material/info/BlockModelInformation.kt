@@ -31,9 +31,9 @@ internal enum class BlockDirection(val char: Char, val x: Int, val y: Int) {
         
         fun of(s: String): List<BlockDirection> {
             if (s.equals("all", true))
-                return values().toList()
+                return entries
             
-            return s.toCharArray().map { c -> BlockDirection.values().first { it.char == c } }
+            return s.toCharArray().map { c -> entries.first { it.char == c } }
         }
         
     }

@@ -74,7 +74,7 @@ internal class FancyPantsArmorFileMerger(basePacks: BasePacks) : FileMerger(base
         var currentArmor: ArmorData? = null
         
         // loop over all armor sections
-        for (armorSection in 0 until armorSections) {
+        for (armorSection in 0..<armorSections) {
             val sectionImage = image.getSubimage(armorSection * textureWidth, 0, textureWidth, height)
             
             if (currentArmor == null) { // new armor

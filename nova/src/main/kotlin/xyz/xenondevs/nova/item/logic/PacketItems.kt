@@ -460,7 +460,7 @@ internal object PacketItems : Listener {
         val hasCustomModifiers = itemStack.tag?.contains("AttributeModifiers", Tag.TAG_LIST.toInt()) == true
         
         val lore = ArrayList<Component>()
-        EquipmentSlot.values().forEach { slot ->
+        EquipmentSlot.entries.forEach { slot ->
             val modifiers: List<AttributeModifier>
             if (hasCustomModifiers) {
                 // use custom attribute modifiers from nbt data

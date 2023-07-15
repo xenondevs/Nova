@@ -47,7 +47,7 @@ internal abstract class VanillaTileEntity internal constructor(val blockState: V
         companion object {
             
             fun of(block: Block): Type? =
-                Type.values().firstOrNull { it.requirement(block) }
+                entries.firstOrNull { it.requirement(block) }
             
         }
         
@@ -56,7 +56,7 @@ internal abstract class VanillaTileEntity internal constructor(val blockState: V
     internal companion object {
         
         fun of(blockState: VanillaTileEntityState): VanillaTileEntity? {
-            val type = Type.values().firstOrNull { it.id == blockState.id.toString() } ?: return null
+            val type = Type.entries.firstOrNull { it.id == blockState.id.toString() } ?: return null
             if (type.requirement(blockState.pos.block)) {
                 return type.constructor(blockState)
             }

@@ -42,7 +42,7 @@ internal data class NoteBlockStateConfig(
         
         override fun of(id: Int): NoteBlockStateConfig {
             return NoteBlockStateConfig(
-                 Instrument.values()[id / POWERED_BASE / NOTE_BASE % INSTRUMENT_BASE],
+                 Instrument.entries[id / POWERED_BASE / NOTE_BASE % INSTRUMENT_BASE],
                 id / POWERED_BASE % NOTE_BASE,
                 id % POWERED_BASE == 1
             )

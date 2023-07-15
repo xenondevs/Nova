@@ -74,7 +74,7 @@ internal class BitmapFontGenerator(
             .forEach { (i, entry) ->
                 codePoints[i] = entry.intKey
                 val glyphRaster = entry.value
-                for (y in 0 until GLYPH_HEIGHT) {
+                for (y in 0..<GLYPH_HEIGHT) {
                     System.arraycopy(glyphRaster, y * width, raster, y * rasterWidth + i * width, width)
                 }
             }

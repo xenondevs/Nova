@@ -10,9 +10,9 @@ class Region(val min: Location, val max: Location) : Iterable<Block> {
     
     val blocks: List<Block> by lazy {
         val blockList = ArrayList<Block>()
-        for (x in min.blockX until max.blockX)
-            for (y in min.blockY until max.blockY)
-                for (z in min.blockZ until max.blockZ)
+        for (x in min.blockX..<max.blockX)
+            for (y in min.blockY..<max.blockY)
+                for (z in min.blockZ..<max.blockZ)
                     blockList.add(min.world!!.getBlockAt(x, y, z))
         return@lazy Collections.unmodifiableList(blockList)
     }

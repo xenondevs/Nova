@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.util.registerEvents
 )
 internal object LootGeneration : Listener {
     
-    private val entityKeys by lazy { EntityType.values().associateWith { NamespacedKey.minecraft("entities/${it.name.lowercase()}") } }
+    private val entityKeys by lazy { EntityType.entries.associateWith { NamespacedKey.minecraft("entities/${it.name.lowercase()}") } }
     private val lootTables = ArrayList<LootTable>()
     
     @InitFun

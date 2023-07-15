@@ -110,7 +110,7 @@ fun Location.isBetweenXZ(min: Location, max: Location): Boolean =
  */
 fun Location.isInsideWorldRestrictions(): Boolean {
     val world = world!!
-    return world.worldBorder.isInside(this) && blockY in world.minHeight until world.maxHeight
+    return world.worldBorder.isInside(this) && blockY in world.minHeight..<world.maxHeight
 }
 //</editor-fold>
 

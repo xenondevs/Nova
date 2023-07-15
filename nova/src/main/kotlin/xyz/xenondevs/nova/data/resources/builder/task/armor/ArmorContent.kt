@@ -198,8 +198,8 @@ class ArmorContent internal constructor(private val builder: ResourcePackBuilder
         val height = image.height
         
         val newImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
-        for (x in 0 until width) {
-            for (y in 0 until height) {
+        for (x in 0..<width) {
+            for (y in 0..<height) {
                 val color = Color(image.getRGB(x, y), true)
                 val newAlpha = (color.red + color.green + color.blue) * color.alpha / 255 / 3
                 newImage.setRGB(x, y, Color(255, 255, 255, newAlpha).rgb)

@@ -210,8 +210,8 @@ object RecipeManager : Listener {
         val inventory = player.inventory
         if (inventory.containsAll(recipe.requiredChoices)) {
             // fill inventory
-            for (x in 0 until recipe.width) {
-                for (y in 0 until recipe.height) {
+            for (x in 0..<recipe.width) {
+                for (y in 0..<recipe.height) {
                     val choice = recipe.getChoice(x, y) ?: continue
                     
                     val item = inventory.takeFirstOccurrence(choice)

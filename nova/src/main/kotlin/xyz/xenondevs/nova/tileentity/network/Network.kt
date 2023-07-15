@@ -129,7 +129,7 @@ enum class NetworkConnectionType(val insert: Boolean, val extract: Boolean, incl
     companion object {
         
         fun of(insert: Boolean, extract: Boolean): NetworkConnectionType =
-            values().first { it.insert == insert && it.extract == extract }
+            entries.first { it.insert == insert && it.extract == extract }
         
         fun of(types: Iterable<NetworkConnectionType>): NetworkConnectionType {
             var insert = false

@@ -21,7 +21,7 @@ object MoveCharacters {
         
         val num = abs((distance * MoveCharactersContent.PRECISION).roundToInt())
         val buffer = StringBuffer()
-        for (bit in 0 until MoveCharactersContent.SIZE)
+        for (bit in 0..<MoveCharactersContent.SIZE)
             if (num and (1 shl bit) != 0)
                 buffer.appendCodePoint(start + bit)
         

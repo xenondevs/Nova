@@ -347,7 +347,7 @@ internal class NetworkedRangedBukkitInventory(
         val amount = tempInventory.addItem(null, item) // add item to the temp inventory
         
         // copy items from temp inv to real inv
-        for (slot in 0 until size) {
+        for (slot in 0..<size) {
             inventory.setItem(slots[slot], tempInventory.getItem(slot))
         }
         

@@ -49,7 +49,7 @@ internal class ModelFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(bas
     
     private fun processOverrides(file: Path, array: JsonArray): JsonArray {
         val matName = file.nameWithoutExtension.uppercase()
-        val material = Material.values().firstOrNull { it.name == matName } ?: return array
+        val material = Material.entries.firstOrNull { it.name == matName } ?: return array
         
         val overrides = TreeMap<Int, String>()
         val occupiedModelData = basePacks.occupiedModelData.getOrPut(material, ::HashSet)

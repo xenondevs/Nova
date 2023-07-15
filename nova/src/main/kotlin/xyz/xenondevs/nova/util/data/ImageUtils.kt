@@ -56,7 +56,7 @@ object ImageUtils {
      * Checks whether the column at the given [x] coordinate is transparent.
      */
     fun isColumnEmpty(image: BufferedImage, x: Int): Boolean {
-        for (y in 0 until image.height) {
+        for (y in 0..<image.height) {
             if (image.getRGB(x, y) ushr 24 != 0)
                 return false
         }
@@ -107,7 +107,7 @@ object ImageUtils {
      * Checks whether the row at the given [y] coordinate is transparent.
      */
     fun isRowEmpty(image: BufferedImage, y: Int): Boolean {
-        for (x in 0 until image.width) {
+        for (x in 0..<image.width) {
             if (image.getRGB(x, y) ushr 24 != 0)
                 return false
         }

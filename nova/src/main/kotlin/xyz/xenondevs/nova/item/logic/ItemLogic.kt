@@ -187,7 +187,7 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder>)
         section.getKeys(false)
             .forEach { key ->
                 try {
-                    val slot = EquipmentSlot.values().firstOrNull { it.name == key.uppercase() }
+                    val slot = EquipmentSlot.entries.firstOrNull { it.name == key.uppercase() }
                         ?: throw IllegalArgumentException("Unknown equipment slot: $key")
                     val attributeSections = section.getConfigurationSectionList(key).takeUnlessEmpty()
                         ?: throw IllegalArgumentException("No attribute modifiers defined for slot $key")
@@ -204,7 +204,7 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder>)
                             
                             val attribute = BuiltInRegistries.ATTRIBUTE.get(ResourceLocation(attributeStr))
                                 ?: throw IllegalArgumentException("Unknown attribute: $attributeStr")
-                            val operation = Operation.values().firstOrNull { it.name == operationStr.uppercase() }
+                            val operation = Operation.entries.firstOrNull { it.name == operationStr.uppercase() }
                                 ?: throw IllegalArgumentException("Unknown operation: $operationStr")
                             
                             modifiers += AttributeModifier(

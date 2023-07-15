@@ -60,7 +60,7 @@ class EnchantmentContent(builder: ResourcePackBuilder) : PackTaskHolder {
         
         val offset = Font.findFirstUnoccupiedRange(codePoints, Font.PRIVATE_USE_AREA, TOOLTIP_OVERLAY_CHAR_AMOUNT).first
         backgroundCharOffset = offset
-        for (i in 0 until TOOLTIP_OVERLAY_CHAR_AMOUNT) {
+        for (i in 0..<TOOLTIP_OVERLAY_CHAR_AMOUNT) {
             val width = 2.0.pow(i).toInt()
             val img = BufferedImage(width, TOOLTIP_OVERLAY_CHAR_HEIGHT, BufferedImage.TYPE_INT_ARGB)
             
@@ -115,7 +115,7 @@ class EnchantmentContent(builder: ResourcePackBuilder) : PackTaskHolder {
                     
                     val novaEnchTranslation = languageContent.getTranslation(lang, novaEnch.localizedName)
                     val vanillaLevels = IntArray(novaEnch.maxLevel)
-                    for (novaLevel in 0 until novaEnch.maxLevel) {
+                    for (novaLevel in 0..<novaEnch.maxLevel) {
                         vanillaLevels[novaLevel] = ++vanillaLevel
                         languageContent.setTranslation(lang, "enchantment.level.$vanillaLevel", createLevelOverrideTranslation(overlayBoxStr, novaEnchTranslation, novaLevel))
                     }
@@ -135,7 +135,7 @@ class EnchantmentContent(builder: ResourcePackBuilder) : PackTaskHolder {
         val minusOne = MoveCharacters.getMovingString(-1f)
         
         append(minusLength)
-        for (bit in 0 until TOOLTIP_OVERLAY_CHAR_AMOUNT) {
+        for (bit in 0..<TOOLTIP_OVERLAY_CHAR_AMOUNT) {
             if (length and (1 shl bit) != 0) {
                 appendCodePoint(backgroundCharOffset + bit)
                 append(minusOne)

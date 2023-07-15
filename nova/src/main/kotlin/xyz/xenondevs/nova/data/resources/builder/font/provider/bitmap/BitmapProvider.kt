@@ -83,8 +83,8 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
         val height = height
         val ascent = ascent
         
-        for (x in 0 until codePointGrid.width) {
-            for (y in 0 until codePointGrid.height) {
+        for (x in 0..<codePointGrid.width) {
+            for (y in 0..<codePointGrid.height) {
                 val codePoint = codePointGrid[x, y]
                 if (codePoint != 0) {
                     val glyph = glyphGrid[x, y]

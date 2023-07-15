@@ -155,7 +155,7 @@ object VanillaToolCategories {
         specialMultipliers: Map<Material, Map<Predicate<Material>, Double>>
     ): VanillaToolCategory {
         val flatSpecialMultipliers = specialMultipliers.mapValuesTo(enumMapOf()) { (_, map) ->
-            Material.values()
+            Material.entries
                 .filter { it.isBlock && !it.isLegacy }
                 .associateWithNotNullTo(enumMapOf()) { material ->
                     map.entries.firstOrNull { it.key.test(material) }?.value

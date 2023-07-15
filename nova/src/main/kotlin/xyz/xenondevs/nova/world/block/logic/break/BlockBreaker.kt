@@ -80,7 +80,7 @@ internal class NovaBlockBreaker(
         val side = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation) ?: BlockFace.UP
         
         val particlePacket = particle(ParticleTypes.ITEM, block.location.add(0.5, 0.5, 0.5).advance(side, 0.6)) {
-            Axis.values().forEach { if (it != side.axis) offset(it, 0.2) }
+            Axis.entries.forEach { if (it != side.axis) offset(it, 0.2) }
             amount(1)
             speed(0f)
             item(texture)

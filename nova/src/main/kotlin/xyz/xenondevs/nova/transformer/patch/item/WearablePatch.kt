@@ -135,7 +135,7 @@ internal class WatchedArmorList(player: Player) : NonNullList<ItemStack>(
                     else -> EquipAction.CHANGE
                 }
                 
-                val equipEvent = ArmorEquipEvent(player.bukkitEntity, EquipmentSlot.values()[index + 2], equipAction, previous.bukkitCopy, item.bukkitCopy)
+                val equipEvent = ArmorEquipEvent(player.bukkitEntity, EquipmentSlot.entries[index + 2], equipAction, previous.bukkitCopy, item.bukkitCopy)
                 Bukkit.getPluginManager().callEvent(equipEvent)
                 
                 if (equipEvent.isCancelled)

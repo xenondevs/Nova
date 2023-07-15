@@ -36,9 +36,9 @@ class MoveCharactersContent(private val builder: ResourcePackBuilder) : PackTask
         
         val advances = Int2FloatOpenHashMap()
         // -.25, -.5, ..., -8192
-        for (i in 0 until SIZE) advances[range[i]] = -2.0.pow(i - EXP_SHIFT).toFloat()
+        for (i in 0..<SIZE) advances[range[i]] = -2.0.pow(i - EXP_SHIFT).toFloat()
         // .25, .5, ..., 8192
-        for (i in 0 until SIZE) advances[range[i + SIZE]] = 2.0.pow(i - EXP_SHIFT).toFloat()
+        for (i in 0..<SIZE) advances[range[i + SIZE]] = 2.0.pow(i - EXP_SHIFT).toFloat()
         
         val moveFontId = ResourcePath("nova", "move")
         val spaceFont = Font(moveFontId, listOf(SpaceProvider(advances)))

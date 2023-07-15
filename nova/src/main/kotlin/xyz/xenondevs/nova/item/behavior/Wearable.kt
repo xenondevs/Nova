@@ -13,6 +13,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
@@ -173,9 +174,9 @@ sealed interface Wearable {
     
     companion object {
         
-        val ARMOR_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = BukkitEquipmentSlot.values().associateWithTo(enumMap()) { UUID.randomUUID() }
-        val ARMOR_TOUGHNESS_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = BukkitEquipmentSlot.values().associateWithTo(enumMap()) { UUID.randomUUID() }
-        val KNOCKBACK_RESISTANCE_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = BukkitEquipmentSlot.values().associateWithTo(enumMap()) { UUID.randomUUID() }
+        val ARMOR_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = EquipmentSlot.entries.associateWithTo(enumMap()) { UUID.randomUUID() }
+        val ARMOR_TOUGHNESS_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = EquipmentSlot.entries.associateWithTo(enumMap()) { UUID.randomUUID() }
+        val KNOCKBACK_RESISTANCE_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = EquipmentSlot.entries.associateWithTo(enumMap()) { UUID.randomUUID() }
         
         /**
          * Checks whether the specified [itemStack] is wearable.

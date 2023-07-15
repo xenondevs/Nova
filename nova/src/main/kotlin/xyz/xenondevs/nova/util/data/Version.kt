@@ -99,7 +99,7 @@ class Version : Comparable<Version> {
     private fun compareVersionArray(a: IntArray, b: IntArray, ignoreIdx: Int): Int {
         val size = max(a.size, b.size)
         
-        for (i in 0 until size) {
+        for (i in 0..<size) {
             if (i == ignoreIdx)
                 return 0
             

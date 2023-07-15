@@ -523,8 +523,8 @@ object ItemUtils {
                     if (slot == null || modifierSlot == null || modifierSlot.equals(slot.name, true)) {
                         val slots = modifierSlot
                             ?.let { MojangEquipmentSlot.valueOf(it.uppercase()) }
-                            ?.let { arrayOf(it) }
-                            ?: MojangEquipmentSlot.values()
+                            ?.let { listOf(it) }
+                            ?: MojangEquipmentSlot.entries
                         
                         val attribute = BuiltInRegistries.ATTRIBUTE.get(ResourceLocation.tryParse(modifier.getString("AttributeName")))
                             ?: return@forEach
@@ -536,7 +536,7 @@ object ItemUtils {
                             .takeUnless { it.mostSignificantBits == 0L && it.leastSignificantBits == 0L }
                             ?: return@forEach
                         
-                        attributeModifiers += AttributeModifier(uuid, name, attribute, operation, amount, true, *slots)
+                        attributeModifiers += AttributeModifier(uuid, name, attribute, operation, amount, true, slots)
                     }
                 } catch (e: Exception) {
                     LOGGER.log(Level.WARNING, "Could not read attribute modifier: $modifier", e)

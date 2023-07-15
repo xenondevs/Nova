@@ -133,7 +133,7 @@ class ArrayCodePointGrid(private var grid: Array<IntArray>) : MutableCodePointGr
             field = value
             
             val newGrid = grid.copyOf(value)
-            for (i in grid.size until newGrid.size)
+            for (i in grid.size..<newGrid.size)
                 newGrid[i] = IntArray(height)
         }
     
@@ -166,9 +166,9 @@ class ArrayCodePointGrid(private var grid: Array<IntArray>) : MutableCodePointGr
     
     override fun toStringList(): List<String> {
         val rows = ArrayList<String>()
-        for (y in 0 until height) {
+        for (y in 0..<height) {
             val builder = StringBuilder()
-            for (x in 0 until width) {
+            for (x in 0..<width) {
                 builder.appendCodePoint(grid[y][x])
             }
             rows += builder.toString()

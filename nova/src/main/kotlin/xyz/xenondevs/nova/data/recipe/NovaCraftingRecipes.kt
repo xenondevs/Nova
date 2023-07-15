@@ -100,14 +100,14 @@ internal class NovaShapedRecipe private constructor(
     }
     
     private fun matchesAt(container: CraftingContainer, x: Int, y: Int, horizontalFlip: Boolean): Boolean {
-        for (absX in 0 until container.width)
-            for (absY in 0 until container.height) {
+        for (absX in 0..<container.width)
+            for (absY in 0..<container.height) {
                 // relX and relY is the position relative to the recipe shape
                 val relX = absX - x
                 val relY = absY - y
                 val item = container.getItem(absX + absY * container.width)
                 // If relX and relY are in the shape, it will be the RecipeChoice at that position, or null otherwise
-                val choice = if (relX in (0 until width) && relY in (0 until height)) {
+                val choice = if (relX in (0..<width) && relY in (0..<height)) {
                     getChoice(if (horizontalFlip) width - relX - 1 else relX, relY)
                 } else null
                 // If choice is null, treat it as an air RecipeChoice.

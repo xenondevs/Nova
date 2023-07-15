@@ -30,8 +30,8 @@ enum class MetricPrefix(exponent: Int, val prefixName: String, val prefixSymbol:
     
     companion object {
         
-        private val VALUES = values()
-        private val VALUES_REVERSED = values().reversedArray()
+        private val VALUES = entries.toTypedArray()
+        private val VALUES_REVERSED = entries.toTypedArray().reversedArray()
         
         fun findBestPrefix(number: BigDecimal, ignored: BooleanArray): Pair<BigDecimal, MetricPrefix> {
             if (number == BigDecimal.ZERO)

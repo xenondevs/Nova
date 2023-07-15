@@ -19,10 +19,18 @@ class AttributeModifier(
     val operation: Operation,
     val value: Double,
     val showInLore: Boolean,
-    vararg slots: EquipmentSlot
+    val slots: List<EquipmentSlot> = EquipmentSlot.entries
 ) {
     
-    val slots = if (slots.isEmpty()) EquipmentSlot.values() else slots
+    constructor(
+        uuid: UUID,
+        name: String,
+        attribute: Attribute,
+        operation: Operation,
+        value: Double,
+        showInLore: Boolean,
+        vararg slots: EquipmentSlot
+    ) : this(uuid, name, attribute, operation, value, showInLore, slots.asList())
     
     constructor(name: String, attribute: Attribute, operation: Operation, value: Double, showInLore: Boolean, vararg slots: EquipmentSlot) :
         this(UUID.nameUUIDFromBytes(name.toByteArray()), name, attribute, operation, value, showInLore, *slots)

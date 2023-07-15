@@ -9,6 +9,6 @@ internal class ItemModelInformation(
     val material: Material? = null
 ) : ModelInformation {
     
-    fun toBlockInfo() = BlockModelInformation(id, BlockModelType.DEFAULT, null, models, BlockDirection.values().toList(), 0)
+    fun toBlockInfo() = BlockModelInformation(id, BlockModelType.DEFAULT, null, models, BlockDirection.entries, 0)
     
 }

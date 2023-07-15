@@ -85,7 +85,7 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     
     private fun emptyBucket(holder: NovaFluidHolder, player: Player, hand: EquipmentSlot): Boolean {
         val bucket = player.inventory.getItem(hand)
-        val type = FluidType.values().first { bucket?.isSimilar(it.bucket) ?: false }
+        val type = FluidType.entries.first { bucket?.isSimilar(it.bucket) ?: false }
         
         val container = holder.availableContainers.values.firstOrNull { it.accepts(type, 1000) && holder.allowedConnectionTypes[it]!!.insert }
         if (container != null) {

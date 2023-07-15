@@ -4,7 +4,7 @@ format.version = "1.1"
 [versions]
 cbf = "0.7"
 invui = "1.12"
-kotlin = "1.8.22"
+kotlin = "1.9.0"
 ktor = "2.3.1"
 spigot = "1.20.1-R0.1-SNAPSHOT"
 xenondevs-commons = "1.3"

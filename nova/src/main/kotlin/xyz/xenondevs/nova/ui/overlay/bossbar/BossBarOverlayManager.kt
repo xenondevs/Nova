@@ -285,7 +285,7 @@ object BossBarOverlayManager : Listener {
     @PacketHandler(ignoreIfCancelled = true)
     private fun handleBossBar(event: ClientboundBossEventPacketEvent) {
         val id = event.id
-        if (id.leastSignificantBits != 0L || id.mostSignificantBits !in 0 until BAR_AMOUNT) {
+        if (id.leastSignificantBits != 0L || id.mostSignificantBits !in 0..<BAR_AMOUNT) {
             event.isCancelled = true
             
             val player = event.player

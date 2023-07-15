@@ -173,7 +173,7 @@ class ReferenceGlyphGrid(
             field = value
             
             val newGrid = grid.copyOf(value)
-            for (i in grid.size until newGrid.size)
+            for (i in grid.size..<newGrid.size)
                 newGrid[i] = arrayOfNulls(gridHeight)
         }
     
@@ -209,8 +209,8 @@ class ReferenceGlyphGrid(
         val image = BufferedImage(gridWidth * glyphWidth, gridHeight * glyphHeight, BufferedImage.TYPE_INT_ARGB)
         val graphics = image.graphics
         
-        for (x in 0 until gridWidth) {
-            for (y in 0 until gridHeight) {
+        for (x in 0..<gridWidth) {
+            for (y in 0..<gridHeight) {
                 val glyph = grid[x][y] ?: continue
                 
                 if (glyph.width != glyphWidth || glyph.height != glyphHeight)
