@@ -21,49 +21,8 @@ import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.eyeInWater
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.roundToDecimalPlaces
-import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
-import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
-import net.minecraft.world.item.ItemStack as MojangStack
-import xyz.xenondevs.nova.item.behavior.Damageable as NovaDamageable
-
-/**
- * Damages the tool in the [player's][Player] main hand as if they've broken a block.
- */
-fun Player.damageToolBreakBlock() = damageToolInMainHand {
-    val novaItem = it.novaItem
-    if (novaItem != null) {
-        if (novaItem.hasBehavior(Tool::class)) {
-            novaItem.getBehavior(NovaDamageable::class)?.options?.itemDamageOnBreakBlock ?: 0
-        } else 0
-    } else (ToolCategory.ofItem(it.bukkitMirror) as? VanillaToolCategory)?.itemDamageOnBreakBlock ?: 0
-}
-
-/**
- * Damages the tool in the [player's][Player] main hand as if they've attack an entity.
- */
-fun Player.damageToolAttackEntity() = damageToolInMainHand {
-    val novaItem = it.novaItem
-    if (novaItem != null) {
-        if (novaItem.hasBehavior(Tool::class)) {
-            novaItem.getBehavior(NovaDamageable::class)?.options?.itemDamageOnAttackEntity ?: 0
-        } else 0
-    } else (ToolCategory.ofItem(it.bukkitMirror) as? VanillaToolCategory)?.itemDamageOnAttackEntity ?: 0
-}
-
-private inline fun Player.damageToolInMainHand(damageReceiver: (MojangStack) -> Int) {
-    val serverPlayer = serverPlayer
-    val itemStack = serverPlayer.mainHandItem
-    val damage = damageReceiver(itemStack)
-    
-    if (damage <= 0)
-        return
-    
-    if (DamageableUtils.damageAndBreakItem(itemStack, damage, serverPlayer) == ItemDamageResult.BROKEN) {
-        serverPlayer.broadcastBreakEvent(MojangEquipmentSlot.MAINHAND)
-    }
-}
 
 object ToolUtils {
     
@@ -166,7 +125,7 @@ object ToolUtils {
         when (player.gameMode) {
             
             GameMode.CREATIVE -> {
-                val canBreakBlocks = tool?.novaItem?.getBehavior(Tool::class)?.options?.canBreakBlocksInCreative
+                val canBreakBlocks = tool?.novaItem?.getBehaviorOrNull(Tool::class)?.canBreakBlocksInCreative
                     ?: (ToolCategory.ofItem(tool) as? VanillaToolCategory)?.canBreakBlocksInCreative
                     ?: (tool?.type != Material.DEBUG_STICK && tool?.type != Material.TRIDENT)
                 
@@ -229,7 +188,7 @@ object ToolUtils {
         
         val novaItem = itemStack.novaItem
         if (novaItem != null)
-            return novaItem.getBehavior(Tool::class)?.options?.breakSpeed ?: 1.0
+            return novaItem.getBehaviorOrNull(Tool::class)?.breakSpeed ?: 1.0
         
         val vanillaToolCategory = ToolCategory.ofItem(itemStack) as? VanillaToolCategory
         if (vanillaToolCategory != null) {

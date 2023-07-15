@@ -9,11 +9,12 @@ import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.util.name
+import java.util.*
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 class NamespacedCompound internal constructor(
-    private val map: HashMap<String, Compound>
+    private val map: MutableMap<String, Compound>
 ) {
     
     val keys: Set<ResourceLocation>
@@ -152,6 +153,13 @@ class NamespacedCompound internal constructor(
     }
     
     
+    fun putAll(other: NamespacedCompound) {
+        for ((namespace, otherCompound) in other.map) {
+            val compound = map.getOrPut(namespace, ::Compound)
+            compound.putAll(otherCompound)
+        }
+    }
+    
     fun copy(): NamespacedCompound = NamespacedCompound(map.mapValuesTo(HashMap()) { (_, value) -> value.copy() })
     
     fun isEmpty(): Boolean = map.isNotEmpty()
@@ -167,6 +175,12 @@ class NamespacedCompound internal constructor(
         }
         
         return builder.toString().replace("\n", "\n  ") + "\n}"
+    }
+    
+    companion object {
+        
+        val EMPTY = NamespacedCompound(Collections.unmodifiableMap(HashMap()))
+        
     }
     
     internal object NamespacedCompoundBinaryAdapter : BinaryAdapter<NamespacedCompound> {

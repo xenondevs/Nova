@@ -21,49 +21,34 @@ import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 
-abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
+sealed interface ItemBehaviorHolder
+
+interface ItemBehavior : ItemBehaviorHolder {
     
-    lateinit var item: NovaItem
-        internal set
+    fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> = emptyList()
+    fun getAttributeModifiers(): List<AttributeModifier> = emptyList()
+    fun getDefaultCompound(): NamespacedCompound = NamespacedCompound()
     
-    open fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> = emptyList()
-    open fun getAttributeModifiers(): List<AttributeModifier> = emptyList()
+    fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) = Unit
+    fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
+    fun handleAttackEntity(player: Player, itemStack: ItemStack, attacked: Entity, event: EntityDamageByEntityEvent) = Unit
+    fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) = Unit
+    fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) = Unit
+    fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) = Unit
+    fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) = Unit
+    fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
+    fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
+    fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
+    fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
+    fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
     
-    open fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) = Unit
-    open fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
-    open fun handleAttackEntity(player: Player, itemStack: ItemStack, attacked: Entity, event: EntityDamageByEntityEvent) = Unit
-    open fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) = Unit
-    open fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) = Unit
-    open fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) = Unit
-    open fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) = Unit
-    open fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
-    open fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
-    open fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
-    open fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
-    open fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
-    
-    open fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
-    open fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) = Unit
-    
-    final override fun get(item: NovaItem): ItemBehavior {
-        setMaterial(item)
-        return this
-    }
-    
-    internal fun setMaterial(item: NovaItem) {
-        if (this::item.isInitialized)
-            throw IllegalStateException("The same item behavior instance cannot be used for multiple materials")
-        
-        this.item = item
-    }
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("Use getDefaultCompound or updatePacketItemData instead")
+    fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder = itemBuilder
+    fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) = Unit
     
 }
 
-abstract class ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder<T>() {
-    abstract fun create(item: NovaItem): T
-    final override fun get(item: NovaItem) = create(item).apply { setMaterial(item) }
-}
-
-abstract class ItemBehaviorHolder<T : ItemBehavior> internal constructor() {
-    internal abstract fun get(item: NovaItem): T
+interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
+    fun create(item: NovaItem): T
 }

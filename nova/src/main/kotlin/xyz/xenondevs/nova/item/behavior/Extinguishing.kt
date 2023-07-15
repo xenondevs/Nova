@@ -12,7 +12,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.particle.particle
-import xyz.xenondevs.nova.util.item.damageItemInHand
+import xyz.xenondevs.nova.util.damageItemInHand
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.sendTo
@@ -22,9 +22,12 @@ import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 
-private const val EXTINGuiSH_CAMPFIRE_LEVEL_EVENT = 1009
+private const val EXTINGUISH_CAMPFIRE_LEVEL_EVENT = 1009
 
-object Extinguishing : ItemBehavior() {
+/**
+ * Allows items to extinguish campfires.
+ */
+object Extinguishing : ItemBehavior {
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_BLOCK) {
@@ -45,7 +48,7 @@ object Extinguishing : ItemBehavior() {
                 
                 val newState = state.setValue(CampfireBlock.LIT, false)
                 level.setBlock(pos, newState, 11)
-                level.levelEvent(null, EXTINGuiSH_CAMPFIRE_LEVEL_EVENT, pos, 0)
+                level.levelEvent(null, EXTINGUISH_CAMPFIRE_LEVEL_EVENT, pos, 0)
                 level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(serverPlayer, newState))
                 
                 val hand = event.hand!!

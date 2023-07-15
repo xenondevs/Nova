@@ -52,7 +52,7 @@ class ToolTier(
             if (item == null)
                 return null
             
-            val novaLevel = item.novaItem?.getBehavior(Tool::class)?.options?.tier
+            val novaLevel = item.novaItem?.getBehaviorOrNull(Tool::class)?.tier
             if (novaLevel != null)
                 return novaLevel
             

@@ -272,7 +272,7 @@ internal object EnchantmentTableLogic {
         val enchantments: Sequence<Enchantment>
         val novaItem = itemStack.novaItem
         if (novaItem != null) {
-            val categories = novaItem.getBehavior<Enchantable>()?.options?.enchantmentCategories?.takeUnlessEmpty()
+            val categories = novaItem.getBehaviorOrNull<Enchantable>()?.enchantmentCategories?.takeUnlessEmpty()
                 ?: return ArrayList()
             
             enchantments = categories.asSequence()
@@ -310,7 +310,7 @@ internal object EnchantmentTableLogic {
     private fun getEnchantmentValue(itemStack: ItemStack): Int {
         val novaItem = itemStack.novaItem
         if (novaItem != null) {
-            return novaItem.getBehavior<Enchantable>()?.options?.enchantmentValue ?: 0
+            return novaItem.getBehaviorOrNull<Enchantable>()?.enchantmentValue ?: 0
         } else {
             return itemStack.item.enchantmentValue
         }

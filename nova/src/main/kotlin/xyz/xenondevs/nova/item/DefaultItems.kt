@@ -3,8 +3,8 @@
 package xyz.xenondevs.nova.item
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.behavior.impl.WrenchBehavior
 import xyz.xenondevs.nova.item.logic.ItemLogic
@@ -137,7 +137,7 @@ object DefaultBlockOverlays {
 
 private fun registerCoreItem(
     name: String,
-    vararg itemBehaviors: ItemBehaviorHolder<*>,
+    vararg itemBehaviors: ItemBehaviorHolder,
     localizedName: String = "item.nova.$name",
     isHidden: Boolean = false
 ): NovaItem = register(NovaItem(
@@ -150,7 +150,7 @@ private fun registerCoreItem(
 private fun registerUnnamedHiddenCoreItem(
     name: String,
     localizedName: String = "",
-    vararg itemBehaviors: ItemBehaviorHolder<*>
+    vararg itemBehaviors: ItemBehaviorHolder
 ): NovaItem = register(NovaItem(
     ResourceLocation("nova", name),
     localizedName,

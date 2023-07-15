@@ -10,7 +10,6 @@ import net.minecraft.world.item.enchantment.Enchantment
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.level.Level
 import xyz.xenondevs.nova.item.behavior.Damageable
-import xyz.xenondevs.nova.util.item.DamageableUtils
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.nmsCopy
 import kotlin.math.max
@@ -26,7 +25,7 @@ internal class RepairItemRecipe(id: ResourceLocation) : MojangRepairItemRecipe(i
             if (itemStack.isEmpty)
                 continue
             
-            if (!secondStackFound && DamageableUtils.isDamageable(itemStack) && itemStack.count == 1) {
+            if (!secondStackFound && Damageable.isDamageable(itemStack) && itemStack.count == 1) {
                 if (firstStack == null) {
                     firstStack = itemStack
                 } else if (isSameItem(firstStack, itemStack)) {
@@ -49,8 +48,8 @@ internal class RepairItemRecipe(id: ResourceLocation) : MojangRepairItemRecipe(i
         require(items.size == 2) { "Item size is not 2" }
         val novaItem = items[0].novaItem
         if (novaItem != null) {
-            val damageable = novaItem.getBehavior(Damageable::class)!!
-            val maxDurability = damageable.options.durability
+            val damageable = novaItem.getBehavior(Damageable::class)
+            val maxDurability = damageable.maxDurability
             
             val itemStackA = items[0]
             val itemStackB = items[1]

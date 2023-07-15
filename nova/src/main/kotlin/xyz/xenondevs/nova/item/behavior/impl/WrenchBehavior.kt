@@ -29,7 +29,7 @@ import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.util.toString
 import xyz.xenondevs.nova.world.pos
 
-internal object WrenchBehavior : ItemBehavior() {
+internal object WrenchBehavior : ItemBehavior {
     
     private val WRENCH_MODE_KEY = NamespacedKey(NOVA, "wrench_mode")
     private val NETWORK_TYPES = arrayOf(DefaultNetworkTypes.ENERGY, DefaultNetworkTypes.ITEMS, DefaultNetworkTypes.FLUID)

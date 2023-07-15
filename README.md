@@ -1,16 +1,25 @@
 [![Banner](https://i.imgur.com/HiDAPmf.png)](https://hangar.papermc.io/xenondevs/Nova)
 
 <p align="center">
-  <a href="https://www.spigotmc.org/resources/93648/reviews">
-    <img src="https://img.shields.io/spiget/rating/93648"> 
+  <a href="https://github.com/xenondevs/Nova/stargazers">
+    <img src="https://img.shields.io/github/stars/xenondevs/Nova">
   </a>
-  <a href="https://www.spigotmc.org/resources/93648/">
-    <img src="https://img.shields.io/spiget/downloads/93648"> 
+  <a href="https://github.com/xenondevs/Nova/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/xenondevs/Nova/ci.yml">
   </a>
-  <a href="https://www.spigotmc.org/resources/93648/">
-    <img src="https://img.shields.io/spiget/tested-versions/93648"> 
+  <a href="">
+    <img alt="Modrinth Game Versions" src="https://img.shields.io/modrinth/game-versions/nova-framework">
   </a>
 </p>
+<p align="center">
+  <a href="https://hangar.papermc.io/xenondevs/Nova">
+    <img src="https://img.shields.io/modrinth/v/nova-framework?color=0552eb&label=Hangar">
+  </a>
+  <a href="https://modrinth.com/plugin/nova-framework">
+    <img src="https://img.shields.io/modrinth/v/nova-framework?label=Modrinth">
+  </a>
+</p>
+
 
 # Nova
 
@@ -18,8 +27,6 @@ Nova is a framework for developers to easily create custom items, blocks, GUIs, 
 With Nova, developers don't have to deal with resource pack tricks, data serialization or world formats and can instead
 just focus in adding content to the game.  
 As a server administrator, you can choose from a set of Nova addons, which will add content to the game.
-
-You can find Nova on: [SpigotMC](https://www.spigotmc.org/resources/93648/) | [Hangar](https://hangar.papermc.io/xenondevs/Nova) | [Modrinth](https://modrinth.com/plugin/nova-framework)
 
 ## Features
 

@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.util.NumberFormatUtils
 
-internal class TileEntityItemBehavior : ItemBehavior() {
+object TileEntityItemBehavior : ItemBehavior {
     
     override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
         val tileEntityData: Compound? = data[TileEntity.TILE_ENTITY_DATA_KEY]

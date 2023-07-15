@@ -31,6 +31,7 @@ import xyz.xenondevs.nova.data.resources.builder.task.material.info.VanillaMater
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.item.behavior.ItemBehaviorFactory
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
@@ -38,25 +39,50 @@ import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.data.getDoubleOrNull
 import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.item.novaCompound
+import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import java.util.logging.Level
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 import net.minecraft.world.item.ItemStack as MojangStack
 
+private fun loadBehaviors(item: NovaItem, holders: List<ItemBehaviorHolder>): List<ItemBehavior> =
+    holders.map { holder ->
+        when (holder) {
+            is ItemBehavior -> holder
+            is ItemBehaviorFactory<*> -> holder.create(item)
+        }
+    }
+
+// TODO: merge with NovaItem?
 /**
- * Handles actions performed on [ItemStack]s of a [NovaItem]
+ * Handles actions performed on [ItemStacks][ItemStack] of a [NovaItem].
  */
-internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder<*>>) : Reloadable {
+internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder>) : Reloadable {
     
-    private val behaviors: List<ItemBehavior> by lazy { holders.map { it.get(item) } }
+    private val behaviors: List<ItemBehavior> by lazy { loadBehaviors(item, holders) }
     private lateinit var item: NovaItem
     private lateinit var name: Component
-    
     lateinit var vanillaMaterial: Material private set
     lateinit var attributeModifiers: Map<EquipmentSlot, List<AttributeModifier>> private set
+    private var defaultCompound: NamespacedCompound? = null
     
-    internal constructor(vararg holders: ItemBehaviorHolder<*>) : this(holders.toList())
+    internal constructor(vararg holders: ItemBehaviorHolder) : this(holders.asList())
+    
+    fun <T : Any> getBehaviorOrNull(type: KClass<T>): T? =
+        behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
+    
+    fun <T : Any> hasBehavior(type: KClass<T>): Boolean =
+        behaviors.any { it::class == type }
+    
+    fun setMaterial(item: NovaItem) {
+        if (this::item.isInitialized)
+            throw IllegalStateException("NovaItems cannot be used for multiple materials")
+        
+        this.item = item
+        this.name = Component.translatable(item.localizedName)
+        reload()
+    }
     
     override fun reload() {
         vanillaMaterial = VanillaMaterialTypes.getMaterial(behaviors.flatMap { it.getVanillaMaterialProperties() }.toHashSet())
@@ -69,25 +95,25 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder<*
             }
         }
         attributeModifiers = modifiersBySlot
-    }
-    
-    fun <T : ItemBehavior> getBehavior(type: KClass<T>): T? =
-        behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
-    
-    fun hasBehavior(type: KClass<out ItemBehavior>): Boolean =
-        behaviors.any { it::class == type }
-    
-    fun setMaterial(item: NovaItem) {
-        if (this::item.isInitialized)
-            throw IllegalStateException("NovaItems cannot be used for multiple materials")
         
-        this.item = item
-        this.name = Component.translatable(item.localizedName)
-        reload()
+        var defaultCompound: NamespacedCompound? = null
+        for (behavior in behaviors) {
+            val behaviorCompound = behavior.getDefaultCompound()
+            if (behaviorCompound.isNotEmpty()) {
+                if (defaultCompound == null)
+                    defaultCompound = NamespacedCompound()
+                
+                defaultCompound.putAll(behaviorCompound)
+            }
+        }
+        this.defaultCompound = defaultCompound
     }
     
+    @Suppress("DEPRECATION")
     fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
         var builder = itemBuilder
+        if (defaultCompound != null)
+            builder.addModifier { it.novaCompound.putAll(defaultCompound!!.copy()); it }
         behaviors.forEach { builder = it.modifyItemBuilder(builder) }
         return builder
     }
@@ -95,7 +121,7 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder<*
     fun getPacketItemData(itemStack: MojangStack?): PacketItemData {
         val itemData = PacketItemData(itemStack?.orCreateTag ?: CompoundTag())
         
-        behaviors.forEach { it.updatePacketItemData(itemStack?.novaCompound ?: NamespacedCompound(), itemData) }
+        behaviors.forEach { it.updatePacketItemData(itemStack?.novaCompoundOrNull ?: NamespacedCompound.EMPTY, itemData) }
         if (itemData.name == null) itemData.name = this.name
         
         return itemData

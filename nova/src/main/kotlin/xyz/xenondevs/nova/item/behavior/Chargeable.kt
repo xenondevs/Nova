@@ -2,103 +2,125 @@ package xyz.xenondevs.nova.item.behavior
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.nova.data.config.ConfigAccess
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.logic.PacketItemData
-import xyz.xenondevs.nova.item.options.ChargeableOptions
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.item.novaCompound
 import net.minecraft.world.item.ItemStack as MojangStack
+import org.bukkit.inventory.ItemStack as BukkitStack
 
 @Suppress("FunctionName")
-fun Chargeable(affectsItemDurability: Boolean): ItemBehaviorFactory<Chargeable> =
-    object : ItemBehaviorFactory<Chargeable>() {
-        override fun create(item: NovaItem): Chargeable =
-            Chargeable(ChargeableOptions.configurable(item), affectsItemDurability)
+fun Chargeable(affectsItemDurability: Boolean): ItemBehaviorFactory<Chargeable.Default> =
+    object : ItemBehaviorFactory<Chargeable.Default> {
+        override fun create(item: NovaItem): Chargeable.Default {
+            val cfg = ConfigAccess(item)
+            return Chargeable.Default(cfg.getEntry("max_energy"), affectsItemDurability)
+        }
     }
 
-class Chargeable(
-    val options: ChargeableOptions,
-    private val affectsItemDurability: Boolean = true
-) : ItemBehavior() {
+/**
+ * Allows items to store energy and be charged.
+ */
+interface Chargeable {
     
-    @Deprecated("Replaced by ChargeableOptions", ReplaceWith("options.maxEnergy"))
+    /**
+     * The maximum amount of energy this item can store.
+     */
     val maxEnergy: Long
-        get() = options.maxEnergy
     
-    //<editor-fold desc="Bukkit ItemStack methods", defaultstate="collapsed">
-    fun getEnergy(itemStack: ItemStack): Long {
-        return getEnergy(itemStack.novaCompound)
-    }
+    /**
+     * Gets the current amount of energy stored in the given [itemStack].
+     */
+    fun getEnergy(itemStack: BukkitStack): Long
     
-    fun setEnergy(itemStack: ItemStack, energy: Long) {
-        return setEnergy(itemStack.novaCompound, energy)
-    }
+    /**
+     * Sets the current amount of energy stored in the given [itemStack] to [energy].
+     */
+    fun setEnergy(itemStack: BukkitStack, energy: Long)
     
-    fun addEnergy(itemStack: ItemStack, energy: Long) {
-        return addEnergy(itemStack.novaCompound, energy)
-    }
-    //</editor-fold>
+    /**
+     * Adds the given [energy] to the current amount of energy stored in the given [itemStack], capped at [maxEnergy].
+     */
+    fun addEnergy(itemStack: BukkitStack, energy: Long)
     
-    //<editor-fold desc="Mojang ItemStack methods", defaultstate="collapsed">
-    fun getEnergy(itemStack: MojangStack): Long {
-        return getEnergy(itemStack.novaCompound)
-    }
+    /**
+     * Gets the current amount of energy stored in the given [itemStack].
+     */
+    fun getEnergy(itemStack: MojangStack): Long
     
-    fun setEnergy(itemStack: MojangStack, energy: Long) {
-        return setEnergy(itemStack.novaCompound, energy)
-    }
+    /**
+     * Sets the current amount of energy stored in the given [itemStack] to [energy].
+     */
+    fun setEnergy(itemStack: MojangStack, energy: Long)
     
-    fun addEnergy(itemStack: MojangStack, energy: Long) {
-        return addEnergy(itemStack.novaCompound, energy)
-    }
-    //</editor-fold>
+    /**
+     * Adds the given [energy] to the current amount of energy stored in the given [itemStack], capped at [maxEnergy].
+     */
+    fun addEnergy(itemStack: MojangStack, energy: Long)
     
-    //<editor-fold desc="Compound methods", defaultstate="collapsed">
-    fun getEnergy(data: NamespacedCompound): Long {
-        val currentEnergy = data["nova", "energy"] ?: 0L
-        if (currentEnergy > options.maxEnergy) {
-            setEnergy(data, options.maxEnergy)
-            return options.maxEnergy
+    companion object : ItemBehaviorFactory<Default> {
+        
+        override fun create(item: NovaItem): Default {
+            val cfg = ConfigAccess(item)
+            return Default(cfg.getEntry<Long>("max_energy"), true)
         }
-        return currentEnergy
-    }
-    
-    fun setEnergy(data: NamespacedCompound, energy: Long) {
-        data["nova", "energy"] = energy.coerceIn(0, options.maxEnergy)
-    }
-    
-    fun addEnergy(data: NamespacedCompound, energy: Long) {
-        setEnergy(data, getEnergy(data) + energy)
-    }
-    //</editor-fold>
-    
-    override fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
-        itemBuilder.addModifier { setEnergy(it.novaCompound, 0); it }
-        return itemBuilder
-    }
-    
-    override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
-        val energy = getEnergy(data)
         
-        itemData.addLore(Component.text(NumberFormatUtils.getEnergyString(energy, options.maxEnergy), NamedTextColor.GRAY))
+    }
+    
+    class Default(
+        maxEnergy: Provider<Long>,
+        private val affectsItemDurability: Boolean
+    ) : ItemBehavior, Chargeable {
         
-        if (affectsItemDurability)
-            itemData.durabilityBar = energy.toDouble() / options.maxEnergy.toDouble()
-    }
-    
-    override fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> {
-        return if (affectsItemDurability)
-            listOf(VanillaMaterialProperty.DAMAGEABLE)
-        else emptyList()
-    }
-    
-    companion object : ItemBehaviorFactory<Chargeable>() {
-        override fun create(item: NovaItem): Chargeable =
-            Chargeable(ChargeableOptions.configurable(item), true)
+        override val maxEnergy by maxEnergy
+        
+        override fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> {
+            return if (affectsItemDurability)
+                listOf(VanillaMaterialProperty.DAMAGEABLE)
+            else emptyList()
+        }
+        
+        override fun getDefaultCompound(): NamespacedCompound {
+            val compound = NamespacedCompound()
+            compound["nova", "energy"] = 0L
+            return compound
+        }
+        
+        override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
+            val energy = getEnergy(data)
+            itemData.addLore(Component.text(NumberFormatUtils.getEnergyString(energy, maxEnergy), NamedTextColor.GRAY))
+            if (affectsItemDurability)
+                itemData.durabilityBar = energy.toDouble() / maxEnergy.toDouble()
+        }
+        
+        override fun getEnergy(itemStack: BukkitStack) = getEnergy(itemStack.novaCompound)
+        override fun setEnergy(itemStack: BukkitStack, energy: Long) = setEnergy(itemStack.novaCompound, energy)
+        override fun addEnergy(itemStack: BukkitStack, energy: Long) = addEnergy(itemStack.novaCompound, energy)
+        override fun getEnergy(itemStack: MojangStack) = getEnergy(itemStack.novaCompound)
+        override fun setEnergy(itemStack: MojangStack, energy: Long) = setEnergy(itemStack.novaCompound, energy)
+        override fun addEnergy(itemStack: MojangStack, energy: Long) = addEnergy(itemStack.novaCompound, energy)
+        
+        private fun getEnergy(data: NamespacedCompound): Long {
+            val currentEnergy = data["nova", "energy"] ?: 0L
+            if (currentEnergy > maxEnergy) {
+                setEnergy(data, maxEnergy)
+                return maxEnergy
+            }
+            return currentEnergy
+        }
+        
+        private fun setEnergy(data: NamespacedCompound, energy: Long) {
+            data["nova", "energy"] = energy.coerceIn(0, maxEnergy)
+        }
+        
+        private fun addEnergy(data: NamespacedCompound, energy: Long) {
+            setEnergy(data, getEnergy(data) + energy)
+        }
+        
     }
     
 }

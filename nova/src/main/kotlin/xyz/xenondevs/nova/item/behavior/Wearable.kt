@@ -6,123 +6,218 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.Equipable
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.nova.data.config.ConfigAccess
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.logic.PacketItemData
-import xyz.xenondevs.nova.item.options.WearableOptions
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.player.equipment.ArmorType
+import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.swingHand
+import java.util.*
+import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
+import net.minecraft.world.item.ItemStack as MojangStack
+import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
+import org.bukkit.inventory.ItemStack as BukkitStack
 
-fun Wearable(type: ArmorType, equipSound: Sound): ItemBehaviorFactory<Wearable> =
-    Wearable(type, equipSound.key.toString())
+fun Wearable(slot: BukkitEquipmentSlot, equipSound: Sound): ItemBehaviorFactory<Wearable.Default> =
+    Wearable(slot, equipSound.key.toString())
 
-fun Wearable(type: ArmorType, equipSound: SoundEvent): ItemBehaviorFactory<Wearable> =
-    Wearable(type, equipSound.location.toString())
+fun Wearable(slot: BukkitEquipmentSlot, equipSound: SoundEvent): ItemBehaviorFactory<Wearable.Default> =
+    Wearable(slot, equipSound.location.toString())
 
-fun Wearable(type: ArmorType, equipSound: String? = null): ItemBehaviorFactory<Wearable> =
-    object : ItemBehaviorFactory<Wearable>() {
-        override fun create(item: NovaItem): Wearable =
-            Wearable(WearableOptions.configurable(type, equipSound, item))
-    }
-
-class Wearable(val options: WearableOptions) : ItemBehavior() {
-    
-    private val textureColor: Int? by lazy {
-        ResourceLookups.MODEL_DATA_LOOKUP[item.id]
-            ?.armor
-            ?.let { ResourceLookups.ARMOR_DATA_LOOKUP[it] }
-            ?.color
-    }
-    
-    override fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> {
-        if (textureColor == null)
-            return emptyList()
-        
-        return listOf(
-            when (options.armorType) {
-                ArmorType.HELMET -> VanillaMaterialProperty.HELMET
-                ArmorType.CHESTPLATE -> VanillaMaterialProperty.CHESTPLATE
-                ArmorType.LEGGINGS -> VanillaMaterialProperty.LEGGINGS
-                ArmorType.BOOTS -> VanillaMaterialProperty.BOOTS
-            }
-        )
-    }
-    
-    override fun getAttributeModifiers(): List<AttributeModifier> {
-        val equipmentSlot = options.armorType.equipmentSlot.nmsEquipmentSlot
-        return listOf(
-            AttributeModifier(
-                "Nova Armor (${item.id}})",
-                Attributes.ARMOR,
-                Operation.ADDITION,
-                options.armor,
-                true,
-                equipmentSlot
-            ),
-            AttributeModifier(
-                "Nova Armor Toughness (${item.id}})",
-                Attributes.ARMOR_TOUGHNESS,
-                Operation.ADDITION,
-                options.armorToughness,
-                true,
-                equipmentSlot
-            ),
-            AttributeModifier(
-                "Nova Knockback Resistance (${item.id}})",
-                Attributes.KNOCKBACK_RESISTANCE,
-                Operation.ADDITION,
-                options.knockbackResistance,
-                true,
-                equipmentSlot
+fun Wearable(slot: BukkitEquipmentSlot, equipSound: String? = null): ItemBehaviorFactory<Wearable.Default> {
+    return object : ItemBehaviorFactory<Wearable.Default> {
+        override fun create(item: NovaItem): Wearable.Default {
+            val texture = ResourceLookups.MODEL_DATA_LOOKUP[item.id]?.armor
+                ?.let { ResourceLookups.ARMOR_DATA_LOOKUP[it] }?.color
+            val cfg = ConfigAccess(item)
+            return Wearable.Default(
+                provider(texture),
+                provider(slot),
+                cfg.getOptionalEntry<Double>("armor").orElse(0.0),
+                cfg.getOptionalEntry<Double>("armor_toughness").orElse(0.0),
+                cfg.getOptionalEntry<Double>("knockback_resistance").orElse(0.0),
+                provider(equipSound)
             )
-        )
+        }
     }
+}
+
+/**
+ * Allows items to be worn in armor slots.
+ */
+sealed interface Wearable {
     
-    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
-        if (action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !event.clickedBlock!!.type.isActuallyInteractable())) {
-            event.isCancelled = true
+    val texture: Int?
+    val slot: BukkitEquipmentSlot
+    val armor: Double
+    val armorToughness: Double
+    val knockbackResistance: Double
+    val equipSound: String?
+    
+    class Default(
+        texture: Provider<Int?>,
+        slot: Provider<BukkitEquipmentSlot>,
+        armor: Provider<Double>,
+        armorToughness: Provider<Double>,
+        knockbackResistance: Provider<Double>,
+        equipSound: Provider<String?>
+    ) : ItemBehavior, Wearable {
+        
+        override val texture by texture
+        override val slot by slot
+        override val armor by armor
+        override val armorToughness by armorToughness
+        override val knockbackResistance by knockbackResistance
+        override val equipSound by equipSound
+        
+        override fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> {
+            if (texture == null)
+                return emptyList()
             
-            val hand = event.hand!!
-            val equipmentSlot = options.armorType.equipmentSlot
-            val previous = player.inventory.getItem(equipmentSlot)?.takeUnlessEmpty()
-            if (previous != null) {
-                // swap armor
-                player.inventory.setItem(equipmentSlot, itemStack)
-                player.inventory.setItem(hand, previous)
-            } else {
-                // equip armor
-                player.inventory.setItem(equipmentSlot, itemStack)
-                if (player.gameMode != GameMode.CREATIVE) player.inventory.setItem(hand, null)
+            return listOf(
+                when (slot) {
+                    BukkitEquipmentSlot.HEAD -> VanillaMaterialProperty.HELMET
+                    BukkitEquipmentSlot.CHEST -> VanillaMaterialProperty.CHESTPLATE
+                    BukkitEquipmentSlot.LEGS -> VanillaMaterialProperty.LEGGINGS
+                    BukkitEquipmentSlot.FEET -> VanillaMaterialProperty.BOOTS
+                    else -> throw IllegalArgumentException("Invalid wearable slot: $slot")
+                }
+            )
+        }
+        
+        override fun getAttributeModifiers(): List<AttributeModifier> {
+            val equipmentSlot = slot.nmsEquipmentSlot
+            return listOf(
+                AttributeModifier(
+                    ARMOR_MODIFIER_UUIDS[slot]!!,
+                    "Nova Wearable Armor",
+                    Attributes.ARMOR,
+                    Operation.ADDITION,
+                    armor,
+                    true,
+                    equipmentSlot
+                ),
+                AttributeModifier(
+                    ARMOR_TOUGHNESS_MODIFIER_UUIDS[slot]!!,
+                    "Nova Wearable Armor Toughness",
+                    Attributes.ARMOR_TOUGHNESS,
+                    Operation.ADDITION,
+                    armorToughness,
+                    true,
+                    equipmentSlot
+                ),
+                AttributeModifier(
+                    KNOCKBACK_RESISTANCE_MODIFIER_UUIDS[slot]!!,
+                    "Nova Wearable Knockback Resistance",
+                    Attributes.KNOCKBACK_RESISTANCE,
+                    Operation.ADDITION,
+                    knockbackResistance,
+                    true,
+                    equipmentSlot
+                )
+            )
+        }
+        
+        override fun handleInteract(player: Player, itemStack: BukkitStack, action: Action, event: PlayerInteractEvent) {
+            if (action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !event.clickedBlock!!.type.isActuallyInteractable())) {
+                event.isCancelled = true
+                
+                val hand = event.hand!!
+                val previous = player.inventory.getItem(slot)?.takeUnlessEmpty()
+                if (previous != null) {
+                    // swap armor
+                    player.inventory.setItem(slot, itemStack)
+                    player.inventory.setItem(hand, previous)
+                } else {
+                    // equip armor
+                    player.inventory.setItem(slot, itemStack)
+                    if (player.gameMode != GameMode.CREATIVE) player.inventory.setItem(hand, null)
+                }
+                
+                player.swingHand(hand)
+                player.serverPlayer.onEquipItem(slot.nmsEquipmentSlot, previous.nmsCopy, itemStack.nmsCopy)
             }
-            
-            player.swingHand(hand)
-            player.serverPlayer.onEquipItem(options.armorType.equipmentSlot.nmsEquipmentSlot, previous.nmsCopy, itemStack.nmsCopy)
         }
+        
+        override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
+            val texture = texture
+            if (texture != null) {
+                itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", texture)
+                itemData.hide(HideableFlag.DYE)
+            }
+        }
+        
     }
     
-    override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
-        val textureColor = textureColor
-        if (textureColor != null) {
-            itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", textureColor)
-            itemData.hide(HideableFlag.DYE)
+    companion object {
+        
+        val ARMOR_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = BukkitEquipmentSlot.values().associateWithTo(enumMap()) { UUID.randomUUID() }
+        val ARMOR_TOUGHNESS_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = BukkitEquipmentSlot.values().associateWithTo(enumMap()) { UUID.randomUUID() }
+        val KNOCKBACK_RESISTANCE_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = BukkitEquipmentSlot.values().associateWithTo(enumMap()) { UUID.randomUUID() }
+        
+        /**
+         * Checks whether the specified [itemStack] is wearable.
+         */
+        fun isWearable(itemStack: BukkitStack): Boolean =
+            isWearable(itemStack.nmsCopy)
+        
+        /**
+         * Checks whether the specified [itemStack] is wearable.
+         */
+        fun isWearable(itemStack: MojangStack): Boolean {
+            val novaItem = itemStack.novaItem
+            if (novaItem != null)
+                return novaItem.hasBehavior<Wearable>()
+            
+            val item = itemStack.item
+            return item is Equipable || item is BlockItem && item.block is Equipable
         }
-        textureColor?.let { itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", it) }
+        
+        /**
+         * Gets the [BukkitEquipmentSlot] of the specified [itemStack], or null if it is not wearable.
+         */
+        fun getSlot(itemStack: BukkitStack): BukkitEquipmentSlot? =
+            getSlot(itemStack.nmsCopy)?.bukkitEquipmentSlot
+        
+        /**
+         * Gets the [MojangEquipmentSlot] of the specified [itemStack], or null if it is not wearable.
+         */
+        fun getSlot(itemStack: MojangStack): MojangEquipmentSlot? {
+            val novaItem = itemStack.novaItem
+            if (novaItem != null)
+                return novaItem.getBehaviorOrNull<Wearable>()?.slot?.nmsEquipmentSlot
+            
+            val equipable = when (val item = itemStack.item) {
+                is Equipable -> item
+                is BlockItem -> item.block as? Equipable
+                else -> null
+            } ?: return null
+            
+            return equipable.equipmentSlot
+        }
+        
     }
     
 }

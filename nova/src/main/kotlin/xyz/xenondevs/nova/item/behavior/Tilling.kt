@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.above
 import xyz.xenondevs.nova.util.interactionHand
-import xyz.xenondevs.nova.util.item.DamageableUtils
 import xyz.xenondevs.nova.util.nmsDirection
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.runTaskLater
@@ -36,7 +35,10 @@ private fun onlyIfAirAbove(event: PlayerInteractEvent): Boolean {
     return event.blockFace != BlockFace.DOWN && event.clickedBlock!!.above.type.isAir
 }
 
-object Tilling : ItemBehavior() {
+/**
+ * Allows items to till the ground.
+ */
+object Tilling : ItemBehavior {
     
     override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
         if (action == Action.RIGHT_CLICK_BLOCK) {
@@ -58,7 +60,7 @@ object Tilling : ItemBehavior() {
                 // drop items
                 drops.forEach { Block.popResourceFromFace(level, pos, event.blockFace.nmsDirection, MojangStack(it)) }
                 // damage item
-                DamageableUtils.damageAndBreakItem(serverPlayer.getItemInHand(interactionHand), 1, serverPlayer)
+                Damageable.damageAndBreak(serverPlayer.getItemInHand(interactionHand), 1, serverPlayer) { serverPlayer.broadcastBreakEvent(interactionHand) }
                 // swing hand
                 runTaskLater(1) { serverPlayer.swing(interactionHand, true) }
             }

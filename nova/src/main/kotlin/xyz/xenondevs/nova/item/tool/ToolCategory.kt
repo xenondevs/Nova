@@ -28,7 +28,7 @@ open class ToolCategory internal constructor(
             if (item == null)
                 return null
             
-            val novaCategory = item.novaItem?.getBehavior(Tool::class)?.options?.category
+            val novaCategory = item.novaItem?.getBehaviorOrNull(Tool::class)?.category
             if (novaCategory != null)
                 return novaCategory
             
