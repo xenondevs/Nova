@@ -4,16 +4,18 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.dokka)
     id("xyz.xenondevs.library-loader-plugin")
+    alias(libs.plugins.paperweight)
 }
 
 dependencies {
+    // server
+    paperweight.paperDevBundle(libs.versions.paper)
+    
     // api dependencies
-    spigotRuntimeApi(variantOf(libs.spigot.server) { classifier("remapped-mojang") })
     novaLoaderApi(variantOf(libs.nmsutilities) { classifier("remapped-mojang") })
     novaLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
-    novaLoaderApi(libs.bundles.kyori.adventure)
     novaLoaderApi(libs.invui.kotlin)
     
     // internal dependencies
