@@ -74,6 +74,8 @@ import org.jetbrains.annotations.Contract
 import xyz.xenondevs.nova.integration.permission.PermissionManager
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.time.Duration
+import java.time.Instant
 import java.util.*
 
 /**
@@ -121,6 +123,14 @@ class FakeOnlinePlayer(
     }
     
     override fun ban(reason: String?, expires: Date?, source: String?, kickPlayer: Boolean): BanEntry<PlayerProfile>? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun ban(reason: String?, expires: Instant?, source: String?, kickPlayer: Boolean): BanEntry<PlayerProfile>? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun ban(reason: String?, expires: Duration?, source: String?, kickPlayer: Boolean): BanEntry<PlayerProfile>? {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -185,6 +195,14 @@ class FakeOnlinePlayer(
     }
     
     override fun banIp(reason: String?, expires: Date?, source: String?, kickPlayer: Boolean): BanEntry<InetAddress>? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun banIp(reason: String?, expires: Instant?, source: String?, kickPlayer: Boolean): BanEntry<InetAddress>? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun banIp(reason: String?, expires: Duration?, source: String?, kickPlayer: Boolean): BanEntry<InetAddress>? {
         throw UnsupportedOperationException("Player is not online")
     }
     
