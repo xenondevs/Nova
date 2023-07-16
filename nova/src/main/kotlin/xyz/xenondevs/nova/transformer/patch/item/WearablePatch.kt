@@ -96,7 +96,7 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
             override fun getEquipmentSlot() = wearable.slot.nmsEquipmentSlot
             
             override fun getEquipSound() = wearable.equipSound?.let {
-                SoundEvent.createVariableRangeEvent(ResourceLocation.tryParse(it))
+                SoundEvent.createVariableRangeEvent(ResourceLocation(it))
             } ?: SoundEvents.ARMOR_EQUIP_GENERIC
             
         }
@@ -121,32 +121,31 @@ internal class WatchedArmorList(player: Player) : NonNullList<ItemStack>(
     private var initialized = false
     private val previousStacks = Array<ItemStack>(4) { ItemStack.EMPTY }
     
-    override fun set(index: Int, element: ItemStack?): ItemStack {
-        val item = element ?: ItemStack.EMPTY
+    override fun set(index: Int, element: ItemStack): ItemStack {
         if (initialized) {
             if (player != null) {
                 val previous = previousStacks[index]
-                if (ItemStack.matches(previous, item))
-                    return item
+                if (ItemStack.matches(previous, element))
+                    return element
                 
                 val equipAction = when {
-                    previous.isEmpty && !item.isEmpty -> EquipAction.EQUIP
-                    !previous.isEmpty && item.isEmpty -> EquipAction.UNEQUIP
+                    previous.isEmpty && !element.isEmpty -> EquipAction.EQUIP
+                    !previous.isEmpty && element.isEmpty -> EquipAction.UNEQUIP
                     else -> EquipAction.CHANGE
                 }
                 
-                val equipEvent = ArmorEquipEvent(player.bukkitEntity, EquipmentSlot.entries[index + 2], equipAction, previous.bukkitCopy, item.bukkitCopy)
+                val equipEvent = ArmorEquipEvent(player.bukkitEntity, EquipmentSlot.entries[index + 2], equipAction, previous.bukkitCopy, element.bukkitCopy)
                 Bukkit.getPluginManager().callEvent(equipEvent)
                 
                 if (equipEvent.isCancelled)
-                    return item // return the item that was tried to set if the event was cancelled
+                    return element // return the item that was tried to set if the event was cancelled
             }
         } else if (index == 3) {
             // When the player first joins, the players inventory is loaded from nbt, with slot 3 being initialized last
             initialized = true
         }
         
-        previousStacks[index] = item.copy()
+        previousStacks[index] = element.copy()
         return super.set(index, element)
     }
     

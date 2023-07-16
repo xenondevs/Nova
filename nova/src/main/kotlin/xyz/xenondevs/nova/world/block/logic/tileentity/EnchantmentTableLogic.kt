@@ -139,7 +139,7 @@ internal object EnchantmentTableLogic {
         
         //<editor-fold desc="EnchantItemEvent", defaultstate="collapsed">
         val bukkitEnchantments = enchantments.mapKeysTo(HashMap()) { Enchantment.asBukkitEnchantment(it.key) }
-        val hintedBukkitEnchantment = BukkitEnchantment.getByKey(BuiltInRegistries.ENCHANTMENT.getKey(BuiltInRegistries.ENCHANTMENT.byId(menu.enchantClue[slot]))!!.namespacedKey)!!
+        val hintedBukkitEnchantment = BukkitEnchantment.getByKey(BuiltInRegistries.ENCHANTMENT.getKey(BuiltInRegistries.ENCHANTMENT.byId(menu.enchantClue[slot])!!)!!.namespacedKey)!!
         val hintedLevel = menu.levelClue[slot]
         
         val event = EnchantItemEvent(

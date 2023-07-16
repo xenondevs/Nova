@@ -41,19 +41,20 @@ import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsState
+import xyz.xenondevs.nova.util.novaSoundGroup
 import xyz.xenondevs.nova.util.removeInternal
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
-import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 
 private val CLIENTSIDE_PREDICTIONS by configReloadable { DEFAULT_CONFIG.getBoolean("world.block_breaking.clientside_predictions") }
-private val MINING_FATIGUE = MobEffectInstance(MobEffect.byId(4), Integer.MAX_VALUE, 255, false, false, false)
+private val MINING_FATIGUE = MobEffect.byId(4)!!
+private val MINING_FATIGUE_INSTANCE = MobEffectInstance(MINING_FATIGUE, Integer.MAX_VALUE, 255, false, false, false)
 
 internal class NovaBlockBreaker(
     player: Player,
@@ -120,7 +121,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
     }
     protected abstract val requiresToolForDrops: Boolean
     
-    protected val soundGroup: SoundGroup? = block.soundGroup
+    protected val soundGroup: SoundGroup? = block.novaSoundGroup
     protected val hardness: Double = block.hardness
     protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
     protected val toolCategory: ToolCategory? = ToolCategory.ofItem(tool)
@@ -204,14 +205,14 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             // The player might actually have mining fatigue.
             // In this case, it is important to copy the hasIcon value to prevent it from disappearing.
             val effectInstance = MobEffectInstance(
-                MobEffect.byId(4),
+                MINING_FATIGUE,
                 Int.MAX_VALUE, 255,
                 effect.isAmbient, effect.hasParticles(), effect.hasIcon()
             )
             ClientboundUpdateMobEffectPacket(player.entityId, effectInstance)
         } else {
             // The player does not have mining fatigue, we can use the default effect instance
-            ClientboundUpdateMobEffectPacket(player.entityId, MINING_FATIGUE)
+            ClientboundUpdateMobEffectPacket(player.entityId, MINING_FATIGUE_INSTANCE)
         }
         
         player.send(packet)
@@ -300,14 +301,14 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             val effectPacket = if (effect != null) {
                 // If the player actually has mining fatigue, send the correct effect again
                 val effectInstance = MobEffectInstance(
-                    MobEffect.byId(4),
+                    MINING_FATIGUE,
                     effect.duration, effect.amplifier,
                     effect.isAmbient, effect.hasParticles(), effect.hasIcon()
                 )
                 ClientboundUpdateMobEffectPacket(player.entityId, effectInstance)
             } else {
                 // Remove the effect
-                ClientboundRemoveMobEffectPacket(player.entityId, MobEffect.byId(4))
+                ClientboundRemoveMobEffectPacket(player.entityId, MINING_FATIGUE)
             }
             
             player.send(effectPacket)

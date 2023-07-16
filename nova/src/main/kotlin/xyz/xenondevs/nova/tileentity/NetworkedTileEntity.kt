@@ -24,7 +24,6 @@ import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.BlockFaceUtils
-import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import java.util.*
 import kotlin.properties.ReadOnlyProperty
@@ -85,7 +84,7 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     
     private fun emptyBucket(holder: NovaFluidHolder, player: Player, hand: EquipmentSlot): Boolean {
         val bucket = player.inventory.getItem(hand)
-        val type = FluidType.entries.first { bucket?.isSimilar(it.bucket) ?: false }
+        val type = FluidType.entries.first { bucket.isSimilar(it.bucket) }
         
         val container = holder.availableContainers.values.firstOrNull { it.accepts(type, 1000) && holder.allowedConnectionTypes[it]!!.insert }
         if (container != null) {
@@ -109,7 +108,7 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
         
         if (container != null) {
             if (player.gameMode != GameMode.CREATIVE) {
-                val handItem = inventory.getItem(hand)!!
+                val handItem = inventory.getItem(hand)
                 val bucket = container.type!!.bucket!!
                 if (handItem.amount == 1) {
                     inventory.setItem(hand, bucket)

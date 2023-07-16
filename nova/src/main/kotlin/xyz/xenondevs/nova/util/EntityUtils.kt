@@ -39,18 +39,6 @@ val BukkitPlayer.destroyProgress: Double?
     get() = BlockBreaking.getBreaker(this)?.progress?.coerceAtMost(1.0)
 
 /**
- * Swings the [hand] of the player.
- * @throws IllegalArgumentException If the [hand] is not a valid hand.
- */
-fun BukkitPlayer.swingHand(hand: BukkitEquipmentSlot) {
-    when (hand) {
-        BukkitEquipmentSlot.HAND -> swingMainHand()
-        BukkitEquipmentSlot.OFF_HAND -> swingOffHand()
-        else -> throw IllegalArgumentException("EquipmentSlot is not a hand")
-    }
-}
-
-/**
  * Damages the item in the [entity's][BukkitLivingEntity] main hand by [damage] amount.
  */
 fun BukkitLivingEntity.damageItemInMainHand(damage: Int = 1) {
@@ -117,7 +105,7 @@ fun BukkitEntity.teleport(modifyLocation: Location.() -> Unit) {
 }
 
 /**
- * The translation key for the name of this [BukkitEntity]. 
+ * The translation key for the name of this [BukkitEntity].
  */
 val BukkitEntity.localizedName: String?
     get() = (this as CraftEntity).handle.type.descriptionId
@@ -169,7 +157,7 @@ object EntityUtils {
         var compoundTag = nmsEntity.saveWithoutId(CompoundTag())
         
         // add id tag to compound tag to identify entity type
-        compoundTag.putString("id", nmsEntity.encodeId)
+        compoundTag.putString("id", nmsEntity.encodeId!!)
         
         // modify nbt data
         if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag)
@@ -252,7 +240,7 @@ class FakePlayer(
         advancements.stopListening()
     }
     
-    override fun onEffectAdded(mobeffect: MobEffectInstance?, entity: MojangEntity?) {
+    override fun onEffectAdded(effect: MobEffectInstance, source: MojangEntity?) {
         // empty
     }
     

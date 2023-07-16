@@ -13,7 +13,7 @@ import java.io.DataOutput
 
 internal object CBFCompoundTagType : TagType.VariableSize<CBFCompoundTag> {
     
-    override fun load(input: DataInput, i: Int, accounter: NbtAccounter?): CBFCompoundTag {
+    override fun load(input: DataInput, i: Int, tracker: NbtAccounter): CBFCompoundTag {
         val reader = ByteReader.fromDataInput(input)
         reader.skip(4) // skip length int
         return CBFCompoundTag(CBF.read(reader)!!)

@@ -263,7 +263,7 @@ val serverTick: Int
     get() = MINECRAFT_SERVER.tickCount
 
 @Suppress("FunctionName")
-fun <E> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
+fun <E : Any> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
     val nonNullList: NonNullList<E>
     if (default == null) {
         nonNullList = NonNullList.createWithCapacity(list.size)
@@ -386,15 +386,15 @@ operator fun Registry<*>.contains(key: String): Boolean {
     return containsKey(id)
 }
 
-internal operator fun <T> WritableRegistry<T>.set(name: String, value: T) {
+internal operator fun <T : Any> WritableRegistry<T>.set(name: String, value: T) {
     register(ResourceKey.create(key(), ResourceLocation.of(name, ':')), value, Lifecycle.stable())
 }
 
-internal operator fun <T> WritableRegistry<T>.set(id: ResourceLocation, value: T) {
+internal operator fun <T : Any> WritableRegistry<T>.set(id: ResourceLocation, value: T) {
     register(ResourceKey.create(key(), id), value, Lifecycle.stable())
 }
 
-operator fun <T> WritableRegistry<T>.set(addon: Addon, key: String, value: T) {
+operator fun <T : Any> WritableRegistry<T>.set(addon: Addon, key: String, value: T) {
     register(ResourceKey.create(key(), ResourceLocation(addon, key)), value, Lifecycle.stable())
 }
 
@@ -483,8 +483,8 @@ object NMSUtils {
         "SRF(net.minecraft.world.entity.Entity ENTITY_COUNTER)"
     ).get(null) as AtomicInteger
     
-    val REGISTRY_ACCESS = MINECRAFT_SERVER.registryAccess()!!
-    val REGISTRY_OPS = RegistryOps.create(JsonOps.INSTANCE, VanillaRegistryAccess)!!
+    val REGISTRY_ACCESS = MINECRAFT_SERVER.registryAccess()
+    val REGISTRY_OPS = RegistryOps.create(JsonOps.INSTANCE, VanillaRegistryAccess)
     
     fun freezeRegistry(registry: Registry<*>) {
         if (registry !is MappedRegistry) return

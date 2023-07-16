@@ -10,7 +10,6 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.util.damageItemInMainHand
 import xyz.xenondevs.nova.util.playSoundNearby
 import xyz.xenondevs.nova.util.runTaskLater
-import xyz.xenondevs.nova.util.swingHand
 
 private val FLATTENABLES: Set<Material> = hashSetOf(
     Material.GRASS_BLOCK,

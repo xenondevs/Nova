@@ -34,7 +34,6 @@ import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.serverPlayer
-import xyz.xenondevs.nova.util.swingHand
 import java.util.*
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -146,7 +145,7 @@ sealed interface Wearable {
                 event.isCancelled = true
                 
                 val hand = event.hand!!
-                val previous = player.inventory.getItem(slot)?.takeUnlessEmpty()
+                val previous = player.inventory.getItem(slot).takeUnlessEmpty()
                 if (previous != null) {
                     // swap armor
                     player.inventory.setItem(slot, itemStack)

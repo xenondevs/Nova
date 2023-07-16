@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.initialize
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import net.kyori.adventure.text.Component
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
 import org.bukkit.Bukkit
@@ -183,7 +184,7 @@ internal object Initializer : Listener {
                 callEvent(NovaLoadDataEvent())
                 
                 runTask {
-                    PermanentStorage.store("last_version", NOVA.description.version)
+                    PermanentStorage.store("last_version", NOVA.pluginMeta.version)
                     setGlobalIngredients()
                     AddonManager.enableAddons()
                     setupMetrics()
@@ -234,7 +235,7 @@ internal object Initializer : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private fun handleLogin(event: PlayerLoginEvent) {
         if (!isDone && !IS_DEV_SERVER) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "[Nova] Initialization not complete. Please wait.")
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("[Nova] Initialization not complete. Please wait."))
         }
     }
     

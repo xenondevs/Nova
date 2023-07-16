@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.item.behavior.impl
 
 import net.kyori.adventure.text.Component
-import net.md_5.bungee.api.ChatMessageType
 import org.bukkit.NamespacedKey
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
@@ -21,11 +20,8 @@ import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
-import xyz.xenondevs.nova.util.component.adventure.sendMessage
 import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.get
-import xyz.xenondevs.nova.util.isRightClick
-import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.util.toString
 import xyz.xenondevs.nova.world.pos
 
@@ -75,11 +71,11 @@ internal object WrenchBehavior : ItemBehavior {
                 }
                 
             }
-        } else if (action.isRightClick() && player.isSneaking) {
+        } else if (action.isRightClick && player.isSneaking) {
             val currentMode = itemStack.wrenchMode
             val newMode = NETWORK_TYPES[(NETWORK_TYPES.indexOf(currentMode) + 1) % NETWORK_TYPES.size]
             itemStack.wrenchMode = newMode
-            player.sendMessage(ChatMessageType.ACTION_BAR, Component.translatable("item.nova.wrench.mode.${newMode.id.toString(".")}"))
+            player.sendActionBar(Component.translatable("item.nova.wrench.mode.${newMode.id.toString(".")}"))
         }
     }
     

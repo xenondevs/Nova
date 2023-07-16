@@ -5,27 +5,15 @@ import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentBuilder
 import net.kyori.adventure.text.format.TextColor
-import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
-import net.md_5.bungee.api.ChatMessageType
-import net.md_5.bungee.api.chat.BaseComponent
 import net.minecraft.nbt.StringTag
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage
-import org.bukkit.entity.Player
 import xyz.xenondevs.inventoryaccess.util.AdventureComponentUtils
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
 import java.awt.Color
 import net.minecraft.network.chat.Component as MojangComponent
-
-fun Player.sendMessage(component: Component) {
-    spigot().sendMessage(*component.toBungeeComponent())
-}
-
-fun Player.sendMessage(type: ChatMessageType, component: Component) {
-    spigot().sendMessage(type, *component.toBungeeComponent())
-}
 
 fun String.toAdventureComponent(): Component {
     return GsonComponentSerializer.gson().deserialize(this)
@@ -37,18 +25,6 @@ fun MojangComponent.toAdventureComponent(): Component {
 
 fun MojangComponent.toJson(): String {
     return MojangComponent.Serializer.toJson(this)
-}
-
-fun Array<out BaseComponent>.toAdventureComponent(): Component {
-    return BungeeComponentSerializer.get().deserialize(this)
-}
-
-fun BaseComponent.toAdventureComponent(): Component {
-    return BungeeComponentSerializer.get().deserialize(arrayOf(this))
-}
-
-fun Component.toBungeeComponent(): Array<out BaseComponent> {
-    return BungeeComponentSerializer.get().serialize(this)
 }
 
 fun Component.toNMSComponent(): MojangComponent {

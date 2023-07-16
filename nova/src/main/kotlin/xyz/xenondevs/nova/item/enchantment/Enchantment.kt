@@ -1,9 +1,13 @@
 package xyz.xenondevs.nova.item.enchantment
 
+import io.papermc.paper.enchantments.EnchantmentRarity
+import net.kyori.adventure.text.Component
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.enchantment.Enchantment.Rarity
 import org.bukkit.enchantments.EnchantmentTarget
+import org.bukkit.entity.EntityCategory
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -102,12 +106,18 @@ sealed interface Enchantment {
             
             return object : BukkitEnchantment(key) {
                 
+                override fun translationKey() = enchantment.localizedName
                 override fun getName() = key.toString()
                 override fun getMaxLevel(): Int = enchantment.maxLevel
                 override fun getStartLevel(): Int = enchantment.minLevel
                 override fun getItemTarget(): EnchantmentTarget = EnchantmentTarget.ALL
-                override fun isTreasure(): Boolean = false
-                override fun isCursed(): Boolean = false
+                override fun isTreasure(): Boolean = enchantment.isTreasure
+                override fun isCursed(): Boolean = enchantment.isCurse
+                override fun isTradeable() = enchantment.isTradeable
+                override fun isDiscoverable() = enchantment.isTableDiscoverable
+                override fun getRarity(): EnchantmentRarity = EnchantmentRarity.COMMON // TODO: find closest match
+                override fun getDamageIncrease(level: Int, entityCategory: EntityCategory): Float = 0f
+                override fun getActiveSlots(): Set<EquipmentSlot> = emptySet() // TODO
                 
                 override fun conflictsWith(other: BukkitEnchantment): Boolean =
                     !enchantment.isCompatibleWith(of(other))
@@ -116,6 +126,12 @@ sealed interface Enchantment {
                     NovaRegistries.ENCHANTMENT_CATEGORY.asSequence()
                         .filter { enchantment in it.enchantments }
                         .any { it.canEnchant(itemStack) }
+                
+                override fun displayName(level: Int) = Component.textOfChildren(
+                    Component.translatable(enchantment.localizedName),
+                    Component.space(),
+                    Component.translatable("enchantment.level.${level}")
+                )
                 
             }
         }

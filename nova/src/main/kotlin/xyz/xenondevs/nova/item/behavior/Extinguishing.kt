@@ -18,7 +18,6 @@ import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.sendTo
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
-import xyz.xenondevs.nova.util.swingHand
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 

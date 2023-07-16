@@ -134,7 +134,7 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
                         
                         enchantments[enchantment] = newLevel
                         
-                        val costMultiplier = when (enchantment.rarity!!) {
+                        val costMultiplier = when (enchantment.rarity) {
                             COMMON -> 1
                             UNCOMMON -> 2
                             RARE -> 4
@@ -173,7 +173,8 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
         } else if (menu.itemName != getHoverName(player, inputStack)) {
             renamed = true
             extraCost += 1
-            resultStack.hoverName = Component.literal(menu.itemName)
+            val nullableComponent: Component? = menu.itemName?.let(Component::literal)
+            resultStack.hoverName = nullableComponent
         }
         //</editor-fold>
         //<editor-fold desc="cost calculations", defaultstate="collapsed">

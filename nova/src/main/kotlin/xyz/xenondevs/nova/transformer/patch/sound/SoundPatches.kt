@@ -24,9 +24,9 @@ import xyz.xenondevs.nova.util.forcePacketBroadcast
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.name
+import xyz.xenondevs.nova.util.novaSoundGroup
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
-import xyz.xenondevs.nova.util.soundGroup
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
@@ -147,7 +147,7 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
             val block = pos.block
             
             if (!block.type.isAir) {
-                val soundGroup = block.soundGroup ?: return
+                val soundGroup = block.novaSoundGroup ?: return
                 val newSound = soundGroup.fallSound
                 val oldSound = block.type.soundGroup.fallSound.key.key
                 
@@ -187,7 +187,7 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
     @JvmStatic
     fun playBreakSound(level: Level, pos: MojangBlockPos) {
         val novaPos = pos.toNovaPos(level.world)
-        val soundGroup = novaPos.block.soundGroup ?: return
+        val soundGroup = novaPos.block.novaSoundGroup ?: return
         val oldSound = novaPos.block.type.soundGroup.breakSound.key.key
         
         // send custom break sound if it's overridden
@@ -218,7 +218,7 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
         if (novaItem != null) {
             val soundEventName = novaItem.getBehaviorOrNull(Wearable::class)?.equipSound
                 ?: return null
-            return SoundEvent.createVariableRangeEvent(ResourceLocation.tryParse(soundEventName))
+            return SoundEvent.createVariableRangeEvent(ResourceLocation(soundEventName))
         }
         
         return (itemStack.item as? ArmorItem)?.material?.equipSound

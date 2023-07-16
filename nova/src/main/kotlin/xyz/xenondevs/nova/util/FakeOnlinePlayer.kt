@@ -1,7 +1,19 @@
-@file:Suppress("OVERRIDE_DEPRECATION")
+@file:Suppress("DEPRECATION", "OVERRIDE_DEPRECATION", "removal")
 
 package xyz.xenondevs.nova.util
 
+import com.destroystokyo.paper.ClientOption
+import com.destroystokyo.paper.Title
+import com.destroystokyo.paper.block.TargetBlockInfo
+import com.destroystokyo.paper.entity.TargetEntityInfo
+import io.papermc.paper.entity.LookAnchor
+import io.papermc.paper.entity.TeleportFlag
+import io.papermc.paper.math.Position
+import io.papermc.paper.threadedregions.scheduler.EntityScheduler
+import net.kyori.adventure.bossbar.BossBar
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.util.TriState
+import net.md_5.bungee.api.chat.BaseComponent
 import org.bukkit.BanEntry
 import org.bukkit.DyeColor
 import org.bukkit.Effect
@@ -39,6 +51,8 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityCategory
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Firework
+import org.bukkit.entity.FishHook
+import org.bukkit.entity.Item
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
@@ -46,7 +60,11 @@ import org.bukkit.entity.Projectile
 import org.bukkit.entity.SpawnCategory
 import org.bukkit.entity.Villager
 import org.bukkit.entity.memory.MemoryKey
+import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.inventory.InventoryCloseEvent
+import org.bukkit.event.player.PlayerKickEvent
+import org.bukkit.event.player.PlayerResourcePackStatusEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.EntityEquipment
 import org.bukkit.inventory.EquipmentSlot
@@ -65,9 +83,9 @@ import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.plugin.Plugin
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.profile.PlayerProfile
 import org.bukkit.scoreboard.Scoreboard
 import org.bukkit.util.BoundingBox
+import org.bukkit.util.Consumer
 import org.bukkit.util.RayTraceResult
 import org.bukkit.util.Vector
 import org.jetbrains.annotations.Contract
@@ -112,6 +130,46 @@ class FakeOnlinePlayer(
         return "en_us"
     }
     
+    override fun getAffectsSpawning(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setAffectsSpawning(affects: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getViewDistance(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setViewDistance(viewDistance: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getSimulationDistance(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setSimulationDistance(simulationDistance: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getNoTickViewDistance(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setNoTickViewDistance(viewDistance: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getSendViewDistance(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setSendViewDistance(viewDistance: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getLocation(): Location {
         return location
     }
@@ -120,7 +178,7 @@ class FakeOnlinePlayer(
         return true
     }
     
-    override fun ban(reason: String?, expires: Date?, source: String?, kickPlayer: Boolean): BanEntry<PlayerProfile>? {
+    override fun <E : BanEntry<in com.destroystokyo.paper.profile.PlayerProfile>?> ban(reason: String?, expires: Date?, source: String?, kickPlayer: Boolean): E? {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -133,6 +191,22 @@ class FakeOnlinePlayer(
     }
     
     override fun setDisplayName(name: String?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun playerListName(name: Component?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun playerListName(): Component {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun playerListHeader(): Component? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun playerListFooter(): Component? {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -164,6 +238,14 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun setPlayerListHeaderFooter(header: Array<out BaseComponent?>?, footer: Array<out BaseComponent?>?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setPlayerListHeaderFooter(header: BaseComponent?, footer: BaseComponent?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun setCompassTarget(loc: Location) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -176,11 +258,39 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getProtocolVersion(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getVirtualHost(): InetSocketAddress? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun displayName(): Component {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun displayName(displayName: Component?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun sendRawMessage(message: String) {
         throw UnsupportedOperationException("Player is not online")
     }
     
     override fun kickPlayer(message: String?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun kick() {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun kick(message: Component?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun kick(message: Component?, cause: PlayerKickEvent.Cause) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -344,6 +454,10 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun sendMultiBlockChange(blockChanges: MutableMap<out Position, BlockData>) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun sendEquipmentChange(entity: LivingEntity, slot: EquipmentSlot, item: ItemStack?) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -352,17 +466,31 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Throws(IllegalArgumentException::class)
-    override fun sendSignChange(loc: Location, lines: Array<String>?) {
+    override fun sendSignChange(loc: Location, lines: MutableList<out Component>?, dyeColor: DyeColor, hasGlowingText: Boolean) {
         throw UnsupportedOperationException("Player is not online")
     }
     
-    @Throws(IllegalArgumentException::class)
-    override fun sendSignChange(loc: Location, lines: Array<String>?, dyeColor: DyeColor) {
+    override fun sendSignChange(loc: Location, lines: Array<out String?>?) {
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun sendSignChange(loc: Location, lines: Array<out String>?, dyeColor: DyeColor, hasGlowingText: Boolean) {
+    override fun sendSignChange(loc: Location, lines: Array<out String?>?, dyeColor: DyeColor) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendSignChange(loc: Location, lines: Array<out String?>?, dyeColor: DyeColor, hasGlowingText: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendSignChange(loc: Location, lines: MutableList<out Component>?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendSignChange(loc: Location, lines: MutableList<out Component>?, dyeColor: DyeColor) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendSignChange(loc: Location, lines: MutableList<out Component>?, hasGlowingText: Boolean) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -371,6 +499,34 @@ class FakeOnlinePlayer(
     }
     
     override fun sendMap(map: MapView) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun showWinScreen() {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun hasSeenWinScreen(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setHasSeenWinScreen(hasSeenWinScreen: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setTitleTimes(fadeInTicks: Int, stayTicks: Int, fadeOutTicks: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setSubtitle(subtitle: Array<out BaseComponent>?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setSubtitle(subtitle: BaseComponent?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendTitle(title: Title) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -438,7 +594,15 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun applyMending(amount: Int): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun giveExp(amount: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun giveExp(amount: Int, applyMending: Boolean) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -483,6 +647,14 @@ class FakeOnlinePlayer(
     }
     
     override fun setAllowFlight(flight: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setFlyingFallDamage(flyingFallDamage: TriState) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun hasFlyingFallDamage(): TriState {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -568,6 +740,22 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun setResourcePack(url: String, hash: ByteArray?, prompt: Component?, force: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setResourcePack(url: String, hash: String) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setResourcePack(url: String, hash: String, required: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setResourcePack(url: String, hash: String, required: Boolean, resourcePackPrompt: Component?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getScoreboard(): Scoreboard {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -623,6 +811,14 @@ class FakeOnlinePlayer(
     }
     
     override fun sendTitle(title: String?, subtitle: String?, fadeIn: Int, stay: Int, fadeOut: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun updateTitle(title: Title) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun hideTitle() {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -686,6 +882,10 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun locale(): Locale {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getPing(): Int {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -714,7 +914,111 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getResourcePackStatus(): PlayerResourcePackStatusEvent.Status? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getResourcePackHash(): String? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun hasResourcePack(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setPlayerProfile(profile: com.destroystokyo.paper.profile.PlayerProfile) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getCooldownPeriod(): Float {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getCooledAttackStrength(adjustTicks: Float): Float {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun resetCooldown() {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun <T : Any?> getClientOption(option: ClientOption<T>): T & Any {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun boostElytra(firework: ItemStack): Firework? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendOpLevel(level: Byte) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun addAdditionalChatCompletions(completions: MutableCollection<String>) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun removeAdditionalChatCompletions(completions: MutableCollection<String>) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getClientBrandName(): String? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun lookAt(x: Double, y: Double, z: Double, playerAnchor: LookAnchor) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun lookAt(entity: Entity, playerAnchor: LookAnchor, entityAnchor: LookAnchor) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun showElderGuardian(silent: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getWardenWarningCooldown(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setWardenWarningCooldown(cooldown: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getWardenTimeSinceLastWarning(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setWardenTimeSinceLastWarning(time: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getWardenWarningLevel(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setWardenWarningLevel(warningLevel: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun increaseWardenWarningLevel() {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun spigot(): Player.Spigot {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun name(): Component {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun customName(): Component? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun customName(customName: Component?) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -770,7 +1074,35 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun openAnvil(location: Location?, force: Boolean): InventoryView? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun openCartographyTable(location: Location?, force: Boolean): InventoryView? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun openGrindstone(location: Location?, force: Boolean): InventoryView? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun openLoom(location: Location?, force: Boolean): InventoryView? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun openSmithingTable(location: Location?, force: Boolean): InventoryView? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun openStonecutter(location: Location?, force: Boolean): InventoryView? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun closeInventory() {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun closeInventory(reason: InventoryCloseEvent.Reason) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -802,7 +1134,19 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun isDeeplySleeping(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getSleepTicks(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getPotentialBedLocation(): Location? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getFishHook(): FishHook? {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -834,11 +1178,71 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getHandRaised(): EquipmentSlot {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isJumping(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setJumping(jumping: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun playPickupItemAnimation(item: Item, quantity: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getHurtDirection(): Float {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setHurtDirection(hurtDirection: Float) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun knockback(strength: Double, directionX: Double, directionZ: Double) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun broadcastSlotBreak(slot: EquipmentSlot) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun broadcastSlotBreak(slot: EquipmentSlot, players: MutableCollection<Player>) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun damageItemStack(stack: ItemStack, amount: Int): ItemStack {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun damageItemStack(slot: EquipmentSlot, amount: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getBodyYaw(): Float {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setBodyYaw(bodyYaw: Float) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getItemInUse(): ItemStack? {
         throw UnsupportedOperationException("Player is not online")
     }
     
     override fun getExpToLevel(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun releaseLeftShoulderEntity(): Entity? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun releaseRightShoulderEntity(): Entity? {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -966,6 +1370,34 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getTargetBlock(maxDistance: Int, fluidMode: TargetBlockInfo.FluidMode): Block? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getTargetBlockFace(maxDistance: Int, fluidMode: TargetBlockInfo.FluidMode): BlockFace? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getTargetBlockFace(maxDistance: Int, fluidMode: FluidCollisionMode): BlockFace? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getTargetBlockInfo(maxDistance: Int, fluidMode: TargetBlockInfo.FluidMode): TargetBlockInfo? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getTargetEntity(maxDistance: Int, ignoreBlocks: Boolean): Entity? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getTargetEntityInfo(maxDistance: Int, ignoreBlocks: Boolean): TargetEntityInfo? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun rayTraceEntities(maxDistance: Int, ignoreBlocks: Boolean): RayTraceResult? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getLastTwoTargetBlocks(transparent: Set<Material>?, maxDistance: Int): List<Block> {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1018,6 +1450,26 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun setArrowsInBody(count: Int, fireEvent: Boolean) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getBeeStingerCooldown(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setBeeStingerCooldown(ticks: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getBeeStingersInBody(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setBeeStingersInBody(count: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getMaximumNoDamageTicks(): Int {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1054,6 +1506,10 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun setKiller(killer: Player?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun addPotionEffect(effect: PotionEffect): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1082,7 +1538,15 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun clearActivePotionEffects(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun hasLineOfSight(other: Entity): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun hasLineOfSight(location: Location): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1094,7 +1558,7 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
-    override fun getEquipment(): EntityEquipment? {
+    override fun getEquipment(): EntityEquipment {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1235,7 +1699,43 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun getArrowsStuck(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setArrowsStuck(arrows: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getShieldBlockingDelay(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setShieldBlockingDelay(delay: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getActiveItem(): ItemStack {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun clearActiveItem() {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getItemUseRemainingTime(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getHandRaisedTime(): Int {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun getAttribute(attribute: Attribute): AttributeInstance? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun registerAttribute(attribute: Attribute) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1308,6 +1808,10 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun teleport(location: Location, cause: PlayerTeleportEvent.TeleportCause, vararg teleportFlags: TeleportFlag): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun teleport(location: Location): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1365,6 +1869,14 @@ class FakeOnlinePlayer(
     }
     
     override fun isFrozen(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isFreezeTickingLocked(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun lockFreezeTicks(locked: Boolean) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1560,6 +2072,78 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun teamDisplayName(): Component {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getOrigin(): Location? {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun fromMobSpawner(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getEntitySpawnReason(): CreatureSpawnEvent.SpawnReason {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isUnderWater(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isInRain(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isInBubbleColumn(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isInWaterOrRain(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isInWaterOrBubbleColumn(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isInWaterOrRainOrBubbleColumn(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isInLava(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isTicking(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getTrackedPlayers(): MutableSet<Player> {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun spawnAt(location: Location, reason: CreatureSpawnEvent.SpawnReason): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun isInPowderedSnow(): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun collidesAt(location: Location): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun wouldCollideUsing(boundingBox: BoundingBox): Boolean {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getScheduler(): EntityScheduler {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun setMetadata(metadataKey: String, newMetadataValue: MetadataValue) {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1589,6 +2173,34 @@ class FakeOnlinePlayer(
     }
     
     override fun sendMessage(sender: UUID?, messages: Array<String>) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendActionBar(message: String) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendActionBar(alternateChar: Char, message: String) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun sendActionBar(vararg message: BaseComponent) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun showTitle(title: Array<out BaseComponent?>?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun showTitle(title: BaseComponent?) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun showTitle(title: Array<out BaseComponent?>?, subtitle: Array<out BaseComponent?>?, fadeInTicks: Int, stayTicks: Int, fadeOutTicks: Int) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun showTitle(title: BaseComponent?, subtitle: BaseComponent?, fadeInTicks: Int, stayTicks: Int, fadeOutTicks: Int) {
         throw UnsupportedOperationException("Player is not online")
     }
     
@@ -1640,6 +2252,18 @@ class FakeOnlinePlayer(
         throw UnsupportedOperationException("Player is not online")
     }
     
+    override fun <T : Projectile?> launchProjectile(projectile: Class<out T>, velocity: Vector?, function: Consumer<T>?): T & Any {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun getFrictionState(): TriState {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun setFrictionState(state: TriState) {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
     override fun isConversing(): Boolean {
         throw UnsupportedOperationException("Player is not online")
     }
@@ -1669,6 +2293,10 @@ class FakeOnlinePlayer(
     }
     
     override fun getListeningPluginChannels(): Set<String> {
+        throw UnsupportedOperationException("Player is not online")
+    }
+    
+    override fun activeBossBars(): MutableIterable<BossBar> {
         throw UnsupportedOperationException("Player is not online")
     }
     

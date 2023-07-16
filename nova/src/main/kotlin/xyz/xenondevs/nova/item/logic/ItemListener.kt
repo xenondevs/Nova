@@ -18,8 +18,8 @@ import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
@@ -58,20 +58,20 @@ internal object ItemListener : Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
-        val item = event.player.inventory.getItem(event.hand)
+        val item = event.player.inventory.getItem(event.hand).takeUnlessEmpty()
         item?.logic?.handleEntityInteract(event.player, item, event.rightClicked, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleEntityAttack(event: EntityDamageByEntityEvent) {
         val player = event.damager as? Player ?: return
-        val item = player.inventory.getItem(EquipmentSlot.HAND)
+        val item = player.inventory.getItem(EquipmentSlot.HAND).takeUnlessEmpty()
         item?.logic?.handleAttackEntity(player, item, event.entity, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleBlockBreak(event: BlockBreakEvent) {
-        val item = event.player.inventory.getItem(EquipmentSlot.HAND)
+        val item = event.player.inventory.getItem(EquipmentSlot.HAND).takeUnlessEmpty()
         item?.logic?.handleBreakBlock(event.player, item, event)
     }
     
@@ -124,7 +124,7 @@ internal object ItemListener : Listener {
     @PacketHandler(priority = EventPriority.HIGHEST, ignoreIfCancelled = true)
     private fun handleUseItem(event: ServerboundUseItemPacketEvent) {
         val player = event.player
-        val item = player.inventory.getItem(event.hand.bukkitEquipmentSlot)?.takeUnlessEmpty()
+        val item = player.inventory.getItem(event.hand.bukkitEquipmentSlot).takeUnlessEmpty()
         if (item != null)
             usedItems[player] = item
         else usedItems -= player

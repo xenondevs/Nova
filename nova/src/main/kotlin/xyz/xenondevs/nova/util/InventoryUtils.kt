@@ -116,7 +116,7 @@ fun Inventory.getFirstEmptySlot(): Int? = InventoryUtils.getFirstEmptySlot(this)
  * if the given slot is occupied.
  */
 fun PlayerInventory.addPrioritized(prioritizedSlot: EquipmentSlot, itemStack: ItemStack) {
-    if (getItem(prioritizedSlot)?.takeUnlessEmpty() == null) setItem(prioritizedSlot, itemStack)
+    if (getItem(prioritizedSlot).takeUnlessEmpty() == null) setItem(prioritizedSlot, itemStack)
     else addItem(itemStack)
 }
 

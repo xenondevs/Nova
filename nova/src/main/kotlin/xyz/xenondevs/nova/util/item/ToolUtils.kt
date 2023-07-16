@@ -55,7 +55,7 @@ object ToolUtils {
     
     @Suppress("DEPRECATION")
     internal fun calculateDamageVanilla(player: Player, block: Block): Double {
-        val serverTool = player.inventory.getItem(EquipmentSlot.HAND)?.takeUnlessEmpty()
+        val serverTool = player.inventory.getItem(EquipmentSlot.HAND).takeUnlessEmpty()
         val tool = serverTool?.let { PacketItems.getClientSideStack(player, it.nmsCopy).bukkitMirror }
         
         when (player.gameMode) {

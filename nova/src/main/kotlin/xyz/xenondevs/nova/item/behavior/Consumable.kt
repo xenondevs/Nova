@@ -25,7 +25,6 @@ import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.util.getPlayersNearby
 import xyz.xenondevs.nova.util.intValue
-import xyz.xenondevs.nova.util.isRightClick
 import xyz.xenondevs.nova.util.item.genericMaxHealth
 import xyz.xenondevs.nova.util.playSoundNearby
 import xyz.xenondevs.nova.util.runTask

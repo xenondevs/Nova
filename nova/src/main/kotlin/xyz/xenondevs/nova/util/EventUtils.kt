@@ -25,10 +25,6 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HANDLER_LIST_HANDLE
 import java.util.*
 import kotlin.reflect.KClass
 
-fun Action.isRightClick() = this == Action.RIGHT_CLICK_BLOCK || this == Action.RIGHT_CLICK_AIR
-
-fun Action.isLeftClick() = this == Action.LEFT_CLICK_BLOCK || this == Action.LEFT_CLICK_AIR
-
 fun Action.isClickBlock() = this == Action.LEFT_CLICK_BLOCK || this == Action.RIGHT_CLICK_BLOCK
 
 fun Action.isClickAir() = this == Action.LEFT_CLICK_AIR || this == Action.RIGHT_CLICK_AIR

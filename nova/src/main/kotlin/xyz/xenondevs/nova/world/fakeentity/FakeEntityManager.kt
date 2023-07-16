@@ -18,8 +18,8 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runAsyncTaskLater
@@ -164,7 +164,7 @@ internal object FakeEntityManager : Listener {
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun handleMove(event: PlayerMoveEvent) {
-        val newChunk = event.to!!.chunkPos
+        val newChunk = event.to.chunkPos
         if (event.from.chunkPos != newChunk) {
             val player = event.player
             runAsyncTask { handleChunksChange(player, newChunk) }
@@ -173,7 +173,7 @@ internal object FakeEntityManager : Listener {
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun handleTeleport(event: PlayerTeleportEvent) {
-        val newChunk = event.to!!.chunkPos
+        val newChunk = event.to.chunkPos
         if (event.from.chunkPos != newChunk) {
             val player = event.player
             runAsyncTaskLater(1) { handleChunksChange(player, newChunk) }

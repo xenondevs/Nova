@@ -20,7 +20,6 @@ import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.concurrent.runIfTrueOnSimilarThread
 import xyz.xenondevs.nova.util.isCompletelyDenied
-import xyz.xenondevs.nova.util.isLeftClick
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.runTask
@@ -184,7 +183,7 @@ internal object HitboxManager : Listener {
                         if (hitbox.qualifier?.invoke(event) == false)
                             continue // skip hitbox as qualifier has failed
                         
-                        val handlers = if (action.isLeftClick()) hitbox.leftClickHandlers else hitbox.rightClickHandlers
+                        val handlers = if (action.isLeftClick) hitbox.leftClickHandlers else hitbox.rightClickHandlers
                         if (handlers.isEmpty())
                             continue // skip hitbox as it has no handlers for the current action
                         

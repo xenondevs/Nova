@@ -16,7 +16,7 @@ internal interface MetadataEntry<T> {
     
 }
 
-internal open class NonNullMetadataEntry<T>(
+internal open class NonNullMetadataEntry<T : Any>(
     private val index: Int,
     private val serializer: EntityDataSerializer<T>,
     private val default: T

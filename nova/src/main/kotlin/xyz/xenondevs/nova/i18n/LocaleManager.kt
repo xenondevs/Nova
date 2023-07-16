@@ -101,6 +101,7 @@ object LocaleManager {
         return loadedLangs.mapTo(HashSet()) { getTranslation(it, key, *args) }
     }
     
+    @Suppress("DEPRECATION")
     @Synchronized
     fun getTranslation(player: Player, key: String, vararg args: Any): String {
         return getTranslation(player.locale, key, *args)
@@ -136,7 +137,7 @@ object LocaleManager {
             return delegate.isDefaultRightToLeft
         }
         
-        override fun getVisualOrder(text: FormattedText?): FormattedCharSequence {
+        override fun getVisualOrder(text: FormattedText): FormattedCharSequence {
             return delegate.getVisualOrder(text)
         }
         

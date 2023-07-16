@@ -132,7 +132,7 @@ val Block.breakTexture: Material
 /**
  * The sound group of this block, also considering custom sound groups of Nova blocks.
  */
-val Block.soundGroup: SoundGroup?
+val Block.novaSoundGroup: SoundGroup?
     get() {
         val novaBlock = novaBlock
         if (novaBlock != null) {
@@ -526,7 +526,7 @@ fun Material.getBreakParticlesPacket(location: Location): ClientboundLevelPartic
  * Plays the breaking sound for this block.
  */
 fun Block.playBreakSound() {
-    val soundGroup = soundGroup ?: return
+    val soundGroup = novaSoundGroup ?: return
     world.playSound(location, soundGroup.breakSound, soundGroup.breakVolume, soundGroup.breakPitch)
 }
 
