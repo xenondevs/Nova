@@ -52,6 +52,6 @@ internal object ResidenceHook : ProtectionIntegration {
         getResidencePlayer(tileEntity.owner!!, entity.location).canDamageEntity(entity, false)
     
     private fun getResidencePlayer(player: OfflinePlayer, location: Location) =
-        RESIDENCE.playerManager.getResidencePlayer(FakeOnlinePlayer(player, location))
+        RESIDENCE.playerManager.getResidencePlayer(FakeOnlinePlayer.create(player, location))
     
 }

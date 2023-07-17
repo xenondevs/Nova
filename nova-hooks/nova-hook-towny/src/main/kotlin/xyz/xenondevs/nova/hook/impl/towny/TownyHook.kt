@@ -35,6 +35,6 @@ internal object TownyHook : ProtectionIntegration {
         hasPermission(player, entity.location, TownyPermission.ActionType.DESTROY)
     
     private fun hasPermission(player: OfflinePlayer, location: Location, actionType: TownyPermission.ActionType) =
-        PlayerCacheUtil.getCachePermission(FakeOnlinePlayer(player, location), location, location.block.type, actionType)
+        PlayerCacheUtil.getCachePermission(FakeOnlinePlayer.create(player, location), location, location.block.type, actionType)
     
 }

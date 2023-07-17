@@ -15,10 +15,10 @@ internal object GriefPreventionHook : ProtectionIntegration {
     private val GRIEF_PREVENTION: GriefPrevention = GriefPrevention.instance
     
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) =
-        GRIEF_PREVENTION.allowBreak(FakeOnlinePlayer(player, location), location.block, location) == null
+        GRIEF_PREVENTION.allowBreak(FakeOnlinePlayer.create(player, location), location.block, location) == null
     
     override fun canPlace(player: OfflinePlayer, item: ItemStack, location: Location) =
-        GRIEF_PREVENTION.allowBuild(FakeOnlinePlayer(player, location), location) == null
+        GRIEF_PREVENTION.allowBuild(FakeOnlinePlayer.create(player, location), location) == null
     
     override fun canUseBlock(player: OfflinePlayer, item: ItemStack?, location: Location) =
         canBreak(player, item, location)
