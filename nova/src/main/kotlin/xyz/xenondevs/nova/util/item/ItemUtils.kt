@@ -44,10 +44,8 @@ import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
 import xyz.xenondevs.nova.util.component.adventure.toJson
 import xyz.xenondevs.nova.util.data.NBTUtils
-import xyz.xenondevs.nova.util.data.getCBFCompoundTag
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
-import xyz.xenondevs.nova.util.data.getOrPutCBFCompoundTag
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.nmsCopy
@@ -208,8 +206,8 @@ var ItemStack.novaCompound: NamespacedCompound
             return handle.novaCompound
         
         val unhandledTags = backingItemMeta!!.unhandledTags
-        val tag = unhandledTags.getOrPutCBFCompoundTag("nova_cbf", ::CBFCompoundTag) as? CBFCompoundTag
-        return tag!!.compound
+        val tag = unhandledTags.getOrPut("nova_cbf", ::CBFCompoundTag) as CBFCompoundTag
+        return tag.compound
     }
     set(value) {
         val handle = handle
@@ -226,19 +224,19 @@ val ItemStack.novaCompoundOrNull: NamespacedCompound?
         if (handle != null)
             return handle.novaCompoundOrNull
         
-        return backingItemMeta?.unhandledTags?.getCBFCompoundTag("nova_cbf")?.compound
+        return (backingItemMeta?.unhandledTags?.get("nova_cbf") as? CBFCompoundTag)?.compound
     }
 //</editor-fold>
 
 //<editor-fold desc="MojangStack - Nova Compound", defaultstate="collapsed">
 var MojangStack.novaCompound: NamespacedCompound
-    get() = orCreateTag.getOrPutCBFCompoundTag("nova_cbf", ::CBFCompoundTag).compound
+    get() = orCreateTag.getOrPut("nova_cbf", ::CBFCompoundTag).compound
     set(value) {
         orCreateTag.put("nova_cbf", CBFCompoundTag(value))
     }
 
 val MojangStack.novaCompoundOrNull: NamespacedCompound?
-    get() = tag?.getCBFCompoundTag("nova_cbf")?.compound
+    get() = (tag?.get("nova_cbf") as? CBFCompoundTag)?.compound
 //</editor-fold>
 
 //<editor-fold desc="BukkitStack - retrieve", defaultstate="collapsed">
