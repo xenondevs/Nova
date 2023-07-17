@@ -1,6 +1,4 @@
 
-import net.lingala.zip4j.ZipFile
-import net.lingala.zip4j.model.ZipParameters
 import net.md_5.specialsource.Jar
 import net.md_5.specialsource.JarMapping
 import net.md_5.specialsource.JarRemapper
@@ -22,11 +20,13 @@ import xyz.xenondevs.stringremapper.FileRemapper
 import xyz.xenondevs.stringremapper.Mappings
 import xyz.xenondevs.stringremapper.RemapGoal
 import java.io.File
+import java.net.URL
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.appendText
+import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.name
 import kotlin.io.path.nameWithoutExtension
@@ -45,13 +45,10 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     abstract var novaApi: Project
     
     @get:Input
-    abstract var novaLoader: Project
-    
-    @get:Input
     abstract var hooks: List<Project>
     
     @get:Input
-    abstract val spigotVersion: Property<String>
+    abstract val gameVersion: Property<String>
     
     @get:Input
     abstract var remap: Boolean
@@ -74,7 +71,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     private fun createBundlerJar(): Path {
         project.buildDir.mkdirs()
         
-        val (mapsMojang, mapsSpigot) = resolveMappings(spigotVersion.get())
+        val (mapsMojang, mapsSpigot) = resolveMappings(gameVersion.get())
         val mappingsCache = project.buildDir.resolve("mappings.json")
         val mappings: Mappings
         if (mappingsCache.exists()) {
@@ -85,9 +82,9 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         }
         val remapper = FileRemapper(mappings, if (remap) RemapGoal.SPIGOT else RemapGoal.MOJANG)
         
-        // create nova jar
-        val novaFile = project.buildDir.resolve("nova-remapped.jar").toPath()
-        buildJarFromProjects(novaFile.toFile(), hooks + nova) { remapper.remap(it.inputStream()) ?: it }
+        // create jar
+        val novaFile = File(project.buildDir, "Nova-${project.version}.jar").toPath()
+        buildJarFromProjects(novaFile.toFile(), hooks + novaApi + nova) { remapper.remap(it.inputStream()) ?: it }
         if (remap) {
             // remap nova jar with specialsource
             val obfFile = novaFile.parent.resolve(novaFile.nameWithoutExtension + "-obf.jar")
@@ -95,15 +92,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
             remapSpigot(obfFile, novaFile, mapsSpigot, false) // obf -> spigot
         }
         
-        // create bundler jar
-        val bundlerFile = File(project.buildDir, "Nova-${project.version}.jar").toPath()
-        buildJarFromProjects(bundlerFile.toFile(), listOf(novaLoader, novaApi))
-        ZipFile(bundlerFile.toFile()).use { bundlerZip ->
-            // include nova jar in bundler jar
-            bundlerZip.addFile(novaFile.toFile(), ZipParameters().apply { fileNameInZip = "nova.jar" })
-        }
-        
-        return bundlerFile
+        return novaFile
     }
     
     private fun buildJarFromProjects(file: File, projects: List<Project>, remapper: (ByteArray) -> ByteArray = { it }) {
@@ -169,8 +158,13 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     }
     
     private fun resolveMappings(version: String): Pair<Path, Path> {
-        val mojangMappings = project.dependencies.create("org.spigotmc:minecraft-server:$version:maps-mojang@txt").getFile(project)
-        val spigotMappings = project.dependencies.create("org.spigotmc:minecraft-server:$version:maps-spigot@csrg").getFile(project)
+        val mojangMappings = project.buildDir.resolve("maps-mojang.txt").toPath()
+        val spigotMappings = project.buildDir.resolve("maps-spigot.csrg").toPath()
+        if (!mojangMappings.exists())
+            mojangMappings.writeText(URL("https://piston-data.mojang.com/v1/objects/a4cd9a97400f7ecfe4dba23e427549ebc5815d66/client.txt").readText()) // TODO: read from client.txt
+        if (!spigotMappings.exists())
+            spigotMappings.writeText(URL("https://hub.spigotmc.org/stash/projects/SPIGOT/repos/builddata/raw/mappings/bukkit-$version-cl.csrg").readText())
+        
         return Pair(mojangMappings, spigotMappings)
     }
     
@@ -184,7 +178,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
             // generate libraries.yml
             bundlerZipRoot.resolve("libraries.yml").writeText(generateNovaLoaderLibrariesYaml().saveToString())
             // add spigot loader libraries to plugin.yml
-            bundlerZipRoot.resolve("plugin.yml").appendText("\n" + generateSpigotLoaderLibrariesYaml().saveToString())
+            bundlerZipRoot.resolve("paper-plugin.yml").appendText("\n" + generateSpigotLoaderLibrariesYaml().saveToString())
         }
     }
     

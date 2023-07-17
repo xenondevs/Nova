@@ -20,7 +20,7 @@ import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -36,7 +36,7 @@ public class LibraryLoader {
         LIBRARIES_DIR = repoProperty != null ? new File(repoProperty) : new File("libraries");
     }
     
-    public static List<URL> downloadLibraries(List<String> repositories, List<Dependency> dependencies, List<String> exclusions, Logger logger) throws DependencyResolutionException, MalformedURLException {
+    public static List<Path> downloadLibraries(List<String> repositories, List<Dependency> dependencies, List<String> exclusions, Logger logger) throws DependencyResolutionException, MalformedURLException {
         // setup connection
         var locator = MavenRepositorySystemUtils.newServiceLocator();
         locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
@@ -75,15 +75,15 @@ public class LibraryLoader {
             new ExclusionsDependencyFilter(exclusions)
         );
         
-        var urls = new ArrayList<URL>();
+        var files = new ArrayList<Path>();
         var results = repoSystem.resolveDependencies(session, request).getArtifactResults();
         for (var result : results) {
             var file = result.getArtifact().getFile();
             logger.info("Loaded library " + file.getAbsolutePath());
-            urls.add(file.toURI().toURL());
+            files.add(file.toPath());
         }
         
-        return urls;
+        return files;
     }
     
     private static class LoggingTransferListener extends AbstractTransferListener {

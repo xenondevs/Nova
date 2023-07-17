@@ -1,13 +1,10 @@
 plugins {
     alias(libs.plugins.kotlin)
-}
-
-repositories {
-    maven("https://repo.papermc.io/repository/maven-public/")
+    alias(libs.plugins.paperweight)
 }
 
 dependencies {
-    implementation(libs.kotlin.stdlib)
+    paperweight.paperDevBundle(libs.versions.paper)
     implementation(project(":nova"))
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Libs-Core:2.6.0") { isTransitive = false }
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core:2.6.0") { isTransitive = false }

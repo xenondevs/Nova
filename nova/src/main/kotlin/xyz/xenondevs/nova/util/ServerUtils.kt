@@ -22,7 +22,7 @@ object ServerUtils {
         }
     }
     
-    val isReload = (NOVA.server as CraftServer).reloadCount != 0
+    fun isReload(): Boolean = (NOVA.server as CraftServer).reloadCount != 0
     
 }
 

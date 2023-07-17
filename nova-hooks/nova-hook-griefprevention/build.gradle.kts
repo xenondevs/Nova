@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin)
+    alias(libs.plugins.paperweight)
 }
 
 repositories {
@@ -7,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.kotlin.stdlib)
+    paperweight.paperDevBundle(libs.versions.paper)
     implementation(project(":nova"))
     implementation(project(":nova-api"))
     compileOnly("com.github.TechFortress:GriefPrevention:16.17.1") { isTransitive = false }

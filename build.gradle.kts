@@ -5,13 +5,13 @@ plugins {
 }
 
 fun RepositoryHandler.configureRepos() {
-    mavenLocal()
+    mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") }}
     mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.xenondevs.xyz/releases")
     
     // include xenondevs-nms repository if requested
     if (project.hasProperty("xenondevsNms")) {
-        maven("https://repo.papermc.io/repository/maven-public/") // authlib, brigadier, etc.
         maven {
             name = "xenondevsNms"
             url = uri("https://repo.xenondevs.xyz/nms/")
@@ -23,7 +23,7 @@ fun RepositoryHandler.configureRepos() {
 repositories { configureRepos() }
 
 loaderJar {
-    spigotVersion.set(libs.versions.spigot)
+    gameVersion.set(libs.versions.paper.get().substringBefore('-'))
 }
 
 subprojects {

@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.loader.NovaClassLoader
 import xyz.xenondevs.nova.transformer.adapter.LcsWrapperAdapter
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
 import xyz.xenondevs.nova.transformer.patch.block.NoteBlockPatch
@@ -45,7 +44,6 @@ import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSec
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.registry.MappedRegistryPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.registry.RegistryCodecPatch
-import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.data.getResourceData
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_PARENT_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
@@ -78,7 +76,7 @@ internal object Patcher {
     private fun init() {
         try {
             LOGGER.info("Applying patches...")
-            VirtualClassPath.classLoaders += NOVA.loader.javaClass.classLoader.parent
+            VirtualClassPath.classLoaders += NOVA.javaClass.classLoader
             redefineModule()
             defineInjectedClasses()
             runTransformers()
@@ -104,8 +102,7 @@ internal object Patcher {
     }
     
     private fun defineInjectedClasses() {
-        (javaClass.classLoader as NovaClassLoader).addInjectedClasses(injectedClasses.keys.map { it.replace('/', '.') })
-        if (ServerUtils.isReload) return
+        //(javaClass.classLoader as NovaClassLoader).addInjectedClasses(injectedClasses.keys.map { it.replace('/', '.') })
         injectedClasses.forEach { (name, adapter) ->
             var bytes = getResourceData("$name.class")
             if (bytes.isEmpty()) throw IllegalStateException("Failed to load injected class $name (Wrong path?)")

@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.addon.loader
 
+import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.commons.collections.poll
 import xyz.xenondevs.nova.addon.AddonLogger
 import xyz.xenondevs.nova.loader.library.LibraryLoader
@@ -54,7 +55,7 @@ internal object LibraryLoaderPools {
             loaders.flatMap { it.description.libraries },
             emptyList(),
             AddonLogger(loaders.joinToString { it.description.name })
-        ).toTypedArray()
+        ).mapToArray { it.toUri().toURL() }
         
         return URLClassLoader(urls, null)
     }

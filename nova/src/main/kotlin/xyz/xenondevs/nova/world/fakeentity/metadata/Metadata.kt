@@ -42,7 +42,7 @@ abstract class Metadata internal constructor() {
         return buf
     }
     
-    internal fun <T> entry(index: Int, serializer: EntityDataSerializer<T>, default: T): NonNullMetadataEntry<T> {
+    internal fun <T : Any> entry(index: Int, serializer: EntityDataSerializer<T>, default: T): NonNullMetadataEntry<T> {
         val entry = NonNullMetadataEntry(index, serializer, default)
         entries += entry
         return entry

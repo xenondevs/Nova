@@ -4,12 +4,11 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 
-class LoaderJarPlugin : Plugin<Project> {
+class LoaderJarPlugin : Plugin<Project> { // Not really a loader anymore though
     
     override fun apply(project: Project) {
         val nova = project.project(":nova")
         val novaAPI = project.project(":nova-api")
-        val novaLoader = project.project(":nova-loader")
         val hooks = project.subprojects.filter { it.name.startsWith("nova-hook-") }
         
         val extension = project.extensions.create<LoaderJarExtension>("loaderJar")
@@ -18,14 +17,12 @@ class LoaderJarPlugin : Plugin<Project> {
             this.group = "build"
             this.nova = nova
             this.novaApi = novaAPI
-            this.novaLoader = novaLoader
             this.hooks = hooks
-            this.spigotVersion.set(extension.spigotVersion)
+            this.gameVersion.set(extension.gameVersion)
             
             dependsOn(
                 nova.tasks.named("classes"),
                 novaAPI.tasks.named("classes"),
-                novaLoader.tasks.named("classes"),
                 hooks.map { it.tasks.named("classes") }
             )
         }

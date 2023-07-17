@@ -3,14 +3,13 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    maven("https://repo.xenondevs.xyz/releases/")
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://repo.xenondevs.xyz/releases")
 }
 
 dependencies {
-    implementation(libs.spigot.api)
+    implementation(libs.paper.api)
     implementation(libs.zip4j)
     implementation(libs.specialsource)
     implementation(libs.stringremapper)

@@ -27,8 +27,8 @@ import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarOrigin
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
@@ -353,7 +353,7 @@ object BossBarOverlayManager : Listener {
             }
         }
         
-        if (plugin != null && plugin != NOVA.loader) {
+        if (plugin != null && plugin != NOVA) {
             trackedOrigins[event.id] = BarOrigin.Plugin(plugin!!)
         }
     }

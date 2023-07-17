@@ -8,7 +8,7 @@ import org.eclipse.aether.resolution.DependencyResolutionException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 public class NovaLibraryLoader {
     
-    public static List<URL> loadLibraries(Logger logger) throws IOException, DependencyResolutionException {
+    public static List<Path> loadLibraries(Logger logger) throws IOException, DependencyResolutionException {
         YamlConfiguration cfg;
         try (var stream = NovaLibraryLoader.class.getResourceAsStream("/libraries.yml")) {
             assert stream != null;

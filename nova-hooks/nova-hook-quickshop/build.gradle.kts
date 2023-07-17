@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin)
+    alias(libs.plugins.paperweight)
 }
 
 repositories {
@@ -7,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.kotlin.stdlib)
+    paperweight.paperDevBundle(libs.versions.paper)
     implementation(project(":nova"))
     implementation(project(":nova-api"))
     compileOnly("org.maxgamer:QuickShop:5.1.0.7") { isTransitive = false }

@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.api.material.NovaMaterialRegistry;
 import xyz.xenondevs.nova.api.player.WailaManager;
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration;
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager;
-import xyz.xenondevs.nova.loader.NovaLoader;
 
 public interface Nova {
     
@@ -23,7 +22,7 @@ public interface Nova {
         if (novaPlugin == null)
             throw new IllegalStateException("Nova is not installed on this server.");
         
-        return (Nova) ((NovaLoader) novaPlugin).getNova();
+        return (Nova) novaPlugin;
     }
     
     /**

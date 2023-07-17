@@ -20,7 +20,6 @@ dependencies {
     
     // internal dependencies
     compileOnly(project(":nova-api"))
-    compileOnly(project(":nova-loader"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
     novaLoader(libs.invui.resourcepack)
@@ -41,6 +40,14 @@ dependencies {
 
 // configure java sources location
 sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
+
+tasks {
+    withType<ProcessResources> {
+        filesMatching("paper-plugin.yml") {
+            expand(project.properties)
+        }
+    }
+}
 
 publishing {
     repositories {

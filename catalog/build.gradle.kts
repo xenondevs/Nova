@@ -6,7 +6,7 @@ plugins {
 catalog {
     versionCatalog {
         version("nova", project.version.toString())
-        version("spigot", libs.versions.spigot.get())
+        version("paper", libs.versions.paper.get())
         version("kotlin", libs.versions.kotlin.get())
         
         plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")

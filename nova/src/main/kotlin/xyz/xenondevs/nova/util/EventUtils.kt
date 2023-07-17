@@ -51,7 +51,7 @@ fun Any.unregisterPacketListener() {
 }
 
 fun Listener.registerEvents() {
-    Bukkit.getPluginManager().registerEvents(this, NOVA.loader)
+    Bukkit.getPluginManager().registerEvents(this, NOVA)
 }
 
 fun Listener.unregisterEvents() {
@@ -88,18 +88,18 @@ fun Listener.registerEventsFirst() {
 
 @JvmName("registerEvents1")
 fun registerEvents(listener: Listener) {
-    Bukkit.getPluginManager().registerEvents(listener, NOVA.loader)
+    Bukkit.getPluginManager().registerEvents(listener, NOVA)
 }
 
 @JvmName("registerEventFirst1")
 fun registerEventFirst(listener: Listener, event: Class<out Event>) {
-    val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA.loader)[event]!!
+    val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA)[event]!!
     registerRegisteredListenerFirst(registeredListeners, event)
 }
 
 @JvmName("registerEventsFirst1")
 fun registerEventsFirst(listener: Listener) {
-    val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA.loader)
+    val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA)
     registeredListeners.forEach { registerRegisteredListenerFirst(it.value, it.key) }
 }
 
@@ -116,14 +116,14 @@ private fun registerRegisteredListenerFirst(registeredListeners: Set<RegisteredL
 
 @JvmName("registerEvent1")
 fun registerEvent(listener: Listener, event: Class<out Event>) {
-    val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA.loader)[event]!!
+    val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA)[event]!!
     val handlerList = event.getMethod("getHandlerList").invoke(null) as HandlerList
     handlerList.registerAll(registeredListeners)
 }
 
 @JvmName("registerEventsExcept1")
 fun registerEventsExcept(listener: Listener, vararg eventClasses: Class<out Event>) {
-    val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA.loader)
+    val registeredListeners = NOVA.pluginLoader.createRegisteredListeners(listener, NOVA)
     
     registeredListeners.forEach { (clazz, listeners) ->
         if (clazz in eventClasses)

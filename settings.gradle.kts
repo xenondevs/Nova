@@ -3,7 +3,6 @@ rootProject.name = "nova-parent"
 // core project
 include("nova")
 include("nova-api")
-include("nova-loader")
 include("nova-gradle-plugin")
 
 // hooks

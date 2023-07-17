@@ -7,7 +7,7 @@ plugins {
 
 dependencies {
     implementation(libs.bundles.minecraft.assets)
-    implementation(libs.spigot.api)
+    implementation(libs.paper.api)
     implementation(libs.zip4j)
 }
 

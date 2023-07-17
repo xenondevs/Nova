@@ -1,13 +1,10 @@
 plugins {
     alias(libs.plugins.kotlin)
-}
-
-repositories {
-    maven("https://repo.papermc.io/repository/maven-public/")
+    alias(libs.plugins.paperweight)
 }
 
 dependencies {
-    implementation(libs.kotlin.stdlib)
+    paperweight.paperDevBundle(libs.versions.paper)
     implementation(project(":nova"))
     compileOnly("net.luckperms:api:5.4") { isTransitive = false }
 }

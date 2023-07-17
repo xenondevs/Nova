@@ -9,7 +9,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.gson.*
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
-import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.ApiBlockManager
@@ -49,16 +48,16 @@ internal val HTTP_CLIENT = HttpClient(CIO) {
     expectSuccess = false
 }
 
-internal class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plugin by loader, INova, Listener {
+internal class Nova(val pluginFile: File) : JavaPlugin(), INova, Listener {
     
-    val version = Version(loader.description.version)
+    val version by lazy { Version(description.version) }
     val lastVersion = PermanentStorage.retrieveOrNull<Version>("last_version")?.let { if (it == Version("0.1")) Version("0.10") else it }
     
     internal val disableHandlers = ArrayList<() -> Unit>()
     
     override fun onEnable() {
         NOVA = this
-        LOGGER = loader.logger
+        LOGGER = logger
         
         if (IS_DEV_SERVER)
             LOGGER.warning("Running in dev mode! Never use this on a production server!")
@@ -73,7 +72,7 @@ internal class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plu
         if (Version.SERVER_VERSION !in REQUIRED_SERVER_VERSION) {
             LOGGER.severe("Nova is not compatible with this version of Minecraft!")
             LOGGER.severe("Nova v$version only runs on $REQUIRED_SERVER_VERSION.")
-            Bukkit.getPluginManager().disablePlugin(loader)
+            Bukkit.getPluginManager().disablePlugin(this)
             return false
         }
         
@@ -81,16 +80,7 @@ internal class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plu
         if (lastVersion != null && lastVersion < Version("0.9")) {
             LOGGER.severe("This version of Nova is not compatible with the version that was previously installed.")
             LOGGER.severe("Please erase all data related to Nova and try again.")
-            Bukkit.getPluginManager().disablePlugin(loader)
-            return false
-        }
-        
-        // prevent reloading
-        if (!IS_DEV_SERVER && ServerUtils.isReload) {
-            LOGGER.severe("============================")
-            LOGGER.severe("!RELOADING IS NOT SUPPORTED!")
-            LOGGER.severe("============================")
-            Bukkit.shutdown()
+            Bukkit.getPluginManager().disablePlugin(this)
             return false
         }
         
@@ -106,6 +96,13 @@ internal class Nova(internal val loader: JavaPlugin, val pluginFile: File) : Plu
                     LOGGER.log(Level.SEVERE, "An exception occurred while running a disable handler", ex)
                 }
             }
+        }
+        
+        if (ServerUtils.isReload()) {
+            LOGGER.severe("====================================================")
+            LOGGER.severe("RELOADING IS NOT SUPPORTED, SHUTTING DOWN THE SERVER")
+            LOGGER.severe("====================================================")
+            Bukkit.shutdown()
         }
     }
     
