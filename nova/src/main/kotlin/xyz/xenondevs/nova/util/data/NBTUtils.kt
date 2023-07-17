@@ -76,7 +76,7 @@ object NBTUtils {
     }
     
     internal fun reserializeCBFCompoundTag(cbfTag: Any): CBFCompoundTag {
-        val toByteArrayMethod = cbfTag::class.java.getMethod("compoundToByteArray")
+        val toByteArrayMethod = cbfTag::class.java.getMethod("getAsByteArray")
         val serializedCBFCompound = toByteArrayMethod.invoke(cbfTag) as ByteArray
         return CBFCompoundTag(CBF.read<NamespacedCompound>(serializedCBFCompound)!!)
     }
