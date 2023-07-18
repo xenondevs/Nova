@@ -32,7 +32,6 @@ dependencyResolutionManagement {
 
 pluginManagement {
     repositories {
-        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
         maven("https://repo.xenondevs.xyz/releases/")
