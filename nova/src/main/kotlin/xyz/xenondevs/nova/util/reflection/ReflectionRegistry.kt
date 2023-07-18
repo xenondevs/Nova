@@ -71,7 +71,6 @@ import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.plugin.SimplePluginManager
 import xyz.xenondevs.nova.util.ServerSoftware
-import xyz.xenondevs.nova.util.ServerUtils.SERVER_SOFTWARE
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCB
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCBClass
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getClass
@@ -174,15 +173,15 @@ internal object ReflectionRegistry {
     val MAPPED_REGISTRY_FROZEN_FIELD = getField(MappedRegistry::class, true, "SRF(net.minecraft.core.MappedRegistry frozen)")
     val BIOME_GENERATION_SETTINGS_FEATURES_FIELD = getField(BiomeGenerationSettings::class, true, "SRF(net.minecraft.world.level.biome.BiomeGenerationSettings features)")
     val LEVEL_CHUNK_SECTION_STATES_FIELD = getField(LevelChunkSection::class, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection states)")
-    val LEVEL_CHUNK_SECTION_BIOMES_FIELD = getField(LevelChunkSection::class, true, if (SERVER_SOFTWARE == ServerSoftware.SPIGOT) "i" else "biomes")
+    val LEVEL_CHUNK_SECTION_BIOMES_FIELD = getField(LevelChunkSection::class, true, "biomes")
     @JvmField
     val LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD = getField(LevelChunkSection::class, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection nonEmptyBlockCount)")
     @JvmField
-    val LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD = getServerSoftwareField(LevelChunkSection::class, true, "specialCollidingBlocks", ServerSoftware.PAPER)
+    val LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD = getField(LevelChunkSection::class, true, "specialCollidingBlocks")
     @JvmField
-    val LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD = getServerSoftwareField(LevelChunkSection::class, true, "knownBlockCollisionData", ServerSoftware.PAPER)
+    val LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD = getField(LevelChunkSection::class, true, "knownBlockCollisionData")
     @JvmField
-    val LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD = getServerSoftwareField(LevelChunkSection::class, true, "tickingList", ServerSoftware.PAPER)
+    val LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD = getField(LevelChunkSection::class, true, "tickingList")
     @JvmField
     val LEVEL_CHUNK_SECTION_FLUID_STATE_COUNT_FIELD = getServerSoftwareField(LevelChunkSection::class, true, "fluidStateCount", ServerSoftware.PUFFERFISH)
     val HOLDER_SET_DIRECT_CONTENTS_FIELD = getField(HOLDER_SET_DIRECT_CLASS, true, "SRF(net.minecraft.core.HolderSet\$Direct contents)")

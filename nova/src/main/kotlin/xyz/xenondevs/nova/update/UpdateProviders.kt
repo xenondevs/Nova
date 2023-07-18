@@ -35,13 +35,6 @@ interface ProjectDistributor {
         fun github(repo: String): ProjectDistributor = GitHub(repo)
         
         /**
-         * An update provider for [SpigotMC](https://spigotmc.org).
-         *
-         * @param id The resource id of the plugin.
-         */
-        fun spigotmc(id: Int): ProjectDistributor = SpigotMC(id)
-        
-        /**
          * An update provider for [Hangar](https://hangar.papermc.io).
          *
          * @param id The id of the project in the format `owner/repo`.
@@ -72,18 +65,6 @@ interface ProjectDistributor {
             else HTTP_CLIENT.get(latestVersionUrl).body<JsonArray>().first().asJsonObject
             
             return@runBlocking Version(versionJson.getString("tag_name").removePrefix("v"))
-        }
-        
-    }
-    
-    private class SpigotMC(id: Int) : ProjectDistributor {
-        
-        private val apiUrl = "https://api.spigotmc.org/legacy/update.php?resource=$id"
-        
-        override val projectUrl = "https://spigotmc.org/resources/$id"
-        
-        override fun getLatestVersion(onlyRelease: Boolean): Version = runBlocking {
-            return@runBlocking Version(HTTP_CLIENT.get(apiUrl).bodyAsText())
         }
         
     }

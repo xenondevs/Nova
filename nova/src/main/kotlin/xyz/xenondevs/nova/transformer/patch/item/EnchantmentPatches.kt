@@ -11,8 +11,6 @@ import net.minecraft.world.level.Level
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.nova.item.behavior.Enchantable
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.ServerSoftware
-import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.block.logic.tileentity.EnchantmentTableLogic
 import xyz.xenondevs.nova.world.block.logic.tileentity.GrindstoneLogic
@@ -21,21 +19,15 @@ import xyz.xenondevs.nova.world.block.logic.tileentity.GrindstoneLogic
 private val ENCHANTMENT_MENU_SLOTS_CHANGED_LAMBDA = ReflectionUtils.getMethod(
     EnchantmentMenu::class,
     true,
-    when {
-        ServerSoftware.PAPER in ServerUtils.SERVER_SOFTWARE.tree -> "SRM(net.minecraft.world.inventory.EnchantmentMenu lambda\$slotsChanged\$0)"
-        else -> "SRM(net.minecraft.world.inventory.EnchantmentMenu lambda\$0)"
-    },
+    "SRM(net.minecraft.world.inventory.EnchantmentMenu lambda\$slotsChanged\$0)",
     ItemStack::class, Level::class, BlockPos::class
 )
 
 // for future reference: https://i.imgur.com/PyYEYD5.png
 private val ENCHANTMENT_MENU_CLICK_MENU_BUTTON_LAMBDA = ReflectionUtils.getMethod(
     EnchantmentMenu::class,
-    true, 
-    when {
-        ServerSoftware.PAPER in ServerUtils.SERVER_SOFTWARE.tree -> "SRM(net.minecraft.world.inventory.EnchantmentMenu lambda\$clickMenuButton\$1)"
-        else -> "SRM(net.minecraft.world.inventory.EnchantmentMenu lambda\$1)"
-    },
+    true,
+    "SRM(net.minecraft.world.inventory.EnchantmentMenu lambda\$clickMenuButton\$1)",
     ItemStack::class, Int::class, Player::class, Int::class, ItemStack::class, Level::class, BlockPos::class
 )
 
