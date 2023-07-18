@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.item.behavior
 
+import io.papermc.paper.event.entity.EntityDamageItemEvent
 import net.minecraft.advancements.CriteriaTriggers
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.stats.Stats
@@ -241,13 +242,18 @@ interface Damageable {
                 actualDamage = calculateActualDamage(actualDamage, unbreakingLevel, Wearable.isWearable(itemStack))
             
             if (damager is BukkitPlayer) {
-                val event = PlayerItemDamageEvent(damager, itemStack, actualDamage).also(::callEvent) // TODO: On Paper: Include original damage
+                val event = PlayerItemDamageEvent(damager, itemStack, actualDamage, damage).also(::callEvent)
                 
                 if (actualDamage != event.damage || event.isCancelled)
                     damager.updateInventory()
                 if (event.isCancelled)
                     return
-            } // TODO: On Paper: Call EntityDamageItemEvent
+            } else if (damager != null) {
+                val event = EntityDamageItemEvent(damager, itemStack, actualDamage).also(::callEvent)
+                if (event.isCancelled)
+                    return
+                actualDamage = event.damage
+            }
             
             if (actualDamage <= 0)
                 return
@@ -392,7 +398,7 @@ interface Damageable {
                 actualDamage = calculateActualDamage(actualDamage, unbreakingLevel, Wearable.isWearable(itemStack))
             
             if (damager is ServerPlayer) {
-                val event = PlayerItemDamageEvent(damager.bukkitEntity, itemStack.bukkitMirror, actualDamage).also(::callEvent) // TODO: On Paper: Include original damage
+                val event = PlayerItemDamageEvent(damager.bukkitEntity, itemStack.bukkitMirror, actualDamage, damage).also(::callEvent)
                 
                 if (actualDamage != event.damage || event.isCancelled)
                     event.player.updateInventory()
@@ -400,7 +406,12 @@ interface Damageable {
                     return
                 
                 actualDamage = event.damage
-            } // TODO: On Paper: Call EntityDamageItemEvent
+            } else if (damager != null) {
+                val event = EntityDamageItemEvent(damager.bukkitEntity, itemStack.bukkitMirror, actualDamage).also(::callEvent)
+                if (event.isCancelled)
+                    return
+                actualDamage = event.damage
+            }
             
             if (actualDamage <= 0)
                 return
