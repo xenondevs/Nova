@@ -31,12 +31,8 @@ jobs:
           arguments: |
             loaderJarSpigot
             -PoutDir=artifacts
-            -PxenondevsNms
             -Prelease
             --scan
-        env:
-          ORG_GRADLE_PROJECT_xenondevsNmsUsername: ${{ secrets.XENONDEVS_NMS_USERNAME }}
-          ORG_GRADLE_PROJECT_xenondevsNmsPassword: ${{ secrets.XENONDEVS_NMS_PASSWORD }}
 
       - name: Upload Artifacts
         id: upload
@@ -63,11 +59,7 @@ jobs:
             publishNovaGradlePluginPublicationToXenondevsRepository
             publishNova-gradle-pluginPluginMarkerMavenPublicationToXenondevsRepository
             publishCatalogPublicationToXenondevsRepository
-            -PxenondevsNms
             -Prelease
-            --scan
         env:
-          ORG_GRADLE_PROJECT_xenondevsNmsUsername: ${{ secrets.XENONDEVS_NMS_USERNAME }}
-          ORG_GRADLE_PROJECT_xenondevsNmsPassword: ${{ secrets.XENONDEVS_NMS_PASSWORD }}
           ORG_GRADLE_PROJECT_xenondevsUsername: ${{ secrets.XENONDEVS_RELEASES_USERNAME }}
           ORG_GRADLE_PROJECT_xenondevsPassword: ${{ secrets.XENONDEVS_RELEASES_PASSWORD }}

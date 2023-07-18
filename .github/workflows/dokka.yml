@@ -31,11 +31,7 @@ jobs:
         with:
           arguments: |
             dokkaHtmlMultiModule
-            -PxenondevsNms
             --scan
-        env:
-          ORG_GRADLE_PROJECT_xenondevsNmsUsername: ${{ secrets.XENONDEVS_NMS_USERNAME }}
-          ORG_GRADLE_PROJECT_xenondevsNmsPassword: ${{ secrets.XENONDEVS_NMS_PASSWORD }}
       
       - name: Deploy to Github Pages
         uses: JamesIves/github-pages-deploy-action@v4.4.1

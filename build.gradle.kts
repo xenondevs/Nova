@@ -9,15 +9,6 @@ fun RepositoryHandler.configureRepos() {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.xenondevs.xyz/releases")
-    
-    // include xenondevs-nms repository if requested
-    if (project.hasProperty("xenondevsNms")) {
-        maven {
-            name = "xenondevsNms"
-            url = uri("https://repo.xenondevs.xyz/nms/")
-            credentials(PasswordCredentials::class)
-        }
-    }
 }
 
 repositories { configureRepos() }
