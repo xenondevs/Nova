@@ -24,7 +24,6 @@ import xyz.xenondevs.nova.util.facing
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
 import xyz.xenondevs.nova.util.isUnobstructed
-import xyz.xenondevs.nova.util.item.canPlaceOn
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaItem
@@ -166,7 +165,7 @@ internal object BlockPlacing : Listener {
         ) return false
         
         if (player.gameMode == GameMode.ADVENTURE)
-            return placedOn.block.type in item.canPlaceOn
+            return placedOn.block.type.key in item.itemMeta.placeableKeys
         
         return true
     }

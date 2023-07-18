@@ -67,7 +67,7 @@ object ToolUtils {
                 else -> 1.0
             }
             
-            GameMode.ADVENTURE -> if (tool == null || block.type !in tool.canDestroy) return 0.0
+            GameMode.ADVENTURE -> if (tool == null || block.type.key !in tool.itemMeta.destroyableKeys) return 0.0
             GameMode.SPECTATOR -> return 0.0
             
             else -> Unit
@@ -132,7 +132,7 @@ object ToolUtils {
                 return if (canBreakBlocks) 1.0 else 0.0
             }
             
-            GameMode.ADVENTURE -> if (tool != null && block.type !in tool.canDestroy) return 0.0
+            GameMode.ADVENTURE -> if (tool != null && block.type.key !in tool.itemMeta.destroyableKeys) return 0.0
             GameMode.SPECTATOR -> return 0.0
             
             else -> Unit

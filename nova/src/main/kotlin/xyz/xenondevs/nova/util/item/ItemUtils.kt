@@ -47,7 +47,6 @@ import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.get
-import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
@@ -129,20 +128,6 @@ internal val ItemStack.handle: MojangStack?
 
 val ItemMeta.unhandledTags: MutableMap<String, NBTTag>
     get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, NBTTag>
-
-// fixme: does not work on paper because paper actually has an api for this
-val ItemStack.canDestroy: Set<Material>
-    get() {
-        val tag = itemMeta?.unhandledTags?.get("CanDestroy") as? ListTag ?: return emptySet()
-        return tag.mapNotNullTo(HashSet()) { strTag -> ResourceLocation.tryParse(strTag.asString)?.let { Material.valueOf(it.name) } }
-    }
-
-// fixme: does not work on paper because paper actually has an api for this
-val ItemStack.canPlaceOn: Set<Material>
-    get() {
-        val tag = itemMeta?.unhandledTags?.get("CanPlaceOn") as? ListTag ?: return emptySet()
-        return tag.mapNotNullTo(HashSet()) { strTag -> ResourceLocation.tryParse(strTag.asString)?.let { Material.valueOf(it.name) } }
-    }
 
 val ItemStack.craftingRemainingItem: ItemStack?
     get() {
