@@ -120,7 +120,7 @@ internal object BlockPlacing : Listener {
             ?.also(futures::add)
         
         CombinedBooleanFuture(futures).runIfTrueOnSimilarThread {
-            if (!canPlace(player, handItem, placeLoc.pos, placeLoc.advance(event.blockFace.oppositeFace).pos))
+            if (!canPlace(player, handItem, placeLoc.pos, placeLoc.clone().advance(event.blockFace.oppositeFace).pos))
                 return@runIfTrueOnSimilarThread
             
             val ctx = BlockPlaceContext(
