@@ -13,7 +13,7 @@ catalog {
         plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
         plugin("paperweight", "io.papermc.paperweight.userdev").versionRef("paperweight")
         plugin("nova", "xyz.xenondevs.nova.nova-gradle-plugin").versionRef("nova")
-        plugin("stringremapper", "xyz.xenondevs.string-remapper-gradle-plugin").version("1.3")
+        plugin("stringremapper", "xyz.xenondevs.string-remapper-gradle-plugin").version("1.4")
         
         library("nova", "xyz.xenondevs.nova", "nova").versionRef("nova")
     }
