@@ -9,8 +9,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -22,8 +22,8 @@ import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-private val LOAD_CHAR_SIZES_ON_STARTUP by configReloadable { DEFAULT_CONFIG.getBoolean("performance.load_char_sizes_on_startup") }
-private val FORCE_UNIFORM_FONT by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.force_uniform_font") }
+private val LOAD_CHAR_SIZES_ON_STARTUP by MAIN_CONFIG.entry<Boolean>("performance", "load_char_sizes_on_startup")
+private val FORCE_UNIFORM_FONT by MAIN_CONFIG.entry<Boolean>("resource_pack", "force_uniform_font")
 
 private val EMPTY_FLOAT_RANGE: ClosedRange<Float> = 0f..0f
 

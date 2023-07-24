@@ -4,11 +4,10 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.map
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.data.serialization.yaml.getDeserialized
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayCompound
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
@@ -18,10 +17,10 @@ import xyz.xenondevs.nova.ui.waila.info.WailaLine
 
 private val BAR_MATCH_INFO = BarMatchInfo.fromAddon(ResourceLocation("nova", "waila"))
 
-private val MARGIN_TOP = configReloadable { DEFAULT_CONFIG.getInt("waila.positioning.margin_top") }
-private val MARGIN_BOTTOM = configReloadable { DEFAULT_CONFIG.getInt("waila.positioning.margin_bottom") }
-private val MATCH_BELOW = configReloadable { BarMatcher.CombinedAny(DEFAULT_CONFIG.getDeserialized("waila.positioning.above")!!) } // bars WAILA should be above: matchers for bar below
-private val MATCH_ABOVE = configReloadable { BarMatcher.CombinedAny(DEFAULT_CONFIG.getDeserialized("waila.positioning.below")!!) } // bars WAILA should be below: matchers for bar above
+private val MARGIN_TOP = MAIN_CONFIG.entry<Int>("waila", "positioning", "margin_top")
+private val MARGIN_BOTTOM = MAIN_CONFIG.entry<Int>("waila", "positioning", "margin_bottom")
+private val MATCH_BELOW = MAIN_CONFIG.entry<BarMatcher.CombinedAny>("waila", "positioning", "above") // bars WAILA should be above: matchers for bar below
+private val MATCH_ABOVE = MAIN_CONFIG.entry<BarMatcher.CombinedAny>("waila", "positioning", "below")  // bars WAILA should be below: matchers for bar above
 
 internal class WailaOverlayCompound(private val player: Player) : BossBarOverlayCompound {
     

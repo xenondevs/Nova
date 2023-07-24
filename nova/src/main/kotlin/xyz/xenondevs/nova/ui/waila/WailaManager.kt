@@ -10,24 +10,21 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.unregisterEvents
 import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
 
-private val ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("waila.enabled") }
-
 private val WAILA_ENABLED_KEY = NamespacedKey(NOVA, "waila")
-private val UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getLong("waila.update_interval") }
 
 private val Player.isWailaEnabled: Boolean
     get() = persistentDataContainer.get<Boolean>(WAILA_ENABLED_KEY) != false
@@ -37,6 +34,8 @@ private val Player.isWailaEnabled: Boolean
     dependsOn = [ResourceGeneration.PostWorld::class, AddonsInitializer::class]
 )
 internal object WailaManager : Listener, IWailaManager {
+    
+    val ENABLED by MAIN_CONFIG.entry<Boolean>("waila", "enabled")
     
     private var tickTask: BukkitTask? = null
     private val overlays = HashMap<Player, Waila>()
@@ -56,7 +55,7 @@ internal object WailaManager : Listener, IWailaManager {
         if (ENABLED) {
             registerEvents()
             Bukkit.getOnlinePlayers().forEach(::tryAddWailaOverlay)
-            tickTask = runTaskTimer(0, UPDATE_INTERVAL) { overlays.values.forEach(Waila::handleTick) }
+            tickTask = runTaskTimer(0, 1) { overlays.values.forEach(Waila::handleTick) }
         }
     }
     

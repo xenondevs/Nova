@@ -3,8 +3,6 @@ package xyz.xenondevs.nova.data.resources.builder.task.font
 import org.bukkit.Material
 import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -13,6 +11,7 @@ import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.renderer.MinecraftModelRenderer
 import java.util.logging.Level
 import kotlin.io.path.copyTo
@@ -198,8 +197,6 @@ private val TEXTURES = setOf(
 private const val SIZE = 32
 private const val ASCENT = -4
 
-private val WAILA_ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("waila.enabled") }
-
 class WailaContent internal constructor(
     builder: ResourcePackBuilder
 ) : CustomFontContent(
@@ -210,7 +207,7 @@ class WailaContent internal constructor(
     
     @PackTask(stage = BuildStage.POST_WORLD, runBefore = ["FontContent#write"])
     private fun write() {
-        if (WAILA_ENABLED) {
+        if (WailaManager.ENABLED) {
             builder.getHolder<MovedFontContent>().requestMovedFonts(ResourcePath("nova", "waila"), 1..19)
             writeHardcodedTextures()
             builder.assetPacks.forEach(::writePackTextures)
@@ -270,7 +267,7 @@ class WailaContent internal constructor(
     }
     
     private fun writePackTextures(pack: AssetPack) {
-        if (!WAILA_ENABLED)
+        if (!WailaManager.ENABLED)
             return
         
         val wailaDir = ASSETS_DIR.resolve("${pack.namespace}/textures/waila/")

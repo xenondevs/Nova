@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.command.requiresPlayer
 import xyz.xenondevs.nova.command.requiresPlayerPermission
 import xyz.xenondevs.nova.command.sendFailure
 import xyz.xenondevs.nova.command.sendSuccess
-import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -175,7 +175,7 @@ internal object NovaCommand : Command("nova") {
     
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {
         ctx.source.sendSuccess(Component.translatable("command.nova.reload_configs.start", NamedTextColor.GRAY))
-        NovaConfig.reload()
+        Configs.reload()
         ctx.source.sendSuccess(Component.translatable("command.nova.reload_configs.success", NamedTextColor.GRAY))
     }
     

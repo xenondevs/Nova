@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data.resources.upload.service
 
-import org.bukkit.configuration.ConfigurationSection
+import org.spongepowered.configurate.ConfigurationNode
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
@@ -24,17 +24,17 @@ internal object S3 : UploadService {
     private lateinit var directory: String
     private lateinit var urlFormat: String
     
-    override fun loadConfig(cfg: ConfigurationSection) {
-        val endpoint = cfg.getString("endpoint")?.removePrefix("https://")?.removePrefix("http://")
+    override fun loadConfig(cfg: ConfigurationNode) {
+        val endpoint = cfg.node("endpoint").string?.removePrefix("https://")?.removePrefix("http://")
             ?: throw IllegalArgumentException("S3 endpoint is not specified")
         val endpointURI = URI("https://$endpoint")
-        val keyId = cfg.getString("key_id")
+        val keyId = cfg.node("key_id").string
             ?: throw IllegalArgumentException("S3 key_id is not specified")
-        val keySecret = cfg.getString("key_secret")
+        val keySecret = cfg.node("key_secret").string
             ?: throw IllegalArgumentException("S3 key_secret is not specified")
         val credentials = AwsBasicCredentials.create(keyId, keySecret)
         
-        val region = cfg.getString("region")?.let(Region::of)
+        val region = cfg.node("region")?.string?.let(Region::of)
             ?: throw IllegalArgumentException("S3 region is not specified. Regions available by default are: " +
                 Region.regions().joinToString(", ", transform = Region::id))
         
@@ -44,12 +44,12 @@ internal object S3 : UploadService {
             .credentialsProvider(StaticCredentialsProvider.create(credentials))
             .region(region)
             .build()
-        this.bucket = cfg.getString("bucket")
+        this.bucket = cfg.node("bucket").string
             ?: throw IllegalArgumentException("S3 bucket is not specified")
         if (this.client!!.listBuckets().buckets().none { it.name() == bucket })
             throw IllegalArgumentException("S3 bucket $bucket not found")
         
-        this.directory = (cfg.getString("directory")?.addSuffix("/") ?: "")
+        this.directory = (cfg.node("directory").string?.addSuffix("/") ?: "")
         urlFormat = "https://$endpoint/$bucket/$directory%s"
     }
     

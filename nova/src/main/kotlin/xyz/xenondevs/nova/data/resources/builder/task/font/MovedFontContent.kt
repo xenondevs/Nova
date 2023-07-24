@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.data.resources.builder.task.font
 
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.BitmapFontGenerator
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -13,10 +13,7 @@ import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import java.util.*
 
-private val MOVED_FONT_BLACKLIST: Set<ResourcePath> by configReloadable {
-    DEFAULT_CONFIG.getStringList("resource_pack.generation.font.moved_font_blacklist")
-        .mapTo(HashSet(), ResourcePath::of)
-}
+private val MOVED_FONT_BLACKLIST by MAIN_CONFIG.entry<Set<ResourcePath>>("resource_pack", "generation", "font", "moved_font_blacklist")
 
 class MovedFontContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
     

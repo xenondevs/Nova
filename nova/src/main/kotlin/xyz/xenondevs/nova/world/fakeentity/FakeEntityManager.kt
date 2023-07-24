@@ -14,8 +14,8 @@ import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -43,9 +43,9 @@ var Player.fakeEntityRenderDistance: Int
 internal object FakeEntityManager : Listener {
     
     val RENDER_DISTANCE_KEY = NamespacedKey(NOVA, "entity_render_distance")
-    val DEFAULT_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("entity_render_distance.default") }
-    val MIN_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("entity_render_distance.min") }
-    val MAX_RENDER_DISTANCE by configReloadable { DEFAULT_CONFIG.getInt("entity_render_distance.max") }
+    val DEFAULT_RENDER_DISTANCE by MAIN_CONFIG.entry<Int>("entity_render_distance", "default")
+    val MIN_RENDER_DISTANCE by MAIN_CONFIG.entry<Int>("entity_render_distance", "min")
+    val MAX_RENDER_DISTANCE by MAIN_CONFIG.entry<Int>("entity_render_distance", "max")
     
     private val renderDistance = HashMap<Player, Int>()
     private val visibleChunks = HashMap<Player, Set<ChunkPos>>()

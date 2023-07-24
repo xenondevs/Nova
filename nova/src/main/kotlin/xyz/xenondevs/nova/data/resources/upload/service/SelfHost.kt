@@ -6,13 +6,12 @@ import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.bukkit.configuration.ConfigurationSection
+import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.UploadService
 import xyz.xenondevs.nova.util.StringUtils
 import xyz.xenondevs.nova.util.concurrent.Latch
-import xyz.xenondevs.nova.util.data.getBooleanOrNull
-import xyz.xenondevs.nova.util.data.getIntOrNull
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import xyz.xenondevs.nova.util.startsWithAny
 import java.io.File
@@ -39,14 +38,14 @@ internal object SelfHost : UploadService {
                 append(":$port")
         }
     
-    override fun loadConfig(cfg: ConfigurationSection) {
+    override fun loadConfig(cfg: ConfigurationNode) {
         startedLatch.close()
-        val configuredHost = cfg.getString("host")
+        val configuredHost = cfg.node("host").string
         this.host = configuredHost ?: ConnectionUtils.SERVER_IP
         
-        val port = cfg.getIntOrNull("port")
+        val port = cfg.node("port").get<Int?>()
         if (port != null) this.port = port
-        appendPort = cfg.getBooleanOrNull("append_port") ?: cfg.getBooleanOrNull("portNeeded") ?: (configuredHost == null)
+        appendPort = cfg.node("append_port").get<Boolean?>() ?: cfg.node("portNeeded").get<Boolean?>() ?: (configuredHost == null)
         
         thread(name = "ResourcePack Server", isDaemon = true) {
             server = embeddedServer(CIO, port = this.port) {

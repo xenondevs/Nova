@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.addon.loader.LibraryLoaderPools
-import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.initialize.Init
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializableClass
@@ -74,7 +74,7 @@ internal object AddonsLoader {
  */
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
-    dependsOn = [NovaConfig::class, Patcher::class]
+    dependsOn = [Configs::class, Patcher::class]
 )
 internal object AddonsInitializer {
     

@@ -3,12 +3,12 @@ package xyz.xenondevs.nova.ui.overlay.character
 import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentBuilder
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.component.adventure.fontName
 
-private val FORCE_UNIFORM_FONT by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.force_uniform_font") }
+private val FORCE_UNIFORM_FONT by MAIN_CONFIG.entry<Boolean>("resource_pack", "force_uniform_font")
 
 object MovedFonts {
     

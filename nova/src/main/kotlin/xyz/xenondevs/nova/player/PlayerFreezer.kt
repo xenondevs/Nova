@@ -15,12 +15,15 @@ import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerResourcePackStatusEvent
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status.*
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.registerEventsFirst
+
+private val ENABLED by MAIN_CONFIG.entry<Boolean>("resource_pack", "freeze_loading_players")
 
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object PlayerFreezer : Listener {
@@ -30,7 +33,7 @@ internal object PlayerFreezer : Listener {
     @InitFun
     internal fun reload() {
         HandlerList.unregisterAll(this)
-        if (DEFAULT_CONFIG.getBoolean("resource_pack.freeze_loading_players")) {
+        if (ENABLED) {
             registerEventsFirst()
         } else {
             clearPlayers()

@@ -13,14 +13,14 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nmsutils.util.removeIf
-import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.config.entry
+import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.util.getPlayersNearby
@@ -252,16 +252,14 @@ sealed interface Consumable { // TODO: remove sealed & make more customizable (m
     companion object : ItemBehaviorFactory<Default> {
         
         override fun create(item: NovaItem): Default {
-            val cfg = ConfigAccess(item)
+            val cfg = item.config
             return Default(
-                cfg.getOptionalEntry<String>("food_type")
-                    .map { FoodType.valueOf(it.uppercase()) }
-                    .orElse(FoodType.NORMAL),
-                cfg.getEntry<Int>("consume_time"),
-                cfg.getEntry<Int>("nutrition"),
-                cfg.getEntry<Float>("saturation_modifier"),
-                cfg.getOptionalEntry<Double>("instant_health").orElse(0.0),
-                cfg.getOptionalEntry<List<PotionEffect>>("effects")
+                cfg.optionalEntry<FoodType>("food_type").orElse(FoodType.NORMAL),
+                cfg.entry<Int>("consume_time"),
+                cfg.entry<Int>("nutrition"),
+                cfg.entry<Float>("saturation_modifier"),
+                cfg.optionalEntry<Double>("instant_health").orElse(0.0),
+                cfg.optionalEntry<List<PotionEffect>>("effects")
             )
         }
         

@@ -4,18 +4,16 @@ import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.config.entry
+import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.item.tool.VanillaToolCategories
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.get
 import java.util.*
 
 private const val PLAYER_ATTACK_SPEED = 4.0
@@ -154,16 +152,16 @@ sealed interface Tool {
         val BASE_ATTACK_SPEED_UUID: UUID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3")
         
         override fun create(item: NovaItem): Default {
-            val cfg = ConfigAccess(item)
+            val cfg = item.config
             return Default(
-                cfg.getEntry<String>("tool_tier", "tool_level").map { NovaRegistries.TOOL_TIER[it]!! },
-                cfg.getEntry<String>("tool_category").map { NovaRegistries.TOOL_CATEGORY[it]!! },
-                cfg.getEntry<Double>("break_speed"),
-                cfg.getOptionalEntry<Double>("attack_damage"),
-                cfg.getOptionalEntry<Double>("attack_speed"),
-                cfg.getOptionalEntry<Int>("knockback_bonus").orElse(0),
-                cfg.getOptionalEntry<Boolean>("can_sweep_attack").orElse(false),
-                cfg.getOptionalEntry<Boolean>("can_break_blocks_in_creative").orElse(true)
+                cfg.entry<ToolTier>(arrayOf("tool_tier"), arrayOf("tool_level")),
+                cfg.entry<ToolCategory>("tool_category"),
+                cfg.entry<Double>("break_speed"),
+                cfg.optionalEntry<Double>("attack_damage"),
+                cfg.optionalEntry<Double>("attack_speed"),
+                cfg.optionalEntry<Int>("knockback_bonus").orElse(0),
+                cfg.optionalEntry<Boolean>("can_sweep_attack").orElse(false),
+                cfg.optionalEntry<Boolean>("can_break_blocks_in_creative").orElse(true)
             )
         }
         

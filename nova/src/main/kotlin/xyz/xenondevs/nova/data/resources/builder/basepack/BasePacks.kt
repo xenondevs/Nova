@@ -1,9 +1,10 @@
 package xyz.xenondevs.nova.data.resources.builder.basepack
 
 import org.bukkit.Material
+import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.FileMerger
@@ -33,11 +34,9 @@ private val DEFAULT_WHITELISTED_FILE_TYPES: Set<String> = hashSetOf(
     "properties" // optifine
 )
 
-private val WHITELISTED_FILE_TYPES: Set<String> by configReloadable {
-    DEFAULT_CONFIG.getStringList("resource_pack.generation.whitelisted_file_types").mapTo(HashSet()) { it.lowercase() } + DEFAULT_WHITELISTED_FILE_TYPES
-}
-
-private val BASE_PACKS by configReloadable { DEFAULT_CONFIG.getStringList("resource_pack.generation.base_packs").map(::File) }
+private val WHITELISTED_FILE_TYPES by MAIN_CONFIG.entry<Set<String>>("resource_pack", "generation", "whitelisted_file_types")
+    .map { it.mapTo(HashSet(), String::lowercase) + DEFAULT_WHITELISTED_FILE_TYPES }
+private val BASE_PACKS by MAIN_CONFIG.entry<List<File>>("resource_pack", "generation", "base_packs")
 
 class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
     

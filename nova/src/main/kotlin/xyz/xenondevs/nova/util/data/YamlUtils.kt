@@ -2,9 +2,11 @@ package xyz.xenondevs.nova.util.data
 
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
+import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.collections.contentEquals
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import java.io.StringReader
+import java.util.*
 
 fun YamlConfiguration.copy(): YamlConfiguration {
     return YamlConfiguration.loadConfiguration(StringReader(saveToString()))
@@ -124,4 +126,17 @@ fun ConfigurationSection(parent: ConfigurationSection, path: String, map: Map<St
     val sectionPathDataMap = map.mapValues { ReflectionRegistry.SECTION_PATH_DATA_CONSTRUCTOR.newInstance(it.value) }
     ReflectionRegistry.MEMORY_SECTION_MAP_FIELD.set(memorySection, sectionPathDataMap)
     return memorySection
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T : ConfigurationNode> T.walk(): Sequence<T> = sequence {
+    val unexplored = LinkedList<T>()
+    unexplored += this@walk
+    while (unexplored.isNotEmpty()) {
+        val node = unexplored.poll()
+        for ((_, child) in node.childrenMap()) {
+            unexplored += child as T
+        }
+        yield(node)
+    }
 }

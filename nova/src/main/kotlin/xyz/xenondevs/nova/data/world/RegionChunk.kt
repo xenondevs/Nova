@@ -4,8 +4,8 @@ import org.bukkit.World
 import xyz.xenondevs.cbf.adapter.NettyBufferProvider
 import xyz.xenondevs.cbf.io.ByteBuffer
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.data.world.block.state.LinkedBlockState
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.logging.Level
 
-private val DELETE_UNKNOWN_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("world.delete_unknown_blocks") }
+private val DELETE_UNKNOWN_BLOCKS by MAIN_CONFIG.entry<Boolean>("world", "delete_unknown_blocks")
 
 internal class RegionChunk(regionX: Int, regionZ: Int, val world: World, relChunkX: Int, relChunkZ: Int) {
     

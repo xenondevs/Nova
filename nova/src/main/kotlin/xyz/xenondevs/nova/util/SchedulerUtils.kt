@@ -4,8 +4,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.util.concurrent.ObservableLock
 import xyz.xenondevs.nova.util.concurrent.lockAndRun
 import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
@@ -16,7 +16,7 @@ import java.util.concurrent.ThreadFactory
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 
-val USE_NOVA_SCHEDULER by configReloadable { DEFAULT_CONFIG.getBoolean("performance.nova_executor.enabled") }
+val USE_NOVA_SCHEDULER by MAIN_CONFIG.entry<Boolean>("performance", "nova_executor", "enabled")
 
 fun runTaskLater(delay: Long, run: () -> Unit) =
     Bukkit.getScheduler().runTaskLater(NOVA, run, delay)
@@ -70,7 +70,7 @@ fun runAsyncTaskTimer(delay: Long, period: Long, run: () -> Unit) =
 
 internal object AsyncExecutor {
     
-    private val THREADS = DEFAULT_CONFIG.getInt("performance.nova_executor.threads")
+    private val THREADS by MAIN_CONFIG.entry<Int>("performance", "nova_executor", "threads")
     
     private lateinit var threadFactory: ThreadFactory
     private lateinit var executorService: ScheduledExecutorService

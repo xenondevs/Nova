@@ -3,10 +3,9 @@
 package xyz.xenondevs.nova.item.logic
 
 import net.kyori.adventure.text.Component
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import org.bukkit.Material
 import org.bukkit.entity.Entity
@@ -20,12 +19,12 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
+import org.spongepowered.configurate.kotlin.extensions.get
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.resources.builder.task.material.info.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
@@ -35,8 +34,6 @@ import xyz.xenondevs.nova.item.behavior.ItemBehaviorFactory
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
-import xyz.xenondevs.nova.util.data.getConfigurationSectionList
-import xyz.xenondevs.nova.util.data.getDoubleOrNull
 import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
@@ -178,51 +175,42 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder>)
     //</editor-fold>
     
     private fun loadConfiguredAttributeModifiers(): List<AttributeModifier> {
-        val section = NovaConfig.getOrNull(item)
-            ?.getConfigurationSection("attribute_modifiers")
-            ?: return emptyList()
+        val section = Configs.getOrNull(item.id.toString())?.node("attribute_modifiers")
+        if (section == null || section.virtual())
+            return emptyList()
         
         val modifiers = ArrayList<AttributeModifier>()
-        
-        section.getKeys(false)
-            .forEach { key ->
-                try {
-                    val slot = EquipmentSlot.entries.firstOrNull { it.name == key.uppercase() }
-                        ?: throw IllegalArgumentException("Unknown equipment slot: $key")
-                    val attributeSections = section.getConfigurationSectionList(key).takeUnlessEmpty()
-                        ?: throw IllegalArgumentException("No attribute modifiers defined for slot $key")
-                    
-                    attributeSections.forEachIndexed { idx, attributeSection ->
-                        try {
-                            val attributeStr = attributeSection.getString("attribute")
-                                ?: throw IllegalArgumentException("Missing value 'attribute'")
-                            val operationStr = attributeSection.getString("operation")
-                                ?: throw IllegalArgumentException("Missing value 'operation'")
-                            val value = attributeSection.getDoubleOrNull("value")
-                                ?: throw IllegalArgumentException("Missing value 'value'")
-                            val hidden = attributeSection.getBoolean("hidden", false)
-                            
-                            val attribute = BuiltInRegistries.ATTRIBUTE.get(ResourceLocation(attributeStr))
-                                ?: throw IllegalArgumentException("Unknown attribute: $attributeStr")
-                            val operation = Operation.entries.firstOrNull { it.name == operationStr.uppercase() }
-                                ?: throw IllegalArgumentException("Unknown operation: $operationStr")
-                            
-                            modifiers += AttributeModifier(
-                                "Nova Configured Attribute Modifier ($slot, $idx)",
-                                attribute,
-                                operation,
-                                value,
-                                !hidden,
-                                slot
-                            )
-                        } catch (e: Exception) {
-                            LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $item, $slot with index $idx", e)
-                        }
+        for ((slotName, attributesNode) in section.childrenMap()) {
+            try {
+                val slot = EquipmentSlot.entries.firstOrNull { it.name.equals(slotName as String, true) }
+                    ?: throw IllegalArgumentException("Unknown equipment slot: $slotName")
+                
+                for ((idx, attributeNode) in attributesNode.childrenList().withIndex()) {
+                    try {
+                        val attribute = attributeNode.node("attribute").get<Attribute>()
+                            ?: throw NoSuchElementException("Missing value 'attribute'")
+                        val operation = attributeNode.node("operation").get<Operation>()
+                            ?: throw IllegalArgumentException("Missing value 'operation'")
+                        val value = attributeNode.node("value").get<Double>()
+                            ?: throw IllegalArgumentException("Missing value 'value'")
+                        val hidden = attributeNode.node("hidden").boolean
+                        
+                        modifiers += AttributeModifier(
+                            "Nova Configured Attribute Modifier ($slot, $idx)",
+                            attribute,
+                            operation,
+                            value,
+                            !hidden,
+                            slot
+                        )
+                    } catch (e: Exception) {
+                        LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $item, $slot with index $idx", e)
                     }
-                } catch (e: Exception) {
-                    LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $item", e)
                 }
+            } catch (e: Exception) {
+                LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $item", e)
             }
+        }
         
         return modifiers
     }

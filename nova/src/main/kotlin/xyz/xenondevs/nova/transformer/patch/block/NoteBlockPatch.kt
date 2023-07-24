@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaNoteBlockTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.transformer.ClassTransformer
@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.world.block.backingstate.impl.NoteBlockBackingState
 internal object NoteBlockPatch : ClassTransformer(NoteBlock::class) {
     
     override fun shouldTransform(): Boolean =
-        DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks")
+        MAIN_CONFIG.value.node("resource_pack", "generation", "use_solid_blocks").boolean
     
     override fun transform() {
         NoteBlock::neighborChanged.replaceWith(::neighborChanged)

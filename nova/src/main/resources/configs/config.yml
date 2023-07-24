@@ -10,7 +10,7 @@ resource_pack:
   # Settings affecting the resource pack prompt
   prompt:
     # The resource pack prompt message
-    message: §bNova Resource Pack
+    message: <gradient:aqua:blue>Nova Resource Pack</gradient>
     # Whether players are forced to accept the resource pack
     force: true
     # Activates the 'nova.misc.resourcePack.bypass.force' permission, with which players will still get the resource pack prompt, but won't be forced to accept it.

@@ -1,90 +1,83 @@
 package xyz.xenondevs.nova.data.config
 
-import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.configuration.file.YamlConfiguration
-import xyz.xenondevs.commons.collections.contentEquals
-import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.util.data.copy
-import java.io.ByteArrayInputStream
-import java.io.File
+import org.spongepowered.configurate.CommentedConfigurationNode
+import xyz.xenondevs.nova.util.data.walk
+import java.nio.file.Path
+import kotlin.io.path.exists
 
 internal object ConfigExtractor {
     
-    private val storedConfigs: HashMap<String, YamlConfiguration> = PermanentStorage.retrieve("storedConfigs", ::HashMap)
+    private val storedConfigs: MutableMap<String, CommentedConfigurationNode> = loadStoredConfigs()
     
-    fun extract(configPath: String, data: ByteArray): YamlConfiguration {
-        val file = File(NOVA.dataFolder, configPath)
-        val internalCfg = YamlConfiguration.loadConfiguration(ByteArrayInputStream(data).reader())
+    fun extract(configPath: String, destFile: Path, fileInZip: Path): CommentedConfigurationNode {
+        val internalCfg = Configs.createLoader(fileInZip).load()
         val storedCfg = storedConfigs[configPath]
         
-        val cfg: YamlConfiguration
-        if (!file.exists() || storedCfg == null) {
+        val loader = Configs.createLoader(destFile)
+        val cfg: CommentedConfigurationNode
+        if (!destFile.exists() || storedCfg == null) {
             cfg = internalCfg.copy()
             storedConfigs[configPath] = internalCfg.copy()
-        } else cfg = updateExistingConfig(file, storedCfg, internalCfg)
+        } else cfg = updateExistingConfig(loader.load(), storedCfg, internalCfg)
         
-        cfg.save(file)
-        cfg.setDefaults(internalCfg)
-        
+        loader.save(cfg)
         return cfg
     }
     
-    private fun updateExistingConfig(file: File, storedCfg: YamlConfiguration, internalCfg: YamlConfiguration): YamlConfiguration {
-        val cfg = YamlConfiguration.loadConfiguration(file)
-        
-        // add keys that are new
-        internalCfg.getKeys(true).filterNot(cfg::isSet).forEach { path ->
-            val internalValue = internalCfg.get(path)
-            cfg.set(path, internalValue)
-            cfg.setComments(path, internalCfg.getComments(path))
-            cfg.setInlineComments(path, internalCfg.getInlineComments(path))
-            storedCfg.set(path, internalValue)
+    private fun updateExistingConfig(
+        cfg: CommentedConfigurationNode,
+        storedCfg: CommentedConfigurationNode,
+        internalCfg: CommentedConfigurationNode
+    ): CommentedConfigurationNode {
+        internalCfg.walk().forEach { internalNode ->
+            val path = internalNode.path()
+            val configuredNode = cfg.node(path)
+            
+            val internalValue = internalNode.raw()
+            if (configuredNode.virtual()) {
+                // add new key
+                configuredNode.raw(internalValue)
+                storedCfg.node(path).set(internalValue)
+            } else {
+                // update value if unchanged by user
+                if (internalNode.childrenMap().isNotEmpty()) // update only terminal nodes
+                    return@forEach
+                
+                val storedNode = storedCfg.node(path)
+                if (internalNode != configuredNode && storedNode == configuredNode) {
+                    configuredNode.raw(internalValue)
+                    storedNode.raw(internalValue)
+                }
+            }
+            
+            // reset comments
+            configuredNode.comment(internalNode.comment())
         }
         
         // remove keys that were once extracted but are no longer in the internal config
-        cfg.getKeys(true)
-            .filter { !internalCfg.isSet(it) && storedCfg.isSet(it) }
-            .forEach { path ->
-                cfg.set(path, null)
-                storedCfg.set(path, null)
-            }
-        
-        internalCfg.getKeys(true).forEach { path ->
-            // reset comments
-            cfg.setComments(path, internalCfg.getComments(path))
-            cfg.setInlineComments(path, internalCfg.getInlineComments(path))
-            
-            // update keys that were unchanged by the user
-            val internalValue = internalCfg.get(path)
-            if (internalValue is ConfigurationSection)
-                return@forEach
-            
-            val storedValue = storedCfg.get(path)
-            val configuredValue = cfg.get(path)
-            
-            if (checkNoUserChanges(internalValue, configuredValue, storedValue)) {
-                cfg.set(path, internalValue)
-                storedCfg.set(path, internalValue)
+        cfg.walk().forEach { node ->
+            val path = node.path()
+            if (internalCfg.node(path).virtual() && !storedCfg.node(path).virtual()) {
+                cfg.removeChild(path)
+                storedCfg.removeChild(path)
             }
         }
         
         return cfg
     }
     
-    /**
-     * Checks if the [configuredValue] differs from the [internalValue] but was not changed by the user by cross-referencing it with [storedValue].
-     */
-    private fun checkNoUserChanges(internalValue: Any?, configuredValue: Any?, storedValue: Any?): Boolean =
-        internalValue != configuredValue && checkEquality(storedValue, configuredValue)
-    
-    /**
-     * Checks if [value1] and [value2] are equal or if they're lists and have the same content.
-     */
-    private fun checkEquality(value1: Any?, value2: Any?): Boolean =
-        value1 == value2 || (value1 is List<*> && value2 is List<*> && value1.contentEquals(value2))
+    private fun loadStoredConfigs(): MutableMap<String, CommentedConfigurationNode> {
+        return PermanentStorage.retrieve<HashMap<String, String>>("storedConfigs", ::HashMap)
+            .mapValuesTo(HashMap()) { (_, cfgStr) -> 
+                Configs.createBuilder().buildAndLoadString(cfgStr) as CommentedConfigurationNode
+            }
+    }
     
     internal fun saveStoredConfigs() {
-        PermanentStorage.store("storedConfigs", storedConfigs)
+        PermanentStorage.store(
+            "storedConfigs",
+            storedConfigs.mapValues { (_, cfg) -> Configs.createBuilder().buildAndSaveString(cfg) }
+        )
     }
     
 }

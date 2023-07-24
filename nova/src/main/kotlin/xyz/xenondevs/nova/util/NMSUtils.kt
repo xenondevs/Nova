@@ -5,6 +5,7 @@ package xyz.xenondevs.nova.util
 import com.mojang.datafixers.util.Either
 import com.mojang.serialization.JsonOps
 import com.mojang.serialization.Lifecycle
+import io.leangen.geantyref.TypeToken
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.MappedRegistry
@@ -49,10 +50,12 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
+import org.spongepowered.configurate.serialize.TypeSerializer
 import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.data.serialization.configurate.RegistryEntrySerializer
 import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
@@ -348,6 +351,10 @@ fun PlayerList.broadcast(exclude: Player?, block: Block, maxDistance: Double, pa
 
 fun <T : Any> Registry<T>.byNameBinaryAdapter(): BinaryAdapter<T> {
     return RegistryBinaryAdapter(this)
+}
+
+inline fun <reified T : Any> Registry<T>.byNameTypeSerializer(): TypeSerializer<T> {
+    return RegistryEntrySerializer(this, object : TypeToken<T>() {})
 }
 
 operator fun <T> Registry<T>.get(key: String): T? {

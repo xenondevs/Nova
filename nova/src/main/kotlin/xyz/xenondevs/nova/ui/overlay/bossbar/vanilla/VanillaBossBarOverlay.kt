@@ -7,8 +7,8 @@ import net.minecraft.world.BossEvent.BossBarColor
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nmsutils.bossbar.BossBar
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
 import xyz.xenondevs.nova.util.component.adventure.font
@@ -18,10 +18,7 @@ import java.awt.Color
 import kotlin.math.roundToInt
 import net.minecraft.world.BossEvent.BossBarOverlay as BossBarStyle
 
-private val INVISIBLE_COLORS by configReloadable {
-    DEFAULT_CONFIG.getStringList("overlay.bossbar.invisible_colors")
-        .mapTo(HashSet()) { BossBarColor.valueOf(it.uppercase()) }
-}
+private val INVISIBLE_COLORS: Set<BossBarColor> by MAIN_CONFIG.entry<HashSet<BossBarColor>>("overlay", "bossbar", "invisible_colors")
 
 private val COLOR_LOOKUP: Map<BossBarColor, TextColor> = mapOf(
     BossBarColor.PINK to Color(255, 0, 199),

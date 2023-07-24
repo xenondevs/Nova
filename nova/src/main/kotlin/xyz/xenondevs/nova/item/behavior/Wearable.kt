@@ -18,7 +18,7 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
@@ -51,13 +51,13 @@ fun Wearable(slot: BukkitEquipmentSlot, equipSound: String? = null): ItemBehavio
         override fun create(item: NovaItem): Wearable.Default {
             val texture = ResourceLookups.MODEL_DATA_LOOKUP[item.id]?.armor
                 ?.let { ResourceLookups.ARMOR_DATA_LOOKUP[it] }?.color
-            val cfg = ConfigAccess(item)
+            val cfg = item.config
             return Wearable.Default(
                 provider(texture),
                 provider(slot),
-                cfg.getOptionalEntry<Double>("armor").orElse(0.0),
-                cfg.getOptionalEntry<Double>("armor_toughness").orElse(0.0),
-                cfg.getOptionalEntry<Double>("knockback_resistance").orElse(0.0),
+                cfg.optionalEntry<Double>("armor").orElse(0.0),
+                cfg.optionalEntry<Double>("armor_toughness").orElse(0.0),
+                cfg.optionalEntry<Double>("knockback_resistance").orElse(0.0),
                 provider(equipSound)
             )
         }

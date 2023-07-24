@@ -24,6 +24,7 @@ import xyz.xenondevs.nova.util.concurrent.runIfTrue
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.toString
 import xyz.xenondevs.nova.world.pos
+import kotlin.collections.set
 
 internal object WrenchBehavior : ItemBehavior {
     

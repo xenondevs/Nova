@@ -6,6 +6,8 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.nova.data.config.ConfigProvider
+import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
@@ -73,6 +75,14 @@ class NovaItem internal constructor(
      * @see [clientsideProviders]
      */
     val clientsideProvider: ItemProvider by lazy { clientsideProviders[0] }
+    
+    /**
+     * The configuration for this [NovaItem].
+     * Accessing this method without a config being present will throw an exception.
+     * 
+     * Use the extension functions `entry` and `optionalEntry` to get values from the config.
+     */
+    val config: ConfigProvider by lazy { Configs[id.toString()] }
     
     init {
         logic.setMaterial(this)

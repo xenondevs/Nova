@@ -23,8 +23,8 @@ import xyz.xenondevs.nmsutils.bossbar.operation.UpdateStyleBossBarOperation
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBossEventPacketEvent
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -46,12 +46,12 @@ import java.util.*
 import kotlin.math.max
 import net.minecraft.network.chat.Component as MojangComponent
 
-private val ENABLED by configReloadable { DEFAULT_CONFIG.getBoolean("overlay.bossbar.enabled") }
-private val BAR_AMOUNT by configReloadable { DEFAULT_CONFIG.getInt("overlay.bossbar.amount") }
-private val SEND_BARS_AFTER_RESOURCE_PACK_LOADED by configReloadable { DEFAULT_CONFIG.getBoolean("overlay.bossbar.send_bars_after_resource_pack_loaded") }
-
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 object BossBarOverlayManager : Listener {
+    
+    val ENABLED by MAIN_CONFIG.entry<Boolean>("overlay", "bossbar", "enabled")
+    private val BAR_AMOUNT by MAIN_CONFIG.entry<Int>("overlay", "bossbar", "amount")
+    private val SEND_BARS_AFTER_RESOURCE_PACK_LOADED by MAIN_CONFIG.entry<Boolean>("overlay", "bossbar", "send_bars_after_resource_pack_loaded")
     
     private var tickTask: BukkitTask? = null
     private val bars = HashMap<UUID, Array<BossBar>>()

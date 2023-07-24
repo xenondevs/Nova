@@ -18,10 +18,11 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.mapNonNull
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.config.entry
+import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer
 import xyz.xenondevs.nova.item.NovaItem
@@ -183,12 +184,12 @@ interface Damageable {
     companion object : ItemBehaviorFactory<Default> {
         
         override fun create(item: NovaItem): Default {
-            val cfg = ConfigAccess(item)
+            val cfg = item.config
             return Default(
-                cfg.getEntry<Int>("durability", "max_durability"),
-                cfg.getOptionalEntry<Int>("item_damage_on_attack_entity").orElse(0),
-                cfg.getOptionalEntry<Int>("item_damage_on_break_block").orElse(0),
-                cfg.getOptionalEntry<Any>("repair_ingredient").map {
+                cfg.entry<Int>(arrayOf("max_durability"), arrayOf("durability")),
+                cfg.optionalEntry<Int>("item_damage_on_attack_entity").orElse(0),
+                cfg.optionalEntry<Int>("item_damage_on_break_block").orElse(0),
+                cfg.optionalEntry<Any>("repair_ingredient").mapNonNull {
                     val list = when (it) {
                         is String -> listOf(it)
                         else -> it as List<String>

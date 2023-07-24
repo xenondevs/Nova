@@ -54,4 +54,9 @@ class ResourceFilter(
         BLACKLIST
     }
     
+    enum class PatternType {
+        WILDCARD,
+        REGEX
+    }
+    
 }

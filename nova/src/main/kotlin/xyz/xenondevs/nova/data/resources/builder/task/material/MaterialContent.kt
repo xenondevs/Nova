@@ -7,8 +7,8 @@ import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.commons.gson.parseJson
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.SoundOverrides
@@ -38,7 +38,7 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.writeText
 
-private val USE_SOLID_BLOCKS by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks") }
+private val USE_SOLID_BLOCKS by MAIN_CONFIG.entry<Boolean>("resource_pack", "generation", "use_solid_blocks")
 
 class MaterialContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
     

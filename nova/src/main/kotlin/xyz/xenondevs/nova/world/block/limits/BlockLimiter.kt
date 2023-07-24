@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.block.limits
 
 import net.minecraft.resources.ResourceLocation
-import org.bukkit.configuration.ConfigurationSection
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
@@ -14,19 +13,6 @@ internal interface BlockLimiter {
     companion object {
         
         val ALLOWED = PlaceResult(true, "")
-        
-        @Suppress("UNCHECKED_CAST")
-        fun createNew(type: String, cfg: Any): BlockLimiter? {
-            return when (type) {
-                "type" -> TypeBlacklist(cfg as List<String>)
-                "world" -> WorldBlacklist(if (cfg is ConfigurationSection) cfg.getStringList("worlds") else cfg as List<String>)
-                "type_world" -> TypeWorldBlacklist(cfg as ConfigurationSection)
-                "amount" -> AmountLimiter(cfg as ConfigurationSection, AmountLimiter.Type.GLOBAL)
-                "amount_per_world" -> AmountLimiter(cfg as ConfigurationSection, AmountLimiter.Type.PER_WORLD)
-                "amount_per_chunk" -> AmountLimiter(cfg as ConfigurationSection, AmountLimiter.Type.PER_CHUNK)
-                else -> null
-            }
-        }
         
     }
     
@@ -44,9 +30,7 @@ internal abstract class SimpleBlockLimiter(denyMessage: String) : BlockLimiter {
     
 }
 
-internal class TypeBlacklist(blacklist: List<String>) : SimpleBlockLimiter("nova.tile_entity_limits.type_blacklist.deny") {
-    
-    private val blacklist = blacklist.mapTo(HashSet()) { ResourceLocation.of(it, ':') }
+internal class TypeBlacklist(private val blacklist: Set<ResourceLocation>) : SimpleBlockLimiter("nova.tile_entity_limits.type_blacklist.deny") {
     
     override fun testPlace(material: NovaBlock, ctx: BlockPlaceContext): Boolean {
         return material.id !in blacklist
@@ -54,9 +38,7 @@ internal class TypeBlacklist(blacklist: List<String>) : SimpleBlockLimiter("nova
     
 }
 
-internal class WorldBlacklist(blacklist: List<String>) : SimpleBlockLimiter("nova.tile_entity_limits.world_blacklist.deny") {
-    
-    private val blacklist = blacklist.toHashSet()
+internal class WorldBlacklist(private val blacklist: Set<String>) : SimpleBlockLimiter("nova.tile_entity_limits.world_blacklist.deny") {
     
     override fun testPlace(material: NovaBlock, ctx: BlockPlaceContext): Boolean {
         return !blacklist.contains("*") && ctx.pos.world.name !in blacklist
@@ -64,10 +46,7 @@ internal class WorldBlacklist(blacklist: List<String>) : SimpleBlockLimiter("nov
     
 }
 
-internal class TypeWorldBlacklist(cfg: ConfigurationSection) : SimpleBlockLimiter("nova.tile_entity_limits.type_world_blacklist.deny") {
-    
-    private val blacklist: Map<String, Set<ResourceLocation>> =
-        cfg.getKeys(false).associateWithTo(HashMap()) { world -> cfg.getStringList(world).mapTo(HashSet()) { ResourceLocation.of(it, ':') } }
+internal class TypeWorldBlacklist(private val blacklist: Map<String, Set<ResourceLocation>>) : SimpleBlockLimiter("nova.tile_entity_limits.type_world_blacklist.deny") {
     
     override fun testPlace(material: NovaBlock, ctx: BlockPlaceContext): Boolean {
         val id = material.id
@@ -76,10 +55,7 @@ internal class TypeWorldBlacklist(cfg: ConfigurationSection) : SimpleBlockLimite
     
 }
 
-internal class AmountLimiter(cfg: ConfigurationSection, private val type: Type) : BlockLimiter {
-    
-    private val limits: Map<ResourceLocation?, Int> =
-        cfg.getKeys(false).associateTo(HashMap()) { id -> (if (id == "*") null else ResourceLocation.of(id, ':')) to cfg.getInt(id) }
+internal class AmountLimiter(private val type: Type, private val limits: Map<ResourceLocation?, Int>) : BlockLimiter {
     
     private val deniedSpecific = PlaceResult(false, "nova.tile_entity_limits.amount_${type.name.lowercase()}.deny")
     private val deniedTotal = PlaceResult(false, "nova.tile_entity_limits.amount_${type.name.lowercase()}_total.deny")

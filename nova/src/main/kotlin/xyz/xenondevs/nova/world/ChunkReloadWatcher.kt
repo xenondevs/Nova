@@ -5,12 +5,15 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.registerEvents
 import java.util.logging.Level
+
+private val ENABLED by MAIN_CONFIG.entry<Boolean>("debug", "watch_chunk_reloads")
 
 @InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
 internal object ChunkReloadWatcher : Listener {
@@ -23,7 +26,7 @@ internal object ChunkReloadWatcher : Listener {
     @InitFun
     fun reload() {
         HandlerList.unregisterAll(this)
-        if (DEFAULT_CONFIG.getBoolean("debug.watch_chunk_reloads"))
+        if (ENABLED)
             registerEvents()
     }
     

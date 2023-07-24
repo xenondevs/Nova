@@ -7,15 +7,17 @@ import kotlinx.coroutines.runBlocking
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.mapNonNull
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.task.AtlasContent
@@ -35,8 +37,9 @@ import xyz.xenondevs.nova.data.resources.builder.task.font.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.task.font.WailaContent
 import xyz.xenondevs.nova.data.resources.builder.task.material.MaterialContent
 import xyz.xenondevs.nova.data.serialization.json.GSON
+import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
+import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.data.Version
-import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.resourcepackobfuscator.ResourcePackObfuscator
 import java.io.File
@@ -51,27 +54,26 @@ import kotlin.io.path.writeText
 import kotlin.time.Duration
 import kotlin.time.measureTime
 
-
-private val EXTRACTION_MODE by configReloadable {
-    when (DEFAULT_CONFIG.getString("resource_pack.generation.minecraft_assets_source")!!.lowercase()) {
+private val EXTRACTION_MODE by MAIN_CONFIG.entry<String>("resource_pack", "generation", "minecraft_assets_source").map {
+    when (it.lowercase()) {
         "github" -> ExtractionMode.GITHUB
         "mojang" -> ExtractionMode.MOJANG_ALL
         else -> throw IllegalArgumentException("Invalid minecraft_assets_source (must be \"github\" or \"mojang\")")
     }
 }
 
-private val CONFIG_RESOURCE_FILTERS by configReloadable { DEFAULT_CONFIG.getConfigurationSectionList("resource_pack.generation.resource_filters").map(ResourceFilter::of) }
+private val CONFIG_RESOURCE_FILTERS by MAIN_CONFIG.entry<List<ResourceFilter>>("resource_pack", "generation", "resource_filters")
 private val CORE_RESOURCE_FILTERS by configReloadable {
     buildList {
         this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, Regex("^[a-z0-9._-]+/textures/armor/.*$"))
         
-        if (!DEFAULT_CONFIG.getBoolean("overlay.bossbar.enabled")) {
+        if (!BossBarOverlayManager.ENABLED) {
             this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "minecraft/textures/gui/bars.png")
             this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/bossbar*")
             this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/bars/*")
         }
         
-        if (!DEFAULT_CONFIG.getBoolean("waila.enabled")) {
+        if (!WailaManager.ENABLED) {
             this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, Regex("^[a-z0-9._-]+/textures/waila/.*$"))
             this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/waila*")
             this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/waila/*")
@@ -79,14 +81,14 @@ private val CORE_RESOURCE_FILTERS by configReloadable {
     }
 }
 
-private val OBFUSCATE by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.protection.obfuscate") }
-private val CORRUPT_ENTRIES by configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.protection.corrupt_entries") }
-private val COMPRESSION_LEVEL by configReloadable { DEFAULT_CONFIG.getInt("resource_pack.generation.compression_level") }
-private val PACK_DESCRIPTION by configReloadable { DEFAULT_CONFIG.getString("resource_pack.generation.description")!! }
-private val IN_MEMORY_PROVIDER = configReloadable { DEFAULT_CONFIG.getBoolean("resource_pack.generation.in_memory") }
+private val OBFUSCATE by MAIN_CONFIG.entry<Boolean>("resource_pack", "generation", "protection", "obfuscate")
+private val CORRUPT_ENTRIES by MAIN_CONFIG.entry<Boolean>("resource_pack", "generation", "protection", "corrupt_entries")
+private val COMPRESSION_LEVEL by MAIN_CONFIG.entry<Int>("resource_pack", "generation", "compression_level")
+private val PACK_DESCRIPTION by MAIN_CONFIG.entry<String>("resource_pack", "generation", "description")
+private val IN_MEMORY_PROVIDER = MAIN_CONFIG.entry<Boolean>("resource_pack", "generation", "in_memory")
 private val IN_MEMORY by IN_MEMORY_PROVIDER
 
-private val SKIP_PACK_TASKS: Set<String> by configReloadable { DEFAULT_CONFIG.getStringList("debug.skip_pack_tasks").toHashSet() }
+private val SKIP_PACK_TASKS: Set<String> by MAIN_CONFIG.entry<HashSet<String>>("debug", "skip_pack_tasks")
 
 class ResourcePackBuilder internal constructor() {
     
@@ -103,7 +105,7 @@ class ResourcePackBuilder internal constructor() {
         //</editor-fold>
         
         //<editor-fold desc="potentially in memory">
-        private val RESOURCE_PACK_BUILD_DIR_PROVIDER: Provider<Path> = JIMFS_PROVIDER.map { it.rootDirectories.first() }.orElse(RESOURCE_PACK_DIR.resolve(".build"))
+        private val RESOURCE_PACK_BUILD_DIR_PROVIDER: Provider<Path> = JIMFS_PROVIDER.mapNonNull { it.rootDirectories.first() }.orElse(RESOURCE_PACK_DIR.resolve(".build"))
         private val TEMP_BASE_PACKS_DIR_PROVIDER: Provider<Path> = RESOURCE_PACK_BUILD_DIR_PROVIDER.map { it.resolve("base_packs") }
         private val PACK_DIR_PROVIDER: Provider<Path> = RESOURCE_PACK_BUILD_DIR_PROVIDER.map { it.resolve("pack") }
         private val ASSETS_DIR_PROVIDER: Provider<Path> = PACK_DIR_PROVIDER.map { it.resolve("assets") }

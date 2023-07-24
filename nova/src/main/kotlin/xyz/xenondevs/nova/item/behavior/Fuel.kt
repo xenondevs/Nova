@@ -7,7 +7,7 @@ import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.item.novaItem
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -38,8 +38,7 @@ interface Fuel {
             .mapKeysTo(enumMap()) { (item, _) -> CraftMagicNumbers.getMaterial(item) }
         
         override fun create(item: NovaItem): Default {
-            val cfg = ConfigAccess(item)
-            return Default(cfg.getEntry<Int>("burn_time"))
+            return Default(item.config.entry<Int>("burn_time"))
         }
         
         fun isFuel(material: Material): Boolean = material in VANILLA_FUELS

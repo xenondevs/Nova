@@ -19,8 +19,8 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionP
 import xyz.xenondevs.nmsutils.network.packetHandler
 import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.registerPacketListener
@@ -36,7 +36,7 @@ import xyz.xenondevs.nova.world.block.BlockManager
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 
-private val BREAK_COOLDOWN by configReloadable { DEFAULT_CONFIG.getInt("world.block_breaking.break_cooldown") }
+private val BREAK_COOLDOWN by MAIN_CONFIG.entry<Int>("world", "block_breaking", "break_cooldown")
 
 internal object BlockBreaking : Listener {
     

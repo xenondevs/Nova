@@ -6,9 +6,8 @@ import net.minecraft.nbt.StringTag
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.enchantment.Enchantment
@@ -19,7 +18,6 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.get
-import xyz.xenondevs.nova.util.getOrThrow
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.item.novaItem
@@ -77,11 +75,10 @@ interface Enchantable {
     companion object : ItemBehaviorFactory<Default> {
         
         override fun create(item: NovaItem): Default {
-            val cfg = ConfigAccess(item)
+            val cfg = item.config
             return Default(
-                cfg.getEntry("enchantment_value"),
-                cfg.getEntry<List<String>>("enchantment_categories")
-                    .map { list -> list.map { NovaRegistries.ENCHANTMENT_CATEGORY.getOrThrow(it) } }
+                cfg.entry("enchantment_value"),
+                cfg.entry<List<EnchantmentCategory>>("enchantment_categories")
             )
         }
         

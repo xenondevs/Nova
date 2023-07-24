@@ -5,8 +5,9 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.commons.provider.immutable.mapEach
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_INFO_PROVIDER
@@ -25,17 +26,14 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
 
-private val POS_UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getInt("waila.pos_update_interval") }
-private val DATA_UPDATE_INTERVAL by configReloadable { DEFAULT_CONFIG.getInt("waila.data_update_interval") }
-
-private val BLACKLISTED_BLOCKS by configReloadable {
-    DEFAULT_CONFIG.getStringList("waila.blacklisted_blocks").map {
-        val parts = it.split(':')
-        if (parts.size == 1) {
-            Regex("minecraft") to WildcardUtils.toRegex(it)
-        } else {
-            WildcardUtils.toRegex(parts[0]) to WildcardUtils.toRegex(parts[1])
-        }
+private val POS_UPDATE_INTERVAL by MAIN_CONFIG.entry<Int>("waila", "pos_update_interval")
+private val DATA_UPDATE_INTERVAL by MAIN_CONFIG.entry<Int>("waila", "data_update_interval")
+private val BLACKLISTED_BLOCKS by MAIN_CONFIG.entry<List<String>>("waila", "blacklisted_blocks").mapEach {
+    val parts = it.split(':')
+    if (parts.size == 1) {
+        Regex("minecraft") to WildcardUtils.toRegex(it)
+    } else {
+        WildcardUtils.toRegex(parts[0]) to WildcardUtils.toRegex(parts[1])
     }
 }
 

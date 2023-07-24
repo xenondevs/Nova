@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.tileentity.network.energy
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkBridge
@@ -16,7 +16,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 
-private val DEFAULT_TRANSFER_RATE by configReloadable { DEFAULT_CONFIG.getLong("network.energy.default_transfer_rate") }
+private val DEFAULT_TRANSFER_RATE by MAIN_CONFIG.entry<Long>("network", "energy", "default_transfer_rate")
 
 /**
  * An EnergyNetwork consists of [NetworkBridge] that connect [NetworkEndPoint]

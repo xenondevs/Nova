@@ -13,12 +13,12 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.util.nmsState
@@ -64,7 +64,7 @@ internal object BackingStateManager : Listener {
     
     @InitFun
     private fun init() {
-        if (!DEFAULT_CONFIG.getBoolean("resource_pack.generation.use_solid_blocks"))
+        if (!MAIN_CONFIG.value.node("resource_pack", "generation", "use_solid_blocks").boolean)
             return
         
         LOGGER.info("Using backing states: ${backingStates.joinToString { it::class.simpleName!! }}")

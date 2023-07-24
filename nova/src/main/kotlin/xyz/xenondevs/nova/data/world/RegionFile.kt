@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.data.world
 import org.bukkit.World
 import xyz.xenondevs.cbf.adapter.NettyBufferProvider
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.util.data.readVarInt
 import xyz.xenondevs.nova.util.data.use
 import xyz.xenondevs.nova.util.data.writeVarInt
@@ -18,7 +18,7 @@ import kotlin.concurrent.read
 private const val MAGIC = 0xB7E21337.toInt()
 private const val FILE_VERSION = 1
 
-private val CREATE_BACKUPS by configReloadable { DEFAULT_CONFIG.getBoolean("performance.region_backups") }
+private val CREATE_BACKUPS by MAIN_CONFIG.entry<Boolean>("performance", "region_backups")
 
 /**
  * A binary region file.

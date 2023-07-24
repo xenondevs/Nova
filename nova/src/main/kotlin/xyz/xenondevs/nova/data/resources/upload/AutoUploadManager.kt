@@ -1,12 +1,15 @@
 package xyz.xenondevs.nova.data.resources.upload
 
 import kotlinx.coroutines.runBlocking
-import net.md_5.bungee.api.chat.TextComponent
+import net.kyori.adventure.text.Component
+import org.spongepowered.configurate.kotlin.extensions.contains
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper
 import xyz.xenondevs.invui.resourcepack.ForceResourcePack
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.service.CustomMultiPart
@@ -16,13 +19,17 @@ import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
-import xyz.xenondevs.nova.util.data.hash
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import java.io.File
 import java.util.logging.Level
+
+private val PROMPT_MESSAGE by MAIN_CONFIG.entry<Component>("resource_pack", "prompt", "message")
+private val PROMPT_FORCE by MAIN_CONFIG.entry<Boolean>("resource_pack", "prompt", "force")
+private val ENABLE_PROMPT_FORCE_BYPASS_PERMISSION by MAIN_CONFIG.entry<Boolean>("resource_pack", "prompt", "enableForceBypassPermission")
+private val ENABLE_PROMPT_BYPASS_PERMISSION by MAIN_CONFIG.entry<Boolean>("resource_pack", "prompt", "enablePromptBypassPermission")
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD_ASYNC,
@@ -32,8 +39,8 @@ internal object AutoUploadManager {
     
     internal val services = arrayListOf(Xenondevs, SelfHost, CustomMultiPart, S3, ResourcePackDotHost)
     
-    private val resourcePackCfg by configReloadable { DEFAULT_CONFIG.getConfigurationSection("resource_pack")!! }
-    private val autoUploadCfg by configReloadable { DEFAULT_CONFIG.getConfigurationSection("resource_pack.auto_upload")!! }
+    private val resourcePackCfg by MAIN_CONFIG.map { it.node("resource_pack") }
+    private val autoUploadCfg by MAIN_CONFIG.map { it.node("resource_pack", "auto_upload") }
     
     var enabled = false
         private set
@@ -71,10 +78,10 @@ internal object AutoUploadManager {
     }
     
     private fun enable(fromReload: Boolean) {
-        enabled = autoUploadCfg.getBoolean("enabled")
+        enabled = autoUploadCfg.node("enabled").boolean
         
         if (resourcePackCfg.contains("url")) {
-            val url = resourcePackCfg.getString("url")
+            val url = resourcePackCfg.node("url").string
             if (!url.isNullOrEmpty()) {
                 if (enabled)
                     LOGGER.warning("The resource pack url is set in the config, but the auto upload is also enabled. Defaulting to the url in the config.")
@@ -93,7 +100,7 @@ internal object AutoUploadManager {
             return
         }
         
-        val serviceName = autoUploadCfg.getString("service")?.lowercase()
+        val serviceName = autoUploadCfg.node("service").string?.lowercase()
         if (serviceName != null) {
             val service = services.find { serviceName in it.names }
             checkNotNull(service) { "Service $serviceName not found!" }
@@ -105,7 +112,7 @@ internal object AutoUploadManager {
             return
         }
         
-        val configHash = autoUploadCfg.hash()
+        val configHash = autoUploadCfg.hashCode()
         if (wasRegenerated || lastConfig != configHash) {
             wasRegenerated = false
             runBlocking {
@@ -144,21 +151,10 @@ internal object AutoUploadManager {
     
     private fun reloadForceResourcePackSettings() {
         ForceResourcePack.getInstance().apply { 
-            setPrompt(TextComponent.fromLegacyText(DEFAULT_CONFIG.getString("resource_pack.prompt.message")))
-            isForced = DEFAULT_CONFIG.getBoolean("resource_pack.prompt.force")
-            
-            if (DEFAULT_CONFIG.getBoolean("resource_pack.prompt.enableForceBypassPermission")) {
-                forceBypassPermission = "nova.misc.resourcePack.bypass.force"
-            } else {
-                forceBypassPermission = null
-            }
-            
-            if (DEFAULT_CONFIG.getBoolean("resource_pack.prompt.enablePromptBypassPermission")) {
-                promptBypassPermission = "nova.misc.resourcePack.bypass.prompt"
-            } else {
-                promptBypassPermission = null
-            }
-            
+            prompt = AdventureComponentWrapper(PROMPT_MESSAGE)
+            isForced = PROMPT_FORCE
+            forceBypassPermission = if (ENABLE_PROMPT_FORCE_BYPASS_PERMISSION) "nova.misc.resourcePack.bypass.force" else null
+            promptBypassPermission = if (ENABLE_PROMPT_BYPASS_PERMISSION) "nova.misc.resourcePack.bypass.prompt" else null
         }
     }
     

@@ -9,7 +9,8 @@ import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundActionBarPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSystemChatPacketEvent
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -18,6 +19,8 @@ import java.util.*
 import net.minecraft.network.chat.Component as MojangComponent
 
 object ActionbarOverlayManager {
+    
+    private val ENABLED by MAIN_CONFIG.entry<Boolean>("overlay", "actionbar", "enabled")
     
     private var tickTask: BukkitTask? = null
     
@@ -36,7 +39,7 @@ object ActionbarOverlayManager {
             tickTask = null
         }
         
-        if (DEFAULT_CONFIG.getBoolean("overlay.actionbar.enabled")) {
+        if (ENABLED) {
             PacketEventManager.registerListener(this)
             tickTask = runTaskTimer(0, 1, ActionbarOverlayManager::handleTick)
         }

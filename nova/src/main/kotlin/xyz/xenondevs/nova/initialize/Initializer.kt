@@ -22,7 +22,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
-import xyz.xenondevs.nova.data.config.NovaConfig
+import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.serialization.cbf.CBFAdapters
 import xyz.xenondevs.nova.registry.NovaRegistryAccess
@@ -119,7 +119,7 @@ internal object Initializer : Listener {
      * Stats the pre-world initialization process.
      */
     private fun initPreWorld() {
-        NovaConfig.loadDefaultConfig()
+        Configs.extractDefaultConfig()
         VanillaRegistryAccess.unfreezeAll()
         registerEvents()
         NMSUtilities.init(NOVA)

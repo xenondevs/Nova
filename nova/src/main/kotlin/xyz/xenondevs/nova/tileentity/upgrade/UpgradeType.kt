@@ -2,14 +2,17 @@ package xyz.xenondevs.nova.tileentity.upgrade
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.immutable.requireNonNull
 import xyz.xenondevs.commons.reflection.createType
-import xyz.xenondevs.nova.data.config.NovaConfig
-import xyz.xenondevs.nova.data.config.Reloadable
-import xyz.xenondevs.nova.data.serialization.yaml.getDeserialized
+import xyz.xenondevs.nova.data.config.ConfigProvider
+import xyz.xenondevs.nova.data.config.Configs
+import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.name
-import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
+import xyz.xenondevs.nova.world.block.NovaBlock
 import kotlin.reflect.KType
 
 class UpgradeType<T> internal constructor(
@@ -17,62 +20,42 @@ class UpgradeType<T> internal constructor(
     val item: NovaItem,
     val icon: NovaItem,
     valueType: KType
-) : Reloadable {
+) {
     
     private val listValueType = createType(List::class, valueType)
-    private val valueListProviders = HashMap<NovaTileEntityBlock, ValueListProvider>()
-    private val valueProviders = HashMap<NovaTileEntityBlock, HashMap<Int, ValueProvider>>()
+    private val globalConfig = Configs["${id.namespace}:upgrade_values"]
+    private val valueListProviders = HashMap<ConfigProvider, Provider<List<T>>>()
+    private val valueProviders = HashMap<ConfigProvider, HashMap<Int, Provider<T>>>()
     
-    fun getValue(material: NovaTileEntityBlock, level: Int): T {
-        val values = getValueList(material)
-        return values[level.coerceIn(0..values.lastIndex)]
-    }
+    fun getValue(block: NovaBlock, level: Int): T =
+        getValueProvider(block, level).value
     
-    fun getValueProvider(material: NovaTileEntityBlock, level: Int): Provider<T> {
-        return valueProviders
-            .getOrPut(material, ::HashMap)
-            .getOrPut(level) { ValueProvider(getValueListProvider(material), level) }
-    }
+    fun getValue(config: ConfigProvider, level: Int): T =
+        getValueProvider(config, level).value
     
-    fun getValueList(material: NovaTileEntityBlock): List<T> {
-        return getValueListProvider(material).value
-    }
+    fun getValueList(block: NovaBlock): List<T> =
+        getValueListProvider(block).value
     
-    fun getValueListProvider(material: NovaTileEntityBlock): Provider<List<T>> {
-        return valueListProviders.getOrPut(material) { ValueListProvider(material) }
-    }
+    fun getValueList(config: ConfigProvider, level: Int): T =
+        getValueProvider(config, level).value
     
-    override fun reload() {
-        valueListProviders.values.forEach(Provider<*>::update)
-    }
+    fun getValueProvider(block: NovaBlock, level: Int): Provider<T> =
+        getValueProvider(block.config, level)
     
-    private inner class ValueListProvider(
-        private val material: NovaTileEntityBlock
-    ) : Provider<List<T>>() {
-        
-        override fun loadValue(): List<T> {
-            return NovaConfig[material].getDeserialized("upgrade_values.${id.name}", listValueType)
-                ?: NovaConfig["${id.namespace}:upgrade_values"].getDeserialized(id.name, listValueType)
-                ?: throw IllegalStateException("No upgrade values present for $id")
+    fun getValueProvider(config: ConfigProvider, level: Int): Provider<T> =
+        valueProviders
+            .getOrPut(config, ::HashMap)
+            .getOrPut(level) { getValueListProvider(config).map { list -> list[level.coerceIn(0..list.lastIndex)] } }
+    
+    fun getValueListProvider(block: NovaBlock): Provider<List<T>> =
+        getValueListProvider(block.config)
+    
+    fun getValueListProvider(config: ConfigProvider): Provider<List<T>> =
+        valueListProviders.getOrPut(config) {
+            config.optionalEntry<List<T>>(listValueType, "upgrade_values", id.name)
+                .orElse(globalConfig.optionalEntry(listValueType, id.name))
+                .requireNonNull("No upgrade values present for $id")
         }
-        
-    }
-    
-    private inner class ValueProvider(
-        private val listProvider: Provider<List<T>>,
-        private val level: Int
-    ) : Provider<T>() {
-        
-        init {
-            listProvider.addChild(this)
-        }
-        
-        override fun loadValue(): T {
-            val valueList = listProvider.value
-            return valueList[level.coerceIn(0..valueList.lastIndex)]
-        }
-        
-    }
     
     companion object {
         

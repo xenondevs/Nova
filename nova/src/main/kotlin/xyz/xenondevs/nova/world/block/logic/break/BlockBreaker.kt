@@ -24,8 +24,8 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.nmsutils.particle.item
 import xyz.xenondevs.nmsutils.particle.particle
-import xyz.xenondevs.nova.data.config.DEFAULT_CONFIG
-import xyz.xenondevs.nova.data.config.configReloadable
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.tool.ToolCategory
@@ -52,7 +52,7 @@ import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 
-private val CLIENTSIDE_PREDICTIONS by configReloadable { DEFAULT_CONFIG.getBoolean("world.block_breaking.clientside_predictions") }
+private val CLIENTSIDE_PREDICTIONS by MAIN_CONFIG.entry<Boolean>("world", "block_breaking", "clientside_predictions")
 private val MINING_FATIGUE = MobEffect.byId(4)!!
 private val MINING_FATIGUE_INSTANCE = MobEffectInstance(MINING_FATIGUE, Integer.MAX_VALUE, 255, false, false, false)
 

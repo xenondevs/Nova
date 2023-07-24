@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.item.behavior
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.data.config.ConfigAccess
+import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.logic.PacketItemData
@@ -17,8 +17,7 @@ import org.bukkit.inventory.ItemStack as BukkitStack
 fun Chargeable(affectsItemDurability: Boolean): ItemBehaviorFactory<Chargeable.Default> =
     object : ItemBehaviorFactory<Chargeable.Default> {
         override fun create(item: NovaItem): Chargeable.Default {
-            val cfg = ConfigAccess(item)
-            return Chargeable.Default(cfg.getEntry("max_energy"), affectsItemDurability)
+            return Chargeable.Default(item.config.entry("max_energy"), affectsItemDurability)
         }
     }
 
@@ -65,8 +64,7 @@ interface Chargeable {
     companion object : ItemBehaviorFactory<Default> {
         
         override fun create(item: NovaItem): Default {
-            val cfg = ConfigAccess(item)
-            return Default(cfg.getEntry<Long>("max_energy"), true)
+            return Default(item.config.entry<Long>("max_energy"), true)
         }
         
     }
