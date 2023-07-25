@@ -33,9 +33,9 @@ class PacketItemData internal constructor(val nbt: CompoundTag) {
     var durabilityBar: Double = 1.0
     
     /**
-     * Whether this item should have an enchantment glow. Null means that this is decided by the item's enchantments.
+     * Whether this item should have an enchantment glint. Null means that this is decided by the item's enchantments.
      */
-    var glow: Boolean? = null
+    var glint: Boolean? = null
     
     /**
      * The flags that should be hidden on this item.

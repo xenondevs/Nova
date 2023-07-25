@@ -92,10 +92,10 @@ private val SHULKER_BOX_ITEMS = setOf(
 private val ATTRIBUTE_DECIMAL_FORMAT = DecimalFormat("#.##")
     .apply { decimalFormatSymbols = DecimalFormatSymbols.getInstance(Locale.ROOT) }
 
-private val GLOW_ENCHANTMENT_TAG = ListTag().apply {
+private val GLINT_ENCHANTMENT_TAG = ListTag().apply {
     val entry = CompoundTag()
-    entry.putString("id", "glow")
-    entry.putInt("level", 1)
+    entry.putString("id", "glint")
+    entry.putInt("lvl", 1)
     add(entry)
 }
 
@@ -264,8 +264,8 @@ internal object PacketItems : Listener {
         // enchantments
         val enchantmentsTooltip = buildEnchantmentsTooltip(newItemStack)
         enchantmentsTooltip.forEach { loreTag += it.withoutPreFormatting().toNBT() }
-        if (packetItemData.glow ?: enchantmentsTooltip.isNotEmpty()) {
-            newItemTag.put("Enchantments", GLOW_ENCHANTMENT_TAG)
+        if (packetItemData.glint ?: enchantmentsTooltip.isNotEmpty()) {
+            newItemTag.put("Enchantments", GLINT_ENCHANTMENT_TAG)
         }
         // actual lore
         val itemDisplayLore = packetItemData.lore
@@ -337,7 +337,7 @@ internal object PacketItems : Listener {
         // enchantments tooltip (above normal lore text)
         val enchantmentsTooltip = buildEnchantmentsTooltip(itemStack)
         enchantmentsTooltip.forEachIndexed { idx, line -> loreTag.add(idx, line.withoutPreFormatting().toNBT()) }
-        if (enchantmentsTooltip.isNotEmpty()) tag.put("Enchantments", GLOW_ENCHANTMENT_TAG) // ensures glow effect
+        if (enchantmentsTooltip.isNotEmpty()) tag.put("Enchantments", GLINT_ENCHANTMENT_TAG) // ensures glint effect
         // attributes tooltip
         buildAttributeModifiersTooltip(player?.serverPlayer, newItemStack).forEach { loreTag += it.withoutPreFormatting().toNBT() }
         // advanced tooltips
