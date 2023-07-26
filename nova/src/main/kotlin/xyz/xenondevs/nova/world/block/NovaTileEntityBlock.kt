@@ -20,7 +20,8 @@ class NovaTileEntityBlock internal constructor(
     internal val tileEntityConstructor: TileEntityConstructor,
     properties: List<BlockPropertyType<*>>,
     placeCheck: PlaceCheckFun?,
-    multiBlockLoader: MultiBlockLoader?
+    multiBlockLoader: MultiBlockLoader?,
+    configId: String
 ) : NovaBlock(
     id,
     localizedName,
@@ -28,7 +29,8 @@ class NovaTileEntityBlock internal constructor(
     options,
     properties,
     placeCheck,
-    multiBlockLoader
+    multiBlockLoader,
+    configId
 ) {
     
     override fun createBlockState(pos: BlockPos): NovaTileEntityState =

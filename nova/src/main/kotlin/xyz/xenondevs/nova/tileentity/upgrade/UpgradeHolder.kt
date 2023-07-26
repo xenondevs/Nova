@@ -29,7 +29,7 @@ class UpgradeHolder internal constructor(
     internal val allowed: Set<UpgradeType<*>>
 ) {
     
-    private val material = tileEntity.block
+    private val config = tileEntity.block.config
     private val valueProviders: Map<UpgradeType<*>, ModifierProvider<*>> = allowed.associateWithTo(HashMap()) { ModifierProvider(it) }
     
     internal val input = VirtualInventory(null, 1).apply { setPreUpdateHandler(::handlePreInvUpdate); setPostUpdateHandler(::handlePostInvUpdate) }
@@ -79,7 +79,7 @@ class UpgradeHolder internal constructor(
     
     fun <T> getValue(type: UpgradeType<T>): T {
         val amount = upgrades[type] ?: 0
-        return type.getValue(material, amount)
+        return type.getValue(config, amount)
     }
     
     @Suppress("UNCHECKED_CAST")
@@ -96,7 +96,7 @@ class UpgradeHolder internal constructor(
     }
     
     fun getLimit(type: UpgradeType<*>): Int {
-        return min(type.getValueList(material).size - 1, 999)
+        return min(type.getValueList(config).size - 1, 999)
     }
     
     fun getUpgradeItems(): List<ItemStack> {
@@ -158,7 +158,7 @@ class UpgradeHolder internal constructor(
     
     private inner class ModifierProvider<T>(private val type: UpgradeType<T>) : Provider<T>() {
         
-        private val parent = type.getValueListProvider(material)
+        private val parent = type.getValueListProvider(config)
         
         init {
             parent.addChild(this)

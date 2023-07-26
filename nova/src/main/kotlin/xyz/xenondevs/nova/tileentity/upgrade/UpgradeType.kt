@@ -12,7 +12,6 @@ import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.name
-import xyz.xenondevs.nova.world.block.NovaBlock
 import kotlin.reflect.KType
 
 class UpgradeType<T> internal constructor(
@@ -27,28 +26,16 @@ class UpgradeType<T> internal constructor(
     private val valueListProviders = HashMap<ConfigProvider, Provider<List<T>>>()
     private val valueProviders = HashMap<ConfigProvider, HashMap<Int, Provider<T>>>()
     
-    fun getValue(block: NovaBlock, level: Int): T =
-        getValueProvider(block, level).value
-    
     fun getValue(config: ConfigProvider, level: Int): T =
         getValueProvider(config, level).value
-    
-    fun getValueList(block: NovaBlock): List<T> =
-        getValueListProvider(block).value
-    
-    fun getValueList(config: ConfigProvider, level: Int): T =
-        getValueProvider(config, level).value
-    
-    fun getValueProvider(block: NovaBlock, level: Int): Provider<T> =
-        getValueProvider(block.config, level)
     
     fun getValueProvider(config: ConfigProvider, level: Int): Provider<T> =
         valueProviders
             .getOrPut(config, ::HashMap)
             .getOrPut(level) { getValueListProvider(config).map { list -> list[level.coerceIn(0..list.lastIndex)] } }
     
-    fun getValueListProvider(block: NovaBlock): Provider<List<T>> =
-        getValueListProvider(block.config)
+    fun getValueList(config: ConfigProvider): List<T> =
+        getValueListProvider(config).value
     
     fun getValueListProvider(config: ConfigProvider): Provider<List<T>> =
         valueListProviders.getOrPut(config) {

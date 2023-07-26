@@ -4,12 +4,12 @@ package xyz.xenondevs.nova.world.block
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.data.config.ConfigurableRegistryElementBuilder
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
 
@@ -17,7 +17,7 @@ private val EMPTY_BLOCK_OPTIONS = BlockOptions(0.0)
 
 abstract class AbstractNovaBlockBuilder<S : AbstractNovaBlockBuilder<S, T, B>, T : NovaBlockState, B : NovaBlock> internal constructor(
     id: ResourceLocation
-) : RegistryElementBuilder<B>(NovaRegistries.BLOCK, id) {
+) : ConfigurableRegistryElementBuilder<S, B>(NovaRegistries.BLOCK, id) {
     
     internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
@@ -66,17 +66,16 @@ class NovaBlockBuilder internal constructor(id: ResourceLocation) : AbstractNova
     
     override var logic: MutableList<BlockBehavior<NovaBlockState>> = mutableListOf(BlockBehavior.Default)
     
-    override fun build(): NovaBlock {
-        return NovaBlock(
-            id,
-            localizedName,
-            BlockLogic(logic),
-            options,
-            properties,
-            placeCheck,
-            multiBlockLoader
-        )
-    }
+    override fun build() = NovaBlock(
+        id,
+        localizedName,
+        BlockLogic(logic),
+        options,
+        properties,
+        placeCheck,
+        multiBlockLoader,
+        configId
+    )
     
 }
 
@@ -99,18 +98,16 @@ class TileEntityNovaBlockBuilder internal constructor(
         return this
     }
     
-    override fun build(): NovaTileEntityBlock {
-        return NovaTileEntityBlock(
-            id,
-            localizedName,
-            BlockLogic(logic),
-            options,
-            tileEntity,
-            properties,
-            placeCheck,
-            multiBlockLoader
-        )
-        
-    }
+    override fun build() = NovaTileEntityBlock(
+        id,
+        localizedName,
+        BlockLogic(logic),
+        options,
+        tileEntity,
+        properties,
+        placeCheck,
+        multiBlockLoader,
+        configId
+    )
     
 }

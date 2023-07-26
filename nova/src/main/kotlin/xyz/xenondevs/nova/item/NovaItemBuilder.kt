@@ -4,17 +4,17 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.data.config.ConfigurableRegistryElementBuilder
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.behavior.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.item.logic.ItemLogic
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 
-class NovaItemBuilder internal constructor(id: ResourceLocation): RegistryElementBuilder<NovaItem>(NovaRegistries.ITEM, id) {
+class NovaItemBuilder internal constructor(id: ResourceLocation): ConfigurableRegistryElementBuilder<NovaItemBuilder, NovaItem>(NovaRegistries.ITEM, id) {
     
     private var logic: MutableList<ItemBehaviorHolder> = ArrayList()
     private var localizedName = "item.${id.namespace}.${id.name}"
@@ -73,7 +73,8 @@ class NovaItemBuilder internal constructor(id: ResourceLocation): RegistryElemen
             maxStackSize,
             craftingRemainingItem,
             isHidden,
-            block
+            block,
+            configId
         )
         block?.item = item
         return item

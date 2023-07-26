@@ -28,7 +28,8 @@ class NovaItem internal constructor(
     private val _maxStackSize: Int = 64,
     val craftingRemainingItem: ItemBuilder? = null,
     val isHidden: Boolean = false,
-    val block: NovaBlock? = null
+    val block: NovaBlock? = null,
+    configId: String = id.toString()
 ) {
     
     /**
@@ -78,11 +79,11 @@ class NovaItem internal constructor(
     
     /**
      * The configuration for this [NovaItem].
-     * Accessing this method without a config being present will throw an exception.
+     * Trying to read config values from this when no config is present will result in an exception.
      * 
      * Use the extension functions `entry` and `optionalEntry` to get values from the config.
      */
-    val config: ConfigProvider by lazy { Configs[id.toString()] }
+    val config: ConfigProvider by lazy { Configs[configId] }
     
     init {
         logic.setMaterial(this)

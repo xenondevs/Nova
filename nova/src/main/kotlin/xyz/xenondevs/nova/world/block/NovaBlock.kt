@@ -45,7 +45,8 @@ open class NovaBlock internal constructor(
     val options: BlockOptions,
     val properties: List<BlockPropertyType<*>>,
     val placeCheck: PlaceCheckFun?,
-    val multiBlockLoader: MultiBlockLoader?
+    val multiBlockLoader: MultiBlockLoader?,
+    configId: String
 ) {
     
     /**
@@ -58,7 +59,13 @@ open class NovaBlock internal constructor(
      */
     val model: BlockModelData by lazy { ResourceLookups.MODEL_DATA_LOOKUP.getOrThrow(id).block!! }
     
-    val config: ConfigProvider by lazy { Configs[id.toString()] }
+    /**
+     * The configuration for this [NovaBlock].
+     * Trying to read config values from this when no config is present will result in an exception.
+     *
+     * Use the extension functions `entry` and `optionalEntry` to get values from the config.
+     */
+    val config: ConfigProvider by lazy { Configs[configId] }
     
     internal val vanillaBlockMaterial: Material
         get() = when (val block = model) {
