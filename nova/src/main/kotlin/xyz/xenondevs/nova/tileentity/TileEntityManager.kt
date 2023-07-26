@@ -1,19 +1,21 @@
 package xyz.xenondevs.nova.tileentity
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.bukkit.Location
 import org.bukkit.Material
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.util.runAsyncTaskTimer
+import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 
 @Suppress("DEPRECATION")
@@ -46,7 +48,9 @@ object TileEntityManager {
         }
         
         runTaskTimer(0, 1) { handleTick(TileEntity::handleTick) }
-        runAsyncTaskTimer(0, 1) { handleTick(TileEntity::handleAsyncTick) }
+        // TODO: multiple threads for async ticks
+        Executors.newSingleThreadScheduledExecutor(ThreadFactoryBuilder().setNameFormat("Nova Async TileEntityManager").build())
+            .scheduleAtFixedRate({ handleTick(TileEntity::handleAsyncTick) }, 0, 50, TimeUnit.MILLISECONDS)
     }
     
     @Synchronized
