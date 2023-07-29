@@ -7,7 +7,9 @@ import io.netty.channel.ChannelDuplexHandler
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
 import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.PacketListener
 import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientboundBundlePacket
 import net.minecraft.network.protocol.login.ServerboundHelloPacket
 import org.bukkit.entity.Player
 import xyz.xenondevs.nmsutils.LOGGER
@@ -46,8 +48,15 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
             if (shouldDrop(msg, outgoingDropQueue))
                 return
             
-            val packet = callEvent(msg) ?: return
-            super.write(ctx, packet, promise)
+            if (msg is ClientboundBundlePacket) {
+                val packets = msg.subPackets().mapNotNull(::callEvent)
+                if (packets.isEmpty())
+                    return
+                super.write(ctx, ClientboundBundlePacket(packets), promise)
+            } else {
+                val packet = callEvent(msg) ?: return
+                super.write(ctx, packet, promise)
+            }
         } catch (t: Throwable) {
             LOGGER.log(Level.SEVERE, "An exception occurred while handling a clientbound packet.", t)
         }
@@ -104,12 +113,15 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
     }
     
     private fun callEvent(msg: Any?): Any? {
-        if (msg is Packet<*>) {
-            val event = PacketEventManager.createAndCallEvent(player, msg) ?: return msg
-            return if (event.isCancelled) null else event.packet
-        }
+        if (msg is Packet<*>)
+            return callEvent(msg)
         
         return msg
+    }
+    
+    private fun <T : PacketListener> callEvent(msg: Packet<T>): Packet<T>? {
+        val event = PacketEventManager.createAndCallEvent(player, msg) ?: return msg
+        return if (event.isCancelled) null else event.packet
     }
     
     fun queueByteBuf(buf: FriendlyByteBuf) {

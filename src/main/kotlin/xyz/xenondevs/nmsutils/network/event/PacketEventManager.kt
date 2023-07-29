@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nmsutils.network.event
 
+import net.minecraft.network.PacketListener
 import net.minecraft.network.protocol.Packet
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
@@ -87,7 +88,7 @@ object PacketEventManager {
         playerEventConstructors[P::class] = constructor as (Player, Packet<*>) -> PlayerPacketEvent<Packet<*>>
     }
     
-    internal fun createAndCallEvent(player: Player?, packet: Packet<*>): PacketEvent<*>? {
+    internal fun <T : PacketListener, P : Packet<T>> createAndCallEvent(player: Player?, packet: Packet<T>): PacketEvent<P>? {
         LOCK.read {
             val packetClass = packet::class
             
@@ -99,7 +100,7 @@ object PacketEventManager {
                 
                 callEvent(event)
                 
-                return event
+                return event as PacketEvent<P>
             }
             
             return null
