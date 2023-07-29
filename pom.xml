@@ -6,7 +6,7 @@
 
     <groupId>xyz.xenondevs</groupId>
     <artifactId>nms-utilities</artifactId>
-    <version>0.12</version>
+    <version>0.13</version>
     <packaging>jar</packaging>
 
     <properties>
