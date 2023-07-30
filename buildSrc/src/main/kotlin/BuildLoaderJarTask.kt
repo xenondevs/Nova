@@ -83,7 +83,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         val remapper = FileRemapper(mappings, if (remap) RemapGoal.SPIGOT else RemapGoal.MOJANG)
         
         // create jar
-        val novaFile = File(project.buildDir, "Nova-${project.version}.jar").toPath()
+        val novaFile = File(project.buildDir, "Nova-${project.version}-bundled.jar").toPath()
         buildJarFromProjects(novaFile.toFile(), hooks + novaApi + nova) { remapper.remap(it.inputStream()) ?: it }
         if (remap) {
             // remap nova jar with specialsource
