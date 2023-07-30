@@ -43,6 +43,7 @@ internal object PermanentStorage {
         if (data != null) {
             val json = GSON.toJsonTree(data)
             storage[key] = json
+            f.parentFile.mkdirs()
             json.writeToFile(f)
         } else {
             f.delete()
