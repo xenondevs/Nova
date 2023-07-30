@@ -234,7 +234,7 @@ object RecipeManager : Listener {
         
         // clear previous items
         player.addToInventoryOrDrop(craftingInventory.matrix.filterNotNull())
-        craftingInventory.matrix = arrayOfNulls(9)
+        craftingInventory.matrix = arrayOfNulls(craftingInventory.matrix.size)
         
         // check if the player has the required ingredients
         val inventory = player.inventory
