@@ -124,22 +124,27 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     private fun remapSpigot(inFile: File, outFile: File, srgIn: File, reverse: Boolean) {
         val mapping = JarMapping()
         val inheritanceProviders = JointProvider().also(mapping::setFallbackInheritanceProvider)
+        val jars = ArrayList<Jar>()
         
         // load mapping file
         mapping.loadMappings(srgIn.absolutePath, reverse, false, null, null)
         
         // inheritance provider
-        val inJar = Jar.init(inFile.toFile())
+        val inJar = Jar.init(inFile).also(jars::add)
         inheritanceProviders.add(JarProvider(inJar))
         
         // load all project dependencies as inheritance providers
         nova.configurations.getByName("compileClasspath").incoming.artifacts.artifactFiles.files.forEach {
-            inheritanceProviders.add(JarProvider(Jar.init(it)))
+            val jar = Jar.init(it).also(jars::add)
+            inheritanceProviders.add(JarProvider(jar))
         }
         
         // remap jar
         val jarMap = JarRemapper(null, mapping, null)
         jarMap.remapJar(inJar, outFile)
+        
+        // close file handles to inputs
+        jars.forEach(Jar::close)
     }
     
     private fun writeLibraries(bundlerFile: File) {
