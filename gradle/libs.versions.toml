@@ -8,6 +8,7 @@ kotlin = "1.9.0"
 ktor = "2.3.1"
 paper = "1.20.1-R0.1-SNAPSHOT"
 paperweight = "1.5.5"
+stringremapper = "1.5"
 xenondevs-commons = "1.4"
 
 [libraries]
@@ -50,7 +51,7 @@ nmsutilities = { group = "xyz.xenondevs", name = "nms-utilities", version = "0.1
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 resource-pack-obfuscator = { group = "xyz.xenondevs", name = "resource-pack-obfuscator", version = "0.4.1" }
 specialsource = { group = "net.md-5", name = "SpecialSource", version = "1.11.0" }
-stringremapper = { group = "xyz.xenondevs.string-remapper", name = "string-remapper-core", version = "1.1" }
+stringremapper = { group = "xyz.xenondevs.string-remapper", name = "string-remapper-core", version.ref = "stringremapper"}
 zip4j = { group = "net.lingala.zip4j", name = "zip4j", version = "2.11.2" }
 
 [bundles]

@@ -7,32 +7,22 @@ import net.md_5.specialsource.provider.JointProvider
 import org.bukkit.configuration.file.YamlConfiguration
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Dependency
-import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
-import org.gradle.api.internal.artifacts.repositories.DefaultMavenArtifactRepository
+import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.internal.artifacts.repositories.DefaultMavenLocalArtifactRepository
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.component.external.model.DefaultModuleComponentIdentifier
-import org.gradle.kotlin.dsl.named
 import xyz.xenondevs.stringremapper.FileRemapper
 import xyz.xenondevs.stringremapper.Mappings
 import xyz.xenondevs.stringremapper.RemapGoal
 import java.io.File
-import java.net.URL
 import java.nio.file.FileSystems
-import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.appendText
-import kotlin.io.path.exists
-import kotlin.io.path.inputStream
-import kotlin.io.path.name
-import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.writeText
-import org.gradle.jvm.tasks.Jar as JarTask
-
 
 private const val MAVEN_CENTRAL = "https://repo1.maven.org/maven2/"
 
@@ -53,41 +43,36 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     @get:Input
     abstract var remap: Boolean
     
+    private val buildDir = project.layout.buildDirectory.asFile.get()
+    
     @TaskAction
     fun run() {
-        val bundlerFile = createBundlerJar()
-        writeLibraries(bundlerFile)
+        val novaFile = createNovaJar()
+        writeLibraries(novaFile)
         
         // copy to custom output directory
         val customOutDir = (project.findProperty("outDir") as? String)?.let(::File)
             ?: System.getProperty("outDir")?.let(::File)
             ?: return
         customOutDir.mkdirs()
-        val copyTo = File(customOutDir, bundlerFile.name)
-        bundlerFile.inputStream().use { ins -> copyTo.outputStream().use { out -> ins.copyTo(out) } }
+        val copyTo = File(customOutDir, novaFile.name)
+        novaFile.inputStream().use { ins -> copyTo.outputStream().use { out -> ins.copyTo(out) } }
     }
     
-    // TODO: use ZipFileSystem and JIMFS when on Kotlin 1.8.20
-    private fun createBundlerJar(): Path {
-        project.buildDir.mkdirs()
+    private fun createNovaJar(): File {
+        buildDir.mkdirs()
         
-        val (mapsMojang, mapsSpigot) = resolveMappings(gameVersion.get())
-        val mappingsCache = project.buildDir.resolve("mappings.json")
-        val mappings: Mappings
-        if (mappingsCache.exists()) {
-            mappings = Mappings.loadFromJson(mappingsCache)
-        } else {
-            mappings = Mappings.load(mapsMojang, mapsSpigot)
-            mappings.writeToJson(mappingsCache)
-        }
+        val mapsMojang = buildDir.resolve("maps-mojang.txt")
+        val mapsSpigot = buildDir.resolve("maps-spigot.csrg")
+        val mappings = Mappings.loadOrDownload(gameVersion.get(), mapsMojang, mapsSpigot, buildDir.resolve("mappings.json"))
         val remapper = FileRemapper(mappings, if (remap) RemapGoal.SPIGOT else RemapGoal.MOJANG)
         
         // create jar
-        val novaFile = File(project.buildDir, "Nova-${project.version}-bundled.jar").toPath()
-        buildJarFromProjects(novaFile.toFile(), hooks + novaApi + nova) { remapper.remap(it.inputStream()) ?: it }
+        val novaFile = buildDir.resolve("Nova-${project.version}.jar")
+        buildJarFromProjects(novaFile, hooks + novaApi + nova) { remapper.remap(it.inputStream()) ?: it }
         if (remap) {
             // remap nova jar with specialsource
-            val obfFile = novaFile.parent.resolve(novaFile.nameWithoutExtension + "-obf.jar")
+            val obfFile = novaFile.parentFile.resolve(novaFile.nameWithoutExtension + "-obf.jar")
             remapSpigot(novaFile, obfFile, mapsMojang, true) // mojang -> obf
             remapSpigot(obfFile, novaFile, mapsSpigot, false) // obf -> spigot
         }
@@ -112,8 +97,8 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     }
     
     private fun iterateClasses(project: Project, run: (File, String) -> Unit) {
-        val kotlinClasses = project.buildDir.resolve("classes/kotlin/main")
-        val javaClasses = project.buildDir.resolve("classes/java/main")
+        val kotlinClasses = project.layout.buildDirectory.asFile.get().resolve("classes/kotlin/main")
+        val javaClasses = project.layout.buildDirectory.asFile.get().resolve("classes/java/main")
         iterateClasses(kotlinClasses,  run)
         iterateClasses(javaClasses,  run)
     }
@@ -127,7 +112,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     }
     
     private fun iterateResources(project: Project, run: (File, String) -> Unit) {
-        val resources = project.buildDir.resolve("resources/main")
+        val resources = project.layout.buildDirectory.asFile.get().resolve("resources/main")
         resources.walkTopDown()
             .filter { it.isFile }
             .forEach {
@@ -136,12 +121,12 @@ abstract class BuildLoaderJarTask : DefaultTask() {
             }
     }
     
-    private fun remapSpigot(inFile: Path, outFile: Path, srgIn: Path, reverse: Boolean) {
+    private fun remapSpigot(inFile: File, outFile: File, srgIn: File, reverse: Boolean) {
         val mapping = JarMapping()
         val inheritanceProviders = JointProvider().also(mapping::setFallbackInheritanceProvider)
         
         // load mapping file
-        mapping.loadMappings(srgIn.toFile().absolutePath, reverse, false, null, null)
+        mapping.loadMappings(srgIn.absolutePath, reverse, false, null, null)
         
         // inheritance provider
         val inJar = Jar.init(inFile.toFile())
@@ -154,25 +139,11 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         
         // remap jar
         val jarMap = JarRemapper(null, mapping, null)
-        jarMap.remapJar(inJar, outFile.toFile())
+        jarMap.remapJar(inJar, outFile)
     }
     
-    private fun resolveMappings(version: String): Pair<Path, Path> {
-        val mojangMappings = project.buildDir.resolve("maps-mojang.txt").toPath()
-        val spigotMappings = project.buildDir.resolve("maps-spigot.csrg").toPath()
-        if (!mojangMappings.exists())
-            mojangMappings.writeText(URL("https://piston-data.mojang.com/v1/objects/a4cd9a97400f7ecfe4dba23e427549ebc5815d66/client.txt").readText()) // TODO: read from client.txt
-        if (!spigotMappings.exists())
-            spigotMappings.writeText(URL("https://hub.spigotmc.org/stash/projects/SPIGOT/repos/builddata/raw/mappings/bukkit-$version-cl.csrg").readText())
-        
-        return Pair(mojangMappings, spigotMappings)
-    }
-    
-    private fun Dependency.getFile(project: Project): Path =
-        project.configurations.detachedConfiguration(this).singleFile.toPath()
-    
-    private fun writeLibraries(bundlerFile: Path) {
-        FileSystems.newFileSystem(bundlerFile).use {
+    private fun writeLibraries(bundlerFile: File) {
+        FileSystems.newFileSystem(bundlerFile.toPath()).use {
             val bundlerZipRoot = it.rootDirectories.first()
             
             // generate libraries.yml
@@ -186,7 +157,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         val librariesYml = YamlConfiguration()
         
         librariesYml["repositories"] = nova.repositories.asSequence()
-            .filterIsInstance<DefaultMavenArtifactRepository>()
+            .filterIsInstance<MavenArtifactRepository>()
             .filter { it !is DefaultMavenLocalArtifactRepository }
             .mapTo(HashSet()) { it.url.toString() }
             .apply { this -= MAVEN_CENTRAL }
@@ -208,7 +179,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     private fun setLibraries(cfg: YamlConfiguration, configuration: String, writeExclusions: Boolean) {
         cfg["libraries"] = nova.configurations.getByName(configuration)
             .incoming.dependencies.asSequence()
-            .filterIsInstance<DefaultExternalModuleDependency>()
+            .filterIsInstance<ExternalModuleDependency>()
             .mapTo(ArrayList()) { dep ->
                 val coords = getArtifactCoords(dep)
                 val excludeRules = dep.excludeRules
@@ -245,28 +216,11 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         cfg["exclusions"] = exclusions
     }
     
-    private fun getArtifactCoords(dependency: DefaultExternalModuleDependency): String {
+    private fun getArtifactCoords(dependency: ExternalModuleDependency): String {
         val artifact = dependency.artifacts.firstOrNull()?.takeUnless { it.classifier == "remapped-mojang" && remap }
         return if (artifact != null)
             "${dependency.group}:${dependency.name}:${artifact.extension}:${artifact.classifier}:${dependency.version}"
         else "${dependency.group}:${dependency.name}:${dependency.version}"
-    }
-    
-    private fun getOutputFile(project: Project): Path {
-        return getOutputFile(project.tasks.named<JarTask>("jar").get())
-    }
-    
-    private fun getOutputFile(jar: JarTask): Path {
-        val dir = jar.destinationDirectory.get().asFile
-        var name = listOf(
-            jar.archiveBaseName.orNull ?: "",
-            jar.archiveAppendix.orNull ?: "",
-            jar.archiveVersion.orNull ?: "",
-            jar.archiveClassifier.orNull ?: ""
-        ).filterNot(String::isBlank).joinToString("-")
-        jar.archiveExtension.orNull?.let { name += ".$it" }
-        
-        return File(dir, name).toPath()
     }
     
 }
