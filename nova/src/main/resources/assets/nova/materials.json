@@ -1,153 +1,155 @@
 {
-    "gui_anvil_overlay_arrow": "item/gui/anvil_overlay_arrow",
-    "gui_anvil_overlay_arrow_left": "item/gui/anvil_overlay_arrow_left",
-    "gui_anvil_overlay_plus": "item/gui/anvil_overlay_plus",
-    "gui_arrow_1_down": "item/gui/arrow_1_down",
-    "gui_arrow_1_left": "item/gui/arrow_1_left",
-    "gui_arrow_1_right": "item/gui/arrow_1_right",
-    "gui_arrow_1_up": "item/gui/arrow_1_up",
-    "gui_arrow_2_down": "item/gui/arrow_2_down",
-    "gui_arrow_2_left": "item/gui/arrow_2_left",
-    "gui_arrow_2_right": "item/gui/arrow_2_right",
-    "gui_arrow_2_up": "item/gui/arrow_2_up",
-    "gui_checkmark": "item/gui/checkmark",
-    "gui_corner_bottom_left": "item/gui/corner_bottom_left",
-    "gui_corner_bottom_right": "item/gui/corner_bottom_right",
-    "gui_corner_top_left": "item/gui/corner_top_left",
-    "gui_corner_top_right": "item/gui/corner_top_right",
-    "gui_green_checkmark": "item/gui/green_checkmark",
-    "gui_horizontal_dots": "item/gui/horizontal_dots",
-    "gui_horizontal_down": "item/gui/horizontal_down",
-    "gui_horizontal_line": "item/gui/horizontal_line",
-    "gui_horizontal_up": "item/gui/horizontal_up",
-    "gui_inventory_part": "item/gui/inventory_part",
-    "gui_invisible": "item/empty",
-    "gui_light_arrow_1_down": "item/gui/light_arrow_1_down",
-    "gui_light_arrow_1_left": "item/gui/light_arrow_1_left",
-    "gui_light_arrow_1_right": "item/gui/light_arrow_1_right",
-    "gui_light_arrow_1_up": "item/gui/light_arrow_1_up",
-    "gui_light_arrow_2_down": "item/gui/light_arrow_2_down",
-    "gui_light_arrow_2_left": "item/gui/light_arrow_2_left",
-    "gui_light_arrow_2_right": "item/gui/light_arrow_2_right",
-    "gui_light_arrow_2_up": "item/gui/light_arrow_2_up",
-    "gui_light_checkmark": "item/gui/light_checkmark",
-    "gui_light_corner_bottom_left": "item/gui/light_corner_bottom_left",
-    "gui_light_corner_bottom_right": "item/gui/light_corner_bottom_right",
-    "gui_light_corner_top_left": "item/gui/light_corner_top_left",
-    "gui_light_corner_top_right": "item/gui/light_corner_top_right",
-    "gui_light_horizontal_dots": "item/gui/light_horizontal_dots",
-    "gui_light_horizontal_down": "item/gui/light_horizontal_down",
-    "gui_light_horizontal_line": "item/gui/light_horizontal_line",
-    "gui_light_horizontal_up": "item/gui/light_horizontal_up",
-    "gui_light_vertical_dots": "item/gui/light_vertical_dots",
-    "gui_light_vertical_horizontal": "item/gui/light_vertical_horizontal",
-    "gui_light_vertical_left": "item/gui/light_vertical_left",
-    "gui_light_vertical_line": "item/gui/light_vertical_line",
-    "gui_light_vertical_right": "item/gui/light_vertical_right",
-    "gui_light_x": "item/gui/light_x",
-    "gui_red_x": "item/gui/red_x",
-    "gui_vertical_dots": "item/gui/vertical_dots",
-    "gui_vertical_horizontal": "item/gui/vertical_horizontal",
-    "gui_vertical_left": "item/gui/vertical_left",
-    "gui_vertical_line": "item/gui/vertical_line",
-    "gui_vertical_right": "item/gui/vertical_right",
-    "gui_x": "item/gui/x",
-    "gui_tp_search": "item/gui/search",
-    "gui_tp_arrow_left_btn_off": "item/gui/btn/arrow_left_off",
-    "gui_tp_arrow_left_btn_on": "item/gui/btn/arrow_left_on",
-    "gui_tp_arrow_right_btn_off": "item/gui/btn/arrow_right_off",
-    "gui_tp_arrow_right_btn_on": "item/gui/btn/arrow_right_on",
-    "gui_area_btn_off": "item/gui/btn/area_off",
-    "gui_area_btn_on": "item/gui/btn/area_on",
-    "gui_minus_btn_off": "item/gui/btn/minus_off",
-    "gui_minus_btn_on": "item/gui/btn/minus_on",
-    "gui_plus_btn_off": "item/gui/btn/plus_off",
-    "gui_plus_btn_on": "item/gui/btn/plus_on",
-    "gui_side_config_btn": "item/gui/btn/side_config",
-    "gui_energy_btn_off": "item/gui/btn/energy_off",
-    "gui_energy_btn_on": "item/gui/btn/energy_on",
-    "gui_energy_btn_selected": "item/gui/btn/energy_selected",
-    "gui_items_btn_off": "item/gui/btn/items_off",
-    "gui_items_btn_on": "item/gui/btn/items_on",
-    "gui_items_btn_selected": "item/gui/btn/items_selected",
-    "gui_fluids_btn_off": "item/gui/btn/fluids_off",
-    "gui_fluids_btn_on": "item/gui/btn/fluids_on",
-    "gui_fluids_btn_selected": "item/gui/btn/fluids_selected",
-    "gui_simple_mode_btn_off": "item/gui/btn/simple_mode_off",
-    "gui_simple_mode_btn_on": "item/gui/btn/simple_mode_on",
-    "gui_advanced_mode_btn_off": "item/gui/btn/advanced_mode_off",
-    "gui_advanced_mode_btn_on": "item/gui/btn/advanced_mode_on",
-    "gui_blue_btn": "item/gui/btn/blue",
-    "gui_gray_btn": "item/gui/btn/gray",
-    "gui_green_btn": "item/gui/btn/green",
-    "gui_orange_btn": "item/gui/btn/orange",
-    "gui_pink_btn": "item/gui/btn/pink",
-    "gui_red_btn": "item/gui/btn/red",
-    "gui_yellow_btn": "item/gui/btn/yellow",
-    "gui_minus": "item/gui/minus",
-    "gui_upgrades_btn": "item/gui/btn/upgrades",
-    "gui_tp_stopwatch": "item/gui/stopwatch",
-    "gui_tp_color_picker": "item/gui/color_picker",
-    "gui_tp_pixel_arrow_left_off": "item/gui/pixel_arrow_left_off",
-    "gui_tp_pixel_arrow_left_on": "item/gui/pixel_arrow_left_on",
-    "gui_tp_pixel_arrow_right_off": "item/gui/pixel_arrow_right_off",
-    "gui_tp_pixel_arrow_right_on": "item/gui/pixel_arrow_right_on",
-    "gui_bar_blue": {
-        "item": {
-            "models": {
-                "item/gui/bar/blue/%s": [0, 16]
-            }
-        }
-    },
-    "gui_bar_green": {
-        "item": {
-            "models": {
-                "item/gui/bar/green/%s": [0, 16]
-            }
-        }
-    },
-    "gui_bar_red": {
-        "item": {
-            "models": {
-                "item/gui/bar/red/%s": [0, 16]
-            }
-        }
-    },
-    "gui_bar_orange": {
-        "item": {
-            "models": {
-                "item/gui/bar/orange/%s": [0, 16]
-            }
-        }
-    },
-    "gui_tp_bar_blue": {
-        "item": {
-            "models": {
-                "item/gui/bar/tp_blue/%s": [0, 16]
-            }
-        }
-    },
-    "gui_tp_bar_orange": {
-        "item": {
-            "models": {
-                "item/gui/bar/tp_orange/%s": [0, 16]
-            }
-        }
-    },
-    "gui_number": {
-        "item": {
-            "models": {
-                "item/gui/number/%s": [0, 999]
-            }
-        }
-    },
-    "break_stage_overlay": {
-        "item": {
-            "models": {
-                "block/break_stage/%s": [0, 9]
-            }
-        }
-    },
-    "transparent_block": "block/transparent",
-    "wrench": "item/wrench"
+  "gui_anvil_overlay_arrow": "item/gui/anvil_overlay_arrow",
+  "gui_anvil_overlay_arrow_left": "item/gui/anvil_overlay_arrow_left",
+  "gui_anvil_overlay_plus": "item/gui/anvil_overlay_plus",
+  "gui_arrow_1_down": "item/gui/arrow_1_down",
+  "gui_arrow_1_left": "item/gui/arrow_1_left",
+  "gui_arrow_1_right": "item/gui/arrow_1_right",
+  "gui_arrow_1_up": "item/gui/arrow_1_up",
+  "gui_arrow_2_down": "item/gui/arrow_2_down",
+  "gui_arrow_2_left": "item/gui/arrow_2_left",
+  "gui_arrow_2_right": "item/gui/arrow_2_right",
+  "gui_arrow_2_up": "item/gui/arrow_2_up",
+  "gui_checkmark": "item/gui/checkmark",
+  "gui_corner_bottom_left": "item/gui/corner_bottom_left",
+  "gui_corner_bottom_right": "item/gui/corner_bottom_right",
+  "gui_corner_top_left": "item/gui/corner_top_left",
+  "gui_corner_top_right": "item/gui/corner_top_right",
+  "gui_green_checkmark": "item/gui/green_checkmark",
+  "gui_horizontal_dots": "item/gui/horizontal_dots",
+  "gui_horizontal_down": "item/gui/horizontal_down",
+  "gui_horizontal_line": "item/gui/horizontal_line",
+  "gui_horizontal_up": "item/gui/horizontal_up",
+  "gui_inventory_part": "item/gui/inventory_part",
+  "gui_invisible": "item/empty",
+  "gui_light_arrow_1_down": "item/gui/light_arrow_1_down",
+  "gui_light_arrow_1_left": "item/gui/light_arrow_1_left",
+  "gui_light_arrow_1_right": "item/gui/light_arrow_1_right",
+  "gui_light_arrow_1_up": "item/gui/light_arrow_1_up",
+  "gui_light_arrow_2_down": "item/gui/light_arrow_2_down",
+  "gui_light_arrow_2_left": "item/gui/light_arrow_2_left",
+  "gui_light_arrow_2_right": "item/gui/light_arrow_2_right",
+  "gui_light_arrow_2_up": "item/gui/light_arrow_2_up",
+  "gui_light_checkmark": "item/gui/light_checkmark",
+  "gui_light_corner_bottom_left": "item/gui/light_corner_bottom_left",
+  "gui_light_corner_bottom_right": "item/gui/light_corner_bottom_right",
+  "gui_light_corner_top_left": "item/gui/light_corner_top_left",
+  "gui_light_corner_top_right": "item/gui/light_corner_top_right",
+  "gui_light_horizontal_dots": "item/gui/light_horizontal_dots",
+  "gui_light_horizontal_down": "item/gui/light_horizontal_down",
+  "gui_light_horizontal_line": "item/gui/light_horizontal_line",
+  "gui_light_horizontal_up": "item/gui/light_horizontal_up",
+  "gui_light_vertical_dots": "item/gui/light_vertical_dots",
+  "gui_light_vertical_horizontal": "item/gui/light_vertical_horizontal",
+  "gui_light_vertical_left": "item/gui/light_vertical_left",
+  "gui_light_vertical_line": "item/gui/light_vertical_line",
+  "gui_light_vertical_right": "item/gui/light_vertical_right",
+  "gui_light_x": "item/gui/light_x",
+  "gui_red_x": "item/gui/red_x",
+  "gui_vertical_dots": "item/gui/vertical_dots",
+  "gui_vertical_horizontal": "item/gui/vertical_horizontal",
+  "gui_vertical_left": "item/gui/vertical_left",
+  "gui_vertical_line": "item/gui/vertical_line",
+  "gui_vertical_right": "item/gui/vertical_right",
+  "gui_x": "item/gui/x",
+  "gui_tp_search": "item/gui/search",
+  "gui_tp_cheating_on": "item/gui/cheating_on",
+  "gui_tp_cheating_off": "item/gui/cheating_off",
+  "gui_tp_arrow_left_btn_off": "item/gui/btn/arrow_left_off",
+  "gui_tp_arrow_left_btn_on": "item/gui/btn/arrow_left_on",
+  "gui_tp_arrow_right_btn_off": "item/gui/btn/arrow_right_off",
+  "gui_tp_arrow_right_btn_on": "item/gui/btn/arrow_right_on",
+  "gui_area_btn_off": "item/gui/btn/area_off",
+  "gui_area_btn_on": "item/gui/btn/area_on",
+  "gui_minus_btn_off": "item/gui/btn/minus_off",
+  "gui_minus_btn_on": "item/gui/btn/minus_on",
+  "gui_plus_btn_off": "item/gui/btn/plus_off",
+  "gui_plus_btn_on": "item/gui/btn/plus_on",
+  "gui_side_config_btn": "item/gui/btn/side_config",
+  "gui_energy_btn_off": "item/gui/btn/energy_off",
+  "gui_energy_btn_on": "item/gui/btn/energy_on",
+  "gui_energy_btn_selected": "item/gui/btn/energy_selected",
+  "gui_items_btn_off": "item/gui/btn/items_off",
+  "gui_items_btn_on": "item/gui/btn/items_on",
+  "gui_items_btn_selected": "item/gui/btn/items_selected",
+  "gui_fluids_btn_off": "item/gui/btn/fluids_off",
+  "gui_fluids_btn_on": "item/gui/btn/fluids_on",
+  "gui_fluids_btn_selected": "item/gui/btn/fluids_selected",
+  "gui_simple_mode_btn_off": "item/gui/btn/simple_mode_off",
+  "gui_simple_mode_btn_on": "item/gui/btn/simple_mode_on",
+  "gui_advanced_mode_btn_off": "item/gui/btn/advanced_mode_off",
+  "gui_advanced_mode_btn_on": "item/gui/btn/advanced_mode_on",
+  "gui_blue_btn": "item/gui/btn/blue",
+  "gui_gray_btn": "item/gui/btn/gray",
+  "gui_green_btn": "item/gui/btn/green",
+  "gui_orange_btn": "item/gui/btn/orange",
+  "gui_pink_btn": "item/gui/btn/pink",
+  "gui_red_btn": "item/gui/btn/red",
+  "gui_yellow_btn": "item/gui/btn/yellow",
+  "gui_minus": "item/gui/minus",
+  "gui_upgrades_btn": "item/gui/btn/upgrades",
+  "gui_tp_stopwatch": "item/gui/stopwatch",
+  "gui_tp_color_picker": "item/gui/color_picker",
+  "gui_tp_pixel_arrow_left_off": "item/gui/pixel_arrow_left_off",
+  "gui_tp_pixel_arrow_left_on": "item/gui/pixel_arrow_left_on",
+  "gui_tp_pixel_arrow_right_off": "item/gui/pixel_arrow_right_off",
+  "gui_tp_pixel_arrow_right_on": "item/gui/pixel_arrow_right_on",
+  "gui_bar_blue": {
+    "item": {
+      "models": {
+        "item/gui/bar/blue/%s": [0, 16]
+      }
+    }
+  },
+  "gui_bar_green": {
+    "item": {
+      "models": {
+        "item/gui/bar/green/%s": [0, 16]
+      }
+    }
+  },
+  "gui_bar_red": {
+    "item": {
+      "models": {
+        "item/gui/bar/red/%s": [0, 16]
+      }
+    }
+  },
+  "gui_bar_orange": {
+    "item": {
+      "models": {
+        "item/gui/bar/orange/%s": [0, 16]
+      }
+    }
+  },
+  "gui_tp_bar_blue": {
+    "item": {
+      "models": {
+        "item/gui/bar/tp_blue/%s": [0, 16]
+      }
+    }
+  },
+  "gui_tp_bar_orange": {
+    "item": {
+      "models": {
+        "item/gui/bar/tp_orange/%s": [0, 16]
+      }
+    }
+  },
+  "gui_number": {
+    "item": {
+      "models": {
+        "item/gui/number/%s": [0, 999]
+      }
+    }
+  },
+  "break_stage_overlay": {
+    "item": {
+      "models": {
+        "block/break_stage/%s": [0, 9]
+      }
+    }
+  },
+  "transparent_block": "block/transparent",
+  "wrench": "item/wrench"
 }

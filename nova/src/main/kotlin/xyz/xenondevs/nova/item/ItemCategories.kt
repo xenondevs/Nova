@@ -7,6 +7,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.setDisplayName
@@ -20,10 +21,13 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InitializationStage
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
+import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
 import xyz.xenondevs.nova.ui.menu.item.recipes.handleRecipeChoiceItemClick
+import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.getConfigurationSectionList
 import xyz.xenondevs.nova.util.data.getResourceAsStream
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.item.novaItem
 import java.io.File
 import java.io.InputStream
 import java.util.logging.Level
@@ -152,7 +156,22 @@ internal class CategorizedItem(val id: String) : AbstractItem() {
     override fun getItemProvider() = itemWrapper
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        handleRecipeChoiceItemClick(player, clickType, event, this@CategorizedItem.itemWrapper)
+        if (player in ItemsWindow.cheaters && player.hasPermission("nova.command.give")) {
+            if (clickType == ClickType.MIDDLE) {
+                player.setItemOnCursor(itemStack.clone().apply { amount = novaItem?.maxStackSize ?: type.maxStackSize })
+            } else if (clickType.isShiftClick) {
+                player.inventory.addItemCorrectly(itemStack)
+            } else if (clickType == ClickType.NUMBER_KEY) {
+                player.inventory.setItem(event.hotbarButton, itemStack)
+            } else if (clickType.isMouseClick) {
+                if (player.itemOnCursor.isSimilar(itemStack))
+                    player.setItemOnCursor(player.itemOnCursor.apply { amount = (amount + 1).coerceAtMost(novaItem?.maxStackSize ?: maxStackSize) })
+                else
+                    player.setItemOnCursor(itemStack)
+            }
+        } else {
+            handleRecipeChoiceItemClick(player, clickType, event, this@CategorizedItem.itemWrapper)
+        }
     }
     
     override fun hashCode(): Int {
