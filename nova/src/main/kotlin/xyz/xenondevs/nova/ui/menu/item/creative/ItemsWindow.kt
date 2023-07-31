@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.ui.menu.item.creative
 
-import io.ktor.server.config.ConfigLoader.Companion.load
 import me.xdrop.fuzzywuzzy.FuzzySearch
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -28,7 +27,6 @@ import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.item.ItemCategories
 import xyz.xenondevs.nova.item.ItemCategories.OBTAINABLE_ITEMS
 import xyz.xenondevs.nova.item.ItemCategory
-import xyz.xenondevs.nova.item.logic.ItemListener.logic
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.item.ToggleItem
 import xyz.xenondevs.nova.ui.item.clickableItem
