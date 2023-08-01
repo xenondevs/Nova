@@ -1,8 +1,6 @@
 package xyz.xenondevs.nova.addon
 
 import org.bukkit.configuration.file.YamlConfiguration
-import org.eclipse.aether.graph.Dependency
-import xyz.xenondevs.nova.loader.library.NovaLibraryLoader
 import xyz.xenondevs.nova.util.data.Version
 import java.io.Reader
 
@@ -14,9 +12,7 @@ data class AddonDescription internal constructor(
     val novaVersion: Version,
     val authors: List<String>,
     val depend: Set<String>,
-    val softdepend: Set<String>,
-    val repositories: List<String>,
-    val libraries: List<Dependency>
+    val softdepend: Set<String>
 ) {
     
     internal companion object {
@@ -52,9 +48,7 @@ data class AddonDescription internal constructor(
                 Version(novaVersion),
                 authors,
                 cfg.getStringList("depend").toHashSet(),
-                cfg.getStringList("softdepend").toHashSet(),
-                cfg.getStringList("repositories"),
-                NovaLibraryLoader.readRequestedLibraries(cfg)
+                cfg.getStringList("softdepend").toHashSet()
             )
         }
         

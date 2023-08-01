@@ -18,7 +18,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.pollFirstWhere
 import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
@@ -26,8 +26,8 @@ import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
@@ -76,7 +76,7 @@ object WorldDataManager : Listener {
         Bukkit.getWorlds().forEach(::queueWorldLoad)
         
         thread(name = "Nova WorldDataManager", isDaemon = true) { // TODO: Use Phaser instead of Thread.sleep
-            while (NOVA.isEnabled) {
+            while (NOVA_PLUGIN.isEnabled) {
                 
                 while (saveTasks.isNotEmpty()) {
                     try {

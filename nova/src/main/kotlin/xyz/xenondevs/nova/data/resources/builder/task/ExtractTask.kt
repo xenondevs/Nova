@@ -27,7 +27,7 @@ class ExtractTask(private val builder: ResourcePackBuilder) : PackTaskHolder {
     }
     
     private fun extractMinecraftAssets() {
-        val zip = NOVA.pluginFile.openZip()
+        val zip = NOVA.novaJar.openZip()
         val filters = builder.getResourceFilters(ResourceFilter.Stage.ASSET_PACK)
         zip.resolve("assets/minecraft/")
             .copyToRecursively(

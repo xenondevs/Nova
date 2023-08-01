@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.ItemStack
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.util.data.getOrNull
 import kotlin.reflect.typeOf
 
@@ -27,19 +27,19 @@ internal object ItemStackLegacyConversion {
         
         registerConverter(ItemStackPersistentDataConverter(
             typeOf<Compound>(),
-            NamespacedKey(NOVA, "tileEntityData"),
-            NamespacedKey(NOVA, "tileentity")
+            NamespacedKey(NOVA_PLUGIN, "tileEntityData"),
+            NamespacedKey(NOVA_PLUGIN, "tileentity")
         ))
         
         registerConverter(ItemStackPersistentDataConverter(
             typeOf<Long>(),
-            NamespacedKey(NOVA, "item_energy"),
-            NamespacedKey(NOVA, "energy")
+            NamespacedKey(NOVA_PLUGIN, "item_energy"),
+            NamespacedKey(NOVA_PLUGIN, "energy")
         ))
         
         registerConverter(ItemStackPersistentDataConverter(
             typeOf<Compound>(),
-            NamespacedKey(NOVA, "damage"),
+            NamespacedKey(NOVA_PLUGIN, "damage"),
         ))
     }
     

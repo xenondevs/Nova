@@ -19,16 +19,14 @@ import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LibraryLoader {
     
-    private static final String CENTRAL_REPO = "https://repo1.maven.org/maven2/";
     private static final File LIBRARIES_DIR;
     
     static {
@@ -36,7 +34,7 @@ public class LibraryLoader {
         LIBRARIES_DIR = repoProperty != null ? new File(repoProperty) : new File("libraries");
     }
     
-    public static List<Path> downloadLibraries(List<String> repositories, List<Dependency> dependencies, List<String> exclusions, Logger logger) throws DependencyResolutionException, MalformedURLException {
+    public static List<File> downloadLibraries(List<String> repositories, List<Dependency> dependencies, Set<String> exclusions, Logger logger) throws DependencyResolutionException {
         // setup connection
         var locator = MavenRepositorySystemUtils.newServiceLocator();
         locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
@@ -53,8 +51,6 @@ public class LibraryLoader {
         session.setReadOnly();
         
         List<RemoteRepository> remoteRepos = new ArrayList<>();
-        remoteRepos.add(new RemoteRepository.Builder("central", "default", CENTRAL_REPO).build());
-        
         var repoId = 0;
         for (var repoUrl : repositories) {
             remoteRepos.add(new RemoteRepository.Builder(String.valueOf(repoId), "default", repoUrl).build());
@@ -75,12 +71,12 @@ public class LibraryLoader {
             new ExclusionsDependencyFilter(exclusions)
         );
         
-        var files = new ArrayList<Path>();
+        var files = new ArrayList<File>();
         var results = repoSystem.resolveDependencies(session, request).getArtifactResults();
         for (var result : results) {
             var file = result.getArtifact().getFile();
             logger.info("Loaded library " + file.getAbsolutePath());
-            files.add(file.toPath());
+            files.add(file);
         }
         
         return files;

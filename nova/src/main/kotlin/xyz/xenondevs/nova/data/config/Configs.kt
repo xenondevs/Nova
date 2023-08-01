@@ -62,7 +62,7 @@ object Configs {
     
     internal fun extractDefaultConfig() {
         LOGGER.info("Extracting default config")
-        NOVA.pluginFile.useZip { extractConfig(it.resolve(DEFAULT_CONFIG_PATH), DEFAULT_CONFIG_NAME, DEFAULT_CONFIG_PATH, ::mainLoaded) }
+        NOVA.novaJar.useZip { extractConfig(it.resolve(DEFAULT_CONFIG_PATH), DEFAULT_CONFIG_NAME, DEFAULT_CONFIG_PATH, ::mainLoaded) }
         ConfigExtractor.saveStoredConfigs()
         mainLoaded = true
     }
@@ -71,7 +71,7 @@ object Configs {
     private fun extractAllConfigs() {
         LOGGER.info("Extracting configs")
         
-        extractConfigs("nova", NOVA.pluginFile, "configs/nova/")
+        extractConfigs("nova", NOVA.novaJar, "configs/nova/")
         for ((id, loader) in AddonManager.loaders) {
             extractConfigs(id, loader.file, "configs/")
         }

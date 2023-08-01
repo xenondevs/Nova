@@ -5,7 +5,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.block.Chest
 import org.bukkit.block.DoubleChest
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
@@ -89,7 +89,7 @@ internal class VanillaChestTileEntity internal constructor(blockState: VanillaTi
     override fun handleRemoved(unload: Boolean) {
         super.handleRemoved(unload)
         
-        if (NOVA.isEnabled) {
+        if (NOVA_PLUGIN.isEnabled) {
             val doubleChestLocation = doubleChestLocation
             if (doubleChestLocation != null) {
                 runTaskLaterSynchronized(VanillaTileEntityManager, 1) {

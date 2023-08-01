@@ -22,7 +22,7 @@ import xyz.xenondevs.nmsutils.bossbar.operation.UpdatePropertiesBossBarOperation
 import xyz.xenondevs.nmsutils.bossbar.operation.UpdateStyleBossBarOperation
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBossEventPacketEvent
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.initialize.DisableFun
@@ -353,7 +353,7 @@ object BossBarOverlayManager : Listener {
             }
         }
         
-        if (plugin != null && plugin != NOVA) {
+        if (plugin != null && plugin != NOVA_PLUGIN) {
             trackedOrigins[event.id] = BarOrigin.Plugin(plugin!!)
         }
     }

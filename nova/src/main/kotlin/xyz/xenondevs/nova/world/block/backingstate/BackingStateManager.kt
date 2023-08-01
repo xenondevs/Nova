@@ -12,7 +12,7 @@ import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.WorldDataManager
@@ -38,7 +38,7 @@ import java.util.logging.Level
 import kotlin.concurrent.thread
 import kotlin.random.Random
 
-private val CHUNK_SEARCH_ID_KEY = NamespacedKey(NOVA, "chunkSearchId")
+private val CHUNK_SEARCH_ID_KEY = NamespacedKey(NOVA_PLUGIN, "chunkSearchId")
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -81,7 +81,7 @@ internal object BackingStateManager : Listener {
     
     private fun startChunkSearcher() {
         thread(isDaemon = true, name = "Nova Chunk Searcher") {
-            while (NOVA.isEnabled) {
+            while (NOVA_PLUGIN.isEnabled) {
                 try {
                     while (chunkSearchQueue.isNotEmpty()) {
                         val chunkPos = chunkSearchQueue.poll()

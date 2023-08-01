@@ -1,12 +1,14 @@
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import net.md_5.specialsource.Jar
 import net.md_5.specialsource.JarMapping
 import net.md_5.specialsource.JarRemapper
 import net.md_5.specialsource.provider.JarProvider
 import net.md_5.specialsource.provider.JointProvider
-import org.bukkit.configuration.file.YamlConfiguration
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ExcludeRule
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.internal.artifacts.repositories.DefaultMavenLocalArtifactRepository
@@ -14,6 +16,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.component.external.model.DefaultModuleComponentIdentifier
+import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.stringremapper.FileRemapper
 import xyz.xenondevs.stringremapper.Mappings
 import xyz.xenondevs.stringremapper.RemapGoal
@@ -21,12 +24,12 @@ import java.io.File
 import java.nio.file.FileSystems
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import kotlin.io.path.appendText
-import kotlin.io.path.writeText
-
-private const val MAVEN_CENTRAL = "https://repo1.maven.org/maven2/"
+import kotlin.io.path.copyTo
 
 abstract class BuildLoaderJarTask : DefaultTask() {
+    
+    @get:Input
+    abstract var novaLoader: Project
     
     @get:Input
     abstract var nova: Project
@@ -47,8 +50,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     
     @TaskAction
     fun run() {
-        val novaFile = createNovaJar()
-        writeLibraries(novaFile)
+        val novaFile = createLoaderJar()
         
         // copy to custom output directory
         val customOutDir = (project.findProperty("outDir") as? String)?.let(::File)
@@ -59,7 +61,7 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         novaFile.inputStream().use { ins -> copyTo.outputStream().use { out -> ins.copyTo(out) } }
     }
     
-    private fun createNovaJar(): File {
+    private fun createLoaderJar(): File {
         buildDir.mkdirs()
         
         val mapsMojang = buildDir.resolve("maps-mojang.txt")
@@ -67,17 +69,36 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         val mappings = Mappings.loadOrDownload(gameVersion.get(), mapsMojang, mapsSpigot, buildDir.resolve("mappings.json"))
         val remapper = FileRemapper(mappings, if (remap) RemapGoal.SPIGOT else RemapGoal.MOJANG)
         
-        // create jar
-        val novaFile = buildDir.resolve("Nova-${project.version}.jar")
-        buildJarFromProjects(novaFile, hooks + novaApi + nova) { remapper.remap(it.inputStream()) ?: it }
+        // create bundled jar
+        val bundledFile = buildDir.resolve("Nova-${project.version}-bundled.jar")
+        buildJarFromProjects(bundledFile, hooks + nova) { remapper.remap(it.inputStream()) ?: it }
         if (remap) {
             // remap nova jar with specialsource
-            val obfFile = novaFile.parentFile.resolve(novaFile.nameWithoutExtension + "-obf.jar")
-            remapSpigot(novaFile, obfFile, mapsMojang, true) // mojang -> obf
-            remapSpigot(obfFile, novaFile, mapsSpigot, false) // obf -> spigot
+            val obfFile = bundledFile.parentFile.resolve(bundledFile.nameWithoutExtension + "-obf.jar")
+            remapSpigot(bundledFile, obfFile, mapsMojang, true) // mojang -> obf
+            remapSpigot(obfFile, bundledFile, mapsSpigot, false) // obf -> spigot
         }
         
-        return novaFile
+        // create loader jar
+        val bundlerFile = buildDir.resolve("Nova-${project.version}.jar")
+        buildJarFromProjects(bundlerFile, listOf(novaLoader, novaApi))
+        
+        FileSystems.newFileSystem(bundlerFile.toPath()).use {
+            val bundlerZipRoot = it.rootDirectories.first()
+            
+            // bundled nova (nova.jar)
+            bundledFile.toPath().copyTo(bundlerZipRoot.resolve("nova.jar"))
+            
+            // default libraries (libraries.json)
+            createLibrariesJson(nova, "novaLoader", listOf("spigotRuntime", "paperweightDevelopmentBundle"))
+                .writeToFile(bundlerZipRoot.resolve("libraries.json"))
+            
+            // prioritized libraries (queried before parent class loader) (prioritized_libraries.json)
+            createLibrariesJson(nova, "prioritizedNovaLoader", listOf("novaLoader", "spigotRuntime", "paperweightDevelopmentBundle"))
+                .writeToFile(bundlerZipRoot.resolve("prioritized_libraries.json"))
+        }
+        
+        return bundlerFile
     }
     
     private fun buildJarFromProjects(file: File, projects: List<Project>, remapper: (ByteArray) -> ByteArray = { it }) {
@@ -99,8 +120,8 @@ abstract class BuildLoaderJarTask : DefaultTask() {
     private fun iterateClasses(project: Project, run: (File, String) -> Unit) {
         val kotlinClasses = project.layout.buildDirectory.asFile.get().resolve("classes/kotlin/main")
         val javaClasses = project.layout.buildDirectory.asFile.get().resolve("classes/java/main")
-        iterateClasses(kotlinClasses,  run)
-        iterateClasses(javaClasses,  run)
+        iterateClasses(kotlinClasses, run)
+        iterateClasses(javaClasses, run)
     }
     
     private fun iterateClasses(dir: File, run: (File, String) -> Unit) {
@@ -147,78 +168,50 @@ abstract class BuildLoaderJarTask : DefaultTask() {
         jars.forEach(Jar::close)
     }
     
-    private fun writeLibraries(bundlerFile: File) {
-        FileSystems.newFileSystem(bundlerFile.toPath()).use {
-            val bundlerZipRoot = it.rootDirectories.first()
-            
-            // generate libraries.yml
-            bundlerZipRoot.resolve("libraries.yml").writeText(generateNovaLoaderLibrariesYaml().saveToString())
-            // add spigot loader libraries to plugin.yml
-            bundlerZipRoot.resolve("paper-plugin.yml").appendText("\n" + generateSpigotLoaderLibrariesYaml().saveToString())
-        }
-    }
-    
-    private fun generateNovaLoaderLibrariesYaml(): YamlConfiguration {
-        val librariesYml = YamlConfiguration()
+    @Suppress("SENSELESS_COMPARISON") // falsely interpreted as non-nullable
+    private fun createLibrariesJson(project: Project, configurationName: String, excludedConfigurationNames: List<String>): JsonObject {
+        val json = JsonObject()
         
-        librariesYml["repositories"] = nova.repositories.asSequence()
+        // repositories
+        val repositories = JsonArray().also { json.add("repositories", it) }
+        project.repositories.asSequence()
             .filterIsInstance<MavenArtifactRepository>()
             .filter { it !is DefaultMavenLocalArtifactRepository }
-            .mapTo(HashSet()) { it.url.toString() }
-            .apply { this -= MAVEN_CENTRAL }
-            .toList() // Required for proper serialization
+            .mapTo(LinkedHashSet()) { it.url.toString() }
+            .forEach(repositories::add)
         
-        setLibraries(librariesYml, "novaLoader", true)
-        excludeConfiguration(librariesYml, "spigotRuntime")
+        // libraries and exclusions
+        val libraries = JsonArray().also { json.add("libraries", it) }
+        val configuration = project.configurations.getByName(configurationName)
         
-        return librariesYml
-    }
-    
-    private fun generateSpigotLoaderLibrariesYaml(): YamlConfiguration {
-        val cfg = YamlConfiguration()
-        setLibraries(cfg, "spigotLoader", false)
-        return cfg
-    }
-    
-    @Suppress("SENSELESS_COMPARISON") // it isn't
-    private fun setLibraries(cfg: YamlConfiguration, configuration: String, writeExclusions: Boolean) {
-        cfg["libraries"] = nova.configurations.getByName(configuration)
-            .incoming.dependencies.asSequence()
+        fun writeExcludeRules(rules: Set<ExcludeRule>, excludes: JsonArray) {
+            rules.forEach {
+                require(it.group != null && it.module != null) { "Exclusion rules need to specify group and module" }
+                excludes.add("${it.group}:${it.module}")
+            }
+        }
+        
+        configuration.incoming.dependencies.asSequence()
             .filterIsInstance<ExternalModuleDependency>()
-            .mapTo(ArrayList()) { dep ->
-                val coords = getArtifactCoords(dep)
-                val excludeRules = dep.excludeRules
-                if (excludeRules.isNotEmpty()) {
-                    val exCfg = YamlConfiguration()
-                    exCfg["library"] = coords
-                    exCfg["exclusions"] = excludeRules.map {
-                        require(it.group != null && it.module != null) { "Exclusion rules need to specify group and module" }
-                        "${it.group}:${it.module}::jar"
-                    }
-                    
-                    return@mapTo exCfg
-                }
+            .forEach { dependency ->
+                val library = JsonObject().also(libraries::add)
                 
-                return@mapTo coords
+                library.addProperty("coords", getArtifactCoords(dependency))
+                val excludeRules = dependency.excludeRules
+                writeExcludeRules(excludeRules, JsonArray().also { library.add("excludes", it) })
             }
         
-        if (writeExclusions) {
-            val exclusions = cfg.getStringList("exclusions")
-            exclusions += nova.configurations.getByName(configuration).excludeRules.map { "${it.group}:${it.module}" }
-            cfg["exclusions"] = exclusions
+        val excludes = JsonArray().also { json.add("excludes", it) }
+        writeExcludeRules(configuration.excludeRules, excludes)
+        for (exclusionConfigurationName in excludedConfigurationNames) {
+            project.configurations.getByName(exclusionConfigurationName)
+                .incoming.artifacts.artifacts.asSequence()
+                .map { it.variant.owner }
+                .filterIsInstance<DefaultModuleComponentIdentifier>()
+                .forEach { excludes.add("${it.group}:${it.module}") }
         }
-    }
-    
-    private fun excludeConfiguration(cfg: YamlConfiguration, configuration: String) {
-        val exclusions = cfg.getStringList("exclusions")
         
-        exclusions += nova.configurations.getByName(configuration)
-            .incoming.artifacts.artifacts.asSequence()
-            .map { it.variant.owner }
-            .filterIsInstance<DefaultModuleComponentIdentifier>()
-            .map { "${it.group}:${it.module}" }
-        
-        cfg["exclusions"] = exclusions
+        return json
     }
     
     private fun getArtifactCoords(dependency: ExternalModuleDependency): String {

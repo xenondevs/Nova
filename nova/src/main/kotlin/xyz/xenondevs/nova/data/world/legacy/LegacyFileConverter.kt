@@ -10,10 +10,11 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.VersionRange
@@ -25,7 +26,7 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
 
-private val WORLD_VERSION_KEY = NamespacedKey(NOVA, "regionVersion")
+private val WORLD_VERSION_KEY = NamespacedKey(NOVA_PLUGIN, "regionVersion")
 
 @InternalInit(stage = InternalInitStage.POST_WORLD, dependsOn = [AddonsInitializer::class, VanillaTileEntityManager::class])
 internal object LegacyFileConverter : Listener {

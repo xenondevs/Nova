@@ -8,15 +8,15 @@ import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.api.ApiTileEntityWrapper
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
-import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.completeServerThread
@@ -217,7 +217,7 @@ object ProtectionManager {
         args: ProtectionArgs,
         check: ProtectionIntegration.() -> Boolean
     ): CompletableFuture<Boolean> {
-        if (!NOVA.isEnabled)
+        if (!NOVA_PLUGIN.isEnabled)
             return CompletableFuture.completedFuture(false)
         
         if (integrations.isNotEmpty()) {

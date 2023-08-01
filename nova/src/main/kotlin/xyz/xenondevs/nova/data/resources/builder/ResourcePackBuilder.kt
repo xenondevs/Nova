@@ -271,7 +271,7 @@ class ResourcePackBuilder internal constructor() {
     private fun loadAssetPacks(): List<AssetPack> {
         return buildList<Triple<String, File, String>> {
             this += AddonManager.loaders.map { (id, loader) -> Triple(id, loader.file, "assets/") }
-            this += Triple("nova", NOVA.pluginFile, "assets/nova/")
+            this += Triple("nova", NOVA.novaJar, "assets/nova/")
         }.map { (namespace, file, assetsPath) ->
             val zip = FileSystems.newFileSystem(file.toPath())
             AssetPack(namespace, zip.getPath(assetsPath))

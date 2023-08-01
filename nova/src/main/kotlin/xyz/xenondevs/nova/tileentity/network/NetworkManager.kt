@@ -13,14 +13,14 @@ import xyz.xenondevs.commons.collections.filterIsInstanceValues
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.commons.collections.poll
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
 import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -195,7 +195,7 @@ private class NetworkManagerImpl : NetworkManager {
         }
         
         thread(isDaemon = true, name = "Nova NetworkManager") {
-            while (NOVA.isEnabled) {
+            while (NOVA_PLUGIN.isEnabled) {
                 try {
                     while (partialTaskQueue.isNotEmpty() || asyncQueue.isNotEmpty() || chunkLoadQueue.isNotEmpty()) {
                         // partial tasks have priority

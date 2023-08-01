@@ -8,7 +8,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
@@ -28,7 +28,7 @@ import kotlin.collections.set
 
 internal object WrenchBehavior : ItemBehavior {
     
-    private val WRENCH_MODE_KEY = NamespacedKey(NOVA, "wrench_mode")
+    private val WRENCH_MODE_KEY = NamespacedKey(NOVA_PLUGIN, "wrench_mode")
     private val NETWORK_TYPES = arrayOf(DefaultNetworkTypes.ENERGY, DefaultNetworkTypes.ITEMS, DefaultNetworkTypes.FLUID)
     
     private var ItemStack.wrenchMode: NetworkType

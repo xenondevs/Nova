@@ -8,8 +8,6 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.gson.*
 import org.bukkit.Bukkit
-import org.bukkit.event.Listener
-import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.ApiBlockManager
 import xyz.xenondevs.nova.api.ApiBlockRegistry
@@ -20,6 +18,8 @@ import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.loader.NovaJavaPlugin
+import xyz.xenondevs.nova.loader.PluginDelegate
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.data.Version
@@ -37,6 +37,7 @@ import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 private val REQUIRED_SERVER_VERSION = Version("1.20")..Version("1.20.1")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 internal lateinit var NOVA: Nova private set
+internal lateinit var NOVA_PLUGIN: NovaJavaPlugin private set
 internal lateinit var LOGGER: Logger private set
 
 internal val HTTP_CLIENT = HttpClient(CIO) {
@@ -48,17 +49,24 @@ internal val HTTP_CLIENT = HttpClient(CIO) {
     expectSuccess = false
 }
 
-internal class Nova(val pluginFile: File) : JavaPlugin(), INova, Listener {
+internal class Nova(
+    private val plugin: NovaJavaPlugin,
+    val novaJar: File
+) : PluginDelegate, INova {
     
-    val version by lazy { Version(description.version) }
+    val dataFolder = plugin.dataFolder
+    val version = Version(plugin.description.version)
     val lastVersion = PermanentStorage.retrieveOrNull<Version>("last_version")?.let { if (it == Version("0.1")) Version("0.10") else it }
     
     internal val disableHandlers = ArrayList<() -> Unit>()
     
-    override fun onEnable() {
+    init {
         NOVA = this
-        LOGGER = logger
-        
+        NOVA_PLUGIN = plugin
+        LOGGER = plugin.logger
+    }
+    
+    override fun onEnable() {
         if (IS_DEV_SERVER)
             LOGGER.warning("Running in dev mode! Never use this on a production server!")
         
@@ -72,7 +80,7 @@ internal class Nova(val pluginFile: File) : JavaPlugin(), INova, Listener {
         if (Version.SERVER_VERSION !in REQUIRED_SERVER_VERSION) {
             LOGGER.severe("Nova is not compatible with this version of Minecraft!")
             LOGGER.severe("Nova v$version only runs on $REQUIRED_SERVER_VERSION.")
-            Bukkit.getPluginManager().disablePlugin(this)
+            Bukkit.getPluginManager().disablePlugin(plugin)
             return false
         }
         
@@ -80,7 +88,7 @@ internal class Nova(val pluginFile: File) : JavaPlugin(), INova, Listener {
         if (lastVersion != null && lastVersion < Version("0.9")) {
             LOGGER.severe("This version of Nova is not compatible with the version that was previously installed.")
             LOGGER.severe("Please erase all data related to Nova and try again.")
-            Bukkit.getPluginManager().disablePlugin(this)
+            Bukkit.getPluginManager().disablePlugin(plugin)
             return false
         }
         

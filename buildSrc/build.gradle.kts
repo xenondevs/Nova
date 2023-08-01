@@ -14,6 +14,7 @@ dependencies {
     implementation(libs.zip4j)
     implementation(libs.specialsource)
     implementation(libs.stringremapper)
+    implementation(libs.bundles.xenondevs.commons)
 }
 
 gradlePlugin {

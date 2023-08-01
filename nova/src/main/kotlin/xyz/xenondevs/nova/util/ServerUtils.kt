@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.util
 
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.util.ServerSoftware.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -22,7 +21,7 @@ object ServerUtils {
         }
     }
     
-    fun isReload(): Boolean = (NOVA.server as CraftServer).reloadCount != 0
+    fun isReload(): Boolean = (Bukkit.getServer() as CraftServer).reloadCount != 0
     
 }
 

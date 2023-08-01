@@ -6,7 +6,7 @@ import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.gson.parseJson
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
@@ -41,7 +41,7 @@ object LocaleManager {
         
         loadingLangs += lang
         
-        if (NOVA.isEnabled) runAsyncTask {
+        if (NOVA_PLUGIN.isEnabled) runAsyncTask {
             val file = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/lang/$lang.json")
             val json = file.parseJson() as JsonObject
             val translations = json.entrySet().associateTo(HashMap()) { it.key to it.value.asString }

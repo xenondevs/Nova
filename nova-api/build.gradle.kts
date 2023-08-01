@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     implementation("org.jetbrains:annotations:24.0.1")
+    compileOnly(project(":nova-loader"))
     compileOnly(libs.paper.api)
 }
 

@@ -4,6 +4,7 @@ import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.commons.collections.poll
 import xyz.xenondevs.nova.addon.AddonLogger
 import xyz.xenondevs.nova.loader.library.LibraryLoader
+import xyz.xenondevs.nova.loader.library.NovaLibraryLoader
 import java.net.URLClassLoader
 
 internal object LibraryLoaderPools {
@@ -47,15 +48,15 @@ internal object LibraryLoaderPools {
     }
     
     private fun createPooledLibraryClassLoader(loaders: List<AddonLoader>): URLClassLoader? {
-        if (loaders.all { it.description.libraries.isEmpty() })
+        if (loaders.all { it.libraries.isEmpty() })
             return null
         
         val urls = LibraryLoader.downloadLibraries(
-            loaders.flatMap { it.description.repositories },
-            loaders.flatMap { it.description.libraries },
-            emptyList(),
+            loaders.flatMap { it.repositories },
+            loaders.flatMap { it.libraries },
+            NovaLibraryLoader.getAllExclusions() + loaders.flatMap { it.exclusions },
             AddonLogger(loaders.joinToString { it.description.name })
-        ).mapToArray { it.toUri().toURL() }
+        ).mapToArray { it.toURI().toURL() }
         
         return URLClassLoader(urls, null)
     }

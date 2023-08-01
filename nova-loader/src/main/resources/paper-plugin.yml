@@ -4,8 +4,7 @@ api-version: "1.20"
 authors: [ "StudioCode", "ByteZ1337", "Javahase" ]
 website: "https://github.com/xenondevs/Nova/"
 bootstrapper: xyz.xenondevs.nova.loader.NovaBootstrapper
-loader: xyz.xenondevs.nova.loader.NovaLoader
-main: xyz.xenondevs.nova.Nova
+main: xyz.xenondevs.nova.loader.NovaJavaPlugin
 load: STARTUP
 
 softdepend:

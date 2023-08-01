@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.transformer
 
-import io.papermc.paper.plugin.entrypoint.classloader.PaperPluginClassLoader
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.loader.NovaClassLoader
 
 /**
  * The class loader that is responsible for loading all Bukkit and Minecraft classes.
@@ -12,7 +12,7 @@ private val PAPER_CLASS_LOADER = Bukkit::class.java.classLoader
 /**
  * The class loader responsible for loading Nova and its libraries.
  */
-private val PLUGIN_CLASS_LOADER = NOVA.javaClass.classLoader as PaperPluginClassLoader
+private val NOVA_CLASS_LOADER = NOVA.javaClass.classLoader as NovaClassLoader
 
 /**
  * The [PatchedClassLoader] is a class loader that is injected in the class loading hierarchy.
@@ -23,7 +23,7 @@ private val PLUGIN_CLASS_LOADER = NOVA.javaClass.classLoader as PaperPluginClass
  *
  * If the PlatformClassLoader (and parents) cannot find the requested class and the class load was triggered by
  * the Paper Bundler (so from a class that was potentially patched), the [PatchedClassLoader] will basically
- * restart the class loading process at Nova's PluginClassLoader.
+ * restart the class loading process at the [NovaClassLoader].
  */
 internal class PatchedClassLoader : ClassLoader(PAPER_CLASS_LOADER.parent) {
     
@@ -37,7 +37,9 @@ internal class PatchedClassLoader : ClassLoader(PAPER_CLASS_LOADER.parent) {
         
         if (c == null && checkNonRecursive() && checkPaperLoader()) {
             try {
-                c = PLUGIN_CLASS_LOADER.loadClass(name, resolve, true, true)
+                // parents (PaperPluginClassLoader) need to be queried to prevent accidental loading of classes
+                // from non-prioritized nova libraries that already come with paper
+                c = NOVA_CLASS_LOADER.loadClass(name, resolve, true, false)
             } catch(ignored: ClassNotFoundException) {
             }
         }

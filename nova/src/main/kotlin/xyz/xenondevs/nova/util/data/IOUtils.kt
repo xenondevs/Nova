@@ -22,7 +22,7 @@ import kotlin.io.path.outputStream
 import kotlin.math.max
 import kotlin.streams.asSequence
 
-private val ZIP_FILE = ZipFile(NOVA.pluginFile)
+private val ZIP_FILE = ZipFile(NOVA.novaJar)
 
 /**
  * Returns a list of all resources in the plugin.

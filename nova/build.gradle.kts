@@ -17,9 +17,9 @@ dependencies {
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
     novaLoaderApi(libs.invui.kotlin)
-    novaLoaderApi(libs.configurate.kotlin)
     
     // internal dependencies
+    compileOnly(project(":nova-loader"))
     compileOnly(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
@@ -32,7 +32,8 @@ dependencies {
     novaLoader(libs.jimfs)
     novaLoader(libs.caffeine)
     
-    // spigot runtime dependencies
+    // runtime dependencies
+    spigotRuntime(paperweight.paperDevBundleDependency(libs.versions.paper.get()))
     spigotRuntime(libs.bundles.maven.resolver)
     
     // test dependencies

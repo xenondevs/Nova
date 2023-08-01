@@ -10,8 +10,8 @@ import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.resources.upload.UploadService
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.permission.PermissionIntegration
@@ -26,7 +26,7 @@ internal object HooksLoader {
     
     @InitFun
     private fun loadHooks() {
-        JarUtils.findAnnotatedClasses(NOVA.pluginFile, Hook::class, "xyz/xenondevs/nova/hook/impl/").forEach { (className, annotation) ->
+        JarUtils.findAnnotatedClasses(NOVA.novaJar, Hook::class, "xyz/xenondevs/nova/hook/impl/").forEach { (className, annotation) ->
             try {
                 val plugins = annotation["plugins"] as? List<String> ?: emptyList()
                 val unless = annotation["unless"] as? List<String> ?: emptyList()
