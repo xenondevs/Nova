@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.data.serialization.configurate
 
-import io.papermc.paper.configuration.serializer.ComponentSerializer
-import io.papermc.paper.configuration.serializer.EnumValueSerializer
+import io.leangen.geantyref.TypeToken
 import net.minecraft.core.registries.BuiltInRegistries
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -10,14 +9,13 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.byNameTypeSerializer
 
 val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
-    // -- Paper Serializers --
-    .register(ComponentSerializer()) // serializes components using MiniMessage
-    .register(EnumValueSerializer()) // lists available entries on failure
     // -- Nova Serializers --
     .register(BarMatcherSerializer)
     .register(BarMatcherCombinedAnySerializer)
     .register(BarMatcherCombinedAllSerializer)
     .register(BlockLimiterSerializer)
+    .register(ComponentSerializer)
+    .register(EnumSerializer)
     .register(NamespacedKeySerializer)
     .register(ResourceLocationSerializer)
     .register(ResourcePathSerializer)
@@ -42,6 +40,10 @@ val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColle
 
 private inline fun <reified T> TypeSerializerCollection.Builder.register(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder {
     val type = javaTypeOf<T>()
-    register({it == type}, serializer)
+    register({ it == type }, serializer)
     return this
 }
+
+@Suppress("UNCHECKED_CAST")
+internal inline fun <reified T> geantyrefTypeTokenOf(): TypeToken<T> =
+    TypeToken.get(javaTypeOf<T>()) as TypeToken<T>

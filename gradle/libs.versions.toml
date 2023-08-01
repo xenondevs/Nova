@@ -3,6 +3,7 @@ format.version = "1.1"
 
 [versions]
 cbf = "0.7"
+configurate = "4.2.0-SNAPSHOT"
 invui = "1.12"
 kotlin = "1.9.0"
 ktor = "2.3.1"
@@ -24,7 +25,8 @@ commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collect
 commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "xenondevs-commons" }
 commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version.ref = "xenondevs-commons" }
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "xenondevs-commons" }
-configurate-kotlin = { group = "org.spongepowered", name = "configurate-extra-kotlin", version = "4.1.2"}
+configurate-yaml = { group = "xyz.xenondevs.configurate", name = "configurate-yaml", version.ref = "configurate" }
+configurate-extra-kotlin = { group = "xyz.xenondevs.configurate", name = "configurate-extra-kotlin", version.ref = "configurate" }
 cosmic-binary-format = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format", version.ref = "cbf" }
 cosmic-binary-format-netty-adapter = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format-netty-adapter", version.ref = "cbf" }
 fuzzywuzzy = { group = "me.xdrop", name = "fuzzywuzzy", version = "1.4.0" }
@@ -51,11 +53,12 @@ nmsutilities = { group = "xyz.xenondevs", name = "nms-utilities", version = "0.1
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 resource-pack-obfuscator = { group = "xyz.xenondevs", name = "resource-pack-obfuscator", version = "0.4.1" }
 specialsource = { group = "net.md-5", name = "SpecialSource", version = "1.11.0" }
-stringremapper = { group = "xyz.xenondevs.string-remapper", name = "string-remapper-core", version.ref = "stringremapper"}
+stringremapper = { group = "xyz.xenondevs.string-remapper", name = "string-remapper-core", version.ref = "stringremapper" }
 zip4j = { group = "net.lingala.zip4j", name = "zip4j", version = "2.11.2" }
 
 [bundles]
 cbf = ["cosmic-binary-format", "cosmic-binary-format-netty-adapter"]
+configurate = ["configurate-yaml", "configurate-extra-kotlin"]
 kotlin = ["kotlin-stdlib", "kotlin-reflect"]
 ktor = ["ktor-server-core-jvm", "ktor-server-cio-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"]
 kyori-adventure = ["adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-plain", "adventure-platform-bukkit"]
