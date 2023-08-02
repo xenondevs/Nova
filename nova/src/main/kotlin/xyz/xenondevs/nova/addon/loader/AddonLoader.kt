@@ -11,43 +11,57 @@ import xyz.xenondevs.nova.addon.AddonLogger
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.loader.library.LibraryFileParser
+import xyz.xenondevs.nova.util.data.useZip
 import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.exists
 import kotlin.reflect.jvm.jvmName
 
 internal class AddonLoader(val file: File) {
     
-    val classLoader = AddonClassLoader(this, javaClass.classLoader)
-    val description: AddonDescription
-    val logger: AddonLogger
+    // init
+    lateinit var logger: AddonLogger private set
+    lateinit var description: AddonDescription private set
+    lateinit var repositories: List<String> private set
+    lateinit var libraries: List<Dependency> private set
+    lateinit var exclusions: Set<String> private set
     
-    // library loading
-    val repositories: List<String>
-    val libraries: List<Dependency>
-    val exclusions: Set<String>
-    
-    lateinit var addon: Addon
+    // load
+    lateinit var addon: Addon private set
     
     init {
-        val descriptionFile = classLoader.getResourceAsStream("addon.yml")
-            ?: throw IllegalArgumentException("Could not find addon.yml")
-        
-        description = AddonDescription.deserialize(descriptionFile.reader())
-        logger = AddonLogger(description.name)
-        
-        if (!IS_DEV_SERVER && description.novaVersion.compareTo(NOVA.version, 2) != 0)
-            throw InitializationException("This addon is made for a different version of Nova (v${description.novaVersion})")
-        
-        val librariesJson = classLoader.getResourceAsStream("libraries.json")?.parseJson() as JsonObject? ?: JsonObject()
-        repositories = LibraryFileParser.readRepositories(librariesJson)
-        libraries = LibraryFileParser.readLibraries(librariesJson)
-        exclusions = LibraryFileParser.readExclusions(librariesJson)
+        file.useZip { zip ->
+            val metadataFile = zip.resolve("addon_metadata.json").takeIf(Path::exists)
+                ?: throw throw IllegalArgumentException("Missing addon_metadata.json")
+            val librariesFile = zip.resolve("addon_libraries.json")
+                ?: throw IllegalArgumentException("Missing addon_libraries.json")
+            
+            description = AddonDescription.fromJson(metadataFile.parseJson() as JsonObject)
+            logger = AddonLogger(description.name)
+            
+            if (!IS_DEV_SERVER && description.novaVersion.compareTo(NOVA.version, 2) != 0)
+                throw InitializationException("This addon is made for a different version of Nova (v${description.novaVersion})")
+            
+            val librariesJson = librariesFile.parseJson() as? JsonObject
+            if (librariesJson != null) {
+                repositories = LibraryFileParser.readRepositories(librariesJson)
+                libraries = LibraryFileParser.readLibraries(librariesJson)
+                exclusions = LibraryFileParser.readExclusions(librariesJson)
+            } else {
+                repositories = emptyList()
+                libraries = emptyList()
+                exclusions = emptySet()
+            }
+        }
     }
     
-    fun load(): Addon {
+    fun load(classLoader: ClassLoader): Addon {
         val mainClass = classLoader.loadClass(description.main).kotlin
         
-        val instance = mainClass.objectInstance ?: throw IllegalStateException("Main class is not a singleton object")
-        addon = instance as? Addon ?: throw IllegalStateException("Main class is not a subclass of ${Addon::class.jvmName}")
+        val instance = mainClass.objectInstance
+            ?: throw IllegalStateException("Main class is not a singleton object")
+        addon = instance as? Addon
+            ?: throw IllegalStateException("Main class is not a subclass of ${Addon::class.jvmName}")
         
         addon.addonFile = file
         addon.description = description

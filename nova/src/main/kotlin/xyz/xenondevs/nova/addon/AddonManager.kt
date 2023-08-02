@@ -4,7 +4,7 @@ import xyz.xenondevs.commons.collections.CollectionUtils
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.loader.AddonLoader
-import xyz.xenondevs.nova.addon.loader.LibraryLoaderPools
+import xyz.xenondevs.nova.addon.loader.AddonLoaderPools
 import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.initialize.Init
 import xyz.xenondevs.nova.initialize.InitFun
@@ -82,8 +82,8 @@ internal object AddonsInitializer {
     internal fun initializeAddons() {
         LOGGER.info("Initializing Addons...")
         
-        // init library loader pools
-        LibraryLoaderPools.init(AddonManager.loaders.values)
+        // pool class loaders
+        val classLoaders = AddonLoaderPools.createPooledClassLoaders(AddonManager.loaders.values)
         
         // init addons ordered by dependencies
         val addonLoaders = CollectionUtils.sortDependencies(AddonManager.loaders.values) {
@@ -97,14 +97,17 @@ internal object AddonsInitializer {
             loader.logger.info("Initializing ${getAddonString(description)}")
             
             try {
-                loader.classLoader.setDependencyClassLoaders()
-                val addon = loader.load()
+                val classLoader = classLoaders[loader]
+                    ?: throw IllegalStateException("No class loader for addon")
+                
+                // create addon instance
+                val addon = loader.load(classLoader)
                 AddonManager.addons[addon.description.id] = addon
                 
+                // init addon
                 addon.init()
-                
                 initClasses += JarUtils.findAnnotatedClasses(addon.addonFile, Init::class)
-                    .map { (clazz, annotation) -> InitializableClass.fromAddonAnnotation(loader.classLoader, clazz, annotation) }
+                    .map { (clazz, annotation) -> InitializableClass.fromAddonAnnotation(classLoader, clazz, annotation) }
             } catch (t: Throwable) {
                 throw AddonInitializeException(loader, t)
             }

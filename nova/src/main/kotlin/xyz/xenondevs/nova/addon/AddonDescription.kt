@@ -1,8 +1,9 @@
 package xyz.xenondevs.nova.addon
 
-import org.bukkit.configuration.file.YamlConfiguration
+import com.google.gson.JsonObject
+import xyz.xenondevs.commons.gson.getString
+import xyz.xenondevs.nova.data.serialization.json.getDeserialized
 import xyz.xenondevs.nova.util.data.Version
-import java.io.Reader
 
 data class AddonDescription internal constructor(
     val id: String,
@@ -17,40 +18,16 @@ data class AddonDescription internal constructor(
     
     internal companion object {
         
-        fun deserialize(reader: Reader): AddonDescription {
-            val cfg = YamlConfiguration.loadConfiguration(reader)
-            
-            val id = cfg.getString("id")
-            val name = cfg.getString("name")
-            val version = cfg.getString("version")
-            val main = cfg.getString("main")
-            val novaVersion = cfg.getString("novaVersion")
-            
-            val authors = if ("author" in cfg)
-                listOf(cfg.getString("author")!!)
-            else if ("authors" in cfg)
-                cfg.getStringList("authors")
-            else null
-            
-            require(id != null) { "Missing required field 'id'" }
-            require(name != null) { "Missing required field 'name'" }
-            require(version != null) { "Missing required field 'version'" }
-            require(main != null) { "Missing required field 'main'" }
-            require(novaVersion != null) { "Missing required field 'novaVersion'" }
-            require(authors != null) { "Missing required field 'author' or 'authors'" }
-            require(authors.isNotEmpty()) { "List of authors cannot be empty" }
-            
-            return AddonDescription(
-                id,
-                name,
-                version,
-                main,
-                Version(novaVersion),
-                authors,
-                cfg.getStringList("depend").toHashSet(),
-                cfg.getStringList("softdepend").toHashSet()
-            )
-        }
+        fun fromJson(obj: JsonObject) = AddonDescription(
+            obj.getString("id"),
+            obj.getString("name"),
+            obj.getString("version"),
+            obj.getString("main"),
+            obj.getDeserialized("nova_version"),
+            obj.getDeserialized("authors"),
+            obj.getDeserialized<HashSet<String>>("depend"),
+            obj.getDeserialized<HashSet<String>>("softdepend")
+        )
         
     }
     

@@ -4,7 +4,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.jvm.tasks.Jar
 
-abstract class AddonExtension {
+abstract class AddonMetadataExtension {
     
     abstract val id: Property<String>
     abstract val name: Property<String>

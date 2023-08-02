@@ -7,7 +7,7 @@ import java.util.logging.Logger
 
 internal class AddonLogger(name: String) : Logger("Nova", null) {
     
-    private val prefix = "[$name]"
+    private val prefix = "[$name] "
     
     init {
         parent = LOGGER

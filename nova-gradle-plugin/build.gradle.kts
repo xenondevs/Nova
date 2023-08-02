@@ -2,13 +2,13 @@ plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
     `maven-publish`
-    kotlin("jvm") version libs.versions.kotlin
+    alias(libs.plugins.kotlin)
 }
 
 dependencies {
+    implementation(libs.gson)
+    implementation(libs.bundles.xenondevs.commons)
     implementation(libs.bundles.minecraft.assets)
-    implementation(libs.paper.api)
-    implementation(libs.zip4j)
 }
 
 gradlePlugin {

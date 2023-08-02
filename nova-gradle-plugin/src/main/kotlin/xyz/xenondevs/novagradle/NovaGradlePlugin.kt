@@ -6,8 +6,8 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.register
-import xyz.xenondevs.novagradle.task.AddonExtension
-import xyz.xenondevs.novagradle.task.AddonTask
+import xyz.xenondevs.novagradle.task.AddonMetadataExtension
+import xyz.xenondevs.novagradle.task.AddonMetadataTask
 import xyz.xenondevs.novagradle.task.GenerateLanguageFilesTask
 import xyz.xenondevs.novagradle.task.GenerateWailaTexturesExtension
 import xyz.xenondevs.novagradle.task.GenerateWailaTexturesTask
@@ -16,10 +16,10 @@ import xyz.xenondevs.novagradle.util.AddonUtils
 class NovaGradlePlugin : Plugin<Project> {
     
     override fun apply(project: Project) {
-        val addonExt = project.extensions.create<AddonExtension>("addon")
-        val addonTask = project.tasks.register<AddonTask>("addon")
+        val addonExt = project.extensions.create<AddonMetadataExtension>("addon")
+        val addonMetadataTask = project.tasks.register<AddonMetadataTask>("addon")
         
-        addonTask.configure {
+        addonMetadataTask.configure {
             id.set(addonExt.id)
             addonName.set(addonExt.name)
             version.set(addonExt.version)
