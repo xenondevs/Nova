@@ -44,6 +44,7 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.behavior.Enchantable
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
@@ -562,6 +563,18 @@ internal object PacketItems : Listener {
         var nbtTagCount = itemStack.orCreateTag.allKeys.size - 1 // don't count 'nova' tag
         
         val lore = ArrayList<Component>()
+        
+        val damageable = item.getBehaviorOrNull<Damageable>()
+        if (damageable != null) {
+            val maxDurability = damageable.maxDurability
+            lore += Component.translatable(
+                "item.durability",
+                NamedTextColor.WHITE,
+                Component.text(maxDurability - damageable.getDamage(itemStack)),
+                Component.text(maxDurability)
+            )
+        }
+        
         lore += Component.text(item.id.toString(), NamedTextColor.DARK_GRAY)
         
         val novaCompound = itemStack.novaCompoundOrNull
