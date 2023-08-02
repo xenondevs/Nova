@@ -198,6 +198,9 @@ internal object PacketItems : Listener {
     
     //<editor-fold desc="server-side stack -> client-side stack", defaultstate="collapsed">
     fun getClientSideStack(player: Player?, itemStack: MojangStack, useName: Boolean = true, storeServerSideTag: Boolean = true): MojangStack {
+        if (itemStack.isEmpty)
+            return itemStack
+        
         return if (itemStack.tag?.contains("nova", NBTUtils.TAG_COMPOUND) == true) {
             getClientSideNovaStack(player, itemStack, useName, storeServerSideTag)
         } else getClientsideVanillaStack(player, itemStack, storeServerSideTag)
@@ -206,8 +209,11 @@ internal object PacketItems : Listener {
     fun getClientSideStack(player: Player?, itemStackCompound: CompoundTag, useName: Boolean = true, storeServerSideTag: Boolean = true): CompoundTag {
         val itemTag = itemStackCompound.getOrNull<CompoundTag>("tag")
             ?: return itemStackCompound
-        
         val itemStack = MojangStack.of(itemStackCompound)
+        
+        if (itemStack.isEmpty)
+            return itemStackCompound
+        
         val newItemStack = if (itemTag.contains("nova", NBTUtils.TAG_COMPOUND)) {
             getClientSideNovaStack(player, itemStack, useName, storeServerSideTag)
         } else getClientsideVanillaStack(player, itemStack, storeServerSideTag)
@@ -317,17 +323,12 @@ internal object PacketItems : Listener {
     //</editor-fold>
     
     //<editor-fold desc="Vanilla", defaultstate="collapsed">
+    // TODO: respect hide-flags for enchantments and modifiers
     private fun getClientsideVanillaStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean): MojangStack {
-        var newItemStack = itemStack
+        val newItemStack = itemStack.copy()
         
-        if (storeServerSideTag && isContainerItem(itemStack)) {
-            newItemStack = getClientSideContainerItem(player, itemStack)
-        } else if (isIllegallyColoredArmor(itemStack)) {
-            newItemStack = getColorCorrectedArmor(itemStack)
-        }
-        
-        if (newItemStack === itemStack)
-            newItemStack = itemStack.copy()
+        updateContainerContentsIfRequired(player, itemStack)
+        correctArmorColorIfRequired(itemStack)
         
         val tag = newItemStack.orCreateTag
         val loreTag = tag
@@ -359,37 +360,26 @@ internal object PacketItems : Listener {
         return newItemStack
     }
     
-    private fun isContainerItem(item: MojangStack): Boolean {
-        return item.item == Items.BUNDLE || item.item in SHULKER_BOX_ITEMS
-    }
-    
-    private fun getClientSideContainerItem(player: Player?, itemStack: MojangStack): MojangStack {
+    private fun updateContainerContentsIfRequired(player: Player?, itemStack: MojangStack) {
         when (itemStack.item) {
             Items.BUNDLE -> {
-                val items = itemStack.tag
-                    ?.getOrNull<ListTag>("Items")
-                    ?: return itemStack
+                val tag = itemStack.tag
+                val items = tag?.getOrNull<ListTag>("Items") ?: return
                 
                 val newItems = convertItemList(player, items)
-                return if (newItems != items) {
-                    itemStack.copy().apply { tag!!.put("Items", newItems) }
-                } else itemStack
+                if (newItems != items)
+                    tag.put("Items", newItems)
             }
             
             in SHULKER_BOX_ITEMS -> {
-                val items = itemStack.tag
-                    ?.getOrNull<CompoundTag>("BlockEntityTag")
-                    ?.getOrNull<ListTag>("Items")
-                    ?: return itemStack
+                val blockEntityTag = itemStack.tag?.getOrNull<CompoundTag>("BlockEntityTag")
+                val items = blockEntityTag?.getOrNull<ListTag>("Items") ?: return
                 
                 val newItems = convertItemList(player, items)
-                return if (newItems != items) {
-                    itemStack.copy().apply { tag!!.getCompound("BlockEntityTag").put("Items", newItems) }
-                } else itemStack
+                if (newItems != items)
+                    blockEntityTag.put("Items", newItems)
             }
         }
-        
-        return itemStack
     }
     
     private fun convertItemList(player: Player?, list: ListTag): ListTag {
@@ -407,30 +397,22 @@ internal object PacketItems : Listener {
         return if (changed) newList else list
     }
     
-    private fun isIllegallyColoredArmor(itemStack: MojangStack): Boolean {
+    private fun correctArmorColorIfRequired(itemStack: MojangStack) {
         val item = itemStack.item
         if (item == Items.LEATHER_BOOTS
             || item == Items.LEATHER_LEGGINGS
             || item == Items.LEATHER_CHESTPLATE
             || item == Items.LEATHER_HELMET
         ) {
-            val color = itemStack.tag?.getOrNull<CompoundTag>("display")?.getOrNull<IntTag>("color")?.asInt
-            // custom armor only uses odd color codes
-            if (color != null && color % 2 != 0) {
-                // allow armor from custom item services to have any color
-                return CustomItemServiceManager.getId(itemStack.bukkitMirror) == null
+            val displayTag = itemStack.tag?.getOrNull<CompoundTag>("display") ?: return
+            val color = displayTag.getOrNull<IntTag>("color")?.asInt
+            // custom armor only uses odd color codes, items from custom armor services are allowed to have any color
+            if (color != null && color % 2 != 0 && CustomItemServiceManager.getId(itemStack.bukkitMirror) == null) {
+                displayTag.putInt("color", color - 1)
             }
         }
-        
-        return false
     }
     
-    private fun getColorCorrectedArmor(itemStack: MojangStack): MojangStack {
-        val newItem = itemStack.copy()
-        val display = newItem.tag!!.getCompound("display")
-        display.putInt("color", display.getInt("color") and 0xFFFFFF)
-        return newItem
-    }
     //</editor-fold>
     
     //<editor-fold desc="tooltip", defaultstate="collapsed">
