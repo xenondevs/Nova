@@ -79,14 +79,14 @@ object Configs {
         ConfigExtractor.saveStoredConfigs()
         loaded = true
         
-        reloadConfigs()
+        configProviders.values.forEach(ConfigProvider::update)
     }
     
     private fun extractConfigs(namespace: String, zipFile: File, configsPath: String) {
         zipFile.useZip { zip ->
             val configsDir = zip.resolve(configsPath)
             configsDir.walk()
-                .filter { !it.isDirectory() && it.extension.equals(".yml", true) }
+                .filter { !it.isDirectory() && it.extension.equals("yml", true) }
                 .forEach { config ->
                     val relPath = config.relativeTo(configsDir).invariantSeparatorsPathString
                     val configName = "$namespace:${relPath.substringBeforeLast('.')}"
@@ -110,12 +110,8 @@ object Configs {
         return ConfigProvider(file, relPath, loadValidation)
     }
     
-    private fun reloadConfigs() {
-        configProviders.values.forEach(ConfigProvider::update)
-    }
-    
     internal fun reload() {
-        reloadConfigs()
+        extractAllConfigs()
         reloadables.sorted().forEach(Reloadable::reload)
         NovaRegistries.ITEM.forEach { it.logic.reload() }
         TileEntityManager.tileEntities.forEach(Reloadable::reload)
