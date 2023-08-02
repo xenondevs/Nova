@@ -233,7 +233,7 @@ interface Damageable {
             val damageable = novaItem?.getBehaviorOrNull<Damageable>()
             
             // check if the item is damageable
-            if (novaItem != null && damageable == null || item.maxDurability <= 0 || itemStack.itemMeta?.isUnbreakable == true)
+            if (novaItem != null && damageable == null || damageable == null && item.maxDurability <= 0 || itemStack.itemMeta?.isUnbreakable == true)
                 return
             
             // build damage based on enchantments and events
@@ -389,7 +389,7 @@ interface Damageable {
             val damageable = novaItem?.getBehaviorOrNull<Damageable>()
             
             // check if the item is damageable
-            if (novaItem != null && damageable == null || item.maxDamage <= 0 || itemStack.tag?.getBoolean("Unbreakable") == true)
+            if (novaItem != null && damageable == null || damageable == null && item.maxDamage <= 0 || itemStack.tag?.getBoolean("Unbreakable") == true)
                 return
             
             // build actual damage value based on enchantments and events
