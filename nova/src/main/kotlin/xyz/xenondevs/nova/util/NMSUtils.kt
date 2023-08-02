@@ -121,10 +121,10 @@ val Player.connection: ServerGamePacketListenerImpl
 val NamespacedKey.resourceLocation: ResourceLocation
     get() = ResourceLocation(toString())
 
-@Suppress("DEPRECATION")
 val ResourceLocation.namespacedKey: NamespacedKey
     get() = NamespacedKey(namespace, path)
 
+@Suppress("DEPRECATION")
 val ResourceLocation.namespacedId: NamespacedId
     get() = NamespacedId(namespace, path)
 
@@ -265,7 +265,6 @@ val MINECRAFT_SERVER: DedicatedServer = (Bukkit.getServer() as CraftServer).serv
 val serverTick: Int
     get() = MINECRAFT_SERVER.tickCount
 
-@Suppress("FunctionName")
 fun <E : Any> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
     val nonNullList: NonNullList<E>
     if (default == null) {

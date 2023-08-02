@@ -71,7 +71,7 @@ interface BarMatcher {
 
 sealed interface BarOrigin {
     
-    object Minecraft : BarOrigin
+    data object Minecraft : BarOrigin
     
     data class Plugin(val plugin: BukkitPlugin) : BarOrigin
     

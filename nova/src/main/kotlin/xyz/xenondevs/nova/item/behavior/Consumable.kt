@@ -39,7 +39,7 @@ private const val PACKET_DISTANCE = 500.0
 
 private data class Eater(val itemStack: ItemStack, val hand: EquipmentSlot, val startTime: Int)
 
-fun FoodOptions(
+fun Consumable(
     type: Consumable.FoodType,
     consumeTime: Int,
     nutrition: Int,
@@ -156,7 +156,7 @@ sealed interface Consumable { // TODO: remove sealed & make more customizable (m
         
         override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
             // only right-clicks in the air or on non-interactive blocks will cause an eating process
-            if (!action.isRightClick() || (action == Action.RIGHT_CLICK_BLOCK && event.clickedBlock!!.type.isInteractable))
+            if (!action.isRightClick || (action == Action.RIGHT_CLICK_BLOCK && event.clickedBlock!!.type.isInteractable))
                 return
             
             // food which is not always consumable cannot be eaten in survival with a full hunger bar

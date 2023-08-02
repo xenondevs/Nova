@@ -145,7 +145,6 @@ object VanillaToolCategories {
         )
     }
     
-    @Suppress("DEPRECATION")
     @JvmName("register2")
     private fun register(
         name: String,

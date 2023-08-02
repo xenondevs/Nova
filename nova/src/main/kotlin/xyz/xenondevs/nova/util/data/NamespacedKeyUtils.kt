@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package xyz.xenondevs.nova.util.data
 
 import org.bukkit.NamespacedKey

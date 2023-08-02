@@ -12,7 +12,6 @@ import xyz.xenondevs.commons.collections.enumMapOf
 val LivingEntity.genericMaxHealth: Double
     get() = getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
 
-@Suppress("DEPRECATION")
 val Animals.canBredNow: Boolean
     get() = !isLoveMode && canBreed() && if (this is Tameable) this.isTamed else true
 
