@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.ui.menu.item.creative
 import me.xdrop.fuzzywuzzy.FuzzySearch
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -20,8 +21,7 @@ import xyz.xenondevs.invui.window.AnvilWindow
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.changeTitle
 import xyz.xenondevs.invui.window.type.context.setTitle
-import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.i18n.LocaleManager
+import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.item.ItemCategories
 import xyz.xenondevs.nova.item.ItemCategories.OBTAINABLE_ITEMS
@@ -299,7 +299,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     }
     
     companion object {
-        val CHEAT_MODE_KEY = NamespacedKey(NOVA, "cheat_mode")
+        val CHEAT_MODE_KEY = NamespacedKey(NOVA_PLUGIN, "cheat_mode")
         val cheaters = Collections.newSetFromMap(WeakHashMap<Player, Boolean>())
     }
+    
 }
