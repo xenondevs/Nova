@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.api.block;
 
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.xenondevs.nova.api.data.NamespacedId;
@@ -25,6 +26,23 @@ public interface NovaBlock {
      *               resource packs (e.g. en_us).
      * @return The localized name of this block type.
      */
-    @NotNull String getLocalizedName(String locale);
+    @Deprecated
+    default @NotNull String getLocalizedName(String locale) {
+        return getPlaintextName(locale);
+    }
+    
+    /**
+     * Gets the name of this block type.
+     * @return The name of this block type.
+     */
+    @NotNull Component getName();
+    
+    /**
+     * Gets the plaintext name of this block type.
+     * @param locale The locale to get the name in. Should be in the same format as the language file
+     *               names in resource packs (e.g. en_us).
+     * @return The name of this {@link NovaBlock} in plaintext.
+     */
+    @NotNull String getPlaintextName(@NotNull String locale);
     
 }

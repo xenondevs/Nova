@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.item.logic
 
-import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.ai.attributes.Attribute
@@ -59,7 +58,6 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder>)
     
     private val behaviors: List<ItemBehavior> by lazy { loadBehaviors(item, holders) }
     private lateinit var item: NovaItem
-    private lateinit var name: Component
     lateinit var vanillaMaterial: Material private set
     lateinit var attributeModifiers: Map<EquipmentSlot, List<AttributeModifier>> private set
     private var defaultCompound: NamespacedCompound? = null
@@ -77,7 +75,6 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder>)
             throw IllegalStateException("NovaItems cannot be used for multiple materials")
         
         this.item = item
-        this.name = Component.translatable(item.localizedName)
         reload()
     }
     
@@ -116,11 +113,8 @@ internal class ItemLogic internal constructor(holders: List<ItemBehaviorHolder>)
     }
     
     fun getPacketItemData(itemStack: MojangStack?): PacketItemData {
-        val itemData = PacketItemData(itemStack?.orCreateTag ?: CompoundTag())
-        
+        val itemData = PacketItemData(itemStack?.orCreateTag ?: CompoundTag(), item.name)
         behaviors.forEach { it.updatePacketItemData(itemStack?.novaCompoundOrNull ?: NamespacedCompound.EMPTY, itemData) }
-        if (itemData.name == null) itemData.name = this.name
-        
         return itemData
     }
     

@@ -40,8 +40,10 @@ import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.Wearable
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.bukkitMaterial
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
+import xyz.xenondevs.nova.util.component.adventure.toAdventureComponentOrNull
 import xyz.xenondevs.nova.util.component.adventure.toJson
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getOrNull
@@ -49,6 +51,7 @@ import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
+import xyz.xenondevs.nova.util.nmsVersion
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import java.util.logging.Level
 import kotlin.collections.set
@@ -79,6 +82,7 @@ val ItemStack.customModelData: Int
         return 0
     }
 
+@Deprecated("Components should be preferred")
 val ItemStack.displayName: String?
     get() {
         if (hasItemMeta()) {
@@ -88,9 +92,6 @@ val ItemStack.displayName: String?
         
         return null
     }
-
-val ItemStack.localizedName: String?
-    get() = novaItem?.localizedName ?: type.localizedName
 
 val ItemStack.namelessCopyOrSelf: ItemStack
     get() {
@@ -165,7 +166,7 @@ internal var MojangStack.adventureName: Component
         ?.getOrNull<CompoundTag>("display")
         ?.getOrNull<StringTag>("Name")
         ?.asString
-        ?.toAdventureComponent()
+        ?.toAdventureComponentOrNull()
         ?: Component.empty()
     set(value) {
         orCreateTag.getOrPut("display", ::CompoundTag).putString("Name", value.toJson())
@@ -175,10 +176,10 @@ internal var MojangStack.adventureLore: List<Component>
     get() = tag
         ?.getOrNull<CompoundTag>("display")
         ?.getOrNull<ListTag>("Lore")
-        ?.map { (it as StringTag).asString.toAdventureComponent() }
+        ?.mapNotNull { (it as StringTag).asString.toAdventureComponentOrNull() }
         ?: emptyList()
     set(value) {
-        orCreateTag.getOrPut("display", ::CompoundTag).put("Lore",  NBTUtils.createStringList(value.map(Component::toJson)))
+        orCreateTag.getOrPut("display", ::CompoundTag).put("Lore", NBTUtils.createStringList(value.map(Component::toJson)))
     }
 
 //<editor-fold desc="nova item data storage", defaultstate="collapsed">
@@ -422,48 +423,65 @@ object ItemUtils {
         }
     }
     
-    fun getItemAndLocalizedName(id: String): Pair<ItemStack, String> {
-        val itemStack: ItemStack
-        val localizedName: String
-        
-        try {
-            when (id.substringBefore(':')) {
-                "minecraft" -> {
-                    itemStack = toItemStack(id)
-                    localizedName = itemStack.type.localizedName!!
-                }
-                
-                "nova" -> {
-                    val name = id.substringAfter(':')
-                    val novaItem = NovaRegistries.ITEM.getByName(name).first()
-                    itemStack = novaItem.createItemStack()
-                    localizedName = novaItem.localizedName
-                }
-                
-                else -> {
-                    val novaItem = NovaRegistries.ITEM[id]
-                    if (novaItem != null) {
-                        localizedName = novaItem.localizedName
-                        itemStack = novaItem.createItemStack()
-                    } else {
-                        itemStack = CustomItemServiceManager.getItemByName(id)!!
-                        localizedName = itemStack.displayName ?: ""
-                    }
-                }
-            }
-        } catch (ex: Exception) {
-            throw IllegalArgumentException("Invalid item name: $id", ex)
+    /**
+     * Creates an [ItemStack] from the given [id]. Resolves ids from vanilla, nova and custom item services.
+     */
+    fun getItemStack(id: String): ItemStack =
+        getItemStack(ResourceLocation(id))
+    
+    /**
+     * Creates an [ItemStack] from the given [id]. Resolves ids from vanilla, nova and custom item services.
+     */
+    fun getItemStack(id: ResourceLocation): ItemStack {
+        return when (id.namespace) {
+            "minecraft" -> ItemStack(BuiltInRegistries.ITEM.get(id).bukkitMaterial)
+            else -> NovaRegistries.ITEM[id]?.createItemStack()
+                ?: CustomItemServiceManager.getItemByName(id.toString())
+                ?: throw IllegalArgumentException("Could not find item with id $id")
         }
-        
-        return itemStack to localizedName
     }
     
-    fun toItemStack(s: String): ItemStack {
-        val holder = ItemParser.parseForItem(BuiltInRegistries.ITEM.asLookup(), StringReader(s))
+    
+    /**
+     * Gets the actually displayed name of the given [itemStack].
+     * If the [itemStack] has a custom display name, that will be returned. Otherwise, the localized name will be returned.
+     */
+    fun getName(itemStack: ItemStack): Component =
+        getName(itemStack.nmsVersion)
+    
+    /**
+     * Gets the actually displayed name of the given [itemStack].
+     * If the [itemStack] has a custom display name, that will be returned. Otherwise, the localized name will be returned.
+     */
+    fun getName(itemStack: MojangStack): Component {
+        val displayName = itemStack.tag
+            ?.getOrNull<CompoundTag>("display")
+            ?.getOrNull<StringTag>("Name")?.asString
+            ?.toAdventureComponentOrNull()
+        
+        if (displayName != null)
+            return displayName
+        
+        val novaItem = itemStack.novaItem
+        if (novaItem != null)
+            return novaItem.name
+        
+        return itemStack.item.getName(itemStack).toAdventureComponent()
+    }
+    
+    /**
+     * Converts the given [snbt] (string-representation of nbt) string to an [ItemStack].
+     * Does not understand custom item ids.
+     */
+    fun toItemStack(snbt: String): ItemStack {
+        val holder = ItemParser.parseForItem(BuiltInRegistries.ITEM.asLookup(), StringReader(snbt))
         val nmsStack = MojangStack(holder.item, 1).apply { tag = holder.nbt }
         return CraftItemStack.asBukkitCopy(nmsStack)
     }
     
+    /**
+     * Gets the id of the given [itemStack].
+     */
     fun getId(itemStack: ItemStack): String {
         val novaItem = itemStack.novaItem
         if (novaItem != null) return novaItem.id.toString()

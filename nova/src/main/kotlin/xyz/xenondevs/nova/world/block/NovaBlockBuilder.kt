@@ -4,10 +4,10 @@ package xyz.xenondevs.nova.world.block
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.config.ConfigurableRegistryElementBuilder
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.item.NovaMaterialTypeRegistryElementBuilder
 import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
@@ -17,42 +17,60 @@ private val EMPTY_BLOCK_OPTIONS = BlockOptions(0.0)
 
 abstract class AbstractNovaBlockBuilder<S : AbstractNovaBlockBuilder<S, T, B>, T : NovaBlockState, B : NovaBlock> internal constructor(
     id: ResourceLocation
-) : ConfigurableRegistryElementBuilder<S, B>(NovaRegistries.BLOCK, id) {
+) : NovaMaterialTypeRegistryElementBuilder<S, B>(NovaRegistries.BLOCK, id, "block.${id.namespace}.${id.name}") {
     
     internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
-    protected var localizedName = "block.${id.namespace}.${id.name}"
     protected abstract var logic: MutableList<BlockBehavior<T>>
     protected val properties = ArrayList<BlockPropertyType<*>>()
     protected var options: BlockOptions = EMPTY_BLOCK_OPTIONS
     protected var placeCheck: PlaceCheckFun? = null
     protected var multiBlockLoader: MultiBlockLoader? = null
     
+    
+    /**
+     * Sets the behaviors of this block to [behaviors].
+     */
     open fun behaviors(vararg behaviors: BlockBehavior<T>): S {
         this.logic = behaviors.toMutableList()
         return this as S
     }
     
+    /**
+     * Adds the [behaviors] to the behaviors of this block.
+     */
     open fun addBehaviors(vararg block: BlockBehavior<T>): S {
         this.logic += block
         return this as S
     }
     
+    /**
+     * Adds the [properties] to the properties of this block.
+     */
     fun properties(vararg properties: BlockPropertyType<*>): S {
         this.properties += properties
         return this as S
     }
     
+    /**
+     * Sets the [BlockOptions] of this block.
+     */
     fun blockOptions(options: BlockOptions): S {
         this.options = options
         return this as S
     }
     
+    /**
+     * Sets the [PlaceCheckFun] of this block.
+     */
     fun placeCheck(placeCheck: PlaceCheckFun): S {
         this.placeCheck = placeCheck
         return this as S
     }
     
+    /**
+     * Sets the [MultiBlockLoader] of this block.
+     */
     fun multiBlockLoader(multiBlockLoader: MultiBlockLoader): S {
         this.multiBlockLoader = multiBlockLoader
         return this as S
@@ -68,7 +86,8 @@ class NovaBlockBuilder internal constructor(id: ResourceLocation) : AbstractNova
     
     override fun build() = NovaBlock(
         id,
-        localizedName,
+        name.style(style),
+        style,
         BlockLogic(logic),
         options,
         properties,
@@ -100,7 +119,8 @@ class TileEntityNovaBlockBuilder internal constructor(
     
     override fun build() = NovaTileEntityBlock(
         id,
-        localizedName,
+        name.style(style),
+        style,
         BlockLogic(logic),
         options,
         tileEntity,

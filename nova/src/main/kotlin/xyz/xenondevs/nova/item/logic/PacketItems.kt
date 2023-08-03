@@ -4,7 +4,9 @@ package xyz.xenondevs.nova.item.logic
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.IntTag
@@ -51,6 +53,7 @@ import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.bukkitMirror
+import xyz.xenondevs.nova.util.component.adventure.toAdventureComponentOrEmpty
 import xyz.xenondevs.nova.util.component.adventure.toJson
 import xyz.xenondevs.nova.util.component.adventure.toNBT
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
@@ -231,9 +234,9 @@ internal object PacketItems : Listener {
             ?: throw IllegalArgumentException("The provided ItemStack is not a Nova item.")
         
         val id = novaTag.getString("id") ?: return getUnknownItem(itemStack, null)
-        val material = NovaRegistries.ITEM[id] ?: return getUnknownItem(itemStack, id)
+        val item = NovaRegistries.ITEM[id] ?: return getUnknownItem(itemStack, id)
         val subId = novaTag.getInt("subId")
-        val itemLogic = material.logic
+        val itemLogic = item.logic
         
         val itemModelDataMap = ResourceLookups.MODEL_DATA_LOOKUP[id]?.item
         val data = itemModelDataMap?.get(itemLogic.vanillaMaterial)
@@ -258,14 +261,21 @@ internal object PacketItems : Listener {
         val displayTag = newItemTag.getOrPut("display", ::CompoundTag)
         
         // name
-        var itemDisplayName = packetItemData.name
-        if (useName && !displayTag.contains("Name") && itemDisplayName != null) {
-            if (Enchantable.isEnchanted(newItemStack) && itemDisplayName.children().isEmpty()) {
-                itemDisplayName = itemDisplayName.color(NamedTextColor.AQUA)
+        var itemDisplayName: Component
+        if (!displayTag.contains("Name")) {
+            if (useName) {
+                itemDisplayName = packetItemData.name
+            } else {
+                itemDisplayName = Component.empty()
             }
-            
-            displayTag.putString("Name", itemDisplayName.withoutPreFormatting().toJson())
+        } else {
+            val customName = displayTag.getString("Name").toAdventureComponentOrEmpty()
+            itemDisplayName = customName.style(customName.style().merge(item.style.decorate(TextDecoration.ITALIC), Style.Merge.Strategy.IF_ABSENT_ON_TARGET))
         }
+        // enchanted items with no custom color or complex structure are colored aqua
+        if (Enchantable.isEnchanted(newItemStack) && itemDisplayName.color() == null && itemDisplayName.children().isEmpty())
+            itemDisplayName = itemDisplayName.color(NamedTextColor.AQUA)
+        displayTag.putString("Name", itemDisplayName.withoutPreFormatting().toJson())
         
         val loreTag = displayTag.getOrPut("Lore", ::ListTag)
         // enchantments
@@ -282,7 +292,7 @@ internal object PacketItems : Listener {
         // advanced tooltips
         if (player != null && AdvancedTooltips.hasNovaTooltips(player)) {
             packetItemData.advancedTooltipsLore?.forEach { loreTag += it.withoutPreFormatting().toNBT() }
-            buildNovaAdvancedTooltip(itemStack, material).forEach { loreTag += it.withoutPreFormatting().toNBT() }
+            buildNovaAdvancedTooltip(itemStack, item).forEach { loreTag += it.withoutPreFormatting().toNBT() }
         }
         //</editor-fold>
         

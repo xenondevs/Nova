@@ -4,9 +4,9 @@ package xyz.xenondevs.nova.api
 
 import com.mojang.datafixers.util.Either
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.namespacedId
@@ -22,8 +22,8 @@ internal class LegacyMaterialWrapper(val material: Either<NovaItem, NovaBlock>) 
     
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
     override fun getLocalizedName(locale: String): String {
-        val key = material.map(NovaItem::localizedName, NovaBlock::localizedName)
-        return LocaleManager.getTranslation(key, locale)
+        val component = material.map(NovaItem::name, NovaBlock::name)
+        return component.toPlainText(locale)
     }
     
 }

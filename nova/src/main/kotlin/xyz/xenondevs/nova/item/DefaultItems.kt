@@ -2,6 +2,8 @@
 
 package xyz.xenondevs.nova.item
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.Style
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -142,7 +144,8 @@ private fun registerCoreItem(
     isHidden: Boolean = false
 ): NovaItem = register(NovaItem(
     ResourceLocation("nova", name),
-    localizedName,
+    Component.translatable(localizedName),
+    Style.empty(),
     ItemLogic(*itemBehaviors),
     isHidden = isHidden
 ))
@@ -153,7 +156,8 @@ private fun registerUnnamedHiddenCoreItem(
     vararg itemBehaviors: ItemBehaviorHolder
 ): NovaItem = register(NovaItem(
     ResourceLocation("nova", name),
-    localizedName,
+    Component.translatable(localizedName),
+    Style.empty(),
     ItemLogic(*itemBehaviors),
     isHidden = true
 ))

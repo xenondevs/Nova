@@ -2,6 +2,8 @@
 
 package xyz.xenondevs.nova.item
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.Style
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.ItemProvider
@@ -23,7 +25,8 @@ import kotlin.reflect.KClass
  */
 class NovaItem internal constructor(
     val id: ResourceLocation,
-    val localizedName: String,
+    val name: Component,
+    val style: Style,
     internal val logic: ItemLogic,
     private val _maxStackSize: Int = 64,
     val craftingRemainingItem: ItemBuilder? = null,

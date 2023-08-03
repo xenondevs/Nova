@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.block
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.Style
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
@@ -14,7 +16,8 @@ typealias TileEntityConstructor = ((NovaTileEntityState) -> TileEntity)
 @Suppress("UNCHECKED_CAST")
 class NovaTileEntityBlock internal constructor(
     id: ResourceLocation,
-    localizedName: String,
+    name: Component,
+    style: Style,
     logic: BlockLogic<NovaTileEntityState>,
     options: BlockOptions,
     internal val tileEntityConstructor: TileEntityConstructor,
@@ -24,7 +27,8 @@ class NovaTileEntityBlock internal constructor(
     configId: String
 ) : NovaBlock(
     id,
-    localizedName,
+    name,
+    style,
     logic as BlockLogic<NovaBlockState>, // fixme: users could cast to BlockNovaMaterial and then call methods on the NovaBlock with a BlockState that is not a NovaTileEntityState
     options,
     properties,

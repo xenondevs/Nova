@@ -87,6 +87,19 @@ val ItemStack.nmsStack: MojangStack
 val ItemStack?.nmsCopy: MojangStack
     get() = CraftItemStack.asNMSCopy(this)
 
+val ItemStack?.nmsVersion: MojangStack
+    get() {
+        if (this == null)
+            return MojangStack.EMPTY
+        
+        var itemStack: MojangStack? = null
+        if (this is CraftItemStack) {
+            itemStack = ReflectionRegistry.CRAFT_ITEM_STACK_HANDLE_FIELD.get(this) as MojangStack?
+        }
+        
+        return itemStack ?: CraftItemStack.asNMSCopy(this)
+    }
+
 @Deprecated("Misleading name", replaceWith = ReplaceWith("bukkitCopy"))
 val MojangStack.bukkitStack: ItemStack
     get() = CraftItemStack.asBukkitCopy(this)

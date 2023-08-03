@@ -588,10 +588,8 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
     
     abstract inner class TileEntityMenu internal constructor(protected val texture: GuiTexture? = null) {
         
-        open fun getTitle(): Component {
-            return texture?.getTitle(block.localizedName)
-                ?: Component.translatable(block.localizedName)
-        }
+        open fun getTitle(): Component =
+            texture?.getTitle(block.name) ?: block.name
         
     }
     

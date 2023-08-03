@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.addon.registry
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.Style
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
@@ -27,7 +29,8 @@ interface ItemRegistry : AddonGetter {
     ): NovaItem {
         val item = NovaItem(
             ResourceLocation(addon, name),
-            localizedName,
+            Component.translatable(localizedName),
+            Style.empty(),
             ItemLogic(*behaviors),
             isHidden = isHidden
         )
@@ -38,13 +41,14 @@ interface ItemRegistry : AddonGetter {
     fun registerItem(
         block: NovaBlock,
         vararg behaviors: ItemBehaviorHolder,
-        localizedName: String = block.localizedName,
+        localizedName: String? = null,
         isHidden: Boolean = false
     ): NovaItem {
         require(block.id.namespace == addon.description.id) { "The block must be from the same addon (${block.id})!" }
         val item = NovaItem(
             block.id,
-            localizedName,
+            localizedName?.let(Component::translatable) ?: block.name,
+            Style.empty(),
             ItemLogic(*behaviors),
             isHidden = isHidden,
             block = block
@@ -60,7 +64,8 @@ interface ItemRegistry : AddonGetter {
     ): NovaItem {
         val item = NovaItem(
             ResourceLocation(addon, name),
-            "",
+            Component.empty(),
+            Style.empty(),
             ItemLogic(),
             isHidden = isHidden
         )
@@ -73,7 +78,8 @@ interface ItemRegistry : AddonGetter {
     ): NovaItem {
         val item = NovaItem(
             ResourceLocation(addon, name),
-            "",
+            Component.empty(),
+            Style.empty(),
             ItemLogic(),
             isHidden = true
         )

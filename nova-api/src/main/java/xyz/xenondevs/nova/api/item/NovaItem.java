@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.api.item;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,11 +36,32 @@ public interface NovaItem {
      * @param locale The locale to get the name in . Should be in the same format as the language file
      *               names in resource packs (e.g. en_us).
      * @return The localized name of this item for the specified locale.
+     * @deprecated Use {@link #getName()} or {@link #getPlaintextName(String)} instead.
      */
-    @NotNull String getLocalizedName(String locale);
+    @Deprecated
+    default @NotNull String getLocalizedName(String locale) {
+        return getPlaintextName(locale);
+    }
+    
+    /**
+     * Gets the name of this {@link NovaItem}.
+     *
+     * @return The name of this {@link NovaItem}.
+     */
+    @NotNull Component getName();
+    
+    /**
+     * Gets the plaintext name of this {@link NovaItem}.
+     *
+     * @param locale The locale to get the name in. Should be in the same format as the language file
+     *               names in resource packs (e.g. en_us).
+     * @return The name of this {@link NovaItem} in plaintext.
+     */
+    @NotNull String getPlaintextName(@NotNull String locale);
     
     /**
      * Creates an {@link ItemStack} of this {@link NovaItem} with the specified amount.
+     *
      * @param amount The amount of items in the stack.
      * @return An {@link ItemStack} of this {@link NovaItem} with the specified amount.
      */
@@ -47,6 +69,7 @@ public interface NovaItem {
     
     /**
      * Creates an {@link ItemStack} of this {@link NovaItem} with the amount of 1.
+     *
      * @return An {@link ItemStack} of this {@link NovaItem} with the amount of 1.
      */
     default @NotNull ItemStack createItemStack() {
@@ -55,6 +78,7 @@ public interface NovaItem {
     
     /**
      * Creates a client-side {@link ItemStack} of this {@link NovaItem} with the specified amount.
+     *
      * @param amount The amount of items in the stack.
      * @return A client-side {@link ItemStack} of this {@link NovaItem} with the specified amount.
      */
@@ -62,6 +86,7 @@ public interface NovaItem {
     
     /**
      * Creates a client-side {@link ItemStack} of this {@link NovaItem} with the amount of 1.
+     *
      * @return A client-side {@link ItemStack} of this {@link NovaItem} with the amount of 1.
      */
     default @NotNull ItemStack createClientsideItemStack() {

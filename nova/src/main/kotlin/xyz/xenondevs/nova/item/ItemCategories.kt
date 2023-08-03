@@ -6,7 +6,6 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.setDisplayName
@@ -138,21 +137,19 @@ internal data class ItemCategory(val name: String, val icon: ItemProvider, val i
 
 internal class CategorizedItem(val id: String) : AbstractItem() {
     
-    val localizedName: String
-    val itemStack: ItemStack
-    val itemWrapper: ItemProvider
+    val name: Component
+    private val itemProvider: ItemProvider
     
     init {
-        val (itemStack, localizedName) = ItemUtils.getItemAndLocalizedName(id)
-        this.localizedName = localizedName
-        this.itemStack = itemStack
-        this.itemWrapper = ItemWrapper(itemStack)
+        val itemStack = ItemUtils.getItemStack(id)
+        this.name = ItemUtils.getName(itemStack)
+        this.itemProvider = ItemWrapper(itemStack)
     }
     
-    override fun getItemProvider() = itemWrapper
+    override fun getItemProvider() = itemProvider
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-        handleRecipeChoiceItemClick(player, clickType, event, this@CategorizedItem.itemWrapper)
+        handleRecipeChoiceItemClick(player, clickType, event, this@CategorizedItem.itemProvider)
     }
     
     override fun hashCode(): Int {

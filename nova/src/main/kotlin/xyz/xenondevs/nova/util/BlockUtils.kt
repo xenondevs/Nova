@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import net.kyori.adventure.text.Component
 import net.minecraft.core.Direction
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.nbt.CompoundTag
@@ -582,6 +583,12 @@ fun Block.sendDestructionPacket(player: Player, stage: Int) {
 // endregion
 
 object BlockUtils {
+    
+    fun getName(block: Block): Component {
+        return CustomItemServiceManager.getName(block, "en_us")
+            ?: BlockManager.getBlockState(block.pos)?.block?.name
+            ?: Component.translatable(block.type.nmsBlock.descriptionId)
+    }
     
     internal fun getVanillaBlockExp(level: ServerLevel, pos: MojangBlockPos, tool: MojangStack): Int {
         val blockState = level.getBlockState(pos) ?: return 0

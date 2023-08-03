@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.nbt.StringTag
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage
+import org.bukkit.entity.Player
 import xyz.xenondevs.inventoryaccess.util.AdventureComponentUtils
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
@@ -17,6 +18,18 @@ import net.minecraft.network.chat.Component as MojangComponent
 
 fun String.toAdventureComponent(): Component {
     return GsonComponentSerializer.gson().deserialize(this)
+}
+
+fun String.toAdventureComponentOrNull(): Component? {
+    return runCatching { GsonComponentSerializer.gson().deserialize(this) }.getOrNull()
+}
+
+fun String.toAdventureComponentOrEmpty(): Component {
+    return toAdventureComponentOrNull() ?: Component.empty()
+}
+
+fun String.toAdventureComponentOr(createComponent: () -> Component): Component {
+    return toAdventureComponentOrNull() ?: createComponent()
 }
 
 fun MojangComponent.toAdventureComponent(): Component {
@@ -37,6 +50,11 @@ fun Component.toJson(): String {
 
 fun Component.toNBT(): StringTag {
     return StringTag.valueOf(toJson())
+}
+
+@Suppress("DEPRECATION")
+fun Component.toPlainText(player: Player): String {
+    return PlainTextComponentConverter.toPlainText(this, player.locale)
 }
 
 fun Component.toPlainText(locale: String = "en_us"): String {

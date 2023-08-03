@@ -44,10 +44,10 @@ import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
 import xyz.xenondevs.nova.ui.waila.WailaManager
+import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
-import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.getSurroundingChunks
-import xyz.xenondevs.nova.util.item.localizedName
+import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.runAsyncTask
@@ -239,8 +239,6 @@ internal object NovaCommand : Command("nova") {
         giveTo(ctx, item, ctx["amount"])
     
     private fun giveTo(ctx: CommandContext<CommandSourceStack>, item: NovaItem, amount: Int) {
-        val itemName = item.localizedName.ifBlank { item.id.toString() }
-        
         val targetPlayers = ctx.getArgument("player", EntitySelector::class.java).findPlayers(ctx.source)
         
         if (targetPlayers.isNotEmpty()) {
@@ -252,7 +250,7 @@ internal object NovaCommand : Command("nova") {
                     "command.nova.give.success",
                     NamedTextColor.GRAY,
                     Component.text(amount).color(NamedTextColor.AQUA),
-                    Component.translatable(itemName).color(NamedTextColor.AQUA),
+                    item.name.color(NamedTextColor.AQUA),
                     Component.text(player.name).color(NamedTextColor.AQUA)
                 ))
             }
@@ -274,7 +272,7 @@ internal object NovaCommand : Command("nova") {
                         NamedTextColor.RED,
                         Component.translatable(enchantment.localizedName, NamedTextColor.AQUA),
                         Component.text(player.displayName, NamedTextColor.AQUA),
-                        Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                        ItemUtils.getName(itemStack).color(NamedTextColor.AQUA)
                     ))
                     
                     continue
@@ -293,7 +291,7 @@ internal object NovaCommand : Command("nova") {
                             NamedTextColor.RED,
                             Component.translatable(enchantment.localizedName, NamedTextColor.AQUA),
                             Component.text(player.displayName, NamedTextColor.AQUA),
-                            Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                            ItemUtils.getName(itemStack).color(NamedTextColor.AQUA)
                         ))
                         
                         continue
@@ -311,7 +309,7 @@ internal object NovaCommand : Command("nova") {
                         Component.translatable("enchantment.level.$level", NamedTextColor.AQUA),
                     ),
                     Component.text(player.displayName, NamedTextColor.AQUA),
-                    Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA))
+                    ItemUtils.getName(itemStack).color(NamedTextColor.AQUA))
                 )
             }
         } else ctx.source.sendFailure(Component.translatable("command.nova.no-players", NamedTextColor.RED))
@@ -330,7 +328,7 @@ internal object NovaCommand : Command("nova") {
                         "command.nova.unenchant_all.failure",
                         NamedTextColor.RED,
                         Component.text(player.displayName, NamedTextColor.AQUA),
-                        Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                        ItemUtils.getName(itemStack).color(NamedTextColor.AQUA)
                     ))
                 }
                 
@@ -339,7 +337,7 @@ internal object NovaCommand : Command("nova") {
                         "command.nova.unenchant_all.success",
                         NamedTextColor.GRAY,
                         Component.text(player.displayName, NamedTextColor.AQUA),
-                        Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                        ItemUtils.getName(itemStack).color(NamedTextColor.AQUA)
                     ))
                 }
                 
@@ -369,7 +367,7 @@ internal object NovaCommand : Command("nova") {
                         NamedTextColor.RED,
                         Component.translatable(enchantment.localizedName, NamedTextColor.AQUA),
                         Component.text(player.displayName, NamedTextColor.AQUA),
-                        Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                        ItemUtils.getName(itemStack).color(NamedTextColor.AQUA)
                     ))
                 }
                 
@@ -379,7 +377,7 @@ internal object NovaCommand : Command("nova") {
                         NamedTextColor.GRAY,
                         Component.translatable(enchantment.localizedName, NamedTextColor.AQUA),
                         Component.text(player.displayName, NamedTextColor.AQUA),
-                        Component.translatable(itemStack.bukkitMirror.localizedName ?: "", NamedTextColor.AQUA)
+                        ItemUtils.getName(itemStack).color(NamedTextColor.AQUA)
                     ))
                 }
                 
@@ -447,10 +445,10 @@ internal object NovaCommand : Command("nova") {
             NamedTextColor.RED
         ))
         
-        fun sendSuccess(name: String, data: Compound) = ctx.source.sendSuccess(Component.translatable(
+        fun sendSuccess(name: Component, data: Compound) = ctx.source.sendSuccess(Component.translatable(
             "command.nova.show_tile_entity_data.success",
             NamedTextColor.GRAY,
-            Component.text(name).color(NamedTextColor.AQUA),
+            name.color(NamedTextColor.AQUA),
             Component.text(data.toString(), NamedTextColor.WHITE)
         ))
         
@@ -458,10 +456,10 @@ internal object NovaCommand : Command("nova") {
         if (location != null) {
             val tileEntity = TileEntityManager.getTileEntity(location, true)
             if (tileEntity != null) {
-                sendSuccess(tileEntity.block.localizedName, tileEntity.data)
+                sendSuccess(tileEntity.block.name, tileEntity.data)
             } else {
                 val vanillaTileEntity = VanillaTileEntityManager.getTileEntityAt(location)
-                if (vanillaTileEntity != null) sendSuccess(vanillaTileEntity.block.type.name, vanillaTileEntity.data)
+                if (vanillaTileEntity != null) sendSuccess(BlockUtils.getName(vanillaTileEntity.block), vanillaTileEntity.data)
                 else sendFailure()
             }
         } else sendFailure()
@@ -491,7 +489,7 @@ internal object NovaCommand : Command("nova") {
                 ctx.source.sendSuccess(Component.translatable(
                     "command.nova.show_item_data.success",
                     NamedTextColor.GRAY,
-                    Component.translatable(item.localizedName ?: item.type.name.lowercase(), NamedTextColor.AQUA),
+                    ItemUtils.getName(item).color(NamedTextColor.AQUA),
                     Component.text(novaCompound.toString(), NamedTextColor.WHITE)
                 ))
             } else ctx.source.sendFailure(Component.translatable("command.nova.show_item.no_data", NamedTextColor.RED))

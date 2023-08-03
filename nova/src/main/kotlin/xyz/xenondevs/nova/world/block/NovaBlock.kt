@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.world.block
 
 import com.mojang.serialization.Codec
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.Style
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Location
 import org.bukkit.Material
@@ -40,7 +42,8 @@ typealias MultiBlockLoader = (BlockPos) -> List<BlockPos>
  */
 open class NovaBlock internal constructor(
     val id: ResourceLocation,
-    val localizedName: String,
+    val name: Component,
+    val style: Style,
     internal val logic: BlockLogic<NovaBlockState>,
     val options: BlockOptions,
     val properties: List<BlockPropertyType<*>>,

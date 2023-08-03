@@ -10,12 +10,16 @@ import xyz.xenondevs.nova.item.vanilla.HideableFlag
  * Note that all values contained in this class are only for display purposes and do not affect gameplay.
  */
 @Suppress("MemberVisibilityCanBePrivate")
-class PacketItemData internal constructor(val nbt: CompoundTag) {
-    
+class PacketItemData internal constructor(
+    /**
+     * The NBT tag of this item.
+     */
+    val nbt: CompoundTag,
     /**
      * The displayed name of this item.
      */
-    var name: Component? = null
+    var name: Component
+) {
     
     /**
      * The displayed lore of this item.

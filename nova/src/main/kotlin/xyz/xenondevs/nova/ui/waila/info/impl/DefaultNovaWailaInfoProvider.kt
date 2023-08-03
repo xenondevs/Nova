@@ -21,11 +21,12 @@ import xyz.xenondevs.nova.util.name
 object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
     
     override fun getInfo(player: Player, block: NovaBlockState): WailaInfo {
-        val material = block.block
+        val blockType = block.block
+        var id = blockType.id
         
         val lines = ArrayList<WailaLine>()
-        lines += WailaLine(Component.translatable(material.localizedName), WailaLine.Alignment.CENTERED)
-        lines += WailaLine(Component.text(material.id.toString(), NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
+        lines += WailaLine(blockType.name, WailaLine.Alignment.CENTERED)
+        lines += WailaLine(Component.text(id.toString(), NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
         lines += ToolLine.getToolLine(player, block.pos.block)
         
         if (block is NovaTileEntityState) {
@@ -40,7 +41,6 @@ object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
             }
         }
         
-        var id = material.id
         val subId = block.modelProvider.currentSubId
         if (subId > 0) {
             val subIdTexture = ResourceLocation(id.namespace, "${id.name}_$subId")

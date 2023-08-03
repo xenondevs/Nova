@@ -19,7 +19,6 @@ import xyz.xenondevs.invui.window.AnvilWindow
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.changeTitle
 import xyz.xenondevs.invui.window.type.context.setTitle
-import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.item.ItemCategories
 import xyz.xenondevs.nova.item.ItemCategories.OBTAINABLE_ITEMS
@@ -30,6 +29,7 @@ import xyz.xenondevs.nova.ui.menu.item.ItemMenu
 import xyz.xenondevs.nova.ui.overlay.character.gui.DefaultGuiTextures
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.moveToStart
+import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import xyz.xenondevs.nova.util.playClickSound
 
 private val TAB_BUTTON_TEXTURES = arrayOf(
@@ -129,7 +129,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         filteredItems = if (filter.isNotEmpty()) {
             val names = OBTAINABLE_ITEMS
                 .asSequence()
-                .map { it to LocaleManager.getTranslation(player, it.localizedName) }
+                .map { it to it.name.toPlainText(player) }
                 .filter { (_, name) -> name.contains(filter, true) }
                 .toMap(HashMap())
             val scores = FuzzySearch.extractAll(filter, names.values).associateTo(HashMap()) { it.string to it.score }

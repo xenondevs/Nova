@@ -13,7 +13,6 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.inventory.InventoryView
 import xyz.xenondevs.bytebase.asm.buildInsnList
-import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.item.behavior.Damageable.Companion.getDamage
 import xyz.xenondevs.nova.item.behavior.Damageable.Companion.getMaxDurability
 import xyz.xenondevs.nova.item.behavior.Damageable.Companion.isDamageable
@@ -22,7 +21,8 @@ import xyz.xenondevs.nova.item.behavior.Damageable.Companion.setDamage
 import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.callEvent
-import xyz.xenondevs.nova.util.item.localizedName
+import xyz.xenondevs.nova.util.component.adventure.toPlainText
+import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import kotlin.math.max
@@ -165,7 +165,7 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
         //<editor-fold desc="renaming", defaultstate="collapsed">
         var renamed = false
         if (menu.itemName.isNullOrBlank()) {
-            if (inputStack.hasCustomHoverName() && inputStack.hoverName.string != getLocalizedNovaName(player, inputStack)) {
+            if (inputStack.hasCustomHoverName()) {
                 renamed = true
                 extraCost += 1
                 resultStack.resetHoverName()
@@ -173,8 +173,7 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
         } else if (menu.itemName != getHoverName(player, inputStack)) {
             renamed = true
             extraCost += 1
-            val nullableComponent: Component? = menu.itemName?.let(Component::literal)
-            resultStack.hoverName = nullableComponent
+            resultStack.hoverName = menu.itemName?.let(Component::literal)
         }
         //</editor-fold>
         //<editor-fold desc="cost calculations", defaultstate="collapsed">
@@ -215,19 +214,8 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
         menu.broadcastChanges()
     }
     
-    private fun getLocalizedNovaName(player: Player, itemStack: ItemStack): String? {
-        val novaItem = itemStack.novaItem ?: return null
-        return LocaleManager.getTranslationOrNull((player as? ServerPlayer)?.locale ?: "en_us", novaItem.localizedName)
-    }
-    
     private fun getHoverName(player: Player, itemStack: ItemStack): String {
-        if (itemStack.hasCustomHoverName())
-            return itemStack.hoverName.string
-        
-        return itemStack.bukkitMirror.localizedName?.let {
-            val serverPlayer = (player as? ServerPlayer) ?: return@let null
-            return@let LocaleManager.getTranslationOrNull(serverPlayer.locale, it)
-        } ?: itemStack.hoverName.string
+        return ItemUtils.getName(itemStack).toPlainText((player as? ServerPlayer)?.locale ?: "en_us")
     }
     
     private fun isSameItemType(first: ItemStack, second: ItemStack): Boolean {

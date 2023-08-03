@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.formatSafely
 import xyz.xenondevs.nova.util.runAsyncTask
 
@@ -105,16 +104,6 @@ object LocaleManager {
     @Synchronized
     fun getTranslation(player: Player, key: String, vararg args: Any): String {
         return getTranslation(player.locale, key, *args)
-    }
-    
-    @Synchronized
-    fun getTranslatedName(lang: String, item: NovaItem): String {
-        return getTranslation(lang, item.localizedName)
-    }
-    
-    @Synchronized
-    fun getTranslatedName(player: Player, item: NovaItem): String {
-        return getTranslation(player, item.localizedName)
     }
     
     private object NovaLanguage : Language() {
