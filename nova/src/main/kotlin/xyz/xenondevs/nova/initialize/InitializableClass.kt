@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.Nova
 import java.lang.reflect.InvocationTargetException
 import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
+import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.jvm.isAccessible
@@ -19,7 +20,7 @@ internal class InitializableClass(
     private val runAfterNames: Set<String>
 ) {
     
-    private val clazz by lazy { Class.forName(className.replace('/', '.'), true, classLoader).kotlin }
+    private lateinit var clazz: KClass<*>
     val dependsOn = HashSet<InitializableClass>()
     val initialization = CompletableFuture<Boolean>()
     
@@ -60,7 +61,10 @@ internal class InitializableClass(
     
     fun initialize(): Boolean {
         try {
-            // load class, call init method(s)
+            // load class
+            clazz = Class.forName(className.replace('/', '.'), true, classLoader).kotlin
+            
+            // call init method(s)
             clazz.declaredFunctions.asSequence()
                 .filter { it.hasAnnotation<InitFun>() && it.hasEmptyArguments() }
                 .forEach {
@@ -73,8 +77,8 @@ internal class InitializableClass(
             
             initialization.complete(true)
             return true
-        } catch (e: Exception) {
-            val cause = if (e is InvocationTargetException) e.targetException else e
+        } catch (t: Throwable) {
+            val cause = if (t is InvocationTargetException) t.targetException else t
             
             if (cause is InitializationException) {
                 LOGGER.severe(cause.message)
@@ -88,16 +92,24 @@ internal class InitializableClass(
     }
     
     fun disable() {
-        // call disable method(s)
-        clazz.declaredFunctions.asSequence()
-            .filter { it.hasAnnotation<DisableFun>() && it.hasEmptyArguments() }
-            .forEach {
-                val instance = clazz.objectInstance
-                    ?: throw InitializationException("Initializable class $className is not a singleton")
-                
-                it.isAccessible = true
-                it.call(instance)
-            }
+        if (!::clazz.isInitialized)
+            return
+        
+        try {
+            // call disable method(s)
+            clazz.declaredFunctions.asSequence()
+                .filter { it.hasAnnotation<DisableFun>() && it.hasEmptyArguments() }
+                .forEach {
+                    val instance = clazz.objectInstance
+                        ?: throw InitializationException("Initializable class $className is not a singleton")
+                    
+                    it.isAccessible = true
+                    it.call(instance)
+                }
+        } catch (t: Throwable) {
+            val cause = if (t is InvocationTargetException) t.targetException else t
+            LOGGER.log(Level.SEVERE, "An exception occurred trying to disable $this", cause)
+        }
     }
     
     override fun toString() = className
