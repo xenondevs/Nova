@@ -116,6 +116,8 @@ object DefaultGuiItems {
     val NUMBER = registerUnnamedHiddenCoreItem("gui_number")
     val MINUS = registerUnnamedHiddenCoreItem("gui_minus")
     val TP_SEARCH = registerUnnamedHiddenCoreItem("gui_tp_search")
+    val TP_CHEATING_ON = registerUnnamedHiddenCoreItem("gui_tp_cheating_on", "menu.nova.items.cheat_mode_item")
+    val TP_CHEATING_OFF = registerUnnamedHiddenCoreItem("gui_tp_cheating_off", "menu.nova.items.cheat_mode_item")
     val TP_ARROW_LEFT_BTN_OFF = registerUnnamedHiddenCoreItem("gui_tp_arrow_left_btn_off")
     val TP_ARROW_LEFT_BTN_ON = registerUnnamedHiddenCoreItem("gui_tp_arrow_left_btn_on")
     val TP_ARROW_RIGHT_BTN_OFF = registerUnnamedHiddenCoreItem("gui_tp_arrow_right_btn_off")

@@ -16,6 +16,8 @@
   "menu.nova.items.search.clear": "Clear search",
   "menu.nova.items.search-item": "Search...",
   "menu.nova.items.category.misc": "Miscellaneous",
+  "menu.nova.items.cheat_mode.on": "Cheat-Mode: On",
+  "menu.nova.items.cheat_mode.off": "Cheat-Mode: Off",
   "menu.nova.recipe": "Crafting Guide",
   "menu.nova.recipe.back": "Back",
   "menu.nova.recipe.item_info": "Item Info",
