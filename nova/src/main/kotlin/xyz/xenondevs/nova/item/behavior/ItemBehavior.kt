@@ -51,9 +51,6 @@ abstract class ItemBehavior : ItemBehaviorHolder<ItemBehavior>() {
     }
     
     internal fun setMaterial(item: NovaItem) {
-        if (this::item.isInitialized)
-            throw IllegalStateException("The same item behavior instance cannot be used for multiple materials")
-        
         this.item = item
     }
     
