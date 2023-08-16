@@ -66,7 +66,7 @@ body:
   - type: textarea
     attributes:
       label: Errors
-      description: If any errors or stacktraces appeared in the console, post them here.
+      description: If any errors or stacktraces appeared in the console, paste them here.
       render: log
     validations:
       required: false
