@@ -17,25 +17,23 @@ class NovaGradlePlugin : Plugin<Project> {
     
     override fun apply(project: Project) {
         val addonExt = project.extensions.create<AddonMetadataExtension>("addon")
-        val addonMetadataTask = project.tasks.register<AddonMetadataTask>("addon")
-        
+        val addonMetadataTask = project.tasks.register<AddonMetadataTask>("addonMetadata")
+        val jarTask = addonExt.jarTask.orElse(project.tasks.getByName<Jar>("jar"))
         addonMetadataTask.configure {
-            id.set(addonExt.id)
-            addonName.set(addonExt.name)
-            version.set(addonExt.version)
-            novaVersion.set(addonExt.novaVersion)
-            main.set(addonExt.main)
-            authors.set(addonExt.authors)
-            depend.set(addonExt.depend)
-            softdepend.set(addonExt.softdepend)
-            jarTask.set(addonExt.jarTask.orElse(project.tasks.getByName<Jar>("jar")))
-            
-            dependsOn(jarTask)
+            this.id.set(addonExt.id)
+            this.addonName.set(addonExt.name)
+            this.version.set(addonExt.version)
+            this.novaVersion.set(addonExt.novaVersion)
+            this.main.set(addonExt.main)
+            this.authors.set(addonExt.authors)
+            this.depend.set(addonExt.depend)
+            this.softdepend.set(addonExt.softdepend)
+            this.jarTask.set(jarTask)
         }
+        jarTask.get().finalizedBy(addonMetadataTask)
         
         val wailaExt = project.extensions.create<GenerateWailaTexturesExtension>("generateWailaTextures")
         val wailaTask = project.tasks.register<GenerateWailaTexturesTask>("generateWailaTextures")
-        
         wailaTask.configure {
             novaVersion.set(wailaExt.novaVersion.orElse(addonExt.novaVersion))
             resourcesDir.set(wailaExt.resourcesDir.orElse("src/main/resources/"))
