@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.NetworkNode
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.util.data.HashUtils
-import java.util.*
 
 internal abstract class NetworkedVanillaTileEntity internal constructor(state: VanillaTileEntityState) : VanillaTileEntity(state), NetworkEndPoint {
     
@@ -26,12 +25,6 @@ internal abstract class NetworkedVanillaTileEntity internal constructor(state: V
     override fun handleRemoved(unload: Boolean) {
         if (!unload) NetworkManager.queueAsync { it.removeEndPoint(this) }
     }
-    
-    override fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? =
-        retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
-    
-    override fun retrieveSerializedConnectedNodes(): Map<NetworkType, Map<BlockFace, UUID>>? =
-        retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("connectedNodes")
     
     override fun saveData() {
         super.saveData()

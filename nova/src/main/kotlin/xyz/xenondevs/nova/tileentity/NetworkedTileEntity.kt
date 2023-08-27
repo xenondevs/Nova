@@ -25,7 +25,6 @@ import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.world.block.context.BlockInteractContext
-import java.util.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -60,10 +59,6 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
         holders.values.forEach(EndPointDataHolder::saveData)
         serializeNetworks()
         serializeConnectedNodes()
-    }
-    
-    override fun retrieveSerializedNetworks(): Map<NetworkType, Map<BlockFace, UUID>>? {
-        return retrieveDataOrNull<HashMap<NetworkType, EnumMap<BlockFace, UUID>>>("networks")
     }
     
     final override fun handleRightClick(ctx: BlockInteractContext): Boolean {
