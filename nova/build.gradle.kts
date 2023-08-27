@@ -10,6 +10,9 @@ plugins {
 dependencies {
     // server
     paperweight.paperDevBundle(libs.versions.paper)
+    configurations.getByName("mojangMappedServer").apply { 
+        exclude("org.spongepowered", "configurate-yaml")
+    }
     
     // api dependencies
     prioritizedNovaLoaderApi(libs.bundles.configurate)
