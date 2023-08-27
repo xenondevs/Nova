@@ -5,10 +5,12 @@ import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
-import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.PacketListener
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundActionBarPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSystemChatPacketEvent
+import xyz.xenondevs.nmsutils.network.event.registerPacketListener
+import xyz.xenondevs.nmsutils.network.event.unregisterPacketListener
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.CharSizes
@@ -18,7 +20,7 @@ import xyz.xenondevs.nova.util.send
 import java.util.*
 import net.minecraft.network.chat.Component as MojangComponent
 
-object ActionbarOverlayManager {
+object ActionbarOverlayManager : PacketListener {
     
     private val ENABLED by MAIN_CONFIG.entry<Boolean>("overlay", "actionbar", "enabled")
     
@@ -35,12 +37,12 @@ object ActionbarOverlayManager {
     internal fun reload() {
         if (tickTask != null) {
             tickTask?.cancel()
-            PacketEventManager.unregisterListener(this)
+            unregisterPacketListener()
             tickTask = null
         }
         
         if (ENABLED) {
-            PacketEventManager.registerListener(this)
+            registerPacketListener()
             tickTask = runTaskTimer(0, 1, ActionbarOverlayManager::handleTick)
         }
     }

@@ -14,14 +14,15 @@ import org.joml.Intersectionf
 import org.joml.Vector2f
 import org.joml.Vector3f
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.PacketListener
 import xyz.xenondevs.nmsutils.network.event.clientbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.concurrent.runIfTrueOnSimilarThread
 import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.toLocation
@@ -35,7 +36,7 @@ import java.util.*
 import org.bukkit.event.block.Action as BlockAction
 import xyz.xenondevs.nmsutils.network.event.clientbound.ServerboundInteractPacketEvent.Action as EntityAction
 
-internal object HitboxManager : Listener {
+internal object HitboxManager : Listener, PacketListener {
     
     private val physicalHitboxes = HashMap<PhysicalHitbox, FakeInteraction>()
     private val physicalHitboxesById = HashMap<Int, PhysicalHitbox>()

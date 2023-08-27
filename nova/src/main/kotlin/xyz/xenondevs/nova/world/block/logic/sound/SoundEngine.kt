@@ -5,14 +5,15 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import org.bukkit.event.Listener
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.PacketListener
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundEntityPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundPacketEvent
+import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.take
 
-internal object SoundEngine : Listener {
+internal object SoundEngine : Listener, PacketListener {
     
     private val SOUND_OVERRIDES: HashSet<String> = PermanentStorage.retrieve("soundOverrides", ::HashSet)
     

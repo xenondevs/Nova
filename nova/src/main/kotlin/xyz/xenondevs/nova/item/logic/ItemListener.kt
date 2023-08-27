@@ -15,6 +15,8 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.PacketListener
+import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
 import xyz.xenondevs.nova.initialize.InitFun
@@ -28,12 +30,11 @@ import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import java.util.*
 
 @InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
-internal object ItemListener : Listener {
+internal object ItemListener : Listener, PacketListener {
     
     private val usedItems = WeakHashMap<Player, ItemStack>()
     

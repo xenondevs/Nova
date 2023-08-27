@@ -31,12 +31,14 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.PacketListener
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundMerchantOffersPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEquipmentPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
+import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
@@ -65,7 +67,6 @@ import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.serverPlayer
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -107,7 +108,7 @@ private val GLINT_ENCHANTMENT_TAG = ListTag().apply {
     stage = InternalInitStage.POST_WORLD,
     dependsOn = [ResourceGeneration.PreWorld::class]
 )
-internal object PacketItems : Listener {
+internal object PacketItems : Listener, PacketListener {
     
     val SERVER_SIDE_MATERIAL = Material.SHULKER_SHELL
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!

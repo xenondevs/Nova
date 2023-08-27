@@ -42,14 +42,6 @@ val BlockPhysicsEvent.changed: BlockData
 
 fun callEvent(event: Event) = Bukkit.getPluginManager().callEvent(event)
 
-fun Any.registerPacketListener() {
-    PacketEventManager.registerListener(this)
-}
-
-fun Any.unregisterPacketListener() {
-    PacketEventManager.unregisterListener(this)
-}
-
 fun Listener.registerEvents() {
     Bukkit.getPluginManager().registerEvents(this, NOVA_PLUGIN)
 }

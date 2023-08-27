@@ -12,9 +12,10 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerRespawnEvent
-import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.PacketListener
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetPassengersPacketEvent
+import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.addon.AddonsInitializer
@@ -36,7 +37,7 @@ private val ATTACHMENTS_KEY = NamespacedKey(NOVA_PLUGIN, "attachments1")
     stage = InternalInitStage.POST_WORLD,
     dependsOn = [AddonsInitializer::class]
 )
-object AttachmentManager :  Listener {
+object AttachmentManager : Listener, PacketListener {
     
     private val activeAttachments = HashMap<Player, HashMap<AttachmentType<*>, Attachment>>()
     private val inactiveAttachments = HashMap<Player, HashSet<ResourceLocation>>()
@@ -44,7 +45,7 @@ object AttachmentManager :  Listener {
     @InitFun
     private fun init() {
         registerEvents()
-        PacketEventManager.registerListener(this)
+        registerPacketListener()
         Bukkit.getOnlinePlayers().forEach(::loadAttachments)
         runTaskTimer(0, 1) { activeAttachments.values.flatMap(Map<*, Attachment>::values).forEach(Attachment::handleTick) }
     }

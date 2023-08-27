@@ -14,6 +14,8 @@ import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.network.ClientboundPlaceGhostRecipePacket
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.PacketListener
+import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlaceRecipePacketEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonsInitializer
@@ -33,7 +35,6 @@ import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.namespacedKey
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.resourceLocation
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.send
@@ -51,7 +52,7 @@ private val ALLOW_RESULT_OVERWRITE by MAIN_CONFIG.entry<Boolean>("debug", "allow
     stage = InternalInitStage.POST_WORLD,
     dependsOn = [AddonsInitializer::class, HooksLoader::class, VanillaRecipeTypes::class]
 )
-object RecipeManager : Listener {
+object RecipeManager : Listener, PacketListener {
     
     private val INTERNAL_RECIPES: Map<ResourceLocation, (ResourceLocation) -> MojangRecipe<*>> = mapOf(
         ResourceLocation("minecraft", "repair_item") to ::RepairItemRecipe

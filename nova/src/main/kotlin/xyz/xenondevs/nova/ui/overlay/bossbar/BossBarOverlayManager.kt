@@ -21,7 +21,10 @@ import xyz.xenondevs.nmsutils.bossbar.operation.UpdateProgressBossBarOperation
 import xyz.xenondevs.nmsutils.bossbar.operation.UpdatePropertiesBossBarOperation
 import xyz.xenondevs.nmsutils.bossbar.operation.UpdateStyleBossBarOperation
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.PacketListener
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBossEventPacketEvent
+import xyz.xenondevs.nmsutils.network.event.registerPacketListener
+import xyz.xenondevs.nmsutils.network.event.unregisterPacketListener
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.entry
@@ -37,17 +40,15 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlayCompou
 import xyz.xenondevs.nova.ui.overlay.character.MovedFonts
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.unregisterEvents
-import xyz.xenondevs.nova.util.unregisterPacketListener
 import java.util.*
 import kotlin.math.max
 import net.minecraft.network.chat.Component as MojangComponent
 
 @InternalInit(stage = InternalInitStage.POST_WORLD)
-object BossBarOverlayManager : Listener {
+object BossBarOverlayManager : Listener, PacketListener {
     
     val ENABLED by MAIN_CONFIG.entry<Boolean>("overlay", "bossbar", "enabled")
     private val BAR_AMOUNT by MAIN_CONFIG.entry<Int>("overlay", "bossbar", "amount")

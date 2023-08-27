@@ -15,6 +15,8 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
+import xyz.xenondevs.nmsutils.network.event.PacketListener
+import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.packetHandler
 import xyz.xenondevs.nmsutils.util.removeIf
@@ -23,7 +25,6 @@ import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.registerPacketListener
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
@@ -38,7 +39,7 @@ import java.util.logging.Level
 
 private val BREAK_COOLDOWN by MAIN_CONFIG.entry<Int>("world", "block_breaking", "break_cooldown")
 
-internal object BlockBreaking : Listener {
+internal object BlockBreaking : Listener, PacketListener {
     
     private val breakCooldowns = ConcurrentHashMap<Player, Int>()
     private val playerBreakers = ConcurrentHashMap<Player, BlockBreaker>()
