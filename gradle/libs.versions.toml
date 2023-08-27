@@ -5,7 +5,7 @@ format.version = "1.1"
 cbf = "0.7"
 configurate = "4.2.0-SNAPSHOT"
 invui = "1.12"
-kotlin = "1.9.0"
+kotlin = "1.9.10"
 ktor = "2.3.1"
 paper = "1.20.1-R0.1-SNAPSHOT"
 paperweight = "1.5.5"
@@ -69,6 +69,6 @@ test = ["kotlin-test-junit", "junit-jupiter"]
 xenondevs-commons = ["commons-collections", "commons-gson", "commons-provider", "commons-reflection"]
 
 [plugins]
-dokka = { id = "org.jetbrains.dokka", version = "1.8.10" }
+dokka = { id = "org.jetbrains.dokka", version = "1.8.20" }
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
