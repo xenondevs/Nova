@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nmsutils.network.event
 
-import net.minecraft.network.PacketListener
 import net.minecraft.network.protocol.Packet
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
@@ -35,6 +34,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.reflect.KClass
+import net.minecraft.network.PacketListener as MojangPacketListener
 
 private data class Listener(val instance: Any, val method: Method, val priority: EventPriority, val ignoreIfCancelled: Boolean)
 
@@ -88,7 +88,7 @@ object PacketEventManager {
         playerEventConstructors[P::class] = constructor as (Player, Packet<*>) -> PlayerPacketEvent<Packet<*>>
     }
     
-    internal fun <T : PacketListener, P : Packet<T>> createAndCallEvent(player: Player?, packet: Packet<T>): PacketEvent<P>? {
+    internal fun <T : MojangPacketListener, P : Packet<T>> createAndCallEvent(player: Player?, packet: Packet<T>): PacketEvent<P>? {
         LOCK.read {
             val packetClass = packet::class
             
@@ -119,11 +119,11 @@ object PacketEventManager {
         }
     }
     
-    fun registerListener(listenerInstance: Any) {
+    fun registerListener(listener: PacketListener) {
         LOCK.write {
             val instanceListeners = ArrayList<Listener>()
             
-            listenerInstance::class.java.declaredMethods.forEach { method ->
+            listener::class.java.declaredMethods.forEach { method ->
                 if (method.isAnnotationPresent(PacketHandler::class.java) && method.parameters.size == 1) {
                     val param = method.parameters.first().type.kotlin
                     if (param in eventTypes.values) {
@@ -133,7 +133,7 @@ object PacketEventManager {
                         val priority = method.getAnnotation(PacketHandler::class.java).priority
                         val ignoreIfCancelled = method.getAnnotation(PacketHandler::class.java).ignoreIfCancelled
                         
-                        val listener = Listener(listenerInstance, method, priority, ignoreIfCancelled)
+                        val listener = Listener(listener, method, priority, ignoreIfCancelled)
                         instanceListeners += listener
                         
                         val list = listeners[param]?.let(::ArrayList) ?: ArrayList()
@@ -146,11 +146,11 @@ object PacketEventManager {
             }
             
             if (instanceListeners.isNotEmpty())
-                listenerInstances[listenerInstance] = instanceListeners
+                listenerInstances[listener] = instanceListeners
         }
     }
     
-    fun unregisterListener(listener: Any) {
+    fun unregisterListener(listener: PacketListener) {
         LOCK.write {
             val toRemove = listenerInstances[listener]?.toHashSet() ?: return
             
