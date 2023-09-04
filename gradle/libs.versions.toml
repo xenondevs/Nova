@@ -10,7 +10,7 @@ ktor = "2.3.1"
 paper = "1.20.1-R0.1-SNAPSHOT"
 paperweight = "1.5.5"
 stringremapper = "1.6"
-xenondevs-commons = "1.5"
+xenondevs-commons = "1.6"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version = "4.12.0" }
