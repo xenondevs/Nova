@@ -209,8 +209,8 @@ interface Damageable {
          * @param damage The amount of damage to add
          * @param breakCallback A callback that is called if the item breaks
          */
-        fun damageAndBreak(itemStack: BukkitStack, damage: Int, breakCallback: () -> Unit) =
-            damageAndBreak(itemStack, damage, null) { breakCallback() }
+        fun damageAndBreak(itemStack: BukkitStack, damage: Int, breakCallback: (() -> Unit)? = null) =
+            damageAndBreak(itemStack, damage, null, breakCallback?.let { { it() } })
         
         /**
          * Damages the given [itemStack] while respecting the unbreaking enchantment, calling events and criteria triggers and incrementing stats.
@@ -220,7 +220,7 @@ interface Damageable {
          * @param damager The entity that damaged the item, used for events, criteria triggers and stats
          * @param breakCallback A callback that is called if the item breaks
          */
-        fun <T : BukkitLivingEntity?> damageAndBreak(itemStack: BukkitStack, damage: Int, damager: T, breakCallback: (T) -> Unit) {
+        fun <T : BukkitLivingEntity?> damageAndBreak(itemStack: BukkitStack, damage: Int, damager: T, breakCallback: ((T) -> Unit)? = null) {
             // check for creative mode
             if (damager is BukkitPlayer && damager.gameMode == GameMode.CREATIVE)
                 return
@@ -276,12 +276,12 @@ interface Damageable {
             }
             
             if (broken) {
-                breakCallback(damager)
+                breakCallback?.invoke(damager)
                 
                 if (itemStack.amount == 1 && damager is BukkitPlayer)
                     callEvent(PlayerItemBreakEvent(damager, itemStack))
-            
-                itemStack.amount = itemStack.amount - 1
+                
+                itemStack.amount -= 1
                 
                 // reset damage value
                 if (damageable != null) {
@@ -307,7 +307,7 @@ interface Damageable {
         
         /**
          * Gets the maximum durability of this [itemStack] or 0 if it is not of a damageable type.
-         * 
+         *
          * Note that a maximum durability larger than 0 does not necessarily mean that the item is damageable,
          * as the unbreakable tag is not checked.
          */
@@ -364,8 +364,8 @@ interface Damageable {
          * @param damage The amount of damage to add
          * @param breakCallback A callback that is called if the item breaks
          */
-        fun damageAndBreak(itemStack: MojangStack, damage: Int, breakCallback: () -> Unit) =
-            damageAndBreak(itemStack, damage, null) { breakCallback() }
+        fun damageAndBreak(itemStack: MojangStack, damage: Int, breakCallback: (() -> Unit)? = null) =
+            damageAndBreak(itemStack, damage, null, breakCallback?.let { { it() } })
         
         /**
          * Damages the given [itemStack] while respecting the unbreaking enchantment, calling events and criteria triggers and incrementing stats.
@@ -375,7 +375,7 @@ interface Damageable {
          * @param damager The entity that damaged the item, used for events, criteria triggers and stats
          * @param breakCallback A callback that is called if the item breaks
          */
-        fun <T : MojangLivingEntity?> damageAndBreak(itemStack: MojangStack, damage: Int, damager: T, breakCallback: (T) -> Unit) {
+        fun <T : MojangLivingEntity?> damageAndBreak(itemStack: MojangStack, damage: Int, damager: T, breakCallback: ((T) -> Unit)? = null) {
             // check for creative mode
             if (damager is MojangPlayer && damager.abilities.instabuild)
                 return
@@ -432,7 +432,7 @@ interface Damageable {
             }
             
             if (broken) {
-                breakCallback(damager)
+                breakCallback?.invoke(damager)
                 
                 if (itemStack.count == 1 && damager is MojangPlayer)
                     CraftEventFactory.callPlayerItemBreakEvent(damager, itemStack)
