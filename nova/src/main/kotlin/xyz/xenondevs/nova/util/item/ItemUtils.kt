@@ -49,6 +49,7 @@ import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.nmsVersion
@@ -435,12 +436,11 @@ object ItemUtils {
     fun getItemStack(id: ResourceLocation): ItemStack {
         return when (id.namespace) {
             "minecraft" -> ItemStack(BuiltInRegistries.ITEM.get(id).bukkitMaterial)
+            "nova" -> NovaRegistries.ITEM.getByName(id.name).firstOrNull()?.createItemStack()
             else -> NovaRegistries.ITEM[id]?.createItemStack()
                 ?: CustomItemServiceManager.getItemByName(id.toString())
-                ?: throw IllegalArgumentException("Could not find item with id $id")
-        }
+        } ?: throw IllegalArgumentException("Could not find item with id $id")
     }
-    
     
     /**
      * Gets the actually displayed name of the given [itemStack].
