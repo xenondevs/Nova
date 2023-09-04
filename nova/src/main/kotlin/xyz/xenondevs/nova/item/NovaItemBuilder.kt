@@ -6,7 +6,6 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.behavior.impl.TileEntityItemBehavior
-import xyz.xenondevs.nova.item.logic.ItemLogic
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
@@ -93,7 +92,7 @@ class NovaItemBuilder internal constructor(
             id,
             name.style(style),
             style,
-            ItemLogic(behaviors),
+            behaviors,
             maxStackSize,
             craftingRemainingItem,
             isHidden,

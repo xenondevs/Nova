@@ -5,7 +5,6 @@ import net.kyori.adventure.text.format.Style
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.NovaItemBuilder
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
-import xyz.xenondevs.nova.item.logic.ItemLogic
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
@@ -31,7 +30,7 @@ interface ItemRegistry : AddonGetter {
             ResourceLocation(addon, name),
             Component.translatable(localizedName),
             Style.empty(),
-            ItemLogic(*behaviors),
+            behaviors.asList(),
             isHidden = isHidden
         )
         NovaRegistries.ITEM[item.id] = item
@@ -49,7 +48,7 @@ interface ItemRegistry : AddonGetter {
             block.id,
             localizedName?.let(Component::translatable) ?: block.name,
             Style.empty(),
-            ItemLogic(*behaviors),
+            behaviors.asList(),
             isHidden = isHidden,
             block = block
         )
@@ -66,7 +65,7 @@ interface ItemRegistry : AddonGetter {
             ResourceLocation(addon, name),
             Component.empty(),
             Style.empty(),
-            ItemLogic(),
+            emptyList(),
             isHidden = isHidden
         )
         NovaRegistries.ITEM[item.id] = item
@@ -80,7 +79,7 @@ interface ItemRegistry : AddonGetter {
             ResourceLocation(addon, name),
             Component.empty(),
             Style.empty(),
-            ItemLogic(),
+            emptyList(),
             isHidden = true
         )
         NovaRegistries.ITEM[item.id] = item

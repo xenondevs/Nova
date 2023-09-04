@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.behavior.impl.WrenchBehavior
-import xyz.xenondevs.nova.item.logic.ItemLogic
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.set
 
@@ -148,7 +147,7 @@ private fun registerCoreItem(
     ResourceLocation("nova", name),
     Component.translatable(localizedName),
     Style.empty(),
-    ItemLogic(*itemBehaviors),
+    itemBehaviors.asList(),
     isHidden = isHidden
 ))
 
@@ -160,7 +159,7 @@ private fun registerUnnamedHiddenCoreItem(
     ResourceLocation("nova", name),
     Component.translatable(localizedName),
     Style.empty(),
-    ItemLogic(*itemBehaviors),
+    itemBehaviors.asList(),
     isHidden = true
 ))
 

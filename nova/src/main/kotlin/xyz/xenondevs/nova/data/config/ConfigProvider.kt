@@ -66,7 +66,10 @@ fun <T : Any> ConfigProvider.optionalEntry(type: KType, vararg path: String): Pr
     optionalEntry(type.javaType, *path)
 
 fun <T : Any> ConfigProvider.optionalEntry(type: Type, vararg path: String): Provider<T?> =
-    map { it.node(*path).get(type) as? T }
+    map {
+        val node = it.node(*path)
+        if (!node.virtual()) node.get(type) as? T else null
+    }
 
 inline fun <reified T : Any> ConfigProvider.optionalEntry(vararg paths: Array<String>): Provider<T?> =
     map {

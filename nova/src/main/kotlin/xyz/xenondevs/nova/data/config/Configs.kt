@@ -107,7 +107,7 @@ object Configs {
     internal fun reload() {
         extractAllConfigs()
         reloadables.sorted().forEach(Reloadable::reload)
-        NovaRegistries.ITEM.forEach { it.logic.reload() }
+        NovaRegistries.ITEM.forEach(Reloadable::reload)
         TileEntityManager.tileEntities.forEach(Reloadable::reload)
         NetworkManager.queueAsync { it.networks.forEach(Reloadable::reload) }
         AbilityManager.activeAbilities.values.flatMap { it.values }.forEach(Reloadable::reload)

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.item.logic
+package xyz.xenondevs.nova.item.novaItem
 
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import org.bukkit.entity.Player
@@ -54,38 +54,38 @@ internal object ItemListener : Listener, PacketListener {
         if (event.isCompletelyDenied() || item == null || !ProtectionManager.canUseItem(player, item, location).get())
             return
         
-        item.logic?.handleInteract(event.player, item, event.action, event)
+        item.novaItem?.handleInteract(event.player, item, event.action, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
         val item = event.player.inventory.getItem(event.hand).takeUnlessEmpty()
-        item?.logic?.handleEntityInteract(event.player, item, event.rightClicked, event)
+        item?.novaItem?.handleEntityInteract(event.player, item, event.rightClicked, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleEntityAttack(event: EntityDamageByEntityEvent) {
         val player = event.damager as? Player ?: return
         val item = player.inventory.getItem(EquipmentSlot.HAND).takeUnlessEmpty()
-        item?.logic?.handleAttackEntity(player, item, event.entity, event)
+        item?.novaItem?.handleAttackEntity(player, item, event.entity, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleBlockBreak(event: BlockBreakEvent) {
         val item = event.player.inventory.getItem(EquipmentSlot.HAND).takeUnlessEmpty()
-        item?.logic?.handleBreakBlock(event.player, item, event)
+        item?.novaItem?.handleBreakBlock(event.player, item, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleDamage(event: PlayerItemDamageEvent) {
         val item = event.item
-        item.logic?.handleDamage(event.player, item, event)
+        item.novaItem?.handleDamage(event.player, item, event)
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private fun handleBreak(event: PlayerItemBreakEvent) {
         val item = event.brokenItem
-        item.logic?.handleBreak(event.player, item, event)
+        item.novaItem?.handleBreak(event.player, item, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -94,8 +94,8 @@ internal object ItemListener : Listener, PacketListener {
         val unequippedItem = event.previous
         val equippedItem = event.now
         
-        unequippedItem?.logic?.handleEquip(player, unequippedItem, false, event)
-        equippedItem?.logic?.handleEquip(player, equippedItem, true, event)
+        unequippedItem?.novaItem?.handleEquip(player, unequippedItem, false, event)
+        equippedItem?.novaItem?.handleEquip(player, equippedItem, true, event)
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -104,12 +104,12 @@ internal object ItemListener : Listener, PacketListener {
         val clickedItem = event.currentItem
         val cursorItem = event.cursor
         
-        clickedItem?.logic?.handleInventoryClick(player, clickedItem, event)
-        cursorItem?.logic?.handleInventoryClickOnCursor(player, cursorItem, event)
+        clickedItem?.novaItem?.handleInventoryClick(player, clickedItem, event)
+        cursorItem?.novaItem?.handleInventoryClickOnCursor(player, cursorItem, event)
         
         if (event.click == ClickType.NUMBER_KEY) {
             val hotbarItem = player.inventory.getItem(event.hotbarButton)
-            hotbarItem?.logic?.handleInventoryHotbarSwap(player, hotbarItem, event)
+            hotbarItem?.novaItem?.handleInventoryHotbarSwap(player, hotbarItem, event)
         }
     }
     
@@ -118,7 +118,7 @@ internal object ItemListener : Listener, PacketListener {
         val player = event.player
         val item = event.player.inventory.itemInMainHand
         
-        item.logic?.handleBlockBreakAction(player, item, event)
+        item.novaItem?.handleBlockBreakAction(player, item, event)
     }
     
     // This method stores the last used item for the RELEASE_USE_ITEM action below
@@ -136,12 +136,9 @@ internal object ItemListener : Listener, PacketListener {
         if (event.action == ServerboundPlayerActionPacket.Action.RELEASE_USE_ITEM) {
             val player = event.player
             val item = usedItems[player]
-            item?.logic?.handleRelease(player, item, event)
+            item?.novaItem?.handleRelease(player, item, event)
         }
     }
-    
-    private val ItemStack.logic: ItemLogic?
-        get() = novaItem?.logic
     
 }
 

@@ -237,10 +237,9 @@ internal object PacketItems : Listener, PacketListener {
         val id = novaTag.getString("id") ?: return getUnknownItem(itemStack, null)
         val item = NovaRegistries.ITEM[id] ?: return getUnknownItem(itemStack, id)
         val subId = novaTag.getInt("subId")
-        val itemLogic = item.logic
         
         val itemModelDataMap = ResourceLookups.MODEL_DATA_LOOKUP[id]?.item
-        val data = itemModelDataMap?.get(itemLogic.vanillaMaterial)
+        val data = itemModelDataMap?.get(item.vanillaMaterial)
             ?: itemModelDataMap?.values?.first()
             ?: return getUnknownItem(itemStack, id)
         
@@ -256,7 +255,7 @@ internal object PacketItems : Listener, PacketListener {
         newItemStack.item = CraftMagicNumbers.getItem(data.material)
         newItemTag.putInt("CustomModelData", data.dataArray[subId])
         
-        val packetItemData = itemLogic.getPacketItemData(newItemStack)
+        val packetItemData = item.getPacketItemData(newItemStack)
         
         //<editor-fold desc="Display", defaultstate="collapsed">
         val displayTag = newItemTag.getOrPut("display", ::CompoundTag)
@@ -463,7 +462,7 @@ internal object PacketItems : Listener, PacketListener {
                 val novaItem = itemStack.novaItem
                 if (novaItem != null) {
                     // use base attribute modifiers from nova item
-                    modifiers = novaItem.logic.attributeModifiers[slot] ?: emptyList()
+                    modifiers = novaItem.attributeModifiers[slot] ?: emptyList()
                 } else {
                     // use base attribute modifiers from vanilla item
                     modifiers = itemStack.item.getDefaultAttributeModifiers(slot).entries().map { (attribute, modifier) ->

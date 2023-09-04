@@ -11,7 +11,6 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.builder.setLore
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.logic.ItemLogic
 import xyz.xenondevs.nova.item.logic.PacketItems
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.item.unhandledTags
@@ -59,12 +58,12 @@ open class ItemModelData(val id: ResourceLocation, val material: Material, val d
      * The [basic] parameter defines whether the returned [ItemProvider] should be in basic format (i.e. only display name)
      * or full format (i.e. display name, lore, other nbt data).
      */
-    internal fun createClientsideItemProvider(logic: ItemLogic, basic: Boolean, modelId: Int): ItemProvider {
+    internal fun createClientsideItemProvider(item: NovaItem, basic: Boolean, modelId: Int): ItemProvider {
         val itemStack = createItemBuilder(modelId).get()
         
         val clientStack: MojangStack
         if (basic) {
-            val basicName = logic.getPacketItemData(null).name
+            val basicName = item.getPacketItemData(null).name
             clientStack = createClientsideItemBuilder(name = basicName, modelId = modelId).get().nmsCopy
         } else {
             clientStack = PacketItems.getClientSideStack(
