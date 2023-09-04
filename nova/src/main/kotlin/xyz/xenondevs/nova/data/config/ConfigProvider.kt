@@ -27,7 +27,7 @@ fun <T : Any> ConfigProvider.entry(type: Type, vararg path: String): Provider<T>
         
         try {
             return@map node.get(type)!! as T
-        } catch(t: Throwable) {
+        } catch (t: Throwable) {
             throw IllegalStateException("Config entry '${node.path().joinToString(" > ")}' in $relPath could not be deserialized to $type", t)
         }
     }
@@ -51,14 +51,13 @@ fun <T : Any> ConfigProvider.entry(type: Type, vararg paths: Array<String>): Pro
         
         if (node == null || node.virtual())
             throw NoSuchElementException("Missing config entry ${paths.joinToString(" or ") { path -> "'${path.joinToString(" > ")}'" }} in $relPath")
-            
+        
         try {
             return@map node.get(type)!! as T
-        } catch(t: Throwable) {
+        } catch (t: Throwable) {
             throw IllegalStateException("Config entry '${node.path().joinToString(" > ")}' in $relPath could not be deserialized to $type", t)
         }
     }
-
 
 inline fun <reified T : Any> ConfigProvider.optionalEntry(vararg path: String): Provider<T?> =
     optionalEntry(typeOf<T>().javaType, *path)

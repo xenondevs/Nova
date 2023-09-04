@@ -17,8 +17,7 @@ interface Reloadable : Comparable<Reloadable> {
 
 fun <T : Any> configReloadable(initializer: () -> T): Provider<T> = ConfigReloadable(initializer)
 
-@Suppress("DEPRECATION")
-private class ConfigReloadable<T : Any>(val initializer: () -> T) : Provider<T>(), ValueReloadable<T> {
+private class ConfigReloadable<T : Any>(val initializer: () -> T) : Provider<T>(), Reloadable {
     
     init {
         Configs.reloadables += this

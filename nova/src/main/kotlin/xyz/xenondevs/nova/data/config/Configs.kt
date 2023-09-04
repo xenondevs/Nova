@@ -2,13 +2,10 @@ package xyz.xenondevs.nova.data.config
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
-import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
@@ -19,7 +16,6 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.item.ItemCategories
-import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.player.PlayerFreezer
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -30,7 +26,6 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.update.UpdateReminder
 import xyz.xenondevs.nova.util.data.useZip
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
-import xyz.xenondevs.nova.world.block.NovaBlock
 import java.io.File
 import java.nio.file.Path
 import kotlin.collections.component1
@@ -41,7 +36,6 @@ import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isDirectory
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
-import kotlin.reflect.KProperty
 
 private const val DEFAULT_CONFIG_NAME = "config"
 private const val DEFAULT_CONFIG_PATH = "configs/config.yml"
@@ -170,47 +164,3 @@ object Configs {
         createBuilder().path(path).build()
     
 }
-
-//<editor-fold desc="deprecated", defaultstate="collapsed">
-@Deprecated("Replaced by Provider", ReplaceWith("provider(value)", "xyz.xenondevs.nova.data.provider.provider"))
-fun <T : Any> notReloadable(value: T): Provider<T> = provider(value)
-
-@Deprecated("Replaced by Provider", ReplaceWith("Provider<T>", "xyz.xenondevs.nova.data.provider.Provider"))
-interface ValueReloadable<T : Any> : Reloadable {
-    val value: T
-    operator fun getValue(thisRef: Any?, property: KProperty<*>?): T
-}
-
-@Suppress("DEPRECATION")
-@Deprecated("Replaced by Configs", ReplaceWith("Configs", "xyz.xenondevs.nova.data.config.Configs"))
-object NovaConfig {
-    
-    @Deprecated("Replaced by Configs", ReplaceWith("Configs.get(name)", "xyz.xenondevs.nova.data.config.Configs"))
-    operator fun get(name: String): YamlConfiguration =
-        getOrNull(name) ?: throw IllegalArgumentException("Config not found: $name")
-    
-    @Deprecated("Replaced by Configs", ReplaceWith("Configs.get(item)", "xyz.xenondevs.nova.data.config.Configs"))
-    operator fun get(item: NovaItem): YamlConfiguration =
-        getOrNull(item.id.toString()) ?: throw IllegalArgumentException("Config not found: ${item.id}")
-    
-    @Deprecated("Replaced by Configs", ReplaceWith("Configs.getOrNull(block)", "xyz.xenondevs.nova.data.config.Configs"))
-    operator fun get(block: NovaBlock): YamlConfiguration =
-        getOrNull(block.id.toString()) ?: throw IllegalArgumentException("Config not found: ${block.id}")
-    
-    @Deprecated("Replaced by Configs", ReplaceWith("Configs.getOrNull(name)", "xyz.xenondevs.nova.data.config.Configs"))
-    fun getOrNull(name: String): YamlConfiguration? =
-        File(NOVA.dataFolder, "configs/$name.yml").takeIf(File::exists)?.let(YamlConfiguration::loadConfiguration)
-    
-    @Deprecated("Replaced by Configs", ReplaceWith("Configs.getOrNull(item)", "xyz.xenondevs.nova.data.config.Configs"))
-    fun getOrNull(item: NovaItem): YamlConfiguration? =
-        getOrNull(item.id.toString())
-    
-    @Deprecated("Replaced by Configs", ReplaceWith("Configs.getOrNull(block)", "xyz.xenondevs.nova.data.config.Configs"))
-    fun getOrNull(block: NovaBlock): YamlConfiguration? =
-        getOrNull(block.id.toString())
-    
-    @Deprecated("Replaced by Configs", ReplaceWith("Configs.save(name)", "xyz.xenondevs.nova.data.config.Configs"))
-    fun save(name: String) = Configs.save(name)
-    
-}
-//</editor-fold>
