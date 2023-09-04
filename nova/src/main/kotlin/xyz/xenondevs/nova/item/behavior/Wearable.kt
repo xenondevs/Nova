@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.mapNonNull
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.data.config.optionalEntry
@@ -49,11 +50,12 @@ fun Wearable(slot: BukkitEquipmentSlot, equipSound: SoundEvent): ItemBehaviorFac
 fun Wearable(slot: BukkitEquipmentSlot, equipSound: String? = null): ItemBehaviorFactory<Wearable.Default> {
     return object : ItemBehaviorFactory<Wearable.Default> {
         override fun create(item: NovaItem): Wearable.Default {
-            val texture = ResourceLookups.MODEL_DATA_LOOKUP[item.id]?.armor
-                ?.let { ResourceLookups.ARMOR_DATA_LOOKUP[it] }?.color
             val cfg = item.config
             return Wearable.Default(
-                provider(texture),
+                ResourceLookups.MODEL_DATA_LOOKUP.getProvider(item.id)
+                    .mapNonNull { it.armor }
+                    .let { ResourceLookups.ARMOR_DATA_LOOKUP.getProvider(it) }
+                    .mapNonNull { it.color },
                 provider(slot),
                 cfg.optionalEntry<Double>("armor").orElse(0.0),
                 cfg.optionalEntry<Double>("armor_toughness").orElse(0.0),
