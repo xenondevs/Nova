@@ -1,8 +1,6 @@
 {
   "item.nova.wrench": "Klucz",
-  "item.nova.speed_upgrade": "Ulepszenie: Prędkość",
   "item.nova.efficiency_upgrade": "Zwiększenie wydajności",
-  "item.nova.energy_upgrade": "Ulepszenie Energii",
   "item.nova.range_upgrade": "Ulepszenie zakresu",
   "menu.nova.items.search": "Wyszukaj przedmiot",
   "menu.nova.items.search.back": "Wróć do głównego ekwipunku",
