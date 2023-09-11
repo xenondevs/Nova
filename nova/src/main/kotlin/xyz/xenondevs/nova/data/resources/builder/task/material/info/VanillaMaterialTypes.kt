@@ -8,6 +8,8 @@ import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 internal object VanillaMaterialTypes {
     
     private val MATERIAL_TYPES = enumMapOf(
+        Material.SHIELD to setOf(VanillaMaterialProperty.SHIELD),
+        
         Material.WOODEN_PICKAXE to setOf(VanillaMaterialProperty.DAMAGEABLE),
         Material.WOODEN_SWORD to setOf(VanillaMaterialProperty.DAMAGEABLE, VanillaMaterialProperty.CREATIVE_NON_BLOCK_BREAKING),
     

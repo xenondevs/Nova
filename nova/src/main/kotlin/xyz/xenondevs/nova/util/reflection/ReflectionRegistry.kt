@@ -21,7 +21,10 @@ import net.minecraft.util.RandomSource
 import net.minecraft.util.ThreadingDetector
 import net.minecraft.world.Container
 import net.minecraft.world.entity.ExperienceOrb
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.ItemCombinerMenu
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.ChunkPos
@@ -152,6 +155,8 @@ internal object ReflectionRegistry {
     val NOISE_ROUTER_DATA_OVERWORLD_METHOD = getMethod(NoiseRouterData::class, true, "SRM(net.minecraft.world.level.levelgen.NoiseRouterData overworld)", HolderGetter::class, HolderGetter::class, Boolean::class, Boolean::class)
     val SEMAPHORE_ACQUIRE_METHOD = getMethod(Semaphore::class, false, "acquire")
     val CRAFT_META_ITEM_CLONE_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "clone")
+    val PLAYER_HURT_CURRENTLY_USED_SHIELD_METHOD = getMethod(Player::class, true, "SRM(net.minecraft.world.entity.player.Player hurtCurrentlyUsedShield)", Float::class)
+    val ITEM_STACK_IS_METHOD = getMethod(ItemStack::class, false, "SRM(net.minecraft.world.item.ItemStack is)", Item::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
