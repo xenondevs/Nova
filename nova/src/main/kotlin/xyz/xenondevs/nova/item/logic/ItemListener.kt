@@ -43,7 +43,7 @@ internal object ItemListener : Listener {
         registerPacketListener()
     }
     
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.LOW)
     private fun handleInteract(e: WrappedPlayerInteractEvent) {
         val event = e.event
         val player = event.player
