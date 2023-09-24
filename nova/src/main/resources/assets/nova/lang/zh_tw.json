@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "扳手",
-  "item.nova.efficiency_upgrade": "效率升級",
   "item.nova.range_upgrade": "範圍升級",
   "menu.nova.energy_per_tick": "%s /刻",
   "menu.nova.items.search": "搜尋物品",
@@ -35,7 +34,6 @@
   "menu.nova.visual_region.hide": "隱藏範圍顯示",
   "menu.nova.visual_region.show": "開啟範圍顯示",
   "menu.nova.upgrades": "升級",
-  "menu.nova.upgrades.type.efficiency": "效率升級: %s/%s",
   "menu.nova.upgrades.type.range": "範圍升級: %s/%s",
   "menu.nova.color_picker": "選擇一種顏色...",
   "menu.nova.color_picker.red": "紅色: %s",
@@ -126,5 +124,7 @@
   "command.nova.advanced_tooltips.nova.failure": "Nova物品的進階工具提示已經被啟用了",
   "command.nova.advanced_tooltips.all.success": "已啟用所有物品的進階工具提示",
   "command.nova.advanced_tooltips.all.failure": "所有物品的進階工具提示已經被啟用了",
-  "command.nova.list_blocks.success": "總共: %s"
+  "command.nova.list_blocks.success": "總共: %s",
+  "menu.nova.items.cheat_mode.on": "作弊模式：开启",
+  "menu.nova.items.cheat_mode.off": "作弊模式：关闭"
 }
