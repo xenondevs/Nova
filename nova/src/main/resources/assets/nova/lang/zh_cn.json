@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "扳手",
-  "item.nova.efficiency_upgrade": "效率升级",
   "item.nova.range_upgrade": "范围升级",
   "menu.nova.energy_per_tick": "%s / 每刻",
   "menu.nova.items.search": "搜索物品",
@@ -35,7 +34,6 @@
   "menu.nova.visual_region.hide": "隐藏区域",
   "menu.nova.visual_region.show": "显示区域",
   "menu.nova.upgrades": "升级",
-  "menu.nova.upgrades.type.efficiency": "效率升级等级: %s/%s",
   "menu.nova.upgrades.type.range": "范围升级等级: %s/%s",
   "menu.nova.color_picker": "选择一种颜色...",
   "menu.nova.color_picker.red": "红: %s",
@@ -126,5 +124,7 @@
   "command.nova.advanced_tooltips.nova.failure": "Nova物品的高级提示框已经处于开启状态。",
   "command.nova.advanced_tooltips.all.failure": "所有物品的高级提示框已经处于开启状态。",
   "command.nova.list_blocks.success": "共计：%s",
-  "command.nova.invalidate_char_sizes.success": "已成功使所有字符大小无效。它们将在下次创建资源包时重新计算。"
+  "command.nova.invalidate_char_sizes.success": "已成功使所有字符大小无效。它们将在下次创建资源包时重新计算。",
+  "menu.nova.items.cheat_mode.on": "作弊模式：开启",
+  "menu.nova.items.cheat_mode.off": "作弊模式：关闭"
 }
