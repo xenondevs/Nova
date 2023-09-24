@@ -8,7 +8,6 @@
   "container.nova.water_tank": "Контаінір з водою",
   "command.nova.no-item-in-hand": "Спробуйте ще раз, тримаючи предмет у руці.",
   "command.nova.remove_obsolete_models.success": "Прибрано %s стійок для броні.",
-  "item.nova.energy_upgrade": "Обнова енергій",
   "item.nova.fluid_upgrade": "Обнова рідини",
   "menu.nova.energy_per_tick": "%s / тік",
   "menu.nova.items.search-item": "Пошук...",
@@ -28,7 +27,6 @@
   "menu.nova.side_config.input_output": "§aВхід і вихід",
   "menu.nova.paged.back": "§7Іди назад",
   "menu.nova.visual_region.hide": "Спрятана облость",
-  "menu.nova.upgrades.type.energy": "Обнова енергій: %s/%s",
   "menu.nova.upgrades.type.fluid": "Обнова рідини: %s/%s",
   "menu.nova.color_picker": "Обери колір...",
   "menu.nova.color_picker.blue": "Синій: %s",
@@ -125,5 +123,8 @@
   "nova.tile_entity_limits.amount_per_chunk.deny": "Досягнуто ліміту розміщених об'єктів цього типу в цьому чанку.",
   "waila.nova.required_tool.none": "Інструмент не потрібен",
   "waila.nova.required_tool.unbreakable": "Незламний",
-  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Досягнуто ліміт розміщених об'єктів Nova в цьому чанку."
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Досягнуто ліміт розміщених об'єктів Nova в цьому чанку.",
+  "command.nova.invalidate_char_sizes.success": "Успішно скасовано всі розміри символів. Їх буде перераховано під час створення наступного пакунку ресурсів.",
+  "menu.nova.items.cheat_mode.on": "Чит-режим: Увімкнено",
+  "menu.nova.items.cheat_mode.off": "Чит-режим: Вимкнено"
 }
