@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "Гаечный ключ",
-  "item.nova.range_upgrade": "Улучшение: Радиус",
   "menu.nova.energy_per_tick": "%s / тик",
   "menu.nova.items.search": "Поиск предмета",
   "menu.nova.items.search.back": "Вернуться на главную страницу",
@@ -34,7 +33,6 @@
   "menu.nova.visual_region.hide": "Спрятать область действия",
   "menu.nova.visual_region.show": "Показать область действия",
   "menu.nova.upgrades": "Улучшения",
-  "menu.nova.upgrades.type.range": "Улучшение: Радиус: %s/%s",
   "menu.nova.color_picker": "Выберите цвет...",
   "menu.nova.color_picker.red": "Красный: %s",
   "menu.nova.color_picker.green": "Зелёный: %s",
@@ -125,6 +123,6 @@
   "command.nova.advanced_tooltips.off.failure": "Расширенные подсказки уже отключены.",
   "command.nova.advanced_tooltips.all.success": "Расширенные подсказки для всех предметов включены.",
   "command.nova.invalidate_char_sizes.success": "Успешно отменены все размеры символов. Они будут пересчитаны при создании следующего пакета ресурсов.",
-  "menu.nova.items.cheat_mode.on": "Чит-режим: На",
-  "menu.nova.items.cheat_mode.off": "Чит-режим: Выключено"
+  "menu.nova.items.cheat_mode.on": "Чит-режим: Включен",
+  "menu.nova.items.cheat_mode.off": "Чит-режим: Выключен"
 }
