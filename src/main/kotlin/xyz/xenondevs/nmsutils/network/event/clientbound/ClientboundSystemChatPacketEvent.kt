@@ -23,7 +23,7 @@ class ClientboundSystemChatPacketEvent(
             changed = true
         }
     
-    var message: String? = packet.content ?: (CLIENTBOUND_SYSTEM_CHAT_PACKET_ADVENTURE_CONTENT_FIELD?.get(packet) as Component?)?.toJson()
+    var message: String? = packet.content() ?: (CLIENTBOUND_SYSTEM_CHAT_PACKET_ADVENTURE_CONTENT_FIELD?.get(packet) as Component?)?.toJson()
         set(value) {
             field = value
             changed = true

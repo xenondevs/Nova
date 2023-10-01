@@ -1,17 +1,20 @@
 package xyz.xenondevs.nmsutils.advancement
 
+import net.minecraft.advancements.AdvancementHolder
+import net.minecraft.advancements.AdvancementTree
 import net.minecraft.advancements.TreeNodePosition
 import org.spigotmc.SpigotConfig
 import xyz.xenondevs.nmsutils.internal.util.DEDICATED_SERVER
+import xyz.xenondevs.nmsutils.internal.util.ReflectionRegistry
 
 object AdvancementLoader {
     
-    fun registerAdvancements(vararg advancements: Advancement, ignoreFilters: Boolean = false) =
+    fun registerAdvancements(vararg advancements: AdvancementHolder, ignoreFilters: Boolean = false) =
         registerAdvancements(advancements.asList(), ignoreFilters)
     
-    fun registerAdvancements(advancements: Iterable<Advancement>, ignoreFilters: Boolean) {
+    fun registerAdvancements(advancements: Iterable<AdvancementHolder>, ignoreFilters: Boolean) {
         // filter advancements
-        var filtered: List<Advancement>? = null
+        var filtered: List<AdvancementHolder> = advancements.toList()
         if (!ignoreFilters) {
             if (SpigotConfig.disableAdvancementSaving || SpigotConfig.disabledAdvancements?.contains("*") == true)
                 return
@@ -23,20 +26,22 @@ object AdvancementLoader {
                 }
         }
         
-        // convert advancements
-        val converted = (filtered ?: advancements).associate(Advancement::toNMS)
-        // register advancements
-        DEDICATED_SERVER.advancements.advancements.add(converted)
-        // set positioning
-        // TODO: open positioning up to the api
-        advancements
-            .asSequence()
-            .filter { it.parent == null && it.display?.isHidden == false }
-            .forEach {
-                val advancement = DEDICATED_SERVER.advancements.advancements.advancements[it.id]
-                if (advancement != null)
-                    TreeNodePosition.run(advancement)
+        // combine with existing advancements and build tree
+        val advancementManager = DEDICATED_SERVER.advancements
+        val allAdvancements = HashMap(DEDICATED_SERVER.advancements.advancements)
+        filtered.forEach { allAdvancements[it.id] = it }
+        val advancementTree = AdvancementTree()
+        advancementTree.addAll(filtered)
+        for (root in advancementTree.roots()) {
+            if (root.holder().value().display().isPresent) {
+                // TODO: open positioning up to the api
+                TreeNodePosition.run(root)
             }
+        }
+        
+        // set new advancements
+        advancementManager.advancements = allAdvancements
+        ReflectionRegistry.SERVER_ADVANCEMENT_MANAGER_TREE_FIELD.set(advancementManager, advancementTree)
     }
     
 }

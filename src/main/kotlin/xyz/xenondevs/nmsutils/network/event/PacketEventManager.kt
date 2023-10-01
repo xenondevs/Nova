@@ -28,13 +28,13 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlaceRecipePa
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
-import xyz.xenondevs.nmsutils.util.removeIf
 import java.lang.reflect.Method
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.reflect.KClass
 import net.minecraft.network.PacketListener as MojangPacketListener
+import xyz.xenondevs.commons.collections.removeIf
 
 private data class Listener(val instance: Any, val method: Method, val priority: EventPriority, val ignoreIfCancelled: Boolean)
 

@@ -125,13 +125,13 @@ internal object PacketManager : Listener {
     }
     
     private fun registerHandler(player: Player) {
-        val connection = ReflectionRegistry.SERVER_GAME_PACKET_LISTENER_IMPL_CONNECTION_FIELD.get(player.serverPlayer.connection) as Connection
+        val connection = ReflectionRegistry.SERVER_COMMON_PACKET_LISTENER_IMPL_CONNECTION_FIELD.get(player.serverPlayer.connection) as Connection
         val channel = connection.channel
         channel.pipeline().addBefore("packet_handler", "${PLUGIN.name}_packet_handler", PacketHandler(channel, player))
     }
     
     private fun unregisterHandler(player: Player) {
-        val connection = ReflectionRegistry.SERVER_GAME_PACKET_LISTENER_IMPL_CONNECTION_FIELD.get(player.serverPlayer.connection) as Connection
+        val connection = ReflectionRegistry.SERVER_COMMON_PACKET_LISTENER_IMPL_CONNECTION_FIELD.get(player.serverPlayer.connection) as Connection
         val pipeline = connection.channel.pipeline()
         pipeline.context("${PLUGIN.name}_packet_handler")?.handler()?.run(pipeline::remove)
     }

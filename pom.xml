@@ -6,7 +6,7 @@
 
     <groupId>xyz.xenondevs</groupId>
     <artifactId>nms-utilities</artifactId>
-    <version>0.14</version>
+    <version>0.15</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -15,7 +15,9 @@
         <maven.compiler.target>17</maven.compiler.target>
         <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
         <kotlin.version>1.9.10</kotlin.version>
-        <spigot.version>1.20.1-R0.1-SNAPSHOT</spigot.version>
+        <adventure.version>4.14.0</adventure.version>
+        <minecraft.version>1.20.2</minecraft.version>
+        <spigot.version>${minecraft.version}-R0.1-SNAPSHOT</spigot.version>
     </properties>
 
     <repositories>
@@ -53,12 +55,17 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-api</artifactId>
-            <version>4.12.0</version>
+            <version>${adventure.version}</version>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-serializer-gson</artifactId>
-            <version>4.12.0</version>
+            <version>${adventure.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>xyz.xenondevs.commons</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>1.7</version>
         </dependency>
     </dependencies>
 
@@ -93,9 +100,9 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>xyz.xenondevs</groupId>
+                <groupId>xyz.xenondevs.string-remapper</groupId>
                 <artifactId>string-remapper-maven-plugin</artifactId>
-                <version>0.6</version>
+                <version>1.7</version>
 
                 <executions>
                     <execution>
@@ -104,14 +111,10 @@
                             <goal>remap</goal>
                         </goals>
                         <configuration>
-                            <remapGoal>spigot</remapGoal>
+                            <version>${minecraft.version}</version>
+                            <goal>spigot</goal>
                             <classesIn>${project.build.directory}/classes</classesIn>
                             <classesOut>${project.build.directory}/classes-spigot</classesOut>
-                            <mapsMojang>org.spigotmc:minecraft-server:txt:maps-mojang:${spigot.version}</mapsMojang>
-                            <mapsSpigot>
-                                <classes>org.spigotmc:minecraft-server:csrg:maps-spigot:${spigot.version}</classes>
-                                <members>org.spigotmc:minecraft-server:csrg:maps-spigot-members:${spigot.version}</members>
-                            </mapsSpigot>
                         </configuration>
                     </execution>
 
@@ -121,14 +124,10 @@
                             <goal>remap</goal>
                         </goals>
                         <configuration>
-                            <remapGoal>mojang</remapGoal>
+                            <version>${minecraft.version}</version>
+                            <goal>mojang</goal>
                             <classesIn>${project.build.directory}/classes</classesIn>
                             <classesOut>${project.build.directory}/classes-mojang</classesOut>
-                            <mapsMojang>org.spigotmc:minecraft-server:txt:maps-mojang:${spigot.version}</mapsMojang>
-                            <mapsSpigot>
-                                <classes>org.spigotmc:minecraft-server:csrg:maps-spigot:${spigot.version}</classes>
-                                <members>org.spigotmc:minecraft-server:csrg:maps-spigot-members:${spigot.version}</members>
-                            </mapsSpigot>
                         </configuration>
                     </execution>
                 </executions>
