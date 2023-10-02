@@ -4,14 +4,15 @@ import com.mojang.authlib.GameProfile
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
 import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ClientInformation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.tags.FluidTags
 import net.minecraft.world.effect.MobEffectInstance
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_20_R2.CraftServer
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftEntity
 import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.VanillaToolCategory
@@ -234,7 +235,7 @@ class FakePlayer(
     level: ServerLevel,
     profile: GameProfile,
     val hasEvents: Boolean
-) : ServerPlayer(server, level, profile) {
+) : ServerPlayer(server, level, profile, ClientInformation.createDefault()) {
     
     init {
         advancements.stopListening()

@@ -39,12 +39,12 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer
-import org.bukkit.craftbukkit.v1_20_R1.CraftWorld
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_20_R2.CraftServer
+import org.bukkit.craftbukkit.v1_20_R2.CraftWorld
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -206,6 +206,7 @@ val Direction.blockFace: BlockFace
 
 val Attribute.nmsAttribute: MojangAttribute
     get() = when (this) {
+        Attribute.GENERIC_MAX_ABSORPTION -> Attributes.MAX_ABSORPTION
         Attribute.GENERIC_MAX_HEALTH -> Attributes.MAX_HEALTH
         Attribute.GENERIC_FOLLOW_RANGE -> Attributes.FOLLOW_RANGE
         Attribute.GENERIC_KNOCKBACK_RESISTANCE -> Attributes.KNOCKBACK_RESISTANCE

@@ -16,7 +16,7 @@ import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.event.world.WorldUnloadEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.pollFirstWhere
-import xyz.xenondevs.nmsutils.util.removeIf
+import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.addon.AddonsInitializer

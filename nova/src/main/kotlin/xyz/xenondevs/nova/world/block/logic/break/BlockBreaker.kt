@@ -4,8 +4,8 @@ import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
 import net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket
-import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.level.GameRules
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
@@ -16,7 +16,7 @@ import org.bukkit.Material
 import org.bukkit.SoundCategory
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory
+import org.bukkit.craftbukkit.v1_20_R2.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockExpEvent
@@ -53,8 +53,7 @@ import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
 
 private val CLIENTSIDE_PREDICTIONS by MAIN_CONFIG.entry<Boolean>("world", "block_breaking", "clientside_predictions")
-private val MINING_FATIGUE = MobEffect.byId(4)!!
-private val MINING_FATIGUE_INSTANCE = MobEffectInstance(MINING_FATIGUE, Integer.MAX_VALUE, 255, false, false, false)
+private val MINING_FATIGUE_INSTANCE = MobEffectInstance(MobEffects.DIG_SLOWDOWN, Integer.MAX_VALUE, 255, false, false, false)
 
 internal class NovaBlockBreaker(
     player: Player,
@@ -205,7 +204,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             // The player might actually have mining fatigue.
             // In this case, it is important to copy the hasIcon value to prevent it from disappearing.
             val effectInstance = MobEffectInstance(
-                MINING_FATIGUE,
+                MobEffects.DIG_SLOWDOWN,
                 Int.MAX_VALUE, 255,
                 effect.isAmbient, effect.hasParticles(), effect.hasIcon()
             )
@@ -301,14 +300,14 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             val effectPacket = if (effect != null) {
                 // If the player actually has mining fatigue, send the correct effect again
                 val effectInstance = MobEffectInstance(
-                    MINING_FATIGUE,
+                    MobEffects.DIG_SLOWDOWN,
                     effect.duration, effect.amplifier,
                     effect.isAmbient, effect.hasParticles(), effect.hasIcon()
                 )
                 ClientboundUpdateMobEffectPacket(player.entityId, effectInstance)
             } else {
                 // Remove the effect
-                ClientboundRemoveMobEffectPacket(player.entityId, MINING_FATIGUE)
+                ClientboundRemoveMobEffectPacket(player.entityId, MobEffects.DIG_SLOWDOWN)
             }
             
             player.send(effectPacket)

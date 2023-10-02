@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
 class FluidBar(
     height: Int,
@@ -59,25 +60,25 @@ class FluidBar(
         
         @Suppress("DEPRECATION")
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            val cursor = event.cursor?.takeUnless { it.type.isAir }
+            val cursor = event.cursor.takeUnlessEmpty()
             when (cursor?.type) {
                 Material.BUCKET -> if (allowedConnectionType.extract && fluidContainer.amount >= 1000) {
                     val bucket = fluidContainer.type!!.bucket!!
                     if (cursor.amount > 1) {
-                        event.cursor!!.amount -= 1
+                        event.cursor.amount -= 1
                         if (player.inventory.addItemCorrectly(bucket) != 0)
                             InventoryUtils.dropItemLikePlayer(player, bucket)
-                    } else event.cursor = bucket
+                    } else event.setCursor(bucket)
                     fluidContainer.takeFluid(1000)
                 }
                 
                 Material.WATER_BUCKET -> if (allowedConnectionType.insert && fluidContainer.accepts(FluidType.WATER, 1000)) {
-                    event.cursor = ItemStack(Material.BUCKET)
+                    event.setCursor(ItemStack(Material.BUCKET))
                     fluidContainer.addFluid(FluidType.WATER, 1000)
                 }
                 
                 Material.LAVA_BUCKET -> if (allowedConnectionType.insert && fluidContainer.accepts(FluidType.LAVA, 1000)) {
-                    event.cursor = ItemStack(Material.BUCKET)
+                    event.setCursor(ItemStack(Material.BUCKET))
                     fluidContainer.addFluid(FluidType.LAVA, 1000)
                 }
                 

@@ -5,7 +5,7 @@ import net.minecraft.world.item.SwordItem
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.enchantment.Enchantments
 import net.minecraft.world.level.block.state.BlockState
-import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock
+import org.bukkit.craftbukkit.v1_20_R2.block.CraftBlock
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.TypeInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList

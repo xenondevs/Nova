@@ -282,6 +282,9 @@ class ResourcePackBuilder internal constructor() {
         val packMcmetaObj = JsonObject()
         val packObj = JsonObject().also { packMcmetaObj.add("pack", it) }
         packObj.addProperty("pack_format", 15)
+        val supportedFormats = JsonObject().also { packObj.add("supported_formats", it) }
+        supportedFormats.addProperty("min_inclusive", 0)
+        supportedFormats.addProperty("max_inclusive", 999)
         packObj.addProperty("description", PACK_DESCRIPTION.format(assetPacks, basePacks))
         
         PACK_MCMETA_FILE.parent.createDirectories()

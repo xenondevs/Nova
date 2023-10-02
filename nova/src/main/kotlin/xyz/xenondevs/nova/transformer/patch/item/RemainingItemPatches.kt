@@ -8,9 +8,9 @@ import net.minecraft.world.item.crafting.BookCloningRecipe
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_20_R2.CraftServer
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode

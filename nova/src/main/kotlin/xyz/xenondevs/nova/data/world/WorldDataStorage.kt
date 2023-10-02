@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data.world
 
 import org.bukkit.World
-import xyz.xenondevs.nmsutils.util.removeIf
+import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.world.ChunkPos
 import java.io.File
 import java.util.*

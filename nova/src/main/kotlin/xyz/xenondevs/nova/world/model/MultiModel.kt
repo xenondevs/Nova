@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.model
 
-import xyz.xenondevs.nmsutils.util.removeIf
+import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemDisplayMetadata
 

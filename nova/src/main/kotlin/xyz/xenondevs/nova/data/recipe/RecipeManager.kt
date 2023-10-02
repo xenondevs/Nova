@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.recipe
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.crafting.Recipe
+import net.minecraft.world.item.crafting.RecipeHolder
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -54,7 +55,7 @@ private val ALLOW_RESULT_OVERWRITE by MAIN_CONFIG.entry<Boolean>("debug", "allow
 )
 object RecipeManager : Listener, PacketListener {
     
-    private val INTERNAL_RECIPES: Map<ResourceLocation, (ResourceLocation) -> MojangRecipe<*>> = mapOf(
+    private val INTERNAL_RECIPES: Map<ResourceLocation, () -> MojangRecipe<*>> = mapOf(
         ResourceLocation("minecraft", "repair_item") to ::RepairItemRecipe
     )
     
@@ -125,9 +126,9 @@ object RecipeManager : Listener, PacketListener {
                 val serversideRecipe = ServersideRecipe.of(recipe)
                 serversideRecipe as Recipe<*> // intersection type of Recipe<*> and ServersideRecipe
                 
-                MINECRAFT_SERVER.recipeManager.addRecipe(serversideRecipe)
+                val id = recipe.key.resourceLocation
+                MINECRAFT_SERVER.recipeManager.addRecipe(RecipeHolder(id, serversideRecipe))
                 
-                val id = serversideRecipe.id
                 _clientsideRecipes[id] = serversideRecipe.clientsideCopy()
                 registeredVanillaRecipes[id] = serversideRecipe
                 customVanillaRecipes[id] = serversideRecipe
@@ -142,10 +143,10 @@ object RecipeManager : Listener, PacketListener {
     private fun loadInternalRecipes() {
         val recipeManager = MINECRAFT_SERVER.recipeManager
         INTERNAL_RECIPES.forEach { (id, recipeConstructor) ->
-            val recipe = recipeConstructor.invoke(id)
+            val recipe = recipeConstructor.invoke()
             
             recipeManager.removeRecipe(id)
-            recipeManager.addRecipe(recipe)
+            recipeManager.addRecipe(RecipeHolder(id, recipe))
             
             registeredVanillaRecipes[id] = recipe
         }
@@ -192,15 +193,15 @@ object RecipeManager : Listener, PacketListener {
         val recipe = registeredVanillaRecipes[id] ?: return
         
         if (recipe is NovaShapedRecipe) {
-            runTask { fillCraftingInventory(event.player, recipe) }
+            runTask { fillCraftingInventory(event.player, recipe, id) }
             event.isCancelled = true
         } else if (recipe is NovaShapelessRecipe) {
-            runTask { fillCraftingInventory(event.player, recipe) }
+            runTask { fillCraftingInventory(event.player, recipe, id) }
             event.isCancelled = true
         }
     }
     
-    private fun fillCraftingInventory(player: Player, recipe: NovaShapedRecipe) {
+    private fun fillCraftingInventory(player: Player, recipe: NovaShapedRecipe, id: ResourceLocation) {
         val craftingInventory = player.openInventory.topInventory as CraftingInventory
         
         // clear previous items
@@ -225,12 +226,12 @@ object RecipeManager : Listener, PacketListener {
             
         } else {
             // send ghost recipe
-            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, recipe.id)
+            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, id)
             player.send(packet)
         }
     }
     
-    private fun fillCraftingInventory(player: Player, recipe: NovaShapelessRecipe) {
+    private fun fillCraftingInventory(player: Player, recipe: NovaShapelessRecipe, id: ResourceLocation) {
         val craftingInventory = player.openInventory.topInventory as CraftingInventory
         
         // clear previous items
@@ -251,7 +252,7 @@ object RecipeManager : Listener, PacketListener {
             
         } else {
             // send ghost recipe
-            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, recipe.id)
+            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, id)
             player.send(packet)
         }
     }

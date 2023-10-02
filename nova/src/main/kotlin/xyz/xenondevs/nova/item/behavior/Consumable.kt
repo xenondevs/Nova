@@ -12,13 +12,13 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
+import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
-import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.item.NovaItem
@@ -237,7 +237,7 @@ sealed interface Consumable { // TODO: remove sealed & make more customizable (m
             val isOffHand = hand == EquipmentSlot.OFF_HAND
             
             val buf = FriendlyByteBuf(Unpooled.buffer())
-            buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_SET_ENTITY_DATA_PACKET)
+            buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_SET_ENTITY_DATA_PACKET)
             buf.writeVarInt(entityId) // entity id
             buf.writeByte(8) // type for eating animation
             buf.writeVarInt(0) // following is byte

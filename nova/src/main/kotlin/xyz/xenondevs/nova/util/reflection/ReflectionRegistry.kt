@@ -63,8 +63,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
-import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R2.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 import org.bukkit.event.block.BlockPhysicsEvent
@@ -132,7 +132,7 @@ internal object ReflectionRegistry {
     val MAPPED_REGISTRY_LIFECYCLE_METHOD = getMethod(MappedRegistry::class, false, "SRM(net.minecraft.core.MappedRegistry lifecycle)", Any::class)
     val MAPPED_REGISTRY_REGISTER_MAPPING_METHOD = getMethod(MappedRegistry::class, false, "SRM(net.minecraft.core.MappedRegistry registerMapping)", Int::class, ResourceKey::class, Any::class, Lifecycle::class)
     val DEFAULTED_MAPPED_REGISTRY_GET_METHOD = getMethod(DefaultedMappedRegistry::class, false, "SRM(net.minecraft.core.DefaultedMappedRegistry get)", ResourceLocation::class)
-    val COMPOUND_TAG_READ_NAMED_TAG_DATA_METHOD = getMethod(CompoundTag::class, true, "SRM(net.minecraft.nbt.CompoundTag readNamedTagData)", TagType::class, String::class, DataInput::class, Int::class, NbtAccounter::class)
+    val COMPOUND_TAG_READ_NAMED_TAG_DATA_METHOD = getMethod(CompoundTag::class, true, "SRM(net.minecraft.nbt.CompoundTag readNamedTagData)", TagType::class, String::class, DataInput::class, NbtAccounter::class)
     val ABSTRACT_FURNACE_BLOCK_ENTITY_GET_BURN_DURATION_METHOD = getMethod(AbstractFurnaceBlockEntity::class, true, "SRM(net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity getBurnDuration)", MojangStack::class)
     val RECIPE_GET_REMAINING_ITEMS_METHOD = getMethod(Recipe::class, false, "SRM(net.minecraft.world.item.crafting.Recipe getRemainingItems)", Container::class)
     val NON_NULL_LIST_SET_METHOD = getMethod(NonNullList::class, false, "SRM(net.minecraft.core.NonNullList set)", Int::class, Any::class)
@@ -178,8 +178,8 @@ internal object ReflectionRegistry {
     val LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD = getField(LevelChunkSection::class, true, "SRF(net.minecraft.world.level.chunk.LevelChunkSection nonEmptyBlockCount)")
     @JvmField
     val LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD = getField(LevelChunkSection::class, true, "specialCollidingBlocks")
-    @JvmField
-    val LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD = getField(LevelChunkSection::class, true, "knownBlockCollisionData")
+//    @JvmField
+//    val LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD = getField(LevelChunkSection::class, true, "knownBlockCollisionData")
     @JvmField
     val LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD = getField(LevelChunkSection::class, true, "tickingList")
     @JvmField

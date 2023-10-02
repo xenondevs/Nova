@@ -21,13 +21,13 @@ import java.util.stream.Stream
 
 internal object CBFCompoundTagType : TagType.VariableSize<ByteArrayTag> {
     
-    override fun load(input: DataInput, i: Int, tracker: NbtAccounter): CBFCompoundTag {
+    override fun load(input: DataInput, tracker: NbtAccounter): ByteArrayTag {
         val reader = ByteReader.fromDataInput(input)
         reader.skip(4) // skip length int
         return CBFCompoundTag(CBF.read(reader)!!)
     }
     
-    override fun skip(input: DataInput){
+    override fun skip(input: DataInput, tracker: NbtAccounter) {
         val reader = ByteReader.fromDataInput(input)
         reader.skip(4) // skip length int
         if (reader.readBoolean()) {
@@ -43,7 +43,7 @@ internal object CBFCompoundTagType : TagType.VariableSize<ByteArrayTag> {
         return "TAG_CBF_COMPOUND"
     }
     
-    override fun parse(input: DataInput, visitor: StreamTagVisitor): StreamTagVisitor.ValueResult {
+    override fun parse(input: DataInput, visitor: StreamTagVisitor, tracker: NbtAccounter): StreamTagVisitor.ValueResult {
         throw UnsupportedOperationException()
     }
     

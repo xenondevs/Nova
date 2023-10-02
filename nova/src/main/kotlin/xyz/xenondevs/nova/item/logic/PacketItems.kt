@@ -22,11 +22,12 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import net.minecraft.world.item.crafting.RecipeHolder
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
@@ -175,7 +176,7 @@ internal object PacketItems : Listener, PacketListener {
         packet.recipes.forEachIndexed { i, recipe ->
             val id = recipe.id
             if (id in RecipeManager.clientsideRecipes)
-                packet.recipes[i] = RecipeManager.clientsideRecipes[id]!!
+                packet.recipes[i] = RecipeHolder(id, RecipeManager.clientsideRecipes[id]!!)
         }
     }
     

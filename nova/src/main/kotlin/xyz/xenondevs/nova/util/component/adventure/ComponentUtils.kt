@@ -7,7 +7,7 @@ import net.kyori.adventure.text.ComponentBuilder
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.minecraft.nbt.StringTag
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage
+import org.bukkit.craftbukkit.v1_20_R2.util.CraftChatMessage
 import org.bukkit.entity.Player
 import xyz.xenondevs.inventoryaccess.util.AdventureComponentUtils
 import xyz.xenondevs.nova.data.resources.CharSizes

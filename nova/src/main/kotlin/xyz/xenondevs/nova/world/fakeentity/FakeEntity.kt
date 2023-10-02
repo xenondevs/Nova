@@ -217,7 +217,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         val buf = FriendlyByteBuf(Unpooled.buffer())
         
         val packedYaw = expectedLocation.yaw.toPackedByte().toInt()
-        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_ADD_ENTITY_PACKET)
+        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_ADD_ENTITY_PACKET)
         buf.writeVarInt(entityId)
         buf.writeUUID(uuid)
         buf.writeId(BuiltInRegistries.ENTITY_TYPE, entityType)
@@ -237,7 +237,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createDespawnDataBuf(): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_REMOVE_ENTITIES_PACKET)
+        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_REMOVE_ENTITIES_PACKET)
         buf.writeVarIntArray(intArrayOf(entityId))
         
         return buf
@@ -245,7 +245,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createEquipmentBuf(): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_SET_EQUIPMENT_PACKET)
+        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_SET_EQUIPMENT_PACKET)
         buf.writeVarInt(entityId)
         equipment.forEachIndexed { index, item ->
             buf.writeByte(if (index != 5) index or -128 else index)
@@ -257,7 +257,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createPosBuf(x: Short, y: Short, z: Short): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_MOVE_ENTITY_PACKET_POS)
+        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_MOVE_ENTITY_PACKET_POS)
         buf.writeVarInt(entityId)
         buf.writeShort(x.toInt())
         buf.writeShort(y.toInt())
@@ -268,7 +268,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createPosRotBuf(x: Short, y: Short, z: Short, yaw: Float, pitch: Float): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_MOVE_ENTITY_PACKET_POS_ROT)
+        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_MOVE_ENTITY_PACKET_POS_ROT)
         buf.writeVarInt(entityId)
         buf.writeShort(x.toInt())
         buf.writeShort(y.toInt())
@@ -281,7 +281,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createRotBuf(location: Location): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_MOVE_ENTITY_PACKET_ROT)
+        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_MOVE_ENTITY_PACKET_ROT)
         buf.writeVarInt(entityId)
         buf.writeByte(location.yaw.toPackedByte().toInt())
         buf.writeByte(location.pitch.toPackedByte().toInt())
@@ -291,7 +291,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     
     private fun createTeleportBuf(location: Location): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_TELEPORT_ENTITY_PACKET)
+        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_TELEPORT_ENTITY_PACKET)
         buf.writeVarInt(entityId)
         buf.writeDouble(location.x)
         buf.writeDouble(location.y)

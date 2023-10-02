@@ -6,6 +6,6 @@ import net.minecraft.world.level.block.state.BlockState
 
 class BlockDisplayMetadata : DisplayMetadata() {
     
-    var blockState: BlockState by entry(22, EntityDataSerializers.BLOCK_STATE, Blocks.AIR.defaultBlockState())
+    var blockState: BlockState by entry(23, EntityDataSerializers.BLOCK_STATE, Blocks.AIR.defaultBlockState())
     
 }

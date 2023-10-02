@@ -10,8 +10,8 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.enchantment.Enchantments
 import org.bukkit.GameMode
 import org.bukkit.Statistic
-import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_20_R2.event.CraftEventFactory
+import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent

@@ -7,7 +7,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.WorldLoadEvent
 import org.bukkit.persistence.PersistentDataType
-import xyz.xenondevs.nmsutils.util.removeIf
+import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.NOVA_PLUGIN

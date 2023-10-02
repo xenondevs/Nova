@@ -12,7 +12,7 @@ abstract class Metadata internal constructor() {
     
     internal fun packDirty(entityId: Int): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_SET_ENTITY_DATA_PACKET)
+        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_SET_ENTITY_DATA_PACKET)
         buf.writeVarInt(entityId)
         
         entries.forEach {
@@ -28,7 +28,7 @@ abstract class Metadata internal constructor() {
     
     internal fun pack(entityId: Int): FriendlyByteBuf {
         val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(PacketIdRegistry.CLIENTBOUND_SET_ENTITY_DATA_PACKET)
+        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_SET_ENTITY_DATA_PACKET)
         buf.writeVarInt(entityId)
         
         entries.forEach {

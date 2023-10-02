@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.Bukkit
-import xyz.xenondevs.nmsutils.util.removeIf
+import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.DisableFun

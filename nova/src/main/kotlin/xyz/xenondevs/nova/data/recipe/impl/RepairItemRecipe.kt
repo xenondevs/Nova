@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.recipe.impl
 
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.inventory.CraftingContainer
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.CraftingBookCategory
@@ -16,7 +15,7 @@ import kotlin.math.max
 import kotlin.math.min
 import net.minecraft.world.item.crafting.RepairItemRecipe as MojangRepairItemRecipe
 
-internal class RepairItemRecipe(id: ResourceLocation) : MojangRepairItemRecipe(id, CraftingBookCategory.MISC) {
+internal class RepairItemRecipe : MojangRepairItemRecipe(CraftingBookCategory.MISC) {
     
     override fun matches(container: CraftingContainer, level: Level): Boolean {
         var firstStack: ItemStack? = null

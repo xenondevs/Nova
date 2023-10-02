@@ -50,20 +50,19 @@ internal object CBFCompoundTagPatch : MultiTransformer(CompoundTag::class, CB_CR
             aLoad(0)
             aLoad(1)
             aLoad(2)
-            iLoad(3)
-            aLoad(4)
+            aLoad(3)
             invokeStatic(::readNamedTagData)
             areturn()
         }
     }
     
     @JvmStatic
-    fun readNamedTagData(type: TagType<*>, name: String, input: DataInput, depth: Int, accounter: NbtAccounter): Tag {
+    fun readNamedTagData(type: TagType<*>, name: String, input: DataInput, accounter: NbtAccounter): Tag {
         try {
             if (type == ByteArrayTag.TYPE && name.endsWith("_cbf"))
-                return CBFCompoundTagType.load(input, depth, accounter)
+                return CBFCompoundTagType.load(input, accounter)
             
-            return type.load(input, depth, accounter)
+            return type.load(input, accounter)
         } catch (e: IOException) {
             val report = CrashReport.forThrowable(e, "Loading NBT data (Modified by Nova)")
             val category = report.addCategory("NBT Tag")

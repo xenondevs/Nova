@@ -215,7 +215,7 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
     }
     
     private fun getHoverName(player: Player, itemStack: ItemStack): String {
-        return ItemUtils.getName(itemStack).toPlainText((player as? ServerPlayer)?.locale ?: "en_us")
+        return ItemUtils.getName(itemStack).toPlainText((player as? ServerPlayer)?.clientInformation()?.language ?: "en_us")
     }
     
     private fun isSameItemType(first: ItemStack, second: ItemStack): Boolean {

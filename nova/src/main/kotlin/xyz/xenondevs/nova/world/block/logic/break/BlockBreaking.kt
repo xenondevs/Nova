@@ -6,7 +6,7 @@ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.*
 import net.minecraft.world.InteractionHand
 import org.bukkit.GameMode
-import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory
+import org.bukkit.craftbukkit.v1_20_R2.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
@@ -14,12 +14,12 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerQuitEvent
+import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.PacketListener
 import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.packetHandler
-import xyz.xenondevs.nmsutils.util.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.entry
