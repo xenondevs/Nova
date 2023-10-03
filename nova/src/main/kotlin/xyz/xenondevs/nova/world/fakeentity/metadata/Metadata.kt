@@ -3,7 +3,10 @@ package xyz.xenondevs.nova.world.fakeentity.metadata
 import io.netty.buffer.Unpooled
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.world.item.ItemStack
 import xyz.xenondevs.nmsutils.network.PacketIdRegistry
+import xyz.xenondevs.nova.item.logic.PacketItems
 import java.util.*
 
 abstract class Metadata internal constructor() {
@@ -49,7 +52,7 @@ abstract class Metadata internal constructor() {
     }
     
     internal fun <T, R> entry(index: Int, serializer: EntityDataSerializer<R>, default: T, toRaw: (T) -> R): MappedNonNullMetadataEntry<T, R>.MappedDelegate {
-        val entry = MappedNonNullMetadataEntry(index, serializer, toRaw, { default }, default)
+        val entry = MappedNonNullMetadataEntry(index, serializer, toRaw, { throw UnsupportedOperationException() }, default)
         entries += entry
         return entry.mappedDelegate
     }
@@ -70,6 +73,17 @@ abstract class Metadata internal constructor() {
         val entry = SharedFlagsMetadataEntry(index)
         entries += entry
         return entry
+    }
+    
+    internal fun itemStack(index: Int, useName: Boolean, default: ItemStack): MappedNonNullMetadataEntry<ItemStack, ItemStack>.MappedDelegate {
+        val entry = MappedNonNullMetadataEntry(
+            index, EntityDataSerializers.ITEM_STACK,
+            { PacketItems.getClientSideStack(null, it, useName)},
+            { PacketItems.getServerSideStack(it) },
+            default
+        )
+        entries += entry
+        return entry.mappedDelegate
     }
     
 }
