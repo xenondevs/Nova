@@ -12,7 +12,6 @@ import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
@@ -27,6 +26,7 @@ import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
@@ -65,6 +65,15 @@ fun Wearable(slot: BukkitEquipmentSlot, equipSound: String? = null): ItemBehavio
         }
     }
 }
+
+private val EquipmentSlot.inventorySlot
+    get() =  when (this) {
+        EquipmentSlot.HEAD -> 5
+        EquipmentSlot.CHEST -> 6
+        EquipmentSlot.LEGS -> 7
+        EquipmentSlot.FEET -> 8
+        else -> throw UnsupportedOperationException()
+    }
 
 /**
  * Allows items to be worn in armor slots.
@@ -142,24 +151,30 @@ sealed interface Wearable {
             )
         }
         
-        override fun handleInteract(player: Player, itemStack: BukkitStack, action: Action, event: PlayerInteractEvent) {
-            if (action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !event.clickedBlock!!.type.isActuallyInteractable())) {
+        override fun handleInteract(player: Player, itemStack: BukkitStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+            val event = wrappedEvent.event
+            val inventory = player.inventory
+            if (!wrappedEvent.actionPerformed && (action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !event.clickedBlock!!.type.isActuallyInteractable()))) {
                 event.isCancelled = true
                 
                 val hand = event.hand!!
-                val previous = player.inventory.getItem(slot).takeUnlessEmpty()
+                val previous = inventory.getItem(slot).takeUnlessEmpty()
                 if (previous != null) {
                     // swap armor
-                    player.inventory.setItem(slot, itemStack)
-                    player.inventory.setItem(hand, previous)
+                    inventory.setItem(slot, itemStack)
+                    inventory.setItem(hand, previous)
                 } else {
                     // equip armor
-                    player.inventory.setItem(slot, itemStack)
-                    if (player.gameMode != GameMode.CREATIVE) player.inventory.setItem(hand, null)
+                    inventory.setItem(slot, itemStack)
+                    if (player.gameMode != GameMode.CREATIVE) inventory.setItem(hand, null)
                 }
                 
                 player.swingHand(hand)
                 player.serverPlayer.onEquipItem(slot.nmsEquipmentSlot, previous.nmsCopy, itemStack.nmsCopy)
+                wrappedEvent.actionPerformed = true
+            } else {
+                // basically marks the remote armor slot as dirty, see https://hub.spigotmc.org/jira/browse/SPIGOT-7500
+                player.serverPlayer.inventoryMenu.setRemoteSlot(slot.inventorySlot, itemStack.nmsCopy)
             }
         }
         
