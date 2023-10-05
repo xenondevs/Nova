@@ -5,12 +5,12 @@ import org.bukkit.NamespacedKey
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.ContainerEndPointDataHolder
@@ -42,7 +42,11 @@ internal object WrenchBehavior : ItemBehavior {
             this.itemMeta = itemMeta
         }
     
-    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
+    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+        if (wrappedEvent.actionPerformed)
+            return
+        
+        val event = wrappedEvent.event
         if (action == Action.RIGHT_CLICK_BLOCK && !player.isSneaking) {
             val pos = event.clickedBlock!!.pos
             val endPoint = (TileEntityManager.getTileEntity(pos) ?: VanillaTileEntityManager.getTileEntityAt(pos)) as? NetworkEndPoint
@@ -51,6 +55,7 @@ internal object WrenchBehavior : ItemBehavior {
                 val face = event.blockFace
                 
                 event.isCancelled = true
+                wrappedEvent.actionPerformed = true
                 player.swingHand(event.hand!!)
                 
                 ProtectionManager.canUseBlock(player, event.item, endPoint.location).runIfTrue {
@@ -77,6 +82,9 @@ internal object WrenchBehavior : ItemBehavior {
             val newMode = NETWORK_TYPES[(NETWORK_TYPES.indexOf(currentMode) + 1) % NETWORK_TYPES.size]
             itemStack.wrenchMode = newMode
             player.sendActionBar(Component.translatable("item.nova.wrench.mode.${newMode.id.toString(".")}"))
+            
+            event.isCancelled = true
+            wrappedEvent.actionPerformed = true
         }
     }
     

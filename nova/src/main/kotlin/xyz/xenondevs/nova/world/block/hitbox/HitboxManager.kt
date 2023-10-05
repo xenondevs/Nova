@@ -21,7 +21,6 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.concurrent.runIfTrueOnSimilarThread
-import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.serverLevel
@@ -146,9 +145,13 @@ internal object HitboxManager : Listener, PacketListener {
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
-    private fun handleInteract(e: WrappedPlayerInteractEvent) {
-        val event = e.event
-        if (event.hand != EquipmentSlot.HAND || event.isCompletelyDenied()) return
+    private fun handleInteract(wrappedEvent: WrappedPlayerInteractEvent) {
+        if (wrappedEvent.actionPerformed)
+            return
+        
+        val event = wrappedEvent.event
+        if (event.hand != EquipmentSlot.HAND)
+            return
         
         val action = event.action
         if (action != BlockAction.PHYSICAL) {
@@ -189,8 +192,10 @@ internal object HitboxManager : Listener, PacketListener {
                             continue // skip hitbox as it has no handlers for the current action
                         
                         if (Intersectionf.intersectRayAab(originF, directionF, hitbox.from, hitbox.to, boxHitResult)) {
-                            // hitbox is hit, cancel vanilla interactions
+                            // cancel vanilla interactions
                             event.isCancelled = true
+                            // mark performed custom action
+                            wrappedEvent.actionPerformed = true
                             
                             // get absolute hit location
                             val t = boxHitResult.x

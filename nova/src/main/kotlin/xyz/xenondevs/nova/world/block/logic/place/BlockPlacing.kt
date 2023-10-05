@@ -11,7 +11,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockMultiPlaceEvent
 import org.bukkit.event.block.BlockPlaceEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
@@ -21,7 +20,6 @@ import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.runIfTrueOnSimilarThread
 import xyz.xenondevs.nova.util.facing
-import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
 import xyz.xenondevs.nova.util.isUnobstructed
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
@@ -61,10 +59,11 @@ internal object BlockPlacing : Listener {
     }
     
     @EventHandler(priority = EventPriority.HIGH)
-    private fun handleInteract(e: WrappedPlayerInteractEvent) {
-        val event = e.event
-        if (event.isCompletelyDenied()) return
+    private fun handleInteract(wrappedEvent: WrappedPlayerInteractEvent) {
+        if (wrappedEvent.actionPerformed)
+            return
         
+        val event = wrappedEvent.event
         val action = event.action
         val player = event.player
         if (action == Action.RIGHT_CLICK_BLOCK) {
@@ -75,23 +74,25 @@ internal object BlockPlacing : Listener {
                 val novaItem = handItem?.novaItem
                 val novaBlock = novaItem?.block
                 if (novaBlock != null) {
-                    placeNovaBlock(event, novaBlock)
+                    placeNovaBlock(wrappedEvent, novaBlock)
                 } else if (
                     BlockManager.hasBlockState(block.pos) // the block placed against is from Nova
                     && block.type.isReplaceable() // and will be replaced without special behavior
                     && novaItem == null
                     && handItem?.type?.isBlock == true // a vanilla block material is used 
-                ) placeVanillaBlock(event)
+                ) placeVanillaBlock(wrappedEvent)
             }
         }
     }
     
-    private fun placeNovaBlock(event: PlayerInteractEvent, material: NovaBlock) {
-        event.isCancelled = true
-        
+    private fun placeNovaBlock(wrappedEvent: WrappedPlayerInteractEvent, material: NovaBlock) {
+        val event = wrappedEvent.event
         val player = event.player
         val handItem = event.item!!
         val playerLocation = player.location
+        
+        event.isCancelled = true
+        wrappedEvent.actionPerformed = true
         
         val clicked = event.clickedBlock!!
         val placeLoc: Location =
@@ -138,13 +139,15 @@ internal object BlockPlacing : Listener {
         }
     }
     
-    private fun placeVanillaBlock(event: PlayerInteractEvent) {
-        event.isCancelled = true
-        
+    private fun placeVanillaBlock(wrappedEvent: WrappedPlayerInteractEvent) {
+        val event = wrappedEvent.event
         val player = event.player
         val handItem = event.item!!
         val placedOn = event.clickedBlock!!.pos
         val block = event.clickedBlock!!.location.advance(event.blockFace).pos
+
+        event.isCancelled = true
+        wrappedEvent.actionPerformed = true
         
         ProtectionManager.canPlace(player, handItem, block.location).runIfTrueOnSimilarThread {
             if (canPlace(player, handItem, block, placedOn)) {

@@ -17,7 +17,6 @@ import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.inventory.InventoryCreativeEvent
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.context.BlockBreakContext
@@ -31,11 +30,11 @@ internal object BlockInteracting : Listener {
     }
     
     @EventHandler(priority = EventPriority.LOW)
-    fun handleInteract(e: WrappedPlayerInteractEvent) {
-        val event = e.event
-        if (event.isCompletelyDenied())
+    fun handleInteract(wrappedEvent: WrappedPlayerInteractEvent) {
+        if (wrappedEvent.actionPerformed)
             return
         
+        val event = wrappedEvent.event
         val player = event.player
         if (event.action == Action.RIGHT_CLICK_BLOCK && !player.isSneaking) {
             val pos = event.clickedBlock!!.pos
@@ -44,7 +43,10 @@ internal object BlockInteracting : Listener {
             if (blockState != null && ProtectionManager.canUseBlock(player, event.item, pos.location).get()) {
                 val material = blockState.block
                 val ctx = BlockInteractContext(pos, player, player.location, event.blockFace, event.item, event.hand)
-                event.isCancelled = material.logic.handleInteract(blockState, ctx)
+                
+                val actionPerformed = material.logic.handleInteract(blockState, ctx)
+                event.isCancelled = actionPerformed
+                wrappedEvent.actionPerformed = actionPerformed
             }
         }
     }

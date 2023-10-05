@@ -9,9 +9,9 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.particle.particle
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.damageItemInHand
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.runTaskLater
@@ -28,7 +28,11 @@ private const val EXTINGUISH_CAMPFIRE_LEVEL_EVENT = 1009
  */
 object Extinguishing : ItemBehavior {
     
-    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
+    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+        if (wrappedEvent.actionPerformed)
+            return
+        
+        val event = wrappedEvent.event
         if (action == Action.RIGHT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             val state = block.nmsState

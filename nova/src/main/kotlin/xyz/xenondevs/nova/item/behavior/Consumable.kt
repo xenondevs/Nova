@@ -8,7 +8,6 @@ import org.bukkit.Sound
 import org.bukkit.SoundCategory
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
@@ -23,6 +22,7 @@ import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.getPlayersNearby
 import xyz.xenondevs.nova.util.intValue
 import xyz.xenondevs.nova.util.item.genericMaxHealth
@@ -154,7 +154,12 @@ sealed interface Consumable { // TODO: remove sealed & make more customizable (m
             return listOf(type.property)
         }
         
-        override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
+        override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+            if (wrappedEvent.actionPerformed)
+                return
+            
+            val event = wrappedEvent.event
+            
             // only right-clicks in the air or on non-interactive blocks will cause an eating process
             if (!action.isRightClick || (action == Action.RIGHT_CLICK_BLOCK && event.clickedBlock!!.type.isInteractable))
                 return

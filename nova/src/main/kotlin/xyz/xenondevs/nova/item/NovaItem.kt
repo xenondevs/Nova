@@ -15,7 +15,6 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
@@ -37,6 +36,7 @@ import xyz.xenondevs.nova.item.behavior.ItemBehaviorFactory
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.data.CentralizedLazy
@@ -307,8 +307,8 @@ class NovaItem internal constructor(
     //</editor-fold>
     
     //<editor-fold desc="event methods", defaultstate="collapsed">
-    internal fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
-        behaviors.forEach { it.handleInteract(player, itemStack, action, event) }
+    internal fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+        behaviors.forEach { it.handleInteract(player, itemStack, action, wrappedEvent) }
     }
     
     internal fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {

@@ -13,8 +13,8 @@ import net.minecraft.world.level.block.WeatheringCopper
 import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.interactionHand
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.runTaskLater
@@ -53,7 +53,11 @@ private val STRIPPABLES: Map<Block, Block> = mapOf(
  */
 object Stripping : ItemBehavior {
     
-    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) {
+    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+        if (wrappedEvent.actionPerformed)
+            return
+        
+        val event = wrappedEvent.event
         if (action == Action.RIGHT_CLICK_BLOCK) {
             val block = event.clickedBlock!!
             event.isCancelled = stripBlock(

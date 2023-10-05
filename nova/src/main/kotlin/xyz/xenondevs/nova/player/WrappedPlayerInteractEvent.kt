@@ -9,15 +9,24 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
-import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 
 /**
- * A class wrapping Bukkit's [PlayerInteractEvent], which will not be called if the
- * event for the other hand has been cancelled.
+ * A class wrapping Bukkit's [PlayerInteractEvent], which will not be called for the
+ * other hand if an action has been performed (marked via [WrappedPlayerInteractEvent.actionPerformed]).
  */
 class WrappedPlayerInteractEvent(val event: PlayerInteractEvent) : Event()  {
+    
+    /**
+     * Whether an action has been performed (by Nova or addons).
+     * 
+     * Possible actions might be: Nova block placed, Gui opened, custom armor equipped, etc.
+     * Note that this does not include possible vanilla actions that might happen if the [PlayerInteractEvent] is not cancelled.
+     * 
+     * If this is set to true, possible subsequent offhand events will not be fired.
+     */
+    var actionPerformed = false
     
     companion object : Listener {
         
@@ -27,24 +36,23 @@ class WrappedPlayerInteractEvent(val event: PlayerInteractEvent) : Event()  {
         @JvmStatic
         fun getHandlerList() = handlers
         
-        private val cancelledInteracts = HashSet<Pair<Player, Action>>()
+        private val performedCustomInteractions = HashSet<Pair<Player, Action>>()
         
         init {
             registerEvents()
-            runTaskTimer(0, 1) { cancelledInteracts.clear() }
+            runTaskTimer(0, 1) { performedCustomInteractions.clear() }
         }
         
         @EventHandler(priority = EventPriority.LOWEST)
         fun handleInteract(event: PlayerInteractEvent) {
-            if (event.isCompletelyDenied()) return
-            
-            val pair = event.player to event.action
-            if (pair in cancelledInteracts) {
+            val playerAction = event.player to event.action
+            if (playerAction in performedCustomInteractions) {
                 event.isCancelled = true
             } else {
-                Bukkit.getPluginManager().callEvent(WrappedPlayerInteractEvent(event))
-                if (event.isCompletelyDenied())
-                    cancelledInteracts += event.player to event.action
+                val wrappedEvent = WrappedPlayerInteractEvent(event)
+                Bukkit.getPluginManager().callEvent(wrappedEvent)
+                if (wrappedEvent.actionPerformed)
+                    performedCustomInteractions += playerAction
             }
         }
         

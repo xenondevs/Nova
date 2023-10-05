@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.item.novaItem
+package xyz.xenondevs.nova.item.logic
 
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import org.bukkit.entity.Player
@@ -26,7 +26,6 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
-import xyz.xenondevs.nova.util.isCompletelyDenied
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.registerEvents
@@ -45,16 +44,16 @@ internal object ItemListener : Listener, PacketListener {
     }
     
     @EventHandler(priority = EventPriority.NORMAL)
-    private fun handleInteract(e: WrappedPlayerInteractEvent) {
-        val event = e.event
+    private fun handleInteract(wrappedEvent: WrappedPlayerInteractEvent) {
+        val event = wrappedEvent.event
         val player = event.player
         val item = event.item
         
         val location = event.clickedBlock?.location ?: player.location
-        if (event.isCompletelyDenied() || item == null || !ProtectionManager.canUseItem(player, item, location).get())
+        if (item == null || !ProtectionManager.canUseItem(player, item, location).get())
             return
         
-        item.novaItem?.handleInteract(event.player, item, event.action, event)
+        item.novaItem?.handleInteract(event.player, item, event.action, wrappedEvent)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

@@ -7,7 +7,6 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
@@ -18,6 +17,7 @@ import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
+import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 
@@ -29,7 +29,7 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun getAttributeModifiers(): List<AttributeModifier> = emptyList()
     fun getDefaultCompound(): NamespacedCompound = NamespacedCompound()
     
-    fun handleInteract(player: Player, itemStack: ItemStack, action: Action, event: PlayerInteractEvent) = Unit
+    fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
     fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
     fun handleAttackEntity(player: Player, itemStack: ItemStack, attacked: Entity, event: EntityDamageByEntityEvent) = Unit
     fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) = Unit
