@@ -477,7 +477,7 @@ class BiomeClimateSettingsBuilder {
  * * `ambientLoopSoundEvent` - Ambient sound that will play in this biome. If `null`, no ambient sound will be played.
  *   Use [disableAmbientLoopSoundEvent] to set the setting back to `null`.
  * * `ambientMoodSettings` - Ambient mood sounds (also known as cave sounds) that will play in this biome. If you're
- *   unfamiliar with Minecraft's mood sound system, check out the [Minecraft Wiki](https://minecraft.fandom.com/wiki/Ambience#Mood_algorithm).
+ *   unfamiliar with Minecraft's mood sound system, check out the [Minecraft Wiki](https://minecraft.wiki/w/Ambience#Mood_algorithm).
  *   If `null`, no ambient mood sounds will be played. Use [disableAmbientMoodSound] to set the setting back to `null`.
  * * `ambientAdditionsSettings` - The ambient additions sound is a sound that will be played each tick at the probability
  *   defined at [AmbientAdditionsSettings.tickChance]. If `null`, no ambient additions sound will be played. Use
@@ -722,7 +722,7 @@ class BiomeSpecialEffectsBuilder {
     
     /**
      * Sets the `ambientMoodSettings` (also known as cave sounds) setting of the biome's special effects. If you're
-     * unfamiliar with Minecraft's mood sound system, check out the [Minecraft Wiki](https://minecraft.fandom.com/wiki/Ambience#Mood_algorithm).
+     * unfamiliar with Minecraft's mood sound system, check out the [Minecraft Wiki](https://minecraft.wiki/w/Ambience#Mood_algorithm).
      * To disable ambient sounds again, use [disableAmbientMoodSound].
      */
     fun ambientMoodSound(moodSettings: AmbientMoodSettings): BiomeSpecialEffectsBuilder {
@@ -733,7 +733,7 @@ class BiomeSpecialEffectsBuilder {
     /**
      * Sets the `ambientMoodSettings` (also known as cave sounds) setting of the biome's special effects by using a
      * [AmbientMoodSoundBuilder]. If you're unfamiliar with Minecraft's mood sound system, check out the
-     * [Minecraft Wiki](https://minecraft.fandom.com/wiki/Ambience#Mood_algorithm). To disable ambient sounds again,
+     * [Minecraft Wiki](https://minecraft.wiki/w/Ambience#Mood_algorithm). To disable ambient sounds again,
      * use [disableAmbientMoodSound].
      */
     fun ambientMoodSound(builder: AmbientMoodSoundBuilder.() -> Unit): BiomeSpecialEffectsBuilder {
@@ -856,7 +856,7 @@ class BiomeSpecialEffectsBuilder {
  * * `creatureGenerationProbability` - The probability of a creature spawning in a chunk. The default value is `0.1`.
  * * `spawners` - A Map of [MobCategory] -> List<[SpawnerData]> that define the spawn conditions and properties for mobs.
  * * `mobSpawnCosts` - A Map of [EntityType] -> [MobSpawnCost] that define the spawn costs for mobs. For more information
- *   on Minecraft's spawn costs system, check out the [Minecraft Wiki](https://minecraft.fandom.com/wiki/Spawn#Spawn_costs)
+ *   on Minecraft's spawn costs system, check out the [Minecraft Wiki](https://minecraft.wiki/w/Spawn#Spawn_costs)
  */
 @ExperimentalWorldGen
 class MobSpawnSettingsBuilder {
@@ -927,7 +927,7 @@ class MobSpawnSettingsBuilder {
 
 /**
  * Builder for [AmbientMoodSoundBuilder]. If you're unfamiliar with Minecraft's mood sound system, check out the
- * [Minecraft Wiki](https://minecraft.fandom.com/wiki/Ambience#Mood_algorithm).
+ * [Minecraft Wiki](https://minecraft.wiki/w/Ambience#Mood_algorithm).
  *
  * The following settings are available:
  *
