@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "Chave Inglesa",
-  "item.nova.range_upgrade": "Melhoria de Alcance",
   "menu.nova.items.search": "Buscar por um item",
   "menu.nova.items.search.back": "Voltar ao inventário principal",
   "menu.nova.items.search.clear": "Limpar busca",
@@ -33,7 +32,6 @@
   "menu.nova.visual_region.hide": "Esconder Área",
   "menu.nova.visual_region.show": "Mostrar Área",
   "menu.nova.upgrades": "Melhorias",
-  "menu.nova.upgrades.type.range": "Melhorias de Alcance: %s/%s",
   "menu.nova.color_picker": "Escolha uma cor...",
   "menu.nova.color_picker.red": "Vermelho: %s",
   "menu.nova.color_picker.green": "Verde: %s",

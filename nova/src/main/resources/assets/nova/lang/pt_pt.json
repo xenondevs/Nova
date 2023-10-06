@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "Chave Inglesa",
-  "item.nova.range_upgrade": "Melhoria de Alcance",
   "menu.nova.items.search": "Pesquisar por um item",
   "menu.nova.items.search.back": "Voltar para o inventário principal",
   "menu.nova.items.search.clear": "Limpar pesquisa",
@@ -31,7 +30,6 @@
   "menu.nova.visual_region.hide": "Esconder Área",
   "menu.nova.visual_region.show": "Mostrar Área",
   "menu.nova.upgrades": "Melhorias",
-  "menu.nova.upgrades.type.range": "Melhorias de Alcance: %s/%s",
   "inventory.nova.default": "Inventário",
   "inventory.nova.input": "Inventário de Entrada",
   "inventory.nova.output": "Inventário de Saída",

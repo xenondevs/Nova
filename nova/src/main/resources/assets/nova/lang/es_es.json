@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "Llave Inglesa",
-  "item.nova.range_upgrade": "Mejora de Rango",
   "menu.nova.items.search": "Buscar un artículo",
   "menu.nova.items.search.back": "Regresar al inventario principal",
   "menu.nova.items.search.clear": "Limpiar búsqueda",
@@ -32,7 +31,6 @@
   "menu.nova.visual_region.hide": "Ocultar área",
   "menu.nova.visual_region.show": "Mostrar área",
   "menu.nova.upgrades": "Mejoras",
-  "menu.nova.upgrades.type.range": "Mejoras de Rango: %s/%s",
   "menu.nova.color_picker": "Selecciona un color...",
   "menu.nova.color_picker.red": "Rojo: %s",
   "menu.nova.color_picker.green": "Verde: %s",

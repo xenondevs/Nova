@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "扳手",
-  "item.nova.range_upgrade": "范围升级",
   "menu.nova.energy_per_tick": "%s / 每刻",
   "menu.nova.items.search": "搜索物品",
   "menu.nova.items.search.back": "回到主菜单",
@@ -34,7 +33,6 @@
   "menu.nova.visual_region.hide": "隐藏区域",
   "menu.nova.visual_region.show": "显示区域",
   "menu.nova.upgrades": "升级",
-  "menu.nova.upgrades.type.range": "范围升级等级: %s/%s",
   "menu.nova.color_picker": "选择一种颜色...",
   "menu.nova.color_picker.red": "红: %s",
   "menu.nova.color_picker.green": "绿： %s",

@@ -11,7 +11,6 @@
   "menu.nova.recipe.time": "時間: %s秒",
   "menu.nova.side_config": "側面の設定",
   "menu.nova.side_config.items": "アイテム",
-  "menu.nova.upgrades.type.range": "範囲アップグレード： %s/%s",
   "inventory.nova.default": "インベントリ",
   "inventory.nova.input": "入力インベントリ",
   "inventory.nova.output": "出力インベントリ",

@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "Schraubenschlüssel",
-  "item.nova.efficiency_upgrade": "Effizienz-Upgrade",
   "item.nova.range_upgrade": "Reichweite-Upgrade",
   "menu.nova.items.search": "Item suchen",
   "menu.nova.items.search.back": "Zurück zum Hauptinventar",
@@ -32,7 +31,6 @@
   "menu.nova.paged.limit_max": "Mehr Seiten gibt es nicht",
   "menu.nova.visual_region.hide": "Bereich verstecken",
   "menu.nova.visual_region.show": "Bereich anzeigen",
-  "menu.nova.upgrades.type.efficiency": "Effizienz-Upgrades: %s/%s",
   "menu.nova.upgrades.type.range": "Reichweite-Upgrades: %s/%s",
   "menu.nova.color_picker": "Wähle eine Farbe...",
   "menu.nova.color_picker.red": "Rot: %s",

@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "Chiave Inglese",
-  "item.nova.range_upgrade": "Potenziamento Raggio",
   "menu.nova.items.search": "Cerca un oggetto",
   "menu.nova.items.search.back": "Torna all'inventario principale",
   "menu.nova.items.search.clear": "Pulisci ricerca",
@@ -33,7 +32,6 @@
   "menu.nova.visual_region.hide": "Nascondi area",
   "menu.nova.visual_region.show": "Mostra area",
   "menu.nova.upgrades": "Potenziamenti",
-  "menu.nova.upgrades.type.range": "Potenziamenti Raggio: %s/%s",
   "menu.nova.color_picker": "Scegli un colore...",
   "menu.nova.color_picker.red": "Rosso: %s",
   "menu.nova.color_picker.green": "Verde: %s",

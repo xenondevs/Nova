@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "Clé à molette",
-  "item.nova.range_upgrade": "Amélioration de la portée",
   "menu.nova.items.search": "Chercher un objet",
   "menu.nova.items.search.back": "Retour au menu principal",
   "menu.nova.items.search.clear": "Nettoyer la recherche",
@@ -31,7 +30,6 @@
   "menu.nova.visual_region.hide": "Cacher la zone",
   "menu.nova.visual_region.show": "Afficher la zone",
   "menu.nova.upgrades": "Améliorations",
-  "menu.nova.upgrades.type.range": "Améliorations de la portée : %s/%s",
   "inventory.nova.default": "Inventaire",
   "inventory.nova.input": "Inventaire d'entrée",
   "inventory.nova.output": "Inventaire de sortie",

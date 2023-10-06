@@ -45,7 +45,6 @@
   "menu.nova.visual_region.hide": "범위 숨기기",
   "menu.nova.visual_region.show": "범위 보이기",
   "menu.nova.upgrades": "업그레이드",
-  "menu.nova.upgrades.type.range": "범위 업그레이드: %s/%s",
   "menu.nova.color_picker": "색상을 선택하십시오...",
   "menu.nova.color_picker.red": "빨간색: %s",
   "menu.nova.color_picker.green": "초록색: %s",

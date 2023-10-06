@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "İngiliz Anahtarı",
-  "item.nova.range_upgrade": "Alan Yükseltmesi",
   "menu.nova.energy_per_tick": "%s / tik",
   "menu.nova.items.search": "Bir eşyayı ara ",
   "menu.nova.items.search.back": "Ana menüye geri dön",
@@ -34,7 +33,6 @@
   "menu.nova.visual_region.hide": "Alanı Gizle",
   "menu.nova.visual_region.show": "Alanı Göster",
   "menu.nova.upgrades": "Yükseltmeler",
-  "menu.nova.upgrades.type.range": "Alan Geliştirmeleri: %s/%s",
   "menu.nova.color_picker": "Bir renk seçin...",
   "menu.nova.color_picker.red": "Kırmızı: %s",
   "menu.nova.color_picker.green": "Yeşil: %s",
