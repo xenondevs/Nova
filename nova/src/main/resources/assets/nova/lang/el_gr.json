@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Δεν μπορείτε να τοποθετήσετε περισσότερες οντότητες πλακιδίων.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Δεν μπορείτε να τοποθετήσετε περισσότερες οντότητες-πλακίδια σε αυτόν τον κόσμο.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Δεν μπορείτε να τοποθετήσετε περισσότερες οντότητες πλακιδίων σε αυτό το κομμάτι.",
-  "nova.outdated_version": "Εκτελείτε μια ξεπερασμένη έκδοση του %s.\nΠαρακαλούμε κατεβάστε την πιο πρόσφατη έκδοση στη διεύθυνση %s."
+  "nova.outdated_version": "Εκτελείτε μια ξεπερασμένη έκδοση του %s.\nΠαρακαλούμε κατεβάστε την πιο πρόσφατη έκδοση στη διεύθυνση %s.",
+  "command.nova.enchant.success": "Εφαρμόστηκε επιτυχώς η μαγεία %s στο %s's %s.",
+  "command.nova.enchant.incompatible": "Δεν μπόρεσε να εφαρμοστεί η μαγεία %s στην %s's %s επειδή είναι ασύμβατη με τις υπάρχουσες μαγείες.",
+  "command.nova.enchant.unsupported": "Δεν μπόρεσε να εφαρμοστεί η μαγεία %s στο %s's %s επειδή το αντικείμενο δεν υποστηρίζει αυτή τη μαγεία.",
+  "command.nova.unenchant_all.success": "Αφαιρέθηκαν επιτυχώς όλα τα ξόρκια από το %s's %s.",
+  "command.nova.unenchant_all.failure": "Δεν υπάρχουν μαγεία στο %s's %s.",
+  "command.nova.unenchant_single.success": "Αφαιρέθηκε επιτυχώς το %s από το %s's %s.",
+  "command.nova.unenchant_single.failure": "Δεν ήταν δυνατή η αφαίρεση του %s από το %s's %s επειδή το αντικείμενο δεν είναι μαγεμένο με αυτή τη μαγεία."
 }
