@@ -124,5 +124,12 @@
   "command.nova.invalidate_char_sizes.success": "Sėkmingai panaikinti visi ženklų dydžiai. Jie bus perskaičiuoti kito išteklių paketo kūrimo metu.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Daugiau plytelių-subjektų šiame pasaulyje įdėti negalite.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Į šį gabalėlį negalima dėti daugiau plytelių elementų.",
-  "nova.outdated_version": "Naudojate pasenusią %s versiją.\nNaujausią versiją atsisiųskite iš %s."
+  "nova.outdated_version": "Naudojate pasenusią %s versiją.\nNaujausią versiją atsisiųskite iš %s.",
+  "command.nova.enchant.success": "Sėkmingai pritaikytas užkeikimas %s %s's %s.",
+  "command.nova.enchant.incompatible": "Negalima taikyti užkeikimo %s %s's %s, nes jis nesuderinamas su esamais užkeikimais.",
+  "command.nova.enchant.unsupported": "Negalima taikyti užkeikimo %s %s's %s, nes daiktas nepalaiko šio užkeikimo.",
+  "command.nova.unenchant_all.success": "Sėkmingai pašalinti visi kerai iš %s's %s.",
+  "command.nova.unenchant_all.failure": "Nėra jokių %s's %s kerų.",
+  "command.nova.unenchant_single.success": "Sėkmingai pašalinta %s iš %s's %s.",
+  "command.nova.unenchant_single.failure": "Nepavyko pašalinti %s iš %s's %s, nes daiktas nėra užburtas šiuo užkeikimu."
 }
