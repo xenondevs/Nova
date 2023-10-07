@@ -124,5 +124,12 @@
   "command.nova.advanced_tooltips.nova.failure": "As dicas de ferramentas avançadas para itens Nova já estão activadas.",
   "command.nova.list_blocks.success": "Total: %s",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Não se pode colocar mais entidades-azulejo neste mundo.",
-  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Não é possível colocar mais entidades-azulejo nesta fração."
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Não é possível colocar mais entidades-azulejo nesta fração.",
+  "command.nova.enchant.success": "Aplicou com sucesso o encantamento %s a %s's %s.",
+  "command.nova.enchant.incompatible": "Não foi possível aplicar o encantamento %s a %s's %s porque é incompatível com os encantamentos existentes.",
+  "command.nova.enchant.unsupported": "Não foi possível aplicar o encantamento %s a %s's %s porque o item não suporta esse encantamento.",
+  "command.nova.unenchant_all.success": "Removido com sucesso todos os encantamentos de %s's %s.",
+  "command.nova.unenchant_all.failure": "Não há encantamentos em %s's %s.",
+  "command.nova.unenchant_single.success": "Removido com êxito %s de %s's %s.",
+  "command.nova.unenchant_single.failure": "Não foi possível remover %s de %s's %s porque o item não está encantado com esse encantamento."
 }
