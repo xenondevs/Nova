@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Nemôžete umiestniť viac dlaždicových objektov.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Do tohto sveta nemôžete umiestniť viac dlaždicových entít.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Do tejto časti nie je možné umiestniť viac dlaždicových objektov.",
-  "nova.outdated_version": "Používate zastaranú verziu %s.\nNajnovšiu verziu si stiahnite na adrese %s."
+  "nova.outdated_version": "Používate zastaranú verziu %s.\nNajnovšiu verziu si stiahnite na adrese %s.",
+  "command.nova.enchant.success": "Úspešne aplikované kúzlo %s na %s's %s.",
+  "command.nova.enchant.incompatible": "Nemožno použiť kúzlo %s na %s's %s, pretože nie je kompatibilné s existujúcimi kúzlami.",
+  "command.nova.enchant.unsupported": "Nemožno použiť kúzlo %s na %s's %s, pretože predmet toto kúzlo nepodporuje.",
+  "command.nova.unenchant_all.success": "Úspešne odstránené všetky kúzla z %s's %s.",
+  "command.nova.unenchant_all.failure": "Na %s's %s nie sú žiadne kúzla.",
+  "command.nova.unenchant_single.success": "Úspešne odstránené %s z %s's %s.",
+  "command.nova.unenchant_single.failure": "Nemožno odstrániť %s z %s's %s, pretože predmet nie je očarovaný týmto kúzlom."
 }
