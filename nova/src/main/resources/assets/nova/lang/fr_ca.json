@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Vous ne pouvez pas placer d'autres tuiles.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Il n'est pas possible de placer plus de tuiles dans ce monde.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Il n'est pas possible de placer d'autres tuiles dans ce bloc.",
-  "nova.outdated_version": "Vous utilisez une version obsolète de %s.\nVeuillez télécharger la dernière version à l'adresse %s."
+  "nova.outdated_version": "Vous utilisez une version obsolète de %s.\nVeuillez télécharger la dernière version à l'adresse %s.",
+  "command.nova.enchant.success": "A réussi à appliquer l'enchantement %s à %s's %s.",
+  "command.nova.enchant.incompatible": "Impossible d'appliquer l'enchantement %s à %s's %s car il est incompatible avec les enchantements existants.",
+  "command.nova.enchant.unsupported": "Impossible d'appliquer l'enchantement %s à %s's %s car l'objet ne supporte pas cet enchantement.",
+  "command.nova.unenchant_all.success": "A réussi à supprimer tous les enchantements de %s's %s.",
+  "command.nova.unenchant_all.failure": "Il n'y a pas d'enchantement sur %s's %s.",
+  "command.nova.unenchant_single.success": "Suppression réussie de %s de %s's %s.",
+  "command.nova.unenchant_single.failure": "Impossible de retirer %s de %s's %s car l'objet n'est pas enchanté avec cet enchantement."
 }
