@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Több csempe-elemet nem lehet elhelyezni.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Több csempe-entitást nem tudsz elhelyezni ebben a világban.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Ebbe a darabba nem helyezhet el több csempe-elemet.",
-  "nova.outdated_version": "Ön a %s egy elavult verzióját futtatja.\nKérjük, töltse le a legújabb verziót a %s címről."
+  "nova.outdated_version": "Ön a %s egy elavult verzióját futtatja.\nKérjük, töltse le a legújabb verziót a %s címről.",
+  "command.nova.unenchant_all.failure": "%s's %s-n nincsenek varázslatok.",
+  "command.nova.enchant.success": "Sikeresen alkalmaztad a %s varázslatot %s's %s-re.",
+  "command.nova.enchant.incompatible": "Nem tudta alkalmazni a %s varázslatot %s's %s-re, mert az nem kompatibilis a meglévő varázslatokkal.",
+  "command.nova.enchant.unsupported": "Nem tudta alkalmazni a %s varázslatot %s's %s-re, mert a tárgy nem támogatja ezt a varázslatot.",
+  "command.nova.unenchant_all.success": "Sikeresen eltávolítottuk az összes varázslatot %s's %s-ből.",
+  "command.nova.unenchant_single.success": "Sikeresen eltávolítottuk %s-t %s's %s-ből.",
+  "command.nova.unenchant_single.failure": "Nem sikerült eltávolítani %s-t %s's %s-ből, mert a tárgy nincs elvarázsolva ezzel a varázslattal."
 }
