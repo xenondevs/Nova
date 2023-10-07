@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_per_chunk.deny": "이 청크에는 이 유형의 타일 엔티티를 더 이상 배치할 수 없습니다.",
   "nova.tile_entity_limits.amount_global_total.deny": "타일 엔티티는 더 이상 배치할 수 없습니다.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "이 월드에는 타일 엔티티를 더 이상 배치할 수 없습니다.",
-  "nova.tile_entity_limits.amount_per_chunk_total.deny": "이 청크에는 타일 엔티티를 더 이상 배치할 수 없습니다."
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "이 청크에는 타일 엔티티를 더 이상 배치할 수 없습니다.",
+  "command.nova.enchant.success": "인챈트 %s를 %s에 성공적으로 적용했습니다.",
+  "command.nova.enchant.incompatible": "인챈트가 기존 인챈트와 호환되지 않으므로 %s의 %s에 인챈트를 적용할 수 없습니다.",
+  "command.nova.enchant.unsupported": "아이템이 해당 인챈트를 지원하지 않으므로 %s의 %s에 인챈트를 적용할 수 없습니다.",
+  "command.nova.unenchant_all.success": "S의 %S에서 모든 마법을 성공적으로 제거했습니다.",
+  "command.nova.unenchant_all.failure": "S의 %S에는 인챈트가 없습니다.",
+  "command.nova.unenchant_single.success": "의 %s에서 %s를 성공적으로 제거했습니다.",
+  "command.nova.unenchant_single.failure": "아이템에 해당 인챈트가 부여되지 않았으므로 %s의 %s에서 %s를 제거할 수 없습니다."
 }
