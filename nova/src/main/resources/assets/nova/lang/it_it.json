@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_per_chunk.deny": "Non è possibile posizionare altre entità-piastrella di questo tipo in questo frammento.",
   "nova.tile_entity_limits.amount_global_total.deny": "Non è possibile posizionare altre entità-piastrella.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Non è possibile collocare altre entità-piastrella in questo mondo.",
-  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Non è possibile inserire altre entità-piastrella in questo blocco."
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Non è possibile inserire altre entità-piastrella in questo blocco.",
+  "command.nova.enchant.incompatible": "Impossibile applicare l'incanto %s a %s's %s perché incompatibile con gli incantesimi esistenti.",
+  "command.nova.enchant.unsupported": "Impossibile applicare l'incanto %s a %s's perché l'oggetto non supporta l'incanto.",
+  "command.nova.unenchant_all.success": "Rimossi con successo tutti gli incantesimi da %s's %s.",
+  "command.nova.unenchant_all.failure": "Non ci sono incantesimi sul %s'%s.",
+  "command.nova.unenchant_single.success": "Rimosso con successo %s da %s's %s.",
+  "command.nova.enchant.success": "Applicato con successo l'incanto %s a %s's %s.",
+  "command.nova.unenchant_single.failure": "Non è stato possibile rimuovere %s da %s's %s perché l'oggetto non è incantato con quell'incanto."
 }
