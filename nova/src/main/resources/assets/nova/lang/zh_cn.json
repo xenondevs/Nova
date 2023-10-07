@@ -124,5 +124,12 @@
   "command.nova.list_blocks.success": "共计：%s",
   "command.nova.invalidate_char_sizes.success": "已成功使所有字符大小无效。它们将在下次创建资源包时重新计算。",
   "menu.nova.items.cheat_mode.on": "作弊模式：开启",
-  "menu.nova.items.cheat_mode.off": "作弊模式：关闭"
+  "menu.nova.items.cheat_mode.off": "作弊模式：关闭",
+  "command.nova.enchant.success": "成功为 %s's %s 附加魔法。",
+  "command.nova.enchant.incompatible": "无法对 %s's %s 施加魔法，因为它与现有魔法不兼容。",
+  "command.nova.enchant.unsupported": "无法对 %s's %s 进行附魔，因为该物品不支持该附魔。",
+  "command.nova.unenchant_all.success": "成功移除 %s's %s 上的所有附魔。",
+  "command.nova.unenchant_all.failure": "在 %s's %s 上没有附魔。",
+  "command.nova.unenchant_single.success": "成功从 %s'%s 中移除 %s。",
+  "command.nova.unenchant_single.failure": "无法从 %s's %s 中移除 %s，因为该物品没有附魔。"
 }
