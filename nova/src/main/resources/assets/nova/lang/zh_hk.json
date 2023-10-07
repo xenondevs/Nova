@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_global_total.deny": "不能放置更多的瓦片实体。",
   "nova.tile_entity_limits.amount_per_world_total.deny": "你不能在这个世界上放置更多的瓦片实体。",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "不能在此块中放置更多瓦片实体。",
-  "nova.outdated_version": "您运行的是 %s 过时版本。\n请从 %s 下载最新版本。"
+  "nova.outdated_version": "您运行的是 %s 过时版本。\n请从 %s 下载最新版本。",
+  "command.nova.enchant.success": "成功为 %s's %s 附加魔法。",
+  "command.nova.enchant.incompatible": "无法对 %s's %s 施加魔法，因为它与现有魔法不兼容。",
+  "command.nova.enchant.unsupported": "无法对 %s's %s 进行附魔，因为该物品不支持该附魔。",
+  "command.nova.unenchant_all.success": "成功移除 %s's %s 上的所有附魔。",
+  "command.nova.unenchant_all.failure": "在 %s's %s 上没有附魔。",
+  "command.nova.unenchant_single.success": "成功从 %s'%s 中移除 %s。",
+  "command.nova.unenchant_single.failure": "无法从 %s's %s 中移除 %s，因为该物品没有附魔。"
 }
