@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Anda tidak dapat menempatkan lebih banyak entitas ubin.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Anda tidak dapat menempatkan lebih banyak entitas ubin di dunia ini.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Anda tidak dapat menempatkan lebih banyak entitas ubin di bagian ini.",
-  "nova.outdated_version": "Anda menjalankan versi %s yang sudah ketinggalan zaman.\nSilakan unduh versi terbaru di %s."
+  "nova.outdated_version": "Anda menjalankan versi %s yang sudah ketinggalan zaman.\nSilakan unduh versi terbaru di %s.",
+  "command.nova.unenchant_all.failure": "Tidak ada pesona di %s & x27; s %s.",
+  "command.nova.enchant.success": "Berhasil menerapkan pesona %s ke %s & # 39; s %s.",
+  "command.nova.enchant.incompatible": "Tidak dapat menerapkan enchantment %s ke %s's %s karena tidak kompatibel dengan enchantment yang ada.",
+  "command.nova.enchant.unsupported": "Tidak dapat menerapkan pesona %s ke %s & # 39; s %s karena item tidak mendukung pesona tersebut.",
+  "command.nova.unenchant_all.success": "Berhasil menghapus semua pesona dari %s & # 39; s %s.",
+  "command.nova.unenchant_single.success": "Berhasil menghapus %s dari %s & # 39; %s.",
+  "command.nova.unenchant_single.failure": "Tidak dapat menghapus %s dari %s's %s karena item tersebut tidak terpesona dengan pesona itu."
 }
