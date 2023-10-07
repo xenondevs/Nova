@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Досягнуто ліміт розміщених об'єктів Nova в цьому чанку.",
   "command.nova.invalidate_char_sizes.success": "Успішно скасовано всі розміри символів. Їх буде перераховано під час створення наступного пакунку ресурсів.",
   "menu.nova.items.cheat_mode.on": "Чит-режим: Увімкнено",
-  "menu.nova.items.cheat_mode.off": "Чит-режим: Вимкнено"
+  "menu.nova.items.cheat_mode.off": "Чит-режим: Вимкнено",
+  "command.nova.enchant.success": "Успішно застосовано заклинання %s до %s's %s.",
+  "command.nova.enchant.incompatible": "Не вдалося застосувати заклинання %s до %s's %s, оскільки воно несумісне з існуючими заклинаннями.",
+  "command.nova.enchant.unsupported": "Не вдалося застосувати заклинання %s до %s's %s, оскільки предмет не підтримує це заклинання.",
+  "command.nova.unenchant_all.success": "Успішно знято всі зачарування з %s's %s.",
+  "command.nova.unenchant_all.failure": "На %s's %s немає ніяких заклинань.",
+  "command.nova.unenchant_single.success": "Успішно вилучено %s з %s's %s.",
+  "command.nova.unenchant_single.failure": "Не вдалося видалити %s з %s's %s, оскільки предмет не зачарований цим закляттям."
 }
