@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_per_chunk.deny": "Du kan ikke placere flere fliseenheder af denne type i denne klump.",
   "nova.tile_entity_limits.amount_global_total.deny": "Du kan ikke placere flere fliseenheder.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Du kan ikke placere flere fliseenheder i denne verden.",
-  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Du kan ikke placere flere fliseenheder i denne klump."
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Du kan ikke placere flere fliseenheder i denne klump.",
+  "command.nova.enchant.success": "Det lykkedes at anvende fortryllelsen %s på %s's %s.",
+  "command.nova.enchant.incompatible": "Kunne ikke anvende fortryllelsen %s på %s's %s, fordi den er uforenelig med de eksisterende fortryllelser.",
+  "command.nova.enchant.unsupported": "Kunne ikke anvende fortryllelsen %s på %s's %s, fordi genstanden ikke understøtter den fortryllelse.",
+  "command.nova.unenchant_all.success": "Det er lykkedes at fjerne alle fortryllelser fra %s's %s.",
+  "command.nova.unenchant_all.failure": "Der er ingen fortryllelser på %s's %s.",
+  "command.nova.unenchant_single.success": "Det lykkedes at fjerne %s fra %s's %s.",
+  "command.nova.unenchant_single.failure": "Kunne ikke fjerne %s fra %s's %s, fordi genstanden ikke er fortryllet med den fortryllelse."
 }
