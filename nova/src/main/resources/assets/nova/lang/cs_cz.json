@@ -1,6 +1,5 @@
 {
   "item.nova.wrench": "Montážní Klíč",
-  "item.nova.range_upgrade": "Vzdálenostní Vylepšení",
   "menu.nova.items.search": "Hledat předmět",
   "menu.nova.items.search.back": "Zpět do hlavního Inventáře",
   "menu.nova.items.search.clear": "Vymazat vyhledávání",
@@ -33,7 +32,6 @@
   "menu.nova.visual_region.hide": "Skrýt Oblast",
   "menu.nova.visual_region.show": "Zobrazit Oblast",
   "menu.nova.upgrades": "Vylepšení",
-  "menu.nova.upgrades.type.range": "Dosahové Vylepšení: %s/%s",
   "menu.nova.color_picker": "Zvolit barvu...",
   "menu.nova.color_picker.red": "Červená: %s",
   "menu.nova.color_picker.green": "Zelená: %s",
