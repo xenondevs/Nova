@@ -124,5 +124,12 @@
   "command.nova.remove_invalid_vtes.success": "Успешно премахнахте %s невалидни елементи на плочки от ванилия.",
   "command.nova.remove_invalid_vtes.failure": "Не бяха открити невалидни елементи на плочките vanilla.",
   "command.nova.list_blocks.success": "Общо: %s",
-  "waila.nova.required_tool": "Инструмент: "
+  "waila.nova.required_tool": "Инструмент: ",
+  "command.nova.enchant.success": "Успешно е приложено омагьосване %s към %s's %s.",
+  "command.nova.enchant.incompatible": "Не може да се приложи заклинание %s към %s's %s, защото е несъвместимо със съществуващите заклинания.",
+  "command.nova.enchant.unsupported": "Не може да се приложи заклинание %s към %s's %s, защото предметът не поддържа това заклинание.",
+  "command.nova.unenchant_all.success": "Успешно премахнахте всички заклинания от %s's %s.",
+  "command.nova.unenchant_all.failure": "В %s's %s няма заклинания.",
+  "command.nova.unenchant_single.success": "Успешно премахнахте %s от %s's %s.",
+  "command.nova.unenchant_single.failure": "Не може да се премахне %s от %s's %s, защото предметът не е омагьосан с това омагьосване."
 }
