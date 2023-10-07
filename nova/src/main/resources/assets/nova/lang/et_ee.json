@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Te ei saa paigutada rohkem plaat-üksusi.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Sellesse maailma ei saa panna rohkem plaat-olendeid.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Sellesse tükki ei saa paigutada rohkem plaadiüksusi.",
-  "nova.outdated_version": "Sa kasutad %s'i vananenud versiooni.\nPalun laadige alla uusim versioon %s."
+  "nova.outdated_version": "Sa kasutad %s'i vananenud versiooni.\nPalun laadige alla uusim versioon %s.",
+  "command.nova.enchant.success": "Loitsu %s's %s's %s edukalt rakendatud.",
+  "command.nova.enchant.incompatible": "Ei saanud rakendada loitsu %s's %s, sest see ei ühildu olemasolevate loitsudega.",
+  "command.nova.enchant.unsupported": "Ei saanud rakendada loitsu %s's %s, sest ese ei toeta seda loitsu.",
+  "command.nova.unenchant_all.success": "Eemaldasin edukalt kõik lummused %s's %s.",
+  "command.nova.unenchant_all.failure": "%s's %s ei ole lummusi.",
+  "command.nova.unenchant_single.success": "Edukalt eemaldatud %s %s's %s.",
+  "command.nova.unenchant_single.failure": "Ei saanud eemaldada %s's %s, sest ese ei ole selle loitsuga loitsitud."
 }
