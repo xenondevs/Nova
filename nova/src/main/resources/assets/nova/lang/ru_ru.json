@@ -124,5 +124,12 @@
   "command.nova.advanced_tooltips.all.success": "Расширенные подсказки для всех предметов включены.",
   "command.nova.invalidate_char_sizes.success": "Успешно отменены все размеры символов. Они будут пересчитаны при создании следующего пакета ресурсов.",
   "menu.nova.items.cheat_mode.on": "Чит-режим: Включен",
-  "menu.nova.items.cheat_mode.off": "Чит-режим: Выключен"
+  "menu.nova.items.cheat_mode.off": "Чит-режим: Выключен",
+  "command.nova.enchant.success": "Успешно применено зачарование %s к %s's %s.",
+  "command.nova.enchant.incompatible": "Не удалось применить зачарование %s к %s's %s, так как оно несовместимо с существующими зачарованиями.",
+  "command.nova.enchant.unsupported": "Не удалось применить зачарование %s к %s's %s, так как предмет не поддерживает это зачарование.",
+  "command.nova.unenchant_all.success": "Успешно сняты все чары с %s's %s.",
+  "command.nova.unenchant_all.failure": "На %s's %s нет никаких зачарований.",
+  "command.nova.unenchant_single.success": "Успешное удаление %s из %s's %s.",
+  "command.nova.unenchant_single.failure": "Не удалось снять %s с %s's %s, так как предмет не зачарован этим заклинанием."
 }
