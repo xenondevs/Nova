@@ -124,5 +124,12 @@
   "menu.nova.side_config.east": "East",
   "menu.nova.side_config.south": "South",
   "menu.nova.side_config.west": "West",
-  "menu.nova.side_config.up": "Uz augšu"
+  "menu.nova.side_config.up": "Uz augšu",
+  "command.nova.enchant.success": "Veiksmīgi pielietots enchantment %s uz %s's %s.",
+  "command.nova.enchant.incompatible": "Nevar pielietot enchantment %s uz %s's %s, jo tas nav saderīgs ar esošajiem enchantmentiem.",
+  "command.nova.enchant.unsupported": "Nevar pielietot enchantment %s uz %s's %s, jo priekšmets neatbalsta šo enchantment.",
+  "command.nova.unenchant_all.failure": "Uz %s's %s nav burvestību.",
+  "command.nova.unenchant_all.success": "Veiksmīgi noņemti visi enchantments no %s's %s.",
+  "command.nova.unenchant_single.success": "Veiksmīgi noņemts %s no %s's %s.",
+  "command.nova.unenchant_single.failure": "Nevarēja noņemt %s no %s's %s, jo priekšmets nav apveltīts ar šo burvestību."
 }
