@@ -124,5 +124,12 @@
   "item.nova.wrench": "Cheie",
   "menu.nova.items.search-item": "Căutare...",
   "menu.nova.items.category.misc": "Diverse",
-  "menu.nova.items.cheat_mode.on": "Cheat-Mode: Pe"
+  "menu.nova.items.cheat_mode.on": "Cheat-Mode: Pe",
+  "command.nova.enchant.success": "Ați aplicat cu succes vraja %s la %s's %s.",
+  "command.nova.enchant.incompatible": "Nu s-a putut aplica vraja %s la %s's %s deoarece este incompatibilă cu vrăjile existente.",
+  "command.nova.enchant.unsupported": "Nu s-a putut aplica vraja %s pe %s's %s deoarece obiectul nu acceptă această vrajă.",
+  "command.nova.unenchant_all.success": "Ați eliminat cu succes toate farmecele din %s's %s.",
+  "command.nova.unenchant_all.failure": "Nu există vrăji pe %s's %s.",
+  "command.nova.unenchant_single.success": "Ați eliminat cu succes %s din %s's %s.",
+  "command.nova.unenchant_single.failure": "Nu s-a putut îndepărta %s din %s's %s deoarece obiectul nu este vrăjit cu acest farmec."
 }
