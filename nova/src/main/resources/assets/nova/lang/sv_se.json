@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Du kan inte placera fler brickor.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Du kan inte placera fler kakel-enheter i den här världen.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Du kan inte placera fler brickor i denna klump.",
-  "nova.outdated_version": "Du kör en föråldrad version av %s.\nLadda ner den senaste versionen på %s."
+  "nova.outdated_version": "Du kör en föråldrad version av %s.\nLadda ner den senaste versionen på %s.",
+  "command.nova.enchant.success": "Tillämpade förtrollningen %s framgångsrikt på %s's %s.",
+  "command.nova.enchant.incompatible": "Kunde inte använda förtrollningen %s på %s's %s eftersom den inte är kompatibel med de befintliga förtrollningarna.",
+  "command.nova.enchant.unsupported": "Kunde inte använda förtrollningen %s på %s's %s eftersom föremålet inte stöder den förtrollningen.",
+  "command.nova.unenchant_all.success": "Lyckades ta bort alla förtrollningar från %s's %s.",
+  "command.nova.unenchant_all.failure": "Det finns inga förtrollningar på %s's %s.",
+  "command.nova.unenchant_single.success": "Ta bort %s från %s's %s.",
+  "command.nova.unenchant_single.failure": "Kunde inte ta bort %s från %s's %s eftersom föremålet inte är förtrollat med den förtrollningen."
 }
