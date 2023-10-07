@@ -124,5 +124,12 @@
   "command.nova.waila.already_off": "WAILA is al uitgeschakeld.",
   "command.nova.waila.on": "Ingeschakeld WAILA.",
   "command.nova.waila.already_on": "WAILA is al ingeschakeld.",
-  "command.nova.list_blocks.success": "Totaal: %s"
+  "command.nova.list_blocks.success": "Totaal: %s",
+  "command.nova.enchant.success": "Betovering %s succesvol toegepast op %s's %s.",
+  "command.nova.enchant.incompatible": "Kan betovering %s niet toepassen op %s's %s omdat het niet compatibel is met de bestaande betoveringen.",
+  "command.nova.enchant.unsupported": "Kon betovering %s niet toepassen op %s's %s omdat het item die betovering niet ondersteunt.",
+  "command.nova.unenchant_all.success": "Succesvol alle betoveringen verwijderd van %s's %s.",
+  "command.nova.unenchant_all.failure": "Er zijn geen betoveringen op %s's %s.",
+  "command.nova.unenchant_single.success": "Succesvol %s verwijderd van %s's %s.",
+  "command.nova.unenchant_single.failure": "Kon %s niet verwijderen van %s's %s omdat het item niet is betoverd met die betovering."
 }
