@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_per_chunk.deny": "Sie können nicht mehr Kachel-Entitäten dieses Typs in diesem Stück platzieren.",
   "nova.tile_entity_limits.amount_global_total.deny": "Sie können nicht mehr Kachel-Entitäten platzieren.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Sie können nicht mehr Kachel-Entitäten in dieser Welt platzieren.",
-  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Sie können keine weiteren Kachel-Entitäten in diesem Stück platzieren."
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Sie können keine weiteren Kachel-Entitäten in diesem Stück platzieren.",
+  "command.nova.enchant.success": "Erfolgreich die Verzauberung %s auf %s's %s angewendet.",
+  "command.nova.enchant.incompatible": "Die Verzauberung %s konnte nicht auf %s's %s angewendet werden, da sie mit den vorhandenen Verzauberungen nicht kompatibel ist.",
+  "command.nova.enchant.unsupported": "Die Verzauberung %s konnte nicht auf %s's %s angewendet werden, da der Gegenstand diese Verzauberung nicht unterstützt.",
+  "command.nova.unenchant_all.success": "Erfolgreich alle Verzauberungen von %s's %s entfernt.",
+  "command.nova.unenchant_all.failure": "Es gibt keine Verzauberungen auf %s's %s.",
+  "command.nova.unenchant_single.success": "Erfolgreich %s aus %s's %s entfernt.",
+  "command.nova.unenchant_single.failure": "%s konnte nicht von %s's %s entfernt werden, da der Gegenstand nicht mit dieser Verzauberung versehen ist."
 }
