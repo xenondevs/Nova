@@ -124,5 +124,12 @@
   "command.nova.update_chunk_search_id.success": "Yığın arama kimliği güncellendi.",
   "waila.nova.required_tool.unbreakable": "Kırılmaz",
   "nova.tile_entity_limits.amount_per_chunk.deny": "Bu yığına bu türden daha fazla karo-varlık yerleştiremezsiniz.",
-  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Bu yığına daha fazla karo-varlık yerleştiremezsiniz."
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Bu yığına daha fazla karo-varlık yerleştiremezsiniz.",
+  "command.nova.enchant.success": "Büyü %s'i %s'in %s'ine başarıyla uyguladı.",
+  "command.nova.enchant.incompatible": "Mevcut büyülerle uyumsuz olduğu için %s büyüsü %s's %s'ye uygulanamadı.",
+  "command.nova.enchant.unsupported": "Büyü %s's %s'e uygulanamadı çünkü eşya o büyüyü desteklemiyor.",
+  "command.nova.unenchant_all.success": "s'nin %s'sinden tüm büyüler başarıyla kaldırıldı.",
+  "command.nova.unenchant_all.failure": "s'nin %s'si üzerinde hiç büyü yok.",
+  "command.nova.unenchant_single.success": "Başarılı bir şekilde %s's %s'den %s kaldırıldı.",
+  "command.nova.unenchant_single.failure": "Eşya o efsunla efsunlanmadığı için %s's %s'den %s kaldırılamadı."
 }
