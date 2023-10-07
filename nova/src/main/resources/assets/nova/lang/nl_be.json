@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Je kunt niet meer tegel-entiteiten plaatsen.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Je kunt niet meer tegel-entiteiten in deze wereld plaatsen.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Je kunt niet meer tile-entiteiten in deze chunk plaatsen.",
-  "nova.outdated_version": "U'gebruikt een verouderde versie van %s.\nDownload de nieuwste versie op %s."
+  "nova.outdated_version": "U'gebruikt een verouderde versie van %s.\nDownload de nieuwste versie op %s.",
+  "command.nova.enchant.success": "Betovering %s succesvol toegepast op %s's %s.",
+  "command.nova.enchant.incompatible": "Kan betovering %s niet toepassen op %s's %s omdat het niet compatibel is met de bestaande betoveringen.",
+  "command.nova.enchant.unsupported": "Kon betovering %s niet toepassen op %s's %s omdat het item die betovering niet ondersteunt.",
+  "command.nova.unenchant_all.success": "Succesvol alle betoveringen verwijderd van %s's %s.",
+  "command.nova.unenchant_all.failure": "Er zijn geen betoveringen op %s's %s.",
+  "command.nova.unenchant_single.success": "Succesvol %s verwijderd van %s's %s.",
+  "command.nova.unenchant_single.failure": "Kon %s niet verwijderen van %s's %s omdat het item niet is betoverd met die betovering."
 }
