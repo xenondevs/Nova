@@ -124,5 +124,12 @@
   "command.nova.list_blocks.success": "Celkem: %s",
   "command.nova.invalidate_char_sizes.success": "Úspěšně odvolány veškeré velikosti char polí. Při novém vytvoření modifikačního balíčku budou pole přepočítány.",
   "menu.nova.items.cheat_mode.on": "Cheat-Režim: Zapnutý",
-  "menu.nova.items.cheat_mode.off": "Cheat-Režim: Vypnutý"
+  "menu.nova.items.cheat_mode.off": "Cheat-Režim: Vypnutý",
+  "command.nova.enchant.success": "Úspěšně použito kouzlo %s na %s's %s.",
+  "command.nova.enchant.incompatible": "Nelze použít kouzlo %s na %s's %s, protože není kompatibilní s existujícími kouzly.",
+  "command.nova.enchant.unsupported": "Nelze použít kouzlo %s na %s's %s, protože předmět toto kouzlo nepodporuje.",
+  "command.nova.unenchant_all.success": "Úspěšně odstraněna všechna kouzla z %s's %s.",
+  "command.nova.unenchant_all.failure": "Na %s's %s nejsou žádná kouzla.",
+  "command.nova.unenchant_single.success": "Úspěšně odstraněno %s z %s's %s.",
+  "command.nova.unenchant_single.failure": "Nelze odstranit %s z %s's %s, protože předmět není očarován tímto kouzlem."
 }
