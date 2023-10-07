@@ -124,5 +124,12 @@
   "command.nova.waila.already_on": "WAILA jest już włączona.",
   "command.nova.remove_invalid_vtes.failure": "Nie znaleziono nieprawidłowych kafelków waniliowych.",
   "command.nova.list_blocks.success": "Razem: %s",
-  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Nie można umieścić więcej kafelków w tym fragmencie."
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Nie można umieścić więcej kafelków w tym fragmencie.",
+  "command.nova.enchant.incompatible": "Nie można zastosować zaklęcia %s do %s'%s, ponieważ jest ono niezgodne z istniejącymi zaklęciami.",
+  "command.nova.enchant.unsupported": "Nie można zastosować zaklęcia %s do %s'%s, ponieważ przedmiot nie obsługuje tego zaklęcia.",
+  "command.nova.unenchant_all.success": "Pomyślnie usunięto wszystkie zaklęcia z %s'%s.",
+  "command.nova.unenchant_all.failure": "Nie ma żadnych zaklęć na %s'%s.",
+  "command.nova.unenchant_single.success": "Pomyślnie usunięto %s z %s'%s.",
+  "command.nova.enchant.success": "Pomyślnie zastosowano zaklęcie %s do %s'%s.",
+  "command.nova.unenchant_single.failure": "Nie można usunąć %s z %s'%s, ponieważ przedmiot nie jest zaklęty tym zaklęciem."
 }
