@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.type_world_blacklist.deny": "No está permitido colocar esta entidad-baldosa en este mundo.",
   "nova.tile_entity_limits.amount_global.deny": "No se pueden colocar más fichas-entidades de este tipo.",
   "nova.tile_entity_limits.amount_per_world.deny": "No puedes colocar más fichas-entidades de este tipo en este mundo.",
-  "nova.outdated_version": "Está ejecutando una versión obsoleta de %s.\nDescargue la última versión en %s."
+  "nova.outdated_version": "Está ejecutando una versión obsoleta de %s.\nDescargue la última versión en %s.",
+  "command.nova.enchant.success": "Aplicado con éxito el encantamiento %s a %s's %s.",
+  "command.nova.enchant.incompatible": "No se ha podido aplicar el encantamiento %s a %s's %s porque es incompatible con los encantamientos existentes.",
+  "command.nova.enchant.unsupported": "No se ha podido aplicar el encantamiento %s a %s's %s porque el objeto no admite ese encantamiento.",
+  "command.nova.unenchant_all.success": "Eliminados con éxito todos los encantamientos de %s's %s.",
+  "command.nova.unenchant_all.failure": "No hay encantamientos en %s's %s.",
+  "command.nova.unenchant_single.success": "Eliminado con éxito %s de %s's %s.",
+  "command.nova.unenchant_single.failure": "No se ha podido eliminar %s de %s's %s porque el objeto no está encantado con ese encantamiento."
 }
