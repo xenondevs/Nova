@@ -124,5 +124,12 @@
   "menu.nova.side_config.simple_mode": "シンプル・モード",
   "inventory.nova.all": "すべての在庫",
   "command.nova.advanced_tooltips.off.success": "高度なツールチップを無効にしました。",
-  "command.nova.list_blocks.success": "合計: %s"
+  "command.nova.list_blocks.success": "合計: %s",
+  "command.nova.enchant.success": "s'の %s にエンチャント %s を適用しました。",
+  "command.nova.enchant.incompatible": "s's %s にエンチャント %s を適用できませんでした。",
+  "command.nova.enchant.unsupported": "アイテムがそのエンチャントをサポートしていないので、%s にエンチャント %s を適用できませんでした。",
+  "command.nova.unenchant_all.success": "s'の %s からすべてのエンチャントを取り除くことに成功しました。",
+  "command.nova.unenchant_all.failure": "s'の %s にはエンチャントがありません。",
+  "command.nova.unenchant_single.success": "s's %s から %s を正常に削除しました。",
+  "command.nova.unenchant_single.failure": "s'の %s から %s を取り除けませんでした。"
 }
