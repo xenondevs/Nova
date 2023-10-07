@@ -124,5 +124,12 @@
   "command.nova.waila.already_off": "WAILA est déjà désactivé.",
   "command.nova.waila.on": "Activé WAILA.",
   "command.nova.waila.already_on": "WAILA est déjà activé.",
-  "command.nova.list_blocks.success": "Total : %s"
+  "command.nova.list_blocks.success": "Total : %s",
+  "command.nova.enchant.success": "A réussi à appliquer l'enchantement %s à %s's %s.",
+  "command.nova.enchant.incompatible": "Impossible d'appliquer l'enchantement %s à %s's %s car il est incompatible avec les enchantements existants.",
+  "command.nova.enchant.unsupported": "Impossible d'appliquer l'enchantement %s à %s's %s car l'objet ne supporte pas cet enchantement.",
+  "command.nova.unenchant_all.success": "A réussi à supprimer tous les enchantements de %s's %s.",
+  "command.nova.unenchant_all.failure": "Il n'y a pas d'enchantement sur %s's %s.",
+  "command.nova.unenchant_single.success": "Suppression réussie de %s de %s's %s.",
+  "command.nova.unenchant_single.failure": "Impossible de retirer %s de %s's %s car l'objet n'est pas enchanté avec cet enchantement."
 }
