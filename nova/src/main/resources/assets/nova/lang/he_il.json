@@ -1,11 +1,7 @@
 {
   "item.nova.wrench.mode.nova.item": "מצב: פריטים",
   "item.nova.wrench.mode.nova.fluid": "מצב: נוזל",
-  "item.nova.speed_upgrade": "שדרוג מיהירות",
-  "item.nova.efficiency_upgrade": "שדרוג יעילות",
-  "item.nova.energy_upgrade": "שדרוג אנרגיה",
   "item.nova.range_upgrade": "שדרוג טווח",
-  "item.nova.fluid_upgrade": "שדרוג נוזלים",
   "menu.nova.energy_per_tick": "s / tick%",
   "menu.nova.items": "פריטים",
   "menu.nova.items.search": "חפש פריט",

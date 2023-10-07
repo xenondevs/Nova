@@ -169,7 +169,7 @@ class DimensionTypeBuilder(id: ResourceLocation) : RegistryElementBuilder<Dimens
      * * BuiltinDimensionTypes.NETHER_EFFECTS
      * * BuiltinDimensionTypes.END_EFFECTS
      *
-     * For a deeper understanding of what these values do, check out the [Minecraft Wiki](https://minecraft.fandom.com/wiki/Custom_dimension#Syntax)
+     * For a deeper understanding of what these values do, check out the [Minecraft Wiki](https://minecraft.wiki/w/Custom_dimension#Syntax)
      * (effects property).
      */
     fun effects(effects: ResourceLocation): DimensionTypeBuilder {

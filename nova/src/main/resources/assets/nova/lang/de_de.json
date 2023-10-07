@@ -1,10 +1,6 @@
 {
   "item.nova.wrench": "Schraubenschlüssel",
-  "item.nova.speed_upgrade": "Geschwindigkeits-Upgrade",
-  "item.nova.efficiency_upgrade": "Effizienz-Upgrade",
-  "item.nova.energy_upgrade": "Energie-Upgrade",
   "item.nova.range_upgrade": "Reichweite-Upgrade",
-  "item.nova.fluid_upgrade": "Flüssigkeits-Upgrade",
   "menu.nova.items.search": "Item suchen",
   "menu.nova.items.search.back": "Zurück zum Hauptinventar",
   "menu.nova.items.search.clear": "Suchfeld leeren",
@@ -35,11 +31,7 @@
   "menu.nova.paged.limit_max": "Mehr Seiten gibt es nicht",
   "menu.nova.visual_region.hide": "Bereich verstecken",
   "menu.nova.visual_region.show": "Bereich anzeigen",
-  "menu.nova.upgrades.type.speed": "Geschwindigkeits-Upgrades: %s/%s",
-  "menu.nova.upgrades.type.efficiency": "Effizienz-Upgrades: %s/%s",
-  "menu.nova.upgrades.type.energy": "Energie-Upgrades: %s/%s",
   "menu.nova.upgrades.type.range": "Reichweite-Upgrades: %s/%s",
-  "menu.nova.upgrades.type.fluid": "Flüssigkeits-Upgrades: %s/%s",
   "menu.nova.color_picker": "Wähle eine Farbe...",
   "menu.nova.color_picker.red": "Rot: %s",
   "menu.nova.color_picker.green": "Grün: %s",
@@ -132,5 +124,7 @@
   "command.nova.advanced_tooltips.all.success": "Erweiterte Schnellinfos für alle Items aktiviert.",
   "command.nova.advanced_tooltips.all.failure": "Erweiterte Schnellinfos für Nova Items sind bereits aktiviert.",
   "command.nova.list_blocks.success": "Insgesamt: %s",
-  "command.nova.invalidate_char_sizes.success": "Alle Zeichengrößen wurden erfolgreich invalidiert. Sie werden beim nächsten Erstellen des Ressourcenpakets neu berechnet."
+  "command.nova.invalidate_char_sizes.success": "Alle Zeichengrößen wurden erfolgreich invalidiert. Sie werden beim nächsten Erstellen des Ressourcenpakets neu berechnet.",
+  "menu.nova.items.cheat_mode.on": "Cheat-Modus: An",
+  "menu.nova.items.cheat_mode.off": "Cheat-Modus: Aus"
 }
