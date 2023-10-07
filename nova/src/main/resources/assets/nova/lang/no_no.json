@@ -124,5 +124,12 @@
   "nova.tile_entity_limits.amount_per_world_total.deny": "Du kan ikke plassere flere flisenheter i denne verdenen.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Du kan ikke plassere flere flisenheter i denne delen.",
   "nova.outdated_version": "Du kjører en utdatert versjon av %s.\nLast ned den nyeste versjonen på %s.",
-  "waila.nova.required_tool": "Verktøy: "
+  "waila.nova.required_tool": "Verktøy: ",
+  "command.nova.enchant.success": "Vellykket bruk av fortryllelsen %s på %s's %s.",
+  "command.nova.enchant.incompatible": "Kunne ikke bruke fortryllelsen %s på %s's %s fordi den ikke er kompatibel med eksisterende fortryllelser.",
+  "command.nova.unenchant_all.success": "Vellykket fjerning av alle fortryllelser fra %s's %s.",
+  "command.nova.enchant.unsupported": "Kunne ikke bruke fortryllelsen %s på %s's %s fordi gjenstanden ikke støtter denne fortryllelsen.",
+  "command.nova.unenchant_all.failure": "Det er ingen fortryllelser på %s's %s.",
+  "command.nova.unenchant_single.success": "Vellykket fjernet %s fra %s's %s.",
+  "command.nova.unenchant_single.failure": "Kunne ikke fjerne %s fra %s's %s fordi gjenstanden ikke er fortryllet med denne fortryllelsen."
 }
