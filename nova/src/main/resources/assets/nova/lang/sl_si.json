@@ -124,5 +124,12 @@
   "menu.nova.side_config.back": "Nazaj",
   "menu.nova.side_config.right": "Desno",
   "menu.nova.side_config.top": "Vrh",
-  "menu.nova.side_config.bottom": "Spodnji del"
+  "menu.nova.side_config.bottom": "Spodnji del",
+  "command.nova.enchant.success": "Uspešno uporabite uroke %s na %s's %s.",
+  "command.nova.enchant.incompatible": "Ni bilo mogoče uporabiti uroka %s na %s's %s, ker ni združljiv z obstoječimi uroki.",
+  "command.nova.enchant.unsupported": "Ni bilo mogoče uporabiti uroka %s na %s's %s, ker predmet ne podpira tega uroka.",
+  "command.nova.unenchant_all.success": "Uspešno odstranite vse uroke z %s's %s.",
+  "command.nova.unenchant_all.failure": "Na %s's %s ni čarov.",
+  "command.nova.unenchant_single.success": "Uspešno odstranite %s iz %s's %s.",
+  "command.nova.unenchant_single.failure": "Ni bilo mogoče odstraniti %s z %s's %s, ker predmet ni začaran s tem urokom."
 }
