@@ -4,7 +4,7 @@ format.version = "1.1"
 [versions]
 cbf = "0.7"
 configurate = "4.2.0-SNAPSHOT"
-invui = "1.19"
+invui = "1.20"
 kotlin = "1.9.10"
 ktor = "2.3.1"
 paper = "1.20.2-R0.1-SNAPSHOT"
