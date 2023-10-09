@@ -50,6 +50,10 @@ enum class VanillaMaterialProperty(internal val importance: Int) {
     /**
      * The item will not catch on fire.
      */
-    FIRE_RESISTANT(0)
+    FIRE_RESISTANT(0),
     
+    /**
+     * The item that player can use to block damage.
+     */
+    SHIELD(3)
 }
