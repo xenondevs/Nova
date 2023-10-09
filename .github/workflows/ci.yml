@@ -32,7 +32,6 @@ jobs:
             loaderJarSpigot
             -PoutDir=artifacts
             -Prelease
-            --scan
 
       - name: Upload Artifacts
         id: upload
@@ -40,14 +39,6 @@ jobs:
         with:
           name: Artifacts
           path: ./artifacts/*.jar
-
-      - name: Attach Artifacts to Release
-        if: github.event_name == 'release'
-        uses: skx/github-action-publish-binaries@release-2.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: ./artifacts/*.jar
 
       - name: Deploy Mojang-Mapped
         if: github.event_name == 'release'
