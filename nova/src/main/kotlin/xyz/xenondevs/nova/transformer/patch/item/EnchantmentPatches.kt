@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.world.block.logic.tileentity.GrindstoneLogic
 private val ENCHANTMENT_MENU_SLOTS_CHANGED_LAMBDA = ReflectionUtils.getMethod(
     EnchantmentMenu::class,
     true,
-    "SRM(net.minecraft.world.inventory.EnchantmentMenu lambda\$slotsChanged\$0)",
+    "lambda\$slotsChanged\$0", // not remapped
     ItemStack::class, Level::class, BlockPos::class
 )
 
@@ -27,7 +27,7 @@ private val ENCHANTMENT_MENU_SLOTS_CHANGED_LAMBDA = ReflectionUtils.getMethod(
 private val ENCHANTMENT_MENU_CLICK_MENU_BUTTON_LAMBDA = ReflectionUtils.getMethod(
     EnchantmentMenu::class,
     true,
-    "SRM(net.minecraft.world.inventory.EnchantmentMenu lambda\$clickMenuButton\$1)",
+    "lambda\$clickMenuButton\$1", // not remapped
     ItemStack::class, Int::class, Player::class, Int::class, ItemStack::class, Level::class, BlockPos::class
 )
 
