@@ -56,14 +56,14 @@ internal sealed interface Transformer {
     }
     
     fun MethodNode.delegateStatic(other: Method) {
-        delegateStatic(other.declaringClass.internalName, VirtualClassPath[other])
+        delegateStatic(other.declaringClass.internalName, VirtualClassPath[other], other.declaringClass.isInterface)
     }
     
-    fun MethodNode.delegateStatic(owner: String, other: MethodNode) {
+    fun MethodNode.delegateStatic(owner: String, other: MethodNode, isInterface: Boolean) {
         clear()
         instructions = AsmUtils.createDelegateInstructions(
             InsnList(),
-            buildInsnList { invokeStatic(owner, other.name, other.desc, false) },
+            buildInsnList { invokeStatic(owner, other.name, other.desc, isInterface) },
             other,
             0
         )
