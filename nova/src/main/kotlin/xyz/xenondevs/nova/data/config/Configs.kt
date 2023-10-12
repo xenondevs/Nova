@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.ui.overlay.actionbar.ActionbarOverlayManager
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
+import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.update.UpdateReminder
 import xyz.xenondevs.nova.util.data.useZip
 import xyz.xenondevs.nova.world.ChunkReloadWatcher
@@ -118,6 +119,7 @@ object Configs {
         UpdateReminder.reload()
         PlayerFreezer.reload()
         ItemCategories.reload()
+        WailaManager.reload()
         Bukkit.getOnlinePlayers().forEach(Player::updateInventory)
     }
     
