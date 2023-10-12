@@ -43,7 +43,7 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
         overlays.clear()
         overlays += imageOverlay
         
-        val iconChar = ResourceLookups.WAILA_DATA_LOOKUP.getOrThrow(icon)
+        val iconChar = ResourceLookups.WAILA_DATA_LOOKUP[icon]
         val (beginX, centerX) = imageOverlay.update(iconChar, lines.size, lines.maxOf { CharSizes.calculateComponentWidth(it.text, player.locale) })
         
         // re-add line overlays

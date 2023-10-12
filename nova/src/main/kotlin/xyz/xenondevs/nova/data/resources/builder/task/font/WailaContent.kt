@@ -85,6 +85,8 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.GLOW_LICHEN to "block/glow_lichen",
     Material.SCULK_VEIN to "block/sculk_vein",
     Material.SUGAR_CANE to "block/sugar_cane",
+    Material.PUMPKIN_STEM to "item/pumpkin_seeds",
+    Material.MELON_STEM to "item/melon_seeds",
     
     // flowers
     Material.DANDELION to "block/dandelion",
