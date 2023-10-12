@@ -68,7 +68,7 @@ private val CORE_RESOURCE_FILTERS by configReloadable {
         this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, Regex("^[a-z0-9._-]+/textures/armor/.*$"))
         
         if (!BossBarOverlayManager.ENABLED) {
-            this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "minecraft/textures/gui/bars.png")
+            this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "minecraft/textures/gui/sprites/boss_bar/*")
             this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/bossbar*")
             this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/bars/*")
         }
