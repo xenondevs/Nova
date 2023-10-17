@@ -7,20 +7,38 @@ bootstrapper: xyz.xenondevs.nova.loader.NovaBootstrapper
 main: xyz.xenondevs.nova.loader.NovaJavaPlugin
 load: STARTUP
 
-softdepend:
-  - WorldGuard
-  - GriefPrevention
-  - PlotSquared
-  - GriefDefender
-  - ProtectionStones
-  - Towny
-  - QuickShop
-  - Residence
-  - Vault
-  - ItemsAdder
-  - Oraxen
-  - MMOItems
-  - AuthMe
+dependencies:
+  server:
+    WorldGuard:
+      required: false
+    GriefPrevention:
+      required: false
+    PlotSquared:
+      required: false
+    GriefDefender:
+      required: false
+    ProtectionStones:
+      required: false
+    Towny:
+      required: false
+    QuickShop:
+      required: false
+    Residence:
+      required: false
+    Vault:
+      required: false
+    ItemsAdder:
+      required: false
+    Oraxen:
+      required: false
+    MMOItems:
+      required: false
+    AuthMe:
+      required: false
+    FastAsyncWorldEdit:
+      required: false
+    WorldEdit:
+      required: false
 
 permissions:
   nova.command.*:
