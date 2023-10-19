@@ -11,7 +11,6 @@ import net.minecraft.tags.FluidTags
 import net.minecraft.world.effect.MobEffectInstance
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_20_R2.CraftServer
 import org.bukkit.craftbukkit.v1_20_R2.entity.CraftEntity
 import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.tool.ToolCategory
@@ -222,10 +221,9 @@ object EntityUtils {
         name: String = "Nova FakePlayer",
         hasEvents: Boolean = false
     ): ServerPlayer {
-        val server = (Bukkit.getServer() as CraftServer).server
         val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
-        return FakePlayer(server, world, gameProfile, hasEvents)
+        return FakePlayer(MINECRAFT_SERVER, world, gameProfile, hasEvents)
     }
     
 }

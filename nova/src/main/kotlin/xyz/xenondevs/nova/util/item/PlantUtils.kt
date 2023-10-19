@@ -17,6 +17,7 @@ import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
+import xyz.xenondevs.nova.util.EntityUtils
 import xyz.xenondevs.nova.util.below
 import xyz.xenondevs.nova.util.blockPos
 import xyz.xenondevs.nova.util.getAllDrops
@@ -173,7 +174,7 @@ object PlantUtils {
         return BoneMealItem.applyBonemeal(
             UseOnContext(
                 plant.world.serverLevel,
-                null,
+                EntityUtils.DUMMY_PLAYER,
                 InteractionHand.MAIN_HAND,
                 MojangStack(Items.BONE_MEAL),
                 BlockHitResult(Vec3.ZERO, Direction.DOWN, plant.location.blockPos, false)
