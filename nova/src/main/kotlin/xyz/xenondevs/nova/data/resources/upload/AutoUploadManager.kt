@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.service.CustomMultiPart
-import xyz.xenondevs.nova.data.resources.upload.service.ResourcePackDotHost
 import xyz.xenondevs.nova.data.resources.upload.service.S3
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
@@ -37,7 +36,7 @@ private val ENABLE_PROMPT_BYPASS_PERMISSION by MAIN_CONFIG.entry<Boolean>("resou
 )
 internal object AutoUploadManager {
     
-    internal val services = arrayListOf(Xenondevs, SelfHost, CustomMultiPart, S3, ResourcePackDotHost)
+    internal val services = arrayListOf(Xenondevs, SelfHost, CustomMultiPart, S3)
     
     private val resourcePackCfg by MAIN_CONFIG.map { it.node("resource_pack") }
     private val autoUploadCfg by MAIN_CONFIG.map { it.node("resource_pack", "auto_upload") }

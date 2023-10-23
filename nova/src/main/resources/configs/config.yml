@@ -4,8 +4,7 @@ resource_pack:
   # The auto uploader automatically uploads the resource pack after generation.
   # READ SETUP GUIDE: https://xenondevs.xyz/docs/nova/admin/setup/#automatic-resource-pack-hosting
   auto_upload:
-    enabled: true
-    service: resourcepack.host
+    enabled: false
     
   # Settings affecting the resource pack prompt
   prompt:

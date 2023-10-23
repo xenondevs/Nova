@@ -55,15 +55,3 @@ internal object CustomMultiPart : MultiPart() {
     }
     
 }
-
-internal object ResourcePackDotHost : MultiPart() {
-    
-    override val names = listOf("resourcepack.host")
-    override val url = "https://resourcepack.host/index.php"
-    override var filePartName = "pack"
-    override var urlRegex = Regex("""(http://resourcepack\.host/dl/[^"]+)""")
-    override val extraParams = emptyMap<String, String>()
-    
-    override fun loadConfig(cfg: ConfigurationNode) = Unit
-    
-}
