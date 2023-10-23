@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.data.serialization.json.serializer
 
 import com.google.gson.TypeAdapter

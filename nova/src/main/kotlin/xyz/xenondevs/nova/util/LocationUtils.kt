@@ -167,12 +167,6 @@ fun Vector3f.toLocation(world: World? = null): Location =
 fun Vector3f.toVec3(): Vec3 =
     Vec3(x.toDouble(), y.toDouble(), z.toDouble())
 
-fun Vector.toVector3d(): Vector3d =
-    Vector3d(x, y, z)
-
-fun Vector.toVector3f(): Vector3f =
-    Vector3f(x.toFloat(), y.toFloat(), z.toFloat())
-
 fun Vector.toVec3(): Vec3 =
     Vec3(x, y, z)
 //</editor-fold>

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+
 package xyz.xenondevs.nova.api
 
 import org.bukkit.Location
@@ -12,7 +14,6 @@ import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.api.block.BlockManager as IBlockManager
 import xyz.xenondevs.nova.api.block.NovaBlock as INovaBlock
 
-@Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
 internal object ApiBlockManager : IBlockManager {
     
     override fun hasBlock(location: Location): Boolean {

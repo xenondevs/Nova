@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.transformer.patch.misc
 
+import io.papermc.paper.plugin.manager.PaperPluginManagerImpl
 import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerEvent
-import org.bukkit.plugin.SimplePluginManager
 import org.objectweb.asm.tree.LabelNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.nova.transformer.MethodTransformer
@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.util.serverPlayer
  * Patches the callEvent method in SimplePluginManager to prevent fake players from triggering events.
  */
 @PublishedApi
-internal object EventPreventionPatch : MethodTransformer(SimplePluginManager::callEvent) {
+internal object EventPreventionPatch : MethodTransformer(PaperPluginManagerImpl::callEvent) {
     
     var dropAll = false
     

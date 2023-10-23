@@ -6,12 +6,12 @@ import dev.lone.itemsadder.api.CustomStack
 import dev.lone.itemsadder.api.ItemsAdder
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.resources.ResourcePath
@@ -136,13 +136,13 @@ internal object ItemsAdderHook : CustomItemService {
         return null
     }
     
-    override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {
+    override fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath> {
         return ItemsAdder.getAllItems()
             .filter { it.isBlock || CustomCrop.isSeed(it.itemStack) }
             .map(CustomStack::getNamespacedID)
             .associateTo(HashMap()) {
                 val path = ItemsAdder.Advanced.getItemModelResourceLocation(it)!!.substringBeforeLast('.')
-                NamespacedId.of(it) to ResourcePath.of(path)
+                ResourceLocation(it) to ResourcePath.of(path)
             }
     }
     

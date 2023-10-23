@@ -4,20 +4,18 @@ import io.lumine.mythic.lib.api.item.NBTItem
 import net.Indyuce.mmoitems.MMOItems
 import net.Indyuce.mmoitems.api.Type
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
-import xyz.xenondevs.nova.util.item.displayName
 import net.Indyuce.mmoitems.MMOItems as MMOItemsPlugin
 
 @Hook(plugins = ["MMOItems"])
@@ -88,12 +86,12 @@ internal object MMOItemsHook : CustomItemService {
         if (getId(item) == null)
             return null
         
-        return item.displayName?.let(LegacyComponentSerializer.legacySection()::deserialize) ?: Component.empty()
+        return item.displayName()
     }
     
     override fun getName(block: Block, locale: String): Component? {
         val item = MMO_ITEMS.customBlocks.getFromBlock(block.blockData).orElse(null)?.item ?: return null
-        return item.displayName?.let(LegacyComponentSerializer.legacySection()::deserialize) ?: Component.empty()
+        return item.displayName()
     }
     
     override fun hasRecipe(key: NamespacedKey): Boolean {
@@ -104,7 +102,7 @@ internal object MMOItemsHook : CustomItemService {
         return null
     }
     
-    override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {
+    override fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath> {
         return emptyMap()
     }
     

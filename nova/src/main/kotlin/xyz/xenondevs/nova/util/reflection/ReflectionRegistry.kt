@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util.reflection
 import com.mojang.brigadier.tree.CommandNode
 import com.mojang.serialization.DynamicOps
 import com.mojang.serialization.Lifecycle
+import io.papermc.paper.plugin.manager.PaperPluginManagerImpl
 import net.minecraft.core.BlockPos
 import net.minecraft.core.BlockPos.MutableBlockPos
 import net.minecraft.core.DefaultedMappedRegistry
@@ -65,11 +66,11 @@ import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
 import org.bukkit.craftbukkit.v1_20_R2.block.data.CraftBlockData
 import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack
-import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
+import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
-import org.bukkit.plugin.SimplePluginManager
+import org.bukkit.plugin.Plugin
 import xyz.xenondevs.nova.util.ServerSoftware
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCB
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getCBClass
@@ -102,6 +103,7 @@ internal object ReflectionRegistry {
     val SECTION_PATH_DATA_CLASS = getClass("org.bukkit.configuration.SectionPathData")
     val PALETTED_CONTAINER_DATA_CLASS = getClass("SRC(net.minecraft.world.level.chunk.PalettedContainer\$Data)")
     val HOLDER_SET_DIRECT_CLASS = getClass("SRC(net.minecraft.core.HolderSet\$Direct)")
+    val PAPER_EVENT_MANAGER_CLASS = getClass("io.papermc.paper.plugin.manager.PaperEventManager")
     
     // Constructors
     val ENUM_MAP_CONSTRUCTOR = getConstructor(EnumMap::class, false, Class::class)
@@ -137,7 +139,6 @@ internal object ReflectionRegistry {
     val RECIPE_GET_REMAINING_ITEMS_METHOD = getMethod(Recipe::class, false, "SRM(net.minecraft.world.item.crafting.Recipe getRemainingItems)", Container::class)
     val NON_NULL_LIST_SET_METHOD = getMethod(NonNullList::class, false, "SRM(net.minecraft.core.NonNullList set)", Int::class, Any::class)
     val BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD = getMethod(BrewingStandBlockEntity::class, true, "doBrew", Level::class, BlockPos::class, NonNullList::class, BrewingStandBlockEntity::class)
-    val SIMPLE_PLUGIN_MANAGER_FIRE_EVENT_METHOD = getMethod(SimplePluginManager::class, true, "fireEvent", Event::class)
     val ITEM_STACK_LOAD_METHOD = getMethod(MojangStack::class, true, "load", CompoundTag::class)
     val RULE_PROCESSOR_PROCESS_BLOCK_METHOD = getMethod(RuleProcessor::class, false, "SRM(net.minecraft.world.level.levelgen.structure.templatesystem.RuleProcessor processBlock)", LevelReader::class, BlockPos::class, BlockPos::class, StructureTemplate.StructureBlockInfo::class, StructureTemplate.StructureBlockInfo::class, StructurePlaceSettings::class)
     val PROCESSOR_RULE_TEST_METHOD = getMethod(ProcessorRule::class, false, "SRM(net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule test)", BlockState::class, BlockState::class, BlockPos::class, BlockPos::class, BlockPos::class, RandomSource::class)
@@ -152,6 +153,7 @@ internal object ReflectionRegistry {
     val NOISE_ROUTER_DATA_OVERWORLD_METHOD = getMethod(NoiseRouterData::class, true, "SRM(net.minecraft.world.level.levelgen.NoiseRouterData overworld)", HolderGetter::class, HolderGetter::class, Boolean::class, Boolean::class)
     val SEMAPHORE_ACQUIRE_METHOD = getMethod(Semaphore::class, false, "acquire")
     val CRAFT_META_ITEM_CLONE_METHOD = getMethod(CB_CRAFT_META_ITEM_CLASS, true, "clone")
+    val PAPER_EVENT_MANAGER_CREATE_REGISTERED_LISTENERS_METHOD = getMethod(PAPER_EVENT_MANAGER_CLASS, true, "createRegisteredListeners", Listener::class, Plugin::class)
     
     // Fields
     val CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD = getField(CB_CRAFT_META_ITEM_CLASS, true, "unhandledTags")
@@ -198,5 +200,6 @@ internal object ReflectionRegistry {
     val ITEM_STACK_ITEM_META_FIELD = getField(BukkitStack::class, true, "meta")
     val CRAFT_ITEM_STACK_HANDLE_FIELD = getField(CraftItemStack::class, true, "handle")
     val ITEM_STACK_ITEM_FIELD = getField(MojangStack::class, true, "SRF(net.minecraft.world.item.ItemStack item)")
+    val PAPER_PLUGIN_MANAGER_IMPL_PAPER_EVENT_MANAGER_FIELD = getField(PaperPluginManagerImpl::class, true, "paperEventManager")
     
 }

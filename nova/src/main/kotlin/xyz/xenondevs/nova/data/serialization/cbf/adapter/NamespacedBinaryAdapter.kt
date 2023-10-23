@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.data.serialization.cbf.adapter
 
 import net.minecraft.resources.ResourceLocation
@@ -24,7 +26,6 @@ internal object NamespacedKeyBinaryAdapter : BinaryAdapter<NamespacedKey> {
     
 }
 
-@Suppress("DEPRECATION")
 internal object NamespacedIdBinaryAdapter : BinaryAdapter<NamespacedId> {
     
     override fun read(type: KType, reader: ByteReader): NamespacedId {

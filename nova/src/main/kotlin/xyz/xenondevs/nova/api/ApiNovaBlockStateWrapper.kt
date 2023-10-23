@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.api
 
 import com.mojang.datafixers.util.Either
@@ -7,7 +9,6 @@ import xyz.xenondevs.nova.api.material.NovaMaterial
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.api.block.NovaBlockState as INovaBlockState
 
-@Suppress("DEPRECATION")
 internal class ApiNovaBlockStateWrapper(private val state: NovaBlockState): INovaBlockState {
     
     @Deprecated("Use NovaBlock instead", replaceWith = ReplaceWith("block"))

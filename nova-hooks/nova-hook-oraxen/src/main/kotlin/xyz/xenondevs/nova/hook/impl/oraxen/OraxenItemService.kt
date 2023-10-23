@@ -12,7 +12,7 @@ import io.th0rgal.oraxen.mechanics.provided.gameplay.stringblock.StringBlockMech
 import io.th0rgal.oraxen.utils.blocksounds.BlockSounds
 import io.th0rgal.oraxen.utils.drops.Drop
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.Rotation
@@ -20,7 +20,6 @@ import org.bukkit.SoundCategory
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.ModelDataTest
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.resources.ResourcePath
@@ -29,7 +28,6 @@ import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.customModelData
-import xyz.xenondevs.nova.util.item.displayName
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 import kotlin.streams.asSequence
@@ -153,13 +151,13 @@ internal object OraxenItemService : CustomItemService {
     
     override fun getName(item: ItemStack, locale: String): Component? {
         return if (OraxenItems.getIdByItem(item) != null)
-            item.displayName?.let(LegacyComponentSerializer.legacySection()::deserialize) ?: Component.empty()
+            item.displayName()
         else null
     }
     
     override fun getName(block: Block, locale: String): Component? {
         val item = getId(block)?.let(OraxenItemService::getItemById) ?: return null
-        return item.displayName?.let(LegacyComponentSerializer.legacySection()::deserialize) ?: Component.empty()
+        return item.displayName()
     }
     
     override fun hasRecipe(key: NamespacedKey): Boolean {
@@ -170,14 +168,14 @@ internal object OraxenItemService : CustomItemService {
         return getOraxenDrop(block)?.isToolEnough(tool) ?: return null
     }
     
-    override fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {
+    override fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath> {
         return OraxenItems.entryStream().asSequence()
             .filter { (id, builder) -> id != null && builder.oraxenMeta?.modelName != null }
             .filter { (id, _) -> BLOCK_MECHANIC_FACTORIES.any { it.getMechanic(id) != null } }
             .associateTo(HashMap()) { (name, builder) ->
                 val modelName = builder.oraxenMeta.modelName
                 
-                val id = NamespacedId("oraxen", name)
+                val id = ResourceLocation("oraxen", name)
                 val path = ResourcePath("oraxen_converted", "oraxen/$modelName")
                 
                 id to path

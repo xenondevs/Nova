@@ -101,7 +101,7 @@ internal object ItemListener : Listener, PacketListener {
     private fun handleInteract(event: InventoryClickEvent) {
         val player = event.whoClicked as Player
         val clickedItem = event.currentItem
-        val cursorItem = event.cursor
+        val cursorItem = event.cursor.takeUnlessEmpty()
         
         clickedItem?.novaItem?.handleInventoryClick(player, clickedItem, event)
         cursorItem?.novaItem?.handleInventoryClickOnCursor(player, cursorItem, event)

@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.waila.WailaManager
+import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.renderer.MinecraftModelRenderer
 import java.util.logging.Level
 import kotlin.io.path.copyTo

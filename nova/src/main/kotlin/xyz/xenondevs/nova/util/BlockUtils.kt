@@ -16,6 +16,7 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.item.crafting.AbstractCookingRecipe
+import net.minecraft.world.item.crafting.RecipeHolder
 import net.minecraft.world.level.block.DoorBlock
 import net.minecraft.world.level.block.TallFlowerBlock
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
@@ -43,10 +44,10 @@ import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.particle.block
 import xyz.xenondevs.nmsutils.particle.particle
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
@@ -74,7 +75,7 @@ import net.minecraft.world.level.block.Block as MojangBlock
 // region block info
 
 /**
- * The [NamespacedId] of this block, considering blocks from Nova, custom item services and vanilla.
+ * The [ResourceLocation] of this block, considering blocks from Nova, custom item services and vanilla.
  */
 val Block.id: ResourceLocation
     get() = BlockManager.getBlockState(pos)?.id
@@ -253,7 +254,7 @@ fun Block.setBlockEntityDataFromItemStack(itemStack: ItemStack) {
     val itemTag = CompoundTag()
     ReflectionRegistry.CB_CRAFT_META_APPLY_TO_ITEM_METHOD.invoke(itemStack.itemMeta, itemTag)
     
-    val tileEntityTag = itemTag.getCompound("BlockEntityTag")?.let { if (it.isEmpty) itemTag else it }
+    val tileEntityTag = itemTag.getOrNull<CompoundTag>("BlockEntityTag")?.let { if (it.isEmpty) itemTag else it }
     if (tileEntityTag != null) {
         val world = this.world.serverLevel
         world.getBlockEntity(MojangBlockPos(x, y, z), true)?.load(tileEntityTag)
@@ -598,8 +599,11 @@ object BlockUtils {
     
     internal fun getVanillaFurnaceExp(furnace: AbstractFurnaceBlockEntity): Int {
         return furnace.recipesUsed.object2IntEntrySet().sumOf { entry ->
+            val recipeHolder = MINECRAFT_SERVER.recipeManager.byKey(entry.key).orElse(null)
+            val recipe = recipeHolder?.value as? AbstractCookingRecipe
+            
             val amount = entry.intValue
-            val expPerRecipe = (MINECRAFT_SERVER.recipeManager.byKey(entry.key).orElse(null) as? AbstractCookingRecipe)?.experience?.toDouble() ?: 0.0
+            val expPerRecipe = recipe?.experience?.toDouble() ?: 0.0
             
             // Minecraft's logic to calculate the furnace exp
             var exp = floor(amount * expPerRecipe).toInt()

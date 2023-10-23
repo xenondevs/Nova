@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.util
 
 import org.bukkit.Bukkit
 import org.bukkit.block.data.BlockData
+import org.bukkit.craftbukkit.v1_20_R2.CraftServer
 import org.bukkit.event.Event
 import org.bukkit.event.Event.Result
 import org.bukkit.event.EventPriority
@@ -14,9 +15,9 @@ import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.RegisteredListener
 import xyz.xenondevs.commons.collections.mapToArray
-import xyz.xenondevs.nmsutils.network.event.PacketEventManager
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.transformer.patch.misc.EventPreventionPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
@@ -85,14 +86,20 @@ fun registerEvents(listener: Listener) {
 
 @JvmName("registerEventFirst1")
 fun registerEventFirst(listener: Listener, event: Class<out Event>) {
-    val registeredListeners = NOVA_PLUGIN.pluginLoader.createRegisteredListeners(listener, NOVA_PLUGIN)[event]!!
+    val registeredListeners = createRegisteredListener(listener, NOVA_PLUGIN)[event]!!
     registerRegisteredListenerFirst(registeredListeners, event)
 }
 
 @JvmName("registerEventsFirst1")
 fun registerEventsFirst(listener: Listener) {
-    val registeredListeners = NOVA_PLUGIN.pluginLoader.createRegisteredListeners(listener, NOVA_PLUGIN)
+    val registeredListeners = createRegisteredListener(listener, NOVA_PLUGIN)
     registeredListeners.forEach { registerRegisteredListenerFirst(it.value, it.key) }
+}
+
+private fun createRegisteredListener(listener: Listener, plugin: Plugin): Map<Class<out Event>, Set<RegisteredListener>> {
+    val paperPluginManager = (Bukkit.getServer() as CraftServer).paperPluginManager
+    val paperEventManager = ReflectionRegistry.PAPER_PLUGIN_MANAGER_IMPL_PAPER_EVENT_MANAGER_FIELD.get(paperPluginManager)
+    return ReflectionRegistry.PAPER_EVENT_MANAGER_CREATE_REGISTERED_LISTENERS_METHOD.invoke(paperEventManager, listener, plugin) as Map<Class<out Event>, Set<RegisteredListener>>
 }
 
 private fun registerRegisteredListenerFirst(registeredListeners: Set<RegisteredListener>, event: Class<out Event>) {
@@ -108,14 +115,14 @@ private fun registerRegisteredListenerFirst(registeredListeners: Set<RegisteredL
 
 @JvmName("registerEvent1")
 fun registerEvent(listener: Listener, event: Class<out Event>) {
-    val registeredListeners = NOVA_PLUGIN.pluginLoader.createRegisteredListeners(listener, NOVA_PLUGIN)[event]!!
+    val registeredListeners = createRegisteredListener(listener, NOVA_PLUGIN)[event]!!
     val handlerList = event.getMethod("getHandlerList").invoke(null) as HandlerList
     handlerList.registerAll(registeredListeners)
 }
 
 @JvmName("registerEventsExcept1")
 fun registerEventsExcept(listener: Listener, vararg eventClasses: Class<out Event>) {
-    val registeredListeners = NOVA_PLUGIN.pluginLoader.createRegisteredListeners(listener, NOVA_PLUGIN)
+    val registeredListeners = createRegisteredListener(listener, NOVA_PLUGIN)
     
     registeredListeners.forEach { (clazz, listeners) ->
         if (clazz in eventClasses)

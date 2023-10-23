@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.integration.customitems
 
 import net.kyori.adventure.text.Component
+import net.minecraft.resources.ResourceLocation
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.recipe.SingleItemTest
 import xyz.xenondevs.nova.data.resources.ResourcePath
 
@@ -65,8 +65,8 @@ object CustomItemServiceManager {
         return services.firstNotNullOfOrNull { it.canBreakBlock(block, tool) }
     }
     
-    fun getBlockItemModelPaths(): Map<NamespacedId, ResourcePath> {
-        val map = HashMap<NamespacedId, ResourcePath>()
+    fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath> {
+        val map = HashMap<ResourceLocation, ResourcePath>()
         services.forEach { map += it.getBlockItemModelPaths() }
         return map
     }
