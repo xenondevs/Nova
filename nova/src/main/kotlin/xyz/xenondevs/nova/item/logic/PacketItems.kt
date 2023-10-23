@@ -63,6 +63,7 @@ import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
+import xyz.xenondevs.nova.util.data.getStringOrNull
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
@@ -235,7 +236,7 @@ internal object PacketItems : Listener, PacketListener {
         val novaTag = itemTag.getOrNull<CompoundTag>("nova")
             ?: throw IllegalArgumentException("The provided ItemStack is not a Nova item.")
         
-        val id = novaTag.getString("id") ?: return getUnknownItem(itemStack, null)
+        val id = novaTag.getStringOrNull("id") ?: return getUnknownItem(itemStack, null)
         val item = NovaRegistries.ITEM[id] ?: return getUnknownItem(itemStack, id)
         val subId = novaTag.getInt("subId")
         
@@ -262,21 +263,24 @@ internal object PacketItems : Listener, PacketListener {
         val displayTag = newItemTag.getOrPut("display", ::CompoundTag)
         
         // name
-        var itemDisplayName: Component
+        var itemDisplayName: Component?
         if (!displayTag.contains("Name")) {
             if (useName) {
                 itemDisplayName = packetItemData.name
             } else {
-                itemDisplayName = Component.empty()
+                itemDisplayName = null
             }
         } else {
             val customName = displayTag.getString("Name").toAdventureComponentOrEmpty()
             itemDisplayName = customName.style(customName.style().merge(item.style.decorate(TextDecoration.ITALIC), Style.Merge.Strategy.IF_ABSENT_ON_TARGET))
         }
-        // enchanted items with no custom color or complex structure are colored aqua
-        if (Enchantable.isEnchanted(newItemStack) && itemDisplayName.color() == null && itemDisplayName.children().isEmpty())
-            itemDisplayName = itemDisplayName.color(NamedTextColor.AQUA)
-        displayTag.putString("Name", itemDisplayName.withoutPreFormatting().toJson())
+        if (itemDisplayName != null) {
+            // enchanted items with no custom color or complex structure are colored aqua
+            if (Enchantable.isEnchanted(newItemStack) && itemDisplayName.color() == null && itemDisplayName.children().isEmpty())
+                itemDisplayName = itemDisplayName.color(NamedTextColor.AQUA)
+            
+            displayTag.putString("Name", itemDisplayName.withoutPreFormatting().toJson())
+        }
         
         val loreTag = displayTag.getOrPut("Lore", ::ListTag)
         // enchantments
