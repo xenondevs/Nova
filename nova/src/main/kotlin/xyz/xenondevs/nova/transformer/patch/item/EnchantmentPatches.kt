@@ -11,6 +11,8 @@ import net.minecraft.world.level.Level
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.nova.item.behavior.Enchantable
 import xyz.xenondevs.nova.transformer.MultiTransformer
+import xyz.xenondevs.nova.util.ServerSoftware
+import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.block.logic.tileentity.EnchantmentTableLogic
 import xyz.xenondevs.nova.world.block.logic.tileentity.GrindstoneLogic
@@ -19,7 +21,8 @@ import xyz.xenondevs.nova.world.block.logic.tileentity.GrindstoneLogic
 private val ENCHANTMENT_MENU_SLOTS_CHANGED_LAMBDA = ReflectionUtils.getMethod(
     EnchantmentMenu::class,
     true,
-    "lambda\$slotsChanged\$0", // not remapped
+    // not remapped
+    if (ServerUtils.SERVER_SOFTWARE == ServerSoftware.PAPER) "lambda\$slotsChanged\$0" else "lambda\$slotsChanged$1",
     ItemStack::class, Level::class, BlockPos::class
 )
 
@@ -27,7 +30,8 @@ private val ENCHANTMENT_MENU_SLOTS_CHANGED_LAMBDA = ReflectionUtils.getMethod(
 private val ENCHANTMENT_MENU_CLICK_MENU_BUTTON_LAMBDA = ReflectionUtils.getMethod(
     EnchantmentMenu::class,
     true,
-    "lambda\$clickMenuButton\$1", // not remapped
+    // not remapped
+    if (ServerUtils.SERVER_SOFTWARE == ServerSoftware.PAPER) "lambda\$clickMenuButton\$1" else "lambda\$clickMenuButton$2",
     ItemStack::class, Int::class, Player::class, Int::class, ItemStack::class, Level::class, BlockPos::class
 )
 
