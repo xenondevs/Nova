@@ -14,7 +14,7 @@ internal object ResourceFilterSerializer : TypeSerializer<ResourceFilter> {
             ?: throw NoSuchElementException("Missing property 'stage' in content filter")
         val filterType = node.node("type").get<ResourceFilter.Type>()
             ?: throw NoSuchElementException("Missing property 'type' in content filter")
-        val patternType = node.node("patter_type").get<ResourceFilter.PatternType>()
+        val patternType = node.node("pattern_type").get<ResourceFilter.PatternType>()
             ?: throw NoSuchElementException("Missing property 'pattern_type' in content filter")
         val filter = node.node("filter").string
             ?: throw NoSuchElementException("Missing property 'filter' in content filter")
