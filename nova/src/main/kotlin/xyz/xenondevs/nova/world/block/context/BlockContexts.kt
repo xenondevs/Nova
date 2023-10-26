@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.block.context
 
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.EquipmentSlot
@@ -52,10 +51,10 @@ data class BlockPlaceContext(
             val pos = location.pos
             return BlockPlaceContext(
                 pos,
-                material.item?.createItemStack(1) ?: ItemStack(Material.AIR),
+                material.item?.createItemStack(1) ?: throw IllegalArgumentException("Block needs an item"),
                 source,
                 getSourceLocation(source) ?: location,
-                getOwnerUUID(source) ?: UUID(0L, 0L),
+                getOwnerUUID(source),
                 pos.add(0, -1, 0),
                 BlockFace.UP
             )
