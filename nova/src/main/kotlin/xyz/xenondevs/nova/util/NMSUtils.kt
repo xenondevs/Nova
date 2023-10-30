@@ -80,10 +80,6 @@ val Entity.nmsEntity: MojangEntity
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
 
-@Deprecated("Misleading name", replaceWith = ReplaceWith("nmsCopy"))
-val ItemStack.nmsStack: MojangStack
-    get() = CraftItemStack.asNMSCopy(this)
-
 val ItemStack?.nmsCopy: MojangStack
     get() = CraftItemStack.asNMSCopy(this)
 
@@ -99,10 +95,6 @@ val ItemStack?.nmsVersion: MojangStack
         
         return itemStack ?: CraftItemStack.asNMSCopy(this)
     }
-
-@Deprecated("Misleading name", replaceWith = ReplaceWith("bukkitCopy"))
-val MojangStack.bukkitStack: ItemStack
-    get() = CraftItemStack.asBukkitCopy(this)
 
 val MojangStack.bukkitCopy: ItemStack
     get() = CraftItemStack.asBukkitCopy(this)
@@ -144,23 +136,11 @@ val ResourceLocation.namespacedId: NamespacedId
 internal val ResourceLocation.name: String
     get() = path
 
-val InteractionHand.bukkitEquipmentSlot: EquipmentSlot
-    get() = when (this) {
-        InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
-        InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
-    }
-
-val EquipmentSlot.interactionHand: InteractionHand
+val EquipmentSlot.nmsInteractionHand: InteractionHand
     get() = when (this) {
         EquipmentSlot.HAND -> InteractionHand.MAIN_HAND
         EquipmentSlot.OFF_HAND -> InteractionHand.OFF_HAND
-        else -> throw UnsupportedOperationException()
-    }
-
-val InteractionHand.equipmentSlot: EquipmentSlot
-    get() = when (this) {
-        InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
-        InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
+        else -> throw UnsupportedOperationException("Not a hand: $this")
     }
 
 val EquipmentSlot.nmsEquipmentSlot: MojangEquipmentSlot
@@ -181,6 +161,25 @@ val MojangEquipmentSlot.bukkitEquipmentSlot: EquipmentSlot
         MojangEquipmentSlot.LEGS -> EquipmentSlot.LEGS
         MojangEquipmentSlot.CHEST -> EquipmentSlot.CHEST
         MojangEquipmentSlot.HEAD -> EquipmentSlot.HEAD
+    }
+
+val MojangEquipmentSlot.nmsInteractionHand: InteractionHand
+    get() = when(this) {
+        MojangEquipmentSlot.MAINHAND -> InteractionHand.MAIN_HAND
+        MojangEquipmentSlot.OFFHAND -> InteractionHand.OFF_HAND
+        else -> throw UnsupportedOperationException("Not a hand: $this")
+    }
+
+val InteractionHand.bukkitEquipmentSlot: EquipmentSlot
+    get() = when (this) {
+        InteractionHand.MAIN_HAND -> EquipmentSlot.HAND
+        InteractionHand.OFF_HAND -> EquipmentSlot.OFF_HAND
+    }
+
+val InteractionHand.nmsEquipmentSlot: MojangEquipmentSlot
+    get() = when (this) {
+        InteractionHand.MAIN_HAND -> MojangEquipmentSlot.MAINHAND
+        InteractionHand.OFF_HAND -> MojangEquipmentSlot.OFFHAND
     }
 
 val BlockFace.nmsDirection: Direction

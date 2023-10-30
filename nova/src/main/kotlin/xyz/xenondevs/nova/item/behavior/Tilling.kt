@@ -15,8 +15,8 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.above
-import xyz.xenondevs.nova.util.interactionHand
 import xyz.xenondevs.nova.util.nmsDirection
+import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.serverLevel
@@ -51,7 +51,7 @@ object Tilling : ItemBehavior {
             val block = event.clickedBlock!!
             val level = block.world.serverLevel
             val pos = block.pos.nmsPos
-            val interactionHand = event.hand!!.interactionHand
+            val interactionHand = event.hand!!.nmsInteractionHand
             
             val (check, newState, drops) = TILLABLES[block.nmsState.block] ?: return
             if (check.invoke(event)) {

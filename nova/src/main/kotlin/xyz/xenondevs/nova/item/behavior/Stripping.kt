@@ -15,7 +15,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.util.interactionHand
+import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.serverLevel
@@ -62,7 +62,7 @@ object Stripping : ItemBehavior {
             val block = event.clickedBlock!!
             event.isCancelled = stripBlock(
                 player.serverPlayer,
-                event.hand!!.interactionHand,
+                event.hand!!.nmsInteractionHand,
                 block.nmsState,
                 block.world.serverLevel,
                 block.pos.nmsPos

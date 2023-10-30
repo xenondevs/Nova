@@ -2,6 +2,10 @@ package xyz.xenondevs.nova.world.block.limits
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -11,8 +15,6 @@ import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
-import xyz.xenondevs.nova.world.block.context.BlockBreakContext
-import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.lang.Integer.max
 import java.util.*
 
@@ -38,14 +40,14 @@ internal object TileEntityTracker {
         PermanentStorage.store("block_chunk_counter", BLOCK_CHUNK_COUNTER)
     }
     
-    internal fun handleBlockPlace(material: NovaTileEntityBlock, ctx: BlockPlaceContext) {
-        if (ctx.ownerUUID != null)
-            modifyCounters(ctx.ownerUUID, ctx.pos, material.id, 1)
+    internal fun handleBlockPlace(block: NovaTileEntityBlock, ctx: Context<BlockPlace>) {
+        val sourceUuid = ctx[ContextParamTypes.SOURCE_UUID] ?: return
+        modifyCounters(sourceUuid, ctx[ContextParamTypes.BLOCK_POS]!!, block.id, 1)
     }
     
-    internal fun handleBlockBreak(tileEntity: TileEntity, ctx: BlockBreakContext) {
+    internal fun handleBlockBreak(tileEntity: TileEntity, ctx: Context<BlockBreak>) {
         if (tileEntity.ownerUUID != null)
-            modifyCounters(tileEntity.ownerUUID, ctx.pos, tileEntity.block.id, -1)
+            modifyCounters(tileEntity.ownerUUID, ctx[ContextParamTypes.BLOCK_POS]!!, tileEntity.block.id, -1)
     }
     
     private fun modifyCounters(player: UUID, pos: BlockPos, id: ResourceLocation, add: Int) {

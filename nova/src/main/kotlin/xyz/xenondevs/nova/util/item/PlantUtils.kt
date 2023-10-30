@@ -14,6 +14,9 @@ import org.bukkit.block.data.Ageable
 import org.bukkit.block.data.type.CaveVinesPlant
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.enumMapOf
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
@@ -24,7 +27,6 @@ import xyz.xenondevs.nova.util.getAllDrops
 import xyz.xenondevs.nova.util.hasSameTypeBelow
 import xyz.xenondevs.nova.util.remove
 import xyz.xenondevs.nova.util.serverLevel
-import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import kotlin.random.Random
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -188,18 +190,18 @@ object PlantUtils {
             && HARVESTABLE_PLANTS[block.type]?.first?.invoke(block) ?: true
     }
     
-    fun harvest(ctx: BlockBreakContext, playEffects: Boolean) {
-        val block = ctx.pos.block
+    fun harvest(ctx: Context<BlockBreak>) {
+        val block = ctx[ContextParamTypes.BLOCK_POS]!!.block
         val type = block.type
         if (block.type !in HARVESTABLE_PLANTS) return
         
         val harvestFunction = HARVESTABLE_PLANTS[type]?.second
         if (harvestFunction != null) harvestFunction(block, true)
-        else block.remove(ctx, playEffects)
+        else block.remove(ctx)
     }
     
-    fun getHarvestDrops(ctx: BlockBreakContext): List<ItemStack>? {
-        val block = ctx.pos.block
+    fun getHarvestDrops(ctx: Context<BlockBreak>): List<ItemStack>? {
+        val block = ctx[ContextParamTypes.BLOCK_POS]!!.block
         val type = block.type
         if (block.type !in HARVESTABLE_PLANTS) return null
         

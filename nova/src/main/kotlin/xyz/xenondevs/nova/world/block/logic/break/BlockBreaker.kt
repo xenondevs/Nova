@@ -26,6 +26,9 @@ import xyz.xenondevs.nmsutils.particle.item
 import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.entry
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.tool.ToolCategory
@@ -47,7 +50,6 @@ import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
-import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.pos
@@ -219,12 +221,11 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
     
     fun breakBlock(brokenClientside: Boolean, sequence: Int) {
         // create a block breaking context
-        val ctx = BlockBreakContext(
-            block.pos,
-            player, player.location,
-            BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation),
-            tool
-        )
+        val ctx = Context.intention(ContextIntentions.BlockBreak)
+            .param(ContextParamTypes.BLOCK_POS, block.pos)
+            .param(ContextParamTypes.SOURCE_ENTITY, player)
+            .param(ContextParamTypes.TOOL_ITEM_STACK, tool)
+            .param(ContextParamTypes.BLOCK_DROPS, drops)
         
         val level = block.world.serverLevel
         val blockPos = block.pos.nmsPos
@@ -233,11 +234,12 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         val event = BlockBreakEvent(block, player)
         if (drops) {
             event.expToDrop = when (this) {
-                is NovaBlockBreaker -> material.logic.getExp(blockState, ctx)
+                is NovaBlockBreaker -> material.logic.getExp(blockState, ctx.build())
                 is VanillaBlockBreaker -> BlockUtils.getVanillaBlockExp(level, blockPos, tool.nmsCopy)
             }
         }
         callEvent(event)
+        ctx.param(ContextParamTypes.BLOCK_DROPS, drops && event.isDropItems)
         //</editor-fold>
         
         if (!event.isCancelled && !ProtectionManager.isVanillaProtected(player, block.location)) {
@@ -272,7 +274,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             val state = block.state
             
             // remove block
-            val itemEntities = block.removeInternal(ctx, event.isDropItems && drops, true, !brokenClientside)
+            val itemEntities = block.removeInternal(ctx.build(), !brokenClientside)
             
             // drop items
             if (event.isDropItems) {

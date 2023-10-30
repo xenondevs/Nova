@@ -4,10 +4,14 @@ import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.reflection.getRuntimeDelegate
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockInteract
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
@@ -24,7 +28,6 @@ import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.BlockFaceUtils
-import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -61,13 +64,17 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
         serializeConnectedNodes()
     }
     
-    final override fun handleRightClick(ctx: BlockInteractContext): Boolean {
-        val item = ctx.item
+    final override fun handleRightClick(ctx: Context<BlockInteract>): Boolean {
+        val itemStack: ItemStack? = ctx[ContextParamTypes.INTERACTION_ITEM_STACK]
+        val sourceEntity: Entity? = ctx[ContextParamTypes.SOURCE_ENTITY]
+        val interactionHand: EquipmentSlot? = ctx[ContextParamTypes.INTERACTION_HAND]
+        
         val holder = holders[DefaultNetworkTypes.FLUID]
-        if (holder is NovaFluidHolder && ctx.source is Player && ctx.hand != null) {
-            val success = when (item?.type) {
-                Material.BUCKET -> fillBucket(holder, ctx.source, ctx.hand)
-                Material.WATER_BUCKET, Material.LAVA_BUCKET -> emptyBucket(holder, ctx.source, ctx.hand)
+        
+        if (holder is NovaFluidHolder && sourceEntity is Player && interactionHand != null) {
+            val success = when (itemStack?.type) {
+                Material.BUCKET -> fillBucket(holder, sourceEntity, interactionHand)
+                Material.WATER_BUCKET, Material.LAVA_BUCKET -> emptyBucket(holder, sourceEntity, interactionHand)
                 else -> false
             }
             
@@ -128,7 +135,7 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
         return false
     }
     
-    open fun handleUnknownRightClick(ctx: BlockInteractContext): Boolean {
+    open fun handleUnknownRightClick(ctx: Context<BlockInteract>): Boolean {
         return super.handleRightClick(ctx)
     }
     

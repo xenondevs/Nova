@@ -12,6 +12,9 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockMultiPlaceEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
@@ -33,7 +36,6 @@ import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
 import xyz.xenondevs.nova.world.pos
 import java.util.concurrent.CompletableFuture
@@ -100,7 +102,7 @@ internal object BlockPlacing : Listener {
                 clicked.location
             else clicked.location.advance(event.blockFace)
         
-        if (!placeLoc.isInsideWorldRestrictions() || !placeLoc.block.isUnobstructed(material.vanillaBlockMaterial, player))
+        if (!placeLoc.isInsideWorldRestrictions() || !placeLoc.block.isUnobstructed(player, material.vanillaBlockMaterial))
             return
         
         val futures = ArrayList<CompletableFuture<Boolean>>()
@@ -121,11 +123,12 @@ internal object BlockPlacing : Listener {
             if (!canPlace(player, handItem, placeLoc.pos, placeLoc.clone().advance(event.blockFace.oppositeFace).pos))
                 return@runIfTrueOnSimilarThread
             
-            val ctx = BlockPlaceContext(
-                placeLoc.pos, handItem,
-                player, player.location, player.uniqueId,
-                event.clickedBlock!!.pos, event.blockFace
-            )
+            val ctx = Context.intention(ContextIntentions.BlockPlace)
+                .param(ContextParamTypes.BLOCK_POS, placeLoc.pos)
+                .param(ContextParamTypes.BLOCK_ITEM_STACK, handItem)
+                .param(ContextParamTypes.SOURCE_ENTITY, player)
+                .param(ContextParamTypes.CLICKED_BLOCK_FACE, event.blockFace)
+                .build()
             
             val result = TileEntityLimits.canPlace(ctx)
             if (result.allowed) {

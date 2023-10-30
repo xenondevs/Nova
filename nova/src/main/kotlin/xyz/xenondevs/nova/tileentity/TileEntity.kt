@@ -23,6 +23,9 @@ import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.data.config.Reloadable
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockInteract
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
@@ -49,7 +52,6 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.TileEntityBlockBehavior
-import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.region.DynamicRegion
 import xyz.xenondevs.nova.world.region.Region
@@ -229,12 +231,15 @@ abstract class TileEntity(val blockState: NovaTileEntityState) : DataHolder(true
      *
      * @return If any action was performed.
      */
-    open fun handleRightClick(ctx: BlockInteractContext): Boolean {
-        val player = ctx.source as? Player ?: return false
+    open fun handleRightClick(ctx: Context<BlockInteract>): Boolean {
+        val player = ctx[ContextParamTypes.SOURCE_ENTITY] as? Player
+            ?: return false
+        
         if (::menuContainer.isInitialized && !player.hasInventoryOpen) {
             menuContainer.openWindow(player)
             return true
         }
+        
         return false
     }
     

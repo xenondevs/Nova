@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
 @Suppress("DEPRECATION")
-internal class ApiTileEntityWrapper(private val tileEntity: TileEntity) : ITileEntity {
+internal class ApiTileEntityWrapper(val tileEntity: TileEntity) : ITileEntity {
     
     @Deprecated("Use NovaBlock instead", replaceWith = ReplaceWith("block"))
     override fun getMaterial(): NovaMaterial = LegacyMaterialWrapper(Either.right(tileEntity.block))

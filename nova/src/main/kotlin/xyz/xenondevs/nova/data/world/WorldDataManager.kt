@@ -4,9 +4,7 @@ package xyz.xenondevs.nova.data.world
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.World
-import org.bukkit.block.BlockFace
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -14,12 +12,14 @@ import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
 import org.bukkit.event.world.WorldUnloadEvent
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.pollFirstWhere
 import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.addon.AddonsInitializer
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.data.world.block.state.BlockState
 import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
@@ -38,7 +38,6 @@ import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.pos
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -245,7 +244,11 @@ object WorldDataManager : Listener {
     }
     
     private fun placeOrphanBlock(pos: BlockPos, material: NovaBlock) {
-        val ctx = BlockPlaceContext(pos, material.item?.createItemStack(0) ?: ItemStack(Material.AIR), null, null, null, pos.below, BlockFace.UP)
+        val ctx = Context.intention(ContextIntentions.BlockPlace)
+            .param(ContextParamTypes.BLOCK_POS, pos)
+            .param(ContextParamTypes.BLOCK_TYPE_NOVA, material)
+            .build()
+        
         val state = material.createNewBlockState(ctx)
         setBlockState(pos, state)
         state.handleInitialized(true)

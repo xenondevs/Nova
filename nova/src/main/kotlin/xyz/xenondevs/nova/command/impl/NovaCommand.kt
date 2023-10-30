@@ -25,6 +25,9 @@ import xyz.xenondevs.nova.command.requiresPlayerPermission
 import xyz.xenondevs.nova.command.sendFailure
 import xyz.xenondevs.nova.command.sendSuccess
 import xyz.xenondevs.nova.data.config.Configs
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -53,7 +56,6 @@ import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.backingstate.BackingStateManager
-import xyz.xenondevs.nova.world.block.context.BlockBreakContext
 import xyz.xenondevs.nova.world.block.hitbox.HitboxManager
 import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MAX_RENDER_DISTANCE
@@ -405,7 +407,12 @@ internal object NovaCommand : Command("nova") {
         val player = ctx.player
         val chunks = player.location.chunk.getSurroundingChunks(ctx["range"], true)
         val novaBlocks = chunks.flatMap { WorldDataManager.getBlockStates(it.pos).values.filterIsInstance<NovaBlockState>() }
-        novaBlocks.forEach { BlockManager.removeBlockState(BlockBreakContext(it.pos)) }
+        novaBlocks.forEach {
+            val breakCtx = Context.intention(ContextIntentions.BlockBreak)
+                .param(ContextParamTypes.BLOCK_POS, it.pos)
+                .build()
+            BlockManager.removeBlockState(breakCtx)
+        }
         
         ctx.source.sendSuccess(Component.translatable(
             "command.nova.remove_tile_entities.success",

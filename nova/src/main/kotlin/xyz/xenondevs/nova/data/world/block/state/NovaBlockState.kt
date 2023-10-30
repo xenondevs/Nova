@@ -4,14 +4,16 @@ import org.bukkit.Location
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteBuffer
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.data.world.block.property.BlockProperty
 import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.context.BlockBreakContext
-import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 
@@ -30,7 +32,7 @@ open class NovaBlockState internal constructor(override val pos: BlockPos, block
     final override var isLoaded = false
         private set
     
-    internal constructor(material: NovaBlock, ctx: BlockPlaceContext) : this(ctx.pos, material) {
+    internal constructor(material: NovaBlock, ctx: Context<BlockPlace>) : this(ctx[ContextParamTypes.BLOCK_POS]!!, material) {
         properties.values.forEach { it.init(ctx) }
     }
     
@@ -54,7 +56,13 @@ open class NovaBlockState internal constructor(override val pos: BlockPos, block
         isLoaded = false
         
         if (broken) {
-            block.multiBlockLoader?.invoke(pos)?.forEach { BlockManager.removeLinkedBlockState(BlockBreakContext(it), breakEffects = true) }
+            block.multiBlockLoader?.invoke(pos)?.forEach {
+                val ctx = Context.intention(ContextIntentions.BlockBreak)
+                    .param(ContextParamTypes.BLOCK_POS, it)
+                    .build()
+                
+                BlockManager.removeLinkedBlockState(ctx, breakEffects = true)
+            }
         }
         
         modelProvider.remove(broken)

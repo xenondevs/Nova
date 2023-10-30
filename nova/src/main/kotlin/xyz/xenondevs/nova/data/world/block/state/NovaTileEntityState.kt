@@ -1,15 +1,18 @@
 package xyz.xenondevs.nova.data.world.block.state
 
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteBuffer
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.util.UUIDUtils
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
-import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.*
 
 class NovaTileEntityState : NovaBlockState {
@@ -37,14 +40,14 @@ class NovaTileEntityState : NovaBlockState {
         this.block = material
     }
     
-    internal constructor(material: NovaTileEntityBlock, ctx: BlockPlaceContext) : super(material, ctx) {
+    internal constructor(material: NovaTileEntityBlock, ctx: Context<BlockPlace>) : super(material, ctx) {
         this.block = material
         this.uuid = UUID.randomUUID()
-        this.ownerUUID = ctx.ownerUUID
+        this.ownerUUID = ctx[ContextParamTypes.SOURCE_UUID]
         this.data = Compound()
         
-        val item = ctx.item
-        val globalData = item.novaCompoundOrNull?.get<Compound>(TileEntity.TILE_ENTITY_DATA_KEY)
+        val itemStack: ItemStack? = ctx[ContextParamTypes.BLOCK_ITEM_STACK]
+        val globalData = itemStack?.novaCompoundOrNull?.get<Compound>(TileEntity.TILE_ENTITY_DATA_KEY)
         if (globalData != null) {
             data["global"] = globalData
         }

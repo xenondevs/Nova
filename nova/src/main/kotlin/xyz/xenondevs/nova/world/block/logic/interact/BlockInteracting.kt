@@ -15,12 +15,14 @@ import org.bukkit.event.block.BlockPistonRetractEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.inventory.InventoryCreativeEvent
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.block.BlockManager
-import xyz.xenondevs.nova.world.block.context.BlockBreakContext
-import xyz.xenondevs.nova.world.block.context.BlockInteractContext
 import xyz.xenondevs.nova.world.pos
 
 internal object BlockInteracting : Listener {
@@ -42,7 +44,15 @@ internal object BlockInteracting : Listener {
             val blockState = BlockManager.getBlockState(pos)
             if (blockState != null && ProtectionManager.canUseBlock(player, event.item, pos.location).get()) {
                 val material = blockState.block
-                val ctx = BlockInteractContext(pos, player, player.location, event.blockFace, event.item, event.hand)
+                
+                val ctx = Context.intention(ContextIntentions.BlockInteract)
+                    .param(ContextParamTypes.BLOCK_POS, pos)
+                    .param(ContextParamTypes.BLOCK_TYPE_NOVA, material)
+                    .param(ContextParamTypes.SOURCE_ENTITY, player)
+                    .param(ContextParamTypes.CLICKED_BLOCK_FACE, event.blockFace)
+                    .param(ContextParamTypes.INTERACTION_HAND, event.hand)
+                    .param(ContextParamTypes.INTERACTION_ITEM_STACK, event.item)
+                    .build()
                 
                 val actionPerformed = material.logic.handleInteract(blockState, ctx)
                 event.isCancelled = actionPerformed
@@ -76,7 +86,11 @@ internal object BlockInteracting : Listener {
         val pos = event.block.pos
         val state = BlockManager.getBlockState(pos)
         if (state != null && Material.AIR == event.block.type) {
-            BlockManager.breakBlockState(BlockBreakContext(pos, null, null, null, null), false)
+            val ctx = Context.intention(BlockBreak)
+                .param(ContextParamTypes.BLOCK_POS, pos)
+                .param(ContextParamTypes.BLOCK_BREAK_EFFECTS, false)
+                .build()
+            BlockManager.breakBlockState(ctx)
         }
     }
     
@@ -96,7 +110,13 @@ internal object BlockInteracting : Listener {
     private fun handleExplosion(blockList: MutableList<Block>) {
         val novaBlocks = blockList.filter { BlockManager.getBlockState(it.pos) != null }
         blockList.removeAll(novaBlocks)
-        novaBlocks.forEach { BlockManager.breakBlockState(BlockBreakContext(it.pos, null, null, null, null), false) }
+        novaBlocks.forEach {
+            val ctx = Context.intention(BlockBreak)
+                .param(ContextParamTypes.BLOCK_POS, it.pos)
+                .param(ContextParamTypes.BLOCK_BREAK_EFFECTS, false)
+                .build()
+            BlockManager.breakBlockState(ctx)
+        }
     }
     
 }

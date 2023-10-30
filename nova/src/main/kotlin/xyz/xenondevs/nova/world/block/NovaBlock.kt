@@ -10,6 +10,8 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.ConfigProvider
 import xyz.xenondevs.nova.data.config.Configs
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.resources.model.data.BlockModelData
 import xyz.xenondevs.nova.data.resources.model.data.BlockStateBlockModelData
@@ -20,7 +22,6 @@ import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -79,7 +80,7 @@ open class NovaBlock internal constructor(
     internal open fun createBlockState(pos: BlockPos): NovaBlockState =
         NovaBlockState(pos, this)
     
-    internal open fun createNewBlockState(ctx: BlockPlaceContext): NovaBlockState =
+    internal open fun createNewBlockState(ctx: Context<BlockPlace>): NovaBlockState =
         NovaBlockState(this, ctx)
     
     companion object {
