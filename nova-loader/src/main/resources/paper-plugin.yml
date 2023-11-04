@@ -15,8 +15,6 @@ dependencies:
       required: false
     PlotSquared:
       required: false
-    GriefDefender:
-      required: false
     ProtectionStones:
       required: false
     Towny:
@@ -38,6 +36,8 @@ dependencies:
     FastAsyncWorldEdit:
       required: false
     WorldEdit:
+      required: false
+    LuckPerms:
       required: false
 
 permissions:
