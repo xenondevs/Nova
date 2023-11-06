@@ -77,6 +77,7 @@ fun obtainNovaItemsAdvancement(
         for (item in items) {
             val criterionName = "obtain_${item.id.name}"
             addCriterion(criterionName, createObtainNovaItemCriterion(item))
+            criteriaNames += criterionName
         }
         
         if (requireAll) {
