@@ -106,15 +106,17 @@ sealed interface Enchantment {
             
             return object : BukkitEnchantment(key) {
                 
-                override fun translationKey() = enchantment.localizedName
-                override fun getName() = key.toString()
+                override fun translationKey(): String = enchantment.localizedName
+                override fun getName(): String = key.toString()
                 override fun getMaxLevel(): Int = enchantment.maxLevel
                 override fun getStartLevel(): Int = enchantment.minLevel
                 override fun getItemTarget(): EnchantmentTarget = EnchantmentTarget.ALL
                 override fun isTreasure(): Boolean = enchantment.isTreasure
                 override fun isCursed(): Boolean = enchantment.isCurse
-                override fun isTradeable() = enchantment.isTradeable
+                override fun isTradeable(): Boolean = enchantment.isTradeable
                 override fun isDiscoverable() = enchantment.isTableDiscoverable
+                override fun getMinModifiedCost(level: Int): Int = enchantment.getTableLevelRequirement(level).first
+                override fun getMaxModifiedCost(level: Int): Int = enchantment.getTableLevelRequirement(level).last
                 override fun getRarity(): EnchantmentRarity = EnchantmentRarity.COMMON // TODO: find closest match
                 override fun getDamageIncrease(level: Int, entityCategory: EntityCategory): Float = 0f
                 override fun getActiveSlots(): Set<EquipmentSlot> = emptySet() // TODO
