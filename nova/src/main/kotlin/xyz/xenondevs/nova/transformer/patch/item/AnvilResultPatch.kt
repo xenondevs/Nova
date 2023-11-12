@@ -5,11 +5,8 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.Container
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AnvilMenu
-import net.minecraft.world.item.EnchantedBookItem
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
 import net.minecraft.world.item.enchantment.Enchantment.Rarity.*
-import net.minecraft.world.item.enchantment.EnchantmentHelper
 import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.inventory.InventoryView
 import xyz.xenondevs.bytebase.asm.buildInsnList
@@ -18,6 +15,9 @@ import xyz.xenondevs.nova.item.behavior.Damageable.Companion.getMaxDurability
 import xyz.xenondevs.nova.item.behavior.Damageable.Companion.isDamageable
 import xyz.xenondevs.nova.item.behavior.Damageable.Companion.isValidRepairItem
 import xyz.xenondevs.nova.item.behavior.Damageable.Companion.setDamage
+import xyz.xenondevs.nova.item.behavior.Enchantable
+import xyz.xenondevs.nova.item.enchantment.Enchantment
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.callEvent
@@ -28,6 +28,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import kotlin.math.max
 import kotlin.math.min
 
+// fixme: when shift-clicking items into the anvil menu the result will not be shown client-side
 @Suppress("unused")
 internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
     
@@ -46,9 +47,9 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
     
     @JvmStatic
     fun createResult(menu: AnvilMenu, inputSlots: Container, player: Player) {
-        val inputStack = inputSlots.getItem(0)
+        val primaryStack = inputSlots.getItem(0)
         
-        if (inputStack.isEmpty) {
+        if (primaryStack.isEmpty) {
             callPrepareAnvilEvent(menu.bukkitView, ItemStack.EMPTY)
             menu.cost.set(-1)
             return
@@ -56,15 +57,15 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
         
         menu.repairItemCountCost = 0
         
-        var resultStack = inputStack.copy()
-        val secondStack = inputSlots.getItem(1)
+        var resultStack = primaryStack.copy()
+        val secondaryStack = inputSlots.getItem(1)
         var extraCost = 0
         
-        if (!secondStack.isEmpty) {
-            if (isDamageable(inputStack) && isValidRepairItem(inputStack, secondStack)) {
+        if (!secondaryStack.isEmpty) {
+            if (isDamageable(primaryStack) && isValidRepairItem(primaryStack, secondaryStack)) {
                 //<editor-fold desc="repairing with repair items", defaultstate="collapsed">
-                val maxDurability = getMaxDurability(inputStack)
-                var damageValue = getDamage(inputStack)
+                val maxDurability = getMaxDurability(primaryStack)
+                var damageValue = getDamage(primaryStack)
                 var repairValue = min(damageValue, maxDurability / 4)
                 
                 if (repairValue <= 0) {
@@ -74,7 +75,7 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
                 }
                 
                 var itemsUsed = 0
-                while (repairValue > 0 && itemsUsed < secondStack.count) {
+                while (repairValue > 0 && itemsUsed < secondaryStack.count) {
                     itemsUsed++
                     extraCost++
                     
@@ -86,22 +87,24 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
                 menu.repairItemCountCost = itemsUsed
                 //</editor-fold>
             } else {
-                val isEnchantedBook = secondStack.item == Items.ENCHANTED_BOOK
-                    && EnchantedBookItem.getEnchantments(secondStack).isNotEmpty()
+                val isPrimaryEnchantedBook = Enchantable.isEnchantedBook(primaryStack)
+                val isSecondaryEnchantedBook = Enchantable.isEnchantedBook(secondaryStack)
                 
-                if (!isEnchantedBook && (!isSameItemType(inputStack, secondStack) || !isDamageable(inputStack))) {
+                if (!isSecondaryEnchantedBook && (!isSameItemType(primaryStack, secondaryStack) || !isDamageable(primaryStack))) {
                     callPrepareAnvilEvent(menu.bukkitView, ItemStack.EMPTY)
                     menu.cost.set(-1)
                     return
                 }
                 
+                // assert secondaryStack is enchanted book or the same item type as primaryStack
+                
                 //<editor-fold desc="repairing with same item", defaultstate="collapsed">
-                if (!isEnchantedBook && isDamageable(inputStack)) {
-                    val inputStackMaxDurability = getMaxDurability(inputStack)
-                    val inputStackDamage = getDamage(inputStack)
+                if (!isSecondaryEnchantedBook && isDamageable(primaryStack)) {
+                    val inputStackMaxDurability = getMaxDurability(primaryStack)
+                    val inputStackDamage = getDamage(primaryStack)
                     
                     val firstDurability = inputStackMaxDurability - inputStackDamage
-                    val secondDurability = getMaxDurability(secondStack) - getDamage(secondStack)
+                    val secondDurability = getMaxDurability(secondaryStack) - getDamage(secondaryStack)
                     
                     val resultDurability = firstDurability + secondDurability + (inputStackMaxDurability * 12 / 100)
                     val resultDamage = inputStackMaxDurability - max(0, resultDurability)
@@ -116,11 +119,14 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
                 var incompatibleEnchantments = false
                 var hasChanged = false
                 
-                val enchantments = EnchantmentHelper.getEnchantments(inputStack)
-                val extraEnchantments = EnchantmentHelper.getEnchantments(secondStack)
+                val enchantments = Enchantable.getEnchantmentsOrStoredEnchantments(primaryStack).toMutableMap()
+                val extraEnchantments = Enchantable.getEnchantmentsOrStoredEnchantments(secondaryStack)
                 
                 for ((enchantment, level) in extraEnchantments) {
-                    var isCompatible = enchantment.canEnchant(inputStack) || player.abilities.instabuild || inputStack.item == Items.ENCHANTED_BOOK
+                    var isCompatible = player.abilities.instabuild
+                        || isPrimaryEnchantedBook
+                        || canEnchant(primaryStack, enchantment)
+                    
                     for (previousEnchantment in enchantments.keys) {
                         if (previousEnchantment != enchantment && !enchantment.isCompatibleWith(previousEnchantment)) {
                             isCompatible = false
@@ -134,16 +140,19 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
                         
                         enchantments[enchantment] = newLevel
                         
-                        val costMultiplier = when (enchantment.rarity) {
-                            COMMON -> 1
-                            UNCOMMON -> 2
-                            RARE -> 4
-                            VERY_RARE -> 8
-                        }.let { if (isEnchantedBook) max(1, it / 2) else it }
+                        val rarity = enchantment.rarity
+                        var costMultiplier = when {
+                            rarity > COMMON.weight -> 1
+                            rarity > UNCOMMON.weight -> 2
+                            rarity > RARE.weight -> 4
+                            else -> 8
+                        }
+                        if (isSecondaryEnchantedBook)
+                            costMultiplier = max(1, costMultiplier / 2)
                         
                         extraCost += costMultiplier * level
                         
-                        if (inputStack.count > 1) {
+                        if (primaryStack.count > 1) {
                             extraCost = menu.maximumRepairCost
                         }
                         
@@ -157,7 +166,7 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
                     return
                 }
                 
-                EnchantmentHelper.setEnchantments(enchantments, resultStack)
+                Enchantable.setEnchantmentsOrStoredEnchantments(resultStack, enchantments)
                 //</editor-fold>
             }
         }
@@ -165,19 +174,19 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
         //<editor-fold desc="renaming", defaultstate="collapsed">
         var renamed = false
         if (menu.itemName.isNullOrBlank()) {
-            if (inputStack.hasCustomHoverName()) {
+            if (primaryStack.hasCustomHoverName()) {
                 renamed = true
                 extraCost += 1
                 resultStack.resetHoverName()
             }
-        } else if (menu.itemName != getHoverName(player, inputStack)) {
+        } else if (menu.itemName != getHoverName(player, primaryStack)) {
             renamed = true
             extraCost += 1
             resultStack.hoverName = menu.itemName?.let(Component::literal)
         }
         //</editor-fold>
         //<editor-fold desc="cost calculations", defaultstate="collapsed">
-        var totalCost = inputStack.baseRepairCost + secondStack.baseRepairCost + extraCost
+        var totalCost = primaryStack.baseRepairCost + secondaryStack.baseRepairCost + extraCost
         
         if (extraCost == 0) {
             resultStack = ItemStack.EMPTY
@@ -192,10 +201,10 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
                 resultStack = ItemStack.EMPTY
             } else {
                 // calculate base repair cost for new item
-                var resultRepairCost = inputStack.baseRepairCost
+                var resultRepairCost = primaryStack.baseRepairCost
                 
-                if (!secondStack.isEmpty && resultRepairCost < secondStack.baseRepairCost) {
-                    resultRepairCost = secondStack.baseRepairCost
+                if (!secondaryStack.isEmpty && resultRepairCost < secondaryStack.baseRepairCost) {
+                    resultRepairCost = secondaryStack.baseRepairCost
                 }
                 
                 if (!renamed || extraCost > 1) {
@@ -232,6 +241,12 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
             .also(::callEvent)
         
         event.inventory.setItem(2, event.result)
+    }
+    
+    private fun canEnchant(itemStack: ItemStack, enchantment: Enchantment): Boolean {
+        return NovaRegistries.ENCHANTMENT_CATEGORY.any { category ->
+            enchantment in category.enchantments && category.canEnchant(itemStack)
+        }
     }
     
 }
