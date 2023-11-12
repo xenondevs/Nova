@@ -9,7 +9,6 @@ import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
 import org.bukkit.craftbukkit.v1_20_R2.CraftServer
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack
 import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.objectweb.asm.Opcodes
@@ -47,7 +46,6 @@ internal object RemainingItemPatches : MultiTransformer(
         
         patchRecipeGetRemainingItems()
         patchAbstractFurnaceBlockEntityServerTick()
-        patchCraftServerCraftItem()
     }
     
     /**
@@ -124,26 +122,6 @@ internal object RemainingItemPatches : MultiTransformer(
                 aLoad(6) // ItemStack
                 invokeStatic(::getRemainingItemStack)
                 ldc(1) // slot
-                swap()
-            }
-        )
-    }
-    
-    /**
-     * Replaces this range: https://i.imgur.com/HTZXwHp.png with a call to [getRemainingBukkitItemStack].
-     */
-    private fun patchCraftServerCraftItem() {
-        val methodNode = VirtualClassPath[CraftServer::craftItem]
-        methodNode.localVariables.clear()
-        methodNode.replaceEveryRange(
-            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(MojangStack::getItem) },
-            { it.opcode == Opcodes.INVOKESTATIC && (it as MethodInsnNode).calls(CraftItemStack::asBukkitCopy) },
-            0, 3,
-            {
-                invokeStatic(::getRemainingBukkitItemStack)
-                aLoad(1) // ItemStack[]
-                swap()
-                iLoad(12) // for loop index
                 swap()
             }
         )
