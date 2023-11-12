@@ -186,7 +186,7 @@ class NovaItem internal constructor(
      * Checks whether this [NovaItem] has an [ItemBehavior] of the specified class [behavior], or a subclass of it.
      */
     fun <T : Any> hasBehavior(type: KClass<T>): Boolean =
-        behaviors.any { it::class == type }
+        behaviors.any { type.isSuperclassOf(it::class) }
     
     /**
      * Gets the first [ItemBehavior] that is an instance of [T], or null if there is none.
