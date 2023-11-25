@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.item.behavior
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.StringTag
+import net.minecraft.world.item.Items
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import xyz.xenondevs.commons.provider.Provider
@@ -90,6 +91,9 @@ interface Enchantable {
         fun isEnchanted(itemStack: BukkitStack): Boolean =
             isEnchanted(itemStack.nmsCopy)
         
+        fun isEnchantedBook(itemStack: BukkitStack): Boolean =
+            isEnchantedBook(itemStack.nmsCopy)
+        
         fun hasStoredEnchantments(itemStack: BukkitStack): Boolean =
             hasStoredEnchantments(itemStack.nmsCopy)
         
@@ -98,6 +102,9 @@ interface Enchantable {
         
         fun getStoredEnchantments(itemStack: BukkitStack): Map<Enchantment, Int> =
             getStoredEnchantments(itemStack.nmsCopy)
+        
+        fun getEnchantmentsOrStoredEnchantments(itemStack: BukkitStack): Map<Enchantment, Int> =
+            getEnchantmentsOrStoredEnchantments(itemStack.nmsCopy)
         
         fun setEnchantments(itemStack: BukkitStack, enchantments: Map<Enchantment, Int>) {
             // clear vanilla enchants
@@ -114,6 +121,14 @@ interface Enchantable {
                 meta.removeStoredEnchant(enchantment)
             
             setEnchantments(STORED_ENCHANTMENTS_CBF, { ench, lvl -> meta.addStoredEnchant(ench, lvl, true) }, itemStack, enchantments)
+        }
+        
+        fun setEnchantmentsOrStoredEnchantments(itemStack: BukkitStack, enchantments: Map<Enchantment, Int>) {
+            if (isEnchantedBook(itemStack)) {
+                setStoredEnchantments(itemStack, enchantments)
+            } else {
+                setEnchantments(itemStack, enchantments)
+            }
         }
         
         private fun setEnchantments(cbfName: String, addVanillaEnchantment: (BukkitEnchantment, Int) -> Unit, itemStack: BukkitStack, enchantments: Map<Enchantment, Int>) {
@@ -141,6 +156,14 @@ interface Enchantable {
             addEnchantment(STORED_ENCHANTMENTS_CBF, { ench, lvl -> meta.addStoredEnchant(ench, lvl, true) }, itemStack, enchantment, level)
         }
         
+        fun addEnchantmentOrStoredEnchantment(itemStack: BukkitStack, enchantment: Enchantment, level: Int) {
+            if (isEnchantedBook(itemStack)) {
+                addStoredEnchantment(itemStack, enchantment, level)
+            } else {
+                addEnchantment(itemStack, enchantment, level)
+            }
+        }
+        
         private fun addEnchantment(cbfName: String, addVanillaEnchantment: (BukkitEnchantment, Int) -> Unit, itemStack: BukkitStack, enchantment: Enchantment, level: Int) {
             if (enchantment is VanillaEnchantment) {
                 addVanillaEnchantment(Enchantment.asBukkitEnchantment(enchantment), level)
@@ -155,6 +178,14 @@ interface Enchantable {
         fun removeStoredEnchantment(itemStack: BukkitStack, enchantment: Enchantment) {
             val meta = itemStack.itemMeta as? EnchantmentStorageMeta ?: return
             removeEnchantment(STORED_ENCHANTMENTS_CBF, meta::removeStoredEnchant, itemStack, enchantment)
+        }
+        
+        fun removeEnchantmentOrStoredEnchantment(itemStack: BukkitStack, enchantment: Enchantment) {
+            if (isEnchantedBook(itemStack)) {
+                removeStoredEnchantment(itemStack, enchantment)
+            } else {
+                removeEnchantment(itemStack, enchantment)
+            }
         }
         
         private fun removeEnchantment(cbfName: String, removeVanillaEnchantment: (BukkitEnchantment) -> Unit, itemStack: BukkitStack, enchantment: Enchantment) {
@@ -178,6 +209,14 @@ interface Enchantable {
             itemStack.novaCompoundOrNull?.remove("nova", STORED_ENCHANTMENTS_CBF)
         }
         
+        fun removeAllEnchantmentsOrStoredEnchantments(itemStack: BukkitStack) {
+            if (isEnchantedBook(itemStack)) {
+                removeAllStoredEnchantments(itemStack)
+            } else {
+                removeAllEnchantments(itemStack)
+            }
+        }
+        
         // -- Mojang ItemStack --
         
         @JvmStatic
@@ -190,6 +229,9 @@ interface Enchantable {
         @JvmStatic
         fun isEnchanted(itemStack: MojangStack): Boolean =
             isEnchanted(ENCHANTMENTS_CBF, ENCHANTMENTS_NBT, itemStack)
+        
+        fun isEnchantedBook(itemStack: MojangStack): Boolean =
+            itemStack.novaItem == null && itemStack.item == Items.ENCHANTED_BOOK
         
         fun hasStoredEnchantments(itemStack: MojangStack): Boolean =
             isEnchanted(STORED_ENCHANTMENTS_CBF, STORED_ENCHANTMENTS_NBT, itemStack)
@@ -205,6 +247,12 @@ interface Enchantable {
         
         fun getStoredEnchantments(itemStack: MojangStack): Map<Enchantment, Int> =
             getEnchantments(STORED_ENCHANTMENTS_CBF, STORED_ENCHANTMENTS_NBT, itemStack)
+        
+        fun getEnchantmentsOrStoredEnchantments(itemStack: MojangStack): Map<Enchantment, Int> {
+            if (isEnchantedBook(itemStack))
+                return getStoredEnchantments(itemStack)
+            return getEnchantments(itemStack)
+        }
         
         private fun getEnchantments(cbfName: String, nbtName: String, itemStack: MojangStack): Map<Enchantment, Int> {
             val enchantments = HashMap<Enchantment, Int>()
@@ -225,6 +273,14 @@ interface Enchantable {
         
         fun setStoredEnchantments(itemStack: MojangStack, enchantments: Map<Enchantment, Int>) =
             setEnchantments(STORED_ENCHANTMENTS_CBF, STORED_ENCHANTMENTS_NBT, itemStack, enchantments)
+        
+        fun setEnchantmentsOrStoredEnchantments(itemStack: MojangStack, enchantments: Map<Enchantment, Int>) {
+            if (isEnchantedBook(itemStack)) {
+                setStoredEnchantments(itemStack, enchantments)
+            } else {
+                setEnchantments(itemStack, enchantments)
+            }
+        }
         
         private fun setEnchantments(cbfName: String, nbtName: String, itemStack: MojangStack, enchantments: Map<Enchantment, Int>) {
             val vanillaEnchantmentsTag = ListTag()
@@ -261,6 +317,14 @@ interface Enchantable {
         fun addStoredEnchantment(itemStack: MojangStack, enchantment: Enchantment, level: Int) =
             addEnchantment(STORED_ENCHANTMENTS_CBF, STORED_ENCHANTMENTS_NBT, itemStack, enchantment, level)
         
+        fun addEnchantmentOrStoredEnchantment(itemStack: MojangStack, enchantment: Enchantment, level: Int) {
+            if (isEnchantedBook(itemStack)) {
+                addStoredEnchantment(itemStack, enchantment, level)
+            } else {
+                addEnchantment(itemStack, enchantment, level)
+            }
+        }
+        
         private fun addEnchantment(cbfName: String, nbtName: String, itemStack: MojangStack, enchantment: Enchantment, level: Int) {
             if (enchantment is VanillaEnchantment) {
                 val id = enchantment.id.toString()
@@ -281,6 +345,14 @@ interface Enchantable {
         fun removeStoredEnchantment(itemStack: MojangStack, enchantment: Enchantment) =
             removeEnchantment(STORED_ENCHANTMENTS_CBF, STORED_ENCHANTMENTS_NBT, itemStack, enchantment)
         
+        fun removeEnchantmentOrStoredEnchantment(itemStack: MojangStack, enchantment: Enchantment) {
+            if (isEnchantedBook(itemStack)) {
+                removeStoredEnchantment(itemStack, enchantment)
+            } else {
+                removeEnchantment(itemStack, enchantment)
+            }
+        }
+        
         private fun removeEnchantment(cbfName: String, nbtName: String, itemStack: MojangStack, enchantment: Enchantment) {
             if (enchantment is VanillaEnchantment) {
                 val id = enchantment.id.toString()
@@ -296,6 +368,14 @@ interface Enchantable {
         
         fun removeAllStoredEnchantments(itemStack: MojangStack) =
             removeAllEnchantments(STORED_ENCHANTMENTS_CBF, STORED_ENCHANTMENTS_NBT, itemStack)
+        
+        fun removeAllEnchantmentsOrStoredEnchantments(itemStack: MojangStack) {
+            if (isEnchantedBook(itemStack)) {
+                removeAllStoredEnchantments(itemStack)
+            } else {
+                removeAllEnchantments(itemStack)
+            }
+        }
         
         private fun removeAllEnchantments(cbfName: String, nbtName: String, itemStack: MojangStack) {
             itemStack.tag?.remove(nbtName)

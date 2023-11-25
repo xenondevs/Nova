@@ -59,14 +59,16 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Full server log
-      description: Please provide the complete server log. Just drag & drop the .log file into this text area to upload it to GitHub. Alternatively, you can also upload your log to sites such as [pastebin](https://pastebin.com) or [mclo.gs](https://mclo.gs). __Please always upload your server log, even if you can't see any errors.__
+      label: Server log
+      description: Upload the complete server log here. Alternatively, you can also upload your log to sites such as [pastebin](https://pastebin.com) or [mclo.gs](https://mclo.gs) and link to it here. __Please always upload your server log, even if you can't see any errors.__
+      placeholder: Drag & drop latest.log here
     validations:
       required: true
   - type: textarea
     attributes:
       label: Errors
-      description: If any errors or stacktraces appeared in the console, paste them here.
+      description: If any errors or stacktraces appeared in the console, post them here.
+      placeholder: Paste error here
       render: log
     validations:
       required: false
