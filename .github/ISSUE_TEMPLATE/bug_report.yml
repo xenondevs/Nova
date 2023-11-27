@@ -6,13 +6,15 @@ body:
     attributes:
       label: Agreements
       options:
+        - label: I am using an official build of Nova.
+          required: true
         - label: I am running the latest version of Nova.
+          required: true
+        - label: I am using a [server software supported by Nova](https://docs.xen.cx/nova/compatibility/#compatible-server-software)
           required: true
         - label: I am running the latest version of my server software.
           required: true
         - label: I have checked for similar issues.
-          required: true
-        - label: I am using an official build of Nova.
           required: true
   - type: dropdown
     id: plugins
