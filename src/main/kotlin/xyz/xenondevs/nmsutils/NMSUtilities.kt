@@ -12,7 +12,6 @@ object NMSUtilities {
     
     fun init(plugin: Plugin) {
         PLUGIN = plugin
-        
         PacketManager.init()
     }
     

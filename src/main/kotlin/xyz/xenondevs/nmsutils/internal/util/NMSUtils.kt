@@ -17,11 +17,11 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Tag
-import org.bukkit.craftbukkit.v1_20_R2.CraftServer
-import org.bukkit.craftbukkit.v1_20_R2.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_20_R3.CraftServer
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack

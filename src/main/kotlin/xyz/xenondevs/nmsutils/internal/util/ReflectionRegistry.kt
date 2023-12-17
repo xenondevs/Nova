@@ -5,14 +5,13 @@ import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
-import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.server.ServerAdvancementManager
 import net.minecraft.server.network.ServerCommonPacketListenerImpl
 import net.minecraft.server.network.ServerConnectionListener
 import net.minecraft.world.BossEvent.BossBarColor
 import net.minecraft.world.BossEvent.BossBarOverlay
-import org.bukkit.craftbukkit.v1_20_R2.tag.CraftTag
+import org.bukkit.craftbukkit.v1_20_R3.tag.CraftTag
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getClass
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getConstructor
 import xyz.xenondevs.nmsutils.internal.util.ReflectionUtils.getField
@@ -75,7 +74,6 @@ internal object ReflectionRegistry {
     val CODEC_DATA_PACKET_SET_FIELD = getField(ConnectionProtocol.CodecData::class.java, true, "SRF(net.minecraft.network.ConnectionProtocol\$CodecData packetSet)")
     
     // Paper exclusive fields
-    val CLIENTBOUND_SYSTEM_CHAT_PACKET_ADVENTURE_CONTENT_FIELD = getFieldOrNull(ClientboundSystemChatPacket::class.java, true, "adventure\$content")
     val CLIENTBOUND_SET_ACTION_BAR_TEXT_PACKET_ADVENTURE_TEXT_FIELD = getFieldOrNull(ClientboundSetActionBarTextPacket::class.java, true, "adventure\$text")
     val CLIENTBOUND_SET_ACTION_BAR_TEXT_PACKET_COMPONENTS_FIELD = getFieldOrNull(ClientboundSetActionBarTextPacket::class.java, true, "components")
     

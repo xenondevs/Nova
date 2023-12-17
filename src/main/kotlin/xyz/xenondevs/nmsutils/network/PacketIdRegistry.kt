@@ -1,4 +1,4 @@
-@file:Suppress("UNCHECKED_CAST", "unused")
+@file:Suppress("unused")
 
 package xyz.xenondevs.nmsutils.network
 
@@ -9,7 +9,8 @@ import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket
 import net.minecraft.network.protocol.common.ClientboundDisconnectPacket
 import net.minecraft.network.protocol.common.ClientboundKeepAlivePacket
 import net.minecraft.network.protocol.common.ClientboundPingPacket
-import net.minecraft.network.protocol.common.ClientboundResourcePackPacket
+import net.minecraft.network.protocol.common.ClientboundResourcePackPopPacket
+import net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket
 import net.minecraft.network.protocol.common.ClientboundUpdateTagsPacket
 import net.minecraft.network.protocol.common.ServerboundClientInformationPacket
 import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket
@@ -78,6 +79,7 @@ import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import net.minecraft.network.protocol.game.ClientboundRecipePacket
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.network.protocol.game.ClientboundRemoveMobEffectPacket
+import net.minecraft.network.protocol.game.ClientboundResetScorePacket
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
 import net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket
@@ -119,6 +121,8 @@ import net.minecraft.network.protocol.game.ClientboundTabListPacket
 import net.minecraft.network.protocol.game.ClientboundTagQueryPacket
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
+import net.minecraft.network.protocol.game.ClientboundTickingStatePacket
+import net.minecraft.network.protocol.game.ClientboundTickingStepPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateAdvancementsPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket
@@ -137,6 +141,7 @@ import net.minecraft.network.protocol.game.ServerboundConfigurationAcknowledgedP
 import net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket
 import net.minecraft.network.protocol.game.ServerboundContainerClickPacket
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket
+import net.minecraft.network.protocol.game.ServerboundContainerSlotStateChangedPacket
 import net.minecraft.network.protocol.game.ServerboundEditBookPacket
 import net.minecraft.network.protocol.game.ServerboundEntityTagQuery
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
@@ -203,6 +208,7 @@ object PacketIdRegistry {
     val PLAY_SERVERBOUND_CONTAINER_BUTTON_CLICK_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.SERVERBOUND, ServerboundContainerButtonClickPacket::class)
     val PLAY_SERVERBOUND_CONTAINER_CLICK_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.SERVERBOUND, ServerboundContainerClickPacket::class)
     val PLAY_SERVERBOUND_CONTAINER_CLOSE_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.SERVERBOUND, ServerboundContainerClosePacket::class)
+    val PLAY_SERVERBOUND_CONTAINER_SLOT_STATE_CHANGED_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.SERVERBOUND, ServerboundContainerSlotStateChangedPacket::class)
     val PLAY_SERVERBOUND_CUSTOM_PAYLOAD_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.SERVERBOUND, ServerboundCustomPayloadPacket::class)
     val PLAY_SERVERBOUND_EDIT_BOOK_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.SERVERBOUND, ServerboundEditBookPacket::class)
     val PLAY_SERVERBOUND_ENTITY_TAG_QUERY = getPacketId(ConnectionProtocol.PLAY, PacketFlow.SERVERBOUND, ServerboundEntityTagQuery::class)
@@ -308,7 +314,9 @@ object PacketIdRegistry {
     val PLAY_CLIENTBOUND_RECIPE_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundRecipePacket::class)
     val PLAY_CLIENTBOUND_REMOVE_ENTITIES_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundRemoveEntitiesPacket::class)
     val PLAY_CLIENTBOUND_REMOVE_MOB_EFFECT_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundRemoveMobEffectPacket::class)
-    val PLAY_CLIENTBOUND_RESOURCE_PACK_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundResourcePackPacket::class)
+    val PLAY_CLIENTBOUND_RESET_SCORE_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundResetScorePacket::class)
+    val PLAY_CLIENTBOUND_RESOURCE_PACK_POP_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundResourcePackPopPacket::class)
+    val PLAY_CLIENTBOUND_RESOURCE_PACK_PUSH_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundResourcePackPushPacket::class)
     val PLAY_CLIENTBOUND_RESPAWN_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundRespawnPacket::class)
     val PLAY_CLIENTBOUND_ROTATE_HEAD_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundRotateHeadPacket::class)
     val PLAY_CLIENTBOUND_SECTION_BLOCKS_UPDATE_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundSectionBlocksUpdatePacket::class)
@@ -350,6 +358,8 @@ object PacketIdRegistry {
     val PLAY_CLIENTBOUND_TAG_QUERY_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundTagQueryPacket::class)
     val PLAY_CLIENTBOUND_TAKE_ITEM_ENTITY_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundTakeItemEntityPacket::class)
     val PLAY_CLIENTBOUND_TELEPORT_ENTITY_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundTeleportEntityPacket::class)
+    val PLAY_CLIENTBOUND_TICKING_STATE_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundTickingStatePacket::class)
+    val PLAY_CLIENTBOUND_TICKING_STEP_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundTickingStepPacket::class)
     val PLAY_CLIENTBOUND_UPDATE_ADVANCEMENTS_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundUpdateAdvancementsPacket::class)
     val PLAY_CLIENTBOUND_UPDATE_ATTRIBUTES_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundUpdateAttributesPacket::class)
     val PLAY_CLIENTBOUND_UPDATE_MOB_EFFECT_PACKET = getPacketId(ConnectionProtocol.PLAY, PacketFlow.CLIENTBOUND, ClientboundUpdateMobEffectPacket::class)
@@ -380,7 +390,8 @@ object PacketIdRegistry {
     val CONFIGURATION_CLIENTBOUND_KEEP_ALIVE_PACKET = getPacketId(ConnectionProtocol.CONFIGURATION, PacketFlow.CLIENTBOUND, ClientboundKeepAlivePacket::class)
     val CONFIGURATION_CLIENTBOUND_PING_PACKET = getPacketId(ConnectionProtocol.CONFIGURATION, PacketFlow.CLIENTBOUND, ClientboundPingPacket::class)
     val CONFIGURATION_CLIENTBOUND_REGISTRY_DATA_PACKET = getPacketId(ConnectionProtocol.CONFIGURATION, PacketFlow.CLIENTBOUND, ClientboundRegistryDataPacket::class)
-    val CONFIGURATION_CLIENTBOUND_RESOURCE_PACK_PACKET = getPacketId(ConnectionProtocol.CONFIGURATION, PacketFlow.CLIENTBOUND, ClientboundResourcePackPacket::class)
+    val CONFIGURATION_CLIENTBOUND_RESOURCE_PACK_POP_PACKET = getPacketId(ConnectionProtocol.CONFIGURATION, PacketFlow.CLIENTBOUND, ClientboundResourcePackPopPacket::class)
+    val CONFIGURATION_CLIENTBOUND_RESOURCE_PACK_PUSH_PACKET = getPacketId(ConnectionProtocol.CONFIGURATION, PacketFlow.CLIENTBOUND, ClientboundResourcePackPushPacket::class)
     val CONFIGURATION_CLIENTBOUND_UPDATE_ENABLED_FEATURES_PACKET = getPacketId(ConnectionProtocol.CONFIGURATION, PacketFlow.CLIENTBOUND, ClientboundUpdateEnabledFeaturesPacket::class)
     val CONFIGURATION_CLIENTBOUND_UPDATE_TAGS_PACKET = getPacketId(ConnectionProtocol.CONFIGURATION, PacketFlow.CLIENTBOUND, ClientboundUpdateTagsPacket::class)
     
