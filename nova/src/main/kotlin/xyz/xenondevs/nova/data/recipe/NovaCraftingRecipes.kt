@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.data.recipe
 
-import net.minecraft.core.NonNullList
 import net.minecraft.core.RegistryAccess
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.CraftingContainer
@@ -10,6 +9,7 @@ import net.minecraft.world.item.crafting.CampfireCookingRecipe
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.ShapedRecipe
+import net.minecraft.world.item.crafting.ShapedRecipePattern
 import net.minecraft.world.item.crafting.ShapelessRecipe
 import net.minecraft.world.item.crafting.SmeltingRecipe
 import net.minecraft.world.item.crafting.SmithingTransformRecipe
@@ -27,6 +27,7 @@ import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.data.nmsCategory
 import xyz.xenondevs.nova.util.data.toNmsIngredient
 import xyz.xenondevs.nova.util.nmsCopy
+import java.util.*
 import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
 import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
 import org.bukkit.inventory.FurnaceRecipe as BukkitFurnaceRecipe
@@ -69,18 +70,15 @@ internal sealed interface ServersideRecipe<T : Recipe<*>> {
 
 internal class NovaShapedRecipe private constructor(
     private val bukkitRecipe: BukkitShapedRecipe,
-    width: Int,
-    height: Int,
-    choices: NonNullList<Ingredient>,
+    private val pattern: ShapedRecipePattern,
     result: ItemStack,
     val flatChoices: Array<RecipeChoice?>,
     val requiredChoices: List<RecipeChoice>,
     val choiceMatrix: Array<Array<RecipeChoice?>>
 ) : ShapedRecipe(
     "", 
-    bukkitRecipe.category.nmsCategory, 
-    width, height,
-    choices, result
+    bukkitRecipe.category.nmsCategory,
+    pattern, result
 ), ServersideRecipe<ShapedRecipe> {
     
     fun getChoice(x: Int, y: Int): RecipeChoice? =
@@ -119,8 +117,7 @@ internal class NovaShapedRecipe private constructor(
     
     override fun clientsideCopy(): ShapedRecipe {
         val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
-        val ingredients = NonNullList(ingredients.map(Ingredient::clientsideCopy))
-        return ShapedRecipe(group, category(), width, height, ingredients, result)
+        return ShapedRecipe(group, category(), pattern, result)
     }
     
     override fun toBukkitRecipe(id: NamespacedKey): BukkitShapedRecipe = bukkitRecipe
@@ -138,8 +135,11 @@ internal class NovaShapedRecipe private constructor(
             
             return NovaShapedRecipe(
                 recipe,
-                width, height,
-                NonNullList(flatChoices.map(RecipeChoice?::toNmsIngredient)),
+                ShapedRecipePattern(
+                    width, height,
+                    NonNullList(flatChoices.map(RecipeChoice?::toNmsIngredient)),
+                    Optional.empty()
+                ),
                 recipe.result.nmsCopy,
                 flatChoices,
                 requiredChoices,

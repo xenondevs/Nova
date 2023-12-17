@@ -27,7 +27,6 @@ dependencies {
     compileOnly(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
-    novaLoader(libs.invui.resourcepack)
     novaLoader(variantOf(libs.inventoryaccess) { classifier("remapped-mojang") })
     novaLoader(libs.bstats)
     novaLoader(libs.bytbase.runtime)

@@ -4,6 +4,7 @@ import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.CollisionContext
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -170,8 +171,8 @@ internal object HitboxManager : Listener, PacketListener {
             
             val world = player.world
             val level = world.serverLevel
-            val ctx = ClipContext(origin, dest, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, null)
-            BlockGetter.traverseBlocks(origin, dest, null, { _, pos ->
+            val ctx = ClipContext(origin, dest, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, CollisionContext.empty())
+            BlockGetter.traverseBlocks(origin, dest, ctx, { _, pos ->
                 // check for collision with vanilla hitboxes
                 val blockState = level.getBlockState(pos)
                 val blockShape = ctx.getBlockShape(blockState, level, pos)

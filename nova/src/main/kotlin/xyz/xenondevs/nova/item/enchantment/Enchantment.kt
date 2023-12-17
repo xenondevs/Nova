@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.enchantment.Enchantment.Rarity
+import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.EnchantmentTarget
 import org.bukkit.entity.EntityCategory
 import org.bukkit.inventory.EquipmentSlot
@@ -104,8 +105,9 @@ sealed interface Enchantment {
             if (enchantment is VanillaEnchantment)
                 return BukkitEnchantment.getByKey(key)!!
             
-            return object : BukkitEnchantment(key) {
+            return object : BukkitEnchantment() {
                 
+                override fun getKey(): NamespacedKey = key
                 override fun translationKey(): String = enchantment.localizedName
                 override fun getName(): String = key.toString()
                 override fun getMaxLevel(): Int = enchantment.maxLevel

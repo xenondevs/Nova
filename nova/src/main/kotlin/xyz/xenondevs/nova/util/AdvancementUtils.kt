@@ -4,12 +4,11 @@ import net.kyori.adventure.text.Component
 import net.minecraft.advancements.Advancement
 import net.minecraft.advancements.AdvancementHolder
 import net.minecraft.advancements.AdvancementRequirements
+import net.minecraft.advancements.AdvancementType
 import net.minecraft.advancements.Criterion
 import net.minecraft.advancements.DisplayInfo
-import net.minecraft.advancements.FrameType
 import net.minecraft.advancements.critereon.InventoryChangeTrigger
 import net.minecraft.advancements.critereon.ItemPredicate
-import net.minecraft.commands.arguments.ObjectiveCriteriaArgument.criteria
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
@@ -18,6 +17,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
+import java.util.*
 
 fun advancement(addon: Addon, name: String, init: Advancement.Builder.() -> Unit): AdvancementHolder {
     val builder = Advancement.Builder()
@@ -29,7 +29,7 @@ fun obtainNovaItemAdvancement(
     addon: Addon,
     parent: AdvancementHolder?,
     item: NovaItem,
-    frameType: FrameType = FrameType.TASK
+    frameType: AdvancementType = AdvancementType.TASK
 ): AdvancementHolder {
     require(addon.description.id == item.id.namespace) { "The specified item is from a different addon" }
     val id = item.id
@@ -41,7 +41,7 @@ fun obtainNovaItemAdvancement(
             item.clientsideProvider.get().nmsCopy,
             Component.translatable("advancement.${id.namespace}.${id.name}.title").toNMSComponent(),
             Component.translatable("advancement.${id.namespace}.${id.name}.description").toNMSComponent(),
-            null,
+            Optional.empty(),
             frameType,
             true, true, false
         ))
@@ -55,7 +55,7 @@ fun obtainNovaItemsAdvancement(
     name: String,
     parent: AdvancementHolder?,
     items: List<NovaItem>, requireAll: Boolean,
-    frameType: FrameType = FrameType.TASK
+    frameType: AdvancementType = AdvancementType.TASK
 ): AdvancementHolder {
     require(items.all { it.id.namespace == addon.description.id }) { "At least one of the specified items is from a different addon" }
     val namespace = addon.description.id
@@ -67,7 +67,7 @@ fun obtainNovaItemsAdvancement(
             items[0].clientsideProvider.get().nmsCopy,
             Component.translatable("advancement.$namespace.$name.title").toNMSComponent(),
             Component.translatable("advancement.$namespace.$name.description").toNMSComponent(),
-            null,
+            Optional.empty(),
             frameType,
             true, true, false
         ))

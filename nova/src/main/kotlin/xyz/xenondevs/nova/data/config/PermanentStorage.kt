@@ -10,6 +10,7 @@ import java.io.File
 import java.lang.reflect.Type
 import kotlin.reflect.KType
 import kotlin.reflect.jvm.javaType
+import kotlin.reflect.typeOf
 
 internal object PermanentStorage {
     
@@ -80,6 +81,18 @@ internal object PermanentStorage {
     
     fun <T> retrieveOrNull(type: KType, key: String): T? {
         return retrieveOrNull(type.javaType, key)
+    }
+    
+    inline fun <reified T> retrieveOrStore(key: String, noinline alternativeProvider: () -> T): T {
+        return retrieveOrStore(typeOf<T>(), key, alternativeProvider)
+    }
+    
+    fun <T> retrieveOrStore(type: KType, key: String, alternativeProvider: () -> T): T {
+        return retrieveOrStore(type.javaType, key, alternativeProvider)
+    }
+    
+    fun <T> retrieveOrStore(type: Type, key: String, alternativeProvider: () -> T): T {
+        return retrieveOrNull(type, key) ?: alternativeProvider().also { store(key, it) }
     }
     
     private fun getFile(key: String) = File(dir, "$key.json")

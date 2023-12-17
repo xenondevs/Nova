@@ -1,15 +1,11 @@
 package xyz.xenondevs.nova.data.resources.upload
 
 import kotlinx.coroutines.runBlocking
-import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.kotlin.extensions.contains
 import xyz.xenondevs.commons.provider.immutable.map
-import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper
-import xyz.xenondevs.invui.resourcepack.ForceResourcePack
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.service.CustomMultiPart
@@ -24,11 +20,6 @@ import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import java.io.File
 import java.util.logging.Level
-
-private val PROMPT_MESSAGE by MAIN_CONFIG.entry<Component>("resource_pack", "prompt", "message")
-private val PROMPT_FORCE by MAIN_CONFIG.entry<Boolean>("resource_pack", "prompt", "force")
-private val ENABLE_PROMPT_FORCE_BYPASS_PERMISSION by MAIN_CONFIG.entry<Boolean>("resource_pack", "prompt", "enableForceBypassPermission")
-private val ENABLE_PROMPT_BYPASS_PERMISSION by MAIN_CONFIG.entry<Boolean>("resource_pack", "prompt", "enablePromptBypassPermission")
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD_ASYNC,
@@ -60,7 +51,6 @@ internal object AutoUploadManager {
     
     @InitFun
     private fun init() {
-        reloadForceResourcePackSettings()
         enable(fromReload = false)
         
         if (url != null)
@@ -72,7 +62,6 @@ internal object AutoUploadManager {
     
     fun reload() {
         disable()
-        reloadForceResourcePackSettings()
         enable(fromReload = true)
     }
     
@@ -148,15 +137,6 @@ internal object AutoUploadManager {
         return url
     }
     
-    private fun reloadForceResourcePackSettings() {
-        ForceResourcePack.getInstance().apply { 
-            prompt = AdventureComponentWrapper(PROMPT_MESSAGE)
-            isForced = PROMPT_FORCE
-            forceBypassPermission = if (ENABLE_PROMPT_FORCE_BYPASS_PERMISSION) "nova.misc.resourcePack.bypass.force" else null
-            promptBypassPermission = if (ENABLE_PROMPT_BYPASS_PERMISSION) "nova.misc.resourcePack.bypass.prompt" else null
-        }
-    }
-    
     private fun forceResourcePack() {
         if (selectedService == SelfHost)
             SelfHost.startedLatch.await()
@@ -175,11 +155,8 @@ internal object AutoUploadManager {
             this.url = null
             return
         }
-        try {
-            ForceResourcePack.getInstance().setResourcePack(url, true)
-        } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "Failed to download the resource pack! Is the server down?", e)
-        }
+        
+        ForceResourcePack.setResourcePack(url)
     }
     
 }

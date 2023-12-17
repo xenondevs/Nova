@@ -27,7 +27,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import xyz.xenondevs.commons.collections.takeUnlessEmpty

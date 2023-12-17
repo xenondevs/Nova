@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.util
 
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.HitResult
+import net.minecraft.world.phys.shapes.CollisionContext
 import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.block.Block
@@ -138,7 +139,7 @@ object BlockFaceUtils {
         val direction = location.direction
         val end = start.add(direction.x * maxDistance, direction.y * maxDistance, direction.z * maxDistance)
         
-        val ctx = ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, null)
+        val ctx = ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, CollisionContext.empty())
         val result = location.world!!.serverLevel.clip(ctx)
         if (result.type == HitResult.Type.BLOCK) {
             return result.direction.blockFace

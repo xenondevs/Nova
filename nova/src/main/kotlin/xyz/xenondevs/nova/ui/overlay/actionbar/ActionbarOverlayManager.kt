@@ -82,8 +82,8 @@ object ActionbarOverlayManager : PacketListener {
             val player = event.player
             val uuid = player.uniqueId
             if (overlays.containsKey(uuid)) {
-                saveInterceptedComponent(player, event.adventureMessage)
-                event.adventureMessage = getCurrentText(player)
+                saveInterceptedComponent(player, event.message)
+                event.message = getCurrentText(player)
             }
         }
     }
