@@ -55,8 +55,6 @@ resource_pack:
   # The uniform font can be activated client-side by toggling "Force Unicode Font" in Minecraft's language settings.
   # If the players on your server are expected to have that option enabled, you should set this to true.
   force_uniform_font: false
-  # If players currently loading the resource pack should be frozen.
-  freeze_loading_players: false
 
 # The render distance for fake (packet-based) entities from Nova, in chunks.
 # Note that the render distance is also limited by the entity render distance of the client.

@@ -64,8 +64,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
-import org.bukkit.craftbukkit.v1_20_R2.block.data.CraftBlockData
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack
+import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPhysicsEvent

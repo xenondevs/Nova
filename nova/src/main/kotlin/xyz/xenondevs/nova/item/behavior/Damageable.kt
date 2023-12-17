@@ -10,8 +10,8 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import net.minecraft.world.item.enchantment.Enchantments
 import org.bukkit.GameMode
 import org.bukkit.Statistic
-import org.bukkit.craftbukkit.v1_20_R2.event.CraftEventFactory
-import org.bukkit.craftbukkit.v1_20_R2.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.v1_20_R3.event.CraftEventFactory
+import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
@@ -30,7 +30,6 @@ import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.callEvent
-import xyz.xenondevs.nova.util.item.isEmpty
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.item.novaItem

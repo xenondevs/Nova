@@ -112,7 +112,7 @@ object PlantUtils {
         )
         
         HARVESTABLE_PLANTS = enumMapOf(
-            Material.GRASS to null,
+            Material.SHORT_GRASS to null,
             Material.TALL_GRASS to null,
             Material.BEE_NEST to null,
             Material.PUMPKIN to null,

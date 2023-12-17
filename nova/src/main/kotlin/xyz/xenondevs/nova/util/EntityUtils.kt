@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.util
 
 import com.mojang.authlib.GameProfile
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.NbtIo
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ClientInformation
@@ -11,7 +12,7 @@ import net.minecraft.tags.FluidTags
 import net.minecraft.world.effect.MobEffectInstance
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_20_R2.entity.CraftEntity
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity
 import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.VanillaToolCategory
@@ -190,7 +191,7 @@ object EntityUtils {
         val level = world.serverLevel
         
         // read data to compound tag
-        var compoundTag = NbtIo.readCompressed(ByteArrayInputStream(data))
+        var compoundTag = NbtIo.readCompressed(ByteArrayInputStream(data), NbtAccounter.unlimitedHeap())
         
         // set new location in nbt data
         compoundTag.put("Pos", NBTUtils.createDoubleList(location.x, location.y, location.z))
