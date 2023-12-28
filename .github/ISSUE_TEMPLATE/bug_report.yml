@@ -63,7 +63,7 @@ body:
     attributes:
       label: Server log
       description: Upload the complete server log here. Alternatively, you can also upload your log to sites such as [pastebin](https://pastebin.com) or [mclo.gs](https://mclo.gs) and link to it here. __Please always upload your server log, even if you can't see any errors.__
-      placeholder: Drag & drop latest.log here
+      placeholder: Drag & drop latest.log here to upload the file. For readability reasons, DO NOT paste the log, but upload it as a file.
     validations:
       required: true
   - type: textarea
