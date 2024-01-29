@@ -73,6 +73,7 @@ import xyz.xenondevs.nova.util.serverPlayer
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
+import kotlin.collections.ArrayList
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -145,12 +146,16 @@ internal object PacketItems : Listener, PacketListener {
         val player = event.player
         val packet = event.packet
         val data = packet.packedItems ?: return
-        data.forEachIndexed { idx, dataValue ->
+        val newItems = ArrayList<DataValue<*>>()
+        data.forEach { dataValue ->
             val value = dataValue.value
             if (value is MojangStack) {
-                data[idx] = DataValue(dataValue.id, EntityDataSerializers.ITEM_STACK, getClientSideStack(player, value, false))
+                newItems.add(DataValue(dataValue.id, EntityDataSerializers.ITEM_STACK, getClientSideStack(player, value, false)))
+            } else {
+                newItems.add(dataValue)
             }
         }
+        event.packedItems = newItems
     }
     
     @PacketHandler
