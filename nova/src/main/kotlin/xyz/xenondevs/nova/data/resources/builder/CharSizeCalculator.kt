@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.data.resources.builder.font.provider.ReferenceProvider
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.data.resources.builder.task.font.FontContent
+import java.util.logging.Level
 
 class CharSizeCalculator internal constructor(builder: ResourcePackBuilder) : PackTaskHolder {
     
@@ -25,8 +26,9 @@ class CharSizeCalculator internal constructor(builder: ResourcePackBuilder) : Pa
         
         val fonts = fontContent.mergedFonts
         val references = fonts.values.associateWith { it.mapReferences(fonts.values) }
-        CollectionUtils.sortDependencies(fonts.values) { references[it]!! }
-            .forEach { font ->
+        val sortedFonts = CollectionUtils.sortDependencies(fonts.values) { references[it]!! }
+        for (font in sortedFonts) {
+            try {
                 val id = font.id
                 val table = CharSizeTable()
                 for (provider in font.providers.reversed()) {
@@ -40,7 +42,10 @@ class CharSizeCalculator internal constructor(builder: ResourcePackBuilder) : Pa
                 }
                 
                 CharSizes.storeTable(id, table)
+            } catch (t: Throwable) {
+                LOGGER.log(Level.SEVERE, "Failed to calculate char sizes for font ${font.id}", t)
             }
+        }
         
         CharSizes.invalidateCache()
     }
