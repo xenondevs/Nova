@@ -17,7 +17,7 @@ class GuiContent internal constructor(
     @PackTask(runBefore = ["FontContent#write"])
     private fun write() {
         builder.assetPacks.forEach { pack ->
-            pack.guisIndex?.forEach { (id, path) -> addEntry(id, ResourcePackBuilder.ASSETS_DIR, path, null, ASCENT) }
+            pack.guisIndex?.forEach { (id, path) -> addEntry(id, path, null, ASCENT) }
         }
         
         ResourceLookups.GUI_DATA_LOOKUP.set(fontCharLookup)

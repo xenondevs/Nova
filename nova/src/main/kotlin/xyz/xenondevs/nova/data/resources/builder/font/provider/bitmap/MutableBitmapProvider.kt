@@ -76,7 +76,6 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
      * A [MutableBitmapProvider] that is read lazily.
      */
     private class LazyLoaded(
-        private val assetsDir: Path,
         private val codePointRows: List<String>,
         override var file: ResourcePath,
         override var height: Int,
@@ -89,7 +88,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
         override val glyphGrid: ReferenceGlyphGrid by lazy(::loadGlyphGrid)
         
         private fun loadGlyphGrid(): ReferenceGlyphGrid {
-            val img = file.getPath(assetsDir, "textures").readImage()
+            val img = file.findInAssets("textures").readImage()
             val codePoints = codePointGrid
             
             require(img.width % codePoints.width == 0 && img.height % codePoints.height == 0) {
@@ -190,14 +189,13 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
         /**
          * Reads a [BitmapProvider] from disk.
          *
-         * @param assetsDir The assets directory to use for reading the bitmap image.
          * @param provider The json object containing the provider data. Might be modified by the resulting [BitmapProvider].
          */
-        fun fromDisk(assetsDir: Path, provider: JsonObject): MutableBitmapProvider<BufferedImage> {
+        fun fromDisk(provider: JsonObject): MutableBitmapProvider<BufferedImage> {
             val file = provider.getDeserialized<ResourcePath>("file")
             val height = provider.getIntOrNull("height") ?: 8
             val ascent = provider.getInt("ascent")
-            return LazyLoaded(assetsDir, provider.getArray("chars").getAllStrings(), file, height, ascent)
+            return LazyLoaded(provider.getArray("chars").getAllStrings(), file, height, ascent)
         }
         
     }

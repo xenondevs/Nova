@@ -39,8 +39,7 @@ class TextureIconContent internal constructor(
             return
         
         val id = ResourcePath(path.namespace, path.path)
-        val assetsDir = if (path.namespace == "minecraft") ResourcePackBuilder.MCASSETS_ASSETS_DIR else ResourcePackBuilder.ASSETS_DIR
-        addEntry(id, assetsDir, path.copy(path = path.path + ".png"), HEIGHT, ASCENT)
+        addEntry(id, path.copy(path = path.path + ".png"), HEIGHT, ASCENT)
         added += path
     }
     
