@@ -31,27 +31,30 @@ public class NovaClassLoader extends URLClassLoader {
     
     public @NotNull Class<?> loadClass(@NotNull String name, boolean resolve, boolean checkParents, boolean checkPrioritizedLibraries) throws ClassNotFoundException {
         // TODO: evaluate the possibility of potential deadlocks considering PatchedClassLoader
+        
+        // check if class is already loaded
+        Class<?> c = findLoadedClass(name);
+        
+        // try load class from prioritized libraries
         synchronized (getClassLoadingLock(name)) {
-            // check if class is already loaded
-            Class<?> c = findLoadedClass(name);
-            
-            // try load class from prioritized libraries
             if (c == null && checkPrioritizedLibraries)
                 c = tryFindClass(prioritizedLibraries, name);
-            
-            // try load class from parent (PaperPluginClassLoader)
-            if (c == null && checkParents)
-                c = tryLoadClass(getParent(), name);
-            
-            // load class from nova and libraries or throw ClassNotFoundException
+        }
+        
+        // try load class from parent (PaperPluginClassLoader)
+        if (c == null && checkParents)
+            c = tryLoadClass(getParent(), name);
+        
+        // load class from nova and libraries or throw ClassNotFoundException
+        synchronized (getClassLoadingLock(name)) {
             if (c == null)
                 c = findClass(name);
-            
-            if (resolve)
-                resolveClass(c);
-            
-            return c;
         }
+        
+        if (resolve)
+            resolveClass(c);
+        
+        return c;
     }
     
     private @Nullable Class<?> tryLoadClass(@NotNull ClassLoader loader, @NotNull String name) {
