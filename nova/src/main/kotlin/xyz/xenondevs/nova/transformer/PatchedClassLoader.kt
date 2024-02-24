@@ -60,8 +60,9 @@ internal class PatchedClassLoader : ClassLoader(PAPER_CLASS_LOADER.parent) {
         for (i in 3..stackTrace.lastIndex) { // skip the first three elements: Thread.getStackTrace(), checkNonRecursive(), loadClass()
             val className = stackTrace[i].className
             
-            // check whether the stack trace element is PatchedClassLoader
-            if (className == "xyz.xenondevs.nova.transformer.PatchedClassLoader")
+            // check whether the stack trace element is NovaClassLoader or PatchedClassLoader
+            // if yes, this indicates a recursive call (PatchedClassLoader) or a call that will become recursive (NovaClassLoader)
+            if (className == "xyz.xenondevs.nova.loader.NovaClassLoader" || className == "xyz.xenondevs.nova.transformer.PatchedClassLoader")
                 return false
         }
         
