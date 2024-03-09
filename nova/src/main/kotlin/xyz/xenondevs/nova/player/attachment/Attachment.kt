@@ -26,6 +26,11 @@ interface Attachment {
     fun handleTick()
     
     /**
+     * Called when the [player] was teleported.
+     */
+    fun handleTeleport()
+    
+    /**
      * Despawns all entities of this [Attachment].
      */
     fun despawn()
