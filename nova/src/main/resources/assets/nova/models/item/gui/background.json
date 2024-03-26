@@ -1,0 +1,22 @@
+{
+	"parent": "nova:item/gui/gui_item",
+	"textures": {
+		"2": "nova:item/gui/inventory_part"
+	},
+	"elements": [
+		{
+			"from": [1, 1, 1],
+			"to": [15, 15, 1],
+			"faces": {
+				"south": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		},
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 0],
+			"faces": {
+				"south": {"uv": [0, 0, 16, 1], "texture": "#2"}
+			}
+		}
+	]
+}

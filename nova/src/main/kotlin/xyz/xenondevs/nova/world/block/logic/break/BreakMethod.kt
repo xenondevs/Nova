@@ -7,7 +7,7 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.util.nmsCopy
-import xyz.xenondevs.nova.util.sendDestructionPacket
+import xyz.xenondevs.nova.util.broadcastDestructionStage
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
@@ -71,9 +71,9 @@ internal class PacketBreakMethod(pos: BlockPos, private val entityId: Int = Rand
     
     private fun sendBreakStage(stage: Int) {
         if (predictionPlayer != null) {
-            block.sendDestructionPacket(predictionPlayer, stage)
+            block.broadcastDestructionStage(predictionPlayer, stage)
         } else {
-            block.sendDestructionPacket(entityId, stage)
+            block.broadcastDestructionStage(entityId, stage)
         }
     }
     
@@ -92,7 +92,7 @@ internal class DisplayEntityBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos)
             field = stage
             itemDisplay.updateEntityData(true) {
                 itemStack = if (stage in 0..9)
-                    DefaultBlockOverlays.BREAK_STAGE_OVERLAY.clientsideProviders[stage].get().nmsCopy
+                    DefaultBlockOverlays.BREAK_STAGE_OVERLAY.model.unnamedClientsideProviders[stage].get().nmsCopy
                 else ItemStack.EMPTY
             }
         }

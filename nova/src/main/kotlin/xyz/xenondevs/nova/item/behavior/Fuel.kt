@@ -7,7 +7,6 @@ import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.item.novaItem
 import net.minecraft.world.item.ItemStack as MojangStack

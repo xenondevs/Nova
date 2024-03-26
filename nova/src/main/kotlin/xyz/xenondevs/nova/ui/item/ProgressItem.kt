@@ -17,7 +17,7 @@ open class ProgressItem(val item: NovaItem, private val maxState: Int) : Abstrac
         }
     
     override fun getItemProvider(): ItemProvider {
-        return item.clientsideProviders[(percentage * maxState).roundToInt()]
+        return item.model.unnamedClientsideProviders[(percentage * maxState).roundToInt()]
     }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit

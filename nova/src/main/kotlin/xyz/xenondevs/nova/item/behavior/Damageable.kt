@@ -21,8 +21,6 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.mapNonNull
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.data.config.entry
-import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer
 import xyz.xenondevs.nova.item.NovaItem

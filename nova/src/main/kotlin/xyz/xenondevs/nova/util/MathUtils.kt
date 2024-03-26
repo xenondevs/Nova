@@ -1,14 +1,16 @@
 package xyz.xenondevs.nova.util
 
+import org.joml.Vector3d
+import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.round
 
-val Boolean.intValue: Int
+internal val Boolean.intValue: Int
     get() = if (this) 1 else 0
 
-fun Double.toFixedPoint(): Short = (this * 4069).toInt().toShort()
+internal fun Double.toFixedPoint(): Short = (this * 4069).toInt().toShort()
 
-fun Short.fromFixedPoint(): Double = this / 4096.0
+internal fun Short.fromFixedPoint(): Double = this / 4096.0
 
 internal fun Float.toPackedByte(): Byte = (this * 256.0f / 360.0f).toInt().toByte()
 
@@ -24,7 +26,7 @@ internal fun Double.roundToDecimalPlaces(n: Int): Double {
     return round(this * multiplier) / multiplier
 }
 
-fun <T> Iterable<T>.sumOfNoOverflow(selector: (T) -> Long): Long {
+internal inline fun <T> Iterable<T>.sumOfNoOverflow(selector: (T) -> Long): Long {
     return try {
         var sum = 0L
         for (element in this) {
@@ -37,7 +39,21 @@ fun <T> Iterable<T>.sumOfNoOverflow(selector: (T) -> Long): Long {
     }
 }
 
-object MathUtils {
+internal fun Int.ceilDiv(other: Int): Int = (this + other - 1) / other
+
+internal fun Vector3d.round(decimalPlaces: Int): Vector3d {
+    val multiplier = 10.0.pow(decimalPlaces.toDouble())
+    mul(multiplier)
+    round()
+    div(multiplier)
+    return this
+}
+
+internal fun max(a: Vector3d, b: Vector3d): Vector3d {
+    return Vector3d(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z))
+}
+
+internal object MathUtils {
     
     fun convertBooleanArrayToInt(array: BooleanArray): Int {
         var i = 0

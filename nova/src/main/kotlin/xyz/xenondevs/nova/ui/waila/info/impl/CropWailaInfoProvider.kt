@@ -7,6 +7,7 @@ import org.bukkit.block.data.Ageable
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
+import xyz.xenondevs.nova.world.BlockPos
 import kotlin.math.roundToInt
 
 private val MAX_TEXTURE_STAGE = mapOf(
@@ -21,8 +22,8 @@ private val MAX_TEXTURE_STAGE = mapOf(
 
 internal object CropWailaInfoProvider : VanillaWailaInfoProvider(MAX_TEXTURE_STAGE.keys) {
     
-    override fun getInfo(player: Player, block: Block): WailaInfo {
-        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
+    override fun getInfo(player: Player, pos: BlockPos, block: Block): WailaInfo {
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, block)
         
         val ageable = block.blockData as Ageable
         val stage = ((ageable.age / ageable.maximumAge.toDouble()) * MAX_TEXTURE_STAGE[block.type]!!).roundToInt()

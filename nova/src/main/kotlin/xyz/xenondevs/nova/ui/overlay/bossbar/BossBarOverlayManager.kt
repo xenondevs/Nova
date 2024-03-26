@@ -27,7 +27,6 @@ import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nmsutils.network.event.unregisterPacketListener
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit

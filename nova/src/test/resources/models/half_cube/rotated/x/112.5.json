@@ -1,0 +1,26 @@
+{
+	"textures": {
+		"2": "block/cobblestone",
+		"3": "block/sand",
+		"4": "block/dirt",
+		"5": "block/stone",
+		"6": "block/iron_block",
+		"7": "block/gold_block",
+		"particle": "block/cobblestone"
+	},
+	"elements": [
+		{
+			"from": [0, 8, 0],
+			"to": [16, 16, 16],
+			"rotation": {"angle": 22.5, "axis": "x", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 8], "rotation": 180, "texture": "#5"},
+				"east": {"uv": [0, 0, 8, 16], "rotation": 270, "texture": "#4"},
+				"south": {"uv": [0, 0, 16, 8], "texture": "#2"},
+				"west": {"uv": [0, 0, 8, 16], "rotation": 90, "texture": "#3"},
+				"up": {"uv": [0, 0, 16, 16], "rotation": 180, "texture": "#7"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#6"}
+			}
+		}
+	]
+}

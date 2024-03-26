@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.block.limits
 
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes

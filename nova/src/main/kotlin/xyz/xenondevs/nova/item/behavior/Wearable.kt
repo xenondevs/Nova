@@ -15,11 +15,6 @@ import org.bukkit.event.block.Action
 import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.mapNonNull
-import xyz.xenondevs.commons.provider.immutable.orElse
-import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.data.config.optionalEntry
-import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.logic.PacketItemData
@@ -51,17 +46,18 @@ fun Wearable(slot: BukkitEquipmentSlot, equipSound: String? = null): ItemBehavio
     return object : ItemBehaviorFactory<Wearable.Default> {
         override fun create(item: NovaItem): Wearable.Default {
             val cfg = item.config
-            return Wearable.Default(
-                ResourceLookups.MODEL_DATA_LOOKUP.getProvider(item.id)
-                    .mapNonNull { it.armor }
-                    .let { ResourceLookups.ARMOR_DATA_LOOKUP.getProvider(it) }
-                    .mapNonNull { it.color },
-                provider(slot),
-                cfg.optionalEntry<Double>("armor").orElse(0.0),
-                cfg.optionalEntry<Double>("armor_toughness").orElse(0.0),
-                cfg.optionalEntry<Double>("knockback_resistance").orElse(0.0),
-                provider(equipSound)
-            )
+            TODO()
+//            return Wearable.Default(
+//                ResourceLookups.MODEL_DATA_LOOKUP.getProvider(item.id)
+//                    .mapNonNull { it.armor }
+//                    .let { ResourceLookups.ARMOR_DATA_LOOKUP.getProvider(it) }
+//                    .mapNonNull { it.color },
+//                provider(slot),
+//                cfg.optionalEntry<Double>("armor").orElse(0.0),
+//                cfg.optionalEntry<Double>("armor_toughness").orElse(0.0),
+//                cfg.optionalEntry<Double>("knockback_resistance").orElse(0.0),
+//                provider(equipSound)
+//            )
         }
     }
 }

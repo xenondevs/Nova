@@ -11,8 +11,9 @@ import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes
-import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.world.block.BlockManager
+import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.util.BlockUtils
+import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.pos
 import java.util.*
 import xyz.xenondevs.nova.api.block.BlockManager as IBlockManager
@@ -21,14 +22,22 @@ import xyz.xenondevs.nova.api.block.NovaBlock as INovaBlock
 internal object ApiBlockManager : IBlockManager {
     
     override fun hasBlock(location: Location): Boolean {
-        return BlockManager.hasBlockState(location.pos, true)
+        return WorldDataManager.getBlockState(location.pos) != null
     }
     
     override fun getBlock(location: Location): NovaBlockState? {
-        val state = BlockManager.getBlockState(location.pos, true) ?: return null
-        if (state is NovaTileEntityState)
-            return ApiNovaTileEntityStateWrapper(state)
-        return ApiNovaBlockStateWrapper(state)
+        val pos = location.pos
+        
+        val state = WorldDataManager.getBlockState(pos)
+            ?: return null
+        
+        if (state.block is NovaTileEntityBlock) {
+            val tileEntity = WorldDataManager.getTileEntity(pos)
+                ?: return null
+            return ApiNovaTileEntityStateWrapper(pos, state, tileEntity)
+        } else {
+            return ApiNovaBlockStateWrapper(pos, state)
+        }
     }
     
     override fun placeBlock(location: Location, block: INovaBlock, source: Any?, playSound: Boolean) {
@@ -39,7 +48,7 @@ internal object ApiBlockManager : IBlockManager {
             .param(ContextParamTypes.BLOCK_TYPE_NOVA, block.block)
             .param(ContextParamTypes.BLOCK_PLACE_EFFECTS, playSound)
         setSourceParam(ctxBuilder, source)
-        BlockManager.placeBlockState(block.block, ctxBuilder.build())
+        BlockUtils.placeBlock(ctxBuilder.build())
     }
     
     override fun placeBlock(location: Location, material: NovaMaterial, source: Any?, playSound: Boolean) {
@@ -52,7 +61,7 @@ internal object ApiBlockManager : IBlockManager {
             .param(ContextParamTypes.BLOCK_POS, location.pos)
             .param(ContextParamTypes.TOOL_ITEM_STACK, tool)
         setSourceParam(ctxBuilder, source)
-        return BlockManager.getDrops(ctxBuilder.build())
+         return BlockUtils.getDrops(ctxBuilder.build())
     }
     
     override fun removeBlock(location: Location, source: Any?, breakEffects: Boolean): Boolean {
@@ -60,7 +69,9 @@ internal object ApiBlockManager : IBlockManager {
             .param(ContextParamTypes.BLOCK_POS, location.pos)
             .param(ContextParamTypes.BLOCK_BREAK_EFFECTS, breakEffects)
         setSourceParam(ctxBuilder, source)
-        return BlockManager.removeBlockState(ctxBuilder.build())
+        BlockUtils.breakBlock(ctxBuilder.build())
+        return true
+        
     }
     
     private fun setSourceParam(builder: Context.Builder<*>, source: Any?) {

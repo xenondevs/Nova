@@ -98,7 +98,7 @@ abstract class ColorPreviewItem(color: Color) : AbstractItem() {
     
 }
 
-class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(DefaultGuiItems.TP_COLOR_PICKER.clientsideProvider) {
+class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(DefaultGuiItems.TP_COLOR_PICKER.model.clientsideProvider) {
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         window.openWindow(player)
     }

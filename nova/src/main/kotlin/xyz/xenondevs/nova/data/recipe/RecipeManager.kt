@@ -21,7 +21,6 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlaceRecipePa
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.recipe.impl.RepairItemRecipe
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit

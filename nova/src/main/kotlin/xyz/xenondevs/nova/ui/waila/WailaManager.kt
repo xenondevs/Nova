@@ -11,7 +11,6 @@ import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set

@@ -10,3 +10,7 @@ fun runInServerThread(task: () -> Unit) {
     if (isServerThread) task()
     else runTask(task)
 }
+
+fun checkServerThread() {
+    check(isServerThread) { "Not on server thread" }
+}

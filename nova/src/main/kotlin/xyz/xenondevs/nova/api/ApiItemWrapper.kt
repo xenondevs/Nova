@@ -23,7 +23,7 @@ internal class ApiItemWrapper(private val item: NovaItem): INovaItem {
     }
     
     override fun createClientsideItemStack(amount: Int): ItemStack {
-        return item.createClientsideItemStack(amount)
+        return item.model.createClientsideItemStack(false).apply { setAmount(amount) }
     }
     
 }

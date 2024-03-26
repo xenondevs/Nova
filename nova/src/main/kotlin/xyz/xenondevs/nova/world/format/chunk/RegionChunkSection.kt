@@ -1,0 +1,127 @@
+package xyz.xenondevs.nova.world.format.chunk
+
+import xyz.xenondevs.cbf.io.ByteReader
+import xyz.xenondevs.cbf.io.ByteWriter
+import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.format.IdResolver
+import xyz.xenondevs.nova.world.format.chunk.container.ArraySectionDataContainer
+import xyz.xenondevs.nova.world.format.chunk.container.MapSectionDataContainer
+import xyz.xenondevs.nova.world.format.chunk.container.SectionDataContainer
+import xyz.xenondevs.nova.world.format.chunk.container.SingleValueSectionDataContainer
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
+
+/**
+ * A 16x16x16 section of a [RegionChunk].
+ *
+ * Each section has its own [SectionDataContainer] which stores the block states.
+ * The type of that container is chosen based on the amount of non-empty blocks in the section.
+ */
+internal class RegionChunkSection<T>(
+    private val idResolver: IdResolver<T>,
+    private var container: SectionDataContainer<T>
+) {
+    
+    constructor(idResolver: IdResolver<T>) : this(idResolver, MapSectionDataContainer(idResolver))
+    
+    val lock = ReentrantReadWriteLock(true)
+    
+    /**
+     * Returns true if this section is empty.
+     */
+    fun isEmpty(): Boolean =
+        lock.read { container.nonEmptyBlockCount == 0 }
+    
+    /**
+     * Retrieves the [NovaBlockState] at the given [x], [y] and [z] section coordinates.
+     */
+    operator fun get(x: Int, y: Int, z: Int): T? =
+        lock.read { container[x, y, z] }
+    
+    /**
+     * Sets the [NovaBlockState] at the given [x], [y] and [z] section coordinates.
+     */
+    operator fun set(x: Int, y: Int, z: Int, state: T?) = lock.write {
+        val current = get(x, y, z)
+        if (current == state)
+            return
+        
+        checkMigrateContainer(state)
+        container[x, y, z] = state
+    }
+    
+    /**
+     * Migrates the container to another type if necessary.
+     */
+    private fun checkMigrateContainer(state: T?) = lock.write {
+        val container = container
+        when {
+            // convert from single value container if a state has changed
+            container is SingleValueSectionDataContainer && state != container.value -> {
+                this.container = if (container.value != null)
+                    ArraySectionDataContainer(idResolver).apply { fill(container.value) }
+                else MapSectionDataContainer(idResolver)
+            }
+            
+            // convert from map to array container if block count is higher than the threshold
+            container is MapSectionDataContainer && container.nonEmptyBlockCount > MAP_TO_ARRAY_CONTAINER_THRESHOLD -> {
+                val arrayContainer = ArraySectionDataContainer(idResolver)
+                container.forEachNonEmpty { x, y, z, value -> arrayContainer[x, y, z] = value }
+                this.container = arrayContainer
+            }
+        }
+    }
+    
+    /**
+     * Writes this section to the given [writer].
+     * Returns true if the section was written, false if it was empty.
+     */
+    fun write(writer: ByteWriter): Boolean = lock.read {
+        optimizeContainer()
+        
+        if (container.nonEmptyBlockCount == 0)
+            return false
+        
+        SectionDataContainer.write(container, writer)
+        return true
+    }
+    
+    /**
+     * Converts the container to a more efficient type if possible.
+     */
+    private fun optimizeContainer() = lock.write {
+        val container = container
+        
+        // single value container cannot be optimized further
+        if (container is SingleValueSectionDataContainer)
+            return
+        
+        when {
+            // convert to empty single value container if there are no blocks
+            container.nonEmptyBlockCount == 0 -> this.container = SingleValueSectionDataContainer(idResolver, null)
+            
+            // convert from array to map container if block count is lower than the threshold
+            container is ArraySectionDataContainer && container.nonEmptyBlockCount < MAP_TO_ARRAY_CONTAINER_THRESHOLD -> {
+                val mapContainer = MapSectionDataContainer(idResolver)
+                container.forEachNonEmpty { x, y, z, value -> mapContainer[x, y, z] = value }
+                this.container = mapContainer
+            }
+            
+            // convert to single value container if all states are the same
+            container.isMonotone() -> this.container = SingleValueSectionDataContainer(idResolver, container[0, 0, 0])
+        }
+    }
+    
+    companion object {
+        
+        private const val MAP_TO_ARRAY_CONTAINER_THRESHOLD = 16
+        
+        fun <T> read(idResolver: IdResolver<T>, reader: ByteReader): RegionChunkSection<T> {
+            val dataContainer = SectionDataContainer.read(idResolver, reader)
+            return RegionChunkSection(idResolver, dataContainer)
+        }
+        
+    }
+    
+}

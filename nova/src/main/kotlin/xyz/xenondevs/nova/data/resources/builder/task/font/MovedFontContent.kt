@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.resources.builder.task.font
 
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.BitmapFontGenerator
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder

@@ -1,55 +1,20 @@
 {
-	"textures": {
-		"2": "nova:item/gui/inventory_part"
-	},
-	"elements": [
-		{
-			"from": [1, 1, -1],
-			"to": [15, 15, 0],
-			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 7]},
-			"faces": {
-				"north": {"uv": [0, 0, 16, 16], "texture": "#1"},
-				"east": {"uv": [0, 0, 16, 1], "texture": "#1"},
-				"south": {"uv": [0, 0, 16, 16], "texture": "#1"},
-				"west": {"uv": [0, 0, 0, 0], "texture": "#1"},
-				"up": {"uv": [0, 0, 0, 0], "texture": "#1"},
-				"down": {"uv": [0, 0, 0, 0], "texture": "#1"}
-			}
-		},
-		{
-			"from": [0, 0, 0],
-			"to": [16, 16, 16],
-			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 23]},
-			"faces": {
-				"north": {"uv": [0, 0, 16, 16], "texture": "#2"},
-				"east": {"uv": [0, 0, 16, 1], "texture": "#2"},
-				"south": {"uv": [0, 0, 16, 1], "texture": "#2"},
-				"west": {"uv": [0, 0, 16, 1], "texture": "#2"},
-				"up": {"uv": [0, 0, 0, 0], "texture": "#2"},
-				"down": {"uv": [0, 0, 16, 16], "texture": "#2"}
-			}
-		}
-	],
-	"gui_light": "front",
-	"display": {
-		"thirdperson_righthand": {
-			"scale": [0, 0, 0]
-		},
-		"thirdperson_lefthand": {
-			"scale": [0, 0, 0]
-		},
-		"firstperson_righthand": {
-			"scale": [0, 0, 0]
-		},
-		"firstperson_lefthand": {
-			"scale": [0, 0, 0]
-		},
-		"ground": {
-			"scale": [0.3, 0.3, 0.3]
-		},
-		"gui": {
-			"rotation": [-180, -180, 0],
-			"scale": [1.15, -1.15, -1.15]
-		}
-	}
+  "gui_light": "front",
+  "display": {
+    "thirdperson_righthand": {
+      "scale": [0, 0, 0]
+    },
+    "thirdperson_lefthand": {
+      "scale": [0, 0, 0]
+    },
+    "firstperson_righthand": {
+      "scale": [0, 0, 0]
+    },
+    "firstperson_lefthand": {
+      "scale": [0, 0, 0]
+    },
+    "gui": {
+      "scale": [1.125, 1.125, 1.125]
+    }
+  }
 }

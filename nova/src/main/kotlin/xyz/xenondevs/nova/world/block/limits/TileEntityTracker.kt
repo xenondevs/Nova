@@ -40,14 +40,15 @@ internal object TileEntityTracker {
         PermanentStorage.store("block_chunk_counter", BLOCK_CHUNK_COUNTER)
     }
     
-    internal fun handleBlockPlace(block: NovaTileEntityBlock, ctx: Context<BlockPlace>) {
+    internal fun handlePlace(block: NovaTileEntityBlock, ctx: Context<BlockPlace>) {
         val sourceUuid = ctx[ContextParamTypes.SOURCE_UUID] ?: return
         modifyCounters(sourceUuid, ctx[ContextParamTypes.BLOCK_POS]!!, block.id, 1)
     }
     
-    internal fun handleBlockBreak(tileEntity: TileEntity, ctx: Context<BlockBreak>) {
-        if (tileEntity.ownerUUID != null)
-            modifyCounters(tileEntity.ownerUUID, ctx[ContextParamTypes.BLOCK_POS]!!, tileEntity.block.id, -1)
+    internal fun handleBreak(tileEntity: TileEntity, ctx: Context<BlockBreak>) {
+        val ownerUuid = tileEntity.ownerUuid
+        if (ownerUuid != null)
+            modifyCounters(ownerUuid, ctx[ContextParamTypes.BLOCK_POS]!!, tileEntity.block.id, -1)
     }
     
     private fun modifyCounters(player: UUID, pos: BlockPos, id: ResourceLocation, add: Int) {

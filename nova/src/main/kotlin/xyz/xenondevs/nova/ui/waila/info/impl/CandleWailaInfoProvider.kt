@@ -7,6 +7,7 @@ import org.bukkit.block.data.type.Candle
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
+import xyz.xenondevs.nova.world.BlockPos
 
 internal object CandleWailaInfoProvider : VanillaWailaInfoProvider(
     setOf(
@@ -17,8 +18,8 @@ internal object CandleWailaInfoProvider : VanillaWailaInfoProvider(
     )
 ) {
     
-    override fun getInfo(player: Player, block: Block): WailaInfo {
-        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
+    override fun getInfo(player: Player, pos: BlockPos, block: Block): WailaInfo {
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, block)
         info.icon = getCandleId(block)
         return info
     }

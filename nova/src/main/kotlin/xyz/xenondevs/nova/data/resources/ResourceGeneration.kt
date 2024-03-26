@@ -14,12 +14,10 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
-import xyz.xenondevs.nova.util.data.getResourceAsStream
-import xyz.xenondevs.nova.util.data.update
+import xyz.xenondevs.nova.registry.NovaRegistries
 import java.security.MessageDigest
 
-private const val RESOURCES_HASH = "resourcesHash"
-private val ASSET_INDEX_FILES = listOf("assets/materials.json", "assets/guis.json", "assets/armor.json")
+private const val VERSION_HASH = "version_hash"
 
 /**
  * Handles resource pack generation on startup.
@@ -27,7 +25,7 @@ private val ASSET_INDEX_FILES = listOf("assets/materials.json", "assets/guis.jso
  */
 internal object ResourceGeneration {
     
-    private lateinit var resourcesHash: String
+    private lateinit var versionHash: String
     private var builder: ResourcePackBuilder? = null
     
     @InternalInit(
@@ -38,15 +36,18 @@ internal object ResourceGeneration {
         
         @InitFun
         private fun init() {
-            resourcesHash = calculateResourcesHash()
-            if (PermanentStorage.retrieveOrNull<String>(RESOURCES_HASH) == resourcesHash && ResourceLookups.hasAllLookups()) {
-                // Load from PermanentStorage
-                ResourceLookups.loadAll()
-            } else {
+            versionHash = calculateVersionHash()
+            if (PermanentStorage.retrieveOrNull<String>(VERSION_HASH) != versionHash
+                || !ResourceLookups.hasAllLookups()
+                || !ResourceLookups.tryLoadAll()
+                || !hasAllBlockModels()
+            ) {
                 // Build resource pack
                 LOGGER.info("Building resource pack")
                 builder = ResourcePackBuilder().also(ResourcePackBuilder::buildPackPreWorld)
                 LOGGER.info("Pre-world resource pack building done")
+            } else {
+                ResourceLookups.loadAll()
             }
         }
         
@@ -57,7 +58,7 @@ internal object ResourceGeneration {
         dependsOn = [HooksLoader::class]
     )
     object PostWorld {
-    
+        
         @InitFun
         private fun init() {
             val builder = builder
@@ -65,32 +66,38 @@ internal object ResourceGeneration {
                 LOGGER.info("Continuing to build resource pack")
                 builder.buildPackPostWorld()
                 AutoUploadManager.wasRegenerated = true
-                PermanentStorage.store(RESOURCES_HASH, resourcesHash)
+                PermanentStorage.store(VERSION_HASH, versionHash)
             }
         }
         
     }
     
-    private fun calculateResourcesHash(): String {
+    /**
+     * Calculates a hash based on the version and name of Nova and all addons.
+     */
+    private fun calculateVersionHash(): String {
         val digest = MessageDigest.getInstance("MD5")
         
         // Nova version
         digest.update(NOVA.version.toString().toByteArray())
-        // nova asset indices
-        ASSET_INDEX_FILES.forEach { getResourceAsStream(it.replace("assets/", "assets/nova/"))?.let(digest::update) }
         
-        // Addon id, version and asset indices
+        // Addon versions
         AddonManager.loaders.forEach { (id, loader) ->
             // id and version
             digest.update(id.toByteArray())
             digest.update(loader.description.version.toByteArray())
-            
-            // asset indices
-            ASSET_INDEX_FILES.forEach { getResourceAsStream(loader.file, it)?.let(digest::update) }
         }
         
         return DataUtils.toHexadecimalString(digest.digest())
     }
+    
+    /**
+     * Checks whether all block states have models.
+     */
+    private fun hasAllBlockModels(): Boolean =
+         NovaRegistries.BLOCK.asSequence()
+            .flatMap { it.blockStates }
+            .all { it in ResourceLookups.BLOCK_MODEL_LOOKUP.value }
     
     internal fun createResourcePack() {
         ResourcePackBuilder().buildPackCompletely()

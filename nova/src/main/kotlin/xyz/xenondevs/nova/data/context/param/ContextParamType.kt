@@ -73,7 +73,11 @@ internal open class ContextParamTypeImpl<V : Any>(
     override val id: ResourceLocation,
     override val requirements: List<Requirement<V>>,
     override val autofillers: List<Autofiller<V>>,
-) : ContextParamType<V>
+) : ContextParamType<V> {
+    
+    override fun toString() = id.toString()
+    
+}
 
 internal class DefaultingContextParamTypeImpl<V : Any>(
     id: ResourceLocation,

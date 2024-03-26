@@ -12,7 +12,6 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSystemChatPac
 import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nmsutils.network.event.unregisterPacketListener
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.runTaskTimer

@@ -61,6 +61,7 @@ import xyz.xenondevs.nova.util.component.adventure.toJson
 import xyz.xenondevs.nova.util.component.adventure.toNBT
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.NBTUtils
+import xyz.xenondevs.nova.util.data.getIntOrNull
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.data.getStringOrNull
@@ -238,12 +239,27 @@ internal object PacketItems : Listener, PacketListener {
         
         val id = novaTag.getStringOrNull("id") ?: return getUnknownItem(itemStack, null)
         val item = NovaRegistries.ITEM[id] ?: return getUnknownItem(itemStack, id)
-        val subId = novaTag.getInt("subId")
         
-        val itemModelDataMap = ResourceLookups.MODEL_DATA_LOOKUP[id]?.item
-        val data = itemModelDataMap?.get(item.vanillaMaterial)
-            ?: itemModelDataMap?.values?.first()
-            ?: return getUnknownItem(itemStack, id)
+        val namedModelId = novaTag.getStringOrNull("modelId")
+        val unnamedModelId = novaTag.getIntOrNull("subId")
+        
+        val vanillaMaterial = item.vanillaMaterial
+        val customModelData = when {
+            namedModelId != null -> ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.value[item]
+                ?.get(vanillaMaterial)
+                ?.get(namedModelId)
+                ?: return getUnknownItem(itemStack, id, namedModelId)
+            
+            unnamedModelId != null -> ResourceLookups.UNNAMED_ITEM_MODEL_LOOKUP.value[item]
+                ?.get(vanillaMaterial)
+                ?.get(unnamedModelId)
+                ?: return getUnknownItem(itemStack, id, unnamedModelId.toString())
+            
+            else -> ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.value[item]
+                ?.get(vanillaMaterial)
+                ?.get("default")
+                ?: return getUnknownItem(itemStack, id)
+        }
         
         val newItemStack = itemStack.copy()
         val newItemTag = newItemStack.tag!!
@@ -254,8 +270,8 @@ internal object PacketItems : Listener, PacketListener {
         }
         
         // set item type and model data
-        newItemStack.item = CraftMagicNumbers.getItem(data.material)
-        newItemTag.putInt("CustomModelData", data.dataArray[subId])
+        newItemStack.item = CraftMagicNumbers.getItem(vanillaMaterial)
+        newItemTag.putInt("CustomModelData", customModelData)
         
         val packetItemData = item.getPacketItemData(newItemStack)
         
@@ -319,7 +335,7 @@ internal object PacketItems : Listener, PacketListener {
         return newItemStack
     }
     
-    private fun getUnknownItem(itemStack: MojangStack, id: String?): MojangStack {
+    private fun getUnknownItem(itemStack: MojangStack, id: String?, modelId: String = "default"): MojangStack {
         val newItemStack = itemStack.copy()
         newItemStack.item = Items.BARRIER
         val tag = newItemStack.tag!!
@@ -331,8 +347,13 @@ internal object PacketItems : Listener, PacketListener {
         tag.put("NovaServerSideTag", itemStack.tag!!)
         
         // overwrite display tag with "missing model" name
+        val nameComponent = Component.text(
+            "Unknown item: $id" + if (modelId != "default") ":$modelId" else "",
+            NamedTextColor.RED
+        )
+        
         val displayTag = CompoundTag().also { tag.put("display", it) }
-        displayTag.putString("Name", Component.text("Unknown item: $id", NamedTextColor.RED).withoutPreFormatting().toJson())
+        displayTag.putString("Name", nameComponent.withoutPreFormatting().toJson())
         
         return newItemStack
     }

@@ -10,19 +10,23 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.tags.FluidTags
 import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.entity.item.ItemEntity
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.random.Random
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EntityType as NMSEntityType
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
@@ -141,6 +145,20 @@ object EntityUtils {
     }
     
     /**
+     * Creates not-spawned [item entities][ItemEntity] based on the specified [items] and [pos].
+     */
+    fun createBlockDropItemEntities(pos: BlockPos, items: Iterable<ItemStack>): List<ItemEntity> =
+        items.map {
+            ItemEntity(
+                pos.world.serverLevel,
+                pos.x + 0.5 + Random.nextDouble(-0.25, 0.25),
+                pos.y + 0.5 + Random.nextDouble(-0.25, 0.25),
+                pos.z + 0.5 + Random.nextDouble(-0.25, 0.25),
+                it.nmsCopy
+            ).apply(ItemEntity::setDefaultPickUpDelay)
+        }
+    
+    /**
      * Serializes an [BukkitEntity] to a [ByteArray].
      *
      * @param remove If the serialized [BukkitEntity] should be removed from the world.
@@ -197,7 +215,7 @@ object EntityUtils {
         compoundTag.put("Pos", NBTUtils.createDoubleList(location.x, location.y, location.z))
         
         // set new rotation in nbt data
-        compoundTag.put("Rotation", NBTUtils.createFloatList(location.yaw, location.pitch))
+        compoundTag.put("xyz.xenondevs.nova.data.resources.model.Rotation", NBTUtils.createFloatList(location.yaw, location.pitch))
         
         // modify nbt data
         if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag)

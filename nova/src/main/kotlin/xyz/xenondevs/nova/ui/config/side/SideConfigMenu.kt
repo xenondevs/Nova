@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.energy.holder.EnergyHolder
-import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
+import xyz.xenondevs.nova.tileentity.network.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
@@ -24,14 +24,14 @@ import xyz.xenondevs.nova.util.playClickSound
 class SideConfigMenu(
     endPoint: NetworkEndPoint,
     inventoryNames: List<Pair<NetworkedInventory, String>>? = null,
-    fluidContainerNames: List<Pair<FluidContainer, String>>? = null,
+    fluidContainerNames: List<Pair<NetworkedFluidContainer, String>>? = null,
     openPrevious: (Player) -> Unit
 ) {
     
     constructor(
         endPoint: NetworkEndPoint,
         inventoryNames: List<Pair<NetworkedInventory, String>>? = null,
-        fluidContainerNames: List<Pair<FluidContainer, String>>? = null,
+        fluidContainerNames: List<Pair<NetworkedFluidContainer, String>>? = null,
         openPrevious: () -> Unit
     ) : this(endPoint, inventoryNames, fluidContainerNames, { _ -> openPrevious() })
     
@@ -95,21 +95,21 @@ class SideConfigMenu(
                     if (it.currentTab == 0)
                         DefaultGuiItems.ENERGY_BTN_SELECTED
                     else DefaultGuiItems.ENERGY_BTN_ON
-                } else DefaultGuiItems.ENERGY_BTN_OFF).clientsideProvider
+                } else DefaultGuiItems.ENERGY_BTN_OFF).model.clientsideProvider
             })
             .addIngredient('i', ClickyTabItem(1) {
                 (if (itemConfigGui != null) {
                     if (it.currentTab == 1)
                         DefaultGuiItems.ITEM_BTN_SELECTED
                     else DefaultGuiItems.ITEM_BTN_ON
-                } else DefaultGuiItems.ITEM_BTN_OFF).clientsideProvider
+                } else DefaultGuiItems.ITEM_BTN_OFF).model.clientsideProvider
             })
             .addIngredient('f', ClickyTabItem(2) {
                 (if (fluidConfigGui != null) {
                     if (it.currentTab == 2)
                         DefaultGuiItems.FLUID_BTN_SELECTED
                     else DefaultGuiItems.FLUID_BTN_ON
-                } else DefaultGuiItems.FLUID_BTN_OFF).clientsideProvider
+                } else DefaultGuiItems.FLUID_BTN_OFF).model.clientsideProvider
             })
             .setTabs(listOf(energyConfigGui, itemConfigGui, fluidConfigGui))
             .build()
@@ -125,7 +125,7 @@ class SideConfigMenu(
     
 }
 
-class OpenSideConfigItem(private val sideConfigMenu: SideConfigMenu) : SimpleItem(DefaultGuiItems.SIDE_CONFIG_BTN.clientsideProvider) {
+class OpenSideConfigItem(private val sideConfigMenu: SideConfigMenu) : SimpleItem(DefaultGuiItems.SIDE_CONFIG_BTN.model.clientsideProvider) {
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         player.playClickSound()

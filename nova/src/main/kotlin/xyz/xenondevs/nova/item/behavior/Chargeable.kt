@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.item.behavior
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.logic.PacketItemData

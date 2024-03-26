@@ -2,7 +2,9 @@
 
 package xyz.xenondevs.nova.data.resources
 
+import com.google.gson.annotations.JsonAdapter
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.serialization.json.serializer.ResourcePathTypeAdapter
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Path
@@ -43,6 +45,9 @@ data class ResourcePath(val namespace: String, val path: String) {
     }
     
     companion object {
+        
+        const val NAME_PATTERN = "[a-z0-9/._-]+"
+        const val PATH_PATTERN = "(?:([a-z0-9/._-]+):)?([a-z0-9/._-])"
         
         val NAMESPACED_ENTRY = Regex("""^([a-z0-9._-]+):([a-z0-9/._-]+)$""")
         val NON_NAMESPACED_ENTRY = Regex("""^([a-z0-9/._-]+)$""")

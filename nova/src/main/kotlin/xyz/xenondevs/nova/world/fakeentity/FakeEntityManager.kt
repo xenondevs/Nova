@@ -15,7 +15,6 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit

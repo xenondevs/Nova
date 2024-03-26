@@ -192,7 +192,7 @@ private class RecipesWindow(
         
         override fun getItemProvider(gui: PagedGui<*>) =
             (if (gui.hasPreviousPage()) DefaultGuiItems.TP_ARROW_LEFT_BTN_ON else DefaultGuiItems.TP_ARROW_LEFT_BTN_OFF)
-                .clientsideProvider
+                .model.clientsideProvider
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (clickType == ClickType.LEFT && gui.hasPreviousPage()) {
@@ -208,7 +208,7 @@ private class RecipesWindow(
         
         override fun getItemProvider(gui: PagedGui<*>) =
             (if (gui.hasNextPage()) DefaultGuiItems.TP_ARROW_RIGHT_BTN_ON else DefaultGuiItems.TP_ARROW_RIGHT_BTN_OFF)
-                .clientsideProvider
+                .model.clientsideProvider
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             if (clickType == ClickType.LEFT && gui.hasNextPage()) {
@@ -232,7 +232,7 @@ private class LastRecipeItem(private val viewerUUID: UUID) : AbstractItem() {
     
     override fun getItemProvider(): ItemProvider {
         return if (ItemMenu.hasHistory(viewerUUID)) {
-            DefaultGuiItems.LIGHT_ARROW_1_LEFT.clientsideProvider
+            DefaultGuiItems.TP_ARROW_LEFT_ON.model.clientsideProvider
         } else ItemWrapper(ItemStack(Material.AIR))
     }
     

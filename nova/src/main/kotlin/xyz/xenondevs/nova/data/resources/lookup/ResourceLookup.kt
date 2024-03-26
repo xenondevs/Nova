@@ -28,8 +28,12 @@ open class ResourceLookup<T : Any> internal constructor(
     }
     
     internal fun load() {
-        if (!::value.isInitialized)
-            value = PermanentStorage.retrieveOrNull<T>(type, key)!!
+        if (::value.isInitialized)
+            return
+        
+        val retrieved = PermanentStorage.retrieveOrNull<T>(type, key)
+        if (retrieved != null)
+            value = retrieved
     }
     
     operator fun getValue(thisRef: Any, property: KProperty<*>): T = value
@@ -62,7 +66,7 @@ class IdResourceLookup<T : Any> internal constructor(
     @JvmName("getProviderString")
     fun <I : String?> getProvider(idProvider: Provider<I>): Provider<T?> {
         val elementProvider = object : Provider<T?>() {
-            override fun loadValue(): T? = idProvider.value?.let(::get)
+            override fun loadValue(): T? = idProvider.get()?.let(::get)
         }
         idProvider.addChild(elementProvider)
         provider.addChild(elementProvider)
@@ -72,7 +76,7 @@ class IdResourceLookup<T : Any> internal constructor(
     @JvmName("getProviderResourceLocation")
     fun <I : ResourceLocation?> getProvider(idProvider: Provider<I>): Provider<T?> {
         val elementProvider = object : Provider<T?>() {
-            override fun loadValue(): T? = idProvider.value?.let(::get)
+            override fun loadValue(): T? = idProvider.get()?.let(::get)
         }
         idProvider.addChild(elementProvider)
         provider.addChild(elementProvider)
@@ -82,7 +86,7 @@ class IdResourceLookup<T : Any> internal constructor(
     @JvmName("getProviderResourcePath")
     fun <I : ResourcePath?> getProvider(idProvider: Provider<I>): Provider<T?> {
         val elementProvider = object : Provider<T?>() {
-            override fun loadValue(): T? = idProvider.value?.let(::get)
+            override fun loadValue(): T? = idProvider.get()?.let(::get)
         }
         idProvider.addChild(elementProvider)
         provider.addChild(elementProvider)

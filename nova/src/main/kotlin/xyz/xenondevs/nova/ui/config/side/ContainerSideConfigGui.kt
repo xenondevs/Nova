@@ -36,8 +36,7 @@ internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : Contai
     
     private val buttonBuilders: Map<EndPointContainer, ItemBuilder> =
         containers.withIndex().associate { (index, triple) ->
-            triple.first to BUTTON_COLORS[index]
-                .createClientsideItemBuilder()
+            triple.first to BUTTON_COLORS[index].model.createClientsideItemBuilder()
                 .addLoreLines(Component.translatable(triple.second, NamedTextColor.AQUA))
         }
     
@@ -146,11 +145,11 @@ internal abstract class ContainerSideConfigGui<C : EndPointContainer, H : Contai
         override fun getItemProvider(): ItemProvider {
             return if (simple) {
                 if (isSimpleConfiguration()) {
-                    DefaultGuiItems.SIMPLE_MODE_BTN_ON.clientsideProvider
-                } else DefaultGuiItems.SIMPLE_MODE_BTN_OFF.createClientsideItemBuilder()
+                    DefaultGuiItems.SIMPLE_MODE_BTN_ON.model.clientsideProvider
+                } else DefaultGuiItems.SIMPLE_MODE_BTN_OFF.model.createClientsideItemBuilder()
                     .setDisplayName(Component.translatable("menu.nova.side_config.simple_mode"))
                     .addLoreLines(Component.translatable("menu.nova.side_config.simple_mode.unavailable", NamedTextColor.GRAY))
-            } else DefaultGuiItems.ADVANCED_MODE_BTN_ON.clientsideProvider
+            } else DefaultGuiItems.ADVANCED_MODE_BTN_ON.model.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

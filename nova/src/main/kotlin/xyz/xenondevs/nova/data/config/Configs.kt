@@ -18,7 +18,6 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.item.ItemCategories
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.ui.overlay.actionbar.ActionbarOverlayManager
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
@@ -108,7 +107,6 @@ object Configs {
         extractAllConfigs()
         reloadables.sorted().forEach(Reloadable::reload)
         NovaRegistries.ITEM.forEach(Reloadable::reload)
-        TileEntityManager.tileEntities.forEach(Reloadable::reload)
         NetworkManager.queueAsync { it.networks.forEach(Reloadable::reload) }
         AbilityManager.activeAbilities.values.flatMap { it.values }.forEach(Reloadable::reload)
         AutoUploadManager.reload()
@@ -137,13 +135,13 @@ object Configs {
         getOrNull(id.toString())
     
     fun getOrNull(id: String): CommentedConfigurationNode? =
-        configProviders[id]?.value
+        configProviders[id]?.get()
     
     fun save(id: ResourceLocation) =
         save(id.toString())
     
     fun save(id: String) {
-        createLoader(File(NOVA.dataFolder, "configs/$id.yml")).save(get(id).value)
+        createLoader(File(NOVA.dataFolder, "configs/$id.yml")).save(get(id).get())
     }
     
     internal fun createBuilder(): YamlConfigurationLoader.Builder =

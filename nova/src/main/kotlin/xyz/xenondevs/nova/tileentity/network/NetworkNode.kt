@@ -97,7 +97,7 @@ sealed interface NetworkNode {
      * The nodes do not need to be in the same network.
      */
     fun getNearbyNodes(): Map<BlockFace, NetworkNode> =
-        location.getNeighboringTileEntitiesOfType(false)
+        location.getNeighboringTileEntitiesOfType()
     
     /**
      * Retrieves a map of directly adjacent [NetworkEndPoints][NetworkEndPoint], ignoring additional hitboxes.
@@ -105,7 +105,7 @@ sealed interface NetworkNode {
      * The end points do not need to be in the same network.
      */
     fun getNearbyEndPoints(): Map<BlockFace, NetworkEndPoint> =
-        location.getNeighboringTileEntitiesOfType(false)
+        location.getNeighboringTileEntitiesOfType()
     
     /**
      * Retrieves a map of directly adjacent [NetworkBridges][NetworkBridge].
@@ -113,7 +113,7 @@ sealed interface NetworkNode {
      * The bridges do not need to be in the same network.
      */
     fun getNearbyBridges(): Map<BlockFace, NetworkBridge> =
-        location.getNeighboringTileEntitiesOfType<NetworkBridge>(false).filter { (_, bridge) -> bridge.networks.isNotEmpty() }
+        location.getNeighboringTileEntitiesOfType<NetworkBridge>().filter { (_, bridge) -> bridge.networks.isNotEmpty() }
     
     /**
      * Retrieves a map of directly adjacent [NetworkBridges][NetworkBridge] supporting the given [networkType].

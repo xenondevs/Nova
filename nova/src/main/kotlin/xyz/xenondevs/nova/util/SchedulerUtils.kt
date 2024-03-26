@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.util
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import kotlinx.coroutines.SupervisorJob
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.util.concurrent.ObservableLock
 import xyz.xenondevs.nova.util.concurrent.lockAndRun
 import xyz.xenondevs.nova.util.concurrent.tryLockAndRun
@@ -72,6 +72,8 @@ fun runAsyncTaskTimer(delay: Long, period: Long, run: () -> Unit) =
 internal object AsyncExecutor {
     
     private val THREADS by MAIN_CONFIG.entry<Int>("performance", "nova_executor", "threads")
+    
+    val SUPERVISOR = SupervisorJob()
     
     private lateinit var threadFactory: ThreadFactory
     private lateinit var executorService: ScheduledExecutorService

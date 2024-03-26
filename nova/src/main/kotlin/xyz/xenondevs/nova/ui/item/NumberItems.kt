@@ -44,7 +44,7 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
         return if (localizedName != null) {
             DefaultGuiItems.NUMBER.model.createClientsideItemBuilder(modelId = number)
                 .setDisplayName(Component.translatable(localizedName, Component.text(number)))
-        } else DefaultGuiItems.NUMBER.clientsideProviders[number]
+        } else DefaultGuiItems.NUMBER.model.unnamedClientsideProviders[number]
     }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
@@ -63,9 +63,9 @@ class AddNumberItem(
     getNumber,
     setNumber,
     localizedName
-        ?.let { DefaultGuiItems.PLUS_BTN_ON.createClientsideItemBuilder().setDisplayName(Component.translatable(it)) }
-        ?: DefaultGuiItems.PLUS_BTN_ON.clientsideProvider,
-    DefaultGuiItems.PLUS_BTN_OFF.clientsideProvider
+        ?.let { DefaultGuiItems.PLUS_BTN_ON.model.createClientsideItemBuilder().setDisplayName(Component.translatable(it)) }
+        ?: DefaultGuiItems.PLUS_BTN_ON.model.clientsideProvider,
+    DefaultGuiItems.PLUS_BTN_OFF.model.clientsideProvider
 )
 
 class RemoveNumberItem(
@@ -80,9 +80,9 @@ class RemoveNumberItem(
     getNumber,
     setNumber,
     localizedName
-        ?.let { DefaultGuiItems.MINUS_BTN_ON.createClientsideItemBuilder().setDisplayName(Component.translatable(it)) }
-        ?: DefaultGuiItems.MINUS_BTN_ON.clientsideProvider,
-    DefaultGuiItems.MINUS_BTN_OFF.clientsideProvider
+        ?.let { DefaultGuiItems.MINUS_BTN_ON.model.createClientsideItemBuilder().setDisplayName(Component.translatable(it)) }
+        ?: DefaultGuiItems.MINUS_BTN_ON.model.clientsideProvider,
+    DefaultGuiItems.MINUS_BTN_OFF.model.clientsideProvider
 )
 
 open class AioNumberItem(

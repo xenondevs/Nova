@@ -61,7 +61,7 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
         soundEvents += event.location.path
     }
     
-    @PackTask(runAfter = ["MaterialContent#write"])
+    @PackTask
     private fun write() {
         try {
             // an index of all vanilla sounds

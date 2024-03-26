@@ -6,8 +6,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.data.config.entry
-import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier

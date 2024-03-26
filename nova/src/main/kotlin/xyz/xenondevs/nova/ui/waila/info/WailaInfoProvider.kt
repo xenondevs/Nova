@@ -6,8 +6,9 @@ import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.state.NovaBlockState
 
 data class WailaLine(val text: Component, val alignment: Alignment) {
     
@@ -23,7 +24,7 @@ data class WailaLine(val text: Component, val alignment: Alignment) {
 data class WailaInfo(var icon: ResourceLocation, var lines: MutableList<WailaLine>)
 
 sealed interface WailaInfoProvider<T> {
-    fun getInfo(player: Player, block: T): WailaInfo
+    fun getInfo(player: Player, pos: BlockPos, block: T): WailaInfo
 }
 
 abstract class NovaWailaInfoProvider : WailaInfoProvider<NovaBlockState> {

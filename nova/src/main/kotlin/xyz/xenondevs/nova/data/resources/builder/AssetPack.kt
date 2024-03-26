@@ -6,9 +6,7 @@ import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.index.ArmorIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.GuisIndexDeserializer
-import xyz.xenondevs.nova.data.resources.builder.index.MaterialsIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.task.armor.info.RegisteredArmor
-import xyz.xenondevs.nova.data.resources.builder.task.material.info.RegisteredMaterial
 import java.io.InputStream
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -24,10 +22,6 @@ class AssetPack(val namespace: String, val assetsDir: Path) {
     val soundsFile: Path? = assetsDir.resolve("sounds.json").takeIf(Path::exists)
     val wailaTexturesDir: Path? = assetsDir.resolve("textures/waila/").takeIf(Path::exists)
     val atlasesDir: Path? = assetsDir.resolve("atlases/").takeIf(Path::exists)
-    
-    internal val materialsIndex: List<RegisteredMaterial>? = assetsDir.resolve("materials.json")
-        .takeIf(Path::exists)
-        ?.let { MaterialsIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
     internal val guisIndex: Map<ResourcePath, ResourcePath>? = assetsDir.resolve("guis.json")
         .takeIf(Path::exists)

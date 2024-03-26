@@ -15,17 +15,22 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.bukkitMaterial
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.ToolUtils
+import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 object ContextParamTypes {
     
@@ -38,7 +43,7 @@ object ContextParamTypes {
     
     /**
      * The world of a block.
-     * 
+     *
      * Autofilled by: [BLOCK_POS]
      */
     val BLOCK_WORLD: ContextParamType<World> =
@@ -48,28 +53,52 @@ object ContextParamTypes {
     
     /**
      * The custom block type.
-     * 
+     *
      * Autofilled by: [BLOCK_TYPE] (if nova block)
      */
     val BLOCK_TYPE_NOVA: ContextParamType<NovaBlock> =
         ContextParamType.builder<NovaBlock>("block_type_nova")
             .autofilledBy(::BLOCK_TYPE) { NovaRegistries.BLOCK[it] }
+            .autofilledBy(::BLOCK_STATE_NOVA) { it.block }
             .build()
     
     /**
+     * The custom block state.
+     *
+     * Autofilled by: [BLOCK_TYPE_NOVA]
+     */
+    val BLOCK_STATE_NOVA: ContextParamType<NovaBlockState> =
+        ContextParamType.builder<NovaBlockState>("block_state_nova")
+            .autofilledBy(::BLOCK_TYPE_NOVA) { it.defaultBlockState }
+            .build()
+    
+    /**
+     * The tile-entity data of a nova tile-entity.
+     */
+    val TILE_ENTITY_DATA_NOVA: ContextParamType<Compound> =
+        ContextParamType.builder<Compound>("tile_entity_data_nova")
+            .autofilledBy(::BLOCK_ITEM_STACK) { itemStack ->
+                itemStack.novaCompoundOrNull
+                    ?.get<Compound>(TileEntity.TILE_ENTITY_DATA_KEY)
+                    ?.let { persistentData -> Compound().also { it["persistent"] = persistentData } }
+            }.build()
+    
+    /**
      * The vanilla block type.
-     * 
+     *
      * Autofilled by: [BLOCK_TYPE] (if vanilla block)
      */
     val BLOCK_TYPE_VANILLA: ContextParamType<Material> =
         ContextParamType.builder<Material>("block_type_vanilla")
             .require({ it.isBlock }, { "$it is not a block" })
-            .autofilledBy(::BLOCK_TYPE) { BuiltInRegistries.BLOCK[it].bukkitMaterial }
+            .autofilledBy(::BLOCK_TYPE) { BuiltInRegistries.BLOCK.getOptional(it).getOrNull()?.bukkitMaterial }
             .build()
+    
+    // TODO: block state vanilla
     
     /**
      * The block type as id.
-     * 
+     *
      * Autofilled by: [BLOCK_TYPE_NOVA], [BLOCK_TYPE_VANILLA], [BLOCK_ITEM_STACK]
      */
     val BLOCK_TYPE: ContextParamType<ResourceLocation> =
@@ -80,15 +109,8 @@ object ContextParamTypes {
             .build()
     
     /**
-     * The direction that a block has or should have.
-     */
-    val BLOCK_FACING: ContextParamType<BlockFace> =
-        ContextParamType.builder<BlockFace>("block_facing")
-            .build()
-    
-    /**
      * The face of a block that was clicked.
-     * 
+     *
      * Autofilled by: [SOURCE_PLAYER]
      */
     val CLICKED_BLOCK_FACE: ContextParamType<BlockFace> =
@@ -105,7 +127,7 @@ object ContextParamTypes {
     
     /**
      * The item stack to be placed as a block.
-     * 
+     *
      * Autofilled by: [SOURCE_ENTITY] & [INTERACTION_HAND]
      */
     val BLOCK_ITEM_STACK: ContextParamType<ItemStack> =
@@ -118,7 +140,7 @@ object ContextParamTypes {
     
     /**
      * The item stack used as a tool.
-     * 
+     *
      * Autofilled by: [SOURCE_ENTITY] & [INTERACTION_HAND]
      */
     val TOOL_ITEM_STACK: ContextParamType<ItemStack> =
@@ -130,7 +152,7 @@ object ContextParamTypes {
     
     /**
      * The item stack used to interact with a something.
-     * 
+     *
      * Autofilled by: [SOURCE_ENTITY] & [INTERACTION_HAND]
      */
     val INTERACTION_ITEM_STACK: ContextParamType<ItemStack> =
@@ -142,7 +164,7 @@ object ContextParamTypes {
     
     /**
      * The [UUID] of the source of an action.
-     * 
+     *
      * Autofilled by: [SOURCE_ENTITY], [SOURCE_TILE_ENTITY]
      */
     val SOURCE_UUID: ContextParamType<UUID> =
@@ -153,18 +175,18 @@ object ContextParamTypes {
     
     /**
      * The location of the source of an action.
-     * 
+     *
      * Autofilled by: [SOURCE_ENTITY], [SOURCE_TILE_ENTITY]
      */
     val SOURCE_LOCATION: ContextParamType<Location> =
         ContextParamType.builder<Location>("source_location")
             .autofilledBy(::SOURCE_ENTITY) { it.location }
-            .autofilledBy(::SOURCE_TILE_ENTITY) { it.location }
+            .autofilledBy(::SOURCE_TILE_ENTITY) { it.pos.location }
             .build()
     
     /**
      * The world of the source of an action.
-     * 
+     *
      * Autofilled by: [SOURCE_LOCATION]
      */
     val SOURCE_WORLD: ContextParamType<World> =
@@ -174,13 +196,13 @@ object ContextParamTypes {
     
     /**
      * The direction that the source of an action is facing.
-     * 
+     *
      * Autofilled by: [SOURCE_ENTITY], [SOURCE_TILE_ENTITY]
      */
     val SOURCE_DIRECTION: ContextParamType<Vector> =
         ContextParamType.builder<Vector>("source_direction")
             .autofilledBy(::SOURCE_ENTITY) { it.location.direction }
-            .autofilledBy(::SOURCE_TILE_ENTITY) { it.facing.direction }
+            .autofilledBy(::SOURCE_TILE_ENTITY) { it.blockState[DefaultBlockStateProperties.FACING]?.direction }
             .build()
     
     /**
@@ -195,7 +217,7 @@ object ContextParamTypes {
     
     /**
      * The entity that is the source of an action.
-     * 
+     *
      * Autofilled by: [SOURCE_PLAYER]
      */
     val SOURCE_ENTITY: ContextParamType<Entity> =
@@ -212,7 +234,7 @@ object ContextParamTypes {
     
     /**
      * Whether block drops should be dropped.
-     * 
+     *
      * Autofilled by: [BLOCK_POS] & [TOOL_ITEM_STACK], [BLOCK_POS]
      */
     val BLOCK_DROPS: DefaultingContextParamType<Boolean> =
@@ -223,7 +245,7 @@ object ContextParamTypes {
     
     /**
      * Whether block storage drops should be dropped.
-     * 
+     *
      * Autofilled by [SOURCE_PLAYER]
      */
     val BLOCK_STORAGE_DROPS: DefaultingContextParamType<Boolean> =

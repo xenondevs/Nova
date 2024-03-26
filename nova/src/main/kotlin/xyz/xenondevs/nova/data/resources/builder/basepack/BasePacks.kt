@@ -4,15 +4,14 @@ import org.bukkit.Material
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.FileMerger
 import xyz.xenondevs.nova.data.resources.builder.task.armor.ArmorData
 import xyz.xenondevs.nova.data.resources.builder.task.font.MovedFontContent
-import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
 import xyz.xenondevs.nova.util.StringUtils
 import xyz.xenondevs.nova.util.data.openZip
+import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
 import java.io.File
 import java.nio.file.Path
 import java.util.logging.Level
@@ -45,7 +44,7 @@ class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
     
     val packAmount = packs.size
     val occupiedModelData = HashMap<Material, HashSet<Int>>()
-    val occupiedSolidIds = HashMap<BlockStateConfigType<*>, HashSet<Int>>()
+    internal val occupiedSolidIds = HashMap<BackingStateConfigType<*>, HashSet<Int>>()
     val customArmor = HashMap<Int, ArmorData>()
     
     fun include() {

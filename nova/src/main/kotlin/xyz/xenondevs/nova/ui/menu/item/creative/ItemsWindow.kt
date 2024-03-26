@@ -8,6 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.commons.collections.weakHashSet
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.ScrollGui
@@ -27,6 +28,8 @@ import xyz.xenondevs.nova.item.ItemCategories
 import xyz.xenondevs.nova.item.ItemCategories.OBTAINABLE_ITEMS
 import xyz.xenondevs.nova.item.ItemCategory
 import xyz.xenondevs.nova.ui.item.AnvilTextItem
+import xyz.xenondevs.nova.ui.item.ScrollDownItem
+import xyz.xenondevs.nova.ui.item.ScrollUpItem
 import xyz.xenondevs.nova.ui.item.ToggleItem
 import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
@@ -35,7 +38,6 @@ import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.moveToStart
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import xyz.xenondevs.nova.util.playClickSound
-import java.util.*
 
 private val TAB_BUTTON_TEXTURES = arrayOf(
     DefaultGuiTextures.ITEMS_0,
@@ -52,14 +54,14 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     private var currentWindow: Window? = null
     
     private val openSearchItem = clickableItem(
-        DefaultGuiItems.TP_SEARCH.createClientsideItemBuilder()
+        DefaultGuiItems.TP_SEARCH.model.createClientsideItemBuilder()
             .setDisplayName(Component.translatable("menu.nova.items.search-item"))
     ) { openSearchWindow() }
     
     private val toggleCheatModeItem = ToggleItem(
         player in cheaters,
-        DefaultGuiItems.TP_CHEATING_ON.createClientsideItemBuilder().setDisplayName(Component.translatable("menu.nova.items.cheat_mode.on")),
-        DefaultGuiItems.TP_CHEATING_OFF.createClientsideItemBuilder().setDisplayName(Component.translatable("menu.nova.items.cheat_mode.off")),
+        DefaultGuiItems.TP_CHEATING_ON.model.createClientsideItemBuilder().setDisplayName(Component.translatable("menu.nova.items.cheat_mode.on")),
+        DefaultGuiItems.TP_CHEATING_OFF.model.createClientsideItemBuilder().setDisplayName(Component.translatable("menu.nova.items.cheat_mode.off")),
     ) {
         if (player.hasPermission(GIVE_PERMISSION)) {
             player.persistentDataContainer.set(CHEAT_MODE_KEY, PersistentDataType.BOOLEAN, it)
@@ -70,7 +72,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     }
     
     private val openMainWindowItem = clickableItem(
-        DefaultGuiItems.ARROW_1_UP.createClientsideItemBuilder()
+        DefaultGuiItems.ARROW_UP_ON.model.createClientsideItemBuilder()
             .setDisplayName(Component.translatable("menu.nova.items.search.back", NamedTextColor.GRAY))
     ) { openMainWindow() }
     
@@ -120,7 +122,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         .addIngredient('s', openMainWindowItem)
         .build()
     
-    private val textItem = AnvilTextItem(DefaultGuiItems.INVISIBLE_ITEM.createClientsideItemBuilder(), "")
+    private val textItem = AnvilTextItem(DefaultGuiItems.INVISIBLE_ITEM.model.createClientsideItemBuilder(), "")
     
     private var filteredItems: List<Item>? = null
     private var filter = ""
@@ -139,7 +141,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         
         updateFilteredItems()
         if (player.hasPermission(GIVE_PERMISSION)) {
-            if (player !in cheaters && player.persistentDataContainer.get(CHEAT_MODE_KEY, PersistentDataType.BOOLEAN) ?: false) {
+            if (player !in cheaters && player.persistentDataContainer.get(CHEAT_MODE_KEY, PersistentDataType.BOOLEAN) == true) {
                 cheaters += player
                 toggleCheatModeItem.state = true
                 toggleCheatModeItem.notifyWindows()
@@ -245,6 +247,14 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             )
             .addIngredient('s', openSearchItem)
             .addIngredient('c', toggleCheatModeItem)
+            .addIngredient('u', ScrollUpItem(
+                on = DefaultGuiItems.TP_ARROW_UP_ON.model.clientsideProvider, 
+                off = DefaultGuiItems.TP_ARROW_UP_OFF.model.clientsideProvider
+            ))
+            .addIngredient('d', ScrollDownItem(
+                on = DefaultGuiItems.TP_ARROW_DOWN_ON.model.clientsideProvider, 
+                off = DefaultGuiItems.TP_ARROW_DOWN_OFF.model.clientsideProvider
+            ))
             .setContent(category.items)
             .build()
     }
@@ -270,8 +280,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
             else if (gui.hasPreviousPage())
-                DefaultGuiItems.TP_PIXEL_ARROW_LEFT_ON.clientsideProvider
-            else DefaultGuiItems.TP_PIXEL_ARROW_LEFT_OFF.clientsideProvider
+                DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.model.clientsideProvider
+            else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF.model.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -287,8 +297,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
             else if (gui.hasNextPage())
-                DefaultGuiItems.TP_PIXEL_ARROW_RIGHT_ON.clientsideProvider
-            else DefaultGuiItems.TP_PIXEL_ARROW_RIGHT_OFF.clientsideProvider
+                DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON.model.clientsideProvider
+            else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF.model.clientsideProvider
         }
         
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -300,7 +310,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     companion object {
         val CHEAT_MODE_KEY = NamespacedKey(NOVA_PLUGIN, "cheat_mode")
-        val cheaters = Collections.newSetFromMap(WeakHashMap<Player, Boolean>())
+        val cheaters = weakHashSet<Player>()
     }
     
 }

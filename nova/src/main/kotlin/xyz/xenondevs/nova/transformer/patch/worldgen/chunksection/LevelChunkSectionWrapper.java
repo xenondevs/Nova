@@ -9,11 +9,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
-import xyz.xenondevs.nova.data.world.WorldDataManager;
+import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.nova.world.format.WorldDataManager;
 import xyz.xenondevs.nova.transformer.Patcher;
 import xyz.xenondevs.nova.transformer.adapter.LcsWrapperAdapter;
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry;
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils;
+import xyz.xenondevs.nova.world.BlockPos;
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState;
 
 import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.*;
@@ -30,9 +32,9 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     private static final long COUNT_OFFSET = ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD);
     
     // Paper
-    private static final long SPECIAL_COLLIDING_BLOCKS_OFFSET = LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD == null ? -1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD);
+    private static final long SPECIAL_COLLIDING_BLOCKS_OFFSET = ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD);
 //    private static final long KNOWN_BLOCK_COLLISION_DATA_OFFSET = LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD == null ? -1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD);
-    private static final long TICKING_LIST_OFFSET = LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD == null ? -1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD);
+    private static final long TICKING_LIST_OFFSET = ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD);
     
     // Pufferfish
     private static final long FLUID_STATE_COUNT_OFFSET = LEVEL_CHUNK_SECTION_FLUID_STATE_COUNT_FIELD == null ? -1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_FLUID_STATE_COUNT_FIELD);
@@ -56,19 +58,22 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     }
     
     @Override
-    public BlockState setBlockState(int relX, int relY, int relZ, BlockState state) {
+    public @NotNull BlockState setBlockState(int relX, int relY, int relZ, @NotNull BlockState state) {
         return setBlockState(relX, relY, relZ, state, true);
     }
     
     @Override
-    public BlockState setBlockState(int relX, int relY, int relZ, BlockState state, boolean sync) {
+    public @NotNull BlockState setBlockState(int relX, int relY, int relZ, @NotNull BlockState state, boolean sync) {
         if (state instanceof WrapperBlockState wrappedState) {
             var chunkPos = this.chunkPos;
-            WorldDataManager.INSTANCE.addOrphanBlock(level,
-                relX + chunkPos.getMinBlockX(),
-                relY + bottomBlockY,
-                relZ + chunkPos.getMinBlockZ(),
-                wrappedState.getNovaBlock());
+            WorldDataManager.INSTANCE.setBlockState(
+                new BlockPos(
+                    level.getWorld(),
+                    relX + chunkPos.getMinBlockX(),
+                    relY + bottomBlockY,
+                    relZ + chunkPos.getMinBlockZ()
+                ),
+                wrappedState.getNovaState());
             return Blocks.AIR.defaultBlockState();
         }
         var blockState = delegate.setBlockState(relX, relY, relZ, state, sync);

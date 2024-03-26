@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.GameMode
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.BlockFace
@@ -8,11 +9,12 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.reflection.getRuntimeDelegate
 import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockInteract
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes
-import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
 import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.Network
@@ -28,10 +30,16 @@ import xyz.xenondevs.nova.tileentity.network.fluid.holder.NovaFluidHolder
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.BlockFaceUtils
+import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity(blockState), NetworkEndPoint {
+abstract class NetworkedTileEntity(
+    pos: BlockPos,
+    blockState: NovaBlockState,
+    data: Compound
+) : TileEntity(pos, blockState, data), NetworkEndPoint {
     
     final override var isNetworkInitialized = false
     final override val networks: MutableMap<NetworkType, MutableMap<BlockFace, Network>> = HashMap()
@@ -48,13 +56,24 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
     open val itemHolder: ItemHolder by PlaceholderProperty
     open val fluidHolder: FluidHolder by PlaceholderProperty
     
-    override fun handleInitialized(first: Boolean) {
-        if (first) NetworkManager.queueAsync { it.addEndPoint(this, true) }
+    override val location: Location // TODO: remove
+        get() = pos.location
+    
+    override fun handlePlace(ctx: Context<ContextIntentions.BlockPlace>) {
+        super.handlePlace(ctx)
+        
+        NetworkManager.queueAsync { it.addEndPoint(this, true) }
     }
     
-    override fun reload() {
-        super.reload()
-        holders.forEach { (_, holder) -> holder.reload() }
+    override fun handleBreak(ctx: Context<ContextIntentions.BlockBreak>) {
+        super.handleBreak(ctx)
+        
+        NetworkManager.queueAsync { it.removeEndPoint(this, true) }
+        val itemHolder = holders[DefaultNetworkTypes.ITEMS]
+        if (itemHolder is ItemHolder) {
+            itemHolder.insertFilters.clear()
+            itemHolder.extractFilters.clear()
+        }
     }
     
     override fun saveData() {
@@ -64,7 +83,7 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
         serializeConnectedNodes()
     }
     
-    final override fun handleRightClick(ctx: Context<BlockInteract>): Boolean {
+    override fun handleRightClick(ctx: Context<BlockInteract>): Boolean {
         val itemStack: ItemStack? = ctx[ContextParamTypes.INTERACTION_ITEM_STACK]
         val sourceEntity: Entity? = ctx[ContextParamTypes.SOURCE_ENTITY]
         val interactionHand: EquipmentSlot? = ctx[ContextParamTypes.INTERACTION_HAND]
@@ -72,16 +91,14 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
         val holder = holders[DefaultNetworkTypes.FLUID]
         
         if (holder is NovaFluidHolder && sourceEntity is Player && interactionHand != null) {
-            val success = when (itemStack?.type) {
-                Material.BUCKET -> fillBucket(holder, sourceEntity, interactionHand)
-                Material.WATER_BUCKET, Material.LAVA_BUCKET -> emptyBucket(holder, sourceEntity, interactionHand)
-                else -> false
+            when (itemStack?.type) {
+                Material.BUCKET -> return fillBucket(holder, sourceEntity, interactionHand)
+                Material.WATER_BUCKET, Material.LAVA_BUCKET -> return emptyBucket(holder, sourceEntity, interactionHand)
+                else -> Unit
             }
-            
-            if (success) return true
         }
         
-        return handleUnknownRightClick(ctx)
+        return super.handleRightClick(ctx)
     }
     
     private fun emptyBucket(holder: NovaFluidHolder, player: Player, hand: EquipmentSlot): Boolean {
@@ -133,23 +150,6 @@ abstract class NetworkedTileEntity(blockState: NovaTileEntityState) : TileEntity
         }
         
         return false
-    }
-    
-    open fun handleUnknownRightClick(ctx: Context<BlockInteract>): Boolean {
-        return super.handleRightClick(ctx)
-    }
-    
-    override fun handleRemoved(unload: Boolean) {
-        super.handleRemoved(unload)
-        
-        if (!unload) {
-            NetworkManager.queueAsync { it.removeEndPoint(this, true) }
-            val itemHolder = holders[DefaultNetworkTypes.ITEMS]
-            if (itemHolder is ItemHolder) {
-                itemHolder.insertFilters.clear()
-                itemHolder.extractFilters.clear()
-            }
-        }
     }
     
     override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {

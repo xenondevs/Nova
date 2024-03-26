@@ -7,11 +7,11 @@ import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.data.resources.model.blockstate.BlockStateConfigType
-import xyz.xenondevs.nova.data.resources.model.blockstate.BrownMushroomBlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.blockstate.MushroomStemBlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.blockstate.NoteBlockStateConfig
-import xyz.xenondevs.nova.data.resources.model.blockstate.RedMushroomBlockStateConfig
+import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
+import xyz.xenondevs.nova.world.block.state.model.BrownMushroomBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.MushroomStemBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
 import xyz.xenondevs.nova.data.serialization.json.GSON
 import java.nio.file.Path
 import java.util.logging.Level
@@ -25,10 +25,10 @@ private val IGNORABLE_MODELS: Set<String> = hashSetOf(
 )
 
 private val MERGEABLE_STATE_CONFIGS = listOf(
-    NoteBlockStateConfig,
-    RedMushroomBlockStateConfig,
-    BrownMushroomBlockStateConfig,
-    MushroomStemBlockStateConfig
+    NoteBackingStateConfig,
+    RedMushroomBackingStateConfig,
+    BrownMushroomBackingStateConfig,
+    MushroomStemBackingStateConfig
 )
 
 internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(basePacks, "assets/minecraft/blockstates") {
@@ -78,7 +78,7 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerge
         return variants
     }
     
-    private fun processVariants(configType: BlockStateConfigType<*>, obj: JsonObject) {
+    private fun processVariants(configType: BackingStateConfigType<*>, obj: JsonObject) {
         try {
             val occupied = basePacks.occupiedSolidIds.getOrPut(configType, ::HashSet)
             obj.entrySet().removeIf { (variant, obj) ->

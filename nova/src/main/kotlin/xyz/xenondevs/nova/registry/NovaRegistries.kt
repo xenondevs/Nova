@@ -11,7 +11,6 @@ import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.player.ability.AbilityType
 import xyz.xenondevs.nova.player.attachment.AttachmentType
 import xyz.xenondevs.nova.tileentity.network.NetworkType
-import xyz.xenondevs.nova.tileentity.upgrade.UpgradeType
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -37,9 +36,6 @@ object NovaRegistries {
     
     @JvmField
     val ENCHANTMENT = registerSimple<Enchantment>("enchantment")
-    
-    @JvmField
-    val UPGRADE_TYPE = registerSimple<UpgradeType<*>>("upgrade_type")
     
     @JvmField
     val NETWORK_TYPE = registerSimple<NetworkType>("network_type")

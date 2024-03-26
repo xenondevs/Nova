@@ -15,15 +15,12 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.addLoreLines
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.nova.data.world.block.property.Directional
 import xyz.xenondevs.nova.item.DefaultGuiItems
-import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.playClickSound
-import xyz.xenondevs.nova.util.yaw
 
 internal abstract class AbstractSideConfigGui<H : EndPointDataHolder>(
     val holder: H
@@ -36,10 +33,11 @@ internal abstract class AbstractSideConfigGui<H : EndPointDataHolder>(
     }
     
     fun getBlockFace(blockSide: BlockSide): Pair<BlockSide?, BlockFace> {
-        val directional = (holder.endPoint as TileEntity).blockState.getProperty(Directional::class)
-        return if (directional != null)
-            blockSide to blockSide.getBlockFace(directional.facing.yaw)
-        else null to blockSide.blockFace
+        TODO()
+//        val directional = (holder.endPoint as TileEntity).blockState.getProperty(Directional::class)
+//        return if (directional != null)
+//            blockSide to blockSide.getBlockFace(directional.facing.yaw)
+//        else null to blockSide.blockFace
     }
     
     fun getSideName(blockSide: BlockSide?, blockFace: BlockFace): Component {
@@ -85,16 +83,16 @@ internal abstract class AbstractSideConfigGui<H : EndPointDataHolder>(
             val connectionType = holder.connectionConfig[blockFace]!! // fixme: Unsafe network value access. Should only be accessed from NetworkManager thread.
             return when (connectionType) {
                 NetworkConnectionType.NONE ->
-                    DefaultGuiItems.GRAY_BTN.createClientsideItemBuilder()
+                    DefaultGuiItems.GRAY_BTN.model.createClientsideItemBuilder()
                         .addLoreLines(Component.translatable("menu.nova.side_config.none", NamedTextColor.GRAY))
                 NetworkConnectionType.EXTRACT ->
-                    DefaultGuiItems.ORANGE_BTN.createClientsideItemBuilder()
+                    DefaultGuiItems.ORANGE_BTN.model.createClientsideItemBuilder()
                         .addLoreLines(Component.translatable( "menu.nova.side_config.output", NamedTextColor.GOLD))
                 NetworkConnectionType.INSERT ->
-                    DefaultGuiItems.BLUE_BTN.createClientsideItemBuilder()
+                    DefaultGuiItems.BLUE_BTN.model.createClientsideItemBuilder()
                         .addLoreLines(Component.translatable("menu.nova.side_config.input", NamedTextColor.AQUA))
                 NetworkConnectionType.BUFFER ->
-                    DefaultGuiItems.GREEN_BTN.createClientsideItemBuilder()
+                    DefaultGuiItems.GREEN_BTN.model.createClientsideItemBuilder()
                         .addLoreLines(Component.translatable("menu.nova.side_config.input_output", NamedTextColor.GREEN))
             }.setDisplayName(getSideName(blockSide, blockFace))
         }

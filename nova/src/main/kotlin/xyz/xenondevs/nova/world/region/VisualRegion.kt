@@ -116,7 +116,7 @@ object VisualRegion {
         
         return FakeItemDisplay(center, false) { _, data ->
             data.itemDisplay = ItemDisplayContext.HEAD
-            data.itemStack = DefaultBlockOverlays.TRANSPARENT_BLOCK.clientsideProvider.get().nmsCopy
+            data.itemStack = DefaultBlockOverlays.TRANSPARENT_BLOCK.model.clientsideProvider.get().nmsCopy
             data.scale = Vector3f(
                 (to.x - from.x + lineWidth).toFloat(),
                 (to.y - from.y + lineWidth).toFloat(),

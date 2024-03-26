@@ -48,9 +48,9 @@ abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
         
         if (time != 0) {
             builder.addIngredient(
-                't', DefaultGuiItems.TP_STOPWATCH
-                .createClientsideItemBuilder()
-                .setDisplayName(Component.translatable("menu.nova.recipe.time", Component.text(time / 20.0)))
+                't',
+                DefaultGuiItems.TP_STOPWATCH.model.createClientsideItemBuilder()
+                    .setDisplayName(Component.translatable("menu.nova.recipe.time", Component.text(time / 20.0)))
             )
         }
         

@@ -46,6 +46,8 @@ subprojects {
                 
                 freeCompilerArgs.addAll(
                     "-Xjvm-default=all", // Emit JVM default methods for interface declarations with bodies
+                    
+                    // experimental features
                     "-opt-in=kotlin.io.path.ExperimentalPathApi",
                     "-opt-in=kotlin.time.ExperimentalTime"
                 )
@@ -57,6 +59,10 @@ subprojects {
                         "-Xno-call-assertions", // Don't generate not-null assertions for arguments of platform types
                         "-Xno-receiver-assertions", // Don't generate not-null assertion for extension receiver arguments of platform types
                         "-Xno-param-assertions", // Don't generate not-null assertions on parameters of methods accessible from Java
+                    )
+                } else {
+                    freeCompilerArgs.addAll(
+                        "-Xdebug" // https://kotlinlang.org/docs/debug-coroutines-with-idea.html#optimized-out-variables
                     )
                 }
             }

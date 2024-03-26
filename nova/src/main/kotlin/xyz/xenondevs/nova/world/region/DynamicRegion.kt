@@ -1,16 +1,18 @@
 package xyz.xenondevs.nova.world.region
 
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.mutable.MutableProvider
+import xyz.xenondevs.commons.provider.mutable.map
 import xyz.xenondevs.nova.ui.item.AddNumberItem
 import xyz.xenondevs.nova.ui.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.item.RemoveNumberItem
 import java.util.*
 
-open class DynamicRegion internal constructor(
+class DynamicRegion internal constructor(
     uuid: UUID,
     minSize: Provider<Int>,
     maxSize: Provider<Int>,
-    size: Int,
+    size: MutableProvider<Int>,
     createRegion: (Int) -> Region,
 ) : ReloadableRegion(uuid, createRegion) {
     
@@ -23,29 +25,35 @@ open class DynamicRegion internal constructor(
     val decreaseSizeItem by _decreaseSizeItem
     
     val minSize by minSize
-    open val maxSize by maxSize
+    val maxSize by maxSize
     
-    override var size = size
-        set(value) {
-            if (field != value) {
-                if (value !in minSize..maxSize)
-                    throw IllegalArgumentException("Illegal region size $value for minSize $minSize, maxSize $maxSize")
-                
-                field = value
-                updateRegion()
-                
-                if (_displaySizeItem.isInitialized())
-                    displaySizeItem.notifyWindows()
-                if (_increaseSizeItem.isInitialized())
-                    increaseSizeItem.notifyWindows()
-                if (_decreaseSizeItem.isInitialized())
-                    decreaseSizeItem.notifyWindows()
-            }
+    private val _size = size.map({ it.coerceIn(minSize.get(), maxSize.get()) }, { it })
+    override var size by _size
+    
+    init {
+        size.addUpdateHandler {
+            updateSizeDisplay()
+            updateSizeControls()
+            updateRegion()
         }
+        
+        minSize.addChild(_size)
+        maxSize.addChild(_size)
+        
+        minSize.addUpdateHandler { updateSizeControls()}
+        maxSize.addUpdateHandler { updateSizeControls() }
+    }
     
-    override fun reload() {
-        if (size !in minSize..maxSize)
-            size = maxSize
+    private fun updateSizeDisplay() {
+        if (_displaySizeItem.isInitialized())
+            displaySizeItem.notifyWindows()
+    }
+    
+    private fun updateSizeControls() {
+        if (_increaseSizeItem.isInitialized())
+            increaseSizeItem.notifyWindows()
+        if (_decreaseSizeItem.isInitialized())
+            decreaseSizeItem.notifyWindows()
     }
     
 }

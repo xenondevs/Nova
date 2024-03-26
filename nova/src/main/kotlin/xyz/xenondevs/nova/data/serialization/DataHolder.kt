@@ -3,11 +3,10 @@ package xyz.xenondevs.nova.data.serialization
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.provider.mutable.MutableProvider
-import xyz.xenondevs.nova.tileentity.TileEntity
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
-abstract class DataHolder internal constructor(includeGlobal: Boolean) {
+abstract class DataHolder internal constructor(includePersistent: Boolean) {
     
     @PublishedApi
     internal val dataAccessors = ArrayList<DataAccessor<*>>()
@@ -16,77 +15,83 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
     internal abstract val data: Compound
     
     @PublishedApi
-    internal val globalData: Compound by lazy {
-        val global = data.get<Compound>("global")
-        global ?: Compound().also { if (includeGlobal) data["global"] = it }
+    internal val persistentData: Compound by lazy {
+        data["global"] // legacy name TODO: remove legacy support at some point
+            ?: data["persistent"]
+            ?: Compound().also { if (includePersistent) data["persistent"] = it }
     }
     
     /**
      * Retrieves data from the data [Compound] of this TileEntity.
      * If it can't find anything under the given key, the result of the
-     * [getAlternative] lambda is returned.
-     */
-    inline fun <reified T : Any> retrieveData(key: String, getAlternative: () -> T): T {
-        return retrieveDataOrNull(key) ?: getAlternative()
-    }
-    
-    /**
-     * Retrieves data using CBF deserialization from the data [Compound].
-     * If neither [storedValue] nor [globalData] contains the given key, ``null`` is returned
-     */
-    @Deprecated("Inconsistent name", ReplaceWith("retrieveDataOrNull<T>(key)"))
-    inline fun <reified T : Any> retrieveOrNull(key: String): T? {
-        return retrieveDataOrNull(key)
-    }
-    
-    /**
-     * Retrieves data using CBF deserialization from the data [Compound].
-     * If neither [storedValue] nor [globalData] contains the given key, ``null`` is returned
-     */
-    inline fun <reified T : Any> retrieveDataOrNull(key: String): T? {
-        return data[key] ?: globalData[key]
-    }
-    
-    /**
-     * Retrieves data of the specified [type] from the data [Compound] of this TileEntity.
-     * If it can't find anything under the given key, the result of the
-     * [getAlternative] lambda is returned.
-     */
-    inline fun <T : Any> retrieveData(type: KType, key: String, getAlternative: () -> T): T {
-        return retrieveDataOrNull(type, key) ?: getAlternative()
-    }
-    
-    /**
-     * Retrieves data of the specified [type] using CBF deserialization from the data [Compound].
-     * If neither [storedValue] nor [globalData] contains the given key, ``null`` is returned
-     */
-    fun <T : Any> retrieveDataOrNull(type: KType, key: String): T? {
-        return data.get(type, key) ?: globalData.get(type, key)
-    }
-    
-    /**
-     * Serializes [value] as the reified type [T] and stores it under the given [key] in the compound.
+     * [defaultValue] lambda is returned.
      *
-     * @param global If the data should also be stored in the [ItemStack]
-     * of this [TileEntity].
+     * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
      */
-    inline fun <reified T : Any> storeData(key: String, value: T?, global: Boolean = false) {
-        storeData(typeOf<T>(), key, value, global)
+    inline fun <reified T> retrieveData(key: String, defaultValue: () -> T): T {
+        return retrieveDataOrNull(key) ?: defaultValue()
     }
     
     /**
-     *Serializes [value] as the given [type] and stores it under the given [key] in the compound.
+     * Retrieves data of type [T] or returns `null` if there is no data stored under the given [key].
      *
-     * @param global If the data should also be stored in the [ItemStack]
-     * of this [TileEntity].
+     * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
      */
-    fun <T : Any> storeData(type: KType, key: String, value: T?, global: Boolean = false) {
-        if (global) {
-            require(!data.contains(key)) { "$key is already a non-global value" }
-            if (value != null) globalData.set(type, key, value)
-            else globalData.remove(key)
+    inline fun <reified T> retrieveDataOrNull(key: String): T? {
+        return data[key] ?: persistentData[key]
+    }
+    
+    /**
+     * Retrieves data of the specified [type] or invokes the [defaultValue] lambda if there is no data stored under the given [key].
+     *
+     * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
+     */
+    inline fun <T> retrieveData(type: KType, key: String, defaultValue: () -> T): T {
+        return retrieveDataOrNull(type, key) ?: defaultValue()
+    }
+    
+    /**
+     * Retrieves data of the specified [type] or returns `null` if there is no data stored under the given [key].
+     *
+     * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
+     */
+    fun <T> retrieveDataOrNull(type: KType, key: String): T? {
+        return data.get(type, key) ?: persistentData.get(type, key)
+    }
+    
+    internal fun hasData(key: String): Boolean =
+        data.contains(key) || persistentData.contains(key)
+    
+    internal fun removeData(key: String) {
+        data.remove(key)
+        persistentData.remove(key)
+    }
+    
+    /**
+     * Stores [value] as the reified type [T] under the given [key].
+     *
+     * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
+     *
+     * @param persistent If the data should also be stored in the [ItemStack].
+     */
+    inline fun <reified T> storeData(key: String, value: T?, persistent: Boolean = false) {
+        storeData(typeOf<T>(), key, value, persistent)
+    }
+    
+    /**
+     * Stores [value] as the given [type] under the given [key].
+     *
+     * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
+     *
+     * @param persistent If the data should also be stored in the [ItemStack].
+     */
+    fun <T> storeData(type: KType, key: String, value: T?, persistent: Boolean = false) {
+        if (persistent) {
+            require(!data.contains(key)) { "$key is already a non-persistent value" }
+            if (value != null) persistentData.set(type, key, value)
+            else persistentData.remove(key)
         } else {
-            require(!globalData.contains(key)) { "$key is already a global value" }
+            require(!persistentData.contains(key)) { "$key is already a persistent value" }
             if (value != null) data.set(type, key, value)
             else data.remove(key)
         }
@@ -95,48 +100,48 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
     /**
      * Creates a [DataAccessor] to which properties can delegate.
      *
-     * The non-global value under the [key] is retrieved and [getAlternative] is called if there is no
-     * value stored under that key.
+     * The [DataAccessor] will contain the non-persistent data of type [T] under [key] or
+     * the result of [defaultValue] if there is no data stored under that [key].
      */
-    inline fun <reified T : Any> storedValue(key: String, getAlternative: () -> T): DataAccessor<T> {
-        return storedValue(key, false, getAlternative)
+    inline fun <reified T> storedValue(key: String, defaultValue: () -> T): MutableProvider<T> {
+        return storedValue(key, false, defaultValue)
     }
     
     /**
      * Creates a [DataAccessor] to which properties can delegate.
      *
-     * The value under the [key] is retrieved and [getAlternative] is called if there is no value
-     * stored under that key.
+     * The [DataAccessor] will contain the data of type [T] under [key] or the result of [defaultValue] if there is no data stored under that [key].
      *
-     * @param global If the data should also be stored in the [ItemStack] of this [TileEntity].
+     * @param persistent If the data should also be stored in the [ItemStack].
      */
-    inline fun <reified T : Any> storedValue(key: String, global: Boolean, getAlternative: () -> T): DataAccessor<T> {
+    inline fun <reified T> storedValue(key: String, persistent: Boolean, defaultValue: () -> T): MutableProvider<T> {
         val type = typeOf<T>()
-        val initialValue = retrieveData(type, key, getAlternative)
-        return DataAccessor(type, key, global, initialValue).also(dataAccessors::add)
+        val initialValue = retrieveData(type, key, defaultValue)
+        return DataAccessor(type, key, persistent, initialValue).also(dataAccessors::add)
     }
     
     /**
      * Creates a [DataAccessor] to which properties can delegate.
      *
-     * The value under the [key] is retrieved and null is returned if there is no value stored under that key.
+     * The [DataAccessor] will contain the data of type [T] under [key] or `null` if there is no data stored under that [key].
      *
-     * @param global If the data should also be stored in the [ItemStack] of this [TileEntity].
+     * @param persistent If the data should also be stored in the [ItemStack].
      */
-    inline fun <reified T : Any> storedValue(key: String, global: Boolean = false): DataAccessor<T?> {
+    inline fun <reified T> storedValue(key: String, persistent: Boolean = false): MutableProvider<T?> {
         val type = typeOf<T>()
         val initialValue = retrieveDataOrNull<T>(type, key)
-        return DataAccessor(type, key, global, initialValue).also(dataAccessors::add)
+        return DataAccessor(type, key, persistent, initialValue).also(dataAccessors::add)
     }
     
     internal fun saveDataAccessors() {
         dataAccessors.forEach(DataAccessor<*>::save)
     }
     
-    inner class DataAccessor<T> @PublishedApi internal constructor(
+    @PublishedApi
+    internal inner class DataAccessor<T>(
         private val type: KType,
         private val key: String,
-        private val global: Boolean,
+        private val persistent: Boolean,
         private val initialValue: T,
     ) : MutableProvider<T>() {
         
@@ -144,12 +149,8 @@ abstract class DataHolder internal constructor(includeGlobal: Boolean) {
             return initialValue
         }
         
-        override fun setValue(value: T) {
-            this._value = value
-        }
-        
         fun save() {
-            storeData(type, key, value, global)
+            storeData(type, key, value, persistent)
         }
         
     }

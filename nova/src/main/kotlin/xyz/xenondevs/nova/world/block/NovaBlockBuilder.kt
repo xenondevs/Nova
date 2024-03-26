@@ -1,107 +1,97 @@
-@file:Suppress("unused", "UNCHECKED_CAST")
+@file:Suppress("unused")
 
 package xyz.xenondevs.nova.world.block
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
-import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.data.resources.model.layout.block.BlockModelLayout
+import xyz.xenondevs.nova.data.resources.model.layout.block.BlockModelLayoutBuilder
 import xyz.xenondevs.nova.item.NovaMaterialTypeRegistryElementBuilder
 import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
+import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
+import xyz.xenondevs.nova.world.block.behavior.InteractiveTileEntityBlockBehavior
+import xyz.xenondevs.nova.world.block.behavior.TileEntityBlockBehavior
+import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 
 private val EMPTY_BLOCK_OPTIONS = BlockOptions(0.0)
 
-abstract class AbstractNovaBlockBuilder<S : AbstractNovaBlockBuilder<S, T, B>, T : NovaBlockState, B : NovaBlock> internal constructor(
+abstract class AbstractNovaBlockBuilder<B : NovaBlock> internal constructor(
     id: ResourceLocation
-) : NovaMaterialTypeRegistryElementBuilder<S, B>(NovaRegistries.BLOCK, id, "block.${id.namespace}.${id.name}") {
+) : NovaMaterialTypeRegistryElementBuilder<B>(NovaRegistries.BLOCK, id, "block.${id.namespace}.${id.name}") {
     
     internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
-    protected abstract var logic: MutableList<BlockBehavior<T>>
-    protected val properties = ArrayList<BlockPropertyType<*>>()
+    protected abstract var behaviors: MutableList<BlockBehavior>
+    protected val stateProperties = ArrayList<ScopedBlockStateProperty<*>>()
     protected var options: BlockOptions = EMPTY_BLOCK_OPTIONS
-    protected var placeCheck: PlaceCheckFun? = null
-    protected var multiBlockLoader: MultiBlockLoader? = null
-    
+    internal var requestedLayout = BlockModelLayout.DEFAULT
     
     /**
      * Sets the behaviors of this block to [behaviors].
      */
-    open fun behaviors(vararg behaviors: BlockBehavior<T>): S {
-        this.logic = behaviors.toMutableList()
-        return this as S
+    open fun behaviors(vararg behaviors: BlockBehavior) {
+        this.behaviors = behaviors.toMutableList()
     }
     
     /**
      * Adds the [behaviors] to the behaviors of this block.
      */
-    open fun addBehaviors(vararg block: BlockBehavior<T>): S {
-        this.logic += block
-        return this as S
+    open fun addBehaviors(vararg block: BlockBehavior) {
+        this.behaviors += block
     }
     
     /**
-     * Adds the [properties] to the properties of this block.
+     * Adds the [stateProperties] to the properties of this block.
      */
-    fun properties(vararg properties: BlockPropertyType<*>): S {
-        this.properties += properties
-        return this as S
+    fun stateProperties(vararg stateProperties: ScopedBlockStateProperty<*>) {
+        this.stateProperties += stateProperties
     }
     
     /**
      * Sets the [BlockOptions] of this block.
      */
-    fun blockOptions(options: BlockOptions): S {
+    fun blockOptions(options: BlockOptions) {
         this.options = options
-        return this as S
     }
     
-    /**
-     * Sets the [PlaceCheckFun] of this block.
-     */
-    fun placeCheck(placeCheck: PlaceCheckFun): S {
-        this.placeCheck = placeCheck
-        return this as S
-    }
-    
-    /**
-     * Sets the [MultiBlockLoader] of this block.
-     */
-    fun multiBlockLoader(multiBlockLoader: MultiBlockLoader): S {
-        this.multiBlockLoader = multiBlockLoader
-        return this as S
+    fun models(buildModel: BlockModelLayoutBuilder.() -> Unit) {
+        val builder = BlockModelLayoutBuilder()
+        builder.buildModel()
+        requestedLayout = builder.build()
     }
     
 }
 
-class NovaBlockBuilder internal constructor(id: ResourceLocation) : AbstractNovaBlockBuilder<NovaBlockBuilder, NovaBlockState, NovaBlock>(id) {
+class NovaBlockBuilder internal constructor(id: ResourceLocation) : AbstractNovaBlockBuilder<NovaBlock>(id) {
     
     internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
-    override var logic: MutableList<BlockBehavior<NovaBlockState>> = mutableListOf(BlockBehavior.Default)
+    override var behaviors: MutableList<BlockBehavior> = mutableListOf(BlockBehavior.Default)
     
     override fun build() = NovaBlock(
         id,
         name.style(style),
         style,
-        BlockLogic(logic),
+        behaviors,
         options,
-        properties,
-        placeCheck,
-        multiBlockLoader,
-        configId
+        stateProperties,
+        configId,
+        requestedLayout
     )
     
 }
 
-class TileEntityNovaBlockBuilder internal constructor(
+class NovaTileEntityBlockBuilder internal constructor(
     id: ResourceLocation,
     private val tileEntity: TileEntityConstructor
-) : AbstractNovaBlockBuilder<TileEntityNovaBlockBuilder, NovaTileEntityState, NovaTileEntityBlock>(id) {
+) : AbstractNovaBlockBuilder<NovaTileEntityBlock>(id) {
+    
+    private var syncTickrate: Int = 20
+    private var asyncTickrate: Double = 20.0
     
     internal constructor(
         addon: Addon,
@@ -109,25 +99,44 @@ class TileEntityNovaBlockBuilder internal constructor(
         tileEntity: TileEntityConstructor
     ) : this(ResourceLocation(addon, name), tileEntity)
     
-    override var logic: MutableList<BlockBehavior<NovaTileEntityState>> = mutableListOf(TileEntityBlockBehavior.INTERACTIVE)
+    override var behaviors: MutableList<BlockBehavior> = mutableListOf(InteractiveTileEntityBlockBehavior)
     
-    fun interactive(interactive: Boolean): TileEntityNovaBlockBuilder {
-        logic.removeIf { it is TileEntityBlockBehavior }
-        logic += if (interactive) TileEntityBlockBehavior.INTERACTIVE else TileEntityBlockBehavior.NON_INTERACTIVE
-        return this
+    /**
+     * Configures whether this tile-entity is interactive, i.e. if it can be right-clicked.
+     * Defaults to `true`.
+     */
+    fun interactive(interactive: Boolean) {
+        behaviors.removeIf { it is TileEntityBlockBehavior }
+        behaviors += if (interactive) InteractiveTileEntityBlockBehavior else TileEntityBlockBehavior
+    }
+    
+    /**
+     * Configures the amount of times [TileEntity.handleTick] is called per second.
+     */
+    fun syncTickrate(syncTickrate: Int) {
+        require(syncTickrate in 1..20) { "Sync TPS must be between 1 and 20" }
+        this.syncTickrate = syncTickrate
+    }
+    
+    /**
+     * Configures the amount of times [TileEntity.handleAsyncTick] is called per second.
+     */
+    fun asyncTickrate(asyncTickrate: Double) {
+        require(asyncTickrate > 0) { "Async TPS must be greater than 0" }
+        this.asyncTickrate = asyncTickrate
     }
     
     override fun build() = NovaTileEntityBlock(
         id,
         name.style(style),
         style,
-        BlockLogic(logic),
+        behaviors,
         options,
         tileEntity,
-        properties,
-        placeCheck,
-        multiBlockLoader,
-        configId
+        syncTickrate, asyncTickrate,
+        stateProperties,
+        configId,
+        requestedLayout
     )
     
 }

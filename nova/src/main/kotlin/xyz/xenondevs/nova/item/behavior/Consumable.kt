@@ -6,6 +6,7 @@ import net.minecraft.network.protocol.game.ClientboundEntityEventPacket
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.EquipmentSlot
@@ -18,14 +19,11 @@ import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.send
-import xyz.xenondevs.nova.data.config.entry
-import xyz.xenondevs.nova.data.config.optionalEntry
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.getPlayersNearby
 import xyz.xenondevs.nova.util.intValue
-import xyz.xenondevs.nova.util.item.genericMaxHealth
 import xyz.xenondevs.nova.util.playSoundNearby
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -224,7 +222,7 @@ sealed interface Consumable { // TODO: remove sealed & make more customizable (m
             // food level / saturation / health
             player.foodLevel = min(player.foodLevel + nutrition, 20)
             player.saturation = min(player.saturation + nutrition * saturationModifier * 2.0f, player.foodLevel.toFloat())
-            player.health = min(player.health + instantHealth, player.genericMaxHealth)
+            player.health = min(player.health + instantHealth, player.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value)
             
             // effects
             effects?.forEach { player.addPotionEffect(it) }

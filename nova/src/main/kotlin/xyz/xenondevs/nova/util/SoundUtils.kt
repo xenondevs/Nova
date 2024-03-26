@@ -11,13 +11,8 @@ fun Player.playItemPickupSound() {
 }
 
 fun Player.playClickSound() {
-    playSound(location, Sound.UI_BUTTON_CLICK, 0.5f, 1f)
+    playSound(location, Sound.UI_BUTTON_CLICK, 0.3f, 1f)
 }
-
-@Deprecated("Unnecessary maxDistance parameter", ReplaceWith("playSoundNearby(sound, volume, pitch, excluded)"))
-fun Location.playSoundNearby(maxDistance: Double, sound: Sound, volume: Float, pitch: Float, vararg excluded: Player) =
-    getPlayersNearby(maxDistance, excluded = excluded)
-        .forEach { it.playSound(this, sound, volume, pitch) }
 
 fun Location.playSoundNearby(sound: Sound, volume: Float, pitch: Float, vararg excluded: Player) =
     playSoundNearby(sound, SoundCategory.MASTER, volume, pitch, excluded = excluded)

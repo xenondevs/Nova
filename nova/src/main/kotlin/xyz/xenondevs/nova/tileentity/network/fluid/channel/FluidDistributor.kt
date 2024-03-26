@@ -2,15 +2,15 @@ package xyz.xenondevs.nova.tileentity.network.fluid.channel
 
 import xyz.xenondevs.nova.tileentity.network.NetworkException
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
-import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
+import xyz.xenondevs.nova.tileentity.network.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.util.sumOfNoOverflow
 import kotlin.math.min
 
 internal class FluidDistributor(
-    private val priorityLevels: List<Triple<List<FluidContainer>, List<FluidContainer>, List<FluidContainer>>>
+    private val priorityLevels: List<Triple<List<NetworkedFluidContainer>, List<NetworkedFluidContainer>, List<NetworkedFluidContainer>>>
 ) {
     
-    private val fluidContainers: Set<FluidContainer> = HashSet<FluidContainer>().also {
+    private val fluidContainers: Set<NetworkedFluidContainer> = HashSet<NetworkedFluidContainer>().also {
         priorityLevels.forEach { (consumers, providers, buffers) ->
             it += consumers
             it += providers
@@ -49,7 +49,7 @@ internal class FluidDistributor(
     private fun findFluidType(): FluidType? {
         var fluidType: FluidType? = null
         fluidContainers.forEach {
-            if (it.hasFluid()) {
+            if (!it .isEmpty()) {
                 if (fluidType != null) {
                     if (fluidType != it.type) return null
                 } else fluidType = it.type
@@ -62,12 +62,12 @@ internal class FluidDistributor(
     private fun distributeInScope(
         transferAmount: Long,
         type: FluidType,
-        consumersInScope: List<FluidContainer>,
-        providersInScope: List<FluidContainer>,
-        buffersInScope: List<FluidContainer>
+        consumersInScope: List<NetworkedFluidContainer>,
+        providersInScope: List<NetworkedFluidContainer>,
+        buffersInScope: List<NetworkedFluidContainer>
     ): Long {
         val consumers = consumersInScope.filterNotTo(ArrayList()) { it.isFull() }
-        val providers = providersInScope.filterTo(ArrayList()) { it.hasFluid() }
+        val providers = providersInScope.filterTo(ArrayList()) { !it.isEmpty() }
         
         var availableTransfers = transferAmount
         availableTransfers -= distributeBetween(availableTransfers, type, consumers, providers)
@@ -89,8 +89,8 @@ internal class FluidDistributor(
     private fun distributeBetween(
         maxTransfers: Long,
         type: FluidType,
-        consumers: MutableList<FluidContainer>,
-        providers: MutableList<FluidContainer>
+        consumers: MutableList<NetworkedFluidContainer>,
+        providers: MutableList<NetworkedFluidContainer>
     ): Long {
         val availableFluid = min(maxTransfers, providers.sumOfNoOverflow { it.amount })
         if (availableFluid == 0L) return 0L
@@ -101,7 +101,7 @@ internal class FluidDistributor(
         return distributed
     }
     
-    private fun giveEqually(amount: Long, type: FluidType, consumers: MutableList<FluidContainer>): Long {
+    private fun giveEqually(amount: Long, type: FluidType, consumers: MutableList<NetworkedFluidContainer>): Long {
         if (amount == 0L)
             return 0
         
@@ -114,7 +114,7 @@ internal class FluidDistributor(
             }
             
             consumers.removeIf {
-                val added = it.tryAddFluid(type, cut)
+                val added = it.addFluid(type, cut)
                 remaining -= added
                 
                 it.isFull()
@@ -124,19 +124,19 @@ internal class FluidDistributor(
         return amount - remaining
     }
     
-    private fun giveFirst(amount: Long, type: FluidType, consumers: MutableList<FluidContainer>): Long {
+    private fun giveFirst(amount: Long, type: FluidType, consumers: MutableList<NetworkedFluidContainer>): Long {
         if (amount == 0L)
             return 0
         
         var remaining = amount
         consumers.forEach {
-            remaining -= it.tryAddFluid(type, remaining)
+            remaining -= it.addFluid(type, remaining)
         }
         
         return remaining
     }
     
-    private fun takeEqually(amount: Long, providers: MutableList<FluidContainer>) {
+    private fun takeEqually(amount: Long, providers: MutableList<NetworkedFluidContainer>) {
         var remaining = amount
         while (remaining != 0L && providers.isNotEmpty()) {
             val cut = remaining / providers.size
@@ -146,7 +146,7 @@ internal class FluidDistributor(
             }
             
             providers.removeIf {
-                val take = it.tryTakeFluid(cut)
+                val take = it.takeFluid(cut)
                 remaining -= take
                 
                 take == 0L
@@ -156,10 +156,10 @@ internal class FluidDistributor(
         if (remaining != 0L) throw NetworkException("Could not provide the fluid distributed")
     }
     
-    private fun takeFirst(amount: Long, providers: MutableList<FluidContainer>): Long {
+    private fun takeFirst(amount: Long, providers: MutableList<NetworkedFluidContainer>): Long {
         var remaining = amount
         providers.forEach {
-            remaining -= it.tryTakeFluid(remaining)
+            remaining -= it.takeFluid(remaining)
         }
         return remaining
     }

@@ -2,15 +2,16 @@
 format.version = "1.1"
 
 [versions]
-cbf = "0.7"
+cbf = "0.8"
 configurate = "4.2.0-SNAPSHOT"
-invui = "1.24"
-kotlin = "1.9.20"
+invui = "1.25"
+kotlin = "1.9.22"
+kotlinx-coroutines = "1.7.3"
 ktor = "2.3.7"
 paper = "1.20.4-R0.1-SNAPSHOT"
 paperweight = "1.5.5"
 stringremapper = "1.6"
-xenondevs-commons = "1.7"
+xenondevs-commons = "1.9"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version = "4.12.0" }
@@ -34,10 +35,12 @@ gson = { group = "com.google.code.gson", name = "gson", version = "2.10.1" }
 inventoryaccess = { group = "xyz.xenondevs.invui", name = "inventory-access-r18", version.ref = "invui" }
 invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version.ref = "invui" }
 jimfs = { group = "com.google.jimfs", name = "jimfs", version = "1.2" }
+joml-primitives = { group = "org.joml", name = "joml-primitives", version = "1.10.0" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.9.0" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+kotlinx-coroutines-core-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core-jvm", version.ref = "kotlinx-coroutines" }
 ktor-client-cio-jvm = { group = "io.ktor", name = "ktor-client-cio-jvm", version.ref = "ktor" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-core-jvm = { group = "io.ktor", name = "ktor-client-core-jvm", version.ref = "ktor" }
@@ -59,7 +62,7 @@ zip4j = { group = "net.lingala.zip4j", name = "zip4j", version = "2.11.2" }
 [bundles]
 cbf = ["cosmic-binary-format", "cosmic-binary-format-netty-adapter"]
 configurate = ["configurate-yaml", "configurate-extra-kotlin"]
-kotlin = ["kotlin-stdlib", "kotlin-reflect"]
+kotlin = ["kotlin-stdlib", "kotlin-reflect", "kotlinx-coroutines-core-jvm"]
 ktor = ["ktor-server-core-jvm", "ktor-server-cio-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"]
 kyori-adventure = ["adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-plain", "adventure-platform-bukkit"]
 maven-resolver = ["maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"]

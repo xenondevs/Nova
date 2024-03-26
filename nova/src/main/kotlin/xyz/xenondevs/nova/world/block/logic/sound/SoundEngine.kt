@@ -9,15 +9,25 @@ import xyz.xenondevs.nmsutils.network.event.PacketListener
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundEntityPacketEvent
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundPacketEvent
 import xyz.xenondevs.nmsutils.network.event.registerPacketListener
+import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.take
+import xyz.xenondevs.nova.world.format.WorldDataManager
 
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class, WorldDataManager::class]
+)
 internal object SoundEngine : Listener, PacketListener {
     
     private val SOUND_OVERRIDES: HashSet<String> = PermanentStorage.retrieve("soundOverrides", ::HashSet)
     
-    fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
         registerPacketListener()
     }

@@ -19,8 +19,8 @@ class VisualizeRegionItem(
     
     override fun getItemProvider(): ItemProvider {
         val visible = VisualRegion.isVisible(player, regionUUID)
-        return if (visible) DefaultGuiItems.AREA_BTN_ON.clientsideProvider
-        else DefaultGuiItems.AREA_BTN_OFF.clientsideProvider
+        return if (visible) DefaultGuiItems.AREA_BTN_ON.model.clientsideProvider
+        else DefaultGuiItems.AREA_BTN_OFF.model.clientsideProvider
     }
     
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

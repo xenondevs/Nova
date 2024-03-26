@@ -39,8 +39,10 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.block.data.BlockData
 import org.bukkit.craftbukkit.v1_20_R3.CraftServer
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld
+import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
@@ -101,6 +103,12 @@ val MojangStack.bukkitCopy: ItemStack
 
 val MojangStack.bukkitMirror: ItemStack
     get() = CraftItemStack.asCraftMirror(this)
+
+val BlockData.nmsBlockState: BlockState
+    get() = (this as CraftBlockData).state
+
+val BlockState.bukkitBlockData: BlockData
+    get() = CraftBlockData.fromData(this)
 
 val Location.blockPos: MojangBlockPos
     get() = MojangBlockPos(blockX, blockY, blockZ)
@@ -405,11 +413,11 @@ operator fun Registry<*>.contains(key: String): Boolean {
     return containsKey(id)
 }
 
-internal operator fun <T : Any> WritableRegistry<T>.set(name: String, value: T) {
+operator fun <T : Any> WritableRegistry<T>.set(name: String, value: T) {
     register(ResourceKey.create(key(), ResourceLocation.of(name, ':')), value, Lifecycle.stable())
 }
 
-internal operator fun <T : Any> WritableRegistry<T>.set(id: ResourceLocation, value: T) {
+operator fun <T : Any> WritableRegistry<T>.set(id: ResourceLocation, value: T) {
     register(ResourceKey.create(key(), id), value, Lifecycle.stable())
 }
 

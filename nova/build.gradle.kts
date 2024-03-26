@@ -21,6 +21,7 @@ dependencies {
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
     novaLoaderApi(libs.invui.kotlin)
+    novaLoaderApi(libs.joml.primitives)
     
     // internal dependencies
     compileOnly(project(":nova-loader"))
@@ -51,6 +52,10 @@ tasks {
         filesMatching("paper-plugin.yml") {
             expand(project.properties)
         }
+    }
+    
+    test {
+        useJUnitPlatform()
     }
 }
 

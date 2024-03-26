@@ -7,16 +7,23 @@ import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.commons.gson.registerTypeAdapter
 import xyz.xenondevs.commons.gson.registerTypeHierarchyAdapter
 import xyz.xenondevs.commons.gson.toJsonTreeTyped
-import xyz.xenondevs.nova.data.serialization.json.serializer.BlockModelDataSerialization
+import xyz.xenondevs.nova.data.serialization.json.serializer.BackingStateConfigSerialization
+import xyz.xenondevs.nova.data.serialization.json.serializer.BlockDataTypeAdapter
+import xyz.xenondevs.nova.data.serialization.json.serializer.BlockStateVariantDataSerialization
 import xyz.xenondevs.nova.data.serialization.json.serializer.EnumMapInstanceCreator
 import xyz.xenondevs.nova.data.serialization.json.serializer.FontCharSerialization
 import xyz.xenondevs.nova.data.serialization.json.serializer.IntRangeSerialization
 import xyz.xenondevs.nova.data.serialization.json.serializer.ItemStackSerialization
+import xyz.xenondevs.nova.data.serialization.json.serializer.LinkedBlockModelProviderSerialization
 import xyz.xenondevs.nova.data.serialization.json.serializer.LocationSerialization
 import xyz.xenondevs.nova.data.serialization.json.serializer.LootItemSerialization
 import xyz.xenondevs.nova.data.serialization.json.serializer.LootTableSerialization
+import xyz.xenondevs.nova.data.serialization.json.serializer.ModelTypeAdapter
 import xyz.xenondevs.nova.data.serialization.json.serializer.NamespacedIdTypeAdapter
 import xyz.xenondevs.nova.data.serialization.json.serializer.NamespacedKeyTypeAdapter
+import xyz.xenondevs.nova.data.serialization.json.serializer.NovaBlockSerialization
+import xyz.xenondevs.nova.data.serialization.json.serializer.NovaBlockStateSerialization
+import xyz.xenondevs.nova.data.serialization.json.serializer.NovaItemSerialization
 import xyz.xenondevs.nova.data.serialization.json.serializer.ResourceLocationTypeAdapter
 import xyz.xenondevs.nova.data.serialization.json.serializer.ResourcePathTypeAdapter
 import xyz.xenondevs.nova.data.serialization.json.serializer.SizeOverrideSerialization
@@ -27,6 +34,8 @@ import xyz.xenondevs.nova.data.serialization.json.serializer.YamlConfigurationTy
 import java.util.*
 
 private val GSON_BUILDER = GsonBuilder()
+    .disableHtmlEscaping()
+    .enableComplexMapKeySerialization()
     .registerTypeHierarchyAdapter(UUIDTypeAdapter)
     .registerTypeHierarchyAdapter(NamespacedIdTypeAdapter)
     .registerTypeHierarchyAdapter(NamespacedKeyTypeAdapter)
@@ -35,16 +44,22 @@ private val GSON_BUILDER = GsonBuilder()
     .registerTypeHierarchyAdapter(ItemStackSerialization)
     .registerTypeHierarchyAdapter(LocationSerialization)
     .registerTypeHierarchyAdapter(WorldTypeAdapter)
+    .registerTypeHierarchyAdapter(BlockDataTypeAdapter)
     .registerTypeHierarchyAdapter(YamlConfigurationTypeAdapter)
     .registerTypeHierarchyAdapter(IntRangeSerialization)
     .registerTypeHierarchyAdapter(LootTableSerialization)
     .registerTypeHierarchyAdapter(LootItemSerialization)
-    .registerTypeHierarchyAdapter(BlockModelDataSerialization)
     .registerTypeHierarchyAdapter(VersionSerialization)
+    .registerTypeHierarchyAdapter(ModelTypeAdapter)
+    .registerTypeHierarchyAdapter(NovaItemSerialization)
+    .registerTypeHierarchyAdapter(NovaBlockSerialization)
+    .registerTypeHierarchyAdapter(NovaBlockStateSerialization)
+    .registerTypeHierarchyAdapter(BlockStateVariantDataSerialization)
+    .registerTypeHierarchyAdapter(BackingStateConfigSerialization)
+    .registerTypeHierarchyAdapter(LinkedBlockModelProviderSerialization)
     .registerTypeAdapter(SizeOverrideSerialization)
     .registerTypeAdapter(FontCharSerialization)
     .registerTypeAdapter(EnumMap::class.java, EnumMapInstanceCreator)
-    .enableComplexMapKeySerialization()
 
 val GSON: Gson = GSON_BUILDER.create()
 val PRETTY_GSON: Gson = GSON_BUILDER.setPrettyPrinting().create()

@@ -1,16 +1,18 @@
 package xyz.xenondevs.nova.tileentity.vanilla
 
-import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.NetworkType
 import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.dropItem
+import xyz.xenondevs.nova.world.BlockPos
 
 internal abstract class ItemStorageVanillaTileEntity internal constructor(
-    blockState: VanillaTileEntityState
-) : NetworkedVanillaTileEntity(blockState) {
+    pos: BlockPos,
+    data: Compound
+) : NetworkedVanillaTileEntity(pos, data) {
     
     abstract val itemHolder: ItemHolder
     final override val holders: MutableMap<NetworkType, EndPointDataHolder>

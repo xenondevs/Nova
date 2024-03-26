@@ -12,8 +12,9 @@ import net.minecraft.world.level.levelgen.feature.Feature
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
 import org.bukkit.Material
-import xyz.xenondevs.nova.data.world.WorldDataManager
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.util.nmsBlock
+import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import java.util.function.Predicate
 
@@ -46,8 +47,8 @@ abstract class FeatureType<FC : FeatureConfiguration>(codec: Codec<FC>) : Featur
      *
      * **Note: Nova blocks won't be properly placed/loaded until the chunk is loaded! (i.e. the chunk finished generating)**
      */
-    protected fun setBlock(level: WorldGenLevel, pos: BlockPos, material: NovaBlock) {
-        WorldDataManager.addOrphanBlock(level.level, pos.x, pos.y, pos.z, material)
+    protected fun setBlock(level: WorldGenLevel, pos: BlockPos, block: NovaBlock) {
+        WorldDataManager.setBlockState(pos.toNovaPos(level.level.world), block.defaultBlockState)
     }
     
     //<editor-fold desc="Overrides for better param names" defaultstate="collapsed">

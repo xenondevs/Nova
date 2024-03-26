@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
-import xyz.xenondevs.nova.util.playBreakEffects
+import xyz.xenondevs.nova.util.broadcastBreakEvent
 
 @Hook(plugins = ["ItemsAdder"], loadListener = ItemsAdderLoadListener::class)
 internal object ItemsAdderHook : CustomItemService {
@@ -36,7 +36,7 @@ internal object ItemsAdderHook : CustomItemService {
         
         val customCrop = CustomCrop.byAlreadyPlaced(block)
         if (customCrop != null) {
-            if (breakEffects) block.playBreakEffects()
+            if (breakEffects) block.broadcastBreakEvent()
             block.type = Material.AIR
             return true
         }

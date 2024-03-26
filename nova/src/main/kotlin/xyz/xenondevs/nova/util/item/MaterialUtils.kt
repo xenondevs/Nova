@@ -9,6 +9,10 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import kotlin.random.Random
 
+@Suppress("DEPRECATION")
+val Material?.requiresLight: Boolean
+    get() = this != null && !isTransparent && isOccluding
+
 val Material.fluidType: FluidType?
     get() {
         val fluidType = when (this) {

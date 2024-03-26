@@ -34,7 +34,7 @@ class FluidBar(
     private var capacity = 0L
     
     init {
-        fluidContainer.updateHandlers += ::update
+        fluidContainer.addUpdateHandler(::update)
         update()
     }
     

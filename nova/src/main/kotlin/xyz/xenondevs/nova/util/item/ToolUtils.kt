@@ -12,6 +12,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.logic.PacketItems
 import xyz.xenondevs.nova.item.tool.ToolCategory
@@ -21,13 +22,12 @@ import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.eyeInWater
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.roundToDecimalPlaces
-import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.pos
 
 object ToolUtils {
     
     fun isCorrectToolForDrops(block: Block, tool: ItemStack?): Boolean {
-        val novaBlock = BlockManager.getBlockState(block.pos)
+        val novaBlock = WorldDataManager.getBlockState(block.pos)
         if (novaBlock != null) {
             if (!novaBlock.block.options.requiresToolForDrops)
                 return true
@@ -193,7 +193,7 @@ object ToolUtils {
         val vanillaToolCategory = ToolCategory.ofItem(itemStack) as? VanillaToolCategory
         if (vanillaToolCategory != null) {
             val itemType = itemStack.type
-            if (BlockManager.getBlockState(block.pos) == null) {
+            if (WorldDataManager.getBlockState(block.pos) == null) {
                 val specialMultiplier = vanillaToolCategory.specialMultipliers[itemType]?.get(block.type)
                 if (specialMultiplier != null)
                     return specialMultiplier

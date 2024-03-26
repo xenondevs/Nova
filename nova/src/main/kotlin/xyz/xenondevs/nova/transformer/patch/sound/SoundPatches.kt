@@ -17,6 +17,7 @@ import org.objectweb.asm.Opcodes
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.replaceFirst
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.item.behavior.Wearable
 import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
@@ -29,7 +30,6 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import kotlin.math.floor
 import kotlin.random.Random
@@ -103,7 +103,7 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
     }
     
     private fun playStepSound(player: MojangPlayer, pos: BlockPos, state: BlockState, volumeMultiplier: Float, pitchMultiplier: Float) {
-        val novaState = BlockManager.getBlockState(pos)
+        val novaState = WorldDataManager.getBlockState(pos)
         
         val oldSound: String
         val newSound: String

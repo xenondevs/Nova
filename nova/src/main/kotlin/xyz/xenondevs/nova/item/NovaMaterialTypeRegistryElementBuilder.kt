@@ -1,5 +1,3 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package xyz.xenondevs.nova.item
 
 import net.kyori.adventure.text.Component
@@ -15,11 +13,11 @@ import xyz.xenondevs.nova.world.block.NovaBlockBuilder
 /**
  * The super-class for [NovaItemBuilder] and [NovaBlockBuilder]
  */
-abstract class NovaMaterialTypeRegistryElementBuilder<S : NovaMaterialTypeRegistryElementBuilder<S, T>, T : Any>(
+abstract class NovaMaterialTypeRegistryElementBuilder<T : Any>(
     registry: WritableRegistry<in T>,
     id: ResourceLocation,
     defaultLocalizationKey: String
-) : ConfigurableRegistryElementBuilder<S, T>(registry, id) {
+) : ConfigurableRegistryElementBuilder<T>(registry, id) {
     
     protected var style: Style = Style.empty()
     protected var name: Component = Component.translatable(defaultLocalizationKey)
@@ -27,41 +25,36 @@ abstract class NovaMaterialTypeRegistryElementBuilder<S : NovaMaterialTypeRegist
     /**
      * Sets the style of the item name.
      */
-    fun style(style: Style): S {
+    fun style(style: Style) {
         this.style = style
-        return this as S
     }
     
     /**
      * Sets the style of the item name.
      */
-    fun style(color: TextColor): S {
+    fun style(color: TextColor) {
         this.style = Style.style(color)
-        return this as S
     }
     
     /**
      * Sets the style of the item name.
      */
-    fun style(color: TextColor, vararg decorations: TextDecoration): S {
+    fun style(color: TextColor, vararg decorations: TextDecoration) {
         this.style = Style.style(color, *decorations)
-        return this as S
     }
     
     /**
      * Sets the style of the item name.
      */
-    fun style(vararg decorations: TextDecoration): S {
+    fun style(vararg decorations: TextDecoration) {
         this.style = Style.style(*decorations)
-        return this as S
     }
     
     /**
      * Sets the style of the item name.
      */
-    fun style(decoration: TextDecoration): S {
+    fun style(decoration: TextDecoration){
         this.style = Style.style(decoration)
-        return this as S
     }
     
     /**
@@ -69,9 +62,8 @@ abstract class NovaMaterialTypeRegistryElementBuilder<S : NovaMaterialTypeRegist
      *
      * This function is exclusive with [localizedName].
      */
-    fun name(name: Component): S {
+    fun name(name: Component) {
         this.name = name
-        return this as S
     }
     
     /**
@@ -81,9 +73,8 @@ abstract class NovaMaterialTypeRegistryElementBuilder<S : NovaMaterialTypeRegist
      *
      * This function is exclusive with [name].
      */
-    fun localizedName(localizedName: String): S {
+    fun localizedName(localizedName: String) {
         this.name = Component.translatable(localizedName)
-        return this as S
     }
     
 }

@@ -4,7 +4,7 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.pollFirstWhere
 import xyz.xenondevs.commons.collections.selectValues
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
-import xyz.xenondevs.nova.tileentity.network.fluid.container.FluidContainer
+import xyz.xenondevs.nova.tileentity.network.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.holder.FluidHolder
 import java.util.*
 
@@ -12,7 +12,7 @@ internal sealed interface FluidConfiguration {
     
     val fluidHolder: FluidHolder
     val faces: Set<BlockFace>
-    val container: FluidContainer
+    val container: NetworkedFluidContainer
     val type: NetworkConnectionType
     
 }
@@ -20,7 +20,7 @@ internal sealed interface FluidConfiguration {
 private class DefaultFluidConfiguration(
     override val fluidHolder: FluidHolder,
     override val faces: Set<BlockFace>,
-    override val container: FluidContainer,
+    override val container: NetworkedFluidContainer,
     override val type: NetworkConnectionType
 ) : FluidConfiguration {
     
@@ -39,14 +39,14 @@ private class DefaultFluidConfiguration(
  * The [FluidBufferConfiguration] is special configuration for [Fluid Holders][FluidHolder] that are
  * connected using [NetworkConnectionType.BUFFER].
  *
- * If the insert and extract priority are unequal, the [FluidContainer] of this configuration is treated as a
+ * If the insert and extract priority are unequal, the [NetworkedFluidContainer] of this configuration is treated as a
  * consumer or provider until a priority level is reached which includes both insert and extract, then the
- * [FluidContainer] will be considered a fluid buffer.
+ * [NetworkedFluidContainer] will be considered a fluid buffer.
  */
 private class FluidBufferConfiguration(
     override val fluidHolder: FluidHolder,
     override val faces: Set<BlockFace>,
-    override val container: FluidContainer,
+    override val container: NetworkedFluidContainer,
 ) : FluidConfiguration {
     
     override val type = NetworkConnectionType.BUFFER
@@ -101,7 +101,7 @@ private fun createFluidConfiguration(fluidHolder: FluidHolder, face: BlockFace):
 private fun createFluidConfiguration(
     fluidHolder: FluidHolder,
     faces: Set<BlockFace>,
-    container: FluidContainer,
+    container: NetworkedFluidContainer,
     type: NetworkConnectionType
 ): FluidConfiguration {
     return when (type) {
@@ -121,7 +121,7 @@ private fun mergeFluidConfigurations(
     return createFluidConfiguration(first.fluidHolder, faces, first.container, newType)
 }
 
-private fun Iterable<FluidConfiguration>.mapToContainer(): List<FluidContainer> = map { it.container }
+private fun Iterable<FluidConfiguration>.mapToContainer(): List<NetworkedFluidContainer> = map { it.container }
 
 internal class FluidNetworkChannel {
     
@@ -220,8 +220,8 @@ internal class FluidNetworkChannel {
     }
     
     // TODO: optimize
-    private fun computeAvailableContainers(): List<Triple<List<FluidContainer>, List<FluidContainer>, List<FluidContainer>>> {
-        val prioritizedFluidContainers = ArrayList<Triple<List<FluidContainer>, List<FluidContainer>, List<FluidContainer>>>()
+    private fun computeAvailableContainers(): List<Triple<List<NetworkedFluidContainer>, List<NetworkedFluidContainer>, List<NetworkedFluidContainer>>> {
+        val prioritizedFluidContainers = ArrayList<Triple<List<NetworkedFluidContainer>, List<NetworkedFluidContainer>, List<NetworkedFluidContainer>>>()
         
         val consumers = convertConfigurations(consumerConfigurations)
         val providers = convertConfigurations(providerConfigurations)

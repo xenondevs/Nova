@@ -50,7 +50,6 @@ class Context<I : ContextIntention> private constructor(
         return (explicitParams[paramType] ?: resolvedParams[paramType]) as V?
     }
     
-    
     /**
      * Checks whether the given [paramType] is present in this context.
      *
@@ -142,7 +141,7 @@ class Context<I : ContextIntention> private constructor(
             
             // verify presence of all required params
             for (requiredParam in intention.required) {
-                if (requiredParam !in explicitParams)
+                if (!hasParam(requiredParam))
                     throw IllegalStateException("Required context parameter ${requiredParam.id} is not present")
             }
             

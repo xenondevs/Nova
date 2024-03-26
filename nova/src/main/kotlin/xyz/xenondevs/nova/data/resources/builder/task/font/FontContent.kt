@@ -8,8 +8,9 @@ import xyz.xenondevs.nova.data.resources.builder.font.Font
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import java.nio.file.Path
+import kotlin.io.path.exists
 import kotlin.io.path.extension
-import kotlin.io.path.notExists
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.walk
 
 class FontContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
@@ -45,7 +46,7 @@ class FontContent internal constructor(private val builder: ResourcePackBuilder)
         return _customFonts.getOrPut(id) { Font(id) }
     }
     
-    fun add(font: Font){
+    fun add(font: Font) {
         _customFonts[font.id] = font
     }
     
@@ -71,20 +72,21 @@ class FontContent internal constructor(private val builder: ResourcePackBuilder)
     
     @PackTask(runAfter = ["ExtractTask#extractAll"])
     private fun discoverAllFonts() {
-        discoverFonts(MCASSETS_ASSETS_DIR, MCASSETS_ASSETS_DIR.resolve("minecraft/font/"), _vanillaFonts)
-        discoverFonts(ASSETS_DIR, ASSETS_DIR.resolve("minecraft/font/"), _customFonts)
-        builder.assetPacks.forEach { discoverFonts(ASSETS_DIR, ASSETS_DIR.resolve("${it.namespace}/font/"), _customFonts) }
+        discoverFonts(MCASSETS_ASSETS_DIR, _vanillaFonts)
+        discoverFonts(ASSETS_DIR, _customFonts)
     }
     
-    private fun discoverFonts(assetsDir: Path, fontDir: Path, map: MutableMap<ResourcePath, Font>) {
-        if (fontDir.notExists())
-            return
-        
-        fontDir.walk()
-            .filter { it.extension.equals("json", true) }
-            .forEach { path -> 
-                val font = Font.fromDisk(assetsDir, path)
-                map[font.id] = font
+    private fun discoverFonts(assetsDir: Path, map: MutableMap<ResourcePath, Font>) {
+        assetsDir.listDirectoryEntries()
+            .map { it.resolve("font") }
+            .filter { it.exists() }
+            .forEach { fontDir ->
+                fontDir.walk()
+                    .filter { it.extension.equals("json", true) }
+                    .forEach { path ->
+                        val font = Font.fromDisk(assetsDir, path)
+                        map[font.id] = font
+                    }
             }
     }
     

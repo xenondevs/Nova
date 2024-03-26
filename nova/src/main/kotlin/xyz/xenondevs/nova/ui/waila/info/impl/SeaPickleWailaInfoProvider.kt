@@ -7,13 +7,14 @@ import org.bukkit.block.data.type.SeaPickle
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
+import xyz.xenondevs.nova.world.BlockPos
 
 internal object SeaPickleWailaInfoProvider : VanillaWailaInfoProvider(
     setOf(Material.SEA_PICKLE)
 ) {
     
-    override fun getInfo(player: Player, block: Block): WailaInfo {
-        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
+    override fun getInfo(player: Player, pos: BlockPos, block: Block): WailaInfo {
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, block)
         info.icon = ResourceLocation("minecraft", getSeaPickleName(block))
         return info
     }

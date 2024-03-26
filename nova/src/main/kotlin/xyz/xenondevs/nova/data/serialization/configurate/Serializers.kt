@@ -26,7 +26,6 @@ val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColle
     .register(BuiltInRegistries.ATTRIBUTE.byNameTypeSerializer())
     // -- Nova Registries --
     .register(NovaRegistries.NETWORK_TYPE.byNameTypeSerializer())
-    .register(NovaRegistries.UPGRADE_TYPE.byNameTypeSerializer())
     .register(NovaRegistries.ABILITY_TYPE.byNameTypeSerializer())
     .register(NovaRegistries.ATTACHMENT_TYPE.byNameTypeSerializer())
     .register(NovaRegistries.RECIPE_TYPE.byNameTypeSerializer())

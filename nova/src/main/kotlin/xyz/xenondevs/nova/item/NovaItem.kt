@@ -20,30 +20,31 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.kotlin.extensions.get
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.ConfigProvider
 import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.data.config.Reloadable
-import xyz.xenondevs.nova.data.resources.builder.task.material.info.VanillaMaterialTypes
+import xyz.xenondevs.nova.data.resources.builder.task.model.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
+import xyz.xenondevs.nova.data.resources.model.layout.item.RequestedItemModelLayout
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorFactory
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.logic.PacketItemData
+import xyz.xenondevs.nova.item.logic.PacketItems
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.data.CentralizedLazy
-import xyz.xenondevs.nova.util.data.LazyArray
 import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
+import xyz.xenondevs.nova.util.item.unhandledTags
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import java.util.logging.Level
@@ -61,11 +62,12 @@ class NovaItem internal constructor(
     val name: Component,
     val style: Style,
     behaviorHolders: List<ItemBehaviorHolder>,
-    private val _maxStackSize: Int = 64,
-    val craftingRemainingItem: ItemBuilder? = null,
-    val isHidden: Boolean = false,
-    val block: NovaBlock? = null,
-    private val configId: String = id.toString()
+    private val _maxStackSize: Int,
+    val craftingRemainingItem: ItemBuilder?,
+    val isHidden: Boolean,
+    val block: NovaBlock?,
+    private val configId: String,
+    internal val requestedLayout: RequestedItemModelLayout
 ) : Reloadable {
     
     /**
@@ -74,44 +76,14 @@ class NovaItem internal constructor(
     val maxStackSize: Int
         get() = min(_maxStackSize, vanillaMaterial.maxStackSize)
     
-    /**
-     * The [ItemModelData] containing all the vanilla material and custom model data to be used for this [NovaItem].
-     */
     val model: ItemModelData by lazy {
-        val itemModelData = ResourceLookups.MODEL_DATA_LOOKUP.getOrThrow(id).item!!
-        if (itemModelData.size == 1)
-            return@lazy itemModelData.values.first()
-        
-        return@lazy itemModelData[vanillaMaterial]!!
+        val material = vanillaMaterial
+        val namedModels = ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.value[this]?.get(material)
+            ?: throw IllegalStateException("Could not retrieve named models for $this, $material")
+        val unnamedModels = ResourceLookups.UNNAMED_ITEM_MODEL_LOOKUP.value[this]?.get(material)
+            ?: throw IllegalStateException("Could not retrieve unnamed models for $this, $material")
+        return@lazy ItemModelData(this, material, namedModels, unnamedModels)
     }
-    
-    /**
-     * An array of [ItemProviders][ItemProvider] for each subId of this [NovaItem].
-     *
-     * The items are in client-side format and do not have any other special data except their display name (hence "basic").
-     */
-    val basicClientsideProviders: LazyArray<ItemProvider> =
-        LazyArray({ model.dataArray.size }) { model.createClientsideItemProvider(this, true, it) }
-    
-    /**
-     * An array of [ItemProviders][ItemProvider] for each subId of this [NovaItem].
-     *
-     * The items are in client-side format and have all special data (lore, other nbt tags, etc.) applied.
-     */
-    val clientsideProviders: LazyArray<ItemProvider> =
-        LazyArray({ model.dataArray.size }) { model.createClientsideItemProvider(this, false, it) }
-    
-    /**
-     * The basic client-side provider for the first subId of this [NovaItem].
-     * @see [basicClientsideProviders]
-     */
-    val basicClientsideProvider: ItemProvider by lazy { basicClientsideProviders[0] }
-    
-    /**
-     * The client-side provider for the first subId of this [NovaItem].
-     * @see [clientsideProviders]
-     */
-    val clientsideProvider: ItemProvider by lazy { clientsideProviders[0] }
     
     /**
      * The configuration for this [NovaItem].
@@ -151,30 +123,44 @@ class NovaItem internal constructor(
     /**
      * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in server-side format.
      */
-    fun createItemBuilder(): ItemBuilder =
-        modifyItemBuilder(model.createItemBuilder())
+    fun createItemBuilder(modelId: String = "default"): ItemBuilder =
+        createItemBuilder { putString("modelId", modelId) }
     
     /**
-     * Creates an [ItemStack] of this [NovaItem] in server-side format.
-     *
-     * Functionally equivalent to: `createItemBuilder().setAmount(amount).get()`
+     * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in server-side format.
      */
-    fun createItemStack(amount: Int = 1): ItemStack =
-        createItemBuilder().setAmount(amount).get()
+    fun createItemBuilder(modelId: Int): ItemBuilder =
+        createItemBuilder { putInt("subId", modelId) }
+    
+    @Suppress("DEPRECATION")
+    private fun createItemBuilder(writeModelId: CompoundTag.() -> Unit): ItemBuilder =
+        ItemBuilder(PacketItems.SERVER_SIDE_MATERIAL)
+            .let { initialBuilder -> behaviors.fold(initialBuilder) { acc, behavior -> behavior.modifyItemBuilder(acc) } }
+            .addModifier { itemStack ->
+                val novaCompoundTag = CompoundTag()
+                novaCompoundTag.putString("id", id.toString())
+                writeModelId(novaCompoundTag)
+                val meta = itemStack.itemMeta!!
+                meta.unhandledTags["nova"] = novaCompoundTag
+                itemStack.itemMeta = meta
+                
+                if (defaultCompound != null)
+                    itemStack.novaCompound.putAll(defaultCompound!!.copy())
+                
+                itemStack
+            }
     
     /**
-     * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem] in client-side format.
+     * Creates an [ItemStack] of this [NovaItem] with the given [amount] and [modelId] in server-side format.
      */
-    fun createClientsideItemBuilder(): ItemBuilder =
-        model.createClientsideItemBuilder()
+    fun createItemStack(amount: Int = 1, modelId: String = "default"): ItemStack =
+        createItemBuilder(modelId).setAmount(amount).get()
     
     /**
-     * Creates an [ItemStack] of this [NovaItem] in client-side format.
-     *
-     * Functionally equivalent to: `createClientsideItemBuilder().setAmount(amount).get()`
+     * Creates an [ItemStack] of this [NovaItem] with the given [amount] and [modelId] in server-side format.
      */
-    fun createClientsideItemStack(amount: Int): ItemStack =
-        createClientsideItemBuilder().setAmount(amount).get()
+    fun createItemStack(amount: Int = 1, modelId: Int): ItemStack =
+        createItemBuilder(modelId).setAmount(amount).get()
     
     /**
      * Checks whether this [NovaItem] has an [ItemBehavior] of the reified type [T], or a subclass of it.
@@ -183,7 +169,7 @@ class NovaItem internal constructor(
         hasBehavior(T::class)
     
     /**
-     * Checks whether this [NovaItem] has an [ItemBehavior] of the specified class [behavior], or a subclass of it.
+     * Checks whether this [NovaItem] has an [ItemBehavior] of the specified class [type], or a subclass of it.
      */
     fun <T : Any> hasBehavior(type: KClass<T>): Boolean =
         behaviors.any { type.isSuperclassOf(it::class) }
@@ -195,7 +181,7 @@ class NovaItem internal constructor(
         getBehaviorOrNull(T::class)
     
     /**
-     * Gets the first [ItemBehavior] that is an instance of [behavior], or null if there is none.
+     * Gets the first [ItemBehavior] that is an instance of [type] or a subclass, or null if there is none.
      */
     fun <T : Any> getBehaviorOrNull(type: KClass<T>): T? =
         behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
@@ -211,15 +197,6 @@ class NovaItem internal constructor(
      */
     fun <T : Any> getBehavior(behavior: KClass<T>): T =
         getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
-    
-    @Suppress("DEPRECATION")
-    internal fun modifyItemBuilder(itemBuilder: ItemBuilder): ItemBuilder {
-        var builder = itemBuilder
-        if (defaultCompound != null)
-            builder.addModifier { it.novaCompound.putAll(defaultCompound!!.copy()); it }
-        behaviors.forEach { builder = it.modifyItemBuilder(builder) }
-        return builder
-    }
     
     internal fun getPacketItemData(itemStack: MojangStack?): PacketItemData {
         val itemData = PacketItemData(itemStack?.orCreateTag ?: CompoundTag(), name)

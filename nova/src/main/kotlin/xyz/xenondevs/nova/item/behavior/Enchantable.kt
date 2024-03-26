@@ -8,7 +8,6 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.enchantment.Enchantment

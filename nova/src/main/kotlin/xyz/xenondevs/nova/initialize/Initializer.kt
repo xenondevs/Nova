@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.initialize
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import io.papermc.paper.configuration.GlobalConfiguration
 import net.kyori.adventure.text.Component
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
@@ -128,6 +129,10 @@ internal object Initializer : Listener {
         InvUILanguages.getInstance().enableServerSideTranslations(false)
         CBFAdapters.register()
         InventoryUtils.stackSizeProvider = StackSizeProvider(ItemStack::novaMaxStackSize)
+        
+        val cfg = GlobalConfiguration.get().blockUpdates
+        cfg.disableNoteblockUpdates = true
+        cfg.disableMushroomBlockUpdates = true
         
         // pre-world initialization polls from the list because additional elements may be added by addons
         var failed = false

@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.item.logic
 
+import kotlinx.coroutines.runBlocking
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -50,7 +51,7 @@ internal object ItemListener : Listener, PacketListener {
         val item = event.item
         
         val location = event.clickedBlock?.location ?: player.location
-        if (item == null || !ProtectionManager.canUseItem(player, item, location).get())
+        if (item == null || runBlocking { !ProtectionManager.canUseItem(player, item, location) }) // TODO
             return
         
         item.novaItem?.handleInteract(event.player, item, event.action, wrappedEvent)

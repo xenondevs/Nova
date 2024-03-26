@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.item.tool
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.config.Configs
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries

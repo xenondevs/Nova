@@ -1,13 +1,16 @@
 package xyz.xenondevs.nova.data.serialization.cbf
 
+import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.CBF.registerBinaryAdapter
 import xyz.xenondevs.cbf.CBF.registerBinaryHierarchyAdapter
 import xyz.xenondevs.cbf.adapter.BinaryAdapter
+import xyz.xenondevs.cbf.adapter.impl.EnumBinaryAdapter
 import xyz.xenondevs.cbf.instancecreator.InstanceCreator
 import xyz.xenondevs.cbf.security.CBFSecurityManager
 import xyz.xenondevs.commons.reflection.classifierClass
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound.NamespacedCompoundBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.BlockPosBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ColorBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ItemFilterBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ItemStackBinaryAdapter
@@ -26,8 +29,8 @@ import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_CATEGORY
 import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_TIER
-import xyz.xenondevs.nova.registry.NovaRegistries.UPGRADE_TYPE
 import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
+import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.util.byNameBinaryAdapter
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -43,12 +46,12 @@ internal object CBFAdapters {
         registerBinaryAdapter(NamespacedIdBinaryAdapter)
         registerBinaryAdapter(ResourceLocationBinaryAdapter)
         registerBinaryAdapter(NETWORK_TYPE.byNameBinaryAdapter())
-        registerBinaryAdapter(UPGRADE_TYPE.byNameBinaryAdapter())
         registerBinaryAdapter(ABILITY_TYPE.byNameBinaryAdapter())
         registerBinaryAdapter(ATTACHMENT_TYPE.byNameBinaryAdapter())
         registerBinaryAdapter(RECIPE_TYPE.byNameBinaryAdapter())
         registerBinaryAdapter(VirtualInventoryBinaryAdapter)
         registerBinaryAdapter(ItemFilterBinaryAdapter)
+        registerBinaryAdapter(BlockPosBinaryAdapter)
         
         // binary hierarchy adapters
         registerBinaryHierarchyAdapter(ItemStackBinaryAdapter)
@@ -61,6 +64,9 @@ internal object CBFAdapters {
         
         // register security manager (this prevents addons from registering adapters / instance creators for non-addon classes)
         CBF.securityManager = CBFAddonSecurityManager()
+        
+        // configure ordinal enums
+        EnumBinaryAdapter.addOrdinalEnums(BlockFace::class, NetworkConnectionType::class)
     }
     
     private class CBFAddonSecurityManager : CBFSecurityManager {

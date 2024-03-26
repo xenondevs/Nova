@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.transformer.adapter.LcsWrapperAdapter
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
-import xyz.xenondevs.nova.transformer.patch.block.NoteBlockPatch
+import xyz.xenondevs.nova.transformer.patch.block.BlockUpdatesPatch
 import xyz.xenondevs.nova.transformer.patch.bossbar.BossBarOriginPatch
 import xyz.xenondevs.nova.transformer.patch.item.AnvilResultPatch
 import xyz.xenondevs.nova.transformer.patch.item.AttributePatch
@@ -59,11 +59,11 @@ internal object Patcher {
     private val extraOpens = setOf("java.lang", "java.lang.reflect", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
         sequenceOf(
-            FieldFilterPatch, NoteBlockPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
+            FieldFilterPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
             StackSizePatch, FeatureSorterPatch, LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
             WrapperBlockPatch, MappedRegistryPatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches,
             BroadcastPacketPatch, CBFCompoundTagPatch, EventPreventionPatch, LegacyConversionPatch, WearablePatch,
-            NovaRuleTestPatch, BossBarOriginPatch, ThreadingDetectorPatch, FakePlayerLastHurtPatch
+            NovaRuleTestPatch, BossBarOriginPatch, ThreadingDetectorPatch, FakePlayerLastHurtPatch, BlockUpdatesPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     

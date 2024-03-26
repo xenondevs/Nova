@@ -48,9 +48,6 @@ resource_pack:
     # Whether Minecraft assets should be downloaded from GitHub or Mojang's API.
     # GitHub is faster since it's a single zip file. If you're unable to access GitHub, change this to "mojang".
     minecraft_assets_source: github
-    # If Nova is allowed to use solid block states (e.g. mushroom, noteblock) when addons request it.
-    # Please read the following documentation page before change this value: https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
-    use_solid_blocks: true
   # If Nova should use the uniform font for moved versions of the default font and calculation of char sizes for the default font.
   # The uniform font can be activated client-side by toggling "Force Unicode Font" in Minecraft's language settings.
   # If the players on your server are expected to have that option enabled, you should set this to true.

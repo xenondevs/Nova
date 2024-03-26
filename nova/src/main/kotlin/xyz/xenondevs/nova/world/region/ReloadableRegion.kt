@@ -37,10 +37,6 @@ abstract class ReloadableRegion(
     override fun iterator(): Iterator<Block> = blocks.iterator()
     //</editor-fold>
     
-    open fun reload() {
-        updateRegion()
-    }
-    
     fun createVisualizeRegionItem(player: Player): VisualizeRegionItem {
         return VisualizeRegionItem(player, uuid, ::region)
     }

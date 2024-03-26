@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.tileentity.network.energy
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.tileentity.network.DefaultNetworkTypes
 import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkBridge

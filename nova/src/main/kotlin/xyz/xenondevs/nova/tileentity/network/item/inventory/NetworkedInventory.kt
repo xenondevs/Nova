@@ -5,10 +5,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.UpdateReason
-import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.EndPointContainer
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
-import xyz.xenondevs.nova.tileentity.network.NetworkException
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedVirtualInventory.Companion.UPDATE_REASON
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.isFull
@@ -103,8 +101,7 @@ class NetworkedVirtualInventory internal constructor(val virtualInventory: Virtu
     }
     
     override fun decrementByOne(slot: Int) {
-        if(virtualInventory.addItemAmount(UpdateReason.SUPPRESSED, slot, -1) != -1)
-            throwNetworkException()
+        virtualInventory.addItemAmount(UpdateReason.SUPPRESSED, slot, -1)
         
         val itemStack = virtualInventory.getUnsafeItem(slot) ?: return
         virtualInventory.callPostUpdateEvent(
@@ -127,12 +124,6 @@ class NetworkedVirtualInventory internal constructor(val virtualInventory: Virtu
         if (other is NetworkedVirtualInventory) other.virtualInventory.uuid == virtualInventory.uuid else false
     
     override fun hashCode() = virtualInventory.uuid.hashCode()
-    
-    private fun throwNetworkException() {
-        val uuid = virtualInventory.uuid
-        val tileEntity = TileEntityManager.tileEntities.first { tileEntity -> tileEntity.inventories.any { it.uuid == uuid } }
-        throw NetworkException("The ItemUpdateEvent was cancelled. UUID: ${virtualInventory.uuid}, TileEntity: $tileEntity")
-    }
     
     companion object {
         
@@ -193,8 +184,7 @@ internal class NetworkedMultiVirtualInventory(inventories: Iterable<Pair<Virtual
     
     override fun decrementByOne(slot: Int) {
         val (inv, invSlot) = getSlot(slot)
-        if (inv.addItemAmount(UpdateReason.SUPPRESSED, invSlot, -1) != -1)
-            throwNetworkException(inv)
+        inv.addItemAmount(UpdateReason.SUPPRESSED, invSlot, -1)
         
         val itemStack = inv.getUnsafeItem(invSlot) ?: return
         inv.callPostUpdateEvent(
@@ -243,12 +233,6 @@ internal class NetworkedMultiVirtualInventory(inventories: Iterable<Pair<Virtual
         }
         
         throw IndexOutOfBoundsException("Slot $slot is out of bounds for this inventories: $inventories")
-    }
-    
-    private fun throwNetworkException(inv: VirtualInventory) {
-        val uuid = inv.uuid
-        val tileEntity = TileEntityManager.tileEntities.first { tileEntity -> tileEntity.inventories.any { it.uuid == uuid } }
-        throw NetworkException("The ItemUpdateEvent was cancelled. UUID: ${inv.uuid}, TileEntity: $tileEntity")
     }
     
 }

@@ -8,7 +8,6 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nmsutils.bossbar.BossBar
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
 import xyz.xenondevs.nova.util.component.adventure.font

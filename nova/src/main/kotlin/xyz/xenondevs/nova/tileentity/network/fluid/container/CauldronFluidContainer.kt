@@ -12,15 +12,13 @@ private var Block.fluidType: FluidType?
     get() = when (type) {
         Material.LAVA_CAULDRON -> FluidType.LAVA
         Material.WATER_CAULDRON -> FluidType.WATER
-        Material.CAULDRON -> FluidType.NONE
         else -> null
     }
     set(fluidType) {
         type = when (fluidType) {
-            FluidType.NONE -> Material.CAULDRON
             FluidType.LAVA -> Material.LAVA_CAULDRON
             FluidType.WATER -> Material.WATER_CAULDRON
-            null -> throw IllegalArgumentException()
+            null -> Material.CAULDRON
         }
     }
 
@@ -65,26 +63,19 @@ private val Block.fluidAmount: Long
         return 0L
     }
 
-internal class CauldronFluidContainer(
-    uuid: UUID,
-    private val cauldron: Block,
-) : FluidContainer(
-    uuid,
-    ALLOWED_FLUID_TYPES,
-    cauldron.fluidType,
-    cauldron.fluidAmount,
-    1000
-) {
+internal class CauldronFluidContainer(uuid: UUID, private val cauldron: Block) : FluidContainer(uuid, ALLOWED_FLUID_TYPES) {
     
     private var selfUpdate = false
     
-    override var amount: Long
-        get() = super.amount
+    override val capacity = 1000L
+    override var type: FluidType? = cauldron.fluidType
+    
+    override var amount: Long = cauldron.fluidAmount
         set(amount) {
-            if (super.amount == amount)
+            if (field == amount)
                 return
             
-            super.amount = amount
+            field = amount
             
             selfUpdate = true
             cauldron.setFluidAmount(amount, type)
@@ -95,8 +86,8 @@ internal class CauldronFluidContainer(
         if (selfUpdate)
             return
         
-        super.type = cauldron.fluidType
-        super.amount = cauldron.fluidAmount
+        type = cauldron.fluidType
+        amount = cauldron.fluidAmount
         
         callUpdateHandlers()
     }

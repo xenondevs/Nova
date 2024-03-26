@@ -1,4 +1,3 @@
-@file:Suppress("UNCHECKED_CAST")
 
 package xyz.xenondevs.nova.data.config
 
@@ -6,7 +5,7 @@ import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 
-abstract class ConfigurableRegistryElementBuilder<S : ConfigurableRegistryElementBuilder<S, T>, T : Any>(
+abstract class ConfigurableRegistryElementBuilder<T : Any>(
     registry: WritableRegistry<in T>,
     id: ResourceLocation
 ) : RegistryElementBuilder<T>(registry, id) {
@@ -18,9 +17,8 @@ abstract class ConfigurableRegistryElementBuilder<S : ConfigurableRegistryElemen
      * 
      * Example: `config("my_cfg")` -> `configs/my_addon/my_cfg.yml`
      */
-    fun config(name: String): S {
+    fun config(name: String) {
         this.configId = id.namespace + ":" + name
-        return this as S
     }
     
     /**
@@ -30,9 +28,8 @@ abstract class ConfigurableRegistryElementBuilder<S : ConfigurableRegistryElemen
      * * `rawConfig("my_addon:my_cfg")` -> `configs/my_addon/my_cfg.yml`
      * * `rawConfig("config") -> `configs/config.yml`
      */
-    fun rawConfig(id: String): S {
+    fun rawConfig(id: String) {
         this.configId = id
-        return this as S
     }
     
     /**
@@ -42,9 +39,8 @@ abstract class ConfigurableRegistryElementBuilder<S : ConfigurableRegistryElemen
      * * `rawConfig(ResourceLocation("my_addon:my_cfg"))` -> `configs/my_addon/my_cfg.yml`
      * * `rawConfig(ResourceLocation("config")) -> `configs/config.yml`
      */
-    fun rawConfig(id: ResourceLocation): S {
+    fun rawConfig(id: ResourceLocation) {
         this.configId = id.toString()
-        return this as S
     }
     
 }

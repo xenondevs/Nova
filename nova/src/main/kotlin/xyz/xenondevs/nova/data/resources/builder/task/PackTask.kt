@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.data.resources.builder.task
 
 import xyz.xenondevs.commons.collections.CollectionUtils
+import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
+import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotations
 import kotlin.reflect.jvm.isAccessible
@@ -66,7 +68,7 @@ internal class PackFunction(
     private fun loadDependencies(functions: List<PackFunction>) {
         runAfter = runAfterNames.mapTo(HashSet()) { name ->
             val thisAfter = functions.firstOrNull { func -> func.toString() == name }
-                ?: throw IllegalStateException("Could not find pack function $func, which is a runAfter of $this")
+                ?: throw IllegalStateException("Could not find pack function $name, which is a runAfter of $this")
             
             val thisAfterStage = thisAfter.stage
             when {
@@ -89,7 +91,7 @@ internal class PackFunction(
         
         runBefore = runBeforeNames.mapTo(HashSet()) { name ->
             val thisBefore = functions.firstOrNull { func -> func.toString() == name }
-                ?: throw IllegalStateException("Could not find pack function $func, which is a runBefore of $this")
+                ?: throw IllegalStateException("Could not find pack function $name, which is a runBefore of $this")
             val thisBeforeStage = thisBefore.stage
             
             when {
@@ -115,8 +117,12 @@ internal class PackFunction(
         func.isAccessible = true
     }
     
-    fun run() {
-        func.call(holder)
+    suspend fun run() {
+        try {
+            func.callSuspend(holder)
+        } catch (e: InvocationTargetException) {
+            throw e.cause ?: e
+        }
     }
     
     override fun toString(): String = "${clazz.simpleName}#${func.name}"

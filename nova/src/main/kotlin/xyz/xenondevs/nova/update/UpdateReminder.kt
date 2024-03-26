@@ -12,7 +12,6 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage

@@ -4,9 +4,10 @@ import org.bukkit.Location
 import org.bukkit.block.BlockFace
 import org.bukkit.block.Chest
 import org.bukkit.block.DoubleChest
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.NOVA_PLUGIN
-import xyz.xenondevs.nova.data.world.block.state.VanillaTileEntityState
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.item.holder.DynamicVanillaItemHolder
@@ -15,9 +16,14 @@ import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedChestInvent
 import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.runTaskLaterSynchronized
+import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.pos
 import java.util.*
 
-internal class VanillaChestTileEntity internal constructor(blockState: VanillaTileEntityState) : ItemStorageVanillaTileEntity(blockState) {
+internal class VanillaChestTileEntity internal constructor(
+    pos: BlockPos,
+    data: Compound
+) : ItemStorageVanillaTileEntity(pos, data) {
     
     override val type = Type.CHEST
     
@@ -37,7 +43,7 @@ internal class VanillaChestTileEntity internal constructor(blockState: VanillaTi
                 if (!isChunkLoaded) return@runTaskLaterSynchronized
                 doubleChestLocation = getOtherChestLocation()
                 doubleChestLocation?.let {
-                    val tileEntity = VanillaTileEntityManager.getTileEntityAt(it)
+                    val tileEntity = WorldDataManager.getVanillaTileEntity(it.pos)
                     if (tileEntity is VanillaChestTileEntity) tileEntity.handleChestStateChange()
                 }
                 handleChestStateChange()
@@ -49,7 +55,7 @@ internal class VanillaChestTileEntity internal constructor(blockState: VanillaTi
     override fun handleInitialized() = Unit
     
     private fun setInventories() {
-        val chest = block.state
+        val chest = pos.block.state
         if (chest is Chest) {
             val inventory = NetworkedChestInventory(chest.inventory)
             inventories = CUBE_FACES.associateWithTo(enumMap()) { inventory }
@@ -58,7 +64,7 @@ internal class VanillaChestTileEntity internal constructor(blockState: VanillaTi
     }
     
     private fun getOtherChestLocation(): Location? {
-        val chest = block.state
+        val chest = pos.block.state
         if (chest is Chest) {
             val holder = chest.inventory.holder
             
@@ -93,7 +99,7 @@ internal class VanillaChestTileEntity internal constructor(blockState: VanillaTi
             val doubleChestLocation = doubleChestLocation
             if (doubleChestLocation != null) {
                 runTaskLaterSynchronized(VanillaTileEntityManager, 1) {
-                    val chest = VanillaTileEntityManager.getTileEntityAt(doubleChestLocation)
+                    val chest = WorldDataManager.getVanillaTileEntity(doubleChestLocation.pos)
                     if (chest is VanillaChestTileEntity) chest.handleChestStateChange()
                 }
             }

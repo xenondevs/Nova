@@ -91,7 +91,6 @@ class ExtractTask(private val builder: ResourcePackBuilder) : PackTaskHolder {
         }
         
         assetPack.texturesDir?.let { extractDir(it, "textures") }
-        assetPack.modelsDir?.let { extractDir(it, "models") }
         assetPack.fontsDir?.let { extractDir(it, "font") }
         assetPack.soundsDir?.let { extractDir(it, "sounds") }
         assetPack.soundsFile?.copyTo(namespaceDir.resolve("sounds.json"))

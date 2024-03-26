@@ -1,0 +1,12 @@
+{
+	"parent": "nova:item/gui/gui_item",
+	"elements": [
+		{
+			"from": [-1, -1, 0],
+			"to": [17, 17, 0],
+			"faces": {
+				"south": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		}
+	]
+}

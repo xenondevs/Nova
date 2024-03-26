@@ -27,7 +27,7 @@ data class Model(
 ) {
     
     constructor(
-        itemStack: BukkitStack,
+        itemStack: BukkitStack?,
         location: Location,
         constraints: Display.BillboardConstraints = Display.BillboardConstraints.FIXED,
         translation: Vector3f = Vector3f(),
@@ -43,7 +43,7 @@ data class Model(
     constructor(
         item: NovaItem,
         location: Location,
-        subId: Int = 0,
+        modelId: Int,
         constraints: Display.BillboardConstraints = Display.BillboardConstraints.FIXED,
         translation: Vector3f = Vector3f(),
         scale: Vector3f = Vector3f(1f, 1f, 1f),
@@ -53,7 +53,22 @@ data class Model(
         width: Float = 0f,
         height: Float = 0f,
         glowColor: Int = -1
-    ) : this(item.clientsideProviders[subId].get(), location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
+    ) : this(item.model.unnamedClientsideProviders[modelId].get(), location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
+    
+    constructor(
+        item: NovaItem,
+        location: Location,
+        modelId: String = "default",
+        constraints: Display.BillboardConstraints = Display.BillboardConstraints.FIXED,
+        translation: Vector3f = Vector3f(),
+        scale: Vector3f = Vector3f(1f, 1f, 1f),
+        leftRotation: Quaternionf = Quaternionf(),
+        rightRotation: Quaternionf = Quaternionf(),
+        brightness: Brightness? = null,
+        width: Float = 0f,
+        height: Float = 0f,
+        glowColor: Int = -1
+    ) : this(item.model.clientsideProviders[modelId]?.get(), location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
     
     fun createFakeItemDisplay(autoRegister: Boolean = true): FakeItemDisplay =
         FakeItemDisplay(location, autoRegister) { _, data ->

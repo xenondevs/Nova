@@ -17,7 +17,6 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
-import xyz.xenondevs.nova.data.config.entry
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.task.AtlasContent
@@ -35,7 +34,9 @@ import xyz.xenondevs.nova.data.resources.builder.task.font.MoveCharactersContent
 import xyz.xenondevs.nova.data.resources.builder.task.font.MovedFontContent
 import xyz.xenondevs.nova.data.resources.builder.task.font.TextureIconContent
 import xyz.xenondevs.nova.data.resources.builder.task.font.WailaContent
-import xyz.xenondevs.nova.data.resources.builder.task.material.MaterialContent
+import xyz.xenondevs.nova.data.resources.builder.task.model.BlockModelContent
+import xyz.xenondevs.nova.data.resources.builder.task.model.ItemModelContent
+import xyz.xenondevs.nova.data.resources.builder.task.model.ModelContent
 import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.ui.waila.WailaManager
@@ -133,9 +134,10 @@ class ResourcePackBuilder internal constructor() {
          * A list of constructors for [PackTaskHolders][PackTaskHolder] that should be used to build the resource pack.
          */
         private val holderCreators: MutableList<(ResourcePackBuilder) -> PackTaskHolder> = mutableListOf(
-            ::ExtractTask, ::MaterialContent, ::ArmorContent, ::GuiContent, ::LanguageContent, ::TextureIconContent,
+            ::ExtractTask, ::ArmorContent, ::GuiContent, ::LanguageContent, ::TextureIconContent,
             ::AtlasContent, ::WailaContent, ::MovedFontContent, ::CharSizeCalculator, ::SoundOverrides, ::FontContent,
-            ::BarOverlayTask, ::MoveCharactersContent, ::EnchantmentContent
+            ::BarOverlayTask, ::MoveCharactersContent, ::EnchantmentContent, ::ModelContent, ::BlockModelContent,
+            ::ItemModelContent
         )
         
         /**
@@ -225,7 +227,7 @@ class ResourcePackBuilder internal constructor() {
             
             // run pack tasks
             LOGGER.info("Running pre-world pack tasks")
-            tasksByStage[BuildStage.PRE_WORLD]?.forEach(::runPackFunction)
+            runBlocking { tasksByStage[BuildStage.PRE_WORLD]?.forEach { runPackFunction(it) } }
         } catch (t: Throwable) {
             // Only delete build dir in case of exception as building is continued in buildPostWorld()
             deleteBuildDir()
@@ -237,7 +239,7 @@ class ResourcePackBuilder internal constructor() {
         try {
             // write post-world content
             LOGGER.info("Running post-world pack tasks")
-            tasksByStage[BuildStage.POST_WORLD]?.forEach(::runPackFunction)
+            runBlocking { tasksByStage[BuildStage.POST_WORLD]?.forEach { runPackFunction(it) } }
             
             // write metadata
             writeMetadata(assetPacks.size, basePacks.packAmount)
@@ -258,7 +260,7 @@ class ResourcePackBuilder internal constructor() {
     }
     
     private fun deleteBuildDir() {
-        val provider = JIMFS_PROVIDER.value
+        val provider = JIMFS_PROVIDER.get()
         if (provider != null) {
             provider.close()
             JIMFS_PROVIDER.update() // creates a new jimfs file system
@@ -307,7 +309,7 @@ class ResourcePackBuilder internal constructor() {
         }.packZip(COMPRESSION_LEVEL)
     }
     
-    private fun runPackFunction(func: PackFunction) {
+    private suspend fun runPackFunction(func: PackFunction) {
         if (func.toString() in SKIP_PACK_TASKS)
             return
         

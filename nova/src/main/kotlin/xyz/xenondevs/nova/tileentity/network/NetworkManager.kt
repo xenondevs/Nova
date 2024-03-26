@@ -4,10 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.World
 import org.bukkit.block.BlockFace
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.world.ChunkUnloadEvent
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.collections.filterIsInstanceValues
 import xyz.xenondevs.commons.collections.flatMap
@@ -15,19 +12,15 @@ import xyz.xenondevs.commons.collections.poll
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.world.event.NovaChunkLoadedEvent
-import xyz.xenondevs.nova.data.world.legacy.LegacyFileConverter
+import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.format.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
-import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityManager
 import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
-import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.ObservableLock
 import xyz.xenondevs.nova.util.concurrent.lockAndRun
@@ -145,15 +138,16 @@ interface NetworkManager {
             Bukkit.getWorlds().flatMap(World::getLoadedChunks).forEach { unloadChunk(it.pos) }
         }
         
-        @EventHandler(priority = EventPriority.HIGHEST)
-        private fun handleChunkLoad(event: NovaChunkLoadedEvent) {
-            queueChunkLoad(event.chunkPos)
-        }
-        
-        @EventHandler(priority = EventPriority.LOWEST)
-        private fun handleChunkUnload(event: ChunkUnloadEvent) {
-            unloadChunk(event.chunk.pos)
-        }
+        // TODO
+//        @EventHandler(priority = EventPriority.HIGHEST)
+//        private fun handleChunkLoad(event: NovaChunkEnabledEvent) {
+//            queueChunkLoad(event.chunkPos)
+//        }
+//        
+//        @EventHandler(priority = EventPriority.LOWEST)
+//        private fun handleChunkUnload(event: NovaChunkDisabledEvent) {
+//            unloadChunk(event.chunkPos)
+//        }
         
     }
     
@@ -226,13 +220,11 @@ private class NetworkManagerImpl : NetworkManager {
         }
     }
     
-    private fun getNodesInChunk(pos: ChunkPos): List<NetworkNode> {
-        val nodes = ArrayList<NetworkNode>()
-        nodes += TileEntityManager.getTileEntitiesInChunk(pos).filterIsInstance<NetworkNode>()
-        nodes += VanillaTileEntityManager.getTileEntitiesInChunk(pos).filterIsInstance<NetworkNode>()
-        
-        return nodes
-    }
+    private fun getNodesInChunk(pos: ChunkPos): Sequence<NetworkNode> =
+        sequence {
+            yieldAll(WorldDataManager.getTileEntities(pos).asSequence().filterIsInstance<NetworkNode>())
+            yieldAll(WorldDataManager.getVanillaTileEntities(pos).asSequence().filterIsInstance<NetworkNode>())
+        }
     
     private fun getNetwork(type: NetworkType, uuid: UUID = UUID.randomUUID(), local: Boolean = false): Network {
         return networksById.getOrPut(uuid) { type.networkConstructor(uuid, local).also(networks::add) }
@@ -290,7 +282,7 @@ private class NetworkManagerImpl : NetworkManager {
         }
     }
     
-    private fun loadNodesIndividually(nodes: List<NetworkNode>) {
+    private fun loadNodesIndividually(nodes: Sequence<NetworkNode>) {
         nodes.forEach {
             if (it is NetworkBridge) addBridge(it)
             else addEndPoint(it as NetworkEndPoint)
@@ -805,8 +797,9 @@ private class NetworkManagerImpl : NetworkManager {
     
     private fun hasAccessPermission(source: NetworkNode, target: NetworkNode): CompletableFuture<Boolean> {
         val futures = ArrayList<CompletableFuture<Boolean>>()
-        if (source is TileEntity) futures += ProtectionManager.canUseBlock(source, null, target.location)
-        if (target is TileEntity) futures += ProtectionManager.canUseBlock(target, null, source.location)
+        // TODO
+//        if (source is TileEntity) futures += ProtectionManager.canUseBlock(source, null, target.location)
+//        if (target is TileEntity) futures += ProtectionManager.canUseBlock(target, null, source.location)
         return CombinedBooleanFuture(futures)
     }
     

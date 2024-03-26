@@ -2,19 +2,25 @@ package xyz.xenondevs.nova.api
 
 import com.mojang.datafixers.util.Either
 import org.bukkit.Location
-import xyz.xenondevs.nova.api.block.NovaBlock
-import xyz.xenondevs.nova.api.material.NovaMaterial
-import xyz.xenondevs.nova.api.tileentity.TileEntity
-import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
+import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.api.block.NovaBlock as INovaBlock
 import xyz.xenondevs.nova.api.block.NovaTileEntityState as INovaTileEntityState
+import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
+import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
 @Suppress("DEPRECATION")
-internal class ApiNovaTileEntityStateWrapper(private val state: NovaTileEntityState) : INovaTileEntityState {
+internal class ApiNovaTileEntityStateWrapper(
+    private val pos: BlockPos,
+    private val state: NovaBlockState,
+    private val tileEntity: TileEntity
+) : INovaTileEntityState {
     
     @Deprecated("Use NovaBlock instead", replaceWith = ReplaceWith("block"))
-    override fun getMaterial(): NovaMaterial = LegacyMaterialWrapper(Either.right(state.block))
-    override fun getTileEntity(): TileEntity = ApiTileEntityWrapper(state.tileEntity)
-    override fun getBlock(): NovaBlock = ApiBlockWrapper(state.block)
-    override fun getLocation(): Location = state.location
+    override fun getMaterial(): INovaMaterial = LegacyMaterialWrapper(Either.right(state.block))
+    override fun getTileEntity(): ITileEntity = ApiTileEntityWrapper(tileEntity)
+    override fun getBlock(): INovaBlock = ApiBlockWrapper(state.block)
+    override fun getLocation(): Location = pos.location
     
 }

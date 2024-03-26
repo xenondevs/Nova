@@ -13,10 +13,11 @@ import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.line.ToolLine
 import xyz.xenondevs.nova.util.item.localizedName
+import xyz.xenondevs.nova.world.BlockPos
 
 object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
     
-    override fun getInfo(player: Player, block: Block): WailaInfo {
+    override fun getInfo(player: Player, pos: BlockPos, block: Block): WailaInfo {
         val material = block.type
         val mainMaterial = getMainMaterial(block)
         
