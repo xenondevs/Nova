@@ -32,11 +32,11 @@ abstract class FakeOnlinePlayer(
 ) : Player, OfflinePlayer by offlinePlayer {
     
     override fun hasPermission(name: String): Boolean {
-        return PermissionManager.hasPermission(world, uniqueId, name)
+        return PermissionManager.hasPermission(world, uniqueId, name).get()
     }
     
     override fun hasPermission(perm: Permission): Boolean {
-        return PermissionManager.hasPermission(world, uniqueId, perm.name)
+        return PermissionManager.hasPermission(world, uniqueId, perm.name).get()
     }
     
     override fun isPermissionSet(name: String): Boolean {

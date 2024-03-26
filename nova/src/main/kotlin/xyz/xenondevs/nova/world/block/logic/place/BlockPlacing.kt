@@ -147,7 +147,7 @@ internal object BlockPlacing : Listener {
         }
     }
     
-    private suspend fun placeVanillaBlock(event: PlayerInteractEvent) {
+    private fun placeVanillaBlock(event: PlayerInteractEvent) {
         val player = event.player
         val handItem = event.item!!
         val placedOn = event.clickedBlock!!.pos

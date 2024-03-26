@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.world.block.logic.interact
 
-import kotlinx.coroutines.runBlocking
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.EntityType
@@ -21,7 +20,6 @@ import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -29,6 +27,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 
 @InternalInit(
@@ -53,7 +52,7 @@ internal object BlockInteracting : Listener {
             val pos = event.clickedBlock!!.pos
             
             val blockState = WorldDataManager.getBlockState(pos)
-            if (blockState != null && runBlocking { ProtectionManager.canUseBlock(player, event.item, pos.location) }) { // TODO
+            if (blockState != null && ProtectionManager.canUseBlock(player, event.item, pos.location)) {
                 val block = blockState.block
                 
                 val ctx = Context.intention(ContextIntentions.BlockInteract)

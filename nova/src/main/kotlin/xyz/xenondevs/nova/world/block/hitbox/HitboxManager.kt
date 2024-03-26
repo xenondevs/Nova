@@ -1,9 +1,5 @@
 package xyz.xenondevs.nova.world.block.hitbox
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.HitResult
@@ -24,9 +20,7 @@ import xyz.xenondevs.nmsutils.network.event.clientbound.ServerboundInteractPacke
 import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.util.BukkitDispatcher
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
-import xyz.xenondevs.nova.util.concurrent.runIfTrueOnSimilarThread
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.serverLevel
@@ -216,12 +210,8 @@ internal object HitboxManager : Listener, PacketListener {
                             val relHitLoc = Vector3f(hitLoc.x - center.x, hitLoc.y - center.y, hitLoc.z - center.z)
                             
                             // check protection integrations
-                            CoroutineScope(Dispatchers.Default).launch { 
-                                if (ProtectionManager.canUseBlock(player, event.item, hitLoc.toLocation(player.world))) {
-                                    withContext(BukkitDispatcher) {
-                                        handlers.forEach { it.invoke(player, event.hand!!, relHitLoc) }
-                                    }
-                                }
+                            if (ProtectionManager.canUseBlock(player, event.item, hitLoc.toLocation(player.world))) {
+                                handlers.forEach { it.invoke(player, event.hand!!, relHitLoc) }
                             }
                             
                             return@traverseBlocks Unit // hitbox hit, don't continue ray
