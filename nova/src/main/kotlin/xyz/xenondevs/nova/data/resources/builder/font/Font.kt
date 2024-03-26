@@ -130,7 +130,7 @@ class Font(
         fun fromDisk(assetsDir: Path, fontFile: Path): Font {
             val id = readIdFromPath(assetsDir, fontFile)
             val providers = fontFile.parseJson().asJsonObject.getArray("providers")
-                .mapTo(ArrayList()) { FontProvider.fromDisk(assetsDir, it.asJsonObject) }
+                .mapTo(ArrayList()) { FontProvider.fromDisk(it.asJsonObject) }
             
             return Font(id, providers)
         }

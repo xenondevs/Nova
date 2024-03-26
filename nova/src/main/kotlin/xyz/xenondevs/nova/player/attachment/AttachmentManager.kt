@@ -12,6 +12,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerRespawnEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 import xyz.xenondevs.nmsutils.network.event.PacketHandler
 import xyz.xenondevs.nmsutils.network.event.PacketListener
 import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetPassengersPacketEvent
@@ -110,6 +111,11 @@ object AttachmentManager : Listener, PacketListener {
             if (player.isOnline && !player.isDead)
                 activateAttachments(event.player)
         }
+    }
+    
+    @EventHandler
+    private fun handleTeleport(event: PlayerTeleportEvent) {
+        activeAttachments[event.player]?.values?.forEach(Attachment::handleTeleport)
     }
     
     @PacketHandler

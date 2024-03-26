@@ -42,15 +42,19 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.runAsyncTask
-import xyz.xenondevs.resourcepackobfuscator.ResourcePackObfuscator
 import java.io.File
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Path
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
+import kotlin.io.path.inputStream
 import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import kotlin.time.Duration
 import kotlin.time.measureTime
@@ -82,8 +86,6 @@ private val CORE_RESOURCE_FILTERS by configReloadable {
     }
 }
 
-private val OBFUSCATE by MAIN_CONFIG.entry<Boolean>("resource_pack", "generation", "protection", "obfuscate")
-private val CORRUPT_ENTRIES by MAIN_CONFIG.entry<Boolean>("resource_pack", "generation", "protection", "corrupt_entries")
 private val COMPRESSION_LEVEL by MAIN_CONFIG.entry<Int>("resource_pack", "generation", "compression_level")
 private val PACK_DESCRIPTION by MAIN_CONFIG.entry<String>("resource_pack", "generation", "description")
 private val IN_MEMORY_PROVIDER = MAIN_CONFIG.entry<Boolean>("resource_pack", "generation", "in_memory")
@@ -300,13 +302,16 @@ class ResourcePackBuilder internal constructor() {
         // pack zip
         LOGGER.info("Packing zip...")
         val filters = getResourceFilters(ResourceFilter.Stage.RESOURCE_PACK)
-        ResourcePackObfuscator(
-            OBFUSCATE, CORRUPT_ENTRIES,
-            PACK_DIR, RESOURCE_PACK_FILE.toPath(),
-            MCASSETS_DIR.toFile()
-        ) { file ->
-            filters.all { filter -> filter.allows(file.relativeTo(ASSETS_DIR).invariantSeparatorsPathString) }
-        }.packZip(COMPRESSION_LEVEL)
+        ZipOutputStream(RESOURCE_PACK_FILE.outputStream()).use { zip ->
+            zip.setLevel(COMPRESSION_LEVEL)
+            PACK_DIR.walk()
+                .filter { path -> path.isRegularFile() }
+                .filter { path -> filters.all { filter -> filter.allows(path.relativeTo(ASSETS_DIR).invariantSeparatorsPathString) } }
+                .forEach { path ->
+                    zip.putNextEntry(ZipEntry(path.relativeTo(PACK_DIR).invariantSeparatorsPathString))
+                    path.inputStream().use { it.copyTo(zip) }
+                }
+        }
     }
     
     private suspend fun runPackFunction(func: PackFunction) {

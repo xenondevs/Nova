@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.data.resources.builder.font.provider.bitmap.BitmapProv
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.data.readImageDimensions
-import java.nio.file.Path
 
 private const val START_CODE_POINT: Int = 0xE000
 private const val END_CODE_POINT: Int = 0xF8FF
@@ -28,11 +27,11 @@ abstract class CustomFontContent internal constructor(
     private var currentCodePoint = END_CODE_POINT
     private var currentFontNum = -1
     
-    fun addEntry(charId: String, assetsDir: Path, image: ResourcePath, height: Int?, ascent: Int) {
-        addEntry(ResourcePath.of(charId), assetsDir, image, height, ascent)
+    fun addEntry(charId: String, image: ResourcePath, height: Int?, ascent: Int) {
+        addEntry(ResourcePath.of(charId), image, height, ascent)
     }
     
-    fun addEntry(charId: ResourcePath, assetsDir: Path, image: ResourcePath, height: Int?, ascent: Int) {
+    fun addEntry(charId: ResourcePath, image: ResourcePath, height: Int?, ascent: Int) {
         if (++currentCodePoint > 0xF8FF) {
             currentCodePoint = START_CODE_POINT
             val id = ResourcePath.of(fontNameTemplate.format(++currentFontNum))
@@ -43,7 +42,7 @@ abstract class CustomFontContent internal constructor(
         }
         
         currentFont += BitmapProvider.single(
-            assetsDir, image,
+            image,
             currentCodePoint,
             height ?: image.findInAssets("textures").readImageDimensions().height,
             ascent

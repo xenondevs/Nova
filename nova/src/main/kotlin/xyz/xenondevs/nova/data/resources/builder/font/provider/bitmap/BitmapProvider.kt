@@ -184,7 +184,6 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
      * An immutable [BitmapProvider] that lazily loads a single [BufferedImage] glyph.
      */
     private class SingleLazyLoaded(
-        private val assetsDir: Path,
         override val file: ResourcePath,
         codePoint: Int,
         override val height: Int,
@@ -194,7 +193,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
         override val glyphImageType = BitmapGlyphImageType.BUFFERED_IMAGE
         
         override val codePointGrid = CodePointGrid.single(codePoint)
-        override val glyphGrid by lazy { GlyphGrid.single(file.getPath(assetsDir, "textures").readImage()) }
+        override val glyphGrid by lazy { GlyphGrid.single(file.findInAssets("textures").readImage()) }
         
         // not necessary because the image is loaded from disk and cannot be changed
         override fun write(assetsDir: Path) = Unit
@@ -266,15 +265,14 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
         /**
          * Creates a immutable [BitmapProvider] with a single glyph, assuming the texture will exist.
          *
-         * @param assetsDir The assets directory to use for reading the bitmap image, if required later.
          * @param file The path where the texture will be read from and saved to.
          * @param codePoint The code point of the glyph.
          * @param height The height that glyphs will be rendered as. If this does not match the glyphs actual height,
          * the glyphs will be scaled, keeping the aspect ratio. This is the `height` property in json.
          * @param ascent The defined character ascent. This is the `ascent` property in json.
          */
-        fun single(assetsDir: Path, file: ResourcePath, codePoint: Int, height: Int, ascent: Int): BitmapProvider<BufferedImage> =
-            SingleLazyLoaded(assetsDir, file, codePoint, height, ascent)
+        fun single(file: ResourcePath, codePoint: Int, height: Int, ascent: Int): BitmapProvider<BufferedImage> =
+            SingleLazyLoaded(file, codePoint, height, ascent)
         
     }
     

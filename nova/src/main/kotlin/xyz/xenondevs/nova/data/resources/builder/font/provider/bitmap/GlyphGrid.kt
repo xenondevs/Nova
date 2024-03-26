@@ -131,7 +131,7 @@ class RasterGlyphGrid(
     
     init {
         require(raster.size == gridWidth * glyphWidth * gridHeight * glyphHeight) { "Raster size does not match other parameters" }
-        require(glyphWidth in 0..256 && glyphHeight in 0..256) { "Max glyph size is 256x256" }
+        require(glyphWidth in 0..256 && glyphHeight in 0..256) { "Max glyph size is 256x256 (got $glyphWidth x $glyphHeight)" }
     }
     
     override fun get(x: Int, y: Int): IntArray {
@@ -163,7 +163,7 @@ class ReferenceGlyphGrid(
     )
     
     init {
-        require(glyphWidth in 0..256 && glyphHeight in 0..256) { "Max glyph size is 256x256 (got $" }
+        require(glyphWidth in 0..256 && glyphHeight in 0..256) { "Max glyph size is 256x256 (got $glyphWidth x $glyphHeight)" }
     }
     
     override var gridWidth = grid.size

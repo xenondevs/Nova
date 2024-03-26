@@ -181,7 +181,7 @@ internal object EnchantmentTableLogic {
         if (!player.abilities.instabuild) {
             lapis.shrink(expLevels)
             if (lapis.isEmpty)
-                enchantSlots.setItem(0, ItemStack.EMPTY)
+                enchantSlots.setItem(1, ItemStack.EMPTY)
         }
         
         menu.slotsChanged(enchantSlots)

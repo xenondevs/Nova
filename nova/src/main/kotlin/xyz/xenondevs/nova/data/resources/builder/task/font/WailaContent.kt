@@ -234,7 +234,7 @@ class WailaContent internal constructor(
                     val file = ResourcePackBuilder.PACK_DIR.resolve("assets/nova/textures/waila_generated/${id.namespace}/${id.name}.png")
                     file.parent.createDirectories()
                     renderer.renderModelToFile(path.toString(), file)
-                    addEntry(id.toString(), ASSETS_DIR, ResourcePath("nova", "waila_generated/${id.namespace}/${id.name}.png"), SIZE, ASCENT)
+                    addEntry(id.toString(), ResourcePath("nova", "waila_generated/${id.namespace}/${id.name}.png"), SIZE, ASCENT)
                     count++
                 } catch (e: Exception) {
                     LOGGER.log(Level.WARNING, "Failed to render $id ($path) ", e)
@@ -261,11 +261,11 @@ class WailaContent internal constructor(
         MATERIAL_TEXTURES.forEach { (material, texture) ->
             val name = material.name.lowercase()
             val path = ResourcePath.of("$texture.png")
-            addEntry(ResourcePath("minecraft", name), ASSETS_DIR, copyMCTexture(path), SIZE, ASCENT)
+            addEntry(ResourcePath("minecraft", name), copyMCTexture(path), SIZE, ASCENT)
         }
         
         TEXTURES.forEach {
-            addEntry(ResourcePath("minecraft", it), ASSETS_DIR, copyMCTexture(ResourcePath("minecraft", "block/$it.png")), SIZE, ASCENT)
+            addEntry(ResourcePath("minecraft", it), copyMCTexture(ResourcePath("minecraft", "block/$it.png")), SIZE, ASCENT)
         }
     }
     
@@ -284,7 +284,6 @@ class WailaContent internal constructor(
             val idNamespace = pack.namespace.takeUnless { it == "nova" } ?: "minecraft" // all textures form "nova" asset pack are for minecraft blocks
             addEntry(
                 ResourcePath(idNamespace, file.nameWithoutExtension),
-                ASSETS_DIR,
                 ResourcePath(pack.namespace, "waila/${file.name}"),
                 SIZE, ASCENT
             )

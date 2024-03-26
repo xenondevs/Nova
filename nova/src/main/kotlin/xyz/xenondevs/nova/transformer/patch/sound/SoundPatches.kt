@@ -180,8 +180,8 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
             aLoad(1)
             aLoad(2)
             invokeStatic(::playBreakSound)
-            _return()
-        }) { it.opcode == Opcodes.RETURN }
+            areturn()
+        }) { it.opcode == Opcodes.ARETURN }
     }
     
     @JvmStatic

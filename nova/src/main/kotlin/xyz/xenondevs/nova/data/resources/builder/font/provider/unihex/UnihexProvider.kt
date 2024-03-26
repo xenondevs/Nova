@@ -223,7 +223,6 @@ abstract class UnihexProvider internal constructor(
     }
     
     private class LazyLoaded(
-        private val assetsDir: Path,
         hexFile: ResourcePath,
         sizeOverrides: List<SizeOverride>
     ) : UnihexProvider(hexFile) {
@@ -235,7 +234,7 @@ abstract class UnihexProvider internal constructor(
             val glyphs = UnihexGlyphs()
             
             // hexFile: zip file that contains .hex files
-            hexFile.getPath(assetsDir).useZip { zip ->
+            hexFile.findInAssets().useZip { zip ->
                 zip.walk()
                     .filter { it.extension == "hex" }
                     .forEach { glyphs.merge(UnihexGlyphs.readUnihexFile(it)) }
@@ -259,13 +258,12 @@ abstract class UnihexProvider internal constructor(
         /**
          * Reads a [UnihexProvider] from disk.
          *
-         * @param assetsDir The assets directory to use for reading the bitmap image.
          * @param provider The json object containing the provider data.
          */
-        fun fromDisk(assetsDir: Path, provider: JsonObject): UnihexProvider {
+        fun fromDisk(provider: JsonObject): UnihexProvider {
             val hexFile = provider.getDeserialized<ResourcePath>("hex_file")
             val sizeOverrides = provider.getDeserialized<List<SizeOverride>>("size_overrides")
-            return LazyLoaded(assetsDir, hexFile, sizeOverrides)
+            return LazyLoaded(hexFile, sizeOverrides)
         }
         
     }

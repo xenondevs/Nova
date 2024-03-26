@@ -99,7 +99,10 @@ internal class VanillaEnchantmentCategory(
     override val enchantments = ArrayList<Enchantment>()
     
     init {
-        for (ench in BuiltInRegistries.ENCHANTMENT) {
+        for ((key, ench) in BuiltInRegistries.ENCHANTMENT.entrySet()) {
+            if (key.location().namespace != "minecraft")
+                continue
+            
             if (ench.category == vanillaCategory)
                 enchantments.add(Enchantment.of(ench))
         }

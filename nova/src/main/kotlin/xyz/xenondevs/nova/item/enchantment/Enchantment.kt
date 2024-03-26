@@ -226,6 +226,14 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
     internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
     /**
+     * Configures the maximum level of this enchantment. Defaults to `1`.
+     */
+    fun maxLevel(maxLevel: Int): EnchantmentBuilder {
+        this.maxLevel = maxLevel
+        return this
+    }
+    
+    /**
      * Configures the categories that this enchantment belongs to.
      */
     fun categories(vararg categories: EnchantmentCategory): EnchantmentBuilder {

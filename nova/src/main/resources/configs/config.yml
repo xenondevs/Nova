@@ -29,12 +29,6 @@ resource_pack:
     compression_level: -1
     # If the generation process should take place entirely in memory. This increases memory usage but improves generation speed.
     in_memory: true
-    # Protection settings for the resource pack.
-    protection:
-      # Renames resource pack textures and models.
-      obfuscate: false
-      # Protects the zip from being opened in normal zip programs.
-      corrupt_entries: false
     # Settings regarding the generation of font files.
     font:
       # A list of fonts that should not have moved versions generated.

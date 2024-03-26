@@ -210,7 +210,23 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         val newChunk = actualLocation.chunkPos
         chunk = newChunk
         
-        if (previousChunk != newChunk) FakeEntityManager.changeEntityChunk(this, previousChunk, newChunk)
+        if (previousChunk != newChunk && registered)
+            FakeEntityManager.changeEntityChunk(this, previousChunk, newChunk)
+    }
+    
+    internal fun updateLocationSilently(location: Location) {
+        spawnBuf?.release()
+        spawnBuf = null
+        
+        val previousChunk = chunk
+        val newChunk = location.chunkPos
+        
+        expectedLocation = location.clone()
+        actualLocation = location.clone()
+        chunk = newChunk
+        
+        if (previousChunk != newChunk && registered)
+            FakeEntityManager.changeEntityChunk(this, previousChunk, newChunk)
     }
     
     private fun createSpawnBuf(): FriendlyByteBuf {

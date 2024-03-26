@@ -41,12 +41,12 @@ abstract class FontProvider internal constructor() {
     
     companion object {
         
-        fun fromDisk(assetsDir: Path, provider: JsonObject): FontProvider =
+        fun fromDisk(provider: JsonObject): FontProvider =
             when (val type = provider.getString("type")) {
                 "reference" -> ReferenceProvider.of(provider)
                 "space" -> SpaceProvider.of(provider)
-                "bitmap" -> MutableBitmapProvider.fromDisk(assetsDir, provider)
-                "unihex" -> UnihexProvider.fromDisk(assetsDir, provider)
+                "bitmap" -> MutableBitmapProvider.fromDisk(provider)
+                "unihex" -> UnihexProvider.fromDisk(provider)
                 else -> throw UnsupportedOperationException("Unsupported font provider type: $type")
             }
         
