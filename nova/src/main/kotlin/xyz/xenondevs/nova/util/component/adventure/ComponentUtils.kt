@@ -94,7 +94,7 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
 }
 
 fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveToCenter(lang: String = "en_us"): B {
-    return move(-CharSizes.calculateComponentWidth(build(), lang))
+    return move(-CharSizes.calculateComponentWidth(build(), lang) / 2)
 }
 
 fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveTo(afterStart: Number, lang: String = "en_us"): B {
