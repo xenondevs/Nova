@@ -15,7 +15,6 @@ import xyz.xenondevs.nova.data.serialization.configurate.NOVA_CONFIGURATE_SERIAL
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.item.ItemCategories
 import xyz.xenondevs.nova.player.ability.AbilityManager
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
@@ -114,7 +113,6 @@ object Configs {
         BossBarOverlayManager.reload()
         ChunkReloadWatcher.reload()
         UpdateReminder.reload()
-        ItemCategories.reload()
         WailaManager.reload()
         Bukkit.getOnlinePlayers().forEach(Player::updateInventory)
     }

@@ -22,6 +22,7 @@ val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColle
     .register(PotionEffectSerializer)
     .register(PotionEffectTypeSerializer)
     .register(ResourceFilterSerializer)
+    .register(ItemCategorySerializer)
     // -- Vanilla Registries --
     .register(BuiltInRegistries.ATTRIBUTE.byNameTypeSerializer())
     // -- Nova Registries --
