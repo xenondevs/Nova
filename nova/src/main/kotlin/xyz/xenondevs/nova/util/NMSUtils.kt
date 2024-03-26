@@ -49,6 +49,7 @@ import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.entity.Pose
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
@@ -69,6 +70,7 @@ import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
+import net.minecraft.world.entity.Pose as MojangPose
 import net.minecraft.world.entity.ai.attributes.Attribute as MojangAttribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier as MojangAttributeModifier
 import net.minecraft.world.entity.player.Player as MojangPlayer
@@ -234,6 +236,50 @@ val AttributeModifier.Operation.nmsOperation: MojangAttributeModifier.Operation
         AttributeModifier.Operation.ADD_NUMBER -> MojangAttributeModifier.Operation.ADDITION
         AttributeModifier.Operation.ADD_SCALAR -> MojangAttributeModifier.Operation.MULTIPLY_BASE
         AttributeModifier.Operation.MULTIPLY_SCALAR_1 -> MojangAttributeModifier.Operation.MULTIPLY_TOTAL
+    }
+
+val MojangPose.bukkitPose: Pose
+    get() = when(this) {
+        MojangPose.STANDING -> Pose.STANDING
+        MojangPose.FALL_FLYING -> Pose.FALL_FLYING
+        MojangPose.SLEEPING -> Pose.SLEEPING
+        MojangPose.SWIMMING -> Pose.SWIMMING
+        MojangPose.SPIN_ATTACK -> Pose.SPIN_ATTACK
+        MojangPose.CROUCHING -> Pose.SNEAKING
+        MojangPose.LONG_JUMPING -> Pose.LONG_JUMPING
+        MojangPose.DYING -> Pose.DYING
+        MojangPose.CROAKING -> Pose.CROAKING
+        MojangPose.USING_TONGUE -> Pose.USING_TONGUE
+        MojangPose.SITTING -> Pose.SITTING
+        MojangPose.ROARING -> Pose.ROARING
+        MojangPose.SNIFFING -> Pose.SNIFFING
+        MojangPose.EMERGING -> Pose.EMERGING
+        MojangPose.DIGGING -> Pose.DIGGING
+        MojangPose.SLIDING -> Pose.SLIDING
+        MojangPose.SHOOTING -> Pose.SHOOTING
+        MojangPose.INHALING -> Pose.INHALING
+    }
+
+val Pose.nmsPose: MojangPose
+    get() = when(this) {
+        Pose.STANDING -> MojangPose.STANDING
+        Pose.FALL_FLYING -> MojangPose.FALL_FLYING
+        Pose.SLEEPING -> MojangPose.SLEEPING
+        Pose.SWIMMING -> MojangPose.SWIMMING
+        Pose.SPIN_ATTACK -> MojangPose.SPIN_ATTACK
+        Pose.SNEAKING -> MojangPose.CROUCHING
+        Pose.LONG_JUMPING -> MojangPose.LONG_JUMPING
+        Pose.DYING -> MojangPose.DYING
+        Pose.CROAKING -> MojangPose.CROAKING
+        Pose.USING_TONGUE -> MojangPose.USING_TONGUE
+        Pose.SITTING -> MojangPose.SITTING
+        Pose.ROARING -> MojangPose.ROARING
+        Pose.SNIFFING -> MojangPose.SNIFFING
+        Pose.EMERGING -> MojangPose.EMERGING
+        Pose.DIGGING -> MojangPose.DIGGING
+        Pose.SLIDING -> MojangPose.SLIDING
+        Pose.SHOOTING -> MojangPose.SHOOTING
+        Pose.INHALING -> MojangPose.INHALING
     }
 
 val Material.nmsBlock: MojangBlock

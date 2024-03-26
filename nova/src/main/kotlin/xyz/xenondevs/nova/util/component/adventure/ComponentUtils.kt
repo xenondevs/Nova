@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util.component.adventure
 
+import io.papermc.paper.adventure.AdventureComponent
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
@@ -33,6 +34,9 @@ fun String.toAdventureComponentOr(createComponent: () -> Component): Component {
 }
 
 fun MojangComponent.toAdventureComponent(): Component {
+    if (this is AdventureComponent)
+        return this.`adventure$component`()
+    
     return GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(this))
 }
 
@@ -41,7 +45,7 @@ fun MojangComponent.toJson(): String {
 }
 
 fun Component.toNMSComponent(): MojangComponent {
-    return CraftChatMessage.fromJSON(GsonComponentSerializer.gson().serialize(this))
+    return AdventureComponent(this)
 }
 
 fun Component.toJson(): String {

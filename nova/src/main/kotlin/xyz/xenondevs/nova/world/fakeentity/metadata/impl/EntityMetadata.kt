@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.world.fakeentity.metadata.impl
 
-import net.minecraft.network.chat.Component
+import net.kyori.adventure.text.Component
 import net.minecraft.network.syncher.EntityDataSerializers
-import net.minecraft.world.entity.Pose
+import org.bukkit.entity.Pose
+import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
+import xyz.xenondevs.nova.util.nmsPose
 import xyz.xenondevs.nova.world.fakeentity.metadata.Metadata
 
 open class EntityMetadata internal constructor() : Metadata() {
@@ -18,10 +20,10 @@ open class EntityMetadata internal constructor() : Metadata() {
     var isFlyingElytra: Boolean by sharedFlags[7]
     var airTicks: Int by entry(1, EntityDataSerializers.INT, 300)
     var isCustomNameVisible: Boolean by entry(2, EntityDataSerializers.BOOLEAN, false)
-    var customName: Component? by optional(3, EntityDataSerializers.OPTIONAL_COMPONENT, null)
+    var customName: Component? by optional(3, EntityDataSerializers.OPTIONAL_COMPONENT) { it.toNMSComponent() }
     var isSilent: Boolean by entry(4, EntityDataSerializers.BOOLEAN, false)
     var hasNoGravity: Boolean by entry(5, EntityDataSerializers.BOOLEAN, false)
-    var pose: Pose by entry(6, EntityDataSerializers.POSE, Pose.STANDING)
+    var pose: Pose by entry(6, EntityDataSerializers.POSE, Pose.STANDING) { it.nmsPose }
     var frozenTicks: Int by entry(7, EntityDataSerializers.INT, 0)
     
 }

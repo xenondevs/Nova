@@ -1,21 +1,18 @@
 package xyz.xenondevs.nova.world.model
 
-import net.minecraft.util.Brightness
-import net.minecraft.world.entity.Display
-import net.minecraft.world.item.ItemDisplayContext
 import org.bukkit.Location
+import org.bukkit.entity.Display.Billboard
+import org.bukkit.entity.Display.Brightness
+import org.bukkit.inventory.ItemStack
 import org.joml.Quaternionf
 import org.joml.Vector3f
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
-import net.minecraft.world.item.ItemStack as MojangStack
-import org.bukkit.inventory.ItemStack as BukkitStack
 
 data class Model(
-    val itemStack: MojangStack,
+    val itemStack: ItemStack?,
     val location: Location,
-    val billboardConstraints: Display.BillboardConstraints = Display.BillboardConstraints.FIXED,
+    val billboardConstraints: Billboard = Billboard.FIXED,
     val translation: Vector3f = Vector3f(),
     val scale: Vector3f = Vector3f(1f, 1f, 1f),
     val leftRotation: Quaternionf = Quaternionf(),
@@ -27,24 +24,10 @@ data class Model(
 ) {
     
     constructor(
-        itemStack: BukkitStack?,
-        location: Location,
-        constraints: Display.BillboardConstraints = Display.BillboardConstraints.FIXED,
-        translation: Vector3f = Vector3f(),
-        scale: Vector3f = Vector3f(1f, 1f, 1f),
-        leftRotation: Quaternionf = Quaternionf(),
-        rightRotation: Quaternionf = Quaternionf(),
-        brightness: Brightness? = null,
-        width: Float = 0f,
-        height: Float = 0f,
-        glowColor: Int = -1
-    ) : this(itemStack.nmsCopy, location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
-    
-    constructor(
         item: NovaItem,
         location: Location,
         modelId: Int,
-        constraints: Display.BillboardConstraints = Display.BillboardConstraints.FIXED,
+        constraints: Billboard = Billboard.FIXED,
         translation: Vector3f = Vector3f(),
         scale: Vector3f = Vector3f(1f, 1f, 1f),
         leftRotation: Quaternionf = Quaternionf(),
@@ -59,7 +42,7 @@ data class Model(
         item: NovaItem,
         location: Location,
         modelId: String = "default",
-        constraints: Display.BillboardConstraints = Display.BillboardConstraints.FIXED,
+        constraints: Billboard = Billboard.FIXED,
         translation: Vector3f = Vector3f(),
         scale: Vector3f = Vector3f(1f, 1f, 1f),
         leftRotation: Quaternionf = Quaternionf(),
@@ -72,7 +55,6 @@ data class Model(
     
     fun createFakeItemDisplay(autoRegister: Boolean = true): FakeItemDisplay =
         FakeItemDisplay(location, autoRegister) { _, data ->
-            data.itemDisplay = ItemDisplayContext.HEAD
             data.itemStack = itemStack
             data.billboardConstraints = billboardConstraints
             data.translation = translation

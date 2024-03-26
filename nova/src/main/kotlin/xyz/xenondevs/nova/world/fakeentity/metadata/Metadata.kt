@@ -4,10 +4,12 @@ import io.netty.buffer.Unpooled
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.network.syncher.EntityDataSerializers
-import net.minecraft.world.item.ItemStack
 import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nova.item.logic.PacketItems
+import xyz.xenondevs.nova.util.nmsCopy
 import java.util.*
+import net.minecraft.world.item.ItemStack as MojangStack
+import org.bukkit.inventory.ItemStack as BukkitStack
 
 abstract class Metadata internal constructor() {
     
@@ -51,20 +53,20 @@ abstract class Metadata internal constructor() {
         return entry
     }
     
-    internal fun <T, R> entry(index: Int, serializer: EntityDataSerializer<R>, default: T, toRaw: (T) -> R): MappedNonNullMetadataEntry<T, R>.MappedDelegate {
-        val entry = MappedNonNullMetadataEntry(index, serializer, toRaw, { throw UnsupportedOperationException() }, default)
-        entries += entry
-        return entry.mappedDelegate
-    }
-    
-    internal fun <T, R> entry(index: Int, serializer: EntityDataSerializer<R>, default: T, toRaw: (T) -> R, fromRaw: (R) -> T): MappedNonNullMetadataEntry<T, R> {
-        val entry = MappedNonNullMetadataEntry(index, serializer, toRaw, fromRaw, default)
+    internal fun <T, R> entry(index: Int, serializer: EntityDataSerializer<R>, default: T, map: (T) -> R): MappedNonNullMetadataEntry<T, R> {
+        val entry = MappedNonNullMetadataEntry(index, serializer, map, default)
         entries += entry
         return entry
     }
     
-    internal fun <T> optional(index: Int, serializer: EntityDataSerializer<Optional<T & Any>>, default: T?): NullableMetadataEntry<T> {
-        val entry = NullableMetadataEntry(index, serializer, default)
+    internal fun <T> optional(index: Int, serializer: EntityDataSerializer<Optional<T & Any>>): NullableMetadataEntry<T> {
+        val entry = NullableMetadataEntry<T>(index, serializer)
+        entries += entry
+        return entry
+    }
+    
+    internal fun <T, R> optional(index: Int, serializer: EntityDataSerializer<Optional<R & Any>>, map: (T) -> R): MappedNullableMetadataEntry<T, R> {
+        val entry = MappedNullableMetadataEntry(index, serializer, map)
         entries += entry
         return entry
     }
@@ -75,15 +77,14 @@ abstract class Metadata internal constructor() {
         return entry
     }
     
-    internal fun itemStack(index: Int, useName: Boolean, default: ItemStack): MappedNonNullMetadataEntry<ItemStack, ItemStack>.MappedDelegate {
-        val entry = MappedNonNullMetadataEntry(
+    internal fun itemStack(index: Int, useName: Boolean, default: BukkitStack? = null): MappedNonNullMetadataEntry<BukkitStack?, MojangStack> {
+        val entry = MappedNonNullMetadataEntry<BukkitStack?, MojangStack>(
             index, EntityDataSerializers.ITEM_STACK,
-            { PacketItems.getClientSideStack(null, it, useName)},
-            { PacketItems.getServerSideStack(it) },
+            { PacketItems.getClientSideStack(null, it.nmsCopy, useName) },
             default
         )
         entries += entry
-        return entry.mappedDelegate
+        return entry
     }
     
 }

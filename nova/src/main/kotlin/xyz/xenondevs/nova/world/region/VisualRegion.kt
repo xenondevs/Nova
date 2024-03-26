@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.world.region
 
-import net.minecraft.world.item.ItemDisplayContext
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.joml.Vector3f
@@ -9,7 +8,6 @@ import xyz.xenondevs.nova.util.component1
 import xyz.xenondevs.nova.util.component2
 import xyz.xenondevs.nova.util.component3
 import xyz.xenondevs.nova.util.component4
-import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import java.awt.Color
 import java.util.*
@@ -115,8 +113,7 @@ object VisualRegion {
         val center = from.clone().add(to).multiply(0.5)
         
         return FakeItemDisplay(center, false) { _, data ->
-            data.itemDisplay = ItemDisplayContext.HEAD
-            data.itemStack = DefaultBlockOverlays.TRANSPARENT_BLOCK.model.clientsideProvider.get().nmsCopy
+            data.itemStack = DefaultBlockOverlays.TRANSPARENT_BLOCK.model.clientsideProvider.get()
             data.scale = Vector3f(
                 (to.x - from.x + lineWidth).toFloat(),
                 (to.y - from.y + lineWidth).toFloat(),
