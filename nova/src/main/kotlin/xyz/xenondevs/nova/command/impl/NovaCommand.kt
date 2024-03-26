@@ -18,6 +18,7 @@ import net.minecraft.world.item.Items
 import org.bukkit.block.data.BlockData
 import org.joml.Matrix4f
 import org.joml.Vector3f
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.command.Command
 import xyz.xenondevs.nova.command.executesCatching
@@ -68,6 +69,7 @@ import xyz.xenondevs.nova.world.fakeentity.fakeEntityRenderDistance
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 import java.text.DecimalFormat
+import java.util.logging.Level
 
 internal object NovaCommand : Command("nova") {
     
@@ -183,15 +185,29 @@ internal object NovaCommand : Command("nova") {
     }
     
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {
-        ctx.source.sendSuccess(Component.translatable("command.nova.reload_configs.start", NamedTextColor.GRAY))
-        Configs.reload()
-        ctx.source.sendSuccess(Component.translatable("command.nova.reload_configs.success", NamedTextColor.GRAY))
+        try {
+            ctx.source.sendSuccess(Component.translatable("command.nova.reload_configs.start", NamedTextColor.GRAY))
+            Configs.reload()
+            ctx.source.sendSuccess(Component.translatable("command.nova.reload_configs.success", NamedTextColor.GRAY))
+        } catch (e: Exception) {
+            if (ctx.source.isPlayer)
+                ctx.source.sendFailure(Component.translatable("command.nova.reload_configs.failure", NamedTextColor.RED))
+            
+            LOGGER.log(Level.SEVERE, "Failed to reload configs", e)
+        }
     }
     
     private fun reloadRecipes(ctx: CommandContext<CommandSourceStack>) {
-        ctx.source.sendSuccess(Component.translatable("command.nova.reload_recipes.start", NamedTextColor.GRAY))
-        RecipeManager.reload()
-        ctx.source.sendSuccess(Component.translatable("command.nova.reload_recipes.success", NamedTextColor.GRAY))
+        try {
+            ctx.source.sendSuccess(Component.translatable("command.nova.reload_recipes.start", NamedTextColor.GRAY))
+            RecipeManager.reload()
+            ctx.source.sendSuccess(Component.translatable("command.nova.reload_recipes.success", NamedTextColor.GRAY))
+        } catch (e: Exception) {
+            if (ctx.source.isPlayer)
+                ctx.source.sendFailure(Component.translatable("command.nova.reload_recipes.failure", NamedTextColor.RED))
+            
+            LOGGER.log(Level.SEVERE, "Failed to reload recipes", e)
+        }
     }
     
     private fun createResourcePack(ctx: CommandContext<CommandSourceStack>) {
