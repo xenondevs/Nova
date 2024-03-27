@@ -59,4 +59,11 @@ class TextureIconContent internal constructor(
         ResourceLookups.TEXTURE_ICON_LOOKUP.set(fontCharLookup)
     }
     
+    companion object {
+        
+        fun getIcon(id: ResourcePath): FontChar? =
+            ResourceLookups.TEXTURE_ICON_LOOKUP[id]
+        
+    }
+    
 }
