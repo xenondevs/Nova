@@ -27,11 +27,11 @@ abstract class CustomFontContent internal constructor(
     private var currentCodePoint = END_CODE_POINT
     private var currentFontNum = -1
     
-    fun addEntry(charId: String, image: ResourcePath, height: Int?, ascent: Int) {
-        addEntry(ResourcePath.of(charId), image, height, ascent)
+    fun addEntry(charId: String, image: ResourcePath, height: Int?, ascent: Int): FontChar {
+        return addEntry(ResourcePath.of(charId), image, height, ascent)
     }
     
-    fun addEntry(charId: ResourcePath, image: ResourcePath, height: Int?, ascent: Int) {
+    fun addEntry(charId: ResourcePath, image: ResourcePath, height: Int?, ascent: Int): FontChar {
         if (++currentCodePoint > 0xF8FF) {
             currentCodePoint = START_CODE_POINT
             val id = ResourcePath.of(fontNameTemplate.format(++currentFontNum))
@@ -48,10 +48,9 @@ abstract class CustomFontContent internal constructor(
             ascent
         )
         
-        fontCharLookup[charId] = FontChar(
-            currentFont.id,
-            currentCodePoint,
-        )
+        val fontChar = FontChar(currentFont.id, currentCodePoint)
+        fontCharLookup[charId] = fontChar
+        return fontChar
     }
     
 }

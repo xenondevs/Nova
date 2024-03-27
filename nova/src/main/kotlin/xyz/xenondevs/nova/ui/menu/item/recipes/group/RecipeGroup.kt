@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.ui.menu.item.recipes.group
 
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.nova.ui.overlay.character.gui.GuiTexture
+import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 
 abstract class RecipeGroup<T : Any> : Comparable<RecipeGroup<*>> {
     

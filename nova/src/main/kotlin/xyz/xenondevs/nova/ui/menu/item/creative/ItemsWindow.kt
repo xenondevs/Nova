@@ -33,7 +33,7 @@ import xyz.xenondevs.nova.ui.item.ScrollUpItem
 import xyz.xenondevs.nova.ui.item.ToggleItem
 import xyz.xenondevs.nova.ui.item.clickableItem
 import xyz.xenondevs.nova.ui.menu.item.ItemMenu
-import xyz.xenondevs.nova.ui.overlay.character.gui.DefaultGuiTextures
+import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.moveToStart
 import xyz.xenondevs.nova.util.component.adventure.toPlainText

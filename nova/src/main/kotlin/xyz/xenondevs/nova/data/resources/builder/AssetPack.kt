@@ -2,9 +2,6 @@
 
 package xyz.xenondevs.nova.data.resources.builder
 
-import xyz.xenondevs.commons.gson.parseJson
-import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.data.resources.builder.index.GuisIndexDeserializer
 import java.io.InputStream
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -20,10 +17,6 @@ class AssetPack(val namespace: String, val assetsDir: Path) {
     val soundsFile: Path? = assetsDir.resolve("sounds.json").takeIf(Path::exists)
     val wailaTexturesDir: Path? = assetsDir.resolve("textures/waila/").takeIf(Path::exists)
     val atlasesDir: Path? = assetsDir.resolve("atlases/").takeIf(Path::exists)
-    
-    internal val guisIndex: Map<ResourcePath, ResourcePath>? = assetsDir.resolve("guis.json")
-        .takeIf(Path::exists)
-        ?.let { GuisIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
     fun getInputStream(path: String): InputStream? =
         assetsDir.resolve(path).takeIf(Path::exists)?.inputStream()

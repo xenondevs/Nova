@@ -3,8 +3,15 @@ package xyz.xenondevs.nova.data.resources.builder.task.font
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
+import xyz.xenondevs.nova.util.data.readImageDimensions
 
-private const val ASCENT = 13
+internal class GuiTextureData(
+    val font: String,
+    val codePoint: Int,
+    val offset: Int
+)
 
 class GuiContent internal constructor(
     builder: ResourcePackBuilder
@@ -16,11 +23,19 @@ class GuiContent internal constructor(
     
     @PackTask(runBefore = ["FontContent#write"])
     private fun write() {
-        builder.assetPacks.forEach { pack ->
-            pack.guisIndex?.forEach { (id, path) -> addEntry(id, path, null, ASCENT) }
+        val guiTextures = HashMap<GuiTexture, GuiTextureData>()
+        
+        for (guiTexture in NovaRegistries.GUI_TEXTURE) {
+            val layout = guiTexture.layout
+            val texture = layout.texture
+            val dim = layout.texture.findInAssets("textures", "png").readImageDimensions()
+            val offset = layout.alignment.getOffset(dim.width, dim.height)
+            
+            val fontChar = addEntry(guiTexture.id.toString(), texture.copy(path = texture.path + ".png"), dim.height, -offset.y())
+            guiTextures[guiTexture] = GuiTextureData(fontChar.font, fontChar.codePoint, offset.x())
         }
         
-        ResourceLookups.GUI_DATA_LOOKUP.set(fontCharLookup)
+        ResourceLookups.GUI_TEXTURE = guiTextures
     }
     
 }

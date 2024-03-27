@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.fluid.container.DynamicFluidContainer
-import xyz.xenondevs.nova.ui.overlay.character.gui.GuiTexture
+import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.util.data.CloseableProperty
 import xyz.xenondevs.nova.util.hasInventoryOpen
 import xyz.xenondevs.nova.util.item.novaCompound

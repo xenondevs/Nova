@@ -9,7 +9,7 @@ import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.util.SlotUtils
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
-import xyz.xenondevs.nova.ui.overlay.character.gui.DefaultGuiTextures
+import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.intValue
 
 internal object TableRecipeGroup : RecipeGroup<Recipe>() {

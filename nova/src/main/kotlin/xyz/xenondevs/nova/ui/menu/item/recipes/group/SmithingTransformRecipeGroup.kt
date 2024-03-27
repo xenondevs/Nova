@@ -6,7 +6,7 @@ import org.bukkit.inventory.SmithingTransformRecipe
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
-import xyz.xenondevs.nova.ui.overlay.character.gui.DefaultGuiTextures
+import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 
 internal object SmithingTransformRecipeGroup : RecipeGroup<SmithingTransformRecipe>() {
     

@@ -17,7 +17,7 @@ import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
 import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.ui.menu.item.recipes.createRecipeChoiceItem
-import xyz.xenondevs.nova.ui.overlay.character.gui.DefaultGuiTextures
+import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.data.getInputStacks
 
 abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {

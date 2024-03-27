@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.player.ability.AbilityType
 import xyz.xenondevs.nova.player.attachment.AttachmentType
 import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -52,6 +53,9 @@ object NovaRegistries {
     
     @JvmField
     val RECIPE_TYPE = registerSimple<RecipeType<*>>("recipe_type")
+    
+    @JvmField
+    val GUI_TEXTURE = registerSimple<GuiTexture>("gui_texture")
     
     @JvmField
     @ExperimentalWorldGen
