@@ -126,49 +126,44 @@ class EnchantmentCategoryBuilder internal constructor(id: ResourceLocation) : Re
     /**
      * Configures from which [EnchantmentCategories][EnchantmentCategory] this [EnchantmentCategory] inherits.
      */
-    fun inheritsFrom(vararg parents: EnchantmentCategory): EnchantmentCategoryBuilder {
+    fun inheritsFrom(vararg parents: EnchantmentCategory) {
         this.parents += parents
-        return this
     }
     
     /**
      * Configures which vanilla items this [EnchantmentCategory] can enchant.
      */
-    fun enchants(vararg vanillaItems: Material): EnchantmentCategoryBuilder {
+    fun enchants(vararg vanillaItems: Material) {
         for (material in vanillaItems) this.vanillaItems += material.nmsItem
-        return this
     }
     
     /**
      * Configures which vanilla items this [EnchantmentCategory] can enchant.
      */
-    fun enchants(vararg vanillaTags: Tag<Material>): EnchantmentCategoryBuilder {
+    fun enchants(vararg vanillaTags: Tag<Material>) {
         for (tag in vanillaTags) {
             for (material in tag.values) {
                 this.vanillaItems += material.nmsItem
             }
         }
-        return this
     }
     
     /**
      * Configures which vanilla items this [EnchantmentCategory] can enchant.
      */
-    fun enchants(vararg vanillaItems: MojangItem): EnchantmentCategoryBuilder {
+    fun enchants(vararg vanillaItems: MojangItem) {
         this.vanillaItems += vanillaItems
-        return this
     }
     
     /**
      * Configures which vanilla items this [EnchantmentCategory] can enchant.
      */
-    fun enchants(vararg vanillaTags: TagKey<MojangItem>): EnchantmentCategoryBuilder {
+    fun enchants(vararg vanillaTags: TagKey<MojangItem>) {
         for (tag in vanillaTags) {
             for (holder in BuiltInRegistries.ITEM.getTag(tag).get()) {
                 this.vanillaItems += holder.value()
             }
         }
-        return this
     }
     
     override fun build(): EnchantmentCategory = NovaEnchantmentCategory(id, parents, vanillaItems)

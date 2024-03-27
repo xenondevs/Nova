@@ -228,33 +228,29 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
     /**
      * Configures the maximum level of this enchantment. Defaults to `1`.
      */
-    fun maxLevel(maxLevel: Int): EnchantmentBuilder {
+    fun maxLevel(maxLevel: Int) {
         this.maxLevel = maxLevel
-        return this
     }
     
     /**
      * Configures the categories that this enchantment belongs to.
      */
-    fun categories(vararg categories: EnchantmentCategory): EnchantmentBuilder {
+    fun categories(vararg categories: EnchantmentCategory) {
         this.categories += categories
-        return this
     }
     
     /**
      * Configures the level requirement range that specifies whether an enchantment qualifies for a table slot.
      */
-    fun tableLevelRequirement(tableLeveRequirement: IntRange): EnchantmentBuilder {
+    fun tableLevelRequirement(tableLeveRequirement: IntRange) {
         this.tableLeveRequirement = { tableLeveRequirement }
-        return this
     }
     
     /**
      * Configures the level requirement range for a given level that specifies whether an enchantment qualifies for a table slot.
      */
-    fun tableLevelRequirement(tableLeveRequirement: (Int) -> IntRange): EnchantmentBuilder {
+    fun tableLevelRequirement(tableLeveRequirement: (Int) -> IntRange) {
         this.tableLeveRequirement = tableLeveRequirement
-        return this
     }
     
     /**
@@ -268,49 +264,43 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
      * - Rare: 2
      * - Very rare: 1
      */
-    fun rarity(weight: Int): EnchantmentBuilder {
+    fun rarity(weight: Int) {
         this.rarity = weight
-        return this
     }
     
     /**
      * Configures the rarity of this enchantment. Defaults to `Rarity.COMMON`.
      */
-    fun rarity(rarity: Rarity): EnchantmentBuilder {
+    fun rarity(rarity: Rarity) {
         this.rarity = rarity.weight
-        return this
     }
     
     /**
      * Whether this enchantment can appear in the enchanting table. Defaults to `false`.
      */
-    fun tableDiscoverable(tableDiscoverable: Boolean): EnchantmentBuilder {
+    fun tableDiscoverable(tableDiscoverable: Boolean) {
         this.isTableDiscoverable = tableDiscoverable
-        return this
     }
     
     /**
      * Whether this enchantment is a treasure enchantment. Defaults to `false`.
      */
-    fun treasure(treasure: Boolean): EnchantmentBuilder {
+    fun treasure(treasure: Boolean) {
         this.isTreasure = treasure
-        return this
     }
     
     /**
      * Whether this enchantment can be traded with villagers. Defaults to `false`.
      */
-    fun tradeable(tradeable: Boolean): EnchantmentBuilder {
+    fun tradeable(tradeable: Boolean) {
         this.isTradeable = tradeable
-        return this
     }
     
     /**
      * Whether this enchantment is a curse enchantment. Defaults to `false`.
      */
-    fun curse(curse: Boolean): EnchantmentBuilder {
+    fun curse(curse: Boolean) {
         this.isCurse = curse
-        return this
     }
     
     /**
@@ -318,9 +308,8 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
      *
      * This option is exclusive with [compatibleWith] and [incompatibleWith].
      */
-    fun compatibility(compatibility: (Enchantment) -> Boolean): EnchantmentBuilder {
+    fun compatibility(compatibility: (Enchantment) -> Boolean) {
         this.compatibility = compatibility
-        return this
     }
     
     /**
@@ -328,9 +317,8 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
      *
      * This option is exclusive with [compatibility] and [incompatibleWith].
      */
-    fun compatibleWith(vararg enchantments: Enchantment): EnchantmentBuilder {
+    fun compatibleWith(vararg enchantments: Enchantment) {
         this.compatibility = { it in enchantments }
-        return this
     }
     
     /**
@@ -338,9 +326,8 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
      *
      * This option is exclusive with [compatibility] and [compatibleWith].
      */
-    fun incompatibleWith(vararg enchantments: Enchantment): EnchantmentBuilder {
+    fun incompatibleWith(vararg enchantments: Enchantment) {
         this.compatibility = { it !in enchantments }
-        return this
     }
     
     /**

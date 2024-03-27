@@ -45,26 +45,23 @@ class DimensionTypeBuilder(id: ResourceLocation) : RegistryElementBuilder<Dimens
      * Sets the `fixedTime` property of this [DimensionType]. If this is set the tick time of any level of this dimension
      * type will be fixed to the given value. To revert it back to `null` use [noFixedTime].
      */
-    fun fixedTime(time: Long): DimensionTypeBuilder {
+    fun fixedTime(time: Long) {
         fixedTime = time
-        return this
     }
     
     /**
      * Sets the `fixedTime` property of this [DimensionType] to `null` and thus re-enables a normal day/light cycle.
      */
-    fun noFixedTime(): DimensionTypeBuilder {
+    fun noFixedTime() {
         fixedTime = null
-        return this
     }
     
     /**
      * Sets the `hasSkyLight` property of this [DimensionType], which determines if this dimension type has a sky light
      * source.
      */
-    fun hasSkyLight(skylight: Boolean): DimensionTypeBuilder {
+    fun hasSkyLight(skylight: Boolean) {
         hasSkyLight = skylight
-        return this
     }
     
     /**
@@ -72,18 +69,16 @@ class DimensionTypeBuilder(id: ResourceLocation) : RegistryElementBuilder<Dimens
      * ceiling (like the nether). Please note that this property won't actually lead to a bedrock ceiling being generated.
      * It's only used to handle other gameplay mechanics like mob spawning or maps.
      */
-    fun hasCeiling(ceiling: Boolean): DimensionTypeBuilder {
+    fun hasCeiling(ceiling: Boolean) {
         hasCeiling = ceiling
-        return this
     }
     
     /**
      * Sets the `ultraWarm` property of this [DimensionType], which determines if this dimension type should behave similar
      * to the nether regarding water evaporation, lava spread or stalactite fluid drops.
      */
-    fun ultraWarm(ultraWarm: Boolean): DimensionTypeBuilder {
+    fun ultraWarm(ultraWarm: Boolean) {
         this.ultraWarm = ultraWarm
-        return this
     }
     
     /**
@@ -91,63 +86,56 @@ class DimensionTypeBuilder(id: ResourceLocation) : RegistryElementBuilder<Dimens
      * are useless regarding spawn points. If `true` they will work as expected and nether portals will spawn zombified
      * piglins.
      */
-    fun natural(natural: Boolean): DimensionTypeBuilder {
+    fun natural(natural: Boolean) {
         this.natural = natural
-        return this
     }
     
     /**
      * Sets the `coordinateScale` property of this [DimensionType], which determines the multiplier applied to the
      * coordinates when leaving the dimension. (e.g. 8.0 for the nether)
      */
-    fun coordinateScale(scale: Double): DimensionTypeBuilder {
+    fun coordinateScale(scale: Double) {
         coordinateScale = scale
-        return this
     }
     
     /**
      * Sets the `bedWorks` property of this [DimensionType], which will lead to beds blowing up when trying to sleep if
      * set to `false`.
      */
-    fun bedWorks(bedWorks: Boolean): DimensionTypeBuilder {
+    fun bedWorks(bedWorks: Boolean) {
         this.bedWorks = bedWorks
-        return this
     }
     
     /**
      * Sets the `respawnAnchorWorks` property of this [DimensionType], which will lead to respawn anchors blowing up when
      * trying to use them if set to `false`.
      */
-    fun respawnAnchorWorks(respawnAnchorWorks: Boolean): DimensionTypeBuilder {
+    fun respawnAnchorWorks(respawnAnchorWorks: Boolean) {
         this.respawnAnchorWorks = respawnAnchorWorks
-        return this
     }
     
     /**
      * Sets the `minY` property of this [DimensionType], which determines the minimum y level that can contain blocks. Must
      * be a multiple of 16 and a value between `-2032` and `2016`. The max height `(minY + height - 1)` cannot exceed `2031`.
      */
-    fun minY(minY: Int): DimensionTypeBuilder {
+    fun minY(minY: Int) {
         this.minY = minY
-        return this
     }
     
     /**
      * Sets the `height` property of this [DimensionType], which determines the amount of layers that can contain blocks.
      * Must be a multiple of 16 and a value between `0` and `4096`. The max height `(minY + height - 1)` cannot exceed `2031`.
      */
-    fun height(height: Int): DimensionTypeBuilder {
+    fun height(height: Int) {
         this.height = height
-        return this
     }
     
     /**
      * Sets the `logicalHeight` property of this [DimensionType], which determines the max y level a player can be teleported
      * to by chorus fruits and nether portals. Can't be higher than the `height` property.
      */
-    fun logicalHeight(logicalHeight: Int): DimensionTypeBuilder {
+    fun logicalHeight(logicalHeight: Int) {
         this.logicalHeight = logicalHeight
-        return this
     }
     
     /**
@@ -157,9 +145,8 @@ class DimensionTypeBuilder(id: ResourceLocation) : RegistryElementBuilder<Dimens
      * * `BlockTags.INFINIBURN_NETHER`
      * * `BlockTags.INFINIBURN_END`
      */
-    fun infiniBurn(infiniBurn: TagKey<Block>): DimensionTypeBuilder {
+    fun infiniBurn(infiniBurn: TagKey<Block>) {
         this.infiniBurn = infiniBurn
-        return this
     }
     
     /**
@@ -172,34 +159,30 @@ class DimensionTypeBuilder(id: ResourceLocation) : RegistryElementBuilder<Dimens
      * For a deeper understanding of what these values do, check out the [Minecraft Wiki](https://minecraft.wiki/w/Custom_dimension#Syntax)
      * (effects property).
      */
-    fun effects(effects: ResourceLocation): DimensionTypeBuilder {
+    fun effects(effects: ResourceLocation) {
         this.effects = effects
-        return this
     }
     
     /**
      * Sets the `ambientLight` property of this [DimensionType].
      */
-    fun ambientLight(ambientLight: Float): DimensionTypeBuilder {
+    fun ambientLight(ambientLight: Float) {
         this.ambientLight = ambientLight
-        return this
     }
     
     /**
      * Sets the [MonsterSettings] of this [DimensionType]. For more information check out the [MonsterSettingsBuilder]
      */
-    fun monsterSettings(monsterSettings: MonsterSettings): DimensionTypeBuilder {
+    fun monsterSettings(monsterSettings: MonsterSettings) {
         this.monsterSettings = monsterSettings
-        return this
     }
     
     /**
      * Sets the [MonsterSettings] of this [DimensionType] using a [MonsterSettingsBuilder].
      */
     @WorldGenDsl
-    fun monsterSettings(builder: MonsterSettingsBuilder.() -> Unit): DimensionTypeBuilder {
+    fun monsterSettings(builder: MonsterSettingsBuilder.() -> Unit) {
         this.monsterSettings = MonsterSettingsBuilder().apply(builder).build()
-        return this
     }
     
     /**
@@ -246,35 +229,31 @@ class MonsterSettingsBuilder {
     /**
      * Sets the `piglinSafe` property which determines whether piglins transform into zombified entities.
      */
-    fun piglinSafe(piglinSafe: Boolean): MonsterSettingsBuilder {
+    fun piglinSafe(piglinSafe: Boolean) {
         this.piglinSafe = piglinSafe
-        return this
     }
     
     /**
      * Sets the `piglinSafe` property which determines whether players with bad omen can trigger raids.
      */
-    fun hasRaids(hasRaids: Boolean): MonsterSettingsBuilder {
+    fun hasRaids(hasRaids: Boolean) {
         this.hasRaids = hasRaids
-        return this
     }
     
     /**
      * Sets the `monsterSpawnLightTest` property which determines the light level test used to determine if a monster can
      * spawn. (Value between 0 and 15)
      */
-    fun monsterSpawnLightTest(test: IntProvider): MonsterSettingsBuilder {
+    fun monsterSpawnLightTest(test: IntProvider) {
         this.monsterSpawnLightTest = test
-        return this
     }
     
     /**
      * Sets the `monsterSpawnBlockLightLimit` property which determines the maximum light level a block can have to allow
      * monsters to spawn. (Value between 0 and 15)
      */
-    fun monsterSpawnBlockLightLimit(limit: Int): MonsterSettingsBuilder {
+    fun monsterSpawnBlockLightLimit(limit: Int) {
         this.monsterSpawnBlockLightLimit = limit
-        return this
     }
     
     /**

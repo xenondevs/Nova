@@ -68,9 +68,8 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
      *
      * Check out the [BiomeClimateSettingsBuilder] documentation for a list of all available settings.
      */
-    fun climateSettings(climateSettings: ClimateSettings): BiomeBuilder {
+    fun climateSettings(climateSettings: ClimateSettings) {
         this.climateSettings = climateSettings
-        return this
     }
     
     /**
@@ -80,17 +79,15 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
      * Check out the [BiomeClimateSettingsBuilder] documentation for a list of all available settings.
      */
     @WorldGenDsl
-    fun climateSettings(climateSettings: BiomeClimateSettingsBuilder.() -> Unit): BiomeBuilder {
+    fun climateSettings(climateSettings: BiomeClimateSettingsBuilder.() -> Unit) {
         this.climateSettings = BiomeClimateSettingsBuilder().apply(climateSettings).build()
-        return this
     }
     
     /**
      * Resets the [ClimateSettings] of this biome to the default values.
      */
-    fun defaultClimateSettings(): BiomeBuilder {
+    fun defaultClimateSettings() {
         climateSettings = null
-        return this
     }
     
     /**
@@ -98,9 +95,8 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
      *
      * Check out the [BiomeSpecialEffectsBuilder] documentation for a list of all available settings.
      */
-    fun specialEffects(specialEffects: BiomeSpecialEffects): BiomeBuilder {
+    fun specialEffects(specialEffects: BiomeSpecialEffects) {
         this.specialEffects = specialEffects
-        return this
     }
     
     /**
@@ -110,17 +106,15 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
      * Check out the [BiomeSpecialEffectsBuilder] documentation for a list of all available settings.
      */
     @WorldGenDsl
-    fun specialEffects(specialEffects: BiomeSpecialEffectsBuilder.() -> Unit): BiomeBuilder {
+    fun specialEffects(specialEffects: BiomeSpecialEffectsBuilder.() -> Unit) {
         this.specialEffects = BiomeSpecialEffectsBuilder().apply(specialEffects).build()
-        return this
     }
     
     /**
      * Resets the [BiomeSpecialEffects] of this biome to the default values.
      */
-    fun defaultSpecialEffects(): BiomeBuilder {
+    fun defaultSpecialEffects() {
         specialEffects = null
-        return this
     }
     
     //<editor-fold desc="Carvers/Features" defaultstate="collapsed">
@@ -359,9 +353,8 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
      *
      * TODO PRE 0.13: change link ^^^^^^^^^^
      */
-    fun mobSpawnSettings(mobSpawnSettings: MobSpawnSettings): BiomeBuilder {
+    fun mobSpawnSettings(mobSpawnSettings: MobSpawnSettings) {
         this.mobSpawnSettings = mobSpawnSettings
-        return this
     }
     
     /**
@@ -373,9 +366,8 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
      * TODO PRE 0.13: change link ^^^^^^^^^^
      */
     @WorldGenDsl
-    fun mobSpawnSettings(mobSpawnSettings: MobSpawnSettingsBuilder.() -> Unit): BiomeBuilder {
+    fun mobSpawnSettings(mobSpawnSettings: MobSpawnSettingsBuilder.() -> Unit) {
         this.mobSpawnSettings = MobSpawnSettingsBuilder().apply(mobSpawnSettings).build()
-        return this
     }
     
     /**
@@ -412,9 +404,8 @@ class BiomeClimateSettingsBuilder {
      * rainfall (e.g. rain/snow). Please note that the [temperature] setting also affects the precipitation of a biome.
      * Any value below `0.15` will prevent precipitation.
      */
-    fun hasPrecipitation(hasPrecipitation: Boolean): BiomeClimateSettingsBuilder {
+    fun hasPrecipitation(hasPrecipitation: Boolean) {
         this.hasPrecipitation = hasPrecipitation
-        return this
     }
     
     /**
@@ -422,9 +413,8 @@ class BiomeClimateSettingsBuilder {
      * multiple gameplay elements like melting ice, preventing rain or changing the color of foliage (unless overridden in
      * [BiomeSpecialEffects]). This setting can also affect a few [Features][FeatureType].
      */
-    fun temperature(temperature: Float): BiomeClimateSettingsBuilder {
+    fun temperature(temperature: Float) {
         this.temperature = temperature
-        return this
     }
     
     /**
@@ -433,18 +423,16 @@ class BiomeClimateSettingsBuilder {
      *
      * @see TemperatureModifier
      */
-    fun temperatureModifier(temperatureModifier: TemperatureModifier): BiomeClimateSettingsBuilder {
+    fun temperatureModifier(temperatureModifier: TemperatureModifier) {
         this.temperatureModifier = temperatureModifier
-        return this
     }
     
     /**
      * Sets the `downfall` setting of the climate settings. This controls foliage color. Any value above `0.85` also leads
      * to fire burning out faster.
      */
-    fun downfall(downfall: Float): BiomeClimateSettingsBuilder {
+    fun downfall(downfall: Float) {
         this.downfall = downfall
-        return this
     }
     
     /**
@@ -506,119 +494,105 @@ class BiomeSpecialEffectsBuilder {
     /**
      * Sets the `fogColor` setting of the biome's special effects via a [Color] instance.
      */
-    fun fogColor(color: Color): BiomeSpecialEffectsBuilder {
+    fun fogColor(color: Color) {
         this.fogColor = color.rgb
-        return this
     }
     
     /**
      * Sets the `fogColor` setting of the biome's special effects via an RGB value (e.g. `0xC0D8FF`).
      */
-    fun fogColor(color: Int): BiomeSpecialEffectsBuilder {
+    fun fogColor(color: Int) {
         this.fogColor = color
-        return this
     }
     
     /**
      * Sets the `waterColor` setting of the biome's special effects via a [Color] instance.
      */
-    fun waterColor(color: Color): BiomeSpecialEffectsBuilder {
+    fun waterColor(color: Color) {
         this.waterColor = color.rgb
-        return this
     }
     
     /**
      * Sets the `waterColor` setting of the biome's special effects via an RGB value (e.g. `0x3F76E4`).
      */
-    fun waterColor(color: Int): BiomeSpecialEffectsBuilder {
+    fun waterColor(color: Int) {
         this.waterColor = color
-        return this
     }
     
     /**
      * Sets the `waterFogColor` setting of the biome's special effects via a [Color] instance.
      */
-    fun waterFogColor(color: Color): BiomeSpecialEffectsBuilder {
+    fun waterFogColor(color: Color) {
         this.waterFogColor = color.rgb
-        return this
     }
     
     /**
      * Sets the `waterFogColor` setting of the biome's special effects via an RGB value (e.g. `0x50533`).
      */
-    fun waterFogColor(color: Int): BiomeSpecialEffectsBuilder {
+    fun waterFogColor(color: Int) {
         this.waterFogColor = color
-        return this
     }
     
     /**
      * Sets the `skyColor` setting of the biome's special effects via a [Color] instance.
      */
-    fun skyColor(color: Color): BiomeSpecialEffectsBuilder {
+    fun skyColor(color: Color) {
         this.skyColor = color.rgb
-        return this
     }
     
     /**
      * Sets the `skyColor` setting of the biome's special effects via an RGB value (e.g. `0x78A7FF`).
      */
-    fun skyColor(color: Int): BiomeSpecialEffectsBuilder {
+    fun skyColor(color: Int) {
         this.skyColor = color
-        return this
     }
     
     /**
      * Sets the `foliageColorOverride` and overrides the calculated foliage color of the biome via a [Color] instance.
      * To reset the foliage color back to the default (`null`), use [defaultFoliageColor].
      */
-    fun foliageColor(color: Color): BiomeSpecialEffectsBuilder {
+    fun foliageColor(color: Color) {
         this.foliageColorOverride = color.rgb
-        return this
     }
     
     /**
      * Sets the `foliageColorOverride` and overrides the calculated foliage color of the biome via an RGB value (e.g.
      * `0x0E8C00`). To reset the foliage color back to the default (`null`), use [defaultFoliageColor].
      */
-    fun foliageColor(color: Int): BiomeSpecialEffectsBuilder {
+    fun foliageColor(color: Int) {
         this.foliageColorOverride = color
-        return this
     }
     
     /**
      * Resets the `foliageColorOverride` setting back to `null`, which will cause the foliage color to be calculated
      * based on the [ClimateSettings.temperature] and [ClimateSettings.downfall] settings of the [ClimateSettings].
      */
-    fun defaultFoliageColor(): BiomeSpecialEffectsBuilder {
+    fun defaultFoliageColor() {
         this.foliageColorOverride = null
-        return this
     }
     
     /**
      * Sets the `grassColorOverride` and overrides the calculated grass color of the biome via a [Color] instance. To
      * reset the grass color back to the default (`null`), use [defaultGrassColor].
      */
-    fun grassColor(color: Color): BiomeSpecialEffectsBuilder {
+    fun grassColor(color: Color) {
         this.grassColorOverride = color.rgb
-        return this
     }
     
     /**
      * Sets the `grassColorOverride` and overrides the calculated grass color of the biome via an RGB value (e.g.
      * `0x0E8C00`). To reset the grass color back to the default (`null`), use [defaultGrassColor].
      */
-    fun grassColor(color: Int): BiomeSpecialEffectsBuilder {
+    fun grassColor(color: Int) {
         this.grassColorOverride = color
-        return this
     }
     
     /**
      * Resets the `grassColorOverride` setting back to `null`, which will cause the grass color to be calculated
      * based on the [ClimateSettings.temperature] and [ClimateSettings.downfall] settings of the [ClimateSettings].
      */
-    fun defaultGrassColor(): BiomeSpecialEffectsBuilder {
+    fun defaultGrassColor() {
         this.grassColorOverride = null
-        return this
     }
     
     /**
@@ -627,9 +601,8 @@ class BiomeSpecialEffectsBuilder {
      *
      * @see [GrassColorModifier]
      */
-    fun grassColorModifier(grassColorModifier: GrassColorModifier): BiomeSpecialEffectsBuilder {
+    fun grassColorModifier(grassColorModifier: GrassColorModifier) {
         this.grassColorModifier = grassColorModifier
-        return this
     }
     
     //</editor-fold>
@@ -643,9 +616,8 @@ class BiomeSpecialEffectsBuilder {
      * [disableAmbientParticles].  For more information on particles, check out the NMS-Utilities [ParticleBuilder]
      * documentation.
      */
-    fun ambientParticles(ambientParticleSettings: AmbientParticleSettings): BiomeSpecialEffectsBuilder {
+    fun ambientParticles(ambientParticleSettings: AmbientParticleSettings) {
         this.ambientParticleSettings = ambientParticleSettings
-        return this
     }
     
     /**
@@ -655,17 +627,15 @@ class BiomeSpecialEffectsBuilder {
      * particles again, use [disableAmbientParticles]. For more information on particles, check out the NMS-Utilities
      * [ParticleBuilder] documentation.
      */
-    fun <T : ParticleOptions> ambientParticles(particle: ParticleType<T>, probability: Float, builder: ParticleBuilder<T>.() -> Unit = {}): BiomeSpecialEffectsBuilder {
+    fun <T : ParticleOptions> ambientParticles(particle: ParticleType<T>, probability: Float, builder: ParticleBuilder<T>.() -> Unit = {}) {
         this.ambientParticleSettings = AmbientParticleSettings(ParticleBuilder(particle).apply(builder).getOptions(), probability)
-        return this
     }
     
     /**
      * Sets the `ambientParticle` setting of the biome's special effects back to `null` to disable ambient particles.
      */
-    fun disableAmbientParticles(): BiomeSpecialEffectsBuilder {
+    fun disableAmbientParticles() {
         this.ambientParticleSettings = null
-        return this
     }
     
     //</editor-fold>
@@ -677,9 +647,8 @@ class BiomeSpecialEffectsBuilder {
      * sounds to the biome. The sound is played randomly. To disable ambient sounds again, use [disableAmbientLoopSoundEvent].
      * To disable ambient sounds again, use [disableAmbientLoopSoundEvent].
      */
-    fun ambientLoopSoundEvent(ambientLoopSoundEvent: SoundEvent): BiomeSpecialEffectsBuilder {
+    fun ambientLoopSoundEvent(ambientLoopSoundEvent: SoundEvent) {
         this.ambientLoopSoundEvent = Holder.direct(ambientLoopSoundEvent)
-        return this
     }
     
     /**
@@ -687,9 +656,8 @@ class BiomeSpecialEffectsBuilder {
      * the [SoundEvent], or is set later by the [SoundEvent Registry][Registries.SOUND_EVENT]. To disable ambient sounds
      * again, use [disableAmbientLoopSoundEvent].
      */
-    fun ambientLoopSoundEvent(ambientLoopSoundEvent: Holder<SoundEvent>): BiomeSpecialEffectsBuilder {
+    fun ambientLoopSoundEvent(ambientLoopSoundEvent: Holder<SoundEvent>) {
         this.ambientLoopSoundEvent = ambientLoopSoundEvent
-        return this
     }
     
     /**
@@ -697,9 +665,8 @@ class BiomeSpecialEffectsBuilder {
      * [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
      * the [SoundEvent Registry][Registries.SOUND_EVENT]. To disable ambient sounds again, use [disableAmbientLoopSoundEvent].
      */
-    fun ambientLoopSoundEvent(soundEventId: ResourceLocation): BiomeSpecialEffectsBuilder {
+    fun ambientLoopSoundEvent(soundEventId: ResourceLocation) {
         this.ambientLoopSoundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId)
-        return this
     }
     
     /**
@@ -707,17 +674,15 @@ class BiomeSpecialEffectsBuilder {
      * [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
      * the [SoundEvent Registry][Registries.SOUND_EVENT]. To disable ambient sounds again, use [disableAmbientLoopSoundEvent].
      */
-    fun ambientLoopSoundEvent(soundEventKey: ResourceKey<SoundEvent>): BiomeSpecialEffectsBuilder {
+    fun ambientLoopSoundEvent(soundEventKey: ResourceKey<SoundEvent>) {
         this.ambientLoopSoundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventKey.location())
-        return this
     }
     
     /**
      * Sets the `ambientLoopSoundEvent` setting of the biome's special effects back to `null` to disable ambient sounds.
      */
-    fun disableAmbientLoopSoundEvent(): BiomeSpecialEffectsBuilder {
+    fun disableAmbientLoopSoundEvent() {
         this.ambientLoopSoundEvent = null
-        return this
     }
     
     /**
@@ -725,9 +690,8 @@ class BiomeSpecialEffectsBuilder {
      * unfamiliar with Minecraft's mood sound system, check out the [Minecraft Wiki](https://minecraft.wiki/w/Ambience#Mood_algorithm).
      * To disable ambient sounds again, use [disableAmbientMoodSound].
      */
-    fun ambientMoodSound(moodSettings: AmbientMoodSettings): BiomeSpecialEffectsBuilder {
+    fun ambientMoodSound(moodSettings: AmbientMoodSettings) {
         this.ambientMoodSettings = moodSettings
-        return this
     }
     
     /**
@@ -736,18 +700,16 @@ class BiomeSpecialEffectsBuilder {
      * [Minecraft Wiki](https://minecraft.wiki/w/Ambience#Mood_algorithm). To disable ambient sounds again,
      * use [disableAmbientMoodSound].
      */
-    fun ambientMoodSound(builder: AmbientMoodSoundBuilder.() -> Unit): BiomeSpecialEffectsBuilder {
+    fun ambientMoodSound(builder: AmbientMoodSoundBuilder.() -> Unit) {
         this.ambientMoodSettings = AmbientMoodSoundBuilder().apply(builder).build()
-        return this
     }
     
     /**
      * Sets the `ambientMoodSettings` (also known as cave sounds) setting of the biome's special effects back to `null`
      * to disable ambient sounds.
      */
-    fun disableAmbientMoodSound(): BiomeSpecialEffectsBuilder {
+    fun disableAmbientMoodSound() {
         this.ambientMoodSettings = null
-        return this
     }
     
     /**
@@ -755,18 +717,16 @@ class BiomeSpecialEffectsBuilder {
      * sounds to the biome. The sound is played each tick at the probability defined at [AmbientAdditionsSettings.tickChance].
      * To disable ambient sounds again, use [disableAmbientAdditionsSound].
      */
-    fun ambientAdditionsSound(additionsSettings: AmbientAdditionsSettings): BiomeSpecialEffectsBuilder {
+    fun ambientAdditionsSound(additionsSettings: AmbientAdditionsSettings) {
         this.ambientAdditionsSettings = additionsSettings
-        return this
     }
     
     /**
      * Sets the `ambientAdditionsSettings` setting of the biome's special effects by creating a new [AmbientAdditionsSettings]
      * instance out of the given [soundEvent] and [tickProbability]. To disable ambient sounds again, use [disableAmbientAdditionsSound].
      */
-    fun ambientAdditionsSound(soundEvent: SoundEvent, tickProbability: Double): BiomeSpecialEffectsBuilder {
+    fun ambientAdditionsSound(soundEvent: SoundEvent, tickProbability: Double) {
         this.ambientAdditionsSettings = AmbientAdditionsSettings(Holder.direct(soundEvent), tickProbability)
-        return this
     }
     
     /**
@@ -775,9 +735,8 @@ class BiomeSpecialEffectsBuilder {
      * [SoundEvent], or be set later by the [SoundEvent Registry][Registries.SOUND_EVENT]. To disable ambient sounds again,
      * use [disableAmbientAdditionsSound].
      */
-    fun ambientAdditionsSound(soundEvent: Holder<SoundEvent>, tickProbability: Double): BiomeSpecialEffectsBuilder {
+    fun ambientAdditionsSound(soundEvent: Holder<SoundEvent>, tickProbability: Double) {
         this.ambientAdditionsSettings = AmbientAdditionsSettings(soundEvent, tickProbability)
-        return this
     }
     
     /**
@@ -786,44 +745,39 @@ class BiomeSpecialEffectsBuilder {
      * an empty [Holder] will be created and the [SoundEvent] will be set later by the [SoundEvent Registry][Registries.SOUND_EVENT].
      * To disable ambient sounds again, use [disableAmbientAdditionsSound].
      */
-    fun ambientAdditionsSound(soundEventId: ResourceLocation, tickProbability: Double): BiomeSpecialEffectsBuilder {
+    fun ambientAdditionsSound(soundEventId: ResourceLocation, tickProbability: Double) {
         this.ambientAdditionsSettings = AmbientAdditionsSettings(VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId), tickProbability)
-        return this
     }
     
     /**
      * Sets the `ambientAdditionsSettings` setting of the biome's special effects back to `null` to disable ambient
      * additions sounds.
      */
-    fun disableAmbientAdditionsSound(): BiomeSpecialEffectsBuilder {
+    fun disableAmbientAdditionsSound() {
         this.ambientAdditionsSettings = null
-        return this
     }
     
     /**
      * Sets the `backgroundMusic` setting of the biome's special effects. This setting is used to add background music
      * to the biome. To disable background music again, use [disableBackgroundMusic].
      */
-    fun backgroundMusic(music: Music): BiomeSpecialEffectsBuilder {
+    fun backgroundMusic(music: Music) {
         this.backgroundMusic = music
-        return this
     }
     
     /**
      * Sets the `backgroundMusic` setting of the biome's special effects by using a [MusicBuilder]. To disable background
      * music again, use [disableBackgroundMusic].
      */
-    fun backgroundMusic(builder: MusicBuilder.() -> Unit): BiomeSpecialEffectsBuilder {
+    fun backgroundMusic(builder: MusicBuilder.() -> Unit) {
         this.backgroundMusic = MusicBuilder().apply(builder).build()
-        return this
     }
     
     /**
      * Sets the `backgroundMusic` setting of the biome's special effects back to `null` to disable background music.
      */
-    fun disableBackgroundMusic(): BiomeSpecialEffectsBuilder {
+    fun disableBackgroundMusic() {
         this.backgroundMusic = null
-        return this
     }
     
     //</editor-fold>
@@ -869,17 +823,15 @@ class MobSpawnSettingsBuilder {
      * Sets the `creatureGenerationProbability` setting of the biome's mob spawn settings. This setting is used to
      * define the probability of a creature spawning in a chunk.
      */
-    fun creatureGenerationProbability(creatureGenerationProbability: Float): MobSpawnSettingsBuilder {
+    fun creatureGenerationProbability(creatureGenerationProbability: Float) {
         this.creatureGenerationProbability = creatureGenerationProbability
-        return this
     }
     
     /**
      * Adds a [SpawnerData] to the `spawners` setting of the biome's mob spawn settings.
      */
-    fun addSpawn(mobCategory: MobCategory, spawnerData: SpawnerData): MobSpawnSettingsBuilder {
+    fun addSpawn(mobCategory: MobCategory, spawnerData: SpawnerData) {
         spawners.getOrPut(mobCategory, ::ArrayList).add(spawnerData)
-        return this
     }
     
     /**
@@ -899,17 +851,15 @@ class MobSpawnSettingsBuilder {
     /**
      * Sets the spawn cost for [entityType] to the given [spawnCost].
      */
-    fun setSpawnCost(entityType: EntityType<*>, spawnCost: MobSpawnCost): MobSpawnSettingsBuilder {
+    fun setSpawnCost(entityType: EntityType<*>, spawnCost: MobSpawnCost) {
         mobSpawnCosts[entityType] = spawnCost
-        return this
     }
     
     /**
      * Sets the spawn cost for [entityType] to the given [energyBudget] and [charge].
      */
-    fun setSpawnCost(entityType: EntityType<*>, energyBudget: Double, charge: Double = 1.0): MobSpawnSettingsBuilder {
+    fun setSpawnCost(entityType: EntityType<*>, energyBudget: Double, charge: Double = 1.0) {
         mobSpawnCosts[entityType] = MobSpawnCost(energyBudget, charge)
-        return this
     }
     
     /**
@@ -947,18 +897,16 @@ class AmbientMoodSoundBuilder {
     /**
      * Sets the `soundEvent` setting of the biome's ambient mood sound to the given [soundEvent].
      */
-    fun soundEvent(soundEvent: SoundEvent): AmbientMoodSoundBuilder {
+    fun soundEvent(soundEvent: SoundEvent) {
         this.soundEvent = Holder.direct(soundEvent)
-        return this
     }
     
     /**
      * Sets the `soundEvent` setting of the biome's ambient mood sound to the given [soundEvent] via a [Holder] that
      * either already contains a [SoundEvent], or is set later by the [SoundEvent Registry][Registries.SOUND_EVENT].
      */
-    fun soundEvent(soundEvent: Holder<SoundEvent>): AmbientMoodSoundBuilder {
+    fun soundEvent(soundEvent: Holder<SoundEvent>) {
         this.soundEvent = soundEvent
-        return this
     }
     
     /**
@@ -966,9 +914,8 @@ class AmbientMoodSoundBuilder {
      * If the [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
      * the [SoundEvent Registry][Registries.SOUND_EVENT].
      */
-    fun soundEvent(soundEventId: ResourceLocation): AmbientMoodSoundBuilder {
+    fun soundEvent(soundEventId: ResourceLocation) {
         this.soundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId)
-        return this
     }
     
     /**
@@ -976,33 +923,29 @@ class AmbientMoodSoundBuilder {
      * If the [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
      * the [SoundEvent Registry][Registries.SOUND_EVENT].
      */
-    fun soundEvent(soundEventId: ResourceKey<SoundEvent>): AmbientMoodSoundBuilder {
+    fun soundEvent(soundEventId: ResourceKey<SoundEvent>) {
         this.soundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId.location())
-        return this
     }
     
     /**
      * Sets the `tickDelay` setting of the biome's ambient mood sound to the given [tickDelay].
      */
-    fun tickDelay(tickDelay: Int): AmbientMoodSoundBuilder {
+    fun tickDelay(tickDelay: Int) {
         this.tickDelay = tickDelay
-        return this
     }
     
     /**
      * Sets the `blockSearchExtent` setting of the biome's ambient mood sound to the given [blockSearchExtent].
      */
-    fun blockSearchExtent(blockSearchExtent: Int): AmbientMoodSoundBuilder {
+    fun blockSearchExtent(blockSearchExtent: Int) {
         this.blockSearchExtent = blockSearchExtent
-        return this
     }
     
     /**
      * Sets the `soundPositionOffset` setting of the biome's ambient mood sound to the given [soundPositionOffset].
      */
-    fun soundPositionOffset(soundPositionOffset: Double): AmbientMoodSoundBuilder {
+    fun soundPositionOffset(soundPositionOffset: Double) {
         this.soundPositionOffset = soundPositionOffset
-        return this
     }
     
     /**
@@ -1026,18 +969,16 @@ class MusicBuilder {
     /**
      * Sets the `soundEvent` setting of the music to the given [soundEvent].
      */
-    fun soundEvent(soundEvent: SoundEvent): MusicBuilder {
+    fun soundEvent(soundEvent: SoundEvent) {
         this.soundEvent = Holder.direct(soundEvent)
-        return this
     }
     
     /**
      * Sets the `soundEvent` setting of the music to the given [soundEvent] via a [Holder] that
      * either already contains a [SoundEvent], or is set later by the [SoundEvent Registry][Registries.SOUND_EVENT].
      */
-    fun soundEvent(soundEvent: Holder<SoundEvent>): MusicBuilder {
+    fun soundEvent(soundEvent: Holder<SoundEvent>) {
         this.soundEvent = soundEvent
-        return this
     }
     
     /**
@@ -1045,9 +986,8 @@ class MusicBuilder {
      * If the [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
      * the [SoundEvent Registry][Registries.SOUND_EVENT].
      */
-    fun soundEvent(soundEventId: ResourceLocation): MusicBuilder {
+    fun soundEvent(soundEventId: ResourceLocation) {
         this.soundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId)
-        return this
     }
     
     /**
@@ -1055,33 +995,29 @@ class MusicBuilder {
      * If the [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
      * the [SoundEvent Registry][Registries.SOUND_EVENT].
      */
-    fun soundEvent(soundEventId: ResourceKey<SoundEvent>): MusicBuilder {
+    fun soundEvent(soundEventId: ResourceKey<SoundEvent>) {
         this.soundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId.location())
-        return this
     }
     
     /**
      * Sets the `minDelay` setting of the music to the given [minDelay].
      */
-    fun minDelay(minDelay: Int): MusicBuilder {
+    fun minDelay(minDelay: Int) {
         this.minDelay = minDelay
-        return this
     }
     
     /**
      * Sets the `maxDelay` setting of the music to the given [maxDelay].
      */
-    fun maxDelay(maxDelay: Int): MusicBuilder {
+    fun maxDelay(maxDelay: Int) {
         this.maxDelay = maxDelay
-        return this
     }
     
     /**
      * Sets the `replaceCurrentMusic` setting of the music to the given [replaceCurrentMusic].
      */
-    fun replaceCurrentMusic(replaceCurrentMusic: Boolean): MusicBuilder {
+    fun replaceCurrentMusic(replaceCurrentMusic: Boolean) {
         this.replaceCurrentMusic = replaceCurrentMusic
-        return this
     }
     
     /**

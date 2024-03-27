@@ -5,10 +5,7 @@ import xyz.xenondevs.nova.item.enchantment.EnchantmentCategoryBuilder
 
 interface EnchantmentCategoryRegistry : AddonGetter {
     
-    fun registerEnchantmentCategory(name: String): EnchantmentCategory =
-        enchantmentCategory(name).register()
-    
-    fun enchantmentCategory(name: String): EnchantmentCategoryBuilder =
-        EnchantmentCategoryBuilder(addon, name)
+    fun enchantmentCategory(name: String, enchantmentCategory: EnchantmentCategoryBuilder.() -> Unit = {}): EnchantmentCategory =
+        EnchantmentCategoryBuilder(addon, name).apply(enchantmentCategory).register()
     
 }

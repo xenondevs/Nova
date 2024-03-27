@@ -7,12 +7,12 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 
 interface ItemRegistry : AddonGetter {
     
-    fun item(name: String, init: NovaItemBuilder.() -> Unit): NovaItem =
-        NovaItemBuilder(addon, name).apply(init).register()
+    fun item(name: String, item: NovaItemBuilder.() -> Unit): NovaItem =
+        NovaItemBuilder(addon, name).apply(item).register()
     
-    fun item(block: NovaBlock, init: NovaItemBuilder.() -> Unit): NovaItem {
+    fun item(block: NovaBlock, item: NovaItemBuilder.() -> Unit): NovaItem {
         require(block.id.namespace == addon.description.id) { "The block must be from the same addon (${block.id})!" }
-        return NovaItemBuilder.fromBlock(block).apply(init).register()
+        return NovaItemBuilder.fromBlock(block).apply(item).register()
     }
     
     fun registerItem(
