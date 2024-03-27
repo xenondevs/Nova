@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.resources.model.layout.block
+package xyz.xenondevs.nova.data.resources.layout.block
 
 import org.bukkit.Material
 import org.bukkit.block.data.BlockData

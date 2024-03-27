@@ -28,8 +28,8 @@ import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.resources.builder.task.model.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.data.resources.model.data.ItemModelData
-import xyz.xenondevs.nova.data.resources.model.layout.item.RequestedItemModelLayout
+import xyz.xenondevs.nova.data.resources.model.ItemModelData
+import xyz.xenondevs.nova.data.resources.layout.item.RequestedItemModelLayout
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorFactory

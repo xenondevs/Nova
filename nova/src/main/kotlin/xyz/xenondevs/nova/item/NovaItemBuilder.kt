@@ -4,9 +4,9 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.resources.model.layout.block.BlockModelSelectorScope
-import xyz.xenondevs.nova.data.resources.model.layout.item.ItemModelLayoutBuilder
-import xyz.xenondevs.nova.data.resources.model.layout.item.RequestedItemModelLayout
+import xyz.xenondevs.nova.data.resources.layout.block.BlockModelSelectorScope
+import xyz.xenondevs.nova.data.resources.layout.item.ItemModelLayoutBuilder
+import xyz.xenondevs.nova.data.resources.layout.item.RequestedItemModelLayout
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.behavior.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.registry.NovaRegistries

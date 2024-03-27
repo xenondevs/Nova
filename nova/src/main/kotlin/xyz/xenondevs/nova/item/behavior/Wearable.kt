@@ -15,8 +15,13 @@ import org.bukkit.event.block.Action
 import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.item.armor.Armor
 import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
@@ -36,34 +41,30 @@ import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
 import org.bukkit.inventory.ItemStack as BukkitStack
 
-fun Wearable(slot: BukkitEquipmentSlot, equipSound: Sound): ItemBehaviorFactory<Wearable.Default> =
-    Wearable(slot, equipSound.key.toString())
+fun Wearable(armor: Armor?, slot: BukkitEquipmentSlot, equipSound: Sound): ItemBehaviorFactory<Wearable.Default> =
+    Wearable(armor, slot, equipSound.key.toString())
 
-fun Wearable(slot: BukkitEquipmentSlot, equipSound: SoundEvent): ItemBehaviorFactory<Wearable.Default> =
-    Wearable(slot, equipSound.location.toString())
+fun Wearable(armor: Armor?, slot: BukkitEquipmentSlot, equipSound: SoundEvent): ItemBehaviorFactory<Wearable.Default> =
+    Wearable(armor, slot, equipSound.location.toString())
 
-fun Wearable(slot: BukkitEquipmentSlot, equipSound: String? = null): ItemBehaviorFactory<Wearable.Default> {
+fun Wearable(armor: Armor?, slot: BukkitEquipmentSlot, equipSound: String? = null): ItemBehaviorFactory<Wearable.Default> {
     return object : ItemBehaviorFactory<Wearable.Default> {
         override fun create(item: NovaItem): Wearable.Default {
             val cfg = item.config
-            TODO()
-//            return Wearable.Default(
-//                ResourceLookups.MODEL_DATA_LOOKUP.getProvider(item.id)
-//                    .mapNonNull { it.armor }
-//                    .let { ResourceLookups.ARMOR_DATA_LOOKUP.getProvider(it) }
-//                    .mapNonNull { it.color },
-//                provider(slot),
-//                cfg.optionalEntry<Double>("armor").orElse(0.0),
-//                cfg.optionalEntry<Double>("armor_toughness").orElse(0.0),
-//                cfg.optionalEntry<Double>("knockback_resistance").orElse(0.0),
-//                provider(equipSound)
-//            )
+            return Wearable.Default(
+                ResourceLookups.ARMOR_DATA_LOOKUP.provider.map { map -> armor?.let(map::get) },
+                provider(slot),
+                cfg.optionalEntry<Double>("armor").orElse(0.0),
+                cfg.optionalEntry<Double>("armor_toughness").orElse(0.0),
+                cfg.optionalEntry<Double>("knockback_resistance").orElse(0.0),
+                provider(equipSound)
+            )
         }
     }
 }
 
 private val EquipmentSlot.inventorySlot
-    get() =  when (this) {
+    get() = when (this) {
         EquipmentSlot.HEAD -> 5
         EquipmentSlot.CHEST -> 6
         EquipmentSlot.LEGS -> 7

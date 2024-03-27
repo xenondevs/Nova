@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.resources.model.layout.block
+package xyz.xenondevs.nova.data.resources.layout.block
 
 import org.bukkit.Axis
 import org.bukkit.block.BlockFace
@@ -6,10 +6,12 @@ import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.model.Model
 import xyz.xenondevs.nova.data.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.data.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 
+@RegistryElementBuilderDsl
 open class BlockSelectorScope internal constructor(
     private val blockState: NovaBlockState
 ) {

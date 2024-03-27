@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.item
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.data.resources.model.layout.item.ItemModelLayoutBuilder
+import xyz.xenondevs.nova.data.resources.layout.item.ItemModelLayoutBuilder
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder

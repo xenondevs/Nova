@@ -1,16 +1,13 @@
-package xyz.xenondevs.nova.data.resources.builder.task.armor
+package xyz.xenondevs.nova.data.resources.builder.task
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.data.resources.builder.AssetPack
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
-import xyz.xenondevs.nova.data.resources.builder.task.PackTask
-import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
-import xyz.xenondevs.nova.data.resources.builder.task.armor.info.ArmorTexture
-import xyz.xenondevs.nova.data.resources.builder.task.armor.info.RegisteredArmor.InterpolationMode
+import xyz.xenondevs.nova.data.resources.layout.armor.InterpolationMode
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.item.armor.Armor
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.data.readImage
 import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.util.intValue
@@ -21,6 +18,7 @@ import java.awt.image.BufferedImage
 import java.nio.file.Path
 import javax.imageio.ImageIO
 import kotlin.io.path.createDirectories
+import kotlin.io.path.inputStream
 import kotlin.io.path.writeText
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -38,42 +36,41 @@ class ArmorData(
 
 class ArmorContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
     
-    private val armor = ArrayList<ArmorData>()
+    private val armorData = ArrayList<ArmorData>()
     private var color = -1
     
     @PackTask(stage = BuildStage.PRE_WORLD, runAfter = ["ExtractTask#extractAll"])
     private fun write() {
         // add armor from base packs
-        armor += builder.basePacks.customArmor.values
+        armorData += builder.basePacks.customArmor.values
         
-        // add armor from asset packs
-        builder.assetPacks.forEach { pack ->
-            pack.armorIndex?.forEach { armor ->
-                this.armor += ArmorData(
-                    armor.id,
-                    nextColor(),
-                    arrayOf(
-                        armor.layer1?.let { extractFrames(pack, it.resourcePath) },
-                        armor.layer2?.let { extractFrames(pack, it.resourcePath) }
-                    ),
-                    arrayOf(
-                        armor.layer1EmissivityMap?.let { extractFrames(pack, it.resourcePath).map(::convertEmissivityMap) },
-                        armor.layer2EmissivityMap?.let { extractFrames(pack, it.resourcePath).map(::convertEmissivityMap) }
-                    ),
-                    armor.interpolationMode,
-                    armor.fps
-                )
-            }
+        // add Nova armor
+        val armorLookup = HashMap<Armor, Int>()
+        NovaRegistries.ARMOR.forEach { armor ->
+            val layout = armor.layout
+            val color = nextColor()
+            armorData += ArmorData(
+                armor.id,
+                color,
+                arrayOf(
+                    layout.layer1?.let(::extractFrames),
+                    layout.layer2?.let(::extractFrames)
+                ),
+                arrayOf(
+                    layout.layer1EmissivityMap?.let { extractFrames(it).map(::convertEmissivityMap) },
+                    layout.layer2EmissivityMap?.let { extractFrames(it).map(::convertEmissivityMap) }
+                ),
+                layout.interpolationMode,
+                layout.fps
+            )
+            armorLookup[armor] = color
         }
+        ResourceLookups.ARMOR_DATA_LOOKUP.set(armorLookup)
         
-        if (armor.isNotEmpty()) {
+        if (armorData.isNotEmpty()) {
             writeLeatherArmorAtlas()
             writeMCPatcherArmor()
         }
-        
-        ResourceLookups.ARMOR_DATA_LOOKUP.set(
-            armor.associateTo(HashMap()) { it.id.toString() to ArmorTexture(it.color) }
-        )
     }
     
     private fun nextColor(): Int {
@@ -104,15 +101,15 @@ class ArmorContent internal constructor(private val builder: ResourcePackBuilder
     private fun buildTexture(defaultLayer: BufferedImage, layer: Int): BufferedImage {
         //<editor-fold desc="loading and creating empty texture", defaultstate="collapsed">
         // calculate width and height of the individual textures
-        val texRes = armor
+        val texRes = armorData
             .maxOf { armorData -> armorData.textureLayers.maxOf { textureLayer -> textureLayer?.maxOf { texture -> texture.width } ?: 0 } }
             .coerceAtLeast(64) / 4
         val width = texRes * 4
         val height = texRes * 2
         
         // calculate width and height of the leather armor texture
-        val totalWidth = (armor.sumOf { armorData -> (if (armorData.emissivityMapsLayers[layer] != null) 2 else 1 as Int) } + 1) * width
-        val totalHeight = (armor.mapNotNull { it.textureLayers[layer] }.maxOfOrNull { it.size * height } ?: 0).coerceAtLeast(height)
+        val totalWidth = (armorData.sumOf { armorData -> (if (armorData.emissivityMapsLayers[layer] != null) 2 else 1 as Int) } + 1) * width
+        val totalHeight = (armorData.mapNotNull { it.textureLayers[layer] }.maxOfOrNull { it.size * height } ?: 0).coerceAtLeast(height)
         
         // create texture image
         val texture = BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_INT_ARGB)
@@ -123,7 +120,7 @@ class ArmorContent internal constructor(private val builder: ResourcePackBuilder
         // draw textures to texture image
         graphics.drawImage(defaultLayer, 0, 0, width, height, null)
         var textureIdx = 1
-        armor.forEach { armorData ->
+        armorData.forEach { armorData ->
             val color = armorData.color
             
             val textureFrames = armorData.textureLayers[layer]
@@ -173,11 +170,8 @@ class ArmorContent internal constructor(private val builder: ResourcePackBuilder
         return texture
     }
     
-    private fun extractFrames(pack: AssetPack, resourcePath: ResourcePath): List<BufferedImage> {
-        val ins = pack.getInputStream("textures/${resourcePath.path}.png")
-            ?: throw IllegalArgumentException("Armor file does not exist: $resourcePath")
-        
-        val image = ImageIO.read(ins)
+    private fun extractFrames(resourcePath: ResourcePath): List<BufferedImage> {
+        val image = resourcePath.findInAssets("textures", "png").inputStream().use(ImageIO::read)
         
         val width = image.width // by default: 64
         val height = image.height // by default: 32
@@ -210,7 +204,7 @@ class ArmorContent internal constructor(private val builder: ResourcePackBuilder
     }
     
     private fun writeMCPatcherArmor() {
-        armor.forEach { armorData ->
+        armorData.forEach { armorData ->
             val id = armorData.id
             if (id.namespace == "base_packs")
                 return

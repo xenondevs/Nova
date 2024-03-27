@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.data.resources.builder.model.Model.Override
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.data.resources.model.layout.item.ItemModelSelectorScope
+import xyz.xenondevs.nova.data.resources.layout.item.ItemModelSelectorScope
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.registry.NovaRegistries

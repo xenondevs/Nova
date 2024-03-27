@@ -1,11 +1,11 @@
-package xyz.xenondevs.nova.data.resources.model.layout.block
+package xyz.xenondevs.nova.data.resources.layout.block
 
 import org.bukkit.Material
 import org.bukkit.block.data.BlockData
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.model.ModelBuilder
-import xyz.xenondevs.nova.data.resources.model.layout.block.BlockModelLayout.LayoutType
+import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout.LayoutType
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty

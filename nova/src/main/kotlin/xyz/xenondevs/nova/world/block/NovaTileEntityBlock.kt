@@ -7,7 +7,7 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes
-import xyz.xenondevs.nova.data.resources.model.layout.block.BlockModelLayout
+import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.world.BlockPos

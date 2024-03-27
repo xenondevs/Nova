@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.world.block
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
-import xyz.xenondevs.nova.data.resources.model.layout.block.BackingStateCategory
+import xyz.xenondevs.nova.data.resources.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.item.options.BlockOptions

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.resources.model.layout.item
+package xyz.xenondevs.nova.data.resources.layout.item
 
 import org.bukkit.Material
 import xyz.xenondevs.commons.collections.takeUnlessEmpty

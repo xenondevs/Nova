@@ -4,8 +4,8 @@ package xyz.xenondevs.nova.world.block
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.resources.model.layout.block.BlockModelLayout
-import xyz.xenondevs.nova.data.resources.model.layout.block.BlockModelLayoutBuilder
+import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout
+import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayoutBuilder
 import xyz.xenondevs.nova.item.NovaMaterialTypeRegistryElementBuilder
 import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries

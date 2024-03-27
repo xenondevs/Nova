@@ -1,11 +1,13 @@
-package xyz.xenondevs.nova.data.resources.model.layout.item
+package xyz.xenondevs.nova.data.resources.layout.item
 
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.model.Model
 import xyz.xenondevs.nova.data.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.data.resources.builder.task.model.ModelContent
 import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 
+@RegistryElementBuilderDsl
 class ItemModelSelectorScope internal constructor(
     item: NovaItem,
     val modelContent: ModelContent
@@ -28,7 +30,11 @@ class ItemModelSelectorScope internal constructor(
     fun getModelRawPath(path: ResourcePath): ModelBuilder =
         modelContent[path]
             ?.let(::ModelBuilder)
-            ?: createLayeredModelRawPath(path)
+            ?: createLayeredModelRawPath(
+                // empty layer 0 for the case that this used for leather armor (layer 0 is colored)
+                ResourcePath("nova", "item/empty"),
+                path
+            )
     
     /**
      * Gets the model under the given [path] or throws an exception if it does not exist.

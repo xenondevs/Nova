@@ -4,9 +4,7 @@ package xyz.xenondevs.nova.data.resources.builder
 
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.data.resources.ResourcePath
-import xyz.xenondevs.nova.data.resources.builder.index.ArmorIndexDeserializer
 import xyz.xenondevs.nova.data.resources.builder.index.GuisIndexDeserializer
-import xyz.xenondevs.nova.data.resources.builder.task.armor.info.RegisteredArmor
 import java.io.InputStream
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -26,10 +24,6 @@ class AssetPack(val namespace: String, val assetsDir: Path) {
     internal val guisIndex: Map<ResourcePath, ResourcePath>? = assetsDir.resolve("guis.json")
         .takeIf(Path::exists)
         ?.let { GuisIndexDeserializer.deserialize(namespace, it.parseJson()) }
-    
-    internal val armorIndex: List<RegisteredArmor>? = assetsDir.resolve("armor.json")
-        .takeIf(Path::exists)
-        ?.let { ArmorIndexDeserializer.deserialize(namespace, it.parseJson()) }
     
     fun getInputStream(path: String): InputStream? =
         assetsDir.resolve(path).takeIf(Path::exists)?.inputStream()

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.resources.model.data
+package xyz.xenondevs.nova.data.resources.model
 
 import net.kyori.adventure.text.Component
 import org.bukkit.Material

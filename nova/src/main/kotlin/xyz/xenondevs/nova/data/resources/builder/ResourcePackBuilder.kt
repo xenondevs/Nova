@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
+import xyz.xenondevs.nova.data.resources.builder.task.ArmorContent
 import xyz.xenondevs.nova.data.resources.builder.task.AtlasContent
 import xyz.xenondevs.nova.data.resources.builder.task.BarOverlayTask
 import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
@@ -27,7 +28,6 @@ import xyz.xenondevs.nova.data.resources.builder.task.ExtractTask
 import xyz.xenondevs.nova.data.resources.builder.task.LanguageContent
 import xyz.xenondevs.nova.data.resources.builder.task.PackFunction
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
-import xyz.xenondevs.nova.data.resources.builder.task.armor.ArmorContent
 import xyz.xenondevs.nova.data.resources.builder.task.font.FontContent
 import xyz.xenondevs.nova.data.resources.builder.task.font.GuiContent
 import xyz.xenondevs.nova.data.resources.builder.task.font.MoveCharactersContent
@@ -70,8 +70,6 @@ private val EXTRACTION_MODE by MAIN_CONFIG.entry<String>("resource_pack", "gener
 private val CONFIG_RESOURCE_FILTERS by MAIN_CONFIG.entry<List<ResourceFilter>>("resource_pack", "generation", "resource_filters")
 private val CORE_RESOURCE_FILTERS by configReloadable {
     buildList {
-        this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, Regex("^[a-z0-9._-]+/textures/armor/.*$"))
-        
         if (!BossBarOverlayManager.ENABLED) {
             this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "minecraft/textures/gui/sprites/boss_bar/*")
             this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/bossbar*")

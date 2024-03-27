@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.basepack.merger.FileMerger
-import xyz.xenondevs.nova.data.resources.builder.task.armor.ArmorData
+import xyz.xenondevs.nova.data.resources.builder.task.ArmorData
 import xyz.xenondevs.nova.data.resources.builder.task.font.MovedFontContent
 import xyz.xenondevs.nova.util.StringUtils
 import xyz.xenondevs.nova.util.data.openZip
