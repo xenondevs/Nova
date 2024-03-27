@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.data.resources.builder.task.font.FontContent
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.item.enchantment.NovaEnchantment
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
+import xyz.xenondevs.nova.ui.overlay.MoveCharacters
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -124,7 +124,7 @@ class EnchantmentContent(builder: ResourcePackBuilder) : PackTaskHolder {
                 }
         }
         
-        ResourceLookups.ENCHANTMENT_DATA_LOOKUP = lookup
+        ResourceLookups.ENCHANTMENT_DATA = lookup
     }
     
     /**

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.ui.overlay.character
+package xyz.xenondevs.nova.ui.overlay
 
 import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component

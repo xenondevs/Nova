@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.ui.overlay.character
+package xyz.xenondevs.nova.ui.overlay
 
 import it.unimi.dsi.fastutil.floats.Float2ObjectOpenHashMap
 import net.kyori.adventure.text.Component

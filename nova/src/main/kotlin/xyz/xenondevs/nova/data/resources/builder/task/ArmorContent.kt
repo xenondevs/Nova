@@ -65,7 +65,7 @@ class ArmorContent internal constructor(private val builder: ResourcePackBuilder
             )
             armorLookup[armor] = color
         }
-        ResourceLookups.ARMOR_DATA_LOOKUP.set(armorLookup)
+        ResourceLookups.ARMOR_COLOR = armorLookup
         
         if (armorData.isNotEmpty()) {
             writeLeatherArmorAtlas()

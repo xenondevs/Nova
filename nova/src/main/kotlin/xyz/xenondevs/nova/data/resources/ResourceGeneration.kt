@@ -97,7 +97,7 @@ internal object ResourceGeneration {
     private fun hasAllBlockModels(): Boolean =
          NovaRegistries.BLOCK.asSequence()
             .flatMap { it.blockStates }
-            .all { it in ResourceLookups.BLOCK_MODEL_LOOKUP.value }
+            .all { it in ResourceLookups.BLOCK_MODEL }
     
     internal fun createResourcePack() {
         ResourcePackBuilder().buildPackCompletely()

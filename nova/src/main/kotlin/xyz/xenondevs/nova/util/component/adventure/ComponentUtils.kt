@@ -13,7 +13,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.inventoryaccess.util.AdventureComponentUtils
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
-import xyz.xenondevs.nova.ui.overlay.character.MoveCharacters
+import xyz.xenondevs.nova.ui.overlay.MoveCharacters
 import java.awt.Color
 import net.minecraft.network.chat.Component as MojangComponent
 

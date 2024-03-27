@@ -27,9 +27,9 @@ import xyz.xenondevs.nova.data.config.ConfigProvider
 import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.resources.builder.task.model.VanillaMaterialTypes
+import xyz.xenondevs.nova.data.resources.layout.item.RequestedItemModelLayout
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.resources.model.ItemModelData
-import xyz.xenondevs.nova.data.resources.layout.item.RequestedItemModelLayout
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorFactory
@@ -78,9 +78,9 @@ class NovaItem internal constructor(
     
     val model: ItemModelData by lazy {
         val material = vanillaMaterial
-        val namedModels = ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.value[this]?.get(material)
+        val namedModels = ResourceLookups.NAMED_ITEM_MODEL[this]?.get(material)
             ?: throw IllegalStateException("Could not retrieve named models for $this, $material")
-        val unnamedModels = ResourceLookups.UNNAMED_ITEM_MODEL_LOOKUP.value[this]?.get(material)
+        val unnamedModels = ResourceLookups.UNNAMED_ITEM_MODEL[this]?.get(material)
             ?: throw IllegalStateException("Could not retrieve unnamed models for $this, $material")
         return@lazy ItemModelData(this, material, namedModels, unnamedModels)
     }

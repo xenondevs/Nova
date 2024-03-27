@@ -30,7 +30,7 @@ open class NovaBlockState internal constructor(
     internal var tree: PropertiesTree<NovaBlockState>? = null
         private set
     
-    internal open val modelProvider: LinkedBlockModelProvider<*> by lazy { ResourceLookups.BLOCK_MODEL_LOOKUP.value[this]!! }
+    internal open val modelProvider: LinkedBlockModelProvider<*> by lazy { ResourceLookups.BLOCK_MODEL[this]!! }
     
     /**
      * Gets the value of the given [property] or `null` if the property is not set.

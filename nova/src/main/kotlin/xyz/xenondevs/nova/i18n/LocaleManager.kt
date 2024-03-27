@@ -29,7 +29,7 @@ object LocaleManager {
     
     @InitFun
     private fun init() {
-        translationProviders = ResourceLookups.LANGUAGE_LOOKUP.mapValuesTo(HashMap()) { HashMap(it.value) }
+        translationProviders = ResourceLookups.LANGUAGE.mapValuesTo(HashMap()) { HashMap(it.value) }
         loadLang("en_us")
         Language.inject(NovaLanguage)
     }

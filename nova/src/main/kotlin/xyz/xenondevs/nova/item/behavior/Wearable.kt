@@ -52,7 +52,7 @@ fun Wearable(armor: Armor?, slot: BukkitEquipmentSlot, equipSound: String? = nul
         override fun create(item: NovaItem): Wearable.Default {
             val cfg = item.config
             return Wearable.Default(
-                ResourceLookups.ARMOR_DATA_LOOKUP.provider.map { map -> armor?.let(map::get) },
+                ResourceLookups.ARMOR_COLOR_LOOKUP.provider.map { map -> armor?.let(map::get) },
                 provider(slot),
                 cfg.optionalEntry<Double>("armor").orElse(0.0),
                 cfg.optionalEntry<Double>("armor_toughness").orElse(0.0),

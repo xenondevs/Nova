@@ -250,17 +250,17 @@ internal object PacketItems : Listener, PacketListener {
         
         val vanillaMaterial = item.vanillaMaterial
         val customModelData = when {
-            namedModelId != null -> ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.value[item]
+            namedModelId != null -> ResourceLookups.NAMED_ITEM_MODEL[item]
                 ?.get(vanillaMaterial)
                 ?.get(namedModelId)
                 ?: return getUnknownItem(itemStack, id, namedModelId)
             
-            unnamedModelId != null -> ResourceLookups.UNNAMED_ITEM_MODEL_LOOKUP.value[item]
+            unnamedModelId != null -> ResourceLookups.UNNAMED_ITEM_MODEL[item]
                 ?.get(vanillaMaterial)
                 ?.get(unnamedModelId)
                 ?: return getUnknownItem(itemStack, id, unnamedModelId.toString())
             
-            else -> ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.value[item]
+            else -> ResourceLookups.NAMED_ITEM_MODEL[item]
                 ?.get(vanillaMaterial)
                 ?.get("default")
                 ?: return getUnknownItem(itemStack, id)

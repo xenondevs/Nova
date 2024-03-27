@@ -15,11 +15,11 @@ import xyz.xenondevs.nova.data.resources.builder.SoundOverrides
 import xyz.xenondevs.nova.data.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
-import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.resources.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout.LayoutType
 import xyz.xenondevs.nova.data.resources.layout.block.BlockModelSelectorScope
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
@@ -124,7 +124,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                 }
             }
         
-        ResourceLookups.BLOCK_MODEL_LOOKUP.set(lookup)
+        ResourceLookups.BLOCK_MODEL = lookup
     }
     
     /**

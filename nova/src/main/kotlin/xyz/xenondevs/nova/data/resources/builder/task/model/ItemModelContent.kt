@@ -11,8 +11,8 @@ import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.model.Model.Override
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
-import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.resources.layout.item.ItemModelSelectorScope
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -127,14 +127,12 @@ class ItemModelContent internal constructor(val builder: ResourcePackBuilder) : 
             }
         }
         
-        ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.set(lookup)
-        ResourceLookups.UNNAMED_ITEM_MODEL_LOOKUP.set(
-            lookup.mapValues { itemModels ->
-                itemModels.value.mapValues { materials ->
-                    materials.value.values.toIntArray()
-                }
+        ResourceLookups.NAMED_ITEM_MODEL = lookup
+        ResourceLookups.UNNAMED_ITEM_MODEL = lookup.mapValues { itemModels ->
+            itemModels.value.mapValues { materials ->
+                materials.value.values.toIntArray()
             }
-        )
+        }
     }
     
     @PackTask(

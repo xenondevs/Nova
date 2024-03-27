@@ -87,7 +87,7 @@ class LanguageContent internal constructor(private val builder: ResourcePackBuil
     @PackTask(runAfter = ["LanguageContent#loadLangFiles"])
     private fun write() {
         extractRomanNumerals(customLangs.getOrPut("en_us", ::HashMap))
-        ResourceLookups.LANGUAGE_LOOKUP = customLangs
+        ResourceLookups.LANGUAGE = customLangs
         customLangs.forEach { (name, content) ->
             val file = ResourcePackBuilder.LANGUAGE_DIR.resolve("$name.json")
             file.parent.createDirectories()

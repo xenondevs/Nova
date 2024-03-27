@@ -36,7 +36,7 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarOrigin
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
 import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlay
 import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlayCompound
-import xyz.xenondevs.nova.ui.overlay.character.MovedFonts
+import xyz.xenondevs.nova.ui.overlay.MovedFonts
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
