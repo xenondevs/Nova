@@ -14,10 +14,10 @@ object DefaultGuiTextures {
     val ITEMS_2 = guiTexture("items_2") { texture { path("items/2") } }
     val ITEMS_3 = guiTexture("items_3") { texture { path("items/3") } }
     val ITEMS_4 = guiTexture("items_4") { texture { path("items/4") } }
-    val RECIPE_CRAFTING = guiTexture("recipe_crafting") { texture { path("recipe_crafting") } }
-    val RECIPE_SMELTING = guiTexture("recipe_smelting") { texture { path("recipe_smelting") } }
-    val RECIPE_SMITHING = guiTexture("recipe_smithing") { texture { path("recipe_smithing") } }
-    val RECIPE_CONVERSION = guiTexture("recipe_conversion") { texture { path("recipe_conversion") } }
+    val RECIPE_CRAFTING = guiTexture("recipe_crafting") { texture { path("recipe/crafting") } }
+    val RECIPE_SMELTING = guiTexture("recipe_smelting") { texture { path("recipe/furnace") } }
+    val RECIPE_SMITHING = guiTexture("recipe_smithing") { texture { path("recipe/smithing") } }
+    val RECIPE_CONVERSION = guiTexture("recipe_conversion") { texture { path("recipe/conversion") } }
     val COLOR_PICKER = guiTexture("color_picker") { texture { path("color_picker") } }
     
     private fun guiTexture(name: String, texture: GuiTextureBuilder.() -> Unit): GuiTexture =
