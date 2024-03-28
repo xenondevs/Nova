@@ -1,12 +1,11 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.config.Reloadable
 
 /**
  * Holds the [NetworkType]-specific data for [NetworkEndPoints][NetworkEndPoint].
  */
-interface EndPointDataHolder : Reloadable {
+interface EndPointDataHolder {
     
     /**
      * The [NetworkEndPoint] of this [EndPointDataHolder].

@@ -23,7 +23,8 @@ class FluidNetwork(override val uuid: UUID) : Network {
     private val bridges = HashSet<FluidBridge>()
     private val channels: Array<FluidNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     
-    private var transferRate = DEFAULT_TRANSFER_RATE
+    private val transferRate: Long
+        get() = bridges.firstOrNull()?.fluidTransferRate ?: DEFAULT_TRANSFER_RATE
     
     private var nextChannel = 0
     
@@ -58,7 +59,6 @@ class FluidNetwork(override val uuid: UUID) : Network {
         
         _nodes += bridge
         bridges += bridge
-        transferRate = bridge.fluidTransferRate
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
@@ -119,10 +119,6 @@ class FluidNetwork(override val uuid: UUID) : Network {
     override fun isEmpty() = _nodes.isEmpty()
     
     override fun isValid() = bridges.isNotEmpty() || _nodes.size > 1
-    
-    override fun reload() {
-        transferRate = bridges.firstOrNull()?.fluidTransferRate ?: DEFAULT_TRANSFER_RATE
-    }
     
     override fun handleTick() {
         val startingChannel = nextChannel

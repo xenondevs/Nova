@@ -2,9 +2,8 @@ package xyz.xenondevs.nova.tileentity.network
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.config.Reloadable
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.network.energy.EnergyNetwork
 import xyz.xenondevs.nova.tileentity.network.fluid.FluidNetwork
@@ -12,7 +11,7 @@ import xyz.xenondevs.nova.tileentity.network.item.ItemNetwork
 import xyz.xenondevs.nova.util.set
 import java.util.*
 
-interface Network : Reloadable {
+interface Network {
     
     /**
      * The [NetworkType] this network implements.

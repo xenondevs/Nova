@@ -10,26 +10,19 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
-import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.data.serialization.configurate.NOVA_CONFIGURATE_SERIALIZERS
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.player.ability.AbilityManager
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.ui.overlay.actionbar.ActionbarOverlayManager
-import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
-import xyz.xenondevs.nova.ui.waila.WailaManager
-import xyz.xenondevs.nova.update.UpdateReminder
 import xyz.xenondevs.nova.util.data.useZip
-import xyz.xenondevs.nova.world.ChunkReloadWatcher
 import java.io.File
 import java.nio.file.Path
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import kotlin.io.path.exists
 import kotlin.io.path.extension
+import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isDirectory
 import kotlin.io.path.relativeTo
@@ -46,11 +39,11 @@ val MAIN_CONFIG by lazy { Configs[DEFAULT_CONFIG_NAME] }
 )
 object Configs {
     
-    private val configProviders = HashMap<String, ConfigProvider>()
-    internal val reloadables = arrayListOf<Reloadable>()
+    private val configProviders = HashMap<String, RootConfigProvider>()
     
     private var mainLoaded = false
     private var loaded = false
+    private var lastReload = -1L
     
     internal fun extractDefaultConfig() {
         LOGGER.info("Extracting default config")
@@ -70,8 +63,11 @@ object Configs {
         
         ConfigExtractor.saveStoredConfigs()
         loaded = true
+        lastReload = System.currentTimeMillis()
         
-        configProviders.values.forEach(ConfigProvider::update)
+        configProviders.values.asSequence()
+            .filter { it.path.exists() }
+            .forEach(ConfigProvider::update)
     }
     
     private fun extractConfigs(namespace: String, zipFile: File, configsPath: String) {
@@ -92,29 +88,27 @@ object Configs {
         val destFile = File(NOVA.dataFolder, configPath).toPath()
         ConfigExtractor.extract(configPath, destFile, config)
         if (configId !in configProviders)
-            configProviders[configId] = ConfigProvider(destFile, configPath, loadValidation)
+            configProviders[configId] = RootConfigProvider(destFile, configPath, loadValidation)
     }
     
-    private fun createConfigProvider(configId: String, loadValidation: () -> Boolean): ConfigProvider {
+    private fun createConfigProvider(configId: String, loadValidation: () -> Boolean): RootConfigProvider {
         val (namespace, path) = configId.split(':')
         val relPath = "configs/$namespace/$path.yml"
         val file = File(NOVA.dataFolder, relPath).toPath()
-        return ConfigProvider(file, relPath, loadValidation)
+        return RootConfigProvider(file, relPath, loadValidation)
     }
     
-    internal fun reload() {
-        extractAllConfigs()
-        reloadables.sorted().forEach(Reloadable::reload)
-        NovaRegistries.ITEM.forEach(Reloadable::reload)
-        NetworkManager.queueAsync { it.networks.forEach(Reloadable::reload) }
-        AbilityManager.activeAbilities.values.flatMap { it.values }.forEach(Reloadable::reload)
-        AutoUploadManager.reload()
-        ActionbarOverlayManager.reload()
-        BossBarOverlayManager.reload()
-        ChunkReloadWatcher.reload()
-        UpdateReminder.reload()
-        WailaManager.reload()
+    internal fun reload(): List<String> {
+        val reloadedConfigs = configProviders.asSequence()
+            .filter { (_, provider) -> provider.path.exists() }
+            .filter { (_, provider) -> provider.path.getLastModifiedTime().toMillis() > lastReload } // only reload updated configs
+            .onEach { (_, provider) -> provider.update() }
+            .mapTo(ArrayList()) { (id, _) -> id }
+        lastReload = System.currentTimeMillis()
+        
         Bukkit.getOnlinePlayers().forEach(Player::updateInventory)
+        
+        return reloadedConfigs
     }
     
     operator fun get(id: ResourceLocation): ConfigProvider =

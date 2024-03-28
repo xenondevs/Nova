@@ -12,8 +12,6 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.registerEvents
 import java.util.logging.Level
 
-private val ENABLED by MAIN_CONFIG.entry<Boolean>("debug", "watch_chunk_reloads")
-
 @InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
 internal object ChunkReloadWatcher : Listener {
     
@@ -23,10 +21,15 @@ internal object ChunkReloadWatcher : Listener {
     private val CHUNK_LOADS = HashMap<ChunkPos, Pair<Long, Int>>()
     
     @InitFun
-    fun reload() {
+    private fun init() {
+        val enabled = MAIN_CONFIG.entry<Boolean>("debug", "watch_chunk_reloads")
+        enabled.addUpdateHandler(::reload)
+        reload(enabled.get())
+    }
+    
+    private fun reload(enabled: Boolean) {
         HandlerList.unregisterAll(this)
-        if (ENABLED)
-            registerEvents()
+        if (enabled) registerEvents()
     }
     
     @EventHandler

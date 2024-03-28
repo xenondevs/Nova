@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.scheduler.BukkitTask
+import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.Addon
@@ -26,9 +27,6 @@ private val NOVA_DISTRIBUTORS = listOf(
     ProjectDistributor.modrinth("nova-framework")
 )
 
-private val ENABLED by MAIN_CONFIG.entry<Boolean>("update_reminder", "enabled")
-private val INTERVAL by MAIN_CONFIG.entry<Long>("update_reminder", "interval")
-
 @InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
 internal object UpdateReminder : Listener {
     
@@ -37,12 +35,21 @@ internal object UpdateReminder : Listener {
     private val alreadyNotified = ArrayList<Addon?>()
     
     @InitFun
-    fun reload() {
-        if (task == null && ENABLED) {
+    private fun init() {
+        val cfg = MAIN_CONFIG.node("update_reminder")
+        cfg.addUpdateHandler(::reload)
+        reload(cfg.get())
+    }
+    
+    private fun reload(cfg: ConfigurationNode) {
+        val enabled = cfg.node("enabled").boolean
+        val interval = cfg.node("interval").long
+        
+        if (task == null && enabled) {
             // Enable reminder
             registerEvents()
-            task = runAsyncTaskTimer(0, INTERVAL, ::checkForUpdates)
-        } else if (task != null && !ENABLED) {
+            task = runAsyncTaskTimer(0, interval, ::checkForUpdates)
+        } else if (task != null && !enabled) {
             // Disable reminder
             unregisterEvents()
             task?.cancel()

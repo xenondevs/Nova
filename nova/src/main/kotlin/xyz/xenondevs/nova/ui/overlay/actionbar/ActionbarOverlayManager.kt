@@ -21,8 +21,6 @@ import net.minecraft.network.chat.Component as MojangComponent
 
 object ActionbarOverlayManager : PacketListener {
     
-    private val ENABLED by MAIN_CONFIG.entry<Boolean>("overlay", "actionbar", "enabled")
-    
     private var tickTask: BukkitTask? = null
     
     private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(MojangComponent.empty())
@@ -30,17 +28,19 @@ object ActionbarOverlayManager : PacketListener {
     private val interceptedActionbars = HashMap<UUID, Pair<Component, Long>>()
     
     init {
-        reload()
+        val enabled = MAIN_CONFIG.entry<Boolean>("overlay", "actionbar", "enabled")
+        enabled.addUpdateHandler(::reload)
+        enabled.update()
     }
     
-    internal fun reload() {
+    private fun reload(enabled: Boolean) {
         if (tickTask != null) {
             tickTask?.cancel()
             unregisterPacketListener()
             tickTask = null
         }
         
-        if (ENABLED) {
+        if (enabled) {
             registerPacketListener()
             tickTask = runTaskTimer(0, 1, ActionbarOverlayManager::handleTick)
         }

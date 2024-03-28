@@ -74,11 +74,6 @@ class NovaFluidHolder(
     override val extractPriorities: MutableMap<BlockFace, Int> =
         dataHolder.retrieveData("fluidExtractPriorities", DEFAULT_PRIORITIES)
     
-    override fun reload() {
-        // TODO
-//        availableContainers.forEach { (_, container) -> if (container is NovaFluidContainer) container.reload() }
-    }
-    
     override fun saveData() {
         dataHolder.storeData("fluidChannels", channels)
         dataHolder.storeData("fluidConnectionConfig", connectionConfig)

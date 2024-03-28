@@ -41,7 +41,8 @@ class EnergyNetwork(override val uuid: UUID) : Network {
         get() = buffers.sumOfNoOverflow { it.energy }
     private val requestedConsumerEnergy: Long
         get() = consumers.sumOfNoOverflow { it.requestedEnergy }
-    private var transferRate = DEFAULT_TRANSFER_RATE
+    private val transferRate: Long
+        get() = bridges.firstOrNull()?.energyTransferRate ?: DEFAULT_TRANSFER_RATE
     
     override fun addAll(network: Network) {
         require(network !== this) { "Can't add to self" }
@@ -65,7 +66,6 @@ class EnergyNetwork(override val uuid: UUID) : Network {
         require(bridge is EnergyBridge) { "Illegal Bridge Type" }
         _nodes += bridge
         bridges += bridge
-        transferRate = bridge.energyTransferRate
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
@@ -126,10 +126,6 @@ class EnergyNetwork(override val uuid: UUID) : Network {
     override fun isEmpty() = _nodes.isEmpty()
     
     override fun isValid() = bridges.isNotEmpty() || ((providers.isNotEmpty() && consumers.isNotEmpty()) || (buffers.isNotEmpty() && (providers.isNotEmpty() || consumers.isNotEmpty())))
-    
-    override fun reload() {
-        transferRate = bridges.firstOrNull()?.energyTransferRate ?: DEFAULT_TRANSFER_RATE
-    }
     
     /**
      * Called every tick to transfer energy.

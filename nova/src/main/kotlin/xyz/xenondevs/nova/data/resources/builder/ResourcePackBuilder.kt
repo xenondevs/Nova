@@ -6,6 +6,8 @@ import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.combinedProvider
+import xyz.xenondevs.commons.provider.immutable.flatten
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.immutable.mapNonNull
 import xyz.xenondevs.commons.provider.immutable.orElse
@@ -16,7 +18,6 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.config.configReloadable
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.data.resources.builder.task.ArmorContent
@@ -38,8 +39,6 @@ import xyz.xenondevs.nova.data.resources.builder.task.model.BlockModelContent
 import xyz.xenondevs.nova.data.resources.builder.task.model.ItemModelContent
 import xyz.xenondevs.nova.data.resources.builder.task.model.ModelContent
 import xyz.xenondevs.nova.data.serialization.json.GSON
-import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
-import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.runAsyncTask
 import java.io.File
@@ -68,21 +67,26 @@ private val EXTRACTION_MODE by MAIN_CONFIG.entry<String>("resource_pack", "gener
 }
 
 private val CONFIG_RESOURCE_FILTERS by MAIN_CONFIG.entry<List<ResourceFilter>>("resource_pack", "generation", "resource_filters")
-private val CORE_RESOURCE_FILTERS by configReloadable {
-    buildList {
-        if (!BossBarOverlayManager.ENABLED) {
-            this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "minecraft/textures/gui/sprites/boss_bar/*")
-            this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/bossbar*")
-            this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/bars/*")
-        }
-        
-        if (!WailaManager.ENABLED) {
-            this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, Regex("^[a-z0-9._-]+/textures/waila/.*$"))
-            this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/waila*")
-            this += ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/waila/*")
-        }
+private val CORE_RESOURCE_FILTERS by combinedProvider(listOf(
+    MAIN_CONFIG.entry<Boolean>("overlay", "bossbar", "enabled").map { enabled ->
+        if (!enabled) {
+            listOf(
+                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "minecraft/textures/gui/sprites/boss_bar/*"),
+                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/bossbar*"),
+                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/bars/*")
+            )
+        } else emptyList()
+    },
+    MAIN_CONFIG.entry<Boolean>("waila", "enabled").map { enabled ->
+        if (!enabled) {
+            listOf(
+                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, Regex("^[a-z0-9._-]+/textures/waila/.*$")),
+                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/waila*"),
+                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/waila/*")
+            )
+        } else emptyList()
     }
-}
+)).flatten()
 
 private val COMPRESSION_LEVEL by MAIN_CONFIG.entry<Int>("resource_pack", "generation", "compression_level")
 private val PACK_DESCRIPTION by MAIN_CONFIG.entry<String>("resource_pack", "generation", "description")

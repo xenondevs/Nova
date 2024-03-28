@@ -31,12 +31,12 @@ import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.ui.overlay.MovedFonts
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarOrigin
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
 import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlay
 import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlayCompound
-import xyz.xenondevs.nova.ui.overlay.MovedFonts
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -49,9 +49,10 @@ import net.minecraft.network.chat.Component as MojangComponent
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 object BossBarOverlayManager : Listener, PacketListener {
     
-    val ENABLED by MAIN_CONFIG.entry<Boolean>("overlay", "bossbar", "enabled")
-    private val BAR_AMOUNT by MAIN_CONFIG.entry<Int>("overlay", "bossbar", "amount")
-    private val SEND_BARS_AFTER_RESOURCE_PACK_LOADED by MAIN_CONFIG.entry<Boolean>("overlay", "bossbar", "send_bars_after_resource_pack_loaded")
+    private val BOSSBAR_CONFIG = MAIN_CONFIG.node("overlay", "bossbar")
+    internal val ENABLED by BOSSBAR_CONFIG.entry<Boolean>("enabled")
+    private val BAR_AMOUNT by BOSSBAR_CONFIG.entry<Int>("amount")
+    private val SEND_BARS_AFTER_RESOURCE_PACK_LOADED by BOSSBAR_CONFIG.entry<Boolean>("send_bars_after_resource_pack_loaded")
     
     private var tickTask: BukkitTask? = null
     private val bars = HashMap<UUID, Array<BossBar>>()
@@ -66,7 +67,12 @@ object BossBarOverlayManager : Listener, PacketListener {
     private val vanillaBarOverlays = HashMap<BossBar, VanillaBossBarOverlayCompound>()
     
     @InitFun
-    internal fun reload() {
+    private fun init() {
+        BOSSBAR_CONFIG.addUpdateHandler { reload() }
+        reload()
+    }
+    
+    private fun reload() {
         // was previously enabled?
         if (tickTask != null) {
             unregisterEvents()

@@ -34,7 +34,8 @@ private val Player.isWailaEnabled: Boolean
 )
 internal object WailaManager : Listener, IWailaManager {
     
-    val ENABLED by MAIN_CONFIG.entry<Boolean>("waila", "enabled")
+    private val ENABLED_PROVIDER = MAIN_CONFIG.entry<Boolean>("waila", "enabled")
+    val ENABLED by ENABLED_PROVIDER
     
     private var tickTask: BukkitTask? = null
     private val overlays = HashMap<Player, Waila>()
@@ -46,12 +47,17 @@ internal object WailaManager : Listener, IWailaManager {
     //</editor-fold>
     
     @InitFun
-    fun reload() {
+    private fun init() {
+        ENABLED_PROVIDER.addUpdateHandler(::reload)
+        reload(ENABLED)
+    }
+    
+    private fun reload(enabled: Boolean) {
         unregisterEvents()
         overlays.values.forEach { it.setActive(false) }
         overlays.clear()
         tickTask?.cancel()
-        if (ENABLED) {
+        if (enabled) {
             registerEvents()
             Bukkit.getOnlinePlayers().forEach(::tryAddWailaOverlay)
             tickTask = runTaskTimer(0, 1) { overlays.values.forEach(Waila::handleTick) }

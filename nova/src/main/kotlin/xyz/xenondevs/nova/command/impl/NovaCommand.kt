@@ -187,8 +187,19 @@ internal object NovaCommand : Command("nova") {
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {
         try {
             ctx.source.sendSuccess(Component.translatable("command.nova.reload_configs.start", NamedTextColor.GRAY))
-            Configs.reload()
-            ctx.source.sendSuccess(Component.translatable("command.nova.reload_configs.success", NamedTextColor.GRAY))
+            val reloadedConfigs = Configs.reload()
+            if (reloadedConfigs.isNotEmpty()) {
+                ctx.source.sendSuccess(Component.translatable(
+                    "command.nova.reload_configs.success", NamedTextColor.GRAY,
+                    Component.text(reloadedConfigs.size),
+                    Component.join(
+                        JoinConfiguration.commas(true),
+                        reloadedConfigs.map { cfgName -> Component.text(cfgName, NamedTextColor.AQUA) }
+                    )
+                ))
+            } else {
+                ctx.source.sendFailure(Component.translatable("command.nova.reload_configs.none", NamedTextColor.RED))
+            }
         } catch (e: Exception) {
             if (ctx.source.isPlayer)
                 ctx.source.sendFailure(Component.translatable("command.nova.reload_configs.failure", NamedTextColor.RED))

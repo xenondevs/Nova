@@ -25,7 +25,8 @@ class ItemNetwork(override val uuid: UUID, private val local: Boolean) : Network
     private val bridges = HashSet<ItemBridge>()
     private val channels: Array<ItemNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     
-    private var transferRate = DEFAULT_TRANSFER_RATE
+    private val transferRate: Int
+        get() = bridges.firstOrNull()?.itemTransferRate ?: DEFAULT_TRANSFER_RATE
     
     private var nextChannel = 0
     
@@ -60,7 +61,6 @@ class ItemNetwork(override val uuid: UUID, private val local: Boolean) : Network
         
         _nodes += bridge
         bridges += bridge
-        transferRate = bridge.itemTransferRate
     }
     
     override fun addEndPoint(endPoint: NetworkEndPoint, face: BlockFace) {
@@ -124,10 +124,6 @@ class ItemNetwork(override val uuid: UUID, private val local: Boolean) : Network
     override fun isEmpty() = _nodes.isEmpty()
     
     override fun isValid() = bridges.isNotEmpty() || _nodes.size > 1
-    
-    override fun reload() {
-        bridges.firstOrNull()?.itemTransferRate ?: DEFAULT_TRANSFER_RATE
-    }
     
     override fun handleTick() {
         val startingChannel = nextChannel

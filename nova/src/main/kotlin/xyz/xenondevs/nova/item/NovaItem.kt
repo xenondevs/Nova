@@ -25,7 +25,6 @@ import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionP
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.ConfigProvider
 import xyz.xenondevs.nova.data.config.Configs
-import xyz.xenondevs.nova.data.config.Reloadable
 import xyz.xenondevs.nova.data.resources.builder.task.model.VanillaMaterialTypes
 import xyz.xenondevs.nova.data.resources.layout.item.RequestedItemModelLayout
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
@@ -68,7 +67,7 @@ class NovaItem internal constructor(
     val block: NovaBlock?,
     private val configId: String,
     internal val requestedLayout: RequestedItemModelLayout
-) : Reloadable {
+) {
     
     /**
      * The maximum stack size of this [NovaItem].
@@ -91,7 +90,7 @@ class NovaItem internal constructor(
      *
      * Use the extension functions `entry` and `optionalEntry` to get values from the config.
      */
-    val config: ConfigProvider by lazy { Configs[configId] }
+    val config: ConfigProvider = Configs[configId]
     
     /**
      * The [ItemBehaviors][ItemBehavior] of this [NovaItem].
@@ -205,7 +204,7 @@ class NovaItem internal constructor(
     }
     
     //<editor-fold desc="load methods", defaultstate="collapsed">
-    override fun reload() {
+    private fun reload() {
         loadVanillaMaterial()
         loadAttributeModifiers()
         loadDefaultCompound()

@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.data.resources.upload
 
 import kotlinx.coroutines.runBlocking
+import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.contains
-import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
@@ -29,9 +29,6 @@ internal object AutoUploadManager {
     
     internal val services = arrayListOf(Xenondevs, SelfHost, CustomMultiPart, S3)
     
-    private val resourcePackCfg by MAIN_CONFIG.map { it.node("resource_pack") }
-    private val autoUploadCfg by MAIN_CONFIG.map { it.node("resource_pack", "auto_upload") }
-    
     var enabled = false
         private set
     var wasRegenerated = false
@@ -51,7 +48,9 @@ internal object AutoUploadManager {
     
     @InitFun
     private fun init() {
-        enable(fromReload = false)
+        val cfg = MAIN_CONFIG.node("resource_pack")
+        cfg.addUpdateHandler { disable(); enable(it, fromReload = true) }
+        enable(cfg.get(), fromReload = false)
         
         if (url != null)
             forceResourcePack()
@@ -60,16 +59,12 @@ internal object AutoUploadManager {
             SelfHost.startedLatch.await()
     }
     
-    fun reload() {
-        disable()
-        enable(fromReload = true)
-    }
-    
-    private fun enable(fromReload: Boolean) {
+    private fun enable(cfg: ConfigurationNode, fromReload: Boolean) {
+        val autoUploadCfg = cfg.node("auto_upload")
         enabled = autoUploadCfg.node("enabled").boolean
         
-        if (resourcePackCfg.contains("url")) {
-            val url = resourcePackCfg.node("url").string
+        if (cfg.contains("url")) {
+            val url = cfg.node("url").string
             if (!url.isNullOrEmpty()) {
                 if (enabled)
                     LOGGER.warning("The resource pack url is set in the config, but the auto upload is also enabled. Defaulting to the url in the config.")
