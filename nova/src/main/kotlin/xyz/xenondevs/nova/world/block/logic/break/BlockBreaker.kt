@@ -171,18 +171,9 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         if (damage >= 1.0 || serverTick >= blockedUntil) {
             progress += damage
             
-            //<editor-fold desc="hit sounds", defaultstate="collapsed">
-            if (progress < 1.0 && destroyTicks % 4 == 0) {
-                if (soundGroup != null) {
-                    block.pos.playSound(
-                        soundGroup.hitSound,
-                        SoundCategory.BLOCKS,
-                        soundGroup.hitVolume,
-                        soundGroup.hitPitch
-                    )
-                }
-            }
-            //</editor-fold>
+            // play break sound every 4 ticks
+            if (progress < 1.0 && destroyTicks % 4 == 0 && soundGroup != null)
+                block.pos.playSound(soundGroup.hitSound,SoundCategory.BLOCKS, soundGroup.hitVolume, soundGroup.hitPitch)
             
             destroyTicks++
         }
