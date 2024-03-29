@@ -12,5 +12,5 @@ dependencies {
     implementation(project(":nova"))
     implementation(project(":nova-api"))
     compileOnly("com.plotsquared:PlotSquared-Core:6.10.5") { isTransitive = false }
-    compileOnly("com.plotsquared:PlotSquared-Bukkit:6.10.5") { isTransitive = false }
+    compileOnly("com.plotsquared:PlotSquared-Bukkit:6.11.2") { isTransitive = false }
 }
