@@ -53,7 +53,7 @@ nmsutilities = { group = "xyz.xenondevs", name = "nms-utilities", version = "0.1
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 specialsource = { group = "net.md-5", name = "SpecialSource", version = "1.11.0" }
 stringremapper = { group = "xyz.xenondevs.string-remapper", name = "string-remapper-core", version.ref = "stringremapper" }
-zip4j = { group = "net.lingala.zip4j", name = "zip4j", version = "2.11.2" }
+zip4j = { group = "net.lingala.zip4j", name = "zip4j", version = "2.11.5" }
 
 [bundles]
 cbf = ["cosmic-binary-format", "cosmic-binary-format-netty-adapter"]
