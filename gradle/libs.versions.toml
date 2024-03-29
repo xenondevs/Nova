@@ -44,7 +44,7 @@ ktor-client-core-jvm = { group = "io.ktor", name = "ktor-client-core-jvm", versi
 ktor-serialization-gson-jvm = { group = "io.ktor", name = "ktor-serialization-gson-jvm", version.ref = "ktor" }
 ktor-server-cio-jvm = { group = "io.ktor", name = "ktor-server-cio-jvm", version.ref = "ktor" }
 ktor-server-core-jvm = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor" }
-maven-resolver-connector-basic = { group = "org.apache.maven.resolver", name = "maven-resolver-connector-basic", version = "1.8.2" }
+maven-resolver-connector-basic = { group = "org.apache.maven.resolver", name = "maven-resolver-connector-basic", version = "1.9.18" }
 maven-resolver-provider = { group = "org.apache.maven", name = "maven-resolver-provider", version = "3.8.5" }
 maven-resolver-transport-http = { group = "org.apache.maven.resolver", name = "maven-resolver-transport-http", version = "1.8.2" }
 minecraft-asset-downloader = { group = "xyz.xenondevs", name = "minecraft-asset-downloader", version = "1.3" }
