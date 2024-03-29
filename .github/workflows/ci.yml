@@ -21,12 +21,12 @@ jobs:
           distribution: adopt
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           cache-disabled: true
         
       - name: Build Spigot-Mapped
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: |
             loaderJarSpigot
@@ -42,7 +42,7 @@ jobs:
 
       - name: Deploy Mojang-Mapped
         if: github.event_name == 'release'
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: | 
             publishNovaPublicationToXenondevsRepository
