@@ -27,12 +27,7 @@ import java.util.logging.Logger;
 
 public class LibraryLoader {
     
-    private static final File LIBRARIES_DIR;
-    
-    static {
-        var repoProperty = System.getProperty("repo");
-        LIBRARIES_DIR = repoProperty != null ? new File(repoProperty) : new File("libraries");
-    }
+    private static final File LIBRARIES_DIR = new File("libraries");
     
     public static List<File> downloadLibraries(List<String> repositories, List<Dependency> dependencies, Set<String> exclusions, Logger logger) throws DependencyResolutionException {
         // setup connection
