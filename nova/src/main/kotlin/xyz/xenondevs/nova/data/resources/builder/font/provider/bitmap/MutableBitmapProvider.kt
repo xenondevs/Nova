@@ -168,7 +168,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
          */
         @JvmName("custom1")
         fun custom(file: ResourcePath, codePointGrid: MutableCodePointGrid, glyphGrid: MutableGlyphGrid<IntArray>, height: Int, ascent: Int): MutableBitmapProvider<IntArray> =
-            Custom(BitmapGlyphImageType.INT_ARRAY, file, codePointGrid, glyphGrid, height, ascent)
+            Custom(BitmapGlyphImageType.ARGB_ARRAY, file, codePointGrid, glyphGrid, height, ascent)
         
         /**
          * Creates a new [BitmapProvider] with a single glyph from a texture.
