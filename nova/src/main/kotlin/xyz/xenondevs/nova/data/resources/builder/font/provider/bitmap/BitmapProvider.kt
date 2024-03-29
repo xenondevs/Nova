@@ -101,10 +101,10 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
                     
                     var minY = 0f
                     var maxY = 0f
-                    val horizontalBorders = glyphImageType.findHorizontalBorders(glyph, glyphWidth, glyphHeight)
+                    val horizontalBorders = glyphImageType.findTopBottomBorders(glyph, glyphWidth, glyphHeight)
                     if (horizontalBorders != null) {
-                        minY = ((minY - ascent) * rescale)
-                        maxY = ((maxY - ascent) * rescale)
+                        minY = ((horizontalBorders.x() - ascent) * rescale)
+                        maxY = ((horizontalBorders.y() - ascent) * rescale)
                     }
                     
                     map.put(codePoint, floatArrayOf(width, minY, maxY))
@@ -239,7 +239,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
          */
         @JvmName("custom1")
         fun custom(file: ResourcePath, codePointGrid: CodePointGrid, glyphGrid: GlyphGrid<IntArray>, height: Int, ascent: Int): BitmapProvider<IntArray> =
-            Custom(BitmapGlyphImageType.INT_ARRAY, file, codePointGrid, glyphGrid, height, ascent)
+            Custom(BitmapGlyphImageType.ARGB_ARRAY, file, codePointGrid, glyphGrid, height, ascent)
         
         /**
          * Creates a new immutable [BitmapProvider] that references another one, but with a different ascent.

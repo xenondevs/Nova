@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.data.resources.builder.font.provider.bitmap
 
+import org.joml.Vector2i
+import org.joml.Vector2ic
 import xyz.xenondevs.nova.util.data.ImageUtils
 import java.awt.image.BufferedImage
 
@@ -20,16 +22,16 @@ interface BitmapGlyphImageType<T> {
      * The values in the returned Pair<Top, Bottom> correspond with the
      * y-coordinate of the first non-empty row from the top and bottom side of the image.
      *
-     * @return An integer pair containing the top and bottom borders, or null if the image is completely empty.
+     * @return A vector containing the top and bottom borders, or null if the image is completely empty.
      */
-    fun findHorizontalBorders(image: T, width: Int, height: Int): Pair<Int, Int>?
+    fun findTopBottomBorders(image: T, width: Int, height: Int): Vector2ic?
     
     companion object {
         
         /**
          * A glyph texture represented by a one-dimensional array of argb integers.
          */
-        val INT_ARRAY: BitmapGlyphImageType<IntArray> = object : BitmapGlyphImageType<IntArray> {
+        val ARGB_ARRAY: BitmapGlyphImageType<IntArray> = object : BitmapGlyphImageType<IntArray> {
             
             // TODO: consider moving these to ImageUtils as well?
             override fun findRightBorder(image: IntArray, width: Int, height: Int): Int? {
@@ -46,7 +48,7 @@ interface BitmapGlyphImageType<T> {
                 return if (x != -1) x else null
             }
             
-            override fun findHorizontalBorders(image: IntArray, width: Int, height: Int): Pair<Int, Int>? {
+            override fun findTopBottomBorders(image: IntArray, width: Int, height: Int): Vector2ic? {
                 fun isRowEmpty(y: Int): Boolean {
                     for (x in 0..<width) {
                         if (image[y * width + x] ushr 24 != 0)
@@ -62,7 +64,7 @@ interface BitmapGlyphImageType<T> {
                 var bottom = height - 1
                 while (bottom > top && isRowEmpty(bottom)) bottom--
                 
-                return top to bottom
+                return Vector2i(top, bottom)
             }
             
         }
@@ -72,7 +74,7 @@ interface BitmapGlyphImageType<T> {
          */
         val BUFFERED_IMAGE: BitmapGlyphImageType<BufferedImage> = object : BitmapGlyphImageType<BufferedImage> {
             override fun findRightBorder(image: BufferedImage, width: Int, height: Int): Int? = ImageUtils.findRightBorder(image)
-            override fun findHorizontalBorders(image: BufferedImage, width: Int, height: Int): Pair<Int, Int>? = ImageUtils.findHorizontalBorders(image)
+            override fun findTopBottomBorders(image: BufferedImage, width: Int, height: Int): Vector2ic? = ImageUtils.findTopBottomBorders(image)
         }
         
     }

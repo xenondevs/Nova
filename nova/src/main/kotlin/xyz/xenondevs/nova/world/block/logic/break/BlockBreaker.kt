@@ -18,6 +18,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_20_R3.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockDamageEvent
 import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
@@ -147,7 +148,7 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
         if (isDone)
             return
         
-        val damage = calculateDamage()
+        var damage = calculateDamage()
         val clientsideDamage = calculateClientsideDamage()
         
         if (clientsideDamage >= 1 && damage < 1) {
@@ -155,21 +156,25 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
             return
         }
         
+        val damageEvent = BlockDamageEvent(
+            player,
+            block,
+            BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation) ?: BlockFace.NORTH,
+            tool ?: ItemStack(Material.AIR),
+            damage > 1
+        )
+        callEvent(damageEvent)
+        if (damageEvent.isCancelled)
+            return
+        if (damageEvent.instaBreak && damage < 1)
+            damage = 1.0
+        
         if (damage >= 1.0 || serverTick >= blockedUntil) {
             progress += damage
             
-            //<editor-fold desc="hit sounds", defaultstate="collapsed">
-            if (progress < 1.0 && destroyTicks % 4 == 0) {
-                if (soundGroup != null) {
-                    pos.playSound(
-                        soundGroup.hitSound,
-                        SoundCategory.BLOCKS,
-                        soundGroup.hitVolume,
-                        soundGroup.hitPitch
-                    )
-                }
-            }
-            //</editor-fold>
+            // play break sound every 4 ticks
+            if (progress < 1.0 && destroyTicks % 4 == 0 && soundGroup != null)
+                pos.playSound(soundGroup.hitSound, SoundCategory.BLOCKS, soundGroup.hitVolume, soundGroup.hitPitch)
             
             destroyTicks++
         }

@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 public class NovaBootstrapper implements PluginBootstrap {
     
     private static final String NOVA_JAR_PATH = "/nova.jar";
-    private static final String LIBRARIES_PATH = "/libraries.json";
     private static final String PRIORITIZED_LIBRARIES_PATH = "/prioritized_libraries.json";
     
     private static final String BUNDLER_DIR_PATH = ".internal_data/bundler";
@@ -36,7 +35,6 @@ public class NovaBootstrapper implements PluginBootstrap {
             var novaJar = extractNovaJar(context);
             var classLoader = new NovaClassLoader(
                 novaJar.toURI().toURL(),
-                loadLibraries(logger, LIBRARIES_PATH),
                 loadLibraries(logger, PRIORITIZED_LIBRARIES_PATH),
                 getClass().getClassLoader() // PaperPluginClassLoader
             );

@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.item.behavior.Damageable.Companion.isValidRepairItem
 import xyz.xenondevs.nova.item.behavior.Damageable.Companion.setDamage
 import xyz.xenondevs.nova.item.behavior.Enchantable
 import xyz.xenondevs.nova.item.enchantment.Enchantment
+import xyz.xenondevs.nova.item.enchantment.VanillaEnchantment
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.bukkitMirror
@@ -244,9 +245,9 @@ internal object AnvilResultPatch : MethodTransformer(AnvilMenu::createResult) {
     }
     
     private fun canEnchant(itemStack: ItemStack, enchantment: Enchantment): Boolean {
-        return NovaRegistries.ENCHANTMENT_CATEGORY.any { category ->
-            enchantment in category.enchantments && category.canEnchant(itemStack)
-        }
+         return NovaRegistries.ENCHANTMENT_CATEGORY.any { category -> 
+             enchantment in category.enchantments && category.canEnchant(itemStack)
+         } || (enchantment is VanillaEnchantment && enchantment.enchantment.canEnchant(itemStack))
     }
     
 }

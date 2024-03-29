@@ -12,16 +12,9 @@ public class NovaClassLoader extends URLClassLoader {
     // Under no circumstances should it be used to load classes, only to find resources.
     private final URLClassLoader prioritizedLibraries;
     
-    public NovaClassLoader(@NotNull URL nova, @NotNull URL @NotNull [] libraries, @NotNull URL @NotNull [] prioritizedLibraries, @Nullable ClassLoader parent) {
-        super(concatUrls(nova, libraries), parent);
+    public NovaClassLoader(@NotNull URL nova, @NotNull URL @NotNull [] prioritizedLibraries, @Nullable ClassLoader parent) {
+        super(new URL[] {nova}, parent);
         this.prioritizedLibraries = new URLClassLoader(prioritizedLibraries, null);
-    }
-    
-    private static URL[] concatUrls(URL url, URL[] arr) {
-        URL[] result = new URL[arr.length + 1];
-        result[0] = url;
-        System.arraycopy(arr, 0, result, 1, arr.length);
-        return result;
     }
     
     @Override

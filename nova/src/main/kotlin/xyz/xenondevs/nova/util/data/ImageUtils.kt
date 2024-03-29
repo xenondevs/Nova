@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.util.data
 
+import org.joml.Vector2i
+import org.joml.Vector2ic
 import java.awt.Point
 import java.awt.image.BufferedImage
 import java.awt.image.ColorModel
@@ -68,9 +70,9 @@ object ImageUtils {
      * The values in the returned Pair<Top, Bottom> correspond with the
      * y-coordinate of the first non-empty row from the top and bottom side of the image.
      * 
-     * @return An integer pair containing the top and bottom borders, or null if the image is completely empty.
+     * @return A vector containing the top and bottom borders, or null if the image is completely empty.
      */
-    fun findHorizontalBorders(image: BufferedImage): Pair<Int, Int>? {
+    fun findTopBottomBorders(image: BufferedImage): Vector2ic? {
         var top = 0
         while (top < image.height && isRowEmpty(image, top)) top++
         if (top == image.height) return null
@@ -78,7 +80,7 @@ object ImageUtils {
         var bottom = image.height - 1
         while (bottom > top && isRowEmpty(image, bottom)) bottom--
         
-        return top to bottom
+        return Vector2i(top, bottom)
     }
     
     /**
