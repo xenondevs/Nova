@@ -14,7 +14,7 @@ xenondevs-commons = "1.7"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version = "4.12.0" }
-adventure-platform-bukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version = "4.2.0" }
+adventure-platform-bukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version = "4.3.2" }
 adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version = "4.12.0" }
 adventure-text-serializer-plain = { group = "net.kyori", name = "adventure-text-serializer-plain", version = "4.12.0" }
 awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.20.68" }
