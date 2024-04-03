@@ -17,7 +17,7 @@ adventure-api = { group = "net.kyori", name = "adventure-api", version = "4.12.0
 adventure-platform-bukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version = "4.2.0" }
 adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version = "4.12.0" }
 adventure-text-serializer-plain = { group = "net.kyori", name = "adventure-text-serializer-plain", version = "4.12.0" }
-awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.20.68" }
+awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.25.23" }
 bstats = { group = "xyz.xenondevs.bstats", name = "bstats-bukkit", version = "3.0.1" }
 bytbase-runtime = { group = "xyz.xenondevs.bytebase", name = "ByteBase-Runtime", version = "0.4.6" }
 caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.1.6" }
