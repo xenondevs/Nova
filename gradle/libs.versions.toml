@@ -13,10 +13,6 @@ stringremapper = "1.6"
 xenondevs-commons = "1.7"
 
 [libraries]
-adventure-api = { group = "net.kyori", name = "adventure-api", version = "4.12.0" }
-adventure-platform-bukkit = { group = "net.kyori", name = "adventure-platform-bukkit", version = "4.2.0" }
-adventure-text-serializer-gson = { group = "net.kyori", name = "adventure-text-serializer-gson", version = "4.12.0" }
-adventure-text-serializer-plain = { group = "net.kyori", name = "adventure-text-serializer-plain", version = "4.12.0" }
 awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.25.23" }
 bstats = { group = "xyz.xenondevs.bstats", name = "bstats-bukkit", version = "3.0.1" }
 bytbase-runtime = { group = "xyz.xenondevs.bytebase", name = "ByteBase-Runtime", version = "0.4.6" }
@@ -60,7 +56,6 @@ cbf = ["cosmic-binary-format", "cosmic-binary-format-netty-adapter"]
 configurate = ["configurate-yaml", "configurate-extra-kotlin"]
 kotlin = ["kotlin-stdlib", "kotlin-reflect"]
 ktor = ["ktor-server-core-jvm", "ktor-server-cio-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"]
-kyori-adventure = ["adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-plain", "adventure-platform-bukkit"]
 maven-resolver = ["maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"]
 minecraft-assets = ["minecraft-asset-downloader", "minecraft-model-renderer"]
 test = ["kotlin-test-junit", "junit-jupiter"]
