@@ -64,6 +64,11 @@ internal class PatchedClassLoader : ClassLoader(PAPER_CLASS_LOADER.parent) {
             // if yes, this indicates a recursive call (PatchedClassLoader) or a call that will become recursive (NovaClassLoader)
             if (className == "xyz.xenondevs.nova.loader.NovaClassLoader" || className == "xyz.xenondevs.nova.transformer.PatchedClassLoader")
                 return false
+            
+            // does not indicate a recursive call, but is the most common class loading deadlock cause,
+            // so it is included here until the root cause is resolved (removal of PatchedClassLoader)
+            if (className == "org.apache.logging.log4j.core.impl.ThrowableProxyHelper")
+                return false
         }
         
         return true
