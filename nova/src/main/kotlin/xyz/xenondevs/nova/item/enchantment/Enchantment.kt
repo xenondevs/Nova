@@ -109,6 +109,7 @@ sealed interface Enchantment {
                 
                 override fun getKey(): NamespacedKey = key
                 override fun translationKey(): String = enchantment.localizedName
+                override fun getTranslationKey(): String = enchantment.localizedName
                 override fun getName(): String = key.toString()
                 override fun getMaxLevel(): Int = enchantment.maxLevel
                 override fun getStartLevel(): Int = enchantment.minLevel
