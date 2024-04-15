@@ -16,7 +16,7 @@ xenondevs-commons = "1.7"
 awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.25.23" }
 bstats = { group = "xyz.xenondevs.bstats", name = "bstats-bukkit", version = "3.0.1" }
 bytbase-runtime = { group = "xyz.xenondevs.bytebase", name = "ByteBase-Runtime", version = "0.4.6" }
-caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.1.6" }
+caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.1.8" }
 commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "xenondevs-commons" }
 commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "xenondevs-commons" }
 commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version.ref = "xenondevs-commons" }
