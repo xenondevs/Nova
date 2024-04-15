@@ -8,7 +8,7 @@ invui = "1.24"
 kotlin = "1.9.20"
 ktor = "2.3.9"
 paper = "1.20.4-R0.1-SNAPSHOT"
-paperweight = "1.5.12"
+paperweight = "1.5.15"
 stringremapper = "1.6"
 xenondevs-commons = "1.7"
 
