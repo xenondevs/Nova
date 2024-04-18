@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data.recipe
 
+import net.minecraft.core.NonNullList
 import net.minecraft.core.RegistryAccess
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.CraftingContainer
@@ -43,6 +44,9 @@ private fun Ingredient.clientsideCopy(): Ingredient {
     return Ingredient(items.stream().map { Ingredient.ItemValue(it) })
 }
 
+private fun NonNullList<Ingredient>.clientsideCopy(): NonNullList<Ingredient> =
+    NonNullList(map(Ingredient::clientsideCopy))
+
 private fun ItemStack.clientsideCopy(): ItemStack =
     PacketItems.getClientSideStack(null, this)
 
@@ -76,7 +80,7 @@ internal class NovaShapedRecipe private constructor(
     val requiredChoices: List<RecipeChoice>,
     val choiceMatrix: Array<Array<RecipeChoice?>>
 ) : ShapedRecipe(
-    "", 
+    "",
     bukkitRecipe.category.nmsCategory,
     pattern, result
 ), ServersideRecipe<ShapedRecipe> {
@@ -117,7 +121,12 @@ internal class NovaShapedRecipe private constructor(
     
     override fun clientsideCopy(): ShapedRecipe {
         val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
-        return ShapedRecipe(group, category(), pattern, result)
+        val clientsidePattern = ShapedRecipePattern(
+            pattern.width, pattern.height,
+            pattern.ingredients.clientsideCopy(),
+            Optional.empty()
+        )
+        return ShapedRecipe(group, category(), clientsidePattern, result)
     }
     
     override fun toBukkitRecipe(id: NamespacedKey): BukkitShapedRecipe = bukkitRecipe
@@ -173,8 +182,7 @@ internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessReci
     
     override fun clientsideCopy(): ShapelessRecipe {
         val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
-        val ingredients = NonNullList(ingredients.map(Ingredient::clientsideCopy))
-        return ShapelessRecipe(group, category(), result, ingredients)
+        return ShapelessRecipe(group, category(), result, ingredients.clientsideCopy())
     }
     
     override fun toBukkitRecipe(id: NamespacedKey): BukkitShapelessRecipe = bukkitRecipe
