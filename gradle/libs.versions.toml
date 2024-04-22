@@ -30,7 +30,7 @@ gson = { group = "com.google.code.gson", name = "gson", version = "2.10.1" }
 inventoryaccess = { group = "xyz.xenondevs.invui", name = "inventory-access-r18", version.ref = "invui" }
 invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version.ref = "invui" }
 jimfs = { group = "com.google.jimfs", name = "jimfs", version = "1.2" }
-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.9.0" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.2" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
