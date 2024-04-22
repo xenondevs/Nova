@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.world.format.chunk.palette.HashPalette
 import xyz.xenondevs.nova.world.format.chunk.palette.LinearPalette
 import xyz.xenondevs.nova.world.format.chunk.palette.Palette
 
-internal abstract class PalletizedSectionDataContainer<T>(idResolver: IdResolver<T>) : SectionDataContainer<T>(idResolver) {
+internal sealed class PalletizedSectionDataContainer<T>(idResolver: IdResolver<T>) : SectionDataContainer<T>(idResolver) {
     
     protected abstract var palette: Palette<T>
     protected abstract val data: CompactIntStorage
@@ -16,7 +16,7 @@ internal abstract class PalletizedSectionDataContainer<T>(idResolver: IdResolver
      * Gets or creates the palletized id for the given [value], while also performing upkeep on the palette.
      * 
      * Upkeep includes:
-     * - Remaking the palette if the next id would be greater than 0xFFFF, i.e. larger than 2 bytes.
+     * - Remaking the [palette] if the next id would be greater than 0xFFFF, i.e. larger than 2 bytes.
      * - Converting a [LinearPalette] to a [HashPalette] if the next id would exceed [LinearPalette.MAX_SIZE].
      * - Resizing the data if [bitsPerEntry] changed.
      */
@@ -48,7 +48,7 @@ internal abstract class PalletizedSectionDataContainer<T>(idResolver: IdResolver
     }
     
     /**
-     * Remakes the palette, thereby eliminating any unused entries, then resizes the data if possible.
+     * Remakes the [palette], thereby eliminating any unused entries, then resizes the [data] if possible.
      */
     protected fun remakePaletteResizeData() {
         val oldBitsPerEntry = bitsPerEntry
@@ -61,7 +61,8 @@ internal abstract class PalletizedSectionDataContainer<T>(idResolver: IdResolver
     }
     
     /**
-     * Remakes the [Palette], eliminating any unused entries.
+     * Remakes the [palette] and migrates palletized ids in [data].
+     * This process eliminates unused entries.
      * Does not update the [bitsPerEntry] or resize the data.
      */
     private fun remakePalette() {
@@ -70,15 +71,21 @@ internal abstract class PalletizedSectionDataContainer<T>(idResolver: IdResolver
         
         val data = data
         for (packedPos in 0..<SECTION_SIZE) {
-            val palletizedId = data[packedPos]
-            val value = currentPalette.getValue(palletizedId)
-            if (value != null && newPalette.getId(value) == 0) {
+            val oldPalletizedId = data[packedPos]
+            if (oldPalletizedId == 0)
+                continue
+            
+            val value = currentPalette.getValue(oldPalletizedId)!!
+            var newPalletizedId = newPalette.getId(value)
+            
+            if (newPalletizedId == 0) {
                 if (newPalette is LinearPalette && newPalette.size >= LinearPalette.MAX_SIZE)
                     newPalette = newPalette.toHashPalette()
                 
-                val newPalletizedId = newPalette.putValue(value)
-                data[packedPos] = newPalletizedId
+                newPalletizedId = newPalette.putValue(value)
             }
+            
+            data[packedPos] = newPalletizedId
         }
         
         this.palette = newPalette

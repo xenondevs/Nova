@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.format.chunk.container
 
+import xyz.xenondevs.nova.byteWriter
 import kotlin.test.assertEquals
 
 abstract class AbstractSectionDataContainerTest {
@@ -48,6 +49,22 @@ abstract class AbstractSectionDataContainerTest {
         
         container[0, 0, 0] = "b"
         assertEquals(false, container.isMonotone())
+    }
+    
+    internal fun testDataMigrateOnPaletteResize(container: SectionDataContainer<String>) {
+        container[0, 0, 1] = "a"
+        container[0, 0, 2] = "b"
+        container[0, 0, 3] = "b"
+        container[0, 0, 4] = "c"
+        
+        container[0, 0, 1] = null
+        
+        // write to cause palette remake
+        byteWriter { container.write(this) }
+        
+        assertEquals("b", container[0, 0, 2])
+        assertEquals("b", container[0, 0, 3])
+        assertEquals("c", container[0, 0, 4])
     }
     
 }

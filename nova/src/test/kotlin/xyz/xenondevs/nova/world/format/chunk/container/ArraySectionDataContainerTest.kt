@@ -141,4 +141,9 @@ class ArraySectionDataContainerTest : AbstractSectionDataContainerTest() {
         testIsMonotone(ArraySectionDataContainer(MockIdResolver()))
     }
     
+    @Test
+    fun testDataMigrateOnPaletteResize() {
+        testDataMigrateOnPaletteResize(ArraySectionDataContainer(MockIdResolver()))
+    }
+    
 }

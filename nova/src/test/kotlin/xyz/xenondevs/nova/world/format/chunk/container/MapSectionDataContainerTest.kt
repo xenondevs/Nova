@@ -110,4 +110,9 @@ class MapSectionDataContainerTest : AbstractSectionDataContainerTest() {
         testIsMonotone(MapSectionDataContainer(MockIdResolver()))
     }
     
+    @Test
+    fun testDataMigrateOnPaletteResize() {
+        testDataMigrateOnPaletteResize(MapSectionDataContainer(MockIdResolver()))
+    }
+    
 }

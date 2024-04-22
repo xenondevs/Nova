@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.world.format.IdResolver
 /**
  * A container for values of type [T] in a 16x16x16 space.
  */
-internal abstract class SectionDataContainer<T>(protected val idResolver: IdResolver<T>) {
+internal sealed class SectionDataContainer<T>(protected val idResolver: IdResolver<T>) {
     
     /**
      * The amount of non-empty blocks in the section.
@@ -111,7 +111,6 @@ internal abstract class SectionDataContainer<T>(protected val idResolver: IdReso
                 is SingleValueSectionDataContainer -> writer.writeByte(SINGLE_VALUE_SECTION_DATA_CONTAINER_ID)
                 is MapSectionDataContainer -> writer.writeByte(MAP_SECTION_DATA_CONTAINER_ID)
                 is ArraySectionDataContainer -> writer.writeByte(ARRAY_SECTION_DATA_CONTAINER_ID)
-                else -> throw IllegalArgumentException("Unknown SectionDataContainer type: ${container::class.simpleName}")
             }
             
             container.write(writer)
