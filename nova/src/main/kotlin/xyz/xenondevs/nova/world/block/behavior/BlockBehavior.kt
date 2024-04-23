@@ -16,7 +16,7 @@ interface BlockBehavior {
     /**
      * Checks whether a block of [state] can be placed at [pos] using the given [ctx].
      */
-    suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean = true
+    fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean = true
     
     /**
      * Handles interaction (right-click) with a block of [state] at [pos] with the given [ctx].

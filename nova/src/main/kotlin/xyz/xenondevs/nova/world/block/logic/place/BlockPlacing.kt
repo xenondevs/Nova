@@ -1,9 +1,5 @@
 package xyz.xenondevs.nova.world.block.logic.place
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.bukkit.GameMode
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
@@ -25,7 +21,6 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.BlockUtils
-import xyz.xenondevs.nova.util.BukkitDispatcher
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
@@ -88,7 +83,7 @@ internal object BlockPlacing : Listener {
                     event.isCancelled = true
                     wrappedEvent.actionPerformed = true
                     
-                    CoroutineScope(Dispatchers.Default).launch { placeNovaBlock(event, novaBlock) }
+                    placeNovaBlock(event, novaBlock)
                 } else if (
                     WorldDataManager.getBlockState(block.pos) != null // the block placed against is from Nova
                     && block.type.isReplaceable() // and will be replaced without special behavior
@@ -98,13 +93,13 @@ internal object BlockPlacing : Listener {
                     event.isCancelled = true
                     wrappedEvent.actionPerformed = true
                     
-                    CoroutineScope(Dispatchers.Default).launch { placeVanillaBlock(event) }
+                    placeVanillaBlock(event)
                 }
             }
         }
     }
     
-    private suspend fun placeNovaBlock(event: PlayerInteractEvent, novaBlock: NovaBlock) {
+    private fun placeNovaBlock(event: PlayerInteractEvent, novaBlock: NovaBlock) {
         val player = event.player
         val handItem = event.item!!
         
@@ -137,13 +132,11 @@ internal object BlockPlacing : Listener {
             && canPlace(player, handItem, pos, pos.location.advance(event.blockFace.oppositeFace).pos)
             && novaBlock.canPlace(pos, newState, ctx)
         ) {
-            withContext(BukkitDispatcher) {
-                if (player.gameMode != GameMode.CREATIVE)
-                    handItem.amount--
-                
-                BlockUtils.placeNovaBlock(pos, newState, ctx)
-                player.swingHand(event.hand!!)
-            }
+            if (player.gameMode != GameMode.CREATIVE)
+                handItem.amount--
+            
+            BlockUtils.placeNovaBlock(pos, newState, ctx)
+            player.swingHand(event.hand!!)
         }
     }
     

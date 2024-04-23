@@ -3,9 +3,6 @@
 package xyz.xenondevs.nova.world.block
 
 import com.mojang.serialization.Codec
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.resources.ResourceLocation
@@ -57,14 +54,8 @@ open class NovaBlock internal constructor(
     val config: ConfigProvider by lazy { Configs[configId] }
     
     //<editor-fold desc="event methods">
-    suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockPlace>): Boolean = coroutineScope {
-        if (behaviors.isEmpty())
-            return@coroutineScope true
-        
-        return@coroutineScope behaviors
-            .map { async { it.canPlace(pos, state, ctx) } }
-            .awaitAll()
-            .all { it }
+    fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockPlace>): Boolean {
+        return behaviors.all { it.canPlace(pos, state, ctx) }
     }
     
     fun chooseBlockState(ctx: Context<ContextIntentions.BlockPlace>): NovaBlockState {
