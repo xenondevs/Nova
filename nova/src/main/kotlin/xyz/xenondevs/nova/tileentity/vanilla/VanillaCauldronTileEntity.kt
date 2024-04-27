@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.type.fluid.container.CauldronFluidContainer
 import xyz.xenondevs.nova.tileentity.network.type.fluid.holder.DefaultFluidHolder
+import xyz.xenondevs.nova.tileentity.network.type.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.*
@@ -17,17 +18,20 @@ internal class VanillaCauldronTileEntity internal constructor(
     
     override val type = Type.CAULDRON
     
-    private val container = CauldronFluidContainer(UUID(0L, 0L), pos.block)
-    private val fluidHolder = DefaultFluidHolder(
-        storedValue("fluidHolder", ::Compound).get(), // TODO: legacy conversion
-        mapOf(container to NetworkConnectionType.BUFFER),
-        { CUBE_FACES.associateWithTo(enumMap()) { container }  },
-        { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.BUFFER } }
-    )
+    private lateinit var container: CauldronFluidContainer
+    private lateinit var fluidHolder: FluidHolder
+    override lateinit var holders: Set<EndPointDataHolder>
     
-    override val holders: Set<EndPointDataHolder> = setOf(fluidHolder)
+    override fun handleEnable() {
+        container = CauldronFluidContainer(UUID(0L, 0L), pos.block)
+        fluidHolder = DefaultFluidHolder(
+            storedValue("fluidHolder", ::Compound).get(), // TODO: legacy conversion
+            mapOf(container to NetworkConnectionType.BUFFER),
+            { CUBE_FACES.associateWithTo(enumMap()) { container } },
+            { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.BUFFER } }
+        )
+        holders = setOf(fluidHolder)
     
-    init {
         handleBlockUpdate()
     }
     

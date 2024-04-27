@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
@@ -60,12 +61,12 @@ object WorldDataManager : Listener {
         }
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     private fun handleChunkLoad(event: ChunkLoadEvent) {
         runBlocking { getOrLoadChunk(event.chunk.pos).enable() }
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private fun handleChunkUnload(event: ChunkUnloadEvent) {
         runBlocking { getOrLoadChunk(event.chunk.pos).disable() }
     }

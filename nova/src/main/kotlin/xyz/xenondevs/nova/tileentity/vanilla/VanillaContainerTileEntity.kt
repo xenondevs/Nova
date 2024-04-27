@@ -5,6 +5,7 @@ import org.bukkit.block.Container
 import org.bukkit.block.ShulkerBox
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.nova.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.StaticVanillaItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedBukkitInventory
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
@@ -18,9 +19,9 @@ internal class VanillaContainerTileEntity internal constructor(
 ) : ItemStorageVanillaTileEntity(pos, data) {
     
     override val type = Type.CONTAINER
-    override val itemHolder: StaticVanillaItemHolder
+    override lateinit var itemHolder: ItemHolder
     
-    init {
+    override fun handleEnable() {
         val container = pos.block.state as Container
         
         val inventory = if (container is ShulkerBox) NetworkedShulkerBoxInventory(container.inventory) else NetworkedBukkitInventory(container.inventory)
