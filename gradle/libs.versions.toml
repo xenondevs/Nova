@@ -2,16 +2,16 @@
 format.version = "1.1"
 
 [versions]
-cbf = "0.8"
+cbf = "0.9"
 configurate = "4.2.0-SNAPSHOT"
 invui = "1.25"
 kotlin = "1.9.22"
-kotlinx-coroutines = "1.7.3"
+kotlinx-coroutines = "1.8.0"
 ktor = "2.3.7"
 paper = "1.20.4-R0.1-SNAPSHOT"
-paperweight = "1.5.5"
+paperweight = "1.5.15"
 stringremapper = "1.6"
-xenondevs-commons = "1.9"
+xenondevs-commons = "1.10"
 
 [libraries]
 adventure-api = { group = "net.kyori", name = "adventure-api", version = "4.12.0" }
@@ -24,6 +24,7 @@ bytbase-runtime = { group = "xyz.xenondevs.bytebase", name = "ByteBase-Runtime",
 caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.1.6" }
 commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "xenondevs-commons" }
 commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "xenondevs-commons" }
+commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "xenondevs-commons" }
 commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version.ref = "xenondevs-commons" }
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "xenondevs-commons" }
 configurate-yaml = { group = "xyz.xenondevs.configurate", name = "configurate-yaml", version.ref = "configurate" }
@@ -41,6 +42,7 @@ kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", vers
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 kotlinx-coroutines-core-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core-jvm", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
 ktor-client-cio-jvm = { group = "io.ktor", name = "ktor-client-cio-jvm", version.ref = "ktor" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-core-jvm = { group = "io.ktor", name = "ktor-client-core-jvm", version.ref = "ktor" }
@@ -61,13 +63,13 @@ zip4j = { group = "net.lingala.zip4j", name = "zip4j", version = "2.11.5" }
 [bundles]
 cbf = ["cosmic-binary-format", "cosmic-binary-format-netty-adapter"]
 configurate = ["configurate-yaml", "configurate-extra-kotlin"]
-kotlin = ["kotlin-stdlib", "kotlin-reflect", "kotlinx-coroutines-core-jvm"]
+kotlin = ["kotlin-stdlib", "kotlin-reflect", "kotlinx-coroutines-core-jvm", "kotlinx-coroutines-debug"]
 ktor = ["ktor-server-core-jvm", "ktor-server-cio-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"]
 kyori-adventure = ["adventure-api", "adventure-text-serializer-gson", "adventure-text-serializer-plain", "adventure-platform-bukkit"]
 maven-resolver = ["maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"]
 minecraft-assets = ["minecraft-asset-downloader", "minecraft-model-renderer"]
 test = ["kotlin-test-junit", "junit-jupiter"]
-xenondevs-commons = ["commons-collections", "commons-gson", "commons-provider", "commons-reflection"]
+xenondevs-commons = ["commons-collections", "commons-gson", "commons-guava", "commons-provider", "commons-reflection"]
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version = "1.8.20" }

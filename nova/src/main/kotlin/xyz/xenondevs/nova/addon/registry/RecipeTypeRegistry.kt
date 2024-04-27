@@ -4,7 +4,7 @@ import xyz.xenondevs.nova.data.recipe.NovaRecipe
 import xyz.xenondevs.nova.data.recipe.RecipeType
 import xyz.xenondevs.nova.data.serialization.json.serializer.RecipeDeserializer
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
+import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 import kotlin.reflect.KClass

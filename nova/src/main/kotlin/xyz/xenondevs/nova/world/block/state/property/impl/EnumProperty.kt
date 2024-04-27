@@ -15,7 +15,7 @@ class EnumProperty<E : Enum<E>>(
 ) : BlockStateProperty<E>(id) {
     
     override fun scope(values: Set<E>, initializer: BlockStatePropertyInitializer<E>): ScopedBlockStateProperty<E> {
-        val scopeValues = values.ifEmpty { enumClass.enumConstants.toHashSet() }
+        val scopeValues = values.ifEmpty { EnumSet.allOf(enumClass) }
         return ScopedEnumProperty(this, enumClass, scopeValues, initializer)
     }
     

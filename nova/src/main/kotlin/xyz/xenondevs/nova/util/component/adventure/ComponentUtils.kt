@@ -104,3 +104,7 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
 fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveTo(afterStart: Number, lang: String = "en_us"): B {
     return move(-CharSizes.calculateComponentWidth(build(), lang) + afterStart.toFloat())
 }
+
+internal fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.indent(spaces: Int): B {
+    return append(Component.text(" ".repeat(spaces)))
+} 

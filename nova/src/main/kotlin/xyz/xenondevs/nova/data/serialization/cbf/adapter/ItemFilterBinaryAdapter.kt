@@ -6,7 +6,7 @@ import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.invui.util.ItemUtils
-import xyz.xenondevs.nova.tileentity.network.item.ItemFilter
+import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilter
 import kotlin.reflect.KType
 
 internal object ItemFilterBinaryAdapter : BinaryAdapter<ItemFilter> {

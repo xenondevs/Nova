@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.player.ability.AbilityType
 import xyz.xenondevs.nova.player.attachment.AttachmentType
-import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider

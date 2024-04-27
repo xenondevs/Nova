@@ -4,9 +4,9 @@ import org.bukkit.block.BlockFace
 import org.bukkit.block.Furnace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.nova.tileentity.network.item.holder.StaticVanillaItemHolder
-import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.tileentity.network.item.inventory.NetworkedRangedBukkitInventory
+import xyz.xenondevs.nova.tileentity.network.type.item.holder.StaticVanillaItemHolder
+import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedRangedBukkitInventory
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.*
@@ -17,7 +17,10 @@ internal class VanillaFurnaceTileEntity internal constructor(
 ) : ItemStorageVanillaTileEntity(pos, data) {
     
     override val type = Type.FURNACE
-    override val itemHolder = StaticVanillaItemHolder(this, getInventories(pos.block.state as Furnace))
+    override val itemHolder = StaticVanillaItemHolder(
+        storedValue("itemHolder", ::Compound).get(), // TODO: legacy support
+        getInventories(pos.block.state as Furnace)
+    )
     
     private fun getInventories(furnace: Furnace): EnumMap<BlockFace, NetworkedInventory> {
         val bukkitInventory = furnace.inventory

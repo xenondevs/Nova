@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.initialize
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import io.papermc.paper.configuration.GlobalConfiguration
+import kotlinx.coroutines.debug.DebugProbes
 import net.kyori.adventure.text.Component
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
@@ -29,7 +30,7 @@ import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.serialization.cbf.CBFAdapters
 import xyz.xenondevs.nova.registry.NovaRegistryAccess
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
-import xyz.xenondevs.nova.ui.setGlobalIngredients
+import xyz.xenondevs.nova.ui.menu.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
@@ -121,6 +122,11 @@ internal object Initializer : Listener {
      * Stats the pre-world initialization process.
      */
     private fun initPreWorld() {
+        if (IS_DEV_SERVER) {
+            DebugProbes.install()
+            DebugProbes.enableCreationStackTraces = true
+        }
+        
         Configs.extractDefaultConfig()
         VanillaRegistryAccess.unfreezeAll()
         registerEvents()

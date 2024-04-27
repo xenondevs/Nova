@@ -15,14 +15,10 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import org.joml.Vector3d
 import org.joml.Vector3f
-import xyz.xenondevs.commons.collections.associateWithNotNullTo
-import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.commons.collections.enumSetOf
 import xyz.xenondevs.nmsutils.particle.ParticleBuilder
 import xyz.xenondevs.nmsutils.particle.color
-import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.item.isTraversable
-import xyz.xenondevs.nova.world.format.WorldDataManager
-import xyz.xenondevs.nova.world.pos
 import java.awt.Color
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -30,9 +26,9 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
-val CUBE_FACES = listOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
-val HORIZONTAL_FACES = listOf(NORTH, EAST, SOUTH, WEST)
-val VERTICAL_FACES = listOf(UP, DOWN)
+val CUBE_FACES: Set<BlockFace> = enumSetOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
+val HORIZONTAL_FACES: Set<BlockFace> = enumSetOf(NORTH, EAST, SOUTH, WEST)
+val VERTICAL_FACES: Set<BlockFace> = enumSetOf(UP, DOWN)
 
 //<editor-fold desc="location creation / modification", defaultstate="collapsed">
 val Location.blockLocation: Location
@@ -193,20 +189,6 @@ fun Vector.toVec3(): Vec3 =
 //</editor-fold>
 
 //<editor-fold desc="surrounding blocks / entities / etc.", defaultstate="collapsed">
-fun Location.getNeighboringTileEntities(): Map<BlockFace, TileEntity> {
-    return getNeighboringTileEntitiesOfType()
-}
-
-internal inline fun <reified T : Any> Location.getNeighboringTileEntitiesOfType(): Map<BlockFace, T> =
-     CUBE_FACES.associateWithNotNullTo(enumMap<BlockFace, T>()) {
-        val pos = blockLocation.advance(it).pos
-        
-        val tileEntity = WorldDataManager.getTileEntity(pos)
-            ?: WorldDataManager.getVanillaTileEntity(pos)
-        
-        if (tileEntity is T) tileEntity else null
-    }
-
 fun Chunk.getSurroundingChunks(range: Int, includeCurrent: Boolean, ignoreUnloaded: Boolean = false): List<Chunk> {
     val chunks = ArrayList<Chunk>()
     val world = world

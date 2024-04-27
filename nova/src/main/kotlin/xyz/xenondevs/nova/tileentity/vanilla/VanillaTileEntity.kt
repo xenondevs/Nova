@@ -19,24 +19,24 @@ internal abstract class VanillaTileEntity internal constructor(
     val isChunkLoaded
         get() = pos.chunkPos.isLoaded()
     
-    internal abstract val type: Type
+    abstract val type: Type
     
-    internal abstract fun handleInitialized()
+    open fun handleEnable() = Unit
+    open fun handleDisable() = Unit
+    open fun handlePlace() = Unit
+    open fun handleBreak() = Unit
+    open fun handleBlockUpdate() = Unit
     
-    internal abstract fun handleRemoved(unload: Boolean)
-    
-    internal open fun handleBlockUpdate() = Unit
-    
-    internal open fun saveData() {
+    open fun saveData() {
         storeData("type", type)
         saveDataAccessors()
     }
     
-    internal fun meetsBlockStateRequirement(): Boolean {
+    fun meetsBlockStateRequirement(): Boolean {
         return type.requirement(pos.block)
     }
     
-    internal enum class Type(val id: String, val constructor: VanillaTileEntityConstructor, val requirement: (Block) -> Boolean) {
+    enum class Type(val id: String, val constructor: VanillaTileEntityConstructor, val requirement: (Block) -> Boolean) {
         
         CHEST("minecraft:chest", ::VanillaChestTileEntity, { it.state is Chest }),
         FURNACE("minecraft:furnace", ::VanillaFurnaceTileEntity, { it.state is Furnace }),
@@ -52,14 +52,14 @@ internal abstract class VanillaTileEntity internal constructor(
         
     }
     
-    internal companion object {
+    companion object {
         
         fun of(pos: BlockPos, data: Compound): VanillaTileEntity? {
             val id: String = data["id"]!!
             val type = Type.entries.firstOrNull { it.id == id } ?: return null
-            if (type.requirement(pos.block)) {
+            if (type.requirement(pos.block))
                 return type.constructor(pos, data)
-            }
+            
             return null
         }
         

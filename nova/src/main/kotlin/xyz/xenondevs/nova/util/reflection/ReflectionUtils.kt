@@ -96,7 +96,7 @@ object ReflectionUtils {
     }
     
     fun getServerSoftwareField(clazz: KClass<*>, declared: Boolean, name: String, serverSoftware: ServerSoftware): Field? {
-        if (serverSoftware !in ServerUtils.SERVER_SOFTWARE.tree)
+        if (serverSoftware !in ServerUtils.SERVER_SOFTWARE.superSoftwares)
             return null
         return getField(clazz, declared, name)
     }

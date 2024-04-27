@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.adapter.LocationBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedIdBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedKeyBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ResourceLocationBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.TableBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.VirtualInventoryBinaryAdapter
 import xyz.xenondevs.nova.registry.NovaRegistries.ABILITY_TYPE
 import xyz.xenondevs.nova.registry.NovaRegistries.ATTACHMENT_TYPE
@@ -30,7 +31,7 @@ import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_CATEGORY
 import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_TIER
 import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
-import xyz.xenondevs.nova.tileentity.network.NetworkConnectionType
+import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.util.byNameBinaryAdapter
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -54,6 +55,7 @@ internal object CBFAdapters {
         registerBinaryAdapter(BlockPosBinaryAdapter)
         
         // binary hierarchy adapters
+        registerBinaryHierarchyAdapter(TableBinaryAdapter)
         registerBinaryHierarchyAdapter(ItemStackBinaryAdapter)
         registerBinaryHierarchyAdapter(BLOCK.byNameBinaryAdapter())
         registerBinaryHierarchyAdapter(ITEM.byNameBinaryAdapter())

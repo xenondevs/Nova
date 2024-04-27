@@ -3,9 +3,9 @@ package xyz.xenondevs.nova.world.region
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.MutableProvider
 import xyz.xenondevs.commons.provider.mutable.map
-import xyz.xenondevs.nova.ui.item.AddNumberItem
-import xyz.xenondevs.nova.ui.item.DisplayNumberItem
-import xyz.xenondevs.nova.ui.item.RemoveNumberItem
+import xyz.xenondevs.nova.ui.menu.item.AddNumberItem
+import xyz.xenondevs.nova.ui.menu.item.DisplayNumberItem
+import xyz.xenondevs.nova.ui.menu.item.RemoveNumberItem
 import java.util.*
 
 class DynamicRegion internal constructor(

@@ -49,7 +49,8 @@ subprojects {
                     
                     // experimental features
                     "-opt-in=kotlin.io.path.ExperimentalPathApi",
-                    "-opt-in=kotlin.time.ExperimentalTime"
+                    "-opt-in=kotlin.time.ExperimentalTime",
+                    "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
                 )
                 
                 if (project.hasProperty("release")) {

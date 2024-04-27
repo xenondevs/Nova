@@ -115,6 +115,36 @@ world:
   # If unknown blocks (e.g. blocks of addons that couldn't be loaded) should be deleted.
   delete_unknown_blocks: false
 
+# Settings affecting tile-entity networks.
+network:
+  # Whether independent networks are allowed to tick in parallel.
+  parallel_ticking: true
+  # Settings affecting nova:energy networks.
+  energy:
+    # The delay in-between energy network ticks, in game ticks.
+    tick_delay: 1
+    # The default transfer rate for energy networks, in energy units per game tick. (-1 for unlimited)
+    # This is scaled with the network tick delay, so that the actual amount of energy transferred per second stays the same.
+    default_transfer_rate: -1
+  # Settings affecting nova:item networks.
+  item:
+    # The delay in-between item network ticks, in game ticks.
+    tick_delay: 20
+    # The default transfer rate for item networks, in items per game tick. (-1 for unlimited)
+    # This is scaled with the network tick delay, so that the actual amount of items transferred per second stays the same.
+    default_transfer_rate: -1
+    # The amount of different channels available.
+    channel_amount: 4
+  # Settings affecting nova:fluid networks.
+  fluid:
+    # The delay in-between fluid network ticks, in game ticks.
+    tick_delay: 1
+    # The default transfer rate for fluid networks, in fluid units per game tick. (-1 for unlimited)
+    # This is scaled with the network tick delay, so that the actual amount of fluid transferred per second stays the same.
+    default_transfer_rate: -1
+    # The amount of different channels available.
+    channel_amount: 4
+
 # Performance options
 performance:
   # Nova's executor caps the amount of threads that are allowed to run simultaneously in order to prevent OutOfMemoryErrors.
@@ -131,15 +161,6 @@ performance:
   drop_excess_on_ground: true
   # If block break particles should be displayed.
   block_break_effects: true
-
-# Default transfer rates for networks when tile entities are directly connected.
-network:
-  energy:
-    default_transfer_rate: 9223372036854775807
-  item:
-    default_transfer_rate: 2147483647
-  fluid:
-    default_transfer_rate: 9223372036854775807
 
 # If metric prefixes should be used to display energy and fluids (e.g. kJ, MJ, GJ or B, kB, MB)
 use_metric_prefixes: false

@@ -8,7 +8,6 @@ import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -16,6 +15,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 
 /**
@@ -63,7 +63,7 @@ internal object VanillaTileEntityManager : Listener {
         
         val vte = type.constructor(pos, Compound())
         WorldDataManager.setVanillaTileEntity(pos, vte)
-        vte.handleInitialized()
+        vte.handlePlace()
     }
     
     internal fun removeInvalidVTEs(chunkPos: ChunkPos): Int {
@@ -87,7 +87,7 @@ internal object VanillaTileEntityManager : Listener {
         val vte = WorldDataManager.getVanillaTileEntity(pos)
         if (vte != null) {
             WorldDataManager.setVanillaTileEntity(pos, null)
-            vte.handleRemoved(false)
+            vte.handleBreak()
         }
     }
     

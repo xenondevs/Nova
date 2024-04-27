@@ -2,14 +2,12 @@
 
 package xyz.xenondevs.nova.world.format
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
@@ -21,7 +19,6 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.registerEvents
@@ -40,108 +37,92 @@ import java.util.concurrent.ConcurrentHashMap
         AddonsInitializer::class,
         ResourceGeneration.PreWorld::class,
         LegacyFileConverter::class,
-        VanillaTileEntityManager::class,
-        NetworkManager.Companion::class
+        VanillaTileEntityManager::class
     ]
 )
 object WorldDataManager : Listener {
     
     private val worlds = ConcurrentHashMap<UUID, WorldDataStorage>()
-    private val chunkJobs = ConcurrentHashMap<ChunkPos, Job>()
     
     @InitFun
-    private fun init() {
+    private fun init() = runBlocking {
         registerEvents()
         Bukkit.getWorlds().asSequence()
             .flatMap { it.loadedChunks.asSequence() }
-            .forEach { handleChunkLoad(it.pos) }
+            .forEach { getOrLoadChunk(it.pos).enable() }
     }
     
     @DisableFun
-    private fun disable() {
+    private fun disable() = runBlocking {
         for (world in worlds.values) {
             world.disableAllChunks()
-            world.saveAllRegions()
+            world.save()
         }
     }
     
     @EventHandler
-    private fun handleChunkLoad(event: ChunkLoadEvent) =
-        handleChunkLoad(event.chunk.pos)
-    
-    private fun handleChunkLoad(pos: ChunkPos) {
-        chunkJobs.compute(pos) { _, prevJob ->
-            CoroutineScope(Dispatchers.IO).launch {
-                prevJob?.join()
-                getOrLoadChunk(pos).enable()
-            }
-        }
+    private fun handleChunkLoad(event: ChunkLoadEvent) {
+        runBlocking { getOrLoadChunk(event.chunk.pos).enable() }
     }
     
     @EventHandler
-    private fun handleChunkUnload(event: ChunkUnloadEvent) =
-        handleChunkUnload(event.chunk.pos)
-    
-    private fun handleChunkUnload(pos: ChunkPos) {
-        chunkJobs.compute(pos) { _, prevJob ->
-            CoroutineScope(Dispatchers.IO).launch {
-                prevJob?.join()
-                getOrLoadChunk(pos).disable()
-            }
-        }
+    private fun handleChunkUnload(event: ChunkUnloadEvent) {
+        runBlocking { getOrLoadChunk(event.chunk.pos).disable() }
     }
     
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     private fun handleWorldSave(event: WorldSaveEvent) {
-        CoroutineScope(Dispatchers.IO).launch { saveWorld(event.world) }
+        runBlocking { worlds[event.world.uid]?.save() }
     }
     
-    private fun saveWorld(world: World) =
-        worlds[world.uid]?.saveAllRegions()
+    internal fun loadAsync(pos: ChunkPos) {
+        // TODO: don't use global scope
+        GlobalScope.launch { worlds.values.forEach { it.loadAsync(pos) } }
+    }
     
     fun getBlockState(pos: BlockPos): NovaBlockState? =
-        getOrLoadChunk(pos.chunkPos).getBlockState(pos)
+        runBlocking { getOrLoadChunk(pos.chunkPos).getBlockState(pos) }
     
     fun setBlockState(pos: BlockPos, state: NovaBlockState?) =
-        getOrLoadChunk(pos.chunkPos).setBlockState(pos, state)
+        runBlocking { getOrLoadChunk(pos.chunkPos).setBlockState(pos, state) }
     
     fun getTileEntity(pos: BlockPos): TileEntity? =
-        getOrLoadChunk(pos.chunkPos).getTileEntity(pos)
+        runBlocking { getOrLoadChunk(pos.chunkPos).getTileEntity(pos) }
     
     fun getTileEntities(pos: ChunkPos): List<TileEntity> =
-        getOrLoadChunk(pos).getTileEntities()
+        runBlocking { getOrLoadChunk(pos).getTileEntities() }
     
     fun getTileEntities(world: World): List<TileEntity> =
-        getWorldStorage(world).getTileEntities()
+        runBlocking { getWorldStorage(world).getTileEntities() }
     
     fun getTileEntities(): List<TileEntity> =
-        worlds.values.flatMap { it.getTileEntities() }
+        runBlocking { worlds.values.flatMap { it.getTileEntities() } }
     
     fun setTileEntity(pos: BlockPos, tileEntity: TileEntity?): TileEntity? =
-        getOrLoadChunk(pos.chunkPos).setTileEntity(pos, tileEntity)
+        runBlocking { getOrLoadChunk(pos.chunkPos).setTileEntity(pos, tileEntity) }
     
     internal fun getVanillaTileEntity(pos: BlockPos): VanillaTileEntity? =
-        getOrLoadChunk(pos.chunkPos).getVanillaTileEntity(pos)
+        runBlocking { getOrLoadChunk(pos.chunkPos).getVanillaTileEntity(pos) }
     
     internal fun getVanillaTileEntities(pos: ChunkPos): List<VanillaTileEntity> =
-        getOrLoadChunk(pos).getVanillaTileEntities()
+        runBlocking { getOrLoadChunk(pos).getVanillaTileEntities() }
     
     internal fun getVanillaTileEntities(world: World): List<VanillaTileEntity> =
-        getWorldStorage(world).getVanillaTileEntities()
+        runBlocking { getWorldStorage(world).getVanillaTileEntities() }
     
     internal fun getVanillaTileEntities(): List<VanillaTileEntity> =
-        worlds.values.flatMap { it.getVanillaTileEntities() }
+        runBlocking { worlds.values.flatMap { it.getVanillaTileEntities() } }
     
-    internal fun setVanillaTileEntity(pos: BlockPos, tileEntity: VanillaTileEntity?) =
-        getOrLoadChunk(pos.chunkPos).setVanillaTileEntity(pos, tileEntity)
+    internal fun setVanillaTileEntity(pos: BlockPos, tileEntity: VanillaTileEntity?): VanillaTileEntity? =
+        runBlocking { getOrLoadChunk(pos.chunkPos).setVanillaTileEntity(pos, tileEntity) }
     
-    private fun getWorldStorage(world: World): WorldDataStorage =
-        worlds.computeIfAbsent(world.uid) { WorldDataStorage(world) }
+    private suspend fun getOrLoadChunk(pos: ChunkPos): RegionChunk =
+        getOrLoadRegion(pos).getChunk(pos)
     
-    private fun getOrLoadRegion(pos: ChunkPos): RegionFile =
+    private suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile =
         getWorldStorage(pos.world!!).getOrLoadRegion(pos)
     
-    private fun getOrLoadChunk(pos: ChunkPos): RegionChunk =
-        getOrLoadRegion(pos).getChunk(pos)
+    internal fun getWorldStorage(world: World): WorldDataStorage =
+        worlds.computeIfAbsent(world.uid) { WorldDataStorage(world) }
     
 }

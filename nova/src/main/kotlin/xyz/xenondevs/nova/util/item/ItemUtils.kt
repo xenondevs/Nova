@@ -183,6 +183,12 @@ internal var MojangStack.adventureLore: List<Component>
         orCreateTag.getOrPut("display", ::CompoundTag).put("Lore", NBTUtils.createStringList(value.map(Component::toJson)))
     }
 
+internal fun Array<ItemStack?>.deepClone() =
+    Array(size) { get(it)?.clone() }
+
+internal inline fun <reified T> Array<T>.takeIndices(indices: IntArray) =
+    indices.map { get(it) }.toTypedArray()
+
 //<editor-fold desc="nova item data storage", defaultstate="collapsed">
 
 //<editor-fold desc="BukkitStack - Nova Compound", defaultstate="collapsed">

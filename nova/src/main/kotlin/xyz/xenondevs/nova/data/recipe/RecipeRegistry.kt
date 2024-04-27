@@ -4,10 +4,10 @@ import org.bukkit.Bukkit
 import org.bukkit.inventory.Recipe
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
-import xyz.xenondevs.nova.ui.menu.item.recipes.group.RecipeGroup
+import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.item.ItemUtils.getId
 import kotlin.reflect.full.isSuperclassOf

@@ -6,6 +6,7 @@ import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockState
+import org.joml.Vector3i
 import xyz.xenondevs.nova.util.Location
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -26,6 +27,9 @@ data class BlockPos(val world: World, val x: Int, val y: Int, val z: Int) {
     
     val location: Location
         get() = Location(world, x, y, z)
+    
+    val vector3i: Vector3i
+        get() = Vector3i(x, y, z)
     
     val block: Block
         get() = world.getBlockAt(x, y, z)

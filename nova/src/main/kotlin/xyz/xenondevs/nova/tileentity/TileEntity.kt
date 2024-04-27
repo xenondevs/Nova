@@ -25,8 +25,8 @@ import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.tileentity.menu.MenuContainer
-import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
-import xyz.xenondevs.nova.tileentity.network.fluid.container.DynamicFluidContainer
+import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidType
+import xyz.xenondevs.nova.tileentity.network.type.fluid.container.DynamicFluidContainer
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.util.data.CloseableProperty
 import xyz.xenondevs.nova.util.hasInventoryOpen
@@ -141,6 +141,8 @@ abstract class TileEntity(
     
     /**
      * Called when this [TileEntity] is enabled.
+     * 
+     * May not add or remove any [TileEntities][TileEntity].
      */
     open fun handleEnable() {
         isEnabled = true
@@ -148,10 +150,13 @@ abstract class TileEntity(
     
     /**
      * Called when this [TileEntity] is disabled.
+     * 
+     * May not add or remove any [TileEntities][TileEntity].
      */
     open fun handleDisable() {
         isEnabled = false
-        if (::menuContainer.isInitialized) menuContainer.closeWindows()
+        if (::menuContainer.isInitialized)
+            menuContainer.closeWindows()
     }
     
     /**
@@ -186,7 +191,7 @@ abstract class TileEntity(
     /**
      * Gets a list of [ItemStacks][ItemStack] to be dropped when this [TileEntity] is destroyed.
      */
-    open fun getDrops(includeSelf: Boolean): MutableList<ItemStack> {
+    open fun getDrops(includeSelf: Boolean): List<ItemStack> {
         val drops = ArrayList<ItemStack>()
         if (includeSelf) {
             saveData()
@@ -232,6 +237,7 @@ abstract class TileEntity(
      * @throws IllegalArgumentException If [blockState] is not of this [TileEntity's][TileEntity] block type.
      */
     fun updateBlockState(blockState: NovaBlockState) {
+        require(isEnabled) { "TileEntity needs to be enabled" }
         require(blockState.block == block) { "New block state needs to be of the same block type" }
         
         val prevBlockState = this.blockState

@@ -17,6 +17,6 @@ internal class ApiTileEntityWrapper(val tileEntity: TileEntity) : ITileEntity {
     override fun getBlock(): NovaBlock = ApiBlockWrapper(tileEntity.block)
     override fun getOwner(): OfflinePlayer? = tileEntity.owner
     override fun getLocation(): Location = tileEntity.pos.location
-    override fun getDrops(includeSelf: Boolean): MutableList<ItemStack> = tileEntity.getDrops(includeSelf)
+    override fun getDrops(includeSelf: Boolean): List<ItemStack> = tileEntity.getDrops(includeSelf)
     
 }

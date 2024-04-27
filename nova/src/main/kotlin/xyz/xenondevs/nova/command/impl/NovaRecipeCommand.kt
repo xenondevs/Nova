@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.command.player
 import xyz.xenondevs.nova.command.requiresPlayerPermission
 import xyz.xenondevs.nova.command.sendFailure
 import xyz.xenondevs.nova.data.recipe.RecipeRegistry
-import xyz.xenondevs.nova.ui.menu.item.recipes.showRecipes
+import xyz.xenondevs.nova.ui.menu.explorer.recipes.showRecipes
 
 internal object NovaRecipeCommand : Command("nvrecipe") {
     

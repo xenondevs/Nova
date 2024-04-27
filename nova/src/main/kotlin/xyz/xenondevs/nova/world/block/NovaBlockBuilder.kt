@@ -91,7 +91,7 @@ class NovaTileEntityBlockBuilder internal constructor(
 ) : AbstractNovaBlockBuilder<NovaTileEntityBlock>(id) {
     
     private var syncTickrate: Int = 20
-    private var asyncTickrate: Double = 20.0
+    private var asyncTickrate: Double = 0.0
     
     internal constructor(
         addon: Addon,
@@ -103,6 +103,7 @@ class NovaTileEntityBlockBuilder internal constructor(
     
     /**
      * Configures whether this tile-entity is interactive, i.e. if it can be right-clicked.
+     * 
      * Defaults to `true`.
      */
     fun interactive(interactive: Boolean) {
@@ -112,17 +113,23 @@ class NovaTileEntityBlockBuilder internal constructor(
     
     /**
      * Configures the amount of times [TileEntity.handleTick] is called per second.
+     * Accepts values from 0 to 20, with 0 disabling sync ticking.
+     * 
+     * Defaults to 20.
      */
     fun syncTickrate(syncTickrate: Int) {
-        require(syncTickrate in 1..20) { "Sync TPS must be between 1 and 20" }
+        require(syncTickrate in 0..20) { "Sync TPS must be between 0 and 20" }
         this.syncTickrate = syncTickrate
     }
     
     /**
      * Configures the amount of times [TileEntity.handleAsyncTick] is called per second.
+     * Accepts any value >= 0.0, with 0 disabling async ticking.
+     * 
+     * Defaults to 0 (disabled).
      */
     fun asyncTickrate(asyncTickrate: Double) {
-        require(asyncTickrate > 0) { "Async TPS must be greater than 0" }
+        require(asyncTickrate >= 0) { "Async TPS must be greater than or equal to 0" }
         this.asyncTickrate = asyncTickrate
     }
     

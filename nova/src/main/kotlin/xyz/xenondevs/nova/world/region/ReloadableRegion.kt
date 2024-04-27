@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.world.region
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.ui.item.VisualizeRegionItem
+import xyz.xenondevs.nova.ui.menu.item.VisualizeRegionItem
 import java.util.*
 
 abstract class ReloadableRegion(

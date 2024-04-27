@@ -11,6 +11,8 @@ import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.EntityArgument
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument
+import net.minecraft.commands.arguments.coordinates.Coordinates
 import net.minecraft.commands.arguments.selector.EntitySelector
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
@@ -18,6 +20,10 @@ import net.minecraft.world.item.Items
 import org.bukkit.block.data.BlockData
 import org.joml.Matrix4f
 import org.joml.Vector3f
+import xyz.xenondevs.commons.guava.component1
+import xyz.xenondevs.commons.guava.component2
+import xyz.xenondevs.commons.guava.component3
+import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.command.Command
@@ -43,20 +49,29 @@ import xyz.xenondevs.nova.item.enchantment.Enchantment
 import xyz.xenondevs.nova.item.logic.AdvancedTooltips
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
+import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.tileentity.network.NetworkType
+import xyz.xenondevs.nova.tileentity.network.node.NetworkBridge
+import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
+import xyz.xenondevs.nova.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.tileentity.network.type.NetworkType
+import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
-import xyz.xenondevs.nova.ui.menu.item.creative.ItemsWindow
+import xyz.xenondevs.nova.ui.menu.explorer.creative.ItemsWindow
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
+import xyz.xenondevs.nova.util.component.adventure.indent
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.runAsyncTask
+import xyz.xenondevs.nova.util.toNovaPos
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockMigrator
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.hitbox.HitboxManager
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
@@ -69,7 +84,10 @@ import xyz.xenondevs.nova.world.fakeentity.fakeEntityRenderDistance
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 import java.text.DecimalFormat
+import java.util.*
 import java.util.logging.Level
+import kotlin.math.max
+import kotlin.math.min
 
 internal object NovaCommand : Command("nova") {
     
@@ -116,6 +134,8 @@ internal object NovaCommand : Command("nova") {
                 .then(literal("removeInvalidVTEs")
                     .then(argument("range", IntegerArgumentType.integer(0))
                         .executesCatching(::removeInvalidVTEs)))
+                .then(literal("updateChunkSearchId")
+                    .executesCatching(::updateChunkSearchId))
                 .then(literal("getBlockData")
                     .requiresPlayer()
                     .executesCatching(::showBlockData))
@@ -125,10 +145,11 @@ internal object NovaCommand : Command("nova") {
                 .then(literal("getItemData")
                     .requiresPlayer()
                     .executesCatching(::showItemData))
-                .then(literal("reloadNetworks")
-                    .executesCatching(::reloadNetworks))
-                .then(literal("updateChunkSearchId")
-                    .executesCatching(::updateChunkSearchId))
+                .then(literal("getNetworkNodeInfo")
+                    .requiresPlayer()
+                    .executesCatching(::showNetworkNodeInfoLookingAt)
+                    .then(argument("pos", BlockPosArgument.blockPos())
+                        .executesCatching(::showNetworkNodeInfoAt)))
                 .then(literal("showNetwork")
                     .requiresPlayer()
                     .apply {
@@ -138,9 +159,22 @@ internal object NovaCommand : Command("nova") {
                         }
                     }
                 )
+                .then(literal("showNetworkClusters")
+                    .requiresPlayer()
+                    .executesCatching(::toggleNetworkClusterDebugging))
                 .then(literal("showHitboxes")
                     .requiresPlayer()
-                    .executesCatching(::toggleHitboxDebugging)))
+                    .executesCatching(::toggleHitboxDebugging))
+                .then(literal("fill")
+                    .requiresPlayer()
+                    .then(argument("from", BlockPosArgument.blockPos())
+                        .then(argument("to", BlockPosArgument.blockPos())
+                            .apply {
+                                for (block in NovaRegistries.BLOCK) {
+                                    then(literal(block.id.toString()).executesCatching { fillArea(block, it) })
+                                }
+                            }
+                        ))))
             .then(literal("items")
                 .requiresPlayerPermission("nova.command.items")
                 .executesCatching(::openItemInventory))
@@ -478,13 +512,6 @@ internal object NovaCommand : Command("nova") {
         }
     }
     
-    private fun reloadNetworks(ctx: CommandContext<CommandSourceStack>) {
-        NetworkManager.queueAsync {
-            it.reloadNetworks()
-            ctx.source.sendSuccess(Component.translatable("command.nova.network_reload.success", NamedTextColor.GRAY))
-        }
-    }
-    
     private fun showBlockData(ctx: CommandContext<CommandSourceStack>) {
         val pos = ctx.player.getTargetBlockExact(8)?.location?.pos
         if (pos != null) {
@@ -615,12 +642,212 @@ internal object NovaCommand : Command("nova") {
     
     private fun toggleNetworkDebugging(ctx: CommandContext<CommandSourceStack>, type: NetworkType) {
         val player = ctx.player
-        NetworkDebugger.toggleDebugger(type, player)
+        val enabled = NetworkDebugger.toggleDebugger(type, player)
         
         ctx.source.sendSuccess(Component.translatable(
-            "command.nova.network_debug." + type.id.toLanguageKey(),
+            "command.nova.network_debug.${type.id.toLanguageKey()}.${if (enabled) "on" else "off"}",
             NamedTextColor.GRAY
         ))
+    }
+    
+    private fun toggleNetworkClusterDebugging(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        val enabled = NetworkDebugger.toggleClusterDebugger(player)
+        
+        ctx.source.sendSuccess(Component.translatable(
+            "command.nova.network_cluster_debug.${if (enabled) "on" else "off"}",
+            NamedTextColor.GRAY
+        ))
+    }
+    
+    private fun showNetworkNodeInfoLookingAt(ctx: CommandContext<CommandSourceStack>) {
+        val pos = ctx.player.getTargetBlockExact(8)?.location?.pos
+        if (pos != null) {
+            showNetworkNodeInfo(pos, ctx)
+        } else ctx.source.sendFailure(Component.translatable("command.nova.show_network_node_info.failure", NamedTextColor.RED))
+    }
+    
+    private fun showNetworkNodeInfoAt(ctx: CommandContext<CommandSourceStack>) {
+        val pos = ctx.get<Coordinates>("pos")
+            .getBlockPos(ctx.source)
+            .toNovaPos(ctx.source.bukkitWorld!!)
+        
+        showNetworkNodeInfo(pos, ctx)
+    }
+    
+    private fun showNetworkNodeInfo(pos: BlockPos, ctx: CommandContext<CommandSourceStack>) {
+        val node = NetworkManager.getNode(pos)
+        if (node != null) {
+            NetworkManager.queueRead(pos.world) { state ->
+                val connectedNodes = state.getConnectedNodes(node)
+                
+                fun buildNetworkInfoComponent(id: UUID): Component {
+                    val network = state.resolveNetwork(id)
+                    return Component.translatable(
+                        "command.nova.show_network_node_info.network", NamedTextColor.GRAY,
+                        Component.text(network.type.id.toString(), NamedTextColor.AQUA),
+                        Component.text(id.toString(), NamedTextColor.AQUA),
+                        Component.text(network.nodes.size, NamedTextColor.AQUA),
+                        Component.text(network.nodes.values.count { (node, _) -> node is NetworkBridge }, NamedTextColor.AQUA),
+                        Component.text(network.nodes.values.count { (node, _) -> node is NetworkEndPoint }, NamedTextColor.AQUA)
+                    )
+                }
+                
+                fun buildNodeNameComponent(node: NetworkNode): Component =
+                    Component.text()
+                        .color(NamedTextColor.AQUA)
+                        .append(
+                            when (node) {
+                                is TileEntity -> node.block.name
+                                is VanillaTileEntity -> Component.translatable(node.pos.block.type.blockTranslationKey ?: "")
+                                else -> Component.text(node::class.simpleName ?: "")
+                            }
+                        ).build()
+                
+                fun buildNodeComponent(node: NetworkNode): Component =
+                    buildNodeNameComponent(node)
+                        .hoverEvent(Component.translatable(
+                            "command.nova.show_network_node_info.node", NamedTextColor.GRAY,
+                            buildNodeNameComponent(node),
+                            Component.text(node.pos.world.name, NamedTextColor.AQUA),
+                            Component.text(node.pos.x, NamedTextColor.AQUA),
+                            Component.text(node.pos.y, NamedTextColor.AQUA),
+                            Component.text(node.pos.z, NamedTextColor.AQUA)
+                        ))
+                
+                val builder = Component.text()
+                    .color(NamedTextColor.GRAY)
+                
+                when (node) {
+                    is NetworkBridge -> {
+                        val networks = state.getNetworks(node)
+                        
+                        builder
+                            .append(Component.translatable("command.nova.show_network_node_info.bridge.header", buildNodeComponent(node)))
+                            .appendNewline().indent(2)
+                            .append(Component.translatable(
+                                "command.nova.show_network_node_info.bridge.supported_network_types",
+                                Component.join(
+                                    JoinConfiguration.commas(true),
+                                    state.getSupportedNetworkTypes(node).map { Component.text(it.id.toString(), NamedTextColor.AQUA) }
+                                )))
+                            .appendNewline().indent(2)
+                            .append(Component.translatable(
+                                "command.nova.show_network_node_info.bridge.allowed_faces",
+                                Component.join(
+                                    JoinConfiguration.commas(true),
+                                    state.getBridgeFaces(node).map { Component.text(it.name, NamedTextColor.AQUA) }
+                                )
+                            ))
+                            .appendNewline().indent(2)
+                            .append(Component.translatable(
+                                "command.nova.show_network_node_info.networks.header",
+                                Component.text(networks.size, NamedTextColor.AQUA)
+                            ))
+                            .appendNewline()
+                        
+                        for ((type, id) in networks) {
+                            builder
+                                .indent(4)
+                                .append(Component.translatable(
+                                    "command.nova.show_network_node_info.bridge.networks.entry",
+                                    Component.text(type.id.toString(), NamedTextColor.AQUA),
+                                    Component
+                                        .text(id.toString().take(8) + "...", NamedTextColor.AQUA)
+                                        .hoverEvent(buildNetworkInfoComponent(id))
+                                ))
+                                .appendNewline()
+                        }
+                    }
+                    
+                    is NetworkEndPoint -> {
+                        val networks = state.getNetworks(node)
+                        
+                        builder
+                            .append(Component.translatable("command.nova.show_network_node_info.end_point.header", buildNodeComponent(node)))
+                            .appendNewline().indent(2)
+                            .append(Component.translatable(
+                                "command.nova.show_network_node_info.networks.header",
+                                Component.text(networks.size(), NamedTextColor.AQUA)
+                            ))
+                            .appendNewline()
+                        
+                        for ((type, face, id) in networks) {
+                            builder
+                                .indent(4)
+                                .append(Component.translatable(
+                                    "command.nova.show_network_node_info.end_point.networks.entry",
+                                    Component.text(type.id.toString(), NamedTextColor.AQUA),
+                                    Component.text(face.name, NamedTextColor.AQUA),
+                                    Component
+                                        .text(id.toString().take(8) + "...", NamedTextColor.AQUA)
+                                        .hoverEvent(buildNetworkInfoComponent(id))
+                                ))
+                                .appendNewline()
+                        }
+                    }
+                }
+                
+                builder
+                    .indent(2)
+                    .append(
+                        Component.translatable(
+                            "command.nova.show_network_node_info.connected_nodes.header",
+                            Component.text(connectedNodes.size(), NamedTextColor.AQUA)
+                        )
+                    )
+                    .appendNewline()
+                
+                for ((type, face, connectedNode) in connectedNodes) {
+                    builder
+                        .indent(4)
+                        .append(Component.translatable(
+                            "command.nova.show_network_node_info.connected_nodes.entry",
+                            Component.text(type.id.toString(), NamedTextColor.AQUA),
+                            Component.text(face.name, NamedTextColor.AQUA),
+                            buildNodeComponent(connectedNode)
+                        ))
+                        .appendNewline()
+                }
+                
+                builder
+                    .indent(2)
+                    .append(Component.translatable(
+                        "command.nova.show_network_node_info.linked_nodes.header",
+                        Component.text(node.linkedNodes.size, NamedTextColor.AQUA)
+                    ))
+                    .appendNewline()
+                
+                for (relatedNode in node.linkedNodes) {
+                    builder
+                        .indent(4)
+                        .append(Component.translatable(
+                            "command.nova.show_network_node_info.linked_nodes.entry",
+                            buildNodeComponent(relatedNode),
+                        ))
+                        .appendNewline()
+                }
+                
+                builder
+                    .indent(2)
+                    .append(Component.translatable(
+                        "command.nova.show_network_node_info.initialized",
+                        if (node in state)
+                            Component.text("true", NamedTextColor.GREEN)
+                        else Component.text("false", NamedTextColor.RED)
+                    ))
+                
+                ctx.source.sendSuccess(builder.build())
+            }
+        } else {
+            ctx.source.sendFailure(Component.translatable(
+                "command.nova.show_network_node_info.failure", NamedTextColor.RED,
+                Component.text(pos.world.name, NamedTextColor.AQUA),
+                Component.text(pos.x, NamedTextColor.AQUA),
+                Component.text(pos.y, NamedTextColor.AQUA),
+                Component.text(pos.z, NamedTextColor.AQUA)
+            ))
+        }
     }
     
     private fun toggleHitboxDebugging(ctx: CommandContext<CommandSourceStack>) {
@@ -630,6 +857,44 @@ internal object NovaCommand : Command("nova") {
         ctx.source.sendSuccess(Component.translatable(
             "command.nova.hitbox_debug",
             NamedTextColor.GRAY
+        ))
+    }
+    
+    private fun fillArea(block: NovaBlock, ctx: CommandContext<CommandSourceStack>) {
+        val world = ctx.source.bukkitWorld!!
+        val from = ctx.get<Coordinates>("from").getBlockPos(ctx.source)
+        val to = ctx.get<Coordinates>("to").getBlockPos(ctx.source)
+        val minX = min(from.x, to.x)
+        val maxX = max(from.x, to.x)
+        val minY = min(from.y, to.y)
+        val maxY = max(from.y, to.y)
+        val minZ = min(from.z, to.z)
+        val maxZ = max(from.z, to.z)
+        
+        val placeCtxBuilder = Context.intention(ContextIntentions.BlockPlace)
+            .param(ContextParamTypes.BLOCK_TYPE_NOVA, block)
+        
+        for (x in minX..maxX) {
+            for (y in minY..maxY) {
+                for (z in minZ..maxZ) {
+                    BlockUtils.placeBlock(
+                        placeCtxBuilder
+                            .param(ContextParamTypes.BLOCK_POS, BlockPos(world, x, y, z))
+                            .build()
+                    )
+                }
+            }
+        }
+        
+        ctx.source.sendSuccess(Component.translatable(
+            "command.nova.fill.success", NamedTextColor.GRAY,
+            Component.text(minX, NamedTextColor.AQUA),
+            Component.text(minY, NamedTextColor.AQUA),
+            Component.text(minZ, NamedTextColor.AQUA),
+            Component.text(maxX, NamedTextColor.AQUA),
+            Component.text(maxY, NamedTextColor.AQUA),
+            Component.text(maxZ, NamedTextColor.AQUA),
+            block.name.color(NamedTextColor.AQUA)
         ))
     }
     

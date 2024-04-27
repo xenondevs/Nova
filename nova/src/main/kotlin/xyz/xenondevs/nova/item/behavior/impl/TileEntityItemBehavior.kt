@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.util.NumberFormatUtils
 
 object TileEntityItemBehavior : ItemBehavior {

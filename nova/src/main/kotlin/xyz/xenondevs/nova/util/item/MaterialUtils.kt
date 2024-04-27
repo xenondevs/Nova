@@ -6,7 +6,7 @@ import org.bukkit.SoundGroup
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidType
 import kotlin.random.Random
 
 @Suppress("DEPRECATION")
