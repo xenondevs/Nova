@@ -50,7 +50,7 @@ internal sealed interface NetworkTicker {
 }
 
 /**
- * A [NetworkTicker] implementation for all server software that has a single main thread.
+ * A [NetworkTicker] implementation for server software that has a single main thread.
  */
 private class PaperNetworkTicker : NetworkTicker {
     

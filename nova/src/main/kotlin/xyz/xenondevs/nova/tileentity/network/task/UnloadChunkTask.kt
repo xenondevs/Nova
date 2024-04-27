@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
-import java.util.*
 
 internal class UnloadChunkTask(
     state: NetworkState,
@@ -17,10 +16,14 @@ internal class UnloadChunkTask(
 ) : NetworkTask(state) {
     
     override suspend fun run(): Boolean {
+        val clustersToInit = HashSet<ProtoNetwork>()
+        
         fun remove(node: NetworkNode, network: ProtoNetwork) {
             network.unloadNode(node)
-            if (network.isEmpty())
-                state -= network
+            network.cluster?.forEach { previouslyClusteredNetwork ->
+                previouslyClusteredNetwork.invalidateCluster()
+                clustersToInit += previouslyClusteredNetwork
+            }
         }
         
         val chunkNodes = NetworkManager.getNodes(pos).associateByTo(HashMap(), NetworkNode::pos)
@@ -43,6 +46,14 @@ internal class UnloadChunkTask(
                     state.forEachNetwork(node) { _, _ , network -> remove(node, network) }
                 
                 else -> throw IllegalStateException("Node type and data type do not match")
+            }
+        }
+        
+        for (network in clustersToInit) {
+            if (network.isUnloaded()) {
+                state -= network
+            } else {
+                network.initCluster()
             }
         }
         

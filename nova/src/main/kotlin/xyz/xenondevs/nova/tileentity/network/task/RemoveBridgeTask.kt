@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network.task
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.tileentity.network.HashProtoNetwork
 import xyz.xenondevs.nova.tileentity.network.NetworkData
 import xyz.xenondevs.nova.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.tileentity.network.node.MutableNetworkNodeConnection

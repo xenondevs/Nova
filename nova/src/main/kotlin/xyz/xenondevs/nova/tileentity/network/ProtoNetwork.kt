@@ -194,6 +194,13 @@ class ProtoNetwork(
     }
     
     /**
+     * Checks whether all nodes in this [ProtoNetwork] are unloaded.
+     */
+    fun isUnloaded(): Boolean {
+        return nodes.values.all { it.node is GhostNetworkNode }
+    }
+    
+    /**
      * Completely builds the [cluster] based on [nodes].
      * Building a cluster also initializes / updates the clusters of all
      * [ProtoNetworks][ProtoNetwork] that are clustered with it.
@@ -274,7 +281,7 @@ class ProtoNetwork(
     }
     
     private fun queueNetworks(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork>, node: NetworkNode) {
-        // ghost nodes do not affect clustering, since they're unloaded anyway
+        // ghost nodes do not affect clustering because they're unloaded
         if (node is GhostNetworkNode)
             return
         
@@ -327,7 +334,12 @@ class ProtoNetwork(
             val size = reader.readVarInt()
             val nodes = HashMap<BlockPos, MutableNetworkNodeConnection>()
             for (i in 0 until size) {
-                val pos = reader.readXYZ(world)
+                val pos = BlockPos(
+                    world,
+                    reader.readVarInt(),
+                    reader.readVarInt(),
+                    reader.readVarInt()
+                )
                 
                 nodes[pos] = MutableNetworkNodeConnection(
                     GhostNetworkNode.fromData(pos, state.getOrLoadNodeData(pos)),
@@ -344,24 +356,13 @@ class ProtoNetwork(
             writer.writeString(network.type.toString())
             writer.writeVarInt(network.nodes.size)
             for ((pos, connection) in network.nodes) {
-                writer.writeXYZ(pos)
+                writer.writeVarInt(pos.x)
+                writer.writeVarInt(pos.y)
+                writer.writeVarInt(pos.z)
                 writer.writeCubeFaceSet(connection.faces)
             }
         }
         
     }
     
-}
-
-private fun ByteWriter.writeXYZ(pos: BlockPos) {
-    writeVarInt(pos.x)
-    writeVarInt(pos.y)
-    writeVarInt(pos.z)
-}
-
-private fun ByteReader.readXYZ(world: World): BlockPos {
-    val x = readVarInt()
-    val y = readVarInt()
-    val z = readVarInt()
-    return BlockPos(world, x, y, z)
 }
