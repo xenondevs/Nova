@@ -8,9 +8,6 @@ import xyz.xenondevs.nova.world.format.chunk.container.ArraySectionDataContainer
 import xyz.xenondevs.nova.world.format.chunk.container.MapSectionDataContainer
 import xyz.xenondevs.nova.world.format.chunk.container.SectionDataContainer
 import xyz.xenondevs.nova.world.format.chunk.container.SingleValueSectionDataContainer
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
 
 /**
  * A 16x16x16 section of a [RegionChunk].
@@ -25,24 +22,22 @@ internal class RegionChunkSection<T>(
     
     constructor(idResolver: IdResolver<T>) : this(idResolver, MapSectionDataContainer(idResolver))
     
-    val lock = ReentrantReadWriteLock(true)
-    
     /**
      * Returns true if this section is empty.
      */
     fun isEmpty(): Boolean =
-        lock.read { container.nonEmptyBlockCount == 0 }
+        container.nonEmptyBlockCount == 0
     
     /**
      * Retrieves the [NovaBlockState] at the given [x], [y] and [z] section coordinates.
      */
     operator fun get(x: Int, y: Int, z: Int): T? =
-        lock.read { container[x, y, z] }
+        container[x, y, z]
     
     /**
      * Sets the [NovaBlockState] at the given [x], [y] and [z] section coordinates.
      */
-    operator fun set(x: Int, y: Int, z: Int, state: T?) = lock.write {
+    operator fun set(x: Int, y: Int, z: Int, state: T?) {
         val current = get(x, y, z)
         if (current == state)
             return
@@ -54,7 +49,7 @@ internal class RegionChunkSection<T>(
     /**
      * Migrates the container to another type if necessary.
      */
-    private fun checkMigrateContainer(state: T?) = lock.write {
+    private fun checkMigrateContainer(state: T?) {
         val container = container
         when {
             // convert from single value container if a state has changed
@@ -77,7 +72,7 @@ internal class RegionChunkSection<T>(
      * Writes this section to the given [writer].
      * Returns true if the section was written, false if it was empty.
      */
-    fun write(writer: ByteWriter): Boolean = lock.read {
+    fun write(writer: ByteWriter): Boolean {
         optimizeContainer()
         
         if (container.nonEmptyBlockCount == 0)
@@ -90,7 +85,7 @@ internal class RegionChunkSection<T>(
     /**
      * Converts the container to a more efficient type if possible.
      */
-    private fun optimizeContainer() = lock.write {
+    private fun optimizeContainer() {
         val container = container
         
         // single value container cannot be optimized further

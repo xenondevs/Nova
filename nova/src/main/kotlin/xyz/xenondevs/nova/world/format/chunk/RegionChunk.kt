@@ -34,10 +34,9 @@ import xyz.xenondevs.nova.world.format.BlockStateIdResolver
 import java.io.ByteArrayOutputStream
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.util.concurrent.locks.ReentrantLock
 import java.util.logging.Level
-import kotlin.concurrent.read
-import kotlin.concurrent.write
+import kotlin.concurrent.withLock
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToLong
 import kotlin.random.Random
@@ -49,11 +48,14 @@ internal class RegionChunk(
     private val tileEntityData: MutableMap<BlockPos, Compound> = HashMap(),
 ) : RegionizedChunk {
     
-    private val lock = ReentrantReadWriteLock(true)
+    private val lock = ReentrantLock()
     
     @Volatile
     var isEnabled = false
         private set
+    
+    private var shouldTick = false
+    private var isTicking = false
     
     private val world = pos.world!!
     private val level = world.serverLevel
@@ -64,6 +66,7 @@ internal class RegionChunk(
     private val vanillaTileEntities: MutableMap<BlockPos, VanillaTileEntity> = HashMap()
     private val tileEntities: MutableMap<BlockPos, TileEntity> = ConcurrentHashMap() // concurrent to allow modifications during ticking
     
+    private var sectionsEmpty = sections.all { it.isEmpty() }
     private var tick = 0
     private var asyncTickerSupervisor: Job? = null
     private var tileEntityAsyncTickers: HashMap<TileEntity, Job>? = null
@@ -119,36 +122,54 @@ internal class RegionChunk(
     /**
      * Gets the [NovaBlockState] at the given [pos].
      */
-    fun getBlockState(pos: BlockPos): NovaBlockState? =
-        getSection(pos.y)[pos.x and 0xF, pos.y and 0xF, pos.z and 0xF]
+    fun getBlockState(pos: BlockPos): NovaBlockState? = lock.withLock {
+        return getSection(pos.y)[pos.x and 0xF, pos.y and 0xF, pos.z and 0xF]
+    }
     
     /**
      * Sets the [BlockState][state] at the given [pos].
      */
-    fun setBlockState(pos: BlockPos, state: NovaBlockState?) {
-        getSection(pos.y)[pos.x and 0xF, pos.y and 0xF, pos.z and 0xF] = state
-        
+    fun setBlockState(pos: BlockPos, state: NovaBlockState?) = lock.withLock {
+        val section = getSection(pos.y)
+        section[pos.x and 0xF, pos.y and 0xF, pos.z and 0xF] = state
         if (state != null) {
-            lock.read { tileEntities[pos]?.blockState = state }
+            tileEntities[pos]?.blockState = state
+            
+            // if this is the first block in the chunk, we may need to start ticking it
+            if (sectionsEmpty) {
+                sectionsEmpty = false
+                if (shouldTick && !isTicking) {
+                    startTicking()
+                }
+            }
+        } else if (!sectionsEmpty && section.isEmpty()) {
+            // this section is now empty, so we check if the whole chunk is empty
+            sectionsEmpty = sections.all { it.isEmpty() }
+            if (sectionsEmpty && isTicking) {
+                stopTicking()
+                shouldTick = true
+            }
         }
     }
     
     /**
      * Gets the [VanillaTileEntity] at the given [pos].
      */
-    fun getVanillaTileEntity(pos: BlockPos): VanillaTileEntity? =
-        lock.read { vanillaTileEntities[pos] }
+    fun getVanillaTileEntity(pos: BlockPos): VanillaTileEntity? = lock.withLock {
+        return vanillaTileEntities[pos]
+    }
     
     /**
      * Gets a snapshot of all [VanillaTileEntities][VanillaTileEntity] in this chunk.
      */
-    fun getVanillaTileEntities(): List<VanillaTileEntity> =
-        lock.read { ArrayList(vanillaTileEntities.values) }
+    fun getVanillaTileEntities(): List<VanillaTileEntity> = lock.withLock {
+        return ArrayList(vanillaTileEntities.values)
+    }
     
     /**
      * Sets the [VanillaTileEntity][vte] at the given [pos].
      */
-    fun setVanillaTileEntity(pos: BlockPos, vte: VanillaTileEntity?): VanillaTileEntity? = lock.write {
+    fun setVanillaTileEntity(pos: BlockPos, vte: VanillaTileEntity?): VanillaTileEntity? = lock.withLock {
         val previous: VanillaTileEntity?
         if (vte == null) {
             previous = vanillaTileEntities.remove(pos)
@@ -170,19 +191,21 @@ internal class RegionChunk(
     /**
      * Gets the [TileEntity] at the given [pos].
      */
-    fun getTileEntity(pos: BlockPos): TileEntity? =
-        lock.read { tileEntities[pos] }
+    fun getTileEntity(pos: BlockPos): TileEntity? = lock.withLock {
+        return tileEntities[pos]
+    }
     
     /**
      * Gets a snapshot of all [TileEntities][TileEntity] in this chunk.
      */
-    fun getTileEntities(): List<TileEntity> =
-        lock.read { tileEntities.values.toList() }
+    fun getTileEntities(): List<TileEntity> = lock.withLock {
+        return tileEntities.values.toList()
+    }
     
     /**
      * Sets the [tileEntity] at the given [pos].
      */
-    fun setTileEntity(pos: BlockPos, tileEntity: TileEntity?): TileEntity? = lock.write {
+    fun setTileEntity(pos: BlockPos, tileEntity: TileEntity?): TileEntity? = lock.withLock {
         val previous: TileEntity?
         if (tileEntity == null) {
             previous = tileEntities.remove(pos)
@@ -216,24 +239,15 @@ internal class RegionChunk(
     /**
      * Enables this RegionChunk.
      *
-     * Enabling a RegionChunk activates synchronous and asynchronous tile-entity ticking,
-     * as well as random ticks and also calls [TileEntity.handleEnable].
+     * This loads all models and calls [TileEntity.handleEnable], [VanillaTileEntity.handleEnable].
+     * 
+     * May only be called from the server thread.
      */
     fun enable() {
         checkServerThread()
-        lock.write {
+        lock.withLock {
             if (isEnabled)
                 return
-            
-            // enable sync ticking
-            syncTicker = runTaskTimer(0, 1, ::tick)
-            
-            // enable async ticking
-            val supervisor = SupervisorJob(AsyncExecutor.SUPERVISOR)
-            asyncTickerSupervisor = supervisor
-            tileEntityAsyncTickers = tileEntities.values.asSequence()
-                .filter { it.block.asyncTickrate > 0 }
-                .associateWithTo(HashMap()) { launchAsyncTicker(supervisor, it) }
             
             // load models
             for ((pos, tileEntity) in tileEntities)
@@ -256,24 +270,17 @@ internal class RegionChunk(
     }
     
     /**
-     * Disables this RegionChunk.
+     * Disables this [RegionChunk].
      *
-     * Disabling a RegionChunk deactivates synchronous and asynchronous tile-entity ticking, as well as random ticks and
-     * also calls [TileEntity.handleDisable].
+     * This unloads all models and calls [TileEntity.handleDisable], [VanillaTileEntity.handleDisable].
+     * 
+     * May only be called from the server thread.
      */
     fun disable() {
         checkServerThread()
-        lock.write {
+        lock.withLock {
             if (!isEnabled)
                 return
-            
-            // disable sync ticking
-            syncTicker?.cancel()
-            syncTicker = null
-            
-            // disable async ticking
-            asyncTickerSupervisor?.cancel("Chunk ticking disabled")
-            tileEntityAsyncTickers = null
             
             // unload models
             for ((pos, tileEntity) in tileEntities)
@@ -286,7 +293,51 @@ internal class RegionChunk(
         }
     }
     
-    private fun tick() = lock.read {
+    /**
+     * Starts ticking this [RegionChunk].
+     */
+    fun startTicking(): Unit = lock.withLock {
+        if (isTicking)
+            return
+        
+        shouldTick = true
+        
+        if (sectionsEmpty)
+            return
+        
+        // enable sync ticking
+        syncTicker = runTaskTimer(0, 1, ::tick)
+        
+        // enable async ticking
+        val supervisor = SupervisorJob(AsyncExecutor.SUPERVISOR)
+        asyncTickerSupervisor = supervisor
+        tileEntityAsyncTickers = tileEntities.values.asSequence()
+            .filter { it.block.asyncTickrate > 0 }
+            .associateWithTo(HashMap()) { launchAsyncTicker(supervisor, it) }
+        
+        isTicking = true
+    }
+    
+    /**
+     * Stops ticking this [RegionChunk].
+     */
+    fun stopTicking(): Unit = lock.withLock {
+        if (!isTicking)
+            return
+        
+        // disable sync ticking
+        syncTicker?.cancel()
+        syncTicker = null
+        
+        // disable async ticking
+        asyncTickerSupervisor?.cancel("Chunk ticking disabled")
+        tileEntityAsyncTickers = null
+        
+        shouldTick = false
+        isTicking = false
+    }
+    
+    private fun tick() = lock.withLock {
         tick++
         
         // tile-entity ticks
@@ -310,20 +361,18 @@ internal class RegionChunk(
         val randomTickSpeed = level.gameRules.getInt(GameRules.RULE_RANDOMTICKING)
         if (randomTickSpeed > 0) {
             for (section in sections) {
-                section.lock.read {
-                    if (!section.isEmpty()) {
-                        repeat(randomTickSpeed) {
-                            val x = Random.nextInt(0, 16)
-                            val y = Random.nextInt(0, 16)
-                            val z = Random.nextInt(0, 16)
-                            val blockState = section[x, y, z]
-                            if (blockState != null) {
-                                val pos = BlockPos(world, pos.x + x, minHeight + y, pos.z + z)
-                                try {
-                                    blockState.block.handleRandomTick(pos, blockState)
-                                } catch (t: Throwable) {
-                                    LOGGER.log(Level.SEVERE, "An exception occurred while ticking block $blockState at $pos", t)
-                                }
+                if (!section.isEmpty()) {
+                    repeat(randomTickSpeed) {
+                        val x = Random.nextInt(0, 16)
+                        val y = Random.nextInt(0, 16)
+                        val z = Random.nextInt(0, 16)
+                        val blockState = section[x, y, z]
+                        if (blockState != null) {
+                            val pos = BlockPos(world, pos.x + x, minHeight + y, pos.z + z)
+                            try {
+                                blockState.block.handleRandomTick(pos, blockState)
+                            } catch (t: Throwable) {
+                                LOGGER.log(Level.SEVERE, "An exception occurred while ticking block $blockState at $pos", t)
                             }
                         }
                     }
@@ -359,38 +408,30 @@ internal class RegionChunk(
     /**
      * Writes this chunk to the given [writer].
      */
-    override fun write(writer: ByteWriter): Boolean = lock.read {
-        // acquire read locks for all sections
-        for (section in sections) section.lock.readLock().lock()
+    override fun write(writer: ByteWriter): Boolean = lock.withLock {
+        if (vanillaTileEntityData.isEmpty() && tileEntityData.isEmpty() && sections.all { it.isEmpty() })
+            return false
         
-        try {
-            if (vanillaTileEntityData.isEmpty() && tileEntityData.isEmpty() && sections.all { it.isEmpty() })
-                return false
-            
-            vanillaTileEntities.values.forEach(VanillaTileEntity::saveData)
-            tileEntities.values.forEach(TileEntity::saveData)
-            
-            // TODO: don't serialize pos as BlockPos
-            CBF.write(vanillaTileEntityData.takeUnlessEmpty(), writer)
-            CBF.write(tileEntityData.takeUnlessEmpty(), writer)
-            
-            val sectionBitmask = BitSet(sectionCount)
-            val sectionsBuffer = ByteArrayOutputStream()
-            val sectionsWriter = ByteWriter.fromStream(sectionsBuffer)
-            
-            for ((sectionIdx, section) in sections.withIndex()) {
-                sectionBitmask.set(sectionIdx, section.write(sectionsWriter))
-            }
-            
-            writer.writeInt(sectionCount)
-            writer.writeBytes(Arrays.copyOf(sectionBitmask.toByteArray(), sectionCount.ceilDiv(8)))
-            writer.writeBytes(sectionsBuffer.toByteArray())
-            
-            return true
-        } finally {
-            // release read locks for all sections
-            for (section in sections) section.lock.readLock().unlock()
+        vanillaTileEntities.values.forEach(VanillaTileEntity::saveData)
+        tileEntities.values.forEach(TileEntity::saveData)
+        
+        // TODO: don't serialize pos as BlockPos
+        CBF.write(vanillaTileEntityData.takeUnlessEmpty(), writer)
+        CBF.write(tileEntityData.takeUnlessEmpty(), writer)
+        
+        val sectionBitmask = BitSet(sectionCount)
+        val sectionsBuffer = ByteArrayOutputStream()
+        val sectionsWriter = ByteWriter.fromStream(sectionsBuffer)
+        
+        for ((sectionIdx, section) in sections.withIndex()) {
+            sectionBitmask.set(sectionIdx, section.write(sectionsWriter))
         }
+        
+        writer.writeInt(sectionCount)
+        writer.writeBytes(Arrays.copyOf(sectionBitmask.toByteArray(), sectionCount.ceilDiv(8)))
+        writer.writeBytes(sectionsBuffer.toByteArray())
+        
+        return true
     }
     
     companion object : RegionizedChunkReader<RegionChunk>() {

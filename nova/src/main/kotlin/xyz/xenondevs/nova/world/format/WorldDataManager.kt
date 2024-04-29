@@ -81,6 +81,14 @@ object WorldDataManager : Listener {
         GlobalScope.launch { worlds.values.forEach { it.loadAsync(pos) } }
     }
     
+    internal fun startTicking(pos: ChunkPos) {
+        runBlocking { getOrLoadChunk(pos).startTicking() }
+    }
+    
+    internal fun stopTicking(pos: ChunkPos) {
+        runBlocking { getOrLoadChunk(pos).stopTicking() }
+    }
+    
     fun getBlockState(pos: BlockPos): NovaBlockState? =
         runBlocking { getOrLoadChunk(pos.chunkPos).getBlockState(pos) }
     
