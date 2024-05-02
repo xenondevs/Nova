@@ -28,7 +28,6 @@ import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.type.fluid.container.DynamicFluidContainer
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
-import xyz.xenondevs.nova.util.data.CloseableProperty
 import xyz.xenondevs.nova.util.hasInventoryOpen
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.salt
@@ -43,8 +42,6 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.region.DynamicRegion
 import xyz.xenondevs.nova.world.region.Region
 import java.util.*
-import kotlin.properties.ReadOnlyProperty
-import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
 import xyz.xenondevs.nova.tileentity.menu.TileEntityMenuClass as TileEntityMenuAnnotation
@@ -111,7 +108,6 @@ abstract class TileEntity(
         internal set
     
     private val dropProviders = ArrayList<() -> Collection<ItemStack>>()
-    private val removeHandlers = ArrayList<() -> Unit>()
     lateinit var menuContainer: MenuContainer
         private set
     
@@ -252,24 +248,6 @@ abstract class TileEntity(
      */
     fun dropProvider(provider: () -> Collection<ItemStack>) {
         dropProviders += provider
-    }
-    
-    /**
-     * Creates a mutable property that will be closed using the specified [closeAction] when the [TileEntity] is disabled.
-     */
-    fun <V> closeable(initialValue: V, closeAction: (V) -> Unit): ReadWriteProperty<Any, V> {
-        val property = CloseableProperty(initialValue, closeAction)
-        removeHandlers += { property.closeAction(property.value) }
-        return property
-    }
-    
-    /**
-     * Creates a property that will be closed using its [AutoCloseable.close] function when the [TileEntity] is disabled.
-     */
-    fun <V : AutoCloseable> closeable(closeable: V): ReadOnlyProperty<Any, V> {
-        val property = CloseableProperty(closeable) { closeable.close() }
-        removeHandlers += { closeable.close() }
-        return property
     }
     
     /**
