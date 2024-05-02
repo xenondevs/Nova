@@ -95,7 +95,7 @@ class BlockModelLayoutBuilder internal constructor() {
     /**
      * Configures this block to not use any custom models, but instead use the given [stateSelector].
      */
-    internal fun modelLess(stateSelector: BlockStateSelector) {
+    fun modelLess(stateSelector: BlockStateSelector) {
         layoutType = LayoutType.MODEL_LESS
         this.stateSelector = stateSelector
     }
