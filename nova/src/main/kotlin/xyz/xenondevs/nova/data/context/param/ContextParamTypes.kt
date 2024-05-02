@@ -175,6 +175,8 @@ object ContextParamTypes {
      *
      * Autofilled by:
      * - [SOURCE_ENTITY] and [INTERACTION_HAND]
+     * - [BLOCK_TYPE_NOVA] if the block has an item type
+     * - [BLOCK_TYPE_VANILLA] if the block has an item type
      *
      * Autofills:
      * - [TILE_ENTITY_DATA_NOVA] if data is present
@@ -186,6 +188,8 @@ object ContextParamTypes {
             .autofilledBy(::SOURCE_ENTITY, ::INTERACTION_HAND) { entity, hand ->
                 (entity as? LivingEntity)?.equipment?.getItem(hand)?.takeUnless { it.isEmpty || !it.type.isBlock }
             }
+            .autofilledBy(::BLOCK_TYPE_NOVA) { it.item?.createItemStack() }
+            .autofilledBy(::BLOCK_TYPE_VANILLA) { if (it.isBlock) ItemStack(it) else null }
             .build()
     
     /**
