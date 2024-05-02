@@ -8,6 +8,12 @@ import xyz.xenondevs.nova.data.context.intention.ContextIntention
 import xyz.xenondevs.nova.data.context.param.ContextParamType
 import xyz.xenondevs.nova.data.context.param.DefaultingContextParamType
 
+/**
+ * A context contains mappings from [ContextParamType] to value.
+ * Each context has an [intention] that defines which parameters are allowed and required.
+ *
+ * With [Context.intention], you can create a new context builder for the given intention.
+ */
 class Context<I : ContextIntention> private constructor(
     private val intention: I,
     private val explicitParams: Map<ContextParamType<*>, Any>,
@@ -95,8 +101,28 @@ class Context<I : ContextIntention> private constructor(
             return Builder(intention)
         }
         
+        /**
+         * Creates a new context builder filled with the parameters of the given [context].
+         */
+        fun <I : ContextIntention> from(context: Context<I>): Builder<I> {
+            val builder = Builder(context.intention)
+            for (paramType in context.intention.all) {
+                copyParam(paramType, context, builder)
+            }
+            return builder
+        }
+        
+        private fun <V : Any> copyParam(paramType: ContextParamType<V>, context: Context<*>, builder: Builder<*>) {
+            if (context.has(paramType)) {
+                builder.param(paramType, context.getOrThrow(paramType))
+            }
+        }
+        
     }
     
+    /**
+     * Builder for [Context].
+     */
     class Builder<I : ContextIntention> internal constructor(private val intention: I) {
         
         /**
