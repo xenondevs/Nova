@@ -46,7 +46,7 @@ abstract class NetworkedTileEntity(
      * If the [EnergyHolder] is created for the first time, [defaultConnectionConfig] is used to determine the
      * correct [NetworkConnectionType] for each side.
      */
-    fun energyHolder(
+    fun storedEnergyHolder(
         maxEnergy: Provider<Long>,
         allowedConnectionType: NetworkConnectionType,
         defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = { CUBE_FACES.associateWithTo(enumMap()) { allowedConnectionType } }
@@ -71,7 +71,7 @@ abstract class NetworkedTileEntity(
      * are used to determine the correct [VirtualInventory] and [NetworkConnectionType] for each side.
      * If [defaultInventoryConfig] is `null`, the merged inventory will be used for all sides.
      */
-    fun itemHolder(
+    fun storedItemHolder(
         inventory: Pair<VirtualInventory, NetworkConnectionType>,
         vararg inventories: Pair<VirtualInventory, NetworkConnectionType>,
         defaultInventoryConfig: (() -> Map<BlockFace, VirtualInventory>)? = null,
@@ -111,7 +111,7 @@ abstract class NetworkedTileEntity(
      * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedInventory] and [NetworkConnectionType] for each side.
      */
-    fun itemHolder(
+    fun storedItemHolder(
         inventory: Pair<NetworkedInventory, NetworkConnectionType>,
         vararg inventories: Pair<NetworkedInventory, NetworkConnectionType>,
         mergedInventory: NetworkedInventory? = null,
@@ -154,7 +154,7 @@ abstract class NetworkedTileEntity(
      * If the [FluidHolder] is created for the first time, [defaultContainerConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedFluidContainer] and [NetworkConnectionType] for each side.
      */
-    fun fluidHolder(
+    fun storedFluidHolder(
         container: Pair<NetworkedFluidContainer, NetworkConnectionType>,
         vararg containers: Pair<NetworkedFluidContainer, NetworkConnectionType>,
         defaultContainerConfig: () -> MutableMap<BlockFace, NetworkedFluidContainer> = { CUBE_FACES.associateWithTo(enumMap()) { container.first } },
