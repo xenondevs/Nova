@@ -46,6 +46,9 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
 import xyz.xenondevs.nova.tileentity.menu.TileEntityMenuClass as TileEntityMenuAnnotation
 
+/**
+ * A custom tile entity.
+ */
 abstract class TileEntity(
     val pos: BlockPos,
     blockState: NovaBlockState,
@@ -307,6 +310,14 @@ abstract class TileEntity(
         postUpdateHandler: ((ItemPostUpdateEvent) -> Unit)? = null,
     ): VirtualInventory = storedInventory(name, size, persistent = false, preUpdateHandler = preUpdateHandler, postUpdateHandler = postUpdateHandler)
     
+    /**
+     * Retrieves a [DynamicFluidContainer] stored under [name] or creates an empty new one.
+     * The values [allowedTypes] and [capacity] are not serialized and will be
+     * applied every time.
+     * Then registers the specified [updateHandler].
+     *
+     * If [persistent] is true, the container will be stored in the item when the [TileEntity] is dropped.
+     */
     fun storedFluidContainer(
         name: String,
         allowedTypes: Set<FluidType>,
@@ -341,6 +352,10 @@ abstract class TileEntity(
         return container
     }
     
+    /**
+     * Creates a [DynamicRegion] with the size stored under [name] or [defaultSize] if it doesn't exist, using [createRegion].
+     * The [minSize] and [maxSize] properties are not serialized and will be applied every time.
+     */
     fun storedRegion(
         name: String,
         minSize: Provider<Int>,
@@ -348,11 +363,12 @@ abstract class TileEntity(
         defaultSize: Int,
         createRegion: (Int) -> Region
     ): DynamicRegion {
+        // legacy conversion
         val legacyName = "region.$name"
         var size = defaultSize
         if (hasData(legacyName)) {
             size = retrieveDataOrNull<Int>(legacyName)!!
-            removeData(legacyName)    
+            removeData(legacyName)
         }
         
         return DynamicRegion(
@@ -367,6 +383,9 @@ abstract class TileEntity(
         return "${javaClass.simpleName}(blockState=$blockState, pos=$pos, data=$data)"
     }
     
+    /**
+     * A menu for a [TileEntity].
+     */
     abstract inner class TileEntityMenu internal constructor(protected val texture: GuiTexture? = null) {
         
         open fun getTitle(): Component =
@@ -374,6 +393,9 @@ abstract class TileEntity(
         
     }
     
+    /**
+     * A menu for a [TileEntity] that uses the same instance for all players.
+     */
     abstract inner class GlobalTileEntityMenu(
         texture: GuiTexture? = null
     ) : TileEntityMenu(texture) {
@@ -385,6 +407,9 @@ abstract class TileEntity(
                 .setTitle(getTitle())
         }
         
+        /**
+         * Opens a [Window] to this menu for the specified [player].
+         */
         open fun openWindow(player: Player) {
             val window = windowBuilder.build(player)
             menuContainer.registerWindow(window)
@@ -393,6 +418,9 @@ abstract class TileEntity(
         
     }
     
+    /**
+     * A menu for a [TileEntity] that uses a separate instance for each player.
+     */
     abstract inner class IndividualTileEntityMenu(
         protected val player: Player,
         texture: GuiTexture? = null
@@ -405,6 +433,9 @@ abstract class TileEntity(
                 .setTitle(getTitle())
         }
         
+        /**
+         * Opens a [Window] to this menu for the specified [player].
+         */
         open fun openWindow() {
             val window = windowBuilder.build(player)
             menuContainer.registerWindow(window)
