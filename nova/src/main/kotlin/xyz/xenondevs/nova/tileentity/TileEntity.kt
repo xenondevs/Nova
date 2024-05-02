@@ -104,9 +104,11 @@ abstract class TileEntity(
     val displayEntities: List<FakeItemDisplay>?
         get() = DisplayEntityBlockModelProvider.entities[pos]
     
-    @Volatile
+    /**
+     * Whether this [TileEntity] is enabled.
+     */
     var isEnabled: Boolean = false
-        private set
+        internal set
     
     private val dropProviders = ArrayList<() -> Collection<ItemStack>>()
     private val removeHandlers = ArrayList<() -> Unit>()
@@ -141,20 +143,17 @@ abstract class TileEntity(
     
     /**
      * Called when this [TileEntity] is enabled.
-     * 
+     *
      * May not add or remove any [TileEntities][TileEntity].
      */
-    open fun handleEnable() {
-        isEnabled = true
-    }
+    open fun handleEnable() = Unit
     
     /**
      * Called when this [TileEntity] is disabled.
-     * 
+     *
      * May not add or remove any [TileEntities][TileEntity].
      */
     open fun handleDisable() {
-        isEnabled = false
         if (::menuContainer.isInitialized)
             menuContainer.closeWindows()
     }
@@ -233,7 +232,7 @@ abstract class TileEntity(
     
     /**
      * Changes the block state of this [TileEntity] to [blockState].
-     * 
+     *
      * @throws IllegalArgumentException If [blockState] is not of this [TileEntity's][TileEntity] block type.
      */
     fun updateBlockState(blockState: NovaBlockState) {

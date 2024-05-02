@@ -215,6 +215,7 @@ internal class RegionChunk(
             tileEntityData[pos] = tileEntity.data
             
             if (isEnabled) {
+                tileEntity.isEnabled = true
                 tileEntity.handleEnable()
                 launchAndRegisterAsyncTicker(asyncTickerSupervisor!!, tileEntity)
             }
@@ -255,7 +256,10 @@ internal class RegionChunk(
             
             // It is assumed that (vanilla-) tile-entities will not update this RegionChunk's tile-entity map
             // during handleEnable, as that would cause the new tile-entity to not be enabled properly.
-            tileEntities.values.forEach(TileEntity::handleEnable)
+            for (tileEntity in tileEntities.values) {
+                tileEntity.isEnabled = true
+                tileEntity.handleEnable()
+            }
             vanillaTileEntities.values.removeIf { vte ->
                 // verify vte validity (the vanilla block state might've been changed without block updates)
                 if (vte.meetsBlockStateRequirement()) {
@@ -282,12 +286,15 @@ internal class RegionChunk(
             if (!isEnabled)
                 return
             
-            // unload models
-            for ((pos, tileEntity) in tileEntities)
+            for ((pos, tileEntity) in tileEntities) {
+                tileEntity.isEnabled = false
                 tileEntity.blockState.modelProvider.unload(pos)
+                tileEntity.handleDisable()
+            }
             
-            tileEntities.values.forEach(TileEntity::handleDisable)
-            vanillaTileEntities.values.forEach(VanillaTileEntity::handleDisable)
+            for (vte in vanillaTileEntities.values) {
+                vte.handleDisable()
+            }
             
             isEnabled = false
         }
