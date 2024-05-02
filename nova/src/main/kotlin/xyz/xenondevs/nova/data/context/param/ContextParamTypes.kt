@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.OfflinePlayer
 import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Entity
@@ -328,6 +329,21 @@ object ContextParamTypes {
      */
     val SOURCE_TILE_ENTITY: ContextParamType<TileEntity> =
         ContextParamType.builder<TileEntity>("source_tile_entity")
+            .build()
+    
+    /**
+     * The player that is either the direct source or responsible for the action.
+     * 
+     * Autofilled by:
+     * - [SOURCE_ENTITY] if offline player
+     * - [SOURCE_TILE_ENTITY] if owner present
+     * 
+     * Autofills: none
+     */
+    val RESPONSIBLE_PLAYER: ContextParamType<OfflinePlayer> =
+        ContextParamType.builder<OfflinePlayer>("responsible_player")
+            .autofilledBy(::SOURCE_ENTITY) { it as? OfflinePlayer }
+            .autofilledBy(::SOURCE_TILE_ENTITY) { it.owner }
             .build()
     
     /**

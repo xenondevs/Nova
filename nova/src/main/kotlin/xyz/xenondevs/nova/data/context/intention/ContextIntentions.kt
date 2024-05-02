@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BYPASS_TILE_ENTIT
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes.CLICKED_BLOCK_FACE
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes.INTERACTION_HAND
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes.INTERACTION_ITEM_STACK
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes.RESPONSIBLE_PLAYER
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes.SOURCE_DIRECTION
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes.SOURCE_ENTITY
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes.SOURCE_LOCATION
@@ -40,6 +41,7 @@ object ContextIntentions {
             BLOCK_TYPE_NOVA, BLOCK_STATE_NOVA, BLOCK_TYPE_VANILLA, CLICKED_BLOCK_FACE,
             TILE_ENTITY_DATA_NOVA,
             SOURCE_UUID, SOURCE_ENTITY, SOURCE_PLAYER, SOURCE_TILE_ENTITY, SOURCE_LOCATION, SOURCE_WORLD, SOURCE_DIRECTION,
+            RESPONSIBLE_PLAYER,
             BLOCK_PLACE_EFFECTS, BYPASS_TILE_ENTITY_LIMITS
         )
     )
@@ -53,6 +55,7 @@ object ContextIntentions {
             TOOL_ITEM_STACK,
             BLOCK_TYPE, BLOCK_TYPE_VANILLA, BLOCK_TYPE_NOVA, CLICKED_BLOCK_FACE, BLOCK_DROPS, BLOCK_STORAGE_DROPS,
             SOURCE_UUID, SOURCE_ENTITY, SOURCE_PLAYER, SOURCE_TILE_ENTITY, SOURCE_LOCATION, SOURCE_WORLD, SOURCE_DIRECTION,
+            RESPONSIBLE_PLAYER,
             BLOCK_BREAK_EFFECTS
         )
     )
@@ -65,7 +68,8 @@ object ContextIntentions {
         optional = listOf(
             INTERACTION_HAND, INTERACTION_ITEM_STACK,
             BLOCK_TYPE, BLOCK_TYPE_VANILLA, BLOCK_TYPE_NOVA, CLICKED_BLOCK_FACE,
-            SOURCE_UUID, SOURCE_ENTITY, SOURCE_PLAYER, SOURCE_TILE_ENTITY, SOURCE_LOCATION, SOURCE_WORLD, SOURCE_DIRECTION
+            SOURCE_UUID, SOURCE_ENTITY, SOURCE_PLAYER, SOURCE_TILE_ENTITY, SOURCE_LOCATION, SOURCE_WORLD, SOURCE_DIRECTION,
+            RESPONSIBLE_PLAYER
         )
     )
     
