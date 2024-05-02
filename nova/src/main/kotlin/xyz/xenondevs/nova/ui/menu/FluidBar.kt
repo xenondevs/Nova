@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.type.fluid.container.FluidContainer
+import xyz.xenondevs.nova.tileentity.network.type.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.tileentity.network.type.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
@@ -19,7 +20,7 @@ import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 class FluidBar(
     height: Int,
     fluidHolder: FluidHolder,
-    private val fluidContainer: FluidContainer
+    private val fluidContainer: NetworkedFluidContainer
 ) : VerticalBar(height) {
     
     private val allowedConnectionType = fluidHolder.containers[fluidContainer]!!
@@ -34,7 +35,10 @@ class FluidBar(
     private var capacity = 0L
     
     init {
-        fluidContainer.addUpdateHandler(::update)
+        if (fluidContainer is FluidContainer) {
+            fluidContainer.addUpdateHandler(::update)
+        }
+        
         update()
     }
     
