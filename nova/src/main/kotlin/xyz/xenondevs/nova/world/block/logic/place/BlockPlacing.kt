@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.block.logic.place
 
+import kotlinx.coroutines.runBlocking
 import org.bukkit.GameMode
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
@@ -128,9 +129,9 @@ internal object BlockPlacing : Listener {
         
         if (pos.location.isInsideWorldRestrictions()
             && BlockUtils.isUnobstructed(pos, player, vanillaState)
-            && ProtectionManager.canPlace(player, handItem, pos.location)
+            && ProtectionManager.canPlace(player, handItem, pos)
             && canPlace(player, handItem, pos, pos.location.advance(event.blockFace.oppositeFace).pos)
-            && novaBlock.canPlace(pos, newState, ctx)
+            && runBlocking { novaBlock.canPlace(pos, newState, ctx) } // assume blocking is ok because player is online
         ) {
             if (player.gameMode != GameMode.CREATIVE)
                 handItem.amount--
@@ -147,7 +148,7 @@ internal object BlockPlacing : Listener {
         val pos = event.clickedBlock!!.location.advance(event.blockFace).pos
         
         if (
-            ProtectionManager.canPlace(player, handItem, pos.location)
+            ProtectionManager.canPlace(player, handItem, pos)
             && canPlace(player, handItem, pos, placedOn)
         ) {
             val placed = BlockUtils.placeVanillaBlock(pos, player.serverPlayer, handItem, true)

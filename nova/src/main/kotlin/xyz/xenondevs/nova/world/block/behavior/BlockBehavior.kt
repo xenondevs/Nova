@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockInteract
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 
@@ -15,8 +16,11 @@ interface BlockBehavior {
     
     /**
      * Checks whether a block of [state] can be placed at [pos] using the given [ctx].
+     * 
+     * Should only suspend for [ProtectionManager] checks, and it is assumed that this function does not suspend
+     * when the source is online.
      */
-    fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean = true
+    suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean = true
     
     /**
      * Handles interaction (right-click) with a block of [state] at [pos] with the given [ctx].

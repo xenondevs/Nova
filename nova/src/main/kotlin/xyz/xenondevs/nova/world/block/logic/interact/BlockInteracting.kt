@@ -52,7 +52,7 @@ internal object BlockInteracting : Listener {
             val pos = event.clickedBlock!!.pos
             
             val blockState = WorldDataManager.getBlockState(pos)
-            if (blockState != null && ProtectionManager.canUseBlock(player, event.item, pos.location)) {
+            if (blockState != null && ProtectionManager.canUseBlock(player, event.item, pos)) {
                 val block = blockState.block
                 
                 val ctx = Context.intention(ContextIntentions.BlockInteract)

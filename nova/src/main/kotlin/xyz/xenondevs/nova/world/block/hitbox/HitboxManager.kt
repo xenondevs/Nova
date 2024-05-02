@@ -180,7 +180,8 @@ internal object HitboxManager : Listener, PacketListener {
                 }
                 
                 // check for collision with virtual hitboxes 
-                val hitboxes = virtualHitboxesByBlock[pos.toNovaPos(world)]
+                val novaPos = pos.toNovaPos(world)
+                val hitboxes = virtualHitboxesByBlock[novaPos]
                 if (hitboxes != null) {
                     val boxHitResult = Vector2f()
                     for (hitbox in hitboxes) {
@@ -210,7 +211,7 @@ internal object HitboxManager : Listener, PacketListener {
                             val relHitLoc = Vector3f(hitLoc.x - center.x, hitLoc.y - center.y, hitLoc.z - center.z)
                             
                             // check protection integrations
-                            if (ProtectionManager.canUseBlock(player, event.item, hitLoc.toLocation(player.world))) {
+                            if (ProtectionManager.canUseBlock(player, event.item, novaPos)) {
                                 handlers.forEach { it.invoke(player, event.hand!!, relHitLoc) }
                             }
                             

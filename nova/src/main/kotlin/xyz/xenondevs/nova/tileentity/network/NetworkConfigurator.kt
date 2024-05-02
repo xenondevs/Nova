@@ -78,7 +78,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
         val owner = node.owner
         if (owner != null) {
             CUBE_FACES
-                .map { face -> async { ProtectionManager.canUseBlock(owner, null, node.pos.advance(face, 1).location) } }
+                .map { face -> async { ProtectionManager.canUseBlock(owner, null, node.pos.advance(face, 1)) } }
                 .mapToBooleanArray { it.await() }
                 .let(::ProtectionResult)
         } else ProtectionResult.ALL_ALLOWED

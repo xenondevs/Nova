@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 
 open class TileEntityBlockBehavior protected constructor() : BlockBehavior.Default() {
     
-    override fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockPlace>): Boolean {
+    override suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockPlace>): Boolean {
         if (ctx[ContextParamTypes.BYPASS_TILE_ENTITY_LIMITS])
             return true
         
