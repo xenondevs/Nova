@@ -34,8 +34,8 @@ val VERTICAL_FACES: Set<BlockFace> = enumSetOf(UP, DOWN)
 val Location.blockLocation: Location
     get() = Location(world, blockX.toDouble(), blockY.toDouble(), blockZ.toDouble())
 
-fun Location(world: World?, x: Number, y: Number, z: Number): Location =
-    Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+fun Location(world: World?, x: Number, y: Number, z: Number, yaw: Number = 0, pitch: Number = 0): Location =
+    Location(world, x.toDouble(), y.toDouble(), z.toDouble(), yaw.toFloat(), pitch.toFloat())
 
 fun Location.removeOrientation() {
     yaw = 0f
