@@ -29,6 +29,7 @@ import xyz.xenondevs.nova.ui.menu.explorer.ItemMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.component.adventure.move
+import xyz.xenondevs.nova.util.component.adventure.moveToCenter
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.playClickSound
 import java.util.*
@@ -138,9 +139,8 @@ private class RecipesWindow(
         val pageNumberString = "${currentTab.currentPage + 1} / ${currentTab.pageAmount}"
         val pageNumberComponent = Component.text(pageNumberString, NamedTextColor.WHITE).font("nova:recipes_numbers")
         return Component.text()
-            .move(-8) // move to side to place overlay
             .append(currentType.texture.component)
-            .move(-84) // move back to the middle
+            .moveToCenter()
             .move(CharSizes.calculateComponentWidth(pageNumberComponent) / -2)
             .append(pageNumberComponent)
             .build()

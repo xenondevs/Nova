@@ -27,12 +27,12 @@ import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.item.ItemCategories
 import xyz.xenondevs.nova.item.ItemCategories.OBTAINABLE_ITEMS
 import xyz.xenondevs.nova.item.ItemCategory
+import xyz.xenondevs.nova.ui.menu.explorer.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.AnvilTextItem
 import xyz.xenondevs.nova.ui.menu.item.ScrollDownItem
 import xyz.xenondevs.nova.ui.menu.item.ScrollUpItem
 import xyz.xenondevs.nova.ui.menu.item.ToggleItem
 import xyz.xenondevs.nova.ui.menu.item.clickableItem
-import xyz.xenondevs.nova.ui.menu.explorer.ItemMenu
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.moveToStart
@@ -186,7 +186,6 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     private fun getMainWindowTitle(): Component {
         return if (filter == "") {
             Component.text()
-                .move(-8)
                 .append(TAB_BUTTON_TEXTURES[mainGui.currentTab % 5].component)
                 .build()
         } else {
