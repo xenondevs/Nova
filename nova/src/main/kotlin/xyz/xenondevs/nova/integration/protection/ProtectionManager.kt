@@ -6,6 +6,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder
 import kotlinx.coroutines.future.await
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -14,6 +15,9 @@ import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.api.ApiTileEntityWrapper
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.param.ContextParamTypes
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -133,6 +137,24 @@ object ProtectionManager {
     }
     
     /**
+     * Checks whether the given [ctx] passes place permission checks.
+     */
+    suspend fun canPlace(ctx: Context<ContextIntentions.BlockPlace>): Boolean {
+        val pos = ctx.getOrThrow(ContextParamTypes.BLOCK_POS)
+        val blockItem = ctx[ContextParamTypes.BLOCK_ITEM_STACK] ?: ItemStack(Material.AIR)
+        
+        val tileEntity = ctx[ContextParamTypes.SOURCE_TILE_ENTITY]
+        if (tileEntity != null)
+            return canPlace(tileEntity, blockItem, pos)
+        
+        val responsiblePlayer = ctx[ContextParamTypes.RESPONSIBLE_PLAYER]
+        if (responsiblePlayer != null)
+            return canPlace(responsiblePlayer, blockItem, pos)
+        
+        return true
+    }
+    
+    /**
      * Checks if the [tileEntity] can place that [item] at that [location].
      */
     suspend fun canPlace(tileEntity: TileEntity, item: ItemStack, pos: BlockPos): Boolean {
@@ -153,6 +175,24 @@ object ProtectionManager {
         cacheCanPlaceUser.get(CanPlaceUserArgs(player, item.clone(), pos.location)).get()
     
     /**
+     * Checks whether the given [ctx] passes break permission checks.
+     */
+    suspend fun canBreak(ctx: Context<ContextIntentions.BlockBreak>): Boolean {
+        val pos = ctx.getOrThrow(ContextParamTypes.BLOCK_POS)
+        val tool = ctx[ContextParamTypes.TOOL_ITEM_STACK]
+        
+        val tileEntity = ctx[ContextParamTypes.SOURCE_TILE_ENTITY]
+        if (tileEntity != null)
+            return canBreak(tileEntity, tool, pos)
+        
+        val responsiblePlayer = ctx[ContextParamTypes.RESPONSIBLE_PLAYER]
+        if (responsiblePlayer != null)
+            return canBreak(responsiblePlayer, tool, pos)
+        
+        return true
+    }
+    
+    /**
      * Checks if that [tileEntity] can break a block at that [location] using that [item].
      */
     suspend fun canBreak(tileEntity: TileEntity, item: ItemStack?, pos: BlockPos): Boolean {
@@ -171,6 +211,24 @@ object ProtectionManager {
      */
     fun canBreak(player: Player, item: ItemStack?, pos: BlockPos): Boolean =
         cacheCanBreakUser.get(CanBreakUserArgs(player, item?.clone(), pos.location)).get()
+    
+    /**
+     * Checks whether the given [ctx] passes block interaction permission checks.
+     */
+    suspend fun canUseBlock(ctx: Context<ContextIntentions.BlockInteract>): Boolean {
+        val pos = ctx.getOrThrow(ContextParamTypes.BLOCK_POS)
+        val item = ctx[ContextParamTypes.INTERACTION_ITEM_STACK]
+        
+        val tileEntity = ctx[ContextParamTypes.SOURCE_TILE_ENTITY]
+        if (tileEntity != null)
+            return canUseBlock(tileEntity, item, pos)
+        
+        val responsiblePlayer = ctx[ContextParamTypes.RESPONSIBLE_PLAYER]
+        if (responsiblePlayer != null)
+            return canUseBlock(responsiblePlayer, item, pos)
+        
+        return true
+    }
     
     /**
      * Checks if the [tileEntity] can interact with a block at that [location] using that [item].
