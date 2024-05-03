@@ -160,7 +160,7 @@ open class ConfigProvider internal constructor(
      * will be null if the entry does not exist or could not be deserialized to [type].
      */
     fun <T : Any> optionalEntry(type: Type, vararg path: String): Provider<T?> =
-        node(*path).map { it.get(type) as? T }
+        node(*path).map { if (!it.virtual()) it.get(type) as? T else null }
     
     /**
      * Gets an optional entry [Provider] for a value of type [T] under the first existing path from [paths],
