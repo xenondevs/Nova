@@ -6,6 +6,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.bukkit.Bukkit
+import org.bukkit.Chunk.LoadLevel
 import org.bukkit.World
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -44,13 +45,21 @@ import java.util.concurrent.ConcurrentHashMap
 object WorldDataManager : Listener {
     
     private val worlds = ConcurrentHashMap<UUID, WorldDataStorage>()
+    private var initialized = false
     
     @InitFun
     private fun init() = runBlocking {
+        initialized = true
         registerEvents()
         Bukkit.getWorlds().asSequence()
             .flatMap { it.loadedChunks.asSequence() }
-            .forEach { getOrLoadChunk(it.pos).enable() }
+            .forEach {
+                val regionChunk = getOrLoadChunk(it.pos)
+                regionChunk.enable()
+                if (it.loadLevel == LoadLevel.TICKING || it.loadLevel == LoadLevel.ENTITY_TICKING) {
+                    regionChunk.startTicking()
+                }
+            }
     }
     
     @DisableFun
@@ -77,15 +86,24 @@ object WorldDataManager : Listener {
     }
     
     internal fun loadAsync(pos: ChunkPos) {
+        if (!initialized)
+            return
+        
         // TODO: don't use global scope
         GlobalScope.launch { worlds.values.forEach { it.loadAsync(pos) } }
     }
     
     internal fun startTicking(pos: ChunkPos) {
+        if (!initialized)
+            return
+        
         runBlocking { getOrLoadChunk(pos).startTicking() }
     }
     
     internal fun stopTicking(pos: ChunkPos) {
+        if (!initialized)
+            return
+        
         runBlocking { getOrLoadChunk(pos).stopTicking() }
     }
     
@@ -128,8 +146,12 @@ object WorldDataManager : Listener {
     private suspend fun getOrLoadChunk(pos: ChunkPos): RegionChunk =
         getOrLoadRegion(pos).getChunk(pos)
     
-    private suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile =
-        getWorldStorage(pos.world!!).getOrLoadRegion(pos)
+    private suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile {
+        if (!initialized)
+            throw IllegalStateException("Tried to load region before initialization")
+        
+        return getWorldStorage(pos.world!!).getOrLoadRegion(pos)
+    }
     
     internal fun getWorldStorage(world: World): WorldDataStorage =
         worlds.computeIfAbsent(world.uid) { WorldDataStorage(world) }
