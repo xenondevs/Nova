@@ -155,7 +155,7 @@ object ProtectionManager {
     }
     
     /**
-     * Checks if the [tileEntity] can place that [item] at that [location].
+     * Checks if the [tileEntity] can place that [item] at that [pos].
      */
     suspend fun canPlace(tileEntity: TileEntity, item: ItemStack, pos: BlockPos): Boolean {
         if (tileEntity.owner == null) return true
@@ -163,13 +163,13 @@ object ProtectionManager {
     }
     
     /**
-     * Checks if the [player] can place that [item] at that [location].
+     * Checks if the [player] can place that [item] at that [pos].
      */
     suspend fun canPlace(player: OfflinePlayer, item: ItemStack, pos: BlockPos): Boolean =
         cacheCanPlaceUser.get(CanPlaceUserArgs(player, item.clone(), pos.location)).await()
     
     /**
-     * Checks if the [player] can place that [item] at that [location].
+     * Checks if the [player] can place that [item] at that [pos].
      */
     fun canPlace(player: Player, item: ItemStack, pos: BlockPos): Boolean =
         cacheCanPlaceUser.get(CanPlaceUserArgs(player, item.clone(), pos.location)).get()
@@ -193,7 +193,7 @@ object ProtectionManager {
     }
     
     /**
-     * Checks if that [tileEntity] can break a block at that [location] using that [item].
+     * Checks if that [tileEntity] can break a block at that [pos] using that [item].
      */
     suspend fun canBreak(tileEntity: TileEntity, item: ItemStack?, pos: BlockPos): Boolean {
         if (tileEntity.owner == null) return true
@@ -201,13 +201,13 @@ object ProtectionManager {
     }
     
     /**
-     * Checks if that [player] can break a block at that [location] using that [item].
+     * Checks if that [player] can break a block at that [pos] using that [item].
      */
     suspend fun canBreak(player: OfflinePlayer, item: ItemStack?, pos: BlockPos): Boolean =
         cacheCanBreakUser.get(CanBreakUserArgs(player, item?.clone(), pos.location)).await()
     
     /**
-     * Checks if that [player] can break a block at that [location] using that [item].
+     * Checks if that [player] can break a block at that [pos] using that [item].
      */
     fun canBreak(player: Player, item: ItemStack?, pos: BlockPos): Boolean =
         cacheCanBreakUser.get(CanBreakUserArgs(player, item?.clone(), pos.location)).get()
@@ -231,7 +231,7 @@ object ProtectionManager {
     }
     
     /**
-     * Checks if the [tileEntity] can interact with a block at that [location] using that [item].
+     * Checks if the [tileEntity] can interact with a block at that [pos] using that [item].
      */
     suspend fun canUseBlock(tileEntity: TileEntity, item: ItemStack?, pos: BlockPos): Boolean {
         if (tileEntity.owner == null) return true
@@ -239,13 +239,13 @@ object ProtectionManager {
     }
     
     /**
-     * Checks if the [player] can interact with a block at that [location] using that [item].
+     * Checks if the [player] can interact with a block at that [pos] using that [item].
      */
     suspend fun canUseBlock(player: OfflinePlayer, item: ItemStack?, pos: BlockPos): Boolean =
         cacheCanUseBlockUser.get(CanUseBlockUserArgs(player, item?.clone(), pos.location)).await()
     
     /**
-     * Checks if the [player] can interact with a block at that [location] using that [item].
+     * Checks if the [player] can interact with a block at that [pos] using that [item].
      */
     fun canUseBlock(player: Player, item: ItemStack?, pos: BlockPos): Boolean =
         cacheCanUseBlockUser.get(CanUseBlockUserArgs(player, item?.clone(), pos.location)).get()
