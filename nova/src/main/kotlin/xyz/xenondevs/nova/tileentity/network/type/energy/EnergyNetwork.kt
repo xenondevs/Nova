@@ -48,8 +48,8 @@ class EnergyNetwork(networkData: NetworkData) : Network, NetworkData by networkD
                 
                 when (NetworkConnectionType.of(insert, extract)) {
                     NetworkConnectionType.BUFFER -> buffers += energyHolder
-                    NetworkConnectionType.INSERT -> providers += energyHolder
-                    NetworkConnectionType.EXTRACT -> consumers += energyHolder
+                    NetworkConnectionType.INSERT -> consumers += energyHolder
+                    NetworkConnectionType.EXTRACT -> providers += energyHolder
                     else -> throw IllegalArgumentException("Invalid connection config for $energyHolder")
                 }
             } else if (node is EnergyBridge) {
