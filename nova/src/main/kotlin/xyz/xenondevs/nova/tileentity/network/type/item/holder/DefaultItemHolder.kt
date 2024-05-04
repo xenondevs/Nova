@@ -23,14 +23,15 @@ import java.util.*
  * @param mergedInventory the [NetworkedInventory] that is the merged inventory of all [NetworkedInventories][NetworkedInventory],
  * or null if there is no merged inventory
  * @param defaultInventoryConfig the default ([BlockFace], [NetworkedInventory]) to be used if no configuration is stored
- * @param defaultConnectionConfig the default ([BlockFace], [NetworkConnectionType]) to be used if no configuration is stored
+ * @param defaultConnectionConfig the default ([BlockFace], [NetworkConnectionType]) to be used if no configuration is stored.
+ * If null, the connection config will be automatically generated using the highest possible connection type for each side.
  */
 class DefaultItemHolder(
     override val compound: Compound,
     override val containers: Map<NetworkedInventory, NetworkConnectionType>,
     override val mergedInventory: NetworkedInventory?,
     defaultInventoryConfig: () -> Map<BlockFace, NetworkedInventory>,
-    defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType>
+    defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)?
 ) : ItemHolder {
     
     init {
@@ -47,7 +48,9 @@ class DefaultItemHolder(
             ?: defaultInventoryConfig().toEnumMap()
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        compound["connectionConfig"] ?: defaultConnectionConfig().toEnumMap()
+        compound["connectionConfig"]
+            ?: defaultConnectionConfig?.invoke()?.toEnumMap() 
+            ?: containerConfig.mapValuesTo(enumMap()) { (_, inv) -> containers[inv] }
     
     override val channels: MutableMap<BlockFace, Int> =
         compound["channels"] ?: DEFAULT_CHANNELS()
@@ -85,7 +88,6 @@ class DefaultItemHolder(
     
     internal companion object {
         val ALL_INVENTORY_UUID = UUID(0, 0xA11)
-        val NONE_CONNECTION_CONFIG = { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.NONE } }
         val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithTo(enumMap()) { 50 } }
         val DEFAULT_CHANNELS = { CUBE_FACES.associateWithTo(enumMap()) { 0 } }
     }

@@ -70,12 +70,13 @@ abstract class NetworkedTileEntity(
      * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
      * are used to determine the correct [VirtualInventory] and [NetworkConnectionType] for each side.
      * If [defaultInventoryConfig] is `null`, the merged inventory will be used for all sides.
+     * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
      */
     fun storedItemHolder(
         inventory: Pair<VirtualInventory, NetworkConnectionType>,
         vararg inventories: Pair<VirtualInventory, NetworkConnectionType>,
         defaultInventoryConfig: (() -> Map<BlockFace, VirtualInventory>)? = null,
-        defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = DefaultItemHolder.NONE_CONNECTION_CONFIG,
+        defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null,
     ): DefaultItemHolder {
         val allInventories: Map<VirtualInventory, NetworkConnectionType> =
             buildMap { this += inventory; this += inventories }
@@ -110,13 +111,14 @@ abstract class NetworkedTileEntity(
      *
      * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedInventory] and [NetworkConnectionType] for each side.
+     * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
      */
     fun storedItemHolder(
         inventory: Pair<NetworkedInventory, NetworkConnectionType>,
         vararg inventories: Pair<NetworkedInventory, NetworkConnectionType>,
         mergedInventory: NetworkedInventory? = null,
         defaultInventoryConfig: () -> Map<BlockFace, NetworkedInventory> = { CUBE_FACES.associateWithTo(enumMap()) { inventory.first } },
-        defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = DefaultItemHolder.NONE_CONNECTION_CONFIG
+        defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null
     ): DefaultItemHolder {
         val allInventories = buildMap { this += inventory; this += inventories }
         val holder = DefaultItemHolder(
