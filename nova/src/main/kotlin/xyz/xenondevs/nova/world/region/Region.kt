@@ -92,7 +92,7 @@ class Region(val min: Location, val max: Location) {
          */
         fun inFrontOf(pos: BlockPos, facing: BlockFace, depth: Number, width: Number, height: Number, translateY: Number): Region {
             val location = pos.location
-                .add(0.5, 0.5, 0.5)
+                .add(0.5, 0.0, 0.5)
                 .advance(facing, 0.5)
             val direction = facing.direction.toVector3d()
             return inDirection(location, direction, depth, width, height, translateY)
@@ -102,8 +102,8 @@ class Region(val min: Location, val max: Location) {
          * Creates a region in the given [direction] from [location] with the given [depth], [width], [height] and [translateY].
          */
         fun inDirection(location: Location, direction: Vector3d, depth: Number, width: Number, height: Number, translateY: Number): Region {
-            val leftDir = Vector3d(direction).rotateY(-90.0)
-            val rightDir = Vector3d(direction).rotateY(90.0)
+            val leftDir = Vector3d(direction).rotateY(Math.toRadians(-90.0))
+            val rightDir = Vector3d(direction).rotateY(Math.toRadians(90.0))
             
             val pos1 = location.clone().apply {
                 add(leftDir.mul(width.toDouble() / 2))
