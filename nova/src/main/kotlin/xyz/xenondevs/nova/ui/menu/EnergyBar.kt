@@ -10,26 +10,32 @@ import xyz.xenondevs.nova.util.NumberFormatUtils
 
 class EnergyBar(
     height: Int,
-    private val energyHolder: DefaultEnergyHolder
+    private val getEnergy: () -> Long,
+    private val getMaxEnergy: () -> Long,
+    private val getEnergyPlus: () -> Long,
+    private val getEnergyMinus: () -> Long,
 ) : VerticalBar(height) {
 
     override val barItem = DefaultGuiItems.BAR_RED
 
     private var energy: Long = 0
     private var maxEnergy: Long = 0
-    private val energyPlusPerTick: Long
-        get() = energyHolder.energyPlus
-    private val energyMinusPerTick: Long
-        get() = energyHolder.energyMinus
 
-    init {
+    constructor(height: Int, energyHolder: DefaultEnergyHolder) : this(
+        height,
+        energyHolder::energy, energyHolder::maxEnergy,
+        energyHolder::energyPlus, energyHolder::energyMinus
+    ) {
         energyHolder.updateHandlers += ::update
+    }
+    
+    init {
         update()
     }
 
     fun update() {
-        energy = energyHolder.energy
-        maxEnergy = energyHolder.maxEnergy
+        energy = getEnergy()
+        maxEnergy = getMaxEnergy()
         percentage = (energy.toDouble() / maxEnergy.toDouble()).coerceIn(0.0, 1.0)
     }
 
@@ -37,18 +43,21 @@ class EnergyBar(
         if (energy == Long.MAX_VALUE) itemBuilder.setDisplayName("∞ J / ∞ J")
         else itemBuilder.setDisplayName(NumberFormatUtils.getEnergyString(energy, maxEnergy))
 
-        if (energyPlusPerTick > 0) {
+        val energyPlus = getEnergyPlus()
+        val energyMinus = getEnergyMinus()
+        
+        if (energyPlus > 0) {
             itemBuilder.addLoreLines(Component.translatable(
                 "menu.nova.energy_per_tick",
                 NamedTextColor.GRAY,
-                Component.text("+" + NumberFormatUtils.getEnergyString(energyPlusPerTick))
+                Component.text("+" + NumberFormatUtils.getEnergyString(energyPlus))
             ))
         }
-        if (energyMinusPerTick > 0) {
+        if (energyMinus > 0) {
             itemBuilder.addLoreLines(Component.translatable(
                 "menu.nova.energy_per_tick",
                 NamedTextColor.GRAY,
-                Component.text("-" + NumberFormatUtils.getEnergyString(energyMinusPerTick))
+                Component.text("-" + NumberFormatUtils.getEnergyString(energyMinus))
             ))
         }
         return itemBuilder

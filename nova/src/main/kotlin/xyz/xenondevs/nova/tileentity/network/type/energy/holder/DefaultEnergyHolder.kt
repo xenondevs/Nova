@@ -67,6 +67,10 @@ class DefaultEnergyHolder(
      */
     val updateHandlers = ArrayList<() -> Unit>()
     
+    init {
+        maxEnergy.addUpdateHandler { callUpdateHandlers() }
+    }
+    
     override fun saveData() {
         compound["energy"] = energy
         compound["connectionConfig"] = connectionConfig
