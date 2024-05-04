@@ -17,6 +17,9 @@ internal class RemoveEndPointTask(
         // remove this endpoint from the connectedNodes map of all connected nodes
         state.forEachConnectedNode(node) { type, face, connectedNode ->
             state.removeConnection(connectedNode, type, face.oppositeFace)
+            if (connectedNode is NetworkEndPoint) {
+                state.removeNetwork(connectedNode, type, face.oppositeFace)
+            }
             nodesToUpdate += connectedNode
         }
         
