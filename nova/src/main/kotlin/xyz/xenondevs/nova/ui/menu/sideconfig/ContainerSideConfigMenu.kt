@@ -102,6 +102,8 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
             // cycle container
             val currentContainer = holder.containerConfig[face]!!
             val newContainer = containers.after(currentContainer, move)
+            holder.containerConfig[face] = newContainer
+            // adjust connection type
             val allowedTypes = holder.containers[newContainer]!!.supertypes
             if (holder.connectionConfig[face] !in allowedTypes)
                 holder.connectionConfig[face] = allowedTypes[0]
