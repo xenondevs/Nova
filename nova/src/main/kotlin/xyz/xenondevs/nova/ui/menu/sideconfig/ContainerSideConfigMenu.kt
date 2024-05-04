@@ -76,12 +76,14 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
     override fun initAsync() {
         super.initAsync()
         val isSimple = isSimpleConfiguration()
+        val simpleModeBtn = SimplicityModeItem(true)
+        val advancedModeBtn = SimplicityModeItem(false)
+        simpleModeBtn.updateAsync()
+        advancedModeBtn.updateAsync()
         runTask {
             if (hasSimpleVersion && hasAdvancedVersion) {
-                simpleModeBtn = SimplicityModeItem(true)
+                this.simpleModeBtn = simpleModeBtn
                 advancedGui.setItem(8, 0, simpleModeBtn)
-                
-                val advancedModeBtn = SimplicityModeItem(false)
                 simpleGui.setItem(8, 0, advancedModeBtn)
             }
             switchSimplicity(isSimple)
