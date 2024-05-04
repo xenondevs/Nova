@@ -13,6 +13,7 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.builder.addLoreLines
 import xyz.xenondevs.invui.item.builder.setDisplayName
+import xyz.xenondevs.invui.item.notifyWindows
 import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
@@ -24,7 +25,6 @@ import xyz.xenondevs.nova.ui.menu.item.AsyncItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.runTask
-import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 
 internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
@@ -36,7 +36,7 @@ internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
     val gui = Gui.empty(9, 3)
     
     private val configItems = ArrayList<ConfigItem>()
-    private val connectionConfigItems = enumMap<BlockFace, ConnectionConfigItem>()
+    protected val connectionConfigItems = enumMap<BlockFace, ArrayList<ConnectionConfigItem>>()
     
     open fun initAsync() {
         configItems.forEach { it.updateAsync() }
@@ -46,8 +46,8 @@ internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
     fun getFaceFromSide(blockSide: BlockSide): Pair<BlockSide?, BlockFace> {
         val facing = (endPoint as? TileEntity)?.blockState?.get(DefaultBlockStateProperties.FACING)
         return if (facing != null)
-            blockSide to blockSide.getBlockFace(facing.yaw)
-        else null to blockSide.blockFace
+            blockSide to blockSide.getBlockFace(facing)
+        else null to blockSide.getBlockFace(0f)
     }
     
     fun getSideName(blockSide: BlockSide?, blockFace: BlockFace): Component {
@@ -75,7 +75,7 @@ internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
             state.handleEndPointAllowedFacesChange(endPoint, networkType, face)
             
             // ui update
-            connectionConfigItems[face]?.updateAsync()
+            connectionConfigItems[face]?.forEach(AsyncItem::updateAsync)
             runTask { connectionConfigItems[face]?.notifyWindows() }
         }
     }
@@ -89,7 +89,7 @@ internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
     inner class ConnectionConfigItem(blockSide: BlockSide) : ConfigItem(blockSide) {
         
         init {
-            connectionConfigItems[face] = this
+            connectionConfigItems.getOrPut(face, ::ArrayList) += this
         }
         
         override fun updateAsync() {

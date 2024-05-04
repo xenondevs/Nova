@@ -11,6 +11,7 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.builder.addLoreLines
 import xyz.xenondevs.invui.item.builder.setDisplayName
+import xyz.xenondevs.invui.item.notifyWindows
 import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.node.ContainerEndPointDataHolder
@@ -107,13 +108,14 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
             state.handleEndPointAllowedFacesChange(endPoint, networkType, face)
             
             // update ui
+            connectionConfigItems[face]?.forEach(AsyncItem::updateAsync)
             containerConfigItems[face]?.updateAsync()
             simpleModeBtn?.updateAsync()
             runTask {
+                connectionConfigItems[face]?.notifyWindows()
                 containerConfigItems[face]?.notifyWindows()
                 simpleModeBtn?.notifyWindows()
             }
-            
         }
     }
     
