@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.World
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
@@ -46,7 +46,7 @@ internal class TypeBlacklist(private val blacklist: Set<ResourceLocation>) : Sim
 internal class WorldBlacklist(private val blacklist: Set<String>) : SimpleBlockLimiter("nova.tile_entity_limits.world_blacklist.deny") {
     
     override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
-        return !blacklist.contains("*") && ctx.get<World>(ContextParamTypes.BLOCK_WORLD)!!.name !in blacklist
+        return !blacklist.contains("*") && ctx.get<World>(DefaultContextParamTypes.BLOCK_WORLD)!!.name !in blacklist
     }
     
 }
@@ -55,7 +55,7 @@ internal class TypeWorldBlacklist(private val blacklist: Map<String, Set<Resourc
     
     override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
         val id = material.id
-        val world: World = ctx[ContextParamTypes.BLOCK_WORLD]!!
+        val world: World = ctx[DefaultContextParamTypes.BLOCK_WORLD]!!
         return blacklist["*"]?.contains(id) != true && blacklist[world.name]?.contains(id) != true
     }
     
@@ -68,8 +68,8 @@ internal class AmountLimiter(private val type: Type, private val limits: Map<Res
     
     override fun canPlace(material: NovaBlock, ctx: Context<BlockPlace>): PlaceResult {
         val id: ResourceLocation = material.id
-        val owner: UUID = ctx[ContextParamTypes.SOURCE_UUID] ?: return ALLOWED
-        val pos: BlockPos = ctx[ContextParamTypes.BLOCK_POS]!!
+        val owner: UUID = ctx[DefaultContextParamTypes.SOURCE_UUID] ?: return ALLOWED
+        val pos: BlockPos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
         
         val specificLimit = limits[id]
         val totalLimit = limits[null]

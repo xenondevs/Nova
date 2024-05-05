@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.world.block.state.property
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Axis
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.calculateYaw
@@ -49,7 +49,7 @@ object DefaultScopedBlockStateProperties {
      */
     val FACING_HORIZONTAL: ScopedBlockStateProperty<BlockFace> =
         DefaultBlockStateProperties.FACING.scope(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST) { ctx ->
-            ctx[ContextParamTypes.SOURCE_DIRECTION]
+            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
                 ?.calculateYaw()
                 ?.let { BlockFaceUtils.toCartesianFace(it) }
                 ?.oppositeFace
@@ -61,7 +61,7 @@ object DefaultScopedBlockStateProperties {
      */
     val FACING_VERTICAL: ScopedBlockStateProperty<BlockFace> =
         DefaultBlockStateProperties.FACING.scope(BlockFace.UP, BlockFace.DOWN) { ctx ->
-            ctx[ContextParamTypes.SOURCE_DIRECTION]?.calculateYawPitch()
+            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]?.calculateYawPitch()
                 ?.let { (_, pitch) -> if (pitch < 0) BlockFace.UP else BlockFace.DOWN }
                 ?: BlockFace.UP
         }
@@ -74,7 +74,7 @@ object DefaultScopedBlockStateProperties {
         DefaultBlockStateProperties.FACING.scope(
             BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN
         ) { ctx ->
-            ctx[ContextParamTypes.SOURCE_DIRECTION]
+            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
                 ?.calculateYawPitch()
                 ?.let { (yaw, pitch) -> BlockFaceUtils.toCartesianFace(yaw, pitch) }
                 ?.oppositeFace
@@ -95,7 +95,7 @@ object DefaultScopedBlockStateProperties {
             BlockFace.SOUTH, BlockFace.SOUTH_SOUTH_WEST, BlockFace.SOUTH_WEST, BlockFace.WEST_SOUTH_WEST,
             BlockFace.WEST, BlockFace.WEST_NORTH_WEST, BlockFace.NORTH_WEST, BlockFace.NORTH_NORTH_WEST
         ) { ctx ->
-            ctx[ContextParamTypes.SOURCE_DIRECTION]
+            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
                 ?.calculateYaw()
                 ?.let { BlockFaceUtils.toRotation(it) }
                 ?.oppositeFace
@@ -107,7 +107,7 @@ object DefaultScopedBlockStateProperties {
      */
     val AXIS: ScopedBlockStateProperty<Axis> =
         DefaultBlockStateProperties.AXIS.scope(Axis.X, Axis.Y, Axis.Z) { ctx ->
-            ctx[ContextParamTypes.SOURCE_DIRECTION]
+            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
                 ?.calculateYawPitch()
                 ?.let { (yaw, pitch) -> BlockFaceUtils.toAxis(yaw, pitch) }
                 ?: Axis.Y
@@ -118,7 +118,7 @@ object DefaultScopedBlockStateProperties {
      */
     val AXIS_HORIZONTAL: ScopedBlockStateProperty<Axis> =
         DefaultBlockStateProperties.AXIS.scope(Axis.X, Axis.Z) { ctx ->
-            ctx[ContextParamTypes.SOURCE_DIRECTION]
+            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
                 ?.calculateYaw()
                 ?.let { BlockFaceUtils.toAxis(it) }
                 ?: Axis.X
@@ -128,13 +128,13 @@ object DefaultScopedBlockStateProperties {
      * A scope for [DefaultBlockStateProperties.POWERED].
      */
     val POWERED: ScopedBlockStateProperty<Boolean> =
-        DefaultBlockStateProperties.POWERED.scope { ctx -> ctx.getOrThrow(ContextParamTypes.BLOCK_POS).block.isBlockIndirectlyPowered }
+        DefaultBlockStateProperties.POWERED.scope { ctx -> ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS).block.isBlockIndirectlyPowered }
     
     /**
      * A scope for [DefaultBlockStateProperties.INSTRUMENT] for all [Instruments][Instrument].
      */
     val INSTRUMENT: ScopedBlockStateProperty<Instrument> =
-        DefaultBlockStateProperties.INSTRUMENT.scope { ctx -> Instrument.determineInstrument(ctx.getOrThrow(ContextParamTypes.BLOCK_POS)) }
+        DefaultBlockStateProperties.INSTRUMENT.scope { ctx -> Instrument.determineInstrument(ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS)) }
     
     /**
      * A scope for [DefaultBlockStateProperties.NOTE] for all 25 note block notes.

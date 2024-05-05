@@ -38,7 +38,7 @@ import xyz.xenondevs.nova.command.sendSuccess
 import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
@@ -481,7 +481,7 @@ internal object NovaCommand : Command("nova") {
             .forEach { tileEntity ->
                 BlockUtils.breakBlock(
                     Context.intention(ContextIntentions.BlockBreak)
-                        .param(ContextParamTypes.BLOCK_POS, tileEntity.pos)
+                        .param(DefaultContextParamTypes.BLOCK_POS, tileEntity.pos)
                         .build()
                 )
                 count++
@@ -872,14 +872,14 @@ internal object NovaCommand : Command("nova") {
         val maxZ = max(from.z, to.z)
         
         val placeCtxBuilder = Context.intention(ContextIntentions.BlockPlace)
-            .param(ContextParamTypes.BLOCK_TYPE_NOVA, block)
+            .param(DefaultContextParamTypes.BLOCK_TYPE_NOVA, block)
         
         for (x in minX..maxX) {
             for (y in minY..maxY) {
                 for (z in minZ..maxZ) {
                     BlockUtils.placeBlock(
                         placeCtxBuilder
-                            .param(ContextParamTypes.BLOCK_POS, BlockPos(world, x, y, z))
+                            .param(DefaultContextParamTypes.BLOCK_POS, BlockPos(world, x, y, z))
                             .build()
                     )
                 }

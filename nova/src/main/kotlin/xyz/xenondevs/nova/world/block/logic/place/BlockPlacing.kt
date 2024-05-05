@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -110,13 +110,13 @@ internal object BlockPlacing : Listener {
             pos = pos.advance(event.blockFace)
         
         val ctxBuilder = Context.intention(ContextIntentions.BlockPlace)
-            .param(ContextParamTypes.BLOCK_POS, pos)
-            .param(ContextParamTypes.BLOCK_ITEM_STACK, handItem)
-            .param(ContextParamTypes.SOURCE_ENTITY, player)
-            .param(ContextParamTypes.CLICKED_BLOCK_FACE, event.blockFace)
+            .param(DefaultContextParamTypes.BLOCK_POS, pos)
+            .param(DefaultContextParamTypes.BLOCK_ITEM_STACK, handItem)
+            .param(DefaultContextParamTypes.SOURCE_ENTITY, player)
+            .param(DefaultContextParamTypes.CLICKED_BLOCK_FACE, event.blockFace)
         
         val newState = novaBlock.chooseBlockState(ctxBuilder.build())
-        ctxBuilder.param(ContextParamTypes.BLOCK_STATE_NOVA, newState)
+        ctxBuilder.param(DefaultContextParamTypes.BLOCK_STATE_NOVA, newState)
         
         val ctx = ctxBuilder.build()
         

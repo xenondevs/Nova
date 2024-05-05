@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockInteract
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
@@ -22,12 +22,12 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 open class TileEntityBlockBehavior protected constructor() : BlockBehavior.Default() {
     
     override suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockPlace>): Boolean {
-        if (ctx[ContextParamTypes.BYPASS_TILE_ENTITY_LIMITS])
+        if (ctx[DefaultContextParamTypes.BYPASS_TILE_ENTITY_LIMITS])
             return true
         
         val result = TileEntityLimits.canPlace(ctx)
         if (!result.allowed) {
-            ctx[ContextParamTypes.SOURCE_PLAYER]?.sendMessage(Component.text(result.message, NamedTextColor.RED))
+            ctx[DefaultContextParamTypes.SOURCE_PLAYER]?.sendMessage(Component.text(result.message, NamedTextColor.RED))
             return false
         }
         
@@ -46,7 +46,7 @@ open class TileEntityBlockBehavior protected constructor() : BlockBehavior.Defau
     }
     
     override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
-        val sourceEntity: Entity? = ctx[ContextParamTypes.SOURCE_ENTITY]
+        val sourceEntity: Entity? = ctx[DefaultContextParamTypes.SOURCE_ENTITY]
         return WorldDataManager.getTileEntity(pos)
             ?.getDrops(sourceEntity !is Player || sourceEntity.gameMode != GameMode.CREATIVE)
             ?: emptyList()
@@ -63,7 +63,7 @@ open class TileEntityBlockBehavior protected constructor() : BlockBehavior.Defau
 open class InteractiveTileEntityBlockBehavior protected constructor() : TileEntityBlockBehavior() {
     
     override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
-        val sourcePlayer = ctx[ContextParamTypes.SOURCE_ENTITY] as? Player
+        val sourcePlayer = ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player
         if (sourcePlayer != null)
             runTask { sourcePlayer.swingMainHand() }
         

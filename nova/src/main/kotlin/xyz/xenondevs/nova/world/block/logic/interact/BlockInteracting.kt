@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -56,12 +56,12 @@ internal object BlockInteracting : Listener {
                 val block = blockState.block
                 
                 val ctx = Context.intention(ContextIntentions.BlockInteract)
-                    .param(ContextParamTypes.BLOCK_POS, pos)
-                    .param(ContextParamTypes.BLOCK_TYPE_NOVA, block)
-                    .param(ContextParamTypes.SOURCE_ENTITY, player)
-                    .param(ContextParamTypes.CLICKED_BLOCK_FACE, event.blockFace)
-                    .param(ContextParamTypes.INTERACTION_HAND, event.hand)
-                    .param(ContextParamTypes.INTERACTION_ITEM_STACK, event.item)
+                    .param(DefaultContextParamTypes.BLOCK_POS, pos)
+                    .param(DefaultContextParamTypes.BLOCK_TYPE_NOVA, block)
+                    .param(DefaultContextParamTypes.SOURCE_ENTITY, player)
+                    .param(DefaultContextParamTypes.CLICKED_BLOCK_FACE, event.blockFace)
+                    .param(DefaultContextParamTypes.INTERACTION_HAND, event.hand)
+                    .param(DefaultContextParamTypes.INTERACTION_ITEM_STACK, event.item)
                     .build()
                 
                 val actionPerformed = block.handleInteract(pos, blockState, ctx)
@@ -97,8 +97,8 @@ internal object BlockInteracting : Listener {
         val state = WorldDataManager.getBlockState(pos)
         if (state != null && Material.AIR == event.block.type) {
             val ctx = Context.intention(BlockBreak)
-                .param(ContextParamTypes.BLOCK_POS, pos)
-                .param(ContextParamTypes.BLOCK_BREAK_EFFECTS, false)
+                .param(DefaultContextParamTypes.BLOCK_POS, pos)
+                .param(DefaultContextParamTypes.BLOCK_BREAK_EFFECTS, false)
                 .build()
             BlockUtils.breakBlockNaturally(ctx)
         }
@@ -122,8 +122,8 @@ internal object BlockInteracting : Listener {
         blockList.removeAll(novaBlocks)
         novaBlocks.forEach {
             val ctx = Context.intention(BlockBreak)
-                .param(ContextParamTypes.BLOCK_POS, it.pos)
-                .param(ContextParamTypes.BLOCK_BREAK_EFFECTS, false)
+                .param(DefaultContextParamTypes.BLOCK_POS, it.pos)
+                .param(DefaultContextParamTypes.BLOCK_BREAK_EFFECTS, false)
                 .build()
             BlockUtils.breakBlockNaturally(ctx)
         }

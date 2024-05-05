@@ -36,7 +36,7 @@ import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
-object ContextParamTypes {
+object DefaultContextParamTypes {
     
     /**
      * The position of a block.

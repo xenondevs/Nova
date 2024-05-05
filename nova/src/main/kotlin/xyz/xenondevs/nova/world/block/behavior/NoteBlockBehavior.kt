@@ -15,7 +15,7 @@ import xyz.xenondevs.nmsutils.particle.noteColor
 import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.item.novaItem
@@ -39,8 +39,8 @@ private val PITCH_TABLE: FloatArray = floatArrayOf(
 internal object NoteBlockBehavior : BlockBehavior {
     
     override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockInteract>): Boolean {
-        val clickedFace = ctx[ContextParamTypes.CLICKED_BLOCK_FACE]
-        val item = ctx[ContextParamTypes.INTERACTION_ITEM_STACK]
+        val clickedFace = ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]
+        val item = ctx[DefaultContextParamTypes.INTERACTION_ITEM_STACK]
         
         if (item != null && item.novaItem == null && Tag.ITEMS_NOTE_BLOCK_TOP_INSTRUMENTS.isTagged(item.type) && clickedFace == BlockFace.UP)
             return false

@@ -22,7 +22,7 @@ import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockInteract
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidType
@@ -175,7 +175,7 @@ abstract class TileEntity(
      * @return If any action was performed.
      */
     open fun handleRightClick(ctx: Context<BlockInteract>): Boolean {
-        val player = ctx[ContextParamTypes.SOURCE_ENTITY] as? Player
+        val player = ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player
             ?: return false
         
         if (::menuContainer.isInitialized && !player.hasInventoryOpen) {

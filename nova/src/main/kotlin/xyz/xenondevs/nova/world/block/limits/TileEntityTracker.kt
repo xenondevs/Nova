@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -41,14 +41,14 @@ internal object TileEntityTracker {
     }
     
     internal fun handlePlace(block: NovaTileEntityBlock, ctx: Context<BlockPlace>) {
-        val sourceUuid = ctx[ContextParamTypes.SOURCE_UUID] ?: return
-        modifyCounters(sourceUuid, ctx[ContextParamTypes.BLOCK_POS]!!, block.id, 1)
+        val sourceUuid = ctx[DefaultContextParamTypes.SOURCE_UUID] ?: return
+        modifyCounters(sourceUuid, ctx[DefaultContextParamTypes.BLOCK_POS]!!, block.id, 1)
     }
     
     internal fun handleBreak(tileEntity: TileEntity, ctx: Context<BlockBreak>) {
         val ownerUuid = tileEntity.ownerUuid
         if (ownerUuid != null)
-            modifyCounters(ownerUuid, ctx[ContextParamTypes.BLOCK_POS]!!, tileEntity.block.id, -1)
+            modifyCounters(ownerUuid, ctx[DefaultContextParamTypes.BLOCK_POS]!!, tileEntity.block.id, -1)
     }
     
     private fun modifyCounters(player: UUID, pos: BlockPos, id: ResourceLocation, add: Int) {

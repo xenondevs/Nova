@@ -6,7 +6,7 @@ import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.tileentity.TileEntity
@@ -34,7 +34,7 @@ class NovaTileEntityBlock internal constructor(
     
     override fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockPlace>) {
         val tileEntityBlock = state.block as NovaTileEntityBlock
-        val data = ctx[ContextParamTypes.TILE_ENTITY_DATA_NOVA] ?: Compound()
+        val data = ctx[DefaultContextParamTypes.TILE_ENTITY_DATA_NOVA] ?: Compound()
         val tileEntity = tileEntityBlock.tileEntityConstructor(pos, state, data)
         WorldDataManager.setTileEntity(pos, tileEntity)
         tileEntity.handlePlace(ctx)

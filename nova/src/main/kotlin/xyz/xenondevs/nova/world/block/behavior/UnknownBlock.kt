@@ -5,7 +5,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -25,7 +25,7 @@ internal class UnknownNovaBlockState(serializedBlockState: JsonObject) : NovaBlo
 internal object UnknownBlockBehavior : BlockBehavior {
     
     override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockInteract>): Boolean {
-        val player = ctx[ContextParamTypes.SOURCE_PLAYER]
+        val player = ctx[DefaultContextParamTypes.SOURCE_PLAYER]
         if (player != null && player.hasPermission("nova.command.debug") && state is UnknownNovaBlockState) {
             player.sendMessage(
                 Component.translatable()

@@ -27,7 +27,7 @@ import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
@@ -226,10 +226,10 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
     fun breakBlock(brokenClientside: Boolean, sequence: Int) {
         // create a block breaking context
         val ctx = Context.intention(BlockBreak)
-            .param(ContextParamTypes.BLOCK_POS, pos)
-            .param(ContextParamTypes.SOURCE_ENTITY, player)
-            .param(ContextParamTypes.TOOL_ITEM_STACK, tool)
-            .param(ContextParamTypes.BLOCK_DROPS, drops)
+            .param(DefaultContextParamTypes.BLOCK_POS, pos)
+            .param(DefaultContextParamTypes.SOURCE_ENTITY, player)
+            .param(DefaultContextParamTypes.TOOL_ITEM_STACK, tool)
+            .param(DefaultContextParamTypes.BLOCK_DROPS, drops)
         
         val level = block.world.serverLevel
         val blockPos = pos.nmsPos
@@ -243,7 +243,7 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
             }
         }
         callEvent(event)
-        ctx.param(ContextParamTypes.BLOCK_DROPS, drops && event.isDropItems)
+        ctx.param(DefaultContextParamTypes.BLOCK_DROPS, drops && event.isDropItems)
         //</editor-fold>
         
         if (!event.isCancelled && !ProtectionManager.isVanillaProtected(player, block.location)) {

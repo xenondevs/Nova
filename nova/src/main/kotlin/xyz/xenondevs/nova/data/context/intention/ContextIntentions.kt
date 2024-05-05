@@ -1,30 +1,30 @@
 package xyz.xenondevs.nova.data.context.intention
 
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BLOCK_BREAK_EFFECTS
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BLOCK_DROPS
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BLOCK_ITEM_STACK
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BLOCK_PLACE_EFFECTS
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BLOCK_POS
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BLOCK_STATE_NOVA
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BLOCK_STORAGE_DROPS
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BLOCK_TYPE
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BLOCK_TYPE_NOVA
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BLOCK_TYPE_VANILLA
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BLOCK_WORLD
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.BYPASS_TILE_ENTITY_LIMITS
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.CLICKED_BLOCK_FACE
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.INTERACTION_HAND
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.INTERACTION_ITEM_STACK
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.RESPONSIBLE_PLAYER
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.SOURCE_DIRECTION
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.SOURCE_ENTITY
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.SOURCE_LOCATION
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.SOURCE_PLAYER
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.SOURCE_TILE_ENTITY
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.SOURCE_UUID
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.SOURCE_WORLD
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.TILE_ENTITY_DATA_NOVA
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes.TOOL_ITEM_STACK
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BLOCK_BREAK_EFFECTS
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BLOCK_DROPS
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BLOCK_ITEM_STACK
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BLOCK_PLACE_EFFECTS
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BLOCK_POS
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BLOCK_STATE_NOVA
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BLOCK_STORAGE_DROPS
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BLOCK_TYPE
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BLOCK_TYPE_NOVA
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BLOCK_TYPE_VANILLA
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BLOCK_WORLD
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.BYPASS_TILE_ENTITY_LIMITS
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.CLICKED_BLOCK_FACE
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.INTERACTION_HAND
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.INTERACTION_ITEM_STACK
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.RESPONSIBLE_PLAYER
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.SOURCE_DIRECTION
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.SOURCE_ENTITY
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.SOURCE_LOCATION
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.SOURCE_PLAYER
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.SOURCE_TILE_ENTITY
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.SOURCE_UUID
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.SOURCE_WORLD
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.TILE_ENTITY_DATA_NOVA
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes.TOOL_ITEM_STACK
 
 /**
  * Contains all built-in [context intentions][ContextIntention].

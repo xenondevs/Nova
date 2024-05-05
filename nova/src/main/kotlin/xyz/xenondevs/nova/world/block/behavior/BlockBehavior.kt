@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockInteract
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -72,7 +72,7 @@ interface BlockBehavior {
         companion object : Default()
         
         override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
-            if ((ctx[ContextParamTypes.SOURCE_ENTITY] as? Player)?.gameMode == GameMode.CREATIVE)
+            if ((ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player)?.gameMode == GameMode.CREATIVE)
                 return emptyList()
             
             return state.block.item

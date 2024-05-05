@@ -49,7 +49,7 @@ import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
-import xyz.xenondevs.nova.data.context.param.ContextParamTypes
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.item.hasNoBreakParticles
@@ -230,23 +230,23 @@ object BlockUtils {
      * @return If a block has been placed
      */
     fun placeBlock(ctx: Context<BlockPlace>): Boolean {
-        val pos = ctx[ContextParamTypes.BLOCK_POS]!!
-        val novaBlockState = ctx[ContextParamTypes.BLOCK_STATE_NOVA]
+        val pos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
+        val novaBlockState = ctx[DefaultContextParamTypes.BLOCK_STATE_NOVA]
         if (novaBlockState != null) {
             placeNovaBlock(pos, novaBlockState, ctx)
             return true
         }
         
         // TODO: place block by block state / id
-        val itemStack: ItemStack? = ctx[ContextParamTypes.BLOCK_ITEM_STACK]
-        val placeEffects = ctx[ContextParamTypes.BLOCK_PLACE_EFFECTS]
+        val itemStack: ItemStack? = ctx[DefaultContextParamTypes.BLOCK_ITEM_STACK]
+        val placeEffects = ctx[DefaultContextParamTypes.BLOCK_PLACE_EFFECTS]
         if (itemStack != null) {
             if (CustomItemServiceManager.placeBlock(itemStack, pos.location, placeEffects))
                 return true
             
             if (itemStack.type.isBlock) {
                 val fakePlayer = EntityUtils.createFakePlayer(
-                    ctx[ContextParamTypes.SOURCE_LOCATION] ?: pos.location,
+                    ctx[DefaultContextParamTypes.SOURCE_LOCATION] ?: pos.location,
                     UUID.randomUUID(), ""
                 )
                 return placeVanillaBlock(pos, fakePlayer, itemStack, placeEffects)
@@ -262,7 +262,7 @@ object BlockUtils {
         block.handlePlace(pos, state, ctx)
         
         // sounds
-        if (ctx[ContextParamTypes.BLOCK_PLACE_EFFECTS]) {
+        if (ctx[DefaultContextParamTypes.BLOCK_PLACE_EFFECTS]) {
             val soundGroup = block.options.soundGroup
             if (soundGroup != null) {
                 pos.playSound(soundGroup.placeSound, soundGroup.placeVolume, soundGroup.placePitch)
@@ -329,10 +329,10 @@ object BlockUtils {
      * @param ctx The [Context] to be used
      */
     fun breakBlockNaturally(ctx: Context<BlockBreak>) {
-        val pos = ctx[ContextParamTypes.BLOCK_POS]!!
+        val pos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
         val items = breakBlockInternal(ctx, sendEffectsToBreaker = true)
         
-        val player = ctx[ContextParamTypes.SOURCE_ENTITY] as? Player ?: return
+        val player = ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player ?: return
         val block = pos.block
         CraftEventFactory.handleBlockDropItemEvent(
             block, block.state,
@@ -356,14 +356,14 @@ object BlockUtils {
     }
     
     internal fun breakBlockInternal(ctx: Context<BlockBreak>, sendEffectsToBreaker: Boolean): List<ItemStack> {
-        val pos = ctx[ContextParamTypes.BLOCK_POS]!!
+        val pos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
         val bukkitBlock = pos.block
-        val breakEffects = ctx[ContextParamTypes.BLOCK_BREAK_EFFECTS]
-        val drops = ctx[ContextParamTypes.BLOCK_DROPS]
+        val breakEffects = ctx[DefaultContextParamTypes.BLOCK_BREAK_EFFECTS]
+        val drops = ctx[DefaultContextParamTypes.BLOCK_DROPS]
         
         if (CustomItemServiceManager.getId(bukkitBlock) != null) {
             val itemDrops = if (drops)
-                CustomItemServiceManager.getDrops(bukkitBlock, ctx[ContextParamTypes.TOOL_ITEM_STACK])!!
+                CustomItemServiceManager.getDrops(bukkitBlock, ctx[DefaultContextParamTypes.TOOL_ITEM_STACK])!!
             else emptyList()
             CustomItemServiceManager.removeBlock(bukkitBlock, breakEffects)
             return itemDrops
@@ -378,17 +378,17 @@ object BlockUtils {
             return itemDrops
         }
         
-        val nmsPlayer = ctx[ContextParamTypes.SOURCE_ENTITY]?.nmsEntity as? ServerPlayer ?: EntityUtils.DUMMY_PLAYER
-        val tool = ctx[ContextParamTypes.TOOL_ITEM_STACK]
+        val nmsPlayer = ctx[DefaultContextParamTypes.SOURCE_ENTITY]?.nmsEntity as? ServerPlayer ?: EntityUtils.DUMMY_PLAYER
+        val tool = ctx[DefaultContextParamTypes.TOOL_ITEM_STACK]
         return breakVanillaBlock(pos, nmsPlayer, tool, drops, breakEffects, sendEffectsToBreaker)
     }
     
     internal fun breakNovaBlockInternal(ctx: Context<BlockBreak>, sendEffectsToBreaker: Boolean): Boolean {
-        val pos = ctx[ContextParamTypes.BLOCK_POS]!!
+        val pos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
         val state = WorldDataManager.getBlockState(pos)
             ?: return false
         
-        if (ctx[ContextParamTypes.BLOCK_BREAK_EFFECTS]) {
+        if (ctx[DefaultContextParamTypes.BLOCK_BREAK_EFFECTS]) {
             playBreakEffects(state, ctx, pos, sendEffectsToBreaker)
         }
         
@@ -399,7 +399,7 @@ object BlockUtils {
     }
     
     private fun playBreakEffects(state: NovaBlockState, ctx: Context<BlockBreak>, pos: BlockPos, sendEffectsToBreaker: Boolean) {
-        val player = ctx[ContextParamTypes.SOURCE_ENTITY] as? Player
+        val player = ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player
         val level = pos.world.serverLevel
         val dimension = level.dimension()
         val nmsPos = pos.nmsPos
@@ -495,8 +495,8 @@ object BlockUtils {
      * Works for vanilla blocks, Nova blocks and blocks from custom item integrations.
      */
     fun getDrops(ctx: Context<BlockBreak>): List<ItemStack> {
-        val pos = ctx[ContextParamTypes.BLOCK_POS]!!
-        val tool = ctx[ContextParamTypes.TOOL_ITEM_STACK]
+        val pos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
+        val tool = ctx[DefaultContextParamTypes.TOOL_ITEM_STACK]
         
         val block = pos.block
         if (CustomItemServiceManager.getBlockType(block) != null)
@@ -506,7 +506,7 @@ object BlockUtils {
         if (novaBlockState != null)
             return novaBlockState.block.getDrops(pos, novaBlockState, ctx)
         
-        return getVanillaDrops(pos, tool, ctx[ContextParamTypes.SOURCE_ENTITY])
+        return getVanillaDrops(pos, tool, ctx[DefaultContextParamTypes.SOURCE_ENTITY])
     }
     
     private fun getVanillaDrops(pos: BlockPos, tool: ItemStack?, sourceEntity: Entity?): List<ItemStack> {
@@ -564,7 +564,7 @@ object BlockUtils {
      * Gets the experience that would be dropped if the block were to be broken.
      */
     fun getExp(ctx: Context<BlockBreak>): Int {
-        val pos = ctx[ContextParamTypes.BLOCK_POS]!!
+        val pos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
         val novaState = WorldDataManager.getBlockState(pos)
         if (novaState != null)
             return novaState.block.getExp(pos, novaState, ctx)
@@ -572,7 +572,7 @@ object BlockUtils {
         val serverLevel = pos.world.serverLevel
         val mojangPos = pos.nmsPos
         
-        val toolItemStack = ctx[ContextParamTypes.TOOL_ITEM_STACK].nmsCopy
+        val toolItemStack = ctx[DefaultContextParamTypes.TOOL_ITEM_STACK].nmsCopy
         var exp = BlockUtils.getVanillaBlockExp(serverLevel, mojangPos, toolItemStack)
         
         // the furnace is the only block entity that can drop exp (I think)
