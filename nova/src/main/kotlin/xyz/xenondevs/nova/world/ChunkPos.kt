@@ -39,6 +39,8 @@ data class ChunkPos(val worldUUID: UUID, val x: Int, val z: Int) {
     }
     
     fun isLoaded() = world?.isChunkLoaded(x, z) ?: false
+    fun toLong(): Long =
+        ((z.toLong() and 0xFFFFFFFF) shl 32) or (x.toLong() and 0xFFFFFFFF)
     
     override fun equals(other: Any?): Boolean {
         return this === other || (other is ChunkPos && other.worldUUID == worldUUID && other.x == x && other.z == z)
