@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.data.context
 
-import xyz.xenondevs.commons.collections.filterValuesNotNullTo
 import xyz.xenondevs.commons.reflection.call
 import xyz.xenondevs.nova.data.context.intention.ContextIntention
 import xyz.xenondevs.nova.data.context.param.ContextParamType
@@ -13,29 +12,35 @@ import xyz.xenondevs.nova.data.context.param.DefaultingContextParamType
  * Each context has an [intention] that defines which parameters are allowed and required.
  *
  * With [Context.intention], you can create a new context builder for the given intention.
+ * 
+ * @param I The intention of this context.
+ * @param intention The intention of this context.
+ * @param explicitParams The parameters that are explicitly set.
+ * @param resolvedParams The parameters that are loaded through autofillers. The value is null if the param could not be loaded through autofillers.
  */
 class Context<I : ContextIntention> private constructor(
     private val intention: I,
     private val explicitParams: Map<ContextParamType<*>, Any>,
-    private val resolvedParams: Map<ContextParamType<*>, Any>,
+    private val resolvedParams: MutableMap<ContextParamType<*>, Any?> = HashMap(),
 ) {
     
     /**
-     * Returns the value of the given [paramType] or null if it is not present.
+     * Returns the value of the given [paramType] or null if it is not present
+     * and could not be resolved through autofillers.
      */
-    operator fun <V : Any> get(paramType: ContextParamType<V>): V? {
-        return getParam(paramType)
-    }
+    operator fun <V : Any> get(paramType: ContextParamType<V>): V? =
+        getParam(paramType)
     
     /**
-     * Returns the value of the given [paramType].
+     * Returns the value of the given [paramType], falling back to the default value
+     * if the param type is not present and could not be resolved through autofillers.
      */
-    operator fun <V : Any> get(paramType: DefaultingContextParamType<V>): V {
-        return getParam(paramType) ?: paramType.defaultValue
-    }
+    operator fun <V : Any> get(paramType: DefaultingContextParamType<V>): V =
+        getParam(paramType) ?: paramType.defaultValue
     
     /**
-     * Returns the value of the given [paramType] or throws an exception if it is not present.
+     * Returns the value of the given [paramType] or throws an exception if it is not present
+     * and also couldn't be resolved through autofillers.
      *
      * @throws IllegalStateException If the given [paramType] is an optional parameter that is not present.
      * @throws IllegalArgumentException If the given [paramType] is not allowed under this context's intention.
@@ -53,37 +58,49 @@ class Context<I : ContextIntention> private constructor(
     }
     
     private fun <V : Any> getParam(paramType: ContextParamType<V>): V? {
-        return (explicitParams[paramType] ?: resolvedParams[paramType]) as V?
-    }
-    
-    /**
-     * Checks whether the given [paramType] is present in this context.
-     *
-     * @throws IllegalArgumentException When the given [paramType] is not allowed under this context's intention.
-     */
-    fun has(paramType: ContextParamType<*>): Boolean {
-        if (paramType in explicitParams || paramType in resolvedParams)
-            return true
-        
-        if (paramType !in intention.all)
-            throw IllegalArgumentException("A context of intention $intention will never contain parameter ${paramType.id}")
-        
-        return false
-    }
-    
-    /**
-     * Checks whether the given [paramType] is explicitly specified in this context.
-     *
-     * @throws IllegalArgumentException When the given [paramType] is not allowed under this context's intention.
-     */
-    fun hasExplicitly(paramType: ContextParamType<*>): Boolean {
         if (paramType in explicitParams)
-            return true
+            return explicitParams[paramType] as V?
         
-        if (paramType !in intention.all)
-            throw IllegalArgumentException("A context of intention $intention will never contain parameter ${paramType.id}")
+        if (paramType in resolvedParams)
+            return resolvedParams[paramType] as V?
         
-        return false
+        return resolveParam(paramType)
+    }
+    
+    private fun <V : Any> resolveParam(paramType: ContextParamType<V>): V? {
+        if (paramType in explicitParams)
+            throw IllegalStateException("Context parameter ${paramType.id} is already set")
+        if (paramType in resolvedParams)
+            throw IllegalStateException("Context parameter ${paramType.id} is already resolved")
+        
+        // preemptively set this to null to prevent recursive call chains
+        resolvedParams[paramType] = null
+        
+        // try to resolve value through autofillers
+        val autofillers = paramType.autofillers
+        var value: V? = null
+        autofiller@ for ((requiredParamTypes, fillerFunction) in autofillers) {
+            // load params required by autofiller
+            val requiredParamValues = arrayOfNulls<Any>(requiredParamTypes.size)
+            for ((i, requiredParamType) in requiredParamTypes.withIndex()) {
+                val requiredParamValue = getParam(requiredParamType)
+                    ?: continue@autofiller // try next autofiller
+                requiredParamValues[i] = requiredParamValue
+            }
+            
+            // run autofiller function
+            value = fillerFunction.call(*requiredParamValues)
+            
+            if (value != null && paramType.requirements.all { it.validator(value!!) })
+                break
+        }
+        
+        // otherwise, use default value if present
+        if (value == null && paramType is DefaultingContextParamType)
+            value = paramType.defaultValue
+        
+        resolvedParams[paramType] = value
+        return value
     }
     
     private fun throwParamNotPresent(paramType: ContextParamType<*>): Nothing {
@@ -97,47 +114,31 @@ class Context<I : ContextIntention> private constructor(
         /**
          * Creates a new context builder for the given [intention].
          */
-        fun <I : ContextIntention> intention(intention: I): Builder<I> {
-            return Builder(intention)
-        }
+        fun <I : ContextIntention> intention(intention: I): Builder<I> =
+            Builder(intention)
         
         /**
          * Creates a new context builder filled with the parameters of the given [context].
          */
-        fun <I : ContextIntention> from(context: Context<I>): Builder<I> {
-            val builder = Builder(context.intention)
-            for (paramType in context.intention.all) {
-                copyParam(paramType, context, builder)
-            }
-            return builder
-        }
-        
-        private fun <V : Any> copyParam(paramType: ContextParamType<V>, context: Context<*>, builder: Builder<*>) {
-            if (context.has(paramType)) {
-                builder.param(paramType, context.getOrThrow(paramType))
-            }
-        }
+        fun <I : ContextIntention> from(context: Context<I>): Builder<I> =
+            Builder(context.intention, HashMap(context.explicitParams), HashMap(context.resolvedParams))
         
     }
     
     /**
      * Builder for [Context].
      */
-    class Builder<I : ContextIntention> internal constructor(private val intention: I) {
-        
-        /**
-         * The parameters that are explicitly set.
-         */
-        private val explicitParams = HashMap<ContextParamType<*>, Any>()
-        
-        /**
-         * The parameters that are loaded through autofillers. The value is null if the param could not be loaded
-         * through fallbacks.
-         */
-        private val resolvedParams = HashMap<ContextParamType<*>, Any?>()
+    class Builder<I : ContextIntention> internal constructor(
+        private val intention: I,
+        private val explicitParams: MutableMap<ContextParamType<*>, Any> = HashMap(),
+        private val resolvedParams: MutableMap<ContextParamType<*>, Any?> = HashMap()
+    ) {
         
         /**
          * Sets the given [paramType] to the given [value].
+         * 
+         * @throws IllegalArgumentException If the given [paramType] is not allowed under this context's intention.
+         * @throws IllegalArgumentException If the given [value] is invalid for the given [paramType].
          */
         fun <V : Any> param(paramType: ContextParamType<V>, value: V?): Builder<I> {
             if (paramType !in intention.all)
@@ -160,68 +161,17 @@ class Context<I : ContextIntention> private constructor(
         
         /**
          * Builds the context.
+         * 
+         * @throws IllegalStateException If a required parameter is not present.
          */
-        fun build(autofill: Boolean = true): Context<I> {
-            if (autofill)
-                resolveParams()
-            
+        fun build(): Context<I> {
             // verify presence of all required params
             for (requiredParam in intention.required) {
-                if (!hasParam(requiredParam))
+                if (requiredParam !in explicitParams)
                     throw IllegalStateException("Required context parameter ${requiredParam.id} is not present")
             }
             
-            return Context(
-                intention,
-                HashMap(explicitParams),
-                resolvedParams.filterValuesNotNullTo(HashMap())
-            )
-        }
-        
-        private fun resolveParams() {
-            for (paramType in intention.all) {
-                resolveParam(paramType)
-            }
-        }
-        
-        private fun hasParam(paramType: ContextParamType<*>): Boolean =
-            paramType in explicitParams || paramType in resolvedParams
-        
-        private fun <V : Any> getParam(paramType: ContextParamType<V>): V? =
-            explicitParams[paramType] as V? ?: resolvedParams[paramType] as V?
-        
-        private fun <V : Any> resolveParam(paramType: ContextParamType<V>): V? {
-            if (hasParam(paramType))
-                return getParam(paramType)
-            
-            // preemptively set this to null to prevent recursive call chains
-            resolvedParams[paramType] = null
-            
-            // try to resolve value through autofillers
-            val autofillers = paramType.autofillers
-            var value: V? = null
-            autofiller@ for ((requiredParamTypes, fillerFunction) in autofillers) {
-                // load params required by autofiller
-                val requiredParamValues = arrayOfNulls<Any>(requiredParamTypes.size)
-                for ((i, requiredParamType) in requiredParamTypes.withIndex()) {
-                    val requiredParamValue = resolveParam(requiredParamType)
-                        ?: continue@autofiller // try next autofiller
-                    requiredParamValues[i] = requiredParamValue
-                }
-                
-                // run autofiller function
-                value = fillerFunction.call(*requiredParamValues)
-                
-                if (value != null && paramType.requirements.all { it.validator(value!!) })
-                    break
-            }
-            
-            // otherwise, use default value if present
-            if (value == null && paramType is DefaultingContextParamType)
-                value = paramType.defaultValue
-            
-            resolvedParams[paramType] = value
-            return value
+            return Context(intention, HashMap(explicitParams), HashMap(resolvedParams))
         }
         
     }
