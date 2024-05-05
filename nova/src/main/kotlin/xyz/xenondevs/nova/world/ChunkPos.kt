@@ -8,20 +8,42 @@ import org.bukkit.block.Block
 import java.util.*
 import kotlin.math.floor
 
+/**
+ * The [ChunkPos] of this [Chunk].
+ */
 val Chunk.pos: ChunkPos
     get() = ChunkPos(world.uid, x, z)
 
+/**
+ * The [ChunkPos] of the [Chunk] at this [Location].
+ */
 val Location.chunkPos: ChunkPos
     get() = ChunkPos(world!!.uid, floor(x).toInt() shr 4, floor(z).toInt() shr 4)
 
+/**
+ * The [ChunkPos] of the [Block] at this position.
+ */
 val Block.chunkPos: ChunkPos
     get() = ChunkPos(world.uid, x shr 4, z shr 4)
 
+/**
+ * A position of a chunk.
+ * 
+ * @param worldUUID The [UUID] of the world this chunk is in.
+ * @param x The x coordinate of the chunk.
+ * @param z The z coordinate of the chunk.
+ */
 data class ChunkPos(val worldUUID: UUID, val x: Int, val z: Int) {
     
+    /**
+     * The [Chunk] at this [ChunkPos], may be null if [world] is null.
+     */
     val chunk: Chunk?
         get() = world?.getChunkAt(x, z)
     
+    /**
+     * The world of this [ChunkPos], may be null if no world with [worldUUID] exists.
+     */
     val world: World?
         get() = Bukkit.getWorld(worldUUID)
     
@@ -38,7 +60,18 @@ data class ChunkPos(val worldUUID: UUID, val x: Int, val z: Int) {
         return chunks
     }
     
-    fun isLoaded() = world?.isChunkLoaded(x, z) ?: false
+    /**
+     * Checks whether the chunk at this position is loaded.
+     */
+    fun isLoaded(): Boolean =
+        world?.isChunkLoaded(x, z) ?: false
+    
+    /**
+     * Converts the chunk position to a long, where the 32 most significant bits are the [z]
+     * coordinate and the 32 least significant bits are the [x] coordinate.
+     * 
+     * This format matches that of [net.minecraft.world.level.ChunkPos.toLong].
+     */
     fun toLong(): Long =
         ((z.toLong() and 0xFFFFFFFF) shl 32) or (x.toLong() and 0xFFFFFFFF)
     
