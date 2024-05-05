@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.data.context.param
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.data.context.intention.ContextIntention
 
 class Requirement<V : Any>(
     val validator: (V) -> Boolean,
@@ -91,6 +92,9 @@ class ContextParamTypeBuilder<V : Any> internal constructor(private val id: Reso
     private val requirements = ArrayList<Requirement<V>>()
     private val autofillers = ArrayList<Autofiller<V>>()
     
+    private val requiredIntentions = HashSet<ContextIntention>()
+    private val optionalIntentions = HashSet<ContextIntention>()
+    
     fun require(validator: (V) -> Boolean, errorGenerator: (V) -> String): ContextParamTypeBuilder<V> {
         return require(Requirement(validator, errorGenerator))
     }
@@ -135,10 +139,35 @@ class ContextParamTypeBuilder<V : Any> internal constructor(private val id: Reso
         return this
     }
     
-    fun build(): ContextParamType<V> =
-        ContextParamTypeImpl(id, requirements, autofillers)
+    fun requiredIn(vararg intention: ContextIntention): ContextParamTypeBuilder<V> {
+        requiredIntentions += intention
+        return this
+    }
     
-    fun build(default: V): DefaultingContextParamType<V> =
-        DefaultingContextParamTypeImpl(id, default, requirements, autofillers)
+    fun optionalIn(vararg intention: ContextIntention): ContextParamTypeBuilder<V> {
+        optionalIntentions += intention
+        return this
+    }
+    
+    fun build(): ContextParamType<V> {
+        val type = ContextParamTypeImpl(id, requirements, autofillers)
+        register(type)
+        return type
+    }
+    
+    fun build(default: V): DefaultingContextParamType<V> {
+        val type = DefaultingContextParamTypeImpl(id, default, requirements, autofillers)
+        register(type)
+        return type
+    }
+    
+    private fun register(type: ContextParamType<V>) {
+        for (intention in requiredIntentions) {
+            intention.addRequired(type)
+        }
+        for (intention in optionalIntentions) {
+            intention.addOptional(type)
+        }
+    }
     
 }
