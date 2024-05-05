@@ -104,9 +104,15 @@ val BlockFace.pitch: Float
         else -> 0f
     }
 
-// TODO: doc
+
+/**
+ * Utilities related to [BlockFace].
+ */
 object BlockFaceUtils {
     
+    /**
+     * Determines the block closest block face of [block] to the given [location].
+     */
     fun determineBlockFace(block: Block, location: Location): BlockFace {
         val result = listOf(
             Axis.X to location.x - (block.x + 0.5),
@@ -117,6 +123,10 @@ object BlockFaceUtils {
         return toFace(result.first, result.second >= 0)
     }
     
+    /**
+     * Determines the block face an entity with location and direction [location] is looking at.
+     * Stops searching after [maxDistance] and returns null if no block was found.
+     */
     fun determineBlockFaceLookingAt(location: Location, maxDistance: Double = 6.0): BlockFace? {
         val start = location.vec3
         val direction = location.direction
@@ -131,6 +141,10 @@ object BlockFaceUtils {
         return null
     }
     
+    /**
+     * Converts the given [axis] to a [BlockFace], using the [positive] flag to determine
+     * the direction on the axis.
+     */
     fun toFace(axis: Axis, positive: Boolean = true): BlockFace {
         return when (axis) {
             Axis.X -> if (positive) EAST else WEST
@@ -139,6 +153,9 @@ object BlockFaceUtils {
         }
     }
     
+    /**
+     * Gets the closest cardinal [BlockFace] (North, East, South, West) to the given [yaw].
+     */
     fun toCartesianFace(yaw: Float): BlockFace {
         val yawMod = yaw.mod(360f)
         return when {
@@ -150,6 +167,10 @@ object BlockFaceUtils {
         }
     }
     
+    /**
+     * Gets the closest cartesian [BlockFace] (North, East, South, West, Up, Down)
+     * to the given [yaw] and [pitch].
+     */
     fun toCartesianFace(yaw: Float, pitch: Float): BlockFace {
         val yawMod = yaw.mod(360f)
         val pitchMod = pitch.coerceIn(-90f..90f)
@@ -164,6 +185,9 @@ object BlockFaceUtils {
         }
     }
     
+    /**
+     * Gets the closest [BlockFace] to [yaw].
+     */
     fun toRotation(yaw: Float): BlockFace {
         val yawMod = yaw.mod(360f)
         return when {
@@ -187,6 +211,9 @@ object BlockFaceUtils {
         }
     }
     
+    /**
+     * Gets the closest [Axis] to [yaw].
+     */
     fun toAxis(yaw: Float): Axis {
         val yawMod = yaw.mod(360f)
         return when {
@@ -198,6 +225,9 @@ object BlockFaceUtils {
         }
     }
     
+    /**
+     * Gets the closest [Axis] to [yaw] and [pitch].
+     */
     fun toAxis(yaw: Float, pitch: Float): Axis {
         val yawMod = yaw.mod(360f)
         val pitchMod = pitch.coerceIn(-90f..90f)
