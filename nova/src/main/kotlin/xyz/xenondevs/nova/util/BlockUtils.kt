@@ -47,8 +47,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.particle.block
 import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.data.getOrNull

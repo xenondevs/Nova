@@ -7,7 +7,8 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
@@ -172,12 +173,12 @@ abstract class NetworkedTileEntity(
         return fluidHolder
     }
     
-    override fun handlePlace(ctx: Context<ContextIntentions.BlockPlace>) {
+    override fun handlePlace(ctx: Context<BlockPlace>) {
         super.handlePlace(ctx)
         NetworkManager.queueAddEndPoint(this)
     }
     
-    override fun handleBreak(ctx: Context<ContextIntentions.BlockBreak>) {
+    override fun handleBreak(ctx: Context<BlockBreak>) {
         super.handleBreak(ctx)
         NetworkManager.queueRemoveEndPoint(this)
     }

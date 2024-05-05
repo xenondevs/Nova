@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -109,7 +109,7 @@ internal object BlockPlacing : Listener {
         if (!clickedBlock.type.isReplaceable() || WorldDataManager.getBlockState(pos) != null)
             pos = pos.advance(event.blockFace)
         
-        val ctxBuilder = Context.intention(ContextIntentions.BlockPlace)
+        val ctxBuilder = Context.intention(DefaultContextIntentions.BlockPlace)
             .param(DefaultContextParamTypes.BLOCK_POS, pos)
             .param(DefaultContextParamTypes.BLOCK_ITEM_STACK, handItem)
             .param(DefaultContextParamTypes.SOURCE_ENTITY, player)

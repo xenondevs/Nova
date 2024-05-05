@@ -4,9 +4,9 @@ import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockInteract
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.BlockPos

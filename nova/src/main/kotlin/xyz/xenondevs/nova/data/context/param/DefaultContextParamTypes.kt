@@ -17,9 +17,9 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockInteract
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.BlockFaceUtils

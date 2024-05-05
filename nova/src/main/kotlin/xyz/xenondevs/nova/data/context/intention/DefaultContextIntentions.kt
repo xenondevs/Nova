@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.data.context.intention
 /**
  * Contains all built-in [context intentions][ContextIntention].
  */
-object ContextIntentions {
+object DefaultContextIntentions {
     
     /**
      * The intention to place a block.

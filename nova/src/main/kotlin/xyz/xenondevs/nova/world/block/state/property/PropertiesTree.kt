@@ -4,7 +4,7 @@ package xyz.xenondevs.nova.world.block.state.property
 
 import xyz.xenondevs.commons.collections.getOrSet
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 
 internal class PropertiesTree<E>(
     private val scopedProperties: List<ScopedBlockStateProperty<*>>,
@@ -100,7 +100,7 @@ internal class PropertiesTree<E>(
         throw IllegalStateException() // shouldn't happen
     }
     
-    fun get(ctx: Context<ContextIntentions.BlockPlace>): E {
+    fun get(ctx: Context<BlockPlace>): E {
         val arr = IntArray(propertiesCount)
         for (i in 0..<propertiesCount) {
             val property = scopedProperties[i] as ScopedBlockStateProperty<Any>

@@ -8,8 +8,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.block.NovaBlockState
 import xyz.xenondevs.nova.api.material.NovaMaterial
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockPlace
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.util.BlockUtils

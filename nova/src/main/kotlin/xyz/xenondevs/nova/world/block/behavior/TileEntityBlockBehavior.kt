@@ -7,9 +7,9 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockInteract
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
@@ -21,7 +21,7 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 
 open class TileEntityBlockBehavior protected constructor() : BlockBehavior.Default() {
     
-    override suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockPlace>): Boolean {
+    override suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean {
         if (ctx[DefaultContextParamTypes.BYPASS_TILE_ENTITY_LIMITS])
             return true
         
@@ -34,7 +34,7 @@ open class TileEntityBlockBehavior protected constructor() : BlockBehavior.Defau
         return true
     }
     
-    override fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockPlace>) {
+    override fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>) {
         super.handlePlace(pos, state, ctx)
         val tileEntityBlock = state.block as NovaTileEntityBlock
         TileEntityTracker.handlePlace(tileEntityBlock, ctx)

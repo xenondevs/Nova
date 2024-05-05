@@ -37,7 +37,7 @@ import xyz.xenondevs.nova.command.sendFailure
 import xyz.xenondevs.nova.command.sendSuccess
 import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
@@ -480,7 +480,7 @@ internal object NovaCommand : Command("nova") {
             .flatMap { WorldDataManager.getTileEntities(it.pos) }
             .forEach { tileEntity ->
                 BlockUtils.breakBlock(
-                    Context.intention(ContextIntentions.BlockBreak)
+                    Context.intention(DefaultContextIntentions.BlockBreak)
                         .param(DefaultContextParamTypes.BLOCK_POS, tileEntity.pos)
                         .build()
                 )
@@ -871,7 +871,7 @@ internal object NovaCommand : Command("nova") {
         val minZ = min(from.z, to.z)
         val maxZ = max(from.z, to.z)
         
-        val placeCtxBuilder = Context.intention(ContextIntentions.BlockPlace)
+        val placeCtxBuilder = Context.intention(DefaultContextIntentions.BlockPlace)
             .param(DefaultContextParamTypes.BLOCK_TYPE_NOVA, block)
         
         for (x in minX..maxX) {

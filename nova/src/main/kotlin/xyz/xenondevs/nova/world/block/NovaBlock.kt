@@ -13,7 +13,9 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.ConfigProvider
 import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.options.BlockOptions
@@ -57,7 +59,7 @@ open class NovaBlock internal constructor(
     val config: ConfigProvider by lazy { Configs[configId] }
     
     //<editor-fold desc="event methods">
-    suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockPlace>): Boolean = coroutineScope {
+    suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean = coroutineScope {
         if (behaviors.isEmpty())
             return@coroutineScope true
         
@@ -67,29 +69,29 @@ open class NovaBlock internal constructor(
             .all { it }
     }
     
-    fun chooseBlockState(ctx: Context<ContextIntentions.BlockPlace>): NovaBlockState {
+    fun chooseBlockState(ctx: Context<BlockPlace>): NovaBlockState {
         return defaultBlockState.tree?.get(ctx) ?: defaultBlockState
     }
     
-    fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockInteract>): Boolean {
+    fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
         checkServerThread()
         var actionPerformed = false
         behaviors.forEach { actionPerformed = it.handleInteract(pos, state, ctx) || actionPerformed }
         return actionPerformed
     }
     
-    fun handleAttack(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockBreak>) {
+    fun handleAttack(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {
         checkServerThread()
         behaviors.forEach { it.handleAttack(pos, state, ctx) }
     }
     
-    open fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockPlace>) {
+    open fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>) {
         checkServerThread()
         state.modelProvider.set(pos)
         behaviors.forEach { it.handlePlace(pos, state, ctx) }
     }
     
-    open fun handleBreak(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockBreak>) {
+    open fun handleBreak(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {
         checkServerThread()
         state.modelProvider.remove(pos)
         behaviors.forEach { it.handleBreak(pos, state, ctx) }
@@ -105,12 +107,12 @@ open class NovaBlock internal constructor(
         behaviors.forEach { it.handleRandomTick(pos, state) }
     }
     
-    fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockBreak>): List<ItemStack> {
+    fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
         checkServerThread()
         return behaviors.flatMap { it.getDrops(pos, state, ctx) }
     }
     
-    fun getExp(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockBreak>): Int {
+    fun getExp(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): Int {
         checkServerThread()
         return behaviors.sumOf { it.getExp(pos, state, ctx) }
     }

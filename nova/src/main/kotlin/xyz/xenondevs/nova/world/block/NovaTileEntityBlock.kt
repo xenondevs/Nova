@@ -5,7 +5,8 @@ import net.kyori.adventure.text.format.Style
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.item.options.BlockOptions
@@ -32,7 +33,7 @@ class NovaTileEntityBlock internal constructor(
     requestedLayout: BlockModelLayout
 ) : NovaBlock(id, name, style, behaviors,options, properties, configId, requestedLayout) {
     
-    override fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockPlace>) {
+    override fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>) {
         val tileEntityBlock = state.block as NovaTileEntityBlock
         val data = ctx[DefaultContextParamTypes.TILE_ENTITY_DATA_NOVA] ?: Compound()
         val tileEntity = tileEntityBlock.tileEntityConstructor(pos, state, data)
@@ -43,7 +44,7 @@ class NovaTileEntityBlock internal constructor(
         super.handlePlace(pos, state, ctx)
     }
     
-    override fun handleBreak(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockBreak>) {
+    override fun handleBreak(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {
         // call super method before removing the tile-entity, so that behaviors can still access it
         super.handleBreak(pos, state, ctx)
         

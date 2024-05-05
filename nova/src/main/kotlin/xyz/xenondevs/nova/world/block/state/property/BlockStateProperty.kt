@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.world.block.state.property
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 
 /**
  * Represents a property-type of a block state.
@@ -26,7 +26,7 @@ abstract class BlockStateProperty<T : Any>(val id: ResourceLocation) {
     
 }
 
-internal typealias BlockStatePropertyInitializer<T> = (Context<ContextIntentions.BlockPlace>) -> T
+internal typealias BlockStatePropertyInitializer<T> = (Context<BlockPlace>) -> T
 
 /**
  * Represents a property-type of a block state, along with the allowed values.

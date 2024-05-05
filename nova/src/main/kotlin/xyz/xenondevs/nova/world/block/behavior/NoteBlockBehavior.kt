@@ -14,7 +14,8 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nmsutils.particle.noteColor
 import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.callEvent
@@ -38,7 +39,7 @@ private val PITCH_TABLE: FloatArray = floatArrayOf(
 
 internal object NoteBlockBehavior : BlockBehavior {
     
-    override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockInteract>): Boolean {
+    override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
         val clickedFace = ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]
         val item = ctx[DefaultContextParamTypes.INTERACTION_ITEM_STACK]
         
@@ -51,7 +52,7 @@ internal object NoteBlockBehavior : BlockBehavior {
         return true
     }
     
-    override fun handleAttack(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockBreak>) {
+    override fun handleAttack(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {
         playNote(pos, state)
     }
     
@@ -117,7 +118,7 @@ internal object NoteBlockBehavior : BlockBehavior {
         FakeEntityManager.getChunkViewers(pos.chunkPos).forEach { it.send(packet) }
     }
     
-    override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockBreak>): List<ItemStack> {
+    override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
         return listOf(ItemStack(Material.NOTE_BLOCK))
     }
     

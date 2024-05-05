@@ -17,8 +17,8 @@ import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.inventory.InventoryCreativeEvent
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -55,7 +55,7 @@ internal object BlockInteracting : Listener {
             if (blockState != null && ProtectionManager.canUseBlock(player, event.item, pos)) {
                 val block = blockState.block
                 
-                val ctx = Context.intention(ContextIntentions.BlockInteract)
+                val ctx = Context.intention(DefaultContextIntentions.BlockInteract)
                     .param(DefaultContextParamTypes.BLOCK_POS, pos)
                     .param(DefaultContextParamTypes.BLOCK_TYPE_NOVA, block)
                     .param(DefaultContextParamTypes.SOURCE_ENTITY, player)

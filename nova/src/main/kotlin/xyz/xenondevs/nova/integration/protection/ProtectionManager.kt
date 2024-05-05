@@ -16,7 +16,9 @@ import xyz.xenondevs.nova.api.ApiTileEntityWrapper
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
@@ -139,7 +141,7 @@ object ProtectionManager {
     /**
      * Checks whether the given [ctx] passes place permission checks.
      */
-    suspend fun canPlace(ctx: Context<ContextIntentions.BlockPlace>): Boolean {
+    suspend fun canPlace(ctx: Context<BlockPlace>): Boolean {
         val pos = ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS)
         val blockItem = ctx[DefaultContextParamTypes.BLOCK_ITEM_STACK] ?: ItemStack(Material.AIR)
         
@@ -177,7 +179,7 @@ object ProtectionManager {
     /**
      * Checks whether the given [ctx] passes break permission checks.
      */
-    suspend fun canBreak(ctx: Context<ContextIntentions.BlockBreak>): Boolean {
+    suspend fun canBreak(ctx: Context<BlockBreak>): Boolean {
         val pos = ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS)
         val tool = ctx[DefaultContextParamTypes.TOOL_ITEM_STACK]
         
@@ -215,7 +217,7 @@ object ProtectionManager {
     /**
      * Checks whether the given [ctx] passes block interaction permission checks.
      */
-    suspend fun canUseBlock(ctx: Context<ContextIntentions.BlockInteract>): Boolean {
+    suspend fun canUseBlock(ctx: Context<BlockInteract>): Boolean {
         val pos = ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS)
         val item = ctx[DefaultContextParamTypes.INTERACTION_ITEM_STACK]
         

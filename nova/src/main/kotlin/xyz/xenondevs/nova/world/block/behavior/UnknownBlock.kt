@@ -4,7 +4,8 @@ import com.google.gson.JsonObject
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.ContextIntentions
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
@@ -24,7 +25,7 @@ internal class UnknownNovaBlockState(serializedBlockState: JsonObject) : NovaBlo
 
 internal object UnknownBlockBehavior : BlockBehavior {
     
-    override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockInteract>): Boolean {
+    override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
         val player = ctx[DefaultContextParamTypes.SOURCE_PLAYER]
         if (player != null && player.hasPermission("nova.command.debug") && state is UnknownNovaBlockState) {
             player.sendMessage(
@@ -41,7 +42,7 @@ internal object UnknownBlockBehavior : BlockBehavior {
         return false
     }
     
-    override fun handleBreak(pos: BlockPos, state: NovaBlockState, ctx: Context<ContextIntentions.BlockBreak>) {
+    override fun handleBreak(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {
         // remove tile-entity data in the case that the previous block was a tile-entity
         WorldDataManager.setTileEntity(pos, null)
     }
