@@ -8,24 +8,49 @@ import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
+import xyz.xenondevs.commons.collections.after
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-enum class BlockSide(private val rotation: Int, val blockFace: BlockFace) {
+private val NESW: List<BlockFace> = listOf(NORTH, EAST, SOUTH, WEST)
+
+/**
+ * The side of a block.
+ */
+enum class BlockSide(private val rotation: Int) {
     
-    FRONT(0, SOUTH),
-    LEFT(1, WEST),
-    BACK(2, NORTH),
-    RIGHT(3, EAST),
-    TOP(-1, UP),
-    BOTTOM(-1, DOWN);
+    FRONT(0),
+    LEFT(1),
+    BACK(2),
+    RIGHT(3),
+    TOP(-1),
+    BOTTOM(-1);
     
-    fun getBlockFace(yaw: Float): BlockFace {
-        if (rotation == -1) return blockFace
-        
-        val rot = ((yaw / 90.0).roundToInt() + rotation).mod(4)
-        return entries[rot].blockFace
+    /**
+     * Gets the [BlockFace] of this [BlockSide] if [front] is the front direction.
+     */
+    fun getBlockFace(front: BlockFace): BlockFace {
+        require(front in NESW) { "Front must be one of the cardinal directions." }
+        return when (this) {
+            FRONT -> front
+            TOP -> UP
+            BOTTOM -> DOWN
+            else -> NESW.after(front, rotation)
+        }
     }
+    
+    /**
+     * Gets the [BlockFace] of this [BlockSide] for blocks facing the given [yaw].
+     */
+    fun getBlockFace(yaw: Float): BlockFace =
+        when (this) {
+            TOP -> UP
+            BOTTOM -> DOWN
+            else -> {
+                val rot = ((yaw / 90.0).roundToInt() + rotation + 2).mod(4)
+                NESW[rot]
+            }
+        }
     
 }
 
