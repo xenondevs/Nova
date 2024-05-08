@@ -15,9 +15,15 @@ object TestIntentions {
 
 object TestParamTypes {
     
+    val STRING_PARENT: ContextParamType<String> =
+        ContextParamType.builder<String>("string_parent")
+            .optionalIn(TestIntentions.TestIntention)
+            .build()
+    
     val STRING: ContextParamType<String> =
         ContextParamType.builder<String>("string")
             .requiredIn(TestIntentions.TestIntention)
+            .autofilledBy(::STRING_PARENT) { it }
             .build()
     
     val STRING_LENGTH: ContextParamType<Int> =
@@ -87,6 +93,15 @@ class ContextTest {
             .build()
         
         assertEquals(true, context[TestParamTypes.BOOLEAN])
+    }
+    
+    @Test
+    fun testDoesNotFailWhenRequiredParamsAreResolvable() {
+        val context = Context.intention(TestIntentions.TestIntention)
+            .param(TestParamTypes.STRING_PARENT, "Hello")
+            .build()
+        
+        assertEquals("Hello", context[TestParamTypes.STRING])
     }
     
 }

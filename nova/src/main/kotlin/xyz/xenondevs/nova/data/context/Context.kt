@@ -165,13 +165,15 @@ class Context<I : ContextIntention> private constructor(
          * @throws IllegalStateException If a required parameter is not present.
          */
         fun build(): Context<I> {
+            val context = Context(intention, HashMap(explicitParams), HashMap(resolvedParams))
+            
             // verify presence of all required params
             for (requiredParam in intention.required) {
-                if (requiredParam !in explicitParams)
+                if (context[requiredParam] == null)
                     throw IllegalStateException("Required context parameter ${requiredParam.id} is not present")
             }
             
-            return Context(intention, HashMap(explicitParams), HashMap(resolvedParams))
+            return context
         }
         
     }
