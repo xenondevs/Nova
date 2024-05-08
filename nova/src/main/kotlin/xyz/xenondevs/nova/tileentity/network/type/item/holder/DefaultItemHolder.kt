@@ -6,8 +6,12 @@ import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.cbf.provider.entry
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.collections.toEnumMap
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.mutable.mapNonNull
+import xyz.xenondevs.commons.provider.mutable.orElseLazily
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilter
@@ -27,7 +31,7 @@ import java.util.*
  * If null, the connection config will be automatically generated using the highest possible connection type for each side.
  */
 class DefaultItemHolder(
-    override val compound: Compound,
+    compound: Provider<Compound>,
     override val containers: Map<NetworkedInventory, NetworkConnectionType>,
     override val mergedInventory: NetworkedInventory?,
     defaultInventoryConfig: () -> Map<BlockFace, NetworkedInventory>,
@@ -42,30 +46,39 @@ class DefaultItemHolder(
     private val invToUuid: BiMap<NetworkedInventory, UUID> = containers.keys.associateWithTo(HashBiMap.create()) { it.uuid }
     private val uuidToInv: BiMap<UUID, NetworkedInventory> get() = invToUuid.inverse()
     
-    override val containerConfig: MutableMap<BlockFace, NetworkedInventory> =
-        compound.get<Map<BlockFace, UUID>>("inventoryConfig")
-            ?.mapValuesTo(enumMap()) { uuidToInv[it.value]!! }
-            ?: defaultInventoryConfig().toEnumMap()
+    override val containerConfig: MutableMap<BlockFace, NetworkedInventory>
+        by compound.entry<Map<BlockFace, UUID>>("inventoryConfig")
+            .mapNonNull(
+                { it.mapValuesTo(enumMap()) { (_, uuid) -> uuidToInv[uuid]!! } },
+                { it.mapValuesTo(enumMap()) { (_, inv) -> inv.uuid } }
+            ).orElseLazily { defaultInventoryConfig().toEnumMap() }
     
-    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        compound["connectionConfig"]
-            ?: defaultConnectionConfig?.invoke()?.toEnumMap() 
-            ?: containerConfig.mapValuesTo(enumMap()) { (_, inv) -> containers[inv] }
+    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
+        by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
+            .orElseLazily {
+                defaultConnectionConfig?.invoke()?.toEnumMap()
+                    ?: containerConfig.mapValuesTo(enumMap()) { (_, inv) -> containers[inv] }
+            }
     
-    override val channels: MutableMap<BlockFace, Int> =
-        compound["channels"] ?: DEFAULT_CHANNELS()
+    override val channels: MutableMap<BlockFace, Int>
+        by compound.entry<MutableMap<BlockFace, Int>>("channels")
+            .orElseLazily(DEFAULT_CHANNELS)
     
-    override val insertFilters: MutableMap<BlockFace, ItemFilter> =
-        compound["insertFilters"] ?: enumMap()
+    override val insertFilters: MutableMap<BlockFace, ItemFilter>
+        by compound.entry<MutableMap<BlockFace, ItemFilter>>("insertFilters")
+            .orElseLazily(::enumMap)
     
-    override val extractFilters: MutableMap<BlockFace, ItemFilter> =
-        compound["extractFilters"] ?: enumMap()
+    override val extractFilters: MutableMap<BlockFace, ItemFilter>
+        by compound.entry<MutableMap<BlockFace, ItemFilter>>("extractFilters")
+            .orElseLazily(::enumMap)
     
-    override val insertPriorities: MutableMap<BlockFace, Int> =
-        compound["insertPriorities"] ?: DEFAULT_PRIORITIES()
+    override val insertPriorities: MutableMap<BlockFace, Int>
+        by compound.entry<MutableMap<BlockFace, Int>>("insertPriorities")
+            .orElseLazily(DEFAULT_PRIORITIES)
     
-    override val extractPriorities: MutableMap<BlockFace, Int> =
-        compound["extractPriorities"] ?: DEFAULT_PRIORITIES()
+    override val extractPriorities: MutableMap<BlockFace, Int>
+        by compound.entry<MutableMap<BlockFace, Int>>("extractPriorities")
+            .orElseLazily(DEFAULT_PRIORITIES)
     
     fun getNetworkedInventory(inv: VirtualInventory): NetworkedInventory =
         getNetworkedInventory(inv.uuid)
@@ -75,16 +88,6 @@ class DefaultItemHolder(
     
     private fun getUUID(inv: NetworkedInventory): UUID =
         invToUuid[inv] ?: throw NoSuchElementException("NetworkedInventory is not part of item holder")
-    
-    override fun saveData() {
-        compound["inventoryConfig"] = containerConfig.mapValuesTo(enumMap()) { (_, inv) -> getUUID(inv) }
-        compound["connectionConfig"] = connectionConfig
-        compound["channels"] = channels
-        compound["insertFilters"] = insertFilters
-        compound["extractFilters"] = extractFilters
-        compound["insertPriorities"] = insertPriorities
-        compound["extractPriorities"] = extractPriorities
-    }
     
     internal companion object {
         val ALL_INVENTORY_UUID = UUID(0, 0xA11)

@@ -26,7 +26,7 @@ internal class VanillaContainerTileEntity internal constructor(
         
         val inventory = if (container is ShulkerBox) NetworkedShulkerBoxInventory(container.inventory) else NetworkedBukkitInventory(container.inventory)
         val inventories = CUBE_FACES.associateWithTo(enumMap<BlockFace, NetworkedInventory>()) { inventory }
-        itemHolder = StaticVanillaItemHolder(storedValue("itemHolder", ::Compound).get(), inventories) // TODO: legacy support
+        itemHolder = StaticVanillaItemHolder(storedValue("itemHolder", ::Compound), inventories) // TODO: legacy support
     }
     
 }

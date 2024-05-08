@@ -22,7 +22,7 @@ internal class VanillaFurnaceTileEntity internal constructor(
     
     override fun handleEnable() {
         itemHolder = StaticVanillaItemHolder(
-            storedValue("itemHolder", ::Compound).get(), // TODO: legacy support
+            storedValue("itemHolder", ::Compound), // TODO: legacy support
             getInventories(pos.block.state as Furnace)
         )
     }

@@ -53,7 +53,7 @@ abstract class NetworkedTileEntity(
         defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = { CUBE_FACES.associateWithTo(enumMap()) { allowedConnectionType } }
     ): DefaultEnergyHolder {
         val holder = DefaultEnergyHolder(
-            storedValue("energyHolder", ::Compound).get(), // TODO: legacy conversion
+            storedValue("energyHolder", ::Compound), // TODO: legacy conversion
             maxEnergy,
             allowedConnectionType,
             defaultConnectionConfig
@@ -91,7 +91,7 @@ abstract class NetworkedTileEntity(
         allowedConnectionTypes[mergedInventory] = NetworkConnectionType.of(allowedConnectionTypes.values)
         
         val holder = DefaultItemHolder(
-            storedValue("itemHolder", ::Compound).get(), // TODO: legacy conversion
+            storedValue("itemHolder", ::Compound), // TODO: legacy conversion
             allowedConnectionTypes,
             mergedInventory,
             // map from VirtualInventory to NetworkedInventory or use mergedInventory for all sides
@@ -123,7 +123,7 @@ abstract class NetworkedTileEntity(
     ): DefaultItemHolder {
         val allInventories = buildMap { this += inventory; this += inventories }
         val holder = DefaultItemHolder(
-            storedValue("itemHolder", ::Compound).get(), // TODO: legacy conversion
+            storedValue("itemHolder", ::Compound), // TODO: legacy conversion
             allInventories,
             mergedInventory,
             defaultInventoryConfig,
@@ -164,7 +164,7 @@ abstract class NetworkedTileEntity(
         defaultConnectionConfig: () -> EnumMap<BlockFace, NetworkConnectionType> = DefaultFluidHolder.DEFAULT_CONNECTION_CONFIG
     ): DefaultFluidHolder {
         val fluidHolder = DefaultFluidHolder(
-            storedValue("fluidHolder", ::Compound).get(), // TODO: legacy conversion
+            storedValue("fluidHolder", ::Compound), // TODO: legacy conversion
             buildMap { this += container; this += containers },
             defaultContainerConfig,
             defaultConnectionConfig
@@ -181,11 +181,6 @@ abstract class NetworkedTileEntity(
     override fun handleBreak(ctx: Context<BlockBreak>) {
         super.handleBreak(ctx)
         NetworkManager.queueRemoveEndPoint(this)
-    }
-    
-    override fun saveData() {
-        super.saveData()
-        holders.forEach(EndPointDataHolder::saveData)
     }
     
 }

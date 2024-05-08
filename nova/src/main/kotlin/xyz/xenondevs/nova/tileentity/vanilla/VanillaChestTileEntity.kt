@@ -29,7 +29,7 @@ internal class VanillaChestTileEntity internal constructor(
     private lateinit var inventories: EnumMap<BlockFace, NetworkedInventory>
     private lateinit var allowedConnectionTypes: HashMap<NetworkedInventory, NetworkConnectionType>
     override var itemHolder: ItemHolder = DynamicVanillaItemHolder(
-        storedValue("itemHolder", ::Compound).get(), // TODO: legacy support
+        storedValue("itemHolder", ::Compound), // TODO: legacy support
         { inventories },
         { allowedConnectionTypes }
     )

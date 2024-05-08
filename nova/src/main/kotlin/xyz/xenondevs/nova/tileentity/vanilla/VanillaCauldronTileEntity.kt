@@ -25,7 +25,7 @@ internal class VanillaCauldronTileEntity internal constructor(
     override fun handleEnable() {
         container = CauldronFluidContainer(UUID(0L, 0L), pos.block)
         fluidHolder = DefaultFluidHolder(
-            storedValue("fluidHolder", ::Compound).get(), // TODO: legacy conversion
+            storedValue("fluidHolder", ::Compound), // TODO: legacy conversion
             mapOf(container to NetworkConnectionType.BUFFER),
             { CUBE_FACES.associateWithTo(enumMap()) { container } },
             { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.BUFFER } }
@@ -37,11 +37,6 @@ internal class VanillaCauldronTileEntity internal constructor(
     
     override fun handleBlockUpdate() {
         container.handleBlockUpdate()
-    }
-    
-    override fun saveData() {
-        super.saveData()
-        fluidHolder.saveData()
     }
     
 }

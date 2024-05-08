@@ -2,8 +2,11 @@ package xyz.xenondevs.nova.tileentity.network.type.energy.holder
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.cbf.provider.entry
 import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.mutable.orElse
+import xyz.xenondevs.commons.provider.mutable.orElseLazily
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.util.TickedLong
 import kotlin.math.max
@@ -11,36 +14,39 @@ import kotlin.math.min
 
 /**
  * The default [EnergyHolder] implementation.
- * 
+ *
  * @param compound the [Compound] for data storage and retrieval
  * @param maxEnergy the maximum amount of energy this [EnergyHolder] can store
  * @param allowedConnectionType determines whether energy can be inserted, extracted, or both
  * @param defaultConnectionConfig the default ([BlockFace], [NetworkConnectionType]) to be used if no configuration is stored
  */
 class DefaultEnergyHolder(
-    override val compound: Compound,
+    compound: Provider<Compound>,
     maxEnergy: Provider<Long>,
     override val allowedConnectionType: NetworkConnectionType,
     defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType>
 ) : EnergyHolder {
     
-    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> =
-        compound["connectionConfig"] ?: defaultConnectionConfig().toEnumMap()
+    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
+        by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
+            .orElseLazily { defaultConnectionConfig().toEnumMap() }
     
     /**
      * The maximum amount of energy this [EnergyHolder] can store.
      */
     val maxEnergy: Long by maxEnergy
     
-    override var energy: Long = compound["energy"] ?: 0L
+    private var _energy by compound.entry<Long>("energy").orElse(0L)
+    override var energy: Long = -1
+        get() = _energy
         set(value) {
             val capped = max(min(value, maxEnergy), 0)
-            if (field != capped) {
+            if (_energy != capped) {
                 val energyDelta = capped - field
                 if (energyDelta > 0) _energyPlus.add(energyDelta)
                 else _energyMinus.add(-energyDelta)
                 
-                field = capped
+                _energy = capped
                 callUpdateHandlers()
             }
         }
@@ -69,11 +75,6 @@ class DefaultEnergyHolder(
     
     init {
         maxEnergy.addUpdateHandler { callUpdateHandlers() }
-    }
-    
-    override fun saveData() {
-        compound["energy"] = energy
-        compound["connectionConfig"] = connectionConfig
     }
     
     private fun callUpdateHandlers() =

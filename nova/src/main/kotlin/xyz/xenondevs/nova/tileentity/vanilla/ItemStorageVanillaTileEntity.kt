@@ -26,9 +26,4 @@ internal abstract class ItemStorageVanillaTileEntity internal constructor(
         itemHolder.extractFilters.clear()
     }
     
-    override fun saveData() {
-        super.saveData()
-        itemHolder.saveData()
-    }
-    
 }
