@@ -56,19 +56,19 @@ internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::c
             
             addLabel()
             aLoad(0) // this
-            getField(RegistryFileCodec::class.internalName, "SRF(net.minecraft.resources.RegistryFileCodec registryKey)", "L$RESOURCE_KEY_NAME;")
-            getStatic(Registries::class.internalName, "SRF(net.minecraft.core.registries.Registries BLOCK)", "L$RESOURCE_KEY_NAME;")
+            getField(RegistryFileCodec::class.internalName, "registryKey", "L$RESOURCE_KEY_NAME;")
+            getStatic(Registries::class.internalName, "BLOCK", "L$RESOURCE_KEY_NAME;")
             invokeVirtual("java/lang/Object", "equals", "(Ljava/lang/Object;)Z")
             ifeq(continueLabel) // if registryKey != Registry.BLOCK goto continueLabel
             
             addLabel()
             aLoad(7) // pair
-            invokeVirtual(MojangPair::class.internalName, "getFirst", "()Ljava/lang/Object;") // datafixers isn't obfuscated
+            invokeVirtual(MojangPair::class.internalName, "getFirst", "()Ljava/lang/Object;")
             checkCast(RESOURCE_KEY_NAME)
-            invokeVirtual(RESOURCE_KEY_NAME, "SRM(net.minecraft.resources.ResourceKey location)", "()L$RESOURCE_LOCATION_NAME;")
+            invokeVirtual(RESOURCE_KEY_NAME, "location", "()L$RESOURCE_LOCATION_NAME;")
             dup()
             aStore(10) // var location = pair.getFirst().location()
-            invokeVirtual(RESOURCE_LOCATION_NAME, "SRM(net.minecraft.resources.ResourceLocation getNamespace)", "()Ljava/lang/String;")
+            invokeVirtual(RESOURCE_LOCATION_NAME, "getNamespace", "()Ljava/lang/String;")
             ldc("minecraft")
             invokeVirtual("java/lang/String", "equals", "(Ljava/lang/Object;)Z")
             ifne(continueLabel) // if location.namespace != "minecraft" goto continueLabel
@@ -100,14 +100,14 @@ internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::c
             
             addLabel()
             aLoad(0)
-            invokeInterface(Registry::class.internalName, "SRM(net.minecraft.core.Registry key)", "()L$RESOURCE_KEY_NAME;")
-            getStatic(Registries::class.internalName, "SRF(net.minecraft.core.registries.Registries BLOCK)", "L$RESOURCE_KEY_NAME;")
+            invokeInterface(Registry::class.internalName, "key", "()L$RESOURCE_KEY_NAME;")
+            getStatic(Registries::class.internalName, "BLOCK", "L$RESOURCE_KEY_NAME;")
             invokeVirtual("java/lang/Object", "equals", "(Ljava/lang/Object;)Z")
             ifeq(continueLabel) // if registryKey != Registry.BLOCK goto continueLabel
             
             addLabel()
             aLoad(1)
-            invokeVirtual(RESOURCE_LOCATION_NAME, "SRM(net.minecraft.resources.ResourceLocation getNamespace)", "()Ljava/lang/String;")
+            invokeVirtual(RESOURCE_LOCATION_NAME, "getNamespace", "()Ljava/lang/String;")
             ldc("minecraft")
             invokeVirtual("java/lang/String", "equals", "(Ljava/lang/Object;)Z")
             ifne(continueLabel) // if location.namespace != "minecraft" goto continueLabel
@@ -150,7 +150,7 @@ internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::c
         instructions.insert(buildInsnList {
             val continueLabel = instructions.first as LabelNode
             aLoad(1)
-            invokeVirtual(RESOURCE_LOCATION_NAME, "SRM(net.minecraft.resources.ResourceLocation getNamespace)", "()Ljava/lang/String;")
+            invokeVirtual(RESOURCE_LOCATION_NAME, "getNamespace", "()Ljava/lang/String;")
             ldc("minecraft")
             invokeVirtual("java/lang/String", "equals", "(Ljava/lang/Object;)Z")
             ifne(continueLabel) // if location.namespace != "minecraft" goto continueLabel

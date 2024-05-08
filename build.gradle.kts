@@ -13,10 +13,6 @@ fun RepositoryHandler.configureRepos() {
 
 repositories { configureRepos() }
 
-loaderJar {
-    gameVersion.set(libs.versions.paper.get().substringBefore('-'))
-}
-
 subprojects {
     group = "xyz.xenondevs.nova"
     version = properties["version"] as String

@@ -40,8 +40,8 @@ import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.level.block.Block as MojangBlock
 
-private val PLAYER_PLAY_STEP_SOUND_METHOD = ReflectionUtils.getMethod(MojangPlayer::class, true, "SRM(net.minecraft.world.entity.Entity playStepSound)", MojangBlockPos::class, BlockState::class)
-private val ENTITY_WATER_SWIM_SOUND_METHOD = ReflectionUtils.getMethod(MojangEntity::class, true, "SRM(net.minecraft.world.entity.Entity waterSwimSound)")
+private val PLAYER_PLAY_STEP_SOUND_METHOD = ReflectionUtils.getMethod(MojangPlayer::class, true, "playStepSound", MojangBlockPos::class, BlockState::class)
+private val ENTITY_WATER_SWIM_SOUND_METHOD = ReflectionUtils.getMethod(MojangEntity::class, true, "waterSwimSound")
 
 internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivingEntity::class, MojangBlock::class, MojangStack::class) {
     

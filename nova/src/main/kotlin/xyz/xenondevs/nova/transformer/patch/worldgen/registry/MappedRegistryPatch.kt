@@ -39,12 +39,12 @@ internal object MappedRegistryPatch : MethodTransformer(MAPPED_REGISTRY_REGISTER
             addLabel()
             aLoad(5) // ref
             aLoad(3) // value
-            invokeVirtual(Holder.Reference::class.internalName, "SRM(net.minecraft.core.Holder\$Reference bindValue)", "(Ljava/lang/Object;)V")
+            invokeVirtual(Holder.Reference::class.internalName, "bindValue", "(Ljava/lang/Object;)V")
             
             add(continueLabel)
         }) { insn -> // https://i.imgur.com/uLdd6pu.png
             insn.opcode == Opcodes.ALOAD && (insn as VarInsnNode).`var` == 0
-                && insn.next?.let { it.opcode == Opcodes.GETFIELD && (it as FieldInsnNode).name == "SRF(net.minecraft.core.MappedRegistry byKey)" } == true
+                && insn.next?.let { it.opcode == Opcodes.GETFIELD && (it as FieldInsnNode).name == "byKey" } == true
                 && insn.next(2)?.let { it.opcode == Opcodes.ALOAD && (it as VarInsnNode).`var` == 2 } == true
                 && insn.next(3)?.let { it.opcode == Opcodes.ALOAD && (it as VarInsnNode).`var` == 5 } == true
         }

@@ -26,8 +26,8 @@ internal object LevelChunkSectionPatch : MethodTransformer(ReflectionRegistry.LE
             instanceOf(WRAPPER_INTERNAL_NAME)
             ifeq(startLabel)
             addLabel()
-            getStatic(Blocks::class.internalName, "AIR", "LSRC/(net.minecraft.world.level.block.Block);")
-            invokeVirtual(Block::class.internalName, "SRM(net.minecraft.world.level.block.Block defaultBlockState)", "()LSRC/(net.minecraft.world.level.block.state.BlockState);")
+            getStatic(Blocks::class.internalName, "AIR", "Lnet/minecraft/world/level/block/Block;")
+            invokeVirtual(Block::class.internalName, "defaultBlockState", "()Lnet/minecraft/world/level/block/state/BlockState;")
             areturn()
         })
     }

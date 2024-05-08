@@ -21,7 +21,6 @@ import xyz.xenondevs.nova.world.block.logic.tileentity.GrindstoneLogic
 private val ENCHANTMENT_MENU_SLOTS_CHANGED_LAMBDA = ReflectionUtils.getMethod(
     EnchantmentMenu::class,
     true,
-    // not remapped
     if (ServerUtils.SERVER_SOFTWARE == ServerSoftware.PURPUR) "lambda\$slotsChanged\$1" else "lambda\$slotsChanged$0",
     ItemStack::class, Level::class, BlockPos::class
 )
@@ -30,29 +29,28 @@ private val ENCHANTMENT_MENU_SLOTS_CHANGED_LAMBDA = ReflectionUtils.getMethod(
 private val ENCHANTMENT_MENU_CLICK_MENU_BUTTON_LAMBDA = ReflectionUtils.getMethod(
     EnchantmentMenu::class,
     true,
-    // not remapped
     if (ServerUtils.SERVER_SOFTWARE == ServerSoftware.PURPUR) "lambda\$clickMenuButton\$2" else "lambda\$clickMenuButton$1",
     ItemStack::class, Int::class, Player::class, Int::class, ItemStack::class, Level::class, BlockPos::class
 )
 
 private val GRINDSTONE_MENU_MERGE_ENCHANTS = ReflectionUtils.getMethod(
     GrindstoneMenu::class,
-    true, "SRM(net.minecraft.world.inventory.GrindstoneMenu mergeEnchants)",
+    true, "mergeEnchants",
     ItemStack::class, ItemStack::class
 )
 
 private val GRINDSTONE_MENU_REMOVE_NON_CURSES = ReflectionUtils.getMethod(
     GrindstoneMenu::class,
-    true, "SRM(net.minecraft.world.inventory.GrindstoneMenu removeNonCurses)",
+    true, "removeNonCurses",
     ItemStack::class, Int::class, Int::class
 )
 
 // for future reference: https://i.imgur.com/5R9nyxC.png
-private val GRINDSTONE_MENU_RESULT_SLOT_CLASS = ReflectionUtils.getClass("SRC(net.minecraft.world.inventory.GrindstoneMenu$4)").kotlin
+private val GRINDSTONE_MENU_RESULT_SLOT_CLASS = ReflectionUtils.getClass("net.minecraft.world.inventory.GrindstoneMenu$4").kotlin
 private val GRINDSTONE_MENU_RESULT_SLOT_GET_EXPERIENCE_FROM_ITEM = ReflectionUtils.getMethod(
     GRINDSTONE_MENU_RESULT_SLOT_CLASS,
     true,
-    "SRM(net.minecraft.world.inventory.GrindstoneMenu\$4 getExperienceFromItem)",
+    "getExperienceFromItem",
     ItemStack::class
 )
 

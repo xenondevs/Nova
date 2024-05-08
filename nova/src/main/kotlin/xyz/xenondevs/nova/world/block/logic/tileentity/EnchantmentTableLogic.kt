@@ -40,9 +40,9 @@ import net.minecraft.world.item.enchantment.Enchantment as MojangEnchantment
 import org.bukkit.enchantments.Enchantment as BukkitEnchantment
 import org.bukkit.entity.Player as BukkitPlayer
 
-private val ENCHANTMENT_MENU_RANDOM_FIELD = ReflectionUtils.getField(EnchantmentMenu::class, true, "SRF(net.minecraft.world.inventory.EnchantmentMenu random)")
-private val ENCHANTMENT_MENU_ENCHANTMENT_SEED_FIELD = ReflectionUtils.getField(EnchantmentMenu::class, true, "SRF(net.minecraft.world.inventory.EnchantmentMenu enchantmentSeed)")
-private val ENCHANTMENT_MENU_ENCHANT_SLOTS_FIELD = ReflectionUtils.getField(EnchantmentMenu::class, true, "SRF(net.minecraft.world.inventory.EnchantmentMenu enchantSlots)")
+private val ENCHANTMENT_MENU_RANDOM_FIELD = ReflectionUtils.getField(EnchantmentMenu::class, true, "random")
+private val ENCHANTMENT_MENU_ENCHANTMENT_SEED_FIELD = ReflectionUtils.getField(EnchantmentMenu::class, true, "enchantmentSeed")
+private val ENCHANTMENT_MENU_ENCHANT_SLOTS_FIELD = ReflectionUtils.getField(EnchantmentMenu::class, true, "enchantSlots")
 private val ENCHANTMENT_MENU_PLAYER_FIELD = ReflectionUtils.getField(EnchantmentMenu::class, true, "player")
 
 private data class EnchantmentInstance(

@@ -12,8 +12,6 @@ repositories {
 dependencies {
     implementation(libs.paper.api)
     implementation(libs.zip4j)
-    implementation(libs.specialsource)
-    implementation(libs.stringremapper)
     implementation(libs.bundles.xenondevs.commons)
 }
 

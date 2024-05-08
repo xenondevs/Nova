@@ -553,7 +553,7 @@ object NMSUtils {
     val ENTITY_COUNTER = ReflectionUtils.getField(
         MojangEntity::class.java,
         true,
-        "SRF(net.minecraft.world.entity.Entity ENTITY_COUNTER)"
+        "ENTITY_COUNTER"
     ).get(null) as AtomicInteger
     
     val REGISTRY_ACCESS = MINECRAFT_SERVER.registryAccess()

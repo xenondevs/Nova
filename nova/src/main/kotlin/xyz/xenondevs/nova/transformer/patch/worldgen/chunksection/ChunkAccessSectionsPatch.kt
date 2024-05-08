@@ -40,7 +40,7 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(CHUNK_ACCESS_CONSTR
             checkCast(Level::class.internalName)
             aStore(9) // level
             aLoad(0)
-            getField(ChunkAccess::class.internalName, "SRF(net.minecraft.world.level.chunk.ChunkAccess sections)", "[LSRC/(net.minecraft.world.level.chunk.LevelChunkSection);")
+            getField(ChunkAccess::class.internalName, "sections", "[Lnet/minecraft/world/level/chunk/LevelChunkSection;")
             aStore(10) // sections
             ldc(0)
             iStore(11) // i
@@ -61,7 +61,7 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(CHUNK_ACCESS_CONSTR
             
             aLoad(9) // level
             aLoad(0)
-            getField(ChunkAccess::class.internalName, "SRF(net.minecraft.world.level.chunk.ChunkAccess chunkPos)", "LSRC/(net.minecraft.world.level.ChunkPos);")
+            getField(ChunkAccess::class.internalName, "chunkPos", "Lnet/minecraft/world/level/ChunkPos;")
             iLoad(11) // i
             aLoad(3) // LevelHeightAccessor
             invokeInterface(LevelHeightAccessor::getMinSection)
