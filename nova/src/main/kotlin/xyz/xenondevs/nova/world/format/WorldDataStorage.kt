@@ -74,6 +74,10 @@ internal class WorldDataStorage(val world: World) {
         }
     }
     
+    fun getBlockChunkOrThrow(pos: ChunkPos): RegionChunk =
+        blockRegionFiles[getRegionId(pos)]?.getCompleted()?.getChunk(pos)
+            ?: throw IllegalStateException("Block chunk at $pos is not loaded")
+    
     fun getNetworkChunkOrThrow(pos: ChunkPos): NetworkChunk =
         networkRegionFiles[getRegionId(pos)]?.getCompleted()?.getChunk(pos)
             ?: throw IllegalStateException("Network chunk at $pos is not loaded")
@@ -87,24 +91,27 @@ internal class WorldDataStorage(val world: World) {
     /**
      * Gets a snapshot of all loaded [TileEntities][TileEntity] in this world.
      */
-    suspend fun getTileEntities(): List<TileEntity> =
+    fun getTileEntities(): List<TileEntity> =
         collectFromChunks { it.getTileEntities() }
     
     /**
      * Gets a snapshot of all loaded [VanillaTileEntities][VanillaTileEntity] in this world.
      */
-    suspend fun getVanillaTileEntities(): List<VanillaTileEntity> =
+    fun getVanillaTileEntities(): List<VanillaTileEntity> =
         collectFromChunks { it.getVanillaTileEntities() }
     
-    private suspend fun <T> collectFromChunks(collector: (RegionChunk) -> List<T>): List<T> = coroutineScope {
+    private fun <T> collectFromChunks(collector: (RegionChunk) -> List<T>): List<T> {
         val list = ArrayList<T>()
         for (regionFile in blockRegionFiles.values) {
-            for (chunk in regionFile.await().chunks) {
+            if (!regionFile.isCompleted)
+                continue
+            
+            for (chunk in regionFile.getCompleted().chunks) {
                 list += collector(chunk)
             }
         }
         
-        return@coroutineScope list
+        return list
     }
     
     /**

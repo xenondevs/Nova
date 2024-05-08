@@ -108,43 +108,50 @@ object WorldDataManager : Listener {
     }
     
     fun getBlockState(pos: BlockPos): NovaBlockState? =
-        runBlocking { getOrLoadChunk(pos.chunkPos).getBlockState(pos) }
+        getChunkOrThrow(pos.chunkPos).getBlockState(pos)
     
     fun setBlockState(pos: BlockPos, state: NovaBlockState?) =
-        runBlocking { getOrLoadChunk(pos.chunkPos).setBlockState(pos, state) }
+        getChunkOrThrow(pos.chunkPos).setBlockState(pos, state)
     
     fun getTileEntity(pos: BlockPos): TileEntity? =
-        runBlocking { getOrLoadChunk(pos.chunkPos).getTileEntity(pos) }
+        getChunkOrThrow(pos.chunkPos).getTileEntity(pos)
     
     fun getTileEntities(pos: ChunkPos): List<TileEntity> =
-        runBlocking { getOrLoadChunk(pos).getTileEntities() }
+        getChunkOrThrow(pos).getTileEntities()
     
     fun getTileEntities(world: World): List<TileEntity> =
-        runBlocking { getWorldStorage(world).getTileEntities() }
+        getWorldStorage(world).getTileEntities()
     
     fun getTileEntities(): List<TileEntity> =
-        runBlocking { worlds.values.flatMap { it.getTileEntities() } }
+        worlds.values.flatMap { it.getTileEntities() }
     
     fun setTileEntity(pos: BlockPos, tileEntity: TileEntity?): TileEntity? =
-        runBlocking { getOrLoadChunk(pos.chunkPos).setTileEntity(pos, tileEntity) }
+        getChunkOrThrow(pos.chunkPos).setTileEntity(pos, tileEntity)
     
     internal fun getVanillaTileEntity(pos: BlockPos): VanillaTileEntity? =
-        runBlocking { getOrLoadChunk(pos.chunkPos).getVanillaTileEntity(pos) }
+        getChunkOrThrow(pos.chunkPos).getVanillaTileEntity(pos)
     
     internal fun getVanillaTileEntities(pos: ChunkPos): List<VanillaTileEntity> =
-        runBlocking { getOrLoadChunk(pos).getVanillaTileEntities() }
-    
-    internal fun getVanillaTileEntities(world: World): List<VanillaTileEntity> =
-        runBlocking { getWorldStorage(world).getVanillaTileEntities() }
-    
-    internal fun getVanillaTileEntities(): List<VanillaTileEntity> =
-        runBlocking { worlds.values.flatMap { it.getVanillaTileEntities() } }
+        getChunkOrThrow(pos).getVanillaTileEntities()
     
     internal fun setVanillaTileEntity(pos: BlockPos, tileEntity: VanillaTileEntity?): VanillaTileEntity? =
-        runBlocking { getOrLoadChunk(pos.chunkPos).setVanillaTileEntity(pos, tileEntity) }
+        getChunkOrThrow(pos.chunkPos).setVanillaTileEntity(pos, tileEntity)
+    
+    internal fun getVanillaTileEntities(world: World): List<VanillaTileEntity> =
+        getWorldStorage(world).getVanillaTileEntities()
+    
+    internal fun getVanillaTileEntities(): List<VanillaTileEntity> =
+        worlds.values.flatMap { it.getVanillaTileEntities() }
     
     private suspend fun getOrLoadChunk(pos: ChunkPos): RegionChunk =
         getOrLoadRegion(pos).getChunk(pos)
+    
+    private fun getChunkOrThrow(pos: ChunkPos): RegionChunk {
+        if (!initialized)
+            throw IllegalStateException("Tried to get chunk before initialization")
+        
+        return getWorldStorage(pos.world!!).getBlockChunkOrThrow(pos)
+    }
     
     private suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile {
         if (!initialized)
