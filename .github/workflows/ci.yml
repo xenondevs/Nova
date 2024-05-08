@@ -25,11 +25,11 @@ jobs:
         with:
           cache-disabled: true
         
-      - name: Build Spigot-Mapped
+      - name: Build Nova
         uses: gradle/gradle-build-action@v3
         with:
           arguments: |
-            loaderJarSpigot
+            loaderJar
             -PoutDir=artifacts
             -Prelease
 
@@ -40,7 +40,7 @@ jobs:
           name: Artifacts
           path: ./artifacts/*.jar
 
-      - name: Deploy Mojang-Mapped
+      - name: Deploy to xenondevs repository
         if: github.event_name == 'release'
         uses: gradle/gradle-build-action@v3
         with:
