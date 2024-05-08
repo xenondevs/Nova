@@ -4,6 +4,7 @@ import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.format.chunk.RegionizedChunk.Companion.packBlockPos
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
@@ -72,13 +73,13 @@ internal class NetworkChunk(
         
         writer.writeVarInt(bridges.size)
         for ((pos, data) in bridges) {
-            writer.writeInt(packCoordinates(pos))
+            writer.writeInt(packBlockPos(pos))
             data.write(writer)
         }
         
         writer.writeVarInt(endPoints.size)
         for ((pos, data) in endPoints) {
-            writer.writeInt(packCoordinates(pos))
+            writer.writeInt(packBlockPos(pos))
             data.write(writer)
         }
         
@@ -109,16 +110,6 @@ internal class NetworkChunk(
         
         override fun createEmpty(pos: ChunkPos): NetworkChunk {
             return NetworkChunk()
-        }
-        
-        private fun packCoordinates(pos: BlockPos): Int =
-            (pos.y shl 8) or (pos.x and 0xF shl 4) or (pos.z and 0xF)
-        
-        private fun unpackBlockPos(chunkPos: ChunkPos, value: Int): BlockPos {
-            val y = value shr 8
-            val x = (value shr 4) and 0xF
-            val z = value and 0xF
-            return BlockPos(chunkPos.world!!, (chunkPos.x shl 4) + x, y, (chunkPos.z shl 4) + z)
         }
         
     }

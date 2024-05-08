@@ -16,7 +16,6 @@ import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
-import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
@@ -31,6 +30,7 @@ import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.format.BlockStateIdResolver
+import xyz.xenondevs.nova.world.format.chunk.RegionizedChunk.Companion.packBlockPos
 import java.io.ByteArrayOutputStream
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -422,9 +422,16 @@ internal class RegionChunk(
         vanillaTileEntities.values.forEach(VanillaTileEntity::saveData)
         tileEntities.values.forEach(TileEntity::saveData)
         
-        // TODO: don't serialize pos as BlockPos
-        CBF.write(vanillaTileEntityData.takeUnlessEmpty(), writer)
-        CBF.write(tileEntityData.takeUnlessEmpty(), writer)
+        writer.writeVarInt(vanillaTileEntityData.size)
+        for ((pos, data) in vanillaTileEntityData) {
+            writer.writeInt(packBlockPos(pos))
+            writer.writeBytes(CBF.write(data))
+        }
+        writer.writeVarInt(tileEntityData.size)
+        for ((pos, data) in tileEntityData) {
+            writer.writeInt(packBlockPos(pos))
+            writer.writeBytes(CBF.write(data))
+        }
         
         val sectionBitmask = BitSet(sectionCount)
         val sectionsBuffer = ByteArrayOutputStream()
@@ -444,8 +451,8 @@ internal class RegionChunk(
     companion object : RegionizedChunkReader<RegionChunk>() {
         
         override fun read(pos: ChunkPos, reader: ByteReader): RegionChunk {
-            val vanillaTileEntityData = CBF.read<HashMap<BlockPos, Compound>>(reader) ?: HashMap()
-            val tileEntityData = CBF.read<HashMap<BlockPos, Compound>>(reader) ?: HashMap()
+            val vanillaTileEntityData = readPosCompoundMap(pos, reader)
+            val tileEntityData = readPosCompoundMap(pos, reader)
             
             val sectionCount = reader.readInt()
             val sectionsBitmask = BitSet.valueOf(reader.readBytes(sectionCount.ceilDiv(8)))
@@ -457,6 +464,17 @@ internal class RegionChunk(
             }
             
             return RegionChunk(pos, sections, vanillaTileEntityData, tileEntityData)
+        }
+        
+        private fun readPosCompoundMap(chunkPos: ChunkPos, reader: ByteReader): HashMap<BlockPos, Compound> {
+            val size = reader.readVarInt()
+            val map = HashMap<BlockPos, Compound>(size)
+            repeat(size) {
+                val pos = unpackBlockPos(chunkPos, reader.readInt())
+                val data = CBF.read<Compound>(reader)!!
+                map[pos] = data
+            }
+            return map
         }
         
         override fun createEmpty(pos: ChunkPos): RegionChunk {
