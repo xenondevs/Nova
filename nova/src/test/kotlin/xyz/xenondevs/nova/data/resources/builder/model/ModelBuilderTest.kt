@@ -37,6 +37,29 @@ class ModelBuilderTest {
     }
     
     @Test
+    fun testScaleUV() {
+        val rots = listOf(0, 90, 180, 270)
+        for (rot in rots) {
+            val model = deserializeModel("arrow_cube/$rot/model")
+            
+            val m1 = ModelBuilder(model)
+                .scale(Vector3d(0.0, 0.0, 0.0), Vector3d(0.5, 1.0, 0.25), true)
+                .buildScaled(null)
+            assertEquals(deserializeModel("arrow_cube/$rot/scaled/pillar_0_0"), m1)
+
+            val m2 = ModelBuilder(model)
+                .scale(Vector3d(16.0, 0.0, 16.0), Vector3d(0.5, 1.0, 0.25), true)
+                .buildScaled(null)
+            assertEquals(deserializeModel("arrow_cube/$rot/scaled/pillar_16_16"), m2)
+
+            val m3 = ModelBuilder(model)
+                .scale(Vector3d(8.0, 8.0, 8.0), Vector3d(0.5, 0.5, 0.5), true)
+                .buildScaled(null)
+            assertEquals(deserializeModel("arrow_cube/$rot/scaled/cube_centered"), m3)
+        }
+    }
+    
+    @Test
     fun testTranslate() {
         val model = deserializeModel("full_cube/model")
         
@@ -167,7 +190,7 @@ class ModelBuilderTest {
     }
     
     private fun deserializeModel(name: String): Model =
-         javaClass.getResourceAsStream("/models/$name.json")?.use { GSON.fromJson<Model>(it.reader())!! }
+        javaClass.getResourceAsStream("/models/$name.json")?.use { GSON.fromJson<Model>(it.reader())!! }
             ?: throw IllegalArgumentException("Model $name not found")
     
     private fun serializeModel(model: Model): String =

@@ -161,27 +161,35 @@ class ModelBuilder(private val base: Model) {
     
     /**
      * Scales the model by [scale] to the given [pivot] point.
+     * 
+     * With [scaleUV], the UV coordinates are scaled accordingly.
      */
-    fun scale(pivot: Vector3dc, scale: Vector3dc): ModelBuilder =
-        action(ScaleTransform(pivot, scale))
+    fun scale(pivot: Vector3dc, scale: Vector3dc, scaleUV: Boolean = false): ModelBuilder =
+        action(ScaleTransform(pivot, scale, scaleUV))
     
     /**
      * Scales the model by [scale].
+     * 
+     * With [scaleUV], the UV coordinates are scaled accordingly.
      */
-    fun scale(scale: Vector3dc): ModelBuilder =
-        scale(CENTER, scale)
+    fun scale(scale: Vector3dc, scaleUV: Boolean = false): ModelBuilder =
+        scale(CENTER, scale, scaleUV)
     
     /**
      * Scales the model by the given factor [scale] for all axes to the given [pivot] point.
+     * 
+     * With [scaleUV], the UV coordinates are scaled accordingly.
      */
-    fun scale(pivot: Vector3dc, scale: Double): ModelBuilder =
-        scale(pivot, Vector3d(scale, scale, scale))
+    fun scale(pivot: Vector3dc, scale: Double, scaleUV: Boolean = false): ModelBuilder =
+        scale(pivot, Vector3d(scale, scale, scale), scaleUV)
     
     /**
      * Scales the model by the given factor [scale] for all axes to the pivot point (8, 8, 8).
+     * 
+     * With [scaleUV], the UV coordinates are scaled accordingly.
      */
-    fun scale(scale: Double): ModelBuilder =
-        scale(Vector3d(scale, scale, scale))
+    fun scale(scale: Double, scaleUV: Boolean = false): ModelBuilder =
+        scale(Vector3d(scale, scale, scale), scaleUV)
     
     /**
      * Combines this model with the given [model] by flattening the elements of the other [model] and
@@ -263,7 +271,7 @@ class ModelBuilder(private val base: Model) {
             if (bounds.minZ < MIN_ELEMENT_FROM)
                 scale = min(scale, (pivot.z - MIN_ELEMENT_FROM) / (pivot.z - bounds.minZ))
             
-            resultModel = ScaleTransform(pivot, Vector3d(scale, scale, scale), true).apply(resultModel)
+            resultModel = ScaleTransform(pivot, Vector3d(scale, scale, scale), keepDisplaySize = true).apply(resultModel)
         }
         
         return ScaledModel(resultModel, 1 / scale)

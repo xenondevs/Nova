@@ -1,12 +1,11 @@
 {
 	"textures": {
-		"1": "block/emerald_block"
+		"1": "block/magenta_glazed_terracotta"
 	},
 	"elements": [
 		{
 			"from": [0, 0, 0],
-			"to": [8, 8, 8],
-			"color": 4,
+			"to": [16, 16, 16],
 			"faces": {
 				"north": {"uv": [0, 0, 16, 16], "texture": "#1"},
 				"east": {"uv": [0, 0, 16, 16], "texture": "#1"},

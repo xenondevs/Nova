@@ -25,6 +25,11 @@ internal data class RotationTransform(
 ) : NonContextualModelBuildAction, Transform {
     
     override fun apply(matrix: Matrix4d) {
+        if (uvLock)
+            throw UnsupportedOperationException("UV lock is not supported in matrix transformations")
+        if (rescale) // TODO: this can be implemented
+            throw UnsupportedOperationException("Rescale is not supported in matrix transformations")
+        
         matrix.translate(-(8 - pivot.x()) / 16, -(8 - pivot.y()) / 16, -(8 - pivot.z()) / 16)
         when (axis) {
             Axis.X -> matrix.rotateX(Math.toRadians(rot))
