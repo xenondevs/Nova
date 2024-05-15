@@ -9,10 +9,9 @@ import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockB
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout
-import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
+import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 import xyz.xenondevs.nova.world.format.WorldDataManager
@@ -23,15 +22,14 @@ class NovaTileEntityBlock internal constructor(
     id: ResourceLocation,
     name: Component,
     style: Style,
-    behaviors: List<BlockBehavior>,
-    options: BlockOptions,
+    behaviors: List<BlockBehaviorHolder>,
     internal val tileEntityConstructor: TileEntityConstructor,
     val syncTickrate: Int,
     val asyncTickrate: Double,
     properties: List<ScopedBlockStateProperty<*>>,
     configId: String,
     requestedLayout: BlockModelLayout
-) : NovaBlock(id, name, style, behaviors,options, properties, configId, requestedLayout) {
+) : NovaBlock(id, name, style, behaviors, properties, configId, requestedLayout) {
     
     override fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>) {
         val tileEntityBlock = state.block as NovaTileEntityBlock

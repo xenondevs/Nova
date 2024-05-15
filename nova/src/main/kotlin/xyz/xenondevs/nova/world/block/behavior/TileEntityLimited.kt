@@ -2,16 +2,10 @@ package xyz.xenondevs.nova.world.block.behavior
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.GameMode
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
-import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
@@ -19,7 +13,11 @@ import xyz.xenondevs.nova.world.block.limits.TileEntityTracker
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.format.WorldDataManager
 
-open class TileEntityBlockBehavior protected constructor() : BlockBehavior.Default() {
+/**
+ * Tracks tile-entity placement and removal and enforces tile-entity limits.
+ * Should only be applied to tile-entity blocks.
+ */
+object TileEntityLimited : BlockBehavior {
     
     override suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean {
         if (ctx[DefaultContextParamTypes.BYPASS_TILE_ENTITY_LIMITS])
@@ -35,7 +33,6 @@ open class TileEntityBlockBehavior protected constructor() : BlockBehavior.Defau
     }
     
     override fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>) {
-        super.handlePlace(pos, state, ctx)
         val tileEntityBlock = state.block as NovaTileEntityBlock
         TileEntityTracker.handlePlace(tileEntityBlock, ctx)
     }
@@ -44,32 +41,5 @@ open class TileEntityBlockBehavior protected constructor() : BlockBehavior.Defau
         val tileEntity = WorldDataManager.getTileEntity(pos) ?: return
         TileEntityTracker.handleBreak(tileEntity, ctx)
     }
-    
-    override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
-        val sourceEntity: Entity? = ctx[DefaultContextParamTypes.SOURCE_ENTITY]
-        return WorldDataManager.getTileEntity(pos)
-            ?.getDrops(sourceEntity !is Player || sourceEntity.gameMode != GameMode.CREATIVE)
-            ?: emptyList()
-    }
-    
-    override fun getExp(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): Int {
-        return WorldDataManager.getTileEntity(pos)?.getExp() ?: 0
-    }
-    
-    companion object : TileEntityBlockBehavior()
-    
-}
-
-open class InteractiveTileEntityBlockBehavior protected constructor() : TileEntityBlockBehavior() {
-    
-    override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
-        val sourcePlayer = ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player
-        if (sourcePlayer != null)
-            runTask { sourcePlayer.swingMainHand() }
-        
-        return WorldDataManager.getTileEntity(pos)?.handleRightClick(ctx) ?: false
-    }
-    
-    companion object : InteractiveTileEntityBlockBehavior()
     
 }

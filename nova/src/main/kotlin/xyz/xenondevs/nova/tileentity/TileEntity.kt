@@ -33,7 +33,6 @@ import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
-import xyz.xenondevs.nova.world.block.behavior.TileEntityBlockBehavior
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
@@ -168,7 +167,7 @@ abstract class TileEntity(
     open suspend fun handleAsyncTick() = Unit
     
     /**
-     * Called when a [TileEntityBlockBehavior] is interacted with.
+     * Handles right-clicking this [TileEntity].
      *
      * Might be called twice, once per hand.
      *

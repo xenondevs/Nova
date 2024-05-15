@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.behavior.BlockSounds
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import kotlin.math.floor
 import kotlin.random.Random
@@ -112,7 +113,7 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
         
         val vanillaSoundType = state.soundType
         if (novaState != null) {
-            val soundGroup = novaState.block.options.soundGroup ?: return
+            val soundGroup = novaState.block.getBehaviorOrNull<BlockSounds>()?.soundGroup ?: return
             oldSound = vanillaSoundType.stepSound.location.name
             newSound = soundGroup.stepSound
             volume = soundGroup.volume * volumeMultiplier

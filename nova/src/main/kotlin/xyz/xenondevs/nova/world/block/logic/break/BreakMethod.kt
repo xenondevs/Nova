@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.util.broadcastDestructionStage
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
@@ -31,11 +32,11 @@ internal interface BreakMethod {
         
         fun of(
             block: Block,
-            material: NovaBlock,
+            type: NovaBlock,
             predictionPlayer: Player?,
             entityId: Int = predictionPlayer?.entityId ?: Random.nextInt()
         ): BreakMethod {
-            return if (material.options.showBreakAnimation)
+            return if (type.getBehavior<Breakable>().showBreakAnimation)
                 if (block.type == Material.BARRIER) DisplayEntityBreakMethod(block.pos)
                 else PacketBreakMethod(block.pos, entityId, predictionPlayer)
             else INVISIBLE

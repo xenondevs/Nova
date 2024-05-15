@@ -11,6 +11,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.novaBlock
+import xyz.xenondevs.nova.world.block.behavior.Breakable
 
 class ToolTier(
     val id: ResourceLocation,
@@ -32,7 +33,7 @@ class ToolTier(
         fun ofBlock(block: Block): ToolTier {
             val novaBlock = block.novaBlock
             if (novaBlock != null)
-                return novaBlock.options.toolTier ?: VanillaToolTiers.WOOD
+                return novaBlock.getBehaviorOrNull<Breakable>()?.toolTier ?: VanillaToolTiers.WOOD
             
             val material = block.type
             return when {

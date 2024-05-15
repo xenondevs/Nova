@@ -8,12 +8,10 @@ import xyz.xenondevs.nova.data.resources.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.data.resources.layout.item.ItemModelLayoutBuilder
 import xyz.xenondevs.nova.data.resources.layout.item.RequestedItemModelLayout
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
-import xyz.xenondevs.nova.item.behavior.impl.TileEntityItemBehavior
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 
 class NovaItemBuilder internal constructor(
     id: ResourceLocation
@@ -106,8 +104,6 @@ class NovaItemBuilder internal constructor(
             return NovaItemBuilder(block.id).apply {
                 this.block = block
                 name(block.name)
-                if (block is NovaTileEntityBlock)
-                    behaviors(TileEntityItemBehavior)
                 models {
                     selectModel {
                         val scope = BlockModelSelectorScope(block.defaultBlockState, modelContent)

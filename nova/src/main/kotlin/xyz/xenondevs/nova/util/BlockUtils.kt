@@ -58,6 +58,8 @@ import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.behavior.BlockSounds
+import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
@@ -97,7 +99,15 @@ val Block.novaBlock: NovaBlock?
  * The hardness of this block, also considering the custom hardness of Nova blocks.
  */
 val Block.hardness: Double
-    get() = WorldDataManager.getBlockState(pos)?.block?.options?.hardness ?: type.hardness.toDouble()
+    get() {
+        val novaBlock = WorldDataManager.getBlockState(pos)?.block
+        if (novaBlock != null) {
+            val breakable = novaBlock.getBehaviorOrNull<Breakable>()
+            return breakable?.hardness ?: -1.0
+        } else {
+            return type.hardness.toDouble()
+        }
+    }
 
 /**
  * The sound group of this block, also considering custom sound groups of Nova blocks.
@@ -106,7 +116,7 @@ val Block.novaSoundGroup: SoundGroup?
     get() {
         val novaBlock = novaBlock
         if (novaBlock != null) {
-            return novaBlock.options.soundGroup
+            return novaBlock.getBehaviorOrNull<BlockSounds>()?.soundGroup
         }
         
         return SoundGroup.from(type.soundGroup)
@@ -263,7 +273,7 @@ object BlockUtils {
         
         // sounds
         if (ctx[DefaultContextParamTypes.BLOCK_PLACE_EFFECTS]) {
-            val soundGroup = block.options.soundGroup
+            val soundGroup = block.getBehaviorOrNull<BlockSounds>()?.soundGroup
             if (soundGroup != null) {
                 pos.playSound(soundGroup.placeSound, soundGroup.placeVolume, soundGroup.placePitch)
             }
@@ -429,7 +439,7 @@ object BlockUtils {
             broadcast(soundPacket, true)
         }
         
-        val soundGroup = state.block.options.soundGroup
+        val soundGroup = state.block.getBehaviorOrNull<BlockSounds>()?.soundGroup
         if (state.modelProvider.provider == BackingStateBlockModelProvider) {
             // use the level event packet for blocks that use block states
             val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, pos.nmsBlockState.id, false)
@@ -442,7 +452,7 @@ object BlockUtils {
             if (soundGroup != null)
                 broadcastBreakSound(soundGroup)
             
-            val breakParticlesMaterial = state.block.options.breakParticles
+            val breakParticlesMaterial = state.block.getBehaviorOrNull<Breakable>()?.breakParticles
             if (breakParticlesMaterial != null) {
                 val breakParticles = particle(ParticleTypes.BLOCK, pos.location.add(0.5, 0.5, 0.5)) {
                     block(breakParticlesMaterial)
@@ -490,7 +500,7 @@ object BlockUtils {
     }
     
     /**
-     * Gets a list of [ItemStacks][ItemStack] containing the drops of this [Block] for the specified [BlockBreakContext].
+     * Gets a list of [ItemStacks][ItemStack] containing the drops of this [Block] for the specified [ctx].
      *
      * Works for vanilla blocks, Nova blocks and blocks from custom item integrations.
      */

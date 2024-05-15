@@ -18,13 +18,16 @@ import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockI
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
+import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorFactory
+import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
+import kotlin.reflect.KClass
+import kotlin.reflect.full.isSuperclassOf
 
 /**
  * Represents a block type in Nova.
@@ -33,8 +36,7 @@ open class NovaBlock internal constructor(
     val id: ResourceLocation,
     val name: Component,
     val style: Style,
-    val behaviors: List<BlockBehavior>,
-    val options: BlockOptions,
+    behaviors: List<BlockBehaviorHolder>,
     val stateProperties: List<ScopedBlockStateProperty<*>>,
     configId: String,
     internal val requestedLayout: BlockModelLayout
@@ -57,6 +59,49 @@ open class NovaBlock internal constructor(
      * Use the extension functions `entry` and `optionalEntry` to get values from the config.
      */
     val config: ConfigProvider by lazy { Configs[configId] }
+    
+    val behaviors: List<BlockBehavior> = behaviors.map { holder ->
+        when (holder) {
+            is BlockBehavior -> holder
+            is BlockBehaviorFactory<*> -> holder.create(this)
+        }
+    }
+    
+    /**
+     * Checks whether this [NovaBlock] has a [BlockBehavior] of the reified type [T], or a subclass of it.
+     */
+    inline fun <reified T : Any> hasBehavior(): Boolean =
+        hasBehavior(T::class)
+    
+    /**
+     * Checks whether this [NovaBlock] has a [BlockBehavior] of the specified class [type], or a subclass of it.
+     */
+    fun <T : Any> hasBehavior(type: KClass<T>): Boolean =
+        behaviors.any { type.isSuperclassOf(it::class) }
+    
+    /**
+     * Gets the first [BlockBehavior] that is an instance of [T], or null if there is none.
+     */
+    inline fun <reified T : Any> getBehaviorOrNull(): T? =
+        getBehaviorOrNull(T::class)
+    
+    /**
+     * Gets the first [BlockBehavior] that is an instance of [type] or a subclass, or null if there is none.
+     */
+    fun <T : Any> getBehaviorOrNull(type: KClass<T>): T? =
+        behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
+    
+    /**
+     * Gets the first [BlockBehavior] that is an instance of [T], or throws an [IllegalStateException] if there is none.
+     */
+    inline fun <reified T : Any> getBehavior(): T =
+        getBehavior(T::class)
+    
+    /**
+     * Gets the first [BlockBehavior] that is an instance of [behavior], or throws an [IllegalStateException] if there is none.
+     */
+    fun <T : Any> getBehavior(behavior: KClass<T>): T =
+        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Block $id does not have a behavior of type ${behavior.simpleName}")
     
     //<editor-fold desc="event methods">
     suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean = coroutineScope {

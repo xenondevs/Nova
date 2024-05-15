@@ -5,9 +5,10 @@ import org.bukkit.Material
 import xyz.xenondevs.nova.data.resources.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.item.options.BlockOptions
 import xyz.xenondevs.nova.item.tool.VanillaToolCategories
 import xyz.xenondevs.nova.item.tool.VanillaToolTiers
+import xyz.xenondevs.nova.world.block.behavior.BlockSounds
+import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.behavior.NoteBlockBehavior
 import xyz.xenondevs.nova.world.block.behavior.UnknownBlockBehavior
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
@@ -18,13 +19,6 @@ internal object DefaultBlocks {
     
     val UNKNOWN = block("unknown") {
         behaviors(UnknownBlockBehavior)
-        blockOptions(
-            BlockOptions(
-                hardness = -1.0,
-                soundGroup = SoundGroup.STONE,
-                showBreakAnimation = false
-            )
-        )
         models {
             stateBacked(Int.MAX_VALUE, BackingStateCategory.NOTE_BLOCK, BackingStateCategory.MUSHROOM_BLOCK)
             selectModel {
@@ -34,21 +28,21 @@ internal object DefaultBlocks {
     }
     
     val NOTE_BLOCK = block("note_block") {
-        behaviors(NoteBlockBehavior)
-        stateProperties(
-            DefaultScopedBlockStateProperties.INSTRUMENT,
-            DefaultScopedBlockStateProperties.NOTE,
-            DefaultScopedBlockStateProperties.POWERED
-        )
-        blockOptions(
-            BlockOptions(
+        behaviors(
+            NoteBlockBehavior,
+            BlockSounds(SoundGroup.WOOD),
+            Breakable(
                 hardness = 0.8,
                 toolCategory = VanillaToolCategories.AXE,
                 toolTier = VanillaToolTiers.WOOD,
                 requiresToolForDrops = false,
-                soundGroup = SoundGroup.WOOD,
                 breakParticles = Material.NOTE_BLOCK
             )
+        )
+        stateProperties(
+            DefaultScopedBlockStateProperties.INSTRUMENT,
+            DefaultScopedBlockStateProperties.NOTE,
+            DefaultScopedBlockStateProperties.POWERED
         )
         models { modelLess { Material.NOTE_BLOCK.createBlockData() } }
     }

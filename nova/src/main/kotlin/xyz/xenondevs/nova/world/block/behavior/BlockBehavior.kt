@@ -1,22 +1,28 @@
 package xyz.xenondevs.nova.world.block.behavior
 
-import org.bukkit.GameMode
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
-import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 
-interface BlockBehavior {
+/**
+ * Supertype for everything that is or can provide a [BlockBehavior].
+ */
+sealed interface BlockBehaviorHolder
+
+/**
+ * For handling block logic.
+ */
+interface BlockBehavior : BlockBehaviorHolder {
     
     /**
      * Checks whether a block of [state] can be placed at [pos] using the given [ctx].
-     * 
+     *
      * Should only suspend for [ProtectionManager] checks, and it is assumed that this function does not suspend
      * when the source is online.
      */
@@ -64,22 +70,16 @@ interface BlockBehavior {
      */
     fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> = emptyList()
     
-    /**
-     * The default block behavior.
-     */
-    open class Default : BlockBehavior {
-        
-        companion object : Default()
-        
-        override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
-            if ((ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player)?.gameMode == GameMode.CREATIVE)
-                return emptyList()
-            
-            return state.block.item
-                ?.let { listOf(it.createItemStack()) }
-                ?: return emptyList()
-        }
-        
-    }
+}
+
+/**
+ * Factory for creating [BlockBehavior] instances of [T] based on a [NovaBlock].
+ */
+interface BlockBehaviorFactory<T : BlockBehavior> : BlockBehaviorHolder {
     
+    /**
+     *  Creates a new [BlockBehavior] instance of [T] based on the given [block].
+     */
+    fun create(block: NovaBlock): T
+
 }

@@ -23,7 +23,6 @@ import xyz.xenondevs.nmsutils.network.packetHandler
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -37,6 +36,8 @@ import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.behavior.Breakable
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 
@@ -142,9 +143,16 @@ internal object BlockBreaking : Listener, PacketListener {
         
         // start breaker
         val novaBlockState = WorldDataManager.getBlockState(pos)
-        val breaker = if (novaBlockState != null)
-            NovaBlockBreaker(player, pos, novaBlockState, sequence, breakCooldowns[player] ?: 0)
-        else VanillaBlockBreaker(player, pos, sequence, breakCooldowns[player] ?: 0)
+        val breaker: BlockBreaker
+        if (novaBlockState != null) {
+            // don't do any breaking logic if the block doesn't have the breakable behavior
+            if (!novaBlockState.block.hasBehavior<Breakable>())
+                return
+            
+            breaker = NovaBlockBreaker(player, pos, novaBlockState, sequence, breakCooldowns[player] ?: 0)
+        } else {
+            breaker = VanillaBlockBreaker(player, pos, sequence, breakCooldowns[player] ?: 0)
+        }
         
         // creative breakers should not be added to the playerBreakers map because players in creative mode
         // do not send an abort or stop packet and therefore the breaker would never be removed

@@ -49,6 +49,7 @@ import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -65,7 +66,8 @@ internal class NovaBlockBreaker(
 ) : BlockBreaker(player, pos, sequence, blockedUntil) {
     
     val blockType = blockState.block
-    override val requiresToolForDrops: Boolean = blockType.options.requiresToolForDrops
+    private val breakable = blockType.getBehavior<Breakable>()
+    override val requiresToolForDrops: Boolean = breakable.requiresToolForDrops
     
     override fun createBreakMethod(clientsidePrediction: Boolean): BreakMethod =
         BreakMethod.of(block, blockType, if (clientsidePrediction) player else null)
@@ -77,7 +79,7 @@ internal class NovaBlockBreaker(
     }
     
     private fun spawnHitParticles() {
-        val texture = blockType.options.breakParticles ?: return
+        val texture = breakable.breakParticles ?: return
         val side = BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation) ?: BlockFace.UP
         
         val particlePacket = particle(ParticleTypes.ITEM, block.location.add(0.5, 0.5, 0.5).advance(side, 0.6)) {

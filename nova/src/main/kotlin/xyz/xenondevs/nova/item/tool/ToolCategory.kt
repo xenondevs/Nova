@@ -5,9 +5,10 @@ import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.world.block.behavior.Breakable
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 
 /**
@@ -45,9 +46,11 @@ open class ToolCategory internal constructor(
         }
         
         fun ofBlock(block: Block): List<ToolCategory> {
-            val novaCategories = WorldDataManager.getBlockState(block.pos)?.block?.options?.toolCategories
-            if (novaCategories != null)
-                return novaCategories
+            val novaBlock = WorldDataManager.getBlockState(block.pos)?.block
+            if (novaBlock != null) {
+                val breakable = novaBlock.getBehaviorOrNull<Breakable>()
+                return breakable?.toolCategories ?: emptyList()
+            }
             
             return ofVanillaBlock(block)
         }
