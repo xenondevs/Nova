@@ -5,8 +5,8 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.provider.entry
 import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
 import xyz.xenondevs.commons.provider.mutable.orElse
-import xyz.xenondevs.commons.provider.mutable.orElseLazily
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.util.TickedLong
 import kotlin.math.max
@@ -29,7 +29,7 @@ class DefaultEnergyHolder(
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
         by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-            .orElseLazily { defaultConnectionConfig().toEnumMap() }
+            .defaultsToLazily { defaultConnectionConfig().toEnumMap() }
     
     /**
      * The maximum amount of energy this [EnergyHolder] can store.

@@ -6,8 +6,8 @@ import xyz.xenondevs.cbf.provider.entry
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
 import xyz.xenondevs.commons.provider.mutable.mapNonNull
-import xyz.xenondevs.commons.provider.mutable.orElseLazily
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.type.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.util.CUBE_FACES
@@ -41,23 +41,23 @@ class DefaultFluidHolder(
             .mapNonNull(
                 { it.mapValuesTo(enumMap()) { (_, uuid) -> uuidToContainer[uuid]!! } },
                 { it.mapValuesTo(enumMap()) { (_, container) -> container.uuid } }
-            ).orElseLazily { defaultContainerConfig().toEnumMap() }
+            ).defaultsToLazily { defaultContainerConfig().toEnumMap() }
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> by
         compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-            .orElseLazily { defaultConnectionConfig().toEnumMap() }
+            .defaultsToLazily { defaultConnectionConfig().toEnumMap() }
     
     override val channels: MutableMap<BlockFace, Int>
         by compound.entry<MutableMap<BlockFace, Int>>("channels")
-            .orElseLazily(DEFAULT_CHANNEL_CONFIG)
+            .defaultsToLazily(DEFAULT_CHANNEL_CONFIG)
     
     override val insertPriorities: MutableMap<BlockFace, Int>
         by compound.entry<MutableMap<BlockFace, Int>>("insertPriorities")
-            .orElseLazily(DEFAULT_PRIORITIES)
+            .defaultsToLazily(DEFAULT_PRIORITIES)
     
     override val extractPriorities: MutableMap<BlockFace, Int>
         by compound.entry<MutableMap<BlockFace, Int>>("extractPriorities")
-            .orElseLazily(DEFAULT_PRIORITIES)
+            .defaultsToLazily(DEFAULT_PRIORITIES)
     
     internal companion object {
         val DEFAULT_CONNECTION_CONFIG = { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.NONE } }

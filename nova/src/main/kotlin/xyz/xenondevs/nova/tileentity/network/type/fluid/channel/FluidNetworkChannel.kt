@@ -107,7 +107,7 @@ private fun createFluidConfiguration(
     return when (type) {
         NetworkConnectionType.INSERT, NetworkConnectionType.EXTRACT -> DefaultFluidConfiguration(fluidHolder, faces, container, type)
         NetworkConnectionType.BUFFER -> FluidBufferConfiguration(fluidHolder, faces, container)
-        else -> throw IllegalArgumentException()
+        else -> throw IllegalArgumentException("Illegal network connection type: $type")
     }
 }
 

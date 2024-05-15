@@ -6,7 +6,7 @@ import xyz.xenondevs.cbf.provider.entry
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.collections.enumSet
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.mutable.orElseLazily
+import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.DefaultItemHolder.Companion.DEFAULT_CHANNELS
@@ -20,8 +20,8 @@ internal abstract class VanillaItemHolder(
     override val mergedInventory: NetworkedInventory? = null
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> by
-        compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-            .orElseLazily { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.INSERT } }
+    compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
+        .defaultsToLazily { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.INSERT } }
     
     override val allowedFaces: Set<BlockFace>
         get() = connectionConfig.mapNotNullTo(enumSet()) { (face, type) ->
@@ -32,25 +32,25 @@ internal abstract class VanillaItemHolder(
         containerConfig.entries.associate { (_, inv) -> inv to NetworkConnectionType.BUFFER }
     }
     
-    override val insertFilters: MutableMap<BlockFace, ItemFilter> by
-        compound.entry<MutableMap<BlockFace, ItemFilter>>("insertFilters")
-            .orElseLazily(::enumMap)
+    override val insertFilters: MutableMap<BlockFace, ItemFilter>
+        by compound.entry<MutableMap<BlockFace, ItemFilter>>("insertFilters")
+            .defaultsToLazily(::enumMap)
     
-    override val extractFilters: MutableMap<BlockFace, ItemFilter> by
-        compound.entry<MutableMap<BlockFace, ItemFilter>>("extractFilters")
-            .orElseLazily(::enumMap)
+    override val extractFilters: MutableMap<BlockFace, ItemFilter>
+        by compound.entry<MutableMap<BlockFace, ItemFilter>>("extractFilters")
+            .defaultsToLazily(::enumMap)
     
-    override val insertPriorities: MutableMap<BlockFace, Int> by
-        compound.entry<MutableMap<BlockFace, Int>>("insertPriorities")
-            .orElseLazily(DefaultItemHolder.DEFAULT_PRIORITIES)
+    override val insertPriorities: MutableMap<BlockFace, Int>
+        by compound.entry<MutableMap<BlockFace, Int>>("insertPriorities")
+            .defaultsToLazily(DefaultItemHolder.DEFAULT_PRIORITIES)
     
-    override val extractPriorities: MutableMap<BlockFace, Int> by
-        compound.entry<MutableMap<BlockFace, Int>>("extractPriorities")
-            .orElseLazily(DefaultItemHolder.DEFAULT_PRIORITIES)
+    override val extractPriorities: MutableMap<BlockFace, Int>
+        by compound.entry<MutableMap<BlockFace, Int>>("extractPriorities")
+            .defaultsToLazily(DefaultItemHolder.DEFAULT_PRIORITIES)
     
-    override val channels: MutableMap<BlockFace, Int> by
-        compound.entry<MutableMap<BlockFace, Int>>("channels")
-            .orElseLazily(DEFAULT_CHANNELS)
+    override val channels: MutableMap<BlockFace, Int>
+        by compound.entry<MutableMap<BlockFace, Int>>("channels")
+            .defaultsToLazily(DEFAULT_CHANNELS)
     
 }
 
