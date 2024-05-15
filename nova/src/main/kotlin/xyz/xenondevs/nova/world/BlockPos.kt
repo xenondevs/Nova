@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world
 
+import net.minecraft.world.level.block.entity.BlockEntity
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
@@ -43,6 +44,9 @@ data class BlockPos(val world: World, val x: Int, val y: Int, val z: Int) {
     
     val nmsBlockState: MojangBlockState
         get() = world.serverLevel.getBlockState(nmsPos)
+    
+    val nmsBlockEntity: BlockEntity?
+        get() = world.serverLevel.getBlockEntity(nmsPos)
     
     val chunkPos: ChunkPos
         get() = ChunkPos(world.uid, x shr 4, z shr 4)

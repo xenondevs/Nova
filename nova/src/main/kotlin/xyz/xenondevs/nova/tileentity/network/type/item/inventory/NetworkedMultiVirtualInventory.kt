@@ -27,7 +27,7 @@ internal class NetworkedMultiVirtualInventory(
     
     override fun setItem(slot: Int, item: ItemStack?): Boolean {
         val (inv, invSlot) = getSlot(slot)
-        return inv.forceSetItem(NetworkedInvUIInventory.UPDATE_REASON, invSlot, item)
+        return inv.forceSetItem(NetworkedVirtualInventory.UPDATE_REASON, invSlot, item)
     }
     
     override fun addItem(item: ItemStack): Int {
@@ -35,7 +35,7 @@ internal class NetworkedMultiVirtualInventory(
         for ((inv, conType) in inventoriesWithConnectionType) {
             if (!conType.insert)
                 continue
-            amountLeft = inv.addItem(NetworkedInvUIInventory.UPDATE_REASON, item)
+            amountLeft = inv.addItem(NetworkedVirtualInventory.UPDATE_REASON, item)
             if (amountLeft == 0)
                 break
             item.amount = amountLeft
@@ -48,7 +48,7 @@ internal class NetworkedMultiVirtualInventory(
         val (inv, invSlot) = getSlot(slot)
         val itemStack = inv.getUnsafeItem(invSlot) ?: return false
         val event = inv.callPreUpdateEvent(
-            NetworkedInvUIInventory.UPDATE_REASON,
+            NetworkedVirtualInventory.UPDATE_REASON,
             invSlot,
             itemStack.clone(),
             itemStack.clone().apply { amount-- }.takeUnlessEmpty()
@@ -63,7 +63,7 @@ internal class NetworkedMultiVirtualInventory(
         
         val itemStack = inv.getUnsafeItem(invSlot) ?: return
         inv.callPostUpdateEvent(
-            NetworkedInvUIInventory.UPDATE_REASON,
+            NetworkedVirtualInventory.UPDATE_REASON,
             invSlot,
             itemStack.clone(),
             itemStack.clone().apply { amount-- }.takeUnlessEmpty()

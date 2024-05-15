@@ -7,7 +7,11 @@ import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import java.util.*
 
-open class NetworkedInvUIInventory(override val uuid: UUID, private val inventory: Inventory) : NetworkedInventory {
+open class NetworkedInvUIInventory(
+    override val uuid: UUID, 
+    private val inventory: Inventory, 
+    private val updateReason: UpdateReason
+) : NetworkedInventory {
     
     override val size: Int
         get() = inventory.size
@@ -24,13 +28,13 @@ open class NetworkedInvUIInventory(override val uuid: UUID, private val inventor
     }
     
     override fun addItem(item: ItemStack): Int {
-        return inventory.addItem(UPDATE_REASON, item)
+        return inventory.addItem(updateReason, item)
     }
     
     override fun canDecrementByOne(slot: Int): Boolean {
         val itemStack = inventory.getUnsafeItem(slot) ?: return false
         val event = inventory.callPreUpdateEvent(
-            UPDATE_REASON,
+            updateReason,
             slot,
             itemStack.clone(),
             itemStack.clone().apply { amount-- }.takeUnlessEmpty()
@@ -44,7 +48,7 @@ open class NetworkedInvUIInventory(override val uuid: UUID, private val inventor
         
         val itemStack = inventory.getUnsafeItem(slot) ?: return
         inventory.callPostUpdateEvent(
-            UPDATE_REASON,
+            updateReason,
             slot,
             itemStack.clone(),
             itemStack.clone().apply { amount-- }.takeUnlessEmpty()
@@ -64,15 +68,6 @@ open class NetworkedInvUIInventory(override val uuid: UUID, private val inventor
     
     override fun hashCode() = uuid.hashCode()
     
-    companion object {
-        
-        /**
-         * The [UpdateReason] used for [Inventory] updates caused by item networks.
-         */
-        val UPDATE_REASON = object : UpdateReason {}
-        
-    }
-    
 }
 
 /**
@@ -80,4 +75,15 @@ open class NetworkedInvUIInventory(override val uuid: UUID, private val inventor
  */
 class NetworkedVirtualInventory(
     val virtualInventory: VirtualInventory
-) : NetworkedInvUIInventory(virtualInventory.uuid, virtualInventory)
+) : NetworkedInvUIInventory(virtualInventory.uuid, virtualInventory, UPDATE_REASON) {
+    
+    companion object {
+        
+        /**
+         * The [UpdateReason] used for [VirtualInventory] updates caused by item networks.
+         */
+        val UPDATE_REASON = object : UpdateReason {}
+        
+    }
+    
+}
