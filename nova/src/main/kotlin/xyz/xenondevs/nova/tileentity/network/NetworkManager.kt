@@ -56,7 +56,7 @@ object NetworkManager : Listener {
     /**
      * A sequence of all loaded [Networks][Network].
      */
-    val networks: Sequence<Network>
+    val networks: Sequence<Network<*>>
         get() = ticker.networks
     
     internal val SUPERVISOR = SupervisorJob()
@@ -116,7 +116,7 @@ object NetworkManager : Listener {
      * 
      * @throws IllegalArgumentException If [bridge] also implements [NetworkEndPoint].
      */
-    fun queueAddBridge(bridge: NetworkBridge, supportedNetworkTypes: Set<NetworkType>, bridgeFaces: Set<BlockFace>, updateNodes: Boolean = true) =
+    fun queueAddBridge(bridge: NetworkBridge, supportedNetworkTypes: Set<NetworkType<*>>, bridgeFaces: Set<BlockFace>, updateNodes: Boolean = true) =
         queueTask(bridge) { AddBridgeTask(it, bridge, supportedNetworkTypes, bridgeFaces, updateNodes) }
     
     /**

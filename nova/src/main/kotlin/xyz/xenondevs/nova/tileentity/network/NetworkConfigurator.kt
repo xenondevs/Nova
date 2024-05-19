@@ -107,20 +107,23 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     private suspend fun buildDirtyNetworks() = coroutineScope {
         for (protoNetwork in state.networks) {
             if (protoNetwork.dirty) {
-                launch {
-                    val network = protoNetwork.type.create(protoNetwork.immutableCopy())
-                    protoNetwork.network = network
-                    protoNetwork.dirty = false
-                }
+                launch { buildNetwork(protoNetwork) }
             }
         }
+    }
+    
+    private fun <T : Network<T>> buildNetwork(protoNetwork: ProtoNetwork<T>) {
+        val data = protoNetwork.immutableCopy()
+        val network = protoNetwork.type.create(data)
+        protoNetwork.network = network
+        protoNetwork.dirty = false
     }
     
     private fun buildClusters(): List<NetworkCluster> {
         val protoClusters = state.networks.mapTo(HashSet()) { it.cluster ?: throw IllegalStateException("Cluster for $it is uninitialized") }
         if (IS_DEV_SERVER)
             verifyClusters(protoClusters)
-        val clusters = protoClusters.map { NetworkCluster(it.uuid, it.map(ProtoNetwork::network)) }
+        val clusters = protoClusters.map { NetworkCluster(it.uuid, it.map(ProtoNetwork<*>::network)) }
         return clusters
     }
     

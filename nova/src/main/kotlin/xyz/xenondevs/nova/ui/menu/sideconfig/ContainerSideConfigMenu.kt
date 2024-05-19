@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.util.runTask
 
 internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPointDataHolder<C>>(
     endPoint: NetworkEndPoint,
-    networkType: NetworkType,
+    networkType: NetworkType<*>,
     holder: H,
     val namedContainers: Map<C, String>
 ) : AbstractSideConfigMenu<H>(endPoint, networkType, holder) {

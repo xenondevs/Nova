@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.tileentity.network
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.bukkit.World
@@ -20,7 +22,7 @@ internal sealed interface NetworkTicker {
     /**
      * A sequence of all [Networks][Network] that are currently being ticked.
      */
-    val networks: Sequence<Network>
+    val networks: Sequence<Network<*>>
     
     /**
      * Replaces the networks to tick for [world] with [clusters]. Thread-safe.
@@ -59,8 +61,8 @@ private class PaperNetworkTicker : NetworkTicker {
     override val clusters: Sequence<NetworkCluster>
         get() = worlds.values.asSequence().flatten()
     
-    override val networks: Sequence<Network>
-        get() = clusters.flatMap { group -> group.networks }
+    override val networks: Sequence<Network<*>>
+        get() = clusters.flatMap { cluster -> cluster.networks }
     
     override fun submit(world: World, clusters: Iterable<NetworkCluster>) {
         worlds[world] = clusters
@@ -68,15 +70,34 @@ private class PaperNetworkTicker : NetworkTicker {
     
     override fun tick() = runBlocking {
         val tick = serverTick
-        for ((_, clusters) in worlds) {
-            for (cluster in clusters) {
-                if (PARALLEL_TICKING) {
-                    launch { cluster.tickNetworks(tick) }
-                } else {
-                    cluster.tickNetworks(tick)
-                }
+        
+        if (PARALLEL_TICKING) {
+            tickParallel(tick)
+        } else {
+            tickSequential(tick)
+        }
+    }
+    
+    private fun tickSequential(tick: Int) {
+        clusters.forEach { it.preTickSync(tick) }
+        clusters.forEach { cluster ->
+            cluster.preTick(tick)
+            cluster.tick(tick)
+            cluster.postTick(tick)
+        }
+        clusters.forEach { it.postTickSync(tick) }
+    }
+    
+    private suspend fun tickParallel(tick: Int) = coroutineScope {
+        clusters.forEach { it.preTickSync(tick) }
+        clusters.forEach { cluster ->
+            launch(Dispatchers.Default) {
+                cluster.preTick(tick)
+                cluster.tick(tick)
+                cluster.postTick(tick)
             }
         }
+        clusters.forEach { it.postTickSync(tick) }
     }
     
 }

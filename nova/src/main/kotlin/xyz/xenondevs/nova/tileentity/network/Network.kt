@@ -12,12 +12,12 @@ import java.util.*
  * The data of a network, containing all [NetworkNodes][NetworkNode] and their connections,
  * as well as the [type] and [uuid] of the network.
  */
-interface NetworkData {
+interface NetworkData<T : Network<T>> {
     
     /**
      * The type of this [NetworkData].
      */
-    val type: NetworkType
+    val type: NetworkType<T>
     
     /**
      * The unique identifier of this [NetworkData].
@@ -32,27 +32,20 @@ interface NetworkData {
     
 }
 
-internal class ImmutableNetworkData(
-    override val type: NetworkType,
+internal class ImmutableNetworkData<T : Network<T>>(
+    override val type: NetworkType<T>,
     override val uuid: UUID,
     override val nodes: Map<BlockPos, NetworkNodeConnection>
-) : NetworkData
- 
+) : NetworkData<T>
+
 /**
  * A network is an immutable data structure that is created from a [NetworkData].
- * 
- * It contains [NetworkNodes][NetworkNode] and how they're connected to this network and
- * handles the ticking logic.
+ *
+ * It contains [NetworkNodes][NetworkNode] and handles the ticking logic.
+ *
+ * Independent networks may be ticked in parallel!
+ * Because of that, the functions not suffixed with `Sync` may not interact with any world state
+ * outside of the blocks that are in this network.
+ * This includes not causing block updates and not firing bukkit events.
  */
-interface Network : NetworkData {
-    
-    /**
-     * Called every [NetworkType.tickDelay] ticks.
-     * 
-     * Independent networks are ticked in parallel!
-     * Because of that, this function may not interact with any world state outside of the blocks that are in this network.
-     * This includes not causing block updates and not firing bukkit events.
-     */
-    fun handleTick()
-
-}
+interface Network<S : Network<S>> : NetworkData<S>

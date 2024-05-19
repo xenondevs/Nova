@@ -1,38 +1,36 @@
 package xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla
 
+import net.minecraft.world.item.ItemStack
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.util.bukkitCopy
-import xyz.xenondevs.nova.util.item.takeUnlessEmpty
-import xyz.xenondevs.nova.util.nmsVersion
 import java.util.*
 import kotlin.math.min
-import net.minecraft.world.item.ItemStack as MojangStack
-import org.bukkit.inventory.ItemStack as BukkitStack
 
 internal open class NetworkedNMSInventory(
-    private val container: MojangStackContainer
+    private val container: ItemStackContainer
 ) : NetworkedInventory {
     
     // UUID is not required for vanilla item holder implementations, because inventory side configuration cannot be changed
     override val uuid = UUID(0L, 0L)
-    
     override val size = container.size
-    override val items: Array<BukkitStack?>
-        get() = Array(container.size) { container[it].bukkitCopy.takeUnlessEmpty() }
     
-    override fun addItem(item: BukkitStack): Int =
-        addItem(item.nmsVersion)
+    override fun get(slot: Int): ItemStack {
+        return container[slot]
+    }
     
-    private fun addItem(itemStack: MojangStack): Int {
+    override fun set(slot: Int, itemStack: ItemStack) {
+        container[slot] = itemStack
+    }
+    
+    override fun add(itemStack: ItemStack, amount: Int): Int {
         val maxStackSize = itemStack.maxStackSize
-        var remaining = itemStack.count
+        var remaining = amount
         
         // add to partial stacks
         for (current in container) {
             if (remaining <= 0)
                 break
             
-            if (!MojangStack.isSameItemSameTags(itemStack, current))
+            if (!ItemStack.isSameItemSameTags(itemStack, current))
                 continue
             
             val transfer = min(remaining, maxStackSize - current.count)
@@ -56,13 +54,17 @@ internal open class NetworkedNMSInventory(
         return remaining
     }
     
-    override fun setItem(slot: Int, item: BukkitStack?): Boolean {
-        container[slot] = item.nmsVersion
+    override fun canTake(slot: Int, amount: Int): Boolean {
         return true
     }
     
-    override fun decrementByOne(slot: Int) {
-        container[slot].count--
+    override fun take(slot: Int, amount: Int) {
+        val current = container[slot]
+        if (current.isEmpty)
+            return
+        
+        val transfer = min(amount, current.count)
+        current.count -= transfer
     }
     
     override fun isFull(): Boolean {
@@ -72,6 +74,24 @@ internal open class NetworkedNMSInventory(
         }
         
         return true
+    }
+    
+    override fun isEmpty(): Boolean {
+        return container.all(ItemStack::isEmpty)
+    }
+    
+    override fun copyContents(destination: Array<ItemStack>) {
+        for ((index, item) in container.withIndex()) {
+            destination[index] = item.copy()
+        }
+    }
+    
+    override fun equals(other: Any?): Boolean {
+        return this === other || other is NetworkedNMSInventory && container == other.container
+    }
+    
+    override fun hashCode(): Int {
+        return container.hashCode()
     }
     
 }

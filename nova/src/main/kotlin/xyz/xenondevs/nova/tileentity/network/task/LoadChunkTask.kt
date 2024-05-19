@@ -24,7 +24,7 @@ internal class LoadChunkTask(
 ) : NetworkTask(state) {
     
     override suspend fun run(): Boolean {
-        val updatedNetworks = ConcurrentHashMap<ProtoNetwork, MutableSet<NetworkNode>>()
+        val updatedNetworks = ConcurrentHashMap<ProtoNetwork<*>, MutableSet<NetworkNode>>()
         
         coroutineScope {
             val chunkNodes = NetworkManager.getNodes(pos).associateByTo(HashMap(), NetworkNode::pos)

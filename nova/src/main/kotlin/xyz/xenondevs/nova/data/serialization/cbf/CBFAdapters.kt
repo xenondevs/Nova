@@ -11,10 +11,11 @@ import xyz.xenondevs.cbf.security.CBFSecurityManager
 import xyz.xenondevs.commons.reflection.classifierClass
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound.NamespacedCompoundBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.BlockPosBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.BukkitItemStackBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ColorBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ItemFilterBinaryAdapter
-import xyz.xenondevs.nova.data.serialization.cbf.adapter.ItemStackBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.LocationBinaryAdapter
+import xyz.xenondevs.nova.data.serialization.cbf.adapter.MojangItemStackBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedIdBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.NamespacedKeyBinaryAdapter
 import xyz.xenondevs.nova.data.serialization.cbf.adapter.ResourceLocationBinaryAdapter
@@ -53,10 +54,11 @@ internal object CBFAdapters {
         registerBinaryAdapter(VirtualInventoryBinaryAdapter)
         registerBinaryAdapter(ItemFilterBinaryAdapter)
         registerBinaryAdapter(BlockPosBinaryAdapter)
+        registerBinaryAdapter(MojangItemStackBinaryAdapter)
         
         // binary hierarchy adapters
         registerBinaryHierarchyAdapter(TableBinaryAdapter)
-        registerBinaryHierarchyAdapter(ItemStackBinaryAdapter)
+        registerBinaryHierarchyAdapter(BukkitItemStackBinaryAdapter)
         registerBinaryHierarchyAdapter(BLOCK.byNameBinaryAdapter())
         registerBinaryHierarchyAdapter(ITEM.byNameBinaryAdapter())
         registerBinaryHierarchyAdapter(ENCHANTMENT.byNameBinaryAdapter())

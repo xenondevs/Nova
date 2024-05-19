@@ -13,9 +13,9 @@ import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.DynamicVanillaItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.DoubleMojangStackContainer
+import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.DoubleChestItemStackContainer
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.NetworkedNMSInventory
-import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.SingleMojangStackContainer
+import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.SimpleItemStackContainer
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.world.BlockPos
@@ -76,6 +76,7 @@ internal class VanillaChestTileEntity internal constructor(
         
         val blockState = pos.nmsBlockState
         val chestType = blockState.getValue(BlockStateProperties.CHEST_TYPE)
+        this.chestType = chestType
         if (chestType == ChestType.SINGLE)
             return null
         
@@ -102,7 +103,7 @@ internal class VanillaChestTileEntity internal constructor(
         val linkedChest = linkedChest
         val chestType = chestType
         if (chestType == ChestType.SINGLE || linkedChest == null)
-            return NetworkedNMSInventory(SingleMojangStackContainer(chest.contents))
+            return NetworkedNMSInventory(SimpleItemStackContainer(chest.contents))
         
         val left: MutableList<ItemStack>
         val right: MutableList<ItemStack>
@@ -120,7 +121,7 @@ internal class VanillaChestTileEntity internal constructor(
             else -> throw UnsupportedOperationException()
         }
         
-        return NetworkedNMSInventory(DoubleMojangStackContainer(left, right))
+        return NetworkedNMSInventory(DoubleChestItemStackContainer(left, right))
     }
     
     private fun setInventory(inventory: NetworkedInventory) {

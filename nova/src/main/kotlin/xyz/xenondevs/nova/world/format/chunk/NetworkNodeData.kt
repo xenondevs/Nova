@@ -24,7 +24,7 @@ sealed interface NetworkNodeData {
     
     val owner: UUID
     
-    val connections: MutableMap<NetworkType, MutableSet<BlockFace>>
+    val connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>>
     
     fun write(writer: ByteWriter)
     
@@ -33,18 +33,18 @@ sealed interface NetworkNodeData {
 data class NetworkBridgeData(
     val typeId: ResourceLocation,
     override val owner: UUID,
-    override val connections: MutableMap<NetworkType, MutableSet<BlockFace>> = HashMap(),
-    val networks: MutableMap<NetworkType, UUID> = HashMap(),
-    val supportedNetworkTypes: MutableSet<NetworkType> = HashSet(),
+    override val connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>> = HashMap(),
+    val networks: MutableMap<NetworkType<*>, UUID> = HashMap(),
+    val supportedNetworkTypes: MutableSet<NetworkType<*>> = HashSet(),
     val bridgeFaces: MutableSet<BlockFace> = enumSet()
 ) : NetworkNodeData {
     
     constructor(
         typeId: ResourceLocation,
         owner: OfflinePlayer?,
-        connections: MutableMap<NetworkType, MutableSet<BlockFace>> = HashMap(),
-        networks: MutableMap<NetworkType, UUID> = HashMap(),
-        supportedNetworkTypes: MutableSet<NetworkType> = HashSet(),
+        connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>> = HashMap(),
+        networks: MutableMap<NetworkType<*>, UUID> = HashMap(),
+        supportedNetworkTypes: MutableSet<NetworkType<*>> = HashSet(),
         bridgeFaces: MutableSet<BlockFace> = enumSet()
     ) : this(
         typeId,
@@ -82,14 +82,14 @@ data class NetworkBridgeData(
 
 data class NetworkEndPointData(
     override val owner: UUID,
-    override val connections: MutableMap<NetworkType, MutableSet<BlockFace>> = HashMap(),
-    val networks: Table<NetworkType, BlockFace, UUID> = HashBasedTable.create()
+    override val connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>> = HashMap(),
+    val networks: Table<NetworkType<*>, BlockFace, UUID> = HashBasedTable.create()
 ) : NetworkNodeData {
     
     constructor(
         owner: OfflinePlayer?, 
-        connections: MutableMap<NetworkType, MutableSet<BlockFace>> = HashMap(),
-        networks: Table<NetworkType, BlockFace, UUID> = HashBasedTable.create()
+        connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>> = HashMap(),
+        networks: Table<NetworkType<*>, BlockFace, UUID> = HashBasedTable.create()
     ) : this(
         owner?.uniqueId ?: UUID(0L, 0L),
         connections,
@@ -115,9 +115,9 @@ data class NetworkEndPointData(
     
 }
 
-private fun ByteReader.readNetworkTypeCubeFaceSetMap(): MutableMap<NetworkType, MutableSet<BlockFace>> {
+private fun ByteReader.readNetworkTypeCubeFaceSetMap(): MutableMap<NetworkType<*>, MutableSet<BlockFace>> {
     val size = readVarInt()
-    val map = HashMap<NetworkType, MutableSet<BlockFace>>(size)
+    val map = HashMap<NetworkType<*>, MutableSet<BlockFace>>(size)
     repeat(size) {
         val networkType = NovaRegistries.NETWORK_TYPE.getOrThrow(readString())
         val set = readCubeFaceSet()
@@ -128,7 +128,7 @@ private fun ByteReader.readNetworkTypeCubeFaceSetMap(): MutableMap<NetworkType, 
     return map
 }
 
-private fun ByteWriter.writeNetworkTypeCubeFaceSetMap(map: Map<NetworkType, Set<BlockFace>>) {
+private fun ByteWriter.writeNetworkTypeCubeFaceSetMap(map: Map<NetworkType<*>, Set<BlockFace>>) {
     writeVarInt(map.size)
     for ((networkType, set) in map) {
         writeString(networkType.id.toString())
@@ -136,9 +136,9 @@ private fun ByteWriter.writeNetworkTypeCubeFaceSetMap(map: Map<NetworkType, Set<
     }
 }
 
-private fun ByteReader.readNetworkTypeBlockFaceUUIDTable(): Table<NetworkType, BlockFace, UUID> {
+private fun ByteReader.readNetworkTypeBlockFaceUUIDTable(): Table<NetworkType<*>, BlockFace, UUID> {
     val size = readVarInt()
-    val table = HashBasedTable.create<NetworkType, BlockFace, UUID>()
+    val table = HashBasedTable.create<NetworkType<*>, BlockFace, UUID>()
     repeat(size) {
         val networkType = NovaRegistries.NETWORK_TYPE.getOrThrow(readString())
         val face = BlockFace.entries[readByte().toInt()]
@@ -150,7 +150,7 @@ private fun ByteReader.readNetworkTypeBlockFaceUUIDTable(): Table<NetworkType, B
     return table
 }
 
-private fun ByteWriter.writeNetworkTypeBlockFaceUUIDTable(table: Table<NetworkType, BlockFace, UUID>) {
+private fun ByteWriter.writeNetworkTypeBlockFaceUUIDTable(table: Table<NetworkType<*>, BlockFace, UUID>) {
     writeVarInt(table.size())
     for ((networkType, face, uuid) in table) {
         writeString(networkType.id.toString())
@@ -159,7 +159,7 @@ private fun ByteWriter.writeNetworkTypeBlockFaceUUIDTable(table: Table<NetworkTy
     }
 }
 
-private fun ByteWriter.writeNetworkTypeUUIDMap(map: Map<NetworkType, UUID>) {
+private fun ByteWriter.writeNetworkTypeUUIDMap(map: Map<NetworkType<*>, UUID>) {
     writeVarInt(map.size)
     for ((networkType, uuid) in map) {
         writeString(networkType.id.toString())
@@ -167,9 +167,9 @@ private fun ByteWriter.writeNetworkTypeUUIDMap(map: Map<NetworkType, UUID>) {
     }
 }
 
-private fun ByteReader.readNetworkTypeUUIDMap(): MutableMap<NetworkType, UUID> {
+private fun ByteReader.readNetworkTypeUUIDMap(): MutableMap<NetworkType<*>, UUID> {
     val size = readVarInt()
-    val map = HashMap<NetworkType, UUID>(size)
+    val map = HashMap<NetworkType<*>, UUID>(size)
     repeat(size) {
         val networkType = NovaRegistries.NETWORK_TYPE.getOrThrow(readString())
         val uuid = readUUID()
@@ -180,16 +180,16 @@ private fun ByteReader.readNetworkTypeUUIDMap(): MutableMap<NetworkType, UUID> {
     return map
 }
 
-private fun ByteWriter.writeNetworkTypeSet(set: Set<NetworkType>) {
+private fun ByteWriter.writeNetworkTypeSet(set: Set<NetworkType<*>>) {
     writeVarInt(set.size)
     for (networkType in set) {
         writeString(networkType.id.toString())
     }
 }
 
-private fun ByteReader.readNetworkTypeSet(): MutableSet<NetworkType> {
+private fun ByteReader.readNetworkTypeSet(): MutableSet<NetworkType<*>> {
     val size = readVarInt()
-    val set = HashSet<NetworkType>(size)
+    val set = HashSet<NetworkType<*>>(size)
     repeat(size) {
         set += NovaRegistries.NETWORK_TYPE.getOrThrow(readString())
     }

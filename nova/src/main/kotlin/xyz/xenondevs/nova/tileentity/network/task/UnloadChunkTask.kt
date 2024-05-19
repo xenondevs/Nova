@@ -16,9 +16,9 @@ internal class UnloadChunkTask(
 ) : NetworkTask(state) {
     
     override suspend fun run(): Boolean {
-        val clustersToInit = HashSet<ProtoNetwork>()
+        val clustersToInit = HashSet<ProtoNetwork<*>>()
         
-        fun remove(node: NetworkNode, network: ProtoNetwork) {
+        fun remove(node: NetworkNode, network: ProtoNetwork<*>) {
             network.unloadNode(node)
             network.cluster?.forEach { previouslyClusteredNetwork ->
                 previouslyClusteredNetwork.invalidateCluster()
@@ -51,7 +51,8 @@ internal class UnloadChunkTask(
         
         for (network in clustersToInit) {
             if (network.isUnloaded()) {
-                state -= network
+                // TODO: save on unload
+//                state -= network
             } else {
                 network.initCluster()
             }

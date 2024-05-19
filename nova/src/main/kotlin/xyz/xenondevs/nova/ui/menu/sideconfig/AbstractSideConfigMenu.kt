@@ -29,7 +29,7 @@ import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 
 internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
     val endPoint: NetworkEndPoint,
-    val networkType: NetworkType,
+    val networkType: NetworkType<*>,
     val holder: H
 ) {
     

@@ -11,7 +11,7 @@ internal abstract class RemoveNodeTask<T : NetworkNode>(
 ) : NetworkTask(state) {
     
     protected val nodesToUpdate = HashSet<NetworkNode>()
-    protected val clustersToInit = HashSet<ProtoNetwork>()
+    protected val clustersToInit = HashSet<ProtoNetwork<*>>()
     
     final override suspend fun run(): Boolean {
         if (node !in state)
@@ -44,7 +44,7 @@ internal abstract class RemoveNodeTask<T : NetworkNode>(
      * schedules them for re-initialization in via [clustersToInit].
      * Only registered networks' clusters will actually be re-initialized.
      */
-    protected fun reclusterize(network: ProtoNetwork) {
+    protected fun reclusterize(network: ProtoNetwork<*>) {
         val cluster = network.cluster
             ?: return
         

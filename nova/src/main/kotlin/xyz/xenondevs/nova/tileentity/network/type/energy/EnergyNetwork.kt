@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 import kotlin.math.roundToLong
 
-class EnergyNetwork(networkData: NetworkData) : Network, NetworkData by networkData {
+class EnergyNetwork(networkData: NetworkData<EnergyNetwork>) : Network<EnergyNetwork>, NetworkData<EnergyNetwork> by networkData {
     
     private val providers = HashSet<EnergyHolder>()
     private val consumers = HashSet<EnergyHolder>()
@@ -63,7 +63,7 @@ class EnergyNetwork(networkData: NetworkData) : Network, NetworkData by networkD
     /**
      * Called every tick to transfer energy.
      */
-    override fun handleTick() {
+    fun tick() {
         val providerEnergy = min(transferRate, availableProviderEnergy)
         val bufferEnergy = min(transferRate - providerEnergy, availableBufferEnergy)
         val requestedEnergy = min(transferRate, requestedConsumerEnergy)

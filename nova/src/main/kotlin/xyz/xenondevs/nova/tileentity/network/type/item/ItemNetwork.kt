@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network.type.item
 
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
-import xyz.xenondevs.commons.collections.getOrSet
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.map
@@ -9,48 +8,44 @@ import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkData
 import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
-import xyz.xenondevs.nova.tileentity.network.type.item.channel.ItemNetworkChannel
+import xyz.xenondevs.nova.tileentity.network.type.item.channel.ItemChannelsBuilder
+import xyz.xenondevs.nova.tileentity.network.type.item.channel.ItemDistributor
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.ItemHolder
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-class ItemNetwork(networkData: NetworkData) : Network, NetworkData by networkData {
+// TODO: block updates
+class ItemNetwork(networkData: NetworkData<ItemNetwork>) : Network<ItemNetwork>, NetworkData<ItemNetwork> by networkData {
     
-    private val channels: Array<ItemNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
+    internal val channels: Array<ItemDistributor?>
     private val transferRate: Int
     
     private var nextChannel = 0
     
     init {
         var transferRate = DEFAULT_TRANSFER_RATE
-        
+        val channelsBuilder = ItemChannelsBuilder()
         for ((node, faces) in nodes.values) {
             if (node is NetworkEndPoint) {
                 val itemHolder = node.holders.firstInstanceOfOrNull<ItemHolder>()
                     ?: continue
                 
-                for ((face, channelId) in itemHolder.channels) {
-                    if (face in faces) {
-                        val channel = channels.getOrSet(channelId, ::ItemNetworkChannel)
-                        channel.addHolder(itemHolder, face, itemHolder.connectionConfig[face]!!)
-                    }
-                }
+                channelsBuilder.addHolder(itemHolder, faces)
             } else if (node is ItemBridge) {
                 transferRate = min(transferRate, node.itemTransferRate)
             }
         }
-        
         this.transferRate = transferRate
-        
-        for (channel in channels)
-            channel?.createDistributor()
+        channels = channelsBuilder.build()
     }
     
-    override fun handleTick() {
+    internal fun tick() {
         val startingChannel = nextChannel
         var transfersLeft = transferRate
         do {
-            transfersLeft = channels[nextChannel]?.distributeItems(transfersLeft) ?: transfersLeft
+            val distributor = channels[nextChannel]
+            if (distributor != null)
+                transfersLeft = distributor.distribute(transfersLeft)
             
             nextChannel++
             if (nextChannel >= channels.size) nextChannel = 0

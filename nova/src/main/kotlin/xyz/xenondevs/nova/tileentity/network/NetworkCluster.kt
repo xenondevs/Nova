@@ -2,23 +2,39 @@ package xyz.xenondevs.nova.tileentity.network
 
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.tileentity.network.type.NetworkType
 import java.util.*
 import java.util.logging.Level
 
-class NetworkCluster(val uuid: UUID, val networks: Collection<Network>) {
+class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     
     // It might make sense to add a random offset to the current tick count in order to spread out the network ticks
     // of networks with tick delay > 1, but this would create inconsistent transfer rates in cases where clusters
     // are rebuilt (thus regenerating the offset) very often.
     
-    fun tickNetworks(tick: Int) {
-        for (network in networks) {
-            val tickDelay = network.type.tickDelay
+    private val groups = networks.groupBy { it.type }
+        .map { (type, networks) -> createGroup(type, networks) }
+    
+    fun preTickSync(tick: Int) = tickNetworks(tick, NetworkGroup<*>::preTickSync)
+    fun preTick(tick: Int) = tickNetworks(tick, NetworkGroup<*>::preTick)
+    fun tick(tick: Int) = tickNetworks(tick, NetworkGroup<*>::tick)
+    fun postTick(tick: Int) = tickNetworks(tick, NetworkGroup<*>::postTick)
+    fun postTickSync(tick: Int) = tickNetworks(tick, NetworkGroup<*>::postTickSync)
+    
+    @Suppress("UNCHECKED_CAST", "USELESS_CAST")
+    private fun <T : Network<T>> createGroup(type: NetworkType<*>, networks: List<*>): NetworkGroup<T> {
+        val data = ImmutableNetworkGroupData(type as NetworkType<T>, networks as List<T>)
+        return (type as NetworkType<T>).create(data)
+    }
+    
+    private inline fun tickNetworks(tick: Int, tickFun: NetworkGroup<*>.() -> Unit) {
+        for (group in groups) {
+            val tickDelay = group.type.tickDelay
             if (tick % tickDelay == 0) {
                 try {
-                    network.handleTick()
+                    tickFun.invoke(group)
                 } catch (e: Exception) {
-                    LOGGER.log(Level.SEVERE, "An exception occurred trying to tick $network in group $this", e)
+                    LOGGER.log(Level.SEVERE, "An exception occurred trying to tick $group in cluster $this", e)
                 }
             }
         }
@@ -32,16 +48,16 @@ class NetworkCluster(val uuid: UUID, val networks: Collection<Network>) {
  * [ProtoNetworkClusters][ProtoNetworkCluster] are used to build [NetworkClusters][NetworkCluster],
  * which are groups of [Networks][Network] that are ticked together.
  */
-class ProtoNetworkCluster : Iterable<ProtoNetwork> {
+class ProtoNetworkCluster : Iterable<ProtoNetwork<*>> {
     
     val uuid: UUID = UUID.randomUUID()
-    private val networks = HashSet<ProtoNetwork>()
+    private val networks = HashSet<ProtoNetwork<*>>()
     
-    operator fun plusAssign(network: ProtoNetwork) {
+    operator fun plusAssign(network: ProtoNetwork<*>) {
         networks += network
     }
     
-    operator fun plusAssign(networks: Iterable<ProtoNetwork>) {
+    operator fun plusAssign(networks: Iterable<ProtoNetwork<*>>) {
         this.networks += networks
     }
     
@@ -52,11 +68,11 @@ class ProtoNetworkCluster : Iterable<ProtoNetwork> {
         networks += other.networks
     }
     
-    operator fun minusAssign(network: ProtoNetwork) {
+    operator fun minusAssign(network: ProtoNetwork<*>) {
         networks -= network
     }
     
-    operator fun contains(network: ProtoNetwork) =
+    operator fun contains(network: ProtoNetwork<*>) =
         network in networks
     
     override operator fun iterator() =

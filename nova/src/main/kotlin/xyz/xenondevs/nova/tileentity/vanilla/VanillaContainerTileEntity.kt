@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.tileentity.network.type.item.holder.StaticVanillaItemH
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.NetworkedNMSInventory
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.NetworkedShulkerBoxInventory
-import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.SingleMojangStackContainer
+import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.SimpleItemStackContainer
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.world.BlockPos
 
@@ -35,7 +35,7 @@ internal class VanillaContainerTileEntity internal constructor(
     
     private fun getInventory(blockEntity: BaseContainerBlockEntity): NetworkedInventory {
         if (blockEntity is ShulkerBoxBlockEntity)
-            return NetworkedShulkerBoxInventory(SingleMojangStackContainer(blockEntity.contents))
+            return NetworkedShulkerBoxInventory(SimpleItemStackContainer(blockEntity.contents))
         
         val contents = when (blockEntity) {
             is BarrelBlockEntity -> blockEntity.contents
@@ -45,7 +45,7 @@ internal class VanillaContainerTileEntity internal constructor(
             else -> throw IllegalArgumentException("Unsupported container block entity: $blockEntity")
         }
         
-        return NetworkedNMSInventory(SingleMojangStackContainer(contents))
+        return NetworkedNMSInventory(SimpleItemStackContainer(contents))
     }
     
 }

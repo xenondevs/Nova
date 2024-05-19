@@ -5,6 +5,7 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.collections.filterIsInstanceValuesTo
 import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.guava.replaceAll
+import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
@@ -20,7 +21,7 @@ import kotlin.collections.set
 internal class AddBridgeTask(
     state: NetworkState,
     node: NetworkBridge,
-    private val supportedNetworkTypes: Set<NetworkType>,
+    private val supportedNetworkTypes: Set<NetworkType<*>>,
     private val bridgeFaces: Set<BlockFace>,
     updateNodes: Boolean
 ) : AddNodeTask<NetworkBridge>(state, node, updateNodes) {
@@ -41,7 +42,7 @@ internal class AddBridgeTask(
         val nearbyBridges: Map<BlockFace, NetworkBridge> = nearbyNodes.filterIsInstanceValuesTo(enumMap())
         val nearbyEndPoints: Map<BlockFace, NetworkEndPoint> = nearbyNodes.filterIsInstanceValuesTo(enumMap())
         
-        val clustersToInit = HashMap<ProtoNetwork, Collection<NetworkNode>>()
+        val clustersToInit = HashMap<ProtoNetwork<*>, Collection<NetworkNode>>()
         for (networkType in supportedNetworkTypes) {
             val availableBridges = nearbyBridges.filterTo(enumMap()) { (face, bridge) ->
                 face.oppositeFace in state.getAllowedFaces(bridge, networkType) && node.typeId == bridge.typeId
@@ -69,12 +70,12 @@ internal class AddBridgeTask(
      * Depending on the amount of neighboring [ProtoNetworks][ProtoNetwork], this function my either merge networks,
      * add the bridge to an existing [ProtoNetwork], or create a new [ProtoNetwork].
      */
-    private fun connectBridgeToBridges(
+    private fun <T : Network<T>> connectBridgeToBridges(
         self: NetworkBridge,
         neighbors: Map<BlockFace, NetworkBridge>,
-        networkType: NetworkType
-    ): ProtoNetwork {
-        val previousNetworks = HashSet<ProtoNetwork>()
+        networkType: NetworkType<T>
+    ): ProtoNetwork<T> {
+        val previousNetworks = HashSet<ProtoNetwork<T>>()
         for ((face, neighbor) in neighbors) {
             previousNetworks += state.getNetwork(neighbor, networkType)!!
             
@@ -103,7 +104,10 @@ internal class AddBridgeTask(
     /**
      * Merges the given [networks] into a single network of [type].
      */
-    private fun mergeNetworks(type: NetworkType, networks: Set<ProtoNetwork>): ProtoNetwork {
+    private fun <T : Network<T>> mergeNetworks(
+        type: NetworkType<T>,
+        networks: Set<ProtoNetwork<T>>
+    ): ProtoNetwork<T> {
         // remove old networks
         for (previousNetwork in networks) {
             state -= previousNetwork
@@ -132,7 +136,11 @@ internal class AddBridgeTask(
     /**
      * Connects the bridge [self] to the given [neighbors] using [network].
      */
-    private fun connectBridgeToEndPoints(self: NetworkBridge, neighbors: Map<BlockFace, NetworkEndPoint>, network: ProtoNetwork) {
+    private fun connectBridgeToEndPoints(
+        self: NetworkBridge,
+        neighbors: Map<BlockFace, NetworkEndPoint>,
+        network: ProtoNetwork<*>
+    ) {
         val networkType = network.type
         for ((face, neighbor) in neighbors) {
             val oppositeFace = face.oppositeFace

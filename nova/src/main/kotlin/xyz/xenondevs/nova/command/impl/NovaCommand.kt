@@ -17,6 +17,7 @@ import net.minecraft.commands.arguments.selector.EntitySelector
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import org.bukkit.Bukkit
 import org.bukkit.block.data.BlockData
 import org.joml.Matrix4f
 import org.joml.Vector3f
@@ -61,6 +62,7 @@ import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.explorer.creative.ItemsWindow
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.BlockUtils
+import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.component.adventure.indent
 import xyz.xenondevs.nova.util.getSurroundingChunks
@@ -162,6 +164,9 @@ internal object NovaCommand : Command("nova") {
                 .then(literal("showNetworkClusters")
                     .requiresPlayer()
                     .executesCatching(::toggleNetworkClusterDebugging))
+                .then(literal("reregisterNetworkNodes")
+                    .executesCatching(::reregisterNetworkNodes)
+                )
                 .then(literal("showHitboxes")
                     .requiresPlayer()
                     .executesCatching(::toggleHitboxDebugging))
@@ -640,7 +645,7 @@ internal object NovaCommand : Command("nova") {
         } else ctx.source.sendFailure(Component.translatable("command.nova.show_item_data.no_item", NamedTextColor.RED))
     }
     
-    private fun toggleNetworkDebugging(ctx: CommandContext<CommandSourceStack>, type: NetworkType) {
+    private fun toggleNetworkDebugging(ctx: CommandContext<CommandSourceStack>, type: NetworkType<*>) {
         val player = ctx.player
         val enabled = NetworkDebugger.toggleDebugger(type, player)
         
@@ -657,6 +662,33 @@ internal object NovaCommand : Command("nova") {
         ctx.source.sendSuccess(Component.translatable(
             "command.nova.network_cluster_debug.${if (enabled) "on" else "off"}",
             NamedTextColor.GRAY
+        ))
+    }
+    
+    private fun reregisterNetworkNodes(ctx: CommandContext<CommandSourceStack>) {
+        val nodes = Bukkit.getWorlds().asSequence()
+            .flatMap { it.loadedChunks.asList() }
+            .flatMap { NetworkManager.getNodes(it.pos) }
+            .toList()
+        
+        for (node in nodes) {
+            when (node) {
+                is NetworkBridge -> NetworkManager.queueRemoveBridge(node, true)
+                is NetworkEndPoint -> NetworkManager.queueRemoveEndPoint(node, true)
+            }
+        }
+        
+        for (node in nodes) {
+            when (node) {
+                is NetworkBridge -> NetworkManager.queueAddBridge(node, NETWORK_TYPE.toSet(), CUBE_FACES, true)
+                is NetworkEndPoint -> NetworkManager.queueAddEndPoint(node, true)
+            }
+        }
+        
+        ctx.source.sendSuccess(Component.translatable(
+            "command.nova.reregister_network_nodes.success",
+            NamedTextColor.GRAY,
+            Component.text(nodes.size)
         ))
     }
     

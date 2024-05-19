@@ -23,7 +23,7 @@ internal class AddEndPointTask(
             NetworkEndPointData(node.owner)
         )
         
-        val clustersToEnlarge = HashSet<ProtoNetwork>()
+        val clustersToEnlarge = HashSet<ProtoNetwork<*>>()
         
         for (networkType in NovaRegistries.NETWORK_TYPE) {
             var allowedFaces = state.getAllowedFaces(node, networkType)
@@ -54,8 +54,8 @@ internal class AddEndPointTask(
     
     private fun tryConnectToBridge(
         bridge: NetworkBridge,
-        networkType: NetworkType, face: BlockFace,
-        clustersToEnlarge: MutableSet<ProtoNetwork>
+        networkType: NetworkType<*>, face: BlockFace,
+        clustersToEnlarge: MutableSet<ProtoNetwork<*>>
     ): Boolean {
         if (face.oppositeFace in state.getAllowedFaces(bridge, networkType)) {
             state.connectEndPointToBridge(node, bridge, networkType, face, clustersToEnlarge)
@@ -67,8 +67,8 @@ internal class AddEndPointTask(
     
     private fun tryConnectToEndPoint(
         endPoint: NetworkEndPoint,
-        networkType: NetworkType, face: BlockFace,
-        clustersToEnlarge: MutableSet<ProtoNetwork>
+        networkType: NetworkType<*>, face: BlockFace,
+        clustersToEnlarge: MutableSet<ProtoNetwork<*>>
     ): Boolean {
         if (face.oppositeFace in state.getAllowedFaces(endPoint, networkType)) {
             state.connectEndPointToEndPoint(node, endPoint, networkType, face, clustersToEnlarge)

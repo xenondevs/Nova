@@ -62,7 +62,7 @@ internal class RemoveBridgeTask(
      * [NetworkEndPoints][NetworkEndPoint] to [connectedEndPoints].
      */
     private fun disconnectConnectedNodes(
-        network: ProtoNetwork,
+        network: ProtoNetwork<*>,
         connectedBridges: MutableSet<NetworkBridge>,
         connectedEndPoints: MutableSet<NetworkEndPoint>
     ) {
@@ -86,7 +86,7 @@ internal class RemoveBridgeTask(
     /**
      * Disconnects [endPoint] at [face] from [network].
      */
-    private fun disconnectEndPoint(endPoint: NetworkEndPoint, face: BlockFace, network: ProtoNetwork) {
+    private fun disconnectEndPoint(endPoint: NetworkEndPoint, face: BlockFace, network: ProtoNetwork<*>) {
         val networkType = network.type
         state.removeNetwork(endPoint, networkType, face)
         state.removeConnection(endPoint, networkType, face)
@@ -96,7 +96,7 @@ internal class RemoveBridgeTask(
     /**
      * Disconnects [bridge] at [face] from [network].
      */
-    private fun disconnectBridge(bridge: NetworkBridge, face: BlockFace, network: ProtoNetwork) {
+    private fun disconnectBridge(bridge: NetworkBridge, face: BlockFace, network: ProtoNetwork<*>) {
         state.removeConnection(bridge, network.type, face)
     }
     
@@ -104,7 +104,7 @@ internal class RemoveBridgeTask(
      * Reassigns the networks inside [NetworkBridgeData.networks] and [NetworkEndPointData.networks] for all
      * nodes in [networks].
      */
-    private fun reassignNetworks(networks: List<ProtoNetwork>) {
+    private fun reassignNetworks(networks: List<ProtoNetwork<*>>) {
         for (network in networks) {
             for ((node, faces) in network.nodes.values) {
                 when (node) {
@@ -124,8 +124,8 @@ internal class RemoveBridgeTask(
     private fun recalculateNetworks(
         bridge: NetworkBridge,
         connectedPreviously: Set<NetworkBridge>,
-        networkType: NetworkType
-    ): List<ProtoNetwork>? {
+        networkType: NetworkType<*>
+    ): List<ProtoNetwork<*>>? {
         require(connectedPreviously.size > 1) { "Recalculating networks is not required" }
         
         val potentialNetworks = ArrayList<MutableMap<BlockPos, MutableNetworkNodeConnection>>()

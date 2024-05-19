@@ -7,53 +7,60 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkData
+import xyz.xenondevs.nova.tileentity.network.NetworkGroup
+import xyz.xenondevs.nova.tileentity.network.NetworkGroupData
 import xyz.xenondevs.nova.tileentity.network.node.ContainerEndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.type.energy.EnergyNetwork
+import xyz.xenondevs.nova.tileentity.network.type.energy.EnergyNetworkGroup
 import xyz.xenondevs.nova.tileentity.network.type.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidNetwork
+import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidNetworkGroup
 import xyz.xenondevs.nova.tileentity.network.type.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.ItemNetwork
+import xyz.xenondevs.nova.tileentity.network.type.item.ItemNetworkGroup
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.util.set
 import java.util.*
 import kotlin.reflect.KClass
 
-internal typealias NetworkConstructor = (NetworkData) -> Network
-
 /**
  * A [Network] type.
  * 
  * @param id The unique identifier of this [NetworkType].
- * @param constructor The constructor to instantiate a [Network] of this [NetworkType].
- * @param tickDelay The delay between [network ticks][Network.handleTick].
+ * @param networkConstructor The constructor to instantiate a [Network] of this [NetworkType].
+ * @param tickDelay The delay between [network ticks][Network.tick].
  * @param holderTypes The types of [EndPointDataHolders][EndPointDataHolder]
  * that are required for end points of this [NetworkType].
  */
-class NetworkType internal constructor(
+class NetworkType<T : Network<T>> internal constructor(
     val id: ResourceLocation,
-    private val constructor: NetworkConstructor,
+    private val networkConstructor: (NetworkData<T>) -> T,
+    private val groupConstructor: ((NetworkGroupData<T>) -> NetworkGroup<T>),
     tickDelay: Provider<Int>,
     val holderTypes: Set<KClass<out EndPointDataHolder>>
 ) {
     
     /**
-     * The delay between [network ticks][Network.handleTick].
+     * The delay between [network ticks][Network.tick].
      */
     val tickDelay: Int by tickDelay
     
     /**
      * Creates a new [Network] based on the given [data].
      */
-    fun create(data: NetworkData): Network =
-        constructor(data)
+    fun create(data: NetworkData<T>): T =
+        networkConstructor(data)
+    
+    fun create(data: NetworkGroupData<T>): NetworkGroup<T> =
+        groupConstructor(data)
     
     override fun toString(): String {
         return id.toString()
     }
     
     override fun equals(other: Any?): Boolean {
-        return other is NetworkType && id == other.id
+        return other is NetworkType<*> && id == other.id
     }
     
     override fun hashCode(): Int {
@@ -71,26 +78,32 @@ object DefaultNetworkTypes {
     /**
      * The default network type responsible for distributing energy provided through [EnergyHolders][EnergyHolder].
      */
-    val ENERGY = register("energy", ::EnergyNetwork, EnergyNetwork.TICK_DELAY_PROVIDER, EnergyHolder::class)
+    val ENERGY = register("energy", ::EnergyNetwork, ::EnergyNetworkGroup, EnergyNetwork.TICK_DELAY_PROVIDER, EnergyHolder::class)
     
     /**
      * The default network type responsible for distributing items provided through [ItemHolders][ItemHolder].
      */
-    val ITEM = register("item", ::ItemNetwork, ItemNetwork.TICK_DELAY_PROVIDER, ItemHolder::class)
+    val ITEM = register("item", ::ItemNetwork, ::ItemNetworkGroup, ItemNetwork.TICK_DELAY_PROVIDER, ItemHolder::class)
     
     /**
      * The default network type responsible for distributing fluids provided through [FluidHolders][FluidHolder].
      */
-    val FLUID = register("fluid", ::FluidNetwork, FluidNetwork.TICK_DELAY_PROVIDER, FluidHolder::class)
+    val FLUID = register("fluid", ::FluidNetwork, ::FluidNetworkGroup, FluidNetwork.TICK_DELAY_PROVIDER, FluidHolder::class)
     
-    private fun register(
+    private fun <T : Network<T>> register(
         name: String,
-        constructor: NetworkConstructor,
+        networkConstructor: (NetworkData<T>) -> T,
+        groupConstructor: (NetworkGroupData<T>) -> NetworkGroup<T>,
         tickDelay: Provider<Int>,
         vararg holderTypes: KClass<out EndPointDataHolder>
-    ): NetworkType {
+    ): NetworkType<T> {
         val id = ResourceLocation("nova", name)
-        val type = NetworkType(id, constructor, tickDelay, holderTypes.toHashSet())
+        val type = NetworkType(
+            id,
+            networkConstructor, groupConstructor, 
+            tickDelay,
+            holderTypes.toHashSet()
+        )
         NovaRegistries.NETWORK_TYPE[id] = type
         return type
     }

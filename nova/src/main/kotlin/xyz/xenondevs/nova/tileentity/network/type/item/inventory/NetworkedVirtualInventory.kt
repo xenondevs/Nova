@@ -1,10 +1,12 @@
 package xyz.xenondevs.nova.tileentity.network.type.item.inventory
 
-import org.bukkit.inventory.ItemStack
+import net.minecraft.world.item.ItemStack
 import xyz.xenondevs.invui.inventory.Inventory
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.UpdateReason
+import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
+import xyz.xenondevs.nova.util.nmsCopy
 import java.util.*
 
 open class NetworkedInvUIInventory(
@@ -16,57 +18,77 @@ open class NetworkedInvUIInventory(
     override val size: Int
         get() = inventory.size
     
-    override val items: Array<ItemStack?>
-        get() = inventory.items
-    
-    override fun setItem(slot: Int, item: ItemStack?): Boolean {
-        return inventory.forceSetItem(null, slot, item)
+    override fun get(slot: Int): ItemStack {
+        return inventory.getUnsafeItem(slot)?.nmsCopy ?: ItemStack.EMPTY
     }
     
-    override fun getItem(slot: Int): ItemStack? {
-        return inventory.getItem(slot)
+    override fun set(slot: Int, itemStack: ItemStack) {
+        inventory.setItem(updateReason, slot, itemStack.bukkitMirror)
     }
     
-    override fun addItem(item: ItemStack): Int {
-        return inventory.addItem(updateReason, item)
+    override fun add(itemStack: ItemStack, amount: Int): Int {
+        val itemStackWithCount = itemStack.copyWithCount(amount).bukkitMirror
+        return inventory.addItem(updateReason, itemStackWithCount)
     }
     
-    override fun canDecrementByOne(slot: Int): Boolean {
-        val itemStack = inventory.getUnsafeItem(slot) ?: return false
+    override fun canTake(slot: Int, amount: Int): Boolean {
+        if (inventory.preUpdateHandler == null)
+            return true
+        
+        val itemStack = inventory.getUnsafeItem(slot) ?: return true
+        val newAmount = itemStack.amount - amount
         val event = inventory.callPreUpdateEvent(
             updateReason,
             slot,
             itemStack.clone(),
-            itemStack.clone().apply { amount-- }.takeUnlessEmpty()
+            itemStack.clone().also { it.amount = newAmount }.takeUnlessEmpty()
         )
         
-        return !event.isCancelled && (event.newItem?.amount ?: 0) == itemStack.amount - 1
+        return !event.isCancelled && (event.newItem?.amount ?: 0) == newAmount
     }
     
-    override fun decrementByOne(slot: Int) {
-        inventory.addItemAmount(UpdateReason.SUPPRESSED, slot, -1)
-        
-        val itemStack = inventory.getUnsafeItem(slot) ?: return
-        inventory.callPostUpdateEvent(
-            updateReason,
-            slot,
-            itemStack.clone(),
-            itemStack.clone().apply { amount-- }.takeUnlessEmpty()
-        )
+    override fun take(slot: Int, amount: Int) {
+        val prev = inventory.getItem(slot) ?: return
+        inventory.addItemAmount(UpdateReason.SUPPRESSED, slot, -amount)
+        val post = inventory.getItem(slot)
+        inventory.callPostUpdateEvent(updateReason, slot, prev, post)
     }
     
     override fun isFull(): Boolean {
         return inventory.isFull
     }
     
-    override fun canExchangeItemsWith(other: NetworkedInventory): Boolean {
-        return this != other && (other !is NetworkedMultiVirtualInventory || other.inventories.none { it.uuid == uuid })
+    override fun isEmpty(): Boolean {
+        return inventory.isEmpty
     }
     
-    override fun equals(other: Any?) =
-        if (other is NetworkedInvUIInventory) other.uuid == uuid else false
+    override fun copyContents(destination: Array<ItemStack>) {
+        for ((slot, item) in inventory.unsafeItems.withIndex()) {
+            destination[slot] = item.nmsCopy
+        }
+    }
     
-    override fun hashCode() = uuid.hashCode()
+    override fun canExchangeItemsWith(other: NetworkedInventory): Boolean {
+        if (this == other)
+            return false
+        
+        if (other is NetworkedMultiVirtualInventory && other.inventories.any { it == inventory })
+            return false
+        
+        return true
+    }
+    
+    override fun equals(other: Any?): Boolean {
+        if (this === other)
+            return true
+        
+        if (other is NetworkedInvUIInventory)
+            return inventory == other.inventory
+        
+        return false
+    }
+    
+    override fun hashCode(): Int = inventory.hashCode()
     
 }
 

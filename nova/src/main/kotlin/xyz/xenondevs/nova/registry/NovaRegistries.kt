@@ -43,7 +43,7 @@ object NovaRegistries {
     val ENCHANTMENT = registerSimple<Enchantment>("enchantment")
     
     @JvmField
-    val NETWORK_TYPE = registerSimple<NetworkType>("network_type")
+    val NETWORK_TYPE = registerSimple<NetworkType<*>>("network_type")
     
     @JvmField
     val ABILITY_TYPE = registerSimple<AbilityType<*>>("ability_type")

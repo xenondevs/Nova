@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.StaticVanillaItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.NetworkedNMSInventory
-import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.SingleSlotMojangStackContainer
+import xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla.SingleSlotItemStackContainer
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.*
@@ -30,9 +30,9 @@ internal class VanillaFurnaceTileEntity internal constructor(
     
     private fun getInventories(furnace: FurnaceBlockEntity): EnumMap<BlockFace, NetworkedInventory> {
         val contents = furnace.contents
-        val inputInventory = NetworkedNMSInventory(SingleSlotMojangStackContainer(contents, 0))
-        val fuelInventory = NetworkedNMSInventory(SingleSlotMojangStackContainer(contents, 1))
-        val outputInventory = NetworkedNMSInventory(SingleSlotMojangStackContainer(contents, 2))
+        val inputInventory = NetworkedNMSInventory(SingleSlotItemStackContainer(contents, 0))
+        val fuelInventory = NetworkedNMSInventory(SingleSlotItemStackContainer(contents, 1))
+        val outputInventory = NetworkedNMSInventory(SingleSlotItemStackContainer(contents, 2))
         
         val inventories = CUBE_FACES.associateWithTo(enumMap<BlockFace, NetworkedInventory>()) { fuelInventory }
         inventories[BlockFace.UP] = inputInventory

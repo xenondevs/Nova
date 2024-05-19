@@ -19,14 +19,14 @@ import java.util.*
 
 internal object NetworkDebugger {
     
-    private val networkDebuggers = HashMap<NetworkType, HashSet<UUID>>()
+    private val networkDebuggers = HashMap<NetworkType<*>, HashSet<UUID>>()
     private val clusterDebuggers = HashSet<UUID>()
     
     init {
         runTaskTimer(0, 1, ::handleTick)
     }
     
-    fun toggleDebugger(type: NetworkType, player: Player): Boolean {
+    fun toggleDebugger(type: NetworkType<*>, player: Player): Boolean {
         val typeDebuggers = networkDebuggers.getOrPut(type, ::HashSet)
         if (player.uniqueId in typeDebuggers) {
             typeDebuggers -= player.uniqueId
@@ -85,7 +85,7 @@ internal object NetworkDebugger {
         }
     }
     
-    private fun showNetwork(color: Color, network: Network, players: List<Player>) {
+    private fun showNetwork(color: Color, network: Network<*>, players: List<Player>) {
         for ((node, faces) in network.nodes.values) {
             val receivers = players.filterInRange(node.pos.location, 64.0)
             if (receivers.isEmpty())

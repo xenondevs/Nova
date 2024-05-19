@@ -26,12 +26,12 @@ import java.util.*
 /**
  * An uninitialized network that is still in creation.
  */
-class ProtoNetwork(
+class ProtoNetwork<T : Network<T>>(
     private val state: NetworkState,
-    override val type: NetworkType,
+    override val type: NetworkType<T>,
     override val uuid: UUID = UUID.randomUUID(),
     override val nodes: MutableMap<BlockPos, MutableNetworkNodeConnection> = HashMap()
-) : NetworkData {
+) : NetworkData<T> {
     
     /**
      * The [ProtoNetworkCluster] that this [ProtoNetwork] is a part of.
@@ -43,7 +43,7 @@ class ProtoNetwork(
      * The [Network] that has been built from this [ProtoNetwork].
      * @see dirty
      */
-    lateinit var network: Network
+    lateinit var network: Network<T>
     
     /**
      * Whether this [ProtoNetwork] has been modified since the last [network] was built from it.
@@ -54,8 +54,7 @@ class ProtoNetwork(
      * Adds all [ProtoNetwork.nodes] of the given [ProtoNetwork] to this [ProtoNetwork].
      * Should only be called for [ProtoNetworks][ProtoNetwork] of the same [type][NetworkData.type].
      */
-    fun addAll(network: NetworkData) {
-        require(network.type == type) { "Type mismatch" }
+    fun addAll(network: NetworkData<T>) {
         for ((node, faces) in network.nodes.values) {
             val (_, myFaces) = this.nodes.getOrPut(node.pos) { MutableNetworkNodeConnection(node) }
             myFaces += faces
@@ -214,7 +213,7 @@ class ProtoNetwork(
         println("Building cluster for network $uuid ($type)")
         
         val cluster = ProtoNetworkCluster()
-        val queue = LinkedList<ProtoNetwork>()
+        val queue = LinkedList<ProtoNetwork<*>>()
         queue += this
         processClusterQueue(cluster, queue)
         this.cluster = cluster
@@ -232,7 +231,7 @@ class ProtoNetwork(
         val cluster = cluster ?: return initCluster()
         println("Enlarging cluster for network $uuid ($type)")
         
-        val queue = LinkedList<ProtoNetwork>()
+        val queue = LinkedList<ProtoNetwork<*>>()
         queueWithRelatedNetworks(cluster, queue, node)
         processClusterQueue(cluster, queue)
     }
@@ -251,14 +250,14 @@ class ProtoNetwork(
         
         println("Enlarging cluster for network $uuid ($type)")
         
-        val queue = LinkedList<ProtoNetwork>()
+        val queue = LinkedList<ProtoNetwork<*>>()
         for (node in nodes) {
             queueWithRelatedNetworks(cluster, queue, node)
         }
         processClusterQueue(cluster, queue)
     }
     
-    private fun processClusterQueue(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork>) {
+    private fun processClusterQueue(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>) {
         while (queue.isNotEmpty()) {
             val network = queue.poll()
             if (network in cluster)
@@ -273,14 +272,14 @@ class ProtoNetwork(
         }
     }
     
-    private fun queueWithRelatedNetworks(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork>, node: NetworkNode) {
+    private fun queueWithRelatedNetworks(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>, node: NetworkNode) {
         queueNetworks(cluster, queue, node)
         for (relatedNode in node.linkedNodes) {
             queueNetworks(cluster, queue, relatedNode)
         }
     }
     
-    private fun queueNetworks(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork>, node: NetworkNode) {
+    private fun queueNetworks(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>, node: NetworkNode) {
         // ghost nodes do not affect clustering because they're unloaded
         if (node is GhostNetworkNode)
             return
@@ -314,7 +313,7 @@ class ProtoNetwork(
     /**
      * Creates an immutable copy of this [ProtoNetwork].
      */
-    fun immutableCopy(): NetworkData =
+    fun immutableCopy(): NetworkData<T> =
         ImmutableNetworkData(
             type, uuid,
             nodes.mapValuesTo(HashMap()) { (_, con) ->
@@ -329,7 +328,7 @@ class ProtoNetwork(
          *
          * May suspend to wait for network region load.
          */
-        internal suspend fun read(uuid: UUID, world: World, state: NetworkState, reader: ByteReader): ProtoNetwork {
+        internal suspend fun read(uuid: UUID, world: World, state: NetworkState, reader: ByteReader): ProtoNetwork<*> {
             val type = NovaRegistries.NETWORK_TYPE.getOrThrow(reader.readString())
             val size = reader.readVarInt()
             val nodes = HashMap<BlockPos, MutableNetworkNodeConnection>()
@@ -352,7 +351,7 @@ class ProtoNetwork(
         /**
          * Writes the given [network] to the [writer].
          */
-        internal fun write(network: ProtoNetwork, writer: ByteWriter) {
+        internal fun write(network: ProtoNetwork<*>, writer: ByteWriter) {
             writer.writeString(network.type.toString())
             writer.writeVarInt(network.nodes.size)
             for ((pos, connection) in network.nodes) {

@@ -14,7 +14,8 @@ import xyz.xenondevs.nova.tileentity.network.type.fluid.holder.FluidHolder
 import kotlin.math.min
 import kotlin.math.roundToLong
 
-class FluidNetwork(networkData: NetworkData) : Network, NetworkData by networkData {
+// TODO: fix illegal world state access
+class FluidNetwork(networkData: NetworkData<FluidNetwork>) : Network<FluidNetwork>, NetworkData<FluidNetwork> by networkData {
     
     private val channels: Array<FluidNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     private val transferRate: Long
@@ -46,7 +47,7 @@ class FluidNetwork(networkData: NetworkData) : Network, NetworkData by networkDa
             channel?.createDistributor()
     }
     
-    override fun handleTick() {
+    fun tick() {
         val startingChannel = nextChannel
         var amountLeft = transferRate
         do {

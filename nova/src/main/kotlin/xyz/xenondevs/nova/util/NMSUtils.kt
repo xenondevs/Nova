@@ -549,6 +549,8 @@ object NMSUtils {
     val REGISTRY_ACCESS = MINECRAFT_SERVER.registryAccess()
     val REGISTRY_OPS = RegistryOps.create(JsonOps.INSTANCE, VanillaRegistryAccess)
     
+    val DATA_VERSION = CraftMagicNumbers.INSTANCE.dataVersion
+    
     fun freezeRegistry(registry: Registry<*>) {
         if (registry !is MappedRegistry) return
         ReflectionRegistry.MAPPED_REGISTRY_FROZEN_FIELD[registry] = true
