@@ -5,6 +5,7 @@ package xyz.xenondevs.nova.tileentity.network.type.item
 import net.minecraft.world.item.ItemStack
 import xyz.xenondevs.nova.tileentity.network.NetworkGroup
 import xyz.xenondevs.nova.tileentity.network.NetworkGroupData
+import xyz.xenondevs.nova.tileentity.network.type.item.ItemNetwork.Companion.MAX_COMPLEXITY
 import xyz.xenondevs.nova.tileentity.network.type.item.channel.FilteredNetworkedInventory
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.util.RoundRobinCounter
@@ -13,6 +14,7 @@ internal class ItemNetworkGroup(data: NetworkGroupData<ItemNetwork>) : NetworkGr
     
     private val providerSnapshots = HashMap<NetworkedInventory, Array<ItemStack>>()
     private val filteredProviderSnapshots = HashMap<FilteredNetworkedInventory, Array<ItemStack>>()
+    private var hasSnapshot = false
     
     private val roundRobin = RoundRobinCounter(networks.size)
     
@@ -54,10 +56,19 @@ internal class ItemNetworkGroup(data: NetworkGroupData<ItemNetwork>) : NetworkGr
     }
     
     override fun preTick() {
+        if (MAX_COMPLEXITY != -1 && networks.all { it.complexity > MAX_COMPLEXITY }) {
+            hasSnapshot = false
+            return
+        }
+        
         takeSnapshot()
+        hasSnapshot = true
     }
     
     override fun tick() {
+        if (!hasSnapshot)
+            return
+        
         val startIdx = roundRobin.next()
         for (i in startIdx..<networks.size) {
             networks[i].tick()

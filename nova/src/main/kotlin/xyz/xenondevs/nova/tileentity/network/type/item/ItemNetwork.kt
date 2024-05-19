@@ -19,11 +19,13 @@ class ItemNetwork(networkData: NetworkData<ItemNetwork>) : Network<ItemNetwork>,
     
     internal val channels: Array<ItemDistributor?>
     private val transferRate: Int
+    val complexity: Int
     
     private var nextChannel = 0
     
     init {
         var transferRate = DEFAULT_TRANSFER_RATE
+        var complexity = 0
         val channelsBuilder = ItemChannelsBuilder()
         for ((node, faces) in nodes.values) {
             if (node is NetworkEndPoint) {
@@ -31,15 +33,21 @@ class ItemNetwork(networkData: NetworkData<ItemNetwork>) : Network<ItemNetwork>,
                     ?: continue
                 
                 channelsBuilder.addHolder(itemHolder, faces)
+                complexity++
             } else if (node is ItemBridge) {
                 transferRate = min(transferRate, node.itemTransferRate)
             }
         }
+        
         this.transferRate = transferRate
+        this.complexity = complexity
         channels = channelsBuilder.build()
     }
     
     internal fun tick() {
+        if (MAX_COMPLEXITY != -1 && complexity > MAX_COMPLEXITY)
+            return
+        
         val startingChannel = nextChannel
         var transfersLeft = transferRate
         do {
@@ -60,6 +68,7 @@ class ItemNetwork(networkData: NetworkData<ItemNetwork>) : Network<ItemNetwork>,
             .map { (defaultTransferRate, tickDelay) -> (defaultTransferRate * tickDelay).roundToInt() }
             .map { defaultTransferRate -> if (defaultTransferRate < 0) Int.MAX_VALUE else defaultTransferRate }
         val CHANNEL_AMOUNT: Int by ITEM_NETWORK.entry<Int>("channel_amount")
+        val MAX_COMPLEXITY: Int by ITEM_NETWORK.entry<Int>("max_complexity")
         
     }
     

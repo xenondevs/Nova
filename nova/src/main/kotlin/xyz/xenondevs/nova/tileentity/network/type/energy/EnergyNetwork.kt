@@ -20,6 +20,7 @@ class EnergyNetwork(networkData: NetworkData<EnergyNetwork>) : Network<EnergyNet
     private val providers = HashSet<EnergyHolder>()
     private val consumers = HashSet<EnergyHolder>()
     private val buffers = HashSet<EnergyHolder>()
+    private val complexity: Int
     
     private val transferRate: Long
     private val availableProviderEnergy: Long
@@ -31,6 +32,7 @@ class EnergyNetwork(networkData: NetworkData<EnergyNetwork>) : Network<EnergyNet
     
     init {
         var transferRate = DEFAULT_TRANSFER_RATE
+        var complexity = 0
         
         for ((node, faces) in networkData.nodes.values) {
             if (node is NetworkEndPoint) {
@@ -52,18 +54,24 @@ class EnergyNetwork(networkData: NetworkData<EnergyNetwork>) : Network<EnergyNet
                     NetworkConnectionType.EXTRACT -> providers += energyHolder
                     else -> throw IllegalArgumentException("Invalid connection config for $energyHolder")
                 }
+                
+                complexity++
             } else if (node is EnergyBridge) {
                 transferRate = min(transferRate, node.energyTransferRate)
             }
         }
         
         this.transferRate = transferRate
+        this.complexity = complexity
     }
     
     /**
      * Called every tick to transfer energy.
      */
     fun tick() {
+        if (MAX_COMPLEXITY != -1 && complexity > MAX_COMPLEXITY)
+            return
+        
         val providerEnergy = min(transferRate, availableProviderEnergy)
         val bufferEnergy = min(transferRate - providerEnergy, availableBufferEnergy)
         val requestedEnergy = min(transferRate, requestedConsumerEnergy)
@@ -154,6 +162,7 @@ class EnergyNetwork(networkData: NetworkData<EnergyNetwork>) : Network<EnergyNet
         val DEFAULT_TRANSFER_RATE: Long by combinedProvider(ENERGY_NETWORK.entry<Double>("default_transfer_rate"), TICK_DELAY_PROVIDER)
             .map { (defaultTransferRate, tickDelay) -> (defaultTransferRate * tickDelay).roundToLong() }
             .map { defaultTransferRate -> if (defaultTransferRate < 0) Long.MAX_VALUE else defaultTransferRate }
+        val MAX_COMPLEXITY: Int by ENERGY_NETWORK.entry<Int>("max_complexity")
         
     }
     

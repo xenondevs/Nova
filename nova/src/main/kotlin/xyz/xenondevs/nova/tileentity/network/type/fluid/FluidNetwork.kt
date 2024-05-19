@@ -19,11 +19,13 @@ class FluidNetwork(networkData: NetworkData<FluidNetwork>) : Network<FluidNetwor
     
     private val channels: Array<FluidNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     private val transferRate: Long
+    private val complexity: Int
     
     private var nextChannel = 0
     
     init {
         var transferRate = DEFAULT_TRANSFER_RATE
+        var complexity = 0
         
         for ((node, faces) in networkData.nodes.values) {
             if (node is NetworkEndPoint) {
@@ -36,18 +38,24 @@ class FluidNetwork(networkData: NetworkData<FluidNetwork>) : Network<FluidNetwor
                         channel.addHolder(fluidHolder, face)
                     }
                 }
+                
+                complexity++
             } else if (node is FluidBridge) {
                 transferRate = min(transferRate, node.fluidTransferRate)
             }
         }
         
         this.transferRate = transferRate
+        this.complexity = complexity
         
         for (channel in channels)
             channel?.createDistributor()
     }
     
     fun tick() {
+        if (MAX_COMPLEXITY != -1 && complexity > MAX_COMPLEXITY)
+            return
+        
         val startingChannel = nextChannel
         var amountLeft = transferRate
         do {
@@ -66,6 +74,7 @@ class FluidNetwork(networkData: NetworkData<FluidNetwork>) : Network<FluidNetwor
             .map { (defaultTransferRate, tickDelay) -> (defaultTransferRate * tickDelay).roundToLong() }
             .map { defaultTransferRate -> if (defaultTransferRate < 0) Long.MAX_VALUE else defaultTransferRate }
         val CHANNEL_AMOUNT: Int by FLUID_NETWORK.entry<Int>("channel_amount")
+        val MAX_COMPLEXITY: Int by FLUID_NETWORK.entry<Int>("max_complexity")
         
     }
     
