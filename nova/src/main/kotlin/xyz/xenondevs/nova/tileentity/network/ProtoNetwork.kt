@@ -49,6 +49,7 @@ class ProtoNetwork<T : Network<T>>(
      * Whether this [ProtoNetwork] has been modified since the last [network] was built from it.
      */
     var dirty = true
+        private set
     
     /**
      * Adds all [ProtoNetwork.nodes] of the given [ProtoNetwork] to this [ProtoNetwork].
@@ -59,7 +60,7 @@ class ProtoNetwork<T : Network<T>>(
             val (_, myFaces) = this.nodes.getOrPut(node.pos) { MutableNetworkNodeConnection(node) }
             myFaces += faces
         }
-        dirty = true
+        markDirty()
     }
     
     /**
@@ -67,7 +68,7 @@ class ProtoNetwork<T : Network<T>>(
      */
     fun addBridge(bridge: NetworkBridge) {
         nodes[bridge.pos] = MutableNetworkNodeConnection(bridge, Collections.emptySet())
-        dirty = true
+        markDirty()
     }
     
     /**
@@ -81,12 +82,12 @@ class ProtoNetwork<T : Network<T>>(
         val presentFaces = nodes[endPoint.pos]?.faces
         if (presentFaces != null) {
             if (presentFaces.add(face)) {
-                dirty = true
+                markDirty()
             }
             return false
         } else {
             nodes[endPoint.pos] = MutableNetworkNodeConnection(endPoint, EnumSet.of(face))
-            dirty = true
+            markDirty()
             return true
         }
     }
@@ -102,12 +103,12 @@ class ProtoNetwork<T : Network<T>>(
         val presentFaces = nodes[endPoint.pos]?.faces
         if (presentFaces != null) {
             if (presentFaces.addAll(faces)) {
-                dirty = true
+                markDirty()
             }
             return false
         } else {
             nodes[endPoint.pos] = MutableNetworkNodeConnection(endPoint, faces.toEnumSet())
-            dirty = true
+            markDirty()
             return true
         }
     }
@@ -120,7 +121,7 @@ class ProtoNetwork<T : Network<T>>(
      */
     fun removeNode(node: NetworkNode): Boolean {
         if (nodes.remove(node.pos) != null) {
-            dirty = true
+            markDirty()
             return true
         }
         return false
@@ -138,7 +139,7 @@ class ProtoNetwork<T : Network<T>>(
             ?: return false
         
         if (presentFaces.remove(face)) {
-            dirty = true
+            markDirty()
         }
         
         if (presentFaces.isEmpty()) {
@@ -156,7 +157,7 @@ class ProtoNetwork<T : Network<T>>(
         for (node in nodes) {
             this.nodes -= node.pos
         }
-        dirty = true
+        markDirty()
     }
     
     /**
@@ -169,7 +170,7 @@ class ProtoNetwork<T : Network<T>>(
             ?: throw IllegalStateException("No node present at ${node.pos}")
         
         nodes[node.pos] = connection.copy(node = node)
-        dirty = true
+        markDirty()
     }
     
     /**
@@ -180,7 +181,7 @@ class ProtoNetwork<T : Network<T>>(
             ?: return
         
         nodes[node.pos] = connection.copy(node = GhostNetworkNode.fromNode(node))
-        dirty = true
+        markDirty()
     }
     
     /**
@@ -320,6 +321,22 @@ class ProtoNetwork<T : Network<T>>(
                 con.copy(faces = con.faces.toEnumSet())
             }
         )
+    
+    /**
+     * Marks this [ProtoNetwork] and its [cluster] as dirty,
+     * requiring them to be rebuilt.
+     */
+    fun markDirty() {
+        dirty = true
+        cluster?.dirty = true
+    }
+    
+    /**
+     * Marks this [ProtoNetwork] as clean, indicating that it has been rebuilt.
+     */
+    internal fun markClean() {
+        dirty = false
+    }
     
     companion object {
         

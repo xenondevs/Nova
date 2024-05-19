@@ -108,7 +108,7 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
             if (holder.connectionConfig[face] !in allowedTypes)
                 holder.connectionConfig[face] = allowedTypes[0]
             
-            state.getNetwork(endPoint, networkType, face)?.dirty = true
+            state.getNetwork(endPoint, networkType, face)?.markDirty()
             state.handleEndPointAllowedFacesChange(endPoint, networkType, face)
             
             // update ui

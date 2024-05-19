@@ -116,15 +116,21 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
         val data = protoNetwork.immutableCopy()
         val network = protoNetwork.type.create(data)
         protoNetwork.network = network
-        protoNetwork.dirty = false
+        protoNetwork.markClean()
     }
     
     private fun buildClusters(): List<NetworkCluster> {
         val protoClusters = state.networks.mapTo(HashSet()) { it.cluster ?: throw IllegalStateException("Cluster for $it is uninitialized") }
         if (IS_DEV_SERVER)
             verifyClusters(protoClusters)
-        val clusters = protoClusters.map { NetworkCluster(it.uuid, it.map(ProtoNetwork<*>::network)) }
-        return clusters
+        
+        return protoClusters.map { protoCluster ->
+            if (protoCluster.dirty) {
+                protoCluster.cluster = NetworkCluster(protoCluster.uuid, protoCluster.map(ProtoNetwork<*>::network))
+                protoCluster.dirty = false
+            }
+            return@map protoCluster.cluster
+        }
     }
     
     private fun verifyClusters(protoClusters: Set<ProtoNetworkCluster>) {

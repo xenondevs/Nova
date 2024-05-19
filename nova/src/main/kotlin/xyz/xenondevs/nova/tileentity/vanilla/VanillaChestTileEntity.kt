@@ -67,7 +67,7 @@ internal class VanillaChestTileEntity internal constructor(
         
         NetworkManager.queueWrite(pos.world) { state ->
             setInventory(inventory)
-            state.forEachNetwork(this) { _, _, network -> network.dirty = true }
+            state.forEachNetwork(this) { _, _, network -> network.markDirty() }
         }
     }
     

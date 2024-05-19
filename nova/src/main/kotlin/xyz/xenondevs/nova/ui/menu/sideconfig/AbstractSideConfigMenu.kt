@@ -71,7 +71,7 @@ internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
             val currentType = getConnectionType(face)
             setConnectionType(face, allowedTypes.after(currentType, move))
             
-            state.getNetwork(endPoint, networkType, face)?.dirty = true
+            state.getNetwork(endPoint, networkType, face)?.markDirty()
             state.handleEndPointAllowedFacesChange(endPoint, networkType, face)
             
             // ui update

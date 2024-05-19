@@ -5,15 +5,18 @@ import xyz.xenondevs.nova.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.tileentity.network.type.NetworkType
 import java.util.*
 import java.util.logging.Level
+import kotlin.random.Random
 
 class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     
-    // It might make sense to add a random offset to the current tick count in order to spread out the network ticks
-    // of networks with tick delay > 1, but this would create inconsistent transfer rates in cases where clusters
-    // are rebuilt (thus regenerating the offset) very often.
-    
+    private val tickOffset: Int // load balancing
     private val groups = networks.groupBy { it.type }
         .map { (type, networks) -> createGroup(type, networks) }
+    
+    init {
+        val maxTickDelay = networks.maxOfOrNull { it.type.tickDelay } ?: 1
+        tickOffset = Random.nextInt(maxTickDelay)
+    }
     
     fun preTickSync(tick: Int) = tickNetworks(tick, NetworkGroup<*>::preTickSync)
     fun preTick(tick: Int) = tickNetworks(tick, NetworkGroup<*>::preTick)
@@ -30,7 +33,7 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     private inline fun tickNetworks(tick: Int, tickFun: NetworkGroup<*>.() -> Unit) {
         for (group in groups) {
             val tickDelay = group.type.tickDelay
-            if (tick % tickDelay == 0) {
+            if ((tick + tickOffset) % tickDelay == 0) {
                 try {
                     tickFun.invoke(group)
                 } catch (e: Exception) {
@@ -53,23 +56,30 @@ class ProtoNetworkCluster : Iterable<ProtoNetwork<*>> {
     val uuid: UUID = UUID.randomUUID()
     private val networks = HashSet<ProtoNetwork<*>>()
     
+    lateinit var cluster: NetworkCluster
+    var dirty = true
+    
     operator fun plusAssign(network: ProtoNetwork<*>) {
-        networks += network
+        if (networks.add(network))
+            dirty = true
     }
     
     operator fun plusAssign(networks: Iterable<ProtoNetwork<*>>) {
-        this.networks += networks
+        if (this.networks.addAll(networks))
+            dirty = true
     }
     
     operator fun plusAssign(other: ProtoNetworkCluster?) {
         if (other == null)
             return
         
-        networks += other.networks
+        if (networks.addAll(other.networks))
+            dirty = true
     }
     
     operator fun minusAssign(network: ProtoNetwork<*>) {
-        networks -= network
+        if (networks.remove(network))
+            dirty = true
     }
     
     operator fun contains(network: ProtoNetwork<*>) =
