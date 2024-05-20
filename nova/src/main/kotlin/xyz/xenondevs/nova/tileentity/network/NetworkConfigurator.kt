@@ -1,9 +1,12 @@
 package xyz.xenondevs.nova.tileentity.network
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.channels.consumeEach
@@ -65,7 +68,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
      */
     fun queueTask(task: NetworkTask) = runBlocking {
         if (task is ProtectedNodeNetworkTask)
-            protectionResults[task] = async { queryProtection(task.node) }
+            protectionResults[task] = async(Dispatchers.Default) { queryProtection(task.node) }
         
         channel.send(task)
     }
@@ -99,38 +102,48 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
             if (!hasWritten)
                 return
             
-            buildDirtyNetworks()
             ticker.submit(world, buildClusters())
         }
     }
     
-    private suspend fun buildDirtyNetworks() = coroutineScope {
-        for (protoNetwork in state.networks) {
-            if (protoNetwork.dirty) {
-                launch { buildNetwork(protoNetwork) }
-            }
-        }
+    private suspend fun buildClusters(): List<NetworkCluster> = coroutineScope {
+        // collect proto clusters
+        val protoClusters = state.networks
+            .mapTo(HashSet()) { it.cluster ?: throw IllegalStateException("Cluster for $it is uninitialized") }
+        // debug: verify proto clusters
+        if (IS_DEV_SERVER)
+            verifyClusters(protoClusters)
+        
+        // build clusters
+        return@coroutineScope protoClusters
+            .map { cluster ->
+                if (cluster.dirty) {
+                    async { buildDirtyCluster(cluster) }
+                } else {
+                    CompletableDeferred(cluster.cluster)
+                }
+            }.awaitAll()
     }
     
-    private fun <T : Network<T>> buildNetwork(protoNetwork: ProtoNetwork<T>) {
+    private fun buildDirtyCluster(protoCluster: ProtoNetworkCluster): NetworkCluster {
+        val networks = ArrayList<Network<*>>()
+        for (protoNetwork in protoCluster) {
+            networks += if (protoNetwork.dirty) buildDirtyNetwork(protoNetwork) else protoNetwork.network
+        }
+        
+        val cluster = NetworkCluster(protoCluster.uuid, networks)
+        protoCluster.cluster = cluster
+        protoCluster.dirty = false
+        
+        return cluster
+    }
+    
+    private fun <T : Network<T>> buildDirtyNetwork(protoNetwork: ProtoNetwork<T>): Network<T> {
         val data = protoNetwork.immutableCopy()
         val network = protoNetwork.type.create(data)
         protoNetwork.network = network
         protoNetwork.markClean()
-    }
-    
-    private fun buildClusters(): List<NetworkCluster> {
-        val protoClusters = state.networks.mapTo(HashSet()) { it.cluster ?: throw IllegalStateException("Cluster for $it is uninitialized") }
-        if (IS_DEV_SERVER)
-            verifyClusters(protoClusters)
-        
-        return protoClusters.map { protoCluster ->
-            if (protoCluster.dirty) {
-                protoCluster.cluster = NetworkCluster(protoCluster.uuid, protoCluster.map(ProtoNetwork<*>::network))
-                protoCluster.dirty = false
-            }
-            return@map protoCluster.cluster
-        }
+        return network
     }
     
     private fun verifyClusters(protoClusters: Set<ProtoNetworkCluster>) {
