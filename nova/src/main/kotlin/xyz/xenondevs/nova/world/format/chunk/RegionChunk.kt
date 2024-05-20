@@ -223,6 +223,7 @@ internal class RegionChunk(
         
         if (previous != null) {
             previous.handleDisable()
+            previous.isEnabled = false
             cancelAndUnregisterAsyncTicker(previous)
         }
         
