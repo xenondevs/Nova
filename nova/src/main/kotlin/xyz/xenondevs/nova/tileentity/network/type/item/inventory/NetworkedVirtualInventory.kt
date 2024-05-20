@@ -18,14 +18,6 @@ open class NetworkedInvUIInventory(
     override val size: Int
         get() = inventory.size
     
-    override fun get(slot: Int): ItemStack {
-        return inventory.getUnsafeItem(slot)?.nmsCopy ?: ItemStack.EMPTY
-    }
-    
-    override fun set(slot: Int, itemStack: ItemStack) {
-        inventory.setItem(updateReason, slot, itemStack.bukkitMirror)
-    }
-    
     override fun add(itemStack: ItemStack, amount: Int): Int {
         val itemStackWithCount = itemStack.copyWithCount(amount).bukkitMirror
         return inventory.addItem(updateReason, itemStackWithCount)
@@ -72,7 +64,7 @@ open class NetworkedInvUIInventory(
         if (this == other)
             return false
         
-        if (other is NetworkedMultiVirtualInventory && other.inventories.any { it == inventory })
+        if (other is NetworkedMultiVirtualInventory && other.inventories.keys.any { it == inventory })
             return false
         
         return true
@@ -106,6 +98,12 @@ class NetworkedVirtualInventory(
          */
         val UPDATE_REASON = object : UpdateReason {}
         
+    }
+    
+    init {
+        virtualInventory.addResizeHandler { _, _ ->
+            throw UnsupportedOperationException("Networked inventories cannot be resized") 
+        }
     }
     
 }

@@ -61,9 +61,7 @@ import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.item.ItemStack as MojangStack
 
 val ItemStack.novaItem: NovaItem?
-    get() = (itemMeta?.unhandledTags?.get("nova") as? CompoundTag)
-        ?.getString("id")
-        ?.let(NovaRegistries.ITEM::get)
+    get() = nmsVersion.novaItem
 
 val MojangStack.novaItem: NovaItem?
     get() = tag?.getCompound("nova")

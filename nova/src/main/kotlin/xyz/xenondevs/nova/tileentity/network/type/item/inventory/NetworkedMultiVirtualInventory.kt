@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package xyz.xenondevs.nova.tileentity.network.type.item.inventory
 
 import net.minecraft.world.item.ItemStack
@@ -8,7 +10,6 @@ import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedVirtua
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsCopy
-import xyz.xenondevs.nova.util.nmsVersion
 import java.util.*
 
 internal class NetworkedMultiVirtualInventory(
@@ -16,29 +17,37 @@ internal class NetworkedMultiVirtualInventory(
     inventories: Map<VirtualInventory, NetworkConnectionType>
 ) : NetworkedInventory {
     
-    val inventories: List<VirtualInventory> =
-        inventories.keys.sortedByDescending { it.guiPriority }
+    override val size: Int = inventories.keys.sumOf(VirtualInventory::getSize)
     
-    private val invToConType: Map<VirtualInventory, NetworkConnectionType> =
-        TreeMap<VirtualInventory, NetworkConnectionType>(compareByDescending { it.guiPriority })
-            .apply { putAll(inventories) }
+    val inventories: Map<VirtualInventory, NetworkConnectionType> =
+        inventories.entries
+            .sortedBy { (inv, _) -> inv.guiPriority }
+            .associate { it.toPair() }
     
-    override val size: Int
-        get() = inventories.sumOf(VirtualInventory::getSize)
+    private val inventoryBySlot: Array<VirtualInventory>
+    private val invSlotBySlot: IntArray
     
-    override fun get(slot: Int): ItemStack {
-        val (inv, invSlot) = getSlot(slot)
-        return inv.getUnsafeItem(invSlot).nmsVersion
-    }
-    
-    override fun set(slot: Int, itemStack: ItemStack) {
-        val (inv, invSlot) = getSlot(slot)
-        inv.forceSetItem(UPDATE_REASON, invSlot, itemStack.bukkitMirror)
+    init {
+        val inventoryBySlot = Array<VirtualInventory?>(size) { null }
+        val invSlotBySlot = IntArray(size)
+        
+        var slot = 0
+        for (inventory in this.inventories.keys) {
+            inventory.addResizeHandler { _, _ -> throw UnsupportedOperationException("Networked inventories cannot be resized") }
+            for (invSlot in 0..<inventory.size) {
+                inventoryBySlot[slot] = inventory
+                invSlotBySlot[slot] = invSlot
+                slot++
+            }
+        }
+        
+        this.inventoryBySlot = inventoryBySlot as Array<VirtualInventory>
+        this.invSlotBySlot = invSlotBySlot
     }
     
     override fun add(itemStack: ItemStack, amount: Int): Int {
-        var amountLeft = itemStack.count
-        for ((inv, conType) in invToConType) {
+        var amountLeft = amount
+        for ((inv, conType) in inventories) {
             if (!conType.insert)
                 continue
             
@@ -52,9 +61,10 @@ internal class NetworkedMultiVirtualInventory(
     }
     
     override fun canTake(slot: Int, amount: Int): Boolean {
-        val (inv, invSlot) = getSlot(slot)
+        val inv = inventoryBySlot[slot]
         if (inv.preUpdateHandler == null)
             return true
+        val invSlot = invSlotBySlot[slot]
         
         val itemStack = inv.getUnsafeItem(invSlot) ?: return true
         val newAmount = itemStack.amount - amount
@@ -69,7 +79,9 @@ internal class NetworkedMultiVirtualInventory(
     }
     
     override fun take(slot: Int, amount: Int) {
-        val (inv, invSlot) = getSlot(slot)
+        val inv = inventoryBySlot[slot]
+        val invSlot = invSlotBySlot[slot]
+        
         val prev = inv.getItem(invSlot) ?: return
         inv.addItemAmount(UpdateReason.SUPPRESSED, invSlot, -amount)
         val post = inv.getItem(invSlot)
@@ -77,16 +89,16 @@ internal class NetworkedMultiVirtualInventory(
     }
     
     override fun isFull(): Boolean {
-        return inventories.all(VirtualInventory::isFull)
+        return inventories.keys.all(VirtualInventory::isFull)
     }
     
     override fun isEmpty(): Boolean {
-        return inventories.all(VirtualInventory::isEmpty)
+        return inventories.keys.all(VirtualInventory::isEmpty)
     }
     
     override fun copyContents(destination: Array<ItemStack>) {
         var invStartIdx = 0
-        for ((inv, conType) in invToConType) {
+        for ((inv, conType) in inventories) {
             if (conType.extract) {
                 for ((idx, itemStack) in inv.unsafeItems.withIndex()) {
                     destination[invStartIdx + idx] = itemStack.nmsCopy
@@ -97,25 +109,14 @@ internal class NetworkedMultiVirtualInventory(
         }
     }
     
-    private fun getSlot(slot: Int): Pair<VirtualInventory, Int> {
-        var invSlot = slot
-        inventories.forEach { inv ->
-            val size = inv.size
-            if (invSlot < size) return inv to invSlot
-            invSlot -= size
-        }
-        
-        throw IndexOutOfBoundsException("Slot $slot is out of bounds for this inventories: $inventories")
-    }
-    
     override fun canExchangeItemsWith(other: NetworkedInventory): Boolean {
         if (this == other)
             return false
         
-        if (other is NetworkedVirtualInventory && inventories.any { it.uuid == other.virtualInventory.uuid })
+        if (other is NetworkedVirtualInventory && other.virtualInventory in inventories)
             return false
         
-        if (other is NetworkedMultiVirtualInventory && inventories.any { myInv -> other.inventories.any { otherInv -> myInv.uuid == otherInv.uuid } })
+        if (other is NetworkedMultiVirtualInventory && other.inventories.keys.any { it in inventories })
             return false
         
         return true

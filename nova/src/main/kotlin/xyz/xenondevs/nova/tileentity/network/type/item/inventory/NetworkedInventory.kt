@@ -11,16 +11,6 @@ interface NetworkedInventory : EndPointContainer {
     val size: Int
     
     /**
-     * Gets the [ItemStack] on a specific slot. May or may not be a copy.
-     */
-    fun get(slot: Int): ItemStack
-    
-    /**
-     * Places [itemStack] on [slot], may or may not be copied.
-     */
-    fun set(slot: Int, itemStack: ItemStack)
-    
-    /**
      * Adds an [amount] of [itemStack] to the inventory and returns how many items have been left over.
      * The [ItemStack.count] should be ignored, and the [itemStack] should not be modified.
      */

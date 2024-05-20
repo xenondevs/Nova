@@ -13,14 +13,6 @@ internal open class NetworkedNMSInventory(
     override val uuid = UUID(0L, 0L)
     override val size = container.size
     
-    override fun get(slot: Int): ItemStack {
-        return container[slot]
-    }
-    
-    override fun set(slot: Int, itemStack: ItemStack) {
-        container[slot] = itemStack
-    }
-    
     override fun add(itemStack: ItemStack, amount: Int): Int {
         val maxStackSize = itemStack.maxStackSize
         var remaining = amount
