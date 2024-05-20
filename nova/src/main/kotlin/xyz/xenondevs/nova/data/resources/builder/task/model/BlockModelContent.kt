@@ -81,10 +81,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
             "ModelContent#discoverAllModels",
             "ItemModelContent#loadOverrides"
         ],
-        runBefore = [
-            "BlockModelContent#writeBlockStateFiles",
-            "SoundOverrides#write"
-        ]
+        runBefore = ["BlockModelContent#writeBlockStateFiles"]
     )
     private fun assignBlockModels() {
         val lookup = HashMap<NovaBlockState, LinkedBlockModelProvider<*>>()
@@ -143,7 +140,6 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         
         modelContent.rememberUsage(variant.model)
         blockStateVariants.getOrPut(cfg.type) { HashBiMap.create() }[cfg] = variant
-        soundOverrides.useMaterial(cfg.type.material)
         
         return cfg
     }

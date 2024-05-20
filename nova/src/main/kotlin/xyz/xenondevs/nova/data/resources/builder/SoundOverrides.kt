@@ -6,6 +6,7 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import org.bukkit.Material
 import org.bukkit.SoundGroup
+import org.bukkit.block.data.BlockData
 import xyz.xenondevs.commons.gson.getBooleanOrNull
 import xyz.xenondevs.commons.gson.getOrPut
 import xyz.xenondevs.commons.gson.getStringOrNull
@@ -15,7 +16,13 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.task.PackTask
 import xyz.xenondevs.nova.data.resources.builder.task.PackTaskHolder
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.item.soundGroup
+import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import java.nio.file.Path
 import java.util.logging.Level
 import kotlin.io.path.exists
@@ -42,7 +49,7 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
         addSoundEvent(SoundEvents.ARMOR_EQUIP_TURTLE)
     }
     
-    fun useMaterial(material: Material) {
+    private fun useMaterial(material: Material) {
         val soundGroup = material.soundGroup
         if (soundGroup !in soundGroups) {
             addSoundGroup(soundGroup)
@@ -59,6 +66,31 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
     
     private fun addSoundEvent(event: SoundEvent) {
         soundEvents += event.location.path
+    }
+    
+    @PackTask(
+        runAfter = ["BlockModelContent#assignBlockModels"],
+        runBefore = ["SoundOverrides#write"]
+    )
+    private fun findUsedBlockTypes() {
+        for (block in NovaRegistries.BLOCK) {
+            for (blockState in block.blockStates) {
+                when (blockState.modelProvider.provider) {
+                    DisplayEntityBlockModelProvider -> {
+                        val info = blockState.modelProvider.info as DisplayEntityBlockModelData
+                        useMaterial(info.hitboxType.material)
+                    }
+                    BackingStateBlockModelProvider -> {
+                        val info = blockState.modelProvider.info as BackingStateConfig
+                        useMaterial(info.vanillaBlockState.bukkitMaterial)
+                    }
+                    ModelLessBlockModelProvider -> {
+                        val info = blockState.modelProvider.info as BlockData
+                        useMaterial(info.material)
+                    }
+                }
+            }
+        }
     }
     
     @PackTask
