@@ -140,7 +140,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     
     private fun <T : Network<T>> buildDirtyNetwork(protoNetwork: ProtoNetwork<T>): Network<T> {
         val data = protoNetwork.immutableCopy()
-        val network = protoNetwork.type.create(data)
+        val network = protoNetwork.type.createNetwork(data)
         protoNetwork.network = network
         protoNetwork.markClean()
         return network

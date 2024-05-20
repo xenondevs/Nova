@@ -27,7 +27,7 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     @Suppress("UNCHECKED_CAST", "USELESS_CAST")
     private fun <T : Network<T>> createGroup(type: NetworkType<*>, networks: List<*>): NetworkGroup<T> {
         val data = ImmutableNetworkGroupData(type as NetworkType<T>, networks as List<T>)
-        return (type as NetworkType<T>).create(data)
+        return (type as NetworkType<T>).createGroup(data)
     }
     
     private inline fun tickNetworks(tick: Int, tickFun: NetworkGroup<*>.() -> Unit) {

@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network.type.item
 
+import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
@@ -8,6 +9,7 @@ import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkData
 import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
+import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.type.item.channel.ItemChannelsBuilder
 import xyz.xenondevs.nova.tileentity.network.type.item.channel.ItemDistributor
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.ItemHolder
@@ -15,7 +17,9 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 // TODO: block updates
-class ItemNetwork(networkData: NetworkData<ItemNetwork>) : Network<ItemNetwork>, NetworkData<ItemNetwork> by networkData {
+class ItemNetwork internal constructor(
+    networkData: NetworkData<ItemNetwork>
+) : Network<ItemNetwork>, NetworkData<ItemNetwork> by networkData {
     
     internal val channels: Array<ItemDistributor?>
     private val transferRate: Int
@@ -69,6 +73,15 @@ class ItemNetwork(networkData: NetworkData<ItemNetwork>) : Network<ItemNetwork>,
             .map { defaultTransferRate -> if (defaultTransferRate < 0) Int.MAX_VALUE else defaultTransferRate }
         val CHANNEL_AMOUNT: Int by ITEM_NETWORK.entry<Int>("channel_amount")
         val MAX_COMPLEXITY: Int by ITEM_NETWORK.entry<Int>("max_complexity")
+        
+        fun validateLocal(from: NetworkEndPoint, to: NetworkEndPoint, face: BlockFace): Boolean {
+            val itemHolderFrom = from.holders.firstInstanceOfOrNull<ItemHolder>() ?: return false
+            val itemHolderTo = to.holders.firstInstanceOfOrNull<ItemHolder>() ?: return false
+            val conFrom = itemHolderFrom.connectionConfig[face]
+            val conTo = itemHolderTo.connectionConfig[face.oppositeFace]
+            
+            return conFrom != conTo || conFrom == NetworkConnectionType.BUFFER
+        }
         
     }
     

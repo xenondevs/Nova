@@ -583,8 +583,6 @@ class NetworkState internal constructor(
      * Tries to connect [endPoint] to [bridge] from [face] over [networkType],
      * adding all [ProtoNetworks][ProtoNetwork] whose clusters need to be enlarged
      * with [endPoint] to [clustersToEnlarge].
-     *
-     * @return `true` if the action was successful
      */
     fun connectEndPointToBridge(
         endPoint: NetworkEndPoint, bridge: NetworkBridge,
@@ -610,11 +608,14 @@ class NetworkState internal constructor(
      *
      * @return `true` if the action was successful
      */
-    fun connectEndPointToEndPoint(
+    fun <T : Network<T>> connectEndPointToEndPoint(
         endPoint: NetworkEndPoint, other: NetworkEndPoint,
-        networkType: NetworkType<*>, face: BlockFace,
+        networkType: NetworkType<T>, face: BlockFace,
         clustersToInit: MutableSet<ProtoNetwork<*>>
-    ) {
+    ): Boolean {
+        if (!networkType.validateLocal(endPoint, other, face))
+            return false
+        
         val oppositeFace = face.oppositeFace
         
         // create a new "local" network
@@ -628,6 +629,8 @@ class NetworkState internal constructor(
         setNetwork(endPoint, face, network)
         setConnection(other, networkType, oppositeFace)
         setNetwork(other, oppositeFace, network)
+        
+        return true
     }
     
     /**

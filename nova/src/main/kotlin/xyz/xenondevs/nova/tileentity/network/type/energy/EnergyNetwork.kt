@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network.type.energy
 
+import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
@@ -15,7 +16,9 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 import kotlin.math.roundToLong
 
-class EnergyNetwork(networkData: NetworkData<EnergyNetwork>) : Network<EnergyNetwork>, NetworkData<EnergyNetwork> by networkData {
+class EnergyNetwork internal constructor(
+    networkData: NetworkData<EnergyNetwork>
+) : Network<EnergyNetwork>, NetworkData<EnergyNetwork> by networkData {
     
     private val providers = HashSet<EnergyHolder>()
     private val consumers = HashSet<EnergyHolder>()
@@ -163,6 +166,15 @@ class EnergyNetwork(networkData: NetworkData<EnergyNetwork>) : Network<EnergyNet
             .map { (defaultTransferRate, tickDelay) -> (defaultTransferRate * tickDelay).roundToLong() }
             .map { defaultTransferRate -> if (defaultTransferRate < 0) Long.MAX_VALUE else defaultTransferRate }
         val MAX_COMPLEXITY: Int by ENERGY_NETWORK.entry<Int>("max_complexity")
+        
+        internal fun validateLocal(from: NetworkEndPoint, to: NetworkEndPoint, face: BlockFace): Boolean {
+            val itemHolderFrom = from.holders.firstInstanceOfOrNull<EnergyHolder>() ?: return false
+            val itemHolderTo = to.holders.firstInstanceOfOrNull<EnergyHolder>() ?: return false
+            val conFrom = itemHolderFrom.connectionConfig[face]
+            val conTo = itemHolderTo.connectionConfig[face.oppositeFace]
+            
+            return conFrom != conTo || conFrom == NetworkConnectionType.BUFFER
+        }
         
     }
     
