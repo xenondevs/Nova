@@ -25,6 +25,7 @@ internal class LoadChunkTask(
     
     override suspend fun run(): Boolean {
         val updatedNetworks = ConcurrentHashMap<ProtoNetwork<*>, MutableSet<NetworkNode>>()
+        val networkLessNodes = ConcurrentHashMap.newKeySet<NetworkNode>()
         
         coroutineScope {
             val chunkNodes = NetworkManager.getNodes(pos).associateByTo(HashMap(), NetworkNode::pos)
@@ -37,16 +38,26 @@ internal class LoadChunkTask(
                 launch(Dispatchers.IO) { // state.resolveOrLoadNetwork likely causes file read
                     when {
                         node is NetworkBridge && data is NetworkBridgeData -> {
-                            for ((_, id) in data.networks) {
-                                val network = state.resolveOrLoadNetwork(id)
-                                updatedNetworks.compute(network) { _, nodes -> nodes?.also { it += node } ?: hashSetOf(node) }
+                            val networks = data.networks
+                            if (networks.isNotEmpty()) {
+                                for ((_, id) in networks) {
+                                    val network = state.resolveOrLoadNetwork(id)
+                                    updatedNetworks.compute(network) { _, nodes -> nodes?.also { it += node } ?: hashSetOf(node) }
+                                }
+                            } else {
+                                networkLessNodes += node
                             }
                         }
                         
                         node is NetworkEndPoint && data is NetworkEndPointData -> {
-                            for ((_, _, id) in data.networks) {
-                                val network = state.resolveOrLoadNetwork(id)
-                                updatedNetworks.compute(network) { _, nodes -> nodes?.also { it += node } ?: hashSetOf(node) }
+                            val networks = data.networks
+                            if (!networks.isEmpty) {
+                                for ((_, _, id) in networks) {
+                                    val network = state.resolveOrLoadNetwork(id)
+                                    updatedNetworks.compute(network) { _, nodes -> nodes?.also { it += node } ?: hashSetOf(node) }
+                                }
+                            } else {
+                                networkLessNodes += node
                             }
                         }
                         
@@ -54,6 +65,10 @@ internal class LoadChunkTask(
                     }
                 }
             }
+        }
+        
+        for (node in networkLessNodes) {
+            state += node
         }
         
         for ((network, nodes) in updatedNetworks) {
