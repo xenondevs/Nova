@@ -78,9 +78,9 @@ class NovaItem internal constructor(
     val model: ItemModelData by lazy {
         val material = vanillaMaterial
         val namedModels = ResourceLookups.NAMED_ITEM_MODEL[this]?.get(material)
-            ?: throw IllegalStateException("Could not retrieve named models for $this, $material")
+            ?: throw IllegalStateException("No named models for $this in resource lookups under $material")
         val unnamedModels = ResourceLookups.UNNAMED_ITEM_MODEL[this]?.get(material)
-            ?: throw IllegalStateException("Could not retrieve unnamed models for $this, $material")
+            ?: throw IllegalStateException("No unnamed models for $this in resource lookups under $material")
         return@lazy ItemModelData(this, material, namedModels, unnamedModels)
     }
     
