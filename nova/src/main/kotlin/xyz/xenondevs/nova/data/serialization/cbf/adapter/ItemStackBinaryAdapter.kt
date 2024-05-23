@@ -18,7 +18,7 @@ import kotlin.reflect.KType
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
-private object ItemStackSerializer {
+internal object ItemStackSerializer {
     
     fun read(id: UByte, reader: ByteReader): ItemStack {
         if (id == 1.toUByte())
@@ -45,7 +45,7 @@ private object ItemStackSerializer {
         NbtIo.write(nbt, writer.asDataOutput())
     }
     
-    private fun tryFix(tag: CompoundTag, fromVersion: Int, toVersion: Int): CompoundTag {
+    fun tryFix(tag: CompoundTag, fromVersion: Int, toVersion: Int): CompoundTag {
         return DataFixers.getDataFixer().update(
             References.ITEM_STACK,
             Dynamic(NbtOps.INSTANCE, tag),

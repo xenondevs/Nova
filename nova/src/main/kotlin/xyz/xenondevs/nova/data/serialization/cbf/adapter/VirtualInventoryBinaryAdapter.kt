@@ -6,9 +6,11 @@ import xyz.xenondevs.cbf.adapter.ComplexBinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.invui.inventory.VirtualInventory
+import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.ceilDiv
 import xyz.xenondevs.nova.util.item.isEmpty
+import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsVersion
 import java.util.*
 import kotlin.reflect.KType
@@ -23,18 +25,27 @@ internal object VirtualInventoryBinaryAdapter : ComplexBinaryAdapter<VirtualInve
         
         val dataInput = reader.asDataInput()
         
+        val dataVersion = reader.readVarInt()
         val uuid = reader.readUUID()
         val size = reader.readVarInt()
         
         val itemsMask = BitSet.valueOf(reader.readBytes(size.ceilDiv(8)))
         val items: Array<BukkitStack?> = Array(size) {
             if (itemsMask[it]) {
-                val nbt = NbtIo.read(dataInput)
-                MojangStack.of(nbt).bukkitMirror
+                val tag = ItemStackSerializer.tryFix(
+                    NbtIo.read(dataInput),
+                    dataVersion, NMSUtils.DATA_VERSION
+                )
+                MojangStack.of(tag).bukkitMirror.takeUnlessEmpty()
             } else null
         }
         
-        val maxStackSizes = if (reader.readBoolean()) IntArray(size) { reader.readVarInt() } else IntArray(size) { 64 }
+        val maxStackSizes: IntArray
+        if (reader.readBoolean()) {
+            maxStackSizes = IntArray(size) { reader.readVarInt() }
+        } else {
+            maxStackSizes = IntArray(size) { 64 }
+        }
         
         return VirtualInventory(uuid, size, items, maxStackSizes)
     }
@@ -55,6 +66,7 @@ internal object VirtualInventoryBinaryAdapter : ComplexBinaryAdapter<VirtualInve
         val items = obj.unsafeItems
         val maxStackSizes = obj.maxStackSizes
         
+        writer.writeVarInt(NMSUtils.DATA_VERSION)
         writer.writeUUID(uuid)
         writer.writeVarInt(size)
         
