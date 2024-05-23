@@ -6,8 +6,9 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.SimpleItem
+import xyz.xenondevs.nova.item.DefaultGuiItems
 
-fun clickableItem(provider: ItemProvider, run: (Player) -> Unit): Item {
+internal fun clickableItem(provider: ItemProvider, run: (Player) -> Unit): Item {
     
     return object : SimpleItem(provider) {
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -16,3 +17,13 @@ fun clickableItem(provider: ItemProvider, run: (Player) -> Unit): Item {
     }
     
 }
+
+val BUTTON_COLORS = listOf(
+    DefaultGuiItems.RED_BTN,
+    DefaultGuiItems.ORANGE_BTN,
+    DefaultGuiItems.YELLOW_BTN,
+    DefaultGuiItems.GREEN_BTN,
+    DefaultGuiItems.BLUE_BTN,
+    DefaultGuiItems.PINK_BTN,
+    DefaultGuiItems.WHITE_BTN
+)

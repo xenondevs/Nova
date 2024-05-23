@@ -11,6 +11,13 @@ import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
+/**
+ * An ui item for visualizing regions via [VisualRegion].
+ * 
+ * @param player the player to visualize the region for
+ * @param regionUUID the [UUID] of the region to visualize
+ * @param getRegion a function to receive the [Region]
+ */
 class VisualizeRegionItem(
     private val player: Player,
     private val regionUUID: UUID,

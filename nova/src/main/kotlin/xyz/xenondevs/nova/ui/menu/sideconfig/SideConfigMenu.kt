@@ -142,7 +142,7 @@ class SideConfigMenu(
                 "x x x x x x x x x",
                 "x x x x x x x x x"
             )
-            .addIngredient('<', BackItem(openPrevious))
+            .addIngredient('<', BackItem(openPrevious = openPrevious))
             .addIngredient('e', ClickyTabItem(0) {
                 (if (energyConfigMenu != null) {
                     if (it.currentTab == 0)

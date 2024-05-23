@@ -53,7 +53,7 @@ class ColorPickerWindow(
         .addIngredient('r', ChangeColorItem({ red }, { red = it }, "menu.nova.color_picker.red", ItemBuilder(Material.RED_DYE)))
         .addIngredient('g', ChangeColorItem({ green }, { green = it }, "menu.nova.color_picker.green", ItemBuilder(Material.LIME_DYE)))
         .addIngredient('b', ChangeColorItem({ blue }, { blue = it }, "menu.nova.color_picker.blue", ItemBuilder(Material.BLUE_DYE)))
-        .addIngredient('<', BackItem(openPrevious))
+        .addIngredient('<', BackItem(openPrevious = openPrevious))
         .build()
     
     init {
