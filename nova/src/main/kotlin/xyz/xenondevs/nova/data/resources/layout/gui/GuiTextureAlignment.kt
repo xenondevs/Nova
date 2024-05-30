@@ -14,6 +14,11 @@ private const val CHEST_GUI_WIDTH: Int = 176
 private val DEFAULT_CHEST_OFFSET: Vector2ic = Vector2i(-8, -13)
 
 /**
+ * The default offset that is required to perfectly overlap the anvil gui texture.
+ */
+private val DEFAULT_ANVIL_OFFSET: Vector2ic = Vector2i(-60, -13)
+
+/**
  * Generates offsets for gui textures.
  */
 interface GuiTextureAlignment {
@@ -41,6 +46,17 @@ interface GuiTextureAlignment {
         
         override fun getOffset(width: Int, height: Int): Vector2ic {
             return DEFAULT_CHEST_OFFSET
+        }
+        
+    }
+    
+    /**
+     * The default (top-left) alignment for anvil gui textures.
+     */
+    object AnvilDefault : GuiTextureAlignment {
+        
+        override fun getOffset(width: Int, height: Int): Vector2ic {
+            return DEFAULT_ANVIL_OFFSET
         }
         
     }

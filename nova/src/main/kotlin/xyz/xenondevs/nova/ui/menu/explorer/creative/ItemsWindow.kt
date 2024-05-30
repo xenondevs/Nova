@@ -16,6 +16,7 @@ import xyz.xenondevs.invui.gui.TabGui
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.setDisplayName
+import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.item.impl.controlitem.TabItem
 import xyz.xenondevs.invui.window.AnvilWindow
@@ -27,14 +28,11 @@ import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.item.ItemCategories
 import xyz.xenondevs.nova.item.ItemCategories.OBTAINABLE_ITEMS
 import xyz.xenondevs.nova.item.ItemCategory
+import xyz.xenondevs.nova.ui.menu.applyDefaultTPIngredients
 import xyz.xenondevs.nova.ui.menu.explorer.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.AnvilTextItem
-import xyz.xenondevs.nova.ui.menu.item.ScrollDownItem
-import xyz.xenondevs.nova.ui.menu.item.ScrollUpItem
 import xyz.xenondevs.nova.ui.menu.item.ToggleItem
-import xyz.xenondevs.nova.ui.menu.item.clickableItem
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
-import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.moveToStart
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import xyz.xenondevs.nova.util.playClickSound
@@ -53,15 +51,15 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     private var currentWindow: Window? = null
     
-    private val openSearchItem = clickableItem(
+    private val openSearchItem = SimpleItem(
         DefaultGuiItems.TP_SEARCH.model.createClientsideItemBuilder()
             .setDisplayName(Component.translatable("menu.nova.items.search-item"))
     ) { openSearchWindow() }
     
     private val toggleCheatModeItem = ToggleItem(
         player in cheaters,
-        DefaultGuiItems.TP_CHEATING_ON.model.createClientsideItemBuilder().setDisplayName(Component.translatable("menu.nova.items.cheat_mode.on")),
-        DefaultGuiItems.TP_CHEATING_OFF.model.createClientsideItemBuilder().setDisplayName(Component.translatable("menu.nova.items.cheat_mode.off")),
+        DefaultGuiItems.TP_CHEATING_ON.model.clientsideProvider,
+        DefaultGuiItems.TP_CHEATING_OFF.model.clientsideProvider,
     ) {
         if (player.hasPermission(GIVE_PERMISSION)) {
             player.persistentDataContainer.set(CHEAT_MODE_KEY, PersistentDataType.BOOLEAN, it)
@@ -71,7 +69,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         return@ToggleItem false
     }
     
-    private val openMainWindowItem = clickableItem(
+    private val openMainWindowItem = SimpleItem(
         DefaultGuiItems.ARROW_UP_ON.model.createClientsideItemBuilder()
             .setDisplayName(Component.translatable("menu.nova.items.search.back", NamedTextColor.GRAY))
     ) { openMainWindow() }
@@ -102,13 +100,14 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     private val searchResultsGui = PagedGui.items()
         .setStructure(
-            "# # # < s > # # #",
+            ". . . < s > . . .",
             "x x x x x x x x x",
             "x x x x x x x x x",
             "x x x x x x x x x",
             "x x x x x x x x x",
             "x x x x x x x x x"
         )
+        .applyDefaultTPIngredients()
         .addIngredient('s', openSearchItem)
         .build()
     
@@ -216,7 +215,6 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         }
         
         val title = Component.text()
-            .move(-60)
             .append(DefaultGuiTextures.SEARCH.component)
             .moveToStart()
             .append(Component.translatable("menu.nova.items.search", NamedTextColor.DARK_GRAY))
@@ -244,16 +242,9 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
                 "x x x x x x x x u",
                 "x x x x x x x x d"
             )
+            .applyDefaultTPIngredients()
             .addIngredient('s', openSearchItem)
             .addIngredient('c', toggleCheatModeItem)
-            .addIngredient('u', ScrollUpItem(
-                on = DefaultGuiItems.TP_ARROW_UP_ON.model.clientsideProvider, 
-                off = DefaultGuiItems.TP_ARROW_UP_OFF.model.clientsideProvider
-            ))
-            .addIngredient('d', ScrollDownItem(
-                on = DefaultGuiItems.TP_ARROW_DOWN_ON.model.clientsideProvider, 
-                off = DefaultGuiItems.TP_ARROW_DOWN_OFF.model.clientsideProvider
-            ))
             .setContent(category.items)
             .build()
     }

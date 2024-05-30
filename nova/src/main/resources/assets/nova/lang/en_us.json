@@ -38,7 +38,7 @@
   "menu.nova.side_config.simple_mode": "Simple Mode",
   "menu.nova.side_config.advanced_mode": "Advanced Mode",
   "menu.nova.side_config.simple_mode.unavailable": "Cannot switch to simple mode due to an advanced configuration.",
-  "menu.nova.paged.back": "Go back",
+  "menu.nova.paged.back": "Previous page",
   "menu.nova.paged.forward": "Next page",
   "menu.nova.paged.go_infinite": "Go to page %s",
   "menu.nova.paged.go": "Go to page %s/%s",

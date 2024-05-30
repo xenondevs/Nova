@@ -42,3 +42,24 @@ fun Structure.addIngredient(char: Char, inventory: Inventory, background: NovaIt
 
 fun <G: Gui, B : Gui.Builder<G, B>> Gui.Builder<G, B>.addIngredient(char: Char, inventory: Inventory, background: NovaItem) =
     addIngredient(char, inventory, background.model.clientsideProvider)
+
+internal fun <G : Gui, B : Gui.Builder<G, B>> B.applyDefaultTPIngredients(): B {
+    addIngredient('u', ScrollUpItem(
+        on = DefaultGuiItems.TP_ARROW_UP_ON.model.clientsideProvider,
+        off = DefaultGuiItems.TP_ARROW_UP_OFF.model.clientsideProvider
+    ))
+    addIngredient('d', ScrollDownItem(
+        on = DefaultGuiItems.TP_ARROW_DOWN_ON.model.clientsideProvider,
+        off = DefaultGuiItems.TP_ARROW_DOWN_OFF.model.clientsideProvider
+    ))
+    addIngredient('<', PageBackItem(
+        on = DefaultGuiItems.TP_ARROW_LEFT_ON.model.clientsideProvider,
+        off = DefaultGuiItems.TP_ARROW_LEFT_OFF.model.clientsideProvider
+    ))
+    addIngredient('>', PageForwardItem(
+        on = DefaultGuiItems.TP_ARROW_RIGHT_ON.model.clientsideProvider,
+        off = DefaultGuiItems.TP_ARROW_RIGHT_OFF.model.clientsideProvider
+    ))
+    
+    return this
+}
