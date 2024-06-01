@@ -110,7 +110,7 @@ internal class AddBridgeTask(
     ): ProtoNetwork<T> {
         // remove old networks
         for (previousNetwork in networks) {
-            state -= previousNetwork
+            state.deleteNetwork(previousNetwork)
         }
         
         // create and populate new network

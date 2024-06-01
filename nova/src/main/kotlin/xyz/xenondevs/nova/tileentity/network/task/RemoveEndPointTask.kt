@@ -29,7 +29,7 @@ internal class RemoveEndPointTask(
             network.removeNode(node)
             
             if (network.isEmpty()) {
-                state -= network
+                state.deleteNetwork(network)
                 reclusterize(network)
             } else {
                 reclusterize(network)

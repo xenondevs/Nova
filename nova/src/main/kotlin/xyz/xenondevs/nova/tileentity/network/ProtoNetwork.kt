@@ -340,12 +340,18 @@ class ProtoNetwork<T : Network<T>>(
     
     companion object {
         
+        private const val MAGIC: Int = 0x4E564E54 // "NVNT" 
+        private const val FILE_VERSION: Byte = 1
+        
         /**
          * Reads a [ProtoNetwork] from the given [reader].
          *
          * May suspend to wait for network region load.
          */
         internal suspend fun read(uuid: UUID, world: World, state: NetworkState, reader: ByteReader): ProtoNetwork<*> {
+            check(reader.readInt() == MAGIC) { "Invalid network file" }
+            check(reader.readByte() == FILE_VERSION) { "Invalid network file version" }
+            
             val type = NovaRegistries.NETWORK_TYPE.getOrThrow(reader.readString())
             val size = reader.readVarInt()
             val nodes = HashMap<BlockPos, MutableNetworkNodeConnection>()
@@ -369,6 +375,9 @@ class ProtoNetwork<T : Network<T>>(
          * Writes the given [network] to the [writer].
          */
         internal fun write(network: ProtoNetwork<*>, writer: ByteWriter) {
+            writer.writeInt(MAGIC)
+            writer.writeByte(FILE_VERSION)
+            
             writer.writeString(network.type.toString())
             writer.writeVarInt(network.nodes.size)
             for ((pos, connection) in network.nodes) {

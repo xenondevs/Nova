@@ -31,7 +31,7 @@ internal class RemoveBridgeTask(
             if (connectedBridges.size > 1) { // destroying this bridge might split network, recalculation required
                 val recalculatedNetworks = recalculateNetworks(node, connectedBridges, networkType)
                 if (recalculatedNetworks != null) { // null means no split in networks
-                    state -= currentNetwork
+                    state.deleteNetwork(currentNetwork)
                     state += recalculatedNetworks
                     reassignNetworks(recalculatedNetworks)
                     clustersToInit += recalculatedNetworks
@@ -46,7 +46,7 @@ internal class RemoveBridgeTask(
                 currentNetwork.removeNode(node)
                 
                 if (currentNetwork.isEmpty()) {
-                    state -= currentNetwork
+                    state.deleteNetwork(currentNetwork)
                     reclusterize(currentNetwork)
                 } else if (connectedEndPoints.isNotEmpty()) { // networks have not been split, only detached end points could de-cluster
                     reclusterize(currentNetwork)

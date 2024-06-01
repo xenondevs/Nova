@@ -51,8 +51,7 @@ internal class UnloadChunkTask(
         
         for (network in clustersToInit) {
             if (network.isUnloaded()) {
-                // TODO: save on unload
-//                state -= network
+                state.unloadNetwork(network)
             } else {
                 network.initCluster()
             }

@@ -12,7 +12,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.withContext
 import org.bukkit.World
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.io.ByteReader
@@ -56,6 +55,9 @@ class NetworkState internal constructor(
     
     private val networksById = ConcurrentHashMap<UUID, Deferred<ProtoNetwork<*>?>>()
     private val nodesByPos = HashMap<BlockPos, NetworkNode>()
+    
+    private val pendingRemovalNetworks = HashSet<UUID>()
+    private val pendingUnloadNetworks = ConcurrentHashMap<UUID, ProtoNetwork<*>>()
     
     /**
      * Mutex for all data governed by this [NetworkState].
@@ -103,10 +105,21 @@ class NetworkState internal constructor(
     }
     
     /**
-     * Removes [network] from the network state.
+     * Removes the [network] from the network state and schedules the deletion
+     * of its data from disk.
      */
-    operator fun minusAssign(network: ProtoNetwork<*>) {
+    fun deleteNetwork(network: ProtoNetwork<*>) {
         networksById -= network.uuid
+        pendingRemovalNetworks += network.uuid
+    }
+    
+    /**
+     * Unloads the [network] from the network state, but does not delete
+     * any data associated with it.
+     */
+    fun unloadNetwork(network: ProtoNetwork<*>) {
+        networksById -= network.uuid
+        pendingUnloadNetworks[network.uuid] = network
     }
     
     /**
@@ -147,6 +160,12 @@ class NetworkState internal constructor(
      */
     suspend fun resolveOrLoadNetwork(networkId: UUID): ProtoNetwork<*> = coroutineScope {
         return@coroutineScope networksById.computeIfAbsent(networkId) {
+            // The network might be unloaded, but not yet written to disk
+            val pendingNetwork = pendingUnloadNetworks.remove(networkId)
+            if (pendingNetwork != null)
+                return@computeIfAbsent CompletableDeferred(pendingNetwork)
+            
+            // The network needs to be read from disk
             async(Dispatchers.IO) { loadNetwork(networkId) }
         }.await() ?: throw IllegalArgumentException("Network with id $networkId not found")
     }
@@ -488,7 +507,7 @@ class NetworkState internal constructor(
     
     /**
      * Iterates over all networks of [bridge], calling [action] for each network.
-     * 
+     *
      * @throws IllegalStateException If there is no data for [bridge].
      * @throws IllegalStateException If a referenced network is currently being loaded.
      */
@@ -670,7 +689,7 @@ class NetworkState internal constructor(
         network.removeNode(other)
         
         check(network.isEmpty()) // this must've been a local network, so it should be empty now
-        this -= network
+        deleteNetwork(network)
         
         removeConnection(endPoint, networkType, face)
         removeConnection(other, networkType, oppositeFace)
@@ -718,22 +737,43 @@ class NetworkState internal constructor(
         neighbor?.handleNetworkUpdate(this)
     }
     
-    // TODO: versioning?
-    // TODO: deletion of removed networks
     internal fun save(scope: CoroutineScope) {
+        // save active networks
         for (deferredNetwork in networksById.values) {
-            scope.launch {
+            scope.launch(Dispatchers.IO) {
                 val network = deferredNetwork.await()
                     ?: return@launch
-                
-                withContext(Dispatchers.IO) {
-                    val file = File(storage.networkFolder, "${network.uuid}.nvnt")
-                    file.outputStream().buffered().use { out ->
-                        val writer = ByteWriter.fromStream(out)
-                        ProtoNetwork.write(network, writer)
-                    }
-                }
+                save(network)
             }
+        }
+        
+        // save unloaded networks
+        val pendingUnloadIterator = pendingUnloadNetworks.iterator()
+        while (pendingUnloadIterator.hasNext()) {
+            val (_, network) = pendingUnloadIterator.next()
+            if (network.isUnloaded()) {
+                pendingUnloadIterator.remove()
+                scope.launch(Dispatchers.IO) { save(network) }
+            }
+        }
+        
+        // delete removed networks
+        val pendingRemovalIterator = pendingRemovalNetworks.iterator()
+        while (pendingRemovalIterator.hasNext()) {
+            val networkId = pendingRemovalIterator.next()
+            pendingRemovalIterator.remove()
+            scope.launch(Dispatchers.IO) {
+                val file = File(storage.networkFolder, "$networkId.nvnt")
+                file.delete()
+            }
+        }
+    }
+    
+    private fun save(network: ProtoNetwork<*>) {
+        val file = File(storage.networkFolder, "${network.uuid}.nvnt")
+        file.outputStream().buffered().use { out ->
+            val writer = ByteWriter.fromStream(out)
+            ProtoNetwork.write(network, writer)
         }
     }
     
