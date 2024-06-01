@@ -20,16 +20,13 @@ import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.tileentity.network.node.NetworkNode
-import xyz.xenondevs.nova.tileentity.network.task.LoadChunkTask
 import xyz.xenondevs.nova.tileentity.network.task.NetworkTask
 import xyz.xenondevs.nova.tileentity.network.task.ProtectedNodeNetworkTask
 import xyz.xenondevs.nova.tileentity.network.task.ProtectionResult
-import xyz.xenondevs.nova.tileentity.network.task.UnloadChunkTask
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
-import kotlin.time.measureTime
 
 internal class NetworkConfigurator(private val world: World, private val ticker: NetworkTicker) {
     
@@ -50,13 +47,13 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     
     init {
         CoroutineScope(NetworkManager.SUPERVISOR).launch(CoroutineName("Network configurator ${world.name}")) {
-            channel.consumeEach {
+            channel.consumeEach { task ->
                 try {
-                    val time = measureTime { processTask(it) }
-                    if (it !is LoadChunkTask && it !is UnloadChunkTask)
-                        LOGGER.info("Executed NetworkTask: $it in $time")
+                    task.event.begin()
+                    processTask(task)
+                    task.event.commit()
                 } catch (e: Exception) {
-                    LOGGER.log(Level.SEVERE, "An exception occurred trying to process NetworkTask: $it", e)
+                    LOGGER.log(Level.SEVERE, "An exception occurred trying to process NetworkTask: $task", e)
                 }
             }
         }

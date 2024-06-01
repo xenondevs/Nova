@@ -1,5 +1,9 @@
 package xyz.xenondevs.nova.tileentity.network.task
 
+import jdk.jfr.Category
+import jdk.jfr.Event
+import jdk.jfr.Label
+import jdk.jfr.Name
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.tileentity.network.node.NetworkBridge
@@ -14,6 +18,21 @@ internal class UnloadChunkTask(
     state: NetworkState,
     private val pos: ChunkPos,
 ) : NetworkTask(state) {
+    
+    //<editor-fold desc="jfr event", defaultstate="collapsed">
+    @Suppress("unused")
+    @Name("xyz.xenondevs.UnloadChunkTask")
+    @Label("Unload Chunk")
+    @Category("Nova", "TileEntity Network")
+    private inner class UnloadChunkTaskEvent : Event() {
+        
+        @Label("Position")
+        val pos: String = this@UnloadChunkTask.pos.toString()
+        
+    }
+    
+    override val event: Event = UnloadChunkTaskEvent()
+    //</editor-fold>
     
     override suspend fun run(): Boolean {
         val clustersToInit = HashSet<ProtoNetwork<*>>()

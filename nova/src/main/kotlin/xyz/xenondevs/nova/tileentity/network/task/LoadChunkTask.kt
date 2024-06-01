@@ -1,5 +1,9 @@
 package xyz.xenondevs.nova.tileentity.network.task
 
+import jdk.jfr.Category
+import jdk.jfr.Event
+import jdk.jfr.Label
+import jdk.jfr.Name
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -22,6 +26,21 @@ internal class LoadChunkTask(
     state: NetworkState,
     private val pos: ChunkPos,
 ) : NetworkTask(state) {
+    
+    //<editor-fold desc="jfr event", defaultstate="collapsed">
+    @Suppress("unused")
+    @Name("xyz.xenondevs.LoadChunk")
+    @Label("Load Chunk")
+    @Category("Nova", "TileEntity Network")
+    private inner class LoadChunkTaskEvent : Event() {
+        
+        @Label("Position")
+        val pos: String = this@LoadChunkTask.pos.toString()
+        
+    }
+    
+    override val event: Event = LoadChunkTaskEvent()
+    //</editor-fold>
     
     override suspend fun run(): Boolean {
         val updatedNetworks = ConcurrentHashMap<ProtoNetwork<*>, MutableSet<NetworkNode>>()

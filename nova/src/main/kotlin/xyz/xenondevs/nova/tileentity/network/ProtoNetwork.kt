@@ -211,8 +211,6 @@ class ProtoNetwork<T : Network<T>>(
         if (cluster != null)
             return
         
-        println("Building cluster for network $uuid ($type)")
-        
         val cluster = ProtoNetworkCluster()
         val queue = LinkedList<ProtoNetwork<*>>()
         queue += this
@@ -230,7 +228,6 @@ class ProtoNetwork<T : Network<T>>(
      */
     fun enlargeCluster(node: NetworkNode) {
         val cluster = cluster ?: return initCluster()
-        println("Enlarging cluster for network $uuid ($type)")
         
         val queue = LinkedList<ProtoNetwork<*>>()
         queueWithRelatedNetworks(cluster, queue, node)
@@ -248,8 +245,6 @@ class ProtoNetwork<T : Network<T>>(
         val cluster = cluster ?: return initCluster()
         if (nodes.isEmpty())
             return
-        
-        println("Enlarging cluster for network $uuid ($type)")
         
         val queue = LinkedList<ProtoNetwork<*>>()
         for (node in nodes) {

@@ -1,5 +1,9 @@
 package xyz.xenondevs.nova.tileentity.network.task
 
+import jdk.jfr.Category
+import jdk.jfr.Event
+import jdk.jfr.Label
+import jdk.jfr.Name
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -16,6 +20,21 @@ internal class AddEndPointTask(
     node: NetworkEndPoint,
     updateNodes: Boolean
 ) : AddNodeTask<NetworkEndPoint>(state, node, updateNodes) {
+    
+    //<editor-fold desc="jfr event", defaultstate="collapsed">
+    @Suppress("unused")
+    @Name("xyz.xenondevs.AddEndPoint")
+    @Label("Add EndPoint")
+    @Category("Nova", "TileEntity Network")
+    private inner class AddEndPointTaskEvent : Event() {
+        
+        @Label("Position")
+        val pos: String = node.pos.toString()
+        
+    }
+    
+    override val event: Event = AddEndPointTaskEvent()
+    //</editor-fold>
     
     override fun add() {
         state.setEndPointData(

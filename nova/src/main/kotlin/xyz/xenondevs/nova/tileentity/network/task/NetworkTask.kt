@@ -1,10 +1,13 @@
 package xyz.xenondevs.nova.tileentity.network.task
 
-import xyz.xenondevs.nova.world.format.NetworkState
+import jdk.jfr.Event
 import xyz.xenondevs.nova.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.world.format.NetworkState
 
 internal sealed class NetworkTask(protected val state: NetworkState) {
  
+    abstract val event: Event
+    
     abstract suspend fun run(): Boolean
     
 }

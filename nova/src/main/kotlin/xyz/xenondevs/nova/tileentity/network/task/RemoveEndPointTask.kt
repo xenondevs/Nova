@@ -1,5 +1,9 @@
 package xyz.xenondevs.nova.tileentity.network.task
 
+import jdk.jfr.Category
+import jdk.jfr.Event
+import jdk.jfr.Label
+import jdk.jfr.Name
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
@@ -12,6 +16,21 @@ internal class RemoveEndPointTask(
     node: NetworkEndPoint,
     updateNodes: Boolean
 ) : RemoveNodeTask<NetworkEndPoint>(state, node, updateNodes) {
+    
+    //<editor-fold desc="jfr event", defaultstate="collapsed">
+    @Suppress("unused")
+    @Name("xyz.xenondevs.RemoveEndPoint")
+    @Label("Remove EndPoint")
+    @Category("Nova", "TileEntity Network")
+    private inner class RemoveEndPointTaskEvent : Event() {
+        
+        @Label("Position")
+        val pos: String = node.pos.toString()
+        
+    }
+    
+    override val event: Event = RemoveEndPointTaskEvent()
+    //</editor-fold>
     
     override fun remove() {
         // remove this endpoint from the connectedNodes map of all connected nodes

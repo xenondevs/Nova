@@ -1,5 +1,9 @@
 package xyz.xenondevs.nova.tileentity.network.task
 
+import jdk.jfr.Category
+import jdk.jfr.Event
+import jdk.jfr.Label
+import jdk.jfr.Name
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.tileentity.network.NetworkData
 import xyz.xenondevs.nova.tileentity.network.ProtoNetwork
@@ -19,6 +23,21 @@ internal class RemoveBridgeTask(
     node: NetworkBridge,
     updateNodes: Boolean
 ) : RemoveNodeTask<NetworkBridge>(state, node, updateNodes) {
+    
+    //<editor-fold desc="jfr event", defaultstate="collapsed">
+    @Suppress("unused")
+    @Name("xyz.xenondevs.RemoveBridge")
+    @Label("Remove Bridge")
+    @Category("Nova", "TileEntity Network")
+    private inner class AddBridgeTaskEvent : Event() {
+        
+        @Label("Position")
+        val pos: String = node.pos.toString()
+        
+    }
+    
+    override val event: Event = AddBridgeTaskEvent()
+    //</editor-fold>
     
     override fun remove() {
         for ((networkType, currentNetworkId) in state.getNetworks(node)) {

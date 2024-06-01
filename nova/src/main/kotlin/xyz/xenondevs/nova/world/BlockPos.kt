@@ -72,4 +72,8 @@ data class BlockPos(val world: World, val x: Int, val y: Int, val z: Int) {
         world.playSound(Location(world, x + .5, y + .5, z + .5), sound, volume, pitch)
     }
     
+    override fun toString(): String {
+        return "BlockPos(world=${world.name}, x=$x, y=$y, z=$z)"
+    }
+    
 }
