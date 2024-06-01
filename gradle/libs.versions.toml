@@ -9,7 +9,7 @@ kotlin = "2.0.0"
 kotlinx-coroutines = "1.8.0"
 ktor = "2.3.9"
 paper = "1.20.4-R0.1-SNAPSHOT"
-paperweight = "1.5.15"
+paperweight = "1.7.1"
 xenondevs-commons = "1.12"
 
 [libraries]
