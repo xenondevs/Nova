@@ -131,7 +131,7 @@ internal object Initializer : Listener {
         VanillaRegistryAccess.unfreezeAll()
         registerEvents()
         NMSUtilities.init(NOVA_PLUGIN)
-        InvUI.getInstance().plugin = NOVA_PLUGIN
+        InvUI.getInstance().setPlugin(NOVA_PLUGIN)
         InvUILanguages.getInstance().enableServerSideTranslations(false)
         CBFAdapters.register()
         InventoryUtils.stackSizeProvider = StackSizeProvider(ItemStack::novaMaxStackSize)
