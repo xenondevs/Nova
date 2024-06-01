@@ -19,11 +19,11 @@ interface ItemHolder : ContainerEndPointDataHolder<NetworkedInventory> {
     /**
      * Stores the insertion [ItemFilters][ItemFilter] per [BlockFace].
      */
-    val insertFilters: MutableMap<BlockFace, ItemFilter>
+    val insertFilters: MutableMap<BlockFace, ItemFilter<*>>
     
     /**
      * Stores the extraction [ItemFilters][ItemFilter] per [BlockFace].
      */
-    val extractFilters: MutableMap<BlockFace, ItemFilter>
+    val extractFilters: MutableMap<BlockFace, ItemFilter<*>>
     
 }

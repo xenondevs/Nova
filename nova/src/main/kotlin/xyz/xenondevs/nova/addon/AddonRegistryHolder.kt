@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.addon.registry.BlockRegistry
 import xyz.xenondevs.nova.addon.registry.EnchantmentCategoryRegistry
 import xyz.xenondevs.nova.addon.registry.EnchantmentRegistry
 import xyz.xenondevs.nova.addon.registry.GuiTextureRegistry
+import xyz.xenondevs.nova.addon.registry.ItemFilterTypeRegistry
 import xyz.xenondevs.nova.addon.registry.ItemRegistry
 import xyz.xenondevs.nova.addon.registry.MinecraftUtilTypeRegistry
 import xyz.xenondevs.nova.addon.registry.NetworkTypeRegistry
@@ -26,4 +27,4 @@ class AddonRegistryHolder internal constructor(
 ) : AbilityTypeRegistry, AttachmentTypeRegistry, BlockRegistry, EnchantmentCategoryRegistry, EnchantmentRegistry,
     ItemRegistry, NetworkTypeRegistry, RecipeTypeRegistry, ToolCategoryRegistry, ToolTierRegistry,
     WailaInfoProviderRegistry, MinecraftUtilTypeRegistry, BiomeRegistry, CarverRegistry, DimensionRegistry,
-    FeatureRegistry, NoiseRegistry, StructureRegistry, ArmorRegistry, GuiTextureRegistry
+    FeatureRegistry, NoiseRegistry, StructureRegistry, ArmorRegistry, GuiTextureRegistry, ItemFilterTypeRegistry

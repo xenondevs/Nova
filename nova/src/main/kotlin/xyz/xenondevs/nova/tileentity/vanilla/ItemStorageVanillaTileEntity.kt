@@ -19,7 +19,7 @@ internal abstract class ItemStorageVanillaTileEntity internal constructor(
         super.handleBreak()
         val centerLocation = pos.location.add(0.5, 0.0, 0.5)
         (itemHolder.insertFilters.values.asSequence() + itemHolder.extractFilters.values.asSequence())
-            .map(ItemFilter::createFilterItem)
+            .map(ItemFilter<*>::toItemStack)
             .forEach { centerLocation.dropItem(it) }
         
         itemHolder.insertFilters.clear()

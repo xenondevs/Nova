@@ -143,7 +143,7 @@ internal class ItemDistributor(
                 
                 // find the first item that can be extracted into the current consumer and perform the extraction
                 for ((slot, itemStack) in providerContent.withIndex()) {
-                    if (itemStack.isEmpty || consumer.deniesItem(itemStack) || !provider.inventory.canTake(slot, 1))
+                    if (itemStack.isEmpty || consumer.denies(itemStack) || !provider.inventory.canTake(slot, 1))
                         continue
                     
                     if (consumer.inventory.add(itemStack, 1) == 0) {
@@ -204,7 +204,7 @@ internal class ItemDistributor(
         
         var transfersLeft = transferAmount
         for ((slot, itemStack) in providerSnapshot.withIndex()) {
-            if (itemStack.isEmpty || consumer.deniesItem(itemStack))
+            if (itemStack.isEmpty || consumer.denies(itemStack))
                 continue
             
             val idealAmount = min(itemStack.count, transfersLeft)

@@ -119,12 +119,7 @@ internal val ItemStack.backingItemMeta: ItemMeta?
     }
 
 internal val ItemStack.handle: MojangStack?
-    get() {
-        if (this is CraftItemStack)
-            return ReflectionRegistry.CRAFT_ITEM_STACK_HANDLE_FIELD.get(this) as MojangStack?
-        
-        return null
-    }
+    get() = (this as? CraftItemStack)?.handle
 
 val ItemMeta.unhandledTags: MutableMap<String, NBTTag>
     get() = ReflectionRegistry.CRAFT_META_ITEM_UNHANDLED_TAGS_FIELD.get(this) as MutableMap<String, NBTTag>

@@ -86,7 +86,7 @@ internal class ItemNetworkGroup(data: NetworkGroupData<ItemNetwork>) : NetworkGr
         for ((provider, snapshot) in filteredProviderSnapshots) {
             val unfilteredSnapshot = providerSnapshots[provider.inventory]!!
             for ((slot, itemStack) in unfilteredSnapshot.withIndex()) {
-                snapshot[slot] = if (provider.deniesItem(itemStack)) ItemStack.EMPTY else itemStack
+                snapshot[slot] = if (provider.denies(itemStack)) ItemStack.EMPTY else itemStack
             }
         }
     }

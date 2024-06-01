@@ -142,9 +142,9 @@ abstract class NetworkedTileEntity(
         dropProvider {
             val itemFilters = ArrayList<ItemStack>()
             for (filter in holder.insertFilters.values)
-                itemFilters += filter.createFilterItem()
+                itemFilters += filter.toItemStack()
             for (filter in holder.extractFilters.values)
-                itemFilters += filter.createFilterItem()
+                itemFilters += filter.toItemStack()
             itemFilters
         }
     }

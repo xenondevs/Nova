@@ -38,7 +38,7 @@ internal object ItemStackSerializer {
     }
     
     fun write(obj: ItemStack, writer: ByteWriter) {
-        writer.writeUnsignedByte(1.toUByte())
+        writer.writeUnsignedByte(2.toUByte())
         
         writer.writeVarInt(NMSUtils.DATA_VERSION)
         val nbt = obj.save(CompoundTag())

@@ -1,4 +1,6 @@
 {
+  "item.nova.unknown_item_filter": "Unknown Item Filter",
+  "item.nova.unknown_item_filter.description": "The addon that manages this item filter type is either not present or did not register it.",
   "item.cbf_tags": "CBF: %s tag(s)",
   "block.nova.unknown": "Unknown Block",
   "block.nova.unknown.message": "No addon registered this block state: ID: %s, Serialized: %s",

@@ -64,12 +64,12 @@ class DefaultItemHolder(
         by compound.entry<MutableMap<BlockFace, Int>>("channels")
             .defaultsToLazily(DEFAULT_CHANNELS)
     
-    override val insertFilters: MutableMap<BlockFace, ItemFilter>
-        by compound.entry<MutableMap<BlockFace, ItemFilter>>("insertFilters")
+    override val insertFilters: MutableMap<BlockFace, ItemFilter<*>>
+        by compound.entry<MutableMap<BlockFace, ItemFilter<*>>>("insertFilters")
             .defaultsToLazily(::enumMap)
     
-    override val extractFilters: MutableMap<BlockFace, ItemFilter>
-        by compound.entry<MutableMap<BlockFace, ItemFilter>>("extractFilters")
+    override val extractFilters: MutableMap<BlockFace, ItemFilter<*>>
+        by compound.entry<MutableMap<BlockFace, ItemFilter<*>>>("extractFilters")
             .defaultsToLazily(::enumMap)
     
     override val insertPriorities: MutableMap<BlockFace, Int>

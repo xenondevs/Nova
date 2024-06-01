@@ -13,12 +13,12 @@ import java.util.*
 
 internal data class FilteredNetworkedInventory(
     val inventory: NetworkedInventory,
-    private val filter: ItemFilter?
+    private val filter: ItemFilter<*>?
 ) {
     
-    fun allowsItem(itemStack: ItemStack): Boolean = filter == null //|| filter.allowsItem(itemStack)
+    fun allows(itemStack: ItemStack): Boolean = filter == null || filter.allows(itemStack)
     
-    fun deniesItem(itemStack: ItemStack): Boolean = filter != null //&& !filter.allowsItem(itemStack)
+    fun denies(itemStack: ItemStack): Boolean = filter != null && !filter.allows(itemStack)
     
     fun canExchangeItemsWith(other: FilteredNetworkedInventory): Boolean = inventory.canExchangeItemsWith(other.inventory)
     

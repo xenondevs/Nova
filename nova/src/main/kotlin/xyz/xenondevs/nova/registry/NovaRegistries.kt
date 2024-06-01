@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.player.ability.AbilityType
 import xyz.xenondevs.nova.player.attachment.AttachmentType
 import xyz.xenondevs.nova.tileentity.network.type.NetworkType
+import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilterType
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
@@ -66,6 +67,9 @@ object NovaRegistries {
     
     @JvmField
     val WAILA_TOOL_ICON_PROVIDER = registerSimple<WailaToolIconProvider>("waila_tool_icon_provider")
+    
+    @JvmField
+    val ITEM_FILTER_TYPE = registerSimple<ItemFilterType<*>>("item_filter_type")
     
     private fun <E : Any> registerSimple( name: String): WritableRegistry<E> {
         val resourceLocation = ResourceLocation("nova", name)
