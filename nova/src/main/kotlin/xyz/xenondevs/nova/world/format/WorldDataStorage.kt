@@ -6,8 +6,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.bukkit.World
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.world.ChunkPos
@@ -17,7 +17,6 @@ import xyz.xenondevs.nova.world.format.chunk.RegionizedChunk
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
-// TODO: RegionizedFile unloading
 internal class WorldDataStorage(val world: World) {
     
     private val blockRegionFolder = File(world.worldFolder, "nova_region")
@@ -37,7 +36,7 @@ internal class WorldDataStorage(val world: World) {
     @Suppress("DeferredResultUnused")
     suspend fun loadAsync(pos: ChunkPos) {
         getOrLoadNetworkRegionAsync(pos)
-        getOrLoadRegionAsync(pos) 
+        getOrLoadRegionAsync(pos)
     }
     
     suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile =
@@ -117,21 +116,30 @@ internal class WorldDataStorage(val world: World) {
     /**
      * Saves all Nova data related to this world.
      */
-    suspend fun save() = coroutineScope { // TODO: save in background
-        LOGGER.info(
-            "Saving ${world.name} (" +
-                "${blockRegionFiles.size} region files, " +
-                "${networkRegionFiles.size} network region files)"
-        )
-        
-        for (regionFile in blockRegionFiles.values) {
-            launch { regionFile.await().save() }
+    suspend fun save() = withContext(Dispatchers.Default) { // TODO: save in background
+        for ((rid, deferredRegionFile) in blockRegionFiles) {
+            launch {
+                val regionFile = deferredRegionFile.await()
+                regionFile.save()
+                
+                // unload unused region files
+                if (!regionFile.isAnyChunkEnabled())
+                    blockRegionFiles -= rid
+            }
         }
         
         networkState.mutex.withLock {
-            for (networkFile in networkRegionFiles.values) {
-                launch { networkFile.await().save() }
+            for ((rid, deferredRegionFile) in networkRegionFiles) {
+                launch {
+                    val regionFile = deferredRegionFile.await()
+                    regionFile.save()
+                    
+                    // network region files that don't have a corresponding block region file can be unloaded
+                    if (!blockRegionFiles.containsKey(rid))
+                        networkRegionFiles -= rid
+                }
             }
+            
             networkState.save(this)
         }
     }

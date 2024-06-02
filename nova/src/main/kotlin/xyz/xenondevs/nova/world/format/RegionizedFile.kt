@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.format
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import org.bukkit.World
 import xyz.xenondevs.cbf.io.ByteReader
@@ -42,7 +41,7 @@ internal abstract class RegionizedFile<T : RegionizedChunk>(
         return _chunks[packedCoords]
     }
     
-    suspend fun save() = coroutineScope {
+    suspend fun save() = withContext(Dispatchers.Default) {
         val compressionType = COMPRESSION_TYPE
         
         // serialize chunks
