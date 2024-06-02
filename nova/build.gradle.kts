@@ -35,6 +35,8 @@ dependencies {
     novaLoader(libs.awssdk.s3)
     novaLoader(libs.jimfs)
     novaLoader(libs.caffeine)
+    novaLoader(libs.lz4)
+    novaLoader(libs.zstd)
     
     // runtime dependencies
     spigotRuntime(paperweight.paperDevBundleDependency(libs.versions.paper.get()))

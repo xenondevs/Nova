@@ -45,6 +45,7 @@ ktor-client-core-jvm = { group = "io.ktor", name = "ktor-client-core-jvm", versi
 ktor-serialization-gson-jvm = { group = "io.ktor", name = "ktor-serialization-gson-jvm", version.ref = "ktor" }
 ktor-server-cio-jvm = { group = "io.ktor", name = "ktor-server-cio-jvm", version.ref = "ktor" }
 ktor-server-core-jvm = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor" }
+lz4 = { group = "org.lz4", name = "lz4-java", version = "1.7.1" }
 maven-resolver-connector-basic = { group = "org.apache.maven.resolver", name = "maven-resolver-connector-basic", version = "1.9.18" }
 maven-resolver-provider = { group = "org.apache.maven", name = "maven-resolver-provider", version = "3.8.5" }
 maven-resolver-transport-http = { group = "org.apache.maven.resolver", name = "maven-resolver-transport-http", version = "1.9.18" }
@@ -53,6 +54,7 @@ minecraft-model-renderer = { group = "xyz.xenondevs", name = "minecraft-model-re
 nmsutilities = { group = "xyz.xenondevs", name = "nms-utilities", version = "0.16" }
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 zip4j = { group = "net.lingala.zip4j", name = "zip4j", version = "2.11.5" }
+zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.6-3" }
 
 [bundles]
 cbf = ["cosmic-binary-format", "cosmic-binary-format-netty-adapter", "cosmic-binary-format-provider"]

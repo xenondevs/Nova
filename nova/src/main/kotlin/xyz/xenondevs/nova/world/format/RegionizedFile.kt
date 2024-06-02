@@ -8,6 +8,7 @@ import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.util.CompressionType
 import xyz.xenondevs.nova.util.data.use
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.chunk.RegionizedChunk
@@ -21,7 +22,8 @@ import java.util.*
 private const val MAGIC: Int = 0xB7E21337.toInt()
 private const val FILE_VERSION: Byte = 2
 private const val NUM_CHUNKS = 1024
-private val CREATE_BACKUPS by MAIN_CONFIG.entry<Boolean>("performance", "region_backups")
+private val CREATE_BACKUPS by MAIN_CONFIG.entry<Boolean>("world", "format", "region_backups")
+private val COMPRESSION_TYPE by MAIN_CONFIG.entry<CompressionType>("world", "format", "compression")
 
 internal abstract class RegionizedFile<T : RegionizedChunk>(
     protected val file: File,
@@ -41,12 +43,16 @@ internal abstract class RegionizedFile<T : RegionizedChunk>(
     }
     
     suspend fun save() = coroutineScope {
+        val compressionType = COMPRESSION_TYPE
+        
         // serialize chunks
         val chunkBitmask = BitSet(NUM_CHUNKS)
         val chunksBuffer = ByteArrayOutputStream()
-        val chunksWriter = ByteWriter.fromStream(chunksBuffer)
-        for ((chunkIdx, chunk) in _chunks.withIndex()) {
-            chunkBitmask.set(chunkIdx, chunk.write(chunksWriter))
+        compressionType.wrapOutput(chunksBuffer).use { compOut ->
+            val chunksWriter = ByteWriter.fromStream(compOut)
+            for ((chunkIdx, chunk) in _chunks.withIndex()) {
+                chunkBitmask.set(chunkIdx, chunk.write(chunksWriter))
+            }
         }
         
         withContext(Dispatchers.IO) {
@@ -60,6 +66,7 @@ internal abstract class RegionizedFile<T : RegionizedChunk>(
                 val writer = ByteWriter.fromStream(out)
                 writer.writeInt(MAGIC)
                 writer.writeByte(FILE_VERSION)
+                writer.writeByte(compressionType.ordinal.toByte())
                 writer.writeBytes(Arrays.copyOf(chunkBitmask.toByteArray(), NUM_CHUNKS / 8))
                 writer.writeBytes(chunksBuffer.toByteArray())
             }
@@ -99,22 +106,26 @@ internal abstract class RegionizedFileReader<C : RegionizedChunk, F : Regionized
                         throw IllegalStateException(file.absolutePath + " has an invalid version (expected $FILE_VERSION, got $version)")
                     
                     // read chunks
-                    val chunkBitmask = BitSet.valueOf(reader.readBytes(NUM_CHUNKS / 8))
-                    val chunks = createArray(NUM_CHUNKS) {
-                        val pos = chunkIdxToPos(it, world, regionX, regionZ)
-                        if (chunkBitmask.get(it)) 
-                            chunkReader.read(pos, reader) 
-                        else chunkReader.createEmpty(pos)
+                    val compressionType = CompressionType.entries[reader.readByte().toInt()]
+                    compressionType.wrapInput(inp).use { decompInp ->
+                        val chunkBitmask = BitSet.valueOf(reader.readBytes(NUM_CHUNKS / 8))
+                        val decompReader = ByteReader.fromStream(decompInp)
+                        val chunks = createArray(NUM_CHUNKS) {
+                            val pos = chunkIdxToPos(it, world, regionX, regionZ)
+                            if (chunkBitmask.get(it))
+                                chunkReader.read(pos, decompReader)
+                            else chunkReader.createEmpty(pos)
+                        }
+                        
+                        return createFile(file, world, regionX, regionZ, chunks)
                     }
-                    
-                    return createFile(file, world, regionX, regionZ, chunks)
                 }
             } else {
                 val chunks = createArray(NUM_CHUNKS) { chunkReader.createEmpty(chunkIdxToPos(it, world, regionX, regionZ)) }
                 return createFile(file, world, regionX, regionZ, chunks)
             }
         } catch (t: Throwable) {
-            throw IllegalStateException("Could not initialize region file $file", t)
+            throw Exception("Could not read region file $file", t)
         }
     }
     
