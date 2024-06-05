@@ -30,7 +30,7 @@ object AdvancementLoader {
         val advancementManager = DEDICATED_SERVER.advancements
         val allAdvancements = HashMap(DEDICATED_SERVER.advancements.advancements)
         filtered.forEach { allAdvancements[it.id] = it }
-        val advancementTree = AdvancementTree()
+        val advancementTree = ReflectionRegistry.SERVER_ADVANCEMENT_MANAGER_TREE_FIELD.get(advancementManager) as AdvancementTree? ?: AdvancementTree()
         advancementTree.addAll(filtered)
         for (root in advancementTree.roots()) {
             if (root.holder().value().display().isPresent) {
