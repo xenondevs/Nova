@@ -9,7 +9,7 @@ kotlin = "1.9.23"
 ktor = "2.3.9"
 paper = "1.20.4-R0.1-SNAPSHOT"
 paperweight = "1.5.15"
-stringremapper = "1.6"
+stringremapper = "1.9"
 xenondevs-commons = "1.7"
 
 [libraries]
