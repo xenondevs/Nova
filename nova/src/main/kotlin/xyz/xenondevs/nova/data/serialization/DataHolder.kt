@@ -16,9 +16,8 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
     
     @PublishedApi
     internal val persistentData: Compound by lazy {
-        data["global"] // legacy name TODO: remove legacy support at some point
-            ?: data["persistent"]
-            ?: Compound().also { if (includePersistent) data["persistent"] = it }
+        data.rename("global", "persistent") // legacy conversion
+        data["persistent"] ?: Compound().also { if (includePersistent) data["persistent"] = it }
     }
     
     /**
@@ -59,10 +58,18 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
         return data.get(type, key) ?: persistentData.get(type, key)
     }
     
-    internal fun hasData(key: String): Boolean =
-        data.contains(key) || persistentData.contains(key)
+    /**
+     * Checks whether there is data stored under the given [key],
+     * regardless of whether it is persistent or not.
+     */
+    fun hasData(key: String): Boolean =
+        key in data || key in persistentData
     
-    internal fun removeData(key: String) {
+    /**
+     * Removes the data stored under the given [key],
+     * regardless of whether it is persistent or not.
+     */
+    fun removeData(key: String) {
         data.remove(key)
         persistentData.remove(key)
     }

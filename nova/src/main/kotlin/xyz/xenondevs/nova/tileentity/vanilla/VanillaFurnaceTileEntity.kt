@@ -4,6 +4,7 @@ import net.minecraft.world.level.block.entity.FurnaceBlockEntity
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.nova.tileentity.network.type.item.holder.DefaultItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.StaticVanillaItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
@@ -22,8 +23,9 @@ internal class VanillaFurnaceTileEntity internal constructor(
     override lateinit var itemHolder: ItemHolder
     
     override fun handleEnable() {
+        DefaultItemHolder.tryConvertLegacy(this)?.let { storeData("itemHolder", it) } // legacy conversion
         itemHolder = StaticVanillaItemHolder(
-            storedValue("itemHolder", ::Compound), // TODO: legacy support
+            storedValue("itemHolder", ::Compound),
             getInventories(pos.nmsBlockEntity as FurnaceBlockEntity)
         )
     }

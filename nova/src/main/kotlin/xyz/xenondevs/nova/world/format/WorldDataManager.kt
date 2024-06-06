@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.registerEvents
@@ -28,7 +29,6 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.format.chunk.RegionChunk
-import xyz.xenondevs.nova.world.format.legacy.LegacyFileConverter
 import xyz.xenondevs.nova.world.pos
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -38,8 +38,8 @@ import java.util.concurrent.ConcurrentHashMap
     dependsOn = [
         AddonsInitializer::class,
         ResourceGeneration.PreWorld::class,
-        LegacyFileConverter::class,
-        VanillaTileEntityManager::class
+        VanillaTileEntityManager::class,
+        NetworkManager::class
     ]
 )
 object WorldDataManager : Listener {
@@ -70,7 +70,7 @@ object WorldDataManager : Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW) // NetworkManager is LOWEST
     private fun handleChunkLoad(event: ChunkLoadEvent) {
         runBlocking { getOrLoadChunk(event.chunk.pos).enable() }
     }
@@ -116,8 +116,14 @@ object WorldDataManager : Listener {
     fun getTileEntity(pos: BlockPos): TileEntity? =
         getChunkOrThrow(pos.chunkPos).getTileEntity(pos)
     
+    internal suspend fun getOrLoadTileEntity(pos: BlockPos): TileEntity? =
+        getOrLoadChunk(pos.chunkPos).getTileEntity(pos)
+    
     fun getTileEntities(pos: ChunkPos): List<TileEntity> =
         getChunkOrThrow(pos).getTileEntities()
+    
+    internal suspend fun getOrLoadTileEntities(pos: ChunkPos): List<TileEntity> =
+        getOrLoadChunk(pos).getTileEntities()
     
     fun getTileEntities(world: World): List<TileEntity> =
         getWorldStorage(world).getTileEntities()
@@ -131,8 +137,14 @@ object WorldDataManager : Listener {
     internal fun getVanillaTileEntity(pos: BlockPos): VanillaTileEntity? =
         getChunkOrThrow(pos.chunkPos).getVanillaTileEntity(pos)
     
+    internal suspend fun getOrLoadVanillaTileEntity(pos: BlockPos): VanillaTileEntity? =
+        getOrLoadChunk(pos.chunkPos).getVanillaTileEntity(pos)
+    
     internal fun getVanillaTileEntities(pos: ChunkPos): List<VanillaTileEntity> =
         getChunkOrThrow(pos).getVanillaTileEntities()
+    
+    internal suspend fun getOrLoadVanillaTileEntities(pos: ChunkPos): List<VanillaTileEntity> =
+        getOrLoadChunk(pos).getVanillaTileEntities()
     
     internal fun setVanillaTileEntity(pos: BlockPos, tileEntity: VanillaTileEntity?): VanillaTileEntity? =
         getChunkOrThrow(pos.chunkPos).setVanillaTileEntity(pos, tileEntity)
@@ -147,16 +159,10 @@ object WorldDataManager : Listener {
         getOrLoadRegion(pos).getChunk(pos)
     
     private fun getChunkOrThrow(pos: ChunkPos): RegionChunk {
-        if (!initialized)
-            throw IllegalStateException("Tried to get chunk before initialization")
-        
         return getWorldStorage(pos.world!!).getBlockChunkOrThrow(pos)
     }
     
     private suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile {
-        if (!initialized)
-            throw IllegalStateException("Tried to load region before initialization")
-        
         return getWorldStorage(pos.world!!).getOrLoadRegion(pos)
     }
     

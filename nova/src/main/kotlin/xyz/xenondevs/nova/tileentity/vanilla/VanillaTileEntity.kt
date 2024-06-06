@@ -36,31 +36,18 @@ internal abstract class VanillaTileEntity internal constructor(
         return type.requirement(pos.block)
     }
     
-    enum class Type(val id: String, val constructor: VanillaTileEntityConstructor, val requirement: (Block) -> Boolean) {
+    enum class Type(val constructor: VanillaTileEntityConstructor, val requirement: (Block) -> Boolean) {
         
-        CHEST("minecraft:chest", ::VanillaChestTileEntity, { it.state is Chest }),
-        FURNACE("minecraft:furnace", ::VanillaFurnaceTileEntity, { it.state is Furnace }),
-        CONTAINER("minecraft:container", ::VanillaContainerTileEntity, { it.state is Container }),
-        CAULDRON("minecraft:cauldron", ::VanillaCauldronTileEntity, { it.type.isCauldron() });
+        CHEST(::VanillaChestTileEntity, { it.state is Chest }),
+        FURNACE(::VanillaFurnaceTileEntity, { it.state is Furnace }),
+        CONTAINER(::VanillaContainerTileEntity, { it.state is Container }),
+        CAULDRON(::VanillaCauldronTileEntity, { it.type.isCauldron() });
         
         companion object {
             
             fun of(block: Block): Type? =
                 entries.firstOrNull { it.requirement(block) }
             
-        }
-        
-    }
-    
-    companion object {
-        
-        fun of(pos: BlockPos, data: Compound): VanillaTileEntity? {
-            val id: String = data["id"]!!
-            val type = Type.entries.firstOrNull { it.id == id } ?: return null
-            if (type.requirement(pos.block))
-                return type.constructor(pos, data)
-            
-            return null
         }
         
     }

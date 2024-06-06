@@ -10,6 +10,7 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
+import xyz.xenondevs.nova.tileentity.network.type.item.holder.DefaultItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.DynamicVanillaItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
@@ -31,11 +32,7 @@ internal class VanillaChestTileEntity internal constructor(
     
     private lateinit var inventories: EnumMap<BlockFace, NetworkedInventory>
     private lateinit var allowedConnectionTypes: HashMap<NetworkedInventory, NetworkConnectionType>
-    override var itemHolder: ItemHolder = DynamicVanillaItemHolder(
-        storedValue("itemHolder", ::Compound), // TODO: legacy support
-        { inventories },
-        { allowedConnectionTypes }
-    )
+    override lateinit var itemHolder: ItemHolder
     
     private var chestType: ChestType = ChestType.SINGLE
     private var linkedChest: VanillaChestTileEntity? = null
@@ -43,6 +40,13 @@ internal class VanillaChestTileEntity internal constructor(
     override fun handleEnable() {
         linkedChest = getLinkedChest()?.also(linkedNodes::add)
         setInventory(createNetworkedInventory())
+        
+        DefaultItemHolder.tryConvertLegacy(this)?.let { storeData("itemHolder", it) } // legacy conversion
+        itemHolder = DynamicVanillaItemHolder(
+            storedValue("itemHolder", ::Compound),
+            { inventories },
+            { allowedConnectionTypes }
+        )
     }
     
     override fun handlePlace() {

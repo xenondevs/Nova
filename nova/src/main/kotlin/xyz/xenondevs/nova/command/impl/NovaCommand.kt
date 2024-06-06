@@ -668,7 +668,7 @@ internal object NovaCommand : Command("nova") {
     private fun reregisterNetworkNodes(ctx: CommandContext<CommandSourceStack>) {
         val nodes = Bukkit.getWorlds().asSequence()
             .flatMap { it.loadedChunks.asList() }
-            .flatMap { NetworkManager.getNodes(it.pos) }
+            .flatMap { runBlocking { NetworkManager.getNodes(it.pos) } }
             .toList()
         
         for (node in nodes) {
@@ -708,7 +708,7 @@ internal object NovaCommand : Command("nova") {
     }
     
     private fun showNetworkNodeInfo(pos: BlockPos, ctx: CommandContext<CommandSourceStack>) {
-        val node = NetworkManager.getNode(pos)
+        val node = runBlocking { NetworkManager.getNode(pos) }
         if (node != null) {
             NetworkManager.queueRead(pos.world) { state ->
                 val connectedNodes = state.getConnectedNodes(node)

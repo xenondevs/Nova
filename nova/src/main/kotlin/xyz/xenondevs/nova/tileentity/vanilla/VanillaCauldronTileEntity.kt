@@ -24,14 +24,15 @@ internal class VanillaCauldronTileEntity internal constructor(
     
     override fun handleEnable() {
         container = CauldronFluidContainer(UUID(0L, 0L), pos.block)
+        DefaultFluidHolder.tryConvertLegacy(this)?.let { storeData("fluidHolder", it) } // legacy conversion
         fluidHolder = DefaultFluidHolder(
-            storedValue("fluidHolder", ::Compound), // TODO: legacy conversion
+            storedValue("fluidHolder", ::Compound),
             mapOf(container to NetworkConnectionType.BUFFER),
             { CUBE_FACES.associateWithTo(enumMap()) { container } },
             { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.BUFFER } }
         )
         holders = setOf(fluidHolder)
-    
+        
         handleBlockUpdate()
     }
     

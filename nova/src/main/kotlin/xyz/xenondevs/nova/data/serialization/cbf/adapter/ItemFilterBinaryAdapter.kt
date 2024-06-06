@@ -3,23 +3,48 @@
 package xyz.xenondevs.nova.data.serialization.cbf.adapter
 
 import net.minecraft.resources.ResourceLocation
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.cbf.adapter.BinaryAdapter
+import xyz.xenondevs.cbf.adapter.ComplexBinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.item.behavior.UnknownItemFilter
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilter
+import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilterType
+import xyz.xenondevs.nova.util.nmsCopy
 import kotlin.reflect.KType
 
-internal object ItemFilterBinaryAdapter : BinaryAdapter<ItemFilter<*>> {
+internal object ItemFilterBinaryAdapter : ComplexBinaryAdapter<ItemFilter<*>> {
     
-    override fun read(type: KType, reader: ByteReader): ItemFilter<*> {
-        val id = ResourceLocation(reader.readString())
-        val filterType = NovaRegistries.ITEM_FILTER_TYPE[id]
-        val compound = CBF.read<Compound>(reader)!!
+    override fun read(type: KType, id: UByte, reader: ByteReader): ItemFilter<*> {
+        if (id == 1.toUByte())
+            return readLegacy(reader)
         
+        val filterTypeId = ResourceLocation(reader.readString())
+        return createFilter(
+            filterTypeId,
+            NovaRegistries.ITEM_FILTER_TYPE[filterTypeId],
+            CBF.read<Compound>(reader)!!
+        )
+    }
+    
+    private fun readLegacy(reader: ByteReader): ItemFilter<*> {
+        val whitelist = reader.readBoolean()
+        val nbt = reader.readBoolean()
+        val size = reader.readVarInt()
+        val items = Array<ItemStack?>(size) { CBF.read(reader) }
+        
+        val id = ResourceLocation("logistics", if (nbt) "nbt_item_filter" else "type_item_filter")
+        val compound = Compound()
+        compound["items"] = items.map { it.nmsCopy }
+        compound["whitelist"] = whitelist
+        
+        return createFilter(id, NovaRegistries.ITEM_FILTER_TYPE[id], compound)
+    }
+    
+    private fun createFilter(id: ResourceLocation, filterType: ItemFilterType<*>?, compound: Compound): ItemFilter<*> {
         if (filterType == null)
             return UnknownItemFilter(id, compound)
         return filterType.deserialize(compound)
@@ -29,6 +54,8 @@ internal object ItemFilterBinaryAdapter : BinaryAdapter<ItemFilter<*>> {
         write(obj, writer)
     
     private fun <T : ItemFilter<T>> write(filter: ItemFilter<T>, writer: ByteWriter) {
+        writer.writeUnsignedByte(2.toUByte())
+        
         if (filter is UnknownItemFilter) {
             writer.writeString(filter.originalId.toString())
             CBF.write(filter.originalData, writer)

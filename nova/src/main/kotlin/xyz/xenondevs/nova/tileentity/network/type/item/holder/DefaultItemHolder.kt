@@ -8,11 +8,13 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.provider.entry
 import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.commons.collections.mapValuesNotNullTo
 import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
 import xyz.xenondevs.commons.provider.mutable.mapNonNull
 import xyz.xenondevs.invui.inventory.VirtualInventory
+import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
@@ -49,7 +51,7 @@ class DefaultItemHolder(
     override val containerConfig: MutableMap<BlockFace, NetworkedInventory>
         by compound.entry<Map<BlockFace, UUID>>("inventoryConfig")
             .mapNonNull(
-                { it.mapValuesTo(enumMap()) { (_, uuid) -> uuidToInv[uuid]!! } },
+                { it.mapValuesNotNullTo(enumMap()) { (_, uuid) -> uuidToInv[uuid] } },
                 { it.mapValuesTo(enumMap()) { (_, inv) -> inv.uuid } }
             ).defaultsToLazily { defaultInventoryConfig().toEnumMap() }
     
@@ -87,12 +89,66 @@ class DefaultItemHolder(
         uuidToInv[uuid] ?: throw NoSuchElementException("No networked inventory with $uuid")
     
     private fun getUUID(inv: NetworkedInventory): UUID =
-        invToUuid[inv] ?: throw NoSuchElementException("NetworkedInventory is not part of item holder")
+        invToUuid[inv] ?: throw NoSuchElementException("$inv is not part of item holder")
     
     internal companion object {
+        
         val ALL_INVENTORY_UUID = UUID(0, 0xA11)
         val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithTo(enumMap()) { 50 } }
         val DEFAULT_CHANNELS = { CUBE_FACES.associateWithTo(enumMap()) { 0 } }
+        
+        fun tryConvertLegacy(dataHolder: DataHolder): Compound? {
+            val inventoryConfig: MutableMap<BlockFace, UUID>? =
+                dataHolder.retrieveDataOrNull("inventories")
+            val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>? =
+                dataHolder.retrieveDataOrNull("itemConfig")
+            val insertFilters: MutableMap<BlockFace, ItemFilter<*>>? =
+                dataHolder.retrieveDataOrNull("insertFilters")
+            val extractFilters: MutableMap<BlockFace, ItemFilter<*>>? =
+                dataHolder.retrieveDataOrNull("extractFilters")
+            val insertPriorities: MutableMap<BlockFace, Int>? =
+                dataHolder.retrieveDataOrNull("insertPriorities")
+            val extractPriorities: MutableMap<BlockFace, Int>? =
+                dataHolder.retrieveDataOrNull("extractPriorities")
+            val channels: MutableMap<BlockFace, Int>? =
+                dataHolder.retrieveDataOrNull("channels")
+            
+            if (inventoryConfig == null && 
+                connectionConfig == null &&
+                insertFilters == null &&
+                extractFilters == null &&
+                insertPriorities == null &&
+                extractPriorities == null &&
+                channels == null
+            ) return null
+            
+            dataHolder.removeData("inventories")
+            dataHolder.removeData("itemConfig")
+            dataHolder.removeData("insertFilters")
+            dataHolder.removeData("extractFilters")
+            dataHolder.removeData("insertPriorities")
+            dataHolder.removeData("extractPriorities")
+            dataHolder.removeData("channels")
+            
+            val compound = Compound() // new format
+            if (inventoryConfig != null)
+                compound["inventoryConfig"] = inventoryConfig
+            if (connectionConfig != null)
+                compound["connectionConfig"] = connectionConfig
+            if (insertFilters != null)
+                compound["insertFilters"] = insertFilters
+            if (extractFilters != null)
+                compound["extractFilters"] = extractFilters
+            if (insertPriorities != null)
+                compound["insertPriorities"] = insertPriorities
+            if (extractPriorities != null)
+                compound["extractPriorities"] = extractPriorities
+            if (channels != null)
+                compound["channels"] = channels
+            
+            return compound
+        }
+        
     }
     
 }

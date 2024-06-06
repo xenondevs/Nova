@@ -7,6 +7,7 @@ import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
 import xyz.xenondevs.commons.provider.mutable.orElse
+import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.util.TickedLong
 import kotlin.math.max
@@ -79,5 +80,31 @@ class DefaultEnergyHolder(
     
     private fun callUpdateHandlers() =
         updateHandlers.forEach { it() }
+    
+    internal companion object {
+        
+        fun tryConvertLegacy(dataHolder: DataHolder): Compound? {
+            val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>? = 
+                dataHolder.retrieveDataOrNull("energyConfig")
+            val energy: Long? = 
+                dataHolder.retrieveDataOrNull("energy")
+            
+            if (connectionConfig == null &&
+                energy == null
+            ) return null
+            
+            dataHolder.removeData("energyConfig")
+            dataHolder.removeData("energy")
+            
+            val compound = Compound() // new format
+            if (connectionConfig != null)
+                compound["connectionConfig"] = connectionConfig
+            if (energy != null)
+                compound["energy"] = energy
+            
+            return compound
+        }
+        
+    }
     
 }

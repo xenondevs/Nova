@@ -1,3 +1,5 @@
+@file:Suppress("LeakingThis")
+
 package xyz.xenondevs.nova.tileentity
 
 import org.bukkit.block.BlockFace
@@ -38,6 +40,13 @@ abstract class NetworkedTileEntity(
     final override val holders: MutableSet<EndPointDataHolder> = HashSet()
     override val linkedNodes: Set<NetworkNode> = emptySet()
     
+    init {
+        // legacy conversion
+        DefaultEnergyHolder.tryConvertLegacy(this)?.let { storeData("energyHolder", it) }
+        DefaultItemHolder.tryConvertLegacy(this)?.let { storeData("itemHolder", it) }
+        DefaultFluidHolder.tryConvertLegacy(this)?.let { storeData("fluidHolder", it) }
+    }
+    
     /**
      * Retrieves the [EnergyHolder] previously stored or creates a new one and registers it in the [holders] map.
      *
@@ -53,7 +62,7 @@ abstract class NetworkedTileEntity(
         defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = { CUBE_FACES.associateWithTo(enumMap()) { allowedConnectionType } }
     ): DefaultEnergyHolder {
         val holder = DefaultEnergyHolder(
-            storedValue("energyHolder", ::Compound), // TODO: legacy conversion
+            storedValue("energyHolder", ::Compound),
             maxEnergy,
             allowedConnectionType,
             defaultConnectionConfig
@@ -91,7 +100,7 @@ abstract class NetworkedTileEntity(
         allowedConnectionTypes[mergedInventory] = NetworkConnectionType.of(allowedConnectionTypes.values)
         
         val holder = DefaultItemHolder(
-            storedValue("itemHolder", ::Compound), // TODO: legacy conversion
+            storedValue("itemHolder", ::Compound),
             allowedConnectionTypes,
             mergedInventory,
             // map from VirtualInventory to NetworkedInventory or use mergedInventory for all sides
@@ -122,8 +131,9 @@ abstract class NetworkedTileEntity(
         defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null
     ): DefaultItemHolder {
         val allInventories = buildMap { this += inventory; this += inventories }
+        
         val holder = DefaultItemHolder(
-            storedValue("itemHolder", ::Compound), // TODO: legacy conversion
+            storedValue("itemHolder", ::Compound),
             allInventories,
             mergedInventory,
             defaultInventoryConfig,
@@ -151,9 +161,9 @@ abstract class NetworkedTileEntity(
     
     /**
      * Retrieves the [FluidHolder] previously stored or creates a new one and registers it in the [holders] map.
-     * 
+     *
      * The fluid holder uses the containers and connection types provided ([container], [containers]).
-     * 
+     *
      * If the [FluidHolder] is created for the first time, [defaultContainerConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedFluidContainer] and [NetworkConnectionType] for each side.
      */
@@ -164,13 +174,25 @@ abstract class NetworkedTileEntity(
         defaultConnectionConfig: () -> EnumMap<BlockFace, NetworkConnectionType> = DefaultFluidHolder.DEFAULT_CONNECTION_CONFIG
     ): DefaultFluidHolder {
         val fluidHolder = DefaultFluidHolder(
-            storedValue("fluidHolder", ::Compound), // TODO: legacy conversion
+            storedValue("fluidHolder", ::Compound),
             buildMap { this += container; this += containers },
             defaultContainerConfig,
             defaultConnectionConfig
         )
         holders += fluidHolder
         return fluidHolder
+    }
+    
+    override fun handleEnable() {
+        super.handleEnable()
+        
+        // legacy conversion
+        if (hasData("connectedNodes") || hasData("networks")) {
+            removeData("connectedNodes")
+            removeData("networks")
+            
+            NetworkManager.queueAddEndPoint(this)
+        }
     }
     
     override fun handlePlace(ctx: Context<BlockPlace>) {

@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.format
 
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bukkit.World
@@ -12,19 +14,20 @@ import xyz.xenondevs.nova.util.data.use
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.chunk.RegionizedChunk
 import xyz.xenondevs.nova.world.format.chunk.RegionizedChunkReader
+import xyz.xenondevs.nova.world.format.legacy.LegacyRegionizedFileReader
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
 import java.util.*
 
-private const val MAGIC: Int = 0xB7E21337.toInt()
-private const val FILE_VERSION: Byte = 2
 private const val NUM_CHUNKS = 1024
 private val CREATE_BACKUPS by MAIN_CONFIG.entry<Boolean>("world", "format", "region_backups")
 private val COMPRESSION_TYPE by MAIN_CONFIG.entry<CompressionType>("world", "format", "compression")
 
 internal abstract class RegionizedFile<T : RegionizedChunk>(
+    private val magic: Int,
+    private val fileVersion: Byte,
     protected val file: File,
     protected val world: World,
     protected val regionX: Int, protected val regionZ: Int,
@@ -63,8 +66,8 @@ internal abstract class RegionizedFile<T : RegionizedChunk>(
             // write region file
             file.outputStream().buffered().use { out ->
                 val writer = ByteWriter.fromStream(out)
-                writer.writeInt(MAGIC)
-                writer.writeByte(FILE_VERSION)
+                writer.writeInt(magic)
+                writer.writeByte(fileVersion)
                 writer.writeByte(compressionType.ordinal.toByte())
                 writer.writeBytes(Arrays.copyOf(chunkBitmask.toByteArray(), NUM_CHUNKS / 8))
                 writer.writeBytes(chunksBuffer.toByteArray())
@@ -77,11 +80,19 @@ internal abstract class RegionizedFile<T : RegionizedChunk>(
     
 }
 
+private const val LEGACY_MAGIC = 0xB7E21337.toInt()
+
 internal abstract class RegionizedFileReader<C : RegionizedChunk, F : RegionizedFile<C>>(
+    private val magic: Int,
+    private val version: Byte,
     private val createArray: (Int, (Int) -> C) -> Array<C>,
     private val createFile: (File, World, Int, Int, Array<C>) -> F,
-    private val chunkReader: RegionizedChunkReader<C>
+    private val chunkReader: RegionizedChunkReader<C>,
+    vararg legacyReaders: Pair<Int, LegacyRegionizedFileReader<C, F>>
 ) {
+   
+    private val legacyReaders: Byte2ObjectMap<LegacyRegionizedFileReader<C, F>> =
+        legacyReaders.associateTo(Byte2ObjectOpenHashMap()) { (version, reader) -> version.toByte() to reader}
     
     fun read(file: File, world: World, regionX: Int, regionZ: Int): F {
         LOGGER.info("Loading region file $file")
@@ -98,25 +109,16 @@ internal abstract class RegionizedFileReader<C : RegionizedChunk, F : Regionized
                     val reader = ByteReader.fromStream(inp)
                     
                     // verify magic and version
-                    if (reader.readInt() != MAGIC)
+                    val fileMagic = reader.readInt()
+                    if (fileMagic != magic && fileMagic != LEGACY_MAGIC)
                         throw IllegalStateException(file.absolutePath + " is not a valid region file")
-                    val version = reader.readByte()
-                    if (version != FILE_VERSION)
-                        throw IllegalStateException(file.absolutePath + " has an invalid version (expected $FILE_VERSION, got $version)")
-                    
-                    // read chunks
-                    val compressionType = CompressionType.entries[reader.readByte().toInt()]
-                    compressionType.wrapInput(inp).use { decompInp ->
-                        val chunkBitmask = BitSet.valueOf(reader.readBytes(NUM_CHUNKS / 8))
-                        val decompReader = ByteReader.fromStream(decompInp)
-                        val chunks = createArray(NUM_CHUNKS) {
-                            val pos = chunkIdxToPos(it, world, regionX, regionZ)
-                            if (chunkBitmask.get(it))
-                                chunkReader.read(pos, decompReader)
-                            else chunkReader.createEmpty(pos)
-                        }
-                        
-                        return createFile(file, world, regionX, regionZ, chunks)
+                    val fileVersion = reader.readByte()
+                    if (fileVersion == version) {
+                        return read(file, reader, world, regionX, regionZ)
+                    } else {
+                        val legacyReader = legacyReaders.get(fileVersion)
+                            ?: throw IllegalStateException("Unsupported region file version $fileVersion")
+                        return legacyReader.read(file, reader, world, regionX, regionZ)
                     }
                 }
             } else {
@@ -125,6 +127,23 @@ internal abstract class RegionizedFileReader<C : RegionizedChunk, F : Regionized
             }
         } catch (t: Throwable) {
             throw Exception("Could not read region file $file", t)
+        }
+    }
+    
+    private fun read(file: File, reader: ByteReader, world: World, regionX: Int, regionZ: Int): F {
+        // read chunks
+        val compressionType = CompressionType.entries[reader.readByte().toInt()]
+        compressionType.wrapInput(reader.asInputStream()).use { decompInp ->
+            val chunkBitmask = BitSet.valueOf(reader.readBytes(NUM_CHUNKS / 8))
+            val decompReader = ByteReader.fromStream(decompInp)
+            val chunks = createArray(NUM_CHUNKS) {
+                val pos = chunkIdxToPos(it, world, regionX, regionZ)
+                if (chunkBitmask.get(it))
+                    chunkReader.read(pos, decompReader)
+                else chunkReader.createEmpty(pos)
+            }
+            
+            return createFile(file, world, regionX, regionZ, chunks)
         }
     }
     

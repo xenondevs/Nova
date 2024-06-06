@@ -14,6 +14,7 @@ import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.nmsVersion
+import java.io.ByteArrayInputStream
 import kotlin.reflect.KType
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
@@ -32,7 +33,8 @@ internal object ItemStackSerializer {
     }
     
     private fun readLegacy(reader: ByteReader): ItemStack {
-        var nbt = NbtIo.readCompressed(reader.asInputStream(), NbtAccounter.unlimitedHeap())
+        val data = reader.readBytes(reader.readVarInt())
+        var nbt = NbtIo.readCompressed(ByteArrayInputStream(data), NbtAccounter.unlimitedHeap())
         nbt = tryFix(nbt, 3700, NMSUtils.DATA_VERSION)
         return ItemStack.of(nbt)
     }

@@ -15,12 +15,12 @@ interface NetworkNodeProvider {
     /**
      * Gets the [NetworkNode] at the specified block [pos] or null if there is none.
      */
-    fun getNode(pos: BlockPos): NetworkNode?
+    suspend fun getNode(pos: BlockPos): NetworkNode?
     
     /**
      * Gets all [NetworkNodes][NetworkNode] in the specified chunk [pos].
      */
-    fun getNodes(pos: ChunkPos): Sequence<NetworkNode>
+    suspend fun getNodes(pos: ChunkPos): Sequence<NetworkNode>
     
 }
 
@@ -29,12 +29,12 @@ interface NetworkNodeProvider {
  */
 internal object NovaNetworkNodeProvider : NetworkNodeProvider {
     
-    override fun getNode(pos: BlockPos): NetworkNode? {
-        return WorldDataManager.getTileEntity(pos) as? NetworkNode
+    override suspend fun getNode(pos: BlockPos): NetworkNode? {
+        return WorldDataManager.getOrLoadTileEntity(pos) as? NetworkNode
     }
     
-    override fun getNodes(pos: ChunkPos): Sequence<NetworkNode> {
-        return WorldDataManager.getTileEntities(pos)
+    override suspend fun getNodes(pos: ChunkPos): Sequence<NetworkNode> {
+        return WorldDataManager.getOrLoadTileEntities(pos)
             .asSequence()
             .filterIsInstance<NetworkNode>()
     }
@@ -47,12 +47,12 @@ internal object NovaNetworkNodeProvider : NetworkNodeProvider {
  */
 internal object VanillaNetworkNodeProvider : NetworkNodeProvider {
     
-    override fun getNode(pos: BlockPos): NetworkNode? {
-        return WorldDataManager.getVanillaTileEntity(pos) as? NetworkNode
+    override suspend fun getNode(pos: BlockPos): NetworkNode? {
+        return WorldDataManager.getOrLoadVanillaTileEntity(pos) as? NetworkNode
     }
     
-    override fun getNodes(pos: ChunkPos): Sequence<NetworkNode> {
-        return WorldDataManager.getVanillaTileEntities(pos)
+    override suspend fun getNodes(pos: ChunkPos): Sequence<NetworkNode> {
+        return WorldDataManager.getOrLoadVanillaTileEntities(pos)
             .asSequence()
             .filterIsInstance<NetworkNode>()
     }

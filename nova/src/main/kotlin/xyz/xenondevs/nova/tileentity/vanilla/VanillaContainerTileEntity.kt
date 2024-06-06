@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.nova.tileentity.network.type.item.holder.DefaultItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.holder.StaticVanillaItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
@@ -30,7 +31,9 @@ internal class VanillaContainerTileEntity internal constructor(
         val container = pos.nmsBlockEntity as BaseContainerBlockEntity
         val inventory = getInventory(container)
         val inventories = CUBE_FACES.associateWithTo(enumMap<BlockFace, NetworkedInventory>()) { inventory }
-        itemHolder = StaticVanillaItemHolder(storedValue("itemHolder", ::Compound), inventories) // TODO: legacy support
+        
+        DefaultItemHolder.tryConvertLegacy(this)?.let { storeData("itemHolder", it) } // legacy conversion
+        itemHolder = StaticVanillaItemHolder(storedValue("itemHolder", ::Compound), inventories)
     }
     
     private fun getInventory(blockEntity: BaseContainerBlockEntity): NetworkedInventory {

@@ -328,21 +328,17 @@ abstract class TileEntity(
         
         // legacy conversion
         val legacyName = "fluidContainer.$uuid"
-        var legacyAmount: Long = 0
-        var legacyType: FluidType? = null
         if (hasData(legacyName)) {
-            val legacyData = retrieveDataOrNull<Compound>(legacyName)!!
-            legacyAmount = legacyData["amount"]!!
-            legacyType = legacyData["type"]
+            val compound = retrieveDataOrNull<Compound>(legacyName)!!
             removeData(legacyName)
+            storeData(name, compound, persistent)
         }
         
         val container = DynamicFluidContainer(
+            storedValue(name, persistent, ::Compound), 
             uuid,
             allowedTypes,
-            storedValue("${name}_type", persistent) { legacyType },
             capacity,
-            storedValue("${name}_value", persistent) { legacyAmount },
         )
         
         if (updateHandler != null)

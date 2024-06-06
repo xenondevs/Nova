@@ -5,11 +5,13 @@ import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldLoadEvent
 import org.bukkit.event.world.WorldUnloadEvent
+import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -33,13 +35,12 @@ import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.NetworkState
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 import java.util.concurrent.ConcurrentHashMap
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [WorldDataManager::class, DefaultNetworkTypes::class]
+    dependsOn = [DefaultNetworkTypes::class]
 )
 object NetworkManager : Listener {
     
@@ -63,9 +64,21 @@ object NetworkManager : Listener {
     
     @InitFun
     private fun init() {
-        Bukkit.getWorlds().forEach(::makeConfigurator)
+        for (world in Bukkit.getWorlds()) {
+            makeConfigurator(world)
+            
+            for (chunk in world.loadedChunks) {
+                queueLoadChunk(chunk.pos)
+            }
+        }
+        
         runTaskTimer(0, 1, ticker::tick)
         registerEvents()
+    }
+    
+    @DisableFun
+    private fun disable() {
+        // TODO: await completion of all network tasks
     }
     
     private fun makeConfigurator(world: World) {
@@ -185,15 +198,15 @@ object NetworkManager : Listener {
      * Gets all [NetworkNodes][NetworkNode] in the chunk at [pos]
      * using the registered [NetworkNodeProviders][NetworkNodeProvider].
      */
-    fun getNodes(pos: ChunkPos): Sequence<NetworkNode> {
-        return nodeProviders.asSequence().flatMap { it.getNodes(pos) }
+    suspend fun getNodes(pos: ChunkPos): List<NetworkNode> {
+        return nodeProviders.flatMap { it.getNodes(pos) }
     }
     
     /**
      * Gets the [NetworkNode] at the specified block [pos] using the registered
      * [NetworkNodeProviders][NetworkNodeProvider] or null if there is none.
      */
-    fun getNode(pos: BlockPos): NetworkNode? {
+    suspend fun getNode(pos: BlockPos): NetworkNode? {
         for (nodeProvider in nodeProviders) {
             val node = nodeProvider.getNode(pos)
             if (node != null)
@@ -213,7 +226,7 @@ object NetworkManager : Listener {
         removeConfigurator(event.world)
     }
     
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     private fun handleChunkLoad(event: ChunkLoadEvent) {
         queueLoadChunk(event.chunk.pos)
     }
