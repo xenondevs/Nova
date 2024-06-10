@@ -30,7 +30,9 @@ import kotlin.math.sin
 
 val CUBE_FACES = listOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
 val HORIZONTAL_FACES = listOf(NORTH, EAST, SOUTH, WEST)
-val VERTICAL_FACES = listOf(UP, DOWN)
+val X_AXIS_FACES = listOf(EAST, WEST)
+val Y_AXIS_FACES = listOf(UP, DOWN)
+val Z_AXIS_FACES = listOF(NORTH, SOUTH) 
 
 //<editor-fold desc="location creation / modification", defaultstate="collapsed">
 val Location.blockLocation: Location
