@@ -46,7 +46,6 @@ object Configs {
     private var lastReload = -1L
     
     internal fun extractDefaultConfig() {
-        LOGGER.info("Extracting default config")
         NOVA.novaJar.useZip { extractConfig(it.resolve(DEFAULT_CONFIG_PATH), DEFAULT_CONFIG_NAME, DEFAULT_CONFIG_PATH, ::mainLoaded) }
         ConfigExtractor.saveStoredConfigs()
         mainLoaded = true
@@ -54,8 +53,6 @@ object Configs {
     
     @InitFun
     private fun extractAllConfigs() {
-        LOGGER.info("Extracting configs")
-        
         extractConfigs("nova", NOVA.novaJar, "configs/nova/")
         for ((id, loader) in AddonManager.loaders) {
             extractConfigs(id, loader.file, "configs/")

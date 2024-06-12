@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.data.resources.upload.service.S3
 import xyz.xenondevs.nova.data.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.data.resources.upload.service.Xenondevs
 import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -22,7 +23,8 @@ import java.io.File
 import java.util.logging.Level
 
 @InternalInit(
-    stage = InternalInitStage.POST_WORLD_ASYNC,
+    stage = InternalInitStage.POST_WORLD,
+    dispatcher = Dispatcher.ASYNC,
     dependsOn = [HooksLoader::class, ResourceGeneration.PostWorld::class]
 )
 internal object AutoUploadManager {
@@ -110,7 +112,7 @@ internal object AutoUploadManager {
         }
     }
     
-    @DisableFun
+    @DisableFun(dispatcher = Dispatcher.ASYNC)
     private fun disable() {
         selectedService?.disable()
         selectedService = null

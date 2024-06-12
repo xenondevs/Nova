@@ -53,7 +53,6 @@ object AttachmentManager : Listener, PacketListener {
     
     @DisableFun
     private fun disable() {
-        LOGGER.info("Saving attachments")
         Bukkit.getOnlinePlayers().forEach { saveAndRemoveAttachments(it) }
     }
     

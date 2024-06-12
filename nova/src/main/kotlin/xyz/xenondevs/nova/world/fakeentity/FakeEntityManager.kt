@@ -12,10 +12,10 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.persistence.PersistentDataType
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -38,7 +38,10 @@ var Player.fakeEntityRenderDistance: Int
         FakeEntityManager.updateRenderDistance(this)
     }
 
-@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dispatcher = Dispatcher.ASYNC
+)
 internal object FakeEntityManager : Listener {
     
     val RENDER_DISTANCE_KEY = NamespacedKey(NOVA_PLUGIN, "entity_render_distance")
@@ -63,7 +66,6 @@ internal object FakeEntityManager : Listener {
     
     @DisableFun
     private fun disable() {
-        LOGGER.info("Despawning fake entities")
         synchronized(FakeEntityManager) {
             chunkEntities.forEach { (chunk, entities) ->
                 val viewers = chunkViewers[chunk] ?: return@forEach

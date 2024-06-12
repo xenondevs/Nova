@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -39,7 +40,8 @@ data class CharOptions(
 )
 
 @InternalInit(
-    stage = InternalInitStage.POST_WORLD_ASYNC,
+    stage = InternalInitStage.POST_WORLD,
+    dispatcher = Dispatcher.ASYNC,
     dependsOn = [ResourceGeneration.PostWorld::class]
 )
 object CharSizes {

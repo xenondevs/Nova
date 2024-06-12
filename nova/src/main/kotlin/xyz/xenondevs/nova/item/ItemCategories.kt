@@ -36,8 +36,6 @@ internal object ItemCategories {
     
     @InitFun
     private fun init() {
-        LOGGER.info("Loading item categories")
-        
         val cfg = Configs["nova:item_categories"]
         reload(cfg.get())
         cfg.addUpdateHandler(::reload)

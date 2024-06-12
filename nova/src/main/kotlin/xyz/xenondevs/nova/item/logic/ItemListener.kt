@@ -19,6 +19,7 @@ import xyz.xenondevs.nmsutils.network.event.PacketListener
 import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundUseItemPacketEvent
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -32,7 +33,10 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import java.util.*
 
-@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dispatcher = Dispatcher.ASYNC
+)
 internal object ItemListener : Listener, PacketListener {
     
     private val usedItems = WeakHashMap<Player, ItemStack>()

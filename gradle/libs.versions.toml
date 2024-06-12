@@ -5,6 +5,7 @@ format.version = "1.1"
 cbf = "0.11"
 configurate = "4.2.0-SNAPSHOT"
 invui = "1.31"
+jgrapht = "1.5.1"
 kotlin = "2.0.0"
 kotlinx-coroutines = "1.8.0"
 ktor = "2.3.9"
@@ -31,6 +32,8 @@ fuzzywuzzy = { group = "me.xdrop", name = "fuzzywuzzy", version = "1.4.0" }
 gson = { group = "com.google.code.gson", name = "gson", version = "2.10.1" }
 inventoryaccess = { group = "xyz.xenondevs.invui", name = "inventory-access-r18", version.ref = "invui" }
 invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version.ref = "invui" }
+jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jgrapht" }
+jgrapht-io = { group = "org.jgrapht", name = "jgrapht-io", version.ref = "jgrapht" }
 jimfs = { group = "com.google.jimfs", name = "jimfs", version = "1.2" }
 joml-primitives = { group = "org.joml", name = "joml-primitives", version = "1.10.0" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.9.0" }
@@ -59,6 +62,7 @@ zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.6-3" }
 [bundles]
 cbf = ["cosmic-binary-format", "cosmic-binary-format-netty-adapter", "cosmic-binary-format-provider"]
 configurate = ["configurate-yaml", "configurate-extra-kotlin"]
+jgrapht = ["jgrapht-core", "jgrapht-io"]
 kotlin = ["kotlin-stdlib", "kotlin-reflect", "kotlinx-coroutines-core-jvm", "kotlinx-coroutines-debug"]
 ktor = ["ktor-server-core-jvm", "ktor-server-cio-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"]
 maven-resolver = ["maven-resolver-provider", "maven-resolver-connector-basic", "maven-resolver-transport-http"]

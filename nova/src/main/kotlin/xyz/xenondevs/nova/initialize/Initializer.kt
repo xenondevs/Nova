@@ -1,20 +1,26 @@
 package xyz.xenondevs.nova.initialize
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder
 import io.papermc.paper.configuration.GlobalConfiguration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.debug.DebugProbes
-import net.kyori.adventure.text.Component
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.server.ServerLoadEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.commons.collections.CollectionUtils
-import xyz.xenondevs.commons.collections.poll
+import org.jgrapht.Graph
+import org.jgrapht.graph.DefaultEdge
+import org.jgrapht.graph.DirectedAcyclicGraph
+import org.jgrapht.nio.DefaultAttribute
+import org.jgrapht.nio.dot.DOTExporter
 import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.invui.inventory.StackSizeProvider
 import xyz.xenondevs.invui.util.InventoryUtils
@@ -23,6 +29,7 @@ import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.NOVA_PLUGIN
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.data.config.Configs
@@ -35,51 +42,24 @@ import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils
 import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.runTask
-import java.util.*
-import java.util.concurrent.Executors
+import java.io.File
+import java.lang.reflect.InvocationTargetException
 import java.util.logging.Level
 import xyz.xenondevs.inventoryaccess.component.i18n.Languages as InvUILanguages
 
+private val LOGGING by Configs["config"].entry<Boolean>("debug", "logging", "initializer")
+
 internal object Initializer : Listener {
     
-    /**
-     * The thread pool used for post-world initialization.
-     */
-    private val execService = Executors.newCachedThreadPool(ThreadFactoryBuilder().setNameFormat("Nova Initializer - %d").build())
+    private val initializables = HashSet<Initializable>()
+    private val disableables = HashSet<DisableableFunction>()
     
-    /**
-     * A list containing all [InitializableClasses][InitializableClass] at all times.
-     */
-    private val initClasses = ArrayList<InitializableClass>()
+    private val initPreWorld = DirectedAcyclicGraph<Initializable, DefaultEdge>(DefaultEdge::class.java)
+    private val initPostWorld = DirectedAcyclicGraph<Initializable, DefaultEdge>(DefaultEdge::class.java)
+    private val disable = DirectedAcyclicGraph<DisableableFunction, DefaultEdge>(DefaultEdge::class.java)
     
-    /**
-     * A list containing all not yet initialized [InitializableClasses][InitializableClass] for pre-world initialization
-     * in the order that they should be initialized in.
-     */
-    private var toInitPreWorld: MutableList<InitializableClass> = ArrayList()
-    
-    /**
-     * A list containing all [InitializableClasses][InitializableClass] for post-world initialization (sync and async)
-     * in the order that they should be initialized in.
-     *
-     * Unlike the pre-world variant, this list is not updated after the initialization of its elements.
-     */
-    private var toInitPostWorld: List<InitializableClass> = ArrayList()
-    
-    /**
-     * A list of successfully initialized [InitializableClasses][InitializableClass].
-     */
-    val initialized: MutableList<InitializableClass> = Collections.synchronizedList(ArrayList())
-    
-    /**
-     * Whether the pre-world initialization step has been completed successfully.
-     */
+    private lateinit var preWorldScope: CoroutineScope
     private var preWorldInitialized = false
-    
-    /**
-     * Whether the initialization process has been completed successfully.
-     */
     var isDone = false
         private set
     
@@ -87,41 +67,130 @@ internal object Initializer : Listener {
      * Stats the initialization process.
      */
     fun start() {
-        searchClasses()
+        val (initializables, disableables) = collectRunnables(NOVA.novaJar, Nova::class.java.classLoader)
+        addRunnables(initializables, disableables)
         initPreWorld()
     }
     
     /**
-     * Searches for classes annotated with [InternalInit] and adds stores them to be initialized.
+     * Searches [file] and collects classes annotated by [InternalInit] and [Init] and functions
+     * annotated by [InitFun] and [DisableFun] as [Initializables][Initializable] and [DisableableFunctions][DisableableFunction].
      */
-    private fun searchClasses() {
-        val classes = JarUtils.findAnnotatedClasses(NOVA.novaJar, InternalInit::class)
-            .map { (clazz, annotation) -> InitializableClass.fromInternalAnnotation(clazz, annotation) }
-        addInitClasses(classes)
+    fun collectRunnables(file: File, classLoader: ClassLoader): Pair<List<Initializable>, List<DisableableFunction>> {
+        val initializables = ArrayList<Initializable>()
+        val disableables = ArrayList<DisableableFunction>()
+        val initializableClasses = HashMap<String, InitializableClass>()
+        
+        val result = JarUtils.findAnnotatedClasses(
+            file,
+            listOf(InternalInit::class, Init::class),
+            listOf(InitFun::class, DisableFun::class)
+        )
+        
+        val internalInits = result.classes[InternalInit::class] ?: emptyMap()
+        val inits = result.classes[Init::class] ?: emptyMap()
+        val initFuncs = result.functions[InitFun::class] ?: emptyMap()
+        val disableFuncs = result.functions[DisableFun::class] ?: emptyMap()
+        
+        for ((className, annotations) in internalInits) {
+            val clazz = InitializableClass.fromInternalAnnotation(classLoader, className, annotations.first())
+            initializables += clazz
+            initializableClasses[className] = clazz
+        }
+        for ((className, annotations) in inits) {
+            val clazz = InitializableClass.fromAddonAnnotation(classLoader, className, annotations.first())
+            initializables += clazz
+            initializableClasses[className] = clazz
+        }
+        
+        for ((className, annotatedFuncs) in initFuncs) {
+            val clazz = initializableClasses[className]
+                ?: throw IllegalStateException("Class $className is missing an init annotation!")
+            
+            for ((methodName, annotations) in annotatedFuncs) {
+                initializables += InitializableFunction.fromInitAnnotation(clazz, methodName, annotations.first())
+            }
+        }
+        
+        for ((className, annotatedFuncs) in disableFuncs) {
+            for ((methodName, annotations) in annotatedFuncs) {
+                disableables += DisableableFunction.fromInitAnnotation(classLoader, className, methodName, annotations.first())
+            }
+        }
+        
+        return initializables to disableables
     }
     
     /**
-     * Adds the given [InitializableClasses][InitializableClass] to the [initClasses] list and sorts them.
+     * Adds the given [Initializables][Initializable] and [DisableableFunctions][DisableableFunction] to the initialization process.
      *
      * This method can only be invoked during the pre-world initialization phase or before the [start] method is called.
      */
-    fun addInitClasses(classes: List<InitializableClass>) {
-        check(!preWorldInitialized) { "Cannot add additional init classes after pre-world initialization!" }
+    fun addRunnables(initializables: List<Initializable>, disableables: List<DisableableFunction>) {
+        check(!preWorldInitialized) { "Cannot add additional callables after pre-world initialization!" }
         
-        initClasses.addAll(classes)
-        initClasses.forEach { it.loadDependencies(initClasses) }
+        // add vertices
+        for (initializable in initializables) {
+            this.initializables += initializable
+            when (initializable.stage) {
+                InternalInitStage.PRE_WORLD -> initPreWorld.addVertex(initializable)
+                else -> initPostWorld.addVertex(initializable)
+            }
+        }
+        for (disableable in disableables) {
+            this.disableables += disableable
+            disable.addVertex(disableable)
+        }
         
-        fun combineAndSort(a: List<InitializableClass>, b: List<InitializableClass>) =
-            ArrayList(CollectionUtils.sortDependencies(a + b, InitializableClass::dependsOn))
+        // add edges
+        for (initializable in initializables) {
+            initializable.loadDependencies(
+                this.initializables,
+                if (initializable.stage == InternalInitStage.PRE_WORLD) initPreWorld else initPostWorld
+            )
+        }
+        for (disableable in disableables) {
+            disableable.loadDependencies(this.disableables, disable)
+        }
         
-        toInitPreWorld = combineAndSort(toInitPreWorld, classes.filter { it.stage == InternalInitStage.PRE_WORLD })
-        toInitPostWorld = combineAndSort(toInitPostWorld, classes.filter { it.stage != InternalInitStage.PRE_WORLD })
+        // launch initialization it if already started
+        if (::preWorldScope.isInitialized) {
+            for (initializable in initializables) {
+                if (initializable.stage != InternalInitStage.PRE_WORLD)
+                    continue
+                
+                launch(preWorldScope, initializable, initPreWorld)
+            }
+        }
+        
+        if (IS_DEV_SERVER)
+            dumpGraphs()
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    private fun dumpGraphs() {
+        val dir = File("debug/nova/")
+        val preWorldFile = File(dir, "pre_world.dot")
+        val postWorldFile = File(dir, "post_world.dot")
+        val disableFile = File(dir, "disable.dot")
+        dir.mkdirs()
+        
+        val exporter = DOTExporter<InitializerRunnable<*>, DefaultEdge>()
+        exporter.setVertexAttributeProvider { vertex ->
+            mapOf(
+                "label" to DefaultAttribute.createAttribute(vertex.toString()),
+                "color" to DefaultAttribute.createAttribute(if (vertex.dispatcher != null) "aqua" else "black")
+            )
+        }
+        exporter.exportGraph(initPreWorld as Graph<InitializerRunnable<*>, DefaultEdge>, preWorldFile)
+        exporter.exportGraph(initPostWorld as Graph<InitializerRunnable<*>, DefaultEdge>, postWorldFile)
+        exporter.exportGraph(disable as Graph<InitializerRunnable<*>, DefaultEdge>, disableFile)
     }
     
     /**
      * Stats the pre-world initialization process.
      */
-    private fun initPreWorld() {
+    private fun initPreWorld() = runBlocking {
         if (IS_DEV_SERVER) {
             DebugProbes.install()
             DebugProbes.enableCreationStackTraces = true
@@ -140,115 +209,122 @@ internal object Initializer : Listener {
         cfg.disableNoteblockUpdates = true
         cfg.disableMushroomBlockUpdates = true
         
-        // pre-world initialization polls from the list because additional elements may be added by addons
-        var failed = false
-        while (toInitPreWorld.isNotEmpty()) {
-            val initClass = toInitPreWorld.poll()!!
-            if (!initClass.initialize()) {
-                failed = true
-                break
+        val success = tryInit {
+            coroutineScope {
+                preWorldScope = this
+                launchAll(this, initPreWorld)
             }
         }
         
-        if (!failed) {
+        if (success) {
             NovaRegistryAccess.freezeAll()
             VanillaRegistryAccess.freezeAll()
             preWorldInitialized = true
-        } else {
-            shutdown()
         }
     }
     
     /**
      * Starts the post-world initialization process.
      */
-    private fun initPostWorld() {
-        execService.submit {
-            toInitPostWorld.forEach { initializable ->
-                // each InitializableClass gets its own thread in which it waits for its dependencies to be initialized
-                execService.submit initializableThread@{
-                    if (!waitForDependencies(initializable))
-                        return@initializableThread
-                    
-                    // dependencies have been initialized, now initialize this class in the preferred thread
-                    when (initializable.stage) {
-                        // for post-world, jump to the server thread
-                        InternalInitStage.POST_WORLD -> runTask { initializable.initialize() }
-                        // for async, we can stay in the current thread
-                        InternalInitStage.POST_WORLD_ASYNC -> initializable.initialize()
-                        
-                        // should not happen
-                        else -> throw UnsupportedOperationException()
-                    }
-                }
-            }
-            
-            // block thread until everything is initialized
-            var failed = false
-            for (initClass in toInitPostWorld) {
-                if (!initClass.initialization.get()) {
-                    failed = true
-                }
-            }
-            
-            if (!failed) {
-                isDone = true
-                callEvent(NovaLoadDataEvent())
-                
-                runTask {
-                    PermanentStorage.store("last_version", NOVA_PLUGIN.pluginMeta.version)
-                    setGlobalIngredients()
-                    AddonManager.enableAddons()
-                    setupMetrics()
-                    LOGGER.info("Done loading")
-                }
-            } else {
-                shutdown()
-            }
-        }
-    }
-    
-    /**
-     * Disables all [InitializableClasses][InitializableClass] in the reverse order that they were initialized in.
-     */
-    fun disable() {
-        CollectionUtils.sortDependencies(initialized, InitializableClass::dependsOn).reversed().forEach {
-            try {
-                it.disable()
-            } catch (e: Exception) {
-                LOGGER.log(Level.SEVERE, "An exception occurred trying to disable $it", e)
+    private fun initPostWorld() = runBlocking {
+        val success = tryInit {
+            coroutineScope {
+                launchAll(this, initPostWorld)
             }
         }
         
-        NMSUtilities.disable()
+        if (success) {
+            isDone = true
+            callEvent(NovaLoadDataEvent())
+            
+            PermanentStorage.store("last_version", NOVA_PLUGIN.pluginMeta.version)
+            setGlobalIngredients()
+            AddonManager.enableAddons()
+            setupMetrics()
+            LOGGER.info("Done loading")
+        }
     }
     
     /**
-     * Blocks the thread until all dependencies of the given [InitializableClass] have been initialized and
-     * returns true if all dependencies were successfully initialized.
+     * Launches all vertices of [graph] in the given [scope].
      */
-    private fun waitForDependencies(initializable: InitializableClass): Boolean {
-        initializable.dependsOn.forEach { dependency ->
-            // wait for all dependencies to load and skip own initialization if one of them failed
-            if (!dependency.initialization.get()) {
-                LOGGER.warning("Skipping initialization: $initializable")
-                initializable.initialization.complete(false)
-                return false
+    private fun <T : InitializerRunnable<T>> launchAll(scope: CoroutineScope, graph: Graph<T, DefaultEdge>) {
+        for (initializable in graph.vertexSet()) {
+            launch(scope, initializable, graph)
+        }
+    }
+    
+    /**
+     * Launches [runnable] of [graph] in the given [scope].
+     */
+    private fun <T : InitializerRunnable<T>> launch(
+        scope: CoroutineScope,
+        runnable: T,
+        graph: Graph<T, DefaultEdge>
+    ) {
+        scope.launch {
+            // await dependencies, which may increase during wait
+            var prevDepsSize = 0
+            var deps: List<Deferred<*>> = emptyList()
+            
+            fun findDependencies(): List<Deferred<*>> {
+                deps = graph.incomingEdgesOf(runnable)
+                    .map { graph.getEdgeSource(it).completion }
+                return deps
+            }
+            
+            while (prevDepsSize != findDependencies().size) {
+                prevDepsSize = deps.size
+                deps.awaitAll()
+            }
+            
+            // run in preferred context
+            withContext(runnable.dispatcher ?: scope.coroutineContext) {
+                if (LOGGING) 
+                    LOGGER.info(runnable.toString())
+                
+                try {
+                    runnable.run()
+                } catch (t: Throwable) {
+                    throw RuntimeException("An exception occurred trying to run $runnable", t)
+                }
             }
         }
-        return true
     }
     
-    private fun shutdown() {
-        LOGGER.warning("Shutting down the server...")
-        Bukkit.shutdown()
-    }
-    
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private fun handleLogin(event: PlayerLoginEvent) {
-        if (!isDone && !IS_DEV_SERVER) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("[Nova] Initialization not complete. Please wait."))
+    /**
+     * Wraps [run] in a try-catch block with error logging specific to initialization.
+     * Returns whether the initialization was successful, and also shuts down the server if it wasn't.
+     */
+    private inline fun tryInit(run: () -> Unit): Boolean {
+        try {
+            run()
+            return true
+        } catch (t: Throwable) {
+            val cause = if (t is InvocationTargetException) t.targetException else t
+            if (cause is InitializationException) {
+                LOGGER.severe(cause.message)
+            } else {
+                LOGGER.log(Level.SEVERE, "An exception occurred during initialization", cause)
+            }
+            
+            LOGGER.severe("Initialization failed, shutting down the server...")
+            Bukkit.shutdown()
+            return false
         }
+    }
+    
+    /**
+     * Disables all [Initializables][Initializable] in the reverse order that they were initialized in.
+     */
+    fun disable() = runBlocking {
+        if (isDone) {
+            coroutineScope { launchAll(this, disable) }
+        } else {
+            LOGGER.warning("Skipping disable phase due to incomplete initialization")
+        }
+        
+        NMSUtilities.disable()
     }
     
     @EventHandler

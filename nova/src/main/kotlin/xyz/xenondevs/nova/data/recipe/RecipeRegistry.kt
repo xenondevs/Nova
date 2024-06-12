@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.recipe
 import org.bukkit.Bukkit
 import org.bukkit.inventory.Recipe
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -13,7 +14,8 @@ import xyz.xenondevs.nova.util.item.ItemUtils.getId
 import kotlin.reflect.full.isSuperclassOf
 
 @InternalInit(
-    stage = InternalInitStage.POST_WORLD_ASYNC,
+    stage = InternalInitStage.POST_WORLD,
+    dispatcher = Dispatcher.ASYNC,
     dependsOn = [RecipeManager::class]
 )
 object RecipeRegistry {
@@ -54,7 +56,6 @@ object RecipeRegistry {
     
     @InitFun
     internal fun indexRecipes() {
-        LOGGER.info("Indexing recipes")
         BUKKIT_RECIPES = loadBukkitRecipes()
         CREATION_RECIPES = loadCreationRecipes()
         USAGE_RECIPES = loadUsageRecipes()

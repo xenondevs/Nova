@@ -10,11 +10,17 @@ import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
+import xyz.xenondevs.nova.item.DefaultBlockOverlays
+import xyz.xenondevs.nova.item.DefaultGuiItems
+import xyz.xenondevs.nova.item.DefaultItems
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
+import xyz.xenondevs.nova.world.block.DefaultBlocks
 import java.security.MessageDigest
 
 private const val VERSION_HASH = "version_hash"
@@ -30,7 +36,15 @@ internal object ResourceGeneration {
     
     @InternalInit(
         stage = InternalInitStage.PRE_WORLD,
-        dependsOn = [AddonsInitializer::class]
+        dispatcher = Dispatcher.ASYNC,
+        dependsOn = [
+            AddonsInitializer::class,
+            DefaultItems::class,
+            DefaultGuiItems::class,
+            DefaultBlocks::class,
+            DefaultBlockOverlays::class,
+        DefaultGuiTextures::class,
+        ]
     )
     object PreWorld {
         
@@ -54,7 +68,8 @@ internal object ResourceGeneration {
     }
     
     @InternalInit(
-        stage = InternalInitStage.POST_WORLD_ASYNC,
+        stage = InternalInitStage.POST_WORLD,
+        dispatcher = Dispatcher.ASYNC,
         dependsOn = [HooksLoader::class]
     )
     object PostWorld {
@@ -95,7 +110,7 @@ internal object ResourceGeneration {
      * Checks whether all block states have models.
      */
     private fun hasAllBlockModels(): Boolean =
-         NovaRegistries.BLOCK.asSequence()
+        NovaRegistries.BLOCK.asSequence()
             .flatMap { it.blockStates }
             .all { it in ResourceLookups.BLOCK_MODEL }
     

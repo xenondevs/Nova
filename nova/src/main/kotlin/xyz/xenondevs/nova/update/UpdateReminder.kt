@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -27,7 +28,10 @@ private val NOVA_DISTRIBUTORS = listOf(
     ProjectDistributor.modrinth("nova-framework")
 )
 
-@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dispatcher = Dispatcher.ASYNC
+)
 internal object UpdateReminder : Listener {
     
     private var task: BukkitTask? = null

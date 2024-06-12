@@ -24,7 +24,6 @@ object ChunkLoadManager {
     
     @DisableFun
     private fun disable() {
-        LOGGER.info("Saving force-loaded chunks")
         PermanentStorage.store("forceLoadedChunks", forceLoadedChunks)
     }
     

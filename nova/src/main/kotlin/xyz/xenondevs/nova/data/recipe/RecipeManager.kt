@@ -71,7 +71,6 @@ object RecipeManager : Listener, PacketListener {
     
     @InitFun
     private fun init() {
-        LOGGER.info("Loading recipes")
         registerEvents()
         registerPacketListener()
         loadRecipes()

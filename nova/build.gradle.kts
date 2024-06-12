@@ -37,6 +37,7 @@ dependencies {
     novaLoader(libs.caffeine)
     novaLoader(libs.lz4)
     novaLoader(libs.zstd)
+    novaLoader(libs.bundles.jgrapht)
     
     // runtime dependencies
     spigotRuntime(paperweight.paperDevBundleDependency(libs.versions.paper.get()))

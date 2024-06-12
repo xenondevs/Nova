@@ -185,3 +185,7 @@ debug:
   allow_craft_result_overwrite: false
   # A list of pack tasks that should be skipped during resource pack generation
   skip_pack_tasks: []
+  # Debug logging options
+  logging:
+    # Logs initializer runnable calls
+    initializer: false

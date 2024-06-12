@@ -9,7 +9,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.commons.collections.removeIf
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
@@ -42,7 +41,6 @@ object AbilityManager : Listener {
     
     @DisableFun
     private fun disable() {
-        LOGGER.info("Removing active abilities")
         Bukkit.getOnlinePlayers().forEach(AbilityManager::handlePlayerQuit)
     }
     
