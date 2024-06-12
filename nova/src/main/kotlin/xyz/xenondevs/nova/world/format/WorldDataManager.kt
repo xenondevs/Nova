@@ -14,8 +14,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
-import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -23,7 +21,6 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
-import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
@@ -33,21 +30,15 @@ import xyz.xenondevs.nova.world.pos
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dependsOn = [
-        AddonsInitializer::class,
-        ResourceGeneration.PreWorld::class,
-        VanillaTileEntityManager::class,
-        NetworkManager::class
-    ]
-)
+@InternalInit(stage = InternalInitStage.POST_WORLD)
 object WorldDataManager : Listener {
     
     private val worlds = ConcurrentHashMap<UUID, WorldDataStorage>()
     private var initialized = false
     
-    @InitFun
+    @InitFun(
+        runAfter = [NetworkManager::class] // chunk enable may queue network tasks
+    )
     private fun init() = runBlocking {
         initialized = true
         registerEvents()
@@ -62,7 +53,9 @@ object WorldDataManager : Listener {
             }
     }
     
-    @DisableFun
+    @DisableFun(
+        runAfter = [NetworkManager::class] // all tasks need to be processed before saving network regions
+    )
     private fun disable() = runBlocking {
         for (world in worlds.values) {
             world.disableAllChunks()

@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.tileentity.network
 
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.block.BlockFace
@@ -12,6 +13,7 @@ import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldLoadEvent
 import org.bukkit.event.world.WorldUnloadEvent
 import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -76,9 +78,12 @@ object NetworkManager : Listener {
         registerEvents()
     }
     
-    @DisableFun
-    private fun disable() {
-        // TODO: await completion of all network tasks
+    @DisableFun(dispatcher = Dispatcher.ASYNC)
+    private suspend fun disable() {
+        for ((_, configurator) in configurators) {
+            configurator.awaitShutdown()
+        }
+        SUPERVISOR.cancel("NetworkManager disabled")
     }
     
     private fun makeConfigurator(world: World) {

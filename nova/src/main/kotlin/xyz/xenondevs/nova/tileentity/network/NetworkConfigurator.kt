@@ -31,11 +31,6 @@ import java.util.logging.Level
 internal class NetworkConfigurator(private val world: World, private val ticker: NetworkTicker) {
     
     /**
-     * The channel responsible for processing [NetworkTasks][NetworkTask].
-     */
-    private val channel = Channel<NetworkTask>(capacity = UNLIMITED)
-    
-    /**
      * Stores protection query results for [ProtectedNodeNetworkTasks][ProtectedNodeNetworkTask].
      */
     private val protectionResults = ConcurrentHashMap<ProtectedNodeNetworkTask, Deferred<ProtectionResult>>()
@@ -45,16 +40,22 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
      */
     val state = WorldDataManager.getWorldStorage(world).networkState
     
-    init {
-        CoroutineScope(NetworkManager.SUPERVISOR).launch(CoroutineName("Network configurator ${world.name}")) {
-            channel.consumeEach { task ->
-                try {
-                    task.event.begin()
-                    processTask(task)
-                    task.event.commit()
-                } catch (e: Exception) {
-                    LOGGER.log(Level.SEVERE, "An exception occurred trying to process NetworkTask: $task", e)
-                }
+    /**
+     * The channel responsible for processing [NetworkTasks][NetworkTask].
+     */
+    private val channel = Channel<NetworkTask>(capacity = UNLIMITED)
+    
+    /**
+     * The coroutine responsible for processing [NetworkTasks][NetworkTask].
+     */
+    private val job = CoroutineScope(NetworkManager.SUPERVISOR).launch(CoroutineName("Network configurator ${world.name}")) {
+        channel.consumeEach { task ->
+            try {
+                task.event.begin()
+                processTask(task)
+                task.event.commit()
+            } catch (e: Exception) {
+                LOGGER.log(Level.SEVERE, "An exception occurred trying to process NetworkTask: $task", e)
             }
         }
     }
@@ -68,6 +69,14 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
             protectionResults[task] = async(Dispatchers.Default) { queryProtection(task.node) }
         
         channel.send(task)
+    }
+    
+    /**
+     * Closes the [channel] and waits for all queued tasks to be processed.
+     */
+    suspend fun awaitShutdown() {
+        channel.close()
+        job.join()
     }
     
     /**
