@@ -342,13 +342,14 @@ object BlockUtils {
         val pos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
         val items = breakBlockInternal(ctx, sendEffectsToBreaker = true)
         
-        val player = ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player ?: return
+        val player = ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player
         val block = pos.block
-        CraftEventFactory.handleBlockDropItemEvent(
-            block, block.state,
-            player.serverPlayer,
-            EntityUtils.createBlockDropItemEntities(pos, items)
-        )
+        val itemEntities = EntityUtils.createBlockDropItemEntities(pos, items)
+        if (player != null) {
+            CraftEventFactory.handleBlockDropItemEvent(block, block.state, player.serverPlayer, itemEntities)
+        } else {
+            itemEntities.forEach(pos.world.serverLevel::addFreshEntity)
+        }
     }
     
     /**
