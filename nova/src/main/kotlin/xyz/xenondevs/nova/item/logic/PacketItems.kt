@@ -380,7 +380,7 @@ internal object PacketItems : Listener, PacketListener {
         // enchantments tooltip (above normal lore text)
         val enchantmentsTooltip = buildEnchantmentsTooltip(itemStack)
         enchantmentsTooltip.forEachIndexed { idx, line -> loreTag.add(idx, line.withoutPreFormatting().toNBT()) }
-        if (enchantmentsTooltip.isNotEmpty()) tag.put("Enchantments", GLINT_ENCHANTMENT_TAG) // ensures glint effect
+        if (enchantmentsTooltip.isNotEmpty() && !tag.contains("Enchantments")) tag.put("Enchantments", GLINT_ENCHANTMENT_TAG) // ensures glint effect
         // attributes tooltip
         buildAttributeModifiersTooltip(player?.serverPlayer, newItemStack).forEach { loreTag += it.withoutPreFormatting().toNBT() }
         // advanced tooltips
