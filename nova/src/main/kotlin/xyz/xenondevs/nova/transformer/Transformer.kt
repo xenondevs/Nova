@@ -5,6 +5,7 @@ import org.objectweb.asm.tree.MethodNode
 import xyz.xenondevs.bytebase.asm.InsnBuilder
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
+import xyz.xenondevs.bytebase.util.copy
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.nova.util.data.AsmUtils
 import java.lang.reflect.Method
@@ -49,6 +50,11 @@ internal sealed interface Transformer {
     fun MethodNode.replaceInstructions(build: InsnBuilder.() -> Unit) {
         clear()
         instructions = buildInsnList(build)
+    }
+    
+    fun MethodNode.replaceInstructions(insns: InsnList) {
+        clear()
+        instructions = insns.copy()
     }
     
     fun MethodNode.delegateStatic(other: KFunction<*>) {

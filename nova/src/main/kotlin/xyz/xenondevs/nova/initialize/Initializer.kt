@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.initialize
 
-import io.papermc.paper.configuration.GlobalConfiguration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
@@ -204,10 +203,6 @@ internal object Initializer : Listener {
         InvUILanguages.getInstance().enableServerSideTranslations(false)
         CBFAdapters.register()
         InventoryUtils.stackSizeProvider = StackSizeProvider(ItemStack::novaMaxStackSize)
-        
-        val cfg = GlobalConfiguration.get().blockUpdates
-        cfg.disableNoteblockUpdates = true
-        cfg.disableMushroomBlockUpdates = true
         
         val success = tryInit {
             coroutineScope {
