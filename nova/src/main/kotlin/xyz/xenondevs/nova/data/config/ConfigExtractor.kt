@@ -58,8 +58,9 @@ internal object ConfigExtractor {
         cfg.walk().forEach { node ->
             val path = node.path()
             if (internalCfg.node(path).virtual() && !storedCfg.node(path).virtual()) {
-                cfg.removeChild(path)
-                storedCfg.removeChild(path)
+                val name = path.array().last()
+                cfg.node(path).parent()?.removeChild(name)
+                storedCfg.node(path).parent()?.removeChild(name)
             }
         }
         
