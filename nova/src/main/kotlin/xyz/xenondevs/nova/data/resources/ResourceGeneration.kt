@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.item.DefaultItems
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.world.block.DefaultBlocks
+import xyz.xenondevs.nova.world.block.migrator.BlockMigrator
 import java.security.MessageDigest
 
 private const val VERSION_HASH = "version_hash"
@@ -82,6 +83,7 @@ internal object ResourceGeneration {
                 builder.buildPackPostWorld()
                 AutoUploadManager.wasRegenerated = true
                 PermanentStorage.store(VERSION_HASH, versionHash)
+                BlockMigrator.updateMigrationId()
             }
         }
         

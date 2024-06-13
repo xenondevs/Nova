@@ -72,7 +72,7 @@ import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.BlockMigrator
+import xyz.xenondevs.nova.world.block.migrator.BlockMigrator
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.hitbox.HitboxManager
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
@@ -136,8 +136,6 @@ internal object NovaCommand : Command("nova") {
                 .then(literal("removeInvalidVTEs")
                     .then(argument("range", IntegerArgumentType.integer(0))
                         .executesCatching(::removeInvalidVTEs)))
-                .then(literal("updateChunkSearchId")
-                    .executesCatching(::updateChunkSearchId))
                 .then(literal("getBlockData")
                     .requiresPlayer()
                     .executesCatching(::showBlockData))
@@ -216,11 +214,6 @@ internal object NovaCommand : Command("nova") {
                     .executesCatching(::reloadConfigs))
                 .then(literal("recipes")
                     .executesCatching(::reloadRecipes)))
-    }
-    
-    private fun updateChunkSearchId(ctx: CommandContext<CommandSourceStack>) {
-        BlockMigrator.updateChunkSearchId()
-        ctx.source.sendSuccess(Component.translatable("command.nova.update_chunk_search_id.success", NamedTextColor.GRAY))
     }
     
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {

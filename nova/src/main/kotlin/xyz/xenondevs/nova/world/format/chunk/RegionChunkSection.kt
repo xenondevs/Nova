@@ -17,8 +17,11 @@ import xyz.xenondevs.nova.world.format.chunk.container.SingleValueSectionDataCon
  */
 internal class RegionChunkSection<T>(
     private val idResolver: IdResolver<T>,
-    private var container: SectionDataContainer<T>
+    container: SectionDataContainer<T>
 ) {
+    
+    var container: SectionDataContainer<T> = container
+        private set
     
     constructor(idResolver: IdResolver<T>) : this(idResolver, MapSectionDataContainer(idResolver))
     

@@ -1,6 +1,32 @@
 package xyz.xenondevs.nova.world.block.state.model
 
+import net.minecraft.world.level.block.Blocks
+import xyz.xenondevs.nova.util.setBlockState
+import xyz.xenondevs.nova.util.setBlockStateNoUpdate
+import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.world.BlockPos
+
+/**
+ * Defines how vanilla block states should be set.
+ */
+internal enum class BlockUpdateMethod {
+    
+    /**
+     * The default way of setting a block, with block updates.
+     */
+    DEFAULT,
+    
+    /**
+     * Places the block without block updates.
+     */
+    NO_UPDATE,
+    
+    /**
+     * Places the block without block updates and without notifying the client.
+     */
+    SILENT
+    
+}
 
 /**
  * A block model provider is responsible for showing custom block models to players and placing their colliders.
@@ -10,29 +36,37 @@ import xyz.xenondevs.nova.world.BlockPos
 internal sealed interface BlockModelProvider<I> {
     
     /**
-     * Called when a block that can be displayed using [info] has been loaded at [pos].
+     * Places the model [info] at [pos].
+     */
+    fun set(pos: BlockPos, info: I, method: BlockUpdateMethod)
+    
+    /**
+     * Removes the model at [pos].
+     */
+    fun remove(pos: BlockPos, method: BlockUpdateMethod) {
+        val air = Blocks.AIR.defaultBlockState()
+        when (method) {
+            BlockUpdateMethod.DEFAULT -> pos.setBlockState(air)
+            BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(air)
+            BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(air)
+        }
+    }
+    
+    /**
+     * Reactivates the model [info] at [pos], assuming the model
+     * was already [set] previously.
      */
     fun load(pos: BlockPos, info: I)
     
     /**
-     * Called when a block that can be displayed using [info] has been placed at [pos].
-     */
-    fun set(pos: BlockPos, info: I)
-    
-    /**
-     * Called when a block that has been displayed at [pos] using this [BlockModelProvider] was destroyed.
-     */
-    fun remove(pos: BlockPos)
-    
-    /**
-     * Called when a block that has been displayed at [pos] using this [BlockModelProvider] was unloaded.
+     * Deactivates the model at [pos].
      */
     fun unload(pos: BlockPos)
     
     /**
-     * Called when a block that has been displayed at [pos] using this [BlockModelProvider] was replaced.
+     * Replaces the model at [pos] with [info].
      */
-    fun replace(pos: BlockPos, prevInfo: I, newInfo: I)
+    fun replace(pos: BlockPos, info: I, method: BlockUpdateMethod)
     
 }
 
@@ -44,20 +78,19 @@ internal data class LinkedBlockModelProvider<I>(
     val info: I
 ) {
     
+    fun set(pos: BlockPos, method: BlockUpdateMethod = BlockUpdateMethod.DEFAULT) = provider.set(pos, info, method)
+    
+    fun remove(pos: BlockPos, method: BlockUpdateMethod = BlockUpdateMethod.DEFAULT) = provider.remove(pos, method)
+    
     fun load(pos: BlockPos) = provider.load(pos, info)
-    
-    fun set(pos: BlockPos) = provider.set(pos, info)
-    
-    fun remove(pos: BlockPos) = provider.remove(pos)
     
     fun unload(pos: BlockPos) = provider.unload(pos)
     
-    fun replace(pos: BlockPos, prevInfo: I) = provider.replace(pos, prevInfo, info)
+    fun replace(pos: BlockPos, method: BlockUpdateMethod = BlockUpdateMethod.DEFAULT) = provider.replace(pos, info, method)
     
-    @Suppress("UNCHECKED_CAST")
     fun replace(pos: BlockPos, prevProvider: LinkedBlockModelProvider<*>) {
         if (prevProvider.provider == provider) {
-            provider.replace(pos, prevProvider.info as I, info)
+            provider.replace(pos, info, BlockUpdateMethod.DEFAULT)
         } else {
             prevProvider.remove(pos)
             set(pos)

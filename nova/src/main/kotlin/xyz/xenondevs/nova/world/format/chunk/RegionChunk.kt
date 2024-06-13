@@ -153,6 +153,22 @@ internal class RegionChunk(
     }
     
     /**
+     * Iterates over all non-empty block states in this chunk and calls the specified [action]
+     * for each of them.
+     */
+    fun forEachNonEmpty(action: (pos: BlockPos, blockState: NovaBlockState) -> Unit) {
+        for ((idx, section) in sections.withIndex()) {
+            if (section.isEmpty())
+                continue
+            val bottomY = (idx shl 4) + minHeight
+            
+            section.container.forEachNonEmpty { x, y, z, blockState -> 
+                action(pos.blockPos(x, bottomY + y, z), blockState)
+            }
+        }
+    }
+    
+    /**
      * Gets the [VanillaTileEntity] at the given [pos].
      */
     fun getVanillaTileEntity(pos: BlockPos): VanillaTileEntity? = lock.withLock {

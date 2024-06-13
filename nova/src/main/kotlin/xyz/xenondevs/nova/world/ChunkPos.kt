@@ -61,6 +61,12 @@ data class ChunkPos(val worldUUID: UUID, val x: Int, val z: Int) {
     }
     
     /**
+     * Gets the [BlockPos] at the specified chunk coordinates [x], [y], [z].
+     */
+    fun blockPos(x: Int, y: Int, z: Int): BlockPos =
+        BlockPos(world!!, (this.x shl 4) + x, y, (this.z shl 4) + z)
+    
+    /**
      * Checks whether the chunk at this position is loaded.
      */
     fun isLoaded(): Boolean =

@@ -148,10 +148,10 @@ object WorldDataManager : Listener {
     internal fun getVanillaTileEntities(): List<VanillaTileEntity> =
         worlds.values.flatMap { it.getVanillaTileEntities() }
     
-    private suspend fun getOrLoadChunk(pos: ChunkPos): RegionChunk =
+    internal suspend fun getOrLoadChunk(pos: ChunkPos): RegionChunk =
         getOrLoadRegion(pos).getChunk(pos)
     
-    private fun getChunkOrThrow(pos: ChunkPos): RegionChunk {
+    internal fun getChunkOrThrow(pos: ChunkPos): RegionChunk {
         return getWorldStorage(pos.world!!).getBlockChunkOrThrow(pos)
     }
     

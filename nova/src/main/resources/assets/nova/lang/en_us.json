@@ -135,7 +135,6 @@
   "command.nova.advanced_tooltips.nova.failure": "Advanced tooltips for Nova items are already enabled.",
   "command.nova.advanced_tooltips.all.success": "Enabled advanced tooltips for all items.",
   "command.nova.advanced_tooltips.all.failure": "Advanced tooltips for all items are already enabled.",
-  "command.nova.update_chunk_search_id.success": "Chunk search id updated.",
   "command.nova.waila.off": "Disabled WAILA.",
   "command.nova.waila.already_off": "WAILA is already disabled.",
   "command.nova.waila.on": "Enabled WAILA.",

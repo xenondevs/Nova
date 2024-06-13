@@ -36,9 +36,9 @@ internal sealed class SectionDataContainer<T>(protected val idResolver: IdResolv
     
     /**
      * Iterates over all non-empty values in the section and calls the specified [action]
-     * with the parameters (x, y, z, value) for each of them.
+     * for each of them.
      */
-    abstract fun forEachNonEmpty(action: (Int, Int, Int, T) -> Unit)
+    abstract fun forEachNonEmpty(action: (x: Int, y: Int, z: Int, value: T) -> Unit)
     
     /**
      * Checks whether all values in the section are the same.

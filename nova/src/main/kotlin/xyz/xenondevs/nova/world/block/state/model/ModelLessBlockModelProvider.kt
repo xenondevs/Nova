@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.world.block.state.model
 
-import org.bukkit.Material
 import org.bukkit.block.data.BlockData
+import xyz.xenondevs.nova.util.nmsBlockState
+import xyz.xenondevs.nova.util.setBlockStateNoUpdate
+import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.world.BlockPos
 
 /**
@@ -9,20 +11,16 @@ import xyz.xenondevs.nova.world.BlockPos
  */
 internal data object ModelLessBlockModelProvider : BlockModelProvider<BlockData> {
     
-    override fun set(pos: BlockPos, info: BlockData) {
-        pos.block.setBlockData(info, true)
+    override fun set(pos: BlockPos, info: BlockData, method: BlockUpdateMethod) {
+        when (method) {
+            BlockUpdateMethod.DEFAULT -> pos.block.blockData = info
+            BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.nmsBlockState)
+            BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.nmsBlockState)
+        }
     }
     
-    override fun remove(pos: BlockPos) {
-        pos.block.type = Material.AIR
-    }
-    
-    override fun replace(pos: BlockPos, prevInfo: BlockData, newInfo: BlockData) {
-        if (prevInfo == newInfo)
-            return
-        
-        remove(pos)
-        set(pos, newInfo)
+    override fun replace(pos: BlockPos, info: BlockData, method: BlockUpdateMethod) {
+        set(pos, info, method)
     }
     
     override fun load(pos: BlockPos, info: BlockData) = Unit

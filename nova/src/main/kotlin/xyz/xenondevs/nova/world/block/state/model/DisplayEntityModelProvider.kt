@@ -6,6 +6,9 @@ import org.bukkit.entity.Display.Brightness
 import org.joml.Matrix4fc
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.util.item.requiresLight
+import xyz.xenondevs.nova.util.nmsBlockState
+import xyz.xenondevs.nova.util.setBlockStateNoUpdate
+import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntity
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
@@ -33,34 +36,41 @@ internal data object DisplayEntityBlockModelProvider : BlockModelProvider<Displa
     
     val entities = ConcurrentHashMap<BlockPos, List<FakeItemDisplay>>()
     
-    override fun set(pos: BlockPos, info: DisplayEntityBlockModelData) {
-        pos.block.blockData = info.hitboxType
+    override fun set(pos: BlockPos, info: DisplayEntityBlockModelData, method: BlockUpdateMethod) {
+        placeHitbox(pos, info, method)
         load(pos, info)
+    }
+    
+    private fun placeHitbox(pos: BlockPos, info: DisplayEntityBlockModelData, method: BlockUpdateMethod) {
+        when (method) {
+            BlockUpdateMethod.DEFAULT -> pos.block.blockData = info.hitboxType
+            BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.hitboxType.nmsBlockState)
+            BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.hitboxType.nmsBlockState)
+        }
     }
     
     override fun load(pos: BlockPos, info: DisplayEntityBlockModelData) {
         createItemDisplays(pos, info)
     }
     
-    override fun remove(pos: BlockPos) {
+    override fun remove(pos: BlockPos, method: BlockUpdateMethod) {
+        super.remove(pos, method)
         entities.remove(pos)?.forEach(FakeEntity<*>::remove)
-        pos.block.type = Material.AIR
     }
     
     override fun unload(pos: BlockPos) {
         entities.remove(pos)?.forEach(FakeEntity<*>::remove)
     }
     
-    override fun replace(pos: BlockPos, prevInfo: DisplayEntityBlockModelData, newInfo: DisplayEntityBlockModelData) {
-        if (prevInfo.hitboxType != newInfo.hitboxType)
-            pos.block.blockData = newInfo.hitboxType
+    override fun replace(pos: BlockPos, info: DisplayEntityBlockModelData, method: BlockUpdateMethod) {
+        placeHitbox(pos, info, method)
         
         // re-use as many existing entities as possible
-        val prevEntities = entities[pos]!!
-        entities[pos] = newInfo.models.mapIndexed { i, model ->
+        val prevEntities = entities[pos] ?: emptyList()
+        entities[pos] = info.models.mapIndexed { i, model ->
             prevEntities.getOrNull(i)
-                ?.also { prevEntity -> prevEntity.updateEntityData(true) { setMetadata(this, newInfo, model) } }
-                ?: FakeItemDisplay(pos.location.add(0.5, 0.5, 0.5)) { _, data -> setMetadata(data, newInfo, model) }
+                ?.also { prevEntity -> prevEntity.updateEntityData(true) { setMetadata(this, info, model) } }
+                ?: FakeItemDisplay(pos.location.add(0.5, 0.5, 0.5)) { _, data -> setMetadata(data, info, model) }
         }
     }
     
