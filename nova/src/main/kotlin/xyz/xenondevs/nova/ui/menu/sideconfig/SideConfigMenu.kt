@@ -71,7 +71,7 @@ fun SideConfigMenu(
  * network types (energy, item, fluid).
  */
 class SideConfigMenu(
-    endPoint: NetworkEndPoint,
+    private val endPoint: NetworkEndPoint,
     inventories: Map<NetworkedInventory, String>? = null,
     containers: Map<NetworkedFluidContainer, String>? = null,
     openPrevious: (Player) -> Unit
@@ -128,12 +128,6 @@ class SideConfigMenu(
         
         require(energyConfigMenu != null || itemConfigMenu != null || fluidConfigMenu != null)
         
-        NetworkManager.queueRead(endPoint.pos.world) {
-            energyConfigMenu?.initAsync()
-            itemConfigMenu?.initAsync()
-            fluidConfigMenu?.initAsync()
-        }
-        
         mainGui = TabGui.normal()
             .setStructure(
                 "< # # e i f # # #",
@@ -166,6 +160,8 @@ class SideConfigMenu(
             })
             .setTabs(listOf(energyConfigMenu?.gui, itemConfigMenu?.gui, fluidConfigMenu?.gui))
             .build()
+        
+        updateNetworkData()
     }
     
     /**
@@ -176,7 +172,16 @@ class SideConfigMenu(
             it.setViewer(player)
             it.setTitle(Component.translatable("menu.nova.side_config"))
             it.setGui(mainGui)
+            it.addOpenHandler(::updateNetworkData)
         }.open()
+    }
+    
+    private fun updateNetworkData() {
+        NetworkManager.queueRead(endPoint.pos.world) {
+            energyConfigMenu?.initAsync()
+            itemConfigMenu?.initAsync()
+            fluidConfigMenu?.initAsync()
+        }
     }
     
 }

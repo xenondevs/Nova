@@ -37,7 +37,8 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
     
     private val containers: List<C> = namedContainers.keys.toList()
     private val containerConfigItems = enumMap<BlockFace, ContainerConfigItem>()
-    private var simpleModeBtn: SimplicityModeItem? = null
+    private val simpleModeBtn = SimplicityModeItem(true)
+    private val advancedModeBtn = SimplicityModeItem(true)
     
     private val simpleGui = Gui.normal()
         .setStructure(
@@ -76,13 +77,10 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
     override fun initAsync() {
         super.initAsync()
         val isSimple = isSimpleConfiguration()
-        val simpleModeBtn = SimplicityModeItem(true)
-        val advancedModeBtn = SimplicityModeItem(false)
         simpleModeBtn.updateAsync()
         advancedModeBtn.updateAsync()
         runTask {
             if (hasSimpleVersion && hasAdvancedVersion) {
-                this.simpleModeBtn = simpleModeBtn
                 advancedGui.setItem(8, 0, simpleModeBtn)
                 simpleGui.setItem(8, 0, advancedModeBtn)
             }
@@ -114,11 +112,11 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
             // update ui
             connectionConfigItems[face]?.forEach(AsyncItem::updateAsync)
             containerConfigItems[face]?.updateAsync()
-            simpleModeBtn?.updateAsync()
+            simpleModeBtn.updateAsync()
             runTask {
                 connectionConfigItems[face]?.notifyWindows()
                 containerConfigItems[face]?.notifyWindows()
-                simpleModeBtn?.notifyWindows()
+                simpleModeBtn.notifyWindows()
             }
         }
     }
