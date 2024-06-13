@@ -156,12 +156,6 @@ network:
 
 # Performance options
 performance:
-  # Nova's executor caps the amount of threads that are allowed to run simultaneously in order to prevent OutOfMemoryErrors.
-  nova_executor:
-    # If enabled, Nova's own executor will be used. Otherwise, Bukkit's scheduler system is used.
-    enabled: true
-    # The amount of threads to be started.
-    threads: 200
   # If all char sizes should be loaded on startup. This will increase startup time but prevent lags when initially accessing char sizes.
   load_char_sizes_on_startup: false
   # If excess items should be dropped on the ground.
