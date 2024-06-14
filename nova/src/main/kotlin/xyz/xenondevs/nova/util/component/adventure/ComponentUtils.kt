@@ -7,6 +7,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentBuilder
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.StringTag
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftChatMessage
 import org.bukkit.entity.Player
@@ -38,6 +40,11 @@ fun MojangComponent.toAdventureComponent(): Component {
         return this.`adventure$component`()
     
     return GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(this))
+}
+
+@Suppress("DEPRECATION")
+fun Array<out BaseComponent>.toAdventureComponent(): Component {
+    return ComponentSerializer.toString(this).toAdventureComponent()
 }
 
 fun MojangComponent.toJson(): String {

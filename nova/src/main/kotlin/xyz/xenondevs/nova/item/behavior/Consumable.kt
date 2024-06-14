@@ -16,11 +16,11 @@ import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nmsutils.network.PacketIdRegistry
-import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
-import xyz.xenondevs.nmsutils.network.send
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
+import xyz.xenondevs.nova.network.PacketIdRegistry
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
+import xyz.xenondevs.nova.network.send
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.getPlayersNearby
 import xyz.xenondevs.nova.util.intValue

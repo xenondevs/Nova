@@ -10,12 +10,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.nova.world.format.WorldDataManager;
 import xyz.xenondevs.nova.transformer.Patcher;
 import xyz.xenondevs.nova.transformer.adapter.LcsWrapperAdapter;
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry;
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils;
 import xyz.xenondevs.nova.world.BlockPos;
+import xyz.xenondevs.nova.world.format.WorldDataManager;
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState;
 
 import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.*;

@@ -22,8 +22,6 @@ import org.bukkit.event.block.BlockDamageEvent
 import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
-import xyz.xenondevs.nmsutils.particle.item
-import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
@@ -44,6 +42,8 @@ import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.novaSoundGroup
+import xyz.xenondevs.nova.util.particle.item
+import xyz.xenondevs.nova.util.particle.particle
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer

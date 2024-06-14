@@ -11,8 +11,6 @@ import org.bukkit.Tag
 import org.bukkit.block.BlockFace
 import org.bukkit.event.block.NotePlayEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nmsutils.particle.noteColor
-import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
@@ -20,6 +18,8 @@ import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.util.particle.noteColor
+import xyz.xenondevs.nova.util.particle.particle
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.BlockPos

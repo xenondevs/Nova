@@ -5,13 +5,13 @@ import org.bukkit.Bukkit
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
-import xyz.xenondevs.nmsutils.particle.color
-import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.filterInRange
+import xyz.xenondevs.nova.util.particle.color
+import xyz.xenondevs.nova.util.particle.particle
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.sendTo
 import java.awt.Color

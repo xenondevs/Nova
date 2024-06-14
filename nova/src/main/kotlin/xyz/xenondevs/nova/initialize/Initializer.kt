@@ -23,7 +23,6 @@ import org.jgrapht.nio.dot.DOTExporter
 import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.invui.inventory.StackSizeProvider
 import xyz.xenondevs.invui.util.InventoryUtils
-import xyz.xenondevs.nmsutils.NMSUtilities
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
@@ -198,7 +197,6 @@ internal object Initializer : Listener {
         Configs.extractDefaultConfig()
         VanillaRegistryAccess.unfreezeAll()
         registerEvents()
-        NMSUtilities.init(NOVA_PLUGIN)
         InvUI.getInstance().setPlugin(NOVA_PLUGIN)
         InvUILanguages.getInstance().enableServerSideTranslations(false)
         CBFAdapters.register()
@@ -318,8 +316,6 @@ internal object Initializer : Listener {
         } else {
             LOGGER.warning("Skipping disable phase due to incomplete initialization")
         }
-        
-        NMSUtilities.disable()
     }
     
     @EventHandler

@@ -13,10 +13,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
-import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.PacketListener
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetPassengersPacketEvent
-import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.addon.AddonsInitializer
@@ -26,6 +22,10 @@ import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.network.event.PacketHandler
+import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetPassengersPacketEvent
+import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.registry.NovaRegistries.ATTACHMENT_TYPE
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskLater

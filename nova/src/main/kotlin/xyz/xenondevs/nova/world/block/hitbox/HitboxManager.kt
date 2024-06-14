@@ -14,11 +14,11 @@ import org.bukkit.inventory.EquipmentSlot
 import org.joml.Intersectionf
 import org.joml.Vector2f
 import org.joml.Vector3f
-import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.PacketListener
-import xyz.xenondevs.nmsutils.network.event.clientbound.ServerboundInteractPacketEvent
-import xyz.xenondevs.nmsutils.network.event.registerPacketListener
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.network.event.PacketHandler
+import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.clientbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.registerEvents
@@ -33,7 +33,7 @@ import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import org.bukkit.event.block.Action as BlockAction
-import xyz.xenondevs.nmsutils.network.event.clientbound.ServerboundInteractPacketEvent.Action as EntityAction
+import xyz.xenondevs.nova.network.event.clientbound.ServerboundInteractPacketEvent.Action as EntityAction
 
 internal object HitboxManager : Listener, PacketListener {
     

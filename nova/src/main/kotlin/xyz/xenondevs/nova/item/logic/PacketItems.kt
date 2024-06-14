@@ -31,16 +31,6 @@ import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
-import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.PacketListener
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetContentPacketEvent
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundMerchantOffersPacketEvent
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEntityDataPacketEvent
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSetEquipmentPacketEvent
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
-import xyz.xenondevs.nmsutils.network.event.registerPacketListener
-import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
@@ -54,6 +44,16 @@ import xyz.xenondevs.nova.item.behavior.Enchantable
 import xyz.xenondevs.nova.item.behavior.Tool
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.item.vanilla.HideableFlag
+import xyz.xenondevs.nova.network.event.PacketHandler
+import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetContentPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundMerchantOffersPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEntityDataPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEquipmentPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
+import xyz.xenondevs.nova.network.event.registerPacketListener
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponentOrEmpty
@@ -74,7 +74,6 @@ import xyz.xenondevs.nova.util.serverPlayer
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
-import kotlin.collections.ArrayList
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 

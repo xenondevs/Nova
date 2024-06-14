@@ -2,9 +2,7 @@
 
 package xyz.xenondevs.nova.data.resources
 
-import com.google.gson.annotations.JsonAdapter
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.serialization.json.serializer.ResourcePathTypeAdapter
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Path

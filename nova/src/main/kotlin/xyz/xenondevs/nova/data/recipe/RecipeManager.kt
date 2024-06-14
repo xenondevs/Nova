@@ -13,12 +13,6 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nmsutils.network.ClientboundPlaceGhostRecipePacket
-import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.PacketListener
-import xyz.xenondevs.nmsutils.network.event.registerPacketListener
-import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlaceRecipePacketEvent
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.recipe.impl.RepairItemRecipe
@@ -26,6 +20,10 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
+import xyz.xenondevs.nova.network.event.PacketHandler
+import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.registerPacketListener
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlaceRecipePacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.addToInventoryOrDrop
@@ -224,7 +222,7 @@ object RecipeManager : Listener, PacketListener {
             
         } else {
             // send ghost recipe
-            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, id)
+            val packet = xyz.xenondevs.nova.network.ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, id)
             player.send(packet)
         }
     }
@@ -250,7 +248,7 @@ object RecipeManager : Listener, PacketListener {
             
         } else {
             // send ghost recipe
-            val packet = ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, id)
+            val packet = xyz.xenondevs.nova.network.ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, id)
             player.send(packet)
         }
     }

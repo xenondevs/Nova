@@ -4,8 +4,8 @@ import io.netty.buffer.Unpooled
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.network.syncher.EntityDataSerializers
-import xyz.xenondevs.nmsutils.network.PacketIdRegistry
 import xyz.xenondevs.nova.item.logic.PacketItems
+import xyz.xenondevs.nova.network.PacketIdRegistry
 import xyz.xenondevs.nova.util.nmsCopy
 import java.util.*
 import net.minecraft.world.item.ItemStack as MojangStack

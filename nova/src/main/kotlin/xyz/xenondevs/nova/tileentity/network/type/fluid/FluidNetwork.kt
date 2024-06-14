@@ -11,7 +11,6 @@ import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkData
 import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
-import xyz.xenondevs.nova.tileentity.network.type.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.tileentity.network.type.fluid.channel.FluidNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.type.fluid.holder.FluidHolder
 import kotlin.math.min

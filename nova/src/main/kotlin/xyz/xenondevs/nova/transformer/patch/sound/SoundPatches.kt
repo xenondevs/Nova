@@ -17,7 +17,6 @@ import org.objectweb.asm.Opcodes
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.replaceFirst
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.item.behavior.Wearable
 import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
@@ -32,6 +31,7 @@ import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.behavior.BlockSounds
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import kotlin.math.floor
 import kotlin.random.Random
 import net.minecraft.core.BlockPos as MojangBlockPos

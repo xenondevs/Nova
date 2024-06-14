@@ -11,7 +11,6 @@ import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.data.config.Configs
 import xyz.xenondevs.nova.initialize.InitFun

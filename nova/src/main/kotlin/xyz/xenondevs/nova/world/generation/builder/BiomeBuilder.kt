@@ -28,11 +28,11 @@ import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.nmsutils.particle.ParticleBuilder
 import xyz.xenondevs.nova.addon.registry.worldgen.BiomeRegistry
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
 import xyz.xenondevs.nova.util.getOrCreateHolder
+import xyz.xenondevs.nova.util.particle.ParticleBuilder
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_CLIMATE_SETTINGS_CONSTRUCTOR
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_CONSTRUCTOR
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_GENERATION_SETTINGS_CONSTRUCTOR

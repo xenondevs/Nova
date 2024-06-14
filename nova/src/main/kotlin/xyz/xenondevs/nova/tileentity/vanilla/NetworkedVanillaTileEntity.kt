@@ -4,7 +4,6 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.node.NetworkNode
-import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.world.BlockPos
 
 internal abstract class NetworkedVanillaTileEntity internal constructor(

@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.overlay.bossbar.positioning
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nmsutils.bossbar.BossBar
+import xyz.xenondevs.nova.util.bossbar.BossBar
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import java.util.*
 import org.bukkit.plugin.Plugin as BukkitPlugin
@@ -40,7 +40,7 @@ interface BarMatcher {
     }
     
     class Text(private val regex: Regex) : BarMatcher {
-        override fun test(info: BarMatchInfo) = info.bossBar?.adventureName?.toPlainText()?.matches(regex) ?: false
+        override fun test(info: BarMatchInfo) = info.bossBar?.name?.toPlainText()?.matches(regex) ?: false
     }
     
     class Origin(private val origin: BarOrigin) : BarMatcher {

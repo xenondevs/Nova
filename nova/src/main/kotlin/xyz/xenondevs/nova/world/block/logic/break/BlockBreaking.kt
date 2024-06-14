@@ -15,11 +15,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.commons.collections.removeIf
-import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.PacketListener
-import xyz.xenondevs.nmsutils.network.event.registerPacketListener
-import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
-import xyz.xenondevs.nmsutils.network.packetHandler
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
@@ -27,6 +22,11 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.network.event.PacketHandler
+import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.registerPacketListener
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
+import xyz.xenondevs.nova.network.packetHandler
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer

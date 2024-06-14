@@ -65,6 +65,21 @@ object ReflectionUtils {
         return method
     }
     
+    fun getMethod(clazz: KClass<*>, methodName: String, vararg args: KClass<*>): Method =
+        getMethod(clazz.java, methodName, *args.mapToArray(KClass<*>::java))
+    
+    fun getMethod(clazz: Class<*>, methodName: String, vararg args: KClass<*>): Method =
+        getMethod(clazz, methodName, *args.mapToArray(KClass<*>::java))
+    
+    fun getMethod(clazz: Class<*>, methodName: String): Method =
+        getMethod(clazz, methodName, *arrayOf<Class<*>>())
+    
+    fun getMethod(clazz: Class<*>, methodName: String, vararg args: Class<*>): Method {
+        val method = clazz.getDeclaredMethod(methodName, *args)
+        method.isAccessible = true
+        return method
+    }
+    
     fun getMethodByName(clazz: KClass<*>, declared: Boolean, methodName: String): Method =
         getMethodByName(clazz.java, declared, methodName)
     
@@ -86,12 +101,33 @@ object ReflectionUtils {
         return constructor
     }
     
+    fun <C : Any> getConstructor(clazz: KClass<C>, vararg args: KClass<*>): Constructor<C> =
+        getConstructor(clazz.java, *args.mapToArray(KClass<*>::java))
+    
+    fun <C : Any> getConstructor(clazz: Class<C>, vararg args: KClass<*>): Constructor<C> =
+        getConstructor(clazz, *args.mapToArray(KClass<*>::java))
+    
+    fun <C> getConstructor(clazz: Class<C>, vararg args: Class<*>): Constructor<C> {
+        val constructor = clazz.getDeclaredConstructor(*args)
+        constructor.isAccessible = true
+        return constructor
+    }
+    
     fun getField(clazz: KClass<*>, declared: Boolean, name: String): Field =
         getField(clazz.java, declared, name)
     
     fun getField(clazz: Class<*>, declared: Boolean, name: String): Field {
         val field = if (declared) clazz.getDeclaredField(name) else clazz.getField(name)
         if (declared) field.isAccessible = true
+        return field
+    }
+    
+    fun getField(clazz: KClass<*>, name: String): Field =
+        getField(clazz.java, name)
+    
+    fun getField(clazz: Class<*>, name: String): Field {
+        val field = clazz.getDeclaredField(name)
+        field.isAccessible = true
         return field
     }
     

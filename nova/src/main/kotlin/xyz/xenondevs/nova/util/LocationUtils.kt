@@ -16,9 +16,9 @@ import org.bukkit.util.Vector
 import org.joml.Vector3d
 import org.joml.Vector3f
 import xyz.xenondevs.commons.collections.enumSetOf
-import xyz.xenondevs.nmsutils.particle.ParticleBuilder
-import xyz.xenondevs.nmsutils.particle.color
 import xyz.xenondevs.nova.util.item.isTraversable
+import xyz.xenondevs.nova.util.particle.ParticleBuilder
+import xyz.xenondevs.nova.util.particle.color
 import java.awt.Color
 import kotlin.math.atan2
 import kotlin.math.cos

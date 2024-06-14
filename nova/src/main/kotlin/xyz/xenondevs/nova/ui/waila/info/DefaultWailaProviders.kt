@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.ui.waila.info
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_INFO_PROVIDER
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_TOOL_ICON_PROVIDER
 import xyz.xenondevs.nova.ui.waila.info.impl.BrushableWailaInfoProvider

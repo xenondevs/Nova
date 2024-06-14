@@ -5,14 +5,14 @@ import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
-import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.PacketListener
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundActionBarPacketEvent
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSystemChatPacketEvent
-import xyz.xenondevs.nmsutils.network.event.registerPacketListener
-import xyz.xenondevs.nmsutils.network.event.unregisterPacketListener
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.resources.CharSizes
+import xyz.xenondevs.nova.network.event.PacketHandler
+import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundActionBarPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSystemChatPacketEvent
+import xyz.xenondevs.nova.network.event.registerPacketListener
+import xyz.xenondevs.nova.network.event.unregisterPacketListener
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
@@ -93,10 +93,10 @@ object ActionbarOverlayManager : PacketListener {
         val uuid = player.uniqueId
         if (overlays.containsKey(uuid)) {
             if (event.packet !== EMPTY_ACTION_BAR_PACKET) {
-                saveInterceptedComponent(player, event.adventureText)
+                saveInterceptedComponent(player, event.text)
             }
             
-            event.adventureText = getCurrentText(player)
+            event.text = getCurrentText(player)
         }
     }
     

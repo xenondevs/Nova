@@ -10,10 +10,10 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.damageItemInHand
 import xyz.xenondevs.nova.util.nmsState
+import xyz.xenondevs.nova.util.particle.particle
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.sendTo
 import xyz.xenondevs.nova.util.serverLevel

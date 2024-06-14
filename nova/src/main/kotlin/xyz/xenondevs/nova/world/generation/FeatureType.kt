@@ -12,10 +12,10 @@ import net.minecraft.world.level.levelgen.feature.Feature
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
 import org.bukkit.Material
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.function.Predicate
 
 /**

@@ -21,7 +21,6 @@ import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.kotlin.extensions.get
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.ConfigProvider
 import xyz.xenondevs.nova.data.config.Configs
@@ -36,6 +35,7 @@ import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.item.logic.PacketItems
 import xyz.xenondevs.nova.item.vanilla.AttributeModifier
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.registry.NovaRegistries

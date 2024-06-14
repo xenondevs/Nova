@@ -11,7 +11,6 @@ import org.joml.Quaternionf
 import org.joml.Vector3f
 import org.joml.Vector3fc
 import xyz.xenondevs.commons.collections.mapToIntArray
-import xyz.xenondevs.nmsutils.network.ClientboundSetPassengersPacket
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
@@ -44,7 +43,7 @@ open class ItemAttachment(
             entity.spawnHandler = {
                 runTaskLater(1) {
                     // This packet will be modified in AbilityManager to include all attachment entities
-                    it.send(ClientboundSetPassengersPacket(player.entityId, player.passengers.mapToIntArray(Entity::getEntityId)))
+                    it.send(xyz.xenondevs.nova.network.ClientboundSetPassengersPacket(player.entityId, player.passengers.mapToIntArray(Entity::getEntityId)))
                 }
             }
             

@@ -7,7 +7,6 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.provider.immutable.mapEach
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_INFO_PROVIDER
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
@@ -22,6 +21,7 @@ import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 
 private val POS_UPDATE_INTERVAL by MAIN_CONFIG.entry<Int>("waila", "pos_update_interval")

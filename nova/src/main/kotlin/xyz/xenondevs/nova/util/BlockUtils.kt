@@ -44,8 +44,6 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nmsutils.particle.block
-import xyz.xenondevs.nmsutils.particle.particle
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
@@ -56,6 +54,8 @@ import xyz.xenondevs.nova.util.item.hasNoBreakParticles
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
+import xyz.xenondevs.nova.util.particle.block
+import xyz.xenondevs.nova.util.particle.particle
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockSounds

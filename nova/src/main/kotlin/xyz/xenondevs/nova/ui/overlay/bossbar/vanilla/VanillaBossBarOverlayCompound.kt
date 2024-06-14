@@ -33,7 +33,7 @@ internal class VanillaBossBarOverlayCompound(
     }
     
     override fun toString(): String {
-        return "VanillaBossBarOverlayCompound(text=${overlay.bar.adventureName.toPlainText()})"
+        return "VanillaBossBarOverlayCompound(text=${overlay.bar.name.toPlainText()})"
     }
     
 }

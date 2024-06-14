@@ -7,12 +7,12 @@ import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.builder.basepack.BasePacks
+import xyz.xenondevs.nova.data.serialization.json.GSON
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
 import xyz.xenondevs.nova.world.block.state.model.BrownMushroomBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.MushroomStemBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
-import xyz.xenondevs.nova.data.serialization.json.GSON
 import java.nio.file.Path
 import java.util.logging.Level
 import kotlin.io.path.copyTo

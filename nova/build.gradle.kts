@@ -16,7 +16,6 @@ dependencies {
     
     // api dependencies
     prioritizedNovaLoaderApi(libs.bundles.configurate)
-    novaLoaderApi(variantOf(libs.nmsutilities) { classifier("remapped-mojang") })
     novaLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)

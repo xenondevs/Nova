@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.recipe
 
 import org.bukkit.Bukkit
 import org.bukkit.inventory.Recipe
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
