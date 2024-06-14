@@ -9,14 +9,13 @@ import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.world.BlockPos
 
-internal object CampfireWailaInfoProvider : VanillaWailaInfoProvider(
+internal object CampfireWailaInfoProvider : VanillaWailaInfoProvider<Campfire>(
     setOf(Material.CAMPFIRE, Material.SOUL_CAMPFIRE)
 ) {
     
-    override fun getInfo(player: Player, pos: BlockPos, block: Block): WailaInfo {
-        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, block)
-        val lit = (block.blockData as Campfire).isLit
-        info.icon = ResourceLocation("minecraft", if (lit) block.type.name.lowercase() else "campfire_off")
+    override fun getInfo(player: Player, pos: BlockPos, blockState: Campfire): WailaInfo {
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
+        info.icon = ResourceLocation("minecraft", if (blockState.isLit) blockState.material.name.lowercase() else "campfire_off")
         return info
     }
     

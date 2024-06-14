@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.world.BlockPos
 
-internal object CandleWailaInfoProvider : VanillaWailaInfoProvider(
+internal object CandleWailaInfoProvider : VanillaWailaInfoProvider<Candle>(
     setOf(
         Material.CANDLE, Material.WHITE_CANDLE, Material.ORANGE_CANDLE, Material.MAGENTA_CANDLE, Material.LIGHT_BLUE_CANDLE,
         Material.YELLOW_CANDLE, Material.LIME_CANDLE, Material.PINK_CANDLE, Material.GRAY_CANDLE, Material.LIGHT_GRAY_CANDLE,
@@ -18,15 +18,14 @@ internal object CandleWailaInfoProvider : VanillaWailaInfoProvider(
     )
 ) {
     
-    override fun getInfo(player: Player, pos: BlockPos, block: Block): WailaInfo {
-        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, block)
-        info.icon = getCandleId(block)
+    override fun getInfo(player: Player, pos: BlockPos, blockState: Candle): WailaInfo {
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
+        info.icon = getCandleId(blockState)
         return info
     }
     
-    private fun getCandleId(block: Block): ResourceLocation {
-        val name = block.type.name.lowercase()
-        val candle = block.blockData as Candle
+    private fun getCandleId(candle: Candle): ResourceLocation {
+        val name = candle.material.name.lowercase()
         val amount = when (candle.candles) {
             1 -> "one_candle"
             2 -> "two_candles"

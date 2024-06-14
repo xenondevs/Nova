@@ -9,12 +9,11 @@ import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.world.BlockPos
 
-internal object RepeaterWailaInfoProvider : VanillaWailaInfoProvider(setOf(Material.REPEATER)) {
+internal object RepeaterWailaInfoProvider : VanillaWailaInfoProvider<Repeater>(setOf(Material.REPEATER)) {
     
-    override fun getInfo(player: Player, pos: BlockPos, block: Block): WailaInfo {
-        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, block)
-        val repeater = block.blockData as Repeater
-        info.icon = getIconName(repeater)
+    override fun getInfo(player: Player, pos: BlockPos, blockState: Repeater): WailaInfo {
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
+        info.icon = getIconName(blockState)
         return info
     }
     

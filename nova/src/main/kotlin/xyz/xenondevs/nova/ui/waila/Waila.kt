@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.block.Block
+import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.provider.immutable.mapEach
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
@@ -115,9 +116,9 @@ internal class Waila(val player: Player) {
             
             return getCustomItemServiceInfo(player, block)
                 ?: WAILA_INFO_PROVIDER.asSequence()
-                    .filterIsInstance<VanillaWailaInfoProvider>()
+                    .filterIsInstance<VanillaWailaInfoProvider<BlockData>>()
                     .lastOrNull { it.materials == null || type in it.materials }
-                    ?.getInfo(player, pos, block)
+                    ?.getInfo(player, pos, block.blockData)
         }
     }
     

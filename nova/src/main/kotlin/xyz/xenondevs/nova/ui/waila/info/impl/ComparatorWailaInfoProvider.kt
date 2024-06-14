@@ -9,12 +9,11 @@ import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.world.BlockPos
 
-internal object ComparatorWailaInfoProvider : VanillaWailaInfoProvider(setOf(Material.COMPARATOR)) {
+internal object ComparatorWailaInfoProvider : VanillaWailaInfoProvider<Comparator>(setOf(Material.COMPARATOR)) {
     
-    override fun getInfo(player: Player, pos: BlockPos, block: Block): WailaInfo {
-        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, block)
-        val comparator = block.blockData as Comparator
-        info.icon = getComparatorIcon(comparator)
+    override fun getInfo(player: Player, pos: BlockPos, blockState: Comparator): WailaInfo {
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
+        info.icon = getComparatorIcon(blockState)
         return info
     }
     

@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
-import org.bukkit.block.Block
+import org.bukkit.block.data.BlockData
 import org.bukkit.block.data.type.PistonHead
 import org.bukkit.block.data.type.TechnicalPiston
 import org.bukkit.entity.Player
@@ -15,24 +15,35 @@ import xyz.xenondevs.nova.ui.waila.info.line.ToolLine
 import xyz.xenondevs.nova.util.item.localizedName
 import xyz.xenondevs.nova.world.BlockPos
 
-object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
-    
-    override fun getInfo(player: Player, pos: BlockPos, block: Block): WailaInfo {
-        val material = block.type
-        val mainMaterial = getMainMaterial(block)
-        
-        val translate = mainMaterial.localizedName ?: "block.minecraft.${mainMaterial.name.lowercase()}"
-        
-        val lines = ArrayList<WailaLine>()
-        lines += WailaLine(Component.translatable(translate), WailaLine.Alignment.CENTERED)
-        lines += WailaLine(Component.text("minecraft:${material.name.lowercase()}", NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
-        lines += ToolLine.getToolLine(player, block)
+object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(null) {
+
+    override fun getInfo(player: Player, pos: BlockPos, blockState: BlockData): WailaInfo {
+        val mainMaterial = getMainMaterial(blockState)
+
+        val lines = buildList {
+            this += WailaLine(
+                Component.translatable(
+                    mainMaterial.localizedName
+                        ?: "block.minecraft.${mainMaterial.name.lowercase()}"
+                ),
+                WailaLine.Alignment.CENTERED
+            )
+
+            this += WailaLine(
+                Component.text(
+                    "minecraft:${blockState.material.name.lowercase()}",
+                    NamedTextColor.DARK_GRAY
+                ),
+                WailaLine.Alignment.CENTERED
+            )
+            this += ToolLine.getToolLine(player, pos.block)
+        }
         
         return WailaInfo(ResourceLocation("minecraft", mainMaterial.name.lowercase()), lines)
     }
-    
-    private fun getMainMaterial(block: Block): Material {
-        return when (val material = block.type) {
+
+    private fun getMainMaterial(blockState: BlockData): Material {
+        return when (val material = blockState.material) {
             // infested blocks
             Material.INFESTED_CHISELED_STONE_BRICKS -> Material.CHISELED_STONE_BRICKS
             Material.INFESTED_COBBLESTONE -> Material.COBBLESTONE
@@ -41,7 +52,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
             Material.INFESTED_MOSSY_STONE_BRICKS -> Material.MOSSY_STONE_BRICKS
             Material.INFESTED_STONE -> Material.STONE
             Material.INFESTED_STONE_BRICKS -> Material.STONE_BRICKS
-            
+
             // signs
             Material.OAK_WALL_SIGN -> Material.OAK_SIGN
             Material.SPRUCE_WALL_SIGN -> Material.SPRUCE_SIGN
@@ -65,19 +76,19 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
             Material.WARPED_WALL_HANGING_SIGN -> Material.WARPED_HANGING_SIGN
             Material.BAMBOO_WALL_HANGING_SIGN -> Material.BAMBOO_HANGING_SIGN
             Material.CHERRY_WALL_HANGING_SIGN -> Material.CHERRY_HANGING_SIGN
-            
+
             // plant
             Material.WEEPING_VINES_PLANT -> Material.WEEPING_VINES
             Material.TWISTING_VINES_PLANT -> Material.TWISTING_VINES
             Material.KELP_PLANT -> Material.KELP
             Material.ATTACHED_MELON_STEM -> Material.MELON_STEM
             Material.ATTACHED_PUMPKIN_STEM -> Material.PUMPKIN_STEM
-            
+
             // torch
             Material.WALL_TORCH -> Material.TORCH
             Material.REDSTONE_WALL_TORCH -> Material.TORCH
             Material.SOUL_WALL_TORCH -> Material.TORCH
-            
+
             // head / skull
             Material.ZOMBIE_WALL_HEAD -> Material.ZOMBIE_HEAD
             Material.CREEPER_WALL_HEAD -> Material.CREEPER_HEAD
@@ -85,19 +96,19 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
             Material.SKELETON_WALL_SKULL -> Material.SKELETON_SKULL
             Material.WITHER_SKELETON_WALL_SKULL -> Material.WITHER_SKELETON_SKULL
             Material.DRAGON_WALL_HEAD -> Material.DRAGON_HEAD
-            
+
             // misc
             Material.BIG_DRIPLEAF_STEM -> Material.BIG_DRIPLEAF
             Material.TRIPWIRE -> Material.STRING
             Material.PISTON_HEAD -> {
-                val data = block.blockData as PistonHead
-                if (data.type == TechnicalPiston.Type.STICKY)
+                blockState as PistonHead
+                if (blockState.type == TechnicalPiston.Type.STICKY)
                     Material.STICKY_PISTON
                 else Material.PISTON
             }
-            
+
             else -> material
         }
     }
-    
+
 }

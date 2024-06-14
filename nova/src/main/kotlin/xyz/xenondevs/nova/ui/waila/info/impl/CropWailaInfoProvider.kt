@@ -20,15 +20,12 @@ private val MAX_TEXTURE_STAGE = mapOf(
     Material.TORCHFLOWER_CROP to 2
 )
 
-internal object CropWailaInfoProvider : VanillaWailaInfoProvider(MAX_TEXTURE_STAGE.keys) {
+internal object CropWailaInfoProvider : VanillaWailaInfoProvider<Ageable>(MAX_TEXTURE_STAGE.keys) {
     
-    override fun getInfo(player: Player, pos: BlockPos, block: Block): WailaInfo {
-        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, block)
-        
-        val ageable = block.blockData as Ageable
-        val stage = ((ageable.age / ageable.maximumAge.toDouble()) * MAX_TEXTURE_STAGE[block.type]!!).roundToInt()
-        
-        info.icon = ResourceLocation("minecraft", block.type.name.lowercase() + "_stage$stage")
+    override fun getInfo(player: Player, pos: BlockPos, blockState: Ageable): WailaInfo {
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
+        val stage = ((blockState.age / blockState.maximumAge.toDouble()) * MAX_TEXTURE_STAGE[blockState.material]!!).roundToInt()
+        info.icon = ResourceLocation("minecraft", blockState.material.name.lowercase() + "_stage$stage")
         return info
     }
 

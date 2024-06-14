@@ -9,12 +9,11 @@ import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.world.BlockPos
 
-internal object DaylightDetectorWailaInfoProvider : VanillaWailaInfoProvider(setOf(Material.DAYLIGHT_DETECTOR)) {
+internal object DaylightDetectorWailaInfoProvider : VanillaWailaInfoProvider<DaylightDetector>(setOf(Material.DAYLIGHT_DETECTOR)) {
     
-    override fun getInfo(player: Player, pos: BlockPos, block: Block): WailaInfo {
-        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, block)
-        val detector = block.blockData as DaylightDetector
-        if (detector.isInverted) {
+    override fun getInfo(player: Player, pos: BlockPos, blockState: DaylightDetector): WailaInfo {
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
+        if (blockState.isInverted) {
             info.icon = ResourceLocation("minecraft", "daylight_detector_inverted")
         }
         return info
