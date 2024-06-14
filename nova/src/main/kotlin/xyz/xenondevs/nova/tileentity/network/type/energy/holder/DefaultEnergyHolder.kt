@@ -38,12 +38,12 @@ class DefaultEnergyHolder(
     val maxEnergy: Long by maxEnergy
     
     private var _energy by compound.entry<Long>("energy").orElse(0L)
-    override var energy: Long = -1
+    override var energy: Long
         get() = _energy
         set(value) {
             val capped = max(min(value, maxEnergy), 0)
             if (_energy != capped) {
-                val energyDelta = capped - field
+                val energyDelta = capped - _energy
                 if (energyDelta > 0) _energyPlus.add(energyDelta)
                 else _energyMinus.add(-energyDelta)
                 
