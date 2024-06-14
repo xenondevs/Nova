@@ -198,7 +198,7 @@ private val CODEC_DATA_PACKET_SET_GETTER = MethodHandles
     .findGetter(CodecData::class.java, "packetSet", PACKET_SET_CLASS)
 private val PACKET_SET_GET_ID_METHOD = MethodHandles
     .privateLookupIn(PACKET_SET_CLASS, MethodHandles.lookup())
-    .findVirtual(PACKET_SET_CLASS, "getId", MethodType.methodType(Int::class.java))
+    .findVirtual(PACKET_SET_CLASS, "getId", MethodType.methodType(Int::class.java, Class::class.java))
 
 object PacketIdRegistry {
     
