@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.util
+package xyz.xenondevs.nova.util.advancement
 
 import net.kyori.adventure.text.Component
 import net.minecraft.advancements.Advancement
@@ -17,6 +17,8 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
+import xyz.xenondevs.nova.util.name
+import xyz.xenondevs.nova.util.nmsCopy
 import java.util.*
 
 fun advancement(addon: Addon, name: String, init: Advancement.Builder.() -> Unit): AdvancementHolder {
