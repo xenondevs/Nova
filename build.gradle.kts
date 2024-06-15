@@ -36,6 +36,11 @@ subprojects {
             archiveClassifier.set("sources")
         }
         
+        withType<JavaCompile> {
+            sourceCompatibility = "17"
+            targetCompatibility = "17"
+        }
+        
         withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile> {
             compilerOptions {
                 jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
