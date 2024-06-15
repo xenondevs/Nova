@@ -18,6 +18,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.block.data.BlockData
 import org.joml.Matrix4f
 import org.joml.Vector3f
@@ -43,6 +44,7 @@ import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.behavior.Enchantable
@@ -65,10 +67,16 @@ import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.component.adventure.indent
+import xyz.xenondevs.nova.util.data.getIntOrNull
+import xyz.xenondevs.nova.util.data.getOrNull
+import xyz.xenondevs.nova.util.data.getStringOrNull
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.novaCompoundOrNull
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
+import xyz.xenondevs.nova.util.nmsVersion
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
@@ -89,6 +97,7 @@ import java.util.*
 import java.util.logging.Level
 import kotlin.math.max
 import kotlin.math.min
+import org.bukkit.inventory.ItemStack as BukkitStack
 
 internal object NovaCommand : Command("nova") {
     
@@ -144,6 +153,9 @@ internal object NovaCommand : Command("nova") {
                 .then(literal("getItemData")
                     .requiresPlayer()
                     .executesCatching(::showItemData))
+                .then(literal("getItemModelData")
+                    .requiresPlayer()
+                    .executesCatching(::showItemModelData))
                 .then(literal("getNetworkNodeInfo")
                     .requiresPlayer()
                     .executesCatching(::showNetworkNodeInfoLookingAt)
@@ -635,6 +647,41 @@ internal object NovaCommand : Command("nova") {
                 ))
             } else ctx.source.sendFailure(Component.translatable("command.nova.show_item.no_data", NamedTextColor.RED))
         } else ctx.source.sendFailure(Component.translatable("command.nova.show_item_data.no_item", NamedTextColor.RED))
+    }
+    
+    private fun showItemModelData(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        val itemStack = player.inventory.itemInMainHand
+        val item = itemStack.novaItem
+        
+        if (item != null) {
+            val novaCompound = itemStack.nmsVersion.tag!!.getCompound("nova")
+            val modelId = novaCompound.getStringOrNull("modelId")
+            val subId = novaCompound.getIntOrNull("subId")
+            
+            val modelName: String
+            val clientSideStack: BukkitStack
+            
+            if (modelId != null) {
+                modelName = modelId
+                clientSideStack = item.model.clientsideProviders[modelId]!!.get()
+            } else if (subId != null) {
+                modelName = subId.toString()
+                clientSideStack = item.model.unnamedClientsideProviders[subId].get()
+            } else {
+                modelName = "default"
+                clientSideStack = item.model.clientsideProvider.get()
+            }
+            
+            ctx.source.sendSuccess(Component.translatable(
+                "command.nova.show_item_model_data.success",
+                NamedTextColor.GRAY,
+                ItemUtils.getName(itemStack).color(NamedTextColor.AQUA),
+                Component.text(modelName, NamedTextColor.AQUA),
+                Component.translatable(clientSideStack.type.translationKey(), NamedTextColor.AQUA),
+                Component.text(clientSideStack.customModelData, NamedTextColor.AQUA)
+            ))
+        } else ctx.source.sendFailure(Component.translatable("command.nova.show_item_model_data.no_item", NamedTextColor.RED))
     }
     
     private fun toggleNetworkDebugging(ctx: CommandContext<CommandSourceStack>, type: NetworkType<*>) {
