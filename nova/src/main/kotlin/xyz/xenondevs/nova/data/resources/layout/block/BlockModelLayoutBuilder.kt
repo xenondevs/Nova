@@ -122,7 +122,7 @@ class BlockModelLayoutBuilder internal constructor() {
     fun <T : Any> selectModel(property: BlockStateProperty<T>, models: Map<T, String>) {
         selectModel {
             val state = getPropertyValueOrNull(property)
-            models[state]?.let(::getModel) ?: defaultModel
+            models[state]?.let(this@selectModel::getModel) ?: defaultModel
         }
     }
     
@@ -141,7 +141,7 @@ class BlockModelLayoutBuilder internal constructor() {
     fun <T : Any> selectModel(property: BlockStateProperty<T>, models: Map<T, ResourcePath>) {
         selectModel {
             val state = getPropertyValueOrNull(property)
-            models[state]?.let(::getModelRawPath) ?: defaultModel
+            models[state]?.let(this@selectModel::getModel) ?: defaultModel
         }
     }
     

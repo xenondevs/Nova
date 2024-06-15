@@ -54,30 +54,24 @@ class BlockModelSelectorScope internal constructor(
      */
     val defaultModel: ModelBuilder by lazy {
         val path = ResourcePath(id.namespace, "block/${id.path}")
-        val model = modelContent[path]
-            ?: Model(
-                parent = ResourcePath("minecraft", "block/cube_all"),
-                textures = mapOf("all" to id.toString()),
-            )
-        ModelBuilder(model)
+        modelContent[path]
+            ?.let(::ModelBuilder)
+            ?: createCubeModel(ResourcePath(id.namespace, "block/${id.path}"))
     }
     
     /**
      * Gets the model under the given [path] or throws an exception if it does not exist.
      */
-    fun getModelRawPath(path: ResourcePath): ModelBuilder =
+    fun getModel(path: ResourcePath): ModelBuilder =
         modelContent[path]
             ?.let(::ModelBuilder)
             ?: throw IllegalArgumentException("Model $path does not exist")
     
     /**
-     * Gets the model under the given [path] after appending the "block/" prefix to it or throws an exception if it does not exist.
-     * Namespaces are not allowed in the [path] parameter.
-     *
-     * Example path: `my_block`, resolves to the raw path `addon_namespace:block/my_block`.
+     * Gets the model under the given [path] after or throws an exception if it does not exist.
      */
     fun getModel(path: String): ModelBuilder =
-        getModelRawPath(ResourcePath(id.namespace, "block/$path"))
+        getModel(ResourcePath.of(path, id.namespace))
     
     /**
      * Rotates the builder based on the built-in facing [BlockStateProperties][BlockStateProperty]:
@@ -111,7 +105,7 @@ class BlockModelSelectorScope internal constructor(
     // TODO: utility methods to generate cube models from textures
     
     fun createCubeModel(all: String): ModelBuilder =
-        createCubeModel(ResourcePath.of("block/$all", id.namespace))
+        createCubeModel(ResourcePath.of(all, id.namespace))
     
     fun createCubeModel(all: ResourcePath): ModelBuilder = ModelBuilder(
         Model(

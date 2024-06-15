@@ -85,14 +85,34 @@ object DefaultGuiItems {
     val SMALL_ARROW_DOWN_ON = guiItem("small_arrow/down_on")
     val SMALL_ARROW_UP_OFF = guiItem("small_arrow/up_off")
     val SMALL_ARROW_UP_ON = guiItem("small_arrow/up_on")
-    val BAR_BLUE = hiddenItem("gui/opaque/bar/blue") { selectModels(0..16, true) { createGuiModel("gui/bar/blue/$it", background = true, stretched = true) } }
-    val BAR_GREEN = hiddenItem("gui/opaque/bar/green") { selectModels(0..16, true) { createGuiModel("gui/bar/green/$it", background = true, stretched = true) } }
-    val BAR_RED = hiddenItem("gui/opaque/bar/red") { selectModels(0..16, true) { createGuiModel("gui/bar/red/$it", background = true, stretched = true) } }
-    val BAR_ORANGE = hiddenItem("gui/opaque/bar/orange") { selectModels(0..16, true) { createGuiModel("gui/bar/orange/$it", background = true, stretched = true) } }
+    val BAR_BLUE = hiddenItem("gui/opaque/bar/blue") {
+        selectModels(0..16, true) {
+            createGuiModel("item/gui/bar/blue/$it", background = true, stretched = true)
+        }
+    }
+    val BAR_GREEN = hiddenItem("gui/opaque/bar/green") {
+        selectModels(0..16, true) {
+            createGuiModel("item/gui/bar/green/$it", background = true, stretched = true)
+        }
+    }
+    val BAR_RED = hiddenItem("gui/opaque/bar/red") {
+        selectModels(0..16, true) {
+            createGuiModel("item/gui/bar/red/$it", background = true, stretched = true)
+        }
+    }
+    val BAR_ORANGE = hiddenItem("gui/opaque/bar/orange") {
+        selectModels(0..16, true) {
+            createGuiModel("item/gui/bar/orange/$it", background = true, stretched = true)
+        }
+    }
     val CHEATING_ON = guiItem("cheating_on", "menu.nova.items.cheat_mode.on")
     val CHEATING_OFF = guiItem("cheating_off", "menu.nova.items.cheat_mode.off")
     val COLOR_PICKER = guiItem("color_picker")
-    val NUMBER = hiddenItem("gui/opaque/number") { selectModels(0..999, true) { createGuiModel("gui/number/$it", background = true, stretched = false) } }
+    val NUMBER = hiddenItem("gui/opaque/number") {
+        selectModels(0..999, true) {
+            createGuiModel("item/gui/number/$it", background = true, stretched = false)
+        }
+    }
     val SEARCH = guiItem("search")
     val STOPWATCH = guiItem("stopwatch")
     //</editor-fold>
@@ -162,14 +182,34 @@ object DefaultGuiItems {
     val TP_SMALL_ARROW_DOWN_ON = tpGuiItem("small_arrow/down_on")
     val TP_SMALL_ARROW_UP_OFF = tpGuiItem("small_arrow/up_off")
     val TP_SMALL_ARROW_UP_ON = tpGuiItem("small_arrow/up_on")
-    val TP_BAR_BLUE = hiddenItem("gui/transparent/bar/blue") { selectModels(0..16, true) { createGuiModel("gui/bar/blue/$it", background = false, stretched = true) } }
-    val TP_BAR_GREEN = hiddenItem("gui/transparent/bar/green") { selectModels(0..16, true) { createGuiModel("gui/bar/green/$it", background = false, stretched = true) } }
-    val TP_BAR_RED = hiddenItem("gui/transparent/bar/red") { selectModels(0..16, true) { createGuiModel("gui/bar/red/$it", background = false, stretched = true) } }
-    val TP_BAR_ORANGE = hiddenItem("gui/transparent/bar/orange") { selectModels(0..16, true) { createGuiModel("gui/bar/orange/$it", background = false, stretched = true) } }
+    val TP_BAR_BLUE = hiddenItem("gui/transparent/bar/blue") {
+        selectModels(0..16, true) {
+            createGuiModel("item/gui/bar/blue/$it", background = false, stretched = true)
+        }
+    }
+    val TP_BAR_GREEN = hiddenItem("gui/transparent/bar/green") {
+        selectModels(0..16, true) {
+            createGuiModel("item/gui/bar/green/$it", background = false, stretched = true)
+        }
+    }
+    val TP_BAR_RED = hiddenItem("gui/transparent/bar/red") {
+        selectModels(0..16, true) {
+            createGuiModel("item/gui/bar/red/$it", background = false, stretched = true)
+        }
+    }
+    val TP_BAR_ORANGE = hiddenItem("gui/transparent/bar/orange") {
+        selectModels(0..16, true) {
+            createGuiModel("item/gui/bar/orange/$it", background = false, stretched = true)
+        }
+    }
     val TP_CHEATING_ON = tpGuiItem("cheating_on", "menu.nova.items.cheat_mode.on")
     val TP_CHEATING_OFF = tpGuiItem("cheating_off", "menu.nova.items.cheat_mode.off")
     val TP_COLOR_PICKER = tpGuiItem("color_picker")
-    val TP_NUMBER = hiddenItem("number") { selectModels(0..999, true) { createGuiModel("gui/number/$it", stretched = false, background = false) } }
+    val TP_NUMBER = hiddenItem("number") {
+        selectModels(0..999, true) {
+            createGuiModel("item/gui/number/$it", stretched = false, background = false)
+        }
+    }
     val TP_SEARCH = tpGuiItem("search")
     val TP_STOPWATCH = tpGuiItem("stopwatch")
     //</editor-fold>
@@ -181,13 +221,13 @@ object DefaultBlockOverlays {
     
     val BREAK_STAGE_OVERLAY = hiddenItem("break_stage_overlay") {
         selectModels(0..9, true) {
-            getModelRawPath(ResourcePath("nova", "block/break_stage/$it"))
+            getModel(ResourcePath("nova", "block/break_stage/$it"))
         }
     }
     
-    val TRANSPARENT_BLOCK = hiddenItem("transparent_block") { 
+    val TRANSPARENT_BLOCK = hiddenItem("transparent_block") {
         selectModel {
-            getModelRawPath(ResourcePath("nova", "block/transparent"))
+            getModel(ResourcePath("nova", "block/transparent"))
         }
     }
     
@@ -209,6 +249,7 @@ private fun hiddenItem(
     hidden(true)
     models {
         itemType(PacketItems.SERVER_SIDE_MATERIAL)
+        selectModel { getModel("item/$name") }
     }
 }
 
@@ -230,9 +271,9 @@ private fun guiItem(
 ): NovaItem = item("gui/opaque/$name") {
     localizedName(localizedName)
     hidden(true)
-    models { 
+    models {
         itemType(PacketItems.SERVER_SIDE_MATERIAL)
-        selectModel { createGuiModel("gui/$name", true, stretched) }
+        selectModel { createGuiModel("item/gui/$name", true, stretched) }
     }
 }
 
@@ -243,8 +284,8 @@ private fun tpGuiItem(
 ): NovaItem = item("gui/transparent/$name") {
     localizedName(localizedName)
     hidden(true)
-    models { 
+    models {
         itemType(PacketItems.SERVER_SIDE_MATERIAL)
-        selectModel { createGuiModel("gui/$name", false, stretched) } 
+        selectModel { createGuiModel("item/gui/$name", false, stretched) }
     }
 }

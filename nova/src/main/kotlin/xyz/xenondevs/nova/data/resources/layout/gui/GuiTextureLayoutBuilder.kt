@@ -24,10 +24,10 @@ class GuiTextureLayoutBuilder(private val namespace: String) {
     }
     
     /**
-     * Sets the path to the gui texture, assuming it is located in `textures/gui` of your addon's namespace.
+     * Sets the path to the gui texture.
      */
     fun path(name: String) {
-        this.texture = ResourcePath(namespace, "gui/$name")
+        this.texture = ResourcePath.of(name, namespace)
     }
     
     /**

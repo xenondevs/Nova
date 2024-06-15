@@ -31,12 +31,11 @@ class ArmorLayoutBuilder internal constructor(private val namespace: String) {
     }
     
     /**
-     * Sets the textures [layer1] and [layer2] for the armor model, assuming they're
-     * located in `textures/armor` of your addon's namespace.
+     * Sets the textures [layer1] and [layer2] for the armor model.
      */
     fun texture(layer1: String, layer2: String) {
-        this.layer1 = ResourcePath(namespace, "armor/$layer1")
-        this.layer2 = ResourcePath(namespace, "armor/$layer2")
+        this.layer1 = ResourcePath.of(layer1, namespace)
+        this.layer2 = ResourcePath.of(layer2, namespace)
     }
     
     /**
@@ -48,12 +47,11 @@ class ArmorLayoutBuilder internal constructor(private val namespace: String) {
     }
     
     /**
-     * Sets the emissivity maps [layer1] and [layer2] for the armor model, assuming they're
-     * located in `textures/armor` of your addon's namespace.
+     * Sets the emissivity maps [layer1] and [layer2] for the armor model.
      */
     fun emissivityMap(layer1: String, layer2: String) {
-        layer1EmissivityMap = ResourcePath(namespace, "armor/$layer1")
-        layer2EmissivityMap = ResourcePath(namespace, "armor/$layer2")
+        layer1EmissivityMap = ResourcePath.of(layer1, namespace)
+        layer2EmissivityMap = ResourcePath.of(layer2, namespace)
     }
     
     /**

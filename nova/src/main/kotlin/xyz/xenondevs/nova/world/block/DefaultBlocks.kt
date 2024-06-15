@@ -21,9 +21,6 @@ internal object DefaultBlocks {
         behaviors(UnknownBlockBehavior)
         models {
             stateBacked(Int.MAX_VALUE, BackingStateCategory.NOTE_BLOCK, BackingStateCategory.MUSHROOM_BLOCK)
-            selectModel {
-                createCubeModel("unknown")
-            }
         }
     }
     
