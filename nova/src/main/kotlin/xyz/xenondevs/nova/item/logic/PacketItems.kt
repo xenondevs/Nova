@@ -247,21 +247,12 @@ internal object PacketItems : Listener, PacketListener {
         val namedModelId = novaTag.getStringOrNull("modelId")
         val unnamedModelId = novaTag.getIntOrNull("subId")
         
-        val vanillaMaterial = item.vanillaMaterial
         val customModelData = when {
-            namedModelId != null -> ResourceLookups.NAMED_ITEM_MODEL[item]
-                ?.get(vanillaMaterial)
-                ?.get(namedModelId)
+            namedModelId != null -> item.model.getCustomModelData(namedModelId)
                 ?: return getUnknownItem(itemStack, id, namedModelId)
-            
-            unnamedModelId != null -> ResourceLookups.UNNAMED_ITEM_MODEL[item]
-                ?.get(vanillaMaterial)
-                ?.get(unnamedModelId)
+            unnamedModelId != null -> item.model.getCustomModelData(unnamedModelId) 
                 ?: return getUnknownItem(itemStack, id, unnamedModelId.toString())
-            
-            else -> ResourceLookups.NAMED_ITEM_MODEL[item]
-                ?.get(vanillaMaterial)
-                ?.get("default")
+            else -> item.model.getCustomModelData("default") 
                 ?: return getUnknownItem(itemStack, id)
         }
         
@@ -274,7 +265,7 @@ internal object PacketItems : Listener, PacketListener {
         }
         
         // set item type and model data
-        newItemStack.item = CraftMagicNumbers.getItem(vanillaMaterial)
+        newItemStack.item = CraftMagicNumbers.getItem(item.vanillaMaterial)
         newItemTag.putInt("CustomModelData", customModelData)
         
         val packetItemData = item.getPacketItemData(newItemStack)

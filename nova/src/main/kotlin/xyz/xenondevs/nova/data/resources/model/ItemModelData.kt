@@ -23,18 +23,30 @@ open class ItemModelData(
 ) {
     
     val size = unnamedCustomModelData.size
-    val unnamedClientsideProviders: Array<ItemProvider> =
-        Array(size) { ItemWrapper(createClientsideItemStack(false, it)) }
-    val unnamedBasicClientsideProviders: Array<ItemProvider> =
-        Array(size) { ItemWrapper(createClientsideItemStack(true, it)) }
-    val clientsideProviders: Map<String, ItemProvider> =
-        namedCustomModelData.mapValues { (modelId, _) -> ItemWrapper(createClientsideItemStack(false, modelId)) }
-    val basicClientsideProviders: Map<String, ItemProvider> =
-        namedCustomModelData.mapValues { (modelId, _) -> ItemWrapper(createClientsideItemStack(true, modelId)) }
+    val unnamedClientsideProviders: Array<ItemProvider>
+        by lazy { Array(size) { ItemWrapper(createClientsideItemStack(false, it)) } }
+    val unnamedBasicClientsideProviders: Array<ItemProvider>
+        by lazy { Array(size) { ItemWrapper(createClientsideItemStack(true, it)) } }
+    val clientsideProviders: Map<String, ItemProvider>
+        by lazy { namedCustomModelData.mapValues { (modelId, _) -> ItemWrapper(createClientsideItemStack(false, modelId)) } }
+    val basicClientsideProviders: Map<String, ItemProvider>
+        by lazy { namedCustomModelData.mapValues { (modelId, _) -> ItemWrapper(createClientsideItemStack(true, modelId)) } }
     val clientsideProvider: ItemProvider
         get() = unnamedClientsideProviders[0]
     val basicClientsideProvider: ItemProvider
         get() = unnamedBasicClientsideProviders[0]
+    
+    /**
+     * Gets the custom model data for [modelId] or null if it does not exist.
+     */
+    fun getCustomModelData(modelId: String): Int? =
+        namedCustomModelData[modelId]
+    
+    /**
+     * Gets the custom model data for [modelId] or null if it does not exist.
+     */
+    fun getCustomModelData(modelId: Int): Int? =
+        unnamedCustomModelData.getOrNull(modelId)
     
     /**
      * Creates a new [ItemBuilder] in client-side format, using the given [name], [lore], and [modelId].

@@ -213,6 +213,12 @@ class NovaItem internal constructor(
     private fun loadVanillaMaterial() {
         val properties = behaviors.flatMapTo(HashSet()) { it.getVanillaMaterialProperties() }
         vanillaMaterial = VanillaMaterialTypes.getMaterial(properties)
+        
+        // fall back to first available material if vanilla material is not present in lookups
+        val itemModels = ResourceLookups.UNNAMED_ITEM_MODEL[this]
+            ?: throw IllegalStateException("No unnamed model lookup for $this")
+        if (vanillaMaterial !in itemModels)
+            vanillaMaterial = itemModels.keys.first()
     }
     
     private fun loadAttributeModifiers() {
