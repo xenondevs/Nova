@@ -32,7 +32,7 @@ internal class RemoveEndPointTask(
     override val event: Event = RemoveEndPointTaskEvent()
     //</editor-fold>
     
-    override fun remove() {
+    override suspend fun remove() {
         // remove this endpoint from the connectedNodes map of all connected nodes
         state.forEachConnectedNode(node) { type, face, connectedNode ->
             state.removeConnection(connectedNode, type, face.oppositeFace)

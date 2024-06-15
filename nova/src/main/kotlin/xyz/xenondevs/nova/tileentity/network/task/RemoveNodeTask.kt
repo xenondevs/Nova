@@ -37,7 +37,7 @@ internal abstract class RemoveNodeTask<T : NetworkNode>(
         return true
     }
     
-    abstract fun remove()
+    abstract suspend fun remove()
     
     /**
      * Invalidates the cluster of all [ProtoNetworks][ProtoNetwork] clustered with [network] and

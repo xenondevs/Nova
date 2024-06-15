@@ -60,7 +60,7 @@ internal class LoadChunkTask(
                             val networks = data.networks
                             if (networks.isNotEmpty()) {
                                 for ((_, id) in networks) {
-                                    val network = state.resolveOrLoadNetwork(id)
+                                    val network = state.resolveNetwork(id)
                                     updatedNetworks.compute(network) { _, nodes -> nodes?.also { it += node } ?: hashSetOf(node) }
                                 }
                             } else {
@@ -72,7 +72,7 @@ internal class LoadChunkTask(
                             val networks = data.networks
                             if (!networks.isEmpty) {
                                 for ((_, _, id) in networks) {
-                                    val network = state.resolveOrLoadNetwork(id)
+                                    val network = state.resolveNetwork(id)
                                     updatedNetworks.compute(network) { _, nodes -> nodes?.also { it += node } ?: hashSetOf(node) }
                                 }
                             } else {

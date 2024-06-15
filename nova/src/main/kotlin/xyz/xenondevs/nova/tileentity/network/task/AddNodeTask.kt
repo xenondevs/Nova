@@ -28,6 +28,6 @@ internal abstract class AddNodeTask<T : NetworkNode>(
         return true
     }
     
-    abstract fun add()
+    abstract suspend fun add()
     
 }

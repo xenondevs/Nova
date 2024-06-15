@@ -39,7 +39,7 @@ internal class RemoveBridgeTask(
     override val event: Event = AddBridgeTaskEvent()
     //</editor-fold>
     
-    override fun remove() {
+    override suspend fun remove() {
         for ((networkType, currentNetworkId) in state.getNetworks(node)) {
             val currentNetwork = state.resolveNetwork(currentNetworkId)
             
@@ -80,7 +80,7 @@ internal class RemoveBridgeTask(
      * [NetworkBridges][NetworkBridge] to [connectedBridges] and all
      * [NetworkEndPoints][NetworkEndPoint] to [connectedEndPoints].
      */
-    private fun disconnectConnectedNodes(
+    private suspend fun disconnectConnectedNodes(
         network: ProtoNetwork<*>,
         connectedBridges: MutableSet<NetworkBridge>,
         connectedEndPoints: MutableSet<NetworkEndPoint>
@@ -105,7 +105,7 @@ internal class RemoveBridgeTask(
     /**
      * Disconnects [endPoint] at [face] from [network].
      */
-    private fun disconnectEndPoint(endPoint: NetworkEndPoint, face: BlockFace, network: ProtoNetwork<*>) {
+    private suspend fun disconnectEndPoint(endPoint: NetworkEndPoint, face: BlockFace, network: ProtoNetwork<*>) {
         val networkType = network.type
         state.removeNetwork(endPoint, networkType, face)
         state.removeConnection(endPoint, networkType, face)
@@ -115,7 +115,7 @@ internal class RemoveBridgeTask(
     /**
      * Disconnects [bridge] at [face] from [network].
      */
-    private fun disconnectBridge(bridge: NetworkBridge, face: BlockFace, network: ProtoNetwork<*>) {
+    private suspend fun disconnectBridge(bridge: NetworkBridge, face: BlockFace, network: ProtoNetwork<*>) {
         state.removeConnection(bridge, network.type, face)
     }
     
@@ -123,7 +123,7 @@ internal class RemoveBridgeTask(
      * Reassigns the networks inside [NetworkBridgeData.networks] and [NetworkEndPointData.networks] for all
      * nodes in [networks].
      */
-    private fun reassignNetworks(networks: List<ProtoNetwork<*>>) {
+    private suspend fun reassignNetworks(networks: List<ProtoNetwork<*>>) {
         for (network in networks) {
             for ((node, faces) in network.nodes.values) {
                 when (node) {
@@ -140,7 +140,7 @@ internal class RemoveBridgeTask(
      *
      * @return A list of new [ProtoNetworks][NetworkData], or null if the networks haven't been split. Will not contain duplicates.
      */
-    private fun recalculateNetworks(
+    private suspend fun recalculateNetworks(
         bridge: NetworkBridge,
         connectedPreviously: Set<NetworkBridge>,
         networkType: NetworkType<*>

@@ -45,7 +45,7 @@ internal class AddBridgeTask(
     override val event: Event = AddBridgeTaskEvent()
     //</editor-fold>
     
-    override fun add() {
+    override suspend fun add() {
         state.setBridgeData(
             node.pos,
             NetworkBridgeData(
@@ -89,7 +89,7 @@ internal class AddBridgeTask(
      * Depending on the amount of neighboring [ProtoNetworks][ProtoNetwork], this function my either merge networks,
      * add the bridge to an existing [ProtoNetwork], or create a new [ProtoNetwork].
      */
-    private fun <T : Network<T>> connectBridgeToBridges(
+    private suspend fun <T : Network<T>> connectBridgeToBridges(
         self: NetworkBridge,
         neighbors: Map<BlockFace, NetworkBridge>,
         networkType: NetworkType<T>
@@ -123,7 +123,7 @@ internal class AddBridgeTask(
     /**
      * Merges the given [networks] into a single network of [type].
      */
-    private fun <T : Network<T>> mergeNetworks(
+    private suspend fun <T : Network<T>> mergeNetworks(
         type: NetworkType<T>,
         networks: Set<ProtoNetwork<T>>
     ): ProtoNetwork<T> {
@@ -145,7 +145,7 @@ internal class AddBridgeTask(
         return mergedNetwork
     }
     
-    private fun moveNetwork(node: NetworkNode, previous: UUID, now: UUID) {
+    private suspend fun moveNetwork(node: NetworkNode, previous: UUID, now: UUID) {
         when (node) {
             is NetworkBridge -> state.getNetworks(node).replaceAll { _, id -> if (id == previous) now else id }
             is NetworkEndPoint -> state.getNetworks(node).replaceAll { _, _, id -> if (id == previous) now else id }
@@ -155,7 +155,7 @@ internal class AddBridgeTask(
     /**
      * Connects the bridge [self] to the given [neighbors] using [network].
      */
-    private fun connectBridgeToEndPoints(
+    private suspend fun connectBridgeToEndPoints(
         self: NetworkBridge,
         neighbors: Map<BlockFace, NetworkEndPoint>,
         network: ProtoNetwork<*>

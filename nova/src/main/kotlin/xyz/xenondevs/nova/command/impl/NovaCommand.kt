@@ -705,7 +705,7 @@ internal object NovaCommand : Command("nova") {
             NetworkManager.queueRead(pos.world) { state ->
                 val connectedNodes = state.getConnectedNodes(node)
                 
-                fun buildNetworkInfoComponent(id: UUID): Component {
+                suspend fun buildNetworkInfoComponent(id: UUID): Component {
                     val network = state.resolveNetwork(id)
                     return Component.translatable(
                         "command.nova.show_network_node_info.network", NamedTextColor.GRAY,

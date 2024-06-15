@@ -207,7 +207,7 @@ class ProtoNetwork<T : Network<T>>(
      *
      * Does nothing if the [cluster] has already been built.
      */
-    fun initCluster() {
+    suspend fun initCluster() {
         if (cluster != null)
             return
         
@@ -226,7 +226,7 @@ class ProtoNetwork<T : Network<T>>(
      *
      * If no [cluster] has been built yet, [initCluster] will be called instead.
      */
-    fun enlargeCluster(node: NetworkNode) {
+    suspend fun enlargeCluster(node: NetworkNode) {
         val cluster = cluster ?: return initCluster()
         
         val queue = LinkedList<ProtoNetwork<*>>()
@@ -241,7 +241,7 @@ class ProtoNetwork<T : Network<T>>(
      *
      * If no [cluster] has been built yet, [initCluster] will be called instead.
      */
-    fun enlargeCluster(nodes: Collection<NetworkNode>) {
+    suspend fun enlargeCluster(nodes: Collection<NetworkNode>) {
         val cluster = cluster ?: return initCluster()
         if (nodes.isEmpty())
             return
@@ -253,7 +253,7 @@ class ProtoNetwork<T : Network<T>>(
         processClusterQueue(cluster, queue)
     }
     
-    private fun processClusterQueue(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>) {
+    private suspend fun processClusterQueue(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>) {
         while (queue.isNotEmpty()) {
             val network = queue.poll()
             if (network in cluster)
@@ -268,14 +268,14 @@ class ProtoNetwork<T : Network<T>>(
         }
     }
     
-    private fun queueWithRelatedNetworks(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>, node: NetworkNode) {
+    private suspend fun queueWithRelatedNetworks(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>, node: NetworkNode) {
         queueNetworks(cluster, queue, node)
         for (relatedNode in node.linkedNodes) {
             queueNetworks(cluster, queue, relatedNode)
         }
     }
     
-    private fun queueNetworks(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>, node: NetworkNode) {
+    private suspend fun queueNetworks(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>, node: NetworkNode) {
         // ghost nodes do not affect clustering because they're unloaded
         if (node is GhostNetworkNode)
             return
@@ -359,7 +359,7 @@ class ProtoNetwork<T : Network<T>>(
                 )
                 
                 nodes[pos] = MutableNetworkNodeConnection(
-                    GhostNetworkNode.fromData(pos, state.getOrLoadNodeData(pos)),
+                    GhostNetworkNode.fromData(pos, state.getNodeData(pos)),
                     reader.readCubeFaceSet()
                 )
             }

@@ -43,7 +43,7 @@ sealed interface NetworkNode {
      * so you shouldn't rely on this method for important updates, it is rather
      * intended to update the visual state and similar non-critical things.
      */
-    fun handleNetworkUpdate(state: NetworkState) = Unit
+    suspend fun handleNetworkUpdate(state: NetworkState) = Unit
     
     /**
      * Called when a [NetworkNode] is loaded into the [state].
@@ -52,6 +52,6 @@ sealed interface NetworkNode {
      * not when the node was added using [NetworkManager.queueAddEndPoint] or
      * [NetworkManager.queueAddBridge].
      */
-    fun handleNetworkLoaded(state: NetworkState) = Unit
+    suspend fun handleNetworkLoaded(state: NetworkState) = Unit
     
 }

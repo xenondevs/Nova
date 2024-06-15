@@ -36,7 +36,7 @@ internal class AddEndPointTask(
     override val event: Event = AddEndPointTaskEvent()
     //</editor-fold>
     
-    override fun add() {
+    override suspend fun add() {
         state.setEndPointData(
             node.pos,
             NetworkEndPointData(node.owner)
@@ -71,7 +71,7 @@ internal class AddEndPointTask(
         }
     }
     
-    private fun tryConnectToBridge(
+    private suspend fun tryConnectToBridge(
         bridge: NetworkBridge,
         networkType: NetworkType<*>, face: BlockFace,
         clustersToEnlarge: MutableSet<ProtoNetwork<*>>
@@ -84,7 +84,7 @@ internal class AddEndPointTask(
         return false
     }
     
-    private fun tryConnectToEndPoint(
+    private suspend fun tryConnectToEndPoint(
         endPoint: NetworkEndPoint,
         networkType: NetworkType<*>, face: BlockFace,
         clustersToEnlarge: MutableSet<ProtoNetwork<*>>
