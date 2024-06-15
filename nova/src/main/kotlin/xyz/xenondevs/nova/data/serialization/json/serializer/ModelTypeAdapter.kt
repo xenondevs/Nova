@@ -189,14 +189,20 @@ internal object ModelTypeAdapter : TypeAdapter<Model>() {
     private fun writeDisplay(writer: JsonWriter, display: Display) {
         writer.beginObject()
         
-        writer.name("rotation")
-        writeVector3d(writer, display.rotation)
+        if (display.rotation != Vector3d(0.0, 0.0, 0.0)) {
+            writer.name("rotation")
+            writeVector3d(writer, display.rotation)
+        }
         
-        writer.name("translation")
-        writeVector3d(writer, display.translation)
+        if (display.translation != Vector3d(0.0, 0.0, 0.0)) {
+            writer.name("translation")
+            writeVector3d(writer, display.translation)
+        }
         
-        writer.name("scale")
-        writeVector3d(writer, display.scale)
+        if (display.scale != Vector3d(1.0, 1.0, 1.0)) {
+            writer.name("scale")
+            writeVector3d(writer, display.scale)
+        }
         
         writer.endObject()
     }
@@ -451,7 +457,7 @@ internal object ModelTypeAdapter : TypeAdapter<Model>() {
         return Display(
             rotation ?: Vector3d(0.0, 0.0, 0.0), 
             translation ?: Vector3d(0.0, 0.0, 0.0),
-            scale ?: Vector3d(0.0, 0.0, 0.0)
+            scale ?: Vector3d(1.0, 1.0, 1.0)
         )
     }
     
