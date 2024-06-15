@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.world.format.chunk.data
 
 import xyz.xenondevs.cbf.io.ByteWriter
 
-interface CompactIntStorage {
+internal interface CompactIntStorage {
     
     /**
      * Retrieves the value at the given [index].

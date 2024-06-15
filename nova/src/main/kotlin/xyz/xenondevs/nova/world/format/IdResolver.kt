@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.format
 
-interface IdResolver<T> {
+internal interface IdResolver<T> {
     
     /**
      * The amount of different ids that can be resolved.

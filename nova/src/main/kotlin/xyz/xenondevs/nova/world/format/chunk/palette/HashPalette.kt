@@ -6,7 +6,7 @@ import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.world.format.IdResolver
 
-class HashPalette<T>(private val idResolver: IdResolver<T>) : Palette<T> {
+internal class HashPalette<T>(private val idResolver: IdResolver<T>) : Palette<T> {
     
     private val fromId: MutableList<T> = ArrayList()
     private val toId: Object2ShortMap<T> = Object2ShortOpenHashMap()
