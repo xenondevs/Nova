@@ -53,7 +53,6 @@ internal class RegionChunk(
     @Volatile
     var isEnabled = false
         private set
-    
     private var shouldTick = false
     private var isTicking = false
     
@@ -61,7 +60,8 @@ internal class RegionChunk(
     private val level = world.serverLevel
     private val minHeight = world.minHeight
     private val maxHeight = world.maxHeight
-    private val sectionCount = getSectionCount(world)
+    private val minSection = minHeight shr 4
+    private val maxSection = maxHeight shr 4
     
     private val vanillaTileEntities: MutableMap<BlockPos, VanillaTileEntity> = HashMap()
     private val tileEntities: MutableMap<BlockPos, TileEntity> = ConcurrentHashMap() // concurrent to allow modifications during ticking
@@ -436,9 +436,21 @@ internal class RegionChunk(
         if (vanillaTileEntityData.isEmpty() && tileEntityData.isEmpty() && sections.all { it.isEmpty() })
             return false
         
+        // sections
+        writer.writeInt(minSection)
+        writer.writeInt(maxSection)
+        val sectionBitmask = BitSet(sections.size)
+        val sectionsBuffer = ByteArrayOutputStream()
+        val sectionsWriter = ByteWriter.fromStream(sectionsBuffer)
+        for ((sectionIdx, section) in sections.withIndex()) {
+            sectionBitmask.set(sectionIdx, section.write(sectionsWriter))
+        }
+        writer.writeBytes(Arrays.copyOf(sectionBitmask.toByteArray(), sections.size.ceilDiv(8)))
+        writer.writeBytes(sectionsBuffer.toByteArray())
+        
+        // tile-entities
         vanillaTileEntities.values.forEach(VanillaTileEntity::saveData)
         tileEntities.values.forEach(TileEntity::saveData)
-        
         writer.writeVarInt(vanillaTileEntityData.size)
         for ((pos, data) in vanillaTileEntityData) {
             writer.writeInt(packBlockPos(pos))
@@ -450,35 +462,41 @@ internal class RegionChunk(
             writer.writeBytes(CBF.write(data))
         }
         
-        val sectionBitmask = BitSet(sectionCount)
-        val sectionsBuffer = ByteArrayOutputStream()
-        val sectionsWriter = ByteWriter.fromStream(sectionsBuffer)
-        
-        for ((sectionIdx, section) in sections.withIndex()) {
-            sectionBitmask.set(sectionIdx, section.write(sectionsWriter))
-        }
-        
-        writer.writeInt(sectionCount)
-        writer.writeBytes(Arrays.copyOf(sectionBitmask.toByteArray(), sectionCount.ceilDiv(8)))
-        writer.writeBytes(sectionsBuffer.toByteArray())
-        
         return true
     }
     
     companion object : RegionizedChunkReader<RegionChunk>() {
         
         override fun read(pos: ChunkPos, reader: ByteReader): RegionChunk {
-            val vanillaTileEntityData = readPosCompoundMap(pos, reader)
-            val tileEntityData = readPosCompoundMap(pos, reader)
-            
-            val sectionCount = reader.readInt()
-            val sectionsBitmask = BitSet.valueOf(reader.readBytes(sectionCount.ceilDiv(8)))
-            
-            val sections = Array(sectionCount) { sectionIdx ->
+            // read sections
+            val minFileSection = reader.readInt()
+            val maxFileSection = reader.readInt()
+            val fileSectionCount = maxFileSection - minFileSection
+            val sectionsBitmask = BitSet.valueOf(reader.readBytes(fileSectionCount.ceilDiv(8)))
+            val fileSections = Array(fileSectionCount) { sectionIdx ->
                 if (sectionsBitmask.get(sectionIdx))
                     RegionChunkSection.read(BlockStateIdResolver, reader)
                 else RegionChunkSection(BlockStateIdResolver)
             }
+            
+            // fix section array if section count changed
+            val minWorldSection = pos.world!!.minHeight shr 4
+            val maxWorldSection = pos.world!!.maxHeight shr 4
+            val worldSectionCount = maxWorldSection - minWorldSection
+            val sections: Array<RegionChunkSection<NovaBlockState>>
+            if (fileSectionCount != worldSectionCount) {
+                val d = minWorldSection - minFileSection
+                sections = Array(worldSectionCount) { sectionIdx ->
+                    fileSections.getOrNull(sectionIdx + d)
+                        ?: RegionChunkSection(BlockStateIdResolver)
+                }
+            } else {
+                sections = fileSections
+            }
+            
+            // read tile-entities
+            val vanillaTileEntityData = readPosCompoundMap(pos, reader)
+            val tileEntityData = readPosCompoundMap(pos, reader)
             
             return RegionChunk(pos, sections, vanillaTileEntityData, tileEntityData)
         }
