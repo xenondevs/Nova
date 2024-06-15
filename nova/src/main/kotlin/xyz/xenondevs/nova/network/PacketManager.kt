@@ -62,14 +62,12 @@ internal object PacketManager : Listener {
     
     @InitFun
     private fun init() {
-        LOGGER.info("Registering packet handlers")
         registerEvents()
         registerHandlers()
     }
     
     @DisableFun
     private fun disable() {
-        LOGGER.info("Unregistering packet handlers")
         Bukkit.getOnlinePlayers().forEach(::unregisterHandler)
         
         if (::serverChannel.isInitialized) {
