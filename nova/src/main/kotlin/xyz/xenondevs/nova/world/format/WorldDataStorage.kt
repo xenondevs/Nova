@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 import org.bukkit.World
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
+import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.chunk.NetworkChunk
 import xyz.xenondevs.nova.world.format.chunk.RegionChunk
@@ -135,6 +136,8 @@ internal class WorldDataStorage(val world: World) {
                     regionFile.save()
                     
                     // network region files that don't have a corresponding block region file can be unloaded
+                    // (at least most of the time, modifications to big networks may cause them to be loaded again)
+                    // TODO: a better solution may be to track last access time
                     if (!blockRegionFiles.containsKey(rid))
                         networkRegionFiles -= rid
                 }
@@ -145,8 +148,9 @@ internal class WorldDataStorage(val world: World) {
     }
     
     suspend fun disableAllChunks() {
+        checkServerThread()
         for (regionFile in blockRegionFiles.values) {
-            for (chunk in regionFile.await().chunks) { // TODO potential enable / disable race condition
+            for (chunk in regionFile.await().chunks) {
                 chunk.disable()
             }
         }

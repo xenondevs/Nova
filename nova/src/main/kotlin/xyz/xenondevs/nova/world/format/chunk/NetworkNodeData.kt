@@ -18,8 +18,6 @@ import xyz.xenondevs.nova.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.util.getOrThrow
 import java.util.*
 
-// TODO: properly handle unknown network types
-
 sealed interface NetworkNodeData {
     
     val owner: UUID
