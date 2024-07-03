@@ -126,10 +126,10 @@
   "menu.nova.items.cheat_mode.on": "Cheat-Modus: An",
   "menu.nova.items.cheat_mode.off": "Cheat-Modus: Aus",
   "command.nova.unenchant_all.failure": "Es gibt keine Verzauberungen auf %s's %s.",
-  "command.nova.enchant.success": "Erfolgreich die Verzauberung %s auf %s's %s angewendet.",
-  "command.nova.enchant.incompatible": "Die Verzauberung %s konnte nicht auf %s's %s angewendet werden, da sie mit den vorhandenen Verzauberungen nicht kompatibel ist.",
-  "command.nova.enchant.unsupported": "Die Verzauberung %s konnte nicht auf %s's %s angewendet werden, da der Gegenstand diese Verzauberung nicht unterstützt.",
-  "command.nova.unenchant_all.success": "Erfolgreich alle Verzauberungen von %s's %s entfernt.",
-  "command.nova.unenchant_single.success": "Erfolgreich %s aus %s's %s entfernt.",
-  "command.nova.unenchant_single.failure": "%s konnte nicht von %s's %s entfernt werden, da der Gegenstand nicht mit dieser Verzauberung versehen ist."
+  "command.nova.enchant.success": "Die Verzauberung %s wurde erfolgreich auf %s's %s angewendet.",
+  "command.nova.enchant.incompatible": "Die Verzauberung %s konnte nicht auf %s's %s angewendet werden, da sie mit den vorhandenen Verzauberungen inkompatibel ist.",
+  "command.nova.enchant.unsupported": "Die Verzauberung %s konnte nicht auf %s's %s angewendet werden, das Item diese Verzauberung nicht unterstützt.",
+  "command.nova.unenchant_all.success": "Alle Verzauberungen wurden erfolgreich von %s's %s entfernt.",
+  "command.nova.unenchant_single.success": "%s wurde erfolgreich von %s's %s entfernt.",
+  "command.nova.unenchant_single.failure": "%s konnte nicht von %s's %s entfernt werden, da das Item nicht mit dieser Verzauberung versehen ist."
 }
