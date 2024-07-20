@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.tileentity.network.type.item.channel
 
-import net.minecraft.world.item.ItemStack
 import org.bukkit.block.BlockFace
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.getOrSet
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType

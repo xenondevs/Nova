@@ -2,7 +2,7 @@
 
 package xyz.xenondevs.nova.tileentity.network.type.item
 
-import net.minecraft.world.item.ItemStack
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.network.NetworkGroup
 import xyz.xenondevs.nova.tileentity.network.NetworkGroupData
 import xyz.xenondevs.nova.tileentity.network.type.item.ItemNetwork.Companion.MAX_COMPLEXITY
@@ -29,14 +29,14 @@ internal class ItemNetworkGroup(data: NetworkGroupData<ItemNetwork>) : NetworkGr
                     if (provider in providerSnapshots)
                         continue
                     
-                    val arr = Array(provider.size) { ItemStack.EMPTY }
+                    val arr = Array(provider.size) { ItemStack.empty() }
                     providerSnapshots[provider] = arr
                 }
                 for (filteredProvider in distributor.filteredProviders) {
                     if (filteredProvider in filteredProviderSnapshots)
                         continue
                     
-                    val arr = Array(filteredProvider.inventory.size) { ItemStack.EMPTY }
+                    val arr = Array(filteredProvider.inventory.size) { ItemStack.empty() }
                     filteredProviderSnapshots[filteredProvider] = arr
                 }
                 
@@ -86,7 +86,7 @@ internal class ItemNetworkGroup(data: NetworkGroupData<ItemNetwork>) : NetworkGr
         for ((provider, snapshot) in filteredProviderSnapshots) {
             val unfilteredSnapshot = providerSnapshots[provider.inventory]!!
             for ((slot, itemStack) in unfilteredSnapshot.withIndex()) {
-                snapshot[slot] = if (provider.denies(itemStack)) ItemStack.EMPTY else itemStack
+                snapshot[slot] = if (provider.denies(itemStack)) ItemStack.empty() else itemStack
             }
         }
     }

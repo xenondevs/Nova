@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network.type.item.inventory
 
-import net.minecraft.world.item.ItemStack
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.tileentity.network.node.EndPointContainer
 
 interface NetworkedInventory : EndPointContainer {
@@ -12,7 +12,7 @@ interface NetworkedInventory : EndPointContainer {
     
     /**
      * Adds an [amount] of [itemStack] to the inventory and returns how many items have been left over.
-     * The [ItemStack.count] should be ignored, and the [itemStack] should not be modified.
+     * The [ItemStack.getAmount] should be ignored, and the [itemStack] should not be modified.
      */
     fun add(itemStack: ItemStack, amount: Int): Int
     

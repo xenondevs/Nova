@@ -1,9 +1,11 @@
 package xyz.xenondevs.nova.tileentity.network.type.item.inventory.vanilla
 
-import net.minecraft.world.item.ItemStack
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.util.unwrap
 import java.util.*
 import kotlin.math.min
+import net.minecraft.world.item.ItemStack as MojangStack
+import org.bukkit.inventory.ItemStack as BukkitStack
 
 internal open class NetworkedNMSInventory(
     private val container: ItemStackContainer
@@ -13,7 +15,7 @@ internal open class NetworkedNMSInventory(
     override val uuid = UUID(0L, 0L)
     override val size = container.size
     
-    override fun add(itemStack: ItemStack, amount: Int): Int {
+    override fun add(itemStack: BukkitStack, amount: Int): Int {
         val maxStackSize = itemStack.maxStackSize
         var remaining = amount
         
@@ -22,7 +24,7 @@ internal open class NetworkedNMSInventory(
             if (remaining <= 0)
                 break
             
-            if (!ItemStack.isSameItemSameComponents(itemStack, current))
+            if (!MojangStack.isSameItemSameComponents(itemStack.unwrap(), current))
                 continue
             
             val transfer = min(remaining, maxStackSize - current.count)
@@ -39,7 +41,7 @@ internal open class NetworkedNMSInventory(
                 continue
             
             val transfer = min(remaining, maxStackSize)
-            container[slot] = itemStack.copy().apply { count = transfer }
+            container[slot] = itemStack.unwrap().copyWithCount(transfer)
             remaining -= transfer
         }
         
@@ -69,12 +71,12 @@ internal open class NetworkedNMSInventory(
     }
     
     override fun isEmpty(): Boolean {
-        return container.all(ItemStack::isEmpty)
+        return container.all(MojangStack::isEmpty)
     }
     
-    override fun copyContents(destination: Array<ItemStack>) {
+    override fun copyContents(destination: Array<BukkitStack>) {
         for ((index, item) in container.withIndex()) {
-            destination[index] = item.copy()
+            destination[index] = item.copy().asBukkitMirror()
         }
     }
     

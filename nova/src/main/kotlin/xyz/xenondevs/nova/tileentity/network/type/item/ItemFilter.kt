@@ -1,16 +1,15 @@
 package xyz.xenondevs.nova.tileentity.network.type.item
 
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
-import net.minecraft.world.item.ItemStack as MojangStack
-import org.bukkit.inventory.ItemStack as BukkitStack
 
 interface ItemFilter<S: ItemFilter<S>> {
     
     val type: ItemFilterType<S>
     
-    fun allows(itemStack: MojangStack): Boolean
+    fun allows(itemStack: ItemStack): Boolean
     
-    fun toItemStack(): BukkitStack
+    fun toItemStack(): ItemStack
     
     @Suppress("UNCHECKED_CAST")
     fun toCompound(): Compound = type.serialize(this as S)

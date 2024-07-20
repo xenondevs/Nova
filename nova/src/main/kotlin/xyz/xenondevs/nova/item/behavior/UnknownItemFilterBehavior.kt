@@ -18,8 +18,6 @@ import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.unwrap
-import net.minecraft.world.item.ItemStack as MojangStack
-import org.bukkit.inventory.ItemStack as BukkitStack
 
 private val ID_KEY = ResourceLocation.fromNamespaceAndPath("nova", "unknown_item_filter_original_id")
 private val DATA_KEY = ResourceLocation.fromNamespaceAndPath("nova", "unknown_item_filter_original_data")
@@ -87,9 +85,9 @@ internal class UnknownItemFilter(
     override val type
         get() = throw UnsupportedOperationException()
     
-    override fun allows(itemStack: MojangStack) = false
+    override fun allows(itemStack: ItemStack) = false
     
-    override fun toItemStack(): BukkitStack {
+    override fun toItemStack(): ItemStack {
         val itemStack = DefaultItems.UNKNOWN_ITEM_FILTER.createItemStack()
         UnknownItemFilterBehavior.setFilter(itemStack, this)
         return itemStack

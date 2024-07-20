@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network.type.item.channel
 
-import net.minecraft.world.item.ItemStack
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.util.RoundRobinCounter
@@ -148,7 +148,7 @@ internal class ItemDistributor(
                     
                     if (consumer.inventory.add(itemStack, 1) == 0) {
                         provider.inventory.take(slot, 1)
-                        providerContent[slot].count--
+                        providerContent[slot].amount--
                         transfersLeft--
                         
                         hasConsumed = true
@@ -207,7 +207,7 @@ internal class ItemDistributor(
             if (itemStack.isEmpty || consumer.denies(itemStack))
                 continue
             
-            val idealAmount = min(itemStack.count, transfersLeft)
+            val idealAmount = min(itemStack.amount, transfersLeft)
             if (!provider.inventory.canTake(slot, idealAmount))
                 continue
             

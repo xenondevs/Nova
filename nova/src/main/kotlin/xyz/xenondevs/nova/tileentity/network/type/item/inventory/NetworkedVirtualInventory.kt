@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.tileentity.network.type.item.inventory
 
-import net.minecraft.world.item.ItemStack
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.inventory.Inventory
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.UpdateReason
@@ -18,8 +18,8 @@ open class NetworkedInvUIInventory(
         get() = inventory.size
     
     override fun add(itemStack: ItemStack, amount: Int): Int {
-        val itemStackWithCount = itemStack.copyWithCount(amount).asBukkitMirror()
-        return inventory.addItem(updateReason, itemStackWithCount)
+        val itemStackWithAmount = itemStack.clone().also { it.amount = amount }
+        return inventory.addItem(updateReason, itemStackWithAmount)
     }
     
     override fun canTake(slot: Int, amount: Int): Boolean {
@@ -55,7 +55,7 @@ open class NetworkedInvUIInventory(
     
     override fun copyContents(destination: Array<ItemStack>) {
         for ((slot, item) in inventory.unsafeItems.withIndex()) {
-            destination[slot] = item.unwrap().copy()
+            destination[slot] = item?.clone() ?: ItemStack.empty()
         }
     }
     
