@@ -4,9 +4,8 @@ import net.minecraft.world.item.ItemStack
 import xyz.xenondevs.invui.inventory.Inventory
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.UpdateReason
-import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
-import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.unwrap
 import java.util.*
 
 open class NetworkedInvUIInventory(
@@ -19,7 +18,7 @@ open class NetworkedInvUIInventory(
         get() = inventory.size
     
     override fun add(itemStack: ItemStack, amount: Int): Int {
-        val itemStackWithCount = itemStack.copyWithCount(amount).bukkitMirror
+        val itemStackWithCount = itemStack.copyWithCount(amount).asBukkitMirror()
         return inventory.addItem(updateReason, itemStackWithCount)
     }
     
@@ -56,7 +55,7 @@ open class NetworkedInvUIInventory(
     
     override fun copyContents(destination: Array<ItemStack>) {
         for ((slot, item) in inventory.unsafeItems.withIndex()) {
-            destination[slot] = item.nmsCopy
+            destination[slot] = item.unwrap().copy()
         }
     }
     

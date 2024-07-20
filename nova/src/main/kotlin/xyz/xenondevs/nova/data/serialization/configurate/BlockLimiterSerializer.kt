@@ -38,7 +38,7 @@ internal object BlockLimiterSerializer : TypeSerializer<List<BlockLimiter>> {
         val map = HashMap<ResourceLocation?, Int>()
         for((key, value) in node.childrenMap()) {
             key as String
-            val id = if (key == "*") null else ResourceLocation(key)
+            val id = if (key == "*") null else ResourceLocation.parse(key)
             map[id] = value.int
         }
         return map

@@ -53,6 +53,6 @@ internal object SoundEngine : Listener, PacketListener {
     }
     
     private fun getNovaSound(path: String): Holder<SoundEvent> =
-        Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation("nova", path)))
+        Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("nova", path)))
     
 }

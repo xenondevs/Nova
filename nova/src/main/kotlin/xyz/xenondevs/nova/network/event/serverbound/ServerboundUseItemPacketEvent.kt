@@ -19,9 +19,19 @@ class ServerboundUseItemPacketEvent(
             field = value
             changed = true
         }
+    var xRot = packet.xRot
+        set(value) {
+            field = value
+            changed = true
+        }
+    var yRot = packet.yRot
+        set(value) {
+            field = value
+            changed = true
+        }
     
     override fun buildChangedPacket(): ServerboundUseItemPacket {
-        return ServerboundUseItemPacket(hand, sequence)
+        return ServerboundUseItemPacket(hand, sequence, xRot, yRot)
     }
     
 }

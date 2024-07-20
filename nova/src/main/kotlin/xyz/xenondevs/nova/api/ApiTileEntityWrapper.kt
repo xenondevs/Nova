@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.api
 
 import com.mojang.datafixers.util.Either
@@ -9,7 +11,6 @@ import xyz.xenondevs.nova.api.material.NovaMaterial
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
-@Suppress("DEPRECATION")
 internal class ApiTileEntityWrapper(val tileEntity: TileEntity) : ITileEntity {
     
     @Deprecated("Use NovaBlock instead", replaceWith = ReplaceWith("block"))

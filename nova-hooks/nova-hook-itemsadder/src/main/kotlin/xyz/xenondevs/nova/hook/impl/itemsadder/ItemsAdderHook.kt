@@ -142,7 +142,7 @@ internal object ItemsAdderHook : CustomItemService {
             .map(CustomStack::getNamespacedID)
             .associateTo(HashMap()) {
                 val path = ItemsAdder.Advanced.getItemModelResourceLocation(it)!!.substringBeforeLast('.')
-                ResourceLocation(it) to ResourcePath.of(path)
+                ResourceLocation.parse(it) to ResourcePath.of(path)
             }
     }
     

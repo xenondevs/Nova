@@ -18,54 +18,63 @@ open class ToolCategory internal constructor(
     val id: ResourceLocation
 ) {
     
-    fun isCorrectToolCategoryForBlock(block: Block): Boolean {
-        val blockToolCategories = ofBlock(block)
-        return this in blockToolCategories
-    }
-    
     companion object {
         
-        fun ofItem(item: ItemStack?): ToolCategory? {
+        fun hasCorrectToolCategory(block: Block, tool: ItemStack?): Boolean {
+            val itemToolCategories = ofItem(tool)
+            val blockToolCategories = ofBlock(block)
+            return itemToolCategories.isNotEmpty() && itemToolCategories.any { it in blockToolCategories }
+        }
+        
+        fun ofItem(item: ItemStack?): Set<ToolCategory> {
             if (item == null)
-                return null
+                return emptySet()
             
-            val novaCategory = item.novaItem?.getBehaviorOrNull(Tool::class)?.category
+            val novaCategory = item.novaItem?.getBehaviorOrNull(Tool::class)?.categories
             if (novaCategory != null)
                 return novaCategory
             
-            return when (item.type) {
-                Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL, Material.GOLDEN_SHOVEL -> VanillaToolCategories.SHOVEL
-                Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE, Material.GOLDEN_PICKAXE -> VanillaToolCategories.PICKAXE
-                Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.DIAMOND_AXE, Material.NETHERITE_AXE, Material.GOLDEN_AXE -> VanillaToolCategories.AXE
-                Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE, Material.GOLDEN_HOE -> VanillaToolCategories.HOE
-                Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD, Material.GOLDEN_SWORD -> VanillaToolCategories.SWORD
-                Material.SHEARS -> VanillaToolCategories.SHEARS
-                
-                else -> null
-            }
+            val type = item.type
+            val categories = HashSet<ToolCategory>()
+            if (Tag.ITEMS_SHOVELS.isTagged(type))
+                categories.add(VanillaToolCategories.SHOVEL)
+            if (Tag.ITEMS_PICKAXES.isTagged(type))
+                categories.add(VanillaToolCategories.PICKAXE)
+            if (Tag.ITEMS_AXES.isTagged(type))
+                categories.add(VanillaToolCategories.AXE)
+            if (Tag.ITEMS_HOES.isTagged(type))
+                categories.add(VanillaToolCategories.HOE)
+            if (Tag.ITEMS_SWORDS.isTagged(type))
+                categories.add(VanillaToolCategories.SWORD)
+            if (type == Material.SHEARS)
+                categories.add(VanillaToolCategories.SHEARS)
+            
+            return categories
         }
         
-        fun ofBlock(block: Block): List<ToolCategory> {
+        fun ofBlock(block: Block): Set<ToolCategory> {
             val novaBlock = WorldDataManager.getBlockState(block.pos)?.block
             if (novaBlock != null) {
                 val breakable = novaBlock.getBehaviorOrNull<Breakable>()
-                return breakable?.toolCategories ?: emptyList()
+                return breakable?.toolCategories ?: emptySet()
             }
             
-            return ofVanillaBlock(block)
-        }
-        
-        internal fun ofVanillaBlock(block: Block): List<ToolCategory> {
-            val material = block.type
-            val list = ArrayList<ToolCategory>()
-            if (Tag.MINEABLE_SHOVEL.isTagged(material)) list.add(VanillaToolCategories.SHOVEL)
-            if (Tag.MINEABLE_PICKAXE.isTagged(material)) list.add(VanillaToolCategories.PICKAXE)
-            if (Tag.MINEABLE_AXE.isTagged(material)) list.add(VanillaToolCategories.AXE)
-            if (Tag.MINEABLE_HOE.isTagged(material)) list.add(VanillaToolCategories.HOE)
-            if (material == Material.COBWEB || material == Material.BAMBOO_SAPLING || material == Material.BAMBOO) list.add(VanillaToolCategories.SWORD)
-            if (Tag.LEAVES.isTagged(material) || Tag.WOOL.isTagged(material) || material == Material.COBWEB) list.add(VanillaToolCategories.SHEARS)
+            val type = block.type
+            val categories = HashSet<ToolCategory>()
+            if (Tag.MINEABLE_SHOVEL.isTagged(type))
+                categories.add(VanillaToolCategories.SHOVEL)
+            if (Tag.MINEABLE_PICKAXE.isTagged(type))
+                categories.add(VanillaToolCategories.PICKAXE)
+            if (Tag.MINEABLE_AXE.isTagged(type))
+                categories.add(VanillaToolCategories.AXE)
+            if (Tag.MINEABLE_HOE.isTagged(type))
+                categories.add(VanillaToolCategories.HOE)
+            if (type == Material.COBWEB || type == Material.BAMBOO_SAPLING || type == Material.BAMBOO)
+                categories.add(VanillaToolCategories.SWORD)
+            if (Tag.LEAVES.isTagged(type) || Tag.WOOL.isTagged(type) || type == Material.COBWEB)
+                categories.add(VanillaToolCategories.SHEARS)
             
-            return list
+            return categories
         }
         
     }
@@ -77,7 +86,5 @@ class VanillaToolCategory internal constructor(
     val canSweepAttack: Boolean,
     val canBreakBlocksInCreative: Boolean,
     val itemDamageOnAttackEntity: Int,
-    val itemDamageOnBreakBlock: Int,
-    val genericMultipliers: Map<Material, Double>,
-    val specialMultipliers: Map<Material, Map<Material, Double>>
+    val itemDamageOnBreakBlock: Int
 ) : ToolCategory(id)

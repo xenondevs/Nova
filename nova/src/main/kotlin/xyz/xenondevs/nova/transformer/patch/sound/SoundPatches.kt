@@ -164,7 +164,7 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
         
         val pos = entity.position()
         val packet = ClientboundSoundPacket(
-            Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation(newSound))),
+            Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation.parse(newSound))),
             entity.soundSource,
             pos.x,
             pos.y,
@@ -201,7 +201,7 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
                 if (volume > 1.0) 16.0 * volume else 16.0,
                 level.dimension(),
                 ClientboundSoundPacket(
-                    Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation(soundGroup.breakSound))),
+                    Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation.parse(soundGroup.breakSound))),
                     SoundSource.BLOCKS,
                     pos.x + 0.5,
                     pos.y + 0.5,
@@ -219,10 +219,10 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
         if (novaItem != null) {
             val soundEventName = novaItem.getBehaviorOrNull(Wearable::class)?.equipSound
                 ?: return null
-            return SoundEvent.createVariableRangeEvent(ResourceLocation(soundEventName))
+            return SoundEvent.createVariableRangeEvent(ResourceLocation.parse(soundEventName))
         }
         
-        return (itemStack.item as? ArmorItem)?.material?.equipSound
+        return (itemStack.item as? ArmorItem)?.material?.value()?.equipSound?.value()
     }
     
     @JvmStatic
@@ -230,7 +230,7 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
         if (itemStack.isEmpty || entity.isSpectator)
             return
         
-        val equipSound = (itemStack.item as? ArmorItem)?.material?.equipSound
+        val equipSound = (itemStack.item as? ArmorItem)?.material?.value()?.equipSound?.value()
             ?: return
         
         forcePacketBroadcast { entity.playSound(equipSound, 1f, 1f) }

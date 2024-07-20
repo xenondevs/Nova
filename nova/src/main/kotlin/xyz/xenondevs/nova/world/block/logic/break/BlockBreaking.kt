@@ -2,17 +2,20 @@ package xyz.xenondevs.nova.world.block.logic.`break`
 
 import net.minecraft.core.Direction
 import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
+import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket.AttributeSnapshot
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.*
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.ai.attributes.Attributes
 import org.bukkit.GameMode
-import org.bukkit.craftbukkit.v1_20_R3.event.CraftEventFactory
+import org.bukkit.craftbukkit.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
@@ -22,8 +25,10 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.network.ClientboundUpdateAttributesPacket
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAttributesPacketEvent
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.network.packetHandler
@@ -206,6 +211,28 @@ internal object BlockBreaking : Listener, PacketListener {
             
             else -> false
         }
+    }
+    
+    @PacketHandler
+    private fun handleAttributes(event: ClientboundUpdateAttributesPacketEvent) {
+        if (event.player.entityId != event.entityId)
+            return
+        
+        event.values = event.values.map {
+            if (it.attribute.value() == Attributes.BLOCK_BREAK_SPEED.value()) {
+                AttributeSnapshot(it.attribute, 0.0, emptyList())
+            } else {
+                it
+            }
+        }
+    }
+    
+    @EventHandler
+    private fun handleJoin(event: PlayerJoinEvent) {
+        val player = event.player
+        val attributes = listOf(AttributeSnapshot(Attributes.BLOCK_BREAK_SPEED, 0.0, emptyList()))
+        val packet = ClientboundUpdateAttributesPacket(player.entityId, attributes)
+        player.send(packet)
     }
     
     @EventHandler(priority = EventPriority.LOWEST)

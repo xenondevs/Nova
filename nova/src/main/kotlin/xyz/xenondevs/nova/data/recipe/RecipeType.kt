@@ -69,7 +69,7 @@ object VanillaRecipeTypes {
     val SMITING_TRANSFORM = register("smithing_transform", SmithingTransformRecipe::class, SmithingTransformRecipeGroup, SmithingTransformRecipeDeserializer)
     
     private fun <T : Any> register(name: String, recipeClass: KClass<T>, group: RecipeGroup<in T>, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
-        val id = ResourceLocation("minecraft", name)
+        val id = ResourceLocation.withDefaultNamespace(name)
         val recipeType = RecipeType(id, recipeClass, group, deserializer)
         NovaRegistries.RECIPE_TYPE[id] = recipeType
         return recipeType

@@ -2,19 +2,26 @@
 
 package xyz.xenondevs.nova.item.behavior
 
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.core.component.DataComponentMap
+import net.minecraft.core.component.DataComponents
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
+import net.minecraft.world.entity.EquipmentSlotGroup
+import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.Equipable
+import net.minecraft.world.item.component.DyedItemColor
+import net.minecraft.world.item.component.ItemAttributeModifiers
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.EquipmentSlot
-import xyz.xenondevs.commons.collections.enumMap
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
@@ -22,20 +29,15 @@ import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.armor.Armor
-import xyz.xenondevs.nova.item.logic.PacketItemData
-import xyz.xenondevs.nova.item.vanilla.AttributeModifier
-import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
-import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
-import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.serverPlayer
-import java.util.*
+import xyz.xenondevs.nova.util.unwrap
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
@@ -100,11 +102,11 @@ sealed interface Wearable {
         override val knockbackResistance by knockbackResistance
         override val equipSound by equipSound
         
-        override fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> {
+        override val vanillaMaterialProperties = combinedProvider(slot, texture) { slot, texture ->
             if (texture == null)
-                return emptyList()
+                return@combinedProvider emptyList()
             
-            return listOf(
+            return@combinedProvider listOf(
                 when (slot) {
                     BukkitEquipmentSlot.HEAD -> VanillaMaterialProperty.HELMET
                     BukkitEquipmentSlot.CHEST -> VanillaMaterialProperty.CHESTPLATE
@@ -115,37 +117,53 @@ sealed interface Wearable {
             )
         }
         
-        override fun getAttributeModifiers(): List<AttributeModifier> {
+        override val baseDataComponents = combinedProvider(
+            slot, armor, armorToughness, knockbackResistance
+        ) { slot, armor, armorToughness, knockBackResistance ->
+            if (armor == 0.0 && armorToughness == 0.0 && knockBackResistance == 0.0)
+                return@combinedProvider DataComponentMap.EMPTY
+            
             val equipmentSlot = slot.nmsEquipmentSlot
-            return listOf(
-                AttributeModifier(
-                    ARMOR_MODIFIER_UUIDS[slot]!!,
-                    "Nova Wearable Armor",
-                    Attributes.ARMOR,
-                    Operation.ADDITION,
-                    armor,
-                    true,
-                    equipmentSlot
-                ),
-                AttributeModifier(
-                    ARMOR_TOUGHNESS_MODIFIER_UUIDS[slot]!!,
-                    "Nova Wearable Armor Toughness",
-                    Attributes.ARMOR_TOUGHNESS,
-                    Operation.ADDITION,
-                    armorToughness,
-                    true,
-                    equipmentSlot
-                ),
-                AttributeModifier(
-                    KNOCKBACK_RESISTANCE_MODIFIER_UUIDS[slot]!!,
-                    "Nova Wearable Knockback Resistance",
-                    Attributes.KNOCKBACK_RESISTANCE,
-                    Operation.ADDITION,
-                    knockbackResistance,
-                    true,
-                    equipmentSlot
-                )
-            )
+            DataComponentMap.builder().set(
+                DataComponents.ATTRIBUTE_MODIFIERS,
+                ItemAttributeModifiers.builder().apply {
+                    if (armor != 0.0) {
+                        add(
+                            Attributes.ARMOR,
+                            AttributeModifier(
+                                ResourceLocation.fromNamespaceAndPath("nova", "armor"),
+                                armor,
+                                Operation.ADD_VALUE
+                            ),
+                            EquipmentSlotGroup.bySlot(equipmentSlot)
+                        )
+                    }
+                    
+                    if (armorToughness != 0.0) {
+                        add(
+                            Attributes.ARMOR_TOUGHNESS,
+                            AttributeModifier(
+                                ResourceLocation.fromNamespaceAndPath("nova", "armor_toughness"),
+                                armorToughness,
+                                Operation.ADD_VALUE
+                            ),
+                            EquipmentSlotGroup.bySlot(equipmentSlot)
+                        )
+                    }
+                    
+                    if (knockBackResistance != 0.0) {
+                        add(
+                            Attributes.KNOCKBACK_RESISTANCE,
+                            AttributeModifier(
+                                ResourceLocation.fromNamespaceAndPath("nova", "knockback_resistance"),
+                                knockBackResistance,
+                                Operation.ADD_VALUE
+                            ),
+                            EquipmentSlotGroup.bySlot(equipmentSlot)
+                        )
+                    }
+                }.build()
+            ).build()
         }
         
         override fun handleInteract(player: Player, itemStack: BukkitStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
@@ -167,35 +185,32 @@ sealed interface Wearable {
                 }
                 
                 player.swingHand(hand)
-                player.serverPlayer.onEquipItem(slot.nmsEquipmentSlot, previous.nmsCopy, itemStack.nmsCopy)
+                player.serverPlayer.onEquipItem(slot.nmsEquipmentSlot, previous.unwrap().copy(), itemStack.unwrap().copy())
                 wrappedEvent.actionPerformed = true
             } else {
                 // basically marks the remote armor slot as dirty, see https://hub.spigotmc.org/jira/browse/SPIGOT-7500
-                player.serverPlayer.inventoryMenu.setRemoteSlot(slot.inventorySlot, itemStack.nmsCopy)
+                player.serverPlayer.inventoryMenu.setRemoteSlot(slot.inventorySlot, itemStack.unwrap().copy())
             }
         }
         
-        override fun updatePacketItemData(data: NamespacedCompound, itemData: PacketItemData) {
+        override fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
             val texture = texture
             if (texture != null) {
-                itemData.nbt.getOrPut("display", ::CompoundTag).putInt("color", texture)
-                itemData.hide(HideableFlag.DYE)
+                itemStack.unwrap().set(DataComponents.DYED_COLOR, DyedItemColor(texture, false))
             }
+            
+            return itemStack
         }
         
     }
     
     companion object {
         
-        val ARMOR_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = EquipmentSlot.entries.associateWithTo(enumMap()) { UUID.randomUUID() }
-        val ARMOR_TOUGHNESS_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = EquipmentSlot.entries.associateWithTo(enumMap()) { UUID.randomUUID() }
-        val KNOCKBACK_RESISTANCE_MODIFIER_UUIDS: Map<BukkitEquipmentSlot, UUID> = EquipmentSlot.entries.associateWithTo(enumMap()) { UUID.randomUUID() }
-        
         /**
          * Checks whether the specified [itemStack] is wearable.
          */
         fun isWearable(itemStack: BukkitStack): Boolean =
-            isWearable(itemStack.nmsCopy)
+            isWearable(itemStack.unwrap().copy())
         
         /**
          * Checks whether the specified [itemStack] is wearable.
@@ -213,7 +228,7 @@ sealed interface Wearable {
          * Gets the [BukkitEquipmentSlot] of the specified [itemStack], or null if it is not wearable.
          */
         fun getSlot(itemStack: BukkitStack): BukkitEquipmentSlot? =
-            getSlot(itemStack.nmsCopy)?.bukkitEquipmentSlot
+            getSlot(itemStack.unwrap().copy())?.bukkitEquipmentSlot
         
         /**
          * Gets the [MojangEquipmentSlot] of the specified [itemStack], or null if it is not wearable.

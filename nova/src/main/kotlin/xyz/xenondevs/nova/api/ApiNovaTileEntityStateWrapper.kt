@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.api
 
 import com.mojang.datafixers.util.Either
@@ -10,7 +12,6 @@ import xyz.xenondevs.nova.api.block.NovaTileEntityState as INovaTileEntityState
 import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
-@Suppress("DEPRECATION")
 internal class ApiNovaTileEntityStateWrapper(
     private val pos: BlockPos,
     private val state: NovaBlockState,

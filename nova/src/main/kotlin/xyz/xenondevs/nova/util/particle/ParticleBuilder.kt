@@ -20,7 +20,7 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -28,9 +28,9 @@ import org.bukkit.util.Vector
 import org.joml.Vector3f
 import xyz.xenondevs.nova.util.blockPos
 import xyz.xenondevs.nova.util.nmsBlock
-import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.send
+import xyz.xenondevs.nova.util.unwrap
 import java.awt.Color
 import java.util.function.Predicate
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -228,7 +228,7 @@ fun ParticleBuilder<SculkChargeParticleOptions>.sculkCharge(roll: Float) = optio
 }
 
 fun ParticleBuilder<ItemParticleOption>.item(itemStack: ItemStack) = options {
-    ItemParticleOption(it, itemStack.nmsCopy)
+    ItemParticleOption(it, itemStack.unwrap().copy())
 }
 
 fun ParticleBuilder<ItemParticleOption>.item(itemStack: MojangStack) = options {

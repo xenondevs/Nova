@@ -22,30 +22,20 @@ import xyz.xenondevs.nova.transformer.patch.block.BlockUpdatesPatch
 import xyz.xenondevs.nova.transformer.patch.block.DisableBackingStateLogicPatch
 import xyz.xenondevs.nova.transformer.patch.bossbar.BossBarOriginPatch
 import xyz.xenondevs.nova.transformer.patch.chunk.ChunkSchedulingPatch
-import xyz.xenondevs.nova.transformer.patch.item.AnvilResultPatch
-import xyz.xenondevs.nova.transformer.patch.item.AttributePatch
-import xyz.xenondevs.nova.transformer.patch.item.DamageablePatches
 import xyz.xenondevs.nova.transformer.patch.item.EnchantmentPatches
-import xyz.xenondevs.nova.transformer.patch.item.FireResistancePatches
 import xyz.xenondevs.nova.transformer.patch.item.FuelPatches
-import xyz.xenondevs.nova.transformer.patch.item.LegacyConversionPatch
+import xyz.xenondevs.nova.transformer.patch.item.ItemStackDataComponentsPatch
 import xyz.xenondevs.nova.transformer.patch.item.RemainingItemPatches
-import xyz.xenondevs.nova.transformer.patch.item.StackSizePatch
+import xyz.xenondevs.nova.transformer.patch.item.RepairPatches
 import xyz.xenondevs.nova.transformer.patch.item.ToolPatches
 import xyz.xenondevs.nova.transformer.patch.item.WearablePatch
 import xyz.xenondevs.nova.transformer.patch.misc.EventPreventionPatch
 import xyz.xenondevs.nova.transformer.patch.misc.FakePlayerLastHurtPatch
-import xyz.xenondevs.nova.transformer.patch.nbt.CBFCompoundTagPatch
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
+import xyz.xenondevs.nova.transformer.patch.registry.TagsPatch
 import xyz.xenondevs.nova.transformer.patch.sound.SoundPatches
-import xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch
-import xyz.xenondevs.nova.transformer.patch.worldgen.NovaRuleTestPatch
-import xyz.xenondevs.nova.transformer.patch.worldgen.ThreadingDetectorPatch
-import xyz.xenondevs.nova.transformer.patch.worldgen.WrapperBlockPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch
-import xyz.xenondevs.nova.transformer.patch.worldgen.registry.MappedRegistryPatch
-import xyz.xenondevs.nova.transformer.patch.worldgen.registry.RegistryCodecPatch
 import xyz.xenondevs.nova.util.data.getResourceData
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_PARENT_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
@@ -61,12 +51,12 @@ internal object Patcher {
     private val extraOpens = setOf("java.lang", "java.lang.reflect", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
         sequenceOf(
-            FieldFilterPatch, DamageablePatches, ToolPatches, AttributePatch, EnchantmentPatches, AnvilResultPatch,
-            StackSizePatch, FeatureSorterPatch, LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
-            WrapperBlockPatch, MappedRegistryPatch, FuelPatches, RemainingItemPatches, FireResistancePatches, SoundPatches,
-            BroadcastPacketPatch, CBFCompoundTagPatch, EventPreventionPatch, LegacyConversionPatch, WearablePatch,
-            NovaRuleTestPatch, BossBarOriginPatch, ThreadingDetectorPatch, FakePlayerLastHurtPatch, BlockUpdatesPatch,
-            ChunkSchedulingPatch, DisableBackingStateLogicPatch
+            FieldFilterPatch, ToolPatches,
+            LevelChunkSectionPatch, ChunkAccessSectionsPatch, /*FeatureSorterPatch, RegistryCodecPatch,
+            WrapperBlockPatch, MappedRegistryPatch, NovaRuleTestPatch,*/ FuelPatches, RemainingItemPatches, SoundPatches,
+            BroadcastPacketPatch, EventPreventionPatch, WearablePatch, BossBarOriginPatch,
+            FakePlayerLastHurtPatch, BlockUpdatesPatch, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
+            ItemStackDataComponentsPatch, EnchantmentPatches, TagsPatch, RepairPatches
         ).filter(Transformer::shouldTransform).toSet()
     }
     

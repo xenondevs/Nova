@@ -20,19 +20,19 @@ object DefaultGuiItems {
     
     //<editor-fold desc="with background">
     // legacy InvUI gui items
-    val INVENTORY_PART = guiItem("inventory_part")
-    val INVISIBLE_ITEM = hiddenItem("empty")
-    val LINE_CORNER_BOTTOM_LEFT = guiItem("line/corner_bottom_left", stretched = true)
-    val LINE_CORNER_BOTTOM_RIGHT = guiItem("line/corner_bottom_right", stretched = true)
-    val LINE_CORNER_TOP_LEFT = guiItem("line/corner_top_left", stretched = true)
-    val LINE_CORNER_TOP_RIGHT = guiItem("line/corner_top_right", stretched = true)
-    val LINE_HORIZONTAL_DOWN = guiItem("line/horizontal_down", stretched = true)
-    val LINE_HORIZONTAL = guiItem("line/horizontal", stretched = true)
-    val LINE_HORIZONTAL_UP = guiItem("line/horizontal_up", stretched = true)
-    val LINE_VERTICAL_HORIZONTAL = guiItem("line/vertical_horizontal", stretched = true)
-    val LINE_VERTICAL_LEFT = guiItem("line/vertical_left", stretched = true)
-    val LINE_VERTICAL = guiItem("line/vertical", stretched = true)
-    val LINE_VERTICAL_RIGHT = guiItem("line/vertical_right", stretched = true)
+    val INVENTORY_PART = guiItem("inventory_part", null)
+    val INVISIBLE_ITEM = hiddenItem("empty", null)
+    val LINE_CORNER_BOTTOM_LEFT = guiItem("line/corner_bottom_left", null, true)
+    val LINE_CORNER_BOTTOM_RIGHT = guiItem("line/corner_bottom_right", null, true)
+    val LINE_CORNER_TOP_LEFT = guiItem("line/corner_top_left", null, true)
+    val LINE_CORNER_TOP_RIGHT = guiItem("line/corner_top_right", null, true)
+    val LINE_HORIZONTAL_DOWN = guiItem("line/horizontal_down", null, true)
+    val LINE_HORIZONTAL = guiItem("line/horizontal", null, true)
+    val LINE_HORIZONTAL_UP = guiItem("line/horizontal_up", null, true)
+    val LINE_VERTICAL_HORIZONTAL = guiItem("line/vertical_horizontal", null, true)
+    val LINE_VERTICAL_LEFT = guiItem("line/vertical_left", null, true)
+    val LINE_VERTICAL = guiItem("line/vertical", null, true)
+    val LINE_VERTICAL_RIGHT = guiItem("line/vertical_right", null, true)
     
     // buttons
     val AREA_BTN_OFF = guiItem("btn/area_off", "menu.nova.visual_region.show")
@@ -113,23 +113,23 @@ object DefaultGuiItems {
             createGuiModel("item/gui/number/$it", background = true, stretched = false)
         }
     }
-    val SEARCH = guiItem("search")
+    val SEARCH = guiItem("search", "menu.nova.items.search-item")
     val STOPWATCH = guiItem("stopwatch")
     //</editor-fold>
     
     //<editor-fold desc="without background">
     // legacy InvUI gui items
-    val TP_LINE_CORNER_BOTTOM_LEFT = tpGuiItem("line/corner_bottom_left", stretched = true)
-    val TP_LINE_CORNER_BOTTOM_RIGHT = tpGuiItem("line/corner_bottom_right", stretched = true)
-    val TP_LINE_CORNER_TOP_LEFT = tpGuiItem("line/corner_top_left", stretched = true)
-    val TP_LINE_CORNER_TOP_RIGHT = tpGuiItem("line/corner_top_right", stretched = true)
-    val TP_LINE_HORIZONTAL = tpGuiItem("line/horizontal", stretched = true)
-    val TP_LINE_HORIZONTAL_DOWN = tpGuiItem("line/horizontal_down", stretched = true)
-    val TP_LINE_HORIZONTAL_UP = tpGuiItem("line/horizontal_up", stretched = true)
-    val TP_LINE_VERTICAL_HORIZONTAL = tpGuiItem("line/vertical_horizontal", stretched = true)
-    val TP_LINE_VERTICAL = tpGuiItem("line/vertical", stretched = true)
-    val TP_LINE_VERTICAL_LEFT = tpGuiItem("line/vertical_left", stretched = true)
-    val TP_LINE_VERTICAL_RIGHT = tpGuiItem("line/vertical_right", stretched = true)
+    val TP_LINE_CORNER_BOTTOM_LEFT = tpGuiItem("line/corner_bottom_left", null, true)
+    val TP_LINE_CORNER_BOTTOM_RIGHT = tpGuiItem("line/corner_bottom_right", null, true)
+    val TP_LINE_CORNER_TOP_LEFT = tpGuiItem("line/corner_top_left", null, true)
+    val TP_LINE_CORNER_TOP_RIGHT = tpGuiItem("line/corner_top_right", null, true)
+    val TP_LINE_HORIZONTAL = tpGuiItem("line/horizontal", null, true)
+    val TP_LINE_HORIZONTAL_DOWN = tpGuiItem("line/horizontal_down", null, true)
+    val TP_LINE_HORIZONTAL_UP = tpGuiItem("line/horizontal_up", null, true)
+    val TP_LINE_VERTICAL_HORIZONTAL = tpGuiItem("line/vertical_horizontal", null, true)
+    val TP_LINE_VERTICAL = tpGuiItem("line/vertical", null, true)
+    val TP_LINE_VERTICAL_LEFT = tpGuiItem("line/vertical_left", null, true)
+    val TP_LINE_VERTICAL_RIGHT = tpGuiItem("line/vertical_right", null, true)
     
     // buttons
     val TP_AREA_BTN_OFF = tpGuiItem("btn/area_off", "menu.nova.visual_region.show")
@@ -210,7 +210,7 @@ object DefaultGuiItems {
             createGuiModel("item/gui/number/$it", stretched = false, background = false)
         }
     }
-    val TP_SEARCH = tpGuiItem("search")
+    val TP_SEARCH = tpGuiItem("search", "menu.nova.items.search-item")
     val TP_STOPWATCH = tpGuiItem("stopwatch")
     //</editor-fold>
     
@@ -234,17 +234,19 @@ object DefaultBlockOverlays {
 }
 
 private fun item(name: String, run: NovaItemBuilder.() -> Unit): NovaItem {
-    val builder = NovaItemBuilder(ResourceLocation("nova", name))
+    val builder = NovaItemBuilder(ResourceLocation.fromNamespaceAndPath("nova", name))
     builder.run()
     return builder.register()
 }
 
 private fun hiddenItem(
     name: String,
-    localizedName: String = "",
+    localizedName: String? = "",
     vararg itemBehaviors: ItemBehaviorHolder
 ): NovaItem = item(name) {
-    localizedName(localizedName)
+    if (localizedName == null) {
+        name(null)
+    } else localizedName(localizedName)
     behaviors(*itemBehaviors)
     hidden(true)
     models {
@@ -266,10 +268,12 @@ private fun hiddenItem(
 
 private fun guiItem(
     name: String,
-    localizedName: String = "",
+    localizedName: String? = "",
     stretched: Boolean = false
 ): NovaItem = item("gui/opaque/$name") {
-    localizedName(localizedName)
+    if (localizedName == null) {
+        name(null)
+    } else localizedName(localizedName)
     hidden(true)
     models {
         itemType(PacketItems.SERVER_SIDE_MATERIAL)
@@ -279,10 +283,12 @@ private fun guiItem(
 
 private fun tpGuiItem(
     name: String,
-    localizedName: String = "",
+    localizedName: String? = "",
     stretched: Boolean = false
 ): NovaItem = item("gui/transparent/$name") {
-    localizedName(localizedName)
+    if (localizedName == null) {
+        name(null)
+    } else localizedName(localizedName)
     hidden(true)
     models {
         itemType(PacketItems.SERVER_SIDE_MATERIAL)

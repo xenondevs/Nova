@@ -2,10 +2,12 @@ package xyz.xenondevs.nova.data.serialization
 
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.commons.provider.AbstractProvider
 import xyz.xenondevs.commons.provider.mutable.MutableProvider
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
+// TODO: use compound entry providers instead of data accessors
 abstract class DataHolder internal constructor(includePersistent: Boolean) {
     
     @PublishedApi
@@ -150,7 +152,7 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
         private val key: String,
         private val persistent: Boolean,
         private val initialValue: T,
-    ) : MutableProvider<T>() {
+    ) : AbstractProvider<T>() {
         
         override fun loadValue(): T {
             return initialValue

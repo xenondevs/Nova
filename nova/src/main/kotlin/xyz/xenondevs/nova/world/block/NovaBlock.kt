@@ -88,6 +88,7 @@ open class NovaBlock internal constructor(
     /**
      * Gets the first [BlockBehavior] that is an instance of [type] or a subclass, or null if there is none.
      */
+    @Suppress("UNCHECKED_CAST")
     fun <T : Any> getBehaviorOrNull(type: KClass<T>): T? =
         behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
     

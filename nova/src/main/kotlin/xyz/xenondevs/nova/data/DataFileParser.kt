@@ -76,7 +76,7 @@ internal object DataFileParser {
             val dir = File(DATA_DIR, "$namespace/$dirName")
             if (!dir.exists() || dir.isFile) return@forEach
             dir.walkTopDown().filter(filter).forEach { file ->
-                val id = ResourceLocation(namespace, file.nameWithoutExtension)
+                val id = ResourceLocation.fromNamespaceAndPath(namespace, file.nameWithoutExtension)
                 fileProcessor.invoke(id, file)
             }
         }

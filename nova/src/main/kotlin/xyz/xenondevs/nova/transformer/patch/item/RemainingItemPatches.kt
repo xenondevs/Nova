@@ -8,8 +8,8 @@ import net.minecraft.world.item.crafting.BookCloningRecipe
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
-import org.bukkit.craftbukkit.v1_20_R3.CraftServer
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.CraftServer
+import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
@@ -22,13 +22,13 @@ import xyz.xenondevs.bytebase.util.replaceEvery
 import xyz.xenondevs.bytebase.util.replaceEveryRange
 import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.util.item.novaItem
-import xyz.xenondevs.nova.util.nmsCopy
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ABSTRACT_FURNACE_BLOCK_ENTITY_ITEMS_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ITEM_STACK_CONSTRUCTOR
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.NON_NULL_LIST_SET_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.RECIPE_GET_REMAINING_ITEMS_METHOD
+import xyz.xenondevs.nova.util.unwrap
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
@@ -140,7 +140,7 @@ internal object RemainingItemPatches : MultiTransformer(
     fun getRemainingItemStack(itemStack: MojangStack): MojangStack {
         val novaItem = itemStack.novaItem
         if (novaItem != null)
-            return novaItem.craftingRemainingItem?.get()?.nmsCopy ?: MojangStack.EMPTY
+            return novaItem.craftingRemainingItem?.get()?.let { it.unwrap().copy() } ?: MojangStack.EMPTY
         
         // retrieve item directly from field as count = 0 causes getItem to return air
         val item = ReflectionRegistry.ITEM_STACK_ITEM_FIELD.get(itemStack) as Item?

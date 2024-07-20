@@ -6,12 +6,12 @@ import xyz.xenondevs.cbf.adapter.ComplexBinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.invui.inventory.VirtualInventory
-import xyz.xenondevs.nova.util.NMSUtils
-import xyz.xenondevs.nova.util.bukkitMirror
+import xyz.xenondevs.nova.util.DATA_VERSION
+import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.ceilDiv
 import xyz.xenondevs.nova.util.item.isEmpty
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
-import xyz.xenondevs.nova.util.nmsVersion
+import xyz.xenondevs.nova.util.unwrap
 import java.util.*
 import kotlin.reflect.KType
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -34,9 +34,9 @@ internal object VirtualInventoryBinaryAdapter : ComplexBinaryAdapter<VirtualInve
             if (itemsMask[it]) {
                 val tag = ItemStackSerializer.tryFix(
                     NbtIo.read(dataInput),
-                    dataVersion, NMSUtils.DATA_VERSION
+                    dataVersion, DATA_VERSION
                 )
-                MojangStack.of(tag).bukkitMirror.takeUnlessEmpty()
+                MojangStack.parse(REGISTRY_ACCESS, tag).get().asBukkitMirror().takeUnlessEmpty()
             } else null
         }
         
@@ -66,7 +66,7 @@ internal object VirtualInventoryBinaryAdapter : ComplexBinaryAdapter<VirtualInve
         val items = obj.unsafeItems
         val maxStackSizes = obj.maxStackSizes
         
-        writer.writeVarInt(NMSUtils.DATA_VERSION)
+        writer.writeVarInt(DATA_VERSION)
         writer.writeUUID(uuid)
         writer.writeVarInt(size)
         
@@ -81,8 +81,8 @@ internal object VirtualInventoryBinaryAdapter : ComplexBinaryAdapter<VirtualInve
             if (itemStack.isEmpty())
                 continue
             
-            val nmsStack = itemStack.nmsVersion
-            val nbt = nmsStack.save(CompoundTag())
+            val nmsStack = itemStack.unwrap()
+            val nbt = nmsStack.save(REGISTRY_ACCESS) as CompoundTag
             NbtIo.write(nbt, dataOutput)
         }
         

@@ -2,16 +2,16 @@
 format.version = "1.1"
 
 [versions]
-cbf = "0.11"
+cbf = "0.12"
 configurate = "4.2.0-SNAPSHOT"
-invui = "1.31"
+invui = "1.33"
 jgrapht = "1.5.1"
-kotlin = "2.0.0"
+kotlin = "2.0.10-RC"
 kotlinx-coroutines = "1.8.0"
 ktor = "2.3.9"
-paper = "1.20.4-R0.1-SNAPSHOT"
+paper = "1.21-R0.1-SNAPSHOT"
 paperweight = "1.7.1"
-xenondevs-commons = "1.12"
+xenondevs-commons = "1.13"
 
 [libraries]
 awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.25.23" }
@@ -30,7 +30,7 @@ cosmic-binary-format-netty-adapter = { group = "xyz.xenondevs.cbf", name = "cosm
 cosmic-binary-format-provider = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format-provider", version.ref = "cbf" }
 fuzzywuzzy = { group = "me.xdrop", name = "fuzzywuzzy", version = "1.4.0" }
 gson = { group = "com.google.code.gson", name = "gson", version = "2.10.1" }
-inventoryaccess = { group = "xyz.xenondevs.invui", name = "inventory-access-r18", version.ref = "invui" }
+inventoryaccess = { group = "xyz.xenondevs.invui", name = "inventory-access-r20", version.ref = "invui" }
 invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version.ref = "invui" }
 jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jgrapht" }
 jgrapht-io = { group = "org.jgrapht", name = "jgrapht-io", version.ref = "jgrapht" }

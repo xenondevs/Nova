@@ -17,27 +17,27 @@ object DefaultBlockStateProperties {
     /**
      * A property for the [BlockFace] a block is facing.
      */
-    val FACING: EnumProperty<BlockFace> = EnumProperty(ResourceLocation("nova", "facing"))
+    val FACING: EnumProperty<BlockFace> = EnumProperty(ResourceLocation.fromNamespaceAndPath("nova", "facing"))
     
     /**
      * A property for the [Axis] a block is aligned to.
      */
-    val AXIS: EnumProperty<Axis> = EnumProperty(ResourceLocation("nova", "axis"))
+    val AXIS: EnumProperty<Axis> = EnumProperty(ResourceLocation.fromNamespaceAndPath("nova", "axis"))
     
     /**
      * A property for the redstone powered state of a block.
      */
-    val POWERED: BooleanProperty = BooleanProperty(ResourceLocation("nova", "powered"))
+    val POWERED: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "powered"))
     
     /**
      * A property the [Instrument] of a note block.
      */
-    val INSTRUMENT: EnumProperty<Instrument> = EnumProperty(ResourceLocation("nova", "instrument"))
+    val INSTRUMENT: EnumProperty<Instrument> = EnumProperty(ResourceLocation.fromNamespaceAndPath("nova", "instrument"))
     
     /**
      * A property for the note value of a note block.
      */
-    val NOTE: IntProperty = IntProperty(ResourceLocation("nova", "note"))
+    val NOTE: IntProperty = IntProperty(ResourceLocation.fromNamespaceAndPath("nova", "note"))
     
 }
 

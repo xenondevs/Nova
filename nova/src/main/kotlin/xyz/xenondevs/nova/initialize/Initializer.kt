@@ -14,15 +14,12 @@ import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.server.ServerLoadEvent
-import org.bukkit.inventory.ItemStack
 import org.jgrapht.Graph
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
 import org.jgrapht.nio.DefaultAttribute
 import org.jgrapht.nio.dot.DOTExporter
 import xyz.xenondevs.invui.InvUI
-import xyz.xenondevs.invui.inventory.StackSizeProvider
-import xyz.xenondevs.invui.util.InventoryUtils
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
@@ -38,7 +35,6 @@ import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
 import xyz.xenondevs.nova.ui.menu.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils
-import xyz.xenondevs.nova.util.item.novaMaxStackSize
 import xyz.xenondevs.nova.util.registerEvents
 import java.io.File
 import java.lang.reflect.InvocationTargetException
@@ -200,7 +196,6 @@ internal object Initializer : Listener {
         InvUI.getInstance().setPlugin(NOVA_PLUGIN)
         InvUILanguages.getInstance().enableServerSideTranslations(false)
         CBFAdapters.register()
-        InventoryUtils.stackSizeProvider = StackSizeProvider(ItemStack::novaMaxStackSize)
         
         val success = tryInit {
             coroutineScope {
@@ -273,14 +268,10 @@ internal object Initializer : Listener {
             
             // run in preferred context
             withContext(runnable.dispatcher ?: scope.coroutineContext) {
-                if (LOGGING) 
+                if (LOGGING)
                     LOGGER.info(runnable.toString())
                 
-                try {
-                    runnable.run()
-                } catch (t: Throwable) {
-                    throw RuntimeException("An exception occurred trying to run $runnable", t)
-                }
+                runnable.run()
             }
         }
     }

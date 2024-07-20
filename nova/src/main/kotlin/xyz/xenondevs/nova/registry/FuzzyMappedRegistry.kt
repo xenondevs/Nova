@@ -7,6 +7,7 @@ import com.mojang.serialization.Lifecycle
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.minecraft.core.Holder
+import net.minecraft.core.RegistrationInfo
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
 import xyz.xenondevs.nova.util.data.asDataResult
@@ -37,8 +38,8 @@ class FuzzyMappedRegistry<T : Any>(
         )
     }
     
-    override fun registerMapping(id: Int, key: ResourceKey<T>, value: T, lifecycle: Lifecycle): Holder.Reference<T> {
-        val holder = super.registerMapping(id, key, value, lifecycle)
+    override fun register(key: ResourceKey<T>, value: T, info: RegistrationInfo): Holder.Reference<T> {
+        val holder = super.register(key, value, info)
         byName.getOrPut(key.location().path, ::ObjectArrayList).add(value)
         return holder
     }

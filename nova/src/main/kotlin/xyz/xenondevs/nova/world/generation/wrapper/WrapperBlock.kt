@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.world.generation.wrapper
 
-import com.google.common.collect.ImmutableMap
 import com.mojang.serialization.Decoder
 import com.mojang.serialization.Encoder
 import com.mojang.serialization.MapCodec
+import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
@@ -24,4 +24,4 @@ class WrapperBlock(novaBlock: NovaBlock): Block(Properties.of()) {
     
 }
 
-class WrapperBlockState(val novaState: NovaBlockState): BlockState(Blocks.STONE, ImmutableMap.of(), MapCodec.of(Encoder.empty(), Decoder.unit { null }))
+class WrapperBlockState(val novaState: NovaBlockState) : BlockState(Blocks.STONE, Reference2ObjectArrayMap(), MapCodec.of(Encoder.empty(), Decoder.unit { null }))

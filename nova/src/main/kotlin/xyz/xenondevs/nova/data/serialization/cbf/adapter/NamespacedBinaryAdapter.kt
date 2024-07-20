@@ -45,7 +45,7 @@ internal object NamespacedIdBinaryAdapter : BinaryAdapter<NamespacedId> {
 internal object ResourceLocationBinaryAdapter : BinaryAdapter<ResourceLocation> {
     
     override fun read(type: KType, reader: ByteReader): ResourceLocation {
-        return ResourceLocation.of(reader.readString(), ':')
+        return ResourceLocation.parse(reader.readString())
     }
     
     override fun write(obj: ResourceLocation, type: KType, writer: ByteWriter) {

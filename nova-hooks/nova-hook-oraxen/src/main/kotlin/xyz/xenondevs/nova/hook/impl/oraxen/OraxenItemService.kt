@@ -175,7 +175,7 @@ internal object OraxenItemService : CustomItemService {
             .associateTo(HashMap()) { (name, builder) ->
                 val modelName = builder.oraxenMeta.modelName
                 
-                val id = ResourceLocation("oraxen", name)
+                val id = ResourceLocation.fromNamespaceAndPath("oraxen", name)
                 val path = ResourcePath("oraxen_converted", "oraxen/$modelName")
                 
                 id to path

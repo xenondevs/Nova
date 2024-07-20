@@ -72,7 +72,7 @@ internal object BarMatcherSerializer : TypeSerializer<BarMatcher> {
             "overlay" -> {
                 val id = map["id"]?.string
                     ?: throw NoSuchElementException("Missing value 'id'")
-                val namespacedId = ResourceLocation.of(id, ':')
+                val namespacedId = ResourceLocation.parse(id)
                 
                 return BarMatcher.Origin(BarOrigin.Addon(namespacedId))
             }

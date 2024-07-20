@@ -75,7 +75,7 @@ class DefaultEnergyHolder(
     val updateHandlers = ArrayList<() -> Unit>()
     
     init {
-        maxEnergy.addUpdateHandler { callUpdateHandlers() }
+        maxEnergy.subscribe { callUpdateHandlers() }
     }
     
     private fun callUpdateHandlers() =

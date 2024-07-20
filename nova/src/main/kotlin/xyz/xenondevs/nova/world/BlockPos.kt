@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world
 
+import io.papermc.paper.math.BlockPosition
 import net.minecraft.world.level.block.entity.BlockEntity
 import org.bukkit.Location
 import org.bukkit.Sound
@@ -21,6 +22,10 @@ val Location.pos: BlockPos
 
 val Block.pos: BlockPos
     get() = BlockPos(world, x, y, z)
+
+@Suppress("UnstableApiUsage")
+fun BlockPosition.toNovaPos(world: World): BlockPos =
+    BlockPos(world, blockX(), blockY(), blockZ())
 
 data class BlockPos(val world: World, val x: Int, val y: Int, val z: Int) {
     

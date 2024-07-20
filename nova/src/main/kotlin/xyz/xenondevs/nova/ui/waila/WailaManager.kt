@@ -48,7 +48,7 @@ internal object WailaManager : Listener, IWailaManager {
     
     @InitFun
     private fun init() {
-        ENABLED_PROVIDER.addUpdateHandler(::reload)
+        ENABLED_PROVIDER.subscribe(::reload)
         reload(ENABLED)
     }
     

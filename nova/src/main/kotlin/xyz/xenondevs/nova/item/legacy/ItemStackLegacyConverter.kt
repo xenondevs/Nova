@@ -2,16 +2,15 @@ package xyz.xenondevs.nova.item.legacy
 
 import net.minecraft.nbt.ByteArrayTag
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.item.ItemStack
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
+import xyz.xenondevs.nova.util.data.getByteArrayOrNull
 import xyz.xenondevs.nova.util.data.getOrNull
-import xyz.xenondevs.nova.util.item.novaCompound
 import kotlin.reflect.KType
-import net.minecraft.world.item.ItemStack as MojangStack
 
 internal sealed interface ItemStackLegacyConverter {
-    fun convert(itemStack: MojangStack)
+    fun convert(customData: CompoundTag)
 }
 
 internal interface SelectedItemStackLegacyConverter : ItemStackLegacyConverter {
@@ -25,8 +24,8 @@ internal class ItemStackNamespaceConverter(
     private val newNamespace: String
 ) : SelectedItemStackLegacyConverter {
     
-    override fun convert(itemStack: ItemStack) {
-        val novaTag = itemStack.tag?.getOrNull<CompoundTag>("nova") ?: return
+    override fun convert(customData: CompoundTag) {
+        val novaTag = customData.getOrNull<CompoundTag>("nova") ?: return
         novaTag.putString("id", newNamespace + ":" + novaTag.getString("id").split(':')[1])
     }
     
@@ -38,14 +37,18 @@ internal class ItemStackPersistentDataConverter(
     private val newKey: NamespacedKey = oldKey
 ) : AllItemStackLegacyConverter {
     
-    override fun convert(itemStack: ItemStack) {
-        val serializedValue = itemStack.tag
-            ?.getOrNull<CompoundTag>("PublicBukkitValues")
+    override fun convert(customData: CompoundTag) {
+        val serializedValue = customData
+            .getOrNull<CompoundTag>("PublicBukkitValues")
             ?.getOrNull<ByteArrayTag>(oldKey.toString())
             ?.asByteArray
             ?: return
-        
-        itemStack.novaCompound.set(type, newKey, CBF.read(type, serializedValue))
+        val novaCompound = customData
+            .getByteArrayOrNull("nova_cbf")
+            ?.let(CBF::read)
+            ?: NamespacedCompound()
+        novaCompound.set(type, newKey, CBF.read(type, serializedValue))
+        customData.putByteArray("nova_cbf", CBF.write(novaCompound))
     }
     
 }

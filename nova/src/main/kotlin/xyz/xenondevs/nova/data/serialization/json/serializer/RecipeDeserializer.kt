@@ -75,7 +75,7 @@ interface RecipeDeserializer<T> {
             getRecipeId(file).namespacedKey
         
         fun getRecipeId(file: File): ResourceLocation =
-            ResourceLocation("nova", "${file.parentFile.name}.${file.nameWithoutExtension}")
+            ResourceLocation.fromNamespaceAndPath("nova", "${file.parentFile.name}.${file.nameWithoutExtension}")
         
     }
     

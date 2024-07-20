@@ -51,7 +51,7 @@ internal object AutoUploadManager {
     @InitFun
     private fun init() {
         val cfg = MAIN_CONFIG.node("resource_pack")
-        cfg.addUpdateHandler { disable(); enable(it, fromReload = true) }
+        cfg.subscribe { disable(); enable(it, fromReload = true) }
         enable(cfg.get(), fromReload = false)
         
         if (url != null)

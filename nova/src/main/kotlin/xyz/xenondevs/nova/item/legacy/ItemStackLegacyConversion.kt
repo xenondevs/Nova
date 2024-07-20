@@ -1,11 +1,9 @@
 package xyz.xenondevs.nova.item.legacy
 
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.item.ItemStack
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.NOVA_PLUGIN
-import xyz.xenondevs.nova.util.data.getOrNull
 import kotlin.reflect.typeOf
 
 internal object ItemStackLegacyConversion {
@@ -23,6 +21,11 @@ internal object ItemStackLegacyConversion {
                 "nova:fluid_upgrade"
             ),
             "simple_upgrades"
+        ))
+        
+        registerConverter(ItemStackNamespaceConverter(
+            hashSetOf("nova:wrench"),
+            "logistics"
         ))
         
         registerConverter(ItemStackPersistentDataConverter(
@@ -55,13 +58,9 @@ internal object ItemStackLegacyConversion {
         }
     }
     
-    @JvmStatic // Called via reflection in LegacyConversionPatch
-    fun convert(itemStack: ItemStack) {
-        val tag = itemStack.tag?.getOrNull<CompoundTag>("nova") ?: return
-        val id = tag.getString("id")
-        
-        idConverters[id]?.forEach { it.convert(itemStack) }
-        allConverters.forEach { it.convert(itemStack) }
+    fun convert(customTag: CompoundTag, novaId: String) {
+        idConverters[novaId]?.forEach { it.convert(customTag) }
+        allConverters.forEach { it.convert(customTag) }
     }
     
 }

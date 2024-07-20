@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.transformer.patch.chunk
 
 import ca.spottedleaf.concurrentutil.executor.standard.PrioritisedExecutor
-import io.papermc.paper.chunk.system.ChunkSystem
-import io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler
-import net.minecraft.world.level.chunk.ChunkStatus
+import ca.spottedleaf.moonrise.common.util.ChunkSystem
+import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler
 import net.minecraft.world.level.chunk.LevelChunk
+import net.minecraft.world.level.chunk.status.ChunkStatus
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.nova.transformer.MultiTransformer

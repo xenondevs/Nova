@@ -111,7 +111,7 @@ object DefaultNetworkTypes {
         tickDelay: Provider<Int>,
         vararg holderTypes: KClass<out EndPointDataHolder>
     ): NetworkType<T> {
-        val id = ResourceLocation("nova", name)
+        val id = ResourceLocation.fromNamespaceAndPath("nova", name)
         val type = NetworkType(
             id,
             createNetwork, createGroup,

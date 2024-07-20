@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetPassengersPack
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundEntityPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSystemChatPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAttributesPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ServerboundInteractPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlaceRecipePacketEvent
@@ -69,6 +70,7 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundMerchantOffersPacketEvent)
         registerPlayerEventType(::ClientboundLevelEventPacketEvent)
         registerPlayerEventType(::ClientboundContainerSetDataPacketEvent)
+        registerPlayerEventType(::ClientboundUpdateAttributesPacketEvent)
         
         // serverbound - player
         registerPlayerEventType(::ServerboundPlaceRecipePacketEvent)
@@ -88,7 +90,7 @@ object PacketEventManager {
         playerEventConstructors[P::class] = constructor as (Player, Packet<*>) -> PlayerPacketEvent<Packet<*>>
     }
     
-    internal fun <T : MojangPacketListener, P : Packet<T>> createAndCallEvent(player: Player?, packet: Packet<T>): PacketEvent<P>? {
+    internal fun <T : MojangPacketListener, P : Packet<in T>> createAndCallEvent(player: Player?, packet: P): PacketEvent<P>? {
         LOCK.read {
             val packetClass = packet::class
             

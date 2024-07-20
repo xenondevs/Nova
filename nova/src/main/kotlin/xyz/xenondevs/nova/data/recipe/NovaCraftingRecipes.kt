@@ -1,18 +1,19 @@
 package xyz.xenondevs.nova.data.recipe
 
+import net.minecraft.core.HolderLookup
 import net.minecraft.core.NonNullList
-import net.minecraft.core.RegistryAccess
-import net.minecraft.world.Container
-import net.minecraft.world.inventory.CraftingContainer
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.BlastingRecipe
 import net.minecraft.world.item.crafting.CampfireCookingRecipe
+import net.minecraft.world.item.crafting.CraftingInput
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapedRecipePattern
 import net.minecraft.world.item.crafting.ShapelessRecipe
+import net.minecraft.world.item.crafting.SingleRecipeInput
 import net.minecraft.world.item.crafting.SmeltingRecipe
+import net.minecraft.world.item.crafting.SmithingRecipeInput
 import net.minecraft.world.item.crafting.SmithingTransformRecipe
 import net.minecraft.world.item.crafting.SmokingRecipe
 import net.minecraft.world.item.crafting.StonecutterRecipe
@@ -21,13 +22,12 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.commons.collections.removeFirstWhere
 import xyz.xenondevs.nova.item.logic.PacketItems
-import xyz.xenondevs.nova.util.NMSUtils.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.NonNullList
-import xyz.xenondevs.nova.util.bukkitCopy
-import xyz.xenondevs.nova.util.bukkitMirror
+import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.data.nmsCategory
 import xyz.xenondevs.nova.util.data.toNmsIngredient
-import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.unwrap
 import java.util.*
 import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
 import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
@@ -88,25 +88,25 @@ internal class NovaShapedRecipe private constructor(
     fun getChoice(x: Int, y: Int): RecipeChoice? =
         choiceMatrix.getOrNull(x)?.getOrNull(y)
     
-    override fun matches(container: CraftingContainer, world: Level): Boolean {
+    override fun matches(input: CraftingInput, world: Level): Boolean {
         // Iterate through all the top-left positions of all possible placements of the recipe shape.
-        for (startX in 0..container.width - width) {
-            for (startY in 0..container.height - height) {
+        for (startX in 0..input.width() - width) {
+            for (startY in 0..input.height() - height) {
                 // Check if the recipe is valid at that position
-                if (matchesAt(container, startX, startY, false)
-                    || matchesAt(container, startX, startY, true)) return true
+                if (matchesAt(input, startX, startY, false)
+                    || matchesAt(input, startX, startY, true)) return true
             }
         }
         return false
     }
     
-    private fun matchesAt(container: CraftingContainer, x: Int, y: Int, horizontalFlip: Boolean): Boolean {
-        for (absX in 0..<container.width)
-            for (absY in 0..<container.height) {
+    private fun matchesAt(input: CraftingInput, x: Int, y: Int, horizontalFlip: Boolean): Boolean {
+        for (absX in 0..<input.width())
+            for (absY in 0..<input.height()) {
                 // relX and relY is the position relative to the recipe shape
                 val relX = absX - x
                 val relY = absY - y
-                val item = container.getItem(absX + absY * container.width)
+                val item = input.getItem(absX + absY * input.width())
                 // If relX and relY are in the shape, it will be the RecipeChoice at that position, or null otherwise
                 val choice = if (relX in (0..<width) && relY in (0..<height)) {
                     getChoice(if (horizontalFlip) width - relX - 1 else relX, relY)
@@ -114,7 +114,7 @@ internal class NovaShapedRecipe private constructor(
                 // If choice is null, treat it as an air RecipeChoice.
                 if (choice == null) {
                     if (!item.isEmpty) return false
-                } else if (!choice.test(item.bukkitCopy)) return false
+                } else if (!choice.test(item.asBukkitMirror())) return false
             }
         return true
     }
@@ -122,8 +122,8 @@ internal class NovaShapedRecipe private constructor(
     override fun clientsideCopy(): ShapedRecipe {
         val result = getResultItem(REGISTRY_ACCESS).clientsideCopy()
         val clientsidePattern = ShapedRecipePattern(
-            pattern.width, pattern.height,
-            pattern.ingredients.clientsideCopy(),
+            pattern.width(), pattern.height(),
+            pattern.ingredients().clientsideCopy(),
             Optional.empty()
         )
         return ShapedRecipe(group, category(), clientsidePattern, result)
@@ -149,7 +149,7 @@ internal class NovaShapedRecipe private constructor(
                     NonNullList(flatChoices.map(RecipeChoice?::toNmsIngredient)),
                     Optional.empty()
                 ),
-                recipe.result.nmsCopy,
+                recipe.result.unwrap().copy(),
                 flatChoices,
                 requiredChoices,
                 choiceMatrix
@@ -163,20 +163,20 @@ internal class NovaShapedRecipe private constructor(
 internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : ShapelessRecipe(
     "",
     bukkitRecipe.category.nmsCategory,
-    bukkitRecipe.result.nmsCopy,
+    bukkitRecipe.result.unwrap().copy(),
     NonNullList(bukkitRecipe.choiceList.map(RecipeChoice?::toNmsIngredient))
 ), ServersideRecipe<ShapelessRecipe> {
     
     val choiceList: List<RecipeChoice> = bukkitRecipe.choiceList
     
-    override fun matches(container: CraftingContainer, level: Level): Boolean {
+    override fun matches(container: CraftingInput, level: Level): Boolean {
         val choiceList = ArrayList(choiceList)
         
         // loop over all items in the inventory and remove matching choices from the choice list
         // if there is an item stack that does not have a matching choice or the choice list is not empty
         // at the end of the loop, the recipe doesn't match
-        return container.contents.filterNot { it.isEmpty }.all { matrixStack ->
-            choiceList.removeFirstWhere { it.test(matrixStack.bukkitCopy) }
+        return container.items().filterNot { it.isEmpty }.all { matrixStack ->
+            choiceList.removeFirstWhere { it.test(matrixStack.asBukkitMirror()) }
         } && choiceList.isEmpty()
     }
     
@@ -193,15 +193,15 @@ internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) 
     "",
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.nmsCopy,
+    bukkitRecipe.result.unwrap().copy(),
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ), ServersideRecipe<SmeltingRecipe> {
     
     private val choice = bukkitRecipe.inputChoice
     
-    override fun matches(container: Container, level: Level): Boolean {
-        return choice.test(container.getItem(0).bukkitCopy)
+    override fun matches(input: SingleRecipeInput, level: Level): Boolean {
+        return choice.test(input.getItem(0).asBukkitMirror())
     }
     
     override fun clientsideCopy(): SmeltingRecipe {
@@ -218,15 +218,15 @@ internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRe
     "",
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.nmsCopy,
+    bukkitRecipe.result.unwrap().copy(),
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ), ServersideRecipe<BlastingRecipe> {
     
     private val choice = bukkitRecipe.inputChoice
     
-    override fun matches(container: Container, level: Level): Boolean {
-        return choice.test(container.getItem(0).bukkitCopy)
+    override fun matches(input: SingleRecipeInput, level: Level): Boolean {
+        return choice.test(input.getItem(0).asBukkitMirror())
     }
     
     override fun clientsideCopy(): BlastingRecipe {
@@ -243,15 +243,15 @@ internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) :
     "",
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.nmsCopy,
+    bukkitRecipe.result.unwrap().copy(),
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ), ServersideRecipe<SmokingRecipe> {
     
     private val choice = bukkitRecipe.inputChoice
     
-    override fun matches(container: Container, level: Level): Boolean {
-        return choice.test(container.getItem(0).bukkitCopy)
+    override fun matches(input: SingleRecipeInput, level: Level): Boolean {
+        return choice.test(input.getItem(0).asBukkitMirror())
     }
     
     override fun clientsideCopy(): SmokingRecipe {
@@ -268,15 +268,15 @@ internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe
     "",
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.nmsCopy,
+    bukkitRecipe.result.unwrap().copy(),
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ), ServersideRecipe<CampfireCookingRecipe> {
     
     private val choice = bukkitRecipe.inputChoice
     
-    override fun matches(container: Container, level: Level): Boolean {
-        return choice.test(container.getItem(0).bukkitCopy)
+    override fun matches(input: SingleRecipeInput, level: Level): Boolean {
+        return choice.test(input.getItem(0).asBukkitMirror())
     }
     
     override fun clientsideCopy(): CampfireCookingRecipe {
@@ -292,13 +292,13 @@ internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe
 internal class NovaStonecutterRecipe(private val bukkitRecipe: BukkitStonecuttingRecipe) : StonecutterRecipe(
     "",
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.nmsCopy
+    bukkitRecipe.result.unwrap().copy()
 ), ServersideRecipe<StonecutterRecipe> {
     
     private val choice = bukkitRecipe.inputChoice
     
-    override fun matches(container: Container, level: Level): Boolean {
-        return choice.test(container.getItem(0).bukkitCopy)
+    override fun matches(input: SingleRecipeInput, level: Level): Boolean {
+        return choice.test(input.getItem(0).asBukkitMirror())
     }
     
     override fun clientsideCopy(): StonecutterRecipe {
@@ -315,25 +315,23 @@ internal class NovaSmithingTransformRecipe(private val bukkitRecipe: BukkitSmith
     bukkitRecipe.template.toNmsIngredient(),
     bukkitRecipe.base.toNmsIngredient(),
     bukkitRecipe.addition.toNmsIngredient(),
-    bukkitRecipe.result.nmsCopy
+    bukkitRecipe.result.unwrap().copy()
 ), ServersideRecipe<SmithingTransformRecipe> {
     
     private val templateChoice = bukkitRecipe.template
     private val baseChoice = bukkitRecipe.base
     private val additionChoice = bukkitRecipe.addition
     
-    override fun matches(container: Container, world: Level): Boolean {
-        return templateChoice.test(container.getItem(0).bukkitMirror)
-            && baseChoice.test(container.getItem(1).bukkitMirror)
-            && additionChoice.test(container.getItem(2).bukkitMirror)
+    override fun matches(input: SmithingRecipeInput, world: Level): Boolean {
+        return templateChoice.test(input.getItem(0).asBukkitMirror())
+            && baseChoice.test(input.getItem(1).asBukkitMirror())
+            && additionChoice.test(input.getItem(2).asBukkitMirror())
     }
     
-    override fun assemble(container: Container, registryAccess: RegistryAccess): ItemStack {
-        val result = bukkitRecipe.result.nmsCopy
-        val currentTag = container.getItem(1).orCreateTag.copy()
-        currentTag.remove("nova") // prevent item id override
-        result.orCreateTag.merge(currentTag)
-        return result
+    override fun assemble(input: SmithingRecipeInput, lookup: HolderLookup.Provider): ItemStack {
+        val recipeResult = bukkitRecipe.result.unwrap()
+        val mergedPatch = ItemUtils.mergeDataComponentPatches(input.base.componentsPatch, recipeResult.componentsPatch) // recipeResult overrides input
+        return ItemStack(recipeResult.itemHolder, recipeResult.count, mergedPatch)
     }
     
     override fun clientsideCopy(): SmithingTransformRecipe {

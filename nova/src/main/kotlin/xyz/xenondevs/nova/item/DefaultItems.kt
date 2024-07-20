@@ -14,7 +14,7 @@ internal object DefaultItems {
     }
     
     private fun item(name: String, run: NovaItemBuilder.() -> Unit): NovaItem {
-        val builder = NovaItemBuilder(ResourceLocation("nova", name))
+        val builder = NovaItemBuilder(ResourceLocation.fromNamespaceAndPath("nova", name))
         builder.run()
         return builder.register()
     }

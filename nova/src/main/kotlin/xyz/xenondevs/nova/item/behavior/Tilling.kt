@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.above
 import xyz.xenondevs.nova.util.nmsDirection
+import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.runTaskLater
@@ -65,7 +66,7 @@ object Tilling : ItemBehavior {
                 // drop items
                 drops.forEach { Block.popResourceFromFace(level, pos, event.blockFace.nmsDirection, MojangStack(it)) }
                 // damage item
-                Damageable.damageAndBreak(serverPlayer.getItemInHand(interactionHand), 1, serverPlayer) { serverPlayer.broadcastBreakEvent(interactionHand) }
+                serverPlayer.getItemInHand(interactionHand).hurtAndBreak(1, serverPlayer, interactionHand.nmsEquipmentSlot)
                 // swing hand
                 runTaskLater(1) { serverPlayer.swing(interactionHand, true) }
             }

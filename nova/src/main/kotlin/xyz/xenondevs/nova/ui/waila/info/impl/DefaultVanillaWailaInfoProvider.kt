@@ -39,7 +39,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(nul
             this += ToolLine.getToolLine(player, pos.block)
         }
         
-        return WailaInfo(ResourceLocation("minecraft", mainMaterial.name.lowercase()), lines)
+        return WailaInfo(ResourceLocation.withDefaultNamespace(mainMaterial.name.lowercase()), lines)
     }
 
     private fun getMainMaterial(blockState: BlockData): Material {

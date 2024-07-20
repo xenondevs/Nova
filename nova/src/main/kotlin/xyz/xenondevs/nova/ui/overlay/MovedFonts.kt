@@ -24,7 +24,7 @@ object MovedFonts {
      */
     fun moveVertically(component: Component, distance: Int, addDistance: Boolean = false): Component {
         require(component is BuildableComponent<*, *>) { "Component must be a BuildableComponent" }
-        return MovedFontsRawTypes.moveVertically(component, distance, addDistance)
+        return moveVertically(component, distance, addDistance)
     }
     
     /**
@@ -34,10 +34,7 @@ object MovedFonts {
      *
      * Depending on the [distance] and configuration settings, the font that the component was changed to might not exist.
      */
-    @Suppress("UNCHECKED_CAST")
-    internal fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> moveVerticallyInternal(component: BuildableComponent<*, *>, distance: Int, addDistance: Boolean = false): C {
-        component as C
-        
+    private fun moveVertically(component: BuildableComponent<*, *>, distance: Int, addDistance: Boolean = false): Component {
         fun updateFont(builder: ComponentBuilder<*, *>, previousFont: String?) {
             var font = previousFont ?: "default"
             var currentDistance = 0

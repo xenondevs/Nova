@@ -22,7 +22,7 @@ internal open class NetworkedNMSInventory(
             if (remaining <= 0)
                 break
             
-            if (!ItemStack.isSameItemSameTags(itemStack, current))
+            if (!ItemStack.isSameItemSameComponents(itemStack, current))
                 continue
             
             val transfer = min(remaining, maxStackSize - current.count)

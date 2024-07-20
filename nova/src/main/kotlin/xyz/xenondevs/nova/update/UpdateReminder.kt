@@ -41,7 +41,7 @@ internal object UpdateReminder : Listener {
     @InitFun
     private fun init() {
         val cfg = MAIN_CONFIG.node("update_reminder")
-        cfg.addUpdateHandler(::reload)
+        cfg.subscribe(::reload)
         reload(cfg.get())
     }
     

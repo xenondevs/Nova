@@ -24,7 +24,6 @@ import xyz.xenondevs.nova.data.resources.builder.task.ArmorContent
 import xyz.xenondevs.nova.data.resources.builder.task.AtlasContent
 import xyz.xenondevs.nova.data.resources.builder.task.BarOverlayTask
 import xyz.xenondevs.nova.data.resources.builder.task.BuildStage
-import xyz.xenondevs.nova.data.resources.builder.task.EnchantmentContent
 import xyz.xenondevs.nova.data.resources.builder.task.ExtractTask
 import xyz.xenondevs.nova.data.resources.builder.task.LanguageContent
 import xyz.xenondevs.nova.data.resources.builder.task.PackFunction
@@ -140,7 +139,7 @@ class ResourcePackBuilder internal constructor() {
         private val holderCreators: MutableList<(ResourcePackBuilder) -> PackTaskHolder> = mutableListOf(
             ::ExtractTask, ::ArmorContent, ::GuiContent, ::LanguageContent, ::TextureIconContent,
             ::AtlasContent, ::WailaContent, ::MovedFontContent, ::CharSizeCalculator, ::SoundOverrides, ::FontContent,
-            ::BarOverlayTask, ::MoveCharactersContent, ::EnchantmentContent, ::ModelContent, ::BlockModelContent,
+            ::BarOverlayTask, ::MoveCharactersContent, ::ModelContent, ::BlockModelContent,
             ::ItemModelContent
         )
         

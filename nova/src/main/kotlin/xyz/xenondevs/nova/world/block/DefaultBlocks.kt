@@ -45,7 +45,7 @@ internal object DefaultBlocks {
     }
     
     private fun block(name: String, run: NovaBlockBuilder.() -> Unit): NovaBlock {
-        val builder = NovaBlockBuilder(ResourceLocation("nova", name))
+        val builder = NovaBlockBuilder(ResourceLocation.fromNamespaceAndPath("nova", name))
         builder.run()
         return builder.register()
     }

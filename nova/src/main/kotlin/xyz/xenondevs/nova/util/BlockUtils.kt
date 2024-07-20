@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.util
 import net.kyori.adventure.text.Component
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
+import net.minecraft.core.component.DataComponents
 import net.minecraft.core.particles.ParticleTypes
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
@@ -39,7 +39,7 @@ import org.bukkit.block.data.Bisected
 import org.bukkit.block.data.BlockData
 import org.bukkit.block.data.type.Bed
 import org.bukkit.block.data.type.PistonHead
-import org.bukkit.craftbukkit.v1_20_R3.event.CraftEventFactory
+import org.bukkit.craftbukkit.event.CraftEventFactory
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockExpEvent
@@ -49,7 +49,6 @@ import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockB
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.item.hasNoBreakParticles
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.soundGroup
@@ -80,8 +79,8 @@ import net.minecraft.world.level.block.Block as MojangBlock
  */
 val Block.id: ResourceLocation
     get() = WorldDataManager.getBlockState(pos)?.block?.id
-        ?: CustomItemServiceManager.getId(this)?.let { ResourceLocation.of(it, ':') }
-        ?: ResourceLocation("minecraft", type.name.lowercase())
+        ?: CustomItemServiceManager.getId(this)?.let { ResourceLocation.parse(it) }
+        ?: ResourceLocation.withDefaultNamespace(type.name.lowercase())
 
 /**
  * The [NovaBlockState] at the position of this [Block].
@@ -289,7 +288,7 @@ object BlockUtils {
      * @return If the item could be placed
      */
     internal fun placeVanillaBlock(pos: BlockPos, player: ServerPlayer, itemStack: ItemStack, placeEffects: Boolean): Boolean {
-        val nmsStack = itemStack.nmsCopy
+        val nmsStack = itemStack.unwrap().copy()
         val blockItem = nmsStack.item as BlockItem
         val result = blockItem.place(BlockPlaceContext(UseOnContext(
             pos.world.serverLevel,
@@ -321,11 +320,11 @@ object BlockUtils {
      * @param itemStack The [ItemStack] to load the data from
      */
     private fun setBlockEntityDataFromItemStack(pos: BlockPos, itemStack: ItemStack) {
-        val tileEntityTag = itemStack.nmsVersion.tag
-            ?.getOrNull<CompoundTag>("BlockEntityTag") // ?.let { if (it.isEmpty) itemTag else it } TODO ?
+        val tileEntityTag = itemStack.unwrap().get(DataComponents.BLOCK_ENTITY_DATA)?.copyTag()
             ?: return
         
-        pos.world.serverLevel.getBlockEntity(pos.nmsPos, true)?.load(tileEntityTag)
+        pos.world.serverLevel.getBlockEntity(pos.nmsPos, true)
+            ?.loadWithComponents(tileEntityTag, REGISTRY_ACCESS)
     }
     
     /**
@@ -427,7 +426,7 @@ object BlockUtils {
         
         fun broadcastBreakSound(soundGroup: SoundGroup) {
             val soundPacket = ClientboundSoundPacket(
-                Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation(soundGroup.breakSound))),
+                Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation.parse(soundGroup.breakSound))),
                 SoundSource.BLOCKS,
                 nmsPos.x + 0.5,
                 nmsPos.y + 0.5,
@@ -494,10 +493,10 @@ object BlockUtils {
                 block.destroy(level, nmsPos, state)
                 
                 if (drops && !player.isCreative) {
-                    block.playerDestroy(level, player, nmsPos, state, level.getBlockEntity(nmsPos), tool.nmsCopy)
+                    block.playerDestroy(level, player, nmsPos, state, level.getBlockEntity(nmsPos), tool.unwrap().copy())
                 }
             }
-        }.map { it.item.bukkitMirror }
+        }.map { it.item.asBukkitMirror() }
     }
     
     /**
@@ -583,7 +582,7 @@ object BlockUtils {
         val serverLevel = pos.world.serverLevel
         val mojangPos = pos.nmsPos
         
-        val toolItemStack = ctx[DefaultContextParamTypes.TOOL_ITEM_STACK].nmsCopy
+        val toolItemStack = ctx[DefaultContextParamTypes.TOOL_ITEM_STACK].unwrap().copy()
         var exp = BlockUtils.getVanillaBlockExp(serverLevel, mojangPos, toolItemStack)
         
         // the furnace is the only block entity that can drop exp (I think)

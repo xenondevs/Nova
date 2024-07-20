@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.ui.waila.info.impl
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
-import org.bukkit.block.Block
 import org.bukkit.block.data.Ageable
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
@@ -25,7 +24,7 @@ internal object CropWailaInfoProvider : VanillaWailaInfoProvider<Ageable>(MAX_TE
     override fun getInfo(player: Player, pos: BlockPos, blockState: Ageable): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
         val stage = ((blockState.age / blockState.maximumAge.toDouble()) * MAX_TEXTURE_STAGE[blockState.material]!!).roundToInt()
-        info.icon = ResourceLocation("minecraft", blockState.material.name.lowercase() + "_stage$stage")
+        info.icon = ResourceLocation.withDefaultNamespace(blockState.material.name.lowercase() + "_stage$stage")
         return info
     }
 

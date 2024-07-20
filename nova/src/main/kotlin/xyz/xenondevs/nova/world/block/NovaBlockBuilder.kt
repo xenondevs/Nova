@@ -2,11 +2,15 @@
 
 package xyz.xenondevs.nova.world.block
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.Style
+import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.data.config.ConfigurableRegistryElementBuilder
 import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayoutBuilder
-import xyz.xenondevs.nova.item.NovaMaterialTypeRegistryElementBuilder
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.util.ResourceLocation
@@ -16,13 +20,70 @@ import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 
 abstract class AbstractNovaBlockBuilder<B : NovaBlock> internal constructor(
     id: ResourceLocation
-) : NovaMaterialTypeRegistryElementBuilder<B>(NovaRegistries.BLOCK, id, "block.${id.namespace}.${id.name}") {
+) : ConfigurableRegistryElementBuilder<B>(NovaRegistries.BLOCK, id) {
     
     internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
+    protected var style: Style = Style.empty()
+    protected var name: Component = Component.translatable("block.${id.namespace}.${id.name}")
     protected var behaviors = ArrayList<BlockBehaviorHolder>()
     protected val stateProperties = ArrayList<ScopedBlockStateProperty<*>>()
     internal var requestedLayout = BlockModelLayout.DEFAULT
+    
+    /**
+     * Sets the style of the block name.
+     */
+    fun style(style: Style) {
+        this.style = style
+    }
+    
+    /**
+     * Sets the style of the block name.
+     */
+    fun style(color: TextColor) {
+        this.style = Style.style(color)
+    }
+    
+    /**
+     * Sets the style of the block name.
+     */
+    fun style(color: TextColor, vararg decorations: TextDecoration) {
+        this.style = Style.style(color, *decorations)
+    }
+    
+    /**
+     * Sets the style of the block name.
+     */
+    fun style(vararg decorations: TextDecoration) {
+        this.style = Style.style(*decorations)
+    }
+    
+    /**
+     * Sets the style of the block name.
+     */
+    fun style(decoration: TextDecoration) {
+        this.style = Style.style(decoration)
+    }
+    
+    /**
+     * Sets the name of the block.
+     *
+     * This function is exclusive with [localizedName].
+     */
+    fun name(name: Component) {
+        this.name = name
+    }
+    
+    /**
+     * Sets the localization key of the block.
+     *
+     * Defaults to `block.<namespace>.<name>`.
+     *
+     * This function is exclusive with [name].
+     */
+    fun localizedName(localizedName: String) {
+        this.name = Component.translatable(localizedName)
+    }
     
     /**
      * Sets the behaviors of this block to [behaviors].

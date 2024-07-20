@@ -37,7 +37,7 @@ internal object ItemCategories {
     private fun init() {
         val cfg = Configs["nova:item_categories"]
         reload(cfg.get())
-        cfg.addUpdateHandler(::reload)
+        cfg.subscribe(::reload)
     }
     
     private fun reload(cfg: CommentedConfigurationNode) {

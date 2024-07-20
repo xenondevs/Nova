@@ -7,9 +7,8 @@ import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedVirtualInventory.Companion.UPDATE_REASON
-import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
-import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.unwrap
 import java.util.*
 
 internal class NetworkedMultiVirtualInventory(
@@ -51,7 +50,7 @@ internal class NetworkedMultiVirtualInventory(
             if (!conType.insert)
                 continue
             
-            val itemStackWithCount = itemStack.copyWithCount(amountLeft).bukkitMirror
+            val itemStackWithCount = itemStack.copyWithCount(amountLeft).asBukkitMirror()
             amountLeft = inv.addItem(UPDATE_REASON, itemStackWithCount)
             if (amountLeft <= 0)
                 break
@@ -101,7 +100,7 @@ internal class NetworkedMultiVirtualInventory(
         for ((inv, conType) in inventories) {
             if (conType.extract) {
                 for ((idx, itemStack) in inv.unsafeItems.withIndex()) {
-                    destination[invStartIdx + idx] = itemStack.nmsCopy
+                    destination[invStartIdx + idx] = itemStack.unwrap().copy()
                 }
             }
             

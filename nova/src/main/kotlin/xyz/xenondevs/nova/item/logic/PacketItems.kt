@@ -2,48 +2,48 @@
 
 package xyz.xenondevs.nova.item.logic
 
+import com.mojang.serialization.Dynamic
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.Style
-import net.kyori.adventure.text.format.TextColor
-import net.kyori.adventure.text.format.TextDecoration
+import net.minecraft.core.component.DataComponentMap
+import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.core.component.DataComponentPredicate
+import net.minecraft.core.component.DataComponentType
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.component.TypedDataComponent
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.IntTag
-import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
-import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.entity.MobType
-import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
-import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.resources.RegistryOps
+import net.minecraft.util.Unit
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.CustomModelData
+import net.minecraft.world.item.component.DyedItemColor
+import net.minecraft.world.item.component.ItemLore
 import net.minecraft.world.item.crafting.RecipeHolder
-import net.minecraft.world.item.enchantment.EnchantmentHelper
+import net.minecraft.world.item.trading.ItemCost
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.Material
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
+import org.bukkit.NamespacedKey
+import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
-import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
-import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.behavior.Damageable
-import xyz.xenondevs.nova.item.behavior.Enchantable
-import xyz.xenondevs.nova.item.behavior.Tool
-import xyz.xenondevs.nova.item.vanilla.AttributeModifier
-import xyz.xenondevs.nova.item.vanilla.HideableFlag
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetContentPacketEvent
@@ -55,57 +55,27 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPack
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.bukkitMirror
-import xyz.xenondevs.nova.util.component.adventure.toAdventureComponentOrEmpty
-import xyz.xenondevs.nova.util.component.adventure.toJson
-import xyz.xenondevs.nova.util.component.adventure.toNBT
+import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
+import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
+import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.NBTUtils
+import xyz.xenondevs.nova.util.data.getCompoundOrNull
+import xyz.xenondevs.nova.util.data.getFirstOrThrow
 import xyz.xenondevs.nova.util.data.getIntOrNull
-import xyz.xenondevs.nova.util.data.getOrNull
-import xyz.xenondevs.nova.util.data.getOrPut
 import xyz.xenondevs.nova.util.data.getStringOrNull
 import xyz.xenondevs.nova.util.get
-import xyz.xenondevs.nova.util.item.ItemUtils
-import xyz.xenondevs.nova.util.item.novaCompoundOrNull
-import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.util.item.novaCompound
+import xyz.xenondevs.nova.util.item.unsafeCustomData
+import xyz.xenondevs.nova.util.item.unsafeNovaTag
+import xyz.xenondevs.nova.util.item.update
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverPlayer
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-import java.util.*
+import xyz.xenondevs.nova.util.unwrap
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
-
-private val SHULKER_BOX_ITEMS = setOf(
-    Items.SHULKER_BOX,
-    Items.BLUE_SHULKER_BOX,
-    Items.BLACK_SHULKER_BOX,
-    Items.CYAN_SHULKER_BOX,
-    Items.BROWN_SHULKER_BOX,
-    Items.GREEN_SHULKER_BOX,
-    Items.GRAY_SHULKER_BOX,
-    Items.LIGHT_BLUE_SHULKER_BOX,
-    Items.LIGHT_GRAY_SHULKER_BOX,
-    Items.LIME_SHULKER_BOX,
-    Items.MAGENTA_SHULKER_BOX,
-    Items.ORANGE_SHULKER_BOX,
-    Items.PINK_SHULKER_BOX,
-    Items.PURPLE_SHULKER_BOX,
-    Items.RED_SHULKER_BOX,
-    Items.WHITE_SHULKER_BOX,
-    Items.YELLOW_SHULKER_BOX
-)
-
-private val ATTRIBUTE_DECIMAL_FORMAT = DecimalFormat("#.##")
-    .apply { decimalFormatSymbols = DecimalFormatSymbols.getInstance(Locale.ROOT) }
-
-private val GLINT_ENCHANTMENT_TAG = ListTag().apply {
-    val entry = CompoundTag()
-    entry.putString("id", "glint")
-    entry.putInt("lvl", 1)
-    add(entry)
-}
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -115,7 +85,9 @@ internal object PacketItems : Listener, PacketListener {
     
     val SERVER_SIDE_MATERIAL = Material.SHULKER_SHELL
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!
-    val SERVER_SIDE_ITEM_ID = BuiltInRegistries.ITEM.getKey(SERVER_SIDE_ITEM).toString()
+    val SERVER_SIDE_ITEM_HOLDER = BuiltInRegistries.ITEM.wrapAsHolder(SERVER_SIDE_ITEM)
+    const val SKIP_SERVER_SIDE_TOOLTIP = "NovaSkipPacketItems"
+    private val INVUI_SLOT_KEY = NamespacedKey("nova", "slot")
     
     @InitFun
     private fun init() {
@@ -143,16 +115,18 @@ internal object PacketItems : Listener, PacketListener {
     
     @PacketHandler
     private fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
-        val player = event.player
-        val packet = event.packet
-        val data = packet.packedItems ?: return
+        val oldItems = event.packedItems
         val newItems = ArrayList<DataValue<*>>()
-        data.forEach { dataValue ->
+        for (dataValue in oldItems) {
             val value = dataValue.value
             if (value is MojangStack) {
-                newItems.add(DataValue(dataValue.id, EntityDataSerializers.ITEM_STACK, getClientSideStack(player, value, false)))
+                newItems += DataValue(
+                    dataValue.id,
+                    EntityDataSerializers.ITEM_STACK,
+                    getClientSideStack(event.player, value, false)
+                )
             } else {
-                newItems.add(dataValue)
+                newItems += dataValue
             }
         }
         event.packedItems = newItems
@@ -163,7 +137,7 @@ internal object PacketItems : Listener, PacketListener {
         val player = event.player
         val slots = ArrayList(event.slots).also { event.slots = it }
         
-        slots.forEachIndexed { i, pair ->
+        for ((i, pair) in slots.withIndex()) {
             slots[i] = MojangPair(
                 pair.first,
                 getClientSideStack(player, pair.second)
@@ -173,7 +147,7 @@ internal object PacketItems : Listener, PacketListener {
     
     @PacketHandler
     private fun handleCreativeSetItem(event: ServerboundSetCreativeModeSlotPacketEvent) {
-        event.item = getServerSideStack(event.item)
+        event.itemStack = getServerSideStack(event.itemStack)
     }
     
     @PacketHandler
@@ -191,16 +165,15 @@ internal object PacketItems : Listener, PacketListener {
         val newOffers = MerchantOffers()
         
         event.offers.forEach { offer ->
+            val stackA = getClientSideStack(event.player, offer.baseCostA.itemStack)
+            val costA = ItemCost(stackA.itemHolder, stackA.count, DataComponentPredicate.EMPTY, stackA)
+            val costB = offer.costB.map {
+                val stackB = getClientSideStack(event.player, it.itemStack)
+                ItemCost(stackB.itemHolder, stackB.count, DataComponentPredicate.EMPTY, stackB)
+            }
             newOffers += MerchantOffer(
-                getClientSideStack(event.player, offer.baseCostA),
-                getClientSideStack(event.player, offer.costB),
-                getClientSideStack(event.player, offer.result),
-                offer.uses,
-                offer.maxUses,
-                offer.xp,
-                offer.priceMultiplier,
-                offer.demand
-            
+                costA, costB, getClientSideStack(event.player, offer.result),
+                offer.uses, offer.maxUses, offer.xp, offer.priceMultiplier, offer.demand
             )
         }
         
@@ -209,467 +182,271 @@ internal object PacketItems : Listener, PacketListener {
     //</editor-fold>
     
     //<editor-fold desc="server-side stack -> client-side stack", defaultstate="collapsed">
-    fun getClientSideStack(player: Player?, itemStack: MojangStack, useName: Boolean = true, storeServerSideTag: Boolean = true): MojangStack {
+    fun getClientSideStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean = true): MojangStack {
         if (itemStack.isEmpty)
             return itemStack
         
-        return if (itemStack.tag?.contains("nova", NBTUtils.TAG_COMPOUND) == true) {
-            getClientSideNovaStack(player, itemStack, useName, storeServerSideTag)
-        } else getClientsideVanillaStack(player, itemStack, storeServerSideTag)
-    }
-    
-    fun getClientSideStack(player: Player?, itemStackCompound: CompoundTag, useName: Boolean = true, storeServerSideTag: Boolean = true): CompoundTag {
-        val itemTag = itemStackCompound.getOrNull<CompoundTag>("tag")
-            ?: return itemStackCompound
-        val itemStack = MojangStack.of(itemStackCompound)
-        
-        if (itemStack.isEmpty)
-            return itemStackCompound
-        
-        val newItemStack = if (itemTag.contains("nova", NBTUtils.TAG_COMPOUND)) {
-            getClientSideNovaStack(player, itemStack, useName, storeServerSideTag)
-        } else getClientsideVanillaStack(player, itemStack, storeServerSideTag)
-        
-        return if (newItemStack == itemStack)
-            itemStackCompound
-        else newItemStack.save(CompoundTag())
+        return if (itemStack.unsafeNovaTag !== null) {
+            getClientSideNovaStack(player, itemStack, storeServerSideTag)
+        } else getClientSideVanillaStack(player, itemStack, storeServerSideTag)
     }
     
     //<editor-fold desc="Nova", defaultstate="collapsed">
-    private fun getClientSideNovaStack(player: Player?, itemStack: MojangStack, useName: Boolean, storeServerSideTag: Boolean): MojangStack {
-        val itemTag = itemStack.tag!!
-        val novaTag = itemTag.getOrNull<CompoundTag>("nova")
-            ?: throw IllegalArgumentException("The provided ItemStack is not a Nova item.")
+    private fun getClientSideNovaStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean): MojangStack {
+        val novaTag = itemStack.unsafeNovaTag // read-only!
+            ?: return itemStack
+        val id = novaTag.getStringOrNull("id")
+            ?: return getUnknownItem(itemStack, null)
+        val novaItem = NovaRegistries.ITEM[id]
+            ?: return getUnknownItem(itemStack, id)
         
-        val id = novaTag.getStringOrNull("id") ?: return getUnknownItem(itemStack, null)
-        val item = NovaRegistries.ITEM[id] ?: return getUnknownItem(itemStack, id)
+        // client-side item stack copy
+        val newItemType = CraftMagicNumbers.getItem(novaItem.vanillaMaterial)
+        val newItemHolder = BuiltInRegistries.ITEM.wrapAsHolder(newItemType)
+        var newItemStack = MojangStack(
+            newItemHolder, itemStack.count,
+            buildClientSideDataComponentsPatch(newItemType, novaItem, itemStack.componentsPatch)
+        )
         
+        // custom model data
         val namedModelId = novaTag.getStringOrNull("modelId")
         val unnamedModelId = novaTag.getIntOrNull("subId")
-        
         val customModelData = when {
-            namedModelId != null -> item.model.getCustomModelData(namedModelId)
+            namedModelId != null -> novaItem.model.getCustomModelData(namedModelId)
                 ?: return getUnknownItem(itemStack, id, namedModelId)
-            unnamedModelId != null -> item.model.getCustomModelData(unnamedModelId) 
+            
+            unnamedModelId != null -> novaItem.model.getCustomModelData(unnamedModelId)
                 ?: return getUnknownItem(itemStack, id, unnamedModelId.toString())
-            else -> item.model.getCustomModelData("default") 
+            
+            else -> novaItem.model.getCustomModelData("default")
                 ?: return getUnknownItem(itemStack, id)
         }
+        newItemStack.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData(customModelData))
         
-        val newItemStack = itemStack.copy()
-        val newItemTag = newItemStack.tag!!
+        // further customization through item behaviors
+        val novaCompound = itemStack.novaCompound ?: NamespacedCompound.EMPTY
+        newItemStack = novaItem.modifyClientSideStack(player, newItemStack.asBukkitMirror(), novaCompound).unwrap()
         
-        // save server-side nbt data
-        if (storeServerSideTag) {
-            newItemTag.put("NovaServerSideTag", itemTag)
-        }
-        
-        // set item type and model data
-        newItemStack.item = CraftMagicNumbers.getItem(item.vanillaMaterial)
-        newItemTag.putInt("CustomModelData", customModelData)
-        
-        val packetItemData = item.getPacketItemData(newItemStack)
-        
-        //<editor-fold desc="Display", defaultstate="collapsed">
-        val displayTag = newItemTag.getOrPut("display", ::CompoundTag)
-        
-        // name
-        var itemDisplayName: Component?
-        if (!displayTag.contains("Name")) {
-            if (useName) {
-                itemDisplayName = packetItemData.name
-            } else {
-                itemDisplayName = null
-            }
+        if (shouldHideEntireTooltip(itemStack)) {
+            newItemStack.set(DataComponents.HIDE_TOOLTIP, Unit.INSTANCE)
         } else {
-            val customName = displayTag.getString("Name").toAdventureComponentOrEmpty()
-            itemDisplayName = customName.style(customName.style().merge(item.style.decorate(TextDecoration.ITALIC), Style.Merge.Strategy.IF_ABSENT_ON_TARGET))
-        }
-        if (itemDisplayName != null) {
-            // enchanted items with no custom color or complex structure are colored aqua
-            if (Enchantable.isEnchanted(newItemStack) && itemDisplayName.color() == null && itemDisplayName.children().isEmpty())
-                itemDisplayName = itemDisplayName.color(NamedTextColor.AQUA)
-            
-            displayTag.putString("Name", itemDisplayName.withoutPreFormatting().toJson())
+            // generate tooltip server-side and apply as lore
+            applyServerSideTooltip(newItemStack, generateNovaTooltipLore(player, novaItem, novaCompound.keys.size, itemStack))
         }
         
-        val loreTag = displayTag.getOrPut("Lore", ::ListTag)
-        // enchantments
-        val enchantmentsTooltip = buildEnchantmentsTooltip(newItemStack)
-        enchantmentsTooltip.forEach { loreTag += it.withoutPreFormatting().toNBT() }
-        if (packetItemData.glint ?: enchantmentsTooltip.isNotEmpty()) {
-            newItemTag.put("Enchantments", GLINT_ENCHANTMENT_TAG)
-        }
-        // actual lore
-        val itemDisplayLore = packetItemData.lore
-        itemDisplayLore?.forEach { loreTag += it.withoutPreFormatting().toNBT() }
-        // attribute modifier tooltip
-        buildAttributeModifiersTooltip(player?.serverPlayer, newItemStack).forEach { loreTag += it.withoutPreFormatting().toNBT() }
-        // advanced tooltips
-        if (player != null && AdvancedTooltips.hasNovaTooltips(player)) {
-            packetItemData.advancedTooltipsLore?.forEach { loreTag += it.withoutPreFormatting().toNBT() }
-            buildNovaAdvancedTooltip(itemStack, item).forEach { loreTag += it.withoutPreFormatting().toNBT() }
-        }
-        //</editor-fold>
-        
-        //<editor-fold desc="Damage", defaultstate="collapsed">
-        val itemDisplayDurabilityBar = packetItemData.durabilityBar
-        if (itemDisplayDurabilityBar != 1.0) {
-            val maxDurability = newItemStack.item.maxDamage
-            newItemTag.putInt("Damage", maxDurability - (maxDurability * itemDisplayDurabilityBar).toInt())
-        }
-        //</editor-fold>
-        
-        //<editor-fold desc="HideFlags">
-        val hiddenFlags = packetItemData.hiddenFlags
-        if (hiddenFlags.isNotEmpty()) {
-            newItemTag.putInt("HideFlags", newItemTag.getInt("HideFlags") or HideableFlag.toInt(hiddenFlags))
-        }
-        //</editor-fold>
+        // save server-side nbt data (for creative mode)
+        // this also drops existing custom data, which is ignored by the client anyway
+        if (storeServerSideTag)
+            storeServerSideTag(newItemStack, itemStack)
         
         return newItemStack
     }
     
+    private fun buildClientSideDataComponentsPatch(vanilla: Item, nova: NovaItem, patch: DataComponentPatch): DataComponentPatch {
+        val builder = DataComponentPatch.builder()
+        
+        // remove vanilla default base components
+        for (vanillaBase in vanilla.components()) {
+            builder.remove(vanillaBase.type)
+        }
+        
+        // add nova default base components
+        mergeIntoClientSidePatch(builder, nova.baseDataComponents)
+        // add nova default patch components
+        mergeIntoClientSidePatch(builder, nova.defaultPatch)
+        // add actual item stack patch components
+        mergeIntoClientSidePatch(builder, patch)
+        
+        return builder.build()
+    }
+    
+    private fun mergeIntoClientSidePatch(builder: DataComponentPatch.Builder, base: DataComponentMap) {
+        for (customBase in base) {
+            if (isIrrelevantClientSideComponent(customBase.type))
+                continue
+            
+            builder.set(customBase)
+        }
+    }
+    
+    private fun mergeIntoClientSidePatch(builder: DataComponentPatch.Builder, patch: DataComponentPatch) {
+        for ((type, valueOpt) in patch.entrySet()) {
+            if (isIrrelevantClientSideComponent(type))
+                continue
+            
+            if (valueOpt.isPresent) {
+                builder.set(TypedDataComponent.createUnchecked(type, valueOpt.get()))
+            } else {
+                builder.remove(type)
+            }
+        }
+    }
+    
+    private fun isIrrelevantClientSideComponent(type: DataComponentType<*>): Boolean {
+        return type == DataComponents.CUSTOM_DATA
+    }
+    
     private fun getUnknownItem(itemStack: MojangStack, id: String?, modelId: String = "default"): MojangStack {
-        val newItemStack = itemStack.copy()
-        newItemStack.item = Items.BARRIER
-        val tag = newItemStack.tag!!
+        return MojangStack(Items.BARRIER).apply {
+            set(
+                DataComponents.ITEM_NAME,
+                Component.text(
+                    "Unknown item: $id" + if (modelId != "default") ":$modelId" else "",
+                    NamedTextColor.RED
+                ).toNMSComponent()
+            )
+            storeServerSideTag(this, itemStack)
+        }
+    }
+    
+    private fun generateNovaTooltipLore(player: Player?, novaItem: NovaItem, cbfTagCount: Int, itemStack: MojangStack): List<Component> {
+        val isAdvanced = player?.let(AdvancedTooltips::hasNovaTooltips) ?: false
+        val lore = generateTooltipLore(player, itemStack).toMutableList()
         
-        // remove custom model data
-        tag.putInt("CustomModelData", 0)
+        // entire tooltip is hidden
+        if (lore.isEmpty())
+            return emptyList()
         
-        // save server-side nbt data
-        tag.put("NovaServerSideTag", itemStack.tag!!)
+        if (isAdvanced) {
+            // nova item id
+            lore[lore.size - 2] = Component.text(
+                novaItem.id.toString(),
+                NamedTextColor.DARK_GRAY
+            )
+            
+            // cbf tag count
+            if (cbfTagCount > 0) {
+                lore += Component.translatable(
+                    "item.cbf_tags",
+                    NamedTextColor.DARK_GRAY,
+                    Component.text(cbfTagCount)
+                )
+            }
+        }
         
-        // overwrite display tag with "missing model" name
-        val nameComponent = Component.text(
-            "Unknown item: $id" + if (modelId != "default") ":$modelId" else "",
-            NamedTextColor.RED
-        )
-        
-        val displayTag = CompoundTag().also { tag.put("display", it) }
-        displayTag.putString("Name", nameComponent.withoutPreFormatting().toJson())
-        
-        return newItemStack
+        return lore
     }
     //</editor-fold>
     
     //<editor-fold desc="Vanilla", defaultstate="collapsed">
-    // TODO: respect hide-flags for enchantments and modifiers
-    private fun getClientsideVanillaStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean): MojangStack {
+    private fun getClientSideVanillaStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean): MojangStack {
         val newItemStack = itemStack.copy()
         
-        updateContainerContentsIfRequired(player, itemStack)
-        correctArmorColorIfRequired(itemStack)
-        
-        val tag = newItemStack.orCreateTag
-        val loreTag = tag
-            .getOrPut("display", ::CompoundTag)
-            .getOrPut("Lore", ::ListTag)
-        
-        // enchantments tooltip (above normal lore text)
-        val enchantmentsTooltip = buildEnchantmentsTooltip(itemStack)
-        enchantmentsTooltip.forEachIndexed { idx, line -> loreTag.add(idx, line.withoutPreFormatting().toNBT()) }
-        if (enchantmentsTooltip.isNotEmpty() && !tag.contains("Enchantments")) tag.put("Enchantments", GLINT_ENCHANTMENT_TAG) // ensures glint effect
-        // attributes tooltip
-        buildAttributeModifiersTooltip(player?.serverPlayer, newItemStack).forEach { loreTag += it.withoutPreFormatting().toNBT() }
-        // advanced tooltips
-        if (player != null && tag.getInt("CustomModelData") == 0 && AdvancedTooltips.hasVanillaTooltips(player)) {
-            buildVanillaAdvancedTooltip(itemStack, itemStack.item).forEach { loreTag += it.withoutPreFormatting().toNBT() }
+        correctArmorColor(newItemStack)
+        if (shouldHideEntireTooltip(itemStack)) {
+            newItemStack.set(DataComponents.HIDE_TOOLTIP, Unit.INSTANCE)
+        } else if (itemStack.unsafeCustomData?.contains(SKIP_SERVER_SIDE_TOOLTIP) != true) {
+            applyServerSideTooltip(newItemStack, generateTooltipLore(player, itemStack))
+        } else {
+            disableClientSideTooltip(newItemStack)
         }
         
-        // hide flags
-        var hideFlags = HideableFlag.modifyInt(tag.getInt("HideFlags"), HideableFlag.ENCHANTMENTS, HideableFlag.MODIFIERS)
-        if (itemStack.item == Items.ENCHANTED_BOOK)
-            hideFlags = hideFlags or HideableFlag.ADDITIONAL.mask
-        tag.putInt("HideFlags", hideFlags)
-        
-        // save server-side nbt data
-        if (storeServerSideTag) {
-            newItemStack.orCreateTag.put("NovaServerSideTag", itemStack.orCreateTag)
-        }
+        // save server-side nbt data (for creative mode)
+        // this also drops existing custom data, which is ignored by the client anyway
+        if (storeServerSideTag)
+            storeServerSideTag(newItemStack, itemStack)
         
         return newItemStack
     }
     
-    private fun updateContainerContentsIfRequired(player: Player?, itemStack: MojangStack) {
-        when (itemStack.item) {
-            Items.BUNDLE -> {
-                val tag = itemStack.tag
-                val items = tag?.getOrNull<ListTag>("Items") ?: return
-                
-                val newItems = convertItemList(player, items)
-                if (newItems != items)
-                    tag.put("Items", newItems)
-            }
+    private fun correctArmorColor(itemStack: MojangStack) {
+        itemStack.update(DataComponents.DYED_COLOR) { color ->
+            val rgb = color.rgb
             
-            in SHULKER_BOX_ITEMS -> {
-                val blockEntityTag = itemStack.tag?.getOrNull<CompoundTag>("BlockEntityTag")
-                val items = blockEntityTag?.getOrNull<ListTag>("Items") ?: return
-                
-                val newItems = convertItemList(player, items)
-                if (newItems != items)
-                    blockEntityTag.put("Items", newItems)
-            }
-        }
-    }
-    
-    private fun convertItemList(player: Player?, list: ListTag): ListTag {
-        val newList = list.copy()
-        var changed = false
-        newList.forEachIndexed { idx, itemStack ->
-            itemStack as CompoundTag
-            val newItemStack = getClientSideStack(player, itemStack, useName = true, storeServerSideTag = false)
-            if (newItemStack != itemStack) {
-                newList[idx] = newItemStack
-                changed = true
-            }
-        }
-        
-        return if (changed) newList else list
-    }
-    
-    private fun correctArmorColorIfRequired(itemStack: MojangStack) {
-        val item = itemStack.item
-        if (item == Items.LEATHER_BOOTS
-            || item == Items.LEATHER_LEGGINGS
-            || item == Items.LEATHER_CHESTPLATE
-            || item == Items.LEATHER_HELMET
-        ) {
-            val displayTag = itemStack.tag?.getOrNull<CompoundTag>("display") ?: return
-            val color = displayTag.getOrNull<IntTag>("color")?.asInt
             // custom armor only uses odd color codes, items from custom armor services are allowed to have any color
-            if (color != null && color % 2 != 0 && CustomItemServiceManager.getId(itemStack.bukkitMirror) == null) {
-                displayTag.putInt("color", color - 1)
+            if (rgb % 2 != 0 && CustomItemServiceManager.getId(itemStack.bukkitMirror) == null) {
+                return@update DyedItemColor(rgb - 1, color.showInTooltip)
             }
+            return@update DyedItemColor(rgb, color.showInTooltip)
         }
     }
-    
     //</editor-fold>
     
     //<editor-fold desc="tooltip", defaultstate="collapsed">
-    private fun buildEnchantmentsTooltip(itemStack: MojangStack): List<Component> {
-        val enchantments = Enchantable.getEnchantments(itemStack).takeUnlessEmpty()
-            ?: Enchantable.getStoredEnchantments(itemStack).takeUnlessEmpty()
-            ?: return emptyList()
-        
-        val lore = ArrayList<Component>()
-        for ((enchantment, level) in enchantments) {
-            lore += Component.text().apply {
-                it.color(if (enchantment.isCurse) NamedTextColor.RED else NamedTextColor.GRAY)
-                it.append(Component.translatable(enchantment.localizedName))
-                it.append(Component.text(" "))
-                if (!enchantment.isCurse) it.append(Component.translatable("enchantment.level.$level"))
-            }.build()
+    private fun applyServerSideTooltip(itemStack: ItemStack, tooltip: List<Component>) {
+        val lore = tooltip.fold(ItemLore.EMPTY) { l, line ->
+            l.withLineAdded(line.withoutPreFormatting().toNMSComponent())
         }
-        
-        return lore
+        itemStack.set(DataComponents.LORE, lore)
+        disableClientSideTooltip(itemStack)
     }
     
-    private fun buildAttributeModifiersTooltip(player: ServerPlayer?, itemStack: MojangStack): List<Component> {
-        if (HideableFlag.MODIFIERS.isHidden(itemStack.tag?.getInt("HideFlags") ?: 0))
+    private fun generateTooltipLore(player: Player?, itemStack: MojangStack): List<Component> {
+        val isAdvanced = player?.let(AdvancedTooltips::hasNovaTooltips) ?: false
+        
+        val lore = itemStack.getTooltipLines(
+            Item.TooltipContext.of(REGISTRY_ACCESS),
+            player?.serverPlayer,
+            if (isAdvanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
+        ).mapTo(ArrayList()) { it.toAdventureComponent() }
+        
+        // entire tooltip is hidden
+        if (lore.isEmpty())
             return emptyList()
         
-        // if the item has custom modifiers set, all default modifiers are ignored
-        val hasCustomModifiers = itemStack.tag?.contains("AttributeModifiers", Tag.TAG_LIST.toInt()) == true
-        
-        val lore = ArrayList<Component>()
-        EquipmentSlot.entries.forEach { slot ->
-            val modifiers: List<AttributeModifier>
-            if (hasCustomModifiers) {
-                // use custom attribute modifiers from nbt data
-                modifiers = ItemUtils.getCustomAttributeModifiers(itemStack, slot)
-            } else {
-                val novaItem = itemStack.novaItem
-                if (novaItem != null) {
-                    // use base attribute modifiers from nova item
-                    modifiers = novaItem.attributeModifiers[slot] ?: emptyList()
-                } else {
-                    // use base attribute modifiers from vanilla item
-                    modifiers = itemStack.item.getDefaultAttributeModifiers(slot).entries().map { (attribute, modifier) ->
-                        AttributeModifier(modifier.id, modifier.name, attribute, modifier.operation, modifier.amount, true, slot)
-                    }
-                }
-            }
-            
-            if (modifiers.isEmpty() || modifiers.none { it.showInLore && it.value != 0.0 })
-                return@forEach
-            
-            lore += Component.empty()
-            lore += Component.translatable("item.modifiers.${slot.name.lowercase()}", NamedTextColor.GRAY)
-            
-            modifiers.asSequence()
-                .filter { it.showInLore && it.value != 0.0 }
-                .forEach { modifier ->
-                    var value = modifier.value
-                    var isBaseModifier = false
-                    
-                    when (modifier.uuid) {
-                        Tool.BASE_ATTACK_DAMAGE_UUID -> {
-                            value += player?.getAttributeBaseValue(Attributes.ATTACK_DAMAGE) ?: 1.0
-                            value += EnchantmentHelper.getDamageBonus(itemStack, MobType.UNDEFINED)
-                            isBaseModifier = true
-                        }
-                        
-                        Tool.BASE_ATTACK_SPEED_UUID -> {
-                            value += player?.getAttributeBaseValue(Attributes.ATTACK_SPEED) ?: 4.0
-                            isBaseModifier = true
-                        }
-                    }
-                    
-                    var displayedValue = if (modifier.operation == Operation.ADDITION) {
-                        if (modifier.attribute == Attributes.KNOCKBACK_RESISTANCE) {
-                            value * 10.0 // vanilla behavior
-                        } else value
-                    } else value * 100.0
-                    
-                    fun appendModifier(type: String, color: TextColor) {
-                        lore += Component.text()
-                            .append(Component.text(if (isBaseModifier) " " else ""))
-                            .append(Component.translatable(
-                                "attribute.modifier.$type.${modifier.operation.ordinal}",
-                                color,
-                                Component.text(ATTRIBUTE_DECIMAL_FORMAT.format(displayedValue)),
-                                Component.translatable(modifier.attribute.descriptionId)
-                            ))
-                            .build()
-                    }
-                    
-                    if (isBaseModifier) {
-                        appendModifier("equals", NamedTextColor.DARK_GREEN)
-                    } else if (value > 0.0) {
-                        appendModifier("plus", NamedTextColor.BLUE)
-                    } else if (value < 0.0) {
-                        displayedValue *= -1
-                        appendModifier("take", NamedTextColor.RED)
-                    }
-                }
-        }
+        lore.removeAt(0) // item name
         
         return lore
     }
     
-    private fun buildVanillaAdvancedTooltip(itemStack: MojangStack, item: Item): List<Component> {
-        val tag = itemStack.orCreateTag
-        val novaCompound = itemStack.novaCompoundOrNull
-        val nbtTagCount = tag.allKeys.size
-        val cbfTagCount = novaCompound?.keys?.size ?: 0
-        
-        val lore = ArrayList<Component>()
-        
-        val maxDamage = item.maxDamage
-        if (maxDamage > 0) {
-            lore += Component.translatable(
-                "item.durability",
-                NamedTextColor.WHITE,
-                Component.text(maxDamage - itemStack.damageValue),
-                Component.text(maxDamage)
-            )
-        }
-        
-        lore += Component.translatable(
-            BuiltInRegistries.ITEM.getKey(item).toString(),
-            NamedTextColor.DARK_GRAY
-        )
-        
-        if (cbfTagCount > 0)
-            lore += Component.translatable(
-                "item.cbf_tags",
-                NamedTextColor.DARK_GRAY,
-                Component.text(cbfTagCount)
-            )
-        
-        if (nbtTagCount > 0)
-            lore += Component.translatable(
-                "item.nbt_tags",
-                NamedTextColor.DARK_GRAY,
-                Component.text(nbtTagCount)
-            )
-        
-        return lore
+    private fun disableClientSideTooltip(itemStack: MojangStack) {
+        itemStack.update(DataComponents.ATTRIBUTE_MODIFIERS) { it.withTooltip(false) }
+        itemStack.update(DataComponents.CAN_BREAK) { it.withTooltip(false) }
+        itemStack.update(DataComponents.CAN_PLACE_ON) { it.withTooltip(false) }
+        itemStack.update(DataComponents.DYED_COLOR) { it.withTooltip(false) }
+        itemStack.update(DataComponents.ENCHANTMENTS) { it.withTooltip(false) }
+        itemStack.update(DataComponents.JUKEBOX_PLAYABLE) { it.withTooltip(false) }
+        itemStack.update(DataComponents.STORED_ENCHANTMENTS) { it.withTooltip(false) }
+        itemStack.update(DataComponents.TRIM) { it.withTooltip(false) }
+        itemStack.update(DataComponents.UNBREAKABLE) { it.withTooltip(false) }
+        // this disables all other tooltips that cannot be disabled through a specific component
+        // it also disables the bundle preview image, but since bundles are still experimental, this is fine
+        itemStack.set(DataComponents.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE)
     }
     
-    private fun buildNovaAdvancedTooltip(itemStack: MojangStack, item: NovaItem): List<Component> {
-        var cbfTagCount = 0
-        var nbtTagCount = itemStack.orCreateTag.allKeys.size - 1 // don't count 'nova' tag
-        
-        val lore = ArrayList<Component>()
-        
-        val damageable = item.getBehaviorOrNull<Damageable>()
-        if (damageable != null) {
-            val maxDurability = damageable.maxDurability
-            lore += Component.translatable(
-                "item.durability",
-                NamedTextColor.WHITE,
-                Component.text(maxDurability - damageable.getDamage(itemStack)),
-                Component.text(maxDurability)
-            )
-        }
-        
-        lore += Component.text(item.id.toString(), NamedTextColor.DARK_GRAY)
-        
-        val novaCompound = itemStack.novaCompoundOrNull
-        if (novaCompound != null) {
-            cbfTagCount = novaCompound.keys.size
-            nbtTagCount -= 1 // don't count 'nova_cbf' tag
-        }
-        
-        if (cbfTagCount > 0)
-            lore += Component.translatable(
-                "item.cbf_tags",
-                NamedTextColor.DARK_GRAY,
-                Component.text(cbfTagCount)
-            )
-        
-        if (nbtTagCount > 0)
-            lore += Component.translatable(
-                "item.nbt_tags",
-                NamedTextColor.DARK_GRAY,
-                Component.text(nbtTagCount)
-            )
-        
-        return lore
+    private fun shouldHideEntireTooltip(itemStack: MojangStack): Boolean {
+        // all items in InvUI guis have a "slot" tag in the pdc
+        // the goal here is to hide the tooltip of all gui items with no name
+        return itemStack.asBukkitMirror().persistentDataContainer.has(INVUI_SLOT_KEY)
+            && itemStack.hoverName.toAdventureComponent().toPlainText().isBlank()
     }
     //</editor-fold>
     //</editor-fold>
     
     //<editor-fold desc="client-side stack -> server-side stack", defaultstate="collapsed">
-    fun getServerSideStack(itemStack: CompoundTag): CompoundTag {
-        val tag = itemStack.getOrNull<CompoundTag>("tag")
-        val serversideTag = tag
-            ?.getOrNull<CompoundTag>("NovaServerSideTag")
-            ?: return itemStack
-        
-        val serverSideStack = CompoundTag()
-        
-        // use server-side item for all Nova items, otherwise keep current item id
-        if (tag.contains("nova", NBTUtils.TAG_COMPOUND)) {
-            serverSideStack.putString("id", SERVER_SIDE_ITEM_ID)
-        } else serverSideStack.putString("id", itemStack.getString("id"))
-        // copy count
-        serverSideStack.putInt("Count", serverSideStack.getInt("Count"))
-        // apply server-side tag
-        serverSideStack.put("tag", serversideTag)
-        
-        return serverSideStack
-    }
-    
     fun getServerSideStack(itemStack: MojangStack): MojangStack {
-        val tag = itemStack.tag
-        val serversideTag = tag
-            ?.getOrNull<CompoundTag>("NovaServerSideTag")
+        val serversideTag = itemStack.get(DataComponents.CUSTOM_DATA)?.unsafe
+            ?.getCompoundOrNull("NovaServerSideTag")
             ?: return itemStack
         
         // use server-side item for all Nova items, otherwise keep current item
-        val item = if (tag.contains("nova", NBTUtils.TAG_COMPOUND)) SERVER_SIDE_ITEM else itemStack.item
-        val serversideStack = ItemStack(item)
-        // copy count
-        serversideStack.count = itemStack.count
-        // apply server-side tag
-        serversideStack.tag = serversideTag
+        val item = if (serversideTag.contains("nova", NBTUtils.TAG_COMPOUND))
+            SERVER_SIDE_ITEM_HOLDER
+        else itemStack.itemHolder
         
-        return serversideStack
+        return MojangStack(item, itemStack.count, decodeComponents(serversideTag))
     }
     //</editor-fold>
+    
+    private fun storeServerSideTag(clientSide: MojangStack, serverSide: MojangStack) {
+        clientSide.set(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag().apply {
+            put("NovaServerSideTag", encodeComponents(serverSide))
+        }))
+    }
+    
+    private fun encodeComponents(itemStack: MojangStack): Tag {
+        val patch = itemStack.componentsPatch
+        return DataComponentPatch.CODEC.encodeStart(
+            RegistryOps.create(NbtOps.INSTANCE, REGISTRY_ACCESS),
+            patch
+        ).getOrThrow()
+    }
+    
+    private fun decodeComponents(components: Tag): DataComponentPatch {
+        return DataComponentPatch.CODEC.decode(Dynamic(
+            RegistryOps.create(NbtOps.INSTANCE, REGISTRY_ACCESS),
+            components
+        )).getFirstOrThrow()
+    }
     
 }

@@ -4,7 +4,6 @@ package xyz.xenondevs.nova.data.resources.lookup
 
 import org.bukkit.Material
 import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.resources.builder.task.EnchantmentData
 import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.data.resources.builder.task.font.GuiTextureData
 import xyz.xenondevs.nova.item.NovaItem
@@ -27,7 +26,7 @@ internal object ResourceLookups {
      * Lookup for getting the relevant [LinkedBlockModelProvider] for every [NovaBlockState].
      */
     var BLOCK_MODEL_LOOKUP: ResourceLookup<Map<NovaBlockState, LinkedBlockModelProvider<*>>> =
-        resourceLookup("block_models", typeOf<HashMap<NovaBlockState, LinkedBlockModelProvider<*>>>())
+        resourceLookup("block_models", emptyMap(), typeOf<HashMap<NovaBlockState, LinkedBlockModelProvider<*>>>())
     
     /**
      * Map of [NovaBlockState] to the relevant [LinkedBlockModelProvider].
@@ -36,30 +35,30 @@ internal object ResourceLookups {
     
     /**
      * Lookup for getting the relevant custom-model-data using named item models.
-     * 
+     *
      * Format: ``Map<NovaItem, Map<Vanilla Material, Map<Model Name, Custom Model Data>>>``
      */
     var NAMED_ITEM_MODEL_LOOKUP: ResourceLookup<Map<NovaItem, Map<Material, Map<String, Int>>>> =
-        resourceLookup("named_item_models", typeOf<HashMap<NovaItem, EnumMap<Material, HashMap<String, Int>>>>())
+        resourceLookup("named_item_models", emptyMap(), typeOf<HashMap<NovaItem, EnumMap<Material, HashMap<String, Int>>>>())
     
     /**
      * Map of [NovaItem] to the relevant custom-model-data using named item models.
-     * 
+     *
      * Format: ``Map<VanillaMaterial, Map<ModelName, CustomModelData>``
      */
     var NAMED_ITEM_MODEL: Map<NovaItem, Map<Material, Map<String, Int>>> by NAMED_ITEM_MODEL_LOOKUP
     
     /**
      * Lookup for getting the relevant custom-model-data using unnamed item models.
-     * 
+     *
      * Format: ``Map<NovaItem, Map<VanillaMaterial, CustomModelData[]>>``
      */
     var UNNAMED_ITEM_MODEL_LOOKUP: ResourceLookup<Map<NovaItem, Map<Material, IntArray>>> =
-        resourceLookup("unnamed_item_models", typeOf<HashMap<NovaItem, EnumMap<Material, IntArray>>>())
+        resourceLookup("unnamed_item_models", emptyMap(), typeOf<HashMap<NovaItem, EnumMap<Material, IntArray>>>())
     
     /**
      * Map of [NovaItem] to the relevant custom-model-data using unnamed item models.
-     * 
+     *
      * Format: ``Map<NovaItem, Map<VanillaMaterial, CustomModelData[]>>``
      */
     var UNNAMED_ITEM_MODEL: Map<NovaItem, Map<Material, IntArray>> by UNNAMED_ITEM_MODEL_LOOKUP
@@ -68,7 +67,7 @@ internal object ResourceLookups {
      * Lookup for getting the leather armor color value for every custom [Armor] type.
      */
     val ARMOR_COLOR_LOOKUP: ResourceLookup<Map<Armor, Int>> =
-        resourceLookup("armor_color", typeOf<HashMap<Armor, Int>>())
+        resourceLookup("armor_color", emptyMap(), typeOf<HashMap<Armor, Int>>())
     
     /**
      * Map of [Armor] to the leather armor color value.
@@ -77,39 +76,24 @@ internal object ResourceLookups {
     
     /**
      * Lookup for getting translations.
-     * 
+     *
      * Format: ``Map<Language, Map<TranslationKey, Translation>>``
      */
     var LANGUAGE_LOOKUP: ResourceLookup<Map<String, Map<String, String>>> =
-        resourceLookup("language_lookup", typeOf<HashMap<String, HashMap<String, String>>>())
+        resourceLookup("language_lookup", emptyMap(), typeOf<HashMap<String, HashMap<String, String>>>())
     
     /**
      * Map of translations.
-     * 
+     *
      * Format: ``Map<Language, Map<TranslationKey, Translation>>``
      */
     var LANGUAGE: Map<String, Map<String, String>> by LANGUAGE_LOOKUP
     
     /**
-     * Lookup for getting the different [EnchantmentData] for each language.
-     * 
-     * Format: ``Map<Language, EnchantmentData>``
-     */
-    var ENCHANTMENT_DATA_LOOKUP: ResourceLookup<Map<String, EnchantmentData>> =
-        resourceLookup("enchantment_data_lookup", typeOf<HashMap<String, EnchantmentData>>())
-    
-    /**
-     * Map of [EnchantmentData] for each language.
-     * 
-     * Format: ``Map<Language, EnchantmentData>``
-     */
-    var ENCHANTMENT_DATA: Map<String, EnchantmentData> by ENCHANTMENT_DATA_LOOKUP
-    
-    /**
      * Lookup for getting the [FontChar] for every [GuiTexture].
      */
     val GUI_TEXTURE_LOOKUP: ResourceLookup<Map<GuiTexture, GuiTextureData>> =
-        resourceLookup("gui_texture_lookup", typeOf<HashMap<GuiTexture, GuiTextureData>>())
+        resourceLookup("gui_texture_lookup", emptyMap(), typeOf<HashMap<GuiTexture, GuiTextureData>>())
     
     /**
      * Map of [GuiTexture] to the [FontChar].
@@ -119,7 +103,7 @@ internal object ResourceLookups {
     /**
      * The first code-point that is a move character in the minecraft:default font.
      */
-    var MOVE_CHARACTERS_OFFSET by resourceLookup<Int>("move_characters_offset")
+    var MOVE_CHARACTERS_OFFSET by resourceLookup<Int>("move_characters_offset", 0)
     
     /**
      * Lookup for Waila icons.
@@ -133,14 +117,14 @@ internal object ResourceLookups {
     val TEXTURE_ICON_LOOKUP: IdResourceLookup<FontChar> =
         idResourceLookup<FontChar>("texture_icon_lookup")
     
-    private inline fun <reified T : Any> resourceLookup(key: String): ResourceLookup<T> {
-        val lookup = ResourceLookup<T>(key, typeOf<T>())
+    private inline fun <reified T : Any> resourceLookup(key: String, empty: T): ResourceLookup<T> {
+        val lookup = ResourceLookup<T>(key, typeOf<T>(), empty)
         lookups += lookup
         return lookup
     }
     
-    private fun <T : Any> resourceLookup(key: String, type: KType): ResourceLookup<T> {
-        val lookup = ResourceLookup<T>(key, type)
+    private fun <T : Any> resourceLookup(key: String, empty: T, type: KType): ResourceLookup<T> {
+        val lookup = ResourceLookup<T>(key, type, empty)
         lookups += lookup
         return lookup
     }

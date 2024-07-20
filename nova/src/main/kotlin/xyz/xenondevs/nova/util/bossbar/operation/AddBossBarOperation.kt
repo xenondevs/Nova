@@ -1,10 +1,12 @@
 package xyz.xenondevs.nova.util.bossbar.operation
 
-import io.netty.buffer.Unpooled
 import net.kyori.adventure.text.Component
 import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.world.BossEvent
+import xyz.xenondevs.nova.util.RegistryFriendlyByteBuf
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
+import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
 import net.minecraft.network.chat.Component as MojangComponent
@@ -20,8 +22,8 @@ class AddBossBarOperation(
 ) : BossBarOperation() {
     
     override fun toNMS(): Any {
-        val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeComponent(name)
+        val buf = RegistryFriendlyByteBuf()
+        ComponentSerialization.TRUSTED_STREAM_CODEC.encode(buf, name.toNMSComponent())
         buf.writeFloat(progress)
         buf.writeEnum(color)
         buf.writeEnum(overlay)

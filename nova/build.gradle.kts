@@ -10,7 +10,7 @@ plugins {
 dependencies {
     // server
     paperweight.paperDevBundle(libs.versions.paper)
-    configurations.getByName("mojangMappedServer").apply { 
+    configurations.getByName("mojangMappedServer").apply {
         exclude("org.spongepowered", "configurate-yaml")
     }
     
@@ -27,7 +27,7 @@ dependencies {
     compileOnly(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
-    novaLoader(variantOf(libs.inventoryaccess) { classifier("remapped-mojang") })
+    novaLoader(libs.inventoryaccess)
     novaLoader(libs.bstats)
     novaLoader(libs.bytbase.runtime)
     novaLoader(libs.fuzzywuzzy)
@@ -58,6 +58,13 @@ tasks {
     
     test {
         useJUnitPlatform()
+    }
+}
+
+// remove "dev" classifier set by paperweight-userdev
+afterEvaluate {
+    tasks.getByName<Jar>("jar") {
+        archiveClassifier = ""
     }
 }
 

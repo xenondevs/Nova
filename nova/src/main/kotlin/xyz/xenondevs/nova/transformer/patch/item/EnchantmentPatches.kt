@@ -1,69 +1,149 @@
-@file:Suppress("IntroduceWhenSubject")
-
 package xyz.xenondevs.nova.transformer.patch.item
 
-import net.minecraft.core.BlockPos
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.inventory.EnchantmentMenu
-import net.minecraft.world.inventory.GrindstoneMenu
+import net.minecraft.core.Holder
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.Level
+import net.minecraft.world.item.enchantment.Enchantment
+import net.minecraft.world.item.enchantment.EnchantmentHelper
+import org.bukkit.craftbukkit.enchantments.CraftEnchantment
+import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.MethodInsnNode
+import org.objectweb.asm.tree.MethodNode
+import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
+import xyz.xenondevs.bytebase.util.calls
+import xyz.xenondevs.bytebase.util.replaceFirstRange
 import xyz.xenondevs.nova.item.behavior.Enchantable
+import xyz.xenondevs.nova.item.enchantment.CustomEnchantmentLogic
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.ServerSoftware
-import xyz.xenondevs.nova.util.ServerUtils
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
-import xyz.xenondevs.nova.world.block.logic.tileentity.EnchantmentTableLogic
-import xyz.xenondevs.nova.world.block.logic.tileentity.GrindstoneLogic
+import xyz.xenondevs.nova.util.item.novaItem
+import java.util.*
 
-// for future reference: https://i.imgur.com/IGlChz6.png
-private val ENCHANTMENT_MENU_SLOTS_CHANGED_LAMBDA = ReflectionUtils.getMethod(
-    EnchantmentMenu::class,
-    true,
-    if (ServerUtils.SERVER_SOFTWARE == ServerSoftware.PURPUR) "lambda\$slotsChanged\$1" else "lambda\$slotsChanged$0",
-    ItemStack::class, Level::class, BlockPos::class
-)
-
-// for future reference: https://i.imgur.com/PyYEYD5.png
-private val ENCHANTMENT_MENU_CLICK_MENU_BUTTON_LAMBDA = ReflectionUtils.getMethod(
-    EnchantmentMenu::class,
-    true,
-    if (ServerUtils.SERVER_SOFTWARE == ServerSoftware.PURPUR) "lambda\$clickMenuButton\$2" else "lambda\$clickMenuButton$1",
-    ItemStack::class, Int::class, Player::class, Int::class, ItemStack::class, Level::class, BlockPos::class
-)
-
-private val GRINDSTONE_MENU_MERGE_ENCHANTS = ReflectionUtils.getMethod(
-    GrindstoneMenu::class,
-    true, "mergeEnchants",
-    ItemStack::class, ItemStack::class
-)
-
-private val GRINDSTONE_MENU_REMOVE_NON_CURSES = ReflectionUtils.getMethod(
-    GrindstoneMenu::class,
-    true, "removeNonCurses",
-    ItemStack::class, Int::class, Int::class
-)
-
-// for future reference: https://i.imgur.com/5R9nyxC.png
-private val GRINDSTONE_MENU_RESULT_SLOT_CLASS = ReflectionUtils.getClass("net.minecraft.world.inventory.GrindstoneMenu$4").kotlin
-private val GRINDSTONE_MENU_RESULT_SLOT_GET_EXPERIENCE_FROM_ITEM = ReflectionUtils.getMethod(
-    GRINDSTONE_MENU_RESULT_SLOT_CLASS,
-    true,
-    "getExperienceFromItem",
-    ItemStack::class
-)
-
-internal object EnchantmentPatches : MultiTransformer(ItemStack::class, EnchantmentMenu::class, GrindstoneMenu::class, GRINDSTONE_MENU_RESULT_SLOT_CLASS) {
+internal object EnchantmentPatches : MultiTransformer(Enchantment::class, EnchantmentHelper::class, ItemStack::class) {
+    
+    val customEnchantments = IdentityHashMap<Enchantment, CustomEnchantmentLogic>()
     
     override fun transform() {
-        VirtualClassPath[ItemStack::isEnchantable].delegateStatic(ReflectionUtils.getMethodByName(Enchantable::class, false, "isEnchantable"))
-        VirtualClassPath[ItemStack::isEnchanted].delegateStatic(ReflectionUtils.getMethodByName(Enchantable::class, false, "isEnchanted"))
-        VirtualClassPath[ENCHANTMENT_MENU_SLOTS_CHANGED_LAMBDA].delegateStatic(EnchantmentTableLogic::enchantmentMenuPrepareClues)
-        VirtualClassPath[ENCHANTMENT_MENU_CLICK_MENU_BUTTON_LAMBDA].delegateStatic(EnchantmentTableLogic::enchantmentMenuEnchant)
-        VirtualClassPath[GRINDSTONE_MENU_MERGE_ENCHANTS].delegateStatic(GrindstoneLogic::grindstoneMenuMergeEnchants)
-        VirtualClassPath[GRINDSTONE_MENU_REMOVE_NON_CURSES].delegateStatic(GrindstoneLogic::grindstoneMenuRemoveNonCurses)
-        VirtualClassPath[GRINDSTONE_MENU_RESULT_SLOT_GET_EXPERIENCE_FROM_ITEM].delegateStatic(GrindstoneLogic::resultSlotGetExperienceFromItem)
+        VirtualClassPath[Enchantment::isPrimaryItem].delegateStatic(::isPrimaryItem)
+        VirtualClassPath[Enchantment::isSupportedItem].delegateStatic(::isSupportedItem)
+        VirtualClassPath[Enchantment::canEnchant].delegateStatic(::isSupportedItem)
+        VirtualClassPath[Enchantment::getMinCost].delegateStatic(::getMinCost)
+        VirtualClassPath[Enchantment::getMaxCost].delegateStatic(::getMaxCost)
+        VirtualClassPath[Enchantment::areCompatible].delegateStatic(::areCompatible)
+        VirtualClassPath[ItemStack::isEnchantable].delegateStatic(::isEnchantable)
+        patchEnchantmentCostRetrieval(VirtualClassPath[EnchantmentHelper::getEnchantmentCost])
+        patchEnchantmentCostRetrieval(VirtualClassPath[EnchantmentHelper::selectEnchantment])
+    }
+    
+    private fun patchEnchantmentCostRetrieval(methodNode: MethodNode) {
+        // EnchantmentHelper::getEnchantmentCost and EnchantmentHelper::selectEnchantment only use Item instance to retrieve enchantmentValue
+        
+        methodNode.replaceFirstRange(
+            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ItemStack::getItem) },
+            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Item::getEnchantmentValue) },
+            0, 0,
+            buildInsnList {
+                invokeStatic(::getEnchantmentValue)
+            }
+        )
+    }
+    
+    @JvmStatic
+    fun getEnchantmentValue(itemStack: ItemStack): Int {
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) {
+            return novaItem.getBehaviorOrNull<Enchantable>()?.enchantmentValue ?: 0
+        }
+        
+        return itemStack.item.enchantmentValue
+    }
+    
+    @JvmStatic
+    fun isPrimaryItem(enchantment: Enchantment, itemStack: ItemStack): Boolean {
+        if (customEnchantments[enchantment]?.isPrimaryItem(itemStack.asBukkitMirror()) == true)
+            return true
+        
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) {
+            val bukkitEnchantment = CraftEnchantment.minecraftToBukkit(enchantment)
+            return novaItem.getBehaviorOrNull<Enchantable>()
+                ?.primaryEnchantments
+                ?.contains(bukkitEnchantment) == true
+        } else {
+            return isSupportedItem(enchantment, itemStack)
+                && (enchantment.definition.primaryItems.isEmpty || itemStack.`is`(enchantment.definition.primaryItems.get()))
+        }
+    }
+    
+    @JvmStatic
+    fun isSupportedItem(enchantment: Enchantment, itemStack: ItemStack): Boolean {
+        if (customEnchantments[enchantment]?.isSupportedItem(itemStack.asBukkitMirror()) == true)
+            return true
+        
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) {
+            val bukkitEnchantment = CraftEnchantment.minecraftToBukkit(enchantment)
+            return novaItem.getBehaviorOrNull<Enchantable>()
+                ?.supportedEnchantments
+                ?.contains(bukkitEnchantment) == true
+        } else {
+            return itemStack.`is`(enchantment.definition.supportedItems)
+        }
+    }
+    
+    @JvmStatic
+    fun getMinCost(enchantment: Enchantment, level: Int): Int {
+        if (enchantment in customEnchantments)
+            return customEnchantments[enchantment]!!.getMinCost(level)
+        
+        // nms logic
+        return enchantment.definition.minCost.calculate(level)
+    }
+    
+    @JvmStatic
+    fun getMaxCost(enchantment: Enchantment, level: Int): Int {
+        if (enchantment in customEnchantments)
+            return customEnchantments[enchantment]!!.getMaxCost(level)
+        
+        // nms logic
+        return enchantment.definition.maxCost.calculate(level)
+    }
+    
+    @JvmStatic
+    fun areCompatible(first: Holder<Enchantment>, second: Holder<Enchantment>): Boolean {
+        if (first == second)
+            return false
+        
+        val firstCompatSecond: Boolean
+        if (first.value() in customEnchantments) {
+            firstCompatSecond = customEnchantments[first.value()]!!.compatibleWith(second.value())
+        } else {
+            firstCompatSecond = second in first.value().exclusiveSet
+        }
+        
+        val secondCompatFirst: Boolean
+        if (second.value() in customEnchantments) {
+            secondCompatFirst = customEnchantments[second.value()]!!.compatibleWith(first.value())
+        } else {
+            secondCompatFirst = first in second.value().exclusiveSet
+        }
+        
+        return firstCompatSecond && secondCompatFirst
+    }
+    
+    @JvmStatic
+    fun isEnchantable(itemStack: ItemStack): Boolean {
+        val enchantments = itemStack.get(DataComponents.ENCHANTMENTS)
+        if (enchantments === null || !enchantments.isEmpty)
+            return false
+        
+        val novaItem = itemStack.novaItem
+        if (novaItem != null) {
+            return novaItem.hasBehavior<Enchantable>()
+        } else {
+            return itemStack.item.isEnchantable(itemStack)
+        }
     }
     
 }

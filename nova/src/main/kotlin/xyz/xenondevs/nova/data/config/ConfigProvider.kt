@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.data.config
 
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.ConfigurationNode
+import xyz.xenondevs.commons.provider.AbstractProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.map
@@ -32,7 +33,7 @@ open class ConfigProvider internal constructor(
     private val parent: ConfigProvider?,
     private val node: String,
     private val relPath: String,
-) : Provider<CommentedConfigurationNode>() {
+) : AbstractProvider<CommentedConfigurationNode>() {
     
     /**
      * Cache for child node providers.

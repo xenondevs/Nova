@@ -4,15 +4,18 @@ package xyz.xenondevs.nova.util
 
 import com.mojang.datafixers.util.Either
 import com.mojang.serialization.JsonOps
-import com.mojang.serialization.Lifecycle
 import io.leangen.geantyref.TypeToken
+import io.netty.buffer.Unpooled
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
+import net.minecraft.core.RegistrationInfo
 import net.minecraft.core.Registry
+import net.minecraft.core.RegistryAccess
 import net.minecraft.core.Rotations
 import net.minecraft.core.WritableRegistry
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
@@ -40,13 +43,13 @@ import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.BlockData
-import org.bukkit.craftbukkit.v1_20_R3.CraftServer
-import org.bukkit.craftbukkit.v1_20_R3.CraftWorld
-import org.bukkit.craftbukkit.v1_20_R3.block.data.CraftBlockData
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.CraftServer
+import org.bukkit.craftbukkit.CraftWorld
+import org.bukkit.craftbukkit.block.data.CraftBlockData
+import org.bukkit.craftbukkit.entity.CraftEntity
+import org.bukkit.craftbukkit.entity.CraftPlayer
+import org.bukkit.craftbukkit.inventory.CraftItemStack
+import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
@@ -56,7 +59,6 @@ import org.bukkit.util.Vector
 import org.spongepowered.configurate.serialize.TypeSerializer
 import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.serialization.configurate.RegistryEntrySerializer
 import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
@@ -84,17 +86,27 @@ val Entity.nmsEntity: MojangEntity
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
 
+@Deprecated("All bukkit stacks now wrap an nms stack", ReplaceWith("unwrap().copy()", "xyz.xenondevs.nova.util.unwrap"))
 val ItemStack?.nmsCopy: MojangStack
-    get() = CraftItemStack.asNMSCopy(this)
+    get() = unwrap().copy()
 
+// TODO: remove in 0.18
+@Deprecated("All bukkit stacks now wrap an nms stack", ReplaceWith("unwrap()", "xyz.xenondevs.nova.util.unwrap"))
 val ItemStack?.nmsVersion: MojangStack
-    get() = CraftItemStack.unwrap(this)
+    get() = unwrap()
 
+fun ItemStack?.unwrap(): MojangStack =
+    this?.let(CraftItemStack::unwrap) ?: MojangStack.EMPTY
+
+// TODO: remove in 0.18
+@Deprecated("Non-extension method available", ReplaceWith("asBukkitCopy()"))
 val MojangStack.bukkitCopy: ItemStack
-    get() = CraftItemStack.asBukkitCopy(this)
+    get() = asBukkitCopy()
 
+// TODO: remove in 0.18
+@Deprecated("Non-extension method available", ReplaceWith("asBukkitMirror()"))
 val MojangStack.bukkitMirror: ItemStack
-    get() = CraftItemStack.asCraftMirror(this)
+    get() = asBukkitMirror()
 
 val BlockData.nmsBlockState: BlockState
     get() = (this as CraftBlockData).state
@@ -124,14 +136,10 @@ val Player.connection: ServerGamePacketListenerImpl
     get() = serverPlayer.connection
 
 val NamespacedKey.resourceLocation: ResourceLocation
-    get() = ResourceLocation(toString())
+    get() = ResourceLocation.fromNamespaceAndPath(namespace, key)
 
 val ResourceLocation.namespacedKey: NamespacedKey
     get() = NamespacedKey(namespace, path)
-
-@Suppress("DEPRECATION")
-val ResourceLocation.namespacedId: NamespacedId
-    get() = NamespacedId(namespace, path)
 
 internal val ResourceLocation.name: String
     get() = path
@@ -151,6 +159,7 @@ val EquipmentSlot.nmsEquipmentSlot: MojangEquipmentSlot
         EquipmentSlot.LEGS -> MojangEquipmentSlot.LEGS
         EquipmentSlot.CHEST -> MojangEquipmentSlot.CHEST
         EquipmentSlot.HEAD -> MojangEquipmentSlot.HEAD
+        EquipmentSlot.BODY -> MojangEquipmentSlot.BODY
     }
 
 val MojangEquipmentSlot.bukkitEquipmentSlot: EquipmentSlot
@@ -161,10 +170,11 @@ val MojangEquipmentSlot.bukkitEquipmentSlot: EquipmentSlot
         MojangEquipmentSlot.LEGS -> EquipmentSlot.LEGS
         MojangEquipmentSlot.CHEST -> EquipmentSlot.CHEST
         MojangEquipmentSlot.HEAD -> EquipmentSlot.HEAD
+        MojangEquipmentSlot.BODY -> EquipmentSlot.BODY
     }
 
 val MojangEquipmentSlot.nmsInteractionHand: InteractionHand
-    get() = when(this) {
+    get() = when (this) {
         MojangEquipmentSlot.MAINHAND -> InteractionHand.MAIN_HAND
         MojangEquipmentSlot.OFFHAND -> InteractionHand.OFF_HAND
         else -> throw UnsupportedOperationException("Not a hand: $this")
@@ -205,7 +215,6 @@ val Direction.blockFace: BlockFace
 
 val Attribute.nmsAttribute: MojangAttribute
     get() = when (this) {
-        Attribute.GENERIC_MAX_ABSORPTION -> Attributes.MAX_ABSORPTION
         Attribute.GENERIC_MAX_HEALTH -> Attributes.MAX_HEALTH
         Attribute.GENERIC_FOLLOW_RANGE -> Attributes.FOLLOW_RANGE
         Attribute.GENERIC_KNOCKBACK_RESISTANCE -> Attributes.KNOCKBACK_RESISTANCE
@@ -216,20 +225,38 @@ val Attribute.nmsAttribute: MojangAttribute
         Attribute.GENERIC_ATTACK_SPEED -> Attributes.ATTACK_SPEED
         Attribute.GENERIC_ARMOR -> Attributes.ARMOR
         Attribute.GENERIC_ARMOR_TOUGHNESS -> Attributes.ARMOR_TOUGHNESS
+        Attribute.GENERIC_FALL_DAMAGE_MULTIPLIER -> Attributes.FALL_DAMAGE_MULTIPLIER
         Attribute.GENERIC_LUCK -> Attributes.LUCK
-        Attribute.HORSE_JUMP_STRENGTH -> Attributes.JUMP_STRENGTH
+        Attribute.GENERIC_MAX_ABSORPTION -> Attributes.MAX_ABSORPTION
+        Attribute.GENERIC_SAFE_FALL_DISTANCE -> Attributes.SAFE_FALL_DISTANCE
+        Attribute.GENERIC_SCALE -> Attributes.SCALE
+        Attribute.GENERIC_STEP_HEIGHT -> Attributes.STEP_HEIGHT
+        Attribute.GENERIC_GRAVITY -> Attributes.GRAVITY
+        Attribute.GENERIC_JUMP_STRENGTH -> Attributes.JUMP_STRENGTH
+        Attribute.GENERIC_BURNING_TIME -> Attributes.BURNING_TIME
+        Attribute.GENERIC_EXPLOSION_KNOCKBACK_RESISTANCE -> Attributes.EXPLOSION_KNOCKBACK_RESISTANCE
+        Attribute.GENERIC_MOVEMENT_EFFICIENCY -> Attributes.MOVEMENT_EFFICIENCY
+        Attribute.GENERIC_OXYGEN_BONUS -> Attributes.OXYGEN_BONUS
+        Attribute.GENERIC_WATER_MOVEMENT_EFFICIENCY -> Attributes.WATER_MOVEMENT_EFFICIENCY
+        Attribute.PLAYER_BLOCK_INTERACTION_RANGE -> Attributes.BLOCK_INTERACTION_RANGE
+        Attribute.PLAYER_ENTITY_INTERACTION_RANGE -> Attributes.ENTITY_INTERACTION_RANGE
+        Attribute.PLAYER_BLOCK_BREAK_SPEED -> Attributes.BLOCK_BREAK_SPEED
+        Attribute.PLAYER_MINING_EFFICIENCY -> Attributes.MINING_EFFICIENCY
+        Attribute.PLAYER_SNEAKING_SPEED -> Attributes.SNEAKING_SPEED
+        Attribute.PLAYER_SUBMERGED_MINING_SPEED -> Attributes.SUBMERGED_MINING_SPEED
+        Attribute.PLAYER_SWEEPING_DAMAGE_RATIO -> Attributes.SWEEPING_DAMAGE_RATIO
         Attribute.ZOMBIE_SPAWN_REINFORCEMENTS -> Attributes.SPAWN_REINFORCEMENTS_CHANCE
-    }
+    }.value()
 
 val AttributeModifier.Operation.nmsOperation: MojangAttributeModifier.Operation
     get() = when (this) {
-        AttributeModifier.Operation.ADD_NUMBER -> MojangAttributeModifier.Operation.ADDITION
-        AttributeModifier.Operation.ADD_SCALAR -> MojangAttributeModifier.Operation.MULTIPLY_BASE
-        AttributeModifier.Operation.MULTIPLY_SCALAR_1 -> MojangAttributeModifier.Operation.MULTIPLY_TOTAL
+        AttributeModifier.Operation.ADD_NUMBER -> MojangAttributeModifier.Operation.ADD_VALUE
+        AttributeModifier.Operation.ADD_SCALAR -> MojangAttributeModifier.Operation.ADD_MULTIPLIED_BASE
+        AttributeModifier.Operation.MULTIPLY_SCALAR_1 -> MojangAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
     }
 
 val MojangPose.bukkitPose: Pose
-    get() = when(this) {
+    get() = when (this) {
         MojangPose.STANDING -> Pose.STANDING
         MojangPose.FALL_FLYING -> Pose.FALL_FLYING
         MojangPose.SLEEPING -> Pose.SLEEPING
@@ -251,7 +278,7 @@ val MojangPose.bukkitPose: Pose
     }
 
 val Pose.nmsPose: MojangPose
-    get() = when(this) {
+    get() = when (this) {
         Pose.STANDING -> MojangPose.STANDING
         Pose.FALL_FLYING -> MojangPose.FALL_FLYING
         Pose.SLEEPING -> MojangPose.SLEEPING
@@ -318,6 +345,8 @@ fun Rotations.add(x: Float, y: Float, z: Float) =
     Rotations(this.x + x, this.y + y, this.z + z)
 
 val MINECRAFT_SERVER: DedicatedServer = (Bukkit.getServer() as CraftServer).server
+val REGISTRY_ACCESS: RegistryAccess = MINECRAFT_SERVER.registryAccess()
+val DATA_VERSION: Int = CraftMagicNumbers.INSTANCE.dataVersion
 
 val serverTick: Int
     get() = MINECRAFT_SERVER.tickCount
@@ -379,6 +408,7 @@ inline fun Level.captureDrops(run: () -> Unit): List<ItemEntity> {
         run.invoke()
         return captureDrops
     } finally {
+        @Suppress("NULL_FOR_NONNULL_TYPE") // improperly annotated
         this.captureDrops = null
     }
 }
@@ -423,7 +453,7 @@ fun <T> Registry<T>.getOrThrow(id: ResourceLocation): T {
 }
 
 fun <T> Registry<T>.getOrThrow(key: String): T {
-    return getOrThrow(ResourceLocation(key))
+    return getOrThrow(ResourceLocation.parse(key))
 }
 
 fun <T> Registry<T>.getHolder(id: ResourceLocation): Holder<T>? {
@@ -450,15 +480,19 @@ operator fun Registry<*>.contains(key: String): Boolean {
 }
 
 operator fun <T : Any> WritableRegistry<T>.set(name: String, value: T) {
-    register(ResourceKey.create(key(), ResourceLocation.of(name, ':')), value, Lifecycle.stable())
+    register(ResourceKey.create(key(), ResourceLocation.parse(name)), value, RegistrationInfo.BUILT_IN)
 }
 
 operator fun <T : Any> WritableRegistry<T>.set(id: ResourceLocation, value: T) {
-    register(ResourceKey.create(key(), id), value, Lifecycle.stable())
+    register(ResourceKey.create(key(), id), value, RegistrationInfo.BUILT_IN)
 }
 
 operator fun <T : Any> WritableRegistry<T>.set(addon: Addon, key: String, value: T) {
-    register(ResourceKey.create(key(), ResourceLocation(addon, key)), value, Lifecycle.stable())
+    register(ResourceKey.create(key(), ResourceLocation(addon, key)), value, RegistrationInfo.BUILT_IN)
+}
+
+fun <T : Any> WritableRegistry<T>.register(id: ResourceLocation, value: T): Holder.Reference<T> {
+    return register(ResourceKey.create(key(), id), value, RegistrationInfo.BUILT_IN)
 }
 
 fun <T> Registry<T>.toHolderMap(): Map<ResourceLocation, Holder<T>> {
@@ -496,18 +530,18 @@ fun ResourceLocation.toString(separator: String): String {
 }
 
 fun ResourceLocation(addon: Addon, name: String): ResourceLocation {
-    return ResourceLocation(addon.description.id, name)
+    return ResourceLocation.fromNamespaceAndPath(addon.description.id, name)
 }
 
 // TODO: replace with static extension once available
 internal fun parseResourceLocation(id: String, fallbackNamespace: String = "minecraft"): ResourceLocation {
     return if (ResourcePath.NON_NAMESPACED_ENTRY.matches(id)) {
-        ResourceLocation(fallbackNamespace, id)
+        ResourceLocation.fromNamespaceAndPath(fallbackNamespace, id)
     } else {
         val match = ResourcePath.NAMESPACED_ENTRY.matchEntire(id)
             ?: throw IllegalArgumentException("Invalid resource id: $id")
         
-        ResourceLocation(match.groupValues[1], match.groupValues[2])
+        ResourceLocation.fromNamespaceAndPath(match.groupValues[1], match.groupValues[2])
     }
 }
 
@@ -538,6 +572,9 @@ fun forcePacketBroadcast(run: () -> Unit) {
     }
 }
 
+fun RegistryFriendlyByteBuf(): RegistryFriendlyByteBuf =
+    RegistryFriendlyByteBuf(Unpooled.buffer(), REGISTRY_ACCESS)
+
 object NMSUtils {
     
     val ENTITY_COUNTER = ReflectionUtils.getField(
@@ -546,10 +583,7 @@ object NMSUtils {
         "ENTITY_COUNTER"
     ).get(null) as AtomicInteger
     
-    val REGISTRY_ACCESS = MINECRAFT_SERVER.registryAccess()
     val REGISTRY_OPS = RegistryOps.create(JsonOps.INSTANCE, VanillaRegistryAccess)
-    
-    val DATA_VERSION = CraftMagicNumbers.INSTANCE.dataVersion
     
     fun freezeRegistry(registry: Registry<*>) {
         if (registry !is MappedRegistry) return

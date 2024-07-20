@@ -1,6 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.util.component.adventure
 
-import io.papermc.paper.adventure.AdventureComponent
+import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
@@ -10,12 +12,12 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.StringTag
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftChatMessage
 import org.bukkit.entity.Player
 import xyz.xenondevs.inventoryaccess.util.AdventureComponentUtils
 import xyz.xenondevs.nova.data.resources.CharSizes
 import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.MoveCharacters
+import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import java.awt.Color
 import net.minecraft.network.chat.Component as MojangComponent
 
@@ -36,23 +38,19 @@ fun String.toAdventureComponentOr(createComponent: () -> Component): Component {
 }
 
 fun MojangComponent.toAdventureComponent(): Component {
-    if (this is AdventureComponent)
-        return this.`adventure$component`()
-    
-    return GsonComponentSerializer.gson().deserialize(CraftChatMessage.toJSON(this))
+    return PaperAdventure.asAdventure(this)
 }
 
-@Suppress("DEPRECATION")
 fun Array<out BaseComponent>.toAdventureComponent(): Component {
     return ComponentSerializer.toString(this).toAdventureComponent()
 }
 
 fun MojangComponent.toJson(): String {
-    return MojangComponent.Serializer.toJson(this)
+    return MojangComponent.Serializer.toJson(this, REGISTRY_ACCESS)
 }
 
 fun Component.toNMSComponent(): MojangComponent {
-    return AdventureComponent(this)
+    return PaperAdventure.asVanilla(this)
 }
 
 fun Component.toJson(): String {
@@ -63,7 +61,6 @@ fun Component.toNBT(): StringTag {
     return StringTag.valueOf(toJson())
 }
 
-@Suppress("DEPRECATION")
 fun Component.toPlainText(player: Player): String {
     return PlainTextComponentConverter.toPlainText(this, player.locale)
 }

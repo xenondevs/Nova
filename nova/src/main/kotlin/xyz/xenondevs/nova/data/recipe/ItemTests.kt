@@ -1,13 +1,12 @@
 package xyz.xenondevs.nova.data.recipe
 
-import net.minecraft.nbt.CompoundTag
 import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
-import xyz.xenondevs.nova.util.item.unhandledTags
+import xyz.xenondevs.nova.util.item.novaItem
 
 interface ItemTest {
     fun test(item: ItemStack): Boolean
@@ -40,7 +39,7 @@ class TagTest(private val tag: Tag<Material>, override val examples: List<ItemSt
 class NovaIdTest(private val id: String, override val example: ItemStack) : SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return (item.itemMeta?.unhandledTags?.get("nova") as? CompoundTag)?.getString("id") == id
+        return item.novaItem?.id.toString() == id
     }
     
 }
@@ -48,8 +47,7 @@ class NovaIdTest(private val id: String, override val example: ItemStack) : Sing
 class NovaNameTest(private val name: String, override val examples: List<ItemStack>) : MultiItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return (item.itemMeta?.unhandledTags?.get("nova") as? CompoundTag)?.getString("id")
-            ?.substringAfter(':') == name
+        return item.novaItem?.id?.path == name
     }
     
 }

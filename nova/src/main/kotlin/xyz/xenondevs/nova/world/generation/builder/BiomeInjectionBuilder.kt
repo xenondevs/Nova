@@ -50,7 +50,7 @@ class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeI
      * (e.g. "minecraft:plains")
      */
     fun biome(biome: String) {
-        biomes.add(ResourceLocationOrTagKey.ofLocation(ResourceLocation(biome)))
+        biomes.add(ResourceLocationOrTagKey.ofLocation(ResourceLocation.parse(biome)))
     }
     
     /**

@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.item.behavior.UnknownItemFilter
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilterType
-import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.unwrap
 import kotlin.reflect.KType
 
 internal object ItemFilterBinaryAdapter : ComplexBinaryAdapter<ItemFilter<*>> {
@@ -22,7 +22,7 @@ internal object ItemFilterBinaryAdapter : ComplexBinaryAdapter<ItemFilter<*>> {
         if (id == 1.toUByte())
             return readLegacy(reader)
         
-        val filterTypeId = ResourceLocation(reader.readString())
+        val filterTypeId = ResourceLocation.parse(reader.readString())
         return createFilter(
             filterTypeId,
             NovaRegistries.ITEM_FILTER_TYPE[filterTypeId],
@@ -36,9 +36,9 @@ internal object ItemFilterBinaryAdapter : ComplexBinaryAdapter<ItemFilter<*>> {
         val size = reader.readVarInt()
         val items = Array<ItemStack?>(size) { CBF.read(reader) }
         
-        val id = ResourceLocation("logistics", if (nbt) "nbt_item_filter" else "type_item_filter")
+        val id = ResourceLocation.fromNamespaceAndPath("logistics", if (nbt) "nbt_item_filter" else "type_item_filter")
         val compound = Compound()
-        compound["items"] = items.map { it.nmsCopy }
+        compound["items"] = items.map { it.unwrap().copy() }
         compound["whitelist"] = whitelist
         
         return createFilter(id, NovaRegistries.ITEM_FILTER_TYPE[id], compound)

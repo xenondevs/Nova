@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.transformer.patch.item
 
+import net.minecraft.core.Holder
 import net.minecraft.core.NonNullList
 import net.minecraft.core.dispenser.DispenseItemBehavior
 import net.minecraft.resources.ResourceLocation
@@ -28,7 +29,6 @@ import xyz.xenondevs.nova.item.behavior.Wearable
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.player.equipment.EquipAction
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.bukkitCopy
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.DISPENSER_BLOCK_GET_DISPENSE_METHOD_METHOD
@@ -58,7 +58,7 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
             
             val defaultBody = LabelNode()
             addLabel()
-            aLoad(1) // itemStack
+            aLoad(2) // itemStack
             invokeStatic(::getNovaArmorDispenseMethod)
             dup()
             ifnull(defaultBody)
@@ -96,7 +96,7 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
             override fun getEquipmentSlot() = wearable.slot.nmsEquipmentSlot
             
             override fun getEquipSound() = wearable.equipSound?.let {
-                SoundEvent.createVariableRangeEvent(ResourceLocation(it))
+                Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation.parse(it)))
             } ?: SoundEvents.ARMOR_EQUIP_GENERIC
             
         }
@@ -119,11 +119,11 @@ internal class WatchedArmorList(player: Player) : NonNullList<ItemStack>(
     
     private val player = player as? ServerPlayer
     private var initialized = false
-    private val previousStacks = Array<ItemStack>(4) { ItemStack.EMPTY }
+    private val previousStacks = Array(4) { ItemStack.EMPTY }
     
     override fun set(index: Int, element: ItemStack): ItemStack {
         if (initialized) {
-            if (player != null) {
+            if (player !== null) {
                 val previous = previousStacks[index]
                 if (ItemStack.matches(previous, element))
                     return element
@@ -134,7 +134,7 @@ internal class WatchedArmorList(player: Player) : NonNullList<ItemStack>(
                     else -> EquipAction.CHANGE
                 }
                 
-                val equipEvent = ArmorEquipEvent(player.bukkitEntity, EquipmentSlot.entries[index + 2], equipAction, previous.bukkitCopy, element.bukkitCopy)
+                val equipEvent = ArmorEquipEvent(player.bukkitEntity, EquipmentSlot.entries[index + 2], equipAction, previous.asBukkitCopy(), element.asBukkitCopy())
                 Bukkit.getPluginManager().callEvent(equipEvent)
                 
                 if (equipEvent.isCancelled)

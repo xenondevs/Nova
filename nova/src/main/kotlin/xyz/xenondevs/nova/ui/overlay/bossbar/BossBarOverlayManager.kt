@@ -67,7 +67,7 @@ object BossBarOverlayManager : Listener, PacketListener {
     
     @InitFun
     private fun init() {
-        BOSSBAR_CONFIG.addUpdateHandler { reload() }
+        BOSSBAR_CONFIG.subscribe { reload() }
         reload()
     }
     
@@ -130,6 +130,7 @@ object BossBarOverlayManager : Listener, PacketListener {
         }
     }
     
+    @Suppress("DEPRECATION")
     private fun remakeBars(playerUUID: UUID): Boolean {
         val overlays = overlays[playerUUID] ?: return false
         val bars = bars[playerUUID] ?: return false

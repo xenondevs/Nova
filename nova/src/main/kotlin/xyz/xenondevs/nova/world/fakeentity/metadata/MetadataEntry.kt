@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.fakeentity.metadata
 
-import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.network.syncher.EntityDataSerializers
 import java.util.*
@@ -10,7 +10,7 @@ internal interface MetadataEntry<T> {
     
     var dirty: Boolean
     
-    fun write(buf: FriendlyByteBuf)
+    fun write(buf: RegistryFriendlyByteBuf)
     
     fun isNotDefault(): Boolean
     
@@ -36,10 +36,10 @@ internal open class NonNullMetadataEntry<T : Any>(
         dirty = true
     }
     
-    override fun write(buf: FriendlyByteBuf) {
+    override fun write(buf: RegistryFriendlyByteBuf) {
         buf.writeByte(index)
         buf.writeVarInt(serializerId)
-        serializer.write(buf, value)
+        serializer.codec().encode(buf, value)
     }
     
     override fun isNotDefault(): Boolean =
@@ -61,10 +61,10 @@ internal class MappedNonNullMetadataEntry<T, R>(
     
     override var dirty: Boolean = false
     
-    override fun write(buf: FriendlyByteBuf) {
+    override fun write(buf: RegistryFriendlyByteBuf) {
         buf.writeByte(index)
         buf.writeVarInt(serializerId)
-        serializer.write(buf, mappedValue!!)
+        serializer.codec().encode(buf, mappedValue!!)
     }
     
     override fun isNotDefault(): Boolean =
@@ -101,10 +101,10 @@ internal class NullableMetadataEntry<T>(
         dirty = true
     }
     
-    override fun write(buf: FriendlyByteBuf) {
+    override fun write(buf: RegistryFriendlyByteBuf) {
         buf.writeByte(index)
         buf.writeVarInt(serializerId)
-        serializer.write(buf, Optional.ofNullable(value))
+        serializer.codec().encode(buf, Optional.ofNullable(value))
     }
     
     override fun isNotDefault(): Boolean =
@@ -125,10 +125,10 @@ internal class MappedNullableMetadataEntry<T, R>(
     
     override var dirty: Boolean = false
     
-    override fun write(buf: FriendlyByteBuf) {
+    override fun write(buf: RegistryFriendlyByteBuf) {
         buf.writeByte(index)
         buf.writeVarInt(serializerId)
-        serializer.write(buf, Optional.ofNullable(mappedValue))
+        serializer.codec().encode(buf, Optional.ofNullable(mappedValue))
     }
     
     override fun isNotDefault(): Boolean =

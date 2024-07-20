@@ -53,12 +53,12 @@ private object DefaultWailaProviders {
     }
     
     private fun <T> register(name: String, provider: WailaInfoProvider<T>) {
-        val id = ResourceLocation("nova", name)
+        val id = ResourceLocation.fromNamespaceAndPath("nova", name)
         WAILA_INFO_PROVIDER[id] = provider
     }
     
     private fun register(name: String, provider: WailaToolIconProvider) {
-        val id = ResourceLocation("nova", name)
+        val id = ResourceLocation.fromNamespaceAndPath("nova", name)
         WAILA_TOOL_ICON_PROVIDER[id] = provider
     }
     

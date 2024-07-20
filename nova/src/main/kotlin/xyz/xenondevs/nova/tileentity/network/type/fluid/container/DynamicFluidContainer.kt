@@ -22,8 +22,8 @@ class DynamicFluidContainer(
     override val capacity by capacityProvider
     
     init {
-        capacityProvider.addUpdateHandler { 
-            if (this.amount > capacity)
+        capacityProvider.subscribe {
+        if (this.amount > capacity)
                 this.amount = capacity
             
             callUpdateHandlers()

@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.data.serialization.configurate
 
+import org.bukkit.NamespacedKey
+import org.bukkit.Registry
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.spongepowered.configurate.ConfigurationNode
@@ -45,7 +47,8 @@ internal object PotionEffectTypeSerializer : TypeSerializer<PotionEffectType?> {
         if (node.raw() == null)
             return null
         
-        return PotionEffectType.getByKey(node.get())
+        return Registry.POTION_EFFECT_TYPE.get(node.get<NamespacedKey>()!!)
+            ?: throw IllegalArgumentException("No such potion type: ${node.raw()}")
     }
     
     override fun serialize(type: Type, obj: PotionEffectType?, node: ConfigurationNode) {

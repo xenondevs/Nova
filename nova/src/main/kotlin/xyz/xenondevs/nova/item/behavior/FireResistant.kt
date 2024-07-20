@@ -1,14 +1,17 @@
 package xyz.xenondevs.nova.item.behavior
 
-import xyz.xenondevs.nova.item.vanilla.VanillaMaterialProperty
+import net.minecraft.core.component.DataComponentMap
+import net.minecraft.core.component.DataComponents
+import net.minecraft.util.Unit
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.provider
 
 /**
  * Makes items fire-resistant.
  */
 object FireResistant : ItemBehavior {
     
-    override fun getVanillaMaterialProperties(): List<VanillaMaterialProperty> {
-        return listOf(VanillaMaterialProperty.FIRE_RESISTANT)
-    }
+    override val baseDataComponents: Provider<DataComponentMap>
+        get() = provider(DataComponentMap.builder().set(DataComponents.FIRE_RESISTANT, Unit.INSTANCE).build())
     
 }

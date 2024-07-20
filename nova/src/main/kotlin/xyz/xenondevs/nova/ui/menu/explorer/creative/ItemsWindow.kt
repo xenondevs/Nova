@@ -51,10 +51,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     private var currentWindow: Window? = null
     
-    private val openSearchItem = SimpleItem(
-        DefaultGuiItems.TP_SEARCH.model.createClientsideItemBuilder()
-            .setDisplayName(Component.translatable("menu.nova.items.search-item"))
-    ) { openSearchWindow() }
+    private val openSearchItem = SimpleItem(DefaultGuiItems.TP_SEARCH.model.clientsideProvider) { openSearchWindow() }
     
     private val toggleCheatModeItem = ToggleItem(
         player in cheaters,

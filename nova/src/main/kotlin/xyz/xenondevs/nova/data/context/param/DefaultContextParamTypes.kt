@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.util.Location
 import xyz.xenondevs.nova.util.bukkitMaterial
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.ToolUtils
-import xyz.xenondevs.nova.util.item.novaCompoundOrNull
+import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.util.pitch
@@ -146,7 +146,7 @@ object DefaultContextParamTypes {
         ContextParamType.builder<Compound>("tile_entity_data_nova")
             .optionalIn(BlockPlace)
             .autofilledBy(::BLOCK_ITEM_STACK) { itemStack ->
-                itemStack.novaCompoundOrNull
+                itemStack.novaCompound
                     ?.get<Compound>(TileEntity.TILE_ENTITY_DATA_KEY)
                     ?.let { persistentData -> Compound().also { it["persistent"] = persistentData } }
             }.build()
@@ -200,7 +200,7 @@ object DefaultContextParamTypes {
             .optionalIn(BlockPlace, BlockBreak, BlockInteract)
             .autofilledBy(::BLOCK_TYPE_NOVA) { it.id }
             .autofilledBy(::BLOCK_TYPE_VANILLA) { BuiltInRegistries.BLOCK.getKey(it.nmsBlock) }
-            .autofilledBy(::BLOCK_ITEM_STACK) { ResourceLocation(ItemUtils.getId(it)) }
+            .autofilledBy(::BLOCK_ITEM_STACK) { ResourceLocation.parse(ItemUtils.getId(it)) }
             .build()
     
     /**

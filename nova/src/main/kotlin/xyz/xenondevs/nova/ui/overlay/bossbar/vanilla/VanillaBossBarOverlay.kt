@@ -53,6 +53,7 @@ internal class VanillaBossBarOverlay(
         component = createComponent()
     }
     
+    @Suppress("DEPRECATION")
     private fun createComponent(): Component {
         val builder = Component.text()
         

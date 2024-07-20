@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.transformer.patch.worldgen.registry
 
+import com.mojang.serialization.Lifecycle
 import net.minecraft.core.Holder
 import net.minecraft.core.MappedRegistry
+import net.minecraft.resources.ResourceKey
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.LabelNode
@@ -12,7 +14,10 @@ import xyz.xenondevs.bytebase.util.insertBeforeFirst
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.bytebase.util.next
 import xyz.xenondevs.nova.transformer.MethodTransformer
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.MAPPED_REGISTRY_REGISTER_MAPPING_METHOD
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
+
+private val MAPPED_REGISTRY_REGISTER_MAPPING_METHOD =
+    getMethod(MappedRegistry::class, false, "registerMapping", Int::class, ResourceKey::class, Any::class, Lifecycle::class)
 
 /**
  * Mojang no longer binds the value of holders when registering something to a registry. So we wrap all values passed to

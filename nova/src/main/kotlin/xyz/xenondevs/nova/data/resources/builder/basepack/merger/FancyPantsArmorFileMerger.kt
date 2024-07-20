@@ -126,7 +126,7 @@ internal class FancyPantsArmorFileMerger(basePacks: BasePacks) : FileMerger(base
         val armor = basePacks.customArmor.getOrPut(color) {
             val colorObj = color.asColor()
             ArmorData(
-                ResourceLocation("base_pack", "armor_${colorObj.red}_${colorObj.green}_${colorObj.blue}"),
+                ResourceLocation.fromNamespaceAndPath("base_pack", "armor_${colorObj.red}_${colorObj.green}_${colorObj.blue}"),
                 color,
                 arrayOfNulls(2),
                 arrayOfNulls(2),

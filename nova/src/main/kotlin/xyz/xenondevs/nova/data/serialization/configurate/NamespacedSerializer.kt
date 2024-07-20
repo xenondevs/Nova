@@ -22,7 +22,7 @@ internal object NamespacedKeySerializer : ScalarSerializer<NamespacedKey>(Namesp
 internal object ResourceLocationSerializer : ScalarSerializer<ResourceLocation>(ResourceLocation::class.java) {
     
     override fun deserialize(type: Type, obj: Any): ResourceLocation {
-        return ResourceLocation(obj.toString())
+        return ResourceLocation.parse(obj.toString())
     }
     
     override fun serialize(item: ResourceLocation, typeSupported: Predicate<Class<*>>): Any {

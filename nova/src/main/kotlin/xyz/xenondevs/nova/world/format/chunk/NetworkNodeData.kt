@@ -66,7 +66,7 @@ data class NetworkBridgeData(
         
         fun read(reader: ByteReader): NetworkBridgeData =
             NetworkBridgeData(
-                ResourceLocation(reader.readString()),
+                ResourceLocation.parse(reader.readString()),
                 reader.readUUID(),
                 reader.readNetworkTypeCubeFaceSetMap(),
                 reader.readNetworkTypeUUIDMap(),

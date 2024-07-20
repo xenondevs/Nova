@@ -15,6 +15,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
+import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.runTaskLater
@@ -77,7 +78,7 @@ object Stripping : ItemBehavior {
         fun setNewState(newState: BlockState) {
             runTaskLater(1) { player.swing(hand, true) }
             level.setBlock(pos, newState, 11)
-            Damageable.damageAndBreak(itemStack, 1, player) { player.broadcastBreakEvent(hand) }
+            itemStack.hurtAndBreak(1, player, hand.nmsEquipmentSlot)
         }
         
         val stripped = STRIPPABLES[block]?.defaultBlockState()?.apply { setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS)) }

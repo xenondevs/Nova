@@ -4,7 +4,7 @@ package xyz.xenondevs.nova.util
 
 import org.bukkit.Bukkit
 import org.bukkit.block.data.BlockData
-import org.bukkit.craftbukkit.v1_20_R3.CraftServer
+import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.event.Event
 import org.bukkit.event.Event.Result
 import org.bukkit.event.EventPriority

@@ -9,8 +9,11 @@ import net.minecraft.advancements.Criterion
 import net.minecraft.advancements.DisplayInfo
 import net.minecraft.advancements.critereon.InventoryChangeTrigger
 import net.minecraft.advancements.critereon.ItemPredicate
+import net.minecraft.core.component.DataComponentPredicate
+import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.component.CustomData
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -18,13 +21,13 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.name
-import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.unwrap
 import java.util.*
 
 fun advancement(addon: Addon, name: String, init: Advancement.Builder.() -> Unit): AdvancementHolder {
     val builder = Advancement.Builder()
     builder.init()
-    return builder.build(ResourceLocation("${addon.description.id}:$name"))
+    return builder.build(ResourceLocation.fromNamespaceAndPath(addon.description.id, name))
 }
 
 fun obtainNovaItemAdvancement(
@@ -36,11 +39,11 @@ fun obtainNovaItemAdvancement(
     require(addon.description.id == item.id.namespace) { "The specified item is from a different addon" }
     val id = item.id
     return advancement(addon, "obtain_${id.name}") {
-        if (parent != null)
+        if (parent !== null)
             parent(parent)
         
         display(DisplayInfo(
-            item.model.clientsideProvider.get().nmsCopy,
+            item.model.clientsideProvider.get().unwrap().copy(),
             Component.translatable("advancement.${id.namespace}.${id.name}.title").toNMSComponent(),
             Component.translatable("advancement.${id.namespace}.${id.name}.description").toNMSComponent(),
             Optional.empty(),
@@ -62,11 +65,11 @@ fun obtainNovaItemsAdvancement(
     require(items.all { it.id.namespace == addon.description.id }) { "At least one of the specified items is from a different addon" }
     val namespace = addon.description.id
     return advancement(addon, name) {
-        if (parent != null)
+        if (parent !== null)
             parent(parent)
         
         display(DisplayInfo(
-            items[0].model.clientsideProvider.get().nmsCopy,
+            items[0].model.clientsideProvider.get().unwrap().copy(),
             Component.translatable("advancement.$namespace.$name.title").toNMSComponent(),
             Component.translatable("advancement.$namespace.$name.description").toNMSComponent(),
             Optional.empty(),
@@ -91,11 +94,18 @@ fun obtainNovaItemsAdvancement(
 }
 
 private fun createObtainNovaItemCriterion(item: NovaItem): Criterion<InventoryChangeTrigger.TriggerInstance> {
-    val nbt = CompoundTag()
-    val nova = CompoundTag()
-    nbt.put("nova", nova)
-    nova.putString("id", item.id.toString())
-    return InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().hasNbt(nbt))
+    val expectedCustomData = CustomData.of(CompoundTag().apply {
+        put("nova", CompoundTag().apply {
+            putString("id", item.id.toString())
+        })
+    })
+    return InventoryChangeTrigger.TriggerInstance.hasItems(
+        ItemPredicate.Builder.item().hasComponents(
+            DataComponentPredicate.builder()
+                .expect(DataComponents.CUSTOM_DATA, expectedCustomData)
+                .build()
+        )
+    )
 }
 
 fun Player.awardAdvancement(key: NamespacedKey) {

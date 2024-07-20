@@ -24,8 +24,6 @@ import xyz.xenondevs.nova.data.serialization.cbf.adapter.VirtualInventoryBinaryA
 import xyz.xenondevs.nova.registry.NovaRegistries.ABILITY_TYPE
 import xyz.xenondevs.nova.registry.NovaRegistries.ATTACHMENT_TYPE
 import xyz.xenondevs.nova.registry.NovaRegistries.BLOCK
-import xyz.xenondevs.nova.registry.NovaRegistries.ENCHANTMENT
-import xyz.xenondevs.nova.registry.NovaRegistries.ENCHANTMENT_CATEGORY
 import xyz.xenondevs.nova.registry.NovaRegistries.ITEM
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
@@ -61,8 +59,6 @@ internal object CBFAdapters {
         registerBinaryHierarchyAdapter(ItemFilterBinaryAdapter)
         registerBinaryHierarchyAdapter(BLOCK.byNameBinaryAdapter())
         registerBinaryHierarchyAdapter(ITEM.byNameBinaryAdapter())
-        registerBinaryHierarchyAdapter(ENCHANTMENT.byNameBinaryAdapter())
-        registerBinaryHierarchyAdapter(ENCHANTMENT_CATEGORY.byNameBinaryAdapter())
         registerBinaryHierarchyAdapter(TOOL_CATEGORY.byNameBinaryAdapter())
         registerBinaryHierarchyAdapter(TOOL_TIER.byNameBinaryAdapter())
         

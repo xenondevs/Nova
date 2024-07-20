@@ -2,8 +2,6 @@ package xyz.xenondevs.nova.ui.waila.info.impl
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
-import org.bukkit.block.Block
-import org.bukkit.block.data.BlockData
 import org.bukkit.block.data.type.Cake
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
@@ -15,7 +13,7 @@ internal object CakeWailaInfoProvider : VanillaWailaInfoProvider<Cake>(setOf(Mat
     override fun getInfo(player: Player, pos: BlockPos, blockState: Cake): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
         val bites = blockState.bites
-        info.icon = ResourceLocation("minecraft", if (bites == 0) "cake" else "cake_slice$bites")
+        info.icon = ResourceLocation.withDefaultNamespace(if (bites == 0) "cake" else "cake_slice$bites")
         return info
     }
     

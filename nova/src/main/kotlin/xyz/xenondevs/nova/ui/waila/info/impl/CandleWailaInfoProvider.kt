@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.ui.waila.info.impl
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
-import org.bukkit.block.Block
 import org.bukkit.block.data.type.Candle
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
@@ -34,7 +33,7 @@ internal object CandleWailaInfoProvider : VanillaWailaInfoProvider<Candle>(
             else -> IllegalStateException("Invalid amount of candles")
         }
         
-        return ResourceLocation("minecraft", "${name}_${amount}")
+        return ResourceLocation.withDefaultNamespace("${name}_${amount}")
     }
     
 }

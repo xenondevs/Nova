@@ -18,7 +18,7 @@ class NamespacedCompound internal constructor(
 ) {
     
     val keys: Set<ResourceLocation>
-        get() = map.flatMapTo(HashSet()) { (namespace, compound) -> compound.keys.map { ResourceLocation.of("$namespace:$it", ':') } }
+        get() = map.flatMapTo(HashSet()) { (namespace, compound) -> compound.keys.map { ResourceLocation.parse("$namespace:$it") } }
     
     constructor() : this(HashMap())
     

@@ -45,7 +45,7 @@ object ToolLine {
     
     fun getToolLine(
         player: Player,
-        blockToolCategories: List<ToolCategory>?,
+        blockToolCategories: Set<ToolCategory>?,
         blockToolLevel: ToolTier?,
         hardness: Double,
         correctToolForDrops: Boolean?

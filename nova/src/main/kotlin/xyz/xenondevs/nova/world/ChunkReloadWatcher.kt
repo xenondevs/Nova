@@ -27,7 +27,7 @@ internal object ChunkReloadWatcher : Listener {
     @InitFun
     private fun init() {
         val enabled = MAIN_CONFIG.entry<Boolean>("debug", "watch_chunk_reloads")
-        enabled.addUpdateHandler(::reload)
+        enabled.subscribe(::reload)
         reload(enabled.get())
     }
     

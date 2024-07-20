@@ -29,7 +29,7 @@ import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.tileentity.network.type.fluid.container.DynamicFluidContainer
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.util.hasInventoryOpen
-import xyz.xenondevs.nova.util.item.novaCompound
+import xyz.xenondevs.nova.util.item.storeData
 import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
@@ -64,7 +64,7 @@ abstract class TileEntity(
         /**
          * The key under which [TileEntity] data is stored in [ItemStacks][ItemStack].
          */
-        val TILE_ENTITY_DATA_KEY = ResourceLocation("nova", "tileentity")
+        val TILE_ENTITY_DATA_KEY = ResourceLocation.fromNamespaceAndPath("nova", "tileentity")
         
     }
     
@@ -196,7 +196,7 @@ abstract class TileEntity(
             val item = block.item?.createItemStack()
             if (item != null) {
                 if (persistentData.isNotEmpty()) {
-                    item.novaCompound[TILE_ENTITY_DATA_KEY] = persistentData
+                    item.storeData(TILE_ENTITY_DATA_KEY, persistentData)
                 }
                 
                 drops += item

@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.util.item.novaItem
 internal object ApiItemRegistry : NovaItemRegistry {
     
     override fun getOrNull(id: String): NovaItem? {
-        val loc = ResourceLocation(id)
+        val loc = ResourceLocation.parse(id)
         return NovaRegistries.ITEM[loc]?.let(::ApiItemWrapper)
     }
     

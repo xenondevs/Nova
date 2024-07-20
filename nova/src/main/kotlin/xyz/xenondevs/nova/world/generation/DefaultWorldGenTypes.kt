@@ -15,7 +15,7 @@ object DefaultWorldGenTypes {
     val MATERIAL_MATCH_TEST_TYPE = registerRuleTestType("material_match", MaterialMatchTestType)
     
     private fun registerRuleTestType(id: String, type: RuleTestType<*>): RuleTestType<*> {
-        VanillaRegistries.RULE_TEST[ResourceLocation("nova", id)] = type
+        VanillaRegistries.RULE_TEST[ResourceLocation.fromNamespaceAndPath("nova", id)] = type
         return type
     }
     

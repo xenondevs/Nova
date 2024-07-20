@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.world.block.logic.place
 
 import kotlinx.coroutines.runBlocking
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
@@ -29,7 +31,9 @@ import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
@@ -166,8 +170,11 @@ internal object BlockPlacing : Listener {
             || WorldDataManager.getBlockState(block) != null
         ) return false
         
-        if (player.gameMode == GameMode.ADVENTURE)
-            return placedOn.block.type.key in item.itemMeta.placeableKeys
+        if (player.gameMode == GameMode.ADVENTURE) {
+            val canPlaceOn = item.unwrap().get(DataComponents.CAN_PLACE_ON)
+            val blockInWorld = BlockInWorld(placedOn.world.serverLevel, placedOn.nmsPos, false)
+            return canPlaceOn?.test(blockInWorld) ?: false
+        }
         
         return true
     }

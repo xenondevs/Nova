@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.util.item
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.SoundGroup
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidType
@@ -46,6 +46,7 @@ fun Material.toItemStack(amount: Int = 1): ItemStack = ItemBuilder(this).setAmou
  * From https://www.spigotmc.org/threads/check-if-a-block-is-interactable.535861/
  * @author LoneDev
  */
+@Suppress("DEPRECATION")
 fun Material.isActuallyInteractable(): Boolean {
     return if (!isInteractable) false else when (this) {
         Material.ACACIA_STAIRS, Material.ANDESITE_STAIRS, Material.BIRCH_STAIRS, Material.BLACKSTONE_STAIRS,

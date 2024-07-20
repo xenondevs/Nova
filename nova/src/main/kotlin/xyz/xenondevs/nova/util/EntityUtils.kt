@@ -13,8 +13,9 @@ import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.item.ItemEntity
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity
+import org.bukkit.craftbukkit.entity.CraftEntity
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.nova.item.behavior.Damageable
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.VanillaToolCategory
@@ -49,8 +50,8 @@ val BukkitPlayer.destroyProgress: Double?
 fun BukkitLivingEntity.damageItemInMainHand(damage: Int = 1) {
     if (damage <= 0)
         return
-    val serverPlayer = nmsEntity as MojangLivingEntity
-    Damageable.damageAndBreak(serverPlayer.mainHandItem, damage) { serverPlayer.broadcastBreakEvent(MojangEquipmentSlot.MAINHAND) }
+    val nmsEntity = nmsEntity as MojangLivingEntity
+    nmsEntity.mainHandItem.hurtAndBreak(damage, nmsEntity, MojangEquipmentSlot.MAINHAND)
 }
 
 /**
@@ -59,8 +60,8 @@ fun BukkitLivingEntity.damageItemInMainHand(damage: Int = 1) {
 fun BukkitLivingEntity.damageItemInOffHand(damage: Int = 1) {
     if (damage <= 0)
         return
-    val serverPlayer = nmsEntity as MojangLivingEntity
-    Damageable.damageAndBreak(serverPlayer.offhandItem, damage) { serverPlayer.broadcastBreakEvent(MojangEquipmentSlot.OFFHAND) }
+    val nmsEntity = nmsEntity as MojangLivingEntity
+    nmsEntity.offhandItem.hurtAndBreak(damage, nmsEntity, MojangEquipmentSlot.OFFHAND)
 }
 
 /**
@@ -93,7 +94,7 @@ private inline fun BukkitLivingEntity.damageToolInMainHand(getNovaDamage: (Damag
         val damageable = novaItem.getBehaviorOrNull<Damageable>() ?: return
         damage = getNovaDamage(damageable)
     } else {
-        val toolCategory = ToolCategory.ofItem(itemStack.bukkitMirror) as? VanillaToolCategory ?: return
+        val toolCategory = ToolCategory.ofItem(itemStack.asBukkitMirror()).firstInstanceOfOrNull<VanillaToolCategory>() ?: return
         damage = getVanillaDamage(toolCategory)
     }
     
@@ -154,7 +155,7 @@ object EntityUtils {
                 pos.x + 0.5 + Random.nextDouble(-0.25, 0.25),
                 pos.y + 0.5 + Random.nextDouble(-0.25, 0.25),
                 pos.z + 0.5 + Random.nextDouble(-0.25, 0.25),
-                it.nmsCopy
+                it.unwrap().copy()
             ).apply(ItemEntity::setDefaultPickUpDelay)
         }
     
@@ -215,7 +216,7 @@ object EntityUtils {
         compoundTag.put("Pos", NBTUtils.createDoubleList(location.x, location.y, location.z))
         
         // set new rotation in nbt data
-        compoundTag.put("xyz.xenondevs.nova.data.resources.model.Rotation", NBTUtils.createFloatList(location.yaw, location.pitch))
+        compoundTag.put("Rotation", NBTUtils.createFloatList(location.yaw, location.pitch))
         
         // modify nbt data
         if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag)

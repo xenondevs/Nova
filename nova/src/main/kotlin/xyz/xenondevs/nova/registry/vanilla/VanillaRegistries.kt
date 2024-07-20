@@ -44,7 +44,7 @@ object VanillaRegistries {
     @JvmField
     val DAMAGE_TYPE = registryOrThrow(Registries.DAMAGE_TYPE)
     @JvmField
-    val DECORATED_POT_PATTERNS = registryOrThrow(Registries.DECORATED_POT_PATTERNS)
+    val DECORATED_POT_PATTERNS = registryOrThrow(Registries.DECORATED_POT_PATTERN)
     @JvmField
     val DENSITY_FUNCTION = registryOrThrow(Registries.DENSITY_FUNCTION)
     @JvmField

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.addon.registry.worldgen
 
-import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 import net.minecraft.core.Holder
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
 import net.minecraft.world.level.levelgen.feature.Feature
@@ -63,7 +63,7 @@ interface FeatureRegistry : AddonGetter {
     }
     
     @ExperimentalWorldGen
-    fun <P : PlacementModifier> registerPlacementModifierType(name: String, codec: Codec<P>): PlacementModifierType<P> =
+    fun <P : PlacementModifier> registerPlacementModifierType(name: String, codec: MapCodec<P>): PlacementModifierType<P> =
         registerPlacementModifierType(name) { codec }
     
 }

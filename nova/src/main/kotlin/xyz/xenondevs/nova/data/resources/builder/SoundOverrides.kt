@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.data.resources.builder
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import net.minecraft.core.Holder
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import org.bukkit.Material
@@ -64,8 +65,8 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
         soundEvents += group.fallSound.key.key
     }
     
-    private fun addSoundEvent(event: SoundEvent) {
-        soundEvents += event.location.path
+    private fun addSoundEvent(event: Holder<SoundEvent>) {
+        soundEvents += event.value().location.path
     }
     
     @PackTask(

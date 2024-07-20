@@ -149,7 +149,7 @@ private class ComponentCharsIterator(
     }
     
     private fun nextArg() {
-        val args = (components.top() as TranslatableComponent).args()
+        val args = (components.top() as TranslatableComponent).arguments().map { it.asComponent() }
         val argIdx = argIndices.popInt() + 1
         argIndices.push(argIdx)
         val arg = args.getOrNull(argIdx) ?: Component.empty()
@@ -157,7 +157,7 @@ private class ComponentCharsIterator(
     }
     
     private fun pushArg(argIdx: Int) {
-        val args = (components.top() as TranslatableComponent).args()
+        val args = (components.top() as TranslatableComponent).arguments().map { it.asComponent() }
         val arg = args.getOrNull(argIdx) ?: Component.empty()
         pushComponent(arg)
     }

@@ -14,14 +14,14 @@ class ServerboundSetCreativeModeSlotPacketEvent(
             field = value
             changed = true
         }
-    var item = packet.item
+    var itemStack = packet.itemStack
         set(value) {
             field = value
             changed = true
         }
     
     override fun buildChangedPacket(): ServerboundSetCreativeModeSlotPacket {
-        return ServerboundSetCreativeModeSlotPacket(slotNum, item)
+        return ServerboundSetCreativeModeSlotPacket(slotNum, itemStack)
     }
     
 }

@@ -43,11 +43,11 @@ sealed interface ContextParamType<V : Any> {
     companion object {
         
         fun <V : Any> builder(addon: Addon, name: String): ContextParamTypeBuilder<V> {
-            return builder(ResourceLocation(addon.description.id, name))
+            return builder(ResourceLocation.fromNamespaceAndPath(addon.description.id, name))
         }
         
         internal fun <V : Any> builder(name: String): ContextParamTypeBuilder<V> {
-            return builder(ResourceLocation("nova", name))
+            return builder(ResourceLocation.fromNamespaceAndPath("nova", name))
         }
         
         fun <V : Any> builder(id: ResourceLocation): ContextParamTypeBuilder<V> {

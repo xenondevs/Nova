@@ -37,13 +37,13 @@ subprojects {
         }
         
         withType<JavaCompile> {
-            sourceCompatibility = "17"
-            targetCompatibility = "17"
+            sourceCompatibility = "21"
+            targetCompatibility = "21"
         }
         
         withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile> {
             compilerOptions {
-                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
                 
                 freeCompilerArgs.addAll(
                     "-Xjvm-default=all", // Emit JVM default methods for interface declarations with bodies

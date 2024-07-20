@@ -11,9 +11,9 @@ import net.minecraft.world.item.ItemStack
 import xyz.xenondevs.cbf.adapter.ComplexBinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
-import xyz.xenondevs.nova.util.NMSUtils
-import xyz.xenondevs.nova.util.bukkitMirror
-import xyz.xenondevs.nova.util.nmsVersion
+import xyz.xenondevs.nova.util.DATA_VERSION
+import xyz.xenondevs.nova.util.REGISTRY_ACCESS
+import xyz.xenondevs.nova.util.unwrap
 import java.io.ByteArrayInputStream
 import kotlin.reflect.KType
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -27,23 +27,23 @@ internal object ItemStackSerializer {
         
         val dataVersion = reader.readVarInt()
         var nbt = NbtIo.read(reader.asDataInput())
-        nbt = tryFix(nbt, dataVersion, NMSUtils.DATA_VERSION)
+        nbt = tryFix(nbt, dataVersion, DATA_VERSION)
         
-        return ItemStack.of(nbt)
+        return ItemStack.parse(REGISTRY_ACCESS, nbt).get()
     }
     
     private fun readLegacy(reader: ByteReader): ItemStack {
         val data = reader.readBytes(reader.readVarInt())
         var nbt = NbtIo.readCompressed(ByteArrayInputStream(data), NbtAccounter.unlimitedHeap())
-        nbt = tryFix(nbt, 3700, NMSUtils.DATA_VERSION)
-        return ItemStack.of(nbt)
+        nbt = tryFix(nbt, 3700, DATA_VERSION)
+        return ItemStack.parse(REGISTRY_ACCESS, nbt).get()
     }
     
     fun write(obj: ItemStack, writer: ByteWriter) {
         writer.writeUnsignedByte(2.toUByte())
         
-        writer.writeVarInt(NMSUtils.DATA_VERSION)
-        val nbt = obj.save(CompoundTag())
+        writer.writeVarInt(DATA_VERSION)
+        val nbt = obj.save(REGISTRY_ACCESS) as CompoundTag
         NbtIo.write(nbt, writer.asDataOutput())
     }
     
@@ -60,11 +60,11 @@ internal object ItemStackSerializer {
 internal object BukkitItemStackBinaryAdapter : ComplexBinaryAdapter<BukkitStack> {
     
     override fun read(type: KType, id: UByte, reader: ByteReader): BukkitStack {
-        return ItemStackSerializer.read(id, reader).bukkitMirror
+        return ItemStackSerializer.read(id, reader).asBukkitMirror()
     }
     
     override fun write(obj: BukkitStack, type: KType, writer: ByteWriter) {
-        return ItemStackSerializer.write(obj.nmsVersion, writer)
+        return ItemStackSerializer.write(obj.unwrap(), writer)
     }
     
     override fun copy(obj: BukkitStack, type: KType): BukkitStack {

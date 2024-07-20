@@ -48,7 +48,7 @@ class DynamicRegion internal constructor(
         }
     
     init {
-        size.addUpdateHandler {
+        size.subscribe {
             updateSizeDisplay()
             updateSizeControls()
             updateRegion()
@@ -57,8 +57,8 @@ class DynamicRegion internal constructor(
         minSize.addChild(_size)
         maxSize.addChild(_size)
         
-        minSize.addUpdateHandler { updateSizeControls()}
-        maxSize.addUpdateHandler { updateSizeControls() }
+        minSize.subscribe { updateSizeControls() }
+        maxSize.subscribe { updateSizeControls() }
     }
     
     fun createVisualizeRegionItem(player: Player): VisualizeRegionItem {

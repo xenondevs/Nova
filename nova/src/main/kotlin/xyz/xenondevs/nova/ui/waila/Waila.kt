@@ -122,8 +122,9 @@ internal class Waila(val player: Player) {
         }
     }
     
+    @Suppress("DEPRECATION")
     private fun getCustomItemServiceInfo(player: Player, block: Block): WailaInfo? {
-        val blockId = CustomItemServiceManager.getId(block)?.let { runCatching { ResourceLocation.of(it, ':') }.getOrNull() } ?: return null
+        val blockId = CustomItemServiceManager.getId(block)?.let { runCatching { ResourceLocation.parse(it) }.getOrNull() } ?: return null
         val blockName = CustomItemServiceManager.getName(block, player.locale) ?: return null
         
         val lines = ArrayList<WailaLine>()

@@ -71,6 +71,6 @@ object DefaultGuiTextures {
     }
     
     private fun guiTexture(name: String, texture: GuiTextureBuilder.() -> Unit): GuiTexture =
-        GuiTextureBuilder(ResourceLocation("nova", name)).apply(texture).register()
+        GuiTextureBuilder(ResourceLocation.fromNamespaceAndPath("nova", name)).apply(texture).register()
     
 }

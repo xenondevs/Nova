@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 
 fun Breakable(
     hardness: Double,
-    toolCategories: List<ToolCategory>,
+    toolCategories: Set<ToolCategory>,
     toolTier: ToolTier?,
     requiresToolForDrops: Boolean,
     breakParticles: Material? = null,
@@ -36,7 +36,7 @@ fun Breakable(
     showBreakAnimation: Boolean = true
 ) = Breakable.Default(
     hardness,
-    listOf(toolCategory),
+    setOf(toolCategory),
     toolTier,
     requiresToolForDrops,
     breakParticles,
@@ -49,7 +49,7 @@ fun Breakable(
     showBreakAnimation: Boolean = true
 ) = Breakable.Default(
     hardness,
-    emptyList(),
+    emptySet(),
     null,
     false,
     breakParticles,
@@ -59,7 +59,7 @@ fun Breakable(
 interface Breakable {
     
     val hardness: Double
-    val toolCategories: List<ToolCategory>
+    val toolCategories: Set<ToolCategory>
     val toolTier: ToolTier?
     val requiresToolForDrops: Boolean
     val breakParticles: Material?
@@ -67,7 +67,7 @@ interface Breakable {
     
     class Default(
         hardness: Provider<Double>,
-        toolCategories: Provider<List<ToolCategory>>,
+        toolCategories: Provider<Set<ToolCategory>>,
         toolTier: Provider<ToolTier?>,
         requiresToolForDrops: Provider<Boolean>,
         breakParticles: Provider<Material?>,
@@ -83,7 +83,7 @@ interface Breakable {
         
         constructor(
             hardness: Double,
-            toolCategories: List<ToolCategory>,
+            toolCategories: Set<ToolCategory>,
             toolTier: ToolTier?,
             requiresToolForDrops: Boolean,
             breakParticles: Material?,
@@ -101,12 +101,11 @@ interface Breakable {
     
     companion object : BlockBehaviorFactory<Default> {
         
-        // TODO: some of these entry types do not have serialization implemented
         override fun create(block: NovaBlock): Default {
             val cfg = block.config
             return Default(
                 cfg.entry<Double>("hardness"),
-                cfg.entry<List<ToolCategory>>("toolCategories"),
+                cfg.entry<Set<ToolCategory>>("toolCategories"),
                 cfg.optionalEntry<ToolTier>("toolTier"),
                 cfg.entry<Boolean>("requiresToolForDrops"),
                 cfg.optionalEntry<Material>("breakParticles"),

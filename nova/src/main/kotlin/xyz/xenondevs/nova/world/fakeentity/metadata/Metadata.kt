@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.world.fakeentity.metadata
 
-import io.netty.buffer.Unpooled
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.network.syncher.EntityDataSerializers
 import xyz.xenondevs.nova.item.logic.PacketItems
 import xyz.xenondevs.nova.network.PacketIdRegistry
-import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.RegistryFriendlyByteBuf
+import xyz.xenondevs.nova.util.unwrap
 import java.util.*
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
@@ -16,8 +16,8 @@ abstract class Metadata internal constructor() {
     private val entries = ArrayList<MetadataEntry<*>>()
     
     internal fun packDirty(entityId: Int): FriendlyByteBuf {
-        val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_SET_ENTITY_DATA_PACKET)
+        val buf = RegistryFriendlyByteBuf()
+        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_SET_ENTITY_DATA)
         buf.writeVarInt(entityId)
         
         entries.forEach {
@@ -32,8 +32,8 @@ abstract class Metadata internal constructor() {
     }
     
     internal fun pack(entityId: Int): FriendlyByteBuf {
-        val buf = FriendlyByteBuf(Unpooled.buffer())
-        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_SET_ENTITY_DATA_PACKET)
+        val buf = RegistryFriendlyByteBuf()
+        buf.writeVarInt(PacketIdRegistry.PLAY_CLIENTBOUND_SET_ENTITY_DATA)
         buf.writeVarInt(entityId)
         
         entries.forEach {
@@ -80,7 +80,7 @@ abstract class Metadata internal constructor() {
     internal fun itemStack(index: Int, useName: Boolean, default: BukkitStack? = null): MappedNonNullMetadataEntry<BukkitStack?, MojangStack> {
         val entry = MappedNonNullMetadataEntry<BukkitStack?, MojangStack>(
             index, EntityDataSerializers.ITEM_STACK,
-            { PacketItems.getClientSideStack(null, it.nmsCopy, useName) },
+            { PacketItems.getClientSideStack(null, it.unwrap().copy(), useName) },
             default
         )
         entries += entry

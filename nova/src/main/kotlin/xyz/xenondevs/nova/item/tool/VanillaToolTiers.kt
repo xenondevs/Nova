@@ -19,7 +19,7 @@ object VanillaToolTiers {
     val NETHERITE = register("netherite")
     
     private fun register(name: String): ToolTier {
-        val id = ResourceLocation("minecraft", name)
+        val id = ResourceLocation.withDefaultNamespace(name)
         val level = ToolTier(id, Configs["nova:tool_levels"].entry(id.name))
         
         NovaRegistries.TOOL_TIER[id] = level

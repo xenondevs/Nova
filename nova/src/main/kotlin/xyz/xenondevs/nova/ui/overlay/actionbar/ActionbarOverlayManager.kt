@@ -29,7 +29,7 @@ object ActionbarOverlayManager : PacketListener {
     
     init {
         val enabled = MAIN_CONFIG.entry<Boolean>("overlay", "actionbar", "enabled")
-        enabled.addUpdateHandler(::reload)
+        enabled.subscribe(::reload)
         enabled.update()
     }
     
@@ -100,6 +100,7 @@ object ActionbarOverlayManager : PacketListener {
         }
     }
     
+    @Suppress("DEPRECATION")
     private fun saveInterceptedComponent(player: Player, text: Component) {
         val mv = CharSizes.calculateComponentWidth(text, player.locale) / -2
         
@@ -112,6 +113,7 @@ object ActionbarOverlayManager : PacketListener {
         interceptedActionbars[player.uniqueId] = component to System.currentTimeMillis()
     }
     
+    @Suppress("DEPRECATION")
     private fun getCurrentText(player: Player): Component {
         val uuid = player.uniqueId
         val builder = Component.text()

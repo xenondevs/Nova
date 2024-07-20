@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.transformer.patch.worldgen.registry
 
 import com.mojang.serialization.DataResult
+import com.mojang.serialization.DynamicOps
 import com.mojang.serialization.Lifecycle
 import net.minecraft.core.DefaultedMappedRegistry
 import net.minecraft.core.MappedRegistry
@@ -18,15 +19,21 @@ import xyz.xenondevs.bytebase.util.insertAfterFirst
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.findNthOfType
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.DEFAULTED_MAPPED_REGISTRY_GET_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.MAPPED_REGISTRY_LIFECYCLE_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_BY_NAME_CODEC_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.REGISTRY_FILE_CODEC_DECODE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.inject.codec.BlockNovaMaterialDecoder
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlock
 import com.mojang.datafixers.util.Pair as MojangPair
+
+private val REGISTRY_FILE_CODEC_DECODE_METHOD =
+    getMethod(RegistryFileCodec::class, false, "decode", DynamicOps::class, Any::class)
+private val REGISTRY_BY_NAME_CODEC_METHOD =
+    getMethod(Registry::class, true, "lambda\$byNameCodec\$1", ResourceLocation::class)
+private val MAPPED_REGISTRY_LIFECYCLE_METHOD =
+    getMethod(MappedRegistry::class, false, "lifecycle", Any::class)
+private val DEFAULTED_MAPPED_REGISTRY_GET_METHOD =
+    getMethod(DefaultedMappedRegistry::class, false, "get", ResourceLocation::class)
 
 /**
  * Allows accessing Nova's registry from Minecraft's Block registry.

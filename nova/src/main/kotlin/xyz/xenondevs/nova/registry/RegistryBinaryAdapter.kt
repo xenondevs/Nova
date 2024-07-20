@@ -10,7 +10,7 @@ import kotlin.reflect.KType
 internal class RegistryBinaryAdapter<T : Any>(private val registry: Registry<T>): BinaryAdapter<T> {
     
     override fun read(type: KType, reader: ByteReader): T {
-        val id = ResourceLocation.of(reader.readString(), ':')
+        val id = ResourceLocation.parse(reader.readString())
         return registry[id]!!
     }
     

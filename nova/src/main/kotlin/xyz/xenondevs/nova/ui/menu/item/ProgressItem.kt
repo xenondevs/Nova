@@ -20,9 +20,9 @@ open class ProgressItem(val item: NovaItem, private val maxState: Int) : Abstrac
     
     /**
      * The current progress percentage.
-     * 
+     *
      * Changing this value will update the item's appearance.
-     * 
+     *
      * Values are capped between 0..1.
      */
     var percentage: Double = 0.0

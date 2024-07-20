@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data.resources.lookup
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.commons.reflection.createType
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.ResourcePath
@@ -11,15 +11,12 @@ import kotlin.reflect.typeOf
 
 open class ResourceLookup<T : Any> internal constructor(
     val key: String,
-    private val type: KType
+    private val type: KType,
+    empty: T,
 ) {
     
-    val provider = object : Provider<T>() {
-        override fun loadValue(): T = this@ResourceLookup.value
-    }
-    
-    lateinit var value: T
-        protected set
+    var value: T = empty
+    val provider = provider { value }
     
     internal open fun set(value: T) {
         this.value = value
@@ -28,12 +25,9 @@ open class ResourceLookup<T : Any> internal constructor(
     }
     
     internal fun load() {
-        if (::value.isInitialized)
-            return
-        
-        val retrieved = PermanentStorage.retrieveOrNull<T>(type, key)
-        if (retrieved != null)
-            value = retrieved
+        val loaded = PermanentStorage.retrieveOrNull<T>(type, key)
+        if (loaded != null)
+            set(loaded)
     }
     
     operator fun getValue(thisRef: Any, property: KProperty<*>): T = value
@@ -47,51 +41,7 @@ open class ResourceLookup<T : Any> internal constructor(
 class IdResourceLookup<T : Any> internal constructor(
     key: String,
     type: KType
-) : ResourceLookup<Map<String, T>>(key, HashMap::class.createType(typeOf<String>(), type)) {
-    
-    fun getProvider(id: String): Provider<T?> {
-        val elementProvider = object : Provider<T?>() {
-            override fun loadValue(): T? = get(id)
-        }
-        provider.addChild(elementProvider)
-        return elementProvider
-    }
-    
-    fun getProvider(id: ResourceLocation): Provider<T?> =
-        getProvider(id.toString())
-    
-    fun getProvider(id: ResourcePath): Provider<T?> =
-        getProvider(id.toString())
-    
-    @JvmName("getProviderString")
-    fun <I : String?> getProvider(idProvider: Provider<I>): Provider<T?> {
-        val elementProvider = object : Provider<T?>() {
-            override fun loadValue(): T? = idProvider.get()?.let(::get)
-        }
-        idProvider.addChild(elementProvider)
-        provider.addChild(elementProvider)
-        return elementProvider
-    }
-    
-    @JvmName("getProviderResourceLocation")
-    fun <I : ResourceLocation?> getProvider(idProvider: Provider<I>): Provider<T?> {
-        val elementProvider = object : Provider<T?>() {
-            override fun loadValue(): T? = idProvider.get()?.let(::get)
-        }
-        idProvider.addChild(elementProvider)
-        provider.addChild(elementProvider)
-        return elementProvider
-    }
-    
-    @JvmName("getProviderResourcePath")
-    fun <I : ResourcePath?> getProvider(idProvider: Provider<I>): Provider<T?> {
-        val elementProvider = object : Provider<T?>() {
-            override fun loadValue(): T? = idProvider.get()?.let(::get)
-        }
-        idProvider.addChild(elementProvider)
-        provider.addChild(elementProvider)
-        return elementProvider
-    }
+) : ResourceLookup<Map<String, T>>(key, HashMap::class.createType(typeOf<String>(), type), emptyMap()) {
     
     operator fun get(id: String): T? =
         value[id]

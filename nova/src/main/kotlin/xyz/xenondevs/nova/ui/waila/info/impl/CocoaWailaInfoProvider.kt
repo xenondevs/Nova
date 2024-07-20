@@ -2,8 +2,6 @@ package xyz.xenondevs.nova.ui.waila.info.impl
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
-import org.bukkit.block.Block
-import org.bukkit.block.data.BlockData
 import org.bukkit.block.data.type.Cocoa
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
@@ -14,7 +12,7 @@ internal object CocoaWailaInfoProvider : VanillaWailaInfoProvider<Cocoa>(setOf(M
     
     override fun getInfo(player: Player, pos: BlockPos, blockState: Cocoa): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
-        info.icon = ResourceLocation("minecraft", "cocoa_stage$${blockState.age}")
+        info.icon = ResourceLocation.withDefaultNamespace("cocoa_stage$${blockState.age}")
         return info
     }
     

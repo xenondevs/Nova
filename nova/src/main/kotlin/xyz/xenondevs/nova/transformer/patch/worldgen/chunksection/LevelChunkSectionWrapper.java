@@ -12,13 +12,12 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.nova.transformer.Patcher;
 import xyz.xenondevs.nova.transformer.adapter.LcsWrapperAdapter;
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry;
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils;
 import xyz.xenondevs.nova.world.BlockPos;
 import xyz.xenondevs.nova.world.format.WorldDataManager;
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState;
 
-import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.*;
+import java.lang.reflect.Field;
 
 /**
  * Wrapper for {@link LevelChunkSection}s to allow placing {@link WrapperBlockState}s.
@@ -28,16 +27,22 @@ import static xyz.xenondevs.nova.util.reflection.ReflectionRegistry.*;
  */
 public class LevelChunkSectionWrapper extends LevelChunkSection {
     
-    // Vanilla
-    private static final long COUNT_OFFSET = ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT_FIELD);
-    
-    // Paper
-    private static final long SPECIAL_COLLIDING_BLOCKS_OFFSET = ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_SPECIAL_COLLIDING_BLOCKS_FIELD);
-//    private static final long KNOWN_BLOCK_COLLISION_DATA_OFFSET = LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD == null ? -1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_KNOWN_BLOCK_COLLISION_DATA_FIELD);
-    private static final long TICKING_LIST_OFFSET = ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_TICKING_LIST_FIELD);
-    
-    // Pufferfish
-    private static final long FLUID_STATE_COUNT_OFFSET = LEVEL_CHUNK_SECTION_FLUID_STATE_COUNT_FIELD == null ? -1 : ReflectionUtils.getFieldOffset$nova(LEVEL_CHUNK_SECTION_FLUID_STATE_COUNT_FIELD);
+    private static final Field STATES =
+        ReflectionUtils.getField(LevelChunkSection.class, "states");
+    private static final Field BIOMES =
+        ReflectionUtils.getField(LevelChunkSection.class, "biomes");
+    private static final Field NON_EMPTY_BLOCK_COUNT =
+        ReflectionUtils.getField(LevelChunkSection.class, "nonEmptyBlockCount");
+    private static final Field TICKING_BLOCK_COUNT =
+        ReflectionUtils.getField(LevelChunkSection.class, "tickingBlockCount");
+    private static final Field TICKING_FLUID_COUNT =
+        ReflectionUtils.getField(LevelChunkSection.class, "tickingFluidCount");
+    private static final long NON_EMPTY_BLOCK_COUNT_OFFSET =
+        ReflectionUtils.getFieldOffset$nova(NON_EMPTY_BLOCK_COUNT);
+    private static final long TICKING_BLOCK_COUNT_OFFSET =
+        ReflectionUtils.getFieldOffset$nova(TICKING_BLOCK_COUNT);
+    private static final long TICKING_FLUID_COUNT_OFFSET =
+        ReflectionUtils.getFieldOffset$nova(TICKING_FLUID_COUNT);
     
     private final Level level;
     private final ChunkPos chunkPos;
@@ -47,8 +52,8 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     @SuppressWarnings("unchecked")
     public LevelChunkSectionWrapper(Level level, ChunkPos chunkPos, int bottomBlockY, LevelChunkSection delegate) throws IllegalAccessException {
         super(
-            (PalettedContainer<BlockState>) ReflectionRegistry.INSTANCE.getLEVEL_CHUNK_SECTION_STATES_FIELD().get(delegate),
-            (PalettedContainer<Holder<Biome>>) ReflectionRegistry.INSTANCE.getLEVEL_CHUNK_SECTION_BIOMES_FIELD().get(delegate)
+            (PalettedContainer<BlockState>) STATES.get(delegate),
+            (PalettedContainer<Holder<Biome>>) BIOMES.get(delegate)
         );
         this.level = level;
         this.chunkPos = chunkPos;
@@ -89,7 +94,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     }
     
     @Override
-    public void read(FriendlyByteBuf buf) {
+    public void read(@NotNull FriendlyByteBuf buf) {
         delegate.read(buf);
         copyBlockCounts();
     }
@@ -107,16 +112,20 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     }
     
     private void copyBlockCounts() {
-        ReflectionUtils.putInt$nova(this, COUNT_OFFSET, ReflectionUtils.getInt$nova(delegate, COUNT_OFFSET));
-        if (SPECIAL_COLLIDING_BLOCKS_OFFSET != -1) {
-            ReflectionUtils.putInt$nova(this, SPECIAL_COLLIDING_BLOCKS_OFFSET, ReflectionUtils.getInt$nova(delegate, SPECIAL_COLLIDING_BLOCKS_OFFSET));
-//            ReflectionUtils.putReference$nova(this, KNOWN_BLOCK_COLLISION_DATA_OFFSET, ReflectionUtils.getReference$nova(delegate, KNOWN_BLOCK_COLLISION_DATA_OFFSET));
-            ReflectionUtils.putReference$nova(this, TICKING_LIST_OFFSET, ReflectionUtils.getReference$nova(delegate, TICKING_LIST_OFFSET));
-            
-            if (FLUID_STATE_COUNT_OFFSET != -1) {
-                ReflectionUtils.putInt$nova(this, FLUID_STATE_COUNT_OFFSET, ReflectionUtils.getInt$nova(delegate, FLUID_STATE_COUNT_OFFSET));
-            }
-        }
+        ReflectionUtils.putInt$nova(
+            this,
+            NON_EMPTY_BLOCK_COUNT_OFFSET,
+            ReflectionUtils.getInt$nova(delegate, NON_EMPTY_BLOCK_COUNT_OFFSET)
+        );
+        ReflectionUtils.putInt$nova(
+            this,
+            TICKING_BLOCK_COUNT_OFFSET,
+            ReflectionUtils.getInt$nova(delegate, TICKING_BLOCK_COUNT_OFFSET));
+        ReflectionUtils.putInt$nova(
+            this,
+            TICKING_FLUID_COUNT_OFFSET,
+            ReflectionUtils.getInt$nova(delegate, TICKING_FLUID_COUNT_OFFSET)
+        );
     }
     
 }

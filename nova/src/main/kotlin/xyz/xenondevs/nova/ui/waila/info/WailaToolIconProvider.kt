@@ -36,7 +36,7 @@ internal object VanillaWailaToolIconProvider : WailaToolIconProvider {
             else -> null
         } ?: return null
         
-        return ResourceLocation("minecraft", "item/$name")
+        return ResourceLocation.withDefaultNamespace("item/$name")
     }
     
 }

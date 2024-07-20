@@ -5,8 +5,8 @@ import com.google.gson.JsonObject
 import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
-import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.MutableProvider
+import xyz.xenondevs.commons.provider.mutable.mutableProvider
 import xyz.xenondevs.nova.data.serialization.json.GSON
 import java.io.File
 import java.lang.reflect.Type
@@ -95,27 +95,13 @@ internal object PermanentStorage {
     
     fun <T> storedValue(type: KType, key: String, alternativeProvider: () -> T): MutableProvider<T> =
         storedValue(type.javaType, key, alternativeProvider)
-        
+    
     fun <T> storedValue(type: Type, key: String, alternativeProvider: () -> T): MutableProvider<T> =
-        DataAccessor(type, key, alternativeProvider)
+        mutableProvider(
+            { retrieveOrStore(type, key, alternativeProvider) },
+            { store(key, it) }
+        )
     
     private fun getFile(key: String) = File(dir, "$key.json")
-    
-    private class DataAccessor<T>(
-        private val type: Type,
-        private val key: String,
-        private val alternativeProvider: () -> T
-    ) : MutableProvider<T>() {
-        
-        override fun loadValue(): T {
-            return retrieveOrStore(type, key, alternativeProvider)
-        }
-        
-        override fun set(value: T, updateChildren: Boolean, callUpdateHandlers: Boolean, ignoredChildren: Set<Provider<*>>) {
-            super.set(value, updateChildren, callUpdateHandlers, ignoredChildren)
-            store(key, value)
-        }
-        
-    }
     
 }

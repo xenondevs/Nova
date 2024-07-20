@@ -4,9 +4,17 @@ package xyz.xenondevs.nova.item
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
+import net.minecraft.core.component.DataComponentMap
+import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.EquipmentSlotGroup
 import net.minecraft.world.entity.ai.attributes.Attribute
+import net.minecraft.world.entity.ai.attributes.AttributeModifier
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.ItemAttributeModifiers
 import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -19,7 +27,8 @@ import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.kotlin.extensions.get
-import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.ConfigProvider
@@ -32,25 +41,22 @@ import xyz.xenondevs.nova.data.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorFactory
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
-import xyz.xenondevs.nova.item.logic.PacketItemData
 import xyz.xenondevs.nova.item.logic.PacketItems
-import xyz.xenondevs.nova.item.vanilla.AttributeModifier
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.data.CentralizedLazy
+import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.data.logExceptionMessages
-import xyz.xenondevs.nova.util.item.novaCompound
-import xyz.xenondevs.nova.util.item.novaCompoundOrNull
-import xyz.xenondevs.nova.util.item.unhandledTags
+import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import java.util.logging.Level
-import kotlin.math.min
+import kotlin.Unit
+import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
-import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
+import net.minecraft.util.Unit as MojangUnit
 import net.minecraft.world.item.ItemStack as MojangStack
 
 /**
@@ -58,10 +64,10 @@ import net.minecraft.world.item.ItemStack as MojangStack
  */
 class NovaItem internal constructor(
     val id: ResourceLocation,
-    val name: Component,
+    val name: Component?,
     val style: Style,
     behaviorHolders: List<ItemBehaviorHolder>,
-    private val _maxStackSize: Int,
+    val maxStackSize: Int,
     val craftingRemainingItem: ItemBuilder?,
     val isHidden: Boolean,
     val block: NovaBlock?,
@@ -69,26 +75,20 @@ class NovaItem internal constructor(
     internal val requestedLayout: RequestedItemModelLayout
 ) {
     
-    /**
-     * The maximum stack size of this [NovaItem].
-     */
-    val maxStackSize: Int
-        get() = min(_maxStackSize, vanillaMaterial.maxStackSize)
-    
-    val model: ItemModelData by lazy {
+    val model: ItemModelData by combinedProvider(
+        ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.provider,
+        ResourceLookups.UNNAMED_ITEM_MODEL_LOOKUP.provider
+    ) { named, unnamed ->
         val material = vanillaMaterial
-        val namedModels = ResourceLookups.NAMED_ITEM_MODEL[this]?.get(material)
-            ?: throw IllegalStateException("No named models for $this in resource lookups under $material")
-        val unnamedModels = ResourceLookups.UNNAMED_ITEM_MODEL[this]?.get(material)
-            ?: throw IllegalStateException("No unnamed models for $this in resource lookups under $material")
-        return@lazy ItemModelData(this, material, namedModels, unnamedModels)
+        val namedModels = named[this]?.get(material) ?: emptyMap()
+        val unnamedModels = unnamed[this]?.get(material) ?: IntArray(0)
+        
+        ItemModelData(this, namedModels, unnamedModels)
     }
     
     /**
      * The configuration for this [NovaItem].
      * Trying to read config values from this when no config is present will result in an exception.
-     *
-     * Use the extension functions `entry` and `optionalEntry` to get values from the config.
      */
     val config: ConfigProvider = Configs[configId]
     
@@ -105,61 +105,110 @@ class NovaItem internal constructor(
     /**
      * The underlying vanilla material of this [NovaItem].
      */
-    internal var vanillaMaterial: Material by CentralizedLazy(::reload)
-        private set
+    internal val vanillaMaterial: Material by combinedProvider(
+        ResourceLookups.UNNAMED_ITEM_MODEL_LOOKUP.provider,
+        combinedProvider(behaviors.map(ItemBehavior::vanillaMaterialProperties))
+    ) { lookup, properties ->
+        var vanillaMaterial = VanillaMaterialTypes.getMaterial(properties.flatten().toHashSet())
+        
+        // fall back to first available material if vanilla material is not present in lookups
+        val itemModels = lookup[this]
+        if (itemModels != null && vanillaMaterial !in itemModels)
+            vanillaMaterial = itemModels.keys.first()
+        
+        vanillaMaterial
+    }
     
     /**
-     * The attribute modifiers that are applied when this [NovaItem] is equipped.
+     * The base data components of this [NovaItem].
      */
-    internal var attributeModifiers: Map<MojangEquipmentSlot, List<AttributeModifier>> by CentralizedLazy(::reload)
-        private set
+    internal val baseDataComponents: DataComponentMap by combinedProvider(
+        behaviors.map(ItemBehavior::baseDataComponents)
+    ) { dataComponentMaps ->
+        val builder = DataComponentMap.builder()
+        if (name != null) {
+            builder.set(DataComponents.ITEM_NAME, name.toNMSComponent())
+        } else {
+            builder.set(DataComponents.HIDE_TOOLTIP, MojangUnit.INSTANCE)
+        }
+        builder.set(DataComponents.ATTRIBUTE_MODIFIERS, loadConfiguredAttributeModifiers())
+        builder.set(DataComponents.MAX_STACK_SIZE, maxStackSize)
+        for (dataComponentMap in dataComponentMaps) {
+            builder.addAll(dataComponentMap) // TODO: proper merging (customdata, attributemodifiers)
+        }
+        
+        builder.build()
+    }
+    
+    /**
+     * The default components patch applied to all [ItemStacks][ItemStack] of this [NovaItem].
+     */
+    internal val defaultPatch: DataComponentPatch by combinedProvider(
+        behaviors.map(ItemBehavior::defaultPatch)
+    ) { dataComponentPatches ->
+        val patch = ItemUtils.mergeDataComponentPatches(dataComponentPatches)
+        var customData = patch.get(DataComponents.CUSTOM_DATA)?.getOrNull() ?: CustomData.EMPTY
+        customData = customData.update { compoundTag ->
+            compoundTag.put("nova", CompoundTag().also {
+                it.putString("id", id.toString())
+            })
+            defaultCompound?.let { compoundTag.putByteArray("nova_cbf", CBF.write(it)) }
+        }
+        
+        DataComponentPatch.builder().apply { copy(patch) }
+            .set(DataComponents.CUSTOM_DATA, customData)
+            .build()
+    }
     
     /**
      * The default [NamespacedCompound] that is applied to all [ItemStacks][ItemStack] of this [NovaItem].
      */
-    private var defaultCompound: NamespacedCompound? by CentralizedLazy(::reload)
+    private val defaultCompound: NamespacedCompound? by combinedProvider(
+        behaviors.map(ItemBehavior::defaultCompound)
+    ) { defaultCompounds ->
+        val compound = NamespacedCompound()
+        for (defaultCompound in defaultCompounds) {
+            compound.putAll(defaultCompound)
+        }
+        
+        compound.takeUnless { it.isEmpty() }
+    }
     
     /**
      * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in server-side format.
      */
     fun createItemBuilder(modelId: String = "default"): ItemBuilder =
-        createItemBuilder { putString("modelId", modelId) }
+        ItemBuilder(createItemStack(1, modelId))
     
     /**
      * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in server-side format.
      */
     fun createItemBuilder(modelId: Int): ItemBuilder =
-        createItemBuilder { putInt("subId", modelId) }
-    
-    @Suppress("DEPRECATION")
-    private fun createItemBuilder(writeModelId: CompoundTag.() -> Unit): ItemBuilder =
-        ItemBuilder(PacketItems.SERVER_SIDE_MATERIAL)
-            .let { initialBuilder -> behaviors.fold(initialBuilder) { acc, behavior -> behavior.modifyItemBuilder(acc) } }
-            .addModifier { itemStack ->
-                val novaCompoundTag = CompoundTag()
-                novaCompoundTag.putString("id", id.toString())
-                writeModelId(novaCompoundTag)
-                val meta = itemStack.itemMeta!!
-                meta.unhandledTags["nova"] = novaCompoundTag
-                itemStack.itemMeta = meta
-                
-                if (defaultCompound != null)
-                    itemStack.novaCompound.putAll(defaultCompound!!.copy())
-                
-                itemStack
-            }
+        ItemBuilder(createItemStack(1, modelId))
     
     /**
      * Creates an [ItemStack] of this [NovaItem] with the given [amount] and [modelId] in server-side format.
      */
     fun createItemStack(amount: Int = 1, modelId: String = "default"): ItemStack =
-        createItemBuilder(modelId).setAmount(amount).get()
+        createItemStack { putString("modelId", modelId) }.also { it.amount = amount }
     
     /**
      * Creates an [ItemStack] of this [NovaItem] with the given [amount] and [modelId] in server-side format.
      */
     fun createItemStack(amount: Int = 1, modelId: Int): ItemStack =
-        createItemBuilder(modelId).setAmount(amount).get()
+        createItemStack { putInt("subId", modelId) }.also { it.amount = amount }
+    
+    private fun createItemStack(writeModelId: CompoundTag.() -> Unit): ItemStack {
+        val itemStack = MojangStack(PacketItems.SERVER_SIDE_ITEM_HOLDER, 1, defaultPatch)
+        itemStack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY) { customData ->
+            customData.update { compoundTag ->
+                val novaCompound = compoundTag.getCompound("nova") // should be present in defaultPatch
+                writeModelId(novaCompound)
+            }
+        }
+        
+        return itemStack.asBukkitMirror()
+    }
     
     /**
      * Checks whether this [NovaItem] has an [ItemBehavior] of the reified type [T], or a subclass of it.
@@ -197,72 +246,47 @@ class NovaItem internal constructor(
     fun <T : Any> getBehavior(behavior: KClass<T>): T =
         getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
     
-    internal fun getPacketItemData(itemStack: MojangStack?): PacketItemData {
-        val itemData = PacketItemData(itemStack?.orCreateTag ?: CompoundTag(), name)
-        behaviors.forEach { it.updatePacketItemData(itemStack?.novaCompoundOrNull ?: NamespacedCompound.EMPTY, itemData) }
-        return itemData
+    /**
+     * Modifies the client-side stack of this [NovaItem], in the context that it is sent to [player] and has [data].
+     */
+    internal fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
+        return behaviors.fold(itemStack) { stack, behavior -> behavior.modifyClientSideStack(player, stack, data) }
     }
     
-    //<editor-fold desc="load methods", defaultstate="collapsed">
-    private fun reload() {
-        loadVanillaMaterial()
-        loadAttributeModifiers()
-        loadDefaultCompound()
-    }
-    
-    private fun loadVanillaMaterial() {
-        val properties = behaviors.flatMapTo(HashSet()) { it.getVanillaMaterialProperties() }
-        vanillaMaterial = VanillaMaterialTypes.getMaterial(properties)
-        
-        // fall back to first available material if vanilla material is not present in lookups
-        val itemModels = ResourceLookups.UNNAMED_ITEM_MODEL[this]
-            ?: throw IllegalStateException("No unnamed model lookup for $this")
-        if (vanillaMaterial !in itemModels)
-            vanillaMaterial = itemModels.keys.first()
-    }
-    
-    private fun loadAttributeModifiers() {
-        val modifiers = loadConfiguredAttributeModifiers() + behaviors.flatMap { it.getAttributeModifiers() }
-        val modifiersBySlot = enumMap<MojangEquipmentSlot, ArrayList<AttributeModifier>>()
-        modifiers.forEach { modifier ->
-            modifier.slots.forEach { slot ->
-                modifiersBySlot.getOrPut(slot, ::ArrayList) += modifier
-            }
-        }
-        attributeModifiers = modifiersBySlot
-    }
-    
-    private fun loadConfiguredAttributeModifiers(): List<AttributeModifier> {
+    private fun loadConfiguredAttributeModifiers(): ItemAttributeModifiers {
         val section = Configs.getOrNull(configId)?.node("attribute_modifiers")
         if (section == null || section.virtual())
-            return emptyList()
+            return ItemAttributeModifiers.EMPTY
         
-        val modifiers = ArrayList<AttributeModifier>()
+        val builder = ItemAttributeModifiers.builder()
         for ((slotName, attributesNode) in section.childrenMap()) {
             try {
-                val slot = MojangEquipmentSlot.entries.firstOrNull { it.name.equals(slotName as String, true) }
-                    ?: throw IllegalArgumentException("Unknown equipment slot: $slotName")
+                val slotGroup = EquipmentSlotGroup.entries.firstOrNull { it.name.equals(slotName as String, true) }
+                    ?: throw IllegalArgumentException("Unknown equipment slot group: $slotName")
                 
                 for ((idx, attributeNode) in attributesNode.childrenList().withIndex()) {
                     try {
                         val attribute = attributeNode.node("attribute").get<Attribute>()
                             ?: throw NoSuchElementException("Missing value 'attribute'")
-                        val operation = attributeNode.node("operation").get<net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation>()
+                        val operation = attributeNode.node("operation").get<AttributeModifier.Operation>()
                             ?: throw NoSuchElementException("Missing value 'operation'")
                         val value = attributeNode.node("value").get<Double>()
                             ?: throw NoSuchElementException("Missing value 'value'")
-                        val hidden = attributeNode.node("hidden").boolean
                         
-                        modifiers += AttributeModifier(
-                            "Nova Configured Attribute Modifier ($slot, $idx)",
-                            attribute,
-                            operation,
-                            value,
-                            !hidden,
-                            slot
+                        builder.add(
+                            BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute),
+                            AttributeModifier(
+                                ResourceLocation.fromNamespaceAndPath(
+                                    "nova",
+                                    "configured_attribute_modifier_${slotGroup}_$idx"
+                                ),
+                                value,
+                                operation
+                            ),
+                            slotGroup
                         )
                     } catch (e: Exception) {
-                        LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $this, $slot with index $idx", e)
+                        LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $this, $slotGroup with index $idx", e)
                     }
                 }
             } catch (e: Exception) {
@@ -270,23 +294,8 @@ class NovaItem internal constructor(
             }
         }
         
-        return modifiers
+        return builder.build()
     }
-    
-    private fun loadDefaultCompound() {
-        var defaultCompound: NamespacedCompound? = null
-        for (behavior in behaviors) {
-            val behaviorCompound = behavior.getDefaultCompound()
-            if (behaviorCompound.isNotEmpty()) {
-                if (defaultCompound == null)
-                    defaultCompound = NamespacedCompound()
-                
-                defaultCompound.putAll(behaviorCompound)
-            }
-        }
-        this.defaultCompound = defaultCompound
-    }
-    //</editor-fold>
     
     //<editor-fold desc="event methods", defaultstate="collapsed">
     internal fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {

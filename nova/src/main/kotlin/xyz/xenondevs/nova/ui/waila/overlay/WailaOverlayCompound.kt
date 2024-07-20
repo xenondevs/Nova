@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatcher
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 
-private val BAR_MATCH_INFO = BarMatchInfo.fromAddon(ResourceLocation("nova", "waila"))
+private val BAR_MATCH_INFO = BarMatchInfo.fromAddon(ResourceLocation.fromNamespaceAndPath("nova", "waila"))
 
 private val MARGIN_TOP = MAIN_CONFIG.entry<Int>("waila", "positioning", "margin_top")
 private val MARGIN_BOTTOM = MAIN_CONFIG.entry<Int>("waila", "positioning", "margin_bottom")
@@ -35,6 +35,7 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
     private val imageOverlay = WailaImageOverlay()
     private val lineOverlays = Array(10, ::WailaLineOverlay)
     
+    @Suppress("DEPRECATION")
     fun update(icon: ResourceLocation, lines: List<WailaLine>) {
         require(lines.size <= 10) { "Waila text can't be longer than 10 lines" }
         
@@ -69,6 +70,7 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
         hasChanged = true
     }
     
+    @Suppress("DEPRECATION")
     private fun getBeginX(lines: List<WailaLine>, lineNumber: Int, beginX: Float, centerX: Float): Float {
         var currentLineNumber = lineNumber
         while (true) {

@@ -48,14 +48,18 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
             if (shouldDrop(msg, outgoingDropQueue))
                 return
             
-            if (msg is ClientboundBundlePacket) {
-                val packets = msg.subPackets().mapNotNull(::callEvent)
-                if (packets.isEmpty())
-                    return
-                super.write(ctx, ClientboundBundlePacket(packets), promise)
+            if (msg is Packet<*>) {
+                if (msg is ClientboundBundlePacket) {
+                    val subPackets = msg.subPackets().mapNotNull(::callEvent)
+                    if (subPackets.isEmpty())
+                        return
+                    super.write(ctx, ClientboundBundlePacket(subPackets), promise)
+                } else {
+                    val packet = callEvent(msg) ?: return
+                    super.write(ctx, packet, promise)
+                }
             } else {
-                val packet = callEvent(msg) ?: return
-                super.write(ctx, packet, promise)
+                super.write(ctx, msg, promise)
             }
         } catch (t: Throwable) {
             LOGGER.log(Level.SEVERE, "An exception occurred while handling a clientbound packet.", t)
@@ -71,8 +75,12 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
                 if (shouldDrop(msg, incomingDropQueue))
                     return
                 
-                val packet = callEvent(msg) ?: return
-                super.channelRead(ctx, packet)
+                if (msg is Packet<*>) {
+                    val packet = callEvent(msg) ?: return
+                    super.channelRead(ctx, packet)
+                } else {
+                    super.channelRead(ctx, msg)
+                }
             }
         } catch (t: Throwable) {
             LOGGER.log(Level.SEVERE, "An exception occurred while handling a serverbound packet.", t)
@@ -112,14 +120,7 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
         }
     }
     
-    private fun callEvent(msg: Any?): Any? {
-        if (msg is Packet<*>)
-            return callEvent(msg)
-        
-        return msg
-    }
-    
-    private fun <T : PacketListener> callEvent(msg: Packet<T>): Packet<T>? {
+    private fun <L : PacketListener, P : Packet<in L>> callEvent(msg: P): P? {
         val event = PacketEventManager.createAndCallEvent(player, msg) ?: return msg
         return if (event.isCancelled) null else event.packet
     }

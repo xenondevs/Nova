@@ -34,7 +34,7 @@ import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegi
 import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
-private val REQUIRED_SERVER_VERSION = Version("1.20.4")..Version("1.20.4")
+private val REQUIRED_SERVER_VERSION = Version("1.21")..Version("1.21")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 internal lateinit var NOVA: Nova private set
 internal lateinit var NOVA_PLUGIN: NovaJavaPlugin private set
@@ -56,7 +56,7 @@ internal class Nova(
     
     val dataFolder = plugin.dataFolder
     val version = Version(plugin.description.version)
-    val lastVersion = PermanentStorage.retrieveOrNull<Version>("last_version")?.let { if (it == Version("0.1")) Version("0.10") else it }
+    val lastVersion = PermanentStorage.retrieveOrNull<Version>("last_version")
     
     internal val disableHandlers = ArrayList<() -> Unit>()
     

@@ -12,10 +12,7 @@ class ClientboundActionBarPacketEvent(
     packet: ClientboundSetActionBarTextPacket
 ) : PlayerPacketEvent<ClientboundSetActionBarTextPacket>(player, packet) {
     
-    @Suppress("UNNECESSARY_SAFE_CALL") // packet.components is actually nullable
-    var text: Component = packet.`adventure$text`
-        ?: packet.components?.toAdventureComponent()
-        ?: packet.text.toAdventureComponent()
+    var text: Component = packet.text().toAdventureComponent()
         set(value) {
             field = value
             changed = true

@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.ui.waila.info.impl
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
-import org.bukkit.block.Block
 import org.bukkit.block.data.Levelled
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
@@ -24,7 +23,7 @@ internal object CauldronWailaInfoProvider : VanillaWailaInfoProvider<Levelled>(
             3 -> "full"
             else -> throw IllegalStateException("Cauldron level is not 1, 2 or 3")
         }
-        info.icon = ResourceLocation("minecraft", blockState.material.name.lowercase() + "_$level")
+        info.icon = ResourceLocation.withDefaultNamespace(blockState.material.name.lowercase() + "_$level")
         return info
     }
     

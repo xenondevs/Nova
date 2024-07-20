@@ -108,8 +108,6 @@ waila:
 world:
   # Settings affecting block breaking.
   block_breaking:
-    # If client-side predictions should be allowed for breaking vanilla blocks with vanilla tools.
-    clientside_predictions: true
     # The block break cooldown, in ticks.
     break_cooldown: 5
   format:

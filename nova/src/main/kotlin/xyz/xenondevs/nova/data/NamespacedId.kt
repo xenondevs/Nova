@@ -26,7 +26,7 @@ internal operator fun <T> MutableMap<NamespacedId, T>.get(namespace: String, key
 }
 
 internal fun NamespacedId.toResourceLocation(): ResourceLocation {
-    return ResourceLocation(namespace, name)
+    return ResourceLocation.fromNamespaceAndPath(namespace, name)
 }
 
 @Suppress("DEPRECATION")
@@ -38,7 +38,7 @@ class NamespacedId(@JvmField val namespace: String, @JvmField val name: String) 
     val namespacedKey: NamespacedKey
         get() = NamespacedKey(namespace, name)
     val resourceLocation: ResourceLocation
-        get() = ResourceLocation(namespace, name)
+        get() = ResourceLocation.fromNamespaceAndPath(namespace, name)
     
     constructor(plugin: Plugin, name: String) : this(plugin.name.lowercase(), name)
     constructor(addon: Addon, name: String) : this(addon.description.id, name)

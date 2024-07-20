@@ -5,8 +5,6 @@ import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.recipe.RecipeType
 import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.item.armor.Armor
-import xyz.xenondevs.nova.item.enchantment.Enchantment
-import xyz.xenondevs.nova.item.enchantment.EnchantmentCategory
 import xyz.xenondevs.nova.item.tool.ToolCategory
 import xyz.xenondevs.nova.item.tool.ToolTier
 import xyz.xenondevs.nova.player.ability.AbilityType
@@ -38,12 +36,6 @@ object NovaRegistries {
     val TOOL_CATEGORY = registerSimple<ToolCategory>("tool_category")
     
     @JvmField
-    val ENCHANTMENT_CATEGORY = registerSimple<EnchantmentCategory>("enchantment_category")
-    
-    @JvmField
-    val ENCHANTMENT = registerSimple<Enchantment>("enchantment")
-    
-    @JvmField
     val NETWORK_TYPE = registerSimple<NetworkType<*>>("network_type")
     
     @JvmField
@@ -72,12 +64,12 @@ object NovaRegistries {
     val ITEM_FILTER_TYPE = registerSimple<ItemFilterType<*>>("item_filter_type")
     
     private fun <E : Any> registerSimple( name: String): WritableRegistry<E> {
-        val resourceLocation = ResourceLocation("nova", name)
+        val resourceLocation = ResourceLocation.fromNamespaceAndPath("nova", name)
         return NovaRegistryAccess.addRegistry(resourceLocation)
     }
     
     private fun <E : Any> registerFuzzy(name: String): FuzzyMappedRegistry<E> {
-        val resourceLocation = ResourceLocation("nova", name)
+        val resourceLocation = ResourceLocation.fromNamespaceAndPath("nova", name)
         return NovaRegistryAccess.addFuzzyRegistry(resourceLocation)
     }
     

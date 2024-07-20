@@ -13,7 +13,7 @@ import java.util.*
 
 /**
  * An ui item for visualizing regions via [VisualRegion].
- * 
+ *
  * @param player the player to visualize the region for
  * @param regionUUID the [UUID] of the region to visualize
  * @param getRegion a function to receive the [Region]

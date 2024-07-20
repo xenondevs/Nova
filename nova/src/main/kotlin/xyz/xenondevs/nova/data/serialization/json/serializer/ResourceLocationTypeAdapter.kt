@@ -18,7 +18,7 @@ internal object ResourceLocationTypeAdapter : TypeAdapter<ResourceLocation?>() {
         if (reader.peek() == JsonToken.NULL)
             return null
         
-        return ResourceLocation(reader.nextString())
+        return ResourceLocation.parse(reader.nextString())
     }
     
 }

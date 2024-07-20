@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.data.recipe
 
+import net.minecraft.network.protocol.game.ClientboundPlaceGhostRecipePacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.RecipeHolder
@@ -15,7 +16,6 @@ import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.recipe.impl.RepairItemRecipe
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -45,6 +45,7 @@ import org.bukkit.inventory.Recipe as BukkitRecipe
 annotation class HardcodedRecipes
 
 private val ALLOW_RESULT_OVERWRITE by MAIN_CONFIG.entry<Boolean>("debug", "allow_craft_result_overwrite")
+private val ALLOWED_RECIPES = setOf(NamespacedKey("minecraft", "repair_item"))
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -52,11 +53,7 @@ private val ALLOW_RESULT_OVERWRITE by MAIN_CONFIG.entry<Boolean>("debug", "allow
 )
 object RecipeManager : Listener, PacketListener {
     
-    private val INTERNAL_RECIPES: Map<ResourceLocation, () -> MojangRecipe<*>> = mapOf(
-        ResourceLocation("minecraft", "repair_item") to ::RepairItemRecipe
-    )
-    
-    private val registeredVanillaRecipes = HashMap<ResourceLocation, MojangRecipe<*>>()
+    private val registeredVanillaRecipes = HashMap<ResourceLocation, RecipeHolder<*>>()
     private val customVanillaRecipes = HashMap<ResourceLocation, MojangRecipe<*>>()
     private val _clientsideRecipes = HashMap<ResourceLocation, MojangRecipe<*>>()
     private val _novaRecipes = HashMap<RecipeType<*>, HashMap<ResourceLocation, NovaRecipe>>()
@@ -72,7 +69,6 @@ object RecipeManager : Listener, PacketListener {
         registerEvents()
         registerPacketListener()
         loadRecipes()
-        loadInternalRecipes()
     }
     
     //<editor-fold desc="hardcoded recipes", defaultstate="collapsed">
@@ -123,10 +119,11 @@ object RecipeManager : Listener, PacketListener {
                 serversideRecipe as Recipe<*> // intersection type of Recipe<*> and ServersideRecipe
                 
                 val id = recipe.key.resourceLocation
-                MINECRAFT_SERVER.recipeManager.addRecipe(RecipeHolder(id, serversideRecipe))
+                val holder = RecipeHolder(id, serversideRecipe)
+                MINECRAFT_SERVER.recipeManager.addRecipe(holder)
                 
                 _clientsideRecipes[id] = serversideRecipe.clientsideCopy()
-                registeredVanillaRecipes[id] = serversideRecipe
+                registeredVanillaRecipes[id] = holder
                 customVanillaRecipes[id] = serversideRecipe
             }
             
@@ -135,19 +132,7 @@ object RecipeManager : Listener, PacketListener {
             else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
         }
     }
-    
-    private fun loadInternalRecipes() {
-        val recipeManager = MINECRAFT_SERVER.recipeManager
-        INTERNAL_RECIPES.forEach { (id, recipeConstructor) ->
-            val recipe = recipeConstructor.invoke()
-            
-            recipeManager.removeRecipe(id)
-            recipeManager.addRecipe(RecipeHolder(id, recipe))
-            
-            registeredVanillaRecipes[id] = recipe
-        }
-    }
-    
+
     internal fun reload() {
         customVanillaRecipes.keys.forEach(MINECRAFT_SERVER.recipeManager::removeRecipe)
         
@@ -170,6 +155,9 @@ object RecipeManager : Listener, PacketListener {
     private fun handlePrepareItemCraft(event: PrepareItemCraftEvent) {
         val recipe = event.recipe ?: return
         
+        if (recipe.key in ALLOWED_RECIPES)
+            return
+        
         var requiresContainer = recipe.key.resourceLocation in registeredVanillaRecipes.keys
         if (!requiresContainer && event.inventory.contents.any { it?.novaItem != null }) {
             // prevent non-Nova recipes from using Nova items
@@ -186,7 +174,9 @@ object RecipeManager : Listener, PacketListener {
     @PacketHandler
     private fun handleRecipePlace(event: ServerboundPlaceRecipePacketEvent) {
         val id = event.recipe
-        val recipe = registeredVanillaRecipes[id] ?: return
+        val recipe = registeredVanillaRecipes[id]
+            ?.value
+            ?: return
         
         if (recipe is NovaShapedRecipe) {
             runTask { fillCraftingInventory(event.player, recipe, id) }
@@ -222,7 +212,10 @@ object RecipeManager : Listener, PacketListener {
             
         } else {
             // send ghost recipe
-            val packet = xyz.xenondevs.nova.network.ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, id)
+            val packet = ClientboundPlaceGhostRecipePacket(
+                player.serverPlayer.containerMenu.containerId,
+                registeredVanillaRecipes[id]!!
+            )
             player.send(packet)
         }
     }
@@ -248,7 +241,10 @@ object RecipeManager : Listener, PacketListener {
             
         } else {
             // send ghost recipe
-            val packet = xyz.xenondevs.nova.network.ClientboundPlaceGhostRecipePacket(player.serverPlayer.containerMenu.containerId, id)
+            val packet = ClientboundPlaceGhostRecipePacket(
+                player.serverPlayer.containerMenu.containerId,
+                registeredVanillaRecipes[id]!!
+            )
             player.send(packet)
         }
     }
