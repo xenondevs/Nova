@@ -22,7 +22,7 @@ private val ENCHANTMENT_MENU_SLOTS_CHANGED_LAMBDA = ReflectionUtils.getMethod(
     EnchantmentMenu::class,
     true,
     // not remapped
-    if (ServerUtils.SERVER_SOFTWARE == ServerSoftware.PURPUR) "lambda\$slotsChanged\$1" else "lambda\$slotsChanged$0",
+    if (ServerUtils.SERVER_SOFTWARE.isPurpur()) "lambda\$slotsChanged\$1" else "lambda\$slotsChanged$0",
     ItemStack::class, Level::class, BlockPos::class
 )
 
@@ -31,7 +31,7 @@ private val ENCHANTMENT_MENU_CLICK_MENU_BUTTON_LAMBDA = ReflectionUtils.getMetho
     EnchantmentMenu::class,
     true,
     // not remapped
-    if (ServerUtils.SERVER_SOFTWARE == ServerSoftware.PURPUR) "lambda\$clickMenuButton\$2" else "lambda\$clickMenuButton$1",
+    if (ServerUtils.SERVER_SOFTWARE.isPurpur()) "lambda\$clickMenuButton\$2" else "lambda\$clickMenuButton$1",
     ItemStack::class, Int::class, Player::class, Int::class, ItemStack::class, Level::class, BlockPos::class
 )
 

@@ -17,6 +17,7 @@ object ServerUtils {
             "Tuinity" -> TUINITY
             "Purpur" -> PURPUR
             "Airplane" -> AIRPLANE
+            "Leaf" -> LEAF
             else -> UNKNOWN
         }
     }
@@ -34,6 +35,7 @@ enum class ServerSoftware(private vararg val superSoftwares: ServerSoftware = em
     TUINITY(PAPER),
     PURPUR(TUINITY, PUFFERFISH),
     AIRPLANE(PURPUR),
+    LEAF(AIRPLANE),
     UNKNOWN;
     
     val tree: List<ServerSoftware> = buildList { 
@@ -50,5 +52,7 @@ enum class ServerSoftware(private vararg val superSoftwares: ServerSoftware = em
     fun <K, V> getCorrectMap(): MutableMap<K, V> = if (this == PURPUR) ConcurrentHashMap() else HashMap()
     
     fun isPaper() = this.tree.contains(PAPER)
-    
+
+    fun isPurpur() = this.tree.contains(PURPUR)
+
 }
