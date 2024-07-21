@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.data.resources.upload
 
 import kotlinx.coroutines.runBlocking
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.contains
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.data.config.PermanentStorage
@@ -65,7 +64,7 @@ internal object AutoUploadManager {
         val autoUploadCfg = cfg.node("auto_upload")
         enabled = autoUploadCfg.node("enabled").boolean
         
-        if (cfg.contains("url")) {
+        if (cfg.hasChild("url")) {
             val url = cfg.node("url").string
             if (!url.isNullOrEmpty()) {
                 if (enabled)

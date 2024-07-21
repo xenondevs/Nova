@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.data.serialization.configurate
 
 import net.minecraft.resources.ResourceLocation
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.TypeSerializer
+import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.world.block.limits.AmountLimiter
 import xyz.xenondevs.nova.world.block.limits.BlockLimiter
 import xyz.xenondevs.nova.world.block.limits.TypeBlacklist

@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.dokka)
-    id("xyz.xenondevs.loader-jar-plugin")
+    id("xyz.xenondevs.bundler-jar-plugin")
 }
 
 fun RepositoryHandler.configureRepos() {

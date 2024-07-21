@@ -2,11 +2,11 @@ package xyz.xenondevs.nova.data.serialization.configurate
 
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.TypeSerializer
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.nova.item.CategorizedItem
 import xyz.xenondevs.nova.item.ItemCategory
+import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.item.ItemUtils
 import java.lang.reflect.Type
 

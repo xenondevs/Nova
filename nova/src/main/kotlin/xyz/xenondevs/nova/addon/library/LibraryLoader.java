@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.loader.library;
+package xyz.xenondevs.nova.addon.library;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.RepositorySystem;
@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Deprecated
 public class LibraryLoader {
     
     private static final File LIBRARIES_DIR = new File("libraries");

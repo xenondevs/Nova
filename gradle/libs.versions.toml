@@ -3,7 +3,6 @@ format.version = "1.1"
 
 [versions]
 cbf = "0.12"
-configurate = "4.2.0-SNAPSHOT"
 invui = "1.33"
 jgrapht = "1.5.1"
 kotlin = "2.0.10-RC"
@@ -23,8 +22,6 @@ commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version
 commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "xenondevs-commons" }
 commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version.ref = "xenondevs-commons" }
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "xenondevs-commons" }
-configurate-yaml = { group = "xyz.xenondevs.configurate", name = "configurate-yaml", version.ref = "configurate" }
-configurate-extra-kotlin = { group = "xyz.xenondevs.configurate", name = "configurate-extra-kotlin", version.ref = "configurate" }
 cosmic-binary-format = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format", version.ref = "cbf" }
 cosmic-binary-format-netty-adapter = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format-netty-adapter", version.ref = "cbf" }
 cosmic-binary-format-provider = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format-provider", version.ref = "cbf" }
@@ -61,7 +58,6 @@ zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.6-3" }
 
 [bundles]
 cbf = ["cosmic-binary-format", "cosmic-binary-format-netty-adapter", "cosmic-binary-format-provider"]
-configurate = ["configurate-yaml", "configurate-extra-kotlin"]
 jgrapht = ["jgrapht-core", "jgrapht-io"]
 kotlin = ["kotlin-stdlib", "kotlin-reflect", "kotlinx-coroutines-core-jvm", "kotlinx-coroutines-debug"]
 ktor = ["ktor-server-core-jvm", "ktor-server-cio-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"]

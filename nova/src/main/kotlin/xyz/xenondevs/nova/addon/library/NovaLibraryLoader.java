@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.loader.library;
+package xyz.xenondevs.nova.addon.library;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+@Deprecated
 public class NovaLibraryLoader {
     
     private static final HashSet<String> allExclusions = new HashSet<>();

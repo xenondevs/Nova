@@ -6,7 +6,6 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.CommentedConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
@@ -20,6 +19,7 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.ui.menu.explorer.creative.ItemsWindow
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.handleRecipeChoiceItemClick
 import xyz.xenondevs.nova.util.addItemCorrectly
+import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaItem
 

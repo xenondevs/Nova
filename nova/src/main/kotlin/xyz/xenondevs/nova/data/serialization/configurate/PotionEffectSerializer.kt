@@ -5,8 +5,8 @@ import org.bukkit.Registry
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.TypeSerializer
+import xyz.xenondevs.nova.util.data.get
 import java.lang.reflect.Type
 
 internal object PotionEffectSerializer : TypeSerializer<PotionEffect?> {

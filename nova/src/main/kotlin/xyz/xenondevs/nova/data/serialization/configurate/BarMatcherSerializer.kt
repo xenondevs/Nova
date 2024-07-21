@@ -3,11 +3,11 @@ package xyz.xenondevs.nova.data.serialization.configurate
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.TypeSerializer
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatcher
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarOrigin
 import xyz.xenondevs.nova.util.data.WildcardUtils
+import xyz.xenondevs.nova.util.data.get
 import java.lang.reflect.Type
 import java.util.*
 

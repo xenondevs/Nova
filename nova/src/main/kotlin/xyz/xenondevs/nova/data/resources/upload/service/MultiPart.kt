@@ -4,9 +4,9 @@ import io.ktor.client.call.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import xyz.xenondevs.nova.HTTP_CLIENT
 import xyz.xenondevs.nova.data.resources.upload.UploadService
+import xyz.xenondevs.nova.util.data.get
 import java.io.File
 
 internal abstract class MultiPart : UploadService {

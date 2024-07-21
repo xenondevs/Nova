@@ -2,28 +2,19 @@ plugins {
     `kotlin-dsl`
 }
 
-repositories {
-    mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") }}
+repositories { 
     mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://repo.xenondevs.xyz/releases")
-}
-
-dependencies {
-    implementation(libs.paper.api)
-    implementation(libs.zip4j)
-    implementation(libs.bundles.xenondevs.commons)
 }
 
 gradlePlugin {
     plugins {
-        create("loader-jar-plugin") {
-            id = "xyz.xenondevs.loader-jar-plugin"
-            implementationClass = "LoaderJarPlugin"
+        create("bundler-jar-plugin") {
+            id = "xyz.xenondevs.bundler-jar-plugin"
+            implementationClass = "BundlerJarPlugin"
         }
-        create("library-loader-plugin") {
-            id = "xyz.xenondevs.library-loader-plugin"
-            implementationClass = "LibraryLoaderPlugin"
+        create("bundler-plugin") {
+            id = "xyz.xenondevs.bundler-plugin"
+            implementationClass = "BundlerPlugin"
         }
     }
 }

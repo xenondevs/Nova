@@ -3,19 +3,16 @@ plugins {
     `maven-publish`
     alias(libs.plugins.kotlin)
     alias(libs.plugins.dokka)
-    id("xyz.xenondevs.library-loader-plugin")
+    id("xyz.xenondevs.bundler-plugin")
     alias(libs.plugins.paperweight)
 }
 
 dependencies {
     // server
     paperweight.paperDevBundle(libs.versions.paper)
-    configurations.getByName("mojangMappedServer").apply {
-        exclude("org.spongepowered", "configurate-yaml")
-    }
+    compileOnly(libs.bundles.maven.resolver)
     
     // api dependencies
-    prioritizedNovaLoaderApi(libs.bundles.configurate)
     novaLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
@@ -23,7 +20,6 @@ dependencies {
     novaLoaderApi(libs.joml.primitives)
     
     // internal dependencies
-    compileOnly(project(":nova-loader"))
     compileOnly(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
@@ -38,10 +34,6 @@ dependencies {
     novaLoader(libs.zstd)
     novaLoader(libs.bundles.jgrapht)
     novaLoader(libs.snakeyaml.engine)
-    
-    // runtime dependencies
-    spigotRuntime(paperweight.paperDevBundleDependency(libs.versions.paper.get()))
-    spigotRuntime(libs.bundles.maven.resolver)
     
     // test dependencies
     testImplementation(libs.bundles.test)

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.loader.library;
+package xyz.xenondevs.nova.addon.library;
 
 import com.google.gson.JsonObject;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Deprecated
 public class LibraryFileParser {
     
     public static List<String> readRepositories(JsonObject json) {

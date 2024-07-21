@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.data.serialization.configurate
 
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.TypeSerializer
 import xyz.xenondevs.nova.data.resources.builder.ResourceFilter
 import xyz.xenondevs.nova.util.data.WildcardUtils
+import xyz.xenondevs.nova.util.data.get
 import java.lang.reflect.Type
 
 internal object ResourceFilterSerializer : TypeSerializer<ResourceFilter> {

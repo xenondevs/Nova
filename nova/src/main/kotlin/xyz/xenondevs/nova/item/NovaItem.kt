@@ -26,7 +26,6 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
-import org.spongepowered.configurate.kotlin.extensions.get
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
@@ -47,6 +46,7 @@ import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.player.equipment.ArmorEquipEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
+import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.world.block.NovaBlock

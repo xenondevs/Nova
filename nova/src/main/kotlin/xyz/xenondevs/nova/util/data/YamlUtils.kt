@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util.data
 
+import io.leangen.geantyref.TypeToken
 import org.snakeyaml.engine.v2.common.FlowStyle
 import org.snakeyaml.engine.v2.common.ScalarStyle
 import org.snakeyaml.engine.v2.nodes.MappingNode
@@ -11,6 +12,9 @@ import org.snakeyaml.engine.v2.nodes.Tag
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.*
 import kotlin.collections.ArrayDeque
+import kotlin.reflect.javaType
+import kotlin.reflect.jvm.javaType
+import kotlin.reflect.typeOf
 
 @Suppress("UNCHECKED_CAST")
 fun <T : ConfigurationNode> T.walk(): Sequence<T> = sequence {
@@ -23,6 +27,15 @@ fun <T : ConfigurationNode> T.walk(): Sequence<T> = sequence {
         }
         yield(node)
     }
+}
+
+inline fun <reified T> ConfigurationNode.get(): T? {
+    return get(typeOf<T>().javaType) as? T
+}
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T> ConfigurationNode.getList(): List<T>? {
+    return getList(TypeToken.get(typeOf<T>().javaType)) as List<T>?
 }
 
 /**

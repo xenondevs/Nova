@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.addon.loader
 
 import xyz.xenondevs.commons.collections.CollectionUtils
 import xyz.xenondevs.nova.addon.AddonLogger
-import xyz.xenondevs.nova.loader.library.LibraryLoader
-import xyz.xenondevs.nova.loader.library.NovaLibraryLoader
+import xyz.xenondevs.nova.addon.library.LibraryLoader
+import xyz.xenondevs.nova.addon.library.NovaLibraryLoader
 import java.net.URL
 import java.net.URLClassLoader
 

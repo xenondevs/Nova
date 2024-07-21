@@ -7,11 +7,11 @@ import io.ktor.server.engine.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.upload.UploadService
 import xyz.xenondevs.nova.util.StringUtils
 import xyz.xenondevs.nova.util.concurrent.Latch
+import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import xyz.xenondevs.nova.util.startsWithAny
 import java.io.File
