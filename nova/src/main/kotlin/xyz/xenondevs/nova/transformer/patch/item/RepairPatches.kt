@@ -29,7 +29,6 @@ internal object RepairPatches : MultiTransformer(Item::class, AnvilMenu::class, 
         patchItemIsValidRepairItem()
         patchRepairItemRecipeAssemble()
         patchAnvilMenuCreateResult()
-        dumpAll()
     }
     
     private fun patchItemIsValidRepairItem() {
