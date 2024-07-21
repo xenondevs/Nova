@@ -22,7 +22,6 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.data.Version
-import java.io.File
 import java.util.logging.Level
 import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
@@ -36,7 +35,6 @@ import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 private val REQUIRED_SERVER_VERSION = Version("1.21")..Version("1.21")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 internal lateinit var NOVA: Nova private set
-internal lateinit var NOVA_PLUGIN: Nova private set
 internal lateinit var LOGGER: Logger private set
 
 internal val HTTP_CLIENT = HttpClient(CIO) {
@@ -58,7 +56,6 @@ internal class Nova : JavaPlugin(), INova {
     
     init {
         NOVA = this
-        NOVA_PLUGIN = this
         LOGGER = logger
     }
     

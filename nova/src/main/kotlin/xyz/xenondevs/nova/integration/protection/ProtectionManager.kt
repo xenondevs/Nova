@@ -11,7 +11,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.NOVA_PLUGIN
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.api.ApiTileEntityWrapper
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
@@ -321,7 +321,7 @@ object ProtectionManager {
         args: ProtectionArgs,
         check: ProtectionIntegration.() -> Boolean
     ): CompletableFuture<Boolean> {
-        if (!NOVA_PLUGIN.isEnabled)
+        if (!NOVA.isEnabled)
             return CompletableFuture.completedFuture(false)
         
         if (integrations.isNotEmpty()) {

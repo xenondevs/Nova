@@ -2,25 +2,25 @@ package xyz.xenondevs.nova.util
 
 import kotlinx.coroutines.SupervisorJob
 import org.bukkit.Bukkit
-import xyz.xenondevs.nova.NOVA_PLUGIN
+import xyz.xenondevs.nova.NOVA
 
 fun runTaskLater(delay: Long, run: () -> Unit) =
-    Bukkit.getScheduler().runTaskLater(NOVA_PLUGIN, run, delay)
+    Bukkit.getScheduler().runTaskLater(NOVA, run, delay)
 
 fun runTask(run: () -> Unit) =
-    Bukkit.getScheduler().runTask(NOVA_PLUGIN, run)
+    Bukkit.getScheduler().runTask(NOVA, run)
 
 fun runTaskTimer(delay: Long, period: Long, run: () -> Unit) =
-    Bukkit.getScheduler().runTaskTimer(NOVA_PLUGIN, run, delay, period)
+    Bukkit.getScheduler().runTaskTimer(NOVA, run, delay, period)
 
 fun runAsyncTask(run: () -> Unit) =
-    Bukkit.getScheduler().runTaskAsynchronously(NOVA_PLUGIN, run)
+    Bukkit.getScheduler().runTaskAsynchronously(NOVA, run)
 
 fun runAsyncTaskLater(delay: Long, run: () -> Unit) =
-    Bukkit.getScheduler().runTaskLaterAsynchronously(NOVA_PLUGIN, run, delay)
+    Bukkit.getScheduler().runTaskLaterAsynchronously(NOVA, run, delay)
 
 fun runAsyncTaskTimer(delay: Long, period: Long, run: () -> Unit) =
-    Bukkit.getScheduler().runTaskTimerAsynchronously(NOVA_PLUGIN, run, delay, period)
+    Bukkit.getScheduler().runTaskTimerAsynchronously(NOVA, run, delay, period)
 
 internal object AsyncExecutor {
     

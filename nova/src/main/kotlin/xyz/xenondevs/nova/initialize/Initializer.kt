@@ -23,7 +23,6 @@ import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.NOVA_PLUGIN
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
@@ -193,7 +192,7 @@ internal object Initializer : Listener {
         Configs.extractDefaultConfig()
         VanillaRegistryAccess.unfreezeAll()
         registerEvents()
-        InvUI.getInstance().setPlugin(NOVA_PLUGIN)
+        InvUI.getInstance().setPlugin(NOVA)
         InvUILanguages.getInstance().enableServerSideTranslations(false)
         CBFAdapters.register()
         
@@ -225,7 +224,7 @@ internal object Initializer : Listener {
             isDone = true
             callEvent(NovaLoadDataEvent())
             
-            PermanentStorage.store("last_version", NOVA_PLUGIN.pluginMeta.version)
+            PermanentStorage.store("last_version", NOVA.pluginMeta.version)
             setGlobalIngredients()
             AddonManager.enableAddons()
             setupMetrics()
@@ -317,7 +316,7 @@ internal object Initializer : Listener {
     }
     
     private fun setupMetrics() {
-        val metrics = Metrics(NOVA_PLUGIN, 11927)
+        val metrics = Metrics(NOVA, 11927)
         metrics.addCustomChart(DrilldownPie("addons") {
             val map = HashMap<String, Map<String, Int>>()
             

@@ -9,7 +9,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.commons.collections.removeIf
-import xyz.xenondevs.nova.NOVA_PLUGIN
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
@@ -22,7 +22,7 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
-private val ABILITIES_KEY = NamespacedKey(NOVA_PLUGIN, "abilities1")
+private val ABILITIES_KEY = NamespacedKey(NOVA, "abilities1")
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,

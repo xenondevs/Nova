@@ -18,7 +18,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.RegisteredListener
 import xyz.xenondevs.commons.collections.mapToArray
-import xyz.xenondevs.nova.NOVA_PLUGIN
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.transformer.patch.misc.EventPreventionPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HANDLER_LIST_HANDLERS_FIELD
@@ -44,7 +44,7 @@ val BlockPhysicsEvent.changed: BlockData
 fun callEvent(event: Event) = Bukkit.getPluginManager().callEvent(event)
 
 fun Listener.registerEvents() {
-    Bukkit.getPluginManager().registerEvents(this, NOVA_PLUGIN)
+    Bukkit.getPluginManager().registerEvents(this, NOVA)
 }
 
 fun Listener.unregisterEvents() {
@@ -81,18 +81,18 @@ fun Listener.registerEventsFirst() {
 
 @JvmName("registerEvents1")
 fun registerEvents(listener: Listener) {
-    Bukkit.getPluginManager().registerEvents(listener, NOVA_PLUGIN)
+    Bukkit.getPluginManager().registerEvents(listener, NOVA)
 }
 
 @JvmName("registerEventFirst1")
 fun registerEventFirst(listener: Listener, event: Class<out Event>) {
-    val registeredListeners = createRegisteredListener(listener, NOVA_PLUGIN)[event]!!
+    val registeredListeners = createRegisteredListener(listener, NOVA)[event]!!
     registerRegisteredListenerFirst(registeredListeners, event)
 }
 
 @JvmName("registerEventsFirst1")
 fun registerEventsFirst(listener: Listener) {
-    val registeredListeners = createRegisteredListener(listener, NOVA_PLUGIN)
+    val registeredListeners = createRegisteredListener(listener, NOVA)
     registeredListeners.forEach { registerRegisteredListenerFirst(it.value, it.key) }
 }
 
@@ -115,14 +115,14 @@ private fun registerRegisteredListenerFirst(registeredListeners: Set<RegisteredL
 
 @JvmName("registerEvent1")
 fun registerEvent(listener: Listener, event: Class<out Event>) {
-    val registeredListeners = createRegisteredListener(listener, NOVA_PLUGIN)[event]!!
+    val registeredListeners = createRegisteredListener(listener, NOVA)[event]!!
     val handlerList = event.getMethod("getHandlerList").invoke(null) as HandlerList
     handlerList.registerAll(registeredListeners)
 }
 
 @JvmName("registerEventsExcept1")
 fun registerEventsExcept(listener: Listener, vararg eventClasses: Class<out Event>) {
-    val registeredListeners = createRegisteredListener(listener, NOVA_PLUGIN)
+    val registeredListeners = createRegisteredListener(listener, NOVA)
     
     registeredListeners.forEach { (clazz, listeners) ->
         if (clazz in eventClasses)

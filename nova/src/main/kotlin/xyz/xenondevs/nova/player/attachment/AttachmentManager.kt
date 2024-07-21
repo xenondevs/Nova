@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA_PLUGIN
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.serialization.persistentdata.get
 import xyz.xenondevs.nova.data.serialization.persistentdata.set
@@ -32,7 +32,7 @@ import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
-private val ATTACHMENTS_KEY = NamespacedKey(NOVA_PLUGIN, "attachments1")
+private val ATTACHMENTS_KEY = NamespacedKey(NOVA, "attachments1")
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
