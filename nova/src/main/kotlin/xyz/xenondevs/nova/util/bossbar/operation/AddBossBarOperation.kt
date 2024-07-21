@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.util.bossbar.operation
 
 import net.kyori.adventure.text.Component
-import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.world.BossEvent
 import xyz.xenondevs.nova.util.RegistryFriendlyByteBuf
@@ -38,7 +38,7 @@ class AddBossBarOperation(
         private val ADD_OPERATION_LOOKUP = MethodHandles
             .privateLookupIn(ADD_OPERATION, MethodHandles.lookup())
         private val ADD_OPERATION_CONSTRUCTOR = ADD_OPERATION_LOOKUP
-            .findConstructor(ADD_OPERATION, MethodType.methodType(Void.TYPE, FriendlyByteBuf::class.java))
+            .findConstructor(ADD_OPERATION, MethodType.methodType(Void.TYPE, RegistryFriendlyByteBuf::class.java))
         private val ADD_OPERATION_NAME_GETTER = ADD_OPERATION_LOOKUP
             .findGetter(ADD_OPERATION, "name", MojangComponent::class.java)
         private val ADD_OPERATION_PROGRESS_GETTER = ADD_OPERATION_LOOKUP
