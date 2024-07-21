@@ -20,10 +20,10 @@ class PropertiesTreeTest {
     
     private companion object {
         
-        val FACING = EnumProperty<BlockFace>(ResourceLocation("nova", "facing"))
+        val FACING = EnumProperty<BlockFace>(ResourceLocation.fromNamespaceAndPath("nova", "facing"))
         val SCOPED_FACING = FACING.scope(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST)
         
-        val NUMBER = IntProperty(ResourceLocation("nova", "number"))
+        val NUMBER = IntProperty(ResourceLocation.fromNamespaceAndPath("nova", "number"))
         val SCOPED_NUMBER = NUMBER.scope(0..15)
         
     }
