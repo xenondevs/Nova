@@ -38,6 +38,7 @@ val MAIN_CONFIG by lazy { Configs[DEFAULT_CONFIG_NAME] }
 )
 object Configs {
     
+    private val extractor = ConfigExtractor(PermanentStorage.storedValue("storedConfigs", ::HashMap))
     private val configProviders = HashMap<String, RootConfigProvider>()
     
     private var mainLoaded = false
@@ -46,7 +47,6 @@ object Configs {
     
     internal fun extractDefaultConfig() {
         NOVA.novaJar.useZip { extractConfig(it.resolve(DEFAULT_CONFIG_PATH), DEFAULT_CONFIG_NAME, DEFAULT_CONFIG_PATH, ::mainLoaded) }
-        ConfigExtractor.saveStoredConfigs()
         mainLoaded = true
     }
     
@@ -57,7 +57,6 @@ object Configs {
             extractConfigs(id, loader.file, "configs/")
         }
         
-        ConfigExtractor.saveStoredConfigs()
         loaded = true
         lastReload = System.currentTimeMillis()
         
@@ -82,7 +81,7 @@ object Configs {
     
     private fun extractConfig(config: Path, configId: String, configPath: String, loadValidation: () -> Boolean) {
         val destFile = File(NOVA.dataFolder, configPath).toPath()
-        ConfigExtractor.extract(configPath, destFile, config)
+        extractor.extract(configPath, config, destFile)
         if (configId !in configProviders)
             configProviders[configId] = RootConfigProvider(destFile, configPath, loadValidation)
     }

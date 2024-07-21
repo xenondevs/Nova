@@ -37,6 +37,7 @@ dependencies {
     novaLoader(libs.lz4)
     novaLoader(libs.zstd)
     novaLoader(libs.bundles.jgrapht)
+    novaLoader(libs.snakeyaml.engine)
     
     // runtime dependencies
     spigotRuntime(paperweight.paperDevBundleDependency(libs.versions.paper.get()))

@@ -1,0 +1,22 @@
+# a is the first letter in the alphabet
+a:
+  # b is the second letter in the alphabet
+  b:
+    # c is the third letter in the alphabet
+    c: "Hello World" # the value "Hello World"
+    # d is the fourth letter in the alphabet
+    d: 1234 # the value 1234
+    # e is the fifth letter in the alphabet
+    e: true # the value true
+    # f is the sixth letter in the alphabet
+    f: []
+    # g is the seventh letter in the alphabet
+    g:
+    - "A"
+    - "B"
+    - C
+  h:
+    i: 3.14
+
+# j is the tenth letter in the alphabet
+j: 3.14
