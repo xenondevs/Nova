@@ -67,11 +67,7 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
             .flatMap { it.chunkedSequence(100) }
             .map { Component.text(it, NamedTextColor.GRAY) }
             .toList()
-        
-        itemStack.unwrap().update(DataComponents.LORE, ItemLore.EMPTY) {
-            lore.fold(it) { itemLore, line -> itemLore.withLineAdded(line.withoutPreFormatting().toNMSComponent()) }
-        }
-        
+        itemStack.lore((itemStack.lore() ?: emptyList()) + lore.map(Component::withoutPreFormatting))
         return itemStack
     }
     

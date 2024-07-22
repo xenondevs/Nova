@@ -77,12 +77,12 @@ interface Chargeable {
         override fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
             val energy = data[ENERGY_KEY] ?: 0L
             
-            itemStack.unwrap().update(DataComponents.LORE, ItemLore.EMPTY) {
-                it.withLineAdded(Component.text(
-                    NumberFormatUtils.getEnergyString(energy, maxEnergy),
-                    NamedTextColor.GRAY
-                ).withoutPreFormatting().toNMSComponent())
-            }
+            val lore = itemStack.lore() ?: mutableListOf()
+            lore += Component.text(
+                NumberFormatUtils.getEnergyString(energy, maxEnergy),
+                NamedTextColor.GRAY
+            ).withoutPreFormatting()
+            itemStack.lore(lore)
             
             if (affectsItemDurability) {
                 val fraction = (maxEnergy - energy) / maxEnergy.toDouble()

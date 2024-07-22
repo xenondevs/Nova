@@ -229,9 +229,12 @@ internal object PacketItems : Listener, PacketListener {
         
         if (shouldHideEntireTooltip(itemStack)) {
             newItemStack.set(DataComponents.HIDE_TOOLTIP, Unit.INSTANCE)
-        } else {
-            // generate tooltip server-side and apply as lore
-            applyServerSideTooltip(newItemStack, generateNovaTooltipLore(player, novaItem, novaCompound.keys.size, itemStack))
+        } else { // generate tooltip server-side and apply as lore
+            // we do not want data component modifications done by item behaviors in modifyClientSideStack
+            // to be reflected in the tooltip, except for the item lore itself
+            val itemStackToGenerateTooltipOf = itemStack.copy()
+            itemStackToGenerateTooltipOf.set(DataComponents.LORE, newItemStack.get(DataComponents.LORE))
+            applyServerSideTooltip(newItemStack, generateNovaTooltipLore(player, novaItem, novaCompound.keys.size, itemStackToGenerateTooltipOf))
         }
         
         // save server-side nbt data (for creative mode)
