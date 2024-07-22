@@ -19,11 +19,14 @@ import kotlin.reflect.KType
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
+// 1: legacy format, 2: empty item stack, 3: non-empty item stack
 internal object ItemStackSerializer {
     
     fun read(id: UByte, reader: ByteReader): ItemStack {
         if (id == 1.toUByte())
             return readLegacy(reader)
+        if (id == 2.toUByte())
+            return ItemStack.EMPTY
         
         val dataVersion = reader.readVarInt()
         var nbt = NbtIo.read(reader.asDataInput())
@@ -40,11 +43,15 @@ internal object ItemStackSerializer {
     }
     
     fun write(obj: ItemStack, writer: ByteWriter) {
-        writer.writeUnsignedByte(2.toUByte())
-        
-        writer.writeVarInt(DATA_VERSION)
-        val nbt = obj.save(REGISTRY_ACCESS) as CompoundTag
-        NbtIo.write(nbt, writer.asDataOutput())
+        if (obj.isEmpty) {
+            writer.writeUnsignedByte(2U)
+        } else {
+            writer.writeUnsignedByte(3U)
+            
+            writer.writeVarInt(DATA_VERSION)
+            val nbt = obj.save(REGISTRY_ACCESS) as CompoundTag
+            NbtIo.write(nbt, writer.asDataOutput())
+        }
     }
     
     fun tryFix(tag: CompoundTag, fromVersion: Int, toVersion: Int): CompoundTag {
