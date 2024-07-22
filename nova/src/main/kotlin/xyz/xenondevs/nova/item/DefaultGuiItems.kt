@@ -251,7 +251,7 @@ private fun hiddenItem(
     hidden(true)
     models {
         itemType(PacketItems.SERVER_SIDE_MATERIAL)
-        selectModel { getModel("item/$name") }
+        selectModel { createLayeredModel("item/$name") }
     }
 }
 
