@@ -12,32 +12,33 @@ import xyz.xenondevs.nova.util.item.novaItem
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
-fun Fuel(burnTime: Int) = Fuel.Default(provider(burnTime))
-
 /**
  * Allows items to be used as fuel in furnaces.
+ * 
+ * @param burnTime The burn time of this fuel, in ticks.
  */
-interface Fuel {
+class Fuel(burnTime: Provider<Int>) : ItemBehavior {
     
     /**
      * The burn time of this fuel, in ticks.
      */
-    val burnTime: Int
+    val burnTime: Int by burnTime
     
-    class Default(
-        burnTime: Provider<Int>
-    ): ItemBehavior, Fuel {
-        override val burnTime by burnTime
-    }
+    /**
+     * Allows items to be used as fuel in furnaces.
+     * 
+     * @param burnTime The burn time of this fuel, in ticks.
+     */
+    constructor(burnTime: Int) : this(provider(burnTime))
     
-    companion object : ItemBehaviorFactory<Default> {
+    companion object : ItemBehaviorFactory<Fuel> {
         
         private val NMS_VANILLA_FUELS: Map<Item, Int> = AbstractFurnaceBlockEntity.getFuel()
         private val VANILLA_FUELS: Map<Material, Int> = NMS_VANILLA_FUELS
             .mapKeysTo(enumMap()) { (item, _) -> CraftMagicNumbers.getMaterial(item) }
         
-        override fun create(item: NovaItem): Default {
-            return Default(item.config.entry<Int>("burn_time"))
+        override fun create(item: NovaItem): Fuel {
+            return Fuel(item.config.entry<Int>("burn_time"))
         }
         
         fun isFuel(material: Material): Boolean = material in VANILLA_FUELS

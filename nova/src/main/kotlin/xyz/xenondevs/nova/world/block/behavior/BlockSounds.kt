@@ -4,16 +4,23 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 
-fun BlockSounds(soundGroup: SoundGroup) =
-    BlockSounds.Default(provider(soundGroup))
-
-// TODO: name
-interface BlockSounds {
+/**
+ * Adds sound to a block.
+ * 
+ * @param soundGroup The sound group to be used.
+ */
+class BlockSounds(soundGroup: Provider<SoundGroup>) : BlockBehavior {
     
-    val soundGroup: SoundGroup
+    /**
+     * The sound group.
+     */
+    val soundGroup: SoundGroup by soundGroup
     
-    class Default(soundGroup: Provider<SoundGroup>) : BlockSounds, BlockBehavior {
-        override val soundGroup by soundGroup
-    }
+    /**
+     * Adds sound to a block.
+     * 
+     * @param soundGroup The sound group to be used.
+     */
+    constructor(soundGroup: SoundGroup) : this(provider(soundGroup))
     
 }
