@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.util.FakeOnlinePlayer
 @Hook(plugins = ["Towny"])
 internal object TownyHook : ProtectionIntegration {
     
-    override fun getExecutionMode(): ExecutionMode = ExecutionMode.NONE
+    override fun getExecutionMode(): ExecutionMode = ExecutionMode.SERVER
     
     override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location) =
         hasPermission(player, location, TownyPermission.ActionType.DESTROY)
