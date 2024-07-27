@@ -166,6 +166,7 @@ class ResourcePackBuilder internal constructor() {
     internal lateinit var holders: List<PackTaskHolder>
     private lateinit var tasksByStage: Map<BuildStage, List<PackFunction>>
     private val taskTimes = HashMap<PackFunction, Duration>()
+    private var totalTime: Duration = Duration.ZERO
     
     private val resourceFilters = sequenceOf(CONFIG_RESOURCE_FILTERS, CORE_RESOURCE_FILTERS, customResourceFilters)
         .flatten().groupByTo(enumMap()) { it.stage }
@@ -193,44 +194,46 @@ class ResourcePackBuilder internal constructor() {
     
     internal fun buildPackPreWorld() {
         try {
-            // download minecraft assets if not present / outdated
-            if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("minecraftAssetsVersion") != Version.SERVER_VERSION) {
-                MCASSETS_DIR.toFile().deleteRecursively()
-                runBlocking {
-                    val downloader = MinecraftAssetsDownloader(
-                        version = Version.SERVER_VERSION.toString(omitZeros = true),
-                        outputDirectory = MCASSETS_DIR.toFile(),
-                        mode = EXTRACTION_MODE,
-                        logger = LOGGER
-                    )
-                    try {
-                        downloader.downloadAssets()
-                    } catch (ex: Exception) {
-                        throw IllegalStateException(buildString {
-                            append("Failed to download minecraft assets. Check your firewall settings.")
-                            if (EXTRACTION_MODE == ExtractionMode.GITHUB)
-                                append(" If your server can't access github.com in general, you can change \"minecraft_assets_source\" in the config to \"mojang\".")
-                        }, ex)
+            totalTime += measureTime {
+                // download minecraft assets if not present / outdated
+                if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("minecraftAssetsVersion") != Version.SERVER_VERSION) {
+                    MCASSETS_DIR.toFile().deleteRecursively()
+                    runBlocking {
+                        val downloader = MinecraftAssetsDownloader(
+                            version = Version.SERVER_VERSION.toString(omitZeros = true),
+                            outputDirectory = MCASSETS_DIR.toFile(),
+                            mode = EXTRACTION_MODE,
+                            logger = LOGGER
+                        )
+                        try {
+                            downloader.downloadAssets()
+                        } catch (ex: Exception) {
+                            throw IllegalStateException(buildString {
+                                append("Failed to download minecraft assets. Check your firewall settings.")
+                                if (EXTRACTION_MODE == ExtractionMode.GITHUB)
+                                    append(" If your server can't access github.com in general, you can change \"minecraft_assets_source\" in the config to \"mojang\".")
+                            }, ex)
+                        }
+                        PermanentStorage.store("minecraftAssetsVersion", Version.SERVER_VERSION)
                     }
-                    PermanentStorage.store("minecraftAssetsVersion", Version.SERVER_VERSION)
                 }
+                
+                // sort and instantiate holders
+                holders = holderCreators.map { it(this) }
+                tasksByStage = PackFunction.getAndSortFunctions(holders).groupBy { it.stage }
+                logTaskOrder()
+                
+                // load asset packs
+                assetPacks = loadAssetPacks()
+                LOGGER.info("Asset packs (${assetPacks.size}): ${assetPacks.joinToString(transform = AssetPack::namespace)}")
+                
+                // merge base packs
+                basePacks.include()
+                
+                // run pack tasks
+                LOGGER.info("Running pre-world pack tasks")
+                runBlocking { tasksByStage[BuildStage.PRE_WORLD]?.forEach { runPackFunction(it) } }
             }
-            
-            // sort and instantiate holders
-            holders = holderCreators.map { it(this) }
-            tasksByStage = PackFunction.getAndSortFunctions(holders).groupBy { it.stage }
-            logTaskOrder()
-            
-            // load asset packs
-            assetPacks = loadAssetPacks()
-            LOGGER.info("Asset packs (${assetPacks.size}): ${assetPacks.joinToString(transform = AssetPack::namespace)}")
-            
-            // merge base packs
-            basePacks.include()
-            
-            // run pack tasks
-            LOGGER.info("Running pre-world pack tasks")
-            runBlocking { tasksByStage[BuildStage.PRE_WORLD]?.forEach { runPackFunction(it) } }
         } catch (t: Throwable) {
             // Only delete build dir in case of exception as building is continued in buildPostWorld()
             deleteBuildDir()
@@ -240,20 +243,21 @@ class ResourcePackBuilder internal constructor() {
     
     internal fun buildPackPostWorld() {
         try {
-            // write post-world content
-            LOGGER.info("Running post-world pack tasks")
-            runBlocking { tasksByStage[BuildStage.POST_WORLD]?.forEach { runPackFunction(it) } }
-            
-            // write metadata
-            writeMetadata(assetPacks.size, basePacks.packAmount)
-            
-            // create zip
-            createZip()
-            LOGGER.info("ResourcePack created.")
-            logTaskTimes()
-            
-            // delete build dir asynchronously
-            runAsyncTask { deleteBuildDir() }
+            totalTime += measureTime {
+                // write post-world content
+                LOGGER.info("Running post-world pack tasks")
+                runBlocking { tasksByStage[BuildStage.POST_WORLD]?.forEach { runPackFunction(it) } }
+                
+                // write metadata
+                writeMetadata(assetPacks.size, basePacks.packAmount)
+                
+                // create zip
+                createZip()
+                logTaskTimes()
+                
+                // delete build dir asynchronously
+                runAsyncTask { deleteBuildDir() }
+            }
         } catch (t: Throwable) {
             // delete build dir
             deleteBuildDir()
@@ -334,7 +338,7 @@ class ResourcePackBuilder internal constructor() {
     }
     
     private fun logTaskTimes() {
-        LOGGER.info("Time breakdown (Top 5):")
+        LOGGER.info("Resource pack built in ${totalTime}:")
         taskTimes.entries.asSequence()
             .sortedByDescending { it.value }
             .take(5)
