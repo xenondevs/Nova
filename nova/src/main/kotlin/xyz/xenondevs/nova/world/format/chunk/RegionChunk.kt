@@ -384,7 +384,7 @@ internal class RegionChunk(
         // random ticks
         val randomTickSpeed = level.gameRules.getInt(GameRules.RULE_RANDOMTICKING)
         if (randomTickSpeed > 0) {
-            for (section in sections) {
+            for ((sectionIdx, section) in sections.withIndex()) {
                 if (!section.isEmpty()) {
                     repeat(randomTickSpeed) {
                         val x = Random.nextInt(0, 16)
@@ -392,7 +392,7 @@ internal class RegionChunk(
                         val z = Random.nextInt(0, 16)
                         val blockState = section[x, y, z]
                         if (blockState != null) {
-                            val pos = BlockPos(world, pos.x + x, minHeight + y, pos.z + z)
+                            val pos = BlockPos(world, (pos.x shl 4) + x,  (sectionIdx shl 4) + minHeight + y, (pos.z shl 4) + z)
                             try {
                                 blockState.block.handleRandomTick(pos, blockState)
                             } catch (t: Throwable) {
