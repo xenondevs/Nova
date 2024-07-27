@@ -63,7 +63,7 @@ object WorldDataManager : Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.LOW) // NetworkManager is LOWEST
+    @EventHandler(priority = EventPriority.LOWEST) // NetworkManager is LOW
     private fun handleChunkLoad(event: ChunkLoadEvent) {
         runBlocking { getOrLoadChunk(event.chunk.pos).enable() }
     }

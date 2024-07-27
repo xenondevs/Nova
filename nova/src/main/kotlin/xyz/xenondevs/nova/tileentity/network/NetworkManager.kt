@@ -231,7 +231,7 @@ object NetworkManager : Listener {
         removeConfigurator(event.world)
     }
     
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW) // WorldDataManager is LOWEST
     private fun handleChunkLoad(event: ChunkLoadEvent) {
         queueLoadChunk(event.chunk.pos)
     }
