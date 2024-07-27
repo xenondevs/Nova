@@ -1,11 +1,9 @@
 package xyz.xenondevs.nova.transformer.patch.worldgen.chunksection
 
-import net.minecraft.core.Registry
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelHeightAccessor
 import net.minecraft.world.level.chunk.ChunkAccess
 import net.minecraft.world.level.chunk.LevelChunkSection
-import org.eclipse.sisu.space.asm.Type
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.LabelNode
@@ -13,8 +11,12 @@ import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.util.insertAfterFirst
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.bytebase.util.previous
+import xyz.xenondevs.bytebase.util.puts
 import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CHUNK_ACCESS_CONSTRUCTOR
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+
+private val CHUNK_ACCESS_MAX_SECTION = ReflectionUtils.getField(ChunkAccess::class, "maxSection")
 
 /**
  * Patch to replace all [LevelChunkSection]s with Nova's [LevelChunkSectionWrapper].
@@ -34,7 +36,7 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(CHUNK_ACCESS_CONSTR
             aLoad(3)
             instanceOf(Level::class.internalName)
             ifeq(returnLabel)
-
+            
             addLabel()
             aLoad(3)
             checkCast(Level::class.internalName)
@@ -44,7 +46,7 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(CHUNK_ACCESS_CONSTR
             aStore(10) // sections
             ldc(0)
             iStore(11) // i
-
+            
             add(loopLabel)
             iLoad(11) // i
             aLoad(10) // sections
@@ -80,7 +82,7 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(CHUNK_ACCESS_CONSTR
             goto(loopLabel)
             
         }) {
-            it.opcode == Opcodes.PUTFIELD && (it as FieldInsnNode).desc == Type.getDescriptor(Registry::class.java) // https://i.imgur.com/sChNvVq.png
+            it.opcode == Opcodes.PUTFIELD && (it as FieldInsnNode).puts(CHUNK_ACCESS_MAX_SECTION) // last insn
         }
     }
     
