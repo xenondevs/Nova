@@ -526,7 +526,7 @@ internal object NovaCommand : Command() {
     
     private fun toggleNetworkDebugging(ctx: CommandContext<CommandSourceStack>) {
         val type: NetworkType<*> = ctx["type"]
-        val player = ctx.source as Player
+        val player = ctx.player
         val enabled = NetworkDebugger.toggleDebugger(type, player)
         
         ctx.source.sender.sendMessage(Component.translatable(
