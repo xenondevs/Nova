@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.block.state.model
 import xyz.xenondevs.nova.util.setBlockState
 import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 import xyz.xenondevs.nova.util.setBlockStateSilently
+import xyz.xenondevs.nova.util.withoutBlockMigration
 import xyz.xenondevs.nova.world.BlockPos
 
 /**
@@ -11,10 +12,12 @@ import xyz.xenondevs.nova.world.BlockPos
 internal data object BackingStateBlockModelProvider : BlockModelProvider<BackingStateConfig> {
     
     override fun set(pos: BlockPos, info: BackingStateConfig, method: BlockUpdateMethod) {
-        when (method) {
-            BlockUpdateMethod.DEFAULT -> pos.setBlockState(info.vanillaBlockState)
-            BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.vanillaBlockState)
-            BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.vanillaBlockState)
+        withoutBlockMigration(pos) {
+            when (method) {
+                BlockUpdateMethod.DEFAULT -> pos.setBlockState(info.vanillaBlockState)
+                BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.vanillaBlockState)
+                BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.vanillaBlockState)
+            }
         }
     }
     

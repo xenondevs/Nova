@@ -66,7 +66,9 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                     blockStateJson.getObjectOrNull("variants")
                         ?.entrySet()
                         ?.associateTo(HashBiMap.create()) { (variantStr, variantOpts) ->
-                            type.of(variantStr) to GSON.fromJson<BlockStateVariantData>(variantOpts)!!
+                            val properties = variantStr.split(',')
+                                .associate { val s = it.split('='); s[0] to s[1] }
+                            type.of(properties) to GSON.fromJson<BlockStateVariantData>(variantOpts)!!
                         }?.also { blockStateVariants[type] = it }
                 }
             }

@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.util.item.requiresLight
 import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 import xyz.xenondevs.nova.util.setBlockStateSilently
+import xyz.xenondevs.nova.util.withoutBlockMigration
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntity
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
@@ -42,10 +43,12 @@ internal data object DisplayEntityBlockModelProvider : BlockModelProvider<Displa
     }
     
     private fun placeHitbox(pos: BlockPos, info: DisplayEntityBlockModelData, method: BlockUpdateMethod) {
-        when (method) {
-            BlockUpdateMethod.DEFAULT -> pos.block.blockData = info.hitboxType
-            BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.hitboxType.nmsBlockState)
-            BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.hitboxType.nmsBlockState)
+        withoutBlockMigration(pos) {
+            when (method) {
+                BlockUpdateMethod.DEFAULT -> pos.block.blockData = info.hitboxType
+                BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.hitboxType.nmsBlockState)
+                BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.hitboxType.nmsBlockState)
+            }
         }
     }
     

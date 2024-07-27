@@ -31,9 +31,11 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
+import net.minecraft.world.level.chunk.LevelChunk
 import net.minecraft.world.level.chunk.LevelChunkSection
 import net.minecraft.world.phys.Vec3
 import org.bukkit.Bukkit
+import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -63,7 +65,9 @@ import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.serialization.configurate.RegistryEntrySerializer
 import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
+import xyz.xenondevs.nova.transformer.patch.block.BlockMigrationPatch
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
@@ -131,6 +135,9 @@ val MojangBlockPos.center: Vec3
 
 val World.serverLevel: ServerLevel
     get() = (this as CraftWorld).handle
+
+val Chunk.levelChunk: LevelChunk
+    get() = world.serverLevel.getChunk(x, z)
 
 val Player.connection: ServerGamePacketListenerImpl
     get() = serverPlayer.connection
@@ -569,6 +576,17 @@ fun forcePacketBroadcast(run: () -> Unit) {
         run.invoke()
     } finally {
         BroadcastPacketPatch.ignoreExcludedPlayer = false
+    }
+}
+
+internal inline fun withoutBlockMigration(pos: BlockPos, run: () -> Unit) {
+    val chunkSection = pos.chunkSection as LevelChunkSectionWrapper
+    val previous = chunkSection.isMigrationActive
+    chunkSection.isMigrationActive = false
+    try {
+        run.invoke()
+    } finally {
+        chunkSection.isMigrationActive = previous
     }
 }
 

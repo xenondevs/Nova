@@ -24,8 +24,8 @@ import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.INSTRUMENT
-import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.NOTE
+import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT
+import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.NOTE_BLOCK_NOTE
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.POWERED
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.format.WorldDataManager
@@ -45,7 +45,7 @@ internal object NoteBlockBehavior : BlockBehavior {
         
         if (item != null && item.novaItem == null && Tag.ITEMS_NOTE_BLOCK_TOP_INSTRUMENTS.isTagged(item.type) && clickedFace == BlockFace.UP)
             return false
-    
+        
         cycleNote(pos, state)
         playNote(pos, state)
         
@@ -62,7 +62,7 @@ internal object NoteBlockBehavior : BlockBehavior {
         
         val newState = state
             .with(POWERED, poweredNow)
-            .with(INSTRUMENT, Instrument.determineInstrument(pos))
+            .with(NOTE_BLOCK_INSTRUMENT, Instrument.determineInstrument(pos))
         
         if (!poweredPreviously && poweredNow)
             playNote(pos, newState)
@@ -72,12 +72,12 @@ internal object NoteBlockBehavior : BlockBehavior {
     }
     
     private fun cycleNote(pos: BlockPos, state: NovaBlockState) {
-        WorldDataManager.setBlockState(pos, state.cycle(NOTE))
+        WorldDataManager.setBlockState(pos, state.cycle(NOTE_BLOCK_NOTE))
     }
     
     private fun playNote(pos: BlockPos, state: NovaBlockState) {
-        val instrument = state.getOrThrow(INSTRUMENT)
-        val note = state.getOrThrow(NOTE)
+        val instrument = state.getOrThrow(NOTE_BLOCK_INSTRUMENT)
+        val note = state.getOrThrow(NOTE_BLOCK_NOTE)
         
         val event = NotePlayEvent(pos.block, instrument.bukkitInstrument, Note(note))
         callEvent(event)

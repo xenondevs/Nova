@@ -18,7 +18,8 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.transformer.adapter.LcsWrapperAdapter
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
-import xyz.xenondevs.nova.transformer.patch.block.BlockUpdatesPatch
+import xyz.xenondevs.nova.transformer.patch.block.BlockMigrationPatch
+import xyz.xenondevs.nova.transformer.patch.block.BlockUpdatesPatches
 import xyz.xenondevs.nova.transformer.patch.block.DisableBackingStateLogicPatch
 import xyz.xenondevs.nova.transformer.patch.bossbar.BossBarOriginPatch
 import xyz.xenondevs.nova.transformer.patch.chunk.ChunkSchedulingPatch
@@ -55,8 +56,8 @@ internal object Patcher {
             LevelChunkSectionPatch, ChunkAccessSectionsPatch, /*FeatureSorterPatch, RegistryCodecPatch,
             WrapperBlockPatch, MappedRegistryPatch, NovaRuleTestPatch,*/ FuelPatches, RemainingItemPatches, SoundPatches,
             BroadcastPacketPatch, EventPreventionPatch, WearablePatch, BossBarOriginPatch,
-            FakePlayerLastHurtPatch, BlockUpdatesPatch, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
-            ItemStackDataComponentsPatch, EnchantmentPatches, TagsPatch, RepairPatches
+            FakePlayerLastHurtPatch, BlockUpdatesPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
+            ItemStackDataComponentsPatch, EnchantmentPatches, TagsPatch, RepairPatches, BlockMigrationPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     

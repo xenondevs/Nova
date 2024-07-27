@@ -87,7 +87,9 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerge
                 if (model in IGNORABLE_MODELS)
                     return@removeIf true
                 
-                occupied += configType.of(variant).id
+                val properties = variant.split(",")
+                    .associate { it.split("=").let { (key, value) -> key to value } }
+                occupied += configType.of(properties).id
                 
                 return@removeIf false
             }

@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.world.block.state.model
 
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import xyz.xenondevs.nova.util.hasProperty
 import xyz.xenondevs.nova.util.setBlockState
 import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 import xyz.xenondevs.nova.util.setBlockStateSilently

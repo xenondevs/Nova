@@ -30,11 +30,7 @@ internal data class NoteBackingStateConfig(
         require(note in 0..24)
     }
     
-    companion object : DynamicDefaultingBackingStateConfigType<NoteBackingStateConfig>() {
-        
-        override val maxId = 1149
-        override val fileName = "note_block"
-        override val material = Material.NOTE_BLOCK
+    companion object : DynamicDefaultingBackingStateConfigType<NoteBackingStateConfig>(1149, "note_block") {
         
         fun getIdOf(instrument: Instrument, note: Int, powered: Boolean): Int {
             return instrument.ordinal * NOTE_BASE * POWERED_BASE + note * POWERED_BASE + powered.intValue
@@ -48,10 +44,7 @@ internal data class NoteBackingStateConfig(
             )
         }
         
-        override fun of(variantString: String): NoteBackingStateConfig {
-            val properties = variantString.split(',')
-                .associate { val s = it.split('='); s[0] to s[1] }
-            
+        override fun of(properties: Map<String, String>): NoteBackingStateConfig {
             return NoteBackingStateConfig(
                 properties["instrument"]?.let { Instrument.valueOf(it.uppercase()) } ?: Instrument.HARP,
                 properties["note"]?.toInt() ?: 0,

@@ -1,7 +1,12 @@
 package xyz.xenondevs.nova.world.block.migrator
 
 import kotlinx.coroutines.runBlocking
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.LeavesBlock
+import net.minecraft.world.level.block.NoteBlock
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.NamespacedKey
@@ -10,7 +15,9 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.commons.collections.associateByNotNull
 import xyz.xenondevs.commons.collections.flatMap
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
@@ -18,14 +25,35 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionWrapper
+import xyz.xenondevs.nova.util.instrument
+import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
-import xyz.xenondevs.nova.util.world.ChunkSearchQuery
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
+import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.state.model.AcaciaLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.AzaleaLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.BirchLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.BlockUpdateMethod
+import xyz.xenondevs.nova.world.block.state.model.BrownMushroomBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.CherryLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.DarkOakLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.DefaultingBackingStateConfigType
+import xyz.xenondevs.nova.world.block.state.model.FloweringAzaleaLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.JungleLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.MangroveLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.MushroomStemBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.OakLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.SpruceLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
+import java.util.logging.Level
 import kotlin.random.Random
 
 @InternalInit(
@@ -41,7 +69,14 @@ internal object BlockMigrator : Listener {
     private var migrationId by PermanentStorage.storedValue("migration_id") { Random.nextInt() }
     
     private val migrations = ArrayList<BlockMigration>()
-    private val queries = ArrayList<ChunkSearchQuery>()
+    private val _migrationsByVanillaBlock = HashMap<Block, BlockMigration>()
+    private val _migrationsByNovaBlock = HashMap<NovaBlock, BlockMigration>()
+    private val queries = ArrayList<(BlockState) -> Boolean>()
+    
+    val migrationsByVanillaBlock: Map<Block, BlockMigration>
+        get() = _migrationsByVanillaBlock
+    val migrationsByNovaBlock: Map<NovaBlock, BlockMigration>
+        get() = _migrationsByNovaBlock
     
     @InitFun
     private fun init() {
@@ -52,29 +87,64 @@ internal object BlockMigrator : Listener {
     
     private fun addMigrations() {
         migrations += BlockMigration(
-            { it.block == Blocks.RED_MUSHROOM_BLOCK },
-            { it.setBlockStateSilently(Blocks.RED_MUSHROOM_BLOCK.defaultBlockState()) }
+            Blocks.RED_MUSHROOM_BLOCK, null,
+            RedMushroomBackingStateConfig.defaultStateConfig.vanillaBlockState
         )
         
         migrations += BlockMigration(
-            { it.block == Blocks.BROWN_MUSHROOM_BLOCK },
-            { it.setBlockStateSilently(Blocks.BROWN_MUSHROOM_BLOCK.defaultBlockState()) }
+            Blocks.BROWN_MUSHROOM_BLOCK, null,
+            BrownMushroomBackingStateConfig.defaultStateConfig.vanillaBlockState
         )
         
         migrations += BlockMigration(
-            { it.block == Blocks.MUSHROOM_STEM },
-            { it.setBlockStateSilently(Blocks.MUSHROOM_STEM.defaultBlockState()) }
+            Blocks.MUSHROOM_STEM, null,
+            MushroomStemBackingStateConfig.defaultStateConfig.vanillaBlockState
         )
         
         migrations += BlockMigration(
-            { it.block == Blocks.NOTE_BLOCK },
-            { pos ->
-                pos.setBlockStateSilently(Blocks.NOTE_BLOCK.defaultBlockState())
-                WorldDataManager.setBlockState(pos, DefaultBlocks.NOTE_BLOCK.defaultBlockState)
+            Blocks.NOTE_BLOCK, DefaultBlocks.NOTE_BLOCK,
+            NoteBackingStateConfig.defaultStateConfig.vanillaBlockState,
+            { vanilla ->
+                DefaultBlocks.NOTE_BLOCK.defaultBlockState
+                    .with(DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT, vanilla.getValue(NoteBlock.INSTRUMENT).instrument)
+                    .with(DefaultBlockStateProperties.NOTE_BLOCK_NOTE, vanilla.getValue(NoteBlock.NOTE))
+                    .with(DefaultBlockStateProperties.POWERED, vanilla.getValue(NoteBlock.POWERED))
             }
         )
         
-        queries += migrations.map { it.query }
+        migrations += leavesMigration(Blocks.OAK_LEAVES, OakLeavesBackingStateConfig, DefaultBlocks.OAK_LEAVES)
+        migrations += leavesMigration(Blocks.SPRUCE_LEAVES, SpruceLeavesBackingStateConfig, DefaultBlocks.SPRUCE_LEAVES)
+        migrations += leavesMigration(Blocks.BIRCH_LEAVES, BirchLeavesBackingStateConfig, DefaultBlocks.BIRCH_LEAVES)
+        migrations += leavesMigration(Blocks.JUNGLE_LEAVES, JungleLeavesBackingStateConfig, DefaultBlocks.JUNGLE_LEAVES)
+        migrations += leavesMigration(Blocks.ACACIA_LEAVES, AcaciaLeavesBackingStateConfig, DefaultBlocks.ACACIA_LEAVES)
+        migrations += leavesMigration(Blocks.DARK_OAK_LEAVES, DarkOakLeavesBackingStateConfig, DefaultBlocks.DARK_OAK_LEAVES)
+        migrations += leavesMigration(Blocks.MANGROVE_LEAVES, MangroveLeavesBackingStateConfig, DefaultBlocks.MANGROVE_LEAVES)
+        migrations += leavesMigration(Blocks.CHERRY_LEAVES, CherryLeavesBackingStateConfig, DefaultBlocks.CHERRY_LEAVES)
+        migrations += leavesMigration(Blocks.AZALEA_LEAVES, AzaleaLeavesBackingStateConfig, DefaultBlocks.AZALEA_LEAVES)
+        migrations += leavesMigration(Blocks.FLOWERING_AZALEA_LEAVES, FloweringAzaleaLeavesBackingStateConfig, DefaultBlocks.FLOWERING_AZALEA_LEAVES)
+        
+        queries += migrations.map { migration -> { state -> state.block == migration.vanillaBlock } }
+        _migrationsByVanillaBlock += migrations.associateBy { it.vanillaBlock }
+        _migrationsByNovaBlock += migrations.associateByNotNull { it.novaBlock }
+    }
+    
+    private fun leavesMigration(block: Block, cfg: DefaultingBackingStateConfigType<*>, novaBlock: NovaBlock): BlockMigration {
+        return BlockMigration(
+            block, novaBlock,
+            cfg.defaultStateConfig.vanillaBlockState,
+            { vanilla ->
+                novaBlock.defaultBlockState
+                    .with(DefaultBlockStateProperties.LEAVES_DISTANCE, vanilla.getValue(LeavesBlock.DISTANCE))
+                    .with(DefaultBlockStateProperties.LEAVES_PERSISTENT, vanilla.getValue(LeavesBlock.PERSISTENT))
+                    .with(DefaultBlockStateProperties.WATERLOGGED, vanilla.getValue(LeavesBlock.WATERLOGGED))
+            },
+            { nova ->
+                block.defaultBlockState()
+                    .setValue(LeavesBlock.DISTANCE, nova.getOrThrow(DefaultBlockStateProperties.LEAVES_DISTANCE))
+                    .setValue(LeavesBlock.PERSISTENT, nova.getOrThrow(DefaultBlockStateProperties.LEAVES_PERSISTENT))
+                    .setValue(LeavesBlock.WATERLOGGED, nova.getOrThrow(DefaultBlockStateProperties.WATERLOGGED))
+            }
+        )
     }
     
     private fun migrateLoadedChunks() {
@@ -89,35 +159,74 @@ internal object BlockMigrator : Listener {
     }
     
     private fun migrateChunk(chunk: Chunk) {
-        val pdc = chunk.persistentDataContainer
+        for (section in chunk.levelChunk.sections) {
+            (section as LevelChunkSectionWrapper).isMigrationActive = true
+        }
         
+        val pdc = chunk.persistentDataContainer
         if (pdc.get(MIGRATION_ID_KEY, PersistentDataType.INTEGER) == migrationId)
             return
         
         // migrate Nova backing states
         val regionChunk = runBlocking { WorldDataManager.getOrLoadChunk(chunk.pos) } // should already be loaded in most cases
-        regionChunk.forEachNonEmpty { pos, blockState -> 
+        regionChunk.forEachNonEmpty { pos, blockState ->
             blockState.modelProvider.replace(pos, BlockUpdateMethod.SILENT)
         }
         
         // migrate vanilla block states that are used by Nova 
         BlockStateSearcher.searchChunk(chunk.pos, queries)
             .withIndex()
-            .forEach { (idx, result) ->
+            .forEach { (_, result) ->
                 if (result == null)
                     return@forEach
                 
-                val migration = migrations[idx]
-                for (pos in result) {
+                for ((pos, blockState) in result) {
                     if (WorldDataManager.getBlockState(pos) == null &&
                         CustomItemServiceManager.getBlockType(pos.block) == null
                     ) {
-                        migration.migrate(pos)
+                        pos.setBlockStateSilently(blockState) // will run through migrateBlockState below
                     }
                 }
             }
         
         pdc.set(MIGRATION_ID_KEY, PersistentDataType.INTEGER, migrationId)
+    }
+    
+    @JvmStatic
+    fun migrateBlockState(pos: BlockPos, blockState: BlockState): BlockState {
+        try {
+            var migratedState = migrationsByVanillaBlock[blockState.block]?.vanillaBlockState
+            if (migratedState != null) {
+                // pass waterlogged property through
+                if (blockState.hasProperty(BlockStateProperties.WATERLOGGED)) {
+                    migratedState = migratedState.setValue(
+                        BlockStateProperties.WATERLOGGED,
+                        blockState.getValue(BlockStateProperties.WATERLOGGED)
+                    )
+                }
+                return migratedState
+            }
+        } catch (e: Exception) {
+            LOGGER.log(Level.SEVERE, "Failed to migrate block state $blockState at $pos", e)
+        }
+        
+        return blockState
+    }
+    
+    @JvmStatic
+    fun handleVanillaBlockStatePlaced(pos: BlockPos, blockState: BlockState) {
+        if (!blockState.isAir) {
+            val migration = migrationsByVanillaBlock[blockState.block]
+            val novaState = migration?.vanillaToNova?.invoke(blockState)
+            if (novaState != null)
+                WorldDataManager.setBlockState(pos, novaState)
+            
+            // TODO: init vte here
+        } else {
+            WorldDataManager.setBlockState(pos, null)
+            WorldDataManager.setTileEntity(pos, null)
+            WorldDataManager.setVanillaTileEntity(pos, null)
+        }
     }
     
     fun updateMigrationId() {

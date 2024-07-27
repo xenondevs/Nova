@@ -56,9 +56,24 @@ interface BlockBehavior : BlockBehaviorHolder {
     fun handleNeighborChanged(pos: BlockPos, state: NovaBlockState, neighborPos: BlockPos) = Unit
     
     /**
+     * Called when a block at [neighborPos] changed to update the [NovaBlockState] of this [state] at [pos].
+     */
+    fun updateShape(pos: BlockPos, state: NovaBlockState, neighborPos: BlockPos): NovaBlockState = state
+    
+    /**
+     * Whether this behavior implements random-tick logic for the given [state].
+     */
+    fun isRandomlyTicking(state: NovaBlockState): Boolean = false // TODO: implement logic for this
+    
+    /**
      * Handles a random tick for a block of [state] at [pos].
      */
     fun handleRandomTick(pos: BlockPos, state: NovaBlockState) = Unit
+    
+    /**
+     * Handles a scheduled tick for a block of [state] at [pos].
+     */
+    fun handleScheduledTick(pos: BlockPos, state: NovaBlockState) = Unit // TODO: implement scheduled ticks via WorldDataManager
     
     /**
      * Retrieves the amount of experience that would be dropped when breaking a block of [state] at [pos] with the given [ctx].

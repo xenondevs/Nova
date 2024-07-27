@@ -3,13 +3,15 @@ package xyz.xenondevs.nova.world.block.state.model
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import org.bukkit.Material
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.commons.collections.enumSet
 import xyz.xenondevs.commons.collections.mapToBooleanArray
 import xyz.xenondevs.nova.util.MathUtils
 
 private val POSSIBLE_FACES = arrayOf(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN)
 
-internal abstract class SidedBackingStateConfig(val faces: List<BlockFace>, block: Block) : BackingStateConfig() {
+internal abstract class SidedBackingStateConfig(val faces: Set<BlockFace>, block: Block) : BackingStateConfig() {
     
     override val id = getIdOf(faces)
     override val variantString = POSSIBLE_FACES.joinToString(",") { "${it.name.lowercase()}=${it in faces}" }
@@ -30,16 +32,16 @@ internal abstract class SidedBackingStateConfig(val faces: List<BlockFace>, bloc
 }
 
 internal abstract class SidedBackingStateConfigType<T : SidedBackingStateConfig>(
-    private val constructor: (List<BlockFace>) -> T
-) : DefaultingBackingStateConfigType<T>() {
+    private val constructor: (Set<BlockFace>) -> T,
+    fileName: String
+) : DefaultingBackingStateConfigType<T>(63, fileName) {
     
-    override val maxId = 63
     override val blockedIds = setOf(63)
     override val defaultStateConfig = of(63)
     
     final override fun of(id: Int): T {
         var i = id
-        val faces = ArrayList<BlockFace>()
+        val faces = enumSet<BlockFace>()
         repeat(POSSIBLE_FACES.size) {
             if (i and 1 == 1)
                 faces += POSSIBLE_FACES[POSSIBLE_FACES.lastIndex - it]
@@ -50,12 +52,9 @@ internal abstract class SidedBackingStateConfigType<T : SidedBackingStateConfig>
         return constructor(faces)
     }
     
-    final override fun of(variantString: String): T {
-        val faces = variantString.split(',').mapNotNull {
-            val s = it.split('=')
-            if (s[1].toBoolean())
-                BlockFace.valueOf(s[0].uppercase())
-            else null
+    final override fun of(properties: Map<String, String>): T {
+        val faces = properties.entries.mapNotNullTo(enumSet()) { (face, enabled) ->
+            BlockFace.valueOf(face.uppercase()).takeIf { enabled.toBoolean() }
         }
         
         return constructor(faces)

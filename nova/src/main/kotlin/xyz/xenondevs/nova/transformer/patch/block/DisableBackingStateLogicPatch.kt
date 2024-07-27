@@ -78,20 +78,20 @@ private val HUGE_MUSHROOM_BLOCK_MIRROR = ReflectionUtils.getMethod(
 internal object DisableBackingStateLogicPatch : MultiTransformer(NoteBlock::class, HugeMushroomBlock::class) {
     
     override fun transform() {
-        val returnDefaultBlockState = buildInsnList { 
+        val returnDefaultBlockState = buildInsnList {
             addLabel()
             aLoad(0)
             invokeVirtual(Block::defaultBlockState)
             areturn()
         }
         
-        val returnFirst = buildInsnList { 
+        val returnFirst = buildInsnList {
             addLabel()
             aLoad(1)
             areturn()
         }
         
-        val emptyInsn = buildInsnList { 
+        val emptyInsn = buildInsnList {
             addLabel()
             _return()
         }
@@ -102,19 +102,18 @@ internal object DisableBackingStateLogicPatch : MultiTransformer(NoteBlock::clas
             areturn()
         }
         
-        val passInteraction = buildInsnList { 
+        val passInteraction = buildInsnList {
             addLabel()
             getStatic(InteractionResult.PASS)
             areturn()
         }
         
-        val returnFalse = buildInsnList { 
+        val returnFalse = buildInsnList {
             addLabel()
             ldc(0)
             ireturn()
         }
         
-        VirtualClassPath[NoteBlock::getStateForPlacement].replaceInstructions(returnDefaultBlockState)
         VirtualClassPath[NOTE_BLOCK_UPDATE_SHAPE].replaceInstructions(returnFirst)
         VirtualClassPath[NOTE_BLOCK_NEIGHBOR_CHANGED].replaceInstructions(emptyInsn)
         VirtualClassPath[NOTE_BLOCK_USE_ITEM_ON].replaceInstructions(failItemInteraction)
@@ -122,10 +121,9 @@ internal object DisableBackingStateLogicPatch : MultiTransformer(NoteBlock::clas
         VirtualClassPath[NOTE_BLOCK_ATTACK].replaceInstructions(emptyInsn)
         VirtualClassPath[NOTE_BLOCK_TRIGGER_EVENT].replaceInstructions(returnFalse)
         
-        VirtualClassPath[HugeMushroomBlock::getStateForPlacement].replaceInstructions(returnDefaultBlockState)
         VirtualClassPath[HUGE_MUSHROOM_BLOCK_UPDATE_SHAPE].replaceInstructions(returnFirst)
         VirtualClassPath[HUGE_MUSHROOM_BLOCK_ROTATE].replaceInstructions(returnDefaultBlockState)
         VirtualClassPath[HUGE_MUSHROOM_BLOCK_MIRROR].replaceInstructions(returnDefaultBlockState)
     }
-
+    
 }

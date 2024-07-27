@@ -9,6 +9,7 @@ import kotlinx.coroutines.coroutineScope
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.resources.ResourceLocation
+import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.config.ConfigProvider
 import xyz.xenondevs.nova.data.config.Configs
@@ -25,6 +26,7 @@ import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorFactory
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
@@ -140,6 +142,8 @@ open class NovaBlock internal constructor(
     open fun handleBreak(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {
         checkServerThread()
         state.modelProvider.remove(pos)
+        if (state[DefaultBlockStateProperties.WATERLOGGED] == true)
+            pos.block.type = Material.WATER
         behaviors.forEach { it.handleBreak(pos, state, ctx) }
     }
     
@@ -148,9 +152,19 @@ open class NovaBlock internal constructor(
         behaviors.forEach { it.handleNeighborChanged(pos, state, neighborPos) }
     }
     
+    fun updateShape(pos: BlockPos, state: NovaBlockState, neighborPos: BlockPos): NovaBlockState {
+        checkServerThread()
+        return behaviors.fold(state) { acc, behavior -> behavior.updateShape(pos, acc, neighborPos) }
+    }
+    
     fun handleRandomTick(pos: BlockPos, state: NovaBlockState) {
         checkServerThread()
         behaviors.forEach { it.handleRandomTick(pos, state) }
+    }
+    
+    fun handleScheduledTick(pos: BlockPos, state: NovaBlockState) {
+        checkServerThread()
+        behaviors.forEach { it.handleScheduledTick(pos, state) }
     }
     
     fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {

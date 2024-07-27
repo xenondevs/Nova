@@ -2,11 +2,21 @@ package xyz.xenondevs.nova.data.resources.layout.block
 
 import org.bukkit.Material
 import org.bukkit.block.data.BlockData
+import xyz.xenondevs.nova.world.block.state.model.AcaciaLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.AzaleaLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
+import xyz.xenondevs.nova.world.block.state.model.BirchLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.BrownMushroomBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.CherryLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.DarkOakLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.FloweringAzaleaLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.JungleLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.MangroveLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.MushroomStemBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.OakLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.SpruceLeavesBackingStateConfig
 
 /**
  * Represent the different block types whose states can be used to display a custom block model.
@@ -26,8 +36,8 @@ enum class BackingStateCategory(
      *
      * - Limited to 1149 different models
      * - Models cannot be transparent
+     * - Cannot be waterlogged
      * - Client-side arm swing animation on right-click
-     *
      */
     NOTE_BLOCK(
         fallbackHitbox = Material.BARRIER,
@@ -39,10 +49,27 @@ enum class BackingStateCategory(
      *
      * - Limited to 189 different models
      * - Models cannot be transparent
+     * - Cannot be waterlogged
      */
     MUSHROOM_BLOCK(
         fallbackHitbox = Material.BARRIER,
         RedMushroomBackingStateConfig, BrownMushroomBackingStateConfig, MushroomStemBackingStateConfig
+    ),
+    
+    /**
+     * The block model uses leave block states.
+     * 
+     * - Limited to 130 different models
+     * - Models can be transparent, translucent textures are disabled on "fancy" graphics setting
+     * - Can be waterlogged
+     * - Some shaders might animate blocks of this type to blow in the wind
+     */
+    LEAVES(
+        fallbackHitbox = Material.BARRIER,
+        OakLeavesBackingStateConfig, SpruceLeavesBackingStateConfig, BirchLeavesBackingStateConfig,
+        JungleLeavesBackingStateConfig, AcaciaLeavesBackingStateConfig, DarkOakLeavesBackingStateConfig,
+        MangroveLeavesBackingStateConfig, CherryLeavesBackingStateConfig, AzaleaLeavesBackingStateConfig,
+        FloweringAzaleaLeavesBackingStateConfig
     );
     
     constructor(fallbackHitbox: Material, vararg backingStateConfigTypes: BackingStateConfigType<*>) :

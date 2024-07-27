@@ -1,9 +1,11 @@
 package xyz.xenondevs.nova.world.block.state.model
 
 import org.bukkit.block.data.BlockData
+import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 import xyz.xenondevs.nova.util.setBlockStateSilently
+import xyz.xenondevs.nova.util.withoutBlockMigration
 import xyz.xenondevs.nova.world.BlockPos
 
 /**
@@ -12,10 +14,12 @@ import xyz.xenondevs.nova.world.BlockPos
 internal data object ModelLessBlockModelProvider : BlockModelProvider<BlockData> {
     
     override fun set(pos: BlockPos, info: BlockData, method: BlockUpdateMethod) {
-        when (method) {
-            BlockUpdateMethod.DEFAULT -> pos.block.blockData = info
-            BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.nmsBlockState)
-            BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.nmsBlockState)
+        withoutBlockMigration(pos) {
+            when (method) {
+                BlockUpdateMethod.DEFAULT -> pos.block.blockData = info
+                BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.nmsBlockState)
+                BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.nmsBlockState)
+            }
         }
     }
     

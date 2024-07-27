@@ -57,15 +57,20 @@ internal object BlockPlacing : Listener {
     
     @EventHandler(ignoreCancelled = true)
     private fun handleBlockPlace(event: BlockPlaceEvent) {
-        // Prevent players from placing blocks where there are actually already blocks form Nova
-        // This can happen when the hitbox material is replaceable, like as structure void
-        event.isCancelled = WorldDataManager.getBlockState(event.block.pos) != null
+        // Prevent players from placing blocks where there are actually already blocks form Nova.
+        // This can happen when a replaceable hitbox material, such as structure void, is used.
+        
+        // However, we want to permit this for built-in custom blocks, as those might have their
+        // WorldDataManager entry set before this event is called (block migration patch)
+        
+        val blockState =  WorldDataManager.getBlockState(event.block.pos)
+        event.isCancelled = blockState != null && blockState.block.id.namespace != "nova"
     }
     
     @EventHandler(ignoreCancelled = true)
     private fun handleBlockPlace(event: BlockMultiPlaceEvent) {
-        // Prevent players from placing blocks where there are actually already blocks form Nova
-        // This can happen when the hitbox material is replaceable, like as structure void
+        // Prevent players from placing blocks where there are actually already blocks form Nova.
+        // This can happen when a replaceable hitbox material, such as structure void, is used.
         event.isCancelled = event.replacedBlockStates.any { WorldDataManager.getBlockState(it.location.pos) != null }
     }
     

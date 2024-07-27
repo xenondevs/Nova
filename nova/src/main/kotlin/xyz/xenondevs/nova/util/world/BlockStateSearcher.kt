@@ -2,8 +2,12 @@
 
 package xyz.xenondevs.nova.util.world
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.ints.IntArraySet
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
+import it.unimi.dsi.fastutil.ints.IntSet
 import net.minecraft.util.BitStorage
 import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap
 import net.minecraft.util.ZeroBitStorage
@@ -40,18 +44,17 @@ private val HASH_MAP_PALETTE_GET_VALUES = MethodHandles
     .privateLookupIn(HashMapPalette::class.java, MethodHandles.lookup())
     .findGetter(HashMapPalette::class.java, "values", CrudeIncrementalIntIdentityHashBiMap::class.java)
 
-private val ZERO_SET = IntArraySet(intArrayOf(0))
-typealias ChunkSearchQuery = Predicate<BlockState>
+private typealias ChunkSearchQuery = (BlockState) -> Boolean
 
 object BlockStateSearcher {
     
-    private val globalPaletteCache = HashMap<ChunkSearchQuery, Set<Int>>()
+    private val globalPaletteCache = HashMap<ChunkSearchQuery, Int2ObjectMap<BlockState>>()
     
-    fun searchChunk(pos: ChunkPos, queries: List<ChunkSearchQuery>): Array<ArrayList<BlockPos>?> {
+    fun searchChunk(pos: ChunkPos, queries: List<ChunkSearchQuery>): Array<ArrayList<Pair<BlockPos, BlockState>>?> {
         val world = pos.world
         require(world != null) { "World does not exist" }
         
-        val result: Array<ArrayList<BlockPos>?> = arrayOfNulls(queries.size)
+        val result: Array<ArrayList<Pair<BlockPos, BlockState>>?> = arrayOfNulls(queries.size)
         for (section in world.serverLevel.getChunk(pos.x, pos.z).sections) {
             section as LevelChunkSectionWrapper
             
@@ -76,12 +79,12 @@ object BlockStateSearcher {
                         break
                     
                     val resultList = result.getOrSet(queryIdx, ::ArrayList)
-                    storage.runOnIds(ids) { idx ->
-                        val x = idx and 0xF
-                        val z = (idx shr 4) and 0xF
-                        val y = idx shr 8
+                    storage.runOnIds(ids.keys) { id, encodedPos ->
+                        val x = encodedPos and 0xF
+                        val z = (encodedPos shr 4) and 0xF
+                        val y = encodedPos shr 8
                         
-                        resultList += BlockPos(world, (pos.x shl 4) + x, y + bottomY, (pos.z shl 4) + z)
+                        resultList += BlockPos(world, (pos.x shl 4) + x, y + bottomY, (pos.z shl 4) + z) to ids.get(id)
                     }
                 }
             } finally {
@@ -92,7 +95,7 @@ object BlockStateSearcher {
         return result
     }
     
-    private fun Palette<BlockState>.findIds(query: ChunkSearchQuery): Set<Int> {
+    private fun Palette<BlockState>.findIds(query: ChunkSearchQuery): Int2ObjectMap<BlockState> {
         return when (this) {
             is SingleValuePalette<BlockState> -> findIdSingle(query)
             is LinearPalette<BlockState> -> findIdsLinear(query)
@@ -102,14 +105,16 @@ object BlockStateSearcher {
         }
     }
     
-    private fun SingleValuePalette<BlockState>.findIdSingle(query: ChunkSearchQuery): Set<Int> {
-        return if (maybeHas(query))
-            ZERO_SET
-        else emptySet()
+    private fun SingleValuePalette<BlockState>.findIdSingle(query: ChunkSearchQuery): Int2ObjectMap<BlockState> {
+        if (maybeHas(query)) {
+            return Int2ObjectArrayMap(intArrayOf(0), arrayOf(valueFor(0)))
+        } else {
+            return Int2ObjectArrayMap(intArrayOf(), arrayOf())
+        }
     }
     
-    private fun LinearPalette<BlockState>.findIdsLinear(query: ChunkSearchQuery): Set<Int> {
-        val result = IntArraySet()
+    private fun LinearPalette<BlockState>.findIdsLinear(query: ChunkSearchQuery): Int2ObjectMap<BlockState> {
+        val result = Int2ObjectOpenHashMap<BlockState>()
         val values = LINEAR_PALETTE_GET_VALUES.invoke(this) as Array<Any?>
         
         for ((idx, value) in values.withIndex()) {
@@ -117,32 +122,35 @@ object BlockStateSearcher {
                 continue
             
             value as BlockState
-            if (query.test(value))
-                result += idx
+            if (query(value)) {
+                result.put(idx, value)
+            }
         }
         
         return result
     }
     
-    private fun HashMapPalette<BlockState>.findIdsHashMap(query: ChunkSearchQuery): Set<Int> {
-        val result = IntOpenHashSet()
+    private fun HashMapPalette<BlockState>.findIdsHashMap(query: ChunkSearchQuery): Int2ObjectMap<BlockState> {
+        val result = Int2ObjectOpenHashMap<BlockState>()
         val values = HASH_MAP_PALETTE_GET_VALUES.invoke(this) as CrudeIncrementalIntIdentityHashBiMap<BlockState>
         
         for ((idx, value) in values.withIndex()) {
-            if (query.test(value))
-                result += idx
+            if (query(value)) {
+                result.put(idx, value)
+            }
         }
         
         return result
     }
     
-    private fun findIdsGlobal(query: ChunkSearchQuery): Set<Int> {
+    private fun findIdsGlobal(query: ChunkSearchQuery): Int2ObjectMap<BlockState> {
         return globalPaletteCache.getOrPut(query) {
-            val result = IntOpenHashSet()
+            val result = Int2ObjectOpenHashMap<BlockState>()
             
             for ((idx, value) in Block.BLOCK_STATE_REGISTRY.withIndex()) {
-                if (query.test(value))
-                    result += idx
+                if (query(value)) {
+                    result.put(idx, value)
+                }
             }
             
             return@getOrPut result
@@ -150,7 +158,7 @@ object BlockStateSearcher {
     }
     
     @Suppress("NAME_SHADOWING")
-    private inline fun BitStorage.runOnIds(find: Set<Int>, run: (Int) -> Unit) {
+    private inline fun BitStorage.runOnIds(find: IntSet, run: (id: Int, pos: Int) -> Unit) {
         val bits = bits
         val data = raw
         
@@ -164,8 +172,8 @@ object BlockStateSearcher {
             repeat(valuesPerLong) {
                 val id = (l and mask).toInt()
                 
-                if (id in find)
-                    run(idx)
+                if (find.contains(id))
+                    run(id, idx)
                 
                 l = l shr bits
                 idx++

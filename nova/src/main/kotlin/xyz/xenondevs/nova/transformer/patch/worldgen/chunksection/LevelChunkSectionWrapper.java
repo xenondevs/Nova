@@ -14,9 +14,12 @@ import xyz.xenondevs.nova.transformer.Patcher;
 import xyz.xenondevs.nova.transformer.adapter.LcsWrapperAdapter;
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils;
 import xyz.xenondevs.nova.world.BlockPos;
+import xyz.xenondevs.nova.world.block.migrator.BlockMigrator;
 import xyz.xenondevs.nova.world.format.WorldDataManager;
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlockState;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 
 /**
@@ -27,39 +30,55 @@ import java.lang.reflect.Field;
  */
 public class LevelChunkSectionWrapper extends LevelChunkSection {
     
-    private static final Field STATES =
-        ReflectionUtils.getField(LevelChunkSection.class, "states");
-    private static final Field BIOMES =
-        ReflectionUtils.getField(LevelChunkSection.class, "biomes");
-    private static final Field NON_EMPTY_BLOCK_COUNT =
-        ReflectionUtils.getField(LevelChunkSection.class, "nonEmptyBlockCount");
-    private static final Field TICKING_BLOCK_COUNT =
-        ReflectionUtils.getField(LevelChunkSection.class, "tickingBlockCount");
-    private static final Field TICKING_FLUID_COUNT =
-        ReflectionUtils.getField(LevelChunkSection.class, "tickingFluidCount");
-    private static final long NON_EMPTY_BLOCK_COUNT_OFFSET =
-        ReflectionUtils.getFieldOffset$nova(NON_EMPTY_BLOCK_COUNT);
-    private static final long TICKING_BLOCK_COUNT_OFFSET =
-        ReflectionUtils.getFieldOffset$nova(TICKING_BLOCK_COUNT);
-    private static final long TICKING_FLUID_COUNT_OFFSET =
-        ReflectionUtils.getFieldOffset$nova(TICKING_FLUID_COUNT);
+    private static final MethodHandle GET_STATES;
+    private static final MethodHandle GET_BIOMES;
+    private static final MethodHandle GET_NON_EMPTY_BLOCK_COUNT;
+    private static final MethodHandle SET_NON_EMPTY_BLOCK_COUNT;
+    private static final MethodHandle GET_TICKING_BLOCK_COUNT;
+    private static final MethodHandle SET_TICKING_BLOCK_COUNT;
+    private static final MethodHandle GET_TICKING_FLUID_COUNT;
+    private static final MethodHandle SET_TICKING_FLUID_COUNT;
+    private static final MethodHandle GET_SPECIAL_COLLIDING_BLOCKS;
+    private static final MethodHandle SET_SPECIAL_COLLIDING_BLOCKS;
+    private static final Field TICKING_BLOCKS;
+    
+    static {
+        try {
+            var lookup = MethodHandles.privateLookupIn(LevelChunkSection.class, MethodHandles.lookup());
+            GET_STATES = lookup.findGetter(LevelChunkSection.class, "states", PalettedContainer.class);
+            GET_BIOMES = lookup.findGetter(LevelChunkSection.class, "biomes", PalettedContainer.class);
+            GET_NON_EMPTY_BLOCK_COUNT = lookup.findGetter(LevelChunkSection.class, "nonEmptyBlockCount", short.class);
+            SET_NON_EMPTY_BLOCK_COUNT = lookup.findSetter(LevelChunkSection.class, "nonEmptyBlockCount", short.class);
+            GET_TICKING_BLOCK_COUNT = lookup.findGetter(LevelChunkSection.class, "tickingBlockCount", short.class);
+            SET_TICKING_BLOCK_COUNT = lookup.findSetter(LevelChunkSection.class, "tickingBlockCount", short.class);
+            GET_TICKING_FLUID_COUNT = lookup.findGetter(LevelChunkSection.class, "tickingFluidCount", short.class);
+            SET_TICKING_FLUID_COUNT = lookup.findSetter(LevelChunkSection.class, "tickingFluidCount", short.class);
+            GET_SPECIAL_COLLIDING_BLOCKS = lookup.findGetter(LevelChunkSection.class, "specialCollidingBlocks", int.class);
+            SET_SPECIAL_COLLIDING_BLOCKS = lookup.findSetter(LevelChunkSection.class, "specialCollidingBlocks", int.class);
+            TICKING_BLOCKS = ReflectionUtils.getField(LevelChunkSection.class, "tickingBlocks");
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
     
     private final Level level;
     private final ChunkPos chunkPos;
     private final int bottomBlockY;
     private final LevelChunkSection delegate;
+    private boolean migrationActive = false;
     
     @SuppressWarnings("unchecked")
-    public LevelChunkSectionWrapper(Level level, ChunkPos chunkPos, int bottomBlockY, LevelChunkSection delegate) throws IllegalAccessException {
+    public LevelChunkSectionWrapper(Level level, ChunkPos chunkPos, int bottomBlockY, LevelChunkSection delegate) throws Throwable {
         super(
-            (PalettedContainer<BlockState>) STATES.get(delegate),
-            (PalettedContainer<Holder<Biome>>) BIOMES.get(delegate)
+            (PalettedContainer<BlockState>) GET_STATES.invoke(delegate),
+            (PalettedContainer<Holder<Biome>>) GET_BIOMES.invoke(delegate)
         );
         this.level = level;
         this.chunkPos = chunkPos;
         this.bottomBlockY = bottomBlockY;
-        this.delegate = delegate;
+        this.delegate = delegate instanceof LevelChunkSectionWrapper w ? w.delegate : delegate;
         recalcBlockCounts();
+        ReflectionUtils.setFinalField$nova(TICKING_BLOCKS, this, TICKING_BLOCKS.get(delegate));
     }
     
     @Override
@@ -69,21 +88,35 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     
     @Override
     public @NotNull BlockState setBlockState(int relX, int relY, int relZ, @NotNull BlockState state, boolean sync) {
+        var pos = getBlockPos(relX, relY, relZ);
+        
         if (state instanceof WrapperBlockState wrappedState) {
-            var chunkPos = this.chunkPos;
-            WorldDataManager.INSTANCE.setBlockState(
-                new BlockPos(
-                    level.getWorld(),
-                    relX + chunkPos.getMinBlockX(),
-                    relY + bottomBlockY,
-                    relZ + chunkPos.getMinBlockZ()
-                ),
-                wrappedState.getNovaState());
+            WorldDataManager.INSTANCE.setBlockState(pos, wrappedState.getNovaState());
             return Blocks.AIR.defaultBlockState();
         }
-        var blockState = delegate.setBlockState(relX, relY, relZ, state, sync);
+        
+        BlockState migrated = state;
+        if (migrationActive) {
+            migrated = BlockMigrator.migrateBlockState(pos, state);
+        }
+        
+        var previous = delegate.setBlockState(relX, relY, relZ, migrated, sync);
+        
+        if (migrationActive) {
+            BlockMigrator.handleVanillaBlockStatePlaced(pos, state);
+        }
+        
         copyBlockCounts();
-        return blockState;
+        return previous;
+    }
+    
+    private BlockPos getBlockPos(int relX, int relY, int relZ) {
+        return new BlockPos(
+            level.getWorld(),
+            relX + chunkPos.getMinBlockX(),
+            relY + bottomBlockY,
+            relZ + chunkPos.getMinBlockZ()
+        );
     }
     
     @Override
@@ -99,33 +132,27 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
         copyBlockCounts();
     }
     
-    public Level getLevel() {
-        return level;
-    }
-    
-    public ChunkPos getChunkPos() {
-        return chunkPos;
-    }
-    
     public int getBottomBlockY() {
         return bottomBlockY;
     }
     
+    public boolean isMigrationActive() {
+        return migrationActive;
+    }
+    
+    public void setMigrationActive(boolean migrationActive) {
+        this.migrationActive = migrationActive;
+    }
+    
     private void copyBlockCounts() {
-        ReflectionUtils.putInt$nova(
-            this,
-            NON_EMPTY_BLOCK_COUNT_OFFSET,
-            ReflectionUtils.getInt$nova(delegate, NON_EMPTY_BLOCK_COUNT_OFFSET)
-        );
-        ReflectionUtils.putInt$nova(
-            this,
-            TICKING_BLOCK_COUNT_OFFSET,
-            ReflectionUtils.getInt$nova(delegate, TICKING_BLOCK_COUNT_OFFSET));
-        ReflectionUtils.putInt$nova(
-            this,
-            TICKING_FLUID_COUNT_OFFSET,
-            ReflectionUtils.getInt$nova(delegate, TICKING_FLUID_COUNT_OFFSET)
-        );
+        try {
+            SET_NON_EMPTY_BLOCK_COUNT.invoke(this, GET_NON_EMPTY_BLOCK_COUNT.invoke(delegate));
+            SET_TICKING_BLOCK_COUNT.invoke(this, GET_TICKING_BLOCK_COUNT.invoke(delegate));
+            SET_TICKING_FLUID_COUNT.invoke(this, GET_TICKING_FLUID_COUNT.invoke(delegate));
+            SET_SPECIAL_COLLIDING_BLOCKS.invoke(this, GET_SPECIAL_COLLIDING_BLOCKS.invoke(delegate));
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
     
 }
