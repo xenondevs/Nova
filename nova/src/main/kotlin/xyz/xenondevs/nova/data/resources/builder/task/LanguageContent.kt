@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.resources.builder.task
 
 import xyz.xenondevs.commons.gson.fromJson
+import xyz.xenondevs.commons.reflection.isLazyInitialized
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
@@ -19,9 +20,8 @@ import kotlin.io.path.writeText
 
 class LanguageContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
     
-    private val _vanillaLangs = HashMap<String, HashMap<String, String>>()
-    val vanillaLangs: Map<String, Map<String, String>> get() = _vanillaLangs
-    val customLangs = HashMap<String, HashMap<String, String>>()
+    val vanillaLangs: Map<String, Map<String, String>> by lazy(::loadVanillaLangs)
+    val customLangs: HashMap<String, HashMap<String, String>> by lazy(::loadCustomLangs)
     
     fun getOrCreate(lang: String): HashMap<String, String> {
         return customLangs.getOrPut(lang) { HashMap() }
@@ -58,18 +58,17 @@ class LanguageContent internal constructor(private val builder: ResourcePackBuil
         customLang[key] = value
     }
     
-    @PackTask(runAfter = ["ExtractTask#extractAll"])
-    private fun loadLangFiles() {
-        try {
-            // Load vanilla lang files
-            loadLangs(ResourcePackBuilder.MCASSETS_ASSETS_DIR.resolve("minecraft/lang/"), _vanillaLangs)
-            // load lang files from base packs
-            loadLangs(ResourcePackBuilder.LANGUAGE_DIR, customLangs)
-            // load lang files from asset packs
-            for (pack in builder.assetPacks) loadLangs(pack.langDir, customLangs)
-        } catch (t: Throwable) {
-            LOGGER.log(Level.SEVERE, "Failed to read existing language files", t)
-        }
+    private fun loadVanillaLangs(): Map<String, Map<String, String>> {
+        val map = HashMap<String, HashMap<String, String>>()
+        loadLangs(ResourcePackBuilder.MCASSETS_ASSETS_DIR.resolve("minecraft/lang/"), map)
+        return map
+    }
+    
+    private fun loadCustomLangs(): HashMap<String, HashMap<String, String>> {
+        val map = HashMap<String, HashMap<String, String>>()
+        loadLangs(ResourcePackBuilder.LANGUAGE_DIR, map) // lang files from base packs
+        for (pack in builder.assetPacks) loadLangs(pack.langDir, map) // lang files from asset packs
+        return map
     }
     
     private fun loadLangs(dir: Path?, map: HashMap<String, HashMap<String, String>>) {
@@ -84,7 +83,7 @@ class LanguageContent internal constructor(private val builder: ResourcePackBuil
             }
     }
     
-    @PackTask(runAfter = ["LanguageContent#loadLangFiles"])
+    @PackTask
     private fun write() {
         extractRomanNumerals(customLangs.getOrPut("en_us", ::HashMap))
         ResourceLookups.LANGUAGE = customLangs
