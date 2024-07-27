@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.associateByNotNull
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.nova.LOGGER
@@ -25,7 +26,9 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionWrapper
+import xyz.xenondevs.nova.util.bukkitMaterial
 import xyz.xenondevs.nova.util.instrument
 import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.registerEvents
@@ -124,6 +127,8 @@ internal object BlockMigrator : Listener {
         migrations += leavesMigration(Blocks.FLOWERING_AZALEA_LEAVES, FloweringAzaleaLeavesBackingStateConfig, DefaultBlocks.FLOWERING_AZALEA_LEAVES)
         
         queries += migrations.map { migration -> { state -> state.block == migration.vanillaBlock } }
+        queries += { state -> VanillaTileEntity.Type.of(state.block.bukkitMaterial) != null }
+        
         _migrationsByVanillaBlock += migrations.associateBy { it.vanillaBlock }
         _migrationsByNovaBlock += migrations.associateByNotNull { it.novaBlock }
     }
@@ -216,12 +221,25 @@ internal object BlockMigrator : Listener {
     @JvmStatic
     fun handleVanillaBlockStatePlaced(pos: BlockPos, blockState: BlockState) {
         if (!blockState.isAir) {
+            // Remove, replace, or place vanilla tile entity
+            val vteType = VanillaTileEntity.Type.of(blockState.block.bukkitMaterial)
+            var vte = WorldDataManager.getVanillaTileEntity(pos)
+            if (vte != null && vte.type != vteType) {
+                WorldDataManager.setVanillaTileEntity(pos, null)
+                vte = null
+            }
+            if (vteType != null && vte == null) {
+                vte = vteType.constructor(pos, Compound())
+                WorldDataManager.setVanillaTileEntity(pos, vte)
+                vte.handlePlace()
+            }
+            
+            // Backing states
             val migration = migrationsByVanillaBlock[blockState.block]
             val novaState = migration?.vanillaToNova?.invoke(blockState)
-            if (novaState != null)
+            if (novaState != null) {
                 WorldDataManager.setBlockState(pos, novaState)
-            
-            // TODO: init vte here
+            }
         } else {
             WorldDataManager.setBlockState(pos, null)
             WorldDataManager.setTileEntity(pos, null)

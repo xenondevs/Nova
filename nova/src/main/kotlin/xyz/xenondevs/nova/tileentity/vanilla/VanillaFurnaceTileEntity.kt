@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.tileentity.vanilla
 
-import net.minecraft.world.level.block.entity.FurnaceBlockEntity
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
@@ -26,11 +26,11 @@ internal class VanillaFurnaceTileEntity internal constructor(
         DefaultItemHolder.tryConvertLegacy(this)?.let { storeData("itemHolder", it) } // legacy conversion
         itemHolder = StaticVanillaItemHolder(
             storedValue("itemHolder", ::Compound),
-            getInventories(pos.nmsBlockEntity as FurnaceBlockEntity)
+            getInventories(pos.nmsBlockEntity as AbstractFurnaceBlockEntity)
         )
     }
     
-    private fun getInventories(furnace: FurnaceBlockEntity): EnumMap<BlockFace, NetworkedInventory> {
+    private fun getInventories(furnace: AbstractFurnaceBlockEntity): EnumMap<BlockFace, NetworkedInventory> {
         val contents = furnace.contents
         val inputInventory = NetworkedNMSInventory(SingleSlotItemStackContainer(contents, 0))
         val fuelInventory = NetworkedNMSInventory(SingleSlotItemStackContainer(contents, 1))

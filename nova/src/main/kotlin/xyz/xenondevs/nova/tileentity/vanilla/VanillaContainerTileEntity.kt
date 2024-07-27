@@ -42,7 +42,6 @@ internal class VanillaContainerTileEntity internal constructor(
         
         val contents = when (blockEntity) {
             is BarrelBlockEntity -> blockEntity.contents
-            is BrewingStandBlockEntity -> blockEntity.contents // TODO: should have its own vte
             is DispenserBlockEntity -> blockEntity.contents
             is HopperBlockEntity -> blockEntity.contents
             else -> throw IllegalArgumentException("Unsupported container block entity: $blockEntity")

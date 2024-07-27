@@ -58,7 +58,6 @@ import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
-import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
 import xyz.xenondevs.nova.ui.menu.explorer.creative.ItemsWindow
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.BlockUtils
@@ -336,7 +335,18 @@ internal object NovaCommand : Command() {
     private fun removeInvalidVTEs(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         val chunks = player.location.chunk.getSurroundingChunks(ctx["range"], true)
-        val count = chunks.sumOf { VanillaTileEntityManager.removeInvalidVTEs(it.pos) }
+        
+        var count = 0
+        for (chunk in chunks) {
+            for (vte in WorldDataManager.getVanillaTileEntities(chunk.pos)) {
+                if (!vte.meetsBlockStateRequirement()) {
+                    WorldDataManager.setVanillaTileEntity(vte.pos, null)
+                    vte.handleBreak()
+                    count++
+                }
+            }
+        }
+        
         if (count > 0) {
             ctx.source.sender.sendMessage(Component.translatable(
                 "command.nova.remove_invalid_vtes.success",
