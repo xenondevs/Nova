@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.resources.layout.item
 
 import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.model.Model
 import xyz.xenondevs.nova.data.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.data.resources.builder.task.model.ModelContent
@@ -10,6 +11,7 @@ import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 @RegistryElementBuilderDsl
 class ItemModelSelectorScope internal constructor(
     item: NovaItem,
+    val resourcePackBuilder: ResourcePackBuilder,
     val modelContent: ModelContent
 ) {
     

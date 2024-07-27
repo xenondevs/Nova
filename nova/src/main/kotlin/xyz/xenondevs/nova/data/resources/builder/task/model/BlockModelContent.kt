@@ -93,7 +93,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
             .forEach { block ->
                 val layout = block.requestedLayout
                 for (blockState in block.blockStates) {
-                    val scope = BlockModelSelectorScope(blockState, modelContent)
+                    val scope = BlockModelSelectorScope(blockState, builder, modelContent)
                     when (layout.type) {
                         LayoutType.STATE_BACKED -> {
                             val modelBuilder = layout.modelSelector(scope)
@@ -111,7 +111,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                             if (block !is NovaTileEntityBlock)
                                 throw IllegalArgumentException("$block cannot use entity-backed block models, as it is not a tile-entity")
                             
-                            val modelBuilder = layout.modelSelector(BlockModelSelectorScope(blockState, modelContent))
+                            val modelBuilder = layout.modelSelector(BlockModelSelectorScope(blockState, builder, modelContent))
                             val data = DisplayEntityBlockModelData(assignModelToItem(modelBuilder), layout.stateSelector(scope))
                             lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
                         }

@@ -111,7 +111,7 @@ class ItemModelContent internal constructor(val builder: ResourcePackBuilder) : 
             val itemLookup = enumMap<Material, MutableMap<String, Int>>()
             val requestedLayout = item.requestedLayout
             for ((modelName, modelSelector) in requestedLayout.models) {
-                val (model, _) = modelSelector(ItemModelSelectorScope(item, modelContent)).buildScaled(modelContent)
+                val (model, _) = modelSelector(ItemModelSelectorScope(item, builder, modelContent)).buildScaled(modelContent)
                 val path = modelContent.getOrPutGenerated(model)
                 
                 val reqItemType = requestedLayout.itemType

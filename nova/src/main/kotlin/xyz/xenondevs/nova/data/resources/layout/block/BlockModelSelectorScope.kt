@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.data.resources.layout.block
 import org.bukkit.Axis
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.model.Model
 import xyz.xenondevs.nova.data.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.data.resources.builder.task.model.ModelContent
@@ -40,6 +41,7 @@ open class BlockSelectorScope internal constructor(
 
 class BlockModelSelectorScope internal constructor(
     blockState: NovaBlockState,
+    val resourcePackBuilder: ResourcePackBuilder,
     val modelContent: ModelContent
 ) : BlockSelectorScope(blockState) {
     

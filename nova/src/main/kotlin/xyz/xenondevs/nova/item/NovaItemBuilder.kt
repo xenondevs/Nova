@@ -169,7 +169,7 @@ class NovaItemBuilder internal constructor(
                 name(block.name)
                 models {
                     selectModel {
-                        val scope = BlockModelSelectorScope(block.defaultBlockState, modelContent)
+                        val scope = BlockModelSelectorScope(block.defaultBlockState, resourcePackBuilder, modelContent)
                         block.requestedLayout.modelSelector.invoke(scope)
                     }
                 }
