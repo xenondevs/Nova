@@ -62,8 +62,9 @@ interface BlockBehavior : BlockBehaviorHolder {
     
     /**
      * Whether this behavior implements random-tick logic for the given [state].
+     * Note that the result of this method will be cached on startup.
      */
-    fun isRandomlyTicking(state: NovaBlockState): Boolean = false // TODO: implement logic for this
+    fun ticksRandomly(state: NovaBlockState): Boolean = false
     
     /**
      * Handles a random tick for a block of [state] at [pos].

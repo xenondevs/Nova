@@ -2,8 +2,6 @@
 
 package xyz.xenondevs.nova.world.format
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.bukkit.Bukkit
 import org.bukkit.Chunk.LoadLevel
@@ -48,7 +46,7 @@ object WorldDataManager : Listener {
                 val regionChunk = getOrLoadChunk(it.pos)
                 regionChunk.enable()
                 if (it.loadLevel == LoadLevel.TICKING || it.loadLevel == LoadLevel.ENTITY_TICKING) {
-                    regionChunk.startTicking()
+                    regionChunk.allowTicking()
                 }
             }
     }
@@ -78,32 +76,24 @@ object WorldDataManager : Listener {
         runBlocking { worlds[event.world.uid]?.save() }
     }
     
-    internal fun loadAsync(pos: ChunkPos) {
-        if (!initialized)
-            return
-        
-        // TODO: don't use global scope
-        GlobalScope.launch { worlds.values.forEach { it.loadAsync(pos) } }
-    }
-    
     internal fun startTicking(pos: ChunkPos) {
         if (!initialized)
             return
         
-        runBlocking { getOrLoadChunk(pos).startTicking() }
+        runBlocking { getOrLoadChunk(pos).allowTicking() }
     }
     
     internal fun stopTicking(pos: ChunkPos) {
         if (!initialized)
             return
         
-        runBlocking { getOrLoadChunk(pos).stopTicking() }
+        runBlocking { getOrLoadChunk(pos).disallowTicking() }
     }
     
     fun getBlockState(pos: BlockPos): NovaBlockState? =
         getChunkOrThrow(pos.chunkPos).getBlockState(pos)
     
-    fun setBlockState(pos: BlockPos, state: NovaBlockState?) =
+    fun setBlockState(pos: BlockPos, state: NovaBlockState?): NovaBlockState? =
         getChunkOrThrow(pos.chunkPos).setBlockState(pos, state)
     
     fun getTileEntity(pos: BlockPos): TileEntity? =

@@ -16,6 +16,7 @@ import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
+import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.tileentity.TileEntity
 import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
@@ -53,7 +54,7 @@ internal class RegionChunk(
     @Volatile
     var isEnabled = false
         private set
-    private var shouldTick = false
+    private var tickingAllowed = false
     private var isTicking = false
     
     private val world = pos.world!!
@@ -66,7 +67,9 @@ internal class RegionChunk(
     private val vanillaTileEntities: MutableMap<BlockPos, VanillaTileEntity> = HashMap()
     private val tileEntities: MutableMap<BlockPos, TileEntity> = ConcurrentHashMap() // concurrent to allow modifications during ticking
     
-    private var sectionsEmpty = sections.all { it.isEmpty() }
+    private var randomTickBlockCounts = sections.mapToIntArray { it.countNonEmpty { state -> state.ticksRandomly } }
+    private var randomTickBlockCount = randomTickBlockCounts.sum()
+    private var tickingTileEntityCount = 0
     private var tick = 0
     private var asyncTickerSupervisor: Job? = null
     private var tileEntityAsyncTickers: HashMap<TileEntity, Job>? = null
@@ -113,6 +116,8 @@ internal class RegionChunk(
             
             try {
                 tileEntities[pos] = block.tileEntityConstructor(pos, blockState, data)
+                if (block.syncTickrate > 0 || block.asyncTickrate > 0)
+                    tickingTileEntityCount++
             } catch (t: Throwable) {
                 LOGGER.log(Level.SEVERE, "Failed to initialize tile entity pos=$pos, blockState=$blockState, data=$data", t)
             }
@@ -127,42 +132,42 @@ internal class RegionChunk(
     }
     
     /**
-     * Sets the [BlockState][state] at the given [pos].
+     * Sets the [BlockState][state] at the given [pos] and returns the previous [NovaBlockState].
      */
-    fun setBlockState(pos: BlockPos, state: NovaBlockState?) = lock.withLock {
-        val section = getSection(pos.y)
-        section[pos.x and 0xF, pos.y and 0xF, pos.z and 0xF] = state
-        if (state != null) {
-            tileEntities[pos]?.blockState = state
-            
-            // if this is the first block in the chunk, we may need to start ticking it
-            if (sectionsEmpty) {
-                sectionsEmpty = false
-                if (shouldTick && !isTicking) {
-                    startTicking()
-                }
-            }
-        } else if (!sectionsEmpty && section.isEmpty()) {
-            // this section is now empty, so we check if the whole chunk is empty
-            sectionsEmpty = sections.all { it.isEmpty() }
-            if (sectionsEmpty && isTicking) {
-                stopTicking()
-                shouldTick = true
-            }
+    fun setBlockState(pos: BlockPos, state: NovaBlockState?): NovaBlockState? = lock.withLock {
+        val sectionIdx = getSectionIndex(pos.y)
+        val section = sections[sectionIdx]
+        val previous = section.set(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF, state)
+        
+        if (previous != null && previous.ticksRandomly) {
+            randomTickBlockCounts[sectionIdx]--
+            randomTickBlockCount--
         }
+        
+        if (state != null) {
+            if (state.ticksRandomly) {
+                randomTickBlockCounts[sectionIdx]++
+                randomTickBlockCount++
+            }
+            tileEntities[pos]?.blockState = state
+        }
+        
+        reconsiderTicking()
+        
+        return previous
     }
     
     /**
      * Iterates over all non-empty block states in this chunk and calls the specified [action]
      * for each of them.
      */
-    fun forEachNonEmpty(action: (pos: BlockPos, blockState: NovaBlockState) -> Unit) {
+    fun forEachNonEmpty(action: (pos: BlockPos, blockState: NovaBlockState) -> Unit): Unit = lock.withLock {
         for ((idx, section) in sections.withIndex()) {
             if (section.isEmpty())
                 continue
             val bottomY = (idx shl 4) + minHeight
             
-            section.container.forEachNonEmpty { x, y, z, blockState -> 
+            section.container.forEachNonEmpty { x, y, z, blockState ->
                 action(pos.blockPos(x, bottomY + y, z), blockState)
             }
         }
@@ -233,15 +238,26 @@ internal class RegionChunk(
             if (isEnabled) {
                 tileEntity.isEnabled = true
                 tileEntity.handleEnable()
+            }
+            
+            if (isTicking && tileEntity.block.asyncTickrate > 0) {
                 launchAndRegisterAsyncTicker(asyncTickerSupervisor!!, tileEntity)
             }
+            
+            if (tileEntity.block.syncTickrate > 0 || tileEntity.block.asyncTickrate > 0)
+                tickingTileEntityCount++
         }
         
         if (previous != null) {
             previous.handleDisable()
             previous.isEnabled = false
             cancelAndUnregisterAsyncTicker(previous)
+            
+            if (previous.block.syncTickrate > 0 || previous.block.asyncTickrate > 0)
+                tickingTileEntityCount--
         }
+        
+        reconsiderTicking()
         
         return previous
     }
@@ -249,16 +265,22 @@ internal class RegionChunk(
     /**
      * Gets the [RegionChunkSection] at the given [y] coordinate.
      */
-    private fun getSection(y: Int): RegionChunkSection<NovaBlockState> {
+    private fun getSection(y: Int): RegionChunkSection<NovaBlockState> =
+        sections[getSectionIndex(y)]
+    
+    /**
+     * Gets the index of the [RegionChunkSection] at the given [y] coordinate.
+     */
+    private fun getSectionIndex(y: Int): Int {
         require(y in minHeight..maxHeight) { "Invalid y coordinate $y" }
-        return sections[(y - minHeight) shr 4]
+        return (y - minHeight) shr 4
     }
     
     /**
      * Enables this RegionChunk.
      *
      * This loads all models and calls [TileEntity.handleEnable], [VanillaTileEntity.handleEnable].
-     * 
+     *
      * May only be called from the server thread.
      */
     fun enable() {
@@ -294,7 +316,7 @@ internal class RegionChunk(
      * Disables this [RegionChunk].
      *
      * This unloads all models and calls [TileEntity.handleDisable], [VanillaTileEntity.handleDisable].
-     * 
+     *
      * May only be called from the server thread.
      */
     fun disable() {
@@ -318,15 +340,40 @@ internal class RegionChunk(
     }
     
     /**
+     * Reconsiders the ticking status based on [tickingAllowed], [isTicking], [randomTickBlockCount], [tickingTileEntityCount]
+     * and starts or stops ticking as required.
+     */
+    private fun reconsiderTicking(): Unit = lock.withLock {
+        if (isTicking) {
+            if (!tickingAllowed || (randomTickBlockCount == 0 && tickingTileEntityCount == 0))
+                stopTicking()
+        } else {
+            if (tickingAllowed && (randomTickBlockCount > 0 || tickingTileEntityCount > 0))
+                startTicking()
+        }
+    }
+    
+    /**
+     * Permits this [RegionChunk] to start ticking.
+     */
+    fun allowTicking(): Unit = lock.withLock {
+        tickingAllowed = true
+        reconsiderTicking()
+    }
+    
+    /**
+     * Prevents this [RegionChunk] from ticking.
+     */
+    fun disallowTicking(): Unit = lock.withLock {
+        tickingAllowed = false
+        reconsiderTicking()
+    }
+    
+    /**
      * Starts ticking this [RegionChunk].
      */
-    fun startTicking(): Unit = lock.withLock {
+    private fun startTicking(): Unit = lock.withLock {
         if (isTicking)
-            return
-        
-        shouldTick = true
-        
-        if (sectionsEmpty)
             return
         
         // enable sync ticking
@@ -345,7 +392,7 @@ internal class RegionChunk(
     /**
      * Stops ticking this [RegionChunk].
      */
-    fun stopTicking(): Unit = lock.withLock {
+    private fun stopTicking(): Unit = lock.withLock {
         if (!isTicking)
             return
         
@@ -357,11 +404,10 @@ internal class RegionChunk(
         asyncTickerSupervisor?.cancel("Chunk ticking disabled")
         tileEntityAsyncTickers = null
         
-        shouldTick = false
         isTicking = false
     }
     
-    private fun tick() = lock.withLock {
+    private fun tick(): Unit = lock.withLock {
         tick++
         
         // tile-entity ticks
@@ -382,17 +428,20 @@ internal class RegionChunk(
         }
         
         // random ticks
+        if (randomTickBlockCount == 0)
+            return
         val randomTickSpeed = level.gameRules.getInt(GameRules.RULE_RANDOMTICKING)
         if (randomTickSpeed > 0) {
             for ((sectionIdx, section) in sections.withIndex()) {
-                if (!section.isEmpty()) {
+                if (randomTickBlockCounts[sectionIdx] > 0) {
                     repeat(randomTickSpeed) {
-                        val x = Random.nextInt(0, 16)
-                        val y = Random.nextInt(0, 16)
-                        val z = Random.nextInt(0, 16)
+                        val rand = Random.nextInt()
+                        val x = rand shr 8 and 0xF
+                        val y = rand shr 4 and 0xF
+                        val z = rand and 0xF
                         val blockState = section[x, y, z]
-                        if (blockState != null) {
-                            val pos = BlockPos(world, (pos.x shl 4) + x,  (sectionIdx shl 4) + minHeight + y, (pos.z shl 4) + z)
+                        if (blockState != null && blockState.ticksRandomly) {
+                            val pos = BlockPos(world, (pos.x shl 4) + x, (sectionIdx shl 4) + minHeight + y, (pos.z shl 4) + z)
                             try {
                                 blockState.block.handleRandomTick(pos, blockState)
                             } catch (t: Throwable) {
@@ -413,8 +462,9 @@ internal class RegionChunk(
         tileEntityAsyncTickers?.remove(tileEntity)?.cancel("Tile entity removed")
     }
     
-    private fun launchAsyncTicker(context: CoroutineContext, tileEntity: TileEntity): Job =
-        CoroutineScope(context).launch {
+    private fun launchAsyncTicker(context: CoroutineContext, tileEntity: TileEntity): Job {
+        require(tileEntity.block.asyncTickrate > 0) { "TileEntity must have an async tickrate > 0" }
+        return CoroutineScope(context).launch {
             var startTime: Long
             while (true) {
                 startTime = System.currentTimeMillis()
@@ -428,6 +478,7 @@ internal class RegionChunk(
                     delay(delayTime)
             }
         }
+    }
     
     /**
      * Writes this chunk to the given [writer].

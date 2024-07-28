@@ -44,17 +44,19 @@ internal class ArraySectionDataContainer<T> : PalletizedSectionDataContainer<T> 
         return palette.getValue(data[pack(x, y, z)])
     }
     
-    override fun set(x: Int, y: Int, z: Int, value: T?) {
-        val current = get(x, y, z)
-        if (current == value)
-            return
-        else if (current == null)
+    override fun set(x: Int, y: Int, z: Int, value: T?): T? {
+        val previous = get(x, y, z)
+        if (previous == value)
+            return previous
+        else if (previous == null)
             nonEmptyBlockCount++
         else if (value == null)
             nonEmptyBlockCount--
         
         val id = toPalletizedId(value)
         data[pack(x, y, z)] = id
+        
+        return previous
     }
     
     override fun fill(value: T?) {

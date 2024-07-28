@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.world.format.chunk
 
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.format.IdResolver
 import xyz.xenondevs.nova.world.format.chunk.container.ArraySectionDataContainer
 import xyz.xenondevs.nova.world.format.chunk.container.MapSectionDataContainer
@@ -32,21 +31,30 @@ internal class RegionChunkSection<T>(
         container.nonEmptyBlockCount == 0
     
     /**
-     * Retrieves the [NovaBlockState] at the given [x], [y] and [z] section coordinates.
+     * Counts all non-empty blocks matching [predicate].
+     */
+    inline fun countNonEmpty(crossinline predicate: (T) -> Boolean): Int {
+        var i = 0
+        container.forEachNonEmpty { _, _, _, value -> if (predicate(value)) i++ }
+        return i
+    }
+    
+    /**
+     * Retrieves the value at the given [x], [y] and [z] section coordinates.
      */
     operator fun get(x: Int, y: Int, z: Int): T? =
         container[x, y, z]
     
     /**
-     * Sets the [NovaBlockState] at the given [x], [y] and [z] section coordinates.
+     * Sets the value at the given [x], [y] and [z] section coordinates and returns the previous value.
      */
-    operator fun set(x: Int, y: Int, z: Int, state: T?) {
+    operator fun set(x: Int, y: Int, z: Int, state: T?): T? {
         val current = get(x, y, z)
         if (current == state)
-            return
+            return current
         
         checkMigrateContainer(state)
-        container[x, y, z] = state
+        return container.set(x, y, z, state)
     }
     
     /**

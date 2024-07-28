@@ -32,6 +32,8 @@ open class NovaBlockState internal constructor(
     
     internal open val modelProvider: LinkedBlockModelProvider<*> by lazy { ResourceLookups.BLOCK_MODEL[this]!! }
     
+    internal val ticksRandomly = block.behaviors.fold(false) { acc, behavior -> acc || behavior.ticksRandomly(this) }
+    
     /**
      * Gets the value of the given [property] or `null` if the property is not set.
      */

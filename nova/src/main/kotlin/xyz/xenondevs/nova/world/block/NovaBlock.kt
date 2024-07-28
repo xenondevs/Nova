@@ -50,10 +50,6 @@ open class NovaBlock internal constructor(
     var item: NovaItem? = null
         internal set
     
-    @Suppress("LeakingThis")
-    val blockStates = NovaBlockState.createBlockStates(this, stateProperties)
-    val defaultBlockState = blockStates[0]
-    
     /**
      * The configuration for this [NovaBlock].
      * Trying to read config values from this when no config is present will result in an exception.
@@ -62,12 +58,26 @@ open class NovaBlock internal constructor(
      */
     val config: ConfigProvider by lazy { Configs[configId] }
     
+    /**
+     * A list of all [BlockBehaviors][BlockBehavior] of this [NovaBlock].
+     */
     val behaviors: List<BlockBehavior> = behaviors.map { holder ->
         when (holder) {
             is BlockBehavior -> holder
             is BlockBehaviorFactory<*> -> holder.create(this)
         }
     }
+    
+    /**
+     * A list of all possible [NovaBLockStates][NovaBlockState] of this [NovaBlock]
+     */
+    @Suppress("LeakingThis")
+    val blockStates = NovaBlockState.createBlockStates(this, stateProperties)
+    
+    /**
+     * The default block state of this [NovaBlock].
+     */
+    val defaultBlockState = blockStates[0]
     
     /**
      * Checks whether this [NovaBlock] has a [BlockBehavior] of the reified type [T], or a subclass of it.

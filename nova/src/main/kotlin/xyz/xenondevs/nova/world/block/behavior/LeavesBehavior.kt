@@ -27,7 +27,7 @@ import kotlin.math.min
 
 internal object LeavesBehavior : BlockBehavior {
     
-    override fun isRandomlyTicking(state: NovaBlockState): Boolean {
+    override fun ticksRandomly(state: NovaBlockState): Boolean {
         return !state.getOrThrow(LEAVES_PERSISTENT) && state.getOrThrow(LEAVES_DISTANCE) == 7
     }
     

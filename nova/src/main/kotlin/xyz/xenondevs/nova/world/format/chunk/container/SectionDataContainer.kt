@@ -25,9 +25,10 @@ internal sealed class SectionDataContainer<T>(protected val idResolver: IdResolv
     abstract operator fun get(x: Int, y: Int, z: Int): T?
     
     /**
-     * Sets the value at the specified [x], [y] and [z] section coordinates to the specified [value].
+     * Sets the value at the specified [x], [y] and [z] section coordinates to the specified [value]
+     * and returns the previous [value].
      */
-    abstract operator fun set(x: Int, y: Int, z: Int, value: T?)
+    abstract operator fun set(x: Int, y: Int, z: Int, value: T?): T?
     
     /**
      * Fills the entire section with the specified [value].
