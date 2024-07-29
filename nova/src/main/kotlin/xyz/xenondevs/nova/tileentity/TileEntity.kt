@@ -26,7 +26,6 @@ import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidType
-import xyz.xenondevs.nova.tileentity.network.type.fluid.container.DynamicFluidContainer
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.util.hasInventoryOpen
 import xyz.xenondevs.nova.util.item.storeData

@@ -299,13 +299,8 @@ internal class RegionChunk(
                 tileEntity.isEnabled = true
                 tileEntity.handleEnable()
             }
-            vanillaTileEntities.values.removeIf { vte ->
-                // verify vte validity (the vanilla block state might've been changed without block updates)
-                if (vte.meetsBlockStateRequirement()) {
-                    vte.handleEnable()
-                    return@removeIf false
-                }
-                return@removeIf true
+            for (vte in vanillaTileEntities.values) {
+                vte.handleEnable()
             }
             
             isEnabled = true

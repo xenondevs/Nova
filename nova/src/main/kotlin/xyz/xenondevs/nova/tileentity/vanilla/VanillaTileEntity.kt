@@ -28,10 +28,6 @@ internal abstract class VanillaTileEntity internal constructor(
         saveDataAccessors()
     }
     
-    fun meetsBlockStateRequirement(): Boolean {
-        return pos.block.type in type.materials
-    }
-    
     enum class Type(val constructor: VanillaTileEntityConstructor, val materials: Set<Material>) {
         
         CHEST(::VanillaChestTileEntity, setOf(Material.CHEST, Material.TRAPPED_CHEST)),

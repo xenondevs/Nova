@@ -339,7 +339,7 @@ internal object NovaCommand : Command() {
         var count = 0
         for (chunk in chunks) {
             for (vte in WorldDataManager.getVanillaTileEntities(chunk.pos)) {
-                if (!vte.meetsBlockStateRequirement()) {
+                if (vte.pos.block.type !in vte.type.materials) {
                     WorldDataManager.setVanillaTileEntity(vte.pos, null)
                     vte.handleBreak()
                     count++
