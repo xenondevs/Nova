@@ -36,6 +36,7 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -130,6 +131,26 @@ object DefaultContextParamTypes {
             .build()
     
     /**
+     * The nova tile-entity of a block.
+     *
+     * Required in intentions: none
+     *
+     * Optional in intentions:
+     * - [BlockBreak]
+     * - [BlockInteract]
+     *
+     * Autofilled by:
+     * - [BLOCK_POS]
+     *
+     * Autofills: none
+     */
+    val TILE_ENTITY_NOVA: ContextParamType<TileEntity> =
+        ContextParamType.builder<TileEntity>("tile_entity_nova")
+            .optionalIn(BlockBreak, BlockInteract)
+            .autofilledBy(::BLOCK_POS) { WorldDataManager.getTileEntity(it) }
+            .build()
+    
+    /**
      * The tile-entity data of a nova tile-entity.
      * 
      * Required in intentions: none
@@ -175,6 +196,7 @@ object DefaultContextParamTypes {
             .build()
     
     // TODO: block state vanilla
+    // TODO: tile entity vanilla
     
     /**
      * The block type as id.
