@@ -21,6 +21,9 @@ import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.data.context.Context
+import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions
+import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.data.resources.ResourceGeneration
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -218,32 +221,47 @@ internal object BlockMigrator : Listener {
         return blockState
     }
     
+    /**
+     * Handles a block state change at [pos] from [previousState] to [newState] that was not caused by Nova.
+     */
     @JvmStatic
-    fun handleVanillaBlockStatePlaced(pos: BlockPos, blockState: BlockState) {
-        if (!blockState.isAir) {
-            // Remove, replace, or place vanilla tile entity
-            val vteType = VanillaTileEntity.Type.of(blockState.block.bukkitMaterial)
-            var vte = WorldDataManager.getVanillaTileEntity(pos)
-            if (vte != null && vte.type != vteType) {
-                WorldDataManager.setVanillaTileEntity(pos, null)
-                vte = null
-            }
-            if (vteType != null && vte == null) {
-                vte = vteType.constructor(pos, Compound())
-                WorldDataManager.setVanillaTileEntity(pos, vte)
-                vte.handlePlace()
-            }
-            
-            // Backing states
-            val migration = migrationsByVanillaBlock[blockState.block]
-            val novaState = migration?.vanillaToNova?.invoke(blockState)
-            if (novaState != null) {
-                WorldDataManager.setBlockState(pos, novaState)
-            }
-        } else {
-            WorldDataManager.setBlockState(pos, null)
-            WorldDataManager.setTileEntity(pos, null)
+    fun handleBlockStatePlaced(pos: BlockPos, previousState: BlockState, newState: BlockState) {
+        if (previousState == newState)
+            return
+        
+        // Remove, replace, or place vanilla tile entity
+        val vteType = VanillaTileEntity.Type.of(newState.block.bukkitMaterial)
+        var vte = WorldDataManager.getVanillaTileEntity(pos)
+        if (vte != null && vte.type != vteType) {
             WorldDataManager.setVanillaTileEntity(pos, null)
+            vte.handleBreak()
+            vte = null
+        }
+        if (vteType != null && vte == null) {
+            vte = vteType.constructor(pos, Compound())
+            WorldDataManager.setVanillaTileEntity(pos, vte)
+            vte.handlePlace()
+        }
+        
+        // Remove any existing nova block state / nova tile entity
+        val previousNovaState = WorldDataManager.setBlockState(pos, null)
+        val previousTileEntity = WorldDataManager.setTileEntity(pos, null)
+        if ((previousNovaState != null && previousNovaState.block !in migrationsByNovaBlock) || previousTileEntity != null) {
+            val ctx = Context.intention(DefaultContextIntentions.BlockBreak)
+                .param(DefaultContextParamTypes.BLOCK_POS, pos)
+                .param(DefaultContextParamTypes.BLOCK_STATE_NOVA, previousNovaState)
+                .param(DefaultContextParamTypes.TILE_ENTITY_NOVA, previousTileEntity)
+                .build()
+            if (previousNovaState?.block !in migrationsByNovaBlock)
+                previousNovaState?.block?.behaviors?.forEach { it.handleBreak(pos, previousNovaState, ctx) }
+            previousTileEntity?.handleBreak(ctx)
+        }
+        
+        // Migrations for block types that are also used as backing states
+        val migration = migrationsByVanillaBlock[newState.block]
+        val novaState = migration?.vanillaToNova?.invoke(newState)
+        if (novaState != null) {
+            WorldDataManager.setBlockState(pos, novaState)
         }
     }
     

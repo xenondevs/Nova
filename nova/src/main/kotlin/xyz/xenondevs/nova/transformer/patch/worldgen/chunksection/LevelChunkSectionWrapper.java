@@ -103,7 +103,7 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
         var previous = delegate.setBlockState(relX, relY, relZ, migrated, sync);
         
         if (migrationActive) {
-            BlockMigrator.handleVanillaBlockStatePlaced(pos, state);
+            BlockMigrator.handleBlockStatePlaced(pos, previous, state);
         }
         
         copyBlockCounts();
