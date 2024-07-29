@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.data.config
 
-object GlobalValues  {
+@Deprecated("Prefer creating your own config entries for these settings, these will be removed in the future.")
+object GlobalValues {
     
     val USE_METRIC_PREFIXES by MAIN_CONFIG.entry<Boolean>("use_metric_prefixes")
     val DROP_EXCESS_ON_GROUND by MAIN_CONFIG.entry<Boolean>("performance", "drop_excess_on_ground")

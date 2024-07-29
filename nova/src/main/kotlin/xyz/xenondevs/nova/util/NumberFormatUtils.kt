@@ -1,11 +1,13 @@
 package xyz.xenondevs.nova.util
 
 import xyz.xenondevs.commons.collections.treeMapOf
-import xyz.xenondevs.nova.data.config.GlobalValues
+import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.NumberFormat
 import java.util.*
+
+private val USE_METRIC_PREFIXES by MAIN_CONFIG.entry<Boolean>("use_metric_prefixes")
 
 object NumberFormatUtils {
     
@@ -57,22 +59,22 @@ object NumberFormatUtils {
     )
     
     fun getEnergyString(energy: Long): String =
-        if (GlobalValues.USE_METRIC_PREFIXES)
+        if (USE_METRIC_PREFIXES)
             getSoleString(IGNORED_ENERGY_PREFIXES, BigDecimal(energy), "J")
         else "${NUMBER_FORMAT.format(energy)} J"
     
     fun getEnergyString(energy: Long, maxEnergy: Long): String =
-        if (GlobalValues.USE_METRIC_PREFIXES)
+        if (USE_METRIC_PREFIXES)
             getOutOfString(IGNORED_ENERGY_PREFIXES, BigDecimal(energy), BigDecimal(maxEnergy), "J")
         else "${NUMBER_FORMAT.format(energy)} J / ${NUMBER_FORMAT.format(maxEnergy)} J"
     
     fun getFluidString(fluid: Long): String =
-        if (GlobalValues.USE_METRIC_PREFIXES)
+        if (USE_METRIC_PREFIXES)
             getSoleString(IGNORED_FLUID_PREFIXES, BigDecimal(fluid).divide(1000.toBigDecimal()), "B")
         else "${NUMBER_FORMAT.format(fluid)} mB"
     
     fun getFluidString(fluid: Long, maxFluid: Long): String =
-        if (GlobalValues.USE_METRIC_PREFIXES)
+        if (USE_METRIC_PREFIXES)
             getOutOfString(IGNORED_FLUID_PREFIXES, BigDecimal(fluid).divide(1000.toBigDecimal()), BigDecimal(maxFluid).divide(1000.toBigDecimal()), "B")
         else "${NUMBER_FORMAT.format(fluid)} mB / ${NUMBER_FORMAT.format(maxFluid)} mB"
     
