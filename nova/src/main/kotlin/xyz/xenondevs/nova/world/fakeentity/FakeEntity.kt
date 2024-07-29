@@ -267,7 +267,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         buf.writeVarInt(entityId)
         equipment.forEachIndexed { index, item ->
             buf.writeByte(if (index != 5) index or -128 else index)
-            ItemStack.STREAM_CODEC.encode(buf, item)
+            ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, item)
         }
         
         return buf
