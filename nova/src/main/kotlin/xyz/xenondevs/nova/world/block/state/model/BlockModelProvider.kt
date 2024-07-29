@@ -1,11 +1,10 @@
 package xyz.xenondevs.nova.world.block.state.model
 
 import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.state.properties.BlockStateProperties
-import xyz.xenondevs.nova.util.hasProperty
 import xyz.xenondevs.nova.util.setBlockState
 import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 import xyz.xenondevs.nova.util.setBlockStateSilently
+import xyz.xenondevs.nova.util.withoutBlockMigration
 import xyz.xenondevs.nova.world.BlockPos
 
 /**
@@ -32,7 +31,7 @@ internal enum class BlockUpdateMethod {
 
 /**
  * A block model provider is responsible for showing custom block models to players and placing their colliders.
- * 
+ *
  * There should be one instance of this interface per provider type.
  */
 internal sealed interface BlockModelProvider<I> {
@@ -47,10 +46,12 @@ internal sealed interface BlockModelProvider<I> {
      */
     fun remove(pos: BlockPos, method: BlockUpdateMethod) {
         val air = Blocks.AIR.defaultBlockState()
-        when (method) {
-            BlockUpdateMethod.DEFAULT -> pos.setBlockState(air)
-            BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(air)
-            BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(air)
+        withoutBlockMigration(pos) {
+            when (method) {
+                BlockUpdateMethod.DEFAULT -> pos.setBlockState(air)
+                BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(air)
+                BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(air)
+            }
         }
     }
     
