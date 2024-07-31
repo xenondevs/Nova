@@ -1,17 +1,15 @@
 package xyz.xenondevs.nova.data.serialization
 
+import net.minecraft.server.commands.data.DataAccessor
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.commons.provider.AbstractProvider
+import xyz.xenondevs.cbf.provider.entry
 import xyz.xenondevs.commons.provider.mutable.MutableProvider
+import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
-// TODO: use compound entry providers instead of data accessors
 abstract class DataHolder internal constructor(includePersistent: Boolean) {
-    
-    @PublishedApi
-    internal val dataAccessors = ArrayList<DataAccessor<*>>()
     
     @PublishedApi
     internal abstract val data: Compound
@@ -27,7 +25,7 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
      * If it can't find anything under the given key, the result of the
      * [defaultValue] lambda is returned.
      *
-     * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
+     * Prefer using [MutableProviders][MutableProvider] via [storedValue] instead.
      */
     inline fun <reified T> retrieveData(key: String, defaultValue: () -> T): T {
         return retrieveDataOrNull(key) ?: defaultValue()
@@ -36,7 +34,7 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
     /**
      * Retrieves data of type [T] or returns `null` if there is no data stored under the given [key].
      *
-     * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
+     * Prefer using [MutableProviders][MutableProvider] via [storedValue] instead.
      */
     inline fun <reified T> retrieveDataOrNull(key: String): T? {
         return data[key] ?: persistentData[key]
@@ -54,7 +52,7 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
     /**
      * Retrieves data of the specified [type] or returns `null` if there is no data stored under the given [key].
      *
-     * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
+     * Prefer using [MutableProviders][MutableProvider] via [storedValue] instead.
      */
     fun <T> retrieveDataOrNull(type: KType, key: String): T? {
         return data.get(type, key) ?: persistentData.get(type, key)
@@ -79,7 +77,7 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
     /**
      * Stores [value] as the reified type [T] under the given [key].
      *
-     * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
+     * Prefer using [MutableProviders][MutableProvider] via [storedValue] instead.
      *
      * @param persistent If the data should also be stored in the [ItemStack].
      */
@@ -90,7 +88,7 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
     /**
      * Stores [value] as the given [type] under the given [key].
      *
-     * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
+     * Prefer using [MutableProviders][MutableProvider] via [storedValue] instead.
      *
      * @param persistent If the data should also be stored in the [ItemStack].
      */
@@ -107,61 +105,32 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
     }
     
     /**
-     * Creates a [DataAccessor] to which properties can delegate.
+     * Creates a [MutableProvider] to which properties can delegate.
      *
-     * The [DataAccessor] will contain the non-persistent data of type [T] under [key] or
+     * The [MutableProvider] will contain the non-persistent data of type [T] under [key] or
      * the result of [defaultValue] if there is no data stored under that [key].
      */
-    inline fun <reified T> storedValue(key: String, defaultValue: () -> T): MutableProvider<T> {
-        return storedValue(key, false, defaultValue)
-    }
+    inline fun <reified T : Any> storedValue(key: String, noinline defaultValue: () -> T): MutableProvider<T> =
+        storedValue(key, false, defaultValue)
     
     /**
-     * Creates a [DataAccessor] to which properties can delegate.
+     * Creates a [MutableProvider] to which properties can delegate.
      *
-     * The [DataAccessor] will contain the data of type [T] under [key] or the result of [defaultValue] if there is no data stored under that [key].
+     * The [MutableProvider] will contain the data of type [T] under [key] or the result of [defaultValue] if there is no data stored under that [key].
      *
      * @param persistent If the data should also be stored in the [ItemStack].
      */
-    inline fun <reified T> storedValue(key: String, persistent: Boolean, defaultValue: () -> T): MutableProvider<T> {
-        val type = typeOf<T>()
-        val initialValue = retrieveData(type, key, defaultValue)
-        return DataAccessor(type, key, persistent, initialValue).also(dataAccessors::add)
-    }
+    inline fun <reified T : Any> storedValue(key: String, persistent: Boolean, noinline defaultValue: () -> T): MutableProvider<T> =
+        storedValue<T>(key, persistent).defaultsToLazily(defaultValue)
     
     /**
-     * Creates a [DataAccessor] to which properties can delegate.
+     * Creates a [MutableProvider] to which properties can delegate.
      *
-     * The [DataAccessor] will contain the data of type [T] under [key] or `null` if there is no data stored under that [key].
+     * The [MutableProvider] will contain the data of type [T] under [key] or `null` if there is no data stored under that [key].
      *
      * @param persistent If the data should also be stored in the [ItemStack].
      */
-    inline fun <reified T> storedValue(key: String, persistent: Boolean = false): MutableProvider<T?> {
-        val type = typeOf<T>()
-        val initialValue = retrieveDataOrNull<T>(type, key)
-        return DataAccessor(type, key, persistent, initialValue).also(dataAccessors::add)
-    }
-    
-    internal fun saveDataAccessors() {
-        dataAccessors.forEach(DataAccessor<*>::save)
-    }
-    
-    @PublishedApi
-    internal inner class DataAccessor<T>(
-        private val type: KType,
-        private val key: String,
-        private val persistent: Boolean,
-        private val initialValue: T,
-    ) : AbstractProvider<T>() {
-        
-        override fun loadValue(): T {
-            return initialValue
-        }
-        
-        fun save() {
-            storeData(type, key, value, persistent)
-        }
-        
-    }
+    inline fun <reified T : Any> storedValue(key: String, persistent: Boolean = false): MutableProvider<T?> =
+        if (persistent) persistentData.entry(key) else data.entry(key)
     
 }

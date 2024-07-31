@@ -25,7 +25,6 @@ internal abstract class VanillaTileEntity internal constructor(
     
     open fun saveData() {
         storeData("type", type)
-        saveDataAccessors()
     }
     
     enum class Type(

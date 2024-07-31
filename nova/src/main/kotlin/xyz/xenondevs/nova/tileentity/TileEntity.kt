@@ -217,9 +217,7 @@ abstract class TileEntity(
     /**
      * Called to save all data using the [storeData] method.
      */
-    open fun saveData() {
-        saveDataAccessors()
-    }
+    open fun saveData() = Unit
     
     /**
      * Gets a [List] of all [players][Player] that this [TileEntity] is
