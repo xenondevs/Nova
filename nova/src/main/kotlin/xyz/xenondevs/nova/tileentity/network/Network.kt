@@ -42,10 +42,5 @@ internal class ImmutableNetworkData<T : Network<T>>(
  * A network is an immutable data structure that is created from a [NetworkData].
  *
  * It contains [NetworkNodes][NetworkNode] and handles the ticking logic.
- *
- * Independent networks may be ticked in parallel!
- * Because of that, the functions not suffixed with `Sync` may not interact with any world state
- * outside of the blocks that are in this network.
- * This includes not causing block updates and not firing bukkit events.
  */
 interface Network<S : Network<S>> : NetworkData<S>

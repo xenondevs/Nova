@@ -7,6 +7,10 @@ import java.util.*
 import java.util.logging.Level
 import kotlin.random.Random
 
+/**
+ * A cluster of [Networks][Network] that share at least one [NetworkNode].
+ * Different clusters are capable of being ticked in parallel, as they do not share state.
+ */
 class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     
     private val tickOffset: Int // load balancing
