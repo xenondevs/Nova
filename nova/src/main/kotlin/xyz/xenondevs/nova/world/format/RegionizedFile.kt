@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import org.bukkit.World
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
+import xyz.xenondevs.commons.provider.immutable.synchronized
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.data.config.MAIN_CONFIG
 import xyz.xenondevs.nova.util.CompressionType
@@ -22,8 +23,8 @@ import java.io.File
 import java.util.*
 
 private const val NUM_CHUNKS = 1024
-private val CREATE_BACKUPS by MAIN_CONFIG.entry<Boolean>("world", "format", "region_backups")
-private val COMPRESSION_TYPE by MAIN_CONFIG.entry<CompressionType>("world", "format", "compression")
+private val CREATE_BACKUPS by MAIN_CONFIG.entry<Boolean>("world", "format", "region_backups").synchronized()
+private val COMPRESSION_TYPE by MAIN_CONFIG.entry<CompressionType>("world", "format", "compression").synchronized()
 
 internal abstract class RegionizedFile<T : RegionizedChunk>(
     private val magic: Int,

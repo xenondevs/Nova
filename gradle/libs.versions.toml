@@ -2,7 +2,7 @@
 format.version = "1.1"
 
 [versions]
-cbf = "0.12"
+cbf = "0.13"
 invui = "1.33"
 jgrapht = "1.5.1"
 kotlin = "2.0.10-RC"
@@ -10,7 +10,7 @@ kotlinx-coroutines = "1.8.0"
 ktor = "2.3.9"
 paper = "1.21-R0.1-SNAPSHOT"
 paperweight = "1.7.1"
-xenondevs-commons = "1.13"
+xenondevs-commons = "1.14"
 
 [libraries]
 awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.25.23" }
