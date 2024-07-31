@@ -182,7 +182,7 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
                 return
             
             player.playClickSound()
-            switchSimplicity(simple)
+            switchSimplicity(!simple)
         }
         
     }
