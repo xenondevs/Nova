@@ -26,6 +26,7 @@ import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.tileentity.network.type.fluid.FluidType
+import xyz.xenondevs.nova.tileentity.network.type.fluid.container.FluidContainer
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.util.hasInventoryOpen
 import xyz.xenondevs.nova.util.item.storeData
@@ -309,7 +310,7 @@ abstract class TileEntity(
     ): VirtualInventory = storedInventory(name, size, persistent = false, preUpdateHandler = preUpdateHandler, postUpdateHandler = postUpdateHandler)
     
     /**
-     * Retrieves a [DynamicFluidContainer] stored under [name] or creates an empty new one.
+     * Retrieves a [FluidContainer] stored under [name] or creates an empty new one.
      * The values [allowedTypes] and [capacity] are not serialized and will be
      * applied every time.
      * Then registers the specified [updateHandler].
@@ -322,7 +323,7 @@ abstract class TileEntity(
         capacity: Provider<Long>,
         persistent: Boolean = false,
         updateHandler: (() -> Unit)? = null,
-    ): DynamicFluidContainer {
+    ): FluidContainer {
         val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
         
         // legacy conversion
@@ -333,7 +334,7 @@ abstract class TileEntity(
             storeData(name, compound, persistent)
         }
         
-        val container = DynamicFluidContainer(
+        val container = FluidContainer(
             storedValue(name, persistent, ::Compound), 
             uuid,
             allowedTypes,

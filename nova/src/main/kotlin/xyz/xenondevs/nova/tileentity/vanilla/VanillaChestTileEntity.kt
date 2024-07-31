@@ -24,11 +24,10 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.*
 
 internal class VanillaChestTileEntity internal constructor(
+    type: Type,
     pos: BlockPos,
     data: Compound
-) : ItemStorageVanillaTileEntity(pos, data) {
-    
-    override val type = Type.CHEST
+) : ItemStorageVanillaTileEntity(type, pos, data) {
     
     private lateinit var inventories: EnumMap<BlockFace, NetworkedInventory>
     private lateinit var allowedConnectionTypes: HashMap<NetworkedInventory, NetworkConnectionType>

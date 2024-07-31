@@ -87,9 +87,9 @@ internal class RegionChunk(
         for ((pos, data) in vanillaTileEntityData) {
             try {
                 val type: VanillaTileEntity.Type = data["type"]!!
-                vanillaTileEntities[pos] = type.constructor(pos, data)
+                vanillaTileEntities[pos] = type.create(pos, data)
             } catch (t: Throwable) {
-                LOGGER.log(Level.SEVERE, "Failed to initialize vanilla tile entity pos=$pos, data=$data")
+                LOGGER.log(Level.SEVERE, "Failed to initialize vanilla tile entity pos=$pos, data=$data", t)
             }
         }
     }

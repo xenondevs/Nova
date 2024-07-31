@@ -15,11 +15,11 @@ import xyz.xenondevs.nova.world.BlockPos
 import java.util.*
 
 internal class VanillaFurnaceTileEntity internal constructor(
+    type: Type,
     pos: BlockPos,
     data: Compound
-) : ItemStorageVanillaTileEntity(pos, data) {
+) : ItemStorageVanillaTileEntity(type, pos, data) {
     
-    override val type = Type.FURNACE
     override lateinit var itemHolder: ItemHolder
     
     override fun handleEnable() {

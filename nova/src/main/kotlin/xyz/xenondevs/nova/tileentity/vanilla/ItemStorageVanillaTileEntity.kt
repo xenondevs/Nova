@@ -8,9 +8,10 @@ import xyz.xenondevs.nova.util.dropItem
 import xyz.xenondevs.nova.world.BlockPos
 
 internal abstract class ItemStorageVanillaTileEntity internal constructor(
+    type: Type,
     pos: BlockPos,
     data: Compound
-) : NetworkedVanillaTileEntity(pos, data) {
+) : NetworkedVanillaTileEntity(type, pos, data) {
     
     abstract val itemHolder: ItemHolder
     final override val holders: Set<EndPointDataHolder> by lazy { setOf(itemHolder) }

@@ -9,4 +9,8 @@ internal class FluidNetworkGroup(data: NetworkGroupData<FluidNetwork>) : Network
         networks.forEach(FluidNetwork::tick)
     }
     
+    override fun postTickSync() {
+        networks.forEach(FluidNetwork::postTickSync)
+    }
+    
 }

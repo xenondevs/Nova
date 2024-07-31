@@ -61,11 +61,13 @@ internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChun
         }
     }
     
+    // fixme: note block is now nova block state instead
+    // fixme, vte type names have changed
     private fun readPopulateVanilla(reader: ByteReader, pos: BlockPos, type: String, chunk: RegionChunk) {
         val data = CBF.read<Compound>(reader)!!
         val vteType = VanillaTileEntity.Type.valueOf(type.substringAfter(':').uppercase())
         data["type"] = vteType
-        val vte = vteType.constructor(pos, data)
+        val vte = vteType.create(pos, data)
         chunk.setVanillaTileEntity(pos, vte)
     }
     

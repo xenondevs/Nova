@@ -5,6 +5,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.LeavesBlock
 import net.minecraft.world.level.block.NoteBlock
+import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.bukkit.Bukkit
@@ -15,7 +16,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.persistence.PersistentDataType
-import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.associateByNotNull
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.nova.LOGGER
@@ -35,7 +35,6 @@ import xyz.xenondevs.nova.util.bukkitMaterial
 import xyz.xenondevs.nova.util.instrument
 import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
@@ -182,6 +181,7 @@ internal object BlockMigrator : Listener {
         }
         
         // migrate vanilla block states that are used by Nova 
+        val levelChunk = chunk.levelChunk
         BlockStateSearcher.searchChunk(chunk.pos, queries)
             .withIndex()
             .forEach { (_, result) ->
@@ -192,7 +192,10 @@ internal object BlockMigrator : Listener {
                     if (WorldDataManager.getBlockState(pos) == null &&
                         CustomItemServiceManager.getBlockType(pos.block) == null
                     ) {
-                        pos.setBlockStateSilently(blockState) // will run through migrateBlockState below
+                        handleBlockStatePlaced(pos, blockState, blockState)
+                        val blockEntity = levelChunk.getBlockEntity(pos.nmsPos)
+                        if (blockEntity != null && WorldDataManager.getVanillaTileEntity(pos) == null)
+                            handleBlockEntityPlaced(pos, blockEntity)
                     }
                 }
             }
@@ -226,19 +229,22 @@ internal object BlockMigrator : Listener {
      */
     @JvmStatic
     fun handleBlockStatePlaced(pos: BlockPos, previousState: BlockState, newState: BlockState) {
-        if (previousState == newState)
-            return
-        
-        // Remove, replace, or place vanilla tile entity
-        val vteType = VanillaTileEntity.Type.of(newState.block.bukkitMaterial)
+        // Remove vte or notify of block state change
+        val expectedVteType = VanillaTileEntity.Type.of(newState.block.bukkitMaterial)
         var vte = WorldDataManager.getVanillaTileEntity(pos)
-        if (vte != null && vte.type != vteType) {
-            WorldDataManager.setVanillaTileEntity(pos, null)
-            vte.handleBreak()
-            vte = null
+        if (vte != null) {
+            if (vte.type != expectedVteType) {
+                WorldDataManager.setVanillaTileEntity(pos, null)
+                vte.handleBreak()
+                vte = null
+            } else {
+                vte.handleBlockStateChange(newState)
+            }
         }
-        if (vteType != null && vte == null) {
-            vte = vteType.constructor(pos, Compound())
+        // Not all vanilla tile entities are actually block entities.
+        // For those, handleBlockEntityPlaced will never be fired, so we'll need to create the vte here.
+        if (expectedVteType != null && vte == null && !expectedVteType.hasBlockEntity) {
+            vte = expectedVteType.create(pos)
             WorldDataManager.setVanillaTileEntity(pos, vte)
             vte.handlePlace()
         }
@@ -262,6 +268,20 @@ internal object BlockMigrator : Listener {
         val novaState = migration?.vanillaToNova?.invoke(newState)
         if (novaState != null) {
             WorldDataManager.setBlockState(pos, novaState)
+        }
+    }
+    
+    @JvmStatic
+    fun handleBlockEntityPlaced(pos: BlockPos, blockEntity: BlockEntity?) {
+        if (blockEntity != null) {
+            val vteType = VanillaTileEntity.Type.of(blockEntity.blockState.bukkitMaterial)
+                ?: return
+            val vte = vteType.create(pos)
+            val previous = WorldDataManager.setVanillaTileEntity(pos, vte)
+            vte.handlePlace()
+            previous?.handleBreak()
+        } else {
+            WorldDataManager.setVanillaTileEntity(pos, null)?.handleBreak()
         }
     }
     

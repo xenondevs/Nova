@@ -7,9 +7,10 @@ import xyz.xenondevs.nova.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.BlockPos
 
 internal abstract class NetworkedVanillaTileEntity internal constructor(
+    type: Type,
     pos: BlockPos,
     data: Compound
-) : VanillaTileEntity(pos, data), NetworkEndPoint {
+) : VanillaTileEntity(type, pos, data), NetworkEndPoint {
     
     final override val owner = null
     final override val linkedNodes = HashSet<NetworkNode>()

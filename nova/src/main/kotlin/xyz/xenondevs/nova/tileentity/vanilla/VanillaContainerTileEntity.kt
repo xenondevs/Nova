@@ -1,10 +1,6 @@
 package xyz.xenondevs.nova.tileentity.vanilla
 
-import net.minecraft.world.level.block.entity.BarrelBlockEntity
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity
-import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
-import net.minecraft.world.level.block.entity.DispenserBlockEntity
-import net.minecraft.world.level.block.entity.HopperBlockEntity
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
@@ -20,11 +16,11 @@ import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.world.BlockPos
 
 internal class VanillaContainerTileEntity internal constructor(
+    type: Type,
     pos: BlockPos,
     data: Compound
-) : ItemStorageVanillaTileEntity(pos, data) {
+) : ItemStorageVanillaTileEntity(type, pos, data) {
     
-    override val type = Type.CONTAINER
     override lateinit var itemHolder: ItemHolder
     
     override fun handleEnable() {
@@ -39,15 +35,7 @@ internal class VanillaContainerTileEntity internal constructor(
     private fun getInventory(blockEntity: BaseContainerBlockEntity): NetworkedInventory {
         if (blockEntity is ShulkerBoxBlockEntity)
             return NetworkedShulkerBoxInventory(SimpleItemStackContainer(blockEntity.contents))
-        
-        val contents = when (blockEntity) {
-            is BarrelBlockEntity -> blockEntity.contents
-            is DispenserBlockEntity -> blockEntity.contents
-            is HopperBlockEntity -> blockEntity.contents
-            else -> throw IllegalArgumentException("Unsupported container block entity: $blockEntity")
-        }
-        
-        return NetworkedNMSInventory(SimpleItemStackContainer(contents))
+        return NetworkedNMSInventory(SimpleItemStackContainer(blockEntity.contents))
     }
     
 }

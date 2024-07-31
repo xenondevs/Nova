@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.transformer.adapter.LcsWrapperAdapter
 import xyz.xenondevs.nova.transformer.patch.FieldFilterPatch
-import xyz.xenondevs.nova.transformer.patch.block.BlockMigrationPatch
+import xyz.xenondevs.nova.transformer.patch.block.BlockMigrationPatches
 import xyz.xenondevs.nova.transformer.patch.block.BlockUpdatesPatches
 import xyz.xenondevs.nova.transformer.patch.block.DisableBackingStateLogicPatch
 import xyz.xenondevs.nova.transformer.patch.bossbar.BossBarOriginPatch
@@ -57,7 +57,7 @@ internal object Patcher {
             WrapperBlockPatch, MappedRegistryPatch, NovaRuleTestPatch,*/ FuelPatches, RemainingItemPatches, SoundPatches,
             BroadcastPacketPatch, EventPreventionPatch, WearablePatch, BossBarOriginPatch,
             FakePlayerLastHurtPatch, BlockUpdatesPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
-            ItemStackDataComponentsPatch, EnchantmentPatches, TagsPatch, RepairPatches, BlockMigrationPatch
+            ItemStackDataComponentsPatch, EnchantmentPatches, TagsPatch, RepairPatches, BlockMigrationPatches
         ).filter(Transformer::shouldTransform).toSet()
     }
     

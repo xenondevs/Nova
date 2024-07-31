@@ -13,10 +13,10 @@ import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.type.fluid.channel.FluidNetworkChannel
 import xyz.xenondevs.nova.tileentity.network.type.fluid.holder.FluidHolder
+import xyz.xenondevs.nova.tileentity.vanilla.VanillaCauldronTileEntity
 import kotlin.math.min
 import kotlin.math.roundToLong
 
-// TODO: fix illegal world state access
 class FluidNetwork internal constructor(
     networkData: NetworkData<FluidNetwork>
 ) : Network<FluidNetwork>, NetworkData<FluidNetwork> by networkData {
@@ -68,6 +68,15 @@ class FluidNetwork internal constructor(
             nextChannel++
             if (nextChannel >= channels.size) nextChannel = 0
         } while (amountLeft != 0L && nextChannel != startingChannel)
+    }
+    
+    fun postTickSync() {
+        for((_, connection) in nodes) {
+            val (node, _) = connection
+            if (node is VanillaCauldronTileEntity) {
+                node.postNetworkTickSync()
+            }
+        }
     }
     
     companion object {
