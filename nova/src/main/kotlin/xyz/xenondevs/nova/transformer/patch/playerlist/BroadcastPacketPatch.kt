@@ -28,7 +28,6 @@ internal object BroadcastPacketPatch : MethodTransformer(PlayerList::broadcast) 
         }
     }
     
-    @Suppress("DEPRECATION")
     @JvmStatic
     fun broadcast(playerList: PlayerList, exclude: Player?, x: Double, y: Double, z: Double, maxDistance: Double, dimension: ResourceKey<*>, packet: Packet<*>) {
         if (dropAll)
@@ -38,9 +37,9 @@ internal object BroadcastPacketPatch : MethodTransformer(PlayerList::broadcast) 
         
         for (player in playerList.players) {
             if (
-                (ignoreExcludedPlayer || excludedPlayer != player)
+                (ignoreExcludedPlayer || excludedPlayer !== player)
                 && player.level().dimension() == dimension
-                && (excludedPlayer == null || player.bukkitEntity.canSee(excludedPlayer.bukkitEntity))
+                && (excludedPlayer === null || player.bukkitEntity.canSee(excludedPlayer.bukkitEntity))
             ) {
                 val dx = x - player.x
                 val dy = y - player.y
