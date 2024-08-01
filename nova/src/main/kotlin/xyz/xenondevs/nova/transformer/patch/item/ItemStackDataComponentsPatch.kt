@@ -9,7 +9,6 @@ import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.component.PatchedDataComponentMap
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.component.CustomData
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
@@ -42,7 +41,7 @@ internal object ItemStackDataComponentsPatch : MultiTransformer(ItemStack::class
     
     @JvmStatic
     fun fromPatch(base: DataComponentMap, changes: DataComponentPatch): PatchedDataComponentMap {
-        val patch = convertLegacy(changes)
+        val patch = ItemStackLegacyConversion.convert(changes)
         
         val novaItem = patch.get(DataComponents.CUSTOM_DATA)?.getOrNull()?.unsafe
             ?.getCompoundOrNull("nova")
@@ -53,26 +52,6 @@ internal object ItemStackDataComponentsPatch : MultiTransformer(ItemStack::class
             if (novaItem != null) NovaDataComponentMap(novaItem) else base,
             patch
         )
-    }
-    
-    private fun convertLegacy(patch: DataComponentPatch): DataComponentPatch {
-        val unsafeCustomTag = patch.get(DataComponents.CUSTOM_DATA)
-            ?.getOrNull()
-            ?.unsafe
-            ?: return patch // not a nova item
-        
-        val novaId = unsafeCustomTag
-            .getCompoundOrNull("nova")
-            ?.getString("id")
-            ?: return patch // not a nova item
-        
-        val customTag = unsafeCustomTag.copy()
-        ItemStackLegacyConversion.convert(customTag, novaId)
-        
-        return DataComponentPatch.builder()
-            .apply { copy(patch) }
-            .set(DataComponents.CUSTOM_DATA, CustomData.of(customTag))
-            .build()
     }
     
 }

@@ -1,15 +1,18 @@
 package xyz.xenondevs.nova.item.legacy
 
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.core.component.DataComponents
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.util.data.getCompoundOrNull
+import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.typeOf
 
 internal object ItemStackLegacyConversion {
     
-    private val idConverters = HashMap<String, ArrayList<ItemStackLegacyConverter>>()
-    private val allConverters = ArrayList<ItemStackLegacyConverter>()
+    private val specializedConverters = HashMap<String, ArrayList<ItemStackLegacyConverter>>()
+    private val genericConverters = ArrayList<ItemStackLegacyConverter>()
     
     init {
         registerConverter(ItemStackNamespaceConverter(
@@ -44,23 +47,35 @@ internal object ItemStackLegacyConversion {
             typeOf<Compound>(),
             NamespacedKey(NOVA, "damage"),
         ))
+        
+        registerConverter(ItemStackEnchantmentsConverter)
     }
     
     private fun registerConverter(converter: ItemStackLegacyConverter) {
-        when (converter) {
-            is SelectedItemStackLegacyConverter -> {
-                converter.affectedItemIds.forEach { id ->
-                    idConverters.getOrPut(id, ::ArrayList) += converter
-                }
+        val affectedItemIds = converter.affectedItemIds
+        if (affectedItemIds != null) {
+            for (affectedItemId in affectedItemIds) {
+                specializedConverters.getOrPut(affectedItemId, ::ArrayList) += converter
             }
-            
-            is AllItemStackLegacyConverter -> allConverters += converter
+        } else {
+            genericConverters += converter
         }
     }
     
-    fun convert(customTag: CompoundTag, novaId: String) {
-        idConverters[novaId]?.forEach { it.convert(customTag) }
-        allConverters.forEach { it.convert(customTag) }
+    @Suppress("DEPRECATION")
+    fun convert(patch: DataComponentPatch): DataComponentPatch {
+        val unsafeCustomTag = patch.get(DataComponents.CUSTOM_DATA)
+            ?.getOrNull()
+            ?.unsafe
+            ?: return patch // not a nova item
+        
+        val novaId = unsafeCustomTag
+            .getCompoundOrNull("nova")
+            ?.getString("id")
+            ?: return patch // not a nova item
+        
+        val converters = (specializedConverters[novaId] ?: emptyList()) + genericConverters
+        return converters.fold(patch) { acc, converter -> converter.convert(acc) }
     }
     
 }

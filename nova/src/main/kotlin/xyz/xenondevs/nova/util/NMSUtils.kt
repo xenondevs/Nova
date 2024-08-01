@@ -467,6 +467,11 @@ fun <T> Registry<T>.getHolder(id: ResourceLocation): Holder<T>? {
     return getHolder(key).getOrNull()
 }
 
+fun <T> Registry<T>.getHolderOrThrow(id: ResourceLocation): Holder<T> {
+    val key = ResourceKey.create(key(), id)
+    return getHolderOrThrow(key)
+}
+
 fun <T> Registry<T>.getOrCreateHolder(id: ResourceLocation): Holder<T> {
     val key = ResourceKey.create(key(), id)
     val holder = getHolder(key)
