@@ -13,6 +13,7 @@ import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
 import xyz.xenondevs.commons.provider.mutable.mapNonNull
+import xyz.xenondevs.commons.provider.mutable.observed
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
@@ -54,6 +55,7 @@ class DefaultItemHolder(
                 { it.mapValuesNotNullTo(enumMap()) { (_, uuid) -> uuidToInv[uuid] } },
                 { it.mapValuesTo(enumMap()) { (_, inv) -> inv.uuid } }
             ).defaultsToLazily { defaultInventoryConfig().toEnumMap() }
+            .observed()
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
         by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")

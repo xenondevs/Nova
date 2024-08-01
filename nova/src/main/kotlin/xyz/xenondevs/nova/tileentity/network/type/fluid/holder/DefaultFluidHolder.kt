@@ -9,6 +9,7 @@ import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
 import xyz.xenondevs.commons.provider.mutable.mapNonNull
+import xyz.xenondevs.commons.provider.mutable.observed
 import xyz.xenondevs.nova.data.serialization.DataHolder
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.type.fluid.container.NetworkedFluidContainer
@@ -44,6 +45,7 @@ class DefaultFluidHolder(
                 { it.mapValuesNotNullTo(enumMap()) { (_, uuid) -> uuidToContainer[uuid] } },
                 { it.mapValuesTo(enumMap()) { (_, container) -> container.uuid } }
             ).defaultsToLazily { defaultContainerConfig().toEnumMap() }
+            .observed()
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> by
         compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
