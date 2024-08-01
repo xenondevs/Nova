@@ -1,155 +1,119 @@
 package xyz.xenondevs.nova.transformer.patch.worldgen.registry
 
-import com.mojang.serialization.DataResult
 import com.mojang.serialization.DynamicOps
-import com.mojang.serialization.Lifecycle
 import net.minecraft.core.DefaultedMappedRegistry
+import net.minecraft.core.Holder
+import net.minecraft.core.HolderGetter
+import net.minecraft.core.HolderSet
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.RegistryFileCodec
+import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.TagKey
+import net.minecraft.world.level.block.Block
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.LabelNode
-import org.objectweb.asm.tree.VarInsnNode
+import org.objectweb.asm.tree.MethodInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
-import xyz.xenondevs.bytebase.util.insertAfterFirst
-import xyz.xenondevs.bytebase.util.internalName
-import xyz.xenondevs.commons.collections.findNthOfType
+import xyz.xenondevs.bytebase.util.calls
+import xyz.xenondevs.bytebase.util.replaceFirst
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
 import xyz.xenondevs.nova.transformer.MultiTransformer
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
-import xyz.xenondevs.nova.world.generation.inject.codec.BlockNovaMaterialDecoder
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlock
-import com.mojang.datafixers.util.Pair as MojangPair
+import java.util.*
 
+private val REGISTRY_OPS_GETTER_METHOD =
+    getMethod(RegistryOps::class, "getter", ResourceKey::class)
+private val REGISTRY_GET_HOLDER_METHOD = 
+    getMethod(Registry::class, "getHolder", ResourceLocation::class)
 private val REGISTRY_FILE_CODEC_DECODE_METHOD =
-    getMethod(RegistryFileCodec::class, false, "decode", DynamicOps::class, Any::class)
-private val REGISTRY_BY_NAME_CODEC_METHOD =
-    getMethod(Registry::class, true, "lambda\$byNameCodec\$1", ResourceLocation::class)
-private val MAPPED_REGISTRY_LIFECYCLE_METHOD =
-    getMethod(MappedRegistry::class, false, "lifecycle", Any::class)
+    getMethod(RegistryFileCodec::class, "decode", DynamicOps::class, Any::class)
+private val REGISTRY_REFERENCE_HOLDER_WITH_LIFECYCLE_LAMBDA =
+    getMethod(Registry::class, "lambda\$referenceHolderWithLifecycle\$4", ResourceLocation::class)
 private val DEFAULTED_MAPPED_REGISTRY_GET_METHOD =
-    getMethod(DefaultedMappedRegistry::class, false, "get", ResourceLocation::class)
+    getMethod(DefaultedMappedRegistry::class, "get", ResourceLocation::class)
 
 /**
  * Allows accessing Nova's registry from Minecraft's Block registry.
  */
 @OptIn(ExperimentalWorldGen::class)
-internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::class, Registry::class, MappedRegistry::class, DefaultedMappedRegistry::class), true) {
-    
-    private val RESOURCE_KEY_NAME = ResourceKey::class.internalName
-    private val RESOURCE_LOCATION_NAME = ResourceLocation::class.internalName
+internal object RegistryCodecPatch : MultiTransformer(RegistryFileCodec::class, Registry::class, MappedRegistry::class, DefaultedMappedRegistry::class) {
     
     override fun transform() {
         patchRegistryFileCodec()
-        patchRegistryByNameCodec()
-        patchRegistryLifecycleGetter()
+        patchRegistryReferenceHolderWithLifecycle()
         patchDefaultedMappedRegistry()
     }
     
     /**
-     * Inserts instructions into RegistryFileCodec to check if a non minecraft block is requested and if so, checks if that
-     * block is registered in Nova and returns a [WrapperBlock] instead.
+     * Replaces the holder getter used in [RegistryFileCodec.decode] to a one that can produce [WrapperBlocks][WrapperBlock]
+     * for nova blocks.
      */
     private fun patchRegistryFileCodec() {
-        val methodNode = VirtualClassPath[REGISTRY_FILE_CODEC_DECODE_METHOD]
-        // For future reference: https://i.imgur.com/Agm0yYI.png
-        methodNode.insertAfterFirst(buildInsnList {
-            val continueLabel = methodNode.instructions.findNthOfType<LabelNode>(11) // L12 in the image
+        VirtualClassPath[REGISTRY_FILE_CODEC_DECODE_METHOD].instructions.replaceFirst(
+            0, 0,
+            buildInsnList { 
+                invokeStatic(::getter)
+            }
+        ) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(REGISTRY_OPS_GETTER_METHOD) }
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    @JvmStatic
+    fun getter(registryOps: RegistryOps<*>, key: ResourceKey<Registry<*>>): Optional<HolderGetter<*>> {
+        if (key != Registries.BLOCK)
+            return registryOps.getter(key) as Optional<HolderGetter<*>>
+        
+        val getter = registryOps.getter(Registries.BLOCK).orElseThrow()
+        val injectGetter = object : HolderGetter<Block> {
             
-            addLabel()
-            aLoad(0) // this
-            getField(RegistryFileCodec::class.internalName, "registryKey", "L$RESOURCE_KEY_NAME;")
-            getStatic(Registries::class.internalName, "BLOCK", "L$RESOURCE_KEY_NAME;")
-            invokeVirtual("java/lang/Object", "equals", "(Ljava/lang/Object;)Z")
-            ifeq(continueLabel) // if registryKey != Registry.BLOCK goto continueLabel
+            override fun get(key: ResourceKey<Block>): Optional<Holder.Reference<Block>> {
+                val vanilla = getter.get(key)
+                if (vanilla.isPresent)
+                    return vanilla
+                return NovaRegistries.WRAPPER_BLOCK.getHolder(key.location()) as Optional<Holder.Reference<Block>>
+            }
             
-            addLabel()
-            aLoad(7) // pair
-            invokeVirtual(MojangPair::class.internalName, "getFirst", "()Ljava/lang/Object;")
-            checkCast(RESOURCE_KEY_NAME)
-            invokeVirtual(RESOURCE_KEY_NAME, "location", "()L$RESOURCE_LOCATION_NAME;")
-            dup()
-            aStore(10) // var location = pair.getFirst().location()
-            invokeVirtual(RESOURCE_LOCATION_NAME, "getNamespace", "()Ljava/lang/String;")
-            ldc("minecraft")
-            invokeVirtual("java/lang/String", "equals", "(Ljava/lang/Object;)Z")
-            ifne(continueLabel) // if location.namespace != "minecraft" goto continueLabel
+            override fun get(tag: TagKey<Block>): Optional<HolderSet.Named<Block>> {
+                val vanilla = getter.get(tag)
+                if (vanilla.isPresent)
+                    return vanilla
+                return NovaRegistries.WRAPPER_BLOCK.getHolder(tag.location()) as Optional<HolderSet.Named<Block>>
+            }
             
-            addLabel()
-            aLoad(10) // location
-            aLoad(2) // obj (to decode)
-            invokeStatic(ReflectionUtils.getMethod(BlockNovaMaterialDecoder::class.java, false, "decodeToPair", ResourceLocation::class.java, Object::class.java)) // DataResult<Pair<Holder<Block>, T>>
-            dup()
-            aStore(11) // var decodedPair = BlockNovaMaterialDecoder.decodeToPair(location, obj)
-            invokeVirtual(DataResult::class.internalName, "result", "()Ljava/util/Optional;")
-            invokeVirtual("java/util/Optional", "isPresent", "()Z")
-            ifeq(continueLabel) // if !decodedPair.result().isPresent() goto continueLabel
-            
-            addLabel()
-            aLoad(11)
-            areturn() // return decodedPair
-        }) { it.opcode == Opcodes.ASTORE && (it as VarInsnNode).`var` == 7 }
+        }
+        
+        return Optional.of(injectGetter)
     }
     
     /**
-     * Same as [patchRegistryFileCodec] but for the RegistryByNameCodec.
+     * Intercepts a [Registry.getHolder] call in [Registry.referenceHolderWithLifecycle] to also produce [WrapperBlocks][WrapperBlock].
      */
-    private fun patchRegistryByNameCodec() {
-        // Mapping name will 100% change in the future, check for these params and method structure: https://i.imgur.com/5mD0ET7.png
-        val instructions = VirtualClassPath[REGISTRY_BY_NAME_CODEC_METHOD].instructions
-        instructions.insert(buildInsnList {
-            val continueLabel = instructions.first as LabelNode
-            
-            addLabel()
-            aLoad(0)
-            invokeInterface(Registry::class.internalName, "key", "()L$RESOURCE_KEY_NAME;")
-            getStatic(Registries::class.internalName, "BLOCK", "L$RESOURCE_KEY_NAME;")
-            invokeVirtual("java/lang/Object", "equals", "(Ljava/lang/Object;)Z")
-            ifeq(continueLabel) // if registryKey != Registry.BLOCK goto continueLabel
-            
-            addLabel()
-            aLoad(1)
-            invokeVirtual(RESOURCE_LOCATION_NAME, "getNamespace", "()Ljava/lang/String;")
-            ldc("minecraft")
-            invokeVirtual("java/lang/String", "equals", "(Ljava/lang/Object;)Z")
-            ifne(continueLabel) // if location.namespace != "minecraft" goto continueLabel
-            
-            addLabel()
-            aLoad(1)
-            invokeStatic(ReflectionUtils.getMethod(BlockNovaMaterialDecoder::class.java, false, "decodeToBlock", ResourceLocation::class.java)) // DataResult<Block>
-            dup()
-            aStore(2) // var decodedBlock = BlockNovaMaterialDecoder.decodeToBlock(location)
-            invokeVirtual(DataResult::class.internalName, "result", "()Ljava/util/Optional;")
-            invokeVirtual("java/util/Optional", "isPresent", "()Z")
-            ifeq(continueLabel) // if !decodedBlock.result().isPresent() goto continueLabel
-            
-            addLabel()
-            aLoad(2)
-            areturn() // return decodedBlock
-        })
+    private fun patchRegistryReferenceHolderWithLifecycle() {
+        // Mapping name will 100% change in the future, check for these params and method structure: https://i.imgur.com/4ix2zLq.png
+        VirtualClassPath[REGISTRY_REFERENCE_HOLDER_WITH_LIFECYCLE_LAMBDA].instructions.replaceFirst(
+            0, 0,
+            buildInsnList { 
+                invokeStatic(::getHolder)
+            }
+        ) { it.opcode == Opcodes.INVOKEINTERFACE && (it as MethodInsnNode).calls(REGISTRY_GET_HOLDER_METHOD) }
     }
     
-    /**
-     * Ensures that all [WrapperBlock]s are marked as stable.
-     */
-    private fun patchRegistryLifecycleGetter() {
-        val lifecycleName = Lifecycle::class.internalName
-        // In case of mapping change, method body should be "return this.lifecycles.get(param0)"
-        val instructions = VirtualClassPath[MAPPED_REGISTRY_LIFECYCLE_METHOD].instructions
-        instructions.insert(buildInsnList {
-            val continueLabel = instructions.first as LabelNode
-            aLoad(1)
-            instanceOf(WrapperBlock::class.internalName)
-            ifeq(continueLabel) // if !(obj instanceof WrapperBlock) goto continueLabel
-            addLabel()
-            invokeStatic(lifecycleName, "stable", "()L$lifecycleName;")
-            areturn() // return Lifecycle.stable()
-        })
+    @JvmStatic
+    fun getHolder(registry: Registry<*>, id: ResourceLocation): Optional<out Holder.Reference<*>> {
+        var holder: Optional<out Holder.Reference<*>> = registry.getHolder(id)
+        if (holder.isEmpty && registry == VanillaRegistries.BLOCK) {
+            holder = NovaRegistries.WRAPPER_BLOCK.getHolder(id)
+        }
+        
+        return holder
     }
     
     private fun patchDefaultedMappedRegistry() {
@@ -157,10 +121,10 @@ internal object RegistryCodecPatch : MultiTransformer(setOf(RegistryFileCodec::c
         instructions.insert(buildInsnList {
             val continueLabel = instructions.first as LabelNode
             aLoad(1)
-            invokeVirtual(RESOURCE_LOCATION_NAME, "getNamespace", "()Ljava/lang/String;")
+            invokeVirtual(ResourceLocation::getNamespace)
             ldc("minecraft")
-            invokeVirtual("java/lang/String", "equals", "(Ljava/lang/Object;)Z")
-            ifne(continueLabel) // if location.namespace != "minecraft" goto continueLabel
+            invokeVirtual(String::equals)
+            ifne(continueLabel) // if location.namespace == "minecraft" goto continueLabel
             
             addLabel()
             constNull()

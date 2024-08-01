@@ -12,9 +12,6 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
-/**
- * Class name is forced because of a check in [Block]
- */
 @ExperimentalWorldGen
 class WrapperBlock(novaBlock: NovaBlock): Block(Properties.of()) {
     

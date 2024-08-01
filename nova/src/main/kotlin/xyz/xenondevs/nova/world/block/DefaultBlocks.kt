@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.world.block
 
 import net.minecraft.resources.ResourceLocation
-import org.bukkit.Material
 import xyz.xenondevs.nova.data.resources.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.item.tool.VanillaToolCategories
 import xyz.xenondevs.nova.item.tool.VanillaToolTiers
+import xyz.xenondevs.nova.transformer.Patcher
 import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.world.block.behavior.BlockSounds
@@ -29,7 +29,10 @@ import xyz.xenondevs.nova.world.block.state.model.OakLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.SpruceLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.property.DefaultScopedBlockStateProperties
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
+@InternalInit(
+    stage = InternalInitStage.PRE_WORLD,
+    dependsOn = [Patcher::class]
+)
 internal object DefaultBlocks {
     
     val UNKNOWN = block("unknown") {

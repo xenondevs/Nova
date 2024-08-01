@@ -5,7 +5,6 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.LabelNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.util.insertAfterFirst
-import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.findNthOfType
 import xyz.xenondevs.nova.transformer.MethodTransformer
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
@@ -22,7 +21,7 @@ internal object WrapperBlockPatch : MethodTransformer(Block::class, "<init>", tr
         methodNode.insertAfterFirst(buildInsnList {
             val continueLabel = methodNode.instructions.findNthOfType<LabelNode>(1)
             aLoad(0)
-            instanceOf(WrapperBlock::class.internalName)
+            instanceOf(WrapperBlock::class)
             ifeq(continueLabel)
             addLabel()
             _return() // if (this instanceof WrapperBlock) return;

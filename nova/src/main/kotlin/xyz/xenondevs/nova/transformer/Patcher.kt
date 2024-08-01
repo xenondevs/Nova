@@ -35,8 +35,13 @@ import xyz.xenondevs.nova.transformer.patch.misc.FakePlayerLastHurtPatch
 import xyz.xenondevs.nova.transformer.patch.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.transformer.patch.registry.TagsPatch
 import xyz.xenondevs.nova.transformer.patch.sound.SoundPatches
+import xyz.xenondevs.nova.transformer.patch.worldgen.FeatureSorterPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.NovaRuleTestPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.WrapperBlockPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.ChunkAccessSectionsPatch
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.registry.MappedRegistryPatch
+import xyz.xenondevs.nova.transformer.patch.worldgen.registry.RegistryCodecPatch
 import xyz.xenondevs.nova.util.data.getResourceData
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_PARENT_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
@@ -53,8 +58,8 @@ internal object Patcher {
     private val transformers by lazy {
         sequenceOf(
             FieldFilterPatch, ToolPatches,
-            LevelChunkSectionPatch, ChunkAccessSectionsPatch, /*FeatureSorterPatch, RegistryCodecPatch,
-            WrapperBlockPatch, MappedRegistryPatch, NovaRuleTestPatch,*/ FuelPatches, RemainingItemPatches, SoundPatches,
+            LevelChunkSectionPatch, ChunkAccessSectionsPatch, FeatureSorterPatch, RegistryCodecPatch,
+            WrapperBlockPatch, MappedRegistryPatch, NovaRuleTestPatch, FuelPatches, RemainingItemPatches, SoundPatches,
             BroadcastPacketPatch, EventPreventionPatch, WearablePatch, BossBarOriginPatch,
             FakePlayerLastHurtPatch, BlockUpdatesPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
             ItemStackDataComponentsPatch, EnchantmentPatches, TagsPatch, RepairPatches, BlockMigrationPatches

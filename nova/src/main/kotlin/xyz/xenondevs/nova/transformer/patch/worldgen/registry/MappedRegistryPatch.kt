@@ -1,58 +1,43 @@
 package xyz.xenondevs.nova.transformer.patch.worldgen.registry
 
-import com.mojang.serialization.Lifecycle
 import net.minecraft.core.Holder
 import net.minecraft.core.MappedRegistry
-import net.minecraft.resources.ResourceKey
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.FieldInsnNode
-import org.objectweb.asm.tree.LabelNode
-import org.objectweb.asm.tree.VarInsnNode
-import xyz.xenondevs.bytebase.asm.OBJECT_TYPE
+import org.objectweb.asm.tree.MethodInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
+import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.insertBeforeFirst
-import xyz.xenondevs.bytebase.util.internalName
-import xyz.xenondevs.bytebase.util.next
 import xyz.xenondevs.nova.transformer.MethodTransformer
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
+import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 
-private val MAPPED_REGISTRY_REGISTER_MAPPING_METHOD =
-    getMethod(MappedRegistry::class, false, "registerMapping", Int::class, ResourceKey::class, Any::class, Lifecycle::class)
+private val MAP_PUT = ReflectionUtils.getMethod(Map::class, "put", Any::class, Any::class)
 
 /**
  * Mojang no longer binds the value of holders when registering something to a registry. So we wrap all values passed to
- * [MappedRegistry.registerMapping] in a [InstantBindValue] and inject a check to unwrap and bind the value.
+ * [MappedRegistry.register] in a [InstantBindValue] and inject a check to unwrap and bind the value.
  */
-internal object MappedRegistryPatch : MethodTransformer(MAPPED_REGISTRY_REGISTER_MAPPING_METHOD) {
-    
-    private val VALUE_WRAPPER_NAME = InstantBindValue::class.internalName
+internal object MappedRegistryPatch : MethodTransformer(MappedRegistry<*>::register) {
     
     override fun transform() {
         methodNode.insertBeforeFirst(buildInsnList {
-            val continueLabel = LabelNode()
-            
-            aLoad(3)
-            instanceOf(VALUE_WRAPPER_NAME)
-            ifeq(continueLabel) // if (!(value instanceof ValueWrapper)) goto continueLabel;
-            
-            addLabel()
-            aLoad(3)
-            checkCast(VALUE_WRAPPER_NAME)
-            getField(VALUE_WRAPPER_NAME, "value", "L$OBJECT_TYPE;")
-            aStore(3) // value = ((ValueWrapper) value).value;
-
-            addLabel()
-            aLoad(5) // ref
-            aLoad(3) // value
-            invokeVirtual(Holder.Reference::class.internalName, "bindValue", "(Ljava/lang/Object;)V")
-            
-            add(continueLabel)
-        }) { insn -> // https://i.imgur.com/uLdd6pu.png
-            insn.opcode == Opcodes.ALOAD && (insn as VarInsnNode).`var` == 0
-                && insn.next?.let { it.opcode == Opcodes.GETFIELD && (it as FieldInsnNode).name == "byKey" } == true
-                && insn.next(2)?.let { it.opcode == Opcodes.ALOAD && (it as VarInsnNode).`var` == 2 } == true
-                && insn.next(3)?.let { it.opcode == Opcodes.ALOAD && (it as VarInsnNode).`var` == 5 } == true
+            aLoad(4) // holder
+            aLoad(2) // value
+            invokeStatic(::unwrapAndBind)
+            aStore(2) // unwrapped value
+        }) { // https://i.imgur.com/kIbTk0Y.png
+            it.opcode == Opcodes.INVOKEINTERFACE && (it as MethodInsnNode).calls(MAP_PUT)
         }
+    }
+    
+    @JvmStatic
+    fun unwrapAndBind(holder: Holder.Reference<Any?>, value: Any?): Any? {
+        if (value is InstantBindValue) {
+            ReflectionRegistry.HOLDER_REFERENCE_BIND_VALUE_METHOD.invoke(holder, value.value)
+            return value.value
+        }
+        
+        return value
     }
     
 }
