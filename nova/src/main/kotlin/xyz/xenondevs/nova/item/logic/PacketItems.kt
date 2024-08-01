@@ -152,11 +152,9 @@ internal object PacketItems : Listener, PacketListener {
     
     @PacketHandler
     private fun handleRecipes(event: ClientboundUpdateRecipesPacketEvent) {
-        val packet = event.packet
-        packet.recipes.forEachIndexed { i, recipe ->
+        event.recipes = event.recipes.map { recipe ->
             val id = recipe.id
-            if (id in RecipeManager.clientsideRecipes)
-                packet.recipes[i] = RecipeHolder(id, RecipeManager.clientsideRecipes[id]!!)
+            RecipeManager.clientsideRecipes[id]?.let { RecipeHolder(id, it) } ?: recipe
         }
     }
     
