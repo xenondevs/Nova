@@ -119,6 +119,8 @@
   "command.nova.fill.success": "Successfully filled the area from x: %s, y: %s, z: %s to x: %s, y: %s, z: %s with %s.",
   "command.nova.give_clientside_stack.success": "Added a client-side version of %s to your inventory.",
   "command.nova.copy_clientside_stack.success": "Added a client-side copy of %s to your inventory.",
+  "command.nova.search_block.result": "Found %s at %s.",
+  "command.nova.search_block.done": "Search completed.",
   "command.nova.recipe.no-recipe": "This item does not have a recipe.",
   "command.nova.usage.no-usage": "This item has no usages.",
   "command.nova.network_reload.success": "All active networks have been reloaded.",

@@ -76,6 +76,7 @@ import xyz.xenondevs.nova.util.item.unsafeNovaTag
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.hitbox.HitboxManager
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
@@ -83,6 +84,7 @@ import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
+import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MAX_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.fakeentity.fakeEntityRenderDistance
@@ -154,7 +156,12 @@ internal object NovaCommand : Command() {
                 .requiresPlayer()
                 .executes0(::copyClientsideStack)
                 .then(argument("item", NovaItemArgumentType)
-                    .executes0(::giveClientsideStack))))
+                    .executes0(::giveClientsideStack)))
+            .then(literal("searchBlock")
+                .requiresPlayer()
+                .then(argument("block", NovaBlockArgumentType)
+                    .then(argument("range", IntegerArgumentType.integer(1, 10))
+                        .executes0(::searchBlock)))))
         .then(literal("items")
             .requiresPlayer()
             .requiresPermission("nova.command.items")
@@ -842,6 +849,33 @@ internal object NovaCommand : Command() {
             NamedTextColor.GRAY,
             ItemUtils.getName(clientsideStack).color(NamedTextColor.AQUA)
         ))
+    }
+    
+    private fun searchBlock(ctx: CommandContext<CommandSourceStack>) = runBlocking {
+        val player = ctx.player
+        val block: NovaBlock = ctx["block"]
+        val range: Int = ctx["range"]
+        
+        val center = player.location.chunkPos
+        for (xOff in -range..range) {
+            for (zOff in -range..range) {
+                val chunkPos = ChunkPos(center.worldUUID, center.x + xOff, center.z + zOff)
+                WorldDataManager.getOrLoadChunk(chunkPos).forEachNonEmpty { pos, blockState -> 
+                    if (blockState.block != block)
+                        return@forEachNonEmpty
+                    
+                    ctx.source.sender.sendMessage(Component.translatable(
+                        "command.nova.search_block.result",
+                        NamedTextColor.GRAY,
+                        block.name,
+                        Component.text("x=${pos.x}, y=${pos.y}, z=${pos.z}", NamedTextColor.AQUA)
+                            .clickEvent(ClickEvent.suggestCommand("/tp ${pos.x} ${pos.y} ${pos.z}"))
+                    ))
+                }
+            }
+        }
+        
+        ctx.source.sender.sendMessage(Component.translatable("command.nova.search_block.done", NamedTextColor.GRAY))
     }
     
     private fun openItemInventory(ctx: CommandContext<CommandSourceStack>) {
