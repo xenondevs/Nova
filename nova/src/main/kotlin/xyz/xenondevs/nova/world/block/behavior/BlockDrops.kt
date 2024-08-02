@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.block.behavior
 
 import org.bukkit.GameMode
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
@@ -18,7 +17,7 @@ import xyz.xenondevs.nova.world.block.state.NovaBlockState
 object BlockDrops : BlockBehavior {
     
     override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
-        if ((ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player)?.gameMode == GameMode.CREATIVE)
+        if (ctx[DefaultContextParamTypes.SOURCE_PLAYER]?.gameMode == GameMode.CREATIVE)
             return emptyList()
         
         return state.block.item
