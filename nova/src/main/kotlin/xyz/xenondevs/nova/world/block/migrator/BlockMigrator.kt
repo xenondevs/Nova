@@ -192,7 +192,7 @@ internal object BlockMigrator : Listener {
                     if (WorldDataManager.getBlockState(pos) == null &&
                         CustomItemServiceManager.getBlockType(pos.block) == null
                     ) {
-                        handleBlockStatePlaced(pos, blockState, blockState)
+                        pos.setBlockStateSilently(blockState) // LevelChunkSectionWrapper will then call handleBlockStatePlaced 
                         val blockEntity = levelChunk.getBlockEntity(pos.nmsPos)
                         if (blockEntity != null && WorldDataManager.getVanillaTileEntity(pos) == null)
                             handleBlockEntityPlaced(pos, blockEntity)
