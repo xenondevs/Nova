@@ -35,6 +35,7 @@ import xyz.xenondevs.nova.util.bukkitMaterial
 import xyz.xenondevs.nova.util.instrument
 import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
@@ -273,15 +274,20 @@ internal object BlockMigrator : Listener {
     
     @JvmStatic
     fun handleBlockEntityPlaced(pos: BlockPos, blockEntity: BlockEntity?) {
+        // We should generally be able to assume that block state changes happen before block entity removal / addition,
+        // which means that there should never be a vanilla tile entity registered when this method is called.
+        val previousVte = WorldDataManager.setVanillaTileEntity(pos, null)
+        if (previousVte != null) {
+            LOGGER.log(Level.SEVERE, "Vanilla tile entity $previousVte registered at $pos when handling block entity placed with $blockEntity", Exception())
+            previousVte.handleBreak()
+        }
+        
         if (blockEntity != null) {
             val vteType = VanillaTileEntity.Type.of(blockEntity.blockState.bukkitMaterial)
                 ?: return
             val vte = vteType.create(pos)
-            val previous = WorldDataManager.setVanillaTileEntity(pos, vte)
+            WorldDataManager.setVanillaTileEntity(pos, vte)
             vte.handlePlace()
-            previous?.handleBreak()
-        } else {
-            WorldDataManager.setVanillaTileEntity(pos, null)?.handleBreak()
         }
     }
     

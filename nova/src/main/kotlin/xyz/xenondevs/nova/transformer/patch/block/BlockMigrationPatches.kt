@@ -3,52 +3,68 @@ package xyz.xenondevs.nova.transformer.patch.block
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.chunk.LevelChunk
 import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.MethodInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
+import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.replaceEvery
 import xyz.xenondevs.nova.transformer.MultiTransformer
 import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionWrapper
-import xyz.xenondevs.nova.util.chunkSection
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.block.migrator.BlockMigrator
+
+private val LEVEL_CHUNK_SET_BLOCK_STATE = ReflectionUtils.getMethod(
+    LevelChunk::class,
+    "setBlockState",
+    BlockPos::class, BlockState::class, Boolean::class, Boolean::class
+)
 
 internal object BlockMigrationPatches : MultiTransformer(Level::class, LevelChunk::class) {
     
     override fun transform() {
-        transformLevelChunkSetBlockEntity()
+        transformLevelChunkSetBlockState()
         transformLevelNotifyAndUpdatePhysics()
     }
     
-    private fun transformLevelChunkSetBlockEntity() {
-        VirtualClassPath[LevelChunk::addAndRegisterBlockEntity].instructions.replaceEvery(0, 0, {
-            aLoad(1)
-            invokeStatic(::handleBlockEntityPlaced)
-            _return()
-        }) { it.opcode == Opcodes.RETURN }
+    private fun transformLevelChunkSetBlockState() {
+        VirtualClassPath[LEVEL_CHUNK_SET_BLOCK_STATE].instructions.replaceEvery(
+            0, 0,
+            { // on stack: this, blockEntity
+                dup2()
+                invokeVirtual(LevelChunk::addAndRegisterBlockEntity)
+                invokeStatic(BlockMigrationPatches::handleBlockEntityPlaced)
+            }
+        ) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(LevelChunk::addAndRegisterBlockEntity) }
         
-        VirtualClassPath[LevelChunk::removeBlockEntity].instructions.insert(buildInsnList { 
-            addLabel()
-            aLoad(0)
-            aLoad(1)
-            invokeStatic(::handleBlockEntityRemoved)
-        })
+        VirtualClassPath[LEVEL_CHUNK_SET_BLOCK_STATE].instructions.replaceEvery(
+            0, 0,
+            { // on stack: this, pos
+                dup2()
+                invokeVirtual(LevelChunk::removeBlockEntity)
+                invokeStatic(BlockMigrationPatches::handleBlockEntityRemoved)
+            }
+        ) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(LevelChunk::removeBlockEntity) }
     }
     
     @JvmStatic
-    fun handleBlockEntityPlaced(blockEntity: BlockEntity) {
-        val novaPos = blockEntity.blockPos.toNovaPos(blockEntity.level!!.world)
-        if ((novaPos.chunkSection as LevelChunkSectionWrapper).isMigrationActive) {
-            BlockMigrator.handleBlockEntityPlaced(blockEntity.blockPos.toNovaPos(blockEntity.level!!.world), blockEntity)
+    fun handleBlockEntityPlaced(chunk: LevelChunk, blockEntity: BlockEntity) {
+        val chunkSection = chunk.getSection(chunk.getSectionIndex(blockEntity.blockPos.y)) as LevelChunkSectionWrapper
+        if (chunkSection.isMigrationActive) {
+            val novaPos = blockEntity.blockPos.toNovaPos(chunk.level.world)
+            BlockMigrator.handleBlockEntityPlaced(novaPos, blockEntity)
         }
     }
     
     @JvmStatic
     fun handleBlockEntityRemoved(chunk: LevelChunk, pos: BlockPos) {
-        val novaPos = pos.toNovaPos(chunk.level.world)
-        if ((novaPos.chunkSection as LevelChunkSectionWrapper).isMigrationActive) {
-            BlockMigrator.handleBlockEntityPlaced(pos.toNovaPos(chunk.level.world), null)
+        val chunkSection = chunk.getSection(chunk.getSectionIndex(pos.y)) as LevelChunkSectionWrapper
+        if (chunkSection.isMigrationActive) {
+            val novaPos = pos.toNovaPos(chunk.level.world)
+            BlockMigrator.handleBlockEntityPlaced(novaPos, null)
         }
     }
     
