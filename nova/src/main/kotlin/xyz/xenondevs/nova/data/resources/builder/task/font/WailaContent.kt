@@ -37,6 +37,14 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.MANGROVE_DOOR to "item/mangrove_door",
     Material.CRIMSON_DOOR to "item/crimson_door",
     Material.WARPED_DOOR to "item/warped_door",
+    Material.COPPER_DOOR to "item/copper_door",
+    Material.WEATHERED_COPPER_DOOR to "item/weathered_copper_door",
+    Material.OXIDIZED_COPPER_DOOR to "item/oxidized_copper_door",
+    Material.EXPOSED_COPPER_DOOR to "item/exposed_copper_door",
+    Material.WAXED_COPPER_DOOR to "item/copper_door",
+    Material.WAXED_WEATHERED_COPPER_DOOR to "item/weathered_copper_door",
+    Material.WAXED_OXIDIZED_COPPER_DOOR to "item/oxidized_copper_door",
+    Material.WAXED_EXPOSED_COPPER_DOOR to "item/exposed_copper_door",
     
     // signs
     Material.OAK_SIGN to "item/oak_sign",
