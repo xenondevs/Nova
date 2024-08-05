@@ -9,12 +9,13 @@ import xyz.xenondevs.nova.data.context.Context
 import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.UUIDUtils
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
+import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.format.RegionFile
 import xyz.xenondevs.nova.world.format.RegionizedFileReader
 import xyz.xenondevs.nova.world.format.chunk.RegionChunk
@@ -61,14 +62,18 @@ internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChun
         }
     }
     
-    // fixme: note block is now nova block state instead
-    // fixme, vte type names have changed
     private fun readPopulateVanilla(reader: ByteReader, pos: BlockPos, type: String, chunk: RegionChunk) {
         val data = CBF.read<Compound>(reader)!!
-        val vteType = VanillaTileEntity.Type.valueOf(type.substringAfter(':').uppercase())
-        data["type"] = vteType
-        val vte = vteType.create(pos, data)
-        chunk.setVanillaTileEntity(pos, vte)
+        when (type) {
+            "minecraft:note_block" -> {
+                val blockState = DefaultBlocks.NOTE_BLOCK.defaultBlockState
+                    .with(DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT, data["instrument"]!!)
+                    .with(DefaultBlockStateProperties.NOTE_BLOCK_NOTE, data["note"]!!)
+                    .with(DefaultBlockStateProperties.POWERED, data["powered"]!!)
+                chunk.setBlockState(pos, blockState)
+            }
+            else -> chunk.setVanillaTileEntityData(pos, data)
+        }
     }
     
     private fun readPopulateNova(reader: ByteReader, pos: BlockPos, type: NovaBlock, chunk: RegionChunk) {

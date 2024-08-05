@@ -86,8 +86,11 @@ internal class RegionChunk(
     private fun initVanillaTileEntities() {
         for ((pos, data) in vanillaTileEntityData) {
             try {
-                val type: VanillaTileEntity.Type = data["type"]!!
-                vanillaTileEntities[pos] = type.create(pos, data)
+                // temporary legacy conversion measure: nullable type to then be read from vanilla block state in enable()
+                val type: VanillaTileEntity.Type? = data["type"]
+                if (type != null) {
+                    vanillaTileEntities[pos] = type.create(pos, data)
+                }
             } catch (t: Throwable) {
                 LOGGER.log(Level.SEVERE, "Failed to initialize vanilla tile entity pos=$pos, data=$data", t)
             }
@@ -185,6 +188,11 @@ internal class RegionChunk(
      */
     fun getVanillaTileEntities(): List<VanillaTileEntity> = lock.withLock {
         return ArrayList(vanillaTileEntities.values)
+    }
+    
+    // temporary legacy-conversion related function
+    fun setVanillaTileEntityData(pos: BlockPos, data: Compound): Unit = lock.withLock {
+        vanillaTileEntityData[pos] = data
     }
     
     /**
@@ -288,6 +296,19 @@ internal class RegionChunk(
         lock.withLock {
             if (isEnabled)
                 return
+            
+            // temporary legacy conversion measure: init vanilla tile entities based on block type
+            for ((pos, vteData) in vanillaTileEntityData) {
+                if (pos in vanillaTileEntities)
+                    continue
+                
+                val vteType = VanillaTileEntity.Type.of(pos.block.type)
+                if (vteType != null) {
+                    vanillaTileEntities[pos] = vteType.create(pos, vteData)
+                } else {
+                    vanillaTileEntityData -= pos
+                }
+            }
             
             // load models
             for ((pos, tileEntity) in tileEntities)
