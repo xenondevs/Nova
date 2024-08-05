@@ -30,6 +30,8 @@ internal class VanillaContainerTileEntity internal constructor(
         
         DefaultItemHolder.tryConvertLegacy(this)?.let { storeData("itemHolder", it) } // legacy conversion
         itemHolder = StaticVanillaItemHolder(storedValue("itemHolder", ::Compound), inventories)
+        
+        super.handleEnable()
     }
     
     private fun getInventory(blockEntity: BaseContainerBlockEntity): NetworkedInventory {

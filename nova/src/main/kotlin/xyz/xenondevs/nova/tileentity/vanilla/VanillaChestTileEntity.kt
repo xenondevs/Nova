@@ -46,6 +46,8 @@ internal class VanillaChestTileEntity internal constructor(
             { inventories },
             { allowedConnectionTypes }
         )
+        
+        super.handleEnable()
     }
     
     override fun handlePlace() {

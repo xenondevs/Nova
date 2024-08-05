@@ -28,6 +28,8 @@ internal class VanillaFurnaceTileEntity internal constructor(
             storedValue("itemHolder", ::Compound),
             getInventories(pos.nmsBlockEntity as AbstractFurnaceBlockEntity)
         )
+        
+        super.handleEnable()
     }
     
     private fun getInventories(furnace: AbstractFurnaceBlockEntity): EnumMap<BlockFace, NetworkedInventory> {

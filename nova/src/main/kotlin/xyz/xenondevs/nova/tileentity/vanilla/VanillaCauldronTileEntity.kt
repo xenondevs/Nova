@@ -44,7 +44,11 @@ internal class VanillaCauldronTileEntity internal constructor(
         }
     
     override fun handleEnable() {
-        DefaultFluidHolder.tryConvertLegacy(this)?.let { storeData("fluidHolder", it) } // legacy conversion
+        // legacy conversion
+        DefaultFluidHolder.tryConvertLegacy(this)?.let {
+            it.remove("containerConfig") // previously used tileentity uuid, now 0
+            storeData("fluidHolder", it) 
+        }
         container = FluidContainer(
             UUID(0L, 0L),
             ALLOWED_FLUID_TYPES,
@@ -62,6 +66,8 @@ internal class VanillaCauldronTileEntity internal constructor(
         currentBlockState = pos.nmsBlockState
         
         handleBlockStateChange(currentBlockState)
+        
+        super.handleEnable()
     }
     
     override fun handleBlockStateChange(blockState: BlockState) {
