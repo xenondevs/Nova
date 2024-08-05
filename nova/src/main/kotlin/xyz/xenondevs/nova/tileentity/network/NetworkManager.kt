@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.node.NetworkNode
@@ -42,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [DefaultNetworkTypes::class]
+    dependsOn = [DefaultNetworkTypes::class, ProtectionManager::class]
 )
 object NetworkManager : Listener {
     
