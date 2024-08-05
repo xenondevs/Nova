@@ -34,6 +34,11 @@ class NovaTileEntityBlock internal constructor(
     override fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>) {
         val tileEntityBlock = state.block as NovaTileEntityBlock
         val data = ctx[DefaultContextParamTypes.TILE_ENTITY_DATA_NOVA] ?: Compound()
+        
+        // write owner into data so that it is accessible during tile-entity construction
+        val owner = ctx[DefaultContextParamTypes.SOURCE_PLAYER] ?: ctx[DefaultContextParamTypes.SOURCE_TILE_ENTITY]?.owner
+        if (owner != null) data["ownerUuid"] = owner.uniqueId
+        
         val tileEntity = tileEntityBlock.tileEntityConstructor(pos, state, data)
         WorldDataManager.setTileEntity(pos, tileEntity)
         tileEntity.handlePlace(ctx)
