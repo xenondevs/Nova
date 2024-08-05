@@ -43,6 +43,7 @@ import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
+import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 
@@ -101,7 +102,7 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
     protected val breakMethod: BreakMethod by lazy { createBreakMethod() }
     
     val block = pos.block
-    protected val soundGroup: SoundGroup? = block.novaSoundGroup
+    protected val soundGroup: SoundGroup? = if (SoundEngine.overridesSound(block.blockSoundGroup.hitSound)) block.novaSoundGroup else null
     protected val hardness: Double = block.hardness
     protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
     protected val itemToolCategories: Set<ToolCategory> = ToolCategory.ofItem(tool)
@@ -150,8 +151,9 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
             progress += damage
             
             // play break sound every 4 ticks
-            if (progress < 1.0 && destroyTicks % 4 == 0 && soundGroup != null)
+            if (progress < 1.0 && destroyTicks % 4 == 0 && soundGroup != null) {
                 pos.playSound(soundGroup.hitSound, SoundCategory.BLOCKS, soundGroup.hitVolume, soundGroup.hitPitch)
+            }
             
             destroyTicks++
         }

@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.block.logic.sound
 import net.minecraft.core.Holder
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
+import org.bukkit.Sound
 import org.bukkit.event.Listener
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.config.PermanentStorage
@@ -34,6 +35,10 @@ internal object SoundEngine : Listener, PacketListener {
     
     fun overridesSound(sound: String): Boolean {
         return sound.removePrefix("minecraft:") in SOUND_OVERRIDES
+    }
+    
+    fun overridesSound(sound: Sound): Boolean {
+        return overridesSound(sound.key.toString())
     }
     
     @PacketHandler
