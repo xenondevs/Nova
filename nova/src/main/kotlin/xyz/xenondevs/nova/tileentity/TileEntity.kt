@@ -329,6 +329,8 @@ abstract class TileEntity(
         if (hasData(legacyName)) {
             val compound = retrieveDataOrNull<Compound>(legacyName)!!
             removeData(legacyName)
+            if (compound.get<String>("type") == "NONE")
+                compound.remove("type")
             storeData(name, compound, persistent)
         }
         
