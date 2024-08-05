@@ -324,11 +324,11 @@ object ProtectionManager {
         if (!NOVA.isEnabled)
             return CompletableFuture.completedFuture(false)
         
+        val player = args.player
+        if (isVanillaProtected(player, args.location))
+            return CompletableFuture.completedFuture(false)
+        
         if (integrations.isNotEmpty()) {
-            val player = args.player
-            if (!isVanillaProtected(player, args.location))
-                return CompletableFuture.completedFuture(false)
-            
             val futures = ArrayList<CompletableFuture<Boolean>>()
             for (integration in integrations) {
                 // assumes that queries for online players can be performed on the main thread
@@ -345,9 +345,9 @@ object ProtectionManager {
             }
             
             return CombinedBooleanFuture(futures)
-        } else {
-            return CompletableFuture.completedFuture(!isVanillaProtected(args.player, args.location))
         }
+        
+        return CompletableFuture.completedFuture(true)
     }
     
     internal fun isVanillaProtected(player: OfflinePlayer, location: Location): Boolean {
