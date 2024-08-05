@@ -32,6 +32,8 @@ import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
+import kotlin.jvm.optionals.getOrNull
+import net.minecraft.world.item.component.Tool as MojangTool
 import net.minecraft.world.level.block.Block as MojangBlock
 
 object ToolUtils {
@@ -49,10 +51,19 @@ object ToolUtils {
         } else if (!(block as CraftBlock).nms.requiresCorrectToolForDrops()) return true
         
         val toolComponent = tool?.unwrap()?.get(DataComponents.TOOL)
-        if (toolComponent != null)
-            return toolComponent.isCorrectForDrops(block.nmsState)
-        
-        return ToolCategory.hasCorrectToolCategory(block, tool) && ToolTier.isCorrectLevel(block, tool)
+        if (toolComponent != null) {
+            if (novaBlock != null) {
+                // vanilla tool, Nova block
+                val blockCategories = novaBlock.getBehaviorOrNull<Breakable>()?.toolCategories ?: emptySet()
+                return findMatchingToolComponentRules(toolComponent, blockCategories)
+                    .any { it.correctForDrops.getOrNull() == true }
+            } else {
+                // vanilla tool, vanilla block
+                return toolComponent.isCorrectForDrops(block.nmsState)
+            }
+        } else {
+            return ToolCategory.hasCorrectToolCategory(block, tool) && ToolTier.isCorrectLevel(block, tool)
+        }
     }
     
     //<editor-fold desc="tool damage", defaultstate="collapsed">
@@ -137,9 +148,7 @@ object ToolUtils {
                 // Vanilla tool, Nova block
                 // we need to search for a tool rule that matches the block's tool category (tool rules cannot contain custom blocks)
                 val blockCategories = novaBlock.getBehaviorOrNull<Breakable>()?.toolCategories ?: emptySet()
-                val tags = blockCategories.mapNotNullTo(HashSet(), ::findSimilarTagForToolCategory)
-                return toolComponent.rules
-                    .filter { it.blocks is HolderSet.Named && (it.blocks as HolderSet.Named<MojangBlock>).key() in tags }
+                return findMatchingToolComponentRules(toolComponent, blockCategories)
                     .maxOfOrNull { it.speed.orElse(1f) }
                     ?.toDouble() ?: 1.0
             } else {
@@ -157,6 +166,19 @@ object ToolUtils {
         return 1.0
     }
     
+    /**
+     * Extracts tool component rules from [component] that sort of match any one of the [categories].
+     */
+    private fun findMatchingToolComponentRules(component: MojangTool, categories: Set<ToolCategory>): Set<MojangTool.Rule> {
+        val tags = categories.mapNotNullTo(HashSet(), ::findSimilarTagForToolCategory)
+        return component.rules.filterTo(HashSet()) {
+            it.blocks is HolderSet.Named && (it.blocks as HolderSet.Named<MojangBlock>).key() in tags 
+        }
+    }
+    
+    /**
+     * Returns a tag that is similar to the given [category] or null if no such tag exists.
+     */
     private fun findSimilarTagForToolCategory(category: ToolCategory): TagKey<MojangBlock>? {
         return when (category) {
             VanillaToolCategories.AXE -> BlockTags.MINEABLE_WITH_AXE
