@@ -50,6 +50,7 @@ internal class GhostNetworkBridge(
     override val typeId: ResourceLocation
 ) : NetworkBridge, GhostNetworkNode {
     
+    override val isValid = true
     override val linkedNodes: Set<NetworkNode> = emptySet()
     
     constructor(pos: BlockPos, data: NetworkBridgeData) : this(pos, Bukkit.getOfflinePlayer(data.owner), data.typeId)
@@ -74,6 +75,7 @@ internal class GhostNetworkEndPoint(
     override val owner: OfflinePlayer?,
 ) : NetworkEndPoint, GhostNetworkNode {
     
+    override val isValid = true
     override val holders: Set<EndPointDataHolder> = emptySet()
     override val linkedNodes: Set<NetworkNode> = emptySet()
     

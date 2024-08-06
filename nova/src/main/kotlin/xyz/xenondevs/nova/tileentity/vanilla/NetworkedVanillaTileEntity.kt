@@ -12,6 +12,9 @@ internal abstract class NetworkedVanillaTileEntity internal constructor(
     data: Compound
 ) : VanillaTileEntity(type, pos, data), NetworkEndPoint {
     
+    @Volatile
+    final override var isValid = false
+    
     final override val owner = null
     final override val linkedNodes = HashSet<NetworkNode>()
     
@@ -23,6 +26,12 @@ internal abstract class NetworkedVanillaTileEntity internal constructor(
             
             NetworkManager.queueAddEndPoint(this)
         }
+        
+        isValid = true
+    }
+    
+    override fun handleDisable() {
+        isValid = false
     }
     
     override fun handlePlace() {
@@ -31,6 +40,7 @@ internal abstract class NetworkedVanillaTileEntity internal constructor(
     
     override fun handleBreak() {
         NetworkManager.queueRemoveEndPoint(this)
+        isValid = false
     }
     
 }

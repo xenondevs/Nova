@@ -37,6 +37,9 @@ abstract class NetworkedTileEntity(
     data: Compound
 ) : TileEntity(pos, blockState, data), NetworkEndPoint {
     
+    @Volatile
+    final override var isValid = false
+    
     final override val holders: MutableSet<EndPointDataHolder> = HashSet()
     override val linkedNodes: Set<NetworkNode> = emptySet()
     
@@ -193,16 +196,25 @@ abstract class NetworkedTileEntity(
             
             NetworkManager.queueAddEndPoint(this)
         }
+        
+        isValid = true
     }
     
     override fun handlePlace(ctx: Context<BlockPlace>) {
         super.handlePlace(ctx)
         NetworkManager.queueAddEndPoint(this)
+        isValid = true
+    }
+    
+    override fun handleDisable() {
+        super.handleDisable()
+        isValid = false
     }
     
     override fun handleBreak(ctx: Context<BlockBreak>) {
         super.handleBreak(ctx)
         NetworkManager.queueRemoveEndPoint(this)
+        isValid = false
     }
     
 }

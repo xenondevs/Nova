@@ -35,6 +35,14 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     }
     
     private inline fun tickNetworks(tick: Int, tickFun: NetworkGroup<*>.() -> Unit) {
+        // skip ticks for clusters that include invalid nodes
+        for (network in networks) {
+            for ((_, con) in network.nodes) {
+                if (!con.node.isValid)
+                    return
+            }
+        }
+        
         for (group in groups) {
             val tickDelay = group.type.tickDelay
             if ((tick + tickOffset) % tickDelay == 0) {

@@ -25,6 +25,12 @@ sealed interface NetworkNode {
     val owner: OfflinePlayer?
     
     /**
+     * Whether this [NetworkNode] is valid and [Networks][Network] including it
+     * should be ticked.
+     */
+    val isValid: Boolean
+    
+    /**
      * A set of [NetworkNodes][NetworkNode] that are not connected via networks,
      * but still share data and need to be clustered together, such as the left
      * and right part of a double chest.
