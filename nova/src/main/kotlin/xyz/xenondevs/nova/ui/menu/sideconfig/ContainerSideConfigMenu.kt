@@ -96,7 +96,7 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
         if (containers.size <= 1)
             return
         
-        NetworkManager.queueWrite(endPoint.pos.world) { state ->
+        NetworkManager.queueWrite(endPoint.pos.chunkPos) { state ->
             // cycle container
             val currentContainer = holder.containerConfig[face]!!
             val newContainer = containers.after(currentContainer, move)

@@ -10,6 +10,8 @@ internal abstract class RemoveNodeTask<T : NetworkNode>(
     private val updateNodes: Boolean
 ) : NetworkTask(state) {
     
+    override val chunkPos = node.pos.chunkPos
+    
     protected val nodesToUpdate = HashSet<NetworkNode>()
     protected val clustersToInit = HashSet<ProtoNetwork<*>>()
     

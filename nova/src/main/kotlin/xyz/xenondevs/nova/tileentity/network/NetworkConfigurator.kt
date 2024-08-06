@@ -13,6 +13,7 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.bukkit.World
 import xyz.xenondevs.commons.collections.mapToBooleanArray
@@ -20,15 +21,35 @@ import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.tileentity.network.task.LoadChunkTask
 import xyz.xenondevs.nova.tileentity.network.task.NetworkTask
 import xyz.xenondevs.nova.tileentity.network.task.ProtectedNodeNetworkTask
 import xyz.xenondevs.nova.tileentity.network.task.ProtectionResult
+import xyz.xenondevs.nova.tileentity.network.task.UnloadChunkTask
 import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 
 internal class NetworkConfigurator(private val world: World, private val ticker: NetworkTicker) {
+    
+    /**
+     * Lock for [loadedChunks] and [taskBacklog].
+     */
+    private val queueLock = Mutex()
+    
+    /**
+     * Contains all positions of chunks that will be loaded for a network task queued now.
+     * (Meaning that a chunk is not necessarily loaded now, but a load is queued, or that
+     * a chunk is loaded now, but an unload is queued.)
+     */
+    private val loadedChunks = HashSet<ChunkPos>()
+    
+    /**
+     * Contains tasks for chunks that are not loaded yet.
+     */
+    private val taskBacklog = HashMap<ChunkPos, ArrayList<NetworkTask>>()
     
     /**
      * Stores protection query results for [ProtectedNodeNetworkTasks][ProtectedNodeNetworkTask].
@@ -64,11 +85,26 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
      * Enqueues the [task] to be processed by the appropriate coroutine.
      * Also queries protection in case of [ProtectedNodeNetworkTask].
      */
-    fun queueTask(task: NetworkTask) = runBlocking {
-        if (task is ProtectedNodeNetworkTask)
-            protectionResults[task] = async(Dispatchers.Default) { queryProtection(task.node) }
-        
-        channel.send(task)
+    fun queueTask(task: NetworkTask): Unit = runBlocking {
+        queueLock.withLock {
+            if (task is ProtectedNodeNetworkTask)
+                protectionResults[task] = async(Dispatchers.Default) { queryProtection(task.node) }
+            
+            // ensure load chunk task is queued before any other task that might need its data
+            val chunkPos = task.chunkPos
+            if (task is LoadChunkTask) {
+                channel.send(task)
+                loadedChunks += chunkPos
+                taskBacklog.remove(chunkPos)?.forEach { channel.send(it) }
+            } else if (task is UnloadChunkTask) {
+                channel.send(task)
+                loadedChunks -= chunkPos
+            } else if (chunkPos !in loadedChunks) {
+                taskBacklog.getOrPut(chunkPos, ::ArrayList) += task
+            } else {
+                channel.send(task)
+            }
+        }
     }
     
     /**

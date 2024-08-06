@@ -4,10 +4,12 @@ import jdk.jfr.Category
 import jdk.jfr.Event
 import jdk.jfr.Label
 import jdk.jfr.Name
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.NetworkState
 
 internal class CustomWriteTask(
     state: NetworkState,
+    override val chunkPos: ChunkPos,
     private val write: suspend (NetworkState) -> Unit
 ) : NetworkTask(state) {
     
@@ -28,6 +30,7 @@ internal class CustomWriteTask(
 
 internal class CustomReadTask(
     state: NetworkState,
+    override val chunkPos: ChunkPos,
     private val read: suspend (NetworkState) -> Unit
 ) : NetworkTask(state) {
     
@@ -48,6 +51,7 @@ internal class CustomReadTask(
 
 internal class CustomUncertainTask(
     state: NetworkState,
+    override val chunkPos: ChunkPos,
     private val task: suspend (NetworkState) -> Boolean
 ) : NetworkTask(state) {
     

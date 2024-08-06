@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 internal class LoadChunkTask(
     state: NetworkState,
-    private val pos: ChunkPos,
+    override val chunkPos: ChunkPos,
 ) : NetworkTask(state) {
     
     //<editor-fold desc="jfr event", defaultstate="collapsed">
@@ -35,7 +35,7 @@ internal class LoadChunkTask(
     private inner class LoadChunkTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = this@LoadChunkTask.pos.toString()
+        val pos: String = this@LoadChunkTask.chunkPos.toString()
         
     }
     
@@ -47,8 +47,8 @@ internal class LoadChunkTask(
         val networkLessNodes = ConcurrentHashMap.newKeySet<NetworkNode>()
         
         coroutineScope {
-            val chunkNodes = NetworkManager.getNodes(pos).associateByTo(HashMap(), NetworkNode::pos)
-            val networkNodes = state.storage.getOrLoadNetworkRegion(pos).getChunk(pos).getData()
+            val chunkNodes = NetworkManager.getNodes(chunkPos).associateByTo(HashMap(), NetworkNode::pos)
+            val networkNodes = state.storage.getOrLoadNetworkRegion(chunkPos).getChunk(chunkPos).getData()
             for ((pos, data) in networkNodes) {
                 val node = chunkNodes[pos]
                 if (node == null || node in state)

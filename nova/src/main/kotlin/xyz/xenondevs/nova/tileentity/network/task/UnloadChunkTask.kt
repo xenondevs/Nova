@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
 
 internal class UnloadChunkTask(
     state: NetworkState,
-    private val pos: ChunkPos,
+    override val chunkPos: ChunkPos,
 ) : NetworkTask(state) {
     
     //<editor-fold desc="jfr event", defaultstate="collapsed">
@@ -27,7 +27,7 @@ internal class UnloadChunkTask(
     private inner class UnloadChunkTaskEvent : Event() {
         
         @Label("Position")
-        val pos: String = this@UnloadChunkTask.pos.toString()
+        val pos: String = this@UnloadChunkTask.chunkPos.toString()
         
     }
     
@@ -45,8 +45,8 @@ internal class UnloadChunkTask(
             }
         }
         
-        val chunkNodes = NetworkManager.getNodes(pos).associateByTo(HashMap(), NetworkNode::pos)
-        val networkNodes = state.storage.getNetworkChunkOrThrow(pos).getData()
+        val chunkNodes = NetworkManager.getNodes(chunkPos).associateByTo(HashMap(), NetworkNode::pos)
+        val networkNodes = state.storage.getNetworkChunkOrThrow(chunkPos).getData()
         if (networkNodes.isEmpty())
             return false
         

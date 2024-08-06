@@ -70,7 +70,7 @@ internal class VanillaChestTileEntity internal constructor(
         
         val inventory = createNetworkedInventory()
         
-        NetworkManager.queueWrite(pos.world) { state ->
+        NetworkManager.queueWrite(pos.chunkPos) { state ->
             setInventory(inventory)
             state.forEachNetwork(this) { _, _, network -> network.markDirty() }
         }

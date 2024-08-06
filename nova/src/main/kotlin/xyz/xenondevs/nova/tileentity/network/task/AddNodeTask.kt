@@ -5,9 +5,11 @@ import xyz.xenondevs.nova.world.format.NetworkState
 
 internal abstract class AddNodeTask<T : NetworkNode>(
     state: NetworkState,
-    override val node: T,
+    final override val node: T,
     private val updateNodes: Boolean
 ) : ProtectedNodeNetworkTask(state) {
+    
+    override val chunkPos = node.pos.chunkPos
     
     protected val nodesToUpdate = HashSet<NetworkNode>()
     

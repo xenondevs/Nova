@@ -65,7 +65,7 @@ internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
     }
     
     private fun queueCycleConnectionType(face: BlockFace, move: Int) {
-        NetworkManager.queueWrite(endPoint.pos.world) { state ->
+        NetworkManager.queueWrite(endPoint.pos.chunkPos) { state ->
             // cycle connection type
             val allowedTypes = getAllowedConnectionType(face).supertypes
             val currentType = getConnectionType(face)

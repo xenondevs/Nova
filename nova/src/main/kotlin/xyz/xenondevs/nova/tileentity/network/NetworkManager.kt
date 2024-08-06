@@ -38,6 +38,7 @@ import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.NetworkState
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 import java.util.concurrent.ConcurrentHashMap
 
@@ -65,11 +66,16 @@ object NetworkManager : Listener {
     
     internal val SUPERVISOR = SupervisorJob()
     
-    @InitFun
-    private fun init() {
+    @InitFun(runBefore = [WorldDataManager::class])
+    private fun initConfigurators() {
         for (world in Bukkit.getWorlds()) {
             makeConfigurator(world)
-            
+        }
+    }
+    
+    @InitFun(runAfter = [WorldDataManager::class])
+    private fun runConfigurators() {
+        for (world in Bukkit.getWorlds()) {
             for (chunk in world.loadedChunks) {
                 queueLoadChunk(chunk.pos)
             }
@@ -96,32 +102,32 @@ object NetworkManager : Listener {
     }
     
     /**
-     * Queues a custom network task in [world] that will definitely change the network state.
+     * Queues a custom network task in [pos] that will definitely change the network state.
      */
-    fun queueWrite(world: World, write: suspend (NetworkState) -> Unit) {
-        queueTask(world) { CustomWriteTask(it, write) }
+    fun queueWrite(pos: ChunkPos, write: suspend (NetworkState) -> Unit) {
+        queueTask(pos.world!!) { CustomWriteTask(it, pos, write) }
     }
     
     /**
-     * Queues a custom network task in [world] that will definitely not change the network state.
+     * Queues a custom network task in [pos] that will definitely not change the network state.
      */
-    fun queueRead(world: World, read: suspend (NetworkState) -> Unit) {
-        queueTask(world) { CustomReadTask(it, read) }
+    fun queueRead(pos: ChunkPos, read: suspend (NetworkState) -> Unit) {
+        queueTask(pos.world!!) { CustomReadTask(it, pos, read) }
     }
     
     /**
-     * Queues a custom network task in [world] that may or may not change the network state.
-     * The [task] then returns whether the network state was changed.  
+     * Queues a custom network task in [pos] that may or may not change the network state.
+     * The [task] then returns whether the network state was changed.
      */
-    fun queue(world: World, task: suspend (NetworkState) -> Boolean) {
-        queueTask(world) { CustomUncertainTask(it, task) }
+    fun queue(pos: ChunkPos, task: suspend (NetworkState) -> Boolean) {
+        queueTask(pos.world!!) { CustomUncertainTask(it, pos, task) }
     }
     
     /**
      * Queues a network task to add [endPoint] to the network state.
-     * 
+     *
      * Should only be called after placing, not during chunk load.
-     * 
+     *
      * @throws IllegalArgumentException If [endPoint] also implements [NetworkBridge].
      */
     fun queueAddEndPoint(endPoint: NetworkEndPoint, updateNodes: Boolean = true) =
@@ -130,9 +136,9 @@ object NetworkManager : Listener {
     /**
      * Queues a network task to add [bridge] to the network state, using the
      * specified [supportedNetworkTypes] and [bridgeFaces].
-     * 
+     *
      * Should only be called after placing, not during chunk load.
-     * 
+     *
      * @throws IllegalArgumentException If [bridge] also implements [NetworkEndPoint].
      */
     fun queueAddBridge(bridge: NetworkBridge, supportedNetworkTypes: Set<NetworkType<*>>, bridgeFaces: Set<BlockFace>, updateNodes: Boolean = true) =
@@ -140,9 +146,9 @@ object NetworkManager : Listener {
     
     /**
      * Queues a network task to remove [endPoint] from the network state.
-     * 
+     *
      * Should only be called after breaking, not during chunk unload.
-     * 
+     *
      * @throws IllegalArgumentException If [endPoint] also implements [NetworkBridge].
      */
     fun queueRemoveEndPoint(endPoint: NetworkEndPoint, updateNodes: Boolean = true) =
@@ -150,9 +156,9 @@ object NetworkManager : Listener {
     
     /**
      * Queues a network task to remove [bridge] from the network state.
-     * 
+     *
      * Should only be called after breaking, not during chunk unload.
-     * 
+     *
      * @throws IllegalArgumentException If [bridge] also implements [NetworkEndPoint].
      */
     fun queueRemoveBridge(bridge: NetworkBridge, updateNodes: Boolean = true) =
@@ -172,7 +178,7 @@ object NetworkManager : Listener {
     
     /**
      * Queues a network task in the world of [node], using the [makeTask] function to create the task.
-     * 
+     *
      * @throws IllegalArgumentException if [node] is both a [NetworkBridge] and a [NetworkEndPoint].
      */
     private fun queueTask(node: NetworkNode, makeTask: (NetworkState) -> NetworkTask) {

@@ -177,7 +177,7 @@ class SideConfigMenu(
     }
     
     private fun updateNetworkData() {
-        NetworkManager.queueRead(endPoint.pos.world) {
+        NetworkManager.queueRead(endPoint.pos.chunkPos) {
             energyConfigMenu?.initAsync()
             itemConfigMenu?.initAsync()
             fluidConfigMenu?.initAsync()

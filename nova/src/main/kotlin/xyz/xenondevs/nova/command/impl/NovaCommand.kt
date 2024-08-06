@@ -597,7 +597,7 @@ internal object NovaCommand : Command() {
     private fun showNetworkNodeInfo(pos: BlockPos, ctx: CommandContext<CommandSourceStack>) {
         val node = runBlocking { NetworkManager.getNode(pos) }
         if (node != null) {
-            NetworkManager.queueRead(pos.world) { state ->
+            NetworkManager.queueRead(pos.chunkPos) { state ->
                 val connectedNodes = state.getConnectedNodes(node)
                 
                 suspend fun buildNetworkInfoComponent(id: UUID): Component {

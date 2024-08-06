@@ -34,9 +34,7 @@ object WorldDataManager : Listener {
     private val worlds = ConcurrentHashMap<UUID, WorldDataStorage>()
     private var initialized = false
     
-    @InitFun(
-        runAfter = [NetworkManager::class] // chunk enable may queue network tasks
-    )
+    @InitFun
     private fun init() = runBlocking {
         initialized = true
         registerEvents()
