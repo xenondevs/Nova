@@ -84,7 +84,7 @@ internal class SingleSlotItemStackContainer(private val items: MutableList<Mojan
                 throw NoSuchElementException()
             
             hasNext = false
-            return items[0]
+            return items[slot]
         }
         
     }
