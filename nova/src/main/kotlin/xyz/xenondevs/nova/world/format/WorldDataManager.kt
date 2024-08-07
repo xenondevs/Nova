@@ -12,6 +12,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
+import xyz.xenondevs.nova.data.recipe.RecipeManager
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -28,7 +29,10 @@ import xyz.xenondevs.nova.world.pos
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dependsOn = [RecipeManager::class] // tile-entities may need recipes
+)
 object WorldDataManager : Listener {
     
     private val worlds = ConcurrentHashMap<UUID, WorldDataStorage>()
