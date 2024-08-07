@@ -15,13 +15,6 @@ import java.awt.image.BufferedImage
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
 object DefaultGuiItems {
     
-    // GUI items with custom model
-    val ANVIL_OVERLAY_ARROW = hiddenItem("gui/anvil_overlay_arrow")
-    val ANVIL_OVERLAY_ARROW_LEFT = hiddenItem("gui/anvil_overlay_arrow_left")
-    val ANVIL_OVERLAY_PLUS = hiddenItem("gui/anvil_overlay_plus")
-    
-    // GUI items without custom model
-    
     //<editor-fold desc="with background">
     // legacy InvUI gui items
     val INVENTORY_PART = guiItem("inventory_part", null)
