@@ -2,11 +2,15 @@ package xyz.xenondevs.nova.item
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.layout.item.ItemModelLayoutBuilder
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.item.logic.PacketItems
+import xyz.xenondevs.nova.util.data.writeImage
+import java.awt.Color
+import java.awt.image.BufferedImage
 
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
 object DefaultGuiItems {
@@ -85,32 +89,16 @@ object DefaultGuiItems {
     val SMALL_ARROW_DOWN_ON = guiItem("small_arrow/down_on")
     val SMALL_ARROW_UP_OFF = guiItem("small_arrow/up_off")
     val SMALL_ARROW_UP_ON = guiItem("small_arrow/up_on")
-    val BAR_BLUE = hiddenItem("gui/opaque/bar/blue") {
-        selectModels(0..16, true) {
-            createGuiModel("item/gui/bar/blue/$it", background = true, stretched = true)
-        }
-    }
-    val BAR_GREEN = hiddenItem("gui/opaque/bar/green") {
-        selectModels(0..16, true) {
-            createGuiModel("item/gui/bar/green/$it", background = true, stretched = true)
-        }
-    }
-    val BAR_RED = hiddenItem("gui/opaque/bar/red") {
-        selectModels(0..16, true) {
-            createGuiModel("item/gui/bar/red/$it", background = true, stretched = true)
-        }
-    }
-    val BAR_ORANGE = hiddenItem("gui/opaque/bar/orange") {
-        selectModels(0..16, true) {
-            createGuiModel("item/gui/bar/orange/$it", background = true, stretched = true)
-        }
-    }
+    val BAR_BLUE = barGuiItem("gui/opaque/bar/blue", Color(75, 75, 255), true)
+    val BAR_GREEN = barGuiItem("gui/opaque/bar/green", Color(0, 204, 76), true)
+    val BAR_RED = barGuiItem("gui/opaque/bar/red", Color(235, 0, 0), true)
+    val BAR_ORANGE = barGuiItem("gui/opaque/bar/orange", Color(232, 76, 0), true)
     val CHEATING_ON = guiItem("cheating_on", "menu.nova.items.cheat_mode.on")
     val CHEATING_OFF = guiItem("cheating_off", "menu.nova.items.cheat_mode.off")
     val COLOR_PICKER = guiItem("color_picker")
     val NUMBER = hiddenItem("gui/opaque/number") {
         selectModels(0..999, true) {
-            createGuiModel("item/gui/number/$it", background = true, stretched = false)
+            createGuiModel(true, false, "item/gui/number/$it")
         }
     }
     val SEARCH = guiItem("search", "menu.nova.items.search-item")
@@ -182,32 +170,16 @@ object DefaultGuiItems {
     val TP_SMALL_ARROW_DOWN_ON = tpGuiItem("small_arrow/down_on")
     val TP_SMALL_ARROW_UP_OFF = tpGuiItem("small_arrow/up_off")
     val TP_SMALL_ARROW_UP_ON = tpGuiItem("small_arrow/up_on")
-    val TP_BAR_BLUE = hiddenItem("gui/transparent/bar/blue") {
-        selectModels(0..16, true) {
-            createGuiModel("item/gui/bar/blue/$it", background = false, stretched = true)
-        }
-    }
-    val TP_BAR_GREEN = hiddenItem("gui/transparent/bar/green") {
-        selectModels(0..16, true) {
-            createGuiModel("item/gui/bar/green/$it", background = false, stretched = true)
-        }
-    }
-    val TP_BAR_RED = hiddenItem("gui/transparent/bar/red") {
-        selectModels(0..16, true) {
-            createGuiModel("item/gui/bar/red/$it", background = false, stretched = true)
-        }
-    }
-    val TP_BAR_ORANGE = hiddenItem("gui/transparent/bar/orange") {
-        selectModels(0..16, true) {
-            createGuiModel("item/gui/bar/orange/$it", background = false, stretched = true)
-        }
-    }
+    val TP_BAR_BLUE = barGuiItem("gui/transparent/bar/blue", Color(75, 75, 255), false)
+    val TP_BAR_GREEN = barGuiItem("gui/transparent/bar/green", Color(0, 204, 76), false)
+    val TP_BAR_RED = barGuiItem("gui/transparent/bar/red", Color(235, 0, 0), false)
+    val TP_BAR_ORANGE = barGuiItem("gui/transparent/bar/orange", Color(232, 76, 0), false)
     val TP_CHEATING_ON = tpGuiItem("cheating_on", "menu.nova.items.cheat_mode.on")
     val TP_CHEATING_OFF = tpGuiItem("cheating_off", "menu.nova.items.cheat_mode.off")
     val TP_COLOR_PICKER = tpGuiItem("color_picker")
     val TP_NUMBER = hiddenItem("number") {
         selectModels(0..999, true) {
-            createGuiModel("item/gui/number/$it", stretched = false, background = false)
+            createGuiModel(false, false, "item/gui/number/$it")
         }
     }
     val TP_SEARCH = tpGuiItem("search", "menu.nova.items.search-item")
@@ -281,7 +253,7 @@ private fun guiItem(
     hidden(true)
     models {
         itemType(PacketItems.SERVER_SIDE_MATERIAL)
-        selectModel { createGuiModel("item/gui/$name", true, stretched) }
+        selectModel { createGuiModel(true, stretched, "item/gui/$name") }
     }
 }
 
@@ -296,6 +268,26 @@ private fun tpGuiItem(
     hidden(true)
     models {
         itemType(PacketItems.SERVER_SIDE_MATERIAL)
-        selectModel { createGuiModel("item/gui/$name", false, stretched) }
+        selectModel { createGuiModel(false, stretched, "item/gui/$name") }
+    }
+}
+
+private fun barGuiItem(name: String, color: Color, background: Boolean): NovaItem = item(name) {
+    localizedName("")
+    hidden(true)
+    models {
+        itemType(PacketItems.SERVER_SIDE_MATERIAL)
+        selectModels(0..18, true) { level ->
+            val levelTexture = BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB)
+            val graphics = levelTexture.createGraphics()
+            graphics.color = color
+            graphics.fillRect(2, 18 - level, 14, level)
+            graphics.dispose()
+            val texPath = "item/gui/bar/color_${color.rgb}_level_$level"
+            ResourcePackBuilder.ASSETS_DIR.resolve("nova/textures/$texPath.png")
+                .writeImage(levelTexture, "PNG")
+            
+            createGuiModel(background, true, "item/gui/bar/background", texPath, "item/gui/bar/overlay")
+        }
     }
 }

@@ -22,7 +22,7 @@ abstract class VerticalBar(private val height: Int) : Supplier<Item> {
     protected fun createItemBuilder(item: NovaItem, section: Int, percentage: Double): ItemBuilder {
         val displayPercentageStart = (1.0 / height) * section
         val displayPercentage = max(min((percentage - displayPercentageStart) * height, 1.0), 0.0)
-        val state = round(displayPercentage * 16).toInt()
+        val state = round(displayPercentage * (item.model.size - 1)).toInt()
         return item.model.createClientsideItemBuilder(modelId = state)
     }
     
