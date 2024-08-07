@@ -1,8 +1,13 @@
 package xyz.xenondevs.nova.data.resources.layout.item
 
+import org.joml.Vector3d
+import org.joml.Vector4d
+import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.model.Model
+import xyz.xenondevs.nova.data.resources.builder.model.Model.*
+import xyz.xenondevs.nova.data.resources.builder.model.Model.Element.Face
 import xyz.xenondevs.nova.data.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.data.resources.builder.task.model.ModelContent
 import xyz.xenondevs.nova.item.NovaItem
@@ -65,30 +70,65 @@ class ItemModelSelectorScope internal constructor(
     )
     
     /**
-     * Creates a new GUI model using the given [texture] as texture, with the vanilla inventory background
-     * if [background] is true and stretched to 18x18 pixels if [stretched] is true.
+     * Creates a new GUI model using the given [layers] as texture
+     * 
+     * With [background], the model will have the vanilla inventory background.
+     * 
+     * With [stretched], the model will be stretched to 18x18 pixels. Due to mip mapping, this requires a 32x32 texture
+     * with the actual texture placed at (0, 0) to (18, 18).
      */
-    fun createGuiModel(texture: String, background: Boolean, stretched: Boolean): ModelBuilder =
-        createGuiModel(ResourcePath.of(texture, id.namespace), background, stretched)
+    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: String): ModelBuilder =
+        createGuiModel(background, stretched, *layers.mapToArray { ResourcePath.of(it, id.namespace) })
     
     /**
-     * Creates a new GUI model using the given [texture] as raw path to the texture, with the vanilla inventory background
-     * if [background] is true and stretched to 18x18 pixels if [stretched] is true.
+     * Creates a new GUI model using the given [layers] as texture
+     *
+     * With [background], the model will have the vanilla inventory background.
+     *
+     * With [stretched], the model will be stretched to 18x18 pixels. Due to mip mapping, this requires a 32x32 texture
+     * with the actual texture placed at (0, 0) to (18, 18).
      */
-    fun createGuiModel(texture: ResourcePath, background: Boolean, stretched: Boolean): ModelBuilder {
-        val name = when {
-            !background && !stretched -> return createLayeredModel(texture)
-            background && !stretched -> "background"
-            !background && stretched -> "stretched"
-            else -> "background_stretched"
+    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: ResourcePath): ModelBuilder {
+        if (!background && !stretched)
+            return createLayeredModel(*layers)
+        
+        val textures = HashMap<String, String>()
+        val elements = ArrayList<Element>()
+        
+        if (background) {
+            textures["background"] = "nova:item/gui/inventory_part"
+        }
+        for ((idx, layer) in layers.withIndex()) {
+            textures[idx.toString()] = layer.toString()
         }
         
-        return ModelBuilder(
-            Model(
-                parent = ResourcePath("nova", "item/gui/$name"),
-                textures = mapOf("1" to texture.toString()),
+        if (background) {
+            elements += Element(
+                Vector3d(-1.0, -1.0, -1.0),
+                Vector3d(17.0, 17.0, -1.0),
+                null,
+                mapOf(Direction.SOUTH to Face(Vector4d(0.0, 0.0, 16.0, 16.0), "#background", null, 0, 0)),
+                true
             )
-        )
+        }
+        val from = if (stretched) -1.0 else 0.0
+        val to = if (stretched) 17.0 else 16.0
+        val uv = if (stretched) {
+            Vector4d(0.0, 0.0, 9.0, 9.0)
+        } else {
+            Vector4d(0.0, 0.0, 16.0, 16.0)
+        }
+        for (idx in layers.indices) {
+            elements += Element(
+                Vector3d(from, from, (idx.toDouble() / layers.size.toDouble())),
+                Vector3d(to, to, (idx.toDouble() / layers.size.toDouble())),
+                null,
+                mapOf(Direction.SOUTH to Face(uv, "#$idx", null, 0, 0)),
+                true
+            )
+        }
+        
+        return ModelBuilder(Model(textures = textures, elements = elements, guiLight = GuiLight.FRONT))
     }
     
 }

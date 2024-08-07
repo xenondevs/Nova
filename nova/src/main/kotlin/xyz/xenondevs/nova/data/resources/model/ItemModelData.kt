@@ -84,8 +84,7 @@ open class ItemModelData(
         // remove existing custom data and tag item to not receive server-side tooltip (again)
         clientStack.set(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag().apply {
             putBoolean(PacketItems.SKIP_SERVER_SIDE_TOOLTIP, true)
-        }
-        ))
+        }))
         
         return clientStack.asBukkitMirror()
     }
