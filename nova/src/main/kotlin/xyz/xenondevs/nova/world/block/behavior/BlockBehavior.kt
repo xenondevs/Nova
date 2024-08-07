@@ -31,7 +31,8 @@ interface BlockBehavior : BlockBehaviorHolder {
     /**
      * Handles interaction (right-click) with a block of [state] at [pos] with the given [ctx].
      *
-     * Returns whether an interaction has taken place.
+     * Returns whether an interaction has taken place. If an interaction has taken place,
+     * subsequent behaviors will not be called.
      */
     fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean = false
     

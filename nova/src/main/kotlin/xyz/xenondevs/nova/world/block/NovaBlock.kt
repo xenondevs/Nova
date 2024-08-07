@@ -133,9 +133,11 @@ open class NovaBlock internal constructor(
     
     fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
         checkServerThread()
-        var actionPerformed = false
-        behaviors.forEach { actionPerformed = it.handleInteract(pos, state, ctx) || actionPerformed }
-        return actionPerformed
+        for (behavior in behaviors) {
+            if (behavior.handleInteract(pos, state, ctx))
+                return true
+        }
+        return false
     }
     
     fun handleAttack(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {
