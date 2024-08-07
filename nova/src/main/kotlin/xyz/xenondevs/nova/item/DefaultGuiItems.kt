@@ -257,8 +257,12 @@ private fun hiddenItem(
 
 private fun hiddenItem(
     name: String,
+    localizedName: String? = "",
     run: ItemModelLayoutBuilder.() -> Unit
 ): NovaItem = item(name) {
+    if (localizedName == null) {
+        name(null)
+    } else localizedName(localizedName)
     hidden(true)
     models {
         itemType(PacketItems.SERVER_SIDE_MATERIAL)
