@@ -88,7 +88,7 @@ object DefaultGuiItems {
     val BAR_ORANGE = barGuiItem("gui/opaque/bar/orange", Color(232, 76, 0), true)
     val CHEATING_ON = guiItem("cheating_on", "menu.nova.items.cheat_mode.on")
     val CHEATING_OFF = guiItem("cheating_off", "menu.nova.items.cheat_mode.off")
-    val COLOR_PICKER = guiItem("color_picker")
+    val COLOR_PICKER = guiItem("color_picker", "menu.nova.color_picker")
     val NUMBER = hiddenItem("gui/opaque/number") {
         selectModels(0..999, true) {
             createGuiModel(true, false, "item/gui/number/$it")
@@ -169,7 +169,7 @@ object DefaultGuiItems {
     val TP_BAR_ORANGE = barGuiItem("gui/transparent/bar/orange", Color(232, 76, 0), false)
     val TP_CHEATING_ON = tpGuiItem("cheating_on", "menu.nova.items.cheat_mode.on")
     val TP_CHEATING_OFF = tpGuiItem("cheating_off", "menu.nova.items.cheat_mode.off")
-    val TP_COLOR_PICKER = tpGuiItem("color_picker")
+    val TP_COLOR_PICKER = tpGuiItem("color_picker", "menu.nova.color_picker")
     val TP_NUMBER = hiddenItem("number") {
         selectModels(0..999, true) {
             createGuiModel(false, false, "item/gui/number/$it")
