@@ -8,9 +8,10 @@ import kotlinx.coroutines.debug.DebugProbes
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.core.LoggerContext
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.DrilldownPie
-import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.server.ServerLoadEvent
@@ -196,40 +197,36 @@ internal object Initializer : Listener {
         InvUILanguages.getInstance().enableServerSideTranslations(false)
         CBFAdapters.register()
         
-        val success = tryInit {
+        tryInit {
             coroutineScope {
                 preWorldScope = this
                 launchAll(this, initPreWorld)
             }
         }
         
-        if (success) {
-            NovaRegistryAccess.freezeAll()
-            VanillaRegistryAccess.freezeAll()
-            preWorldInitialized = true
-        }
+        NovaRegistryAccess.freezeAll()
+        VanillaRegistryAccess.freezeAll()
+        preWorldInitialized = true
     }
     
     /**
      * Starts the post-world initialization process.
      */
     private fun initPostWorld() = runBlocking {
-        val success = tryInit {
+        tryInit {
             coroutineScope {
                 launchAll(this, initPostWorld)
             }
         }
         
-        if (success) {
-            isDone = true
-            callEvent(NovaLoadDataEvent())
-            
-            PermanentStorage.store("last_version", NOVA.pluginMeta.version)
-            setGlobalIngredients()
-            AddonManager.enableAddons()
-            setupMetrics()
-            LOGGER.info("Done loading")
-        }
+        isDone = true
+        callEvent(NovaLoadDataEvent())
+        
+        PermanentStorage.store("last_version", NOVA.pluginMeta.version)
+        setGlobalIngredients()
+        AddonManager.enableAddons()
+        setupMetrics()
+        LOGGER.info("Done loading")
     }
     
     /**
@@ -279,10 +276,9 @@ internal object Initializer : Listener {
      * Wraps [run] in a try-catch block with error logging specific to initialization.
      * Returns whether the initialization was successful, and also shuts down the server if it wasn't.
      */
-    private inline fun tryInit(run: () -> Unit): Boolean {
+    private inline fun tryInit(run: () -> Unit) {
         try {
             run()
-            return true
         } catch (t: Throwable) {
             val cause = if (t is InvocationTargetException) t.targetException else t
             if (cause is InitializationException) {
@@ -291,9 +287,9 @@ internal object Initializer : Listener {
                 LOGGER.log(Level.SEVERE, "An exception occurred during initialization", cause)
             }
             
-            LOGGER.severe("Initialization failed, shutting down the server...")
-            Bukkit.shutdown()
-            return false
+            LOGGER.severe("Initialization failure")
+            (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
+            Runtime.getRuntime().halt(-1) // force-quit process to prevent further errors
         }
     }
     
