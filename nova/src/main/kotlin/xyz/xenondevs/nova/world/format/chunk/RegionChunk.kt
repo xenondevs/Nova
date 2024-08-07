@@ -208,11 +208,19 @@ internal class RegionChunk(
             vanillaTileEntityData[pos] = vte.data
             
             if (isEnabled) {
-                vte.handleEnable()
+                try {
+                    vte.handleEnable()
+                } catch (t: Throwable) {
+                    LOGGER.log(Level.SEVERE, "Failed to enable vanilla tile-entity $vte", t)
+                }
             }
         }
         
-        previous?.handleDisable()
+        try {
+            previous?.handleDisable()
+        } catch (t: Throwable) {
+            LOGGER.log(Level.SEVERE, "Failed to disable vanilla tile-entity $previous", t)
+        }
         
         return previous
     }
@@ -245,7 +253,11 @@ internal class RegionChunk(
             
             if (isEnabled) {
                 tileEntity.isEnabled = true
-                tileEntity.handleEnable()
+                try {
+                    tileEntity.handleEnable()
+                } catch (t: Throwable) {
+                    LOGGER.log(Level.SEVERE, "Failed to enable tile-entity $tileEntity", t)
+                }
             }
             
             if (isTicking && tileEntity.block.asyncTickrate > 0) {
@@ -257,7 +269,11 @@ internal class RegionChunk(
         }
         
         if (previous != null) {
-            previous.handleDisable()
+            try {
+                previous.handleDisable()
+            } catch (t: Throwable) {
+                LOGGER.log(Level.SEVERE, "Failed to disable tile-entity $previous", t)
+            }
             previous.isEnabled = false
             cancelAndUnregisterAsyncTicker(previous)
             
@@ -318,10 +334,18 @@ internal class RegionChunk(
             // during handleEnable, as that would cause the new tile-entity to not be enabled properly.
             for (tileEntity in tileEntities.values) {
                 tileEntity.isEnabled = true
-                tileEntity.handleEnable()
+                try {
+                    tileEntity.handleEnable()
+                } catch (t: Throwable) {
+                    LOGGER.log(Level.SEVERE, "Failed to enable tile-entity $tileEntity", t)
+                }
             }
             for (vte in vanillaTileEntities.values) {
-                vte.handleEnable()
+                try {
+                    vte.handleEnable()
+                } catch (t: Throwable) {
+                    LOGGER.log(Level.SEVERE, "Failed to enable vanilla tile-entity $vte", t)
+                }
             }
             
             isEnabled = true
@@ -344,11 +368,19 @@ internal class RegionChunk(
             for ((pos, tileEntity) in tileEntities) {
                 tileEntity.isEnabled = false
                 tileEntity.blockState.modelProvider.unload(pos)
-                tileEntity.handleDisable()
+                try {
+                    tileEntity.handleDisable()
+                } catch (t: Throwable) {
+                    LOGGER.log(Level.SEVERE, "Failed to disable tile-entity $tileEntity", t)
+                }
             }
             
             for (vte in vanillaTileEntities.values) {
-                vte.handleDisable()
+                try {
+                    vte.handleDisable()
+                } catch (t: Throwable) {
+                    LOGGER.log(Level.SEVERE, "Failed to disable vanilla tile-entity $vte", t)
+                }
             }
             
             isEnabled = false
