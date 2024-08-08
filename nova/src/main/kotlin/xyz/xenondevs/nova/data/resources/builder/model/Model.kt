@@ -21,7 +21,7 @@ import java.util.*
  * @param overrides (Only relevant for item models) A list of overrides for the item model. Every override has one
  * or more predicates that determine whether the override model should be used.
  */
-data class Model internal constructor(
+data class Model(
     val parent: ResourcePath? = null,
     val textures: Map<String, String> = emptyMap(),
     val elements: List<Element>? = null,
@@ -43,7 +43,7 @@ data class Model internal constructor(
     /**
      * Determines a case in which a different [model] should be used based on the given [predicate].
      */
-    data class Override internal constructor(val predicate: Map<String, Number>, val model: ResourcePath)
+    data class Override(val predicate: Map<String, Number>, val model: ResourcePath)
     
     /**
      * An axis in 3D space.
@@ -71,7 +71,7 @@ data class Model internal constructor(
      * @param faces A map of the voxel's faces.
      * @params shade Whether shadows are rendered.
      */
-    data class Element internal constructor(
+    data class Element(
         val from: Vector3dc,
         val to: Vector3dc,
         val rotation: Rotation?,
@@ -89,7 +89,7 @@ data class Model internal constructor(
          * @param rotation The rotation of the texture.
          * @param tintIndex Specifies the tint color for certain block- and item types.
          */
-        data class Face internal constructor(
+        data class Face(
             val uv: Vector4dc?,
             val texture: String,
             val cullface: Direction?,
@@ -106,7 +106,7 @@ data class Model internal constructor(
          * @param rescale Whether the model should be rescaled to fit the new size.
          * (for example a 45° rotation stretches the element by sqrt(2))
          */
-        data class Rotation internal constructor(
+        data class Rotation(
             val angle: Double,
             val axis: Axis,
             val origin: Vector3dc,
@@ -134,7 +134,7 @@ data class Model internal constructor(
      * @param translation The translation of the model.
      * @param scale The scale of the model.
      */
-    data class Display internal constructor(
+    data class Display(
         val rotation: Vector3dc,
         val translation: Vector3dc,
         val scale: Vector3dc
