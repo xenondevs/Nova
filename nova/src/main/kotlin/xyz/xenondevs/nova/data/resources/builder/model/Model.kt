@@ -27,10 +27,10 @@ data class Model internal constructor(
     val elements: List<Element>? = null,
     
     // block-specific
-    val ambientOcclusion: Boolean = true,
+    val ambientOcclusion: Boolean? = null,
     
     // item-specific
-    val guiLight: GuiLight = GuiLight.SIDE,
+    val guiLight: GuiLight? = null,
     val display: Map<Display.Position, Display> = emptyMap(),
     val overrides: List<Override> = emptyList()
 ) {
@@ -183,8 +183,8 @@ data class Model internal constructor(
             
             textures.putAll(model.textures)
             if (model.elements != null) elements = model.elements
-            ambientOcclusion = model.ambientOcclusion
-            guiLight = model.guiLight
+            if (model.ambientOcclusion != null) ambientOcclusion = model.ambientOcclusion
+            if (model.guiLight != null) guiLight = model.guiLight
             display.putAll(model.display)
             overrides.addAll(model.overrides)
         }

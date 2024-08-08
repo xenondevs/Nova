@@ -45,14 +45,15 @@ internal object ModelTypeAdapter : TypeAdapter<Model>() {
         }
         
         // block-specific
-        if (!value.ambientOcclusion) {
+        val ambientOcclusion = value.ambientOcclusion
+        if (ambientOcclusion != null) {
             writer.name("ambientocclusion")
-            writer.value(false)
+            writer.value(ambientOcclusion)
         }
         
         // item-specific
         val guiLight = value.guiLight
-        if (guiLight != GuiLight.SIDE) {
+        if (guiLight != null) {
             writer.name("gui_light")
             writer.value(guiLight.name.lowercase())
         }
@@ -261,8 +262,8 @@ internal object ModelTypeAdapter : TypeAdapter<Model>() {
         var parentName: String? = null
         var textures: Map<String, String>? = null
         var elements: List<Element>? = null
-        var ambientOcclusion = true
-        var guiLight = GuiLight.SIDE
+        var ambientOcclusion: Boolean? = null
+        var guiLight: GuiLight? = null
         var display: Map<Display.Position, Display>? = null
         var overrides: List<Override>? = null
         
