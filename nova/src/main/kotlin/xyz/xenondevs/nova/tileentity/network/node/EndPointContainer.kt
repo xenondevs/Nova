@@ -4,9 +4,6 @@ import java.util.*
 
 /**
  * Used to mark container-like classes that can be used in [ContainerEndPointDataHolders][ContainerEndPointDataHolder].
- * 
- * @see NetworkedInventory
- * @see NetworkedFluidContainer
  */
 interface EndPointContainer {
     
