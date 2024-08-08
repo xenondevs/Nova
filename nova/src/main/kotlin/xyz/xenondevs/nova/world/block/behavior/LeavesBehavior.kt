@@ -5,6 +5,7 @@ import net.minecraft.world.level.storage.loot.LootParams
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.phys.Vec3
+import org.bukkit.GameMode
 import org.bukkit.Tag
 import org.bukkit.event.block.LeavesDecayEvent
 import org.bukkit.inventory.ItemStack
@@ -62,6 +63,9 @@ internal object LeavesBehavior : BlockBehavior {
     }
     
     override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<DefaultContextIntentions.BlockBreak>): List<ItemStack> {
+        if (ctx[DefaultContextParamTypes.SOURCE_PLAYER]?.gameMode == GameMode.CREATIVE)
+            return emptyList()
+
         val nmsState = pos.nmsBlockState
         val params = LootParams.Builder(pos.world.serverLevel)
             .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos.nmsPos))
