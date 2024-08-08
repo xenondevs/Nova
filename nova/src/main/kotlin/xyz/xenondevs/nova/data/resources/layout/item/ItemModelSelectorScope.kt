@@ -6,7 +6,8 @@ import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.data.resources.ResourcePath
 import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.data.resources.builder.model.Model
-import xyz.xenondevs.nova.data.resources.builder.model.Model.*
+import xyz.xenondevs.nova.data.resources.builder.model.Model.Direction
+import xyz.xenondevs.nova.data.resources.builder.model.Model.Element
 import xyz.xenondevs.nova.data.resources.builder.model.Model.Element.Face
 import xyz.xenondevs.nova.data.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.data.resources.builder.task.model.ModelContent
@@ -128,7 +129,7 @@ class ItemModelSelectorScope internal constructor(
             )
         }
         
-        return ModelBuilder(Model(textures = textures, elements = elements, guiLight = GuiLight.FRONT))
+        return ModelBuilder(Model(ResourcePath("nova", "item/gui_item"), textures, elements))
     }
     
 }
