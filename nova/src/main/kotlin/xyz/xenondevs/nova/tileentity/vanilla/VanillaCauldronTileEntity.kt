@@ -59,6 +59,7 @@ internal class VanillaCauldronTileEntity internal constructor(
         fluidHolder = DefaultFluidHolder(
             storedValue("fluidHolder", ::Compound),
             mapOf(container to NetworkConnectionType.BUFFER),
+            emptySet(),
             { CUBE_FACES.associateWithTo(enumMap()) { container } },
             { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.BUFFER } }
         )

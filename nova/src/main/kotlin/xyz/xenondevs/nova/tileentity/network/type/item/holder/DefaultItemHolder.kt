@@ -2,20 +2,15 @@
 
 package xyz.xenondevs.nova.tileentity.network.type.item.holder
 
-import com.google.common.collect.BiMap
-import com.google.common.collect.HashBiMap
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.provider.entry
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.commons.collections.mapValuesNotNullTo
-import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
-import xyz.xenondevs.commons.provider.mutable.mapNonNull
-import xyz.xenondevs.commons.provider.mutable.observed
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.nova.data.serialization.DataHolder
+import xyz.xenondevs.nova.tileentity.network.node.DefaultContainerEndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
@@ -35,38 +30,25 @@ import java.util.*
  */
 class DefaultItemHolder(
     compound: Provider<Compound>,
-    override val containers: Map<NetworkedInventory, NetworkConnectionType>,
+    containers: Map<NetworkedInventory, NetworkConnectionType>,
     override val mergedInventory: NetworkedInventory?,
+    blockedFaces: Set<BlockFace>,
     defaultInventoryConfig: () -> Map<BlockFace, NetworkedInventory>,
     defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)?
-) : ItemHolder {
+) : DefaultContainerEndPointDataHolder<NetworkedInventory>(
+    compound,
+    containers,
+    blockedFaces,
+    defaultInventoryConfig,
+    defaultConnectionConfig
+), ItemHolder {
     
     init {
         if (containers.isEmpty())
             throw IllegalArgumentException("availableInventories must not be empty")
     }
     
-    private val invToUuid: BiMap<NetworkedInventory, UUID> = containers.keys.associateWithTo(HashBiMap.create()) { it.uuid }
-    private val uuidToInv: BiMap<UUID, NetworkedInventory> get() = invToUuid.inverse()
-    
-    override val containerConfig: MutableMap<BlockFace, NetworkedInventory>
-        by compound.entry<Map<BlockFace, UUID>>("inventoryConfig")
-            .mapNonNull(
-                { it.mapValuesNotNullTo(enumMap()) { (_, uuid) -> uuidToInv[uuid] } },
-                { it.mapValuesTo(enumMap()) { (_, inv) -> inv.uuid } }
-            ).defaultsToLazily { defaultInventoryConfig().toEnumMap() }
-            .observed()
-    
-    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
-        by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-            .defaultsToLazily {
-                defaultConnectionConfig?.invoke()?.toEnumMap()
-                    ?: containerConfig.mapValuesTo(enumMap()) { (_, inv) -> containers[inv] }
-            }
-    
-    override val channels: MutableMap<BlockFace, Int>
-        by compound.entry<MutableMap<BlockFace, Int>>("channels")
-            .defaultsToLazily(DEFAULT_CHANNELS)
+    override val uuidToContainer: Map<UUID, NetworkedInventory> = containers.keys.associateByTo(HashMap()) { it.uuid }
     
     override val insertFilters: MutableMap<BlockFace, ItemFilter<*>>
         by compound.entry<MutableMap<BlockFace, ItemFilter<*>>>("insertFilters")
@@ -76,22 +58,11 @@ class DefaultItemHolder(
         by compound.entry<MutableMap<BlockFace, ItemFilter<*>>>("extractFilters")
             .defaultsToLazily(::enumMap)
     
-    override val insertPriorities: MutableMap<BlockFace, Int>
-        by compound.entry<MutableMap<BlockFace, Int>>("insertPriorities")
-            .defaultsToLazily(DEFAULT_PRIORITIES)
-    
-    override val extractPriorities: MutableMap<BlockFace, Int>
-        by compound.entry<MutableMap<BlockFace, Int>>("extractPriorities")
-            .defaultsToLazily(DEFAULT_PRIORITIES)
-    
     fun getNetworkedInventory(inv: VirtualInventory): NetworkedInventory =
         getNetworkedInventory(inv.uuid)
     
     fun getNetworkedInventory(uuid: UUID): NetworkedInventory =
-        uuidToInv[uuid] ?: throw NoSuchElementException("No networked inventory with $uuid")
-    
-    private fun getUUID(inv: NetworkedInventory): UUID =
-        invToUuid[inv] ?: throw NoSuchElementException("$inv is not part of item holder")
+        uuidToContainer[uuid] ?: throw NoSuchElementException("No networked inventory with $uuid")
     
     internal companion object {
         

@@ -29,6 +29,9 @@ internal class EnergySideConfigMenu(
     }
     
     override fun getAllowedConnectionType(face: BlockFace): NetworkConnectionType {
+        if (face in holder.blockedFaces)
+            return NetworkConnectionType.NONE
+        
         return holder.allowedConnectionType
     }
     

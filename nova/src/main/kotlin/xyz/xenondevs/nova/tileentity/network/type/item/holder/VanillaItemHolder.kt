@@ -57,13 +57,21 @@ internal abstract class VanillaItemHolder(
 internal class StaticVanillaItemHolder(
     compound: Provider<Compound>,
     override val containerConfig: MutableMap<BlockFace, NetworkedInventory>
-) : VanillaItemHolder(compound)
+) : VanillaItemHolder(compound) {
+    
+    override val blockedFaces: Set<BlockFace>
+        get() = emptySet()
+    
+}
 
 internal class DynamicVanillaItemHolder(
     compound: Provider<Compound>,
     val inventoriesGetter: () -> MutableMap<BlockFace, NetworkedInventory>,
     val allowedConnectionTypesGetter: () -> Map<NetworkedInventory, NetworkConnectionType>
 ) : VanillaItemHolder(compound) {
+    
+    override val blockedFaces: Set<BlockFace>
+        get() = emptySet()
     
     override val containerConfig: MutableMap<BlockFace, NetworkedInventory>
         get() = inventoriesGetter()

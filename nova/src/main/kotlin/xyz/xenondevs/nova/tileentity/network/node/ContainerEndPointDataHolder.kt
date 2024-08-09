@@ -11,6 +11,11 @@ import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
 interface ContainerEndPointDataHolder<C : EndPointContainer> : EndPointDataHolder {
     
     /**
+     * The [BlockFaces][BlockFace] that can never have a connection.
+     */
+    val blockedFaces: Set<BlockFace>
+    
+    /**
      * Stores all available [C] and their allowed [NetworkConnectionTypes][NetworkConnectionType].
      */
     val containers: Map<C, NetworkConnectionType>

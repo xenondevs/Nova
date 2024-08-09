@@ -4,6 +4,7 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.provider.entry
 import xyz.xenondevs.commons.collections.toEnumMap
+import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.MutableProvider
 import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
@@ -27,6 +28,7 @@ class DefaultEnergyHolder(
     compound: Provider<Compound>,
     val maxEnergyProvider: Provider<Long>,
     override val allowedConnectionType: NetworkConnectionType,
+    blockedFaces: Set<BlockFace>,
     defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType>
 ) : EnergyHolder {
     
@@ -34,9 +36,15 @@ class DefaultEnergyHolder(
     private val _energyMinusProvider = ResettingLongProvider(EnergyNetwork.TICK_DELAY_PROVIDER)
     private val _energyPlusProvider = ResettingLongProvider(EnergyNetwork.TICK_DELAY_PROVIDER)
     
+    override val blockedFaces = blockedFaces.toEnumSet()
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
         by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-            .defaultsToLazily { defaultConnectionConfig().toEnumMap() }
+            .defaultsToLazily {
+                val map = defaultConnectionConfig().toEnumMap() 
+                for (face in blockedFaces)
+                    map[face] = NetworkConnectionType.NONE
+                map
+            }
     
     /**
      * The maximum amount of energy this [EnergyHolder] can store.

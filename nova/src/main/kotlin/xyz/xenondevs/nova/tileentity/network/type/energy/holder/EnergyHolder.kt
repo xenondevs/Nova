@@ -13,6 +13,11 @@ interface EnergyHolder : EndPointDataHolder {
     val allowedConnectionType: NetworkConnectionType
     
     /**
+     * The [BlockFaces][BlockFace] that can never have a connection.
+     */
+    val blockedFaces: Set<BlockFace>
+    
+    /**
      * Stores which [NetworkConnectionType] is used for each [BlockFace].
      */
     val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>

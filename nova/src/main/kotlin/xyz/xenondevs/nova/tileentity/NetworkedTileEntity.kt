@@ -6,6 +6,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.commons.collections.enumSet
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.nova.data.context.Context
@@ -26,9 +27,11 @@ import xyz.xenondevs.nova.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedMultiVirtualInventory
 import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedVirtualInventory
+import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import java.util.*
 
 abstract class NetworkedTileEntity(
@@ -56,18 +59,47 @@ abstract class NetworkedTileEntity(
      * The energy capacity is limited by the [maxEnergy] provider and the [allowedConnectionType] determines
      * whether energy can be inserted, extracted, or both.
      *
+     * The [blockedSides] defines which sides of this tile-entity can never be used for energy transfer.
+     * 
      * If the [EnergyHolder] is created for the first time, [defaultConnectionConfig] is used to determine the
      * correct [NetworkConnectionType] for each side.
      */
+    @JvmName("storedEnergyHolderBlockSide")
     fun storedEnergyHolder(
         maxEnergy: Provider<Long>,
         allowedConnectionType: NetworkConnectionType,
+        blockedSides: Set<BlockSide>,
+        defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = { CUBE_FACES.associateWithTo(enumMap()) { allowedConnectionType } }
+    ) = storedEnergyHolder(
+        maxEnergy,
+        allowedConnectionType,
+        translateSidesToFaces(blockedSides),
+        defaultConnectionConfig
+    )
+    
+    /**
+     * Retrieves the [EnergyHolder] previously stored or creates a new one and registers it in the [holders] map.
+     *
+     * The energy capacity is limited by the [maxEnergy] provider and the [allowedConnectionType] determines
+     * whether energy can be inserted, extracted, or both.
+     *
+     * The [blockedFaces] define which faces of this tile-entity can never be used for energy transfer.
+     * 
+     * If the [EnergyHolder] is created for the first time, [defaultConnectionConfig] is used to determine the
+     * correct [NetworkConnectionType] for each side.
+     */
+    @JvmName("storedEnergyHolderBlockFace")
+    fun storedEnergyHolder(
+        maxEnergy: Provider<Long>,
+        allowedConnectionType: NetworkConnectionType,
+        blockedFaces: Set<BlockFace> = emptySet(),
         defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = { CUBE_FACES.associateWithTo(enumMap()) { allowedConnectionType } }
     ): DefaultEnergyHolder {
         val holder = DefaultEnergyHolder(
             storedValue("energyHolder", ::Compound),
             maxEnergy,
             allowedConnectionType,
+            blockedFaces,
             defaultConnectionConfig
         )
         holders += holder
@@ -80,15 +112,48 @@ abstract class NetworkedTileEntity(
      *
      * The item holder uses the inventories and connection types provided ([inventory], [inventories]).
      *
+     * The [blockedSides] define which sides of the tile-entity can never be used for item transfer.
+     * 
+     * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
+     * are used to determine the correct [VirtualInventory] and [NetworkConnectionType] for each side.
+     * If [defaultInventoryConfig] is `null`, the merged inventory will be used for all sides.
+     *
+     * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
+     */
+    @JvmName("storedItemHolderBlockSide")
+    fun storedItemHolder(
+        inventory: Pair<VirtualInventory, NetworkConnectionType>,
+        vararg inventories: Pair<VirtualInventory, NetworkConnectionType>,
+        blockedSides: Set<BlockSide>,
+        defaultInventoryConfig: (() -> Map<BlockFace, VirtualInventory>)? = null,
+        defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null,
+    ) = storedItemHolder(
+        inventory,
+        inventories = inventories,
+        translateSidesToFaces(blockedSides),
+        defaultInventoryConfig,
+        defaultConnectionConfig
+    )
+    
+    /**
+     * Retrieves the [ItemHolder] previously stored or creates a new one, registers it in the [holders] map,
+     * and adds drop providers for [ItemHolder.insertFilters] and [ItemHolder.extractFilters].
+     *
+     * The item holder uses the inventories and connection types provided ([inventory], [inventories]).
+     *
+     * The [blockedFaces] define which faces of the tile-entity can never be used for item transfer.
+     * 
      * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
      * are used to determine the correct [VirtualInventory] and [NetworkConnectionType] for each side.
      * If [defaultInventoryConfig] is `null`, the merged inventory will be used for all sides.
      * 
      * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
      */
+    @JvmName("storedItemHolderBlockFace")
     fun storedItemHolder(
         inventory: Pair<VirtualInventory, NetworkConnectionType>,
         vararg inventories: Pair<VirtualInventory, NetworkConnectionType>,
+        blockedFaces: Set<BlockFace> = emptySet(),
         defaultInventoryConfig: (() -> Map<BlockFace, VirtualInventory>)? = null,
         defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null,
     ): DefaultItemHolder {
@@ -107,6 +172,7 @@ abstract class NetworkedTileEntity(
             storedValue("itemHolder", ::Compound),
             allowedConnectionTypes,
             mergedInventory,
+            blockedFaces,
             // map from VirtualInventory to NetworkedInventory or use mergedInventory for all sides
             defaultInventoryConfig
                 ?.let { { it.invoke().mapValues { (_, vi) -> availableInventories[vi.uuid]!! } } }
@@ -123,15 +189,49 @@ abstract class NetworkedTileEntity(
      *
      * The item holder uses the inventories and connection types provided ([inventory], [inventories]).
      *
+     * The [blockedSides] define which sides of the tile-entity can never be used for item transfer.
+     * 
+     * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
+     * are used to determine the correct [NetworkedInventory] and [NetworkConnectionType] for each side.
+     *
+     * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
+     */
+    @JvmName("storedItemHolderBlockSide")
+    fun storedItemHolder(
+        inventory: Pair<NetworkedInventory, NetworkConnectionType>,
+        vararg inventories: Pair<NetworkedInventory, NetworkConnectionType>,
+        mergedInventory: NetworkedInventory? = null,
+        blockedSides: Set<BlockSide>,
+        defaultInventoryConfig: () -> Map<BlockFace, NetworkedInventory> = { CUBE_FACES.associateWithTo(enumMap()) { inventory.first } },
+        defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null
+    ) = storedItemHolder(
+        inventory, 
+        inventories = inventories,
+        mergedInventory, 
+        translateSidesToFaces(blockedSides),
+        defaultInventoryConfig,
+        defaultConnectionConfig
+    )
+    
+    /**
+     * Retrieves the [ItemHolder] previously stored or creates a new one, registers it in the [holders] map,
+     * and adds drop providers for [ItemHolder.insertFilters] and [ItemHolder.extractFilters].
+     *
+     * The item holder uses the inventories and connection types provided ([inventory], [inventories]).
+     *
+     * The [blockedFaces] define which faces of the tile-entity can never be used for item transfer.
+     * 
      * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedInventory] and [NetworkConnectionType] for each side.
      * 
      * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
      */
+    @JvmName("storedItemHolderBlockFace")
     fun storedItemHolder(
         inventory: Pair<NetworkedInventory, NetworkConnectionType>,
         vararg inventories: Pair<NetworkedInventory, NetworkConnectionType>,
         mergedInventory: NetworkedInventory? = null,
+        blockedFaces: Set<BlockFace> = emptySet(),
         defaultInventoryConfig: () -> Map<BlockFace, NetworkedInventory> = { CUBE_FACES.associateWithTo(enumMap()) { inventory.first } },
         defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null
     ): DefaultItemHolder {
@@ -141,6 +241,7 @@ abstract class NetworkedTileEntity(
             storedValue("itemHolder", ::Compound),
             allInventories,
             mergedInventory,
+            blockedFaces,
             defaultInventoryConfig,
             defaultConnectionConfig
         )
@@ -169,25 +270,63 @@ abstract class NetworkedTileEntity(
      *
      * The fluid holder uses the containers and connection types provided ([container], [containers]).
      *
+     * The [blockedSides] define which sides of the tile-entity can never be used for fluid transfer.
+     * 
+     * If the [FluidHolder] is created for the first time, [defaultContainerConfig] and [defaultConnectionConfig]
+     * are used to determine the correct [NetworkedFluidContainer] and [NetworkConnectionType] for each side.
+     *
+     * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
+     */
+    @JvmName("storedFluidHolderBlockSide")
+    fun storedFluidHolder(
+        container: Pair<NetworkedFluidContainer, NetworkConnectionType>,
+        vararg containers: Pair<NetworkedFluidContainer, NetworkConnectionType>,
+        blockedSides: Set<BlockSide>,
+        defaultContainerConfig: () -> MutableMap<BlockFace, NetworkedFluidContainer> = { CUBE_FACES.associateWithTo(enumMap()) { container.first } },
+        defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
+    ) = storedFluidHolder(
+        container,
+        containers = containers,
+        translateSidesToFaces(blockedSides),
+        defaultContainerConfig, 
+        defaultConnectionConfig
+    )
+    
+    
+    /**
+     * Retrieves the [FluidHolder] previously stored or creates a new one and registers it in the [holders] map.
+     *
+     * The fluid holder uses the containers and connection types provided ([container], [containers]).
+     *
+     * The [blockedFaces] define which faces of the tile-entity can never be used for fluid transfer.
+     * 
      * If the [FluidHolder] is created for the first time, [defaultContainerConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedFluidContainer] and [NetworkConnectionType] for each side.
      * 
      * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
      */
+    @JvmName("storedFluidHolderBlockFace")
     fun storedFluidHolder(
         container: Pair<NetworkedFluidContainer, NetworkConnectionType>,
         vararg containers: Pair<NetworkedFluidContainer, NetworkConnectionType>,
+        blockedFaces: Set<BlockFace> = emptySet(),
         defaultContainerConfig: () -> MutableMap<BlockFace, NetworkedFluidContainer> = { CUBE_FACES.associateWithTo(enumMap()) { container.first } },
         defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
     ): DefaultFluidHolder {
         val fluidHolder = DefaultFluidHolder(
             storedValue("fluidHolder", ::Compound),
             buildMap { this += container; this += containers },
+            blockedFaces,
             defaultContainerConfig,
             defaultConnectionConfig
         )
         holders += fluidHolder
         return fluidHolder
+    }
+    
+    private fun translateSidesToFaces(sides: Set<BlockSide>): Set<BlockFace> {
+        val facing = blockState[DefaultBlockStateProperties.FACING] ?: BlockFace.NORTH
+        return sides.mapTo(enumSet()) { it.getBlockFace(facing) }
     }
     
     override fun handleEnable() {

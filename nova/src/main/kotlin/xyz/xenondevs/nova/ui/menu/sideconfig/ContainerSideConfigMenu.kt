@@ -124,6 +124,7 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
     override fun getAllowedConnectionType(face: BlockFace): NetworkConnectionType =
         holder.containerConfig[face]
             ?.let { holder.containers[it] }
+            ?.takeUnless { face in holder.blockedFaces }
             ?: NetworkConnectionType.NONE
     
     override fun getConnectionType(face: BlockFace): NetworkConnectionType {
