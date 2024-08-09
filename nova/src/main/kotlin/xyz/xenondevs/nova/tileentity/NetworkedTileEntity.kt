@@ -83,6 +83,7 @@ abstract class NetworkedTileEntity(
      * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
      * are used to determine the correct [VirtualInventory] and [NetworkConnectionType] for each side.
      * If [defaultInventoryConfig] is `null`, the merged inventory will be used for all sides.
+     * 
      * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
      */
     fun storedItemHolder(
@@ -124,6 +125,7 @@ abstract class NetworkedTileEntity(
      *
      * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedInventory] and [NetworkConnectionType] for each side.
+     * 
      * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
      */
     fun storedItemHolder(
@@ -169,12 +171,14 @@ abstract class NetworkedTileEntity(
      *
      * If the [FluidHolder] is created for the first time, [defaultContainerConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedFluidContainer] and [NetworkConnectionType] for each side.
+     * 
+     * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
      */
     fun storedFluidHolder(
         container: Pair<NetworkedFluidContainer, NetworkConnectionType>,
         vararg containers: Pair<NetworkedFluidContainer, NetworkConnectionType>,
         defaultContainerConfig: () -> MutableMap<BlockFace, NetworkedFluidContainer> = { CUBE_FACES.associateWithTo(enumMap()) { container.first } },
-        defaultConnectionConfig: () -> EnumMap<BlockFace, NetworkConnectionType> = DefaultFluidHolder.DEFAULT_CONNECTION_CONFIG
+        defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
     ): DefaultFluidHolder {
         val fluidHolder = DefaultFluidHolder(
             storedValue("fluidHolder", ::Compound),

@@ -28,7 +28,7 @@ class DefaultFluidHolder(
     compound: Provider<Compound>,
     override val containers: Map<NetworkedFluidContainer, NetworkConnectionType>,
     defaultContainerConfig: () -> Map<BlockFace, NetworkedFluidContainer>,
-    defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType>
+    defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)?
 ) : FluidHolder {
     
     init {
@@ -49,7 +49,10 @@ class DefaultFluidHolder(
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> by
         compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-            .defaultsToLazily { defaultConnectionConfig().toEnumMap() }
+            .defaultsToLazily {
+                defaultConnectionConfig?.invoke()?.toEnumMap()
+                    ?: containerConfig.mapValuesTo(enumMap()) { (_, inv) -> containers[inv] }
+            }
     
     override val channels: MutableMap<BlockFace, Int>
         by compound.entry<MutableMap<BlockFace, Int>>("channels")
@@ -65,7 +68,6 @@ class DefaultFluidHolder(
     
     internal companion object {
         
-        val DEFAULT_CONNECTION_CONFIG = { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.NONE } }
         val DEFAULT_CHANNEL_CONFIG = { CUBE_FACES.associateWithTo(enumMap()) { 0 } }
         val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithTo(enumMap()) { 50 } }
         

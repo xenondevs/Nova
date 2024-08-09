@@ -10,7 +10,6 @@ import xyz.xenondevs.nova.tileentity.network.Network
 import xyz.xenondevs.nova.tileentity.network.NetworkData
 import xyz.xenondevs.nova.tileentity.network.NetworkGroup
 import xyz.xenondevs.nova.tileentity.network.NetworkGroupData
-import xyz.xenondevs.nova.tileentity.network.node.ContainerEndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.tileentity.network.type.energy.EnergyNetwork
@@ -32,7 +31,7 @@ internal typealias LocalValidator = (NetworkEndPoint, NetworkEndPoint, BlockFace
 
 /**
  * A [Network] type.
- * 
+ *
  * @param id The unique identifier of this [NetworkType].
  * @param createNetwork The constructor to instantiate a [Network] of this [NetworkType].
  * @param tickDelay The delay between [network ticks][Network.tick].
@@ -78,8 +77,8 @@ object DefaultNetworkTypes {
      */
     val ENERGY = register(
         "energy",
-        ::EnergyNetwork, ::EnergyNetworkGroup, EnergyNetwork::validateLocal, 
-        EnergyNetwork.TICK_DELAY_PROVIDER, 
+        ::EnergyNetwork, ::EnergyNetworkGroup, EnergyNetwork::validateLocal,
+        EnergyNetwork.TICK_DELAY_PROVIDER,
         EnergyHolder::class
     )
     
@@ -87,7 +86,7 @@ object DefaultNetworkTypes {
      * The default network type responsible for distributing items provided through [ItemHolders][ItemHolder].
      */
     val ITEM = register(
-        "item", 
+        "item",
         ::ItemNetwork, ::ItemNetworkGroup, ItemNetwork::validateLocal,
         ItemNetwork.TICK_DELAY_PROVIDER,
         ItemHolder::class
@@ -97,8 +96,8 @@ object DefaultNetworkTypes {
      * The default network type responsible for distributing fluids provided through [FluidHolders][FluidHolder].
      */
     val FLUID = register(
-        "fluid", 
-        ::FluidNetwork, ::FluidNetworkGroup, FluidNetwork::validateLocal, 
+        "fluid",
+        ::FluidNetwork, ::FluidNetworkGroup, FluidNetwork::validateLocal,
         FluidNetwork.TICK_DELAY_PROVIDER,
         FluidHolder::class
     )
@@ -126,8 +125,8 @@ object DefaultNetworkTypes {
 }
 
 /**
- * A connection type for [ContainerEndPointDataHolders][ContainerEndPointDataHolder].
- * 
+ * A connection type for end point data holders.
+ *
  * @param insert Whether this connection type allows inserting.
  * @param extract Whether this connection type allows extracting.
  * @param supertypes The supertypes of this connection type.
