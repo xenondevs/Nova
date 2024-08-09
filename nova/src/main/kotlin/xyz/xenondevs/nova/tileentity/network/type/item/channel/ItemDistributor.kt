@@ -70,21 +70,21 @@ internal class ItemDistributor(
             val providersInScope = providerLevels[level]
             
             when {
-                consumersInScope.size > 1 && providersInScope.size > 1 -> {
+                consumersInScope.size == 1 && providersInScope.size == 1 -> {
+                    transfersLeft = distributeDirectlyBetween(
+                        transfersLeft,
+                        consumersInScope[0], providersInScope[0],
+                        providerSnapshots[level][0]
+                    )
+                }
+                
+                consumersInScope.isNotEmpty() && providersInScope.isNotEmpty() -> {
                     transfersLeft = distributeBetween(
                         transfersLeft,
                         consumersInScope, providersInScope,
                         ignoredProviders[level].mapToArray { it.clone() as BitSet },
                         providerSnapshots[level],
                         consumerRRCounters[level], providerRRCounters[level]
-                    )
-                }
-                
-                consumersInScope.size == 1 && providersInScope.size == 1 -> {
-                    transfersLeft = distributeDirectlyBetween(
-                        transfersLeft,
-                        consumersInScope[0], providersInScope[0],
-                        providerSnapshots[level][0]
                     )
                 }
                 
