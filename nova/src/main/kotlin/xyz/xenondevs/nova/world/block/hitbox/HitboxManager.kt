@@ -193,11 +193,6 @@ internal object HitboxManager : Listener, PacketListener {
                             continue // skip hitbox as it has no handlers for the current action
                         
                         if (Intersectionf.intersectRayAab(originF, directionF, hitbox.from, hitbox.to, boxHitResult)) {
-                            // cancel vanilla interactions
-                            event.isCancelled = true
-                            // mark performed custom action
-                            wrappedEvent.actionPerformed = true
-                            
                             // get absolute hit location
                             val t = boxHitResult.x
                             val hitLoc = Vector3f(originF.x + directionF.x * t, originF.y + directionF.y * t, originF.z + directionF.z * t)
@@ -205,6 +200,11 @@ internal object HitboxManager : Listener, PacketListener {
                             // check if block hit is closer
                             if (blockHitLoc != null && blockHitLoc.distanceSquared(originF) < hitLoc.distanceSquared(originF))
                                 return@traverseBlocks Unit
+                            
+                            // cancel vanilla interactions
+                            event.isCancelled = true
+                            // mark performed custom action
+                            wrappedEvent.actionPerformed = true
                             
                             // get hit location relative to hitbox.center
                             val center = hitbox.center
