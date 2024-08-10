@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.item.behavior
 
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.world.item.component.ItemAttributeModifiers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -26,12 +27,27 @@ sealed interface ItemBehaviorHolder
 
 interface ItemBehavior : ItemBehaviorHolder {
     
+    /**
+     * The base data components that every item with this [ItemBehavior] has.
+     */
     val baseDataComponents: Provider<DataComponentMap>
         get() = provider(DataComponentMap.EMPTY)
+    
+    /**
+     * The data component patch that every new [ItemStack] of an item with this [ItemBehavior] has by default.
+     */
     val defaultPatch: Provider<DataComponentPatch>
         get() = provider(DataComponentPatch.EMPTY)
+    
+    /**
+     * The [NamespacedCompound] that every new [ItemStack] of an item with this [ItemBehavior] has by default.
+     */
     val defaultCompound: Provider<NamespacedCompound>
         get() = provider(NamespacedCompound())
+    
+    /**
+     * The vanilla material properties that an item with this [ItemBehavior] requires.
+     */
     val vanillaMaterialProperties: Provider<List<VanillaMaterialProperty>>
         get() = provider(emptyList())
     
@@ -48,6 +64,9 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
     fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
     
+    /**
+     * Updates the client-side [itemStack] that is to be viewed by [player] and has server-side [data].
+     */
     fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound) = itemStack
     
 }
