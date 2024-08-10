@@ -19,7 +19,7 @@ import kotlin.reflect.KClass
 @Target(AnnotationTarget.CLASS)
 internal annotation class InternalInit(
     val stage: InternalInitStage,
-    val dispatcher: Dispatcher = Dispatcher.SERVER,
+    val dispatcher: Dispatcher = Dispatcher.SYNC,
     val dependsOn: Array<KClass<*>> = []
 )
 
@@ -43,7 +43,7 @@ internal annotation class InternalInit(
 @Target(AnnotationTarget.CLASS)
 annotation class Init(
     val stage: InitStage,
-    val dispatcher: Dispatcher = Dispatcher.SERVER,
+    val dispatcher: Dispatcher = Dispatcher.SYNC,
     val runAfter: Array<KClass<*>> = [],
     val runBefore: Array<KClass<*>> = [],
 )
@@ -65,7 +65,7 @@ annotation class Init(
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
 annotation class InitFun(
-    val dispatcher: Dispatcher = Dispatcher.SERVER,
+    val dispatcher: Dispatcher = Dispatcher.SYNC,
     val runAfter: Array<KClass<*>> = [],
     val runBefore: Array<KClass<*>> = []
 )
@@ -82,7 +82,7 @@ annotation class InitFun(
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
 annotation class DisableFun(
-    val dispatcher: Dispatcher = Dispatcher.SERVER,
+    val dispatcher: Dispatcher = Dispatcher.SYNC,
     val runAfter: Array<KClass<*>> = [],
     val runBefore: Array<KClass<*>> = []
 )

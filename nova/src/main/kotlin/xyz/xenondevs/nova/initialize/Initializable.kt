@@ -109,7 +109,7 @@ internal class InitializableClass(
             
             return InitializableClass(
                 classLoader, clazz,
-                stage.internalStage, (dispatcher ?: Dispatcher.SERVER).dispatcher, 
+                stage.internalStage, (dispatcher ?: Dispatcher.SYNC).dispatcher, 
                 runBefore, runAfter
             )
         }
@@ -124,7 +124,7 @@ internal class InitializableClass(
             
             return InitializableClass(
                 classLoader, clazz, 
-                stage, (dispatcher ?: Dispatcher.SERVER).dispatcher,
+                stage, (dispatcher ?: Dispatcher.SYNC).dispatcher,
                 emptySet(), dependsOn
             )
         }

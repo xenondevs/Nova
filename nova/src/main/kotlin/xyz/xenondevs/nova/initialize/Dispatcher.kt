@@ -4,18 +4,17 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
 /**
- * Defines how an [InitializerRunnable] is dispatched, i.e. on which thread it is executed.
+ * Defines how an [InitializerRunnable] is dispatched.
  */
 enum class Dispatcher(internal val dispatcher: CoroutineDispatcher?) {
     
     /**
-     * The runnable is dispatched on the server thread.
+     * The initialization is performed synchronously with other initializables.
      */
-    SERVER(null),
+    SYNC(null),
     
     /**
-     * The runnable is dispatched in an off-main-thread context,
-     * in parallel with other runnables dispatched [ASYNC].
+     * The initialization is performed asynchronously, in parallel with other async initializables.
      */
     ASYNC(Dispatchers.Default)
     

@@ -55,7 +55,7 @@ internal class DisableableFunction(
         ) = DisableableFunction(
             classLoader,
             className, methodName,
-            (readDispatcher(annotation) ?: Dispatcher.SERVER).dispatcher,
+            (readDispatcher(annotation) ?: Dispatcher.SYNC).dispatcher,
             readStrings("runBefore", annotation),
             readStrings("runAfter", annotation)
         )
