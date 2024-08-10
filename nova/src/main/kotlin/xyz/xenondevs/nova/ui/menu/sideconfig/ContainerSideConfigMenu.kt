@@ -38,7 +38,7 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
     private val containers: List<C> = namedContainers.keys.toList()
     private val containerConfigItems = enumMap<BlockFace, ContainerConfigItem>()
     private val simpleModeBtn = SimplicityModeItem(true)
-    private val advancedModeBtn = SimplicityModeItem(true)
+    private val advancedModeBtn = SimplicityModeItem(false)
     
     private val simpleGui = Gui.normal()
         .setStructure(
@@ -183,7 +183,7 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
                 return
             
             player.playClickSound()
-            switchSimplicity(!simple)
+            switchSimplicity(simple)
         }
         
     }
