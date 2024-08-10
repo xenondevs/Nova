@@ -72,6 +72,7 @@ internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChun
                     .with(DefaultBlockStateProperties.POWERED, data["powered"]!!)
                 chunk.setBlockState(pos, blockState)
             }
+            
             else -> chunk.setVanillaTileEntityData(pos, data)
         }
     }

@@ -34,13 +34,13 @@ internal fun setGlobalIngredients() {
 fun Structure.addIngredient(char: Char, item: NovaItem) =
     addIngredient(char, item.model.clientsideProvider)
 
-fun <G: Gui, B : Gui.Builder<G, B>> Gui.Builder<G, B>.addIngredient(char: Char, item: NovaItem) =
+fun <G : Gui, B : Gui.Builder<G, B>> Gui.Builder<G, B>.addIngredient(char: Char, item: NovaItem) =
     addIngredient(char, item.model.clientsideProvider)
 
 fun Structure.addIngredient(char: Char, inventory: Inventory, background: NovaItem) =
     addIngredient(char, inventory, background.model.clientsideProvider)
 
-fun <G: Gui, B : Gui.Builder<G, B>> Gui.Builder<G, B>.addIngredient(char: Char, inventory: Inventory, background: NovaItem) =
+fun <G : Gui, B : Gui.Builder<G, B>> Gui.Builder<G, B>.addIngredient(char: Char, inventory: Inventory, background: NovaItem) =
     addIngredient(char, inventory, background.model.clientsideProvider)
 
 internal fun <G : Gui, B : Gui.Builder<G, B>> B.applyDefaultTPIngredients(): B {

@@ -98,5 +98,5 @@ interface BlockBehaviorFactory<T : BlockBehavior> : BlockBehaviorHolder {
      *  Creates a new [BlockBehavior] instance of [T] based on the given [block].
      */
     fun create(block: NovaBlock): T
-
+    
 }

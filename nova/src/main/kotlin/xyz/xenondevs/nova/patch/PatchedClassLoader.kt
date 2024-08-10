@@ -37,7 +37,7 @@ internal class PatchedClassLoader : ClassLoader(PAPER_CLASS_LOADER.parent) {
         if (c == null && checkNonRecursive() && checkPaperLoader()) {
             try {
                 c = NOVA_CLASS_LOADER.loadClass(name)
-            } catch(ignored: ClassNotFoundException) {
+            } catch (ignored: ClassNotFoundException) {
             }
         }
         
@@ -49,7 +49,7 @@ internal class PatchedClassLoader : ClassLoader(PAPER_CLASS_LOADER.parent) {
     
     /**
      * Checks the stacktrace for the PatchedClassLoader to prevent recursion.
-     * 
+     *
      * It's independent from [checkPaperLoader] as that requires loading a class, which would then cause recursion.
      */
     private fun checkNonRecursive(): Boolean {

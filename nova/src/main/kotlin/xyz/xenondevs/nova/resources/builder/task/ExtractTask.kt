@@ -62,7 +62,7 @@ class ExtractTask(private val builder: ResourcePackBuilder) : PackTaskHolder {
             extractAssetPack(pack, ResourcePackBuilder.ASSETS_DIR.resolve(namespace)) { path -> filters.all { it.allows(path) } }
         }
     }
-
+    
     private fun extractAssetPack(assetPack: AssetPack, namespaceDir: Path, fileFilter: (String) -> Boolean) {
         val namespace = assetPack.namespace
         fun extractDir(sourceDir: Path, dirName: String) {

@@ -27,5 +27,5 @@ internal object CropWailaInfoProvider : VanillaWailaInfoProvider<Ageable>(MAX_TE
         info.icon = ResourceLocation.withDefaultNamespace(blockState.material.name.lowercase() + "_stage$stage")
         return info
     }
-
+    
 }

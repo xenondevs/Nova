@@ -16,14 +16,14 @@ import xyz.xenondevs.nova.util.runTaskTimer
  * A class wrapping Bukkit's [PlayerInteractEvent], which will not be called for the
  * other hand if an action has been performed (marked via [WrappedPlayerInteractEvent.actionPerformed]).
  */
-class WrappedPlayerInteractEvent(val event: PlayerInteractEvent) : Event()  {
+class WrappedPlayerInteractEvent(val event: PlayerInteractEvent) : Event() {
     
     /**
      * Whether an action has been performed (by Nova or addons).
-     * 
+     *
      * Possible actions might be: Nova block placed, Gui opened, custom armor equipped, etc.
      * Note that this does not include possible vanilla actions that might happen if the [PlayerInteractEvent] is not cancelled.
-     * 
+     *
      * If this is set to true, possible subsequent offhand events will not be fired.
      */
     var actionPerformed = false

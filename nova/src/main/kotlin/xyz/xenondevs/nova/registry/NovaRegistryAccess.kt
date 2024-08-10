@@ -36,7 +36,7 @@ object NovaRegistryAccess : RegistryAccess {
         registryName: String
     ): FuzzyMappedRegistry<E> = addRegistry(ResourceLocation(addon, registryName), ::FuzzyMappedRegistry)
     
-    fun <E: Any, R : Registry<E>> addRegistry(
+    fun <E : Any, R : Registry<E>> addRegistry(
         addon: Addon,
         registryName: String,
         registryConstructor: (ResourceKey<out R>, Lifecycle) -> R
@@ -63,7 +63,7 @@ object NovaRegistryAccess : RegistryAccess {
         registryName: ResourceLocation
     ): WritableRegistry<E> = addRegistry(registryName, ::InstantBindMappedRegistry)
     
-    internal fun <E: Any> addFuzzyRegistry(
+    internal fun <E : Any> addFuzzyRegistry(
         registryName: ResourceLocation
     ): FuzzyMappedRegistry<E> = addRegistry(registryName, ::FuzzyMappedRegistry)
     

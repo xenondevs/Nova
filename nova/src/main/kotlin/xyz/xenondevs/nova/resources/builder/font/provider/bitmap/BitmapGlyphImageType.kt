@@ -78,5 +78,5 @@ interface BitmapGlyphImageType<T> {
         }
         
     }
-
+    
 }

@@ -46,9 +46,9 @@ data class NetworkBridgeData(
         bridgeFaces: MutableSet<BlockFace> = enumSet()
     ) : this(
         typeId,
-        owner?.uniqueId ?: UUID(0L, 0L), 
-        connections, 
-        networks, 
+        owner?.uniqueId ?: UUID(0L, 0L),
+        connections,
+        networks,
         supportedNetworkTypes,
         bridgeFaces
     )
@@ -85,7 +85,7 @@ data class NetworkEndPointData(
 ) : NetworkNodeData {
     
     constructor(
-        owner: OfflinePlayer?, 
+        owner: OfflinePlayer?,
         connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>> = HashMap(),
         networks: Table<NetworkType<*>, BlockFace, UUID> = HashBasedTable.create()
     ) : this(

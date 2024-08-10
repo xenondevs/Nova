@@ -36,7 +36,7 @@ class Version : Comparable<Version> {
         val stage = result.groupValues[2].takeUnless(String::isBlank)
         val stageVer = result.groupValues[3].takeUnless(String::isBlank)
         
-        this.version = ver.split('.').mapToIntArray { it.toIntOrNull() ?: 0}
+        this.version = ver.split('.').mapToIntArray { it.toIntOrNull() ?: 0 }
         
         if (stage != null) {
             this.stageVersion = buildList<Int> {

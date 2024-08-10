@@ -8,8 +8,8 @@ import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import java.util.*
 
 open class NetworkedInvUIInventory(
-    override val uuid: UUID, 
-    private val inventory: Inventory, 
+    override val uuid: UUID,
+    private val inventory: Inventory,
     private val updateReason: UpdateReason
 ) : NetworkedInventory {
     
@@ -100,7 +100,7 @@ class NetworkedVirtualInventory(
     
     init {
         virtualInventory.addResizeHandler { _, _ ->
-            throw UnsupportedOperationException("Networked inventories cannot be resized") 
+            throw UnsupportedOperationException("Networked inventories cannot be resized")
         }
     }
     

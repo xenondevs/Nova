@@ -58,7 +58,7 @@ enum class BackingStateCategory(
     
     /**
      * The block model uses leave block states.
-     * 
+     *
      * - Limited to 130 different models
      * - Models can be transparent, translucent textures are disabled on "fancy" graphics setting
      * - Can be waterlogged

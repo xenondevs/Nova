@@ -49,7 +49,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
     private val soundOverrides by builder.getHolderLazily<SoundOverrides>()
     
     /**
-     * Reads all block state files that may be used by backing-state block models. 
+     * Reads all block state files that may be used by backing-state block models.
      */
     @PackTask(runAfter = ["ExtractTask#extractAll"])
     private fun readBlockStateFiles() {
@@ -135,8 +135,8 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         val (model, rotations) = modelBuilder.buildBlockStateVariant(modelContent)
         val variant = BlockStateVariantData(modelContent.getOrPutGenerated(model), rotations.x(), rotations.y())
         
-        val cfg = layout.backingStateConfigTypes.firstNotNullOfOrNull { configType -> 
-            blockStateVariants[configType]?.inverse()?.get(variant) 
+        val cfg = layout.backingStateConfigTypes.firstNotNullOfOrNull { configType ->
+            blockStateVariants[configType]?.inverse()?.get(variant)
                 ?: nextBackingStateConfig(configType)
         } ?: return null
         

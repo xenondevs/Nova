@@ -25,8 +25,8 @@ internal class ArraySectionDataContainer<T> : PalletizedSectionDataContainer<T> 
         palette = Palette.read(idResolver, reader)
         bitsPerEntry = determineBitsPerEntry()
         data = CompactIntArray.fromByteArray(
-            SECTION_SIZE, 
-            bitsPerEntry, 
+            SECTION_SIZE,
+            bitsPerEntry,
             reader.readBytes(SECTION_SIZE * bitsPerEntry / 8)
         )
         nonEmptyBlockCount = reader.readVarInt()
@@ -110,7 +110,6 @@ internal class ArraySectionDataContainer<T> : PalletizedSectionDataContainer<T> 
             else -> throw UnsupportedOperationException()
         }
     }
-    
     
     
 }

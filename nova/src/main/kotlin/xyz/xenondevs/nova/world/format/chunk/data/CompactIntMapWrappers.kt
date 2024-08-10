@@ -7,7 +7,7 @@ import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 
-internal inline fun MappedCompactIntStorage.forEach(action: (Int, Int) -> Unit) = when(this) {
+internal inline fun MappedCompactIntStorage.forEach(action: (Int, Int) -> Unit) = when (this) {
     is Short2ByteMapCompactIntStorage -> map.short2ByteEntrySet().forEach { action(it.shortKey.toInt(), it.byteValue.toInt()) }
     is Short2ShortMapCompactIntStorage -> map.short2ShortEntrySet().forEach { action(it.shortKey.toInt(), it.shortValue.toInt()) }
 }

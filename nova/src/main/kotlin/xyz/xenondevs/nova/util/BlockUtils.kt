@@ -215,7 +215,7 @@ object BlockUtils {
     
     /**
      * Changes the state of the custom Nova block at [pos] to [blockState].
-     * 
+     *
      * @throws IllegalArgumentException If there is no custom Nova block of the same block type at [pos].
      * For such cases, use [breakBlock] and [placeBlock] instead.
      */

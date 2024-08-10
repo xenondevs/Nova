@@ -26,7 +26,7 @@ import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
  * @see [BiomeRegistry]
  */
 @ExperimentalWorldGen
-class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeInjection>(NovaRegistries.BIOME_INJECTION, id) {
+class BiomeInjectionBuilder(id: ResourceLocation) : RegistryElementBuilder<BiomeInjection>(NovaRegistries.BIOME_INJECTION, id) {
     
     private val biomes = mutableListOf<ResourceLocationOrTagKey<Biome>>()
     private val features = Array(11) { mutableListOf<Holder<PlacedFeature>>() }

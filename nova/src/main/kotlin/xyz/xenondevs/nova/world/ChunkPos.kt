@@ -28,7 +28,7 @@ val Block.chunkPos: ChunkPos
 
 /**
  * A position of a chunk.
- * 
+ *
  * @param worldUUID The [UUID] of the world this chunk is in.
  * @param x The x coordinate of the chunk.
  * @param z The z coordinate of the chunk.
@@ -75,7 +75,7 @@ data class ChunkPos(val worldUUID: UUID, val x: Int, val z: Int) {
     /**
      * Converts the chunk position to a long, where the 32 most significant bits are the [z]
      * coordinate and the 32 least significant bits are the [x] coordinate.
-     * 
+     *
      * This format matches that of [net.minecraft.world.level.ChunkPos.toLong].
      */
     fun toLong(): Long =

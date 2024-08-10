@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack as BukkitStack
 
 /**
  * Allows items to be used as fuel in furnaces.
- * 
+ *
  * @param burnTime The burn time of this fuel, in ticks.
  */
 class Fuel(burnTime: Provider<Int>) : ItemBehavior {
@@ -26,7 +26,7 @@ class Fuel(burnTime: Provider<Int>) : ItemBehavior {
     
     /**
      * Allows items to be used as fuel in furnaces.
-     * 
+     *
      * @param burnTime The burn time of this fuel, in ticks.
      */
     constructor(burnTime: Int) : this(provider(burnTime))
@@ -63,7 +63,7 @@ class Fuel(burnTime: Provider<Int>) : ItemBehavior {
         
         fun isFuel(itemStack: MojangStack): Boolean {
             val novaItem = itemStack.novaItem
-            if (novaItem != null) 
+            if (novaItem != null)
                 return novaItem.hasBehavior<Fuel>()
             
             return itemStack.item in NMS_VANILLA_FUELS

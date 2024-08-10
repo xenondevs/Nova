@@ -19,7 +19,7 @@ internal class BrownMushroomBackingStateConfig(faces: Set<BlockFace>) : SidedBac
     override val type = BrownMushroomBackingStateConfig
     
     companion object : SidedBackingStateConfigType<BrownMushroomBackingStateConfig>(
-        ::BrownMushroomBackingStateConfig, 
+        ::BrownMushroomBackingStateConfig,
         "brown_mushroom_block"
     )
     

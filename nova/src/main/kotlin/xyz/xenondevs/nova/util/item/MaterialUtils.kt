@@ -62,6 +62,7 @@ fun Material.isActuallyInteractable(): Boolean {
         Material.JUNGLE_FENCE, Material.MOVING_PISTON, Material.NETHER_BRICK_FENCE, Material.OAK_FENCE,
         Material.PUMPKIN, Material.REDSTONE_ORE, Material.REDSTONE_WIRE, Material.SPRUCE_FENCE,
         Material.WARPED_FENCE -> false
+        
         else -> true
     }
 }
@@ -72,6 +73,7 @@ fun Material.isReplaceable(): Boolean =
         Material.SHORT_GRASS, Material.TALL_GRASS, Material.FERN, Material.DEAD_BUSH, Material.VINE,
         Material.CRIMSON_ROOTS, Material.WARPED_ROOTS, Material.NETHER_SPROUTS, Material.SEAGRASS, Material.FIRE,
         Material.SOUL_FIRE, Material.SNOW, Material.STRUCTURE_VOID, Material.LIGHT -> true
+        
         else -> false
     }
 

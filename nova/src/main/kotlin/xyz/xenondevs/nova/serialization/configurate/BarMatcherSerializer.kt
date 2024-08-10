@@ -84,7 +84,7 @@ internal object BarMatcherSerializer : TypeSerializer<BarMatcher> {
     override fun serialize(type: Type, obj: BarMatcher?, node: ConfigurationNode) {
         throw UnsupportedOperationException()
     }
-
+    
 }
 
 internal object BarMatcherCombinedAnySerializer : TypeSerializer<BarMatcher.CombinedAny> {
@@ -96,7 +96,7 @@ internal object BarMatcherCombinedAnySerializer : TypeSerializer<BarMatcher.Comb
     override fun serialize(type: Type, obj: BarMatcher.CombinedAny?, node: ConfigurationNode) {
         throw UnsupportedOperationException()
     }
-
+    
 }
 
 internal object BarMatcherCombinedAllSerializer : TypeSerializer<BarMatcher.CombinedAll> {
@@ -108,5 +108,5 @@ internal object BarMatcherCombinedAllSerializer : TypeSerializer<BarMatcher.Comb
     override fun serialize(type: Type, obj: BarMatcher.CombinedAll?, node: ConfigurationNode) {
         throw UnsupportedOperationException()
     }
-
+    
 }

@@ -63,7 +63,7 @@ internal object BlockPlacing : Listener {
         // However, we want to permit this for built-in custom blocks, as those might have their
         // WorldDataManager entry set before this event is called (block migration patch)
         
-        val blockState =  WorldDataManager.getBlockState(event.block.pos)
+        val blockState = WorldDataManager.getBlockState(event.block.pos)
         event.isCancelled = blockState != null && blockState.block.id.namespace != "nova"
     }
     

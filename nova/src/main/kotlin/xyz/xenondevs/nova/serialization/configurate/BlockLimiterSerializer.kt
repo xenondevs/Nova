@@ -15,7 +15,7 @@ internal object BlockLimiterSerializer : TypeSerializer<List<BlockLimiter>> {
     
     override fun deserialize(type: Type, node: ConfigurationNode): List<BlockLimiter> {
         val limiters = ArrayList<BlockLimiter>()
-        for((key, value) in node.childrenMap()) {
+        for ((key, value) in node.childrenMap()) {
             limiters += deserializeLimiter(key as String, value)
         }
         
@@ -36,7 +36,7 @@ internal object BlockLimiterSerializer : TypeSerializer<List<BlockLimiter>> {
     
     private fun deserializeAmountLimiterMap(node: ConfigurationNode): Map<ResourceLocation?, Int> {
         val map = HashMap<ResourceLocation?, Int>()
-        for((key, value) in node.childrenMap()) {
+        for ((key, value) in node.childrenMap()) {
             key as String
             val id = if (key == "*") null else ResourceLocation.parse(key)
             map[id] = value.int

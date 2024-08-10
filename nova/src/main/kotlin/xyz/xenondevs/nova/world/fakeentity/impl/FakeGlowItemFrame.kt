@@ -7,10 +7,10 @@ import xyz.xenondevs.nova.world.fakeentity.FakeEntity
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemFrameMetadata
 
 class FakeGlowItemFrame(
-	location: Location,
-	autoRegister: Boolean,
-	beforeSpawn: ((FakeGlowItemFrame, ItemFrameMetadata) -> Unit)?,
-	override val metadata: ItemFrameMetadata
+    location: Location,
+    autoRegister: Boolean,
+    beforeSpawn: ((FakeGlowItemFrame, ItemFrameMetadata) -> Unit)?,
+    override val metadata: ItemFrameMetadata
 ) : FakeEntity<ItemFrameMetadata>(location) {
     
     override val entityType: EntityType<GlowItemFrame> = EntityType.GLOW_ITEM_FRAME

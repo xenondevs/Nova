@@ -216,7 +216,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
         
         /**
          * Creates a new immutable [BitmapProvider] with custom grids.
-         * 
+         *
          * @param file The path to where the texture will be saved.
          * @param codePointGrid The code points, aligned in a grid pointing to the glyphs.
          * @param glyphGrid The glyphs, aligned in a grid pointing to the code points.

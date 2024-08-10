@@ -375,7 +375,7 @@ internal object ModelTypeAdapter : TypeAdapter<Model>() {
         return Rotation(
             angle ?: throw IllegalArgumentException("Missing property 'angle'"),
             axis ?: throw IllegalArgumentException("Missing property 'axis'"),
-            origin ?: throw IllegalArgumentException("Missing property 'origin'"), 
+            origin ?: throw IllegalArgumentException("Missing property 'origin'"),
             rescale
         )
     }
@@ -456,7 +456,7 @@ internal object ModelTypeAdapter : TypeAdapter<Model>() {
         reader.endObject()
         
         return Display(
-            rotation ?: Vector3d(0.0, 0.0, 0.0), 
+            rotation ?: Vector3d(0.0, 0.0, 0.0),
             translation ?: Vector3d(0.0, 0.0, 0.0),
             scale ?: Vector3d(1.0, 1.0, 1.0)
         )

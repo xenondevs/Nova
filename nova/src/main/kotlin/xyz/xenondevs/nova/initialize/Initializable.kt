@@ -101,7 +101,7 @@ internal class InitializableClass(
         @Suppress("UNCHECKED_CAST")
         fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass {
             val stage = (annotation["stage"] as Array<String>?)?.get(1)
-                ?.let { enumValueOf< InitStage>(it) }
+                ?.let { enumValueOf<InitStage>(it) }
                 ?: throw IllegalStateException("Init annotation on $clazz does not contain a stage!")
             val (dispatcher, runBefore, runAfter) = readAnnotationCommons(annotation)
             runBefore += stage.runBefore
@@ -109,7 +109,7 @@ internal class InitializableClass(
             
             return InitializableClass(
                 classLoader, clazz,
-                stage.internalStage, (dispatcher ?: Dispatcher.SYNC).dispatcher, 
+                stage.internalStage, (dispatcher ?: Dispatcher.SYNC).dispatcher,
                 runBefore, runAfter
             )
         }
@@ -117,13 +117,13 @@ internal class InitializableClass(
         @Suppress("UNCHECKED_CAST")
         fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass {
             val stage = (annotation["stage"] as Array<String>?)?.get(1)
-                ?.let { enumValueOf<InternalInitStage>(it)}
+                ?.let { enumValueOf<InternalInitStage>(it) }
                 ?: throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")
             val dispatcher = readDispatcher(annotation)
             val dependsOn = readStrings("dependsOn", annotation)
             
             return InitializableClass(
-                classLoader, clazz, 
+                classLoader, clazz,
                 stage, (dispatcher ?: Dispatcher.SYNC).dispatcher,
                 emptySet(), dependsOn
             )
@@ -148,8 +148,8 @@ internal class InitializableFunction(
     
     override suspend fun run() {
         val clazz = initClass.clazz.kotlin
-        val function = clazz.functions.first { 
-            it.javaMethod!!.name == methodName && 
+        val function = clazz.functions.first {
+            it.javaMethod!!.name == methodName &&
                 it.parameters.size == 1 &&
                 it.parameters[0].kind == KParameter.Kind.INSTANCE
         }

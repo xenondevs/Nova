@@ -65,7 +65,7 @@ class ColorPickerWindow(
     }
     
     fun openWindow(player: Player) {
-        Window.single { 
+        Window.single {
             it.setViewer(player)
             it.setTitle(DefaultGuiTextures.COLOR_PICKER.getTitle("menu.nova.color_picker"))
             it.setGui(gui)

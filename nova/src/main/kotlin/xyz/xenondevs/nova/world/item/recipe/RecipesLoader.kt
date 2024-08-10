@@ -94,6 +94,7 @@ internal object RecipesLoader {
                 failSilently = element.getBooleanOrNull("failSilently") ?: false
                 listOf(element)
             }
+            
             else -> null
         }
         

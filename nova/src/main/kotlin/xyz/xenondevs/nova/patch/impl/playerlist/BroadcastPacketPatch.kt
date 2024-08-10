@@ -14,7 +14,7 @@ internal object BroadcastPacketPatch : MethodTransformer(PlayerList::broadcast) 
     var exclude: Player? = null
     
     override fun transform() {
-        methodNode.instructions = buildInsnList { 
+        methodNode.instructions = buildInsnList {
             aLoad(0) // this
             aLoad(1) // player
             dLoad(2) // x

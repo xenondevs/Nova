@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 /**
  * Delegates drops and experience to [TileEntity.getDrops] and [TileEntity.getExp].
  * Should only be used for tile-entity blocks.
- * 
+ *
  * @see BlockDrops
  */
 object TileEntityDrops : BlockBehavior {

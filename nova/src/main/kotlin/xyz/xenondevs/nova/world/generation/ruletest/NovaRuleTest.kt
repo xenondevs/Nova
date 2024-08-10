@@ -15,5 +15,5 @@ abstract class NovaRuleTest : RuleTest() {
     }
     
     abstract fun test(level: Level, pos: BlockPos, state: BlockState, random: RandomSource): Boolean
-
+    
 }

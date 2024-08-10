@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
 @ExperimentalWorldGen
-class WrapperBlock(novaBlock: NovaBlock): Block(Properties.of()) {
+class WrapperBlock(novaBlock: NovaBlock) : Block(Properties.of()) {
     
     init {
         BLOCK_DEFAULT_BLOCK_STATE_FIELD[this] = WrapperBlockState(novaBlock.defaultBlockState)

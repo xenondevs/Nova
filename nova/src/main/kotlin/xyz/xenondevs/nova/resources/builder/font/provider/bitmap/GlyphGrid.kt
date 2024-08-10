@@ -27,7 +27,7 @@ sealed interface GlyphGrid<T> {
     
     /**
      * Gets the glyph at the specified [x] and [y] coordinates.
-     * 
+     *
      * @throws IndexOutOfBoundsException If the coordinates are out of bounds.
      * @throws NoSuchElementException If there is no glyph at the specified coordinates.
      */
@@ -95,7 +95,7 @@ sealed interface MutableGlyphGrid<T> : GlyphGrid<T> {
     
     /**
      * Sets the glyph at the specified [x] and [y] coordinates, or removes it if [value] is null.
-     * 
+     *
      * If the coordinates are out of bounds, the grid will be resized to fit the coordinates.
      */
     operator fun set(x: Int, y: Int, value: T?)
@@ -103,7 +103,7 @@ sealed interface MutableGlyphGrid<T> : GlyphGrid<T> {
     /**
      * Creates a new glyph at the specified [x] and [y] and returns it.
      * Changes made to the returned glyph will be reflected in this grid.
-     * 
+     *
      * If the coordinates are out of bounds, the grid will be resized to fit the coordinates.
      */
     fun create(x: Int, y: Int): T
@@ -112,7 +112,7 @@ sealed interface MutableGlyphGrid<T> : GlyphGrid<T> {
 
 /**
  * An immutable [GlyphGrid] implementation that stores the entire grid in an argb [raster][IntArray].
- * 
+ *
  * @param glyphWidth The width of each glyph.
  * @param glyphHeight The height of each glyph.
  * @param gridWidth The width of the grid, i.e. the number of columns.
@@ -143,7 +143,7 @@ class RasterGlyphGrid(
     }
     
     override fun toImage(): BufferedImage {
-        return ImageUtils.createImageFromArgbRaster(gridWidth * glyphWidth , raster)
+        return ImageUtils.createImageFromArgbRaster(gridWidth * glyphWidth, raster)
     }
     
 }

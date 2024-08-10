@@ -192,7 +192,7 @@ object CharSizes {
         
         if (FORCE_UNIFORM_FONT && namespacedFont == "minecraft:default")
             namespacedFont = "minecraft:uniform"
-            
+        
         return loadedTables[namespacedFont] ?: loadTable(namespacedFont)
     }
     
@@ -259,7 +259,7 @@ internal class CharSizeTable(
     
     fun write(file: File) {
         val buf = ByteBuffer.allocate(sizes.size * 16) // 1 int, 3 floats, 4 bytes each
-        for(entry in sizes.int2ObjectEntrySet()) {
+        for (entry in sizes.int2ObjectEntrySet()) {
             val codePoint = entry.intKey
             val charSizes = entry.value
             

@@ -71,7 +71,7 @@ class FluidNetwork internal constructor(
     }
     
     fun postTickSync() {
-        for((_, connection) in nodes) {
+        for ((_, connection) in nodes) {
             val (node, _) = connection
             if (node is VanillaCauldronTileEntity) {
                 node.postNetworkTickSync()

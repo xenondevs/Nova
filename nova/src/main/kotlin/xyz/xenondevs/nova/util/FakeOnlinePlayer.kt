@@ -1,4 +1,3 @@
-
 package xyz.xenondevs.nova.util
 
 import org.bukkit.Location
@@ -82,7 +81,7 @@ abstract class FakeOnlinePlayer(
         
         @Suppress("UNCHECKED_CAST")
         private fun buildImpl(): Constructor<FakeOnlinePlayer> {
-            val classWrapper = ClassWrapper("xyz/xenondevs/nova/util/FakeOnlinePlayerImpl.class").apply { 
+            val classWrapper = ClassWrapper("xyz/xenondevs/nova/util/FakeOnlinePlayerImpl.class").apply {
                 access = Opcodes.ACC_PUBLIC
                 superName = "xyz/xenondevs/nova/util/FakeOnlinePlayer"
                 
@@ -102,7 +101,7 @@ abstract class FakeOnlinePlayer(
                 AsmUtils.listNonOverriddenMethods(
                     VirtualClassPath[FakeOnlinePlayer::class],
                     OfflinePlayer::class, Any::class
-                ).forEach { 
+                ).forEach {
                     val methodNode = MethodNode(
                         Opcodes.ACC_PUBLIC,
                         it.name,

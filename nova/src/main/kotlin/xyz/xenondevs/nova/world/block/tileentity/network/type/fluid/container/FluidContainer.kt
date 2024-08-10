@@ -26,7 +26,7 @@ class FluidContainer(
     override val capacity by capacityProvider
     
     init {
-        capacityProvider.subscribe { 
+        capacityProvider.subscribe {
             if (amount > it)
                 amount = it
         }

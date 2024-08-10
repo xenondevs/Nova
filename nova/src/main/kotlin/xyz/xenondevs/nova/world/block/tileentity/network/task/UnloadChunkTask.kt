@@ -62,7 +62,7 @@ internal class UnloadChunkTask(
                     state.forEachNetwork(node) { _, network -> remove(node, network) }
                 
                 node is NetworkEndPoint && data is NetworkEndPointData ->
-                    state.forEachNetwork(node) { _, _ , network -> remove(node, network) }
+                    state.forEachNetwork(node) { _, _, network -> remove(node, network) }
                 
                 else -> throw IllegalStateException("Node type and data type do not match")
             }

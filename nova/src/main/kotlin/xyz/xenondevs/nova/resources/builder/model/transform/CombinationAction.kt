@@ -11,15 +11,15 @@ internal data class CombinationAction(val other: ModelBuilder) : ContextualModel
     
     override fun apply(model: Model, context: ModelContent): Model {
         val otherModel = other.build(context).flattened(context)
-
+        
         val textures = HashMap<String, String>()
         textures.putAll(model.textures)
         textures.putAll(otherModel.textures)
-
+        
         val elements = if (model.elements != null || otherModel.elements != null)
             (model.elements ?: emptyList()) + (otherModel.elements ?: emptyList())
         else null
-
+        
         return model.copy(
             textures = textures,
             elements = elements

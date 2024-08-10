@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.world.block.state.NovaBlockState
 /**
  * Simple block drop logic for non-tile-entity blocks.
  * Should not be used for tile-entity blocks.
- * 
+ *
  * @see TileEntityDrops
  */
 object BlockDrops : BlockBehavior {

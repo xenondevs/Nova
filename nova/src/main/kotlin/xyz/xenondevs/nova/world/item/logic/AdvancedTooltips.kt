@@ -55,7 +55,7 @@ internal object AdvancedTooltips : Listener {
     private fun handleQuit(event: PlayerQuitEvent) {
         players -= event.player
     }
-
+    
     enum class Type(val includesNova: Boolean, val includesVanilla: Boolean) {
         OFF(false, false),
         NOVA(true, false),

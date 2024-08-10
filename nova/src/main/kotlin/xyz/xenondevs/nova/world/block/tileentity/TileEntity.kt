@@ -335,7 +335,7 @@ abstract class TileEntity(
         }
         
         val container = FluidContainer(
-            storedValue(name, persistent, ::Compound), 
+            storedValue(name, persistent, ::Compound),
             uuid,
             allowedTypes,
             capacity,

@@ -10,7 +10,7 @@ import org.bukkit.block.data.BlockData
 internal object BlockDataTypeAdapter : TypeAdapter<BlockData>() {
     
     override fun write(writer: JsonWriter, value: BlockData?) {
-        if (value == null) 
+        if (value == null)
             writer.nullValue()
         else writer.value(value.asString)
     }

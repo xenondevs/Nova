@@ -860,7 +860,7 @@ internal object NovaCommand : Command() {
         for (xOff in -range..range) {
             for (zOff in -range..range) {
                 val chunkPos = ChunkPos(center.worldUUID, center.x + xOff, center.z + zOff)
-                WorldDataManager.getOrLoadChunk(chunkPos).forEachNonEmpty { pos, blockState -> 
+                WorldDataManager.getOrLoadChunk(chunkPos).forEachNonEmpty { pos, blockState ->
                     if (blockState.block != block)
                         return@forEachNonEmpty
                     

@@ -185,9 +185,9 @@ public record UnihexGlyphs(
         for (int i = 0; i < 16; i++) {
             int binIdx = i * 4;
             glyph[i] = fromHex(bin[binIdx]) << 12
-                | fromHex(bin[binIdx + 1]) << 8
-                | fromHex(bin[binIdx + 2]) << 4
-                | fromHex(bin[binIdx + 3]);
+                       | fromHex(bin[binIdx + 1]) << 8
+                       | fromHex(bin[binIdx + 2]) << 4
+                       | fromHex(bin[binIdx + 3]);
         }
         
         return glyph;
@@ -206,11 +206,11 @@ public record UnihexGlyphs(
         for (int i = 0; i < 16; i++) {
             int binIdx = i * 6;
             glyph[i] = fromHex(bin[binIdx]) << 20
-                | fromHex(bin[binIdx + 1]) << 16
-                | fromHex(bin[binIdx + 2]) << 12
-                | fromHex(bin[binIdx + 3]) << 8
-                | fromHex(bin[binIdx + 4]) << 4
-                | fromHex(bin[binIdx + 5]);
+                       | fromHex(bin[binIdx + 1]) << 16
+                       | fromHex(bin[binIdx + 2]) << 12
+                       | fromHex(bin[binIdx + 3]) << 8
+                       | fromHex(bin[binIdx + 4]) << 4
+                       | fromHex(bin[binIdx + 5]);
         }
         
         return glyph;
@@ -229,13 +229,13 @@ public record UnihexGlyphs(
         for (int i = 0; i < 16; i++) {
             int binIdx = i * 8;
             glyph[i] = fromHex(bin[binIdx]) << 28
-                | fromHex(bin[binIdx + 1]) << 24
-                | fromHex(bin[binIdx + 2]) << 20
-                | fromHex(bin[binIdx + 3]) << 16
-                | fromHex(bin[binIdx + 4]) << 12
-                | fromHex(bin[binIdx + 5]) << 8
-                | fromHex(bin[binIdx + 6]) << 4
-                | fromHex(bin[binIdx + 7]);
+                       | fromHex(bin[binIdx + 1]) << 24
+                       | fromHex(bin[binIdx + 2]) << 20
+                       | fromHex(bin[binIdx + 3]) << 16
+                       | fromHex(bin[binIdx + 4]) << 12
+                       | fromHex(bin[binIdx + 5]) << 8
+                       | fromHex(bin[binIdx + 6]) << 4
+                       | fromHex(bin[binIdx + 7]);
         }
         
         return glyph;
@@ -349,14 +349,14 @@ public record UnihexGlyphs(
     /**
      * Creates an argb raster from of glyph.
      *
-     * @param width      The width of the binary glyph data.
-     * @param glyph      The glyph as an int array, where each int is a row in the glyph texture.
-     * @param leftBorder The first column of the glyph, either determined by {@link UnihexGlyphs#findVerticalBorders(int, int[])}
-     *                   or configured through size overrides.
+     * @param width       The width of the binary glyph data.
+     * @param glyph       The glyph as an int array, where each int is a row in the glyph texture.
+     * @param leftBorder  The first column of the glyph, either determined by {@link UnihexGlyphs#findVerticalBorders(int, int[])}
+     *                    or configured through size overrides.
      * @param rightBorder The last column of the glyph, either determined by {@link UnihexGlyphs#findVerticalBorders(int, int[])}
      *                    or configured through size overrides.
-     * @param argb1  The color to use for pixels that are part of the glyph
-     * @param argb0 The color to use for pixels that are not part of the glyph
+     * @param argb1       The color to use for pixels that are part of the glyph
+     * @param argb0       The color to use for pixels that are not part of the glyph
      * @return An argb raster representing the image of the glyph.<br>
      * Dimensions: ({@code rightBorder - leftBorder + 1}) x {@code 16} pixels
      */

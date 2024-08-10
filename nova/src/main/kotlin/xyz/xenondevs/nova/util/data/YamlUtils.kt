@@ -65,6 +65,7 @@ internal fun Node.walk(consume: (path: List<String>, keyNode: ScalarNode, valueN
                     }
                 }
             }
+            
             NodeWalkDecision.SKIP -> Unit
             NodeWalkDecision.STOP -> break
         }

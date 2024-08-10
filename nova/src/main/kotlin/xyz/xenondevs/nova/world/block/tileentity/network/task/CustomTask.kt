@@ -18,6 +18,7 @@ internal class CustomWriteTask(
     @Label("Custom Write")
     @Category("Nova", "TileEntity Network")
     private inner class CustomWriteTaskEvent : Event()
+    
     override val event: Event = CustomWriteTaskEvent()
     //</editor-fold>
     
@@ -25,7 +26,7 @@ internal class CustomWriteTask(
         write(state)
         return true
     }
-
+    
 }
 
 internal class CustomReadTask(
@@ -39,6 +40,7 @@ internal class CustomReadTask(
     @Label("Custom Read")
     @Category("Nova", "TileEntity Network")
     private inner class CustomReadTaskEvent : Event()
+    
     override val event: Event = CustomReadTaskEvent()
     //</editor-fold>
     
@@ -46,7 +48,7 @@ internal class CustomReadTask(
         read(state)
         return false
     }
-
+    
 }
 
 internal class CustomUncertainTask(
@@ -60,6 +62,7 @@ internal class CustomUncertainTask(
     @Label("Custom Read or Write")
     @Category("Nova", "TileEntity Network")
     private inner class CustomUncertainTaskEvent : Event()
+    
     override val event: Event = CustomUncertainTaskEvent()
     //</editor-fold>
     

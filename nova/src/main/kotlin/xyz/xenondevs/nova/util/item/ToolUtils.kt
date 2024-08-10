@@ -172,7 +172,7 @@ object ToolUtils {
     private fun findMatchingToolComponentRules(component: MojangTool, categories: Set<ToolCategory>): Set<MojangTool.Rule> {
         val tags = categories.mapNotNullTo(HashSet(), ::findSimilarTagForToolCategory)
         return component.rules.filterTo(HashSet()) {
-            it.blocks is HolderSet.Named && (it.blocks as HolderSet.Named<MojangBlock>).key() in tags 
+            it.blocks is HolderSet.Named && (it.blocks as HolderSet.Named<MojangBlock>).key() in tags
         }
     }
     

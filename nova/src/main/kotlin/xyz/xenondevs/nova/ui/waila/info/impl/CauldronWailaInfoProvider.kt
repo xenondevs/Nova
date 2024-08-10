@@ -17,7 +17,7 @@ internal object CauldronWailaInfoProvider : VanillaWailaInfoProvider<Levelled>(
     
     override fun getInfo(player: Player, pos: BlockPos, blockState: Levelled): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
-        val level = when(blockState.level) {
+        val level = when (blockState.level) {
             1 -> "level1"
             2 -> "level2"
             3 -> "full"

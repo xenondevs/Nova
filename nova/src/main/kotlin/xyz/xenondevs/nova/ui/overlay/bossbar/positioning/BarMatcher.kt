@@ -56,15 +56,15 @@ interface BarMatcher {
     }
     
     companion object {
-
+        
         val TRUE = object : BarMatcher {
             override fun test(info: BarMatchInfo) = true
         }
-
+        
         val FALSE = object : BarMatcher {
             override fun test(info: BarMatchInfo) = false
         }
-
+        
     }
     
 }

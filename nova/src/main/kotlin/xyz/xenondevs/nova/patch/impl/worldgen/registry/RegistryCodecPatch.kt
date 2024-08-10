@@ -31,7 +31,7 @@ import java.util.*
 
 private val REGISTRY_OPS_GETTER_METHOD =
     getMethod(RegistryOps::class, "getter", ResourceKey::class)
-private val REGISTRY_GET_HOLDER_METHOD = 
+private val REGISTRY_GET_HOLDER_METHOD =
     getMethod(Registry::class, "getHolder", ResourceLocation::class)
 private val REGISTRY_FILE_CODEC_DECODE_METHOD =
     getMethod(RegistryFileCodec::class, "decode", DynamicOps::class, Any::class)
@@ -59,7 +59,7 @@ internal object RegistryCodecPatch : MultiTransformer(RegistryFileCodec::class, 
     private fun patchRegistryFileCodec() {
         VirtualClassPath[REGISTRY_FILE_CODEC_DECODE_METHOD].instructions.replaceFirst(
             0, 0,
-            buildInsnList { 
+            buildInsnList {
                 invokeStatic(::getter)
             }
         ) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(REGISTRY_OPS_GETTER_METHOD) }
@@ -100,7 +100,7 @@ internal object RegistryCodecPatch : MultiTransformer(RegistryFileCodec::class, 
         // Mapping name will 100% change in the future, check for these params and method structure: https://i.imgur.com/4ix2zLq.png
         VirtualClassPath[REGISTRY_REFERENCE_HOLDER_WITH_LIFECYCLE_LAMBDA].instructions.replaceFirst(
             0, 0,
-            buildInsnList { 
+            buildInsnList {
                 invokeStatic(::getHolder)
             }
         ) { it.opcode == Opcodes.INVOKEINTERFACE && (it as MethodInsnNode).calls(REGISTRY_GET_HOLDER_METHOD) }

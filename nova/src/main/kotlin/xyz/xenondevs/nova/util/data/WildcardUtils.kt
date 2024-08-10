@@ -9,7 +9,7 @@ internal object WildcardUtils {
         val regexStr = StringBuilder()
         wildcard.toCharArray().forEach { char ->
             regexStr.append(
-                WILDCARD_REPLACEMENT_RULES[char] 
+                WILDCARD_REPLACEMENT_RULES[char]
                     ?: if (char in ESCAPE_REGEX_CHARS) "\\$char" else char
             )
         }

@@ -1,4 +1,3 @@
-
 package xyz.xenondevs.nova.config
 
 import net.minecraft.core.WritableRegistry
@@ -14,7 +13,7 @@ abstract class ConfigurableRegistryElementBuilder<T : Any>(
     
     /**
      * Configures the name of the config file in this addon's namespace.
-     * 
+     *
      * Example: `config("my_cfg")` -> `configs/my_addon/my_cfg.yml`
      */
     fun config(name: String) {
@@ -23,8 +22,8 @@ abstract class ConfigurableRegistryElementBuilder<T : Any>(
     
     /**
      * Configures the id of this config file in the format `namespace:name`.
-     * 
-     * Examples: 
+     *
+     * Examples:
      * * `rawConfig("my_addon:my_cfg")` -> `configs/my_addon/my_cfg.yml`
      * * `rawConfig("config") -> `configs/config.yml`
      */
@@ -34,7 +33,7 @@ abstract class ConfigurableRegistryElementBuilder<T : Any>(
     
     /**
      * Configures the id of this config file in the format `namespace:name`.
-     * 
+     *
      * Examples:
      * * `rawConfig(ResourceLocation("my_addon:my_cfg"))` -> `configs/my_addon/my_cfg.yml`
      * * `rawConfig(ResourceLocation("config")) -> `configs/config.yml`

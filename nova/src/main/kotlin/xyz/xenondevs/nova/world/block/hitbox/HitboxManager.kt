@@ -175,7 +175,7 @@ internal object HitboxManager : Listener, PacketListener {
                 // check for collision with vanilla hitboxes
                 val blockState = level.getBlockState(pos)
                 val blockShape = ctx.getBlockShape(blockState, level, pos)
-                val blockHitLoc = level.clipWithInteractionOverride(origin, dest, pos, blockShape, blockState)?.let { 
+                val blockHitLoc = level.clipWithInteractionOverride(origin, dest, pos, blockShape, blockState)?.let {
                     if (it.type != HitResult.Type.MISS) it.location.toVector3f() else null
                 }
                 

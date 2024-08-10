@@ -93,7 +93,7 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerge
                 
                 return@removeIf false
             }
-    
+            
             configType.handleMerged(occupied)
         } catch (e: Exception) {
             LOGGER.log(Level.SEVERE, "Failed to process variants for $configType in $obj", e)

@@ -48,7 +48,7 @@ internal sealed class SectionDataContainer<T>(protected val idResolver: IdResolv
     
     /**
      * Packs the specified [x], [y] and [z] coordinates into a 12 bit integer.
-     * 
+     *
      * @see unpackX
      * @see unpackY
      * @see unpackZ
@@ -58,7 +58,7 @@ internal sealed class SectionDataContainer<T>(protected val idResolver: IdResolv
     
     /**
      * Unpacks the x coordinate from the specified [packedPos].
-     * 
+     *
      * @see pack
      */
     protected fun unpackX(packedPos: Int): Int =
@@ -66,7 +66,7 @@ internal sealed class SectionDataContainer<T>(protected val idResolver: IdResolv
     
     /**
      * Unpacks the y coordinate from the specified [packedPos].
-     * 
+     *
      * @see pack
      */
     protected fun unpackY(packedPos: Int): Int =
@@ -74,7 +74,7 @@ internal sealed class SectionDataContainer<T>(protected val idResolver: IdResolv
     
     /**
      * Unpacks the z coordinate from the specified [packedPos].
-     * 
+     *
      * @see pack
      */
     protected fun unpackZ(packedPos: Int): Int =

@@ -4,7 +4,7 @@ import xyz.xenondevs.commons.provider.AbstractProvider
 import xyz.xenondevs.commons.provider.Provider
 
 internal class ResettingLongProvider(
-    resetDelay: Provider<Int> 
+    resetDelay: Provider<Int>
 ) : AbstractProvider<Long>() {
     
     private val resetDelay by resetDelay

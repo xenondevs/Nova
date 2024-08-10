@@ -133,7 +133,7 @@ private class ComponentCharsIterator(
                 contentStrings.pop()
                 styles.pop()
                 argIndices.popInt()
-    
+                
                 // try to continue reading the new top component (for translatable components)
                 if (!readHeads.isEmpty) {
                     readHead = readHeads.popInt()

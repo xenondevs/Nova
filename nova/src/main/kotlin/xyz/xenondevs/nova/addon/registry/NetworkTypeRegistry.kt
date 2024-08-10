@@ -24,9 +24,9 @@ interface NetworkTypeRegistry : AddonGetter {
     ): NetworkType<T> {
         val id = ResourceLocation(addon, name)
         val networkType = NetworkType(
-            id, 
+            id,
             createNetwork, createGroup, validateLocal,
-            tickDelay, 
+            tickDelay,
             holderTypes.toHashSet()
         )
         

@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.tags.TagKey
 import java.util.*
 
-internal class VanillaLookupWrapper<T>(val registry: MappedRegistry<T>): RegistryLookup<T> by registry.asLookup() {
+internal class VanillaLookupWrapper<T>(val registry: MappedRegistry<T>) : RegistryLookup<T> by registry.asLookup() {
     
     private val lookup = registry.createRegistrationLookup()
     

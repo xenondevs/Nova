@@ -44,16 +44,16 @@ object DefaultContextParamTypes {
     
     /**
      * The position of a block.
-     * 
+     *
      * Required in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Optional in intentions: none
-     * 
+     *
      * Autofilled by: none
-     * 
+     *
      * Autofills:
      * - [BLOCK_WORLD]
      * - [BLOCK_DROPS] with and without [TOOL_ITEM_STACK]
@@ -70,12 +70,12 @@ object DefaultContextParamTypes {
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Optional in intentions: none
-     * 
+     *
      * Autofilled by:
      * - [BLOCK_POS]
-     * 
+     *
      * Autofills: none
      */
     val BLOCK_WORLD: ContextParamType<World> =
@@ -88,12 +88,12 @@ object DefaultContextParamTypes {
      * The custom block type.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [BLOCK_TYPE] if Nova block
      *
@@ -112,15 +112,15 @@ object DefaultContextParamTypes {
      * The custom block state.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [BLOCK_TYPE_NOVA]
-     * 
+     *
      * Autofills:
      * - [BLOCK_TYPE_NOVA]
      */
@@ -152,15 +152,15 @@ object DefaultContextParamTypes {
     
     /**
      * The tile-entity data of a nova tile-entity.
-     * 
+     *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
-     * 
+     *
      * Autofilled by:
      * - [BLOCK_ITEM_STACK] if data is present
-     * 
+     *
      * Autofills: none
      */
     val TILE_ENTITY_DATA_NOVA: ContextParamType<Compound> =
@@ -176,12 +176,12 @@ object DefaultContextParamTypes {
      * The vanilla block type.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [BLOCK_TYPE] if vanilla block
      *
@@ -202,12 +202,12 @@ object DefaultContextParamTypes {
      * The block type as id.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [BLOCK_TYPE_NOVA]
      * - [BLOCK_TYPE_VANILLA]
@@ -229,15 +229,15 @@ object DefaultContextParamTypes {
      * The face of a block that was clicked.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [SOURCE_PLAYER]
-     * 
+     *
      * Autofills: none
      */
     val CLICKED_BLOCK_FACE: ContextParamType<BlockFace> =
@@ -250,14 +250,14 @@ object DefaultContextParamTypes {
      * The hand that was used to interact.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by: none
-     * 
+     *
      * Autofills:
      * - [BLOCK_ITEM_STACK] with [SOURCE_ENTITY]
      * - [TOOL_ITEM_STACK] with [SOURCE_ENTITY]
@@ -272,10 +272,10 @@ object DefaultContextParamTypes {
      * The item stack to be placed as a block.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
-     * 
+     *
      * Autofilled by:
      * - [SOURCE_ENTITY] and [INTERACTION_HAND]
      * - [BLOCK_TYPE_NOVA] if the block has an item type
@@ -300,13 +300,13 @@ object DefaultContextParamTypes {
      * The item stack used as a tool.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockBreak]
-     * 
+     *
      * Autofilled by:
      * - [SOURCE_ENTITY] and [INTERACTION_HAND]
-     * 
+     *
      * Autofills:
      * - [BLOCK_DROPS] with [BLOCK_POS]
      */
@@ -322,13 +322,13 @@ object DefaultContextParamTypes {
      * The item stack used to interact with a something.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [SOURCE_ENTITY] and [INTERACTION_HAND]
-     * 
+     *
      * Autofills: none
      */
     val INTERACTION_ITEM_STACK: ContextParamType<ItemStack> =
@@ -343,16 +343,16 @@ object DefaultContextParamTypes {
      * The [UUID] of the source of an action.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by
      * - [SOURCE_ENTITY]
      * - [SOURCE_TILE_ENTITY]
-     * 
+     *
      * Autofills: none
      */
     val SOURCE_UUID: ContextParamType<UUID> =
@@ -366,16 +366,16 @@ object DefaultContextParamTypes {
      * The location of the source of an action.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [SOURCE_ENTITY]
      * - [SOURCE_TILE_ENTITY]
-     * 
+     *
      * Autofills:
      * - [SOURCE_WORLD]
      * - [SOURCE_DIRECTION]
@@ -397,15 +397,15 @@ object DefaultContextParamTypes {
      * The world of the source of an action.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [SOURCE_LOCATION]
-     * 
+     *
      * Autofills: none
      */
     val SOURCE_WORLD: ContextParamType<World> =
@@ -418,15 +418,15 @@ object DefaultContextParamTypes {
      * The direction that the source of an action is facing.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [SOURCE_LOCATION]
-     * 
+     *
      * Autofills: none
      */
     val SOURCE_DIRECTION: ContextParamType<Vector> =
@@ -439,12 +439,12 @@ object DefaultContextParamTypes {
      * The player that is the source of an action.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [SOURCE_ENTITY] if player
      */
@@ -458,15 +458,15 @@ object DefaultContextParamTypes {
      * The entity that is the source of an action.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [SOURCE_PLAYER]
-     * 
+     *
      * Autofills:
      * - [SOURCE_UUID]
      * - [SOURCE_LOCATION]
@@ -483,16 +483,16 @@ object DefaultContextParamTypes {
     
     /**
      * The [TileEntity] that is the source of an action.
-     * 
+     *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by: none
-     * 
+     *
      * Autofills:
      * - [SOURCE_UUID]
      * - [SOURCE_LOCATION]
@@ -504,18 +504,18 @@ object DefaultContextParamTypes {
     
     /**
      * The player that is either the direct source or responsible for the action.
-     * 
+     *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
      * - [BlockBreak]
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by:
      * - [SOURCE_ENTITY] if offline player
      * - [SOURCE_TILE_ENTITY] if owner present
-     * 
+     *
      * Autofills: none
      */
     val RESPONSIBLE_PLAYER: ContextParamType<OfflinePlayer> =
@@ -530,13 +530,13 @@ object DefaultContextParamTypes {
      * Defaults to `false`.
      *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockBreak]
-     * 
-     * Autofilled by: 
+     *
+     * Autofilled by:
      * - [BLOCK_POS] with and without [TOOL_ITEM_STACK]
-     * 
+     *
      * Autofills: none
      */
     val BLOCK_DROPS: DefaultingContextParamType<Boolean> =
@@ -549,15 +549,15 @@ object DefaultContextParamTypes {
     /**
      * Whether block storage drops should be dropped.
      * Defaults to `true`
-     * 
+     *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockBreak]
-     * 
+     *
      * Autofilled by:
      * - [SOURCE_PLAYER]
-     * 
+     *
      * Autofills: none
      */
     val BLOCK_STORAGE_DROPS: DefaultingContextParamType<Boolean> =
@@ -569,14 +569,14 @@ object DefaultContextParamTypes {
     /**
      * Whether block place effects should be played.
      * Defaults to `true`.
-     * 
+     *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
-     * 
+     *
      * Autofilled by: none
-     * 
+     *
      * Autofills: none
      */
     val BLOCK_PLACE_EFFECTS: DefaultingContextParamType<Boolean> =
@@ -587,14 +587,14 @@ object DefaultContextParamTypes {
     /**
      * Whether block break effects should be played.
      * Defaults to `true`
-     * 
+     *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockBreak]
-     * 
+     *
      * Autofilled by: none
-     * 
+     *
      * Autofills: none
      */
     val BLOCK_BREAK_EFFECTS: DefaultingContextParamType<Boolean> =
@@ -606,14 +606,14 @@ object DefaultContextParamTypes {
      * Whether tile-entity limits should be bypassed when placing tile-entity blocks.
      * Placed blocks will still be counted.
      * Defaults to `false`.
-     * 
+     *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockPlace]
-     * 
+     *
      * Autofilled by: none
-     * 
+     *
      * Autofills: none
      */
     val BYPASS_TILE_ENTITY_LIMITS: DefaultingContextParamType<Boolean> =

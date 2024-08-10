@@ -157,7 +157,7 @@ abstract class UnihexProvider internal constructor(
                     // /2 because they're rendered at gui-scale 2
                     // +1 for spacing between characters
                     // integer operations because the next character always starts at the next integer (e.g 4 -> 5, 4.5 -> 5)
-                    ((right - left + 1) / 2 + 1).toFloat(), 
+                    ((right - left + 1) / 2 + 1).toFloat(),
                     
                     // /2 because they're rendered at gui-scale 2
                     top / 2f, bottom / 2f

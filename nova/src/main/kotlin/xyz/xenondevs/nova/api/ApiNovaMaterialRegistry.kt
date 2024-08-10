@@ -40,16 +40,22 @@ internal object NovaMaterialRegistry : INovaMaterialRegistry {
         if (novaBlock != null) return LegacyMaterialWrapper(Either.right(novaBlock))
         return null
     }
+    
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
     override fun getOrNull(id: INamespacedId): INovaMaterial? = getOrNull(id.toString())
+    
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
     override fun getOrNull(item: ItemStack): INovaMaterial? = item.novaItem?.let { LegacyMaterialWrapper(Either.left(it)) }
+    
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
     override fun get(id: String): INovaMaterial = getOrNull(id)!!
+    
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
     override fun get(id: INamespacedId): INovaMaterial = getOrNull(id)!!
+    
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
     override fun get(item: ItemStack): INovaMaterial = getOrNull(item)!!
+    
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
     override fun getNonNamespaced(name: String): List<INovaMaterial> = NovaRegistries.ITEM.getByName(name).map { LegacyMaterialWrapper(Either.left(it)) }
     

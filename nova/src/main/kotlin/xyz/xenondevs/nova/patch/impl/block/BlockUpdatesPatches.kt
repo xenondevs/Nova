@@ -129,7 +129,7 @@ internal object BlockUpdatesPatches : MultiTransformer(BlockStateBase::class) {
         if (novaState != null) {
             try {
                 novaState.block.handleScheduledTick(novaPos, novaState)
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 LOGGER.log(LogLevel.SEVERE, "Failed to handle vanilla scheduled tick for $novaState at $pos", e)
             }
         } else {

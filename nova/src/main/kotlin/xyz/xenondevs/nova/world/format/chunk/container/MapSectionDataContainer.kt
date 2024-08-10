@@ -69,7 +69,7 @@ internal class MapSectionDataContainer<T> : PalletizedSectionDataContainer<T> {
             return true
         
         var prev = 0
-        data.forEach { _, value -> 
+        data.forEach { _, value ->
             if (prev == 0)
                 prev = value
             else if (prev != value)

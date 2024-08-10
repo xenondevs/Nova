@@ -27,9 +27,9 @@ class SpaceProvider(val advances: Int2FloatMap) : FontProvider() {
             return sizes
         }
     
-    override fun toJson() = JsonObject().apply { 
+    override fun toJson() = JsonObject().apply {
         addProperty("type", "space")
-        add("advances", JsonObject().apply { 
+        add("advances", JsonObject().apply {
             for ((codePoint, width) in advances.int2FloatEntrySet())
                 addProperty(Character.toString(codePoint), width)
         })
@@ -48,5 +48,5 @@ class SpaceProvider(val advances: Int2FloatMap) : FontProvider() {
         }
         
     }
-
+    
 }

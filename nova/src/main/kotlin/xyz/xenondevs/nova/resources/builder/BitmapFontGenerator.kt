@@ -46,11 +46,11 @@ internal class BitmapFontGenerator(
     
     /**
      * Converts the given [UnihexProvider] to a list of [BitmapProviders][BitmapProvider].
-     * 
+     *
      * Also writes their bitmap textures to the resource pack build directory.
      */
     private fun convertUnihexProvider(provider: UnihexProvider): List<BitmapProvider<IntArray>> =
-        provider.glyphRasters.map { (width, glyphRasters) -> 
+        provider.glyphRasters.map { (width, glyphRasters) ->
             val bitmapProvider = buildBitmapProvider(width, glyphRasters)
             bitmapProvider.write(ResourcePackBuilder.ASSETS_DIR)
             return@map bitmapProvider

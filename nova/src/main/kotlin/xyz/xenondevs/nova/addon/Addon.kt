@@ -15,7 +15,7 @@ abstract class Addon {
     
     /**
      * A list of [ProjectDistributors][ProjectDistributor] that distribute this addon.
-     * 
+     *
      * This list is used to check for updates.
      */
     open val projectDistributors: List<ProjectDistributor> = emptyList()

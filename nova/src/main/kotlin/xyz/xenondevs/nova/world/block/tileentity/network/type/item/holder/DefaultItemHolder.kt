@@ -86,7 +86,7 @@ class DefaultItemHolder(
             val channels: MutableMap<BlockFace, Int>? =
                 dataHolder.retrieveDataOrNull("channels")
             
-            if (inventoryConfig == null && 
+            if (inventoryConfig == null &&
                 connectionConfig == null &&
                 insertFilters == null &&
                 extractFilters == null &&

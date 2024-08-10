@@ -108,7 +108,7 @@ class StaticFluidBar(
         return SimpleItem(
             createItemBuilder(
                 getFluidBarItem(type),
-                section, 
+                section,
                 amount.toDouble() / capacity.toDouble()
             ).setFluidDisplayName(amount, capacity)
         )

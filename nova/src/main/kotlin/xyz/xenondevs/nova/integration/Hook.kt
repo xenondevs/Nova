@@ -11,15 +11,15 @@ import kotlin.reflect.KClass
  */
 @Target(AnnotationTarget.CLASS)
 annotation class Hook(
-    val plugins: Array<String>, 
-    val unless: Array<String> = [], 
+    val plugins: Array<String>,
+    val unless: Array<String> = [],
     val requireAll: Boolean = false,
     val loadListener: KClass<out LoadListener> = LoadListener::class
 )
 
 /**
  * A listener that is used to wait for a plugin to finish loading.
- * 
+ *
  * @see AwaitLoaded
  */
 interface LoadListener {

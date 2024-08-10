@@ -11,6 +11,7 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.AbstractItem
 
 private typealias ClickHandler = (clickType: ClickType, player: Player, event: InventoryClickEvent) -> Unit
+
 private val EMPTY_CLICK_HANDLER: ClickHandler = { _, _, _ -> }
 
 fun <A> reactiveItem(

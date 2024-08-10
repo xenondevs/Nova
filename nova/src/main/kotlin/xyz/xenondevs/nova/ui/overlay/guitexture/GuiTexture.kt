@@ -15,7 +15,7 @@ class GuiTexture internal constructor(
     internal val layout: GuiTextureLayout
 ) {
     
-    val component: Component by lazy { 
+    val component: Component by lazy {
         val data = ResourceLookups.GUI_TEXTURE[this]!!
         Component.text()
             .move(data.offset)

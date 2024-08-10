@@ -18,7 +18,7 @@ internal class ImmutableNetworkGroupData<T : Network<T>>(
 /**
  * A collection of [Networks][Network] of the same [NetworkType] from
  * the same [NetworkCluster], handling ticking logic for these networks.
- * 
+ *
  * Independent network groups may be ticked in parallel!
  * Because of that, the functions not suffixed with `Sync` may not interact with any world state
  * outside of the blocks that are in this network.

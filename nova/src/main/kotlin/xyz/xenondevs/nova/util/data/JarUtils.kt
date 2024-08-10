@@ -20,7 +20,7 @@ internal object JarUtils {
     // TODO: find annotated classes during build and write them to a file 
     
     fun findAnnotatedClasses(
-        file: File, 
+        file: File,
         classAnnotations: List<KClass<out Annotation>>,
         functionAnnotations: List<KClass<out Annotation>>,
         path: String = ""

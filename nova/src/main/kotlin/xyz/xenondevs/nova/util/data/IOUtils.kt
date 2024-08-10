@@ -233,7 +233,7 @@ inline fun <T> use(vararg closeable: Closeable, block: () -> T): T {
 }
 
 internal fun Path.readImageDimensions(): Dimension {
-    inputStream().buffered().use { 
+    inputStream().buffered().use {
         val imageIn = ImageIO.createImageInputStream(it)
         val reader = ImageIO.getImageReadersBySuffix(extension).next()
         try {
@@ -254,7 +254,7 @@ internal fun Path.writeImage(image: RenderedImage, formatName: String) {
 }
 
 internal fun File.openZip(): Path =
-     toPath().openZip()
+    toPath().openZip()
 
 internal fun <T> File.useZip(create: Boolean = false, run: (Path) -> T): T =
     toPath().useZip(create, run)

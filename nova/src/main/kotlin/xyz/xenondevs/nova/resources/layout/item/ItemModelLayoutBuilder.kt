@@ -49,7 +49,7 @@ class ItemModelLayoutBuilder internal constructor() {
     
     /**
      * Configures the models for each number in the specified [range] by invoking the given [modelSelector].
-     * 
+     *
      * If [setDefault] is true, the first model in the range will be the default model.
      */
     fun selectModels(range: IntRange, setDefault: Boolean = false, modelSelector: NumberedItemModelSelector) {
@@ -64,7 +64,7 @@ class ItemModelLayoutBuilder internal constructor() {
     /**
      * Configures the models for each number in the specified [range] by invoking the given [format] with the
      * number as the argument.
-     * 
+     *
      * If [setDefault] is true, the first model in the range will be the default model.
      */
     fun selectModels(range: IntRange, format: String, setDefault: Boolean = false) {

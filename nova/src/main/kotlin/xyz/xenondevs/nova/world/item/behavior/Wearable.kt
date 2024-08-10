@@ -45,7 +45,7 @@ import org.bukkit.inventory.ItemStack as BukkitStack
 
 /**
  * Allows items to be worn in armor slots.
- * 
+ *
  * @param armor The custom armor texture, or null if no custom texture should be used.
  * @param slot The slot in which the item can be worn.
  * @param equipSound The sound that is played when the item is equipped, or null if no sound should be played.
@@ -55,7 +55,7 @@ fun Wearable(armor: Armor?, slot: BukkitEquipmentSlot, equipSound: Sound): ItemB
 
 /**
  * Allows items to be worn in armor slots.
- * 
+ *
  * @param armor The custom armor texture, or null if no custom texture should be used.
  * @param slot The slot in which the item can be worn.
  * @param equipSound The sound that is played when the item is equipped, or null if no sound should be played.
@@ -65,7 +65,7 @@ fun Wearable(armor: Armor?, slot: BukkitEquipmentSlot, equipSound: SoundEvent): 
 
 /**
  * Allows items to be worn in armor slots.
- * 
+ *
  * @param armor The custom armor texture, or null if no custom texture should be used.
  * @param slot The slot in which the item can be worn.
  * @param equipSound The sound that is played when the item is equipped, or null if no sound should be played.
@@ -97,7 +97,7 @@ private val EquipmentSlot.inventorySlot
 
 /**
  * Allows items to be worn in armor slots.
- * 
+ *
  * @param texture The leather armor color used for the custom texture, or null if no custom texture should be used.
  * @param slot The slot in which the item can be worn.
  * @param armor The amount of armor this item provides.

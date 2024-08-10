@@ -145,7 +145,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
         
         /**
          * Creates a new mutable [BitmapProvider] with custom grids.
-         * 
+         *
          * @param file The path where the texture will be saved to.
          * @param codePointGrid The grid containing the code points.
          * @param glyphGrid The grid containing the glyph images.

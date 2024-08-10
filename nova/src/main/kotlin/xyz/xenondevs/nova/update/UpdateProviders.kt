@@ -60,7 +60,7 @@ interface ProjectDistributor {
         override val projectUrl = "https://github.com/$repo"
         
         override fun getLatestVersion(onlyRelease: Boolean): Version = runBlocking {
-            val versionJson = if(onlyRelease)
+            val versionJson = if (onlyRelease)
                 HTTP_CLIENT.get(releaseVersionUrl).body<JsonObject>()
             else HTTP_CLIENT.get(latestVersionUrl).body<JsonArray>().first().asJsonObject
             

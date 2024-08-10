@@ -22,7 +22,8 @@ import java.util.function.Function;
 public record BiomeInjection(
     Either<List<ResourceLocationOrTagKey<Biome>>, ResourceLocationOrTagKey<Biome>> biomes,
     List<HolderSet<PlacedFeature>> features
-) {
+)
+{
     
     private static final Registry<Biome> BIOME_REGISTRY = VanillaRegistries.BIOME;
     private static final Codec<ResourceLocationOrTagKey<Biome>> BIOME_CODEC = ResourceLocationOrTagKey.codec(Registries.BIOME);

@@ -50,7 +50,7 @@ internal class DisableableFunction(
         
         fun fromInitAnnotation(
             classLoader: ClassLoader,
-            className: String, methodName: String, 
+            className: String, methodName: String,
             annotation: Map<String, Any?>
         ) = DisableableFunction(
             classLoader,

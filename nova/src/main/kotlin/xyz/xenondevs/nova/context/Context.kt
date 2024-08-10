@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.context.param.DefaultingContextParamType
  * Each context has an [intention] that defines which parameters are allowed and required.
  *
  * With [Context.intention], you can create a new context builder for the given intention.
- * 
+ *
  * @param I The intention of this context.
  * @param intention The intention of this context.
  * @param explicitParams The parameters that are explicitly set.
@@ -136,7 +136,7 @@ class Context<I : ContextIntention> private constructor(
         
         /**
          * Sets the given [paramType] to the given [value].
-         * 
+         *
          * @throws IllegalArgumentException If the given [paramType] is not allowed under this context's intention.
          * @throws IllegalArgumentException If the given [value] is invalid for the given [paramType].
          */
@@ -161,7 +161,7 @@ class Context<I : ContextIntention> private constructor(
         
         /**
          * Builds the context.
-         * 
+         *
          * @throws IllegalStateException If a required parameter is not present.
          */
         fun build(): Context<I> {

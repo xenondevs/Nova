@@ -41,7 +41,7 @@ internal fun handleRecipeChoiceItemClick(player: Player, clickType: ClickType, e
     } else if (clickType == ClickType.RIGHT) {
         player.showUsages(id)
     } else if (player.gameMode == GameMode.CREATIVE) {
-        val itemStack = itemProvider.get().clone().apply { 
+        val itemStack = itemProvider.get().clone().apply {
             amount = novaItem?.maxStackSize ?: type.maxStackSize
         }
         

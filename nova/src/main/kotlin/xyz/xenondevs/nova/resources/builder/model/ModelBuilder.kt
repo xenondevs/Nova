@@ -161,7 +161,7 @@ class ModelBuilder(private val base: Model) {
     
     /**
      * Scales the model by [scale] to the given [pivot] point.
-     * 
+     *
      * With [scaleUV], the UV coordinates are scaled accordingly.
      */
     fun scale(pivot: Vector3dc, scale: Vector3dc, scaleUV: Boolean = false): ModelBuilder =
@@ -169,7 +169,7 @@ class ModelBuilder(private val base: Model) {
     
     /**
      * Scales the model by [scale].
-     * 
+     *
      * With [scaleUV], the UV coordinates are scaled accordingly.
      */
     fun scale(scale: Vector3dc, scaleUV: Boolean = false): ModelBuilder =
@@ -177,7 +177,7 @@ class ModelBuilder(private val base: Model) {
     
     /**
      * Scales the model by the given factor [scale] for all axes to the given [pivot] point.
-     * 
+     *
      * With [scaleUV], the UV coordinates are scaled accordingly.
      */
     fun scale(pivot: Vector3dc, scale: Double, scaleUV: Boolean = false): ModelBuilder =
@@ -185,7 +185,7 @@ class ModelBuilder(private val base: Model) {
     
     /**
      * Scales the model by the given factor [scale] for all axes to the pivot point (8, 8, 8).
-     * 
+     *
      * With [scaleUV], the UV coordinates are scaled accordingly.
      */
     fun scale(scale: Double, scaleUV: Boolean = false): ModelBuilder =

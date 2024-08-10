@@ -81,10 +81,12 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
                         val info = blockState.modelProvider.info as DisplayEntityBlockModelData
                         useMaterial(info.hitboxType.material)
                     }
+                    
                     BackingStateBlockModelProvider -> {
                         val info = blockState.modelProvider.info as BackingStateConfig
                         useMaterial(info.vanillaBlockState.bukkitMaterial)
                     }
+                    
                     ModelLessBlockModelProvider -> {
                         val info = blockState.modelProvider.info as BlockData
                         useMaterial(info.material)

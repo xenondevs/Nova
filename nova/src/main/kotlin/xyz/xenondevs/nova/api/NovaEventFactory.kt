@@ -15,7 +15,7 @@ object NovaEventFactory {
     
     /**
      * Calls the [TileEntityBreakBlockEvent] for the given [tileEntity] and [block].
-     * 
+     *
      * The event might mutate the [drops] list, which should affect the dropped items.
      */
     fun callTileEntityBlockBreakEvent(tileEntity: TileEntity, block: Block, drops: MutableList<ItemStack>) {

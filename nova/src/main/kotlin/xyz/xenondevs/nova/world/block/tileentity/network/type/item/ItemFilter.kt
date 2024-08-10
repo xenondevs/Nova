@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type.item
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 
-interface ItemFilter<S: ItemFilter<S>> {
+interface ItemFilter<S : ItemFilter<S>> {
     
     val type: ItemFilterType<S>
     
@@ -16,12 +16,12 @@ interface ItemFilter<S: ItemFilter<S>> {
     
 }
 
-interface ItemFilterType<T: ItemFilter<T>> {
+interface ItemFilterType<T : ItemFilter<T>> {
     
     fun serialize(filter: T): Compound
     
     fun deserialize(compound: Compound): T
     
     fun copy(filter: T): T
-
+    
 }

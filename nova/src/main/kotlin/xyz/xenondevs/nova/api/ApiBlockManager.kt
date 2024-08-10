@@ -61,7 +61,7 @@ internal object ApiBlockManager : IBlockManager {
             .param(DefaultContextParamTypes.BLOCK_POS, location.pos)
             .param(DefaultContextParamTypes.TOOL_ITEM_STACK, tool)
         setSourceParam(ctxBuilder, source)
-         return BlockUtils.getDrops(ctxBuilder.build())
+        return BlockUtils.getDrops(ctxBuilder.build())
     }
     
     override fun removeBlock(location: Location, source: Any?, breakEffects: Boolean): Boolean {

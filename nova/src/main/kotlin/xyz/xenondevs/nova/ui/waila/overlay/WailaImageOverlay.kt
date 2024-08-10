@@ -82,7 +82,7 @@ internal class WailaImageOverlay : BossBarOverlay {
                 .append(getComponent(lines, 2)) // end texture
                 .moveTo(-halfWidth + ICON_MARGIN_LEFT + START_TEXTURE_SIZE) // move to start icon texture
             
-            if (icon != null) 
+            if (icon != null)
                 builder.append(icon)
             
             builder.moveTo(0)

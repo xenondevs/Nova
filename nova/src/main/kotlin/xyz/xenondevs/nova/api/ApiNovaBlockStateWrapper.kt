@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.api.block.NovaBlockState as INovaBlockState
 internal class ApiNovaBlockStateWrapper(
     private val pos: BlockPos,
     private val state: NovaBlockState
-): INovaBlockState {
+) : INovaBlockState {
     
     @Deprecated("Use NovaBlock instead", replaceWith = ReplaceWith("block"))
     override fun getMaterial(): NovaMaterial = LegacyMaterialWrapper(Either.right(state.block))

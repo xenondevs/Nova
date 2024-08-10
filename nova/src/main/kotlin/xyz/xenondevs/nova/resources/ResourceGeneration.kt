@@ -44,7 +44,7 @@ internal object ResourceGeneration {
             DefaultGuiItems::class,
             DefaultBlocks::class,
             DefaultBlockOverlays::class,
-        DefaultGuiTextures::class,
+            DefaultGuiTextures::class,
         ]
     )
     object PreWorld {

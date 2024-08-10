@@ -17,7 +17,7 @@ internal class PropertiesTree<E>(
     private val root: Array<Any>
     
     init {
-        if (scopedProperties.mapTo(HashSet()) { it.property}.size != scopedProperties.size)
+        if (scopedProperties.mapTo(HashSet()) { it.property }.size != scopedProperties.size)
             throw IllegalArgumentException("Duplicate properties")
         
         val propertiesCount = propertiesCount

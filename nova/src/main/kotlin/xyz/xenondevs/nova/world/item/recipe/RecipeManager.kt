@@ -132,7 +132,7 @@ object RecipeManager : Listener, PacketListener {
             else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
         }
     }
-
+    
     internal fun reload() {
         customVanillaRecipes.keys.forEach(MINECRAFT_SERVER.recipeManager::removeRecipe)
         

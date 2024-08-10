@@ -40,7 +40,7 @@ class DefaultEnergyHolder(
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
         by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
             .defaultsToLazily {
-                val map = defaultConnectionConfig().toEnumMap() 
+                val map = defaultConnectionConfig().toEnumMap()
                 for (face in blockedFaces)
                     map[face] = NetworkConnectionType.NONE
                 map

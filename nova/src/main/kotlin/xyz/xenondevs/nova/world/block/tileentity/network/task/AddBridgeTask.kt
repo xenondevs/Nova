@@ -51,7 +51,7 @@ internal class AddBridgeTask(
             NetworkBridgeData(
                 typeId = node.typeId,
                 owner = node.owner?.uniqueId ?: UUID(0L, 0L),
-                supportedNetworkTypes = HashSet(supportedNetworkTypes), 
+                supportedNetworkTypes = HashSet(supportedNetworkTypes),
                 bridgeFaces = bridgeFaces.toEnumSet()
             )
         )

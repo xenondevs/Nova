@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.world.block.sound.SoundGroup
 
 /**
  * Adds sound to a block.
- * 
+ *
  * @param soundGroup The sound group to be used.
  */
 class BlockSounds(soundGroup: Provider<SoundGroup>) : BlockBehavior {
@@ -18,7 +18,7 @@ class BlockSounds(soundGroup: Provider<SoundGroup>) : BlockBehavior {
     
     /**
      * Adds sound to a block.
-     * 
+     *
      * @param soundGroup The sound group to be used.
      */
     constructor(soundGroup: SoundGroup) : this(provider(soundGroup))

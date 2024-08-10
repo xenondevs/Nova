@@ -79,7 +79,7 @@ fun Location.add(vec: Vector3d): Location {
     y += vec.y
     z += vec.z
     return this
-
+    
 }
 
 fun Location.subtract(vec: Vector3d): Location {

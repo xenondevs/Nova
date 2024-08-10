@@ -10,7 +10,7 @@ import java.util.zip.DeflaterOutputStream
 import java.util.zip.InflaterInputStream
 
 internal enum class CompressionType(
-    val wrapInput: (InputStream) -> InputStream, 
+    val wrapInput: (InputStream) -> InputStream,
     val wrapOutput: (OutputStream) -> OutputStream
 ) {
     

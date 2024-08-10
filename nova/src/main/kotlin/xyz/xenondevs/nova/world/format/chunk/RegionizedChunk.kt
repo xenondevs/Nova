@@ -24,7 +24,7 @@ internal sealed interface RegionizedChunk {
          * - 24 bits for the y-coordinate
          * - 4 bits for the x-coordinate
          * - 4 bits for the z-coordinate
-         * 
+         *
          * @see RegionizedChunkReader.unpackBlockPos
          */
         fun packBlockPos(pos: BlockPos): Int =
@@ -53,7 +53,7 @@ internal abstract class RegionizedChunkReader<C : RegionizedChunk> {
         
         /**
          * Unpacks a 32-bit integer [value] into a [BlockPos] using the given [chunkPos].
-         * 
+         *
          * @see RegionizedChunk.packBlockPos
          */
         fun unpackBlockPos(chunkPos: ChunkPos, value: Int): BlockPos {

@@ -87,7 +87,7 @@ class ModelContent internal constructor(private val builder: ResourcePackBuilder
      * if it is neither present in the resource pack nor in the vanilla assets.
      */
     fun getPaths(model: Model): Collection<ResourcePath> {
-        return buildList { 
+        return buildList {
             customModelsByModel[model]?.also(::addAll)
             vanillaModelsByModel[model]?.also(::addAll)
         }

@@ -9,14 +9,14 @@ import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 import kotlin.reflect.KClass
 
-interface RecipeTypeRegistry: AddonGetter {
+interface RecipeTypeRegistry : AddonGetter {
     
-    fun<T: NovaRecipe> registerRecipeType(name: String, recipeClass: KClass<T>, group: RecipeGroup<in T>, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
+    fun <T : NovaRecipe> registerRecipeType(name: String, recipeClass: KClass<T>, group: RecipeGroup<in T>, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
         val id = ResourceLocation(addon, name)
         val recipeType = RecipeType(id, recipeClass, group, deserializer)
         
         NovaRegistries.RECIPE_TYPE[id] = recipeType
         return recipeType
     }
-
+    
 }

@@ -31,8 +31,8 @@ internal object HooksLoader {
     @InitFun
     private fun loadHooks() {
         JarUtils.findAnnotatedClasses(
-            NOVA.novaJar, 
-            listOf(Hook::class), emptyList(), 
+            NOVA.novaJar,
+            listOf(Hook::class), emptyList(),
             "xyz/xenondevs/nova/hook/impl/"
         ).classes[Hook::class]?.forEach { (className, annotations) ->
             val annotation = annotations.first()

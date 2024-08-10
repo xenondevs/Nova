@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.api.block.NovaBlockRegistry
 import xyz.xenondevs.nova.api.data.NamespacedId
 import xyz.xenondevs.nova.registry.NovaRegistries
 
-internal object ApiBlockRegistry: NovaBlockRegistry {
+internal object ApiBlockRegistry : NovaBlockRegistry {
     
     override fun getOrNull(id: String): NovaBlock? {
         val loc = ResourceLocation.parse(id)

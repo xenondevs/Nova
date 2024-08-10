@@ -4,7 +4,7 @@ import org.bukkit.entity.Player
 
 /**
  * Superclass for all attachments.
- * 
+ *
  * @see ItemAttachment
  * @see HideDownItemAttachment
  */

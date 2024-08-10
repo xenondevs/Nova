@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.network.syncher.EntityDataSerializers
 import org.joml.Vector3ic
 
-open class LivingEntityMetadata internal constructor(): EntityMetadata() {
+open class LivingEntityMetadata internal constructor() : EntityMetadata() {
     
     private val sharedFlags = sharedFlags(8)
     

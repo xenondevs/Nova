@@ -12,19 +12,19 @@ abstract class FontProvider internal constructor() {
     
     /**
      * The code points that this [FontProvider] supplies.
-     * 
+     *
      * # DO NOT MUTATE
      */
     abstract val codePoints: IntSet
     
     /**
      * The sizes of the supplied characters of this [FontProvider].
-     * 
+     *
      * Implementations of this should be lazy, meaning that any modifications to the font after retrieving this map
      * will not be present. This is why this property is internal.
-     * 
+     *
      * Format: `size -> [width, height, ascent, yMin, yMax]`
-     * 
+     *
      * # DO NOT MUTATE
      */
     internal abstract val charSizes: Int2ObjectMap<FloatArray>

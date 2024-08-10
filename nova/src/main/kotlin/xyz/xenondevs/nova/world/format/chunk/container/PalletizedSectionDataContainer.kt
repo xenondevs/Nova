@@ -14,7 +14,7 @@ internal sealed class PalletizedSectionDataContainer<T>(idResolver: IdResolver<T
     
     /**
      * Gets or creates the palletized id for the given [value], while also performing upkeep on the palette.
-     * 
+     *
      * Upkeep includes:
      * - Remaking the [palette] if the next id would be greater than 0xFFFF, i.e. larger than 2 bytes.
      * - Converting a [LinearPalette] to a [HashPalette] if the next id would exceed [LinearPalette.MAX_SIZE].

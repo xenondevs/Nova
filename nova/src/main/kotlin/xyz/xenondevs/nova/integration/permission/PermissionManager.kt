@@ -68,7 +68,7 @@ object PermissionManager {
     
     /**
      * Checks whether the player under the given [UUID][player] has the given [permission] in the given [world].
-     * 
+     *
      * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline permission cache,
      * which accesses the registered [PermissionIntegrations][PermissionIntegration] asynchronously.
      */
@@ -77,7 +77,7 @@ object PermissionManager {
     
     /**
      * Checks whether the given [player] has the given [permission] in the given [world].
-     * 
+     *
      * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline permission cache,
      * which accesses the registered [PermissionIntegrations][PermissionIntegration] asynchronously.
      */

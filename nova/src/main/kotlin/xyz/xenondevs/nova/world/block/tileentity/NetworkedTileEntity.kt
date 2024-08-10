@@ -60,7 +60,7 @@ abstract class NetworkedTileEntity(
      * whether energy can be inserted, extracted, or both.
      *
      * The [blockedSides] defines which sides of this tile-entity can never be used for energy transfer.
-     * 
+     *
      * If the [EnergyHolder] is created for the first time, [defaultConnectionConfig] is used to determine the
      * correct [NetworkConnectionType] for each side.
      */
@@ -84,7 +84,7 @@ abstract class NetworkedTileEntity(
      * whether energy can be inserted, extracted, or both.
      *
      * The [blockedFaces] define which faces of this tile-entity can never be used for energy transfer.
-     * 
+     *
      * If the [EnergyHolder] is created for the first time, [defaultConnectionConfig] is used to determine the
      * correct [NetworkConnectionType] for each side.
      */
@@ -113,7 +113,7 @@ abstract class NetworkedTileEntity(
      * The item holder uses the inventories and connection types provided ([inventory], [inventories]).
      *
      * The [blockedSides] define which sides of the tile-entity can never be used for item transfer.
-     * 
+     *
      * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
      * are used to determine the correct [VirtualInventory] and [NetworkConnectionType] for each side.
      * If [defaultInventoryConfig] is `null`, the merged inventory will be used for all sides.
@@ -142,11 +142,11 @@ abstract class NetworkedTileEntity(
      * The item holder uses the inventories and connection types provided ([inventory], [inventories]).
      *
      * The [blockedFaces] define which faces of the tile-entity can never be used for item transfer.
-     * 
+     *
      * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
      * are used to determine the correct [VirtualInventory] and [NetworkConnectionType] for each side.
      * If [defaultInventoryConfig] is `null`, the merged inventory will be used for all sides.
-     * 
+     *
      * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
      */
     @JvmName("storedItemHolderBlockFace")
@@ -190,7 +190,7 @@ abstract class NetworkedTileEntity(
      * The item holder uses the inventories and connection types provided ([inventory], [inventories]).
      *
      * The [blockedSides] define which sides of the tile-entity can never be used for item transfer.
-     * 
+     *
      * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedInventory] and [NetworkConnectionType] for each side.
      *
@@ -205,9 +205,9 @@ abstract class NetworkedTileEntity(
         defaultInventoryConfig: () -> Map<BlockFace, NetworkedInventory> = { CUBE_FACES.associateWithTo(enumMap()) { inventory.first } },
         defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null
     ) = storedItemHolder(
-        inventory, 
+        inventory,
         inventories = inventories,
-        mergedInventory, 
+        mergedInventory,
         translateSidesToFaces(blockedSides),
         defaultInventoryConfig,
         defaultConnectionConfig
@@ -220,10 +220,10 @@ abstract class NetworkedTileEntity(
      * The item holder uses the inventories and connection types provided ([inventory], [inventories]).
      *
      * The [blockedFaces] define which faces of the tile-entity can never be used for item transfer.
-     * 
+     *
      * If the [ItemHolder] is created for the first time, [defaultInventoryConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedInventory] and [NetworkConnectionType] for each side.
-     * 
+     *
      * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
      */
     @JvmName("storedItemHolderBlockFace")
@@ -271,7 +271,7 @@ abstract class NetworkedTileEntity(
      * The fluid holder uses the containers and connection types provided ([container], [containers]).
      *
      * The [blockedSides] define which sides of the tile-entity can never be used for fluid transfer.
-     * 
+     *
      * If the [FluidHolder] is created for the first time, [defaultContainerConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedFluidContainer] and [NetworkConnectionType] for each side.
      *
@@ -288,7 +288,7 @@ abstract class NetworkedTileEntity(
         container,
         containers = containers,
         translateSidesToFaces(blockedSides),
-        defaultContainerConfig, 
+        defaultContainerConfig,
         defaultConnectionConfig
     )
     
@@ -299,10 +299,10 @@ abstract class NetworkedTileEntity(
      * The fluid holder uses the containers and connection types provided ([container], [containers]).
      *
      * The [blockedFaces] define which faces of the tile-entity can never be used for fluid transfer.
-     * 
+     *
      * If the [FluidHolder] is created for the first time, [defaultContainerConfig] and [defaultConnectionConfig]
      * are used to determine the correct [NetworkedFluidContainer] and [NetworkConnectionType] for each side.
-     * 
+     *
      * If [defaultConnectionConfig] is `null`, each side will be assigned the highest possible connection type.
      */
     @JvmName("storedFluidHolderBlockFace")

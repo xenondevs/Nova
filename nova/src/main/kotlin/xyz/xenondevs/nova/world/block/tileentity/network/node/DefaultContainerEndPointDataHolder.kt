@@ -40,7 +40,7 @@ abstract class DefaultContainerEndPointDataHolder<C : EndPointContainer> interna
             ).defaultsToLazily { defaultContainerConfig().toEnumMap() }
             .observed()
     
-    final override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> 
+    final override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
         by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
             .defaultsToLazily {
                 val map: MutableMap<BlockFace, NetworkConnectionType> = defaultConnectionConfig?.invoke()?.toEnumMap()

@@ -16,10 +16,10 @@ import xyz.xenondevs.nova.util.item.localizedName
 import xyz.xenondevs.nova.world.BlockPos
 
 object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(null) {
-
+    
     override fun getInfo(player: Player, pos: BlockPos, blockState: BlockData): WailaInfo {
         val mainMaterial = getMainMaterial(blockState)
-
+        
         val lines = buildList {
             this += WailaLine(
                 Component.translatable(
@@ -28,7 +28,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(nul
                 ),
                 WailaLine.Alignment.CENTERED
             )
-
+            
             this += WailaLine(
                 Component.text(
                     "minecraft:${blockState.material.name.lowercase()}",
@@ -41,7 +41,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(nul
         
         return WailaInfo(ResourceLocation.withDefaultNamespace(mainMaterial.name.lowercase()), lines)
     }
-
+    
     private fun getMainMaterial(blockState: BlockData): Material {
         return when (val material = blockState.material) {
             // infested blocks
@@ -52,7 +52,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(nul
             Material.INFESTED_MOSSY_STONE_BRICKS -> Material.MOSSY_STONE_BRICKS
             Material.INFESTED_STONE -> Material.STONE
             Material.INFESTED_STONE_BRICKS -> Material.STONE_BRICKS
-
+            
             // signs
             Material.OAK_WALL_SIGN -> Material.OAK_SIGN
             Material.SPRUCE_WALL_SIGN -> Material.SPRUCE_SIGN
@@ -76,19 +76,19 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(nul
             Material.WARPED_WALL_HANGING_SIGN -> Material.WARPED_HANGING_SIGN
             Material.BAMBOO_WALL_HANGING_SIGN -> Material.BAMBOO_HANGING_SIGN
             Material.CHERRY_WALL_HANGING_SIGN -> Material.CHERRY_HANGING_SIGN
-
+            
             // plant
             Material.WEEPING_VINES_PLANT -> Material.WEEPING_VINES
             Material.TWISTING_VINES_PLANT -> Material.TWISTING_VINES
             Material.KELP_PLANT -> Material.KELP
             Material.ATTACHED_MELON_STEM -> Material.MELON_STEM
             Material.ATTACHED_PUMPKIN_STEM -> Material.PUMPKIN_STEM
-
+            
             // torch
             Material.WALL_TORCH -> Material.TORCH
             Material.REDSTONE_WALL_TORCH -> Material.TORCH
             Material.SOUL_WALL_TORCH -> Material.TORCH
-
+            
             // head / skull
             Material.ZOMBIE_WALL_HEAD -> Material.ZOMBIE_HEAD
             Material.CREEPER_WALL_HEAD -> Material.CREEPER_HEAD
@@ -96,7 +96,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(nul
             Material.SKELETON_WALL_SKULL -> Material.SKELETON_SKULL
             Material.WITHER_SKELETON_WALL_SKULL -> Material.WITHER_SKELETON_SKULL
             Material.DRAGON_WALL_HEAD -> Material.DRAGON_HEAD
-
+            
             // misc
             Material.BIG_DRIPLEAF_STEM -> Material.BIG_DRIPLEAF
             Material.TRIPWIRE -> Material.STRING
@@ -106,9 +106,9 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(nul
                     Material.STICKY_PISTON
                 else Material.PISTON
             }
-
+            
             else -> material
         }
     }
-
+    
 }

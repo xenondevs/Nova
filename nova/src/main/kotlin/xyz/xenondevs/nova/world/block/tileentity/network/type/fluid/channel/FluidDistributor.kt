@@ -48,7 +48,7 @@ internal class FluidDistributor(
     private fun findFluidType(): FluidType? {
         var fluidType: FluidType? = null
         fluidContainers.forEach {
-            if (!it .isEmpty()) {
+            if (!it.isEmpty()) {
                 if (fluidType != null) {
                     if (fluidType != it.type) return null
                 } else fluidType = it.type

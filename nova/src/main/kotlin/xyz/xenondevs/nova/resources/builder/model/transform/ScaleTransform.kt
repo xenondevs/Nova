@@ -11,13 +11,13 @@ import xyz.xenondevs.nova.resources.builder.model.Model
 
 /**
  * A transformation that scales a model by [scale] around [pivot].
- * 
+ *
  * @param pivot the pivot point around which the model is scaled
  * @param scale the scale factor
  * @param scaleUV whether to scale the UV coordinates of the model,
  * trying to preserve the pixel size
  * @param keepDisplaySize whether the display size properties should be
- * inversely scaled in order to keep the actual displayed size constant 
+ * inversely scaled in order to keep the actual displayed size constant
  */
 internal data class ScaleTransform(
     val pivot: Vector3dc,
@@ -78,7 +78,7 @@ internal data class ScaleTransform(
     private fun scaledUV(uv: Vector4dc, uvPivot: Vector2dc, uvScale: Vector2dc): Vector4dc {
         val from = Vector2d(uv.x(), uv.y())
         val to = Vector2d(uv.z(), uv.w())
-
+        
         from.sub(uvPivot).mul(uvScale).add(uvPivot)
         to.sub(uvPivot).mul(uvScale).add(uvPivot)
         
@@ -104,22 +104,27 @@ internal data class ScaleTransform(
             Model.Direction.SOUTH -> {
                 rotate(Model.Axis.Z, -rotation.toDouble())
             }
-            Model.Direction.EAST ->{
+            
+            Model.Direction.EAST -> {
                 rotate(Model.Axis.Y, 90.0)
                 rotate(Model.Axis.X, -rotation.toDouble())
             }
-            Model.Direction.NORTH ->{
+            
+            Model.Direction.NORTH -> {
                 rotate(Model.Axis.Y, 180.0)
                 rotate(Model.Axis.Z, rotation.toDouble())
             }
+            
             Model.Direction.WEST -> {
                 rotate(Model.Axis.Y, 270.0)
                 rotate(Model.Axis.X, rotation.toDouble())
             }
+            
             Model.Direction.UP -> {
                 rotate(Model.Axis.X, -90.0)
                 rotate(Model.Axis.Y, -rotation.toDouble())
             }
+            
             Model.Direction.DOWN -> {
                 rotate(Model.Axis.X, 90.0)
                 rotate(Model.Axis.Y, rotation.toDouble())

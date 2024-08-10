@@ -12,7 +12,7 @@ internal object TileEntityLimits {
     private val limiters: List<BlockLimiter>? by MAIN_CONFIG.optionalEntry<List<BlockLimiter>>("performance", "tile_entity_limits")
     
     fun canPlace(ctx: Context<BlockPlace>): PlaceResult {
-        val block: NovaTileEntityBlock = ctx[DefaultContextParamTypes.BLOCK_TYPE_NOVA] as? NovaTileEntityBlock 
+        val block: NovaTileEntityBlock = ctx[DefaultContextParamTypes.BLOCK_TYPE_NOVA] as? NovaTileEntityBlock
             ?: return ALLOWED
         
         limiters?.forEach {

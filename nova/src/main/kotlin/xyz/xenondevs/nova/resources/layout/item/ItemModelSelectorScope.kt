@@ -72,9 +72,9 @@ class ItemModelSelectorScope internal constructor(
     
     /**
      * Creates a new GUI model using the given [layers] as texture
-     * 
+     *
      * With [background], the model will have the vanilla inventory background.
-     * 
+     *
      * With [stretched], the model will be stretched to 18x18 pixels. Due to mip mapping, this requires a 32x32 texture
      * with the actual texture placed at (0, 0) to (18, 18).
      */

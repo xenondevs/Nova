@@ -147,7 +147,7 @@ class NovaTileEntityBlockBuilder internal constructor(
     /**
      * Configures the amount of times [TileEntity.handleTick] is called per second.
      * Accepts values from 0 to 20, with 0 disabling sync ticking.
-     * 
+     *
      * Defaults to 20.
      */
     fun syncTickrate(syncTickrate: Int) {
@@ -158,7 +158,7 @@ class NovaTileEntityBlockBuilder internal constructor(
     /**
      * Configures the amount of times [TileEntity.handleAsyncTick] is called per second.
      * Accepts any value >= 0.0, with 0 disabling async ticking.
-     * 
+     *
      * Defaults to 0 (disabled).
      */
     fun asyncTickrate(asyncTickrate: Double) {

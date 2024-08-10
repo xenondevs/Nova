@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.fakeentity.metadata.impl
 
-open class MobMetadata internal constructor(): LivingEntityMetadata() {
+open class MobMetadata internal constructor() : LivingEntityMetadata() {
     
     private val sharedFlags = sharedFlags(15)
     

@@ -20,7 +20,7 @@ operator fun Location.rangeTo(loc: Location) = Region(this, loc)
 
 /**
  * A region in the world.
- * 
+ *
  * @param min The start of the region, inclusive.
  * @param max The end of the region, inclusive.
  */
