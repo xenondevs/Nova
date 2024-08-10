@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.addon.registry
 
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilterType
+import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterType
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 

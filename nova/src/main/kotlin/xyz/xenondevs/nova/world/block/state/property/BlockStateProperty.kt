@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.world.block.state.property
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
 
 /**
  * Represents a property-type of a block state.

@@ -12,10 +12,10 @@ import org.bukkit.Tag
 import org.bukkit.block.BlockFace
 import org.bukkit.event.block.NotePlayEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
-import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.item.novaItem

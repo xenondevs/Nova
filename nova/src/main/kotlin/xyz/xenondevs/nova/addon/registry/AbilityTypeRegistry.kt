@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.addon.registry
 
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.player.ability.Ability
-import xyz.xenondevs.nova.player.ability.AbilityType
+import xyz.xenondevs.nova.world.player.ability.Ability
+import xyz.xenondevs.nova.world.player.ability.AbilityType
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set

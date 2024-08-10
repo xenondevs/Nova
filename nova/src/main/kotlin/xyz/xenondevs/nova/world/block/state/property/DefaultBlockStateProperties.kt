@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.Axis
 import org.bukkit.Fluid
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.calculateYaw

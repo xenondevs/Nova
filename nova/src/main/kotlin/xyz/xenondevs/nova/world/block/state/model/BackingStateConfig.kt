@@ -1,10 +1,7 @@
 package xyz.xenondevs.nova.world.block.state.model
 
 import net.minecraft.world.level.block.state.BlockState
-import org.bukkit.Material
-import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.config.PermanentStorage.storedValue
-import kotlin.reflect.jvm.jvmName
+import xyz.xenondevs.nova.config.PermanentStorage.storedValue
 
 internal abstract class BackingStateConfig internal constructor() {
     

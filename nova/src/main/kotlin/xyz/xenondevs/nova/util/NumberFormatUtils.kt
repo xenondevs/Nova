@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.util
 
 import xyz.xenondevs.commons.collections.treeMapOf
-import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.MAIN_CONFIG
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.NumberFormat

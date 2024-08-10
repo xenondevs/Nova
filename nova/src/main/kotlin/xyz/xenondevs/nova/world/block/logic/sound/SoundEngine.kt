@@ -6,7 +6,7 @@ import net.minecraft.sounds.SoundEvent
 import org.bukkit.Sound
 import org.bukkit.event.Listener
 import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage

@@ -19,7 +19,7 @@ import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.RegisteredListener
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.transformer.patch.misc.EventPreventionPatch
+import xyz.xenondevs.nova.patch.impl.misc.EventPreventionPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HANDLER_LIST_HANDLERS_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HANDLER_LIST_HANDLER_SLOTS_FIELD

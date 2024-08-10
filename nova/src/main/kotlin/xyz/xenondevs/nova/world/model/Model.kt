@@ -6,7 +6,7 @@ import org.bukkit.entity.Display.Brightness
 import org.bukkit.inventory.ItemStack
 import org.joml.Quaternionf
 import org.joml.Vector3f
-import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 
 data class Model(

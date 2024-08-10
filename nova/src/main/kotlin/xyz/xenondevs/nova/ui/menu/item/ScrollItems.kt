@@ -6,8 +6,8 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.controlitem.ControlItem
-import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.util.playClickSound
+import xyz.xenondevs.nova.world.item.DefaultGuiItems
 
 /**
  * An ui [ControlItem] for [ScrollGuis][ScrollGui] that scrolls up one line on left-click.

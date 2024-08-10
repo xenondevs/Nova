@@ -16,9 +16,9 @@ import org.bukkit.Location
 import org.bukkit.craftbukkit.entity.CraftEntity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
-import xyz.xenondevs.nova.item.behavior.Damageable
-import xyz.xenondevs.nova.item.tool.ToolCategory
-import xyz.xenondevs.nova.item.tool.VanillaToolCategory
+import xyz.xenondevs.nova.world.item.behavior.Damageable
+import xyz.xenondevs.nova.world.item.tool.ToolCategory
+import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.world.BlockPos

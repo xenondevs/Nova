@@ -24,10 +24,6 @@ import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.changeTitle
 import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.item.DefaultGuiItems
-import xyz.xenondevs.nova.item.ItemCategories
-import xyz.xenondevs.nova.item.ItemCategories.OBTAINABLE_ITEMS
-import xyz.xenondevs.nova.item.ItemCategory
 import xyz.xenondevs.nova.ui.menu.applyDefaultTPIngredients
 import xyz.xenondevs.nova.ui.menu.explorer.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.AnvilTextItem
@@ -36,6 +32,10 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.component.adventure.moveToStart
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import xyz.xenondevs.nova.util.playClickSound
+import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.ItemCategories
+import xyz.xenondevs.nova.world.item.ItemCategories.OBTAINABLE_ITEMS
+import xyz.xenondevs.nova.world.item.ItemCategory
 
 private val TAB_BUTTON_TEXTURES = arrayOf(
     DefaultGuiTextures.ITEMS_0,

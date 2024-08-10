@@ -4,7 +4,6 @@ package xyz.xenondevs.nova.api
 
 import net.kyori.adventure.text.Component
 import xyz.xenondevs.nova.api.item.NovaItem
-import xyz.xenondevs.nova.data.NamespacedId
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.api.block.NovaBlock as INovaBlock

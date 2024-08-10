@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.block.state.model
 
 import org.bukkit.block.data.BlockData
-import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 import xyz.xenondevs.nova.util.setBlockStateSilently

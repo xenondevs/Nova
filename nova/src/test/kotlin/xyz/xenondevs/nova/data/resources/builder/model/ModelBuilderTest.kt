@@ -5,7 +5,7 @@ import org.joml.Vector3d
 import org.junit.jupiter.api.Test
 import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.commons.gson.registerTypeAdapter
-import xyz.xenondevs.nova.data.serialization.json.serializer.ModelTypeAdapter
+import xyz.xenondevs.nova.serialization.json.serializer.ModelTypeAdapter
 
 class ModelBuilderTest {
     

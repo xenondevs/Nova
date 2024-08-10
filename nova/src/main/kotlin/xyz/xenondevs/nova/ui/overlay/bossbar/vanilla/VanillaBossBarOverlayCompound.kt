@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui.overlay.bossbar.vanilla
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.mutable.mutableProvider
-import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayCompound
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatcher

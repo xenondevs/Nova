@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.addon.registry
 
-import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.NovaItemBuilder
-import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
+import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.NovaItemBuilder
+import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.world.block.NovaBlock
 
 interface ItemRegistry : AddonGetter {

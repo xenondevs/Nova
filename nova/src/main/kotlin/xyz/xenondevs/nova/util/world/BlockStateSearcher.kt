@@ -5,8 +5,6 @@ package xyz.xenondevs.nova.util.world
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
-import it.unimi.dsi.fastutil.ints.IntArraySet
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import it.unimi.dsi.fastutil.ints.IntSet
 import net.minecraft.util.BitStorage
 import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap
@@ -20,12 +18,11 @@ import net.minecraft.world.level.chunk.Palette
 import net.minecraft.world.level.chunk.PalettedContainer
 import net.minecraft.world.level.chunk.SingleValuePalette
 import xyz.xenondevs.commons.collections.getOrSet
-import xyz.xenondevs.nova.transformer.patch.worldgen.chunksection.LevelChunkSectionWrapper
+import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import java.lang.invoke.MethodHandles
-import java.util.function.Predicate
 import kotlin.reflect.jvm.jvmName
 
 private val PALETTED_CONTAINER_DATA_CLASS = Class.forName("net.minecraft.world.level.chunk.PalettedContainer\$Data")

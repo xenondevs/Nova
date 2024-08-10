@@ -7,8 +7,8 @@ import org.objectweb.asm.Type
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
-import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.data.resources.upload.UploadService
+import xyz.xenondevs.nova.resources.upload.AutoUploadManager
+import xyz.xenondevs.nova.resources.upload.UploadService
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit

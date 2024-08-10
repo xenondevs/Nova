@@ -5,12 +5,12 @@ import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.gui.structure.Structure
 import xyz.xenondevs.invui.gui.structure.Structure.addGlobalIngredient
 import xyz.xenondevs.invui.inventory.Inventory
-import xyz.xenondevs.nova.item.DefaultGuiItems
-import xyz.xenondevs.nova.item.NovaItem
 import xyz.xenondevs.nova.ui.menu.item.PageBackItem
 import xyz.xenondevs.nova.ui.menu.item.PageForwardItem
 import xyz.xenondevs.nova.ui.menu.item.ScrollDownItem
 import xyz.xenondevs.nova.ui.menu.item.ScrollUpItem
+import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.NovaItem
 
 internal fun setGlobalIngredients() {
     addGlobalIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)

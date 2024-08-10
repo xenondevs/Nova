@@ -18,7 +18,7 @@ import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.unwrap

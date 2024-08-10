@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.world.block.limits
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.World
-import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
-import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
@@ -46,7 +46,7 @@ internal class TypeBlacklist(private val blacklist: Set<ResourceLocation>) : Sim
 internal class WorldBlacklist(private val blacklist: Set<String>) : SimpleBlockLimiter("nova.tile_entity_limits.world_blacklist.deny") {
     
     override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
-        return !blacklist.contains("*") && ctx.get<World>(DefaultContextParamTypes.BLOCK_WORLD)!!.name !in blacklist
+        return !blacklist.contains("*") && ctx.get(DefaultContextParamTypes.BLOCK_WORLD)!!.name !in blacklist
     }
     
 }

@@ -7,9 +7,9 @@ import net.minecraft.util.FormattedCharSequence
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
-import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit

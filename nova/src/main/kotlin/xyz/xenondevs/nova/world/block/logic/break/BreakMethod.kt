@@ -4,12 +4,12 @@ import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.ItemDisplay.ItemDisplayTransform
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.util.broadcastDestructionStage
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
+import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 

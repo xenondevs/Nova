@@ -13,13 +13,13 @@ import net.minecraft.world.level.levelgen.structure.StructureSet
 import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.DataFileParser
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
+import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
-import xyz.xenondevs.nova.transformer.Patcher
+import xyz.xenondevs.nova.patch.Patcher
 import xyz.xenondevs.nova.util.data.decodeJsonFile
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
 import xyz.xenondevs.nova.util.set

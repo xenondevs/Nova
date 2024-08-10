@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block.state
 
-import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty

@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.world.format
 
 import com.google.common.collect.HashBiMap
 import com.google.gson.JsonObject
-import xyz.xenondevs.nova.data.config.PermanentStorage
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
-import xyz.xenondevs.nova.data.serialization.json.serializer.NovaBlockStateSerialization
+import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.serialization.json.serializer.NovaBlockStateSerialization
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage

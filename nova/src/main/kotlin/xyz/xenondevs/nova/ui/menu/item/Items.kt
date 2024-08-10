@@ -6,7 +6,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.SimpleItem
-import xyz.xenondevs.nova.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.DefaultGuiItems
 
 internal fun clickableItem(provider: ItemProvider, run: (Player) -> Unit): Item {
     

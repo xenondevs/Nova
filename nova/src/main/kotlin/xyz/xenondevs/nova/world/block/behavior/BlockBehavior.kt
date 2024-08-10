@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.world.block.behavior
 
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock

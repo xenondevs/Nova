@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.loader.AddonLoader
 import xyz.xenondevs.nova.addon.loader.AddonLoaderPools
-import xyz.xenondevs.nova.data.config.Configs
+import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.initialize.DisableableFunction
 import xyz.xenondevs.nova.initialize.Init
 import xyz.xenondevs.nova.initialize.InitFun
@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.transformer.Patcher
+import xyz.xenondevs.nova.patch.Patcher
 import java.io.File
 import java.util.logging.Level
 

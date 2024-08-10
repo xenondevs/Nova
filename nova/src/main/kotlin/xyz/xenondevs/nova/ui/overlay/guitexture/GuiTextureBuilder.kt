@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.ui.overlay.guitexture
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.data.resources.layout.gui.GuiTextureLayout
-import xyz.xenondevs.nova.data.resources.layout.gui.GuiTextureLayoutBuilder
+import xyz.xenondevs.nova.resources.layout.gui.GuiTextureLayout
+import xyz.xenondevs.nova.resources.layout.gui.GuiTextureLayoutBuilder
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 

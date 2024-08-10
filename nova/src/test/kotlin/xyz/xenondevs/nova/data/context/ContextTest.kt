@@ -2,9 +2,10 @@ package xyz.xenondevs.nova.data.context
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import xyz.xenondevs.nova.data.context.intention.ContextIntention
-import xyz.xenondevs.nova.data.context.param.ContextParamType
-import xyz.xenondevs.nova.data.context.param.DefaultingContextParamType
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.ContextIntention
+import xyz.xenondevs.nova.context.param.ContextParamType
+import xyz.xenondevs.nova.context.param.DefaultingContextParamType
 import kotlin.test.assertEquals
 
 object TestIntentions {

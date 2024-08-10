@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.initialize
 
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
-import xyz.xenondevs.nova.data.config.Configs
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
-import xyz.xenondevs.nova.transformer.Patcher
+import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.patch.Patcher
 import kotlin.reflect.KClass
 
 /**

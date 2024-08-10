@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.world.block.state.model
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.state.BlockState
-import org.bukkit.Material
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.intValue
 

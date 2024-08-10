@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.overlay.guitexture
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.data.resources.layout.gui.GuiTextureAlignment
+import xyz.xenondevs.nova.resources.layout.gui.GuiTextureAlignment
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 

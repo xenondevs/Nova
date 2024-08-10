@@ -4,8 +4,7 @@ package xyz.xenondevs.nova.api
 
 import com.mojang.datafixers.util.Either
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.NamespacedId
-import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import xyz.xenondevs.nova.util.get

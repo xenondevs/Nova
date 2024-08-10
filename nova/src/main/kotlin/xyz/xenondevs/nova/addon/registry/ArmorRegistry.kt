@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.addon.registry
 
-import xyz.xenondevs.nova.item.armor.Armor
-import xyz.xenondevs.nova.item.armor.ArmorBuilder
+import xyz.xenondevs.nova.world.item.armor.Armor
+import xyz.xenondevs.nova.world.item.armor.ArmorBuilder
 import xyz.xenondevs.nova.util.ResourceLocation
 
 interface ArmorRegistry : AddonGetter {

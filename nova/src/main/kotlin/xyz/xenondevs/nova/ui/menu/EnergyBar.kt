@@ -4,11 +4,11 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.item.builder.addLoreLines
-import xyz.xenondevs.nova.item.DefaultGuiItems
-import xyz.xenondevs.nova.tileentity.network.type.energy.EnergyNetwork
-import xyz.xenondevs.nova.tileentity.network.type.energy.holder.DefaultEnergyHolder
 import xyz.xenondevs.nova.ui.menu.item.reactiveItem
 import xyz.xenondevs.nova.util.NumberFormatUtils
+import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.EnergyNetwork
+import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.DefaultEnergyHolder
+import xyz.xenondevs.nova.world.item.DefaultGuiItems
 
 /**
  * A multi-item gui component for displaying energy levels.

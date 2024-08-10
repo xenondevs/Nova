@@ -8,7 +8,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.block.NovaBlock
 import xyz.xenondevs.nova.api.material.NovaMaterial
-import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.api.tileentity.TileEntity as ITileEntity
 
 internal class ApiTileEntityWrapper(val tileEntity: TileEntity) : ITileEntity {

@@ -17,11 +17,11 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
-import xyz.xenondevs.nova.item.behavior.Tool
-import xyz.xenondevs.nova.item.tool.ToolCategory
-import xyz.xenondevs.nova.item.tool.ToolTier
-import xyz.xenondevs.nova.item.tool.VanillaToolCategories
-import xyz.xenondevs.nova.item.tool.VanillaToolCategory
+import xyz.xenondevs.nova.world.item.behavior.Tool
+import xyz.xenondevs.nova.world.item.tool.ToolCategory
+import xyz.xenondevs.nova.world.item.tool.ToolTier
+import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
+import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.util.eyeInWater
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.nmsState

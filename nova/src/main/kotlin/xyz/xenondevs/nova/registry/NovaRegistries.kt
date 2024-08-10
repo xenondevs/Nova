@@ -2,15 +2,15 @@ package xyz.xenondevs.nova.registry
 
 import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.data.recipe.RecipeType
-import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.armor.Armor
-import xyz.xenondevs.nova.item.tool.ToolCategory
-import xyz.xenondevs.nova.item.tool.ToolTier
-import xyz.xenondevs.nova.player.ability.AbilityType
-import xyz.xenondevs.nova.player.attachment.AttachmentType
-import xyz.xenondevs.nova.tileentity.network.type.NetworkType
-import xyz.xenondevs.nova.tileentity.network.type.item.ItemFilterType
+import xyz.xenondevs.nova.world.item.recipe.RecipeType
+import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.armor.Armor
+import xyz.xenondevs.nova.world.item.tool.ToolCategory
+import xyz.xenondevs.nova.world.item.tool.ToolTier
+import xyz.xenondevs.nova.world.player.ability.AbilityType
+import xyz.xenondevs.nova.world.player.attachment.AttachmentType
+import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
+import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterType
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider

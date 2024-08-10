@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.addon.registry
 
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.enchantments.Enchantment
-import xyz.xenondevs.nova.item.enchantment.EnchantmentBuilder
+import xyz.xenondevs.nova.world.item.enchantment.EnchantmentBuilder
 
 interface EnchantmentRegistry : AddonGetter {
     

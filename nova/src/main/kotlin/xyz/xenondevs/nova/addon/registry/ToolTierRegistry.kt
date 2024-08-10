@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.addon.registry
 
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.data.config.Configs
-import xyz.xenondevs.nova.item.tool.ToolTier
+import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.world.item.tool.ToolTier
 import xyz.xenondevs.nova.registry.HardcodedProperties
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation

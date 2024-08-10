@@ -14,8 +14,8 @@ import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.StringTag
 import org.bukkit.entity.Player
 import xyz.xenondevs.inventoryaccess.util.AdventureComponentUtils
-import xyz.xenondevs.nova.data.resources.CharSizes
-import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
+import xyz.xenondevs.nova.resources.CharSizes
+import xyz.xenondevs.nova.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.MoveCharacters
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import java.awt.Color

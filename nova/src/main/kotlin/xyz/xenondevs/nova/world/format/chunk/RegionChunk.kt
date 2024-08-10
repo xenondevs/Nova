@@ -18,8 +18,8 @@ import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntity
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
+import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.ceilDiv
 import xyz.xenondevs.nova.util.concurrent.checkServerThread

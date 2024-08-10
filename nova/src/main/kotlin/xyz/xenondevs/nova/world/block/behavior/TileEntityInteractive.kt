@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.world.block.behavior
 
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockInteract
-import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
-import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState

@@ -14,11 +14,11 @@ import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.setDisplayName
-import xyz.xenondevs.nova.data.recipe.ConversionNovaRecipe
-import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.data.getInputStacks
+import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.recipe.ConversionNovaRecipe
 
 abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
     

@@ -8,11 +8,11 @@ import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.config.ConfigurableRegistryElementBuilder
-import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayout
-import xyz.xenondevs.nova.data.resources.layout.block.BlockModelLayoutBuilder
+import xyz.xenondevs.nova.config.ConfigurableRegistryElementBuilder
+import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout
+import xyz.xenondevs.nova.resources.layout.block.BlockModelLayoutBuilder
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder

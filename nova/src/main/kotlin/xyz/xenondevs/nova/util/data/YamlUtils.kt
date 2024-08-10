@@ -12,7 +12,6 @@ import org.snakeyaml.engine.v2.nodes.Tag
 import org.spongepowered.configurate.ConfigurationNode
 import java.util.*
 import kotlin.collections.ArrayDeque
-import kotlin.reflect.javaType
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.typeOf
 

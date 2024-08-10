@@ -8,9 +8,9 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.nova.item.DefaultGuiItems
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
+import xyz.xenondevs.nova.world.item.DefaultGuiItems
 
 open class ChangeNumberItem(
     private val sizeModifier: Int,

@@ -2,10 +2,10 @@ package xyz.xenondevs.nova.ui.menu.sideconfig
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.invui.gui.structure.Structure
-import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
-import xyz.xenondevs.nova.tileentity.network.type.DefaultNetworkTypes
-import xyz.xenondevs.nova.tileentity.network.type.NetworkConnectionType
-import xyz.xenondevs.nova.tileentity.network.type.energy.holder.EnergyHolder
+import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
+import xyz.xenondevs.nova.world.block.tileentity.network.type.DefaultNetworkTypes
+import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
+import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.util.BlockSide
 
 internal class EnergySideConfigMenu(

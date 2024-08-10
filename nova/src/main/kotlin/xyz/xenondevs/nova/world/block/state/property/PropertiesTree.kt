@@ -3,8 +3,8 @@
 package xyz.xenondevs.nova.world.block.state.property
 
 import xyz.xenondevs.commons.collections.getOrSet
-import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
 
 internal class PropertiesTree<E>(
     private val scopedProperties: List<ScopedBlockStateProperty<*>>,

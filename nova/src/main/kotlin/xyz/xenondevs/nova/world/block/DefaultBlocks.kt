@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.world.block
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.data.resources.layout.block.BackingStateCategory
+import xyz.xenondevs.nova.resources.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.item.tool.VanillaToolCategories
-import xyz.xenondevs.nova.item.tool.VanillaToolTiers
-import xyz.xenondevs.nova.transformer.Patcher
+import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
+import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers
+import xyz.xenondevs.nova.patch.Patcher
 import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.world.block.behavior.BlockSounds

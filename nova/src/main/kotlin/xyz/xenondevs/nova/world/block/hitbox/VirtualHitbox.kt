@@ -43,12 +43,8 @@ class VirtualHitbox internal constructor(
     
     internal val uuid = UUID.randomUUID() // region id for visualization
     
-    internal val blocks: Set<BlockPos>
+    internal val blocks: Set<BlockPos> = getBlocksBetween(world, from, to)
     internal var qualifier: HitboxQualifier? = null
-    
-    init {
-        blocks = getBlocksBetween(world, from, to)
-    }
     
     constructor(center: Location, xWidth: Double, zWidth: Double, height: Double) : this(
         center.world!!,

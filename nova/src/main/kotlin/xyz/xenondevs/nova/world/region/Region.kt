@@ -5,7 +5,7 @@ import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.joml.Vector3d
-import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.util.Location
 import xyz.xenondevs.nova.util.LocationUtils
 import xyz.xenondevs.nova.util.add

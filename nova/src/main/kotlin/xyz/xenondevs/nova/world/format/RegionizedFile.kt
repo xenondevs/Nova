@@ -9,7 +9,7 @@ import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.commons.provider.immutable.synchronized
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.util.CompressionType
 import xyz.xenondevs.nova.util.data.use
 import xyz.xenondevs.nova.world.ChunkPos

@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.ui.menu.sideconfig
 
-import xyz.xenondevs.nova.tileentity.network.node.NetworkEndPoint
-import xyz.xenondevs.nova.tileentity.network.type.DefaultNetworkTypes
-import xyz.xenondevs.nova.tileentity.network.type.item.holder.ItemHolder
-import xyz.xenondevs.nova.tileentity.network.type.item.inventory.NetworkedInventory
+import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
+import xyz.xenondevs.nova.world.block.tileentity.network.type.DefaultNetworkTypes
+import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
+import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 
 internal fun ItemSideConfigMenu(
     endPoint: NetworkEndPoint,

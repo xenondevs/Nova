@@ -44,10 +44,10 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.context.Context
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.data.context.intention.DefaultContextIntentions.BlockPlace
-import xyz.xenondevs.nova.data.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.util.item.hasNoBreakParticles
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
@@ -583,12 +583,12 @@ object BlockUtils {
         val mojangPos = pos.nmsPos
         
         val toolItemStack = ctx[DefaultContextParamTypes.TOOL_ITEM_STACK].unwrap().copy()
-        var exp = BlockUtils.getVanillaBlockExp(serverLevel, mojangPos, toolItemStack)
+        var exp = getVanillaBlockExp(serverLevel, mojangPos, toolItemStack)
         
         // the furnace is the only block entity that can drop exp (I think)
         val furnace = serverLevel.getBlockEntity(mojangPos) as? AbstractFurnaceBlockEntity
         if (furnace != null) {
-            exp += BlockUtils.getVanillaFurnaceExp(furnace)
+            exp += getVanillaFurnaceExp(furnace)
         }
         
         return exp

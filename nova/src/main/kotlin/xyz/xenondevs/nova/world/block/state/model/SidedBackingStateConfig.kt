@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.world.block.state.model
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
-import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.enumSet
 import xyz.xenondevs.commons.collections.mapToBooleanArray

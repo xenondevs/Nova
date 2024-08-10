@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.hook.impl.oraxen
 import io.th0rgal.oraxen.config.Settings
 import io.th0rgal.oraxen.pack.upload.hosts.Polymath
 import org.spongepowered.configurate.ConfigurationNode
-import xyz.xenondevs.nova.data.resources.upload.UploadService
+import xyz.xenondevs.nova.resources.upload.UploadService
 import xyz.xenondevs.nova.integration.Hook
 import java.io.File
 

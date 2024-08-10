@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.ui.menu
 
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.nova.item.NovaItem
+import xyz.xenondevs.nova.world.item.NovaItem
 import java.util.function.Supplier
 import kotlin.math.max
 import kotlin.math.min

@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.ui.overlay
 
 import net.kyori.adventure.text.Component
-import xyz.xenondevs.nova.data.resources.builder.task.font.MoveCharactersContent
-import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.resources.builder.task.font.MoveCharactersContent
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import kotlin.math.abs
 import kotlin.math.roundToInt
 

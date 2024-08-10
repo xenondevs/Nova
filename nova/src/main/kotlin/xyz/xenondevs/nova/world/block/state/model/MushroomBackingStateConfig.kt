@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.block.state.model
 
 import net.minecraft.world.level.block.Blocks
-import org.bukkit.Material
 import org.bukkit.block.BlockFace
 
 internal class RedMushroomBackingStateConfig(faces: Set<BlockFace>) : SidedBackingStateConfig(faces, Blocks.RED_MUSHROOM_BLOCK) {
