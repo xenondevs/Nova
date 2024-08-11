@@ -296,7 +296,9 @@ abstract class TileEntity(
         // legacy conversion
         val legacyName = "inventory.${uuid.salt(name)}"
         if (hasData(legacyName)) {
-            storeData(name, retrieveDataOrNull<VirtualInventory>(legacyName)!!)
+            val inventory = retrieveDataOrNull<VirtualInventory>(legacyName)!!
+            inventory.maxStackSizes = maxStackSizes
+            storeData(name, inventory)
             removeData(legacyName)
         }
         
