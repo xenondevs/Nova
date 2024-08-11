@@ -6,8 +6,9 @@ import org.bukkit.entity.Display.Brightness
 import org.bukkit.inventory.ItemStack
 import org.joml.Quaternionf
 import org.joml.Vector3f
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
+import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemDisplayMetadata
+import xyz.xenondevs.nova.world.item.NovaItem
 
 data class Model(
     val itemStack: ItemStack?,
@@ -54,20 +55,22 @@ data class Model(
     ) : this(item.model.clientsideProviders[modelId]?.get(), location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
     
     fun createFakeItemDisplay(autoRegister: Boolean = true): FakeItemDisplay =
-        FakeItemDisplay(location, autoRegister) { _, data ->
-            data.itemStack = itemStack
-            data.billboardConstraints = billboardConstraints
-            data.translation = translation
-            data.scale = scale
-            data.leftRotation = leftRotation
-            data.rightRotation = rightRotation
-            data.brightness = brightness
-            data.width = width
-            data.height = height
-            data.glowColor = glowColor
-            
-            if (data.glowColor != -1)
-                data.isGlowing = true
-        }
+        FakeItemDisplay(location, autoRegister) { _, data -> applyMetadata(data) }
+    
+    fun applyMetadata(data: ItemDisplayMetadata) {
+        data.itemStack = itemStack
+        data.billboardConstraints = billboardConstraints
+        data.translation = translation
+        data.scale = scale
+        data.leftRotation = leftRotation
+        data.rightRotation = rightRotation
+        data.brightness = brightness
+        data.width = width
+        data.height = height
+        data.glowColor = glowColor
+        
+        if (data.glowColor != -1)
+            data.isGlowing = true
+    }
     
 }
