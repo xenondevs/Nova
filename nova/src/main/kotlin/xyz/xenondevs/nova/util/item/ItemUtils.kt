@@ -53,10 +53,33 @@ import net.minecraft.world.item.ItemStack as MojangStack
 val ItemStack.novaItem: NovaItem?
     get() = unwrap().novaItem
 
+var ItemStack.novaModel: String?
+    get() = unwrap().novaModel
+    set(model) {
+        unwrap().novaModel = model
+    }
+
 val MojangStack.novaItem: NovaItem?
     get() = unsafeNovaTag
         ?.getString("id")
         ?.let(NovaRegistries.ITEM::get)
+
+var MojangStack.novaModel: String?
+    get() = unsafeNovaTag?.getString("modelId")
+    set(model) {
+        update(DataComponents.CUSTOM_DATA) { customData ->
+            customData.update { tag ->
+                val novaCompound = tag.getCompoundOrNull("nova")
+                if (novaCompound !== null) {
+                    if (model != null) {
+                        novaCompound.putString("modelId", model)
+                    } else {
+                        novaCompound.remove("modelId")
+                    }
+                }
+            }
+        }
+    }
 
 @Suppress("DEPRECATION")
 internal val MojangStack.unsafeCustomData: CompoundTag?
