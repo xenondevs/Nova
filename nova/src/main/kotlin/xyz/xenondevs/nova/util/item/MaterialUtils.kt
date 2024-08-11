@@ -5,7 +5,6 @@ import org.bukkit.Material
 import org.bukkit.SoundGroup
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import kotlin.random.Random
 
@@ -39,7 +38,7 @@ fun Material.isCauldron() = this == Material.CAULDRON || this == Material.WATER_
 
 fun Material.hasNoBreakParticles() = this == Material.BARRIER || this == Material.STRUCTURE_VOID || this == Material.LIGHT
 
-fun Material.toItemStack(amount: Int = 1): ItemStack = ItemBuilder(this).setAmount(amount).get()
+fun Material.toItemStack(amount: Int = 1): ItemStack = ItemStack.of(this).also { it.amount = amount }
 
 /**
  * More reliable function compared to the Spigot API function [Material.isInteractable].

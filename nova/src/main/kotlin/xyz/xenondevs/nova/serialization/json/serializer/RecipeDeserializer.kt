@@ -31,7 +31,7 @@ import xyz.xenondevs.nova.serialization.json.serializer.RecipeDeserializer.Compa
 import xyz.xenondevs.nova.serialization.json.serializer.RecipeDeserializer.Companion.getRecipeKey
 import xyz.xenondevs.nova.serialization.json.serializer.RecipeDeserializer.Companion.parseRecipeChoice
 import xyz.xenondevs.nova.util.item.ItemUtils
-import xyz.xenondevs.nova.util.item.ItemUtils.getItemBuilder
+import xyz.xenondevs.nova.util.item.ItemUtils.getItemStack
 import xyz.xenondevs.nova.util.namespacedKey
 import java.io.File
 import kotlin.collections.component1
@@ -86,9 +86,8 @@ internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
     override fun deserialize(json: JsonObject, file: File): ShapedRecipe {
         val resultKey = json.getString("result")
         
-        val result = getItemBuilder(resultKey)
-            .setAmount(json.getIntOrNull("amount") ?: 1)
-            .get()
+        val result = getItemStack(resultKey)
+        result.amount = json.getIntOrNull("amount") ?: 1
         
         val shape = json.getAsJsonArray("shape").getAllStrings()
         val ingredientMap = HashMap<Char, RecipeChoice>()
@@ -125,9 +124,8 @@ internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe
     override fun deserialize(json: JsonObject, file: File): ShapelessRecipe {
         val resultKey = json.getStringOrNull("result")!!
         
-        val result = getItemBuilder(resultKey)
-            .setAmount(json.getIntOrNull("amount") ?: 1)
-            .get()
+        val result = getItemStack(resultKey)
+        result.amount = json.getIntOrNull("amount") ?: 1
         
         val ingredientsMap = HashMap<RecipeChoice, Int>()
         val ingredients = json.get("ingredients")
@@ -168,9 +166,9 @@ internal object StonecutterRecipeDeserializer : RecipeDeserializer<StonecuttingR
     
     override fun deserialize(json: JsonObject, file: File): StonecuttingRecipe {
         val input = parseRecipeChoice(json.get("input"))
-        val result = getItemBuilder(json.get("result").asString)
+        val result = getItemStack(json.get("result").asString)
         result.amount = json.getIntOrNull("amount") ?: 1
-        return StonecuttingRecipe(getRecipeKey(file), result.get(), input)
+        return StonecuttingRecipe(getRecipeKey(file), result, input)
     }
     
 }
@@ -181,9 +179,9 @@ internal object SmithingTransformRecipeDeserializer : RecipeDeserializer<Smithin
         val template = parseRecipeChoice(json.get("template"))
         val base = parseRecipeChoice(json.get("base"))
         val addition = parseRecipeChoice(json.get("addition"))
-        val result = getItemBuilder(json.get("result").asString)
+        val result = getItemStack(json.get("result").asString)
         result.amount = json.getIntOrNull("amount") ?: 1
-        return SmithingTransformRecipe(getRecipeKey(file), result.get(), template, base, addition)
+        return SmithingTransformRecipe(getRecipeKey(file), result, template, base, addition)
     }
     
 }
@@ -193,12 +191,12 @@ abstract class ConversionRecipeDeserializer<T> : RecipeDeserializer<T> {
     override fun deserialize(json: JsonObject, file: File): T {
         val inputChoice = parseRecipeChoice(json.get("input"))
         
-        val result = getItemBuilder(json.getStringOrNull("result")!!)
+        val result = getItemStack(json.getStringOrNull("result")!!)
         result.amount = json.getIntOrNull("amount") ?: 1
         
         val time = json.getIntOrNull("time") ?: json.getIntOrNull("cookingTime")!! // legacy support
         
-        return createRecipe(json, getRecipeId(file), inputChoice, result.get(), time)
+        return createRecipe(json, getRecipeId(file), inputChoice, result, time)
     }
     
     abstract fun createRecipe(json: JsonObject, id: ResourceLocation, input: RecipeChoice, result: ItemStack, time: Int): T

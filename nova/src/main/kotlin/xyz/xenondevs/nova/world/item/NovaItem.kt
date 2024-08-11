@@ -69,12 +69,19 @@ class NovaItem internal constructor(
     val style: Style,
     behaviorHolders: List<ItemBehaviorHolder>,
     val maxStackSize: Int,
-    val craftingRemainingItem: ItemBuilder?,
+    private val _craftingRemainingItem: ItemStack?,
     val isHidden: Boolean,
     val block: NovaBlock?,
     private val configId: String,
     internal val requestedLayout: RequestedItemModelLayout
 ) {
+    
+    /**
+     * The [ItemStack] that is left over after this [NovaItem] was
+     * used in a crafting recipe.
+     */
+    val craftingRemainingItem: ItemStack?
+        get() = _craftingRemainingItem?.clone()
     
     val model: ItemModelData by ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.provider.map {
         val material = vanillaMaterial

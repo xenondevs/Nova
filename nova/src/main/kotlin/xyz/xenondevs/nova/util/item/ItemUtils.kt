@@ -24,20 +24,11 @@ import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.cbf.CBF
-import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.api.NamespacedId
-import xyz.xenondevs.nova.world.item.recipe.ComplexTest
-import xyz.xenondevs.nova.world.item.recipe.CustomRecipeChoice
-import xyz.xenondevs.nova.world.item.recipe.ModelDataTest
-import xyz.xenondevs.nova.world.item.recipe.NovaIdTest
-import xyz.xenondevs.nova.world.item.recipe.NovaNameTest
-import xyz.xenondevs.nova.world.item.recipe.TagTest
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.behavior.Wearable
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.bukkitMaterial
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
@@ -47,6 +38,14 @@ import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.behavior.Wearable
+import xyz.xenondevs.nova.world.item.recipe.ComplexTest
+import xyz.xenondevs.nova.world.item.recipe.CustomRecipeChoice
+import xyz.xenondevs.nova.world.item.recipe.ModelDataTest
+import xyz.xenondevs.nova.world.item.recipe.NovaIdTest
+import xyz.xenondevs.nova.world.item.recipe.NovaNameTest
+import xyz.xenondevs.nova.world.item.recipe.TagTest
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -95,7 +94,7 @@ val ItemStack.craftingRemainingItem: ItemStack?
     get() {
         val novaItem = novaItem
         if (novaItem != null)
-            return novaItem.craftingRemainingItem?.get()
+            return novaItem.craftingRemainingItem
         
         return type.craftingRemainingItem?.let(::ItemStack)
     }
@@ -243,36 +242,16 @@ object ItemUtils {
         return CustomRecipeChoice(tests)
     }
     
-    fun getItemBuilder(id: String, basicClientSide: Boolean = false): ItemBuilder {
-        try {
-            return when (id.substringBefore(':')) {
-                "minecraft" -> ItemBuilder(toItemStack(id))
-                "nova" -> {
-                    val name = id.substringAfter(':')
-                    val novaItems = NovaRegistries.ITEM.getByName(name).first()
-                    
-                    if (basicClientSide) novaItems.model.createClientsideItemBuilder()
-                    else novaItems.createItemBuilder()
-                }
-                
-                else -> {
-                    val novaItem = NovaRegistries.ITEM[id]
-                    if (novaItem != null) {
-                        if (basicClientSide) novaItem.model.createClientsideItemBuilder()
-                        else novaItem.createItemBuilder()
-                    } else CustomItemServiceManager.getItemByName(id)!!.let(::ItemBuilder)
-                }
-            }
-        } catch (ex: Exception) {
-            throw IllegalArgumentException("Invalid item name: $id", ex)
+    /**
+     * Creates an [ItemStack] from the given [String].
+     * Resolves ids from vanilla, nova and custom item services. Can also parse snbt.
+     */
+    fun getItemStack(s: String): ItemStack {
+        return when (s.substringBefore(':')) {
+            "minecraft" -> toItemStack(s)
+            else -> getItemStack(ResourceLocation.parse(s))
         }
     }
-    
-    /**
-     * Creates an [ItemStack] from the given [id]. Resolves ids from vanilla, nova and custom item services.
-     */
-    fun getItemStack(id: String): ItemStack =
-        getItemStack(ResourceLocation.parse(id))
     
     /**
      * Creates an [ItemStack] from the given [id]. Resolves ids from vanilla, nova and custom item services.
@@ -297,7 +276,7 @@ object ItemUtils {
      * Gets the actually displayed name of the given [itemStack].
      * If the [itemStack] has a custom display name, that will be returned. Otherwise, the localized name will be returned.
      */
-    fun getName(itemStack: MojangStack): Component {
+    internal fun getName(itemStack: MojangStack): Component {
         val displayName = itemStack.get(DataComponents.CUSTOM_NAME)?.toAdventureComponent()
         
         if (displayName != null)

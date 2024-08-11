@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.config.ConfigurableRegistryElementBuilder
@@ -26,7 +27,7 @@ class NovaItemBuilder internal constructor(
     private var name: Component? = Component.translatable("item.${id.namespace}.${id.name}")
     private var behaviors: MutableList<ItemBehaviorHolder> = ArrayList()
     private var maxStackSize = 64
-    private var craftingRemainingItem: ItemBuilder? = null
+    private var craftingRemainingItem: ItemStack? = null
     private var isHidden = false
     private var block: NovaBlock? = null
     private var requestedLayout = RequestedItemModelLayout.DEFAULT
@@ -110,21 +111,14 @@ class NovaItemBuilder internal constructor(
      * Sets the crafting remaining item to [item].
      */
     fun craftingRemainingItem(item: NovaItem) {
-        this.craftingRemainingItem = item.createItemBuilder()
+        this.craftingRemainingItem = item.createItemStack()
     }
     
     /**
      * Sets the crafting remaining item to [material].
      */
     fun craftingRemainingItem(material: Material) {
-        this.craftingRemainingItem = ItemBuilder(material)
-    }
-    
-    /**
-     * Sets the crafting remaining item to be built using the specified [itemBuilder].
-     */
-    fun craftingRemainingItem(itemBuilder: ItemBuilder) {
-        this.craftingRemainingItem = itemBuilder
+        this.craftingRemainingItem = ItemStack.of(material)
     }
     
     /**

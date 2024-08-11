@@ -140,7 +140,7 @@ internal object RemainingItemPatches : MultiTransformer(
     fun getRemainingItemStack(itemStack: MojangStack): MojangStack {
         val novaItem = itemStack.novaItem
         if (novaItem != null)
-            return novaItem.craftingRemainingItem?.get()?.let { it.unwrap().copy() } ?: MojangStack.EMPTY
+            return novaItem.craftingRemainingItem?.let { it.unwrap().copy() } ?: MojangStack.EMPTY
         
         // retrieve item directly from field as count = 0 causes getItem to return air
         val item = ReflectionRegistry.ITEM_STACK_ITEM_FIELD.get(itemStack) as Item?
@@ -151,7 +151,7 @@ internal object RemainingItemPatches : MultiTransformer(
     fun getRemainingBukkitItemStack(itemStack: MojangStack): BukkitStack? {
         val novaItem = itemStack.novaItem
         if (novaItem != null)
-            return novaItem.craftingRemainingItem?.get()
+            return novaItem.craftingRemainingItem
         
         return itemStack.item.craftingRemainingItem?.let { ItemStack(CraftMagicNumbers.getMaterial(it)) }
     }

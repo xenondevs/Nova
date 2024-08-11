@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.world.loot
 
-import xyz.xenondevs.invui.item.builder.ItemBuilder
+import org.bukkit.inventory.ItemStack
 
 data class LootItem(
-    val item: ItemBuilder,
+    val item: ItemStack,
     val chance: Double,
     val amount: IntRange
 )

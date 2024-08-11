@@ -31,7 +31,7 @@ internal object LootItemSerialization : JsonDeserializer<LootItem> {
         if (!ItemUtils.isIdRegistered(itemId)) {
             throw IllegalArgumentException("Item with id $itemId is not registered")
         }
-        val item = ItemUtils.getItemBuilder(itemId)
+        val item = ItemUtils.getItemStack(itemId)
         val chance = obj.get("chance").asDouble
         val amount = GSON.fromJson<IntRange>(obj.get("amount"))!!
         
