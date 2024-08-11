@@ -351,6 +351,9 @@ internal class RegionChunk(
             if (!isEnabled)
                 return
             
+            if (isTicking)
+                stopTicking()
+            
             for ((pos, tileEntity) in tileEntities) {
                 tileEntity.isEnabled = false
                 tileEntity.blockState.modelProvider.unload(pos)
@@ -436,7 +439,6 @@ internal class RegionChunk(
         tickTask = null
         
         coroutineSupervisor?.cancel("Ticking disabled")
-        coroutineSupervisor = null
         
         for ((_, tileEntity) in tileEntities) {
             if (tileEntity.block.tickrate <= 0)
@@ -446,6 +448,13 @@ internal class RegionChunk(
         }
         
         isTicking = false
+    }
+    
+    /**
+     * Suspends until all tile-entity coroutines have completed.
+     */
+    suspend fun awaitShutdown() {
+        coroutineSupervisor?.join()
     }
     
     private fun tick(): Unit = lock.withLock {
