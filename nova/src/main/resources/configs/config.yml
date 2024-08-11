@@ -160,6 +160,8 @@ performance:
   drop_excess_on_ground: true
   # If block break particles should be displayed.
   block_break_effects: true
+  # Whether legacy conversion for Nova item stacks is enabled.
+  item_stack_legacy_conversion: true
 
 # If metric prefixes should be used to display energy and fluids (e.g. kJ, MJ, GJ or B, kB, MB)
 use_metric_prefixes: false

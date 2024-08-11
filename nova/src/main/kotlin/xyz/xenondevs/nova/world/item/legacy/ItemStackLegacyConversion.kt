@@ -5,11 +5,14 @@ import net.minecraft.core.component.DataComponents
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.typeOf
 
 internal object ItemStackLegacyConversion {
+    
+    private val ENABLED by MAIN_CONFIG.entry<Boolean>("performance", "item_stack_legacy_conversion")
     
     private val specializedConverters = HashMap<String, ArrayList<ItemStackLegacyConverter>>()
     private val genericConverters = ArrayList<ItemStackLegacyConverter>()
@@ -66,6 +69,9 @@ internal object ItemStackLegacyConversion {
     
     @Suppress("DEPRECATION")
     fun convert(patch: DataComponentPatch): DataComponentPatch {
+        if (!ENABLED)
+            return patch
+        
         val unsafeCustomTag = patch.get(DataComponents.CUSTOM_DATA)
             ?.getOrNull()
             ?.unsafe
