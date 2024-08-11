@@ -32,7 +32,7 @@ import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegi
 import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
-private val REQUIRED_SERVER_VERSION = Version("1.21")..Version("1.21")
+private val REQUIRED_SERVER_VERSION = Version("1.21.1")..Version("1.21.1")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 internal lateinit var NOVA: Nova private set
 internal lateinit var LOGGER: Logger private set
