@@ -4,28 +4,28 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
-import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.registry.NovaRegistries
+import net.minecraft.core.Registry
 import xyz.xenondevs.nova.util.get
 
-internal object NovaItemSerialization : TypeAdapter<NovaItem>() {
+internal class RegistryElementSerializer<T>(private val registry: Registry<T>) : TypeAdapter<T>() {
     
-    override fun write(writer: JsonWriter, value: NovaItem?) {
+    override fun write(writer: JsonWriter, value: T?) {
         if (value != null) {
-            writer.value(value.id.toString())
+            writer.value(registry.getKey(value).toString())
         } else {
             writer.nullValue()
         }
     }
     
-    override fun read(reader: JsonReader): NovaItem? {
+    override fun read(reader: JsonReader): T? {
         if (reader.peek() == JsonToken.NULL) {
             reader.nextNull()
             return null
         }
         
         val id = reader.nextString()
-        return NovaRegistries.ITEM[id]
+        return registry[id]
     }
+    
     
 }
