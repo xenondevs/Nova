@@ -10,14 +10,14 @@ import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.getOrThrow
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.MutableNetworkNodeConnection
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
-import xyz.xenondevs.nova.util.getOrThrow
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.format.chunk.readCubeFaceSet
 import xyz.xenondevs.nova.world.format.chunk.writeCubeFaceSet
@@ -270,8 +270,10 @@ class ProtoNetwork<T : Network<T>>(
     
     private suspend fun queueWithRelatedNetworks(cluster: ProtoNetworkCluster, queue: Queue<ProtoNetwork<*>>, node: NetworkNode) {
         queueNetworks(cluster, queue, node)
-        for (relatedNode in node.linkedNodes) {
-            queueNetworks(cluster, queue, relatedNode)
+        for (linkedNode in node.linkedNodes) {
+            if (linkedNode !in state)
+                continue
+            queueNetworks(cluster, queue, linkedNode)
         }
     }
     
