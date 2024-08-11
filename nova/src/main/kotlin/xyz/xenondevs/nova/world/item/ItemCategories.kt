@@ -54,7 +54,7 @@ internal object ItemCategories {
                     .takeUnlessEmpty()
                     ?.let { items ->
                         ItemCategory(
-                            items[0].model.createClientsideItemBuilder(Component.text(addon.description.name)),
+                            items[0].model.createClientsideItemBuilder(Component.text(addon.description.name)).setLore(emptyList()),
                             items.map { CategorizedItem(it.id.toString()) }
                         )
                     }

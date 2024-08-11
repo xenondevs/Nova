@@ -22,7 +22,7 @@ internal object ItemCategorySerializer : TypeSerializer<ItemCategory> {
         val iconItemStack = ItemUtils.getItemStack(iconId)
         val icon = iconItemStack.novaItem?.model?.createClientsideItemBuilder() ?: ItemBuilder(iconItemStack)
         icon.setDisplayName(MiniMessage.miniMessage().deserialize(name))
-        icon.clearLore()
+        icon.setLore(emptyList())
         
         return ItemCategory(icon, items.map { CategorizedItem(it) })
     }
