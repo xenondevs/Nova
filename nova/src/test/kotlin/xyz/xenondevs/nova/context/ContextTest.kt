@@ -1,8 +1,7 @@
-package xyz.xenondevs.nova.data.context
+package xyz.xenondevs.nova.context
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.ContextIntention
 import xyz.xenondevs.nova.context.param.ContextParamType
 import xyz.xenondevs.nova.context.param.DefaultingContextParamType
@@ -24,19 +23,19 @@ object TestParamTypes {
     val STRING: ContextParamType<String> =
         ContextParamType.builder<String>("string")
             .requiredIn(TestIntentions.TestIntention)
-            .autofilledBy(::STRING_PARENT) { it }
+            .autofilledBy(TestParamTypes::STRING_PARENT) { it }
             .build()
     
     val STRING_LENGTH: ContextParamType<Int> =
         ContextParamType.builder<Int>("string_length")
             .optionalIn(TestIntentions.TestIntention)
-            .autofilledBy(::STRING) { it.length }
+            .autofilledBy(TestParamTypes::STRING) { it.length }
             .build()
     
     val STRING_LENGTH_AS_STRING: ContextParamType<String> =
         ContextParamType.builder<String>("string_length_as_string")
             .optionalIn(TestIntentions.TestIntention)
-            .autofilledBy(::STRING_LENGTH) { it.toString() }
+            .autofilledBy(TestParamTypes::STRING_LENGTH) { it.toString() }
             .build()
     
     val BOOLEAN: DefaultingContextParamType<Boolean> =

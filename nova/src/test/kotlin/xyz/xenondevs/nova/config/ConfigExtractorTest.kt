@@ -1,9 +1,8 @@
-package xyz.xenondevs.nova.data.config
+package xyz.xenondevs.nova.config
 
 import com.google.common.jimfs.Jimfs
 import org.junit.jupiter.api.Test
 import xyz.xenondevs.commons.provider.mutable.mutableProvider
-import xyz.xenondevs.nova.config.ConfigExtractor
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.readText

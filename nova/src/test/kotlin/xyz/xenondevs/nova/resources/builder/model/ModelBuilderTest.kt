@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.data.resources.builder.model
+package xyz.xenondevs.nova.resources.builder.model
 
 import com.google.gson.GsonBuilder
 import org.joml.Vector3d
