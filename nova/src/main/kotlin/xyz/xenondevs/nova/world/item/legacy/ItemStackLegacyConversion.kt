@@ -48,6 +48,7 @@ internal object ItemStackLegacyConversion {
             NamespacedKey(NOVA, "damage"),
         ))
         
+        registerConverter(ItemStackSubIdToModelIdConverter)
         registerConverter(ItemStackEnchantmentsConverter)
     }
     

@@ -42,29 +42,16 @@ import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
-import xyz.xenondevs.nova.world.item.recipe.RecipeManager
+import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.logic.AdvancedTooltips
-import xyz.xenondevs.nova.world.item.logic.PacketItems
-import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
-import xyz.xenondevs.nova.world.block.tileentity.TileEntity
-import xyz.xenondevs.nova.world.block.tileentity.network.NetworkDebugger
-import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
-import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
-import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
-import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
-import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.ui.menu.explorer.creative.ItemsWindow
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.component.adventure.indent
-import xyz.xenondevs.nova.util.data.getIntOrNull
 import xyz.xenondevs.nova.util.data.getStringOrNull
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.item.ItemUtils
@@ -84,11 +71,23 @@ import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
+import xyz.xenondevs.nova.world.block.tileentity.network.NetworkDebugger
+import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
+import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
+import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
+import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
+import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MAX_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MIN_RENDER_DISTANCE
 import xyz.xenondevs.nova.world.fakeentity.fakeEntityRenderDistance
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.logic.AdvancedTooltips
+import xyz.xenondevs.nova.world.item.logic.PacketItems
+import xyz.xenondevs.nova.world.item.recipe.RecipeManager
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.world.toNovaPos
 import java.text.DecimalFormat
@@ -504,7 +503,6 @@ internal object NovaCommand : Command() {
         if (item != null) {
             val novaTag = itemStack.unwrap().unsafeNovaTag
             val modelId = novaTag?.getStringOrNull("modelId")
-            val subId = novaTag?.getIntOrNull("subId")
             
             val modelName: String
             val clientSideStack: BukkitStack
@@ -512,9 +510,6 @@ internal object NovaCommand : Command() {
             if (modelId != null) {
                 modelName = modelId
                 clientSideStack = item.model.clientsideProviders[modelId]!!.get()
-            } else if (subId != null) {
-                modelName = subId.toString()
-                clientSideStack = item.model.unnamedClientsideProviders[subId].get()
             } else {
                 modelName = "default"
                 clientSideStack = item.model.clientsideProvider.get()

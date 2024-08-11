@@ -6,11 +6,11 @@ import org.bukkit.Material
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.resources.builder.task.font.GuiTextureData
-import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.armor.Armor
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
+import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.armor.Armor
 import java.util.*
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -47,21 +47,6 @@ internal object ResourceLookups {
      * Format: ``Map<VanillaMaterial, Map<ModelName, CustomModelData>``
      */
     var NAMED_ITEM_MODEL: Map<NovaItem, Map<Material, Map<String, Int>>> by NAMED_ITEM_MODEL_LOOKUP
-    
-    /**
-     * Lookup for getting the relevant custom-model-data using unnamed item models.
-     *
-     * Format: ``Map<NovaItem, Map<VanillaMaterial, CustomModelData[]>>``
-     */
-    var UNNAMED_ITEM_MODEL_LOOKUP: ResourceLookup<Map<NovaItem, Map<Material, IntArray>>> =
-        resourceLookup("unnamed_item_models", emptyMap(), typeOf<HashMap<NovaItem, EnumMap<Material, IntArray>>>())
-    
-    /**
-     * Map of [NovaItem] to the relevant custom-model-data using unnamed item models.
-     *
-     * Format: ``Map<NovaItem, Map<VanillaMaterial, CustomModelData[]>>``
-     */
-    var UNNAMED_ITEM_MODEL: Map<NovaItem, Map<Material, IntArray>> by UNNAMED_ITEM_MODEL_LOOKUP
     
     /**
      * Lookup for getting the leather armor color value for every custom [Armor] type.

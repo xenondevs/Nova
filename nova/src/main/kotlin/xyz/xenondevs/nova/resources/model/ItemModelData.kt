@@ -10,21 +10,21 @@ import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.invui.item.builder.setLore
+import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.logic.PacketItems
-import xyz.xenondevs.nova.util.unwrap
 
-open class ItemModelData(
+class ItemModelData internal constructor(
     private val item: NovaItem,
-    private val namedCustomModelData: Map<String, Int>,
-    private val unnamedCustomModelData: IntArray
+    private val models: Map<String, Int>,
 ) {
     
-    val size = unnamedCustomModelData.size
+    private val modelNames = models.keys.toTypedArray()
+    val size = models.size
     val unnamedClientsideProviders: Array<ItemProvider>
         by lazy { Array(size) { ItemWrapper(createClientsideItemStack(it)) } }
     val clientsideProviders: Map<String, ItemProvider>
-        by lazy { namedCustomModelData.mapValues { (modelId, _) -> ItemWrapper(createClientsideItemStack(modelId)) } }
+        by lazy { models.mapValues { (modelId, _) -> ItemWrapper(createClientsideItemStack(modelId)) } }
     val clientsideProvider: ItemProvider
         get() = unnamedClientsideProviders[0]
     
@@ -32,13 +32,13 @@ open class ItemModelData(
      * Gets the custom model data for [modelId] or null if it does not exist.
      */
     fun getCustomModelData(modelId: String): Int? =
-        namedCustomModelData[modelId]
+        models[modelId]
     
     /**
      * Gets the custom model data for [modelId] or null if it does not exist.
      */
     fun getCustomModelData(modelId: Int): Int? =
-        unnamedCustomModelData.getOrNull(modelId)
+        models[modelNames[modelId]]
     
     /**
      * Creates a new [ItemBuilder] in client-side format, using the given [name], [lore], and [modelId].
@@ -72,7 +72,7 @@ open class ItemModelData(
      * This provider is intended for usage in GUIs or similar.
      */
     fun createClientsideItemStack(modelId: Int): ItemStack =
-        createClientsideItemStackInternal { item.createItemStack(modelId = modelId) }
+        createClientsideItemStackInternal { item.createItemStack(modelId = modelNames[modelId]) }
     
     private fun createClientsideItemStackInternal(createItemStack: () -> ItemStack): ItemStack {
         val clientStack = PacketItems.getClientSideStack(

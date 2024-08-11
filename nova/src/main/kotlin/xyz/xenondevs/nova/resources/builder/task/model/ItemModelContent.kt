@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList
 import it.unimi.dsi.fastutil.ints.IntList
 import org.bukkit.Material
 import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.model.Model.Override
@@ -15,7 +16,6 @@ import xyz.xenondevs.nova.resources.layout.item.ItemModelSelectorScope
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.registry.NovaRegistries
 
 private const val CUSTOM_MODEL_DATA_PREDICATE_KEY = "custom_model_data"
 
@@ -128,11 +128,6 @@ class ItemModelContent internal constructor(val builder: ResourcePackBuilder) : 
         }
         
         ResourceLookups.NAMED_ITEM_MODEL = lookup
-        ResourceLookups.UNNAMED_ITEM_MODEL = lookup.mapValues { itemModels ->
-            itemModels.value.mapValues { materials ->
-                materials.value.values.toIntArray()
-            }
-        }
     }
     
     @PackTask(

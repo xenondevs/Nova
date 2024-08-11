@@ -36,14 +36,10 @@ import org.bukkit.NamespacedKey
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
-import xyz.xenondevs.nova.world.item.recipe.RecipeManager
-import xyz.xenondevs.nova.resources.ResourceGeneration
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetContentPacketEvent
@@ -55,6 +51,8 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPack
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
@@ -64,7 +62,6 @@ import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
-import xyz.xenondevs.nova.util.data.getIntOrNull
 import xyz.xenondevs.nova.util.data.getStringOrNull
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.item.novaCompound
@@ -74,6 +71,8 @@ import xyz.xenondevs.nova.util.item.update
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.recipe.RecipeManager
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -208,13 +207,9 @@ internal object PacketItems : Listener, PacketListener {
         
         // custom model data
         val namedModelId = novaTag.getStringOrNull("modelId")
-        val unnamedModelId = novaTag.getIntOrNull("subId")
         val customModelData = when {
             namedModelId != null -> novaItem.model.getCustomModelData(namedModelId)
                 ?: return getUnknownItem(itemStack, id, namedModelId)
-            
-            unnamedModelId != null -> novaItem.model.getCustomModelData(unnamedModelId)
-                ?: return getUnknownItem(itemStack, id, unnamedModelId.toString())
             
             else -> novaItem.model.getCustomModelData("default")
                 ?: return getUnknownItem(itemStack, id)

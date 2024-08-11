@@ -28,6 +28,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
+import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.ConfigProvider
@@ -75,15 +76,10 @@ class NovaItem internal constructor(
     internal val requestedLayout: RequestedItemModelLayout
 ) {
     
-    val model: ItemModelData by combinedProvider(
-        ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.provider,
-        ResourceLookups.UNNAMED_ITEM_MODEL_LOOKUP.provider
-    ) { named, unnamed ->
+    val model: ItemModelData by ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.provider.map {
         val material = vanillaMaterial
-        val namedModels = named[this]?.get(material) ?: emptyMap()
-        val unnamedModels = unnamed[this]?.get(material) ?: IntArray(0)
-        
-        ItemModelData(this, namedModels, unnamedModels)
+        val models = it[this]?.get(material) ?: emptyMap()
+        ItemModelData(this, models)
     }
     
     /**
@@ -106,7 +102,7 @@ class NovaItem internal constructor(
      * The underlying vanilla material of this [NovaItem].
      */
     internal val vanillaMaterial: Material by combinedProvider(
-        ResourceLookups.UNNAMED_ITEM_MODEL_LOOKUP.provider,
+        ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.provider,
         combinedProvider(behaviors.map(ItemBehavior::vanillaMaterialProperties))
     ) { lookup, properties ->
         var vanillaMaterial = VanillaMaterialTypes.getMaterial(properties.flatten().toHashSet())
@@ -181,22 +177,10 @@ class NovaItem internal constructor(
         ItemBuilder(createItemStack(1, modelId))
     
     /**
-     * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in server-side format.
-     */
-    fun createItemBuilder(modelId: Int): ItemBuilder =
-        ItemBuilder(createItemStack(1, modelId))
-    
-    /**
      * Creates an [ItemStack] of this [NovaItem] with the given [amount] and [modelId] in server-side format.
      */
     fun createItemStack(amount: Int = 1, modelId: String = "default"): ItemStack =
         createItemStack { putString("modelId", modelId) }.also { it.amount = amount }
-    
-    /**
-     * Creates an [ItemStack] of this [NovaItem] with the given [amount] and [modelId] in server-side format.
-     */
-    fun createItemStack(amount: Int = 1, modelId: Int): ItemStack =
-        createItemStack { putInt("subId", modelId) }.also { it.amount = amount }
     
     private fun createItemStack(writeModelId: CompoundTag.() -> Unit): ItemStack {
         val itemStack = MojangStack(PacketItems.SERVER_SIDE_ITEM_HOLDER, 1, defaultPatch)
