@@ -49,6 +49,7 @@ internal object ItemStackLegacyConversion {
         ))
         
         registerConverter(ItemStackSubIdToModelIdConverter)
+        registerConverter(ItemStackNovaDamageConverter)
         registerConverter(ItemStackEnchantmentsConverter)
     }
     

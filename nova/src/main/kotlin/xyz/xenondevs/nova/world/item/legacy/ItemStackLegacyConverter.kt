@@ -94,6 +94,35 @@ internal data object ItemStackSubIdToModelIdConverter : ItemStackTagLegacyConver
     
 }
 
+internal data object ItemStackNovaDamageConverter : ItemStackLegacyConverter {
+    
+    @Suppress("DEPRECATION")
+    override fun convert(patch: DataComponentPatch): DataComponentPatch {
+        val unsafeTag = patch.get(DataComponents.CUSTOM_DATA)?.getOrNull()?.unsafe
+            ?: return patch
+        val novaCompound: NamespacedCompound = unsafeTag.getByteArrayOrNull("nova_cbf")?.let(CBF::read)
+            ?: return patch
+        val damage = novaCompound.get<Int>("nova", "damage")
+            ?: return patch
+       
+        novaCompound.remove("nova", "damage")
+       
+        val tag = unsafeTag.copy()
+        if (novaCompound.isNotEmpty()) {
+            tag.putByteArray("nova_cbf", CBF.write(novaCompound))
+        } else {
+            tag.remove("nova_cbf")
+        }
+        
+        return DataComponentPatch.builder().apply { 
+            copy(patch)
+            set(DataComponents.CUSTOM_DATA, CustomData.of(tag))
+            set(DataComponents.DAMAGE, damage)
+        }.build()
+    }
+    
+}
+
 internal data object ItemStackEnchantmentsConverter : ItemStackLegacyConverter {
     
     @Suppress("DEPRECATION")
@@ -130,7 +159,11 @@ internal data object ItemStackEnchantmentsConverter : ItemStackLegacyConverter {
         val tag = unsafeTag.copy()
         novaCompound.remove("nova", "enchantments")
         novaCompound.remove("nova", "stored_enchantments")
-        tag.putByteArray("nova_cbf", CBF.write(novaCompound))
+        if (novaCompound.isNotEmpty()) {
+            tag.putByteArray("nova_cbf", CBF.write(novaCompound))
+        } else {
+            tag.remove("nova_cbf")
+        }
         builder.set(DataComponents.CUSTOM_DATA, CustomData.of(tag))
         
         return builder.build()
