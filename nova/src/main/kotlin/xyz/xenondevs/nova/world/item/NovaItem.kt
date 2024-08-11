@@ -247,6 +247,13 @@ class NovaItem internal constructor(
         getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
     
     /**
+     * Modifies the block damage of this [NovaItem] when breaking a block.
+     */
+    internal fun modifyBlockDamage(player: Player, itemStack: ItemStack, damage: Double): Double {
+        return behaviors.fold(damage) { currentDamage, behavior -> behavior.modifyBlockDamage(player, itemStack, currentDamage) }
+    }
+    
+    /**
      * Modifies the client-side stack of this [NovaItem], in the context that it is sent to [player] and has [data].
      */
     internal fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {

@@ -17,11 +17,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
-import xyz.xenondevs.nova.world.item.behavior.Tool
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
-import xyz.xenondevs.nova.world.item.tool.ToolTier
-import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
-import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.util.eyeInWater
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.nmsState
@@ -31,6 +26,11 @@ import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.item.behavior.Tool
+import xyz.xenondevs.nova.world.item.tool.ToolCategory
+import xyz.xenondevs.nova.world.item.tool.ToolTier
+import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
+import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.world.pos
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.world.item.component.Tool as MojangTool
@@ -94,7 +94,7 @@ object ToolUtils {
             else -> Unit
         }
         
-        return calculateDamage(
+        var damage = calculateDamage(
             hardness = block.hardness,
             correctForDrops = isCorrectToolForDrops(block, tool),
             speed = getDestroySpeed(block, tool),
@@ -106,6 +106,13 @@ object ToolUtils {
             isOnGround = player.isOnGround,
             isUnderWater = player.eyeInWater && player.inventory.helmet?.containsEnchantment(Enchantment.AQUA_AFFINITY) != true
         )
+        
+        val novaItem = tool?.novaItem
+        if (novaItem != null) {
+            damage = novaItem.modifyBlockDamage(player, tool, damage)
+        }
+        
+        return damage
     }
     
     fun calculateDamage(

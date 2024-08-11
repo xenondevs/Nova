@@ -64,6 +64,12 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
     
     /**
+     * Modifies the damage when [player] is breaking a block with [itemStack].
+     * This damage is applied to the block every tick until 1.0 is reached, at which point the block is destroyed.
+     */
+    fun modifyBlockDamage(player: Player, itemStack: ItemStack, damage: Double): Double = damage
+    
+    /**
      * Updates the client-side [itemStack] that is to be viewed by [player] and has server-side [data].
      */
     fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound) = itemStack
