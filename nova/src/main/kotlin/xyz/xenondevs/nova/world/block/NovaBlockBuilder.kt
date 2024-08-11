@@ -9,14 +9,14 @@ import net.kyori.adventure.text.format.TextDecoration
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.config.ConfigurableRegistryElementBuilder
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.resources.layout.block.BlockModelLayoutBuilder
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 
 abstract class AbstractNovaBlockBuilder<B : NovaBlock> internal constructor(
     id: ResourceLocation
@@ -146,24 +146,13 @@ class NovaTileEntityBlockBuilder internal constructor(
     
     /**
      * Configures the amount of times [TileEntity.handleTick] is called per second.
-     * Accepts values from 0 to 20, with 0 disabling sync ticking.
+     * Accepts values from 0 to 20, with 0 disabling ticking.
      *
      * Defaults to 20.
      */
-    fun syncTickrate(syncTickrate: Int) {
-        require(syncTickrate in 0..20) { "Sync TPS must be between 0 and 20" }
-        this.syncTickrate = syncTickrate
-    }
-    
-    /**
-     * Configures the amount of times [TileEntity.handleAsyncTick] is called per second.
-     * Accepts any value >= 0.0, with 0 disabling async ticking.
-     *
-     * Defaults to 0 (disabled).
-     */
-    fun asyncTickrate(asyncTickrate: Double) {
-        require(asyncTickrate >= 0) { "Async TPS must be greater than or equal to 0" }
-        this.asyncTickrate = asyncTickrate
+    fun tickrate(tickrate: Int) {
+        require(tickrate in 0..20) { "Sync TPS must be between 0 and 20" }
+        this.syncTickrate = tickrate
     }
     
     override fun build() = NovaTileEntityBlock(
@@ -172,7 +161,7 @@ class NovaTileEntityBlockBuilder internal constructor(
         style,
         behaviors,
         tileEntity,
-        syncTickrate, asyncTickrate,
+        syncTickrate,
         stateProperties,
         configId,
         requestedLayout

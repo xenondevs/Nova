@@ -1,15 +1,9 @@
 package xyz.xenondevs.nova.world.format.chunk
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.world.level.GameRules
-import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.cbf.CBF
@@ -18,8 +12,6 @@ import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.world.block.tileentity.TileEntity
-import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.ceilDiv
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
@@ -30,6 +22,8 @@ import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
+import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.world.format.BlockStateIdResolver
 import xyz.xenondevs.nova.world.format.chunk.RegionizedChunk.Companion.packBlockPos
 import java.io.ByteArrayOutputStream
@@ -38,8 +32,6 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.logging.Level
 import kotlin.concurrent.withLock
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.roundToLong
 import kotlin.random.Random
 
 internal class RegionChunk(
@@ -71,9 +63,8 @@ internal class RegionChunk(
     private var randomTickBlockCount = randomTickBlockCounts.sum()
     private var tickingTileEntityCount = 0
     private var tick = 0
-    private var asyncTickerSupervisor: Job? = null
-    private var tileEntityAsyncTickers: HashMap<TileEntity, Job>? = null
-    private var syncTicker: BukkitTask? = null
+    private var coroutineSupervisor: Job? = null
+    private var tickTask: BukkitTask? = null
     
     init {
         initVanillaTileEntities()
@@ -119,7 +110,7 @@ internal class RegionChunk(
             
             try {
                 tileEntities[pos] = block.tileEntityConstructor(pos, blockState, data)
-                if (block.syncTickrate > 0 || block.asyncTickrate > 0)
+                if (block.tickrate > 0)
                     tickingTileEntityCount++
             } catch (t: Throwable) {
                 LOGGER.log(Level.SEVERE, "Failed to initialize tile entity pos=$pos, blockState=$blockState, data=$data", t)
@@ -260,11 +251,7 @@ internal class RegionChunk(
                 }
             }
             
-            if (isTicking && tileEntity.block.asyncTickrate > 0) {
-                launchAndRegisterAsyncTicker(asyncTickerSupervisor!!, tileEntity)
-            }
-            
-            if (tileEntity.block.syncTickrate > 0 || tileEntity.block.asyncTickrate > 0)
+            if (tileEntity.block.tickrate > 0)
                 tickingTileEntityCount++
         }
         
@@ -275,9 +262,8 @@ internal class RegionChunk(
                 LOGGER.log(Level.SEVERE, "Failed to disable tile-entity $previous", t)
             }
             previous.isEnabled = false
-            cancelAndUnregisterAsyncTicker(previous)
             
-            if (previous.block.syncTickrate > 0 || previous.block.asyncTickrate > 0)
+            if (previous.block.tickrate > 0)
                 tickingTileEntityCount--
         }
         
@@ -424,15 +410,17 @@ internal class RegionChunk(
         if (isTicking)
             return
         
-        // enable sync ticking
-        syncTicker = runTaskTimer(0, 1, ::tick)
+        tickTask = runTaskTimer(0, 1, ::tick)
         
-        // enable async ticking
-        val supervisor = SupervisorJob(AsyncExecutor.SUPERVISOR)
-        asyncTickerSupervisor = supervisor
-        tileEntityAsyncTickers = tileEntities.values.asSequence()
-            .filter { it.block.asyncTickrate > 0 }
-            .associateWithTo(HashMap()) { launchAsyncTicker(supervisor, it) }
+        val chunkSupervisor = SupervisorJob(AsyncExecutor.SUPERVISOR)
+        coroutineSupervisor = chunkSupervisor
+        for ((_, tileEntity) in tileEntities) {
+            if (tileEntity.block.tickrate <= 0)
+                continue
+            
+            tileEntity.coroutineSupervisor = SupervisorJob(chunkSupervisor)
+            tileEntity.handleEnableTicking()
+        }
         
         isTicking = true
     }
@@ -444,13 +432,18 @@ internal class RegionChunk(
         if (!isTicking)
             return
         
-        // disable sync ticking
-        syncTicker?.cancel()
-        syncTicker = null
+        tickTask?.cancel()
+        tickTask = null
         
-        // disable async ticking
-        asyncTickerSupervisor?.cancel("Chunk ticking disabled")
-        tileEntityAsyncTickers = null
+        coroutineSupervisor?.cancel("Ticking disabled")
+        coroutineSupervisor = null
+        
+        for ((_, tileEntity) in tileEntities) {
+            if (tileEntity.block.tickrate <= 0)
+                continue
+            
+            tileEntity.handleDisableTicking()
+        }
         
         isTicking = false
     }
@@ -460,7 +453,7 @@ internal class RegionChunk(
         
         // tile-entity ticks
         for (tileEntity in tileEntities.values) {
-            val tickRate = tileEntity.block.syncTickrate
+            val tickRate = tileEntity.block.tickrate
             if (tickRate == 0)
                 continue
             
@@ -498,32 +491,6 @@ internal class RegionChunk(
                         }
                     }
                 }
-            }
-        }
-    }
-    
-    private fun launchAndRegisterAsyncTicker(context: CoroutineContext, tileEntity: TileEntity) {
-        tileEntityAsyncTickers?.put(tileEntity, launchAsyncTicker(context, tileEntity))
-    }
-    
-    private fun cancelAndUnregisterAsyncTicker(tileEntity: TileEntity) {
-        tileEntityAsyncTickers?.remove(tileEntity)?.cancel("Tile entity removed")
-    }
-    
-    private fun launchAsyncTicker(context: CoroutineContext, tileEntity: TileEntity): Job {
-        require(tileEntity.block.asyncTickrate > 0) { "TileEntity must have an async tickrate > 0" }
-        return CoroutineScope(context).launch {
-            var startTime: Long
-            while (true) {
-                startTime = System.currentTimeMillis()
-                
-                withContext(NonCancellable) { tileEntity.handleAsyncTick() }
-                
-                val globalTickRate = Bukkit.getServerTickManager().tickRate
-                val msPerTick = (1000 / tileEntity.block.asyncTickrate * (globalTickRate / 20)).roundToLong()
-                val delayTime = msPerTick - (System.currentTimeMillis() - startTime)
-                if (delayTime > 0)
-                    delay(delayTime)
             }
         }
     }

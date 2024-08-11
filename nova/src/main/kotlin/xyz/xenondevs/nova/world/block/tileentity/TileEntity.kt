@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.world.block.tileentity
 
+import kotlinx.coroutines.Job
 import net.kyori.adventure.text.Component
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
@@ -109,9 +110,23 @@ abstract class TileEntity(
     var isEnabled: Boolean = false
         internal set
     
-    private val dropProviders = ArrayList<() -> Collection<ItemStack>>()
+    /**
+     * The [MenuContainer] for this [TileEntity's][TileEntity] gui.
+     * May stay uninitialized if the [TileEntity] has no gui.
+     */
     lateinit var menuContainer: MenuContainer
         private set
+    
+    /**
+     * The supervisor [Job] for coroutines of this [TileEntity].
+     * 
+     * Will be available for use after ticking was enabled, indicated by [handleEnableTicking].
+     * Will be automatically cancelled when ticking is disabled, indicated by [handleDisableTicking].
+     */
+    lateinit var coroutineSupervisor: Job
+        internal set
+    
+    private val dropProviders = ArrayList<() -> Collection<ItemStack>>()
     
     init {
         // look through the nested classes of this::class and all its superclasses for a class annotated with @TileEntityMenuClass
@@ -157,14 +172,23 @@ abstract class TileEntity(
     }
     
     /**
+     * Called when this [TileEntity] starts ticking.
+     * 
+     * May not add or remove any [TileEntities][TileEntity].
+     */
+    open fun handleEnableTicking() = Unit
+    
+    /**
+     * Called when this [TileEntity] stops ticking.
+     * 
+     * May not add or remove any [TileEntities][TileEntity].
+     */
+    open fun handleDisableTicking() = Unit
+    
+    /**
      * Called every tick for every TileEntity that is in a loaded chunk.
      */
     open fun handleTick() = Unit
-    
-    /**
-     * Called asynchronously for every tick that this TileEntity is in a loaded chunk.
-     */
-    open suspend fun handleAsyncTick() = Unit
     
     /**
      * Handles right-clicking this [TileEntity].
