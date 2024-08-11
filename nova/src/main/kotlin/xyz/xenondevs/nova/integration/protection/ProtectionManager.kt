@@ -26,12 +26,13 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.HooksLoader
-import xyz.xenondevs.nova.world.block.tileentity.TileEntity
+import xyz.xenondevs.nova.integration.permission.PermissionManager
 import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
 import xyz.xenondevs.nova.util.concurrent.isServerThread
 import xyz.xenondevs.nova.util.isBetweenXZ
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
@@ -87,7 +88,7 @@ private data class CanHurtEntityTileArgs(override val tileEntity: TileEntity, va
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
     dispatcher = Dispatcher.ASYNC,
-    dependsOn = [HooksLoader::class]
+    dependsOn = [HooksLoader::class, PermissionManager::class]
 )
 object ProtectionManager {
     
@@ -138,7 +139,7 @@ object ProtectionManager {
         cacheCanHurtEntityTile = cacheBuilder.build { checkProtection(it) { canHurtEntity(it.apiTileEntity, it.entity, it.item) } }
     }
     
-    @DisableFun
+    @DisableFun(runBefore = [PermissionManager::class])
     private fun disable() {
         executor.shutdown()
     }

@@ -12,19 +12,20 @@ import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldSaveEvent
-import xyz.xenondevs.nova.world.item.recipe.RecipeManager
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.world.block.tileentity.TileEntity
-import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
+import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.world.format.chunk.RegionChunk
+import xyz.xenondevs.nova.world.item.recipe.RecipeManager
 import xyz.xenondevs.nova.world.pos
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -54,7 +55,8 @@ object WorldDataManager : Listener {
     }
     
     @DisableFun(
-        runAfter = [NetworkManager::class] // all tasks need to be processed before saving network regions
+        runAfter = [NetworkManager::class], // all tasks need to be processed before saving network regions
+        runBefore = [ProtectionManager::class] // tile-entities may access protection, so we need to disable them before ProtectionManager
     )
     private fun disable() = runBlocking {
         for (world in worlds.values) {
