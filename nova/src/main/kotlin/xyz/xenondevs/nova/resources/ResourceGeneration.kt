@@ -24,6 +24,7 @@ import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.DefaultItems
 import java.security.MessageDigest
 
+private const val FORCE_REBUILD_FLAG = "NovaForceRegenerateResourcePack"
 private const val VERSION_HASH = "version_hash"
 
 /**
@@ -52,7 +53,8 @@ internal object ResourceGeneration {
         @InitFun
         private fun init() {
             versionHash = calculateVersionHash()
-            if (PermanentStorage.retrieveOrNull<String>(VERSION_HASH) != versionHash
+            if (System.getProperty(FORCE_REBUILD_FLAG) != null
+                || PermanentStorage.retrieveOrNull<String>(VERSION_HASH) != versionHash
                 || !ResourceLookups.hasAllLookups()
                 || !ResourceLookups.tryLoadAll()
                 || !hasAllBlockModels()
