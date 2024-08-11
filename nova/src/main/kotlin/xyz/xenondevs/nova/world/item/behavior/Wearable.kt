@@ -27,10 +27,6 @@ import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
-import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.armor.Armor
-import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.novaItem
@@ -38,6 +34,10 @@ import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.armor.Armor
+import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
+import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
@@ -173,7 +173,7 @@ class Wearable(
                     add(
                         Attributes.ARMOR,
                         AttributeModifier(
-                            ResourceLocation.fromNamespaceAndPath("nova", "armor"),
+                            ResourceLocation.fromNamespaceAndPath("nova", "armor_${slot.name.lowercase()}"),
                             armor,
                             Operation.ADD_VALUE
                         ),
@@ -185,7 +185,7 @@ class Wearable(
                     add(
                         Attributes.ARMOR_TOUGHNESS,
                         AttributeModifier(
-                            ResourceLocation.fromNamespaceAndPath("nova", "armor_toughness"),
+                            ResourceLocation.fromNamespaceAndPath("nova", "armor_toughness_${slot.name.lowercase()}"),
                             armorToughness,
                             Operation.ADD_VALUE
                         ),
@@ -197,7 +197,7 @@ class Wearable(
                     add(
                         Attributes.KNOCKBACK_RESISTANCE,
                         AttributeModifier(
-                            ResourceLocation.fromNamespaceAndPath("nova", "knockback_resistance"),
+                            ResourceLocation.fromNamespaceAndPath("nova", "knockback_resistance_${slot.name.lowercase()}"),
                             knockBackResistance,
                             Operation.ADD_VALUE
                         ),
