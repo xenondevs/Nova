@@ -162,7 +162,7 @@ class NamespacedCompound internal constructor(
     
     fun copy(): NamespacedCompound = NamespacedCompound(map.mapValuesTo(HashMap()) { (_, value) -> value.copy() })
     
-    fun isEmpty(): Boolean = map.isNotEmpty()
+    fun isEmpty(): Boolean = map.isEmpty()
     
     fun isNotEmpty(): Boolean = map.isNotEmpty()
     
