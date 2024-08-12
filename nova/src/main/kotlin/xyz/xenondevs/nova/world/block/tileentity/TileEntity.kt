@@ -41,6 +41,7 @@ import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.region.DynamicRegion
 import xyz.xenondevs.nova.world.region.Region
+import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
@@ -119,7 +120,7 @@ abstract class TileEntity(
     
     /**
      * The supervisor [Job] for coroutines of this [TileEntity].
-     * 
+     *
      * Will be available for use after ticking was enabled, indicated by [handleEnableTicking].
      * Will be automatically cancelled when ticking is disabled, indicated by [handleDisableTicking].
      */
@@ -127,6 +128,7 @@ abstract class TileEntity(
         internal set
     
     private val dropProviders = ArrayList<() -> Collection<ItemStack>>()
+    private val disableHandlers = ArrayList<() -> Unit>()
     
     init {
         // look through the nested classes of this::class and all its superclasses for a class annotated with @TileEntityMenuClass
@@ -169,18 +171,19 @@ abstract class TileEntity(
     open fun handleDisable() {
         if (::menuContainer.isInitialized)
             menuContainer.closeWindows()
+        disableHandlers.forEach { it() }
     }
     
     /**
      * Called when this [TileEntity] starts ticking.
-     * 
+     *
      * May not add or remove any [TileEntities][TileEntity].
      */
     open fun handleEnableTicking() = Unit
     
     /**
      * Called when this [TileEntity] stops ticking.
-     * 
+     *
      * May not add or remove any [TileEntities][TileEntity].
      */
     open fun handleDisableTicking() = Unit
@@ -395,8 +398,10 @@ abstract class TileEntity(
             removeData(legacyName)
         }
         
+        val regionUuid = uuid.salt(name)
+        disableHandlers += { VisualRegion.removeRegion(regionUuid) }
         return DynamicRegion(
-            uuid.salt(name),
+            regionUuid,
             minSize, maxSize,
             storedValue(name) { size },
             createRegion
