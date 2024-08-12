@@ -127,7 +127,7 @@ class ItemModelContent internal constructor(val builder: ResourcePackBuilder) : 
             }
         }
         
-        ResourceLookups.NAMED_ITEM_MODEL = lookup
+        ResourceLookups.ITEM_MODEL = lookup
     }
     
     @PackTask(

@@ -38,15 +38,15 @@ internal object ResourceLookups {
      *
      * Format: ``Map<NovaItem, Map<Vanilla Material, Map<Model Name, Custom Model Data>>>``
      */
-    var NAMED_ITEM_MODEL_LOOKUP: ResourceLookup<Map<NovaItem, Map<Material, Map<String, Int>>>> =
-        resourceLookup("named_item_models", emptyMap(), typeOf<HashMap<NovaItem, EnumMap<Material, HashMap<String, Int>>>>())
+    var ITEM_MODEL_LOOKUP: ResourceLookup<Map<NovaItem, Map<Material, Map<String, Int>>>> =
+        resourceLookup("item_models", emptyMap(), typeOf<HashMap<NovaItem, EnumMap<Material, LinkedHashMap<String, Int>>>>())
     
     /**
      * Map of [NovaItem] to the relevant custom-model-data using named item models.
      *
      * Format: ``Map<VanillaMaterial, Map<ModelName, CustomModelData>``
      */
-    var NAMED_ITEM_MODEL: Map<NovaItem, Map<Material, Map<String, Int>>> by NAMED_ITEM_MODEL_LOOKUP
+    var ITEM_MODEL: Map<NovaItem, Map<Material, Map<String, Int>>> by ITEM_MODEL_LOOKUP
     
     /**
      * Lookup for getting the leather armor color value for every custom [Armor] type.

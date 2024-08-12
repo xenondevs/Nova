@@ -83,7 +83,7 @@ class NovaItem internal constructor(
     val craftingRemainingItem: ItemStack?
         get() = _craftingRemainingItem?.clone()
     
-    val model: ItemModelData by ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.provider.map {
+    val model: ItemModelData by ResourceLookups.ITEM_MODEL_LOOKUP.provider.map {
         val material = vanillaMaterial
         val models = it[this]?.get(material) ?: emptyMap()
         ItemModelData(this, models)
@@ -109,7 +109,7 @@ class NovaItem internal constructor(
      * The underlying vanilla material of this [NovaItem].
      */
     internal val vanillaMaterial: Material by combinedProvider(
-        ResourceLookups.NAMED_ITEM_MODEL_LOOKUP.provider,
+        ResourceLookups.ITEM_MODEL_LOOKUP.provider,
         combinedProvider(behaviors.map(ItemBehavior::vanillaMaterialProperties))
     ) { lookup, properties ->
         var vanillaMaterial = VanillaMaterialTypes.getMaterial(properties.flatten().toHashSet())
