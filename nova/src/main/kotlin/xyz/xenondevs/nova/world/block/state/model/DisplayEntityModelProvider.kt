@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.block.state.model
 import org.bukkit.Material
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Display.Brightness
+import org.bukkit.inventory.ItemStack
 import org.joml.Matrix4fc
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.util.item.requiresLight
@@ -23,8 +24,8 @@ internal data class DisplayEntityBlockModelData(
     
     internal data class Model(val material: Material, val customModelData: Int, val transform: Matrix4fc) {
         
-        @Transient
-        val itemStack = ItemBuilder(material).setCustomModelData(customModelData).get()
+        val itemStack: ItemStack
+            get() = ItemBuilder(material).setCustomModelData(customModelData).get()
         
     }
     
