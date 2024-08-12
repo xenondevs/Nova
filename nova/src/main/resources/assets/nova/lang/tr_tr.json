@@ -102,7 +102,7 @@
   "command.nova.resource_pack.reupload.fail": "Kaynak paketi yüklenemedi.",
   "command.nova.resource_pack.reupload.success": "Kaynak paketi %s'ye yüklendi.",
   "command.nova.reload_configs.start": "Konfigürasyonlar yeniden yükleniyor...",
-  "command.nova.reload_configs.success": "Konfigürasyonlar yeniden yüklendi.",
+  "command.nova.reload_configs.success": "Başarıyla %s yapılandırma(lar) yeniden yüklendi: %s.",
   "command.nova.reload_recipes.start": "Doldurma tarifleri...",
   "command.nova.reload_recipes.success": "Reloaded tarifleri.",
   "command.nova.advanced_tooltips.off.success": "Gelişmiş araç ipuçları devre dışı bırakıldı.",
@@ -113,5 +113,10 @@
   "command.nova.advanced_tooltips.all.failure": "Tüm öğeler için gelişmiş araç ipuçları zaten etkinleştirilmiştir.",
   "waila.nova.required_tool.unbreakable": "Kırılmaz",
   "nova.tile_entity_limits.amount_per_chunk.deny": "Bu yığına bu türden daha fazla karo-varlık yerleştiremezsiniz.",
-  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Bu yığına daha fazla karo-varlık yerleştiremezsiniz."
+  "nova.tile_entity_limits.amount_per_chunk_total.deny": "Bu yığına daha fazla karo-varlık yerleştiremezsiniz.",
+  "item.nova.unknown_item_filter": "Bilinmeyen Öğe Filtresi",
+  "item.nova.unknown_item_filter.description": "Bu öğe filtre türünü yöneten eklenti ya mevcut değil ya da kaydedilmedi.",
+  "block.nova.unknown": "Bilinmeyen Blok",
+  "block.nova.unknown.message": "Bu blok durumunu kaydeden bir eklenti yok: Kimlik: %s, Serileştirilmiş: %s",
+  "enchantment.nova.unknown": "Bilinmeyen Büyü: %s"
 }
