@@ -43,9 +43,9 @@ internal abstract class VanillaTileEntity internal constructor(
         DROPPER(::VanillaContainerTileEntity, setOf(Material.DROPPER)),
         HOPPER(::VanillaContainerTileEntity, setOf(Material.HOPPER)),
         SHULKER_BOX(::VanillaContainerTileEntity, setOf(Material.SHULKER_BOX)),
-        CAULDRON(::VanillaCauldronTileEntity, setOf(Material.CAULDRON, Material.WATER_CAULDRON, Material.LAVA_CAULDRON), false);
-        // TODO: brewing stand, crafter
-        // TODO: crafter
+        CAULDRON(::VanillaCauldronTileEntity, setOf(Material.CAULDRON, Material.WATER_CAULDRON, Material.LAVA_CAULDRON), false),
+        CRAFTER(::VanillaCrafterTileEntity, setOf(Material.CRAFTER));
+        // TODO: brewing stand
         
         fun create(pos: BlockPos, data: Compound = Compound()): VanillaTileEntity =
             constructor(this, pos, data)

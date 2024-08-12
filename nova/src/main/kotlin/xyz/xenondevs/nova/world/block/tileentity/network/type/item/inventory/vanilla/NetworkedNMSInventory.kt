@@ -1,14 +1,14 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla
 
-import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 import java.util.*
 import kotlin.math.min
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 internal open class NetworkedNMSInventory(
-    private val container: ItemStackContainer
+    protected val container: ItemStackContainer
 ) : NetworkedInventory {
     
     // UUID is not required for vanilla item holder implementations, because inventory side configuration cannot be changed
