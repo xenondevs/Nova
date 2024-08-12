@@ -15,12 +15,10 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import org.joml.Vector3d
 import org.joml.Vector3f
-import xyz.xenondevs.nmsutils.particle.ParticleBuilder
-import xyz.xenondevs.nmsutils.particle.color
-import xyz.xenondevs.nova.tileentity.TileEntity
-import xyz.xenondevs.nova.tileentity.TileEntityManager
-import xyz.xenondevs.nova.tileentity.vanilla.VanillaTileEntityManager
+import xyz.xenondevs.commons.collections.enumSetOf
 import xyz.xenondevs.nova.util.item.isTraversable
+import xyz.xenondevs.nova.util.particle.ParticleBuilder
+import xyz.xenondevs.nova.util.particle.color
 import java.awt.Color
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -28,16 +26,16 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
-val CUBE_FACES = listOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
-val HORIZONTAL_FACES = listOf(NORTH, EAST, SOUTH, WEST)
-val VERTICAL_FACES = listOf(UP, DOWN)
+val CUBE_FACES: Set<BlockFace> = enumSetOf(NORTH, EAST, SOUTH, WEST, UP, DOWN)
+val HORIZONTAL_FACES: Set<BlockFace> = enumSetOf(NORTH, EAST, SOUTH, WEST)
+val VERTICAL_FACES: Set<BlockFace> = enumSetOf(UP, DOWN)
 
 //<editor-fold desc="location creation / modification", defaultstate="collapsed">
 val Location.blockLocation: Location
     get() = Location(world, blockX.toDouble(), blockY.toDouble(), blockZ.toDouble())
 
-fun Location(world: World?, x: Int, y: Int, z: Int): Location =
-    Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+fun Location(world: World?, x: Number, y: Number, z: Number, yaw: Number = 0, pitch: Number = 0): Location =
+    Location(world, x.toDouble(), y.toDouble(), z.toDouble(), yaw.toFloat(), pitch.toFloat())
 
 fun Location.removeOrientation() {
     yaw = 0f
@@ -74,6 +72,35 @@ fun Location.getCoordinate(axis: Axis): Double {
         Axis.Y -> y
         Axis.Z -> z
     }
+}
+
+fun Location.add(vec: Vector3d): Location {
+    x += vec.x
+    y += vec.y
+    z += vec.z
+    return this
+    
+}
+
+fun Location.subtract(vec: Vector3d): Location {
+    x -= vec.x
+    y -= vec.y
+    z -= vec.z
+    return this
+}
+
+fun Location.add(vec: Vector3f): Location {
+    x += vec.x.toDouble()
+    y += vec.y.toDouble()
+    z += vec.z.toDouble()
+    return this
+}
+
+fun Location.subtract(vec: Vector3f): Location {
+    x -= vec.x.toDouble()
+    y -= vec.y.toDouble()
+    z -= vec.z.toDouble()
+    return this
 }
 //</editor-fold>
 
@@ -116,24 +143,14 @@ fun Location.isInsideWorldRestrictions(): Boolean {
 
 //<editor-fold desc="direction / vector", defaultstate="collapsed">
 fun Vector.calculateYawPitch(): FloatArray {
-    // Minecraft's coordinate system is weird
-    val x = this.z
-    val y = -this.x
-    val z = this.y
-    
-    val yaw = atan2(y, x)
-    val h = y / sin(yaw)
-    val pitch = atan2(z, h)
-    
+    val yaw = atan2(-x, z)
+    val h = -x / sin(yaw)
+    val pitch = atan2(y, h)
     return floatArrayOf(Math.toDegrees(yaw).toFloat(), -Math.toDegrees(pitch).toFloat())
 }
 
 fun Vector.calculateYaw(): Float {
-    val x = this.z
-    val y = -this.x
-    
-    val yaw = atan2(y, x)
-    return Math.toDegrees(yaw).toFloat()
+    return Math.toDegrees(atan2(-this.x, this.z)).toFloat()
 }
 
 fun Vector(yaw: Float, pitch: Float): Vector {
@@ -172,22 +189,6 @@ fun Vector.toVec3(): Vec3 =
 //</editor-fold>
 
 //<editor-fold desc="surrounding blocks / entities / etc.", defaultstate="collapsed">
-fun Location.getNeighboringTileEntities(additionalHitboxes: Boolean): Map<BlockFace, TileEntity> {
-    return getNeighboringTileEntitiesOfType(additionalHitboxes)
-}
-
-internal inline fun <reified T> Location.getNeighboringTileEntitiesOfType(additionalHitboxes: Boolean): Map<BlockFace, T> {
-    val tileEntities = HashMap<BlockFace, T>()
-    CUBE_FACES.forEach {
-        val location = blockLocation.advance(it)
-        val tileEntity = TileEntityManager.getTileEntity(location, additionalHitboxes)
-            ?: VanillaTileEntityManager.getTileEntityAt(location)
-        if (tileEntity != null && tileEntity is T) tileEntities[it] = tileEntity as T
-    }
-    
-    return tileEntities
-}
-
 fun Chunk.getSurroundingChunks(range: Int, includeCurrent: Boolean, ignoreUnloaded: Boolean = false): List<Chunk> {
     val chunks = ArrayList<Chunk>()
     val world = world

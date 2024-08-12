@@ -10,10 +10,10 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
-import xyz.xenondevs.nova.item.DefaultGuiItems
-import xyz.xenondevs.nova.ui.item.AioNumberItem
-import xyz.xenondevs.nova.ui.item.BackItem
-import xyz.xenondevs.nova.ui.overlay.character.gui.DefaultGuiTextures
+import xyz.xenondevs.nova.ui.menu.item.AioNumberItem
+import xyz.xenondevs.nova.ui.menu.item.BackItem
+import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
+import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import java.awt.Color
 
 class ColorPickerWindow(
@@ -53,7 +53,7 @@ class ColorPickerWindow(
         .addIngredient('r', ChangeColorItem({ red }, { red = it }, "menu.nova.color_picker.red", ItemBuilder(Material.RED_DYE)))
         .addIngredient('g', ChangeColorItem({ green }, { green = it }, "menu.nova.color_picker.green", ItemBuilder(Material.LIME_DYE)))
         .addIngredient('b', ChangeColorItem({ blue }, { blue = it }, "menu.nova.color_picker.blue", ItemBuilder(Material.BLUE_DYE)))
-        .addIngredient('<', BackItem(openPrevious))
+        .addIngredient('<', BackItem(openPrevious = openPrevious))
         .build()
     
     init {
@@ -65,7 +65,7 @@ class ColorPickerWindow(
     }
     
     fun openWindow(player: Player) {
-        Window.single { 
+        Window.single {
             it.setViewer(player)
             it.setTitle(DefaultGuiTextures.COLOR_PICKER.getTitle("menu.nova.color_picker"))
             it.setGui(gui)
@@ -98,7 +98,7 @@ abstract class ColorPreviewItem(color: Color) : AbstractItem() {
     
 }
 
-class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(DefaultGuiItems.TP_COLOR_PICKER.clientsideProvider) {
+class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(DefaultGuiItems.TP_COLOR_PICKER.model.clientsideProvider) {
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
         window.openWindow(player)
     }

@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data
 
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.decodeWithBase64
 import xyz.xenondevs.nova.util.data.encodeWithBase64

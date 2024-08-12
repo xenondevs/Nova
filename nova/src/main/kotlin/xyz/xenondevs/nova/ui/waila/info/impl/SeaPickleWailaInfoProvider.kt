@@ -2,24 +2,23 @@ package xyz.xenondevs.nova.ui.waila.info.impl
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
-import org.bukkit.block.Block
 import org.bukkit.block.data.type.SeaPickle
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
+import xyz.xenondevs.nova.world.BlockPos
 
-internal object SeaPickleWailaInfoProvider : VanillaWailaInfoProvider(
+internal object SeaPickleWailaInfoProvider : VanillaWailaInfoProvider<SeaPickle>(
     setOf(Material.SEA_PICKLE)
 ) {
     
-    override fun getInfo(player: Player, block: Block): WailaInfo {
-        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
-        info.icon = ResourceLocation("minecraft", getSeaPickleName(block))
+    override fun getInfo(player: Player, pos: BlockPos, blockState: SeaPickle): WailaInfo {
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
+        info.icon = ResourceLocation.withDefaultNamespace(getSeaPickleName(blockState))
         return info
     }
     
-    private fun getSeaPickleName(block: Block): String {
-        val pickle = block.blockData as SeaPickle
+    private fun getSeaPickleName(pickle: SeaPickle): String {
         val amount = pickle.pickles
         if (amount > 1) {
             val prefix = when (amount) {

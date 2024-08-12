@@ -13,7 +13,7 @@ import org.bukkit.inventory.SmithingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import org.bukkit.inventory.recipe.CookingBookCategory
 import org.bukkit.inventory.recipe.CraftingBookCategory
-import xyz.xenondevs.nova.util.nmsCopy
+import xyz.xenondevs.nova.util.unwrap
 import net.minecraft.world.item.crafting.CookingBookCategory as MojangCookingBookCategory
 import net.minecraft.world.item.crafting.CraftingBookCategory as MojangCraftingBookCategory
 
@@ -42,8 +42,8 @@ fun RecipeChoice.getInputStacks(): List<ItemStack> =
 internal fun RecipeChoice?.toNmsIngredient(): Ingredient =
     when {
         this == null -> Ingredient.EMPTY
-        this is RecipeChoice.MaterialChoice -> Ingredient(choices.stream().map { Ingredient.ItemValue(ItemStack(it).nmsCopy) })
-        this is RecipeChoice.ExactChoice -> Ingredient(choices.stream().map { Ingredient.ItemValue(it.nmsCopy) })
+        this is RecipeChoice.MaterialChoice -> Ingredient(choices.stream().map { Ingredient.ItemValue(ItemStack(it).unwrap().copy()) })
+        this is RecipeChoice.ExactChoice -> Ingredient(choices.stream().map { Ingredient.ItemValue(it.unwrap().copy()) })
         else -> throw UnsupportedOperationException("Unsupported RecipeChoice type")
     }
 

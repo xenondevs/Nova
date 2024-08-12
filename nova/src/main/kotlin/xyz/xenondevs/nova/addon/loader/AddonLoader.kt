@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.addon.AddonDescription
 import xyz.xenondevs.nova.addon.AddonLogger
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.initialize.InitializationException
-import xyz.xenondevs.nova.loader.library.LibraryFileParser
+import xyz.xenondevs.nova.addon.library.LibraryFileParser
 import xyz.xenondevs.nova.util.data.useZip
 import java.io.File
 import java.nio.file.Path

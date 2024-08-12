@@ -1,107 +1,142 @@
-@file:Suppress("unused", "UNCHECKED_CAST")
+@file:Suppress("unused")
 
 package xyz.xenondevs.nova.world.block
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.Style
+import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
-import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.item.NovaMaterialTypeRegistryElementBuilder
-import xyz.xenondevs.nova.item.options.BlockOptions
+import xyz.xenondevs.nova.config.ConfigurableRegistryElementBuilder
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout
+import xyz.xenondevs.nova.resources.layout.block.BlockModelLayoutBuilder
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
+import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
+import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 
-private val EMPTY_BLOCK_OPTIONS = BlockOptions(0.0)
-
-abstract class AbstractNovaBlockBuilder<S : AbstractNovaBlockBuilder<S, T, B>, T : NovaBlockState, B : NovaBlock> internal constructor(
+abstract class AbstractNovaBlockBuilder<B : NovaBlock> internal constructor(
     id: ResourceLocation
-) : NovaMaterialTypeRegistryElementBuilder<S, B>(NovaRegistries.BLOCK, id, "block.${id.namespace}.${id.name}") {
+) : ConfigurableRegistryElementBuilder<B>(NovaRegistries.BLOCK, id) {
     
     internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
-    protected abstract var logic: MutableList<BlockBehavior<T>>
-    protected val properties = ArrayList<BlockPropertyType<*>>()
-    protected var options: BlockOptions = EMPTY_BLOCK_OPTIONS
-    protected var placeCheck: PlaceCheckFun? = null
-    protected var multiBlockLoader: MultiBlockLoader? = null
+    protected var style: Style = Style.empty()
+    protected var name: Component = Component.translatable("block.${id.namespace}.${id.name}")
+    protected var behaviors = ArrayList<BlockBehaviorHolder>()
+    protected val stateProperties = ArrayList<ScopedBlockStateProperty<*>>()
+    internal var requestedLayout = BlockModelLayout.DEFAULT
     
+    /**
+     * Sets the style of the block name.
+     */
+    fun style(style: Style) {
+        this.style = style
+    }
+    
+    /**
+     * Sets the style of the block name.
+     */
+    fun style(color: TextColor) {
+        this.style = Style.style(color)
+    }
+    
+    /**
+     * Sets the style of the block name.
+     */
+    fun style(color: TextColor, vararg decorations: TextDecoration) {
+        this.style = Style.style(color, *decorations)
+    }
+    
+    /**
+     * Sets the style of the block name.
+     */
+    fun style(vararg decorations: TextDecoration) {
+        this.style = Style.style(*decorations)
+    }
+    
+    /**
+     * Sets the style of the block name.
+     */
+    fun style(decoration: TextDecoration) {
+        this.style = Style.style(decoration)
+    }
+    
+    /**
+     * Sets the name of the block.
+     *
+     * This function is exclusive with [localizedName].
+     */
+    fun name(name: Component) {
+        this.name = name
+    }
+    
+    /**
+     * Sets the localization key of the block.
+     *
+     * Defaults to `block.<namespace>.<name>`.
+     *
+     * This function is exclusive with [name].
+     */
+    fun localizedName(localizedName: String) {
+        this.name = Component.translatable(localizedName)
+    }
     
     /**
      * Sets the behaviors of this block to [behaviors].
      */
-    open fun behaviors(vararg behaviors: BlockBehavior<T>): S {
-        this.logic = behaviors.toMutableList()
-        return this as S
+    open fun behaviors(vararg behaviors: BlockBehaviorHolder) {
+        this.behaviors += behaviors
     }
     
     /**
      * Adds the [behaviors] to the behaviors of this block.
      */
-    open fun addBehaviors(vararg block: BlockBehavior<T>): S {
-        this.logic += block
-        return this as S
+    open fun addBehaviors(vararg block: BlockBehaviorHolder) {
+        this.behaviors += block
     }
     
     /**
-     * Adds the [properties] to the properties of this block.
+     * Adds the [stateProperties] to the properties of this block.
      */
-    fun properties(vararg properties: BlockPropertyType<*>): S {
-        this.properties += properties
-        return this as S
+    fun stateProperties(vararg stateProperties: ScopedBlockStateProperty<*>) {
+        this.stateProperties += stateProperties
     }
     
-    /**
-     * Sets the [BlockOptions] of this block.
-     */
-    fun blockOptions(options: BlockOptions): S {
-        this.options = options
-        return this as S
-    }
-    
-    /**
-     * Sets the [PlaceCheckFun] of this block.
-     */
-    fun placeCheck(placeCheck: PlaceCheckFun): S {
-        this.placeCheck = placeCheck
-        return this as S
-    }
-    
-    /**
-     * Sets the [MultiBlockLoader] of this block.
-     */
-    fun multiBlockLoader(multiBlockLoader: MultiBlockLoader): S {
-        this.multiBlockLoader = multiBlockLoader
-        return this as S
+    fun models(buildModel: BlockModelLayoutBuilder.() -> Unit) {
+        val builder = BlockModelLayoutBuilder()
+        builder.buildModel()
+        requestedLayout = builder.build()
     }
     
 }
 
-class NovaBlockBuilder internal constructor(id: ResourceLocation) : AbstractNovaBlockBuilder<NovaBlockBuilder, NovaBlockState, NovaBlock>(id) {
+class NovaBlockBuilder internal constructor(id: ResourceLocation) : AbstractNovaBlockBuilder<NovaBlock>(id) {
     
     internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
-    
-    override var logic: MutableList<BlockBehavior<NovaBlockState>> = mutableListOf(BlockBehavior.Default)
     
     override fun build() = NovaBlock(
         id,
         name.style(style),
         style,
-        BlockLogic(logic),
-        options,
-        properties,
-        placeCheck,
-        multiBlockLoader,
-        configId
+        behaviors,
+        stateProperties,
+        configId,
+        requestedLayout
     )
     
 }
 
-class TileEntityNovaBlockBuilder internal constructor(
+class NovaTileEntityBlockBuilder internal constructor(
     id: ResourceLocation,
     private val tileEntity: TileEntityConstructor
-) : AbstractNovaBlockBuilder<TileEntityNovaBlockBuilder, NovaTileEntityState, NovaTileEntityBlock>(id) {
+) : AbstractNovaBlockBuilder<NovaTileEntityBlock>(id) {
+    
+    private var syncTickrate: Int = 20
+    private var asyncTickrate: Double = 0.0
     
     internal constructor(
         addon: Addon,
@@ -109,25 +144,27 @@ class TileEntityNovaBlockBuilder internal constructor(
         tileEntity: TileEntityConstructor
     ) : this(ResourceLocation(addon, name), tileEntity)
     
-    override var logic: MutableList<BlockBehavior<NovaTileEntityState>> = mutableListOf(TileEntityBlockBehavior.INTERACTIVE)
-    
-    fun interactive(interactive: Boolean): TileEntityNovaBlockBuilder {
-        logic.removeIf { it is TileEntityBlockBehavior }
-        logic += if (interactive) TileEntityBlockBehavior.INTERACTIVE else TileEntityBlockBehavior.NON_INTERACTIVE
-        return this
+    /**
+     * Configures the amount of times [TileEntity.handleTick] is called per second.
+     * Accepts values from 0 to 20, with 0 disabling ticking.
+     *
+     * Defaults to 20.
+     */
+    fun tickrate(tickrate: Int) {
+        require(tickrate in 0..20) { "Sync TPS must be between 0 and 20" }
+        this.syncTickrate = tickrate
     }
     
     override fun build() = NovaTileEntityBlock(
         id,
         name.style(style),
         style,
-        BlockLogic(logic),
-        options,
+        behaviors,
         tileEntity,
-        properties,
-        placeCheck,
-        multiBlockLoader,
-        configId
+        syncTickrate,
+        stateProperties,
+        configId,
+        requestedLayout
     )
     
 }

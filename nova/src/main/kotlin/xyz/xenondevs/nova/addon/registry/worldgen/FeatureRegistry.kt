@@ -1,9 +1,7 @@
 package xyz.xenondevs.nova.addon.registry.worldgen
 
-import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 import net.minecraft.core.Holder
-import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
 import net.minecraft.world.level.levelgen.feature.Feature
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
@@ -21,26 +19,8 @@ import xyz.xenondevs.nova.world.generation.builder.PlacedFeatureBuilder
 interface FeatureRegistry : AddonGetter {
     
     @ExperimentalWorldGen
-    fun placedFeature(name: String): PlacedFeatureBuilder {
-        val id = ResourceLocation(addon, name)
-        return PlacedFeatureBuilder(id)
-    }
-    
-    @ExperimentalWorldGen
-    fun placedFeature(name: String, configuredFeature: ConfiguredFeature<*, *>) =
-        placedFeature(name).configuredFeature(configuredFeature)
-    
-    @ExperimentalWorldGen
-    fun placedFeature(name: String, configuredFeature: Holder<ConfiguredFeature<*, *>>) =
-        placedFeature(name).configuredFeature(configuredFeature)
-    
-    @ExperimentalWorldGen
-    fun placedFeature(name: String, configuredFeatureId: ResourceLocation) =
-        placedFeature(name).configuredFeature(configuredFeatureId)
-    
-    @ExperimentalWorldGen
-    fun placedFeature(name: String, configuredFeatureKey: ResourceKey<ConfiguredFeature<*, *>>) =
-        placedFeature(name).configuredFeature(configuredFeatureKey)
+    fun placedFeature(name: String, placedFeature: PlacedFeatureBuilder.() -> Unit): PlacedFeature =
+        PlacedFeatureBuilder(ResourceLocation(addon, name)).apply(placedFeature).register()
     
     @ExperimentalWorldGen
     fun <FC : FeatureConfiguration> registerFeatureType(name: String, feature: FeatureType<FC>): FeatureType<FC> {
@@ -83,7 +63,7 @@ interface FeatureRegistry : AddonGetter {
     }
     
     @ExperimentalWorldGen
-    fun <P : PlacementModifier> registerPlacementModifierType(name: String, codec: Codec<P>): PlacementModifierType<P> =
+    fun <P : PlacementModifier> registerPlacementModifierType(name: String, codec: MapCodec<P>): PlacementModifierType<P> =
         registerPlacementModifierType(name) { codec }
     
 }

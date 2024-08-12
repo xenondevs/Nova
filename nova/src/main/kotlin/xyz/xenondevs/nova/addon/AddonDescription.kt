@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.addon
 
 import com.google.gson.JsonObject
 import xyz.xenondevs.commons.gson.getString
-import xyz.xenondevs.nova.data.serialization.json.getDeserialized
+import xyz.xenondevs.nova.serialization.json.getDeserialized
 import xyz.xenondevs.nova.util.data.Version
 
 data class AddonDescription internal constructor(

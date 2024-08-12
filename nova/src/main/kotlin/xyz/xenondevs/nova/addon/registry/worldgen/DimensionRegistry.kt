@@ -11,10 +11,8 @@ import xyz.xenondevs.nova.world.generation.builder.DimensionTypeBuilder
 interface DimensionRegistry : AddonGetter {
     
     @ExperimentalWorldGen
-    fun dimensionType(name: String): DimensionTypeBuilder {
-        val id = ResourceLocation(addon, name)
-        return DimensionTypeBuilder(id)
-    }
+    fun dimensionType(name: String, dimensionType: DimensionTypeBuilder.() -> Unit): DimensionType =
+        DimensionTypeBuilder(ResourceLocation(addon, name)).apply(dimensionType).register()
     
     @ExperimentalWorldGen
     fun registerDimensionType(name: String, dimensionType: DimensionType): DimensionType {

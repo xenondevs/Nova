@@ -55,7 +55,7 @@ enum class Instrument(val bukkitInstrument: BukkitInstrument, val nmsInstrument:
 }
 
 internal val BukkitInstrument.instrument: Instrument
-    get() = when(this) {
+    get() = when (this) {
         BukkitInstrument.PIANO -> Instrument.HARP
         BukkitInstrument.BASS_DRUM -> Instrument.BASEDRUM
         BukkitInstrument.SNARE_DRUM -> Instrument.SNARE
@@ -82,7 +82,7 @@ internal val BukkitInstrument.instrument: Instrument
     }
 
 internal val NoteBlockInstrument.instrument: Instrument
-    get() = when(this) {
+    get() = when (this) {
         NoteBlockInstrument.HARP -> Instrument.HARP
         NoteBlockInstrument.BASEDRUM -> Instrument.BASEDRUM
         NoteBlockInstrument.SNARE -> Instrument.SNARE

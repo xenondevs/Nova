@@ -1,18 +1,18 @@
 package xyz.xenondevs.nova.world.block.limits
 
-import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.optionalEntry
-import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
-import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
 import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
 
 internal object TileEntityLimits {
     
     private val limiters: List<BlockLimiter>? by MAIN_CONFIG.optionalEntry<List<BlockLimiter>>("performance", "tile_entity_limits")
     
-    fun canPlace(ctx: BlockPlaceContext): PlaceResult {
-        val block = ctx.item.novaItem?.block as? NovaTileEntityBlock
+    fun canPlace(ctx: Context<BlockPlace>): PlaceResult {
+        val block: NovaTileEntityBlock = ctx[DefaultContextParamTypes.BLOCK_TYPE_NOVA] as? NovaTileEntityBlock
             ?: return ALLOWED
         
         limiters?.forEach {

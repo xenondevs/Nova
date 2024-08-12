@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.generation.ruletest
 
-import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 import net.minecraft.core.BlockPos
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.Level
@@ -25,12 +25,10 @@ class MaterialMatchTest(val material: NovaBlock) : NovaMaterialTest() {
 @ExperimentalWorldGen
 object MaterialMatchTestType : RuleTestType<MaterialMatchTest> {
     
-    private val CODEC: Codec<MaterialMatchTest> =
+    private val CODEC: MapCodec<MaterialMatchTest> =
         NovaBlock.CODEC
             .fieldOf("material")
             .xmap(::MaterialMatchTest, MaterialMatchTest::material)
-            .codec()
-            .stable()
     
     override fun codec() = CODEC
     

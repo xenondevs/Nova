@@ -14,10 +14,12 @@ import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 interface BiomeRegistry : AddonGetter {
     
     @ExperimentalWorldGen
-    fun biomeInjection(name: String) = BiomeInjectionBuilder(ResourceLocation(addon, name))
+    fun biomeInjection(name: String, biomeInjection: BiomeInjectionBuilder.() -> Unit): BiomeInjection =
+        BiomeInjectionBuilder(ResourceLocation(addon, name)).apply(biomeInjection).register()
     
     @ExperimentalWorldGen
-    fun biome(name: String) = BiomeBuilder(ResourceLocation(addon, name))
+    fun biome(name: String, biome: BiomeBuilder.() -> Unit): Biome =
+        BiomeBuilder(ResourceLocation(addon, name)).apply(biome).register()
     
     @ExperimentalWorldGen
     fun registerBiomeInjection(name: String, injection: BiomeInjection): BiomeInjection {

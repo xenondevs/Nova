@@ -5,10 +5,10 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.GameMode
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.item.tool.ToolCategory
-import xyz.xenondevs.nova.item.tool.ToolTier
+import xyz.xenondevs.nova.world.item.tool.ToolCategory
+import xyz.xenondevs.nova.world.item.tool.ToolTier
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.WailaLine.Alignment
@@ -45,7 +45,7 @@ object ToolLine {
     
     fun getToolLine(
         player: Player,
-        blockToolCategories: List<ToolCategory>?,
+        blockToolCategories: Set<ToolCategory>?,
         blockToolLevel: ToolTier?,
         hardness: Double,
         correctToolForDrops: Boolean?

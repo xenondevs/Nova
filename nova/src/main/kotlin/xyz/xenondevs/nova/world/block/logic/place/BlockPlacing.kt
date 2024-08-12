@@ -1,9 +1,10 @@
 package xyz.xenondevs.nova.world.block.logic.place
 
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
+import kotlinx.coroutines.runBlocking
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
-import org.bukkit.Location
+import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -11,51 +12,81 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockMultiPlaceEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.player.PlayerBucketEmptyEvent
+import org.bukkit.event.player.PlayerBucketFillEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.world.WorldDataManager
-import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.addon.AddonsInitializer
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.player.WrappedPlayerInteractEvent
+import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.advance
-import xyz.xenondevs.nova.util.concurrent.CombinedBooleanFuture
-import xyz.xenondevs.nova.util.concurrent.runIfTrueOnSimilarThread
-import xyz.xenondevs.nova.util.facing
+import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
-import xyz.xenondevs.nova.util.isUnobstructed
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaItem
-import xyz.xenondevs.nova.util.placeVanilla
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.runTask
+import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
-import xyz.xenondevs.nova.util.yaw
+import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.BlockManager
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
-import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
+import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
+import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.pos
-import java.util.concurrent.CompletableFuture
 
+/**
+ * Handles in-game block placing by players.
+ */
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class, WorldDataManager::class]
+)
 internal object BlockPlacing : Listener {
     
-    fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
     }
     
+    // handleBlockPlace, handleFluidPlace, handleFluidRemove:
+    // Prevent players from placing blocks where there are actually already blocks form Nova.
+    // This can happen when a replaceable hitbox material, such as structure void, is used.
+    // However, we want to permit this for built-in custom blocks, as those might have their
+    // WorldDataManager entry set before this event is called (block migration patch)
+    
     @EventHandler(ignoreCancelled = true)
     private fun handleBlockPlace(event: BlockPlaceEvent) {
-        // Prevent players from placing blocks where there are actually already blocks form Nova
-        // This can happen when the hitbox material is replaceable, like as structure void
-        event.isCancelled = WorldDataManager.getBlockState(event.block.pos) is NovaBlockState
+        val blockState = WorldDataManager.getBlockState(event.block.pos)
+        event.isCancelled = blockState != null && blockState.block.id.namespace != "nova"
     }
     
     @EventHandler(ignoreCancelled = true)
     private fun handleBlockPlace(event: BlockMultiPlaceEvent) {
-        // Prevent players from placing blocks where there are actually already blocks form Nova
-        // This can happen when the hitbox material is replaceable, like as structure void
-        event.isCancelled = event.replacedBlockStates.any { WorldDataManager.getBlockState(it.location.pos) is NovaBlockState }
+        event.isCancelled = event.replacedBlockStates.any {
+            val blockState = WorldDataManager.getBlockState(it.location.pos)
+            blockState != null && blockState.block.id.namespace != "nova"
+        }
+    }
+    
+    @EventHandler(ignoreCancelled = true)
+    private fun handleFluidPlace(event: PlayerBucketEmptyEvent) {
+        val blockState = WorldDataManager.getBlockState(event.block.pos)
+        event.isCancelled = blockState != null && blockState.block.id.namespace != "nova"
+    }
+    
+    @EventHandler(ignoreCancelled = true)
+    private fun handleFluidRemove(event: PlayerBucketFillEvent) {
+        val blockState = WorldDataManager.getBlockState(event.block.pos)
+        event.isCancelled = blockState != null && blockState.block.id.namespace != "nova"
     }
     
     @EventHandler(priority = EventPriority.HIGH)
@@ -74,87 +105,79 @@ internal object BlockPlacing : Listener {
                 val novaItem = handItem?.novaItem
                 val novaBlock = novaItem?.block
                 if (novaBlock != null) {
-                    placeNovaBlock(wrappedEvent, novaBlock)
+                    event.isCancelled = true
+                    wrappedEvent.actionPerformed = true
+                    
+                    placeNovaBlock(event, novaBlock)
                 } else if (
-                    BlockManager.hasBlockState(block.pos) // the block placed against is from Nova
+                    WorldDataManager.getBlockState(block.pos) != null // the block placed against is from Nova
                     && block.type.isReplaceable() // and will be replaced without special behavior
                     && novaItem == null
                     && handItem?.type?.isBlock == true // a vanilla block material is used 
-                ) placeVanillaBlock(wrappedEvent)
+                ) {
+                    event.isCancelled = true
+                    wrappedEvent.actionPerformed = true
+                    
+                    placeVanillaBlock(event)
+                }
             }
         }
     }
     
-    private fun placeNovaBlock(wrappedEvent: WrappedPlayerInteractEvent, material: NovaBlock) {
-        val event = wrappedEvent.event
+    private fun placeNovaBlock(event: PlayerInteractEvent, novaBlock: NovaBlock) {
         val player = event.player
         val handItem = event.item!!
-        val playerLocation = player.location
         
-        event.isCancelled = true
-        wrappedEvent.actionPerformed = true
+        val clickedBlock = event.clickedBlock!!
+        var pos = clickedBlock.location.pos
+        if (!clickedBlock.type.isReplaceable() || WorldDataManager.getBlockState(pos) != null)
+            pos = pos.advance(event.blockFace)
         
-        val clicked = event.clickedBlock!!
-        val placeLoc: Location =
-            if (clicked.type.isReplaceable() && !BlockManager.hasBlockState(clicked.pos))
-                clicked.location
-            else clicked.location.advance(event.blockFace)
+        val ctxBuilder = Context.intention(DefaultContextIntentions.BlockPlace)
+            .param(DefaultContextParamTypes.BLOCK_POS, pos)
+            .param(DefaultContextParamTypes.BLOCK_ITEM_STACK, handItem)
+            .param(DefaultContextParamTypes.SOURCE_ENTITY, player)
+            .param(DefaultContextParamTypes.CLICKED_BLOCK_FACE, event.blockFace)
         
-        if (!placeLoc.isInsideWorldRestrictions() || !placeLoc.block.isUnobstructed(material.vanillaBlockMaterial, player))
-            return
+        val newState = novaBlock.chooseBlockState(ctxBuilder.build())
+        ctxBuilder.param(DefaultContextParamTypes.BLOCK_STATE_NOVA, newState)
         
-        val futures = ArrayList<CompletableFuture<Boolean>>()
-        futures += ProtectionManager.canPlace(player, handItem, placeLoc)
-        material.multiBlockLoader
-            ?.invoke(placeLoc.pos)
-            ?.forEach {
-                val multiBlockLoc = it.location
-                if (!multiBlockLoc.isInsideWorldRestrictions())
-                    return
-                futures += ProtectionManager.canPlace(player, handItem, multiBlockLoc)
-            }
-        material.placeCheck
-            ?.invoke(player, handItem, placeLoc.apply { yaw = playerLocation.facing.oppositeFace.yaw })
-            ?.also(futures::add)
+        val ctx = ctxBuilder.build()
         
-        CombinedBooleanFuture(futures).runIfTrueOnSimilarThread {
-            if (!canPlace(player, handItem, placeLoc.pos, placeLoc.clone().advance(event.blockFace.oppositeFace).pos))
-                return@runIfTrueOnSimilarThread
+        val vanillaState = when (val info = newState.modelProvider.info) {
+            is BackingStateConfig -> info.vanillaBlockState.bukkitBlockData
+            is DisplayEntityBlockModelData -> info.hitboxType
+            is BlockData -> info
+            else -> throw UnsupportedOperationException()
+        }
+        
+        if (pos.location.isInsideWorldRestrictions()
+            && BlockUtils.isUnobstructed(pos, player, vanillaState)
+            && ProtectionManager.canPlace(player, handItem, pos)
+            && canPlace(player, handItem, pos, pos.location.advance(event.blockFace.oppositeFace).pos)
+            && runBlocking { novaBlock.canPlace(pos, newState, ctx) } // assume blocking is ok because player is online
+        ) {
+            if (player.gameMode != GameMode.CREATIVE)
+                handItem.amount--
             
-            val ctx = BlockPlaceContext(
-                placeLoc.pos, handItem,
-                player, player.location, player.uniqueId,
-                event.clickedBlock!!.pos, event.blockFace
-            )
-            
-            val result = TileEntityLimits.canPlace(ctx)
-            if (result.allowed) {
-                BlockManager.placeBlockState(material, ctx)
-                
-                if (player.gameMode != GameMode.CREATIVE) handItem.amount--
-                runTask { player.swingHand(event.hand!!) }
-            } else {
-                player.sendMessage(Component.text(result.message, NamedTextColor.RED))
-            }
+            BlockUtils.placeNovaBlock(pos, newState, ctx)
+            player.swingHand(event.hand!!)
         }
     }
     
-    private fun placeVanillaBlock(wrappedEvent: WrappedPlayerInteractEvent) {
-        val event = wrappedEvent.event
+    private fun placeVanillaBlock(event: PlayerInteractEvent) {
         val player = event.player
         val handItem = event.item!!
         val placedOn = event.clickedBlock!!.pos
-        val block = event.clickedBlock!!.location.advance(event.blockFace).pos
-
-        event.isCancelled = true
-        wrappedEvent.actionPerformed = true
+        val pos = event.clickedBlock!!.location.advance(event.blockFace).pos
         
-        ProtectionManager.canPlace(player, handItem, block.location).runIfTrueOnSimilarThread {
-            if (canPlace(player, handItem, block, placedOn)) {
-                val placed = block.block.placeVanilla(player.serverPlayer, handItem, true)
-                if (placed && player.gameMode != GameMode.CREATIVE) {
-                    player.inventory.setItem(event.hand!!, handItem.apply { amount -= 1 })
-                }
+        if (
+            ProtectionManager.canPlace(player, handItem, pos)
+            && canPlace(player, handItem, pos, placedOn)
+        ) {
+            val placed = BlockUtils.placeVanillaBlock(pos, player.serverPlayer, handItem, true)
+            if (placed && player.gameMode != GameMode.CREATIVE) {
+                player.inventory.setItem(event.hand!!, handItem.apply { amount -= 1 })
             }
         }
     }
@@ -167,8 +190,11 @@ internal object BlockPlacing : Listener {
             || WorldDataManager.getBlockState(block) != null
         ) return false
         
-        if (player.gameMode == GameMode.ADVENTURE)
-            return placedOn.block.type.key in item.itemMeta.placeableKeys
+        if (player.gameMode == GameMode.ADVENTURE) {
+            val canPlaceOn = item.unwrap().get(DataComponents.CAN_PLACE_ON)
+            val blockInWorld = BlockInWorld(placedOn.world.serverLevel, placedOn.nmsPos, false)
+            return canPlaceOn?.test(blockInWorld) ?: false
+        }
         
         return true
     }

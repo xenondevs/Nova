@@ -2,28 +2,36 @@ package xyz.xenondevs.nova.world.block.logic.`break`
 
 import net.minecraft.core.Direction
 import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
+import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket.AttributeSnapshot
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.*
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.ai.attributes.Attributes
 import org.bukkit.GameMode
-import org.bukkit.craftbukkit.v1_20_R3.event.CraftEventFactory
+import org.bukkit.craftbukkit.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.commons.collections.removeIf
-import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.PacketListener
-import xyz.xenondevs.nmsutils.network.event.registerPacketListener
-import xyz.xenondevs.nmsutils.network.event.serverbound.ServerboundPlayerActionPacketEvent
-import xyz.xenondevs.nmsutils.network.packetHandler
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
+import xyz.xenondevs.nova.addon.AddonsInitializer
+import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.network.ClientboundUpdateAttributesPacket
+import xyz.xenondevs.nova.network.event.PacketHandler
+import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAttributesPacketEvent
+import xyz.xenondevs.nova.network.event.registerPacketListener
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
+import xyz.xenondevs.nova.network.packetHandler
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -33,26 +41,32 @@ import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.BlockManager
+import xyz.xenondevs.nova.world.block.behavior.Breakable
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 
 private val BREAK_COOLDOWN by MAIN_CONFIG.entry<Int>("world", "block_breaking", "break_cooldown")
 
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class, WorldDataManager::class]
+)
 internal object BlockBreaking : Listener, PacketListener {
     
     private val breakCooldowns = ConcurrentHashMap<Player, Int>()
     private val playerBreakers = ConcurrentHashMap<Player, BlockBreaker>()
     private val internalBreakers = HashMap<Int, VisibleBreakMethod>()
     
-    fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
         registerPacketListener()
         runTaskTimer(0, 1, BlockBreaking::handleTick)
     }
     
     fun setBreakStage(pos: BlockPos, entityId: Int, stage: Int) {
-        val blockState = BlockManager.getBlockState(pos) ?: return
+        val blockState = WorldDataManager.getBlockState(pos) ?: return
         
         val block = pos.block
         var method = internalBreakers[entityId]
@@ -65,7 +79,7 @@ internal object BlockBreaking : Listener, PacketListener {
         }
         
         // check that the previous break effect is on that block, otherwise cancel the previous effect
-        if (method != null && method.pos != blockState.pos) {
+        if (method != null && method.pos != pos) {
             method.stop()
             method = null
             internalBreakers -= entityId
@@ -103,10 +117,8 @@ internal object BlockBreaking : Listener, PacketListener {
     }
     
     private fun handleDestroyStart(player: Player, packet: ServerboundPlayerActionPacket, pos: BlockPos, direction: Direction, sequence: Int) {
-        val block = pos.block
-        
         // pass packet further down the pipeline if the block is from a custom item service
-        if (CustomItemServiceManager.getBlockType(block) != null) {
+        if (CustomItemServiceManager.getBlockType(pos.block) != null) {
             player.packetHandler?.injectIncoming(packet)
             return
         }
@@ -135,10 +147,17 @@ internal object BlockBreaking : Listener, PacketListener {
         }
         
         // start breaker
-        val novaBlockState = BlockManager.getBlockState(pos)
-        val breaker = if (novaBlockState != null)
-            NovaBlockBreaker(player, block, novaBlockState, sequence, breakCooldowns[player] ?: 0)
-        else VanillaBlockBreaker(player, block, sequence, breakCooldowns[player] ?: 0)
+        val novaBlockState = WorldDataManager.getBlockState(pos)
+        val breaker: BlockBreaker
+        if (novaBlockState != null) {
+            // don't do any breaking logic if the block doesn't have the breakable behavior
+            if (!novaBlockState.block.hasBehavior<Breakable>())
+                return
+            
+            breaker = NovaBlockBreaker(player, pos, novaBlockState, sequence, breakCooldowns[player] ?: 0)
+        } else {
+            breaker = VanillaBlockBreaker(player, pos, sequence, breakCooldowns[player] ?: 0)
+        }
         
         // creative breakers should not be added to the playerBreakers map because players in creative mode
         // do not send an abort or stop packet and therefore the breaker would never be removed
@@ -192,6 +211,28 @@ internal object BlockBreaking : Listener, PacketListener {
             
             else -> false
         }
+    }
+    
+    @PacketHandler
+    private fun handleAttributes(event: ClientboundUpdateAttributesPacketEvent) {
+        if (event.player.entityId != event.entityId)
+            return
+        
+        event.values = event.values.map {
+            if (it.attribute.value() == Attributes.BLOCK_BREAK_SPEED.value()) {
+                AttributeSnapshot(it.attribute, 0.0, emptyList())
+            } else {
+                it
+            }
+        }
+    }
+    
+    @EventHandler
+    private fun handleJoin(event: PlayerJoinEvent) {
+        val player = event.player
+        val attributes = listOf(AttributeSnapshot(Attributes.BLOCK_BREAK_SPEED, 0.0, emptyList()))
+        val packet = ClientboundUpdateAttributesPacket(player.entityId, attributes)
+        player.send(packet)
     }
     
     @EventHandler(priority = EventPriority.LOWEST)

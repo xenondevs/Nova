@@ -1,4 +1,3 @@
-
 package xyz.xenondevs.nova.util
 
 import org.bukkit.Location
@@ -32,11 +31,11 @@ abstract class FakeOnlinePlayer(
 ) : Player, OfflinePlayer by offlinePlayer {
     
     override fun hasPermission(name: String): Boolean {
-        return PermissionManager.hasPermission(world, uniqueId, name)
+        return PermissionManager.hasPermission(world, uniqueId, name).get()
     }
     
     override fun hasPermission(perm: Permission): Boolean {
-        return PermissionManager.hasPermission(world, uniqueId, perm.name)
+        return PermissionManager.hasPermission(world, uniqueId, perm.name).get()
     }
     
     override fun isPermissionSet(name: String): Boolean {
@@ -82,7 +81,7 @@ abstract class FakeOnlinePlayer(
         
         @Suppress("UNCHECKED_CAST")
         private fun buildImpl(): Constructor<FakeOnlinePlayer> {
-            val classWrapper = ClassWrapper("xyz/xenondevs/nova/util/FakeOnlinePlayerImpl.class").apply { 
+            val classWrapper = ClassWrapper("xyz/xenondevs/nova/util/FakeOnlinePlayerImpl.class").apply {
                 access = Opcodes.ACC_PUBLIC
                 superName = "xyz/xenondevs/nova/util/FakeOnlinePlayer"
                 
@@ -102,7 +101,7 @@ abstract class FakeOnlinePlayer(
                 AsmUtils.listNonOverriddenMethods(
                     VirtualClassPath[FakeOnlinePlayer::class],
                     OfflinePlayer::class, Any::class
-                ).forEach { 
+                ).forEach {
                     val methodNode = MethodNode(
                         Opcodes.ACC_PUBLIC,
                         it.name,

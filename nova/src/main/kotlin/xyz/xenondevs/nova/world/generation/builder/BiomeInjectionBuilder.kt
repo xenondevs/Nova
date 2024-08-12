@@ -26,7 +26,7 @@ import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
  * @see [BiomeRegistry]
  */
 @ExperimentalWorldGen
-class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeInjection>(NovaRegistries.BIOME_INJECTION, id) {
+class BiomeInjectionBuilder(id: ResourceLocation) : RegistryElementBuilder<BiomeInjection>(NovaRegistries.BIOME_INJECTION, id) {
     
     private val biomes = mutableListOf<ResourceLocationOrTagKey<Biome>>()
     private val features = Array(11) { mutableListOf<Holder<PlacedFeature>>() }
@@ -34,15 +34,14 @@ class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeI
     /**
      * Adds a [Biome's][Biome] [ResourceLocation] to the list of biomes this [BiomeInjection] should be applied to.
      */
-    fun biome(biome: ResourceLocation): BiomeInjectionBuilder {
+    fun biome(biome: ResourceLocation) {
         biomes.add(ResourceLocationOrTagKey.ofLocation(biome))
-        return this
     }
     
     /**
      * Adds a [Biome's][Biome] [ResourceKey] to the list of biomes this [BiomeInjection] should be applied to.
      */
-    fun biome(biome: ResourceKey<Biome>): BiomeInjectionBuilder {
+    fun biome(biome: ResourceKey<Biome>) {
         return biome(biome.location())
     }
     
@@ -50,44 +49,39 @@ class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeI
      * Adds a [Biome's][Biome] [String] id to the list of biomes this [BiomeInjection] should be applied to.
      * (e.g. "minecraft:plains")
      */
-    fun biome(biome: String): BiomeInjectionBuilder {
-        biomes.add(ResourceLocationOrTagKey.ofLocation(ResourceLocation(biome)))
-        return this
+    fun biome(biome: String) {
+        biomes.add(ResourceLocationOrTagKey.ofLocation(ResourceLocation.parse(biome)))
     }
     
     /**
      * Adds a [TagKey] of [Biomes][Biome] to the list of biomes this [BiomeInjection] should be applied to.
      */
-    fun biomes(biomeTag: TagKey<Biome>): BiomeInjectionBuilder {
+    fun biomes(biomeTag: TagKey<Biome>) {
         biomes.add(ResourceLocationOrTagKey.ofTag(biomeTag))
-        return this
     }
     
     /**
      * Adds multiple [Biome's][Biome] [ResourceLocations][ResourceLocation] to the list of biomes this [BiomeInjection]
      * should be applied to.
      */
-    fun biomes(vararg biomes: ResourceLocation): BiomeInjectionBuilder {
+    fun biomes(vararg biomes: ResourceLocation) {
         biomes.forEach(::biome)
-        return this
     }
     
     /**
      * Adds multiple [Biome's][Biome] [ResourceKeys][ResourceKey] to the list of biomes this [BiomeInjection] should be
      * applied to.
      */
-    fun biomes(vararg biomes: ResourceKey<Biome>): BiomeInjectionBuilder {
+    fun biomes(vararg biomes: ResourceKey<Biome>) {
         biomes.forEach(::biome)
-        return this
     }
     
     /**
      * Adds multiple [Biome's][Biome] [String] ids to the list of biomes this [BiomeInjection] should be applied to.
      * (e.g. "minecraft:plains")
      */
-    fun biomes(vararg biomes: String): BiomeInjectionBuilder {
+    fun biomes(vararg biomes: String) {
         biomes.forEach(::biome)
-        return this
     }
     
     /**
@@ -96,9 +90,8 @@ class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeI
      *
      * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
      */
-    fun feature(index: GenerationStep.Decoration, feature: PlacedFeature): BiomeInjectionBuilder {
+    fun feature(index: GenerationStep.Decoration, feature: PlacedFeature) {
         features[index.ordinal].add(Holder.direct(feature))
-        return this
     }
     
     /**
@@ -106,9 +99,8 @@ class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeI
      * or is set later by the [PlacedFeature Registry][Registries.PLACED_FEATURE] at the specified
      * [GenerationStep.Decoration] to the list of features this [BiomeInjection] should add.
      */
-    fun feature(index: GenerationStep.Decoration, feature: Holder<PlacedFeature>): BiomeInjectionBuilder {
+    fun feature(index: GenerationStep.Decoration, feature: Holder<PlacedFeature>) {
         features[index.ordinal].add(feature)
-        return this
     }
     
     /**
@@ -116,9 +108,8 @@ class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeI
      * should add. If the [PlacedFeature] is not yet registered, an empty [Holder] will be created and the [PlacedFeature]
      * will be set later by the [PlacedFeature Registry][Registries.PLACED_FEATURE].
      */
-    fun feature(index: GenerationStep.Decoration, featureId: ResourceLocation): BiomeInjectionBuilder {
+    fun feature(index: GenerationStep.Decoration, featureId: ResourceLocation) {
         features[index.ordinal].add(VanillaRegistries.PLACED_FEATURE.getOrCreateHolder(featureId))
-        return this
     }
     
     /**
@@ -126,17 +117,16 @@ class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeI
      * should add. If the [PlacedFeature] is not yet registered, an empty [Holder] will be created and the [PlacedFeature]
      * will be set later by the [PlacedFeature Registry][Registries.PLACED_FEATURE].
      */
-    fun feature(index: GenerationStep.Decoration, featureKey: ResourceKey<PlacedFeature>): BiomeInjectionBuilder {
-        return feature(index, featureKey.location())
+    fun feature(index: GenerationStep.Decoration, featureKey: ResourceKey<PlacedFeature>) {
+        feature(index, featureKey.location())
     }
     
     /**
      * Adds multiple [PlacedFeature]s at the specified [GenerationStep.Decoration] to the list of features this [BiomeInjection]
      * should add.
      */
-    fun features(index: GenerationStep.Decoration, vararg placedFeatures: PlacedFeature): BiomeInjectionBuilder {
+    fun features(index: GenerationStep.Decoration, vararg placedFeatures: PlacedFeature) {
         features[index.ordinal].addAll(placedFeatures.map { Holder.direct(it) })
-        return this
     }
     
     /**
@@ -146,9 +136,8 @@ class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeI
      *
      * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
      */
-    fun features(index: GenerationStep.Decoration, vararg placedFeatures: Holder<PlacedFeature>): BiomeInjectionBuilder {
+    fun features(index: GenerationStep.Decoration, vararg placedFeatures: Holder<PlacedFeature>) {
         features[index.ordinal].addAll(placedFeatures)
-        return this
     }
     
     /**
@@ -158,9 +147,8 @@ class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeI
      *
      * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
      */
-    fun features(index: GenerationStep.Decoration, vararg placedFeatureIds: ResourceLocation): BiomeInjectionBuilder {
+    fun features(index: GenerationStep.Decoration, vararg placedFeatureIds: ResourceLocation) {
         features[index.ordinal].addAll(placedFeatureIds.map { VanillaRegistries.PLACED_FEATURE.getOrCreateHolder(it) })
-        return this
     }
     
     /**
@@ -170,9 +158,8 @@ class BiomeInjectionBuilder(id: ResourceLocation): RegistryElementBuilder<BiomeI
      *
      * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
      */
-    fun features(index: GenerationStep.Decoration, vararg placedFeatureKeys: ResourceKey<PlacedFeature>): BiomeInjectionBuilder {
+    fun features(index: GenerationStep.Decoration, vararg placedFeatureKeys: ResourceKey<PlacedFeature>) {
         placedFeatureKeys.forEach { feature(index, it.location()) }
-        return this
     }
     
     /**

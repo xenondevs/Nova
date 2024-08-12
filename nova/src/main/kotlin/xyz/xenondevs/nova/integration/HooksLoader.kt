@@ -7,8 +7,9 @@ import org.objectweb.asm.Type
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
-import xyz.xenondevs.nova.data.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.data.resources.upload.UploadService
+import xyz.xenondevs.nova.resources.upload.AutoUploadManager
+import xyz.xenondevs.nova.resources.upload.UploadService
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -21,12 +22,20 @@ import xyz.xenondevs.nova.util.data.JarUtils
 import java.util.logging.Level
 import kotlin.reflect.KClass
 
-@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dispatcher = Dispatcher.ASYNC
+)
 internal object HooksLoader {
     
     @InitFun
     private fun loadHooks() {
-        JarUtils.findAnnotatedClasses(NOVA.novaJar, Hook::class, "xyz/xenondevs/nova/hook/impl/").forEach { (className, annotation) ->
+        JarUtils.findAnnotatedClasses(
+            NOVA.novaJar,
+            listOf(Hook::class), emptyList(),
+            "xyz/xenondevs/nova/hook/impl/"
+        ).classes[Hook::class]?.forEach { (className, annotations) ->
+            val annotation = annotations.first()
             try {
                 val plugins = annotation["plugins"] as? List<String> ?: emptyList()
                 val unless = annotation["unless"] as? List<String> ?: emptyList()

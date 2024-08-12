@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.ui.waila.info
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_INFO_PROVIDER
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_TOOL_ICON_PROVIDER
 import xyz.xenondevs.nova.ui.waila.info.impl.BrushableWailaInfoProvider
@@ -53,12 +53,12 @@ private object DefaultWailaProviders {
     }
     
     private fun <T> register(name: String, provider: WailaInfoProvider<T>) {
-        val id = ResourceLocation("nova", name)
+        val id = ResourceLocation.fromNamespaceAndPath("nova", name)
         WAILA_INFO_PROVIDER[id] = provider
     }
     
     private fun register(name: String, provider: WailaToolIconProvider) {
-        val id = ResourceLocation("nova", name)
+        val id = ResourceLocation.fromNamespaceAndPath("nova", name)
         WAILA_TOOL_ICON_PROVIDER[id] = provider
     }
     

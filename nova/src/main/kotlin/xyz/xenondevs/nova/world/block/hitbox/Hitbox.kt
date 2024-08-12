@@ -12,6 +12,7 @@ import kotlin.math.abs
 
 internal typealias ClickHandler = (Player) -> Unit
 internal typealias ClickAtLocationHandler = (Player, EquipmentSlot, Vector3f) -> Unit
+
 private const val EPSILON = 0.0001f
 
 abstract class Hitbox<L, R> internal constructor(

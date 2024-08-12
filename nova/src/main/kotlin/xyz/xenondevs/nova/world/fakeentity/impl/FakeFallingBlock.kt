@@ -7,10 +7,10 @@ import xyz.xenondevs.nova.world.fakeentity.FakeEntity
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.FallingBlockMetadata
 
 class FakeFallingBlock(
-	location: Location,
-	autoRegister: Boolean,
-	beforeSpawn: ((FakeFallingBlock, FallingBlockMetadata) -> Unit)?,
-	override val metadata: FallingBlockMetadata
+    location: Location,
+    autoRegister: Boolean,
+    beforeSpawn: ((FakeFallingBlock, FallingBlockMetadata) -> Unit)?,
+    override val metadata: FallingBlockMetadata
 ) : FakeEntity<FallingBlockMetadata>(location) {
     
     override val entityType: EntityType<FallingBlockEntity> = EntityType.FALLING_BLOCK

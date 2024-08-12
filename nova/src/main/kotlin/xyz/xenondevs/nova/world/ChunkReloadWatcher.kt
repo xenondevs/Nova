@@ -5,17 +5,18 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
+import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.registerEvents
 import java.util.logging.Level
 
-private val ENABLED by MAIN_CONFIG.entry<Boolean>("debug", "watch_chunk_reloads")
-
-@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC)
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dispatcher = Dispatcher.ASYNC
+)
 internal object ChunkReloadWatcher : Listener {
     
     private const val RELOAD_TIME_LIMIT = 500
@@ -24,10 +25,15 @@ internal object ChunkReloadWatcher : Listener {
     private val CHUNK_LOADS = HashMap<ChunkPos, Pair<Long, Int>>()
     
     @InitFun
-    fun reload() {
+    private fun init() {
+        val enabled = MAIN_CONFIG.entry<Boolean>("debug", "watch_chunk_reloads")
+        enabled.subscribe(::reload)
+        reload(enabled.get())
+    }
+    
+    private fun reload(enabled: Boolean) {
         HandlerList.unregisterAll(this)
-        if (ENABLED)
-            registerEvents()
+        if (enabled) registerEvents()
     }
     
     @EventHandler

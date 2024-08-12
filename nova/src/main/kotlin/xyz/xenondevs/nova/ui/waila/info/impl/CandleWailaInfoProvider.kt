@@ -2,13 +2,13 @@ package xyz.xenondevs.nova.ui.waila.info.impl
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
-import org.bukkit.block.Block
 import org.bukkit.block.data.type.Candle
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.ui.waila.info.VanillaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaInfo
+import xyz.xenondevs.nova.world.BlockPos
 
-internal object CandleWailaInfoProvider : VanillaWailaInfoProvider(
+internal object CandleWailaInfoProvider : VanillaWailaInfoProvider<Candle>(
     setOf(
         Material.CANDLE, Material.WHITE_CANDLE, Material.ORANGE_CANDLE, Material.MAGENTA_CANDLE, Material.LIGHT_BLUE_CANDLE,
         Material.YELLOW_CANDLE, Material.LIME_CANDLE, Material.PINK_CANDLE, Material.GRAY_CANDLE, Material.LIGHT_GRAY_CANDLE,
@@ -17,15 +17,14 @@ internal object CandleWailaInfoProvider : VanillaWailaInfoProvider(
     )
 ) {
     
-    override fun getInfo(player: Player, block: Block): WailaInfo {
-        val info = DefaultVanillaWailaInfoProvider.getInfo(player, block)
-        info.icon = getCandleId(block)
+    override fun getInfo(player: Player, pos: BlockPos, blockState: Candle): WailaInfo {
+        val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
+        info.icon = getCandleId(blockState)
         return info
     }
     
-    private fun getCandleId(block: Block): ResourceLocation {
-        val name = block.type.name.lowercase()
-        val candle = block.blockData as Candle
+    private fun getCandleId(candle: Candle): ResourceLocation {
+        val name = candle.material.name.lowercase()
         val amount = when (candle.candles) {
             1 -> "one_candle"
             2 -> "two_candles"
@@ -34,7 +33,7 @@ internal object CandleWailaInfoProvider : VanillaWailaInfoProvider(
             else -> IllegalStateException("Invalid amount of candles")
         }
         
-        return ResourceLocation("minecraft", "${name}_${amount}")
+        return ResourceLocation.withDefaultNamespace("${name}_${amount}")
     }
     
 }

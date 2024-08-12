@@ -3,27 +3,42 @@ package xyz.xenondevs.nova.world.block.logic.sound
 import net.minecraft.core.Holder
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
+import org.bukkit.Sound
 import org.bukkit.event.Listener
-import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.PacketListener
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundEntityPacketEvent
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSoundPacketEvent
-import xyz.xenondevs.nmsutils.network.event.registerPacketListener
-import xyz.xenondevs.nova.data.config.PermanentStorage
+import xyz.xenondevs.nova.addon.AddonsInitializer
+import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.network.event.PacketHandler
+import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundEntityPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundPacketEvent
+import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.take
+import xyz.xenondevs.nova.world.format.WorldDataManager
 
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dependsOn = [AddonsInitializer::class, WorldDataManager::class]
+)
 internal object SoundEngine : Listener, PacketListener {
     
     private val SOUND_OVERRIDES: HashSet<String> = PermanentStorage.retrieve("soundOverrides", ::HashSet)
     
-    fun init() {
+    @InitFun
+    private fun init() {
         registerEvents()
         registerPacketListener()
     }
     
     fun overridesSound(sound: String): Boolean {
         return sound.removePrefix("minecraft:") in SOUND_OVERRIDES
+    }
+    
+    fun overridesSound(sound: Sound): Boolean {
+        return overridesSound(sound.key.toString())
     }
     
     @PacketHandler
@@ -43,6 +58,6 @@ internal object SoundEngine : Listener, PacketListener {
     }
     
     private fun getNovaSound(path: String): Holder<SoundEvent> =
-        Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation("nova", path)))
+        Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("nova", path)))
     
 }

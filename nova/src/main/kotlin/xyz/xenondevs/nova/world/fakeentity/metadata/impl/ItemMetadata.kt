@@ -1,9 +1,10 @@
 package xyz.xenondevs.nova.world.fakeentity.metadata.impl
 
-import net.minecraft.world.item.ItemStack
+import org.bukkit.inventory.ItemStack
+
 
 class ItemMetadata : EntityMetadata() {
     
-    var item: ItemStack by itemStack(8, true, ItemStack.EMPTY)
+    var item: ItemStack? by itemStack(8, true)
     
 }

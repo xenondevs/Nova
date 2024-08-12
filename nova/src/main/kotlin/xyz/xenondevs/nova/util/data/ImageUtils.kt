@@ -69,7 +69,7 @@ object ImageUtils {
      * Finds the top and bottom borders of the given [image].
      * The values in the returned Pair<Top, Bottom> correspond with the
      * y-coordinate of the first non-empty row from the top and bottom side of the image.
-     * 
+     *
      * @return A vector containing the top and bottom borders, or null if the image is completely empty.
      */
     fun findTopBottomBorders(image: BufferedImage): Vector2ic? {

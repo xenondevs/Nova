@@ -1,6 +1,0 @@
-{
-  "parent": "nova:item/gui/gui_item",
-  "textures": {
-    "1": "nova:item/gui/number/66"
-  }
-}

@@ -6,10 +6,11 @@ import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.gson.parseJson
-import xyz.xenondevs.nova.NOVA_PLUGIN
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
-import xyz.xenondevs.nova.data.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.data.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -17,7 +18,8 @@ import xyz.xenondevs.nova.util.formatSafely
 import xyz.xenondevs.nova.util.runAsyncTask
 
 @InternalInit(
-    stage = InternalInitStage.POST_WORLD_ASYNC,
+    stage = InternalInitStage.POST_WORLD,
+    dispatcher = Dispatcher.ASYNC,
     dependsOn = [ResourceGeneration.PostWorld::class]
 )
 object LocaleManager {
@@ -29,7 +31,7 @@ object LocaleManager {
     
     @InitFun
     private fun init() {
-        translationProviders = ResourceLookups.LANGUAGE_LOOKUP.mapValuesTo(HashMap()) { HashMap(it.value) }
+        translationProviders = ResourceLookups.LANGUAGE.mapValuesTo(HashMap()) { HashMap(it.value) }
         loadLang("en_us")
         Language.inject(NovaLanguage)
     }
@@ -40,7 +42,7 @@ object LocaleManager {
         
         loadingLangs += lang
         
-        if (NOVA_PLUGIN.isEnabled) runAsyncTask {
+        if (NOVA.isEnabled) runAsyncTask {
             val file = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/lang/$lang.json")
             val json = file.parseJson() as JsonObject
             val translations = json.entrySet().associateTo(HashMap()) { it.key to it.value.asString }

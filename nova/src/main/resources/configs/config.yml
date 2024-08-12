@@ -42,9 +42,6 @@ resource_pack:
     # Whether Minecraft assets should be downloaded from GitHub or Mojang's API.
     # GitHub is faster since it's a single zip file. If you're unable to access GitHub, change this to "mojang".
     minecraft_assets_source: github
-    # If Nova is allowed to use solid block states (e.g. mushroom, noteblock) when addons request it.
-    # Please read the following documentation page before change this value: https://xenondevs.xyz/docs/nova/admin/compatibility/troubleshooting/#solid-blocks
-    use_solid_blocks: true
   # If Nova should use the uniform font for moved versions of the default font and calculation of char sizes for the default font.
   # The uniform font can be activated client-side by toggling "Force Unicode Font" in Minecraft's language settings.
   # If the players on your server are expected to have that option enabled, you should set this to true.
@@ -111,38 +108,60 @@ waila:
 world:
   # Settings affecting block breaking.
   block_breaking:
-    # If client-side predictions should be allowed for breaking vanilla blocks with vanilla tools.
-    clientside_predictions: true
     # The block break cooldown, in ticks.
     break_cooldown: 5
-  # If unknown blocks (e.g. blocks of addons that couldn't be loaded) should be deleted.
-  delete_unknown_blocks: false
+  format:
+    # If backup files should be created while saving Nova regions
+    region_backups: true
+    # The compression algorithm used (none, deflate, lz4, zstd)
+    compression: zstd
+
+# Settings affecting tile-entity networks.
+network:
+  # Whether independent networks are allowed to tick in parallel.
+  parallel_ticking: true
+  # Settings affecting nova:energy networks.
+  energy:
+    # The delay in-between energy network ticks, in game ticks.
+    tick_delay: 1
+    # The maximum amount of end points in energy networks. Networks with more end points will not be ticked. (-1 for unlimited)
+    max_complexity: -1
+    # The default transfer rate for energy networks, in energy units per game tick. (-1 for unlimited)
+    # This is scaled with the network tick delay, so that the actual amount of energy transferred per second stays the same.
+    default_transfer_rate: -1
+  # Settings affecting nova:item networks.
+  item:
+    # The delay in-between item network ticks, in game ticks.
+    tick_delay: 20
+    # The maximum amount of end points in item networks. Networks with more end points will not be ticked. (-1 for unlimited)
+    max_complexity: -1
+    # The default transfer rate for item networks, in items per game tick. (-1 for unlimited)
+    # This is scaled with the network tick delay, so that the actual amount of items transferred per second stays the same.
+    default_transfer_rate: -1
+    # The amount of different channels available.
+    channel_amount: 4
+  # Settings affecting nova:fluid networks.
+  fluid:
+    # The delay in-between fluid network ticks, in game ticks.
+    tick_delay: 1
+    # The maximum amount of end points in fluid networks. Networks with more end points will not be ticked. (-1 for unlimited)
+    max_complexity: -1
+    # The default transfer rate for fluid networks, in fluid units per game tick. (-1 for unlimited)
+    # This is scaled with the network tick delay, so that the actual amount of fluid transferred per second stays the same.
+    default_transfer_rate: -1
+    # The amount of different channels available.
+    channel_amount: 4
 
 # Performance options
 performance:
-  # Nova's executor caps the amount of threads that are allowed to run simultaneously in order to prevent OutOfMemoryErrors.
-  nova_executor:
-    # If enabled, Nova's own executor will be used. Otherwise, Bukkit's scheduler system is used.
-    enabled: true
-    # The amount of threads to be started.
-    threads: 200
   # If all char sizes should be loaded on startup. This will increase startup time but prevent lags when initially accessing char sizes.
   load_char_sizes_on_startup: false
-  # If backup files should be created while saving Nova regions
-  region_backups: true
   # If excess items should be dropped on the ground.
   drop_excess_on_ground: true
   # If block break particles should be displayed.
   block_break_effects: true
-
-# Default transfer rates for networks when tile entities are directly connected.
-network:
-  energy:
-    default_transfer_rate: 9223372036854775807
-  item:
-    default_transfer_rate: 2147483647
-  fluid:
-    default_transfer_rate: 9223372036854775807
+  # Whether legacy conversion for Nova item stacks is enabled.
+  item_stack_legacy_conversion: true
 
 # If metric prefixes should be used to display energy and fluids (e.g. kJ, MJ, GJ or B, kB, MB)
 use_metric_prefixes: false
@@ -160,3 +179,7 @@ debug:
   allow_craft_result_overwrite: false
   # A list of pack tasks that should be skipped during resource pack generation
   skip_pack_tasks: []
+  # Debug logging options
+  logging:
+    # Logs initializer runnable calls
+    initializer: false

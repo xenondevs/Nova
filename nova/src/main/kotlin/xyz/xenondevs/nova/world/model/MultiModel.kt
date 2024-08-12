@@ -1,6 +1,9 @@
 package xyz.xenondevs.nova.world.model
 
+import org.bukkit.Location
+import xyz.xenondevs.commons.collections.poll
 import xyz.xenondevs.commons.collections.removeIf
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemDisplayMetadata
 
@@ -70,11 +73,37 @@ class MovableMultiModel : MultiModel() {
 class FixedMultiModel : MultiModel() {
     
     @Synchronized
-    fun replaceModels(models: Set<Model>) {
-        removeIf { model, _ -> model !in models }
-        for (model in models) {
-            if (model !in this.models)
-                add(model)
+    fun replaceModels(newModels: Set<Model>) {
+        val availableDisplays = HashMap<Location, HashSet<FakeItemDisplay>>()
+        for ((model, itemDisplay) in models) {
+            availableDisplays.getOrPut(model.location, ::HashSet) += itemDisplay
+        }
+        models.clear()
+        
+        // first, use existing display entities that are already at the correct position
+        val remainingModels = newModels.toHashSet()
+        remainingModels.removeIf { model ->
+            val displaysAtPos = availableDisplays[model.location]
+                ?.takeUnlessEmpty()
+                ?: return@removeIf false
+            
+            val display = displaysAtPos.poll()!!
+            display.updateEntityData(true) { model.applyMetadata(this) }
+            models[model] = display
+            
+            return@removeIf true
+        }
+        
+        // despawn all unused display entities
+        for (displays in availableDisplays.values) {
+            for (display in displays) {
+                display.remove()
+            }
+        }
+        
+        // add the remaining models by spawning new display entities
+        for (model in remainingModels) {
+            add(model)
         }
     }
     

@@ -3,11 +3,14 @@ package xyz.xenondevs.nova.util.item
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.SoundGroup
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers
+import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.nova.tileentity.network.fluid.FluidType
+import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import kotlin.random.Random
+
+@Suppress("DEPRECATION")
+val Material?.requiresLight: Boolean
+    get() = this != null && !isTransparent && isOccluding
 
 val Material.fluidType: FluidType?
     get() {
@@ -35,13 +38,14 @@ fun Material.isCauldron() = this == Material.CAULDRON || this == Material.WATER_
 
 fun Material.hasNoBreakParticles() = this == Material.BARRIER || this == Material.STRUCTURE_VOID || this == Material.LIGHT
 
-fun Material.toItemStack(amount: Int = 1): ItemStack = ItemBuilder(this).setAmount(amount).get()
+fun Material.toItemStack(amount: Int = 1): ItemStack = ItemStack.of(this).also { it.amount = amount }
 
 /**
  * More reliable function compared to the Spigot API function [Material.isInteractable].
  * From https://www.spigotmc.org/threads/check-if-a-block-is-interactable.535861/
  * @author LoneDev
  */
+@Suppress("DEPRECATION")
 fun Material.isActuallyInteractable(): Boolean {
     return if (!isInteractable) false else when (this) {
         Material.ACACIA_STAIRS, Material.ANDESITE_STAIRS, Material.BIRCH_STAIRS, Material.BLACKSTONE_STAIRS,
@@ -57,6 +61,7 @@ fun Material.isActuallyInteractable(): Boolean {
         Material.JUNGLE_FENCE, Material.MOVING_PISTON, Material.NETHER_BRICK_FENCE, Material.OAK_FENCE,
         Material.PUMPKIN, Material.REDSTONE_ORE, Material.REDSTONE_WIRE, Material.SPRUCE_FENCE,
         Material.WARPED_FENCE -> false
+        
         else -> true
     }
 }
@@ -67,6 +72,7 @@ fun Material.isReplaceable(): Boolean =
         Material.SHORT_GRASS, Material.TALL_GRASS, Material.FERN, Material.DEAD_BUSH, Material.VINE,
         Material.CRIMSON_ROOTS, Material.WARPED_ROOTS, Material.NETHER_SPROUTS, Material.SEAGRASS, Material.FIRE,
         Material.SOUL_FIRE, Material.SNOW, Material.STRUCTURE_VOID, Material.LIGHT -> true
+        
         else -> false
     }
 

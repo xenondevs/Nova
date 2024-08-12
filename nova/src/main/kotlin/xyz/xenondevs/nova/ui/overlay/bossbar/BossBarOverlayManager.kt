@@ -13,31 +13,30 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.inventoryaccess.util.ReflectionRegistry
-import xyz.xenondevs.nmsutils.bossbar.BossBar
-import xyz.xenondevs.nmsutils.bossbar.operation.AddBossBarOperation
-import xyz.xenondevs.nmsutils.bossbar.operation.RemoveBossBarOperation
-import xyz.xenondevs.nmsutils.bossbar.operation.UpdateNameBossBarOperation
-import xyz.xenondevs.nmsutils.bossbar.operation.UpdateProgressBossBarOperation
-import xyz.xenondevs.nmsutils.bossbar.operation.UpdatePropertiesBossBarOperation
-import xyz.xenondevs.nmsutils.bossbar.operation.UpdateStyleBossBarOperation
-import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.PacketListener
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundBossEventPacketEvent
-import xyz.xenondevs.nmsutils.network.event.registerPacketListener
-import xyz.xenondevs.nmsutils.network.event.unregisterPacketListener
-import xyz.xenondevs.nova.NOVA_PLUGIN
-import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
+import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.network.event.PacketHandler
+import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundBossEventPacketEvent
+import xyz.xenondevs.nova.network.event.registerPacketListener
+import xyz.xenondevs.nova.network.event.unregisterPacketListener
+import xyz.xenondevs.nova.ui.overlay.MovedFonts
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarMatchInfo
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarOrigin
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
 import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlay
 import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlayCompound
-import xyz.xenondevs.nova.ui.overlay.character.MovedFonts
+import xyz.xenondevs.nova.util.bossbar.BossBar
+import xyz.xenondevs.nova.util.bossbar.operation.AddBossBarOperation
+import xyz.xenondevs.nova.util.bossbar.operation.RemoveBossBarOperation
+import xyz.xenondevs.nova.util.bossbar.operation.UpdateNameBossBarOperation
+import xyz.xenondevs.nova.util.bossbar.operation.UpdateProgressBossBarOperation
+import xyz.xenondevs.nova.util.bossbar.operation.UpdatePropertiesBossBarOperation
+import xyz.xenondevs.nova.util.bossbar.operation.UpdateStyleBossBarOperation
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -45,14 +44,14 @@ import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.unregisterEvents
 import java.util.*
 import kotlin.math.max
-import net.minecraft.network.chat.Component as MojangComponent
 
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 object BossBarOverlayManager : Listener, PacketListener {
     
-    val ENABLED by MAIN_CONFIG.entry<Boolean>("overlay", "bossbar", "enabled")
-    private val BAR_AMOUNT by MAIN_CONFIG.entry<Int>("overlay", "bossbar", "amount")
-    private val SEND_BARS_AFTER_RESOURCE_PACK_LOADED by MAIN_CONFIG.entry<Boolean>("overlay", "bossbar", "send_bars_after_resource_pack_loaded")
+    private val BOSSBAR_CONFIG = MAIN_CONFIG.node("overlay", "bossbar")
+    internal val ENABLED by BOSSBAR_CONFIG.entry<Boolean>("enabled")
+    private val BAR_AMOUNT by BOSSBAR_CONFIG.entry<Int>("amount")
+    private val SEND_BARS_AFTER_RESOURCE_PACK_LOADED by BOSSBAR_CONFIG.entry<Boolean>("send_bars_after_resource_pack_loaded")
     
     private var tickTask: BukkitTask? = null
     private val bars = HashMap<UUID, Array<BossBar>>()
@@ -67,7 +66,12 @@ object BossBarOverlayManager : Listener, PacketListener {
     private val vanillaBarOverlays = HashMap<BossBar, VanillaBossBarOverlayCompound>()
     
     @InitFun
-    internal fun reload() {
+    private fun init() {
+        BOSSBAR_CONFIG.subscribe { reload() }
+        reload()
+    }
+    
+    private fun reload() {
         // was previously enabled?
         if (tickTask != null) {
             unregisterEvents()
@@ -126,6 +130,7 @@ object BossBarOverlayManager : Listener, PacketListener {
         }
     }
     
+    @Suppress("DEPRECATION")
     private fun remakeBars(playerUUID: UUID): Boolean {
         val overlays = overlays[playerUUID] ?: return false
         val bars = bars[playerUUID] ?: return false
@@ -133,7 +138,7 @@ object BossBarOverlayManager : Listener, PacketListener {
         val locale = player.locale
         
         // clear bars
-        bars.forEach { it.name = MojangComponent.literal("") }
+        bars.forEach { it.name = Component.empty() }
         
         // group sorted fixed bars by bar level
         val groupedFixedOverlays = groupOverlaysByBarLevel(
@@ -176,7 +181,7 @@ object BossBarOverlayManager : Listener, PacketListener {
                     .move(-width)
             }
             
-            bar.adventureName = builder.build()
+            bar.name = builder.build()
         }
         
         // reset changed state
@@ -354,7 +359,7 @@ object BossBarOverlayManager : Listener, PacketListener {
             }
         }
         
-        if (plugin != null && plugin != NOVA_PLUGIN) {
+        if (plugin != null && plugin != NOVA) {
             trackedOrigins[event.id] = BarOrigin.Plugin(plugin!!)
         }
     }

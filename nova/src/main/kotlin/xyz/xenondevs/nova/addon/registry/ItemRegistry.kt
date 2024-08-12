@@ -1,40 +1,29 @@
 package xyz.xenondevs.nova.addon.registry
 
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.Style
-import xyz.xenondevs.nova.item.NovaItem
-import xyz.xenondevs.nova.item.NovaItemBuilder
-import xyz.xenondevs.nova.item.behavior.ItemBehaviorHolder
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.ResourceLocation
-import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.NovaItemBuilder
+import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.world.block.NovaBlock
 
 interface ItemRegistry : AddonGetter {
     
-    fun item(name: String): NovaItemBuilder =
-        NovaItemBuilder(addon, name)
+    fun item(name: String, item: NovaItemBuilder.() -> Unit): NovaItem =
+        NovaItemBuilder(addon, name).apply(item).register()
     
-    fun item(block: NovaBlock): NovaItemBuilder {
+    fun item(block: NovaBlock, item: NovaItemBuilder.() -> Unit): NovaItem {
         require(block.id.namespace == addon.description.id) { "The block must be from the same addon (${block.id})!" }
-        return NovaItemBuilder.fromBlock(block)
+        return NovaItemBuilder.fromBlock(block).apply(item).register()
     }
     
     fun registerItem(
         name: String,
         vararg behaviors: ItemBehaviorHolder,
-        localizedName: String = "item.${addon.description.id}.$name",
+        localizedName: String? = null,
         isHidden: Boolean = false
-    ): NovaItem {
-        val item = NovaItem(
-            ResourceLocation(addon, name),
-            Component.translatable(localizedName),
-            Style.empty(),
-            behaviors.asList(),
-            isHidden = isHidden
-        )
-        NovaRegistries.ITEM[item.id] = item
-        return item
+    ): NovaItem = item(name) {
+        behaviors(*behaviors)
+        localizedName?.let(::localizedName)
+        hidden(isHidden)
     }
     
     fun registerItem(
@@ -42,48 +31,10 @@ interface ItemRegistry : AddonGetter {
         vararg behaviors: ItemBehaviorHolder,
         localizedName: String? = null,
         isHidden: Boolean = false
-    ): NovaItem {
-        require(block.id.namespace == addon.description.id) { "The block must be from the same addon (${block.id})!" }
-        val item = NovaItem(
-            block.id,
-            localizedName?.let(Component::translatable) ?: block.name,
-            Style.empty(),
-            behaviors.asList(),
-            isHidden = isHidden,
-            block = block
-        )
-        block.item = item
-        NovaRegistries.ITEM[item.id] = item
-        return item
+    ): NovaItem = item(block) {
+        behaviors(*behaviors)
+        localizedName?.let(::localizedName)
+        hidden(isHidden)
     }
     
-    fun registerUnnamedItem(
-        name: String,
-        isHidden: Boolean = false
-    ): NovaItem {
-        val item = NovaItem(
-            ResourceLocation(addon, name),
-            Component.empty(),
-            Style.empty(),
-            emptyList(),
-            isHidden = isHidden
-        )
-        NovaRegistries.ITEM[item.id] = item
-        return item
-    }
-    
-    fun registerUnnamedHiddenItem(
-        name: String
-    ): NovaItem {
-        val item = NovaItem(
-            ResourceLocation(addon, name),
-            Component.empty(),
-            Style.empty(),
-            emptyList(),
-            isHidden = true
-        )
-        NovaRegistries.ITEM[item.id] = item
-        return item
-    }
-
 }

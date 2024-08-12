@@ -5,15 +5,14 @@ import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
-import xyz.xenondevs.nmsutils.network.event.PacketHandler
-import xyz.xenondevs.nmsutils.network.event.PacketListener
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundActionBarPacketEvent
-import xyz.xenondevs.nmsutils.network.event.clientbound.ClientboundSystemChatPacketEvent
-import xyz.xenondevs.nmsutils.network.event.registerPacketListener
-import xyz.xenondevs.nmsutils.network.event.unregisterPacketListener
-import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
-import xyz.xenondevs.nova.data.resources.CharSizes
+import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.network.event.PacketHandler
+import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundActionBarPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSystemChatPacketEvent
+import xyz.xenondevs.nova.network.event.registerPacketListener
+import xyz.xenondevs.nova.network.event.unregisterPacketListener
+import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
@@ -22,8 +21,6 @@ import net.minecraft.network.chat.Component as MojangComponent
 
 object ActionbarOverlayManager : PacketListener {
     
-    private val ENABLED by MAIN_CONFIG.entry<Boolean>("overlay", "actionbar", "enabled")
-    
     private var tickTask: BukkitTask? = null
     
     private val EMPTY_ACTION_BAR_PACKET = ClientboundSetActionBarTextPacket(MojangComponent.empty())
@@ -31,17 +28,19 @@ object ActionbarOverlayManager : PacketListener {
     private val interceptedActionbars = HashMap<UUID, Pair<Component, Long>>()
     
     init {
-        reload()
+        val enabled = MAIN_CONFIG.entry<Boolean>("overlay", "actionbar", "enabled")
+        enabled.subscribe(::reload)
+        enabled.update()
     }
     
-    internal fun reload() {
+    private fun reload(enabled: Boolean) {
         if (tickTask != null) {
             tickTask?.cancel()
             unregisterPacketListener()
             tickTask = null
         }
         
-        if (ENABLED) {
+        if (enabled) {
             registerPacketListener()
             tickTask = runTaskTimer(0, 1, ActionbarOverlayManager::handleTick)
         }
@@ -94,13 +93,14 @@ object ActionbarOverlayManager : PacketListener {
         val uuid = player.uniqueId
         if (overlays.containsKey(uuid)) {
             if (event.packet !== EMPTY_ACTION_BAR_PACKET) {
-                saveInterceptedComponent(player, event.adventureText)
+                saveInterceptedComponent(player, event.text)
             }
             
-            event.adventureText = getCurrentText(player)
+            event.text = getCurrentText(player)
         }
     }
     
+    @Suppress("DEPRECATION")
     private fun saveInterceptedComponent(player: Player, text: Component) {
         val mv = CharSizes.calculateComponentWidth(text, player.locale) / -2
         
@@ -113,6 +113,7 @@ object ActionbarOverlayManager : PacketListener {
         interceptedActionbars[player.uniqueId] = component to System.currentTimeMillis()
     }
     
+    @Suppress("DEPRECATION")
     private fun getCurrentText(player: Player): Component {
         val uuid = player.uniqueId
         val builder = Component.text()

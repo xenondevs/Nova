@@ -1,16 +1,15 @@
 package xyz.xenondevs.nova.world.block.logic.`break`
 
-import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.item.ItemStack
 import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.entity.ItemDisplay.ItemDisplayTransform
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.item.DefaultBlockOverlays
-import xyz.xenondevs.nova.util.nmsCopy
-import xyz.xenondevs.nova.util.sendDestructionPacket
+import xyz.xenondevs.nova.util.broadcastDestructionStage
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
+import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 
@@ -33,11 +32,11 @@ internal interface BreakMethod {
         
         fun of(
             block: Block,
-            material: NovaBlock,
+            type: NovaBlock,
             predictionPlayer: Player?,
             entityId: Int = predictionPlayer?.entityId ?: Random.nextInt()
         ): BreakMethod {
-            return if (material.options.showBreakAnimation)
+            return if (type.getBehavior<Breakable>().showBreakAnimation)
                 if (block.type == Material.BARRIER) DisplayEntityBreakMethod(block.pos)
                 else PacketBreakMethod(block.pos, entityId, predictionPlayer)
             else INVISIBLE
@@ -71,9 +70,9 @@ internal class PacketBreakMethod(pos: BlockPos, private val entityId: Int = Rand
     
     private fun sendBreakStage(stage: Int) {
         if (predictionPlayer != null) {
-            block.sendDestructionPacket(predictionPlayer, stage)
+            block.broadcastDestructionStage(predictionPlayer, stage)
         } else {
-            block.sendDestructionPacket(entityId, stage)
+            block.broadcastDestructionStage(entityId, stage)
         }
     }
     
@@ -82,7 +81,7 @@ internal class PacketBreakMethod(pos: BlockPos, private val entityId: Int = Rand
 internal class DisplayEntityBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos) {
     
     private val itemDisplay = FakeItemDisplay(pos.location.add(.5, .5, .5), true) { _, data ->
-        data.itemDisplay = ItemDisplayContext.HEAD
+        data.itemDisplay = ItemDisplayTransform.HEAD
     }
     
     override var breakStage: Int = -1
@@ -92,8 +91,8 @@ internal class DisplayEntityBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos)
             field = stage
             itemDisplay.updateEntityData(true) {
                 itemStack = if (stage in 0..9)
-                    DefaultBlockOverlays.BREAK_STAGE_OVERLAY.clientsideProviders[stage].get().nmsCopy
-                else ItemStack.EMPTY
+                    DefaultBlockOverlays.BREAK_STAGE_OVERLAY.model.unnamedClientsideProviders[stage].get()
+                else null
             }
         }
     

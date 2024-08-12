@@ -159,7 +159,7 @@ public interface ProtectionIntegration {
     enum ExecutionMode {
         
         /**
-         * The thread will not be changed in order to call the methods
+         * The method can be called from any thread
          */
         NONE,
         
@@ -170,7 +170,10 @@ public interface ProtectionIntegration {
         
         /**
          * The methods are never called from the server thread
+         * 
+         * @deprecated Use {@link #NONE} instead 
          */
+        @Deprecated
         ASYNC
         
     }

@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.ui.waila.overlay
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import net.kyori.adventure.text.Component
-import xyz.xenondevs.nova.data.resources.builder.task.font.FontChar
+import xyz.xenondevs.nova.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
 import xyz.xenondevs.nova.util.component.adventure.append
 import xyz.xenondevs.nova.util.component.adventure.font
@@ -82,7 +82,7 @@ internal class WailaImageOverlay : BossBarOverlay {
                 .append(getComponent(lines, 2)) // end texture
                 .moveTo(-halfWidth + ICON_MARGIN_LEFT + START_TEXTURE_SIZE) // move to start icon texture
             
-            if (icon != null) 
+            if (icon != null)
                 builder.append(icon)
             
             builder.moveTo(0)

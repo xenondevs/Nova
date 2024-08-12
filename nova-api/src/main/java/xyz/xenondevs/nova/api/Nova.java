@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.api.material.NovaMaterialRegistry;
 import xyz.xenondevs.nova.api.player.WailaManager;
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration;
 import xyz.xenondevs.nova.api.tileentity.TileEntityManager;
-import xyz.xenondevs.nova.loader.NovaJavaPlugin;
 
 public interface Nova {
     
@@ -18,11 +17,11 @@ public interface Nova {
      * @throws IllegalStateException If Nova is not installed on this server.
      */
     static Nova getNova() {
-        NovaJavaPlugin novaPlugin = (NovaJavaPlugin) Bukkit.getPluginManager().getPlugin("Nova");
-        if (novaPlugin == null)
+        Nova nova = (Nova) Bukkit.getPluginManager().getPlugin("Nova");
+        if (nova == null)
             throw new IllegalStateException("Nova is not installed on this server.");
         
-        return (Nova) novaPlugin.getNova();
+        return nova;
     }
     
     /**

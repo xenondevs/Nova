@@ -3,11 +3,12 @@ package xyz.xenondevs.nova.ui.waila.info
 import net.kyori.adventure.text.Component
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
-import org.bukkit.block.Block
+import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.state.NovaBlockState
 
 data class WailaLine(val text: Component, val alignment: Alignment) {
     
@@ -20,10 +21,10 @@ data class WailaLine(val text: Component, val alignment: Alignment) {
     
 }
 
-data class WailaInfo(var icon: ResourceLocation, var lines: MutableList<WailaLine>)
+data class WailaInfo(var icon: ResourceLocation, var lines: List<WailaLine>)
 
 sealed interface WailaInfoProvider<T> {
-    fun getInfo(player: Player, block: T): WailaInfo
+    fun getInfo(player: Player, pos: BlockPos, blockState: T): WailaInfo
 }
 
 abstract class NovaWailaInfoProvider : WailaInfoProvider<NovaBlockState> {
@@ -43,4 +44,4 @@ abstract class NovaWailaInfoProvider : WailaInfoProvider<NovaBlockState> {
     
 }
 
-abstract class VanillaWailaInfoProvider(val materials: Set<Material>?) : WailaInfoProvider<Block>
+abstract class VanillaWailaInfoProvider<T : BlockData>(val materials: Set<Material>?) : WailaInfoProvider<T>

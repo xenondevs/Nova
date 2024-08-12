@@ -9,7 +9,7 @@ public class NovaLoadDataEvent extends Event {
     private static final @NotNull HandlerList HANDLERS = new HandlerList();
     
     public NovaLoadDataEvent() {
-        super(true);
+        super(false);
     }
     
     public static @NotNull HandlerList getHandlerList() {

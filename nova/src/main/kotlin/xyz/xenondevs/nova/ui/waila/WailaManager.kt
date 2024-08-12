@@ -8,13 +8,12 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.scheduler.BukkitTask
-import xyz.xenondevs.nova.NOVA_PLUGIN
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
-import xyz.xenondevs.nova.data.resources.ResourceGeneration
-import xyz.xenondevs.nova.data.serialization.persistentdata.get
-import xyz.xenondevs.nova.data.serialization.persistentdata.set
+import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.serialization.persistentdata.get
+import xyz.xenondevs.nova.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -24,7 +23,7 @@ import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.unregisterEvents
 import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
 
-private val WAILA_ENABLED_KEY = NamespacedKey(NOVA_PLUGIN, "waila")
+private val WAILA_ENABLED_KEY = NamespacedKey(NOVA, "waila")
 
 private val Player.isWailaEnabled: Boolean
     get() = persistentDataContainer.get<Boolean>(WAILA_ENABLED_KEY) != false
@@ -35,7 +34,8 @@ private val Player.isWailaEnabled: Boolean
 )
 internal object WailaManager : Listener, IWailaManager {
     
-    val ENABLED by MAIN_CONFIG.entry<Boolean>("waila", "enabled")
+    private val ENABLED_PROVIDER = MAIN_CONFIG.entry<Boolean>("waila", "enabled")
+    val ENABLED by ENABLED_PROVIDER
     
     private var tickTask: BukkitTask? = null
     private val overlays = HashMap<Player, Waila>()
@@ -47,12 +47,17 @@ internal object WailaManager : Listener, IWailaManager {
     //</editor-fold>
     
     @InitFun
-    fun reload() {
+    private fun init() {
+        ENABLED_PROVIDER.subscribe(::reload)
+        reload(ENABLED)
+    }
+    
+    private fun reload(enabled: Boolean) {
         unregisterEvents()
         overlays.values.forEach { it.setActive(false) }
         overlays.clear()
         tickTask?.cancel()
-        if (ENABLED) {
+        if (enabled) {
             registerEvents()
             Bukkit.getOnlinePlayers().forEach(::tryAddWailaOverlay)
             tickTask = runTaskTimer(0, 1) { overlays.values.forEach(Waila::handleTick) }

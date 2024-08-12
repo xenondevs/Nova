@@ -6,11 +6,10 @@ import net.kyori.adventure.text.format.TextColor
 import net.minecraft.world.BossEvent.BossBarColor
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.nmsutils.bossbar.BossBar
-import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
-import xyz.xenondevs.nova.data.resources.CharSizes
+import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
+import xyz.xenondevs.nova.util.bossbar.BossBar
 import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
@@ -54,6 +53,7 @@ internal class VanillaBossBarOverlay(
         component = createComponent()
     }
     
+    @Suppress("DEPRECATION")
     private fun createComponent(): Component {
         val builder = Component.text()
         
@@ -84,7 +84,7 @@ internal class VanillaBossBarOverlay(
         }
         
         // text
-        val text = bar.adventureName
+        val text = bar.name
         val textLength = CharSizes.calculateComponentWidth(text, player.locale)
         val halfTextLength = textLength / 2
         
@@ -121,7 +121,7 @@ internal class VanillaBossBarOverlay(
     }
     
     override fun toString(): String {
-        return "VanillaBossBarOverlay(text=${bar.adventureName.toPlainText()})"
+        return "VanillaBossBarOverlay(text=${bar.name.toPlainText()})"
     }
     
 }

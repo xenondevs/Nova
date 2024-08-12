@@ -19,7 +19,7 @@ class LootTable(
         return items
             .asSequence()
             .filter { Math.random() * 100 <= it.chance }
-            .map { it.item.setAmount(it.amount.random()).get() }
+            .map { it.item.clone().apply { amount = it.amount.random() } }
             .toList()
     }
 }

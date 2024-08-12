@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.overlay.actionbar
 
 import net.kyori.adventure.text.Component
-import xyz.xenondevs.nova.data.resources.CharSizes
+import xyz.xenondevs.nova.resources.CharSizes
 
 interface ActionbarOverlay {
     

@@ -1,10 +1,8 @@
 package xyz.xenondevs.nova.util
 
 import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.v1_20_R3.CraftServer
+import org.bukkit.craftbukkit.CraftServer
 import xyz.xenondevs.nova.util.ServerSoftware.*
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 object ServerUtils {
     
@@ -13,10 +11,9 @@ object ServerUtils {
             "Bukkit" -> CRAFT_BUKKIT
             "Spigot" -> SPIGOT
             "Paper" -> PAPER
+            "Folia" -> FOLIA
             "Pufferfish" -> PUFFERFISH
-            "Tuinity" -> TUINITY
             "Purpur" -> PURPUR
-            "Airplane" -> AIRPLANE
             else -> UNKNOWN
         }
     }
@@ -25,30 +22,26 @@ object ServerUtils {
     
 }
 
-enum class ServerSoftware(private vararg val superSoftwares: ServerSoftware = emptyArray()) {
+enum class ServerSoftware(private val upstream: ServerSoftware? = null) {
     
+    UNKNOWN,
     CRAFT_BUKKIT,
     SPIGOT(CRAFT_BUKKIT),
     PAPER(SPIGOT),
+    FOLIA(PAPER),
     PUFFERFISH(PAPER),
-    TUINITY(PAPER),
-    PURPUR(TUINITY, PUFFERFISH),
-    AIRPLANE(PURPUR),
-    UNKNOWN;
+    PURPUR(PUFFERFISH);
     
-    val tree: List<ServerSoftware> = buildList { 
-        val unexplored = LinkedList<ServerSoftware>()
-        unexplored += this@ServerSoftware
-        
-        generateSequence { unexplored.poll() }
-            .forEach { software -> 
-                add(software)
-                unexplored += software.superSoftwares
-            }
+    val superSoftwares: List<ServerSoftware>
+    
+    init {
+        val superSoftwares = ArrayList<ServerSoftware>()
+        var software: ServerSoftware? = this
+        while (software != null) {
+            superSoftwares.add(software)
+            software = software.upstream
+        }
+        this.superSoftwares = superSoftwares
     }
-    
-    fun <K, V> getCorrectMap(): MutableMap<K, V> = if (this == PURPUR) ConcurrentHashMap() else HashMap()
-    
-    fun isPaper() = this.tree.contains(PAPER)
     
 }

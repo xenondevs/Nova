@@ -1,0 +1,17 @@
+{
+  "gui_light": "front",
+  "display": {
+    "thirdperson_righthand": {
+      "scale": [0, 0, 0]
+    },
+    "thirdperson_lefthand": {
+      "scale": [0, 0, 0]
+    },
+    "firstperson_righthand": {
+      "scale": [0, 0, 0]
+    },
+    "firstperson_lefthand": {
+      "scale": [0, 0, 0]
+    }
+  }
+}

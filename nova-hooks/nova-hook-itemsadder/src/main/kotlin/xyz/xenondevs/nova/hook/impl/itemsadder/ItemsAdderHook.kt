@@ -12,16 +12,16 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.data.recipe.ModelDataTest
-import xyz.xenondevs.nova.data.recipe.SingleItemTest
-import xyz.xenondevs.nova.data.resources.ResourcePath
+import xyz.xenondevs.nova.world.item.recipe.ModelDataTest
+import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
+import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
-import xyz.xenondevs.nova.util.playBreakEffects
+import xyz.xenondevs.nova.util.broadcastBreakEvent
 
 @Hook(plugins = ["ItemsAdder"], loadListener = ItemsAdderLoadListener::class)
 internal object ItemsAdderHook : CustomItemService {
@@ -36,7 +36,7 @@ internal object ItemsAdderHook : CustomItemService {
         
         val customCrop = CustomCrop.byAlreadyPlaced(block)
         if (customCrop != null) {
-            if (breakEffects) block.playBreakEffects()
+            if (breakEffects) block.broadcastBreakEvent()
             block.type = Material.AIR
             return true
         }
@@ -142,7 +142,7 @@ internal object ItemsAdderHook : CustomItemService {
             .map(CustomStack::getNamespacedID)
             .associateTo(HashMap()) {
                 val path = ItemsAdder.Advanced.getItemModelResourceLocation(it)!!.substringBeforeLast('.')
-                ResourceLocation(it) to ResourcePath.of(path)
+                ResourceLocation.parse(it) to ResourcePath.of(path)
             }
     }
     

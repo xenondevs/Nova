@@ -8,11 +8,12 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.World
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.initialize.DisableFun
+import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import java.time.Duration
 import java.util.*
@@ -29,7 +30,11 @@ private data class PermissionArgs(val world: World, val player: OfflinePlayer, v
  *
  * [OfflinePlayer] permissions will be cached for 30 minutes after the last access and commonly accessed permissions will be refreshed every minute.
  */
-@InternalInit(stage = InternalInitStage.POST_WORLD_ASYNC, dependsOn = [HooksLoader::class])
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dispatcher = Dispatcher.ASYNC,
+    dependsOn = [HooksLoader::class]
+)
 object PermissionManager {
     
     internal val integrations = ArrayList<PermissionIntegration>()
@@ -43,10 +48,11 @@ object PermissionManager {
             10, 10,
             0, TimeUnit.MILLISECONDS,
             LinkedBlockingQueue(),
-            ThreadFactoryBuilder().setNameFormat("Nova Protection Worker - %s").build()
+            ThreadFactoryBuilder().setNameFormat("Nova Permission Worker - %s").build()
         )
         
         offlinePermissionCache = Caffeine.newBuilder()
+            .executor(executor)
             .expireAfterAccess(Duration.ofMinutes(30))
             .refreshAfterWrite(Duration.ofMinutes(1))
             .build { hasOfflinePermission(it.world, it.player, it.permission) }
@@ -63,53 +69,19 @@ object PermissionManager {
     /**
      * Checks whether the player under the given [UUID][player] has the given [permission] in the given [world].
      *
-     * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline
-     * permission cache. If the permission is not cached yet, this method will return false and initiate a cache load.
+     * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline permission cache,
+     * which accesses the registered [PermissionIntegrations][PermissionIntegration] asynchronously.
      */
-    fun hasPermission(world: World, player: UUID, permission: String): Boolean =
+    fun hasPermission(world: World, player: UUID, permission: String): CompletableFuture<Boolean> =
         hasPermission(world, Bukkit.getOfflinePlayer(player), permission)
     
     /**
      * Checks whether the given [player] has the given [permission] in the given [world].
      *
-     * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline
-     * permission cache. If the permission is not cached yet, this method will return false and initiate a cache load.
-     */
-    fun hasPermission(world: World, player: OfflinePlayer, permission: String): Boolean {
-        // online-player permissions are cached by the permissions plugin
-        if (player.isOnline)
-            return player.player!!.hasPermission(permission)
-        
-        val args = PermissionArgs(world, player, permission)
-        
-        // don't initiate cache loads, as that would cause lag spikes due to database access from the main thread
-        val cachedResult = offlinePermissionCache.getIfPresent(args)
-        if (cachedResult == null) {
-            // load cache async
-            offlinePermissionCache.refresh(args)
-            // return false as we don't know the result yet
-            return false
-        }
-        
-        return cachedResult
-    }
-    
-    /**
-     * Checks whether the player under the given [UUID][player] has the given [permission] in the given [world].
-     * 
      * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline permission cache,
-     * which accessed the registered [PermissionIntegrations][PermissionIntegration] asynchronously.
+     * which accesses the registered [PermissionIntegrations][PermissionIntegration] asynchronously.
      */
-    fun hasPermissionAsync(world: World, player: UUID, permission: String): CompletableFuture<Boolean> =
-        hasPermissionAsync(world, Bukkit.getOfflinePlayer(player), permission)
-    
-    /**
-     * Checks whether the given [player] has the given [permission] in the given [world].
-     * 
-     * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline permission cache,
-     * which accessed the registered [PermissionIntegrations][PermissionIntegration] asynchronously.
-     */
-    fun hasPermissionAsync(world: World, player: OfflinePlayer, permission: String): CompletableFuture<Boolean> {
+    fun hasPermission(world: World, player: OfflinePlayer, permission: String): CompletableFuture<Boolean> {
         // online-player permissions are cached by the permissions plugin
         if (player.isOnline)
             return CompletableFuture.completedFuture(player.player!!.hasPermission(permission))

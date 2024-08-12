@@ -3,41 +3,37 @@ plugins {
     `maven-publish`
     alias(libs.plugins.kotlin)
     alias(libs.plugins.dokka)
-    id("xyz.xenondevs.library-loader-plugin")
+    id("xyz.xenondevs.bundler-plugin")
     alias(libs.plugins.paperweight)
 }
 
 dependencies {
     // server
     paperweight.paperDevBundle(libs.versions.paper)
-    configurations.getByName("mojangMappedServer").apply { 
-        exclude("org.spongepowered", "configurate-yaml")
-    }
+    compileOnly(libs.bundles.maven.resolver)
     
     // api dependencies
-    prioritizedNovaLoaderApi(libs.bundles.configurate)
-    novaLoaderApi(variantOf(libs.nmsutilities) { classifier("remapped-mojang") })
     novaLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
     novaLoaderApi(libs.bundles.xenondevs.commons)
     novaLoaderApi(libs.invui.kotlin)
+    novaLoaderApi(libs.joml.primitives)
     
     // internal dependencies
-    compileOnly(project(":nova-loader"))
     compileOnly(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
-    novaLoader(variantOf(libs.inventoryaccess) { classifier("remapped-mojang") })
+    novaLoader(libs.inventoryaccess)
     novaLoader(libs.bstats)
     novaLoader(libs.bytbase.runtime)
     novaLoader(libs.fuzzywuzzy)
     novaLoader(libs.awssdk.s3)
     novaLoader(libs.jimfs)
     novaLoader(libs.caffeine)
-    
-    // runtime dependencies
-    spigotRuntime(paperweight.paperDevBundleDependency(libs.versions.paper.get()))
-    spigotRuntime(libs.bundles.maven.resolver)
+    novaLoader(libs.lz4)
+    novaLoader(libs.zstd)
+    novaLoader(libs.bundles.jgrapht)
+    novaLoader(libs.snakeyaml.engine)
     
     // test dependencies
     testImplementation(libs.bundles.test)
@@ -51,6 +47,17 @@ tasks {
         filesMatching("paper-plugin.yml") {
             expand(project.properties)
         }
+    }
+    
+    test {
+        useJUnitPlatform()
+    }
+}
+
+// remove "dev" classifier set by paperweight-userdev
+afterEvaluate {
+    tasks.getByName<Jar>("jar") {
+        archiveClassifier = ""
     }
 }
 

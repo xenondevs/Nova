@@ -4,11 +4,10 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.block.Block
+import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.provider.immutable.mapEach
-import xyz.xenondevs.nova.data.config.MAIN_CONFIG
-import xyz.xenondevs.nova.data.config.entry
-import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries.WAILA_INFO_PROVIDER
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
@@ -23,7 +22,7 @@ import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.BlockManager
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 
 private val POS_UPDATE_INTERVAL by MAIN_CONFIG.entry<Int>("waila", "pos_update_interval")
@@ -103,28 +102,29 @@ internal class Waila(val player: Player) {
     }
     
     private fun getInfo(player: Player, pos: BlockPos): WailaInfo? {
-        val novaState = BlockManager.getBlockState(pos)
-        if (novaState is NovaBlockState) {
+        val novaState = WorldDataManager.getBlockState(pos)
+        if (novaState != null) {
             val material = novaState.block
             
             return WAILA_INFO_PROVIDER.asSequence()
                 .filterIsInstance<NovaWailaInfoProvider>()
                 .lastOrNull { it.blocks == null || material in it.blocks }
-                ?.getInfo(player, novaState)
+                ?.getInfo(player, pos, novaState)
         } else {
             val block = pos.block
             val type = block.type
             
             return getCustomItemServiceInfo(player, block)
                 ?: WAILA_INFO_PROVIDER.asSequence()
-                    .filterIsInstance<VanillaWailaInfoProvider>()
+                    .filterIsInstance<VanillaWailaInfoProvider<BlockData>>()
                     .lastOrNull { it.materials == null || type in it.materials }
-                    ?.getInfo(player, block)
+                    ?.getInfo(player, pos, block.blockData)
         }
     }
     
+    @Suppress("DEPRECATION")
     private fun getCustomItemServiceInfo(player: Player, block: Block): WailaInfo? {
-        val blockId = CustomItemServiceManager.getId(block)?.let { runCatching { ResourceLocation.of(it, ':') }.getOrNull() } ?: return null
+        val blockId = CustomItemServiceManager.getId(block)?.let { runCatching { ResourceLocation.parse(it) }.getOrNull() } ?: return null
         val blockName = CustomItemServiceManager.getName(block, player.locale) ?: return null
         
         val lines = ArrayList<WailaLine>()

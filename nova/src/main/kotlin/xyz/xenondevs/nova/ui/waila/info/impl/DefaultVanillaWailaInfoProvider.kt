@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
-import org.bukkit.block.Block
+import org.bukkit.block.data.BlockData
 import org.bukkit.block.data.type.PistonHead
 import org.bukkit.block.data.type.TechnicalPiston
 import org.bukkit.entity.Player
@@ -13,25 +13,37 @@ import xyz.xenondevs.nova.ui.waila.info.WailaInfo
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.ui.waila.info.line.ToolLine
 import xyz.xenondevs.nova.util.item.localizedName
+import xyz.xenondevs.nova.world.BlockPos
 
-object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
+object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(null) {
     
-    override fun getInfo(player: Player, block: Block): WailaInfo {
-        val material = block.type
-        val mainMaterial = getMainMaterial(block)
+    override fun getInfo(player: Player, pos: BlockPos, blockState: BlockData): WailaInfo {
+        val mainMaterial = getMainMaterial(blockState)
         
-        val translate = mainMaterial.localizedName ?: "block.minecraft.${mainMaterial.name.lowercase()}"
+        val lines = buildList {
+            this += WailaLine(
+                Component.translatable(
+                    mainMaterial.localizedName
+                        ?: "block.minecraft.${mainMaterial.name.lowercase()}"
+                ),
+                WailaLine.Alignment.CENTERED
+            )
+            
+            this += WailaLine(
+                Component.text(
+                    "minecraft:${blockState.material.name.lowercase()}",
+                    NamedTextColor.DARK_GRAY
+                ),
+                WailaLine.Alignment.CENTERED
+            )
+            this += ToolLine.getToolLine(player, pos.block)
+        }
         
-        val lines = ArrayList<WailaLine>()
-        lines += WailaLine(Component.translatable(translate), WailaLine.Alignment.CENTERED)
-        lines += WailaLine(Component.text("minecraft:${material.name.lowercase()}", NamedTextColor.DARK_GRAY), WailaLine.Alignment.CENTERED)
-        lines += ToolLine.getToolLine(player, block)
-        
-        return WailaInfo(ResourceLocation("minecraft", mainMaterial.name.lowercase()), lines)
+        return WailaInfo(ResourceLocation.withDefaultNamespace(mainMaterial.name.lowercase()), lines)
     }
     
-    private fun getMainMaterial(block: Block): Material {
-        return when (val material = block.type) {
+    private fun getMainMaterial(blockState: BlockData): Material {
+        return when (val material = blockState.material) {
             // infested blocks
             Material.INFESTED_CHISELED_STONE_BRICKS -> Material.CHISELED_STONE_BRICKS
             Material.INFESTED_COBBLESTONE -> Material.COBBLESTONE
@@ -89,8 +101,8 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider(null) {
             Material.BIG_DRIPLEAF_STEM -> Material.BIG_DRIPLEAF
             Material.TRIPWIRE -> Material.STRING
             Material.PISTON_HEAD -> {
-                val data = block.blockData as PistonHead
-                if (data.type == TechnicalPiston.Type.STICKY)
+                blockState as PistonHead
+                if (blockState.type == TechnicalPiston.Type.STICKY)
                     Material.STICKY_PISTON
                 else Material.PISTON
             }

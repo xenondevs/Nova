@@ -11,13 +11,12 @@ import com.sk89q.worldedit.util.eventbus.Subscribe
 import com.sk89q.worldedit.world.block.BaseBlock
 import com.sk89q.worldedit.world.block.BlockStateHolder
 import com.sk89q.worldedit.world.block.BlockTypes
-import xyz.xenondevs.nova.data.world.WorldDataManager
 import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.contains
 import xyz.xenondevs.nova.util.get
-import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.stream.Stream
 
 private val BLOCK_STATE = BlockTypes.BARRIER!!.defaultState
@@ -64,7 +63,7 @@ internal class NovaBlockExtent(private val event: EditSessionEvent) : AbstractDe
     override fun <T : BlockStateHolder<T>?> setBlock(x: Int, y: Int, z: Int, block: T): Boolean {
         if (block is NovaBlock) {
             val pos = BlockPos(BukkitAdapter.adapt(event.world), x, y, z)
-            runTask { WorldDataManager.addOrphanBlock(pos, NovaRegistries.BLOCK[block.novaId]!!) }
+            WorldDataManager.setBlockState(pos, NovaRegistries.BLOCK[block.novaId]!!.defaultBlockState)
             return true
         }
         

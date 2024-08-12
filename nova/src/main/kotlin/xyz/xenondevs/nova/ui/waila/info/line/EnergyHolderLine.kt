@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.ui.waila.info.line
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import xyz.xenondevs.nova.tileentity.network.energy.holder.NovaEnergyHolder
+import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.DefaultEnergyHolder
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.util.NumberFormatUtils
 
@@ -10,27 +10,34 @@ private const val ENERGY_BAR_LENGTH = 40
 
 object EnergyHolderLine {
     
-    fun getEnergyBarLine(holder: NovaEnergyHolder): WailaLine {
+    fun getEnergyBarLine(holder: DefaultEnergyHolder): WailaLine {
         return WailaLine(
             createEnergyBarString(holder.energy, holder.maxEnergy),
             WailaLine.Alignment.CENTERED
         )
     }
     
-    fun getEnergyAmountLine(holder: NovaEnergyHolder): WailaLine {
+    fun getEnergyAmountLine(holder: DefaultEnergyHolder): WailaLine {
         return WailaLine(
             Component.text(NumberFormatUtils.getEnergyString(holder.energy, holder.maxEnergy), NamedTextColor.GRAY),
             WailaLine.Alignment.CENTERED
         )
     }
     
-    fun getEnergyDeltaLine(holder: NovaEnergyHolder): WailaLine {
+    fun getEnergyDeltaLine(holder: DefaultEnergyHolder): WailaLine {
         return WailaLine(
             Component.text()
-                .append(Component.text("+", NamedTextColor.GRAY))
-                .append(Component.translatable("menu.nova.energy_per_tick", Component.text(NumberFormatUtils.getEnergyString(holder.energyPlus))))
+                .color(NamedTextColor.GRAY)
+                .append(Component.text("+"))
+                .append(Component.translatable(
+                    "menu.nova.energy_per_tick",
+                    Component.text(NumberFormatUtils.getEnergyString(holder.energyPlus))
+                ))
                 .append(Component.text(" | -"))
-                .append(Component.translatable("menu.nova.energy_per_tick", Component.text(NumberFormatUtils.getEnergyString(holder.energyMinus))))
+                .append(Component.translatable(
+                    "menu.nova.energy_per_tick",
+                    Component.text(NumberFormatUtils.getEnergyString(holder.energyMinus))
+                ))
                 .build(),
             WailaLine.Alignment.CENTERED
         )

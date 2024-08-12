@@ -14,10 +14,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set Up JDK 17
+      - name: Set Up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: 17
+          java-version: 21
           distribution: adopt
 
       - name: Setup Gradle
@@ -25,11 +25,12 @@ jobs:
         with:
           cache-disabled: true
         
-      - name: Build Spigot-Mapped
+      - name: Build Nova
         uses: gradle/gradle-build-action@v3
         with:
           arguments: |
-            loaderJarSpigot
+            test
+            loaderJar
             -PoutDir=artifacts
             -Prelease
 
@@ -40,7 +41,7 @@ jobs:
           name: Artifacts
           path: ./artifacts/*.jar
 
-      - name: Deploy Mojang-Mapped
+      - name: Deploy to xenondevs repository
         if: github.event_name == 'release'
         uses: gradle/gradle-build-action@v3
         with:

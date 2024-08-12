@@ -62,9 +62,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
     /**
      * Sets the [ConfiguredFeature] that should be placed by this [PlacedFeature].
      */
-    fun configuredFeature(configuredFeature: ConfiguredFeature<*, *>): PlacedFeatureBuilder {
+    fun configuredFeature(configuredFeature: ConfiguredFeature<*, *>) {
         this.configuredFeature = Holder.direct(configuredFeature)
-        return this
     }
     
     /**
@@ -73,9 +72,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * For more information on configured features, check out their [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/features/#2-configured-feature).
      */
-    fun configuredFeature(configuredFeature: Holder<ConfiguredFeature<*, *>>): PlacedFeatureBuilder {
+    fun configuredFeature(configuredFeature: Holder<ConfiguredFeature<*, *>>) {
         this.configuredFeature = configuredFeature
-        return this
     }
     
     /**
@@ -85,9 +83,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * For more information on configured features, check out their [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/features/#2-configured-feature).
      */
-    fun configuredFeature(configuredFeatureId: ResourceLocation): PlacedFeatureBuilder {
+    fun configuredFeature(configuredFeatureId: ResourceLocation) {
         this.configuredFeature = VanillaRegistries.CONFIGURED_FEATURE.getOrCreateHolder(configuredFeatureId)
-        return this
     }
     
     /**
@@ -97,9 +94,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * For more information on configured features, check out their [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/features/#2-configured-feature).
      */
-    fun configuredFeature(configuredFeatureKey: ResourceKey<ConfiguredFeature<*, *>>): PlacedFeatureBuilder {
+    fun configuredFeature(configuredFeatureKey: ResourceKey<ConfiguredFeature<*, *>>) {
         this.configuredFeature = VanillaRegistries.CONFIGURED_FEATURE.getOrCreateHolder(configuredFeatureKey.location())
-        return this
     }
     
     /**
@@ -107,9 +103,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * For more information on placement modifiers, check out their [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/placed-feature/#placement-modifiers).
      */
-    fun modifier(modifier: PlacementModifier): PlacedFeatureBuilder {
+    fun modifier(modifier: PlacementModifier) {
         modifiers += modifier
-        return this
     }
     
     /**
@@ -117,9 +112,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * For more information on placement modifiers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/placed-feature/#placement-modifiers).
      */
-    fun modifiers(vararg modifiers: PlacementModifier): PlacedFeatureBuilder {
+    fun modifiers(vararg modifiers: PlacementModifier) {
         this.modifiers += modifiers
-        return this
     }
     
     /**
@@ -127,66 +121,58 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * For more information on placement modifiers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/placed-feature/#placement-modifiers).
      */
-    fun modifiers(modifiers: Collection<PlacementModifier>): PlacedFeatureBuilder {
+    fun modifiers(modifiers: Collection<PlacementModifier>) {
         this.modifiers += modifiers
-        return this
     }
     
     /**
      * Adds a [BiomeFilter] [PlacementModifier] to this [PlacedFeature], which returns the position if the configured
      * feature is registered in the biome's feature list at the given position. Empty otherwise.
      */
-    fun biomeFilter(): PlacedFeatureBuilder {
+    fun biomeFilter() {
         modifiers += BiomeFilter.biome()
-        return this
     }
     
     /**
      * Adds a [BlockPredicateFilter] [PlacementModifier] with the given [BlockPredicate] to this [PlacedFeature], which
      * returns the position if the [BlockPredicate] matches the block at the given position. Empty otherwise.
      */
-    fun blockPredicateFilter(predicate: BlockPredicate): PlacedFeatureBuilder {
+    fun blockPredicateFilter(predicate: BlockPredicate) {
         modifiers += BlockPredicateFilter.forPredicate(predicate)
-        return this
     }
     
     /**
      * Adds a [CarvingMaskPlacement] [PlacementModifier] to this [PlacedFeature], which returns all positions in the
      * given position's chunk that were carved out by a [WorldCarver] in the specified [GenerationStep.Carving].
      */
-    fun carvingMaskBlocks(step: GenerationStep.Carving): PlacedFeatureBuilder {
+    fun carvingMaskBlocks(step: GenerationStep.Carving) {
         modifiers += CarvingMaskPlacement.forStep(step)
-        return this
     }
     
     /**
      * Adds a [CountPlacement] [PlacementModifier] with the given [count] to this [PlacedFeature], which returns the
      * given position [count] times.
      */
-    fun count(count: Int): PlacedFeatureBuilder {
+    fun count(count: Int) {
         modifiers += CountPlacement.of(count)
-        return this
     }
     
     /**
      * Adds a [CountPlacement] [PlacementModifier] with the given [count] [IntProvider] to this [PlacedFeature], which
      * returns the given position [count] times. The [IntProvider] is sampled for each position.
      */
-    fun count(count: IntProvider): PlacedFeatureBuilder {
+    fun count(count: IntProvider) {
         modifiers += CountPlacement.of(count)
-        return this
     }
     
     @Deprecated("Deprecated in vanilla.")
-    fun countOnEveryLayer(count: Int): PlacedFeatureBuilder {
+    fun countOnEveryLayer(count: Int) {
         modifiers += CountOnEveryLayerPlacement.of(count)
-        return this
     }
     
     @Deprecated("Deprecated in vanilla.")
-    fun countOnEveryLayer(count: IntProvider): PlacedFeatureBuilder {
+    fun countOnEveryLayer(count: IntProvider) {
         modifiers += CountOnEveryLayerPlacement.of(count)
-        return this
     }
     
     /**
@@ -195,9 +181,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      * [max number of steps][maxSteps] is reached or the [continuePredicate] not matching the next block. If no matching
      * block is found, empty is returned.
      */
-    fun environmentScan(direction: Direction, target: BlockPredicate, continuePredicate: BlockPredicate, maxSteps: Int): PlacedFeatureBuilder {
+    fun environmentScan(direction: Direction, target: BlockPredicate, continuePredicate: BlockPredicate, maxSteps: Int) {
         modifiers += EnvironmentScanPlacement.scanningFor(direction, target, continuePredicate, maxSteps)
-        return this
     }
     
     /**
@@ -205,18 +190,16 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      * the given [target BlockPredicate][BlockPredicate] up/down until it finds a matching block or the
      * [max number of steps][maxSteps] is reached. If no matching block is found, empty is returned.
      */
-    fun environmentScan(direction: Direction, target: BlockPredicate, maxSteps: Int): PlacedFeatureBuilder {
+    fun environmentScan(direction: Direction, target: BlockPredicate, maxSteps: Int) {
         modifiers += EnvironmentScanPlacement.scanningFor(direction, target, maxSteps)
-        return this
     }
     
     /**
      * Adds a [HeightRangePlacement] [PlacementModifier] with the given [provider] to this [PlacedFeature], which takes
      * the input position and sets the y-coordinate to a value provided by the given [HeightProvider].
      */
-    fun heightRange(provider: HeightProvider): PlacedFeatureBuilder {
+    fun heightRange(provider: HeightProvider) {
         modifiers += HeightRangePlacement.of(provider)
-        return this
     }
     
     /**
@@ -228,9 +211,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      * heightRange(UniformHeight.of(min, max))
      * ```
      */
-    fun heightRangeUniform(min: VerticalAnchor, max: VerticalAnchor): PlacedFeatureBuilder {
+    fun heightRangeUniform(min: VerticalAnchor, max: VerticalAnchor) {
         modifiers += HeightRangePlacement.uniform(min, max)
-        return this
     }
     
     /**
@@ -242,9 +224,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      * heightRange(TrapezoidHeight.of(min, max))
      * ```
      */
-    fun heightRangeTriangle(min: VerticalAnchor, max: VerticalAnchor): PlacedFeatureBuilder {
+    fun heightRangeTriangle(min: VerticalAnchor, max: VerticalAnchor) {
         modifiers += HeightRangePlacement.triangle(min, max)
-        return this
     }
     
     /**
@@ -256,9 +237,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      * heightRange(UniformHeight.of(VerticalAnchor.bottom(), VerticalAnchor.absolute(256)))
      * ```
      */
-    fun inYWorldBounds(): PlacedFeatureBuilder {
+    fun inYWorldBounds() {
         modifiers += PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT
-        return this
     }
     
     /**
@@ -267,9 +247,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * Check out the [heightmap gist page](https://gist.github.com/ByteZ1337/31f10b0052f44acfc177f40a0f0fe9cd) for image examples.
      */
-    fun heightMap(heightmap: Heightmap.Types): PlacedFeatureBuilder {
+    fun heightMap(heightmap: Heightmap.Types) {
         modifiers += HeightmapPlacement.onHeightmap(heightmap)
-        return this
     }
     
     /**
@@ -279,9 +258,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * Check out the [heightmap gist page](https://gist.github.com/ByteZ1337/31f10b0052f44acfc177f40a0f0fe9cd) for image examples.
      */
-    fun moveToMotionBlocking(): PlacedFeatureBuilder {
+    fun moveToMotionBlocking() {
         modifiers += PlacementUtils.HEIGHTMAP
-        return this
     }
     
     /**
@@ -291,9 +269,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * Check out the [heightmap gist page](https://gist.github.com/ByteZ1337/31f10b0052f44acfc177f40a0f0fe9cd) for image examples.
      */
-    fun moveToWorldSurface(): PlacedFeatureBuilder {
+    fun moveToWorldSurface() {
         modifiers += PlacementUtils.HEIGHTMAP_WORLD_SURFACE
-        return this
     }
     
     /**
@@ -303,9 +280,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * Check out the [heightmap gist page](https://gist.github.com/ByteZ1337/31f10b0052f44acfc177f40a0f0fe9cd) for image examples.
      */
-    fun moveToOceanFloor(): PlacedFeatureBuilder {
+    fun moveToOceanFloor() {
         modifiers += PlacementUtils.HEIGHTMAP_OCEAN_FLOOR
-        return this
     }
     
     /**
@@ -315,23 +291,20 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * Check out the [heightmap gist page](https://gist.github.com/ByteZ1337/31f10b0052f44acfc177f40a0f0fe9cd) for image examples.
      */
-    fun moveToTopSolid(): PlacedFeatureBuilder {
+    fun moveToTopSolid() {
         modifiers += PlacementUtils.HEIGHTMAP_TOP_SOLID
-        return this
     }
     
     /**
      * Adds a [InSquarePlacement] [PlacementModifier] to this [PlacedFeature], which adds a random integer in the range
      * `[0; 15]` to the x- and z-coordinates of the given position.
      */
-    fun inSquareSpread(): PlacedFeatureBuilder {
+    fun inSquareSpread() {
         modifiers += InSquarePlacement.spread()
-        return this
     }
     
-    fun noiseBasedCount(noiseToCountRatio: Int, noiseFactor: Double, noiseOffset: Double): PlacedFeatureBuilder {
+    fun noiseBasedCount(noiseToCountRatio: Int, noiseFactor: Double, noiseOffset: Double) {
         modifiers += NoiseBasedCountPlacement.of(noiseToCountRatio, noiseFactor, noiseOffset)
-        return this
     }
     
     /**
@@ -345,9 +318,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      * int count = (int)Math.ceil((noise + noiseOffset) * noiseToCountRatio);
      * ```
      */
-    fun noiseThresholdCount(noiseLevel: Double, belowNoise: Int, aboveNoise: Int): PlacedFeatureBuilder {
+    fun noiseThresholdCount(noiseLevel: Double, belowNoise: Int, aboveNoise: Int) {
         modifiers += NoiseThresholdCountPlacement.of(noiseLevel, belowNoise, aboveNoise)
-        return this
     }
     
     /**
@@ -355,18 +327,16 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      * [PlacedFeature], which offsets the given position by the provided [IntProvider's][IntProvider] value. Please note,
      * that the [xzSpread] [IntProvider] is sampled separately for the x- and z-coordinates.
      */
-    fun randomOffset(xzSpread: IntProvider, ySpread: IntProvider): PlacedFeatureBuilder {
+    fun randomOffset(xzSpread: IntProvider, ySpread: IntProvider) {
         modifiers += RandomOffsetPlacement.of(xzSpread, ySpread)
-        return this
     }
     
     /**
      * Adds a [RandomOffsetPlacement] [PlacementModifier] with the given [xzSpread] and [ySpread] values to this
      * [PlacedFeature], which offsets the given position by the provided values.
      */
-    fun randomOffset(xzSpread: Int, ySpread: Int): PlacedFeatureBuilder {
+    fun randomOffset(xzSpread: Int, ySpread: Int) {
         modifiers += RandomOffsetPlacement.of(ConstantInt.of(xzSpread), ConstantInt.of(ySpread))
-        return this
     }
     
     /**
@@ -374,18 +344,16 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      * to this [PlacedFeature], which offsets the y-coordinate of the given position by the provided
      * [IntProvider's][IntProvider] value.
      */
-    fun randomVerticalOffset(ySpread: IntProvider): PlacedFeatureBuilder {
+    fun randomVerticalOffset(ySpread: IntProvider) {
         modifiers += RandomOffsetPlacement.of(ConstantInt.of(0), ySpread)
-        return this
     }
     
     /**
      * Adds a [RandomOffsetPlacement] [PlacementModifier] with a `xzSpread` value of `0` and the given [ySpread] value to
      * this [PlacedFeature], which offsets the y-coordinate of the given position by the provided value.
      */
-    fun randomVerticalOffset(ySpread: Int): PlacedFeatureBuilder {
+    fun randomVerticalOffset(ySpread: Int) {
         modifiers += RandomOffsetPlacement.of(ConstantInt.of(0), ConstantInt.of(ySpread))
-        return this
     }
     
     /**
@@ -394,27 +362,24 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      * [IntProvider's][IntProvider] value. Please note, that the [xzSpread] [IntProvider] is sampled separately for the
      * x- and z-coordinates.
      */
-    fun randomHorizontalOffset(xzSpread: IntProvider): PlacedFeatureBuilder {
+    fun randomHorizontalOffset(xzSpread: IntProvider) {
         modifiers += RandomOffsetPlacement.of(xzSpread, ConstantInt.of(0))
-        return this
     }
     
     /**
      * Adds a [RandomOffsetPlacement] [PlacementModifier] with a `ySpread` value of `0` and the given [xzSpread] value to
      * this [PlacedFeature], which offsets the x- and z-coordinates of the given position by the provided value.
      */
-    fun randomHorizontalOffset(xzSpread: Int): PlacedFeatureBuilder {
+    fun randomHorizontalOffset(xzSpread: Int) {
         modifiers += RandomOffsetPlacement.of(ConstantInt.of(xzSpread), ConstantInt.of(0))
-        return this
     }
     
     /**
      * Adds a [RarityFilter] [PlacementModifier] to this [PlacedFeature], which returns the given position with a
      * probability of `1 / onAverageOnceEvery`.
      */
-    fun rarityFilter(onAverageOnceEvery: Int): PlacedFeatureBuilder {
+    fun rarityFilter(onAverageOnceEvery: Int) {
         modifiers += RarityFilter.onAverageOnceEvery(onAverageOnceEvery)
-        return this
     }
     
     /**
@@ -424,9 +389,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      *
      * Check out the [heightmap gist page](https://gist.github.com/ByteZ1337/31f10b0052f44acfc177f40a0f0fe9cd) for image examples.
      */
-    fun surfaceRelativeThresholdFilter(heightmap: Heightmap.Types, min: Int, max: Int): PlacedFeatureBuilder {
+    fun surfaceRelativeThresholdFilter(heightmap: Heightmap.Types, min: Int, max: Int) {
         modifiers += SurfaceRelativeThresholdFilter.of(heightmap, min, max)
-        return this
     }
     
     /**
@@ -434,9 +398,8 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
      * only returns the given position if the amount of motion-blocking blocks under the surface is less than/equal to
      * [maxDepth].
      */
-    fun surfaceWaterDepthFilter(maxDepth: Int): PlacedFeatureBuilder {
+    fun surfaceWaterDepthFilter(maxDepth: Int) {
         modifiers += SurfaceWaterDepthFilter.forMaxDepth(maxDepth)
-        return this
     }
     
     /**
@@ -449,6 +412,5 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
         
         return PlacedFeature(configuredFeature!!, modifiers)
     }
-    
     
 }

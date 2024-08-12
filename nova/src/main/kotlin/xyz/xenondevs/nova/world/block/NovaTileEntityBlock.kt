@@ -3,44 +3,54 @@ package xyz.xenondevs.nova.world.block
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.data.world.block.property.BlockPropertyType
-import xyz.xenondevs.nova.data.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.data.world.block.state.NovaTileEntityState
-import xyz.xenondevs.nova.item.options.BlockOptions
-import xyz.xenondevs.nova.tileentity.TileEntity
+import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.context.BlockPlaceContext
+import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
+import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
+import xyz.xenondevs.nova.world.format.WorldDataManager
 
-typealias TileEntityConstructor = ((NovaTileEntityState) -> TileEntity)
+typealias TileEntityConstructor = ((BlockPos, NovaBlockState, Compound) -> TileEntity)
 
-@Suppress("UNCHECKED_CAST")
 class NovaTileEntityBlock internal constructor(
     id: ResourceLocation,
     name: Component,
     style: Style,
-    logic: BlockLogic<NovaTileEntityState>,
-    options: BlockOptions,
+    behaviors: List<BlockBehaviorHolder>,
     internal val tileEntityConstructor: TileEntityConstructor,
-    properties: List<BlockPropertyType<*>>,
-    placeCheck: PlaceCheckFun?,
-    multiBlockLoader: MultiBlockLoader?,
-    configId: String
-) : NovaBlock(
-    id,
-    name,
-    style,
-    logic as BlockLogic<NovaBlockState>, // fixme: users could cast to BlockNovaMaterial and then call methods on the NovaBlock with a BlockState that is not a NovaTileEntityState
-    options,
-    properties,
-    placeCheck,
-    multiBlockLoader,
-    configId
-) {
+    val tickrate: Int,
+    properties: List<ScopedBlockStateProperty<*>>,
+    configId: String,
+    requestedLayout: BlockModelLayout
+) : NovaBlock(id, name, style, behaviors, properties, configId, requestedLayout) {
     
-    override fun createBlockState(pos: BlockPos): NovaTileEntityState =
-        NovaTileEntityState(pos, this)
+    override fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>) {
+        val tileEntityBlock = state.block as NovaTileEntityBlock
+        val data = ctx[DefaultContextParamTypes.TILE_ENTITY_DATA_NOVA] ?: Compound()
+        
+        // write owner into data so that it is accessible during tile-entity construction
+        val owner = ctx[DefaultContextParamTypes.SOURCE_PLAYER] ?: ctx[DefaultContextParamTypes.SOURCE_TILE_ENTITY]?.owner
+        if (owner != null) data["ownerUuid"] = owner.uniqueId
+        
+        val tileEntity = tileEntityBlock.tileEntityConstructor(pos, state, data)
+        WorldDataManager.setTileEntity(pos, tileEntity)
+        tileEntity.handlePlace(ctx)
+        
+        // call super method after creating the tile-entity, so that behaviors can access it
+        super.handlePlace(pos, state, ctx)
+    }
     
-    override fun createNewBlockState(ctx: BlockPlaceContext): NovaTileEntityState =
-        NovaTileEntityState(this, ctx)
+    override fun handleBreak(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {
+        // call super method before removing the tile-entity, so that behaviors can still access it
+        super.handleBreak(pos, state, ctx)
+        
+        WorldDataManager.setTileEntity(pos, null)?.handleBreak(ctx)
+    }
     
 }

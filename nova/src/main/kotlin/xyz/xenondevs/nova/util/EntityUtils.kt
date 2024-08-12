@@ -10,19 +10,24 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.tags.FluidTags
 import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.entity.item.ItemEntity
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity
-import xyz.xenondevs.nova.item.behavior.Damageable
-import xyz.xenondevs.nova.item.tool.ToolCategory
-import xyz.xenondevs.nova.item.tool.VanillaToolCategory
+import org.bukkit.craftbukkit.entity.CraftEntity
+import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
+import xyz.xenondevs.nova.world.item.behavior.Damageable
+import xyz.xenondevs.nova.world.item.tool.ToolCategory
+import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.random.Random
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EntityType as NMSEntityType
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
@@ -45,8 +50,8 @@ val BukkitPlayer.destroyProgress: Double?
 fun BukkitLivingEntity.damageItemInMainHand(damage: Int = 1) {
     if (damage <= 0)
         return
-    val serverPlayer = nmsEntity as MojangLivingEntity
-    Damageable.damageAndBreak(serverPlayer.mainHandItem, damage) { serverPlayer.broadcastBreakEvent(MojangEquipmentSlot.MAINHAND) }
+    val nmsEntity = nmsEntity as MojangLivingEntity
+    nmsEntity.mainHandItem.hurtAndBreak(damage, nmsEntity, MojangEquipmentSlot.MAINHAND)
 }
 
 /**
@@ -55,8 +60,8 @@ fun BukkitLivingEntity.damageItemInMainHand(damage: Int = 1) {
 fun BukkitLivingEntity.damageItemInOffHand(damage: Int = 1) {
     if (damage <= 0)
         return
-    val serverPlayer = nmsEntity as MojangLivingEntity
-    Damageable.damageAndBreak(serverPlayer.offhandItem, damage) { serverPlayer.broadcastBreakEvent(MojangEquipmentSlot.OFFHAND) }
+    val nmsEntity = nmsEntity as MojangLivingEntity
+    nmsEntity.offhandItem.hurtAndBreak(damage, nmsEntity, MojangEquipmentSlot.OFFHAND)
 }
 
 /**
@@ -89,7 +94,7 @@ private inline fun BukkitLivingEntity.damageToolInMainHand(getNovaDamage: (Damag
         val damageable = novaItem.getBehaviorOrNull<Damageable>() ?: return
         damage = getNovaDamage(damageable)
     } else {
-        val toolCategory = ToolCategory.ofItem(itemStack.bukkitMirror) as? VanillaToolCategory ?: return
+        val toolCategory = ToolCategory.ofItem(itemStack.asBukkitMirror()).firstInstanceOfOrNull<VanillaToolCategory>() ?: return
         damage = getVanillaDamage(toolCategory)
     }
     
@@ -139,6 +144,20 @@ object EntityUtils {
         
         return passengers
     }
+    
+    /**
+     * Creates not-spawned [item entities][ItemEntity] based on the specified [items] and [pos].
+     */
+    fun createBlockDropItemEntities(pos: BlockPos, items: Iterable<ItemStack>): List<ItemEntity> =
+        items.map {
+            ItemEntity(
+                pos.world.serverLevel,
+                pos.x + 0.5 + Random.nextDouble(-0.25, 0.25),
+                pos.y + 0.5 + Random.nextDouble(-0.25, 0.25),
+                pos.z + 0.5 + Random.nextDouble(-0.25, 0.25),
+                it.unwrap().copy()
+            ).apply(ItemEntity::setDefaultPickUpDelay)
+        }
     
     /**
      * Serializes an [BukkitEntity] to a [ByteArray].

@@ -11,13 +11,11 @@ import java.util.concurrent.CompletableFuture
  * * If one of the futures completes exceptionally, the future will complete exceptionally, using the same exception
  *   of the first future which completed exceptionally. All other futures will be cancelled.
  */
-class CombinedBooleanFuture(private val futures: List<CompletableFuture<Boolean>>) : CompletableFuture<Boolean>() {
+internal class CombinedBooleanFuture(private val futures: List<CompletableFuture<Boolean>>) : CompletableFuture<Boolean>() {
     
     init {
         futures.forEach { it.thenRun(::handleFutureArrival) }
     }
-    
-    constructor(vararg futures: CompletableFuture<Boolean>) : this(futures.asList())
     
     private fun handleFutureArrival() {
         if (!isDone) {
