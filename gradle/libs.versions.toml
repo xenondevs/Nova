@@ -32,7 +32,7 @@ jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jg
 jgrapht-io = { group = "org.jgrapht", name = "jgrapht-io", version.ref = "jgrapht" }
 jimfs = { group = "com.google.jimfs", name = "jimfs", version = "1.2" }
 joml-primitives = { group = "org.joml", name = "joml-primitives", version = "1.10.0" }
-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.9.0" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.3" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
