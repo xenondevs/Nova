@@ -1,12 +1,11 @@
 package xyz.xenondevs.nova.world.block
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.nova.resources.layout.block.BackingStateCategory
+import net.minecraft.world.level.block.LeavesBlock
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
-import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers
 import xyz.xenondevs.nova.patch.Patcher
+import xyz.xenondevs.nova.resources.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.world.block.behavior.BlockSounds
@@ -27,7 +26,10 @@ import xyz.xenondevs.nova.world.block.state.model.MangroveLeavesBackingStateConf
 import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.OakLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.SpruceLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.state.property.DefaultScopedBlockStateProperties
+import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
+import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers
 
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
@@ -90,7 +92,13 @@ internal object DefaultBlocks {
             DefaultScopedBlockStateProperties.LEAVES_PERSISTENT,
             DefaultScopedBlockStateProperties.WATERLOGGED
         )
-        models { modelLess { cfg.defaultStateConfig.vanillaBlockState.bukkitBlockData } }
+        models {
+            modelLess {
+                cfg.defaultStateConfig.vanillaBlockState
+                    .setValue(LeavesBlock.WATERLOGGED, getPropertyValueOrThrow(DefaultBlockStateProperties.WATERLOGGED))
+                    .bukkitBlockData
+            } 
+        }
     }
     
     private fun block(name: String, run: NovaBlockBuilder.() -> Unit): NovaBlock {
