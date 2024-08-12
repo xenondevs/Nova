@@ -64,7 +64,7 @@ interface RecipeDeserializer<T> {
                             val tagName = NamespacedKey.fromString(it.substringAfter('#'))
                                 ?: throw IllegalArgumentException("Malformed tag: $it")
                             return@firstOrNull Bukkit.getTag(Tag.REGISTRY_ITEMS, tagName, Material::class.java) != null
-                        } else ItemUtils.isIdRegistered(it.substringBefore('{'))
+                        } else ItemUtils.isIdRegistered(it.substringBefore('['))
                     } ?: throw IllegalArgumentException("Invalid item id(s): $ids")
             }
             
