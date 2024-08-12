@@ -12,6 +12,8 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockMultiPlaceEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.player.PlayerBucketEmptyEvent
+import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.AddonsInitializer
@@ -22,7 +24,6 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.bukkitBlockData
@@ -39,6 +40,7 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.pos
 
 /**
@@ -55,23 +57,36 @@ internal object BlockPlacing : Listener {
         registerEvents()
     }
     
+    // handleBlockPlace, handleFluidPlace, handleFluidRemove:
+    // Prevent players from placing blocks where there are actually already blocks form Nova.
+    // This can happen when a replaceable hitbox material, such as structure void, is used.
+    // However, we want to permit this for built-in custom blocks, as those might have their
+    // WorldDataManager entry set before this event is called (block migration patch)
+    
     @EventHandler(ignoreCancelled = true)
     private fun handleBlockPlace(event: BlockPlaceEvent) {
-        // Prevent players from placing blocks where there are actually already blocks form Nova.
-        // This can happen when a replaceable hitbox material, such as structure void, is used.
-        
-        // However, we want to permit this for built-in custom blocks, as those might have their
-        // WorldDataManager entry set before this event is called (block migration patch)
-        
         val blockState = WorldDataManager.getBlockState(event.block.pos)
         event.isCancelled = blockState != null && blockState.block.id.namespace != "nova"
     }
     
     @EventHandler(ignoreCancelled = true)
     private fun handleBlockPlace(event: BlockMultiPlaceEvent) {
-        // Prevent players from placing blocks where there are actually already blocks form Nova.
-        // This can happen when a replaceable hitbox material, such as structure void, is used.
-        event.isCancelled = event.replacedBlockStates.any { WorldDataManager.getBlockState(it.location.pos) != null }
+        event.isCancelled = event.replacedBlockStates.any {
+            val blockState = WorldDataManager.getBlockState(it.location.pos)
+            blockState != null && blockState.block.id.namespace != "nova"
+        }
+    }
+    
+    @EventHandler(ignoreCancelled = true)
+    private fun handleFluidPlace(event: PlayerBucketEmptyEvent) {
+        val blockState = WorldDataManager.getBlockState(event.block.pos)
+        event.isCancelled = blockState != null && blockState.block.id.namespace != "nova"
+    }
+    
+    @EventHandler(ignoreCancelled = true)
+    private fun handleFluidRemove(event: PlayerBucketFillEvent) {
+        val blockState = WorldDataManager.getBlockState(event.block.pos)
+        event.isCancelled = blockState != null && blockState.block.id.namespace != "nova"
     }
     
     @EventHandler(priority = EventPriority.HIGH)
