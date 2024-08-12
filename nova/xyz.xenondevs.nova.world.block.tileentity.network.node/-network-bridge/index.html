@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>NetworkBridge</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../index.html">
+<span>nova-parent</span>            </a>    </div>
+    <div>0.17-alpha.1
+    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova:dokkaHtmlPartial/main">jvm</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.world.block.tileentity.network.node/NetworkBridge///PointingToDeclaration//2031297628">
+  <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.world.block.tileentity.network.node</a><span class="delimiter">/</span><span class="current">NetworkBridge</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Network</span><wbr><span><span>Bridge</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">NetworkBridge</a> : <a href="../-network-node/index.html">NetworkNode</a></div><p class="paragraph">A type of <a href="../-network-node/index.html">NetworkNode</a> that can connect multiple <a href="../-network-end-point/index.html">NetworkEndPoints</a>, without having to place them next to each other. <a href="index.html">NetworkBridges</a> with the same <a href="type-id.html">NetworkBridge.typeId</a> can also connect to each other.</p><p class="paragraph">May be commonly known as "cable" or "pipe".</p><p class="paragraph">Types that inherit from both <a href="index.html">NetworkBridge</a> and <a href="../-network-end-point/index.html">NetworkEndPoint</a> are not allowed.</p><h4 class="">See also</h4><div class="table"><div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-network-end-point/index.html"><span>Network</span><wbr><span>End</span><wbr><span><span>Point</span></span></a></div></span></div><div></div></div></div></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type.energy/-energy-bridge/index.html">EnergyBridge</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type.fluid/-fluid-bridge/index.html">FluidBridge</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type.item/-item-bridge/index.html">ItemBridge</a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="2072482612%2FProperties%2F2031297628" anchor-label="isValid" id="2072482612%2FProperties%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-network-node/is-valid.html"><span>is</span><wbr><span><span>Valid</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2072482612%2FProperties%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-network-node/is-valid.html">isValid</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Whether this <a href="../-network-node/index.html">NetworkNode</a> is valid and <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-network/index.html">Networks</a> including it should be ticked.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1952802382%2FProperties%2F2031297628" anchor-label="linkedNodes" id="1952802382%2FProperties%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-network-node/linked-nodes.html"><span>linked</span><wbr><span><span>Nodes</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1952802382%2FProperties%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-network-node/linked-nodes.html">linkedNodes</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../-network-node/index.html">NetworkNode</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A set of <a href="../-network-node/index.html">NetworkNodes</a> that are not connected via networks, but still share data and need to be clustered together, such as the left and right part of a double chest.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="867180243%2FProperties%2F2031297628" anchor-label="owner" id="867180243%2FProperties%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-network-node/owner.html"><span><span>owner</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="867180243%2FProperties%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-network-node/owner.html">owner</a><span class="token operator">: </span><span data-unresolved-link="org.bukkit/OfflinePlayer///PointingToDeclaration/">OfflinePlayer</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">The owner of this <a href="../-network-node/index.html">NetworkNode</a> or null if it doesn't have one.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1805185902%2FProperties%2F2031297628" anchor-label="pos" id="-1805185902%2FProperties%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-network-node/pos.html"><span><span>pos</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1805185902%2FProperties%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="../-network-node/pos.html">pos</a><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a></div><div class="brief "><p class="paragraph">The <a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a> of this <a href="../-network-node/index.html">NetworkNode</a></p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1429132966%2FProperties%2F2031297628" anchor-label="typeId" id="1429132966%2FProperties%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="type-id.html"><span>type</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1429132966%2FProperties%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword"></span><span class="token keyword">val </span><a href="type-id.html">typeId</a><span class="token operator">: </span><span data-unresolved-link="net.minecraft.resources/ResourceLocation///PointingToDeclaration/">ResourceLocation</span></div><div class="brief "><p class="paragraph">An identifier that defines which <a href="index.html">NetworkBridges</a> can connect to each other.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1027641626%2FFunctions%2F2031297628" anchor-label="handleNetworkLoaded" id="1027641626%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-network-node/handle-network-loaded.html"><span>handle</span><wbr><span>Network</span><wbr><span><span>Loaded</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1027641626%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="../-network-node/handle-network-loaded.html"><span class="token function">handleNetworkLoaded</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">state<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format/-network-state/index.html">NetworkState</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Called when a <a href="../-network-node/index.html">NetworkNode</a> is loaded into the <a href="../-network-node/handle-network-loaded.html">state</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2139390678%2FFunctions%2F2031297628" anchor-label="handleNetworkUpdate" id="2139390678%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-network-node/handle-network-update.html"><span>handle</span><wbr><span>Network</span><wbr><span><span>Update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2139390678%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="../-network-node/handle-network-update.html"><span class="token function">handleNetworkUpdate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">state<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format/-network-state/index.html">NetworkState</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Called when a <a href="../-network-node/index.html">NetworkNode</a> in one of the six cartesian directions is added, removed, or updated in a way that affects this node.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>
+

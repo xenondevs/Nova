@@ -1,0 +1,604 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>NetworkState</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../index.html">
+<span>nova-parent</span>            </a>    </div>
+    <div>0.17-alpha.1
+    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova:dokkaHtmlPartial/main">jvm</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.world.format/NetworkState///PointingToDeclaration//2031297628">
+  <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.world.format</a><span class="delimiter">/</span><span class="current">NetworkState</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Network</span><wbr><span><span>State</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">NetworkState</a></div><p class="paragraph">Contains or links to all network-related data for a specific <span data-unresolved-link="org.bukkit/World///PointingToDeclaration/">World</span>.</p><p class="paragraph">Unless otherwise specified, all functions in this class are only to be called from the network configurator context.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="246763531%2FProperties%2F2031297628" anchor-label="networks" id="246763531%2FProperties%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="networks.html"><span><span>networks</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="246763531%2FProperties%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="networks.html">networks</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence/index.html">Sequence</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">A sequence of all loaded <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetworks</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1306405918%2FFunctions%2F2031297628" anchor-label="connectEndPointToBridge" id="-1306405918%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="connect-end-point-to-bridge.html"><span>connect</span><wbr><span>End</span><wbr><span>Point</span><wbr><span>To</span><wbr><span><span>Bridge</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1306405918%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="connect-end-point-to-bridge.html"><span class="token function">connectEndPointToBridge</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">bridge<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span></span><span class="parameter ">clustersToEnlarge<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/index.html">MutableSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Tries to connect <a href="connect-end-point-to-bridge.html">endPoint</a> to <a href="connect-end-point-to-bridge.html">bridge</a> from <a href="connect-end-point-to-bridge.html">face</a> over <a href="connect-end-point-to-bridge.html">networkType</a>, adding all <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetworks</a> whose clusters need to be enlarged with <a href="connect-end-point-to-bridge.html">endPoint</a> to <a href="connect-end-point-to-bridge.html">clustersToEnlarge</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1685722967%2FFunctions%2F2031297628" anchor-label="connectEndPointToEndPoint" id="1685722967%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="connect-end-point-to-end-point.html"><span>connect</span><wbr><span>End</span><wbr><span>Point</span><wbr><span>To</span><wbr><span>End</span><wbr><span><span>Point</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1685722967%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="connect-end-point-to-end-point.html">T</a><span class="token operator"> : </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-network/index.html">Network</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="connect-end-point-to-end-point.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="connect-end-point-to-end-point.html"><span class="token function">connectEndPointToEndPoint</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">other<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="connect-end-point-to-end-point.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span></span><span class="parameter ">clustersToInit<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/index.html">MutableSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Connects <a href="connect-end-point-to-end-point.html">endPoint</a> to <a href="connect-end-point-to-end-point.html">other</a> from <a href="connect-end-point-to-end-point.html">face</a> over <a href="connect-end-point-to-end-point.html">networkType</a> and adds the new <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a> to <a href="connect-end-point-to-end-point.html">clustersToInit</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-535592918%2FFunctions%2F2031297628" anchor-label="contains" id="-535592918%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="contains.html"><span><span>contains</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-535592918%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="contains.html"><span class="token function">contains</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">network<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether a network with the same UUID as <a href="contains.html">network</a> is present in the network state.</p></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="contains.html"><span class="token function">contains</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether a node with the same position as <a href="contains.html">node</a> is present in the network state.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1093238654%2FFunctions%2F2031297628" anchor-label="createNetwork" id="-1093238654%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="create-network.html"><span>create</span><wbr><span><span>Network</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1093238654%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="create-network.html">T</a><span class="token operator"> : </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-network/index.html">Network</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="create-network.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="create-network.html"><span class="token function">createNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="create-network.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">networkId<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token operator"> = </span>UUID.randomUUID()</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="create-network.html">T</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Creates a new <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a> with the given <a href="create-network.html">type</a> and <a href="create-network.html">networkId</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1507581302%2FFunctions%2F2031297628" anchor-label="deleteNetwork" id="1507581302%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="delete-network.html"><span>delete</span><wbr><span><span>Network</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1507581302%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="delete-network.html"><span class="token function">deleteNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">network<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Removes the <a href="delete-network.html">network</a> from the network state and schedules the deletion of its data from disk.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-440939523%2FFunctions%2F2031297628" anchor-label="disconnectEndPointFromBridge" id="-440939523%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="disconnect-end-point-from-bridge.html"><span>disconnect</span><wbr><span>End</span><wbr><span>Point</span><wbr><span>From</span><wbr><span><span>Bridge</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-440939523%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="disconnect-end-point-from-bridge.html"><span class="token function">disconnectEndPointFromBridge</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">bridge<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span></span><span class="parameter ">clustersToInit<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/index.html">MutableSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Disconnects <a href="disconnect-end-point-from-bridge.html">endPoint</a> from <a href="disconnect-end-point-from-bridge.html">bridge</a> at <a href="disconnect-end-point-from-bridge.html">face</a> over <a href="disconnect-end-point-from-bridge.html">networkType</a>, adding all <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetworks</a> whose clusters need to be reinitialized to <a href="disconnect-end-point-from-bridge.html">clustersToInit</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-325444163%2FFunctions%2F2031297628" anchor-label="disconnectEndPointFromEndPoint" id="-325444163%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="disconnect-end-point-from-end-point.html"><span>disconnect</span><wbr><span>End</span><wbr><span>Point</span><wbr><span>From</span><wbr><span>End</span><wbr><span><span>Point</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-325444163%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="disconnect-end-point-from-end-point.html"><span class="token function">disconnectEndPointFromEndPoint</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">other<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span></span><span class="parameter ">clustersToInit<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/index.html">MutableSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Disconnects <a href="disconnect-end-point-from-end-point.html">endPoint</a> from <a href="disconnect-end-point-from-end-point.html">other</a> at <a href="disconnect-end-point-from-end-point.html">face</a> over <a href="disconnect-end-point-from-end-point.html">networkType</a>, adding all <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetworks</a> whose clusters need to be reinitialized to <a href="disconnect-end-point-from-end-point.html">clustersToInit</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="40948662%2FFunctions%2F2031297628" anchor-label="forEachConnectedNode" id="40948662%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="for-each-connected-node.html"><span>for</span><wbr><span>Each</span><wbr><span>Connected</span><wbr><span><span>Node</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="40948662%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><a href="for-each-connected-node.html"><span class="token function">forEachConnectedNode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Iterates over all <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNodes</a> connected to <a href="for-each-connected-node.html">node</a>, calling <a href="for-each-connected-node.html">action</a> for each connection. The action parameters describe using which <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a> and through wich <span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span> the <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a> is connected. Some <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNodes</a> may be connected through multiple <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkTypes</a>.</p></div><div class="symbol monospace"><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><a href="for-each-connected-node.html"><span class="token function">forEachConnectedNode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Iterates over all <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNodes</a> connected to <a href="for-each-connected-node.html">node</a> using <a href="for-each-connected-node.html">networkType</a>, calling <a href="for-each-connected-node.html">action</a> for each connection. The action parameters describe through wich <span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span> the <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a> is connected.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1113619357%2FFunctions%2F2031297628" anchor-label="forEachNetwork" id="1113619357%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="for-each-network.html"><span>for</span><wbr><span>Each</span><wbr><span><span>Network</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1113619357%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><a href="for-each-network.html"><span class="token function">forEachNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bridge<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Iterates over all networks of <a href="for-each-network.html">bridge</a>, calling <a href="for-each-network.html">action</a> for each network.</p></div><div class="symbol monospace"><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><a href="for-each-network.html"><span class="token function">forEachNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Iterates over all networks of <a href="for-each-network.html">endPoint</a>, calling <a href="for-each-network.html">action</a> for each network. The action parameters describe with which <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a> and through which <span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span> the <a href="for-each-network.html">endPoint</a> is connected to the given <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a>.</p></div><div class="symbol monospace"><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="for-each-network.html">T</a><span class="token operator"> : </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-network/index.html">Network</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="for-each-network.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="for-each-network.html"><span class="token function">forEachNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="for-each-network.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">action<span class="token operator">: </span><span class="token punctuation">(</span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="for-each-network.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Iterates over all <a href="for-each-network.html">networkType</a> networks of <a href="for-each-network.html">endPoint</a>, calling <a href="for-each-network.html">action</a> for each network. The action parameters describe through which <span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span> the <a href="for-each-network.html">endPoint</a> is connected to the given <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="843758624%2FFunctions%2F2031297628" anchor-label="getAllowedFaces" id="843758624%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-allowed-faces.html"><span>get</span><wbr><span>Allowed</span><wbr><span><span>Faces</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="843758624%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-allowed-faces.html"><span class="token function">getAllowedFaces</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bridge<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a><span class="token punctuation">, </span></span><span class="parameter ">type<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Gets a set of allowed <span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFaces</span> with which <a href="get-allowed-faces.html">bridge</a> is allowed to connect to <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-network/index.html">Networks</a> of the given <a href="get-allowed-faces.html">type</a>, which are all supported faces if the <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a> supports the <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a>.</p></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-allowed-faces.html"><span class="token function">getAllowedFaces</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">type<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Computes a set of allowed <span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFaces</span> with which <a href="get-allowed-faces.html">endPoint</a> is allowed to connect to <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-network/index.html">Networks</a> of the given <a href="get-allowed-faces.html">type</a>. Will be empty if the <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a> does not contain all <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/holder-types.html">required holder types</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2000400173%2FFunctions%2F2031297628" anchor-label="getBridgeData" id="-2000400173%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-bridge-data.html"><span>get</span><wbr><span>Bridge</span><wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2000400173%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-bridge-data.html"><span class="token function">getBridgeData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bridge<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format.chunk/-network-bridge-data/index.html">NetworkBridgeData</a></div><div class="brief "><p class="paragraph">Gets the <a href="../../xyz.xenondevs.nova.world.format.chunk/-network-bridge-data/index.html">NetworkBridgeData</a> for <a href="get-bridge-data.html">bridge</a>, or throws an exception if there is no data.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-51034069%2FFunctions%2F2031297628" anchor-label="getBridgeFaces" id="-51034069%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-bridge-faces.html"><span>get</span><wbr><span>Bridge</span><wbr><span><span>Faces</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-51034069%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-bridge-faces.html"><span class="token function">getBridgeFaces</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bridge<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/index.html">MutableSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Gets the allowed faces for <a href="get-bridge-faces.html">bridge</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1475424032%2FFunctions%2F2031297628" anchor-label="getConnectedNode" id="-1475424032%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-connected-node.html"><span>get</span><wbr><span>Connected</span><wbr><span><span>Node</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1475424032%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-connected-node.html"><span class="token function">getConnectedNode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets the <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a> connected to <a href="get-connected-node.html">node</a> at <a href="get-connected-node.html">face</a>, or <code class="lang-kotlin">null</code> if there is no connection.</p></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-connected-node.html"><span class="token function">getConnectedNode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets the <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a> connected to <a href="get-connected-node.html">node</a> at <a href="get-connected-node.html">face</a> using <a href="get-connected-node.html">networkType</a>, or <code class="lang-kotlin">null</code> if there is no connection.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="516358661%2FFunctions%2F2031297628" anchor-label="getConnectedNodes" id="516358661%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-connected-nodes.html"><span>get</span><wbr><span>Connected</span><wbr><span><span>Nodes</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="516358661%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-connected-nodes.html"><span class="token function">getConnectedNodes</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.google.common.collect/Table///PointingToDeclaration/">Table</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Creates a table that describes using which <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a> and <span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span> which <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNodes</a> are connected to <a href="get-connected-nodes.html">node</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1512584325%2FFunctions%2F2031297628" anchor-label="getEndPointData" id="-1512584325%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-end-point-data.html"><span>get</span><wbr><span>End</span><wbr><span>Point</span><wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1512584325%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-end-point-data.html"><span class="token function">getEndPointData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format.chunk/-network-end-point-data/index.html">NetworkEndPointData</a></div><div class="brief "><p class="paragraph">Gets the <a href="../../xyz.xenondevs.nova.world.format.chunk/-network-end-point-data/index.html">NetworkEndPointData</a> for <a href="get-end-point-data.html">endPoint</a>, or throws an exception if there is no data.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1120546922%2FFunctions%2F2031297628" anchor-label="getNearbyNodes" id="-1120546922%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-nearby-nodes.html"><span>get</span><wbr><span>Nearby</span><wbr><span><span>Nodes</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1120546922%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="get-nearby-nodes.html"><span class="token function">getNearbyNodes</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pos<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a><span class="token punctuation">, </span></span><span class="parameter ">faces<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Finds all nearby <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNodes</a> of <a href="get-nearby-nodes.html">pos</a> using the given <a href="get-nearby-nodes.html">faces</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-210520124%2FFunctions%2F2031297628" anchor-label="getNetwork" id="-210520124%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-network.html"><span>get</span><wbr><span><span>Network</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-210520124%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get-network.html">T</a><span class="token operator"> : </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-network/index.html">Network</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get-network.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="get-network.html"><span class="token function">getNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bridge<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get-network.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get-network.html">T</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets the network of <a href="get-network.html">bridge</a> of <a href="get-network.html">networkType</a>, or <code class="lang-kotlin">null</code> if there is no connection.</p></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get-network.html">T</a><span class="token operator"> : </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-network/index.html">Network</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get-network.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="get-network.html"><span class="token function">getNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get-network.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="get-network.html">T</a><span class="token operator">&gt;</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets the network of <a href="get-network.html">endPoint</a> at <a href="get-network.html">face</a>, or <code class="lang-kotlin">null</code> if there is no connection.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-758296192%2FFunctions%2F2031297628" anchor-label="getNetworks" id="-758296192%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-networks.html"><span>get</span><wbr><span><span>Networks</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-758296192%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-networks.html"><span class="token function">getNetworks</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bridge<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Gets the network map of <a href="get-networks.html">bridge</a>.</p></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-networks.html"><span class="token function">getNetworks</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.google.common.collect/Table///PointingToDeclaration/">Table</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span><span class="token keyword"></span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Gets the networks table of <a href="get-networks.html">endPoint</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-273979227%2FFunctions%2F2031297628" anchor-label="getNodeData" id="-273979227%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-node-data.html"><span>get</span><wbr><span>Node</span><wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-273979227%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-node-data.html"><span class="token function">getNodeData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pos<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format.chunk/-network-node-data/index.html">NetworkNodeData</a></div><div class="brief "><p class="paragraph">Gets the <a href="../../xyz.xenondevs.nova.world.format.chunk/-network-node-data/index.html">NetworkNodeData</a> for <a href="get-node-data.html">pos</a>, potentially loading the corresponding network region if necessary and throws an exception if there is no data.</p></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-node-data.html"><span class="token function">getNodeData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pos<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-chunk-pos/index.html">ChunkPos</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a><span class="token punctuation">, </span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.format.chunk/-network-node-data/index.html">NetworkNodeData</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Gets all network node data for the given <a href="get-node-data.html">pos</a>.</p></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-node-data.html"><span class="token function">getNodeData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format.chunk/-network-node-data/index.html">NetworkNodeData</a></div><div class="brief "><p class="paragraph">Gets the <a href="../../xyz.xenondevs.nova.world.format.chunk/-network-node-data/index.html">NetworkNodeData</a> for <a href="get-node-data.html">node</a>, or throws an exception if there is no data.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="201737567%2FFunctions%2F2031297628" anchor-label="getSupportedNetworkTypes" id="201737567%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-supported-network-types.html"><span>get</span><wbr><span>Supported</span><wbr><span>Network</span><wbr><span><span>Types</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="201737567%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="get-supported-network-types.html"><span class="token function">getSupportedNetworkTypes</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bridge<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-set/index.html">MutableSet</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Gets the supported network types for <a href="get-supported-network-types.html">bridge</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1385309813%2FFunctions%2F2031297628" anchor-label="handleEndPointAllowedFacesChange" id="1385309813%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-end-point-allowed-faces-change.html"><span>handle</span><wbr><span>End</span><wbr><span>Point</span><wbr><span>Allowed</span><wbr><span>Faces</span><wbr><span><span>Change</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1385309813%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="handle-end-point-allowed-faces-change.html"><span class="token function">handleEndPointAllowedFacesChange</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Performs network connect/disconnect actions based on the new allowed faces of <a href="handle-end-point-allowed-faces-change.html">endPoint</a> for <a href="handle-end-point-allowed-faces-change.html">networkType</a> at <a href="handle-end-point-allowed-faces-change.html">face</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="950514794%2FFunctions%2F2031297628" anchor-label="hasConnection" id="950514794%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="has-connection.html"><span>has</span><wbr><span><span>Connection</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="950514794%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="has-connection.html"><span class="token function">hasConnection</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether <a href="has-connection.html">node</a> has a connection at <a href="has-connection.html">face</a>.</p></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="has-connection.html"><span class="token function">hasConnection</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether <a href="has-connection.html">node</a> has a connection at <a href="has-connection.html">face</a> using <a href="has-connection.html">networkType</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-236878908%2FFunctions%2F2031297628" anchor-label="minusAssign" id="-236878908%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="minus-assign.html"><span>minus</span><wbr><span><span>Assign</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-236878908%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="minus-assign.html"><span class="token function">minusAssign</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Removes <a href="minus-assign.html">node</a> from the network state.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1868405930%2FFunctions%2F2031297628" anchor-label="plusAssign" id="1868405930%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="plus-assign.html"><span>plus</span><wbr><span><span>Assign</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1868405930%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="plus-assign.html"><span class="token function">plusAssign</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">networks<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds all <a href="plus-assign.html">networks</a> to the network state.</p></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="plus-assign.html"><span class="token function">plusAssign</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">network<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds <a href="plus-assign.html">network</a> to the network state.</p></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="plus-assign.html"><span class="token function">plusAssign</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds <a href="plus-assign.html">node</a> to the network state.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1883408471%2FFunctions%2F2031297628" anchor-label="removeConnection" id="-1883408471%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-connection.html"><span>remove</span><wbr><span><span>Connection</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1883408471%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="remove-connection.html"><span class="token function">removeConnection</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Forgets a connection of <a href="remove-connection.html">node</a> at <a href="remove-connection.html">face</a> using <a href="remove-connection.html">networkType</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1984386602%2FFunctions%2F2031297628" anchor-label="removeNetwork" id="1984386602%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-network.html"><span>remove</span><wbr><span><span>Network</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1984386602%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="remove-network.html"><span class="token function">removeNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bridge<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Forgets the connection of <a href="remove-network.html">bridge</a> to the network of <a href="remove-network.html">networkType</a>.</p></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="remove-network.html"><span class="token function">removeNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">faces<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Forgets the connection of <a href="remove-network.html">endPoint</a> to the network of <a href="remove-network.html">networkType</a> at all <a href="remove-network.html">faces</a>.</p></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="remove-network.html"><span class="token function">removeNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Forgets the connection of <a href="remove-network.html">endPoint</a> to the network of <a href="remove-network.html">networkType</a> at <a href="remove-network.html">face</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-568464455%2FFunctions%2F2031297628" anchor-label="removeNodeData" id="-568464455%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-node-data.html"><span>remove</span><wbr><span>Node</span><wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-568464455%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="remove-node-data.html"><span class="token function">removeNodeData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Removes the data for <a href="remove-node-data.html">node</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1297772371%2FFunctions%2F2031297628" anchor-label="resolveNetwork" id="1297772371%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="resolve-network.html"><span>resolve</span><wbr><span><span>Network</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1297772371%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="resolve-network.html"><span class="token function">resolveNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">networkId<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Resolves a network by its <a href="resolve-network.html">networkId</a>, loading it from disk if necessary.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="423286246%2FFunctions%2F2031297628" anchor-label="resolveNode" id="423286246%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="resolve-node.html"><span>resolve</span><wbr><span><span>Node</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="423286246%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="resolve-node.html"><span class="token function">resolveNode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pos<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a></div><div class="brief "><p class="paragraph">Resolves a <a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a> by its <a href="resolve-node.html">pos</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1374027822%2FFunctions%2F2031297628" anchor-label="setBridgeData" id="1374027822%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-bridge-data.html"><span>set</span><wbr><span>Bridge</span><wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1374027822%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set-bridge-data.html"><span class="token function">setBridgeData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pos<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a><span class="token punctuation">, </span></span><span class="parameter ">data<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format.chunk/-network-bridge-data/index.html">NetworkBridgeData</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets <a href="set-bridge-data.html">data</a> at <a href="set-bridge-data.html">pos</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1313309005%2FFunctions%2F2031297628" anchor-label="setConnection" id="1313309005%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-connection.html"><span>set</span><wbr><span><span>Connection</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1313309005%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set-connection.html"><span class="token function">setConnection</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a><span class="token punctuation">, </span></span><span class="parameter ">networkType<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remembers a connection of <a href="set-connection.html">node</a> at <a href="set-connection.html">face</a> using <a href="set-connection.html">networkType</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2146194578%2FFunctions%2F2031297628" anchor-label="setEndPointData" id="-2146194578%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-end-point-data.html"><span>set</span><wbr><span>End</span><wbr><span>Point</span><wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2146194578%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set-end-point-data.html"><span class="token function">setEndPointData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pos<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a><span class="token punctuation">, </span></span><span class="parameter ">data<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format.chunk/-network-end-point-data/index.html">NetworkEndPointData</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets <a href="set-end-point-data.html">data</a> at <a href="set-end-point-data.html">pos</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="574198048%2FFunctions%2F2031297628" anchor-label="setNetwork" id="574198048%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-network.html"><span>set</span><wbr><span><span>Network</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="574198048%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set-network.html"><span class="token function">setNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bridge<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-bridge/index.html">NetworkBridge</a><span class="token punctuation">, </span></span><span class="parameter ">network<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remembers the connection of <a href="set-network.html">bridge</a> to <a href="set-network.html">network</a> under <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/type.html">ProtoNetwork.type</a>.</p></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set-network.html"><span class="token function">setNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">faces<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">network<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remembers the connection of <a href="set-network.html">endPoint</a> to <a href="set-network.html">network</a> at all <a href="set-network.html">faces</a>.</p></div><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set-network.html"><span class="token function">setNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">endPoint<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-end-point/index.html">NetworkEndPoint</a><span class="token punctuation">, </span></span><span class="parameter ">face<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/BlockFace///PointingToDeclaration/">BlockFace</span><span class="token punctuation">, </span></span><span class="parameter ">network<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remembers the connection of <a href="set-network.html">endPoint</a> to <a href="set-network.html">network</a> at <a href="set-network.html">face</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="91659938%2FFunctions%2F2031297628" anchor-label="unloadNetwork" id="91659938%2FFunctions%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="unload-network.html"><span>unload</span><wbr><span><span>Network</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="91659938%2FFunctions%2F2031297628"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="unload-network.html"><span class="token function">unloadNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">network<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Unloads the <a href="unload-network.html">network</a> from the network state, but does not delete any data associated with it.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>
+
