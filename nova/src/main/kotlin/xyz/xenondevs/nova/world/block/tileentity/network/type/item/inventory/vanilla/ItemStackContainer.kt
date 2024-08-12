@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla
 
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemStack as MojangStack
 
 internal interface ItemStackContainer : Iterable<MojangStack> {
@@ -35,58 +34,6 @@ internal class SimpleItemStackContainer(private val items: MutableList<MojangSta
     
     override fun hashCode(): Int {
         return System.identityHashCode(items)
-    }
-    
-}
-
-internal class SingleSlotItemStackContainer(private val items: MutableList<MojangStack>, private val slot: Int) : ItemStackContainer {
-    
-    override val size = 1
-    
-    override fun get(index: Int): ItemStack {
-        if (index != 0)
-            throw IndexOutOfBoundsException(index)
-        
-        return items[slot]
-    }
-    
-    override fun set(index: Int, value: ItemStack) {
-        if (index != 0)
-            throw IndexOutOfBoundsException(index)
-        
-        items[slot] = value
-    }
-    
-    override fun iterator(): Iterator<ItemStack> {
-        return IteratorImpl()
-    }
-    
-    override fun equals(other: Any?): Boolean {
-        return this === other || other is SingleSlotItemStackContainer && items === other.items && slot == other.slot
-    }
-    
-    override fun hashCode(): Int {
-        var result = System.identityHashCode(items)
-        result = 31 * result + slot
-        return result
-    }
-    
-    private inner class IteratorImpl : Iterator<ItemStack> {
-        
-        private var hasNext = true
-        
-        override fun hasNext(): Boolean {
-            return hasNext
-        }
-        
-        override fun next(): ItemStack {
-            if (!hasNext)
-                throw NoSuchElementException()
-            
-            hasNext = false
-            return items[slot]
-        }
-        
     }
     
 }
