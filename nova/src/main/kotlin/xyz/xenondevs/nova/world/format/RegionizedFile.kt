@@ -96,8 +96,6 @@ internal abstract class RegionizedFileReader<C : RegionizedChunk, F : Regionized
         legacyReaders.associateTo(Byte2ObjectOpenHashMap()) { (version, reader) -> version.toByte() to reader }
     
     fun read(file: File, world: World, regionX: Int, regionZ: Int): F {
-        LOGGER.info("Loading region file $file")
-        
         val backupFile = getBackupFile(file)
         try {
             // restore backup if present
