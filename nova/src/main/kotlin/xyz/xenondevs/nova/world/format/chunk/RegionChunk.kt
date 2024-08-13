@@ -122,7 +122,7 @@ internal class RegionChunk(
      * Gets the [NovaBlockState] at the given [pos].
      */
     fun getBlockState(pos: BlockPos): NovaBlockState? = lock.withLock {
-        return getSection(pos.y)[pos.x and 0xF, pos.y and 0xF, pos.z and 0xF]
+        return getSection(pos.y)?.get(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF)
     }
     
     /**
@@ -130,7 +130,8 @@ internal class RegionChunk(
      */
     fun setBlockState(pos: BlockPos, state: NovaBlockState?): NovaBlockState? = lock.withLock {
         val sectionIdx = getSectionIndex(pos.y)
-        val section = sections[sectionIdx]
+        val section = sections.getOrNull(sectionIdx)
+            ?: return null
         val previous = section.set(pos.x and 0xF, pos.y and 0xF, pos.z and 0xF, state)
         
         if (previous != null && previous.ticksRandomly) {
@@ -273,10 +274,10 @@ internal class RegionChunk(
     }
     
     /**
-     * Gets the [RegionChunkSection] at the given [y] coordinate.
+     * Gets the [RegionChunkSection] at the given [y] coordinate, or null if out of bounds.
      */
-    private fun getSection(y: Int): RegionChunkSection<NovaBlockState> =
-        sections[getSectionIndex(y)]
+    private fun getSection(y: Int): RegionChunkSection<NovaBlockState>? =
+        sections.getOrNull(getSectionIndex(y))
     
     /**
      * Gets the index of the [RegionChunkSection] at the given [y] coordinate.
