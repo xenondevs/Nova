@@ -3,7 +3,6 @@
 package xyz.xenondevs.nova.util
 
 import org.bukkit.Bukkit
-import org.bukkit.block.data.BlockData
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.event.Event
 import org.bukkit.event.Event.Result
@@ -11,7 +10,6 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
-import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -37,9 +35,6 @@ val PlayerInteractEvent.handItems: Array<ItemStack>
 
 val PlayerInteractEvent.hands: Array<Pair<EquipmentSlot, ItemStack>>
     get() = arrayOf(EquipmentSlot.HAND to player.inventory.itemInMainHand, EquipmentSlot.OFF_HAND to player.inventory.itemInOffHand)
-
-val BlockPhysicsEvent.changed: BlockData
-    get() = ReflectionRegistry.BLOCK_PHYSICS_EVENT_CHANGED_FIELD.get(this) as BlockData
 
 fun callEvent(event: Event) = Bukkit.getPluginManager().callEvent(event)
 

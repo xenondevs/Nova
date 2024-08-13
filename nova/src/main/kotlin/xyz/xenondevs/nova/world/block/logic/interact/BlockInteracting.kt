@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.world.block.logic.interact
 
-import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -9,7 +8,6 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockExplodeEvent
-import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.block.BlockPistonExtendEvent
 import org.bukkit.event.block.BlockPistonRetractEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
@@ -24,10 +22,10 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.pos
 
 @InternalInit(
@@ -89,19 +87,6 @@ internal object BlockInteracting : Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handlePistonRetract(event: BlockPistonRetractEvent) {
         if (event.blocks.any { WorldDataManager.getBlockState(it.pos) != null }) event.isCancelled = true
-    }
-    
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private fun handleBlockPhysics(event: BlockPhysicsEvent) {
-        val pos = event.block.pos
-        val state = WorldDataManager.getBlockState(pos)
-        if (state != null && Material.AIR == event.block.type) {
-            val ctx = Context.intention(BlockBreak)
-                .param(DefaultContextParamTypes.BLOCK_POS, pos)
-                .param(DefaultContextParamTypes.BLOCK_BREAK_EFFECTS, false)
-                .build()
-            BlockUtils.breakBlockNaturally(ctx)
-        }
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
