@@ -18,12 +18,7 @@ import xyz.xenondevs.nova.resources.builder.model.Model.Element.Rotation
 internal object ModelTypeAdapter : TypeAdapter<Model>() {
     
     //<editor-fold desc="write">
-    override fun write(writer: JsonWriter, value: Model?) {
-        if (value == null) {
-            writer.nullValue()
-            return
-        }
-        
+    override fun write(writer: JsonWriter, value: Model) {
         writer.beginObject()
         
         val parentPath = value.parent

@@ -2,44 +2,35 @@ package xyz.xenondevs.nova.serialization.json.serializer
 
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import org.joml.Matrix4f
 import org.joml.Matrix4fc
 
-internal object Matrix4fcTypeAdapter : TypeAdapter<Matrix4fc?>() {
+internal object Matrix4fcTypeAdapter : TypeAdapter<Matrix4fc>() {
     
-    override fun write(writer: JsonWriter, value: Matrix4fc?) {
-        if (value != null) {
-            writer.beginArray()
-            writer.value(value.m00())
-            writer.value(value.m01())
-            writer.value(value.m02())
-            writer.value(value.m03())
-            writer.value(value.m10())
-            writer.value(value.m11())
-            writer.value(value.m12())
-            writer.value(value.m13())
-            writer.value(value.m20())
-            writer.value(value.m21())
-            writer.value(value.m22())
-            writer.value(value.m23())
-            writer.value(value.m30())
-            writer.value(value.m31())
-            writer.value(value.m32())
-            writer.value(value.m33())
-            writer.endArray()
-        } else 
-            writer.nullValue()
+    override fun write(writer: JsonWriter, value: Matrix4fc) {
+        writer.beginArray()
+        writer.value(value.m00())
+        writer.value(value.m01())
+        writer.value(value.m02())
+        writer.value(value.m03())
+        writer.value(value.m10())
+        writer.value(value.m11())
+        writer.value(value.m12())
+        writer.value(value.m13())
+        writer.value(value.m20())
+        writer.value(value.m21())
+        writer.value(value.m22())
+        writer.value(value.m23())
+        writer.value(value.m30())
+        writer.value(value.m31())
+        writer.value(value.m32())
+        writer.value(value.m33())
+        writer.endArray()
     }
     
     @Suppress("DuplicatedCode")
-    override fun read(reader: JsonReader): Matrix4fc? {
-        if (reader.peek() == JsonToken.NULL) {
-            reader.nextNull()
-            return null
-        }
-        
+    override fun read(reader: JsonReader): Matrix4fc {
         reader.beginArray()
         val m00 = reader.nextDouble().toFloat()
         val m01 = reader.nextDouble().toFloat()
