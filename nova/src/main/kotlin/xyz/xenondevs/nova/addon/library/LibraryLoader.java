@@ -17,6 +17,7 @@ import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@ApiStatus.Internal
 @Deprecated
 public class LibraryLoader {
     

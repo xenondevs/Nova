@@ -10,7 +10,7 @@ import java.awt.image.DataBufferInt
 import java.awt.image.Raster
 import java.awt.image.SinglePixelPackedSampleModel
 
-object ImageUtils {
+internal object ImageUtils {
     
     private val ARGB_BIT_MASKS = intArrayOf(0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000.toInt())
     

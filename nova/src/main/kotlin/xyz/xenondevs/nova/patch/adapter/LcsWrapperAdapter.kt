@@ -8,7 +8,7 @@ import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.nova.util.data.AsmUtils
 
-object LcsWrapperAdapter : Adapter {
+internal object LcsWrapperAdapter : Adapter {
     
     private val COPY_BLOCK_COUNTS_METHODS: Set<String> = hashSetOf("updateKnownBlockInfo")
     

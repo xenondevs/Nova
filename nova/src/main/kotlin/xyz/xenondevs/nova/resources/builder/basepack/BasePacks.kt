@@ -47,7 +47,7 @@ class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
     internal val occupiedSolidIds = HashMap<BackingStateConfigType<*>, HashSet<Int>>()
     val customArmor = HashMap<Int, ArmorData>()
     
-    fun include() {
+    internal fun include() {
         packs.map {
             if (it.isFile && it.extension.equals("zip", true)) {
                 val dir = ResourcePackBuilder.TEMP_BASE_PACKS_DIR.resolve("${it.nameWithoutExtension}-${StringUtils.randomString(5)}")

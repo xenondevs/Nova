@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.nova.patch.Patcher;
 import xyz.xenondevs.nova.patch.adapter.LcsWrapperAdapter;
@@ -28,6 +29,7 @@ import java.lang.reflect.Field;
  * <h2>! UPDATE {@link Patcher Patcher.injectedClasses} WHEN MOVING THIS CLASS !</h2>
  * <h2> Also check out {@link LcsWrapperAdapter} when refactoring </h2>
  */
+@ApiStatus.Internal
 public class LevelChunkSectionWrapper extends LevelChunkSection {
     
     private static final MethodHandle GET_STATES;

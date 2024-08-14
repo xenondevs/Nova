@@ -63,14 +63,13 @@ private val GSON_BUILDER = GsonBuilder()
     .registerTypeAdapter(FontCharSerialization)
     .registerTypeAdapter(EnumMapInstanceCreator)
 
+internal val GSON: Gson = GSON_BUILDER.create()
+internal val PRETTY_GSON: Gson = GSON_BUILDER.setPrettyPrinting().create()
 
-val GSON: Gson = GSON_BUILDER.create()
-val PRETTY_GSON: Gson = GSON_BUILDER.setPrettyPrinting().create()
-
-inline fun <reified T> JsonObject.getDeserializedOrNull(key: String): T? =
+internal inline fun <reified T> JsonObject.getDeserializedOrNull(key: String): T? =
     GSON.fromJson<T>(get(key))
 
-inline fun <reified T> JsonObject.getDeserialized(key: String): T {
+internal inline fun <reified T> JsonObject.getDeserialized(key: String): T {
     if (!has(key))
         throw NoSuchElementException("No JsonElement with key $key found.")
     
@@ -78,5 +77,5 @@ inline fun <reified T> JsonObject.getDeserialized(key: String): T {
         ?: throw NullPointerException("Could not deserialize JsonElement with key $key.")
 }
 
-inline fun <reified T> JsonObject.addSerialized(key: String, value: T) =
+internal inline fun <reified T> JsonObject.addSerialized(key: String, value: T) =
     add(key, GSON.toJsonTreeTyped(value))

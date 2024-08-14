@@ -54,7 +54,6 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
 import java.security.ProtectionDomain
 import java.util.*
 import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
-import net.minecraft.world.entity.player.Inventory as MojangInventory
 import net.minecraft.world.item.ItemStack as MojangStack
 import java.util.function.Function as JavaFunction
 

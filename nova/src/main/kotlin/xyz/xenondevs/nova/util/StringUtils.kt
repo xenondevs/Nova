@@ -2,6 +2,8 @@ package xyz.xenondevs.nova.util
 
 import java.util.*
 
+// TODO: move to commons
+
 private val FORMATTING_FILTER_REGEX = Regex("§.")
 
 fun String.capitalize() = replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }

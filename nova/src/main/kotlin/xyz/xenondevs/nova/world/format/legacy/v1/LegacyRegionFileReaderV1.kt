@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.UUIDUtils
 import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
@@ -22,6 +21,7 @@ import xyz.xenondevs.nova.world.format.chunk.RegionChunk
 import xyz.xenondevs.nova.world.format.legacy.LegacyConversionException
 import xyz.xenondevs.nova.world.format.legacy.LegacyRegionizedFileReader
 import java.io.File
+import java.util.*
 
 internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChunk, RegionFile> {
     
@@ -93,7 +93,7 @@ internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChun
         
         if (type is NovaTileEntityBlock) {
             val uuid = reader.readUUID()
-            val ownerUUID = reader.readUUID().takeUnless(UUIDUtils.ZERO::equals)
+            val ownerUUID = reader.readUUID().takeUnless { it == UUID(0L, 0L) }
             val data = CBF.read<Compound>(reader)!!
             
             data["uuid"] = uuid

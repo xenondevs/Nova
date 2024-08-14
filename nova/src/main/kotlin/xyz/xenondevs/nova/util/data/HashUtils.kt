@@ -8,7 +8,7 @@ import java.security.MessageDigest
 import java.util.*
 import kotlin.io.path.inputStream
 
-fun MessageDigest.update(ins: InputStream, bufferSize: Int = 4096) {
+internal fun MessageDigest.update(ins: InputStream, bufferSize: Int = 4096) {
     val buffer = ByteArray(bufferSize)
     var len: Int
     while (run { len = ins.read(buffer); len } != -1) {
@@ -17,7 +17,7 @@ fun MessageDigest.update(ins: InputStream, bufferSize: Int = 4096) {
     ins.close()
 }
 
-object HashUtils {
+internal object HashUtils {
     
     fun getFileHash(file: Path, algorithm: String): ByteArray {
         return file.inputStream().use { getHash(it, algorithm) }

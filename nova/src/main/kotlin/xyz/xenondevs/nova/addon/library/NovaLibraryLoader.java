@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.addon.library;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+@ApiStatus.Internal
 @Deprecated
 public class NovaLibraryLoader {
     
