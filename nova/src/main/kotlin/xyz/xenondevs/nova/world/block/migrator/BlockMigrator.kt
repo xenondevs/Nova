@@ -24,13 +24,12 @@ import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
-import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
+import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.util.bukkitMaterial
 import xyz.xenondevs.nova.util.instrument
 import xyz.xenondevs.nova.util.levelChunk
@@ -48,6 +47,7 @@ import xyz.xenondevs.nova.world.block.state.model.BrownMushroomBackingStateConfi
 import xyz.xenondevs.nova.world.block.state.model.CherryLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.DarkOakLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.DefaultingBackingStateConfigType
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.FloweringAzaleaLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.JungleLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.MangroveLeavesBackingStateConfig
@@ -57,6 +57,7 @@ import xyz.xenondevs.nova.world.block.state.model.OakLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.SpruceLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
+import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 import java.util.logging.Level
@@ -259,8 +260,14 @@ internal object BlockMigrator : Listener {
                 .param(DefaultContextParamTypes.BLOCK_STATE_NOVA, previousNovaState)
                 .param(DefaultContextParamTypes.TILE_ENTITY_NOVA, previousTileEntity)
                 .build()
-            if (previousNovaState?.block !in migrationsByNovaBlock)
-                previousNovaState?.block?.behaviors?.forEach { it.handleBreak(pos, previousNovaState, ctx) }
+            if (previousNovaState != null && previousNovaState.block !in migrationsByNovaBlock) {
+                // call behavior break handlers directly to bypass any tile-entity or model provider related logic
+                previousNovaState.block.behaviors.forEach { it.handleBreak(pos, previousNovaState, ctx) }
+                // for entity-backed models, the display entity needs to be despawned
+                if (previousNovaState.modelProvider.provider == DisplayEntityBlockModelProvider) {
+                    DisplayEntityBlockModelProvider.unload(pos)
+                }
+            }
             previousTileEntity?.handleBreak(ctx)
         }
         
