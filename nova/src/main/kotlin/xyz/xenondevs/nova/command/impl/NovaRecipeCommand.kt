@@ -23,9 +23,9 @@ internal object NovaRecipeCommand : Command() {
     override val node: LiteralCommandNode<CommandSourceStack> = literal("nvrecipe")
         .requiresPlayer()
         .requiresPermission("nova.command.nvrecipe")
-        .executes0(::showRecipe)
+        .executes0(::showCurrentRecipe)
         .then(argument("recipe", CreationRecipeArgumentType)
-            .executes0(::showCurrentRecipe))
+            .executes0(::showRecipe))
         .build()
     
     private fun showRecipe(ctx: CommandContext<CommandSourceStack>) {

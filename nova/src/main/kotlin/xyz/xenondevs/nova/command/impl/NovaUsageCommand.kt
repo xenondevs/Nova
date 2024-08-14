@@ -16,29 +16,29 @@ import xyz.xenondevs.nova.command.get
 import xyz.xenondevs.nova.command.player
 import xyz.xenondevs.nova.command.requiresPermission
 import xyz.xenondevs.nova.command.requiresPlayer
-import xyz.xenondevs.nova.ui.menu.explorer.recipes.showRecipes
+import xyz.xenondevs.nova.ui.menu.explorer.recipes.showUsages
 
 internal object NovaUsageCommand : Command() {
     
     override val node: LiteralCommandNode<CommandSourceStack> = literal("nvusage")
         .requiresPlayer()
         .requiresPermission("nova.command.nvusage")
-        .executes0(::showUsage)
+        .executes0(::showCurrentUsage)
         .then(argument("recipe", UsageRecipeArgumentType)
-            .executes0(::showCurrentUsage))
+            .executes0(::showUsage))
         .build()
     
     private fun showUsage(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         val recipe: String = ctx["recipe"]
-        player.showRecipes(recipe)
+        player.showUsages(recipe)
     }
     
     private fun showCurrentUsage(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         val item = player.inventory.itemInMainHand
         if (!item.type.isAir) {
-            if (!player.showRecipes(item)) {
+            if (!player.showUsages(item)) {
                 ctx.source.sender.sendMessage(Component.translatable("command.nova.usage.no-usage", NamedTextColor.RED))
             }
         } else ctx.source.sender.sendMessage(Component.translatable("command.nova.no-item-in-hand", NamedTextColor.RED))
