@@ -68,8 +68,15 @@ internal object NoteBlockBehavior : BlockBehavior {
         if (!poweredPreviously && poweredNow)
             playNote(pos, newState)
         
-        if (newState != state)
+        if (newState != state) {
             WorldDataManager.setBlockState(pos, newState)
+            
+            // We need to still cause block updates even though the block wasn't changed to keep vanilla behavior
+            val level = pos.world.serverLevel
+            val nmsPos = pos.nmsPos
+            val nmsState = pos.nmsBlockState
+            level.notifyAndUpdatePhysics(nmsPos, level.getChunkAt(nmsPos), nmsState, nmsState, nmsState, 3, 512)
+        }
     }
     
     private fun cycleNote(pos: BlockPos, state: NovaBlockState) {
