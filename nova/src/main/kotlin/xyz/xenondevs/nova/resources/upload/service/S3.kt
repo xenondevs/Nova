@@ -38,11 +38,14 @@ internal object S3 : UploadService {
             ?: throw IllegalArgumentException("S3 region is not specified. Regions available by default are: " +
                 Region.regions().joinToString(", ", transform = Region::id))
         
+        val forcePathStyle = cfg.node("force_path_style").getBoolean(false)
+        
         LOGGER.info("Connecting to S3 endpoint $endpoint")
         this.client = S3Client.builder()
             .endpointOverride(endpointURI)
             .credentialsProvider(StaticCredentialsProvider.create(credentials))
             .region(region)
+            .forcePathStyle(forcePathStyle)
             .build()
         this.bucket = cfg.node("bucket").string
             ?: throw IllegalArgumentException("S3 bucket is not specified")
