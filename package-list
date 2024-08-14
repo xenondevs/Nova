@@ -23,7 +23,6 @@ xyz.xenondevs.nova.network
 xyz.xenondevs.nova.network.event
 xyz.xenondevs.nova.network.event.clientbound
 xyz.xenondevs.nova.network.event.serverbound
-xyz.xenondevs.nova.patch.adapter
 xyz.xenondevs.nova.patch.impl.worldgen.chunksection
 xyz.xenondevs.nova.patch.impl.worldgen.registry
 xyz.xenondevs.nova.registry
@@ -49,7 +48,6 @@ xyz.xenondevs.nova.resources.upload
 xyz.xenondevs.nova.serialization
 xyz.xenondevs.nova.serialization.cbf
 xyz.xenondevs.nova.serialization.configurate
-xyz.xenondevs.nova.serialization.json
 xyz.xenondevs.nova.serialization.json.serializer
 xyz.xenondevs.nova.serialization.persistentdata
 xyz.xenondevs.nova.ui.menu
@@ -72,10 +70,8 @@ xyz.xenondevs.nova.util.bossbar
 xyz.xenondevs.nova.util.bossbar.operation
 xyz.xenondevs.nova.util.component.adventure
 xyz.xenondevs.nova.util.data
-xyz.xenondevs.nova.util.data.http
 xyz.xenondevs.nova.util.item
 xyz.xenondevs.nova.util.particle
-xyz.xenondevs.nova.util.reflection
 xyz.xenondevs.nova.util.world
 xyz.xenondevs.nova.world
 xyz.xenondevs.nova.world.block
