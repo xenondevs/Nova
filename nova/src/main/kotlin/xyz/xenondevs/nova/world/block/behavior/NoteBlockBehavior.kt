@@ -87,6 +87,9 @@ internal object NoteBlockBehavior : BlockBehavior {
         val instrument = state.getOrThrow(NOTE_BLOCK_INSTRUMENT)
         val note = state.getOrThrow(NOTE_BLOCK_NOTE)
         
+        if (!instrument.worksAboveNoteBlock && !pos.add(0, 1, 0).nmsBlockState.isAir)
+            return
+        
         val event = NotePlayEvent(pos.block, instrument.bukkitInstrument, Note(note))
         callEvent(event)
         
