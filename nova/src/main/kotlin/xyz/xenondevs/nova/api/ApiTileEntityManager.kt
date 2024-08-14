@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.api
 
+import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.World
 import xyz.xenondevs.nova.api.tileentity.TileEntity
@@ -11,6 +12,10 @@ internal object ApiTileEntityManager : ITileEntityManager {
     
     override fun getTileEntity(location: Location): TileEntity? {
         return WorldDataManager.getTileEntity(location.pos)?.let(::ApiTileEntityWrapper)
+    }
+    
+    override fun getTileEntities(chunk: Chunk): List<TileEntity> {
+        return WorldDataManager.getTileEntities(chunk.pos).map(::ApiTileEntityWrapper)
     }
     
     override fun getTileEntities(world: World): List<TileEntity> {
