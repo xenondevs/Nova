@@ -240,6 +240,14 @@ object BlockUtils {
      */
     fun placeBlock(ctx: Context<BlockPlace>): Boolean {
         val pos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
+        
+        // break previous block (if present)
+        val breakCtx = Context.intention(BlockBreak)
+            .param(DefaultContextParamTypes.BLOCK_POS, pos)
+            .param(DefaultContextParamTypes.BLOCK_BREAK_EFFECTS, false)
+            .build()
+        breakBlock(breakCtx)
+        
         val novaBlockState = ctx[DefaultContextParamTypes.BLOCK_STATE_NOVA]
         if (novaBlockState != null) {
             placeNovaBlock(pos, novaBlockState, ctx)
@@ -476,6 +484,9 @@ object BlockUtils {
         val nmsPos = pos.nmsPos
         val state = pos.nmsBlockState
         val block = state.block
+        
+        if (state.isAir)
+            return emptyList()
         
         return level.captureDrops {
             // calls game and level events (includes break effects), angers piglins, ignites unstable tnt, etc.
