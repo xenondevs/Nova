@@ -10,11 +10,13 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ArmorItem
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.Equipable
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.DispenserBlock
 import org.bukkit.Bukkit
 import org.bukkit.inventory.EquipmentSlot
@@ -25,46 +27,30 @@ import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.puts
 import xyz.xenondevs.bytebase.util.replaceFirst
-import xyz.xenondevs.nova.world.item.behavior.Wearable
-import xyz.xenondevs.nova.world.player.equipment.ArmorEquipEvent
-import xyz.xenondevs.nova.world.player.equipment.EquipAction
 import xyz.xenondevs.nova.patch.MultiTransformer
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.DISPENSER_BLOCK_GET_DISPENSE_METHOD_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.INVENTORY_ARMOR_FIELD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.INVENTORY_CONSTRUCTOR
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
+import xyz.xenondevs.nova.world.item.behavior.Wearable
+import xyz.xenondevs.nova.world.player.equipment.ArmorEquipEvent
+import xyz.xenondevs.nova.world.player.equipment.EquipAction
 
-internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity::class, DispenserBlock::class) {
+private val INVENTORY_CONSTRUCTOR = ReflectionUtils.getConstructor(Inventory::class, Player::class)
+private val INVENTORY_ARMOR_FIELD = getField(Inventory::class, true, "armor")
+private val DISPENSER_BLOCK_GET_DISPENSE_METHOD = ReflectionUtils.getMethod(DispenserBlock::class, "getDispenseMethod", Level::class, ItemStack::class)
+
+internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity::class, DispenserBlock::class, Inventory::class) {
     
     override fun transform() {
+        patchEquipable()
+        patchDispenser()
+        patchEquipEvent()
+    }
+    
+    private fun patchEquipable() {
         // makes nova wearables equipable
         Equipable::get.replaceWith(::getEquipable)
-        
-        // patches the armor inventory to fire the ArmorEquipEvent
-        VirtualClassPath[INVENTORY_CONSTRUCTOR].replaceFirst(3, -1, buildInsnList {
-            new(WatchedArmorList::class)
-            dup()
-            aLoad(1) // player
-            invokeSpecial(WatchedArmorList::class.java.constructors[0])
-            checkCast(NonNullList::class)
-        }) { it.opcode == Opcodes.PUTFIELD && (it as FieldInsnNode).puts(INVENTORY_ARMOR_FIELD) }
-        
-        // patches dispense behavior for nova wearables
-        VirtualClassPath[DISPENSER_BLOCK_GET_DISPENSE_METHOD_METHOD].instructions.insert(buildInsnList {
-            // val method = getNovaArmorDispenseMethod(itemStack)
-            // if (method != null) return method
-            // ... default body
-            
-            val defaultBody = LabelNode()
-            addLabel()
-            aLoad(2) // itemStack
-            invokeStatic(::getNovaArmorDispenseMethod)
-            dup()
-            ifnull(defaultBody)
-            areturn()
-            add(defaultBody)
-        })
     }
     
     @JvmStatic
@@ -85,6 +71,24 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
         // ----
         
         return null
+    }
+    
+    // patches dispense behavior for nova wearables
+    private fun patchDispenser() {
+        VirtualClassPath[DISPENSER_BLOCK_GET_DISPENSE_METHOD].instructions.insert(buildInsnList {
+            // val method = getNovaArmorDispenseMethod(itemStack)
+            // if (method != null) return method
+            // ... default body
+            
+            val defaultBody = LabelNode()
+            addLabel()
+            aLoad(2) // itemStack
+            invokeStatic(::getNovaArmorDispenseMethod)
+            dup()
+            ifnull(defaultBody)
+            areturn()
+            add(defaultBody)
+        })
     }
     
     fun getNovaEquipable(itemStack: ItemStack): Equipable? {
@@ -108,6 +112,18 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
             return ArmorItem.DISPENSE_ITEM_BEHAVIOR
         
         return null
+    }
+    
+    // patches the armor inventory to fire the ArmorEquipEvent
+    private fun patchEquipEvent() {
+        // replaces armor list with WatchedArmorList which fires ArmorEquipEvent
+        VirtualClassPath[INVENTORY_CONSTRUCTOR].replaceFirst(3, -1, buildInsnList {
+            new(WatchedArmorList::class)
+            dup()
+            aLoad(1) // player
+            invokeSpecial(WatchedArmorList::class.java.constructors[0])
+            checkCast(NonNullList::class)
+        }) { it.opcode == Opcodes.PUTFIELD && (it as FieldInsnNode).puts(INVENTORY_ARMOR_FIELD) }
     }
     
 }

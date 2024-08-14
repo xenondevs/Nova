@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.util.reflection
 
-import com.mojang.brigadier.tree.CommandNode
 import io.papermc.paper.plugin.manager.PaperPluginManagerImpl
 import net.minecraft.core.BlockPos
 import net.minecraft.core.BlockPos.MutableBlockPos
@@ -24,10 +23,8 @@ import net.minecraft.world.level.biome.Biome.TemperatureModifier
 import net.minecraft.world.level.biome.BiomeGenerationSettings
 import net.minecraft.world.level.biome.BiomeSpecialEffects
 import net.minecraft.world.level.biome.BiomeSpecialEffects.GrassColorModifier
-import net.minecraft.world.level.biome.FeatureSorter
 import net.minecraft.world.level.biome.MobSpawnSettings
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.DispenserBlock
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
 import net.minecraft.world.level.block.state.BlockState
@@ -48,7 +45,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
-import org.bukkit.event.block.BlockPhysicsEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.plugin.Plugin
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getClass
@@ -57,10 +53,8 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
 import java.security.ProtectionDomain
 import java.util.*
-import java.util.concurrent.Semaphore
 import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 import net.minecraft.world.entity.player.Inventory as MojangInventory
-import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
 import java.util.function.Function as JavaFunction
 
@@ -76,7 +70,6 @@ internal object ReflectionRegistry {
     val ENUM_MAP_CONSTRUCTOR = getConstructor(EnumMap::class, false, Class::class)
     val ITEM_STACK_CONSTRUCTOR = getConstructor(MojangStack::class, false, ItemLike::class)
     val CHUNK_ACCESS_CONSTRUCTOR = getConstructor(ChunkAccess::class, false, ChunkPos::class, UpgradeData::class, LevelHeightAccessor::class, Registry::class, Long::class, Array<LevelChunkSection>::class, BlendingData::class)
-    val INVENTORY_CONSTRUCTOR = getConstructor(MojangInventory::class, false, MojangPlayer::class)
     val BIOME_CLIMATE_SETTINGS_CONSTRUCTOR = getConstructor(ClimateSettings::class, true, Boolean::class, Float::class, TemperatureModifier::class, Float::class)
     val BIOME_SPECIAL_EFFECTS_CONSTRUCTOR = getConstructor(BiomeSpecialEffects::class, true, Int::class, Int::class, Int::class, Int::class, Optional::class, Optional::class, GrassColorModifier::class, Optional::class, Optional::class, Optional::class, Optional::class, Optional::class)
     val BIOME_GENERATION_SETTINGS_CONSTRUCTOR = getConstructor(BiomeGenerationSettings::class, true, Map::class, List::class)
@@ -86,7 +79,6 @@ internal object ReflectionRegistry {
     // Methods
     val CLASS_LOADER_PARENT_FIELD by lazy { getField(ClassLoader::class.java, true, "parent") }
     val CLASS_LOADER_DEFINE_CLASS_METHOD by lazy { getMethod(ClassLoader::class, true, "defineClass", String::class, ByteArray::class, Int::class, Int::class, ProtectionDomain::class) }
-    val FEATURE_SORTER_BUILD_FEATURES_PER_STEP_METHOD = getMethod(FeatureSorter::class, true, "buildFeaturesPerStep", List::class, JavaFunction::class, Boolean::class)
     val LEVEL_CHUNK_SECTION_SET_BLOCK_STATE_METHOD = getMethod(LevelChunkSection::class, true, "setBlockState", Int::class, Int::class, Int::class, BlockState::class, Boolean::class)
     val CRAFT_BLOCK_DATA_IS_PREFERRED_TOOL_METHOD = getMethod(CraftBlockData::class, true, "isPreferredTool", BlockState::class, MojangStack::class)
     val LIVING_ENTITY_PLAY_BLOCK_FALL_SOUND_METHOD = getMethod(MojangLivingEntity::class, true, "playBlockFallSound")
@@ -102,19 +94,13 @@ internal object ReflectionRegistry {
     val RULE_TEST_TEST_METHOD = getMethod(RuleTest::class, false, "test", BlockState::class, RandomSource::class)
     val BLOCK_GETTER_GET_BLOCK_STATE_METHOD = getMethod(BlockGetter::class, false, "getBlockState", BlockPos::class)
     val FEATURE_PLACE_CONTEXT_RANDOM_METHOD = getMethod(FeaturePlaceContext::class, false, "random")
-    val DISPENSER_BLOCK_GET_DISPENSE_METHOD_METHOD = getMethod(DispenserBlock::class, true, "getDispenseMethod", Level::class, MojangStack::class)
     val HOLDER_REFERENCE_BIND_VALUE_METHOD = getMethod(Holder.Reference::class, true, "bindValue", Any::class)
-    val SEMAPHORE_ACQUIRE_METHOD = getMethod(Semaphore::class, false, "acquire")
     val PAPER_EVENT_MANAGER_CREATE_REGISTERED_LISTENERS_METHOD = getMethod(PAPER_EVENT_MANAGER_CLASS, true, "createRegisteredListeners", Listener::class, Plugin::class)
     
     // Fields
-    val COMMAND_NODE_CHILDREN_FIELD = getField(CommandNode::class, true, "children")
-    val COMMAND_NODE_LITERALS_FIELD = getField(CommandNode::class, true, "literals")
-    val COMMAND_NODE_ARGUMENTS_FIELD = getField(CommandNode::class, true, "arguments")
     val PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD = getField(PrepareItemCraftEvent::class, true, "matrix")
     val HANDLER_LIST_HANDLERS_FIELD = getField(HandlerList::class, true, "handlers")
     val HANDLER_LIST_HANDLER_SLOTS_FIELD = getField(HandlerList::class, true, "handlerslots")
-    val BLOCK_PHYSICS_EVENT_CHANGED_FIELD = getField(BlockPhysicsEvent::class, true, "changed")
     val BLOCK_DEFAULT_BLOCK_STATE_FIELD = getField(Block::class, true, "defaultBlockState")
     val MAPPED_REGISTRY_FROZEN_FIELD = getField(MappedRegistry::class, true, "frozen")
     val BIOME_GENERATION_SETTINGS_FEATURES_FIELD = getField(BiomeGenerationSettings::class, true, "features")
@@ -125,7 +111,6 @@ internal object ReflectionRegistry {
     val PROCESSOR_RULE_LOC_PREDICATE_FIELD = getField(ProcessorRule::class, true, "locPredicate")
     val PROCESSOR_RULE_POS_PREDICATE_FIELD = getField(ProcessorRule::class, true, "posPredicate")
     val TARGET_BLOCK_STATE_TARGET_FIELD = getField(TargetBlockState::class, false, "target")
-    val INVENTORY_ARMOR_FIELD = getField(MojangInventory::class, true, "armor")
     val ITEM_STACK_ITEM_FIELD = getField(MojangStack::class, true, "item")
     val PAPER_PLUGIN_MANAGER_IMPL_PAPER_EVENT_MANAGER_FIELD = getField(PaperPluginManagerImpl::class, true, "paperEventManager")
     
