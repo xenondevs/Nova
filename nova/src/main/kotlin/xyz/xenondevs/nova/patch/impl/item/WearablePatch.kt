@@ -39,8 +39,9 @@ import xyz.xenondevs.nova.world.player.equipment.EquipAction
 private val INVENTORY_CONSTRUCTOR = ReflectionUtils.getConstructor(Inventory::class, Player::class)
 private val INVENTORY_ARMOR_FIELD = getField(Inventory::class, true, "armor")
 private val DISPENSER_BLOCK_GET_DISPENSE_METHOD = ReflectionUtils.getMethod(DispenserBlock::class, "getDispenseMethod", Level::class, ItemStack::class)
+private val SERVER_PLAYER_RESTORE_FROM = ReflectionUtils.getMethod(ServerPlayer::class, "restoreFrom", ServerPlayer::class, Boolean::class)
 
-internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity::class, DispenserBlock::class, Inventory::class) {
+internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity::class, DispenserBlock::class, Inventory::class, ServerPlayer::class) {
     
     override fun transform() {
         patchEquipable()
@@ -124,6 +125,22 @@ internal object WearablePatch : MultiTransformer(Equipable::class, LivingEntity:
             invokeSpecial(WatchedArmorList::class.java.constructors[0])
             checkCast(NonNullList::class)
         }) { it.opcode == Opcodes.PUTFIELD && (it as FieldInsnNode).puts(INVENTORY_ARMOR_FIELD) }
+        
+        // Changing worlds in vanilla creates a new ServerPlayer instance which should also create a new Inventory and WatchedArmorList
+        // with the initialized field set to false.
+        // However, Spigot reuses ServerPlayer instances, so in some cases ServerPlayer#restoreFrom is called with itself, which causes
+        // the armor inventory entries to be set again, firing ArmorEquipEvent on a player that is not alive.
+        // See: https://github.com/orgs/PaperMC/projects/6?pane=issue&itemId=16746355 (this should solve this problem)
+        // To circumvent this issue, we mark WatchedArmorList as uninitialized again in ServerPlayer#restoreFrom.
+        VirtualClassPath[SERVER_PLAYER_RESTORE_FROM].instructions.insert(buildInsnList {
+            addLabel()
+            aLoad(0)
+            invokeVirtual(ServerPlayer::getInventory)
+            getField(Inventory::armor)
+            checkCast(WatchedArmorList::class)
+            ldc(0)
+            putField(WatchedArmorList::initialized)
+        })
     }
     
 }
@@ -133,8 +150,9 @@ internal class WatchedArmorList(player: Player) : NonNullList<ItemStack>(
     ItemStack.EMPTY
 ) {
     
+    @JvmField
+    var initialized = false
     private val player = player as? ServerPlayer
-    private var initialized = false
     private val previousStacks = Array(4) { ItemStack.EMPTY }
     
     override fun set(index: Int, element: ItemStack): ItemStack {
