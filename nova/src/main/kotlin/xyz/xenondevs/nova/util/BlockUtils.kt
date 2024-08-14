@@ -85,14 +85,33 @@ val Block.id: ResourceLocation
 /**
  * The [NovaBlockState] at the position of this [Block].
  */
-val Block.novaBlockState: NovaBlockState?
+var Block.novaBlockState: NovaBlockState?
     get() = WorldDataManager.getBlockState(pos)
+    set(blockState) {
+        if (blockState == null) {
+            val ctx = Context.intention(BlockBreak)
+                .param(DefaultContextParamTypes.BLOCK_POS, pos)
+                .param(DefaultContextParamTypes.BLOCK_BREAK_EFFECTS, false)
+                .build()
+            BlockUtils.breakBlock(ctx)
+        } else {
+            val ctx = Context.intention(BlockPlace)
+                .param(DefaultContextParamTypes.BLOCK_POS, pos)
+                .param(DefaultContextParamTypes.BLOCK_STATE_NOVA, blockState)
+                .param(DefaultContextParamTypes.BLOCK_PLACE_EFFECTS, false)
+                .build()
+            BlockUtils.placeBlock(ctx)
+        }
+    }
 
 /**
  * The [NovaBlock] of the [NovaBlockState] at the position of this [Block].
  */
-val Block.novaBlock: NovaBlock?
+var Block.novaBlock: NovaBlock?
     get() = novaBlockState?.block
+    set(block) {
+        novaBlockState = block?.defaultBlockState
+    }
 
 /**
  * The hardness of this block, also considering the custom hardness of Nova blocks.

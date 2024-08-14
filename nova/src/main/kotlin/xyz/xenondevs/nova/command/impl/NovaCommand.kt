@@ -60,6 +60,7 @@ import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.item.unsafeNovaTag
+import xyz.xenondevs.nova.util.novaBlock
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.BlockPos
@@ -786,17 +787,10 @@ internal object NovaCommand : Command() {
         val minZ = min(from.blockZ(), to.blockZ())
         val maxZ = max(from.blockZ(), to.blockZ())
         
-        val placeCtxBuilder = Context.intention(DefaultContextIntentions.BlockPlace)
-            .param(DefaultContextParamTypes.BLOCK_TYPE_NOVA, block)
-        
         for (x in minX..maxX) {
             for (y in minY..maxY) {
                 for (z in minZ..maxZ) {
-                    BlockUtils.placeBlock(
-                        placeCtxBuilder
-                            .param(DefaultContextParamTypes.BLOCK_POS, BlockPos(world, x, y, z))
-                            .build()
-                    )
+                    world.getBlockAt(x, y, z).novaBlock = block
                 }
             }
         }
