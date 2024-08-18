@@ -14,10 +14,10 @@ import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.replaceFirstRange
-import xyz.xenondevs.nova.world.item.behavior.Enchantable
-import xyz.xenondevs.nova.world.item.enchantment.CustomEnchantmentLogic
 import xyz.xenondevs.nova.patch.MultiTransformer
 import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.world.item.behavior.Enchantable
+import xyz.xenondevs.nova.world.item.enchantment.CustomEnchantmentLogic
 import java.util.*
 
 internal object EnchantmentPatches : MultiTransformer(Enchantment::class, EnchantmentHelper::class, ItemStack::class) {
@@ -119,14 +119,14 @@ internal object EnchantmentPatches : MultiTransformer(Enchantment::class, Enchan
         if (first.value() in customEnchantments) {
             firstCompatSecond = customEnchantments[first.value()]!!.compatibleWith(second.value())
         } else {
-            firstCompatSecond = second in first.value().exclusiveSet
+            firstCompatSecond = second !in first.value().exclusiveSet
         }
         
         val secondCompatFirst: Boolean
         if (second.value() in customEnchantments) {
             secondCompatFirst = customEnchantments[second.value()]!!.compatibleWith(first.value())
         } else {
-            secondCompatFirst = first in second.value().exclusiveSet
+            secondCompatFirst = first !in second.value().exclusiveSet
         }
         
         return firstCompatSecond && secondCompatFirst
