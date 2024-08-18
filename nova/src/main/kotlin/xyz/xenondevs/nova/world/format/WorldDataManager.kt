@@ -38,6 +38,7 @@ object WorldDataManager : Listener {
     
     private val worlds = ConcurrentHashMap<UUID, WorldDataStorage>()
     private var initialized = false
+    private var disabled = false
     
     @InitFun
     private fun init() = runBlocking {
@@ -61,8 +62,9 @@ object WorldDataManager : Listener {
     private fun disable() = runBlocking {
         for (world in worlds.values) {
             world.disableAllChunks()
-            world.save()
+            world.save(false)
         }
+        disabled = true
     }
     
     @EventHandler(priority = EventPriority.LOWEST) // NetworkManager is LOW
@@ -97,8 +99,10 @@ object WorldDataManager : Listener {
     fun getBlockState(pos: BlockPos): NovaBlockState? =
         getChunkOrThrow(pos.chunkPos).getBlockState(pos)
     
-    fun setBlockState(pos: BlockPos, state: NovaBlockState?): NovaBlockState? =
-        getChunkOrThrow(pos.chunkPos).setBlockState(pos, state)
+    fun setBlockState(pos: BlockPos, state: NovaBlockState?): NovaBlockState? {
+        check(!disabled) { "WorldDataManager is already disabled" }
+        return getChunkOrThrow(pos.chunkPos).setBlockState(pos, state)
+    }
     
     fun getTileEntity(pos: BlockPos): TileEntity? =
         getChunkOrThrow(pos.chunkPos).getTileEntity(pos)
@@ -118,8 +122,10 @@ object WorldDataManager : Listener {
     fun getTileEntities(): List<TileEntity> =
         worlds.values.flatMap { it.getTileEntities() }
     
-    fun setTileEntity(pos: BlockPos, tileEntity: TileEntity?): TileEntity? =
-        getChunkOrThrow(pos.chunkPos).setTileEntity(pos, tileEntity)
+    fun setTileEntity(pos: BlockPos, tileEntity: TileEntity?): TileEntity? {
+        check(!disabled) { "WorldDataManager is already disabled"}
+        return getChunkOrThrow(pos.chunkPos).setTileEntity(pos, tileEntity)
+    }
     
     internal fun getVanillaTileEntity(pos: BlockPos): VanillaTileEntity? =
         getChunkOrThrow(pos.chunkPos).getVanillaTileEntity(pos)
@@ -133,8 +139,10 @@ object WorldDataManager : Listener {
     internal suspend fun getOrLoadVanillaTileEntities(pos: ChunkPos): List<VanillaTileEntity> =
         getOrLoadChunk(pos).getVanillaTileEntities()
     
-    internal fun setVanillaTileEntity(pos: BlockPos, tileEntity: VanillaTileEntity?): VanillaTileEntity? =
-        getChunkOrThrow(pos.chunkPos).setVanillaTileEntity(pos, tileEntity)
+    internal fun setVanillaTileEntity(pos: BlockPos, tileEntity: VanillaTileEntity?): VanillaTileEntity? {
+        check(!disabled) { "WorldDataManager is already disabled" }
+        return getChunkOrThrow(pos.chunkPos).setVanillaTileEntity(pos, tileEntity)
+    }
     
     internal fun getVanillaTileEntities(world: World): List<VanillaTileEntity> =
         getWorldStorage(world).getVanillaTileEntities()

@@ -117,14 +117,14 @@ internal class WorldDataStorage(val world: World) {
     /**
      * Saves all Nova data related to this world.
      */
-    suspend fun save() = withContext(Dispatchers.Default) { // TODO: save in background
+    suspend fun save(unload: Boolean = true) = withContext(Dispatchers.Default) { // TODO: save in background
         for ((rid, deferredRegionFile) in blockRegionFiles) {
             launch {
                 val regionFile = deferredRegionFile.await()
                 regionFile.save()
                 
                 // unload unused region files
-                if (!regionFile.isAnyChunkEnabled())
+                if (unload && !regionFile.isAnyChunkEnabled())
                     blockRegionFiles -= rid
             }
         }
@@ -138,7 +138,7 @@ internal class WorldDataStorage(val world: World) {
                     // network region files that don't have a corresponding block region file can be unloaded
                     // (at least most of the time, modifications to big networks may cause them to be loaded again)
                     // TODO: a better solution may be to track last access time
-                    if (!blockRegionFiles.containsKey(rid))
+                    if (unload && !blockRegionFiles.containsKey(rid))
                         networkRegionFiles -= rid
                 }
             }
