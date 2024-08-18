@@ -37,16 +37,16 @@ internal class TripwireBackingStateConfig(
         faces: Set<BlockFace>, disarmed: Boolean, powered: Boolean
     ) : this(
         type,
-        BlockFace.NORTH in faces, 
+        BlockFace.NORTH in faces,
         BlockFace.EAST in faces,
-        BlockFace.SOUTH in faces, 
+        BlockFace.SOUTH in faces,
         BlockFace.WEST in faces,
         disarmed, powered
     )
     
 }
 
-internal class TripwireBackingStateConfigType private constructor(
+internal abstract class TripwireBackingStateConfigType private constructor(
     val attached: Boolean
 ) : BackingStateConfigType<TripwireBackingStateConfig>(63, "tripwire") {
     
@@ -76,9 +76,7 @@ internal class TripwireBackingStateConfigType private constructor(
         )
     }
     
-    companion object {
-        val UNATTACHED = TripwireBackingStateConfigType(false)
-        val ATTACHED = TripwireBackingStateConfigType(true)
-    }
+    object Unattached : TripwireBackingStateConfigType(false)
+    object Attached : TripwireBackingStateConfigType(true)
     
 }

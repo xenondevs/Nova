@@ -90,7 +90,7 @@ enum class BackingStateCategory(
      */
     TRIPWIRE_UNATTACHED(
         fallbackHitbox = Material.STRUCTURE_VOID,
-        TripwireBackingStateConfigType.UNATTACHED
+        TripwireBackingStateConfigType.Unattached
     ),
     
     /**
@@ -104,7 +104,7 @@ enum class BackingStateCategory(
      */
     TRIPWIRE_ATTACHED(
         fallbackHitbox = Material.STRUCTURE_VOID,
-        TripwireBackingStateConfigType.ATTACHED
+        TripwireBackingStateConfigType.Attached
     );
     
     constructor(fallbackHitbox: Material, vararg backingStateConfigTypes: BackingStateConfigType<*>) :
