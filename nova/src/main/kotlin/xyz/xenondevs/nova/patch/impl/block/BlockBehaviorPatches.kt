@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelAccessor
 import net.minecraft.world.level.block.Block
@@ -66,12 +67,25 @@ private val BLOCK_BEHAVIOR_TICK = BLOCK_BEHAVIOR_LOOKUP.findVirtual(
     )
 )
 
-internal object BlockUpdatesPatches : MultiTransformer(BlockStateBase::class) {
+private val BLOCK_BEHAVIOR_ENTITY_INSIDE = BLOCK_BEHAVIOR_LOOKUP.findVirtual(
+    BlockBehaviour::class.java,
+    "entityInside",
+    MethodType.methodType(
+        Void.TYPE,
+        BlockState::class.java,
+        Level::class.java,
+        BlockPos::class.java,
+        Entity::class.java
+    )
+)
+
+internal object BlockBehaviorPatches : MultiTransformer(BlockStateBase::class) {
     
     override fun transform() {
         VirtualClassPath[BlockStateBase::handleNeighborChanged].delegateStatic(::handleNeighborChanged)
         VirtualClassPath[BlockStateBase::updateShape].delegateStatic(::updateShape)
         VirtualClassPath[BlockStateBase::tick].delegateStatic(::tick)
+        VirtualClassPath[BlockStateBase::entityInside].delegateStatic(::entityInside)
     }
     
     @JvmStatic
@@ -114,7 +128,7 @@ internal object BlockUpdatesPatches : MultiTransformer(BlockStateBase::class) {
                     
                     return thisRef as BlockState
                 } catch (e: Exception) {
-                    LOGGER.log(LogLevel.SEVERE, "Failed to update shape for $novaState at $novaPos")
+                    LOGGER.log(LogLevel.SEVERE, "Failed to update shape for $novaState at $novaPos", e)
                 }
             }
         }
@@ -134,6 +148,21 @@ internal object BlockUpdatesPatches : MultiTransformer(BlockStateBase::class) {
             }
         } else {
             BLOCK_BEHAVIOR_TICK.invoke(thisRef.block, thisRef, level, pos, random)
+        }
+    }
+    
+    @JvmStatic
+    fun entityInside(thisRef: BlockStateBase, level: Level, pos: BlockPos, entity: Entity) {
+        val novaPos = pos.toNovaPos(level.world)
+        val novaState = WorldDataManager.getBlockState(novaPos)
+        if (novaState != null) {
+            try {
+                novaState.block.handleEntityInside(novaPos, novaState, entity.bukkitEntity)
+            } catch (e: Exception) {
+                LOGGER.log(LogLevel.SEVERE, "Failed to handle entity inside for $novaState at $novaPos", e)
+            }
+        } else {
+            BLOCK_BEHAVIOR_ENTITY_INSIDE.invoke(thisRef.block, thisRef, level, pos, entity)
         }
     }
     

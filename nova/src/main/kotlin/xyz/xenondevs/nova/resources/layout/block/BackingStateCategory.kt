@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.OakLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.SpruceLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.TripwireBackingStateConfigType
 
 /**
  * Represent the different block types whose states can be used to display a custom block model.
@@ -36,6 +37,8 @@ enum class BackingStateCategory(
      *
      * - Limited to 1149 different models
      * - Models cannot be transparent
+     * - Full block hitbox
+     * - Full block collider
      * - Cannot be waterlogged
      * - Client-side arm swing animation on right-click
      */
@@ -49,6 +52,8 @@ enum class BackingStateCategory(
      *
      * - Limited to 189 different models
      * - Models cannot be transparent
+     * - Full block hitbox
+     * - Full block collider
      * - Cannot be waterlogged
      */
     MUSHROOM_BLOCK(
@@ -61,6 +66,8 @@ enum class BackingStateCategory(
      *
      * - Limited to 130 different models
      * - Models can be transparent, translucent textures are disabled on "fancy" graphics setting
+     * - Full block hitbox
+     * - Full block collider
      * - Can be waterlogged
      * - Some shaders might animate blocks of this type to blow in the wind
      */
@@ -70,6 +77,34 @@ enum class BackingStateCategory(
         JungleLeavesBackingStateConfig, AcaciaLeavesBackingStateConfig, DarkOakLeavesBackingStateConfig,
         MangroveLeavesBackingStateConfig, CherryLeavesBackingStateConfig, AzaleaLeavesBackingStateConfig,
         FloweringAzaleaLeavesBackingStateConfig
+    ),
+    
+    /**
+     * The block model uses tripwire block states.
+     * 
+     * - Limited to 48 different models
+     * - Models can be transparent
+     * - Half-height block hitbox
+     * - No collider
+     * - Cannot be waterlogged
+     */
+    TRIPWIRE_UNATTACHED(
+        fallbackHitbox = Material.STRUCTURE_VOID,
+        TripwireBackingStateConfigType.UNATTACHED
+    ),
+    
+    /**
+     * The block model uses tripwire block states.
+     * 
+     * - Limited to 48 different models
+     * - Models can be transparent
+     * - Block hitbox: 1x0.09375x1, offset by +0.0625y
+     * - No collider
+     * - Cannot be waterlogged
+     */
+    TRIPWIRE_ATTACHED(
+        fallbackHitbox = Material.STRUCTURE_VOID,
+        TripwireBackingStateConfigType.ATTACHED
     );
     
     constructor(fallbackHitbox: Material, vararg backingStateConfigTypes: BackingStateConfigType<*>) :

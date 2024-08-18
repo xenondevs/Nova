@@ -5,9 +5,9 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.LeavesBlock
 import net.minecraft.world.level.block.NoteBlock
+import net.minecraft.world.level.block.TripWireBlock
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.NamespacedKey
@@ -39,23 +39,11 @@ import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.state.model.AcaciaLeavesBackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.AzaleaLeavesBackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.BirchLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.BlockUpdateMethod
 import xyz.xenondevs.nova.world.block.state.model.BrownMushroomBackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.CherryLeavesBackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.DarkOakLeavesBackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.DefaultingBackingStateConfigType
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
-import xyz.xenondevs.nova.world.block.state.model.FloweringAzaleaLeavesBackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.JungleLeavesBackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.MangroveLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.MushroomStemBackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.OakLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.SpruceLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.world.format.WorldDataManager
@@ -76,14 +64,9 @@ internal object BlockMigrator : Listener {
     private var migrationId by PermanentStorage.storedValue("migration_id") { Random.nextInt() }
     
     private val migrations = ArrayList<BlockMigration>()
-    private val _migrationsByVanillaBlock = HashMap<Block, BlockMigration>()
-    private val _migrationsByNovaBlock = HashMap<NovaBlock, BlockMigration>()
+    private val migrationsByVanillaBlock = HashMap<Block, BlockMigration>()
+    private val migrationsByNovaBlock = HashMap<NovaBlock, BlockMigration>()
     private val queries = ArrayList<(BlockState) -> Boolean>()
-    
-    val migrationsByVanillaBlock: Map<Block, BlockMigration>
-        get() = _migrationsByVanillaBlock
-    val migrationsByNovaBlock: Map<NovaBlock, BlockMigration>
-        get() = _migrationsByNovaBlock
     
     @InitFun
     private fun init() {
@@ -93,67 +76,70 @@ internal object BlockMigrator : Listener {
     }
     
     private fun addMigrations() {
-        migrations += BlockMigration(
-            Blocks.RED_MUSHROOM_BLOCK, null,
+        migrations += SimpleBlockMigration(
+            Blocks.RED_MUSHROOM_BLOCK,
             RedMushroomBackingStateConfig.defaultStateConfig.vanillaBlockState
         )
         
-        migrations += BlockMigration(
-            Blocks.BROWN_MUSHROOM_BLOCK, null,
+        migrations += SimpleBlockMigration(
+            Blocks.BROWN_MUSHROOM_BLOCK,
             BrownMushroomBackingStateConfig.defaultStateConfig.vanillaBlockState
         )
         
-        migrations += BlockMigration(
-            Blocks.MUSHROOM_STEM, null,
+        migrations += SimpleBlockMigration(
+            Blocks.MUSHROOM_STEM,
             MushroomStemBackingStateConfig.defaultStateConfig.vanillaBlockState
         )
         
-        migrations += BlockMigration(
-            Blocks.NOTE_BLOCK, DefaultBlocks.NOTE_BLOCK,
-            NoteBackingStateConfig.defaultStateConfig.vanillaBlockState,
-            { vanilla ->
-                DefaultBlocks.NOTE_BLOCK.defaultBlockState
-                    .with(DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT, vanilla.getValue(NoteBlock.INSTRUMENT).instrument)
-                    .with(DefaultBlockStateProperties.NOTE_BLOCK_NOTE, vanilla.getValue(NoteBlock.NOTE))
-                    .with(DefaultBlockStateProperties.POWERED, vanilla.getValue(NoteBlock.POWERED))
-            }
-        )
+        migrations += ComplexBlockMigration(
+            Blocks.NOTE_BLOCK, DefaultBlocks.NOTE_BLOCK
+        ) { vanilla ->
+            DefaultBlocks.NOTE_BLOCK.defaultBlockState
+                .with(DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT, vanilla.getValue(NoteBlock.INSTRUMENT).instrument)
+                .with(DefaultBlockStateProperties.NOTE_BLOCK_NOTE, vanilla.getValue(NoteBlock.NOTE))
+                .with(DefaultBlockStateProperties.POWERED, vanilla.getValue(NoteBlock.POWERED))
+        }
         
-        migrations += leavesMigration(Blocks.OAK_LEAVES, OakLeavesBackingStateConfig, DefaultBlocks.OAK_LEAVES)
-        migrations += leavesMigration(Blocks.SPRUCE_LEAVES, SpruceLeavesBackingStateConfig, DefaultBlocks.SPRUCE_LEAVES)
-        migrations += leavesMigration(Blocks.BIRCH_LEAVES, BirchLeavesBackingStateConfig, DefaultBlocks.BIRCH_LEAVES)
-        migrations += leavesMigration(Blocks.JUNGLE_LEAVES, JungleLeavesBackingStateConfig, DefaultBlocks.JUNGLE_LEAVES)
-        migrations += leavesMigration(Blocks.ACACIA_LEAVES, AcaciaLeavesBackingStateConfig, DefaultBlocks.ACACIA_LEAVES)
-        migrations += leavesMigration(Blocks.DARK_OAK_LEAVES, DarkOakLeavesBackingStateConfig, DefaultBlocks.DARK_OAK_LEAVES)
-        migrations += leavesMigration(Blocks.MANGROVE_LEAVES, MangroveLeavesBackingStateConfig, DefaultBlocks.MANGROVE_LEAVES)
-        migrations += leavesMigration(Blocks.CHERRY_LEAVES, CherryLeavesBackingStateConfig, DefaultBlocks.CHERRY_LEAVES)
-        migrations += leavesMigration(Blocks.AZALEA_LEAVES, AzaleaLeavesBackingStateConfig, DefaultBlocks.AZALEA_LEAVES)
-        migrations += leavesMigration(Blocks.FLOWERING_AZALEA_LEAVES, FloweringAzaleaLeavesBackingStateConfig, DefaultBlocks.FLOWERING_AZALEA_LEAVES)
+        migrations += ComplexBlockMigration(
+            Blocks.TRIPWIRE, DefaultBlocks.TRIPWIRE
+        ) { vanilla ->
+            DefaultBlocks.TRIPWIRE.defaultBlockState
+                .with(DefaultBlockStateProperties.TRIPWIRE_NORTH, vanilla.getValue(TripWireBlock.NORTH))
+                .with(DefaultBlockStateProperties.TRIPWIRE_EAST, vanilla.getValue(TripWireBlock.EAST))
+                .with(DefaultBlockStateProperties.TRIPWIRE_SOUTH, vanilla.getValue(TripWireBlock.SOUTH))
+                .with(DefaultBlockStateProperties.TRIPWIRE_WEST, vanilla.getValue(TripWireBlock.WEST))
+                .with(DefaultBlockStateProperties.TRIPWIRE_ATTACHED, vanilla.getValue(TripWireBlock.ATTACHED))
+                .with(DefaultBlockStateProperties.TRIPWIRE_DISARMED, vanilla.getValue(TripWireBlock.DISARMED))
+                .with(DefaultBlockStateProperties.POWERED, vanilla.getValue(TripWireBlock.POWERED))
+        }
+        
+        migrations += leavesMigration(Blocks.OAK_LEAVES, DefaultBlocks.OAK_LEAVES)
+        migrations += leavesMigration(Blocks.SPRUCE_LEAVES, DefaultBlocks.SPRUCE_LEAVES)
+        migrations += leavesMigration(Blocks.BIRCH_LEAVES, DefaultBlocks.BIRCH_LEAVES)
+        migrations += leavesMigration(Blocks.JUNGLE_LEAVES, DefaultBlocks.JUNGLE_LEAVES)
+        migrations += leavesMigration(Blocks.ACACIA_LEAVES, DefaultBlocks.ACACIA_LEAVES)
+        migrations += leavesMigration(Blocks.DARK_OAK_LEAVES, DefaultBlocks.DARK_OAK_LEAVES)
+        migrations += leavesMigration(Blocks.MANGROVE_LEAVES, DefaultBlocks.MANGROVE_LEAVES)
+        migrations += leavesMigration(Blocks.CHERRY_LEAVES, DefaultBlocks.CHERRY_LEAVES)
+        migrations += leavesMigration(Blocks.AZALEA_LEAVES, DefaultBlocks.AZALEA_LEAVES)
+        migrations += leavesMigration(Blocks.FLOWERING_AZALEA_LEAVES, DefaultBlocks.FLOWERING_AZALEA_LEAVES)
         
         queries += migrations.map { migration -> { state -> state.block == migration.vanillaBlock } }
         queries += { state -> VanillaTileEntity.Type.of(state.block.bukkitMaterial) != null }
         
-        _migrationsByVanillaBlock += migrations.associateBy { it.vanillaBlock }
-        _migrationsByNovaBlock += migrations.associateByNotNull { it.novaBlock }
+        migrationsByVanillaBlock += migrations.associateBy { it.vanillaBlock }
+        migrationsByNovaBlock += migrations.filterIsInstance<ComplexBlockMigration>().associateByNotNull { it.novaBlock }
     }
     
-    private fun leavesMigration(block: Block, cfg: DefaultingBackingStateConfigType<*>, novaBlock: NovaBlock): BlockMigration {
-        return BlockMigration(
-            block, novaBlock,
-            cfg.defaultStateConfig.vanillaBlockState,
-            { vanilla ->
-                novaBlock.defaultBlockState
-                    .with(DefaultBlockStateProperties.LEAVES_DISTANCE, vanilla.getValue(LeavesBlock.DISTANCE))
-                    .with(DefaultBlockStateProperties.LEAVES_PERSISTENT, vanilla.getValue(LeavesBlock.PERSISTENT))
-                    .with(DefaultBlockStateProperties.WATERLOGGED, vanilla.getValue(LeavesBlock.WATERLOGGED))
-            },
-            { nova ->
-                block.defaultBlockState()
-                    .setValue(LeavesBlock.DISTANCE, nova.getOrThrow(DefaultBlockStateProperties.LEAVES_DISTANCE))
-                    .setValue(LeavesBlock.PERSISTENT, nova.getOrThrow(DefaultBlockStateProperties.LEAVES_PERSISTENT))
-                    .setValue(LeavesBlock.WATERLOGGED, nova.getOrThrow(DefaultBlockStateProperties.WATERLOGGED))
-            }
-        )
+    private fun leavesMigration(block: Block, novaBlock: NovaBlock): BlockMigration {
+        return ComplexBlockMigration(
+            block, novaBlock
+        ) { vanilla ->
+            novaBlock.defaultBlockState
+                .with(DefaultBlockStateProperties.LEAVES_DISTANCE, vanilla.getValue(LeavesBlock.DISTANCE))
+                .with(DefaultBlockStateProperties.LEAVES_PERSISTENT, vanilla.getValue(LeavesBlock.PERSISTENT))
+                .with(DefaultBlockStateProperties.WATERLOGGED, vanilla.getValue(LeavesBlock.WATERLOGGED))
+        }
     }
     
     private fun migrateLoadedChunks() {
@@ -208,16 +194,12 @@ internal object BlockMigrator : Listener {
     @JvmStatic
     fun migrateBlockState(pos: BlockPos, blockState: BlockState): BlockState {
         try {
-            var migratedState = migrationsByVanillaBlock[blockState.block]?.vanillaBlockState
-            if (migratedState != null) {
-                // pass waterlogged property through
-                if (blockState.hasProperty(BlockStateProperties.WATERLOGGED)) {
-                    migratedState = migratedState.setValue(
-                        BlockStateProperties.WATERLOGGED,
-                        blockState.getValue(BlockStateProperties.WATERLOGGED)
-                    )
-                }
-                return migratedState
+            val migration = migrationsByVanillaBlock[blockState.block]
+                ?: return blockState
+            
+            return when (migration) {
+                is SimpleBlockMigration -> migration.vanillaBlockState
+                is ComplexBlockMigration -> migration.novaToVanilla(migration.vanillaToNova(blockState))
             }
         } catch (e: Exception) {
             LOGGER.log(Level.SEVERE, "Failed to migrate block state $blockState at $pos", e)
@@ -273,8 +255,8 @@ internal object BlockMigrator : Listener {
         
         // Migrations for block types that are also used as backing states
         val migration = migrationsByVanillaBlock[newState.block]
-        val novaState = migration?.vanillaToNova?.invoke(newState)
-        if (novaState != null) {
+        if (migration is ComplexBlockMigration) {
+            val novaState = migration.vanillaToNova(newState)
             WorldDataManager.setBlockState(pos, novaState)
         }
     }

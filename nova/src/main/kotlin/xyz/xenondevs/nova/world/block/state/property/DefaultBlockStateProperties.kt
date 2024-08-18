@@ -36,25 +36,16 @@ object DefaultBlockStateProperties {
      */
     val POWERED: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "powered"))
     
-    /**
-     * A property the [Instrument] of a note block.
-     */
     internal val NOTE_BLOCK_INSTRUMENT: EnumProperty<Instrument> = EnumProperty(ResourceLocation.fromNamespaceAndPath("nova", "instrument"))
-    
-    /**
-     * A property for the note value of a note block.
-     */
     internal val NOTE_BLOCK_NOTE: IntProperty = IntProperty(ResourceLocation.fromNamespaceAndPath("nova", "note"))
-    
-    /**
-     * A property for the distance value of leaves.
-     */
     internal val LEAVES_DISTANCE: IntProperty = IntProperty(ResourceLocation.fromNamespaceAndPath("nova", "distance"))
-    
-    /**
-     * A property for the persistent value of leaves.
-     */
     internal val LEAVES_PERSISTENT: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "persistent"))
+    internal val TRIPWIRE_NORTH: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "north"))
+    internal val TRIPWIRE_EAST: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "east"))
+    internal val TRIPWIRE_SOUTH: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "south"))
+    internal val TRIPWIRE_WEST: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "west"))
+    internal val TRIPWIRE_ATTACHED: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "attached"))
+    internal val TRIPWIRE_DISARMED: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "disarmed"))
     
 }
 
@@ -158,35 +149,29 @@ object DefaultScopedBlockStateProperties {
             ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS).block.isBlockIndirectlyPowered
         }
     
-    /**
-     * A scope for [DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT] for all [Instruments][Instrument],
-     * that is initialized based on the block below and above the note block.
-     */
     internal val NOTE_BLOCK_INSTRUMENT: ScopedBlockStateProperty<Instrument> =
         DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT.scope { ctx ->
             Instrument.determineInstrument(ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS))
         }
     
-    /**
-     * A scope for [DefaultBlockStateProperties.NOTE_BLOCK_NOTE] for all 25 note block notes.
-     */
     internal val NOTE_BLOCK_NOTE: ScopedBlockStateProperty<Int> =
         DefaultBlockStateProperties.NOTE_BLOCK_NOTE.scope(0..24) { 0 }
-    
-    /**
-     * A scope for [DefaultBlockStateProperties.LEAVES_DISTANCE] for all 7 possible distances.
-     */
+
     internal val LEAVES_DISTANCE: ScopedBlockStateProperty<Int> =
         DefaultBlockStateProperties.LEAVES_DISTANCE.scope(1..7) { ctx ->
             LeavesBehavior.calculateDistance(ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS))
         }
-    
-    /**
-     * A scope for [DefaultBlockStateProperties.LEAVES_PERSISTENT].
-     */
+
     internal val LEAVES_PERSISTENT: ScopedBlockStateProperty<Boolean> =
         DefaultBlockStateProperties.LEAVES_PERSISTENT.scope { ctx ->
             ctx[DefaultContextParamTypes.SOURCE_UUID] != null
         }
+    
+    internal val TRIPWIRE_NORTH: ScopedBlockStateProperty<Boolean> = DefaultBlockStateProperties.TRIPWIRE_NORTH.scope { false }
+    internal val TRIPWIRE_EAST: ScopedBlockStateProperty<Boolean> = DefaultBlockStateProperties.TRIPWIRE_EAST.scope { false }
+    internal val TRIPWIRE_SOUTH: ScopedBlockStateProperty<Boolean> = DefaultBlockStateProperties.TRIPWIRE_SOUTH.scope { false }
+    internal val TRIPWIRE_WEST: ScopedBlockStateProperty<Boolean> = DefaultBlockStateProperties.TRIPWIRE_WEST.scope { false }
+    internal val TRIPWIRE_ATTACHED: ScopedBlockStateProperty<Boolean> = DefaultBlockStateProperties.TRIPWIRE_ATTACHED.scope { true }
+    internal val TRIPWIRE_DISARMED: ScopedBlockStateProperty<Boolean> = DefaultBlockStateProperties.TRIPWIRE_DISARMED.scope { false }
     
 }

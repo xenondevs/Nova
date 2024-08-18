@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.world.block
 
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.LeavesBlock
+import net.minecraft.world.level.block.TripWireBlock
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.patch.Patcher
@@ -12,6 +14,7 @@ import xyz.xenondevs.nova.world.block.behavior.BlockSounds
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.behavior.LeavesBehavior
 import xyz.xenondevs.nova.world.block.behavior.NoteBlockBehavior
+import xyz.xenondevs.nova.world.block.behavior.TripwireBehavior
 import xyz.xenondevs.nova.world.block.behavior.UnknownBlockBehavior
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.model.AcaciaLeavesBackingStateConfig
@@ -64,6 +67,34 @@ internal object DefaultBlocks {
         models { modelLess { NoteBackingStateConfig.defaultStateConfig.vanillaBlockState.bukkitBlockData } }
     }
     
+    val TRIPWIRE = block("tripwire") {
+        behaviors(
+            TripwireBehavior,
+            BlockSounds(SoundGroup.STONE),
+            Breakable(hardness = 0.0)
+        )
+        stateProperties(
+            DefaultScopedBlockStateProperties.TRIPWIRE_NORTH,
+            DefaultScopedBlockStateProperties.TRIPWIRE_EAST,
+            DefaultScopedBlockStateProperties.TRIPWIRE_SOUTH,
+            DefaultScopedBlockStateProperties.TRIPWIRE_WEST,
+            DefaultScopedBlockStateProperties.TRIPWIRE_ATTACHED,
+            DefaultScopedBlockStateProperties.TRIPWIRE_DISARMED,
+            DefaultScopedBlockStateProperties.POWERED
+        )
+        models {
+            modelLess {
+                Blocks.TRIPWIRE.defaultBlockState()
+                    .setValue(TripWireBlock.NORTH, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_NORTH))
+                    .setValue(TripWireBlock.EAST, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_EAST))
+                    .setValue(TripWireBlock.SOUTH, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_SOUTH))
+                    .setValue(TripWireBlock.WEST, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_WEST))
+                    .setValue(TripWireBlock.ATTACHED, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_ATTACHED))
+                    .bukkitBlockData
+            }
+        }
+    }
+    
     val OAK_LEAVES = leaves(OakLeavesBackingStateConfig)
     val SPRUCE_LEAVES = leaves(SpruceLeavesBackingStateConfig)
     val BIRCH_LEAVES = leaves(BirchLeavesBackingStateConfig)
@@ -97,7 +128,7 @@ internal object DefaultBlocks {
                 cfg.defaultStateConfig.vanillaBlockState
                     .setValue(LeavesBlock.WATERLOGGED, getPropertyValueOrThrow(DefaultBlockStateProperties.WATERLOGGED))
                     .bukkitBlockData
-            } 
+            }
         }
     }
     

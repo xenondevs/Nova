@@ -18,9 +18,10 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.patch.adapter.LcsWrapperAdapter
 import xyz.xenondevs.nova.patch.impl.FieldFilterPatch
+import xyz.xenondevs.nova.patch.impl.block.BlockBehaviorPatches
 import xyz.xenondevs.nova.patch.impl.block.BlockMigrationPatches
-import xyz.xenondevs.nova.patch.impl.block.BlockUpdatesPatches
 import xyz.xenondevs.nova.patch.impl.block.DisableBackingStateLogicPatch
+import xyz.xenondevs.nova.patch.impl.block.TripwireLogicPatch
 import xyz.xenondevs.nova.patch.impl.bossbar.BossBarOriginPatch
 import xyz.xenondevs.nova.patch.impl.chunk.ChunkSchedulingPatch
 import xyz.xenondevs.nova.patch.impl.item.EnchantmentPatches
@@ -61,8 +62,9 @@ internal object Patcher {
             LevelChunkSectionPatch, ChunkAccessSectionsPatch, FeatureSorterPatch, RegistryCodecPatch,
             WrapperBlockPatch, MappedRegistryPatch, NovaRuleTestPatch, FuelPatches, RemainingItemPatches, SoundPatches,
             BroadcastPacketPatch, EventPreventionPatch, WearablePatch, BossBarOriginPatch,
-            FakePlayerLastHurtPatch, BlockUpdatesPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
-            ItemStackDataComponentsPatch, EnchantmentPatches, TagsPatch, RepairPatches, BlockMigrationPatches
+            FakePlayerLastHurtPatch, BlockBehaviorPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
+            ItemStackDataComponentsPatch, EnchantmentPatches, TagsPatch, RepairPatches, BlockMigrationPatches,
+            TripwireLogicPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     

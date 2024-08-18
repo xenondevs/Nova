@@ -9,6 +9,7 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockFace.*
 import xyz.xenondevs.commons.collections.after
+import xyz.xenondevs.nova.world.BlockPos
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -139,6 +140,29 @@ object BlockFaceUtils {
         }
         
         return null
+    }
+    
+    /**
+     * Determines the block face that needs to be used to advance from [from] to [to] with step size 1,
+     * or null if the two positions are not adjacent.
+     */
+    fun determineBlockFaceBetween(from: BlockPos, to: BlockPos): BlockFace? {
+        val x = to.x - from.x
+        val y = to.y - from.y
+        val z = to.z - from.z
+        return when {
+            x == 0 && y == 0 && z == -1 -> NORTH
+            x == 1 && y == 0 && z == 0 -> EAST
+            x == 0 && y == 0 && z == 1 -> SOUTH
+            x == -1 && y == 0 && z == 0 -> WEST
+            x == 0 && y == 1 && z == 0 -> UP
+            x == 0 && y == -1 && z == 0 -> DOWN
+            x == 1 && y == 0 && z == -1 -> NORTH_EAST
+            x == 1 && y == 0 && z == 1 -> SOUTH_EAST
+            x == -1 && y == 0 && z == 1 -> SOUTH_WEST
+            x == -1 && y == 0 && z == -1 -> NORTH_WEST
+            else -> null
+        }
     }
     
     /**

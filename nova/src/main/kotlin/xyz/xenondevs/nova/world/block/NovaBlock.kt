@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
+import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.config.Configs
@@ -17,9 +18,8 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
-import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
@@ -28,6 +28,7 @@ import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
+import xyz.xenondevs.nova.world.item.NovaItem
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 
@@ -177,6 +178,11 @@ open class NovaBlock internal constructor(
     fun handleScheduledTick(pos: BlockPos, state: NovaBlockState) {
         checkServerThread()
         behaviors.forEach { it.handleScheduledTick(pos, state) }
+    }
+    
+    fun handleEntityInside(pos: BlockPos, state: NovaBlockState, entity: Entity) {
+        checkServerThread()
+        return behaviors.forEach { it.handleEntityInside(pos, state, entity) }
     }
     
     fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {

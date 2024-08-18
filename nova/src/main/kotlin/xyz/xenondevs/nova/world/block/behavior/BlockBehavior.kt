@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.block.behavior
 
+import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
@@ -60,6 +61,11 @@ interface BlockBehavior : BlockBehaviorHolder {
      * Called when a block at [neighborPos] changed to update the [NovaBlockState] of this [state] at [pos].
      */
     fun updateShape(pos: BlockPos, state: NovaBlockState, neighborPos: BlockPos): NovaBlockState = state
+    
+    /**
+     * Called when an [entity] is inside a block of [state] at [pos].
+     */
+    fun handleEntityInside(pos: BlockPos, state: NovaBlockState, entity: Entity) = Unit
     
     /**
      * Whether this behavior implements random-tick logic for the given [state].

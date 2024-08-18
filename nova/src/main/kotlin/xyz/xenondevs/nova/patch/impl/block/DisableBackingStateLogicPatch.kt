@@ -2,9 +2,12 @@ package xyz.xenondevs.nova.patch.impl.block
 
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.ItemInteractionResult
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -14,6 +17,7 @@ import net.minecraft.world.level.block.HugeMushroomBlock
 import net.minecraft.world.level.block.Mirror
 import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.Rotation
+import net.minecraft.world.level.block.TripWireBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import xyz.xenondevs.bytebase.asm.buildInsnList
@@ -75,6 +79,18 @@ private val HUGE_MUSHROOM_BLOCK_MIRROR = ReflectionUtils.getMethod(
     BlockState::class, Mirror::class
 )
 
+private val TRIP_WIRE_BLOCK_ENTITY_INSIDE = ReflectionUtils.getMethod(
+    TripWireBlock::class,
+    "entityInside",
+    BlockState::class, Level::class, BlockPos::class, Entity::class
+)
+
+private val TRIP_WIRE_BLOCK_TICK = ReflectionUtils.getMethod(
+    TripWireBlock::class,
+    "tick",
+    BlockState::class, ServerLevel::class, BlockPos::class, RandomSource::class
+)
+
 internal object DisableBackingStateLogicPatch : MultiTransformer(NoteBlock::class, HugeMushroomBlock::class) {
     
     override fun transform() {
@@ -124,6 +140,9 @@ internal object DisableBackingStateLogicPatch : MultiTransformer(NoteBlock::clas
         VirtualClassPath[HUGE_MUSHROOM_BLOCK_UPDATE_SHAPE].replaceInstructions(returnFirst)
         VirtualClassPath[HUGE_MUSHROOM_BLOCK_ROTATE].replaceInstructions(returnDefaultBlockState)
         VirtualClassPath[HUGE_MUSHROOM_BLOCK_MIRROR].replaceInstructions(returnDefaultBlockState)
+        
+        VirtualClassPath[TRIP_WIRE_BLOCK_TICK].replaceInstructions(emptyInsn)
+        VirtualClassPath[TRIP_WIRE_BLOCK_ENTITY_INSIDE].replaceInstructions(emptyInsn)
     }
     
 }

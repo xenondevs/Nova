@@ -666,4 +666,11 @@ object BlockUtils {
         return pos.world.serverLevel.isUnobstructed(blockData.nmsBlockState, pos.nmsPos, context)
     }
     
+    internal fun broadcastBlockUpdate(pos: BlockPos) {
+        val level = pos.world.serverLevel
+        val nmsPos = pos.nmsPos
+        val nmsState = pos.nmsBlockState
+        level.notifyAndUpdatePhysics(nmsPos, level.getChunkAt(nmsPos), nmsState, nmsState, nmsState, 3, 512)
+    }
+    
 }

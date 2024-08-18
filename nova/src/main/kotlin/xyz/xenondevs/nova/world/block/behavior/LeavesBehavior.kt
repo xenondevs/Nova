@@ -53,13 +53,8 @@ internal object LeavesBehavior : BlockBehavior {
         if (state == newState)
             return
         
-        BlockUtils.updateBlockState(pos, state.with(LEAVES_DISTANCE, calculateDistance(pos)))
-        
-        // due to block migration, we need to call block updates manually
-        val level = pos.world.serverLevel
-        val nmsPos = pos.nmsPos
-        val nmsState = pos.nmsBlockState
-        level.notifyAndUpdatePhysics(nmsPos, level.getChunkAt(nmsPos), nmsState, nmsState, nmsState, 3, 512)
+        WorldDataManager.setBlockState(pos, state.with(LEAVES_DISTANCE, calculateDistance(pos)))
+        BlockUtils.broadcastBlockUpdate(pos)
     }
     
     override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<DefaultContextIntentions.BlockBreak>): List<ItemStack> {

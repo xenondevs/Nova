@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.item.novaItem
@@ -70,12 +71,7 @@ internal object NoteBlockBehavior : BlockBehavior {
         
         if (newState != state) {
             WorldDataManager.setBlockState(pos, newState)
-            
-            // We need to still cause block updates even though the block wasn't changed to keep vanilla behavior
-            val level = pos.world.serverLevel
-            val nmsPos = pos.nmsPos
-            val nmsState = pos.nmsBlockState
-            level.notifyAndUpdatePhysics(nmsPos, level.getChunkAt(nmsPos), nmsState, nmsState, nmsState, 3, 512)
+            BlockUtils.broadcastBlockUpdate(pos)
         }
     }
     
