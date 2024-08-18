@@ -36,7 +36,7 @@ class Context<I : ContextIntention> private constructor(
      * if the param type is not present and could not be resolved through autofillers.
      */
     operator fun <V : Any> get(paramType: DefaultingContextParamType<V>): V =
-        getParam(paramType) ?: paramType.defaultValue
+        paramType.copy(getParam(paramType) ?: paramType.defaultValue)
     
     /**
      * Returns the value of the given [paramType] or throws an exception if it is not present
@@ -49,10 +49,10 @@ class Context<I : ContextIntention> private constructor(
         val value = getParam(paramType)
         
         if (value != null)
-            return value
+            return paramType.copy(value)
         
         if (paramType is DefaultingContextParamType)
-            return paramType.defaultValue
+            return paramType.copy(paramType.defaultValue)
         
         throwParamNotPresent(paramType)
     }
@@ -153,7 +153,7 @@ class Context<I : ContextIntention> private constructor(
                         throw IllegalArgumentException("Context value: $value for parameter type: ${paramType.id} is invalid: ${requirement.errorGenerator(value)}")
                 }
                 
-                explicitParams[paramType] = value
+                explicitParams[paramType] = paramType.copy(value)
             }
             
             return this

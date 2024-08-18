@@ -166,6 +166,7 @@ object DefaultContextParamTypes {
     val TILE_ENTITY_DATA_NOVA: ContextParamType<Compound> =
         ContextParamType.builder<Compound>("tile_entity_data_nova")
             .optionalIn(BlockPlace)
+            .copiedBy(Compound::copy)
             .autofilledBy(::BLOCK_ITEM_STACK) { itemStack ->
                 itemStack.novaCompound
                     ?.get<Compound>(TileEntity.TILE_ENTITY_DATA_KEY)
@@ -288,6 +289,7 @@ object DefaultContextParamTypes {
     val BLOCK_ITEM_STACK: ContextParamType<ItemStack> =
         ContextParamType.builder<ItemStack>("block_item_stack")
             .optionalIn(BlockPlace)
+            .copiedBy(ItemStack::clone)
             // TODO: Validate if item stack represents block. This is currently not supported by CustomItemServices.
             .autofilledBy(::SOURCE_ENTITY, ::INTERACTION_HAND) { entity, hand ->
                 (entity as? LivingEntity)?.equipment?.getItem(hand)?.takeUnless { it.isEmpty || !it.type.isBlock }
@@ -313,6 +315,7 @@ object DefaultContextParamTypes {
     val TOOL_ITEM_STACK: ContextParamType<ItemStack> =
         ContextParamType.builder<ItemStack>("tool_item_stack")
             .optionalIn(BlockBreak)
+            .copiedBy(ItemStack::clone)
             .autofilledBy(::SOURCE_ENTITY) { entity ->
                 (entity as? LivingEntity)?.equipment?.itemInMainHand?.takeUnlessEmpty()
             }
@@ -383,6 +386,7 @@ object DefaultContextParamTypes {
     val SOURCE_LOCATION: ContextParamType<Location> =
         ContextParamType.builder<Location>("source_location")
             .optionalIn(BlockPlace, BlockBreak, BlockInteract)
+            .copiedBy(Location::clone)
             .autofilledBy(::SOURCE_ENTITY) { it.location }
             .autofilledBy(::SOURCE_TILE_ENTITY) { tileEntity ->
                 val pos = tileEntity.pos
@@ -432,6 +436,7 @@ object DefaultContextParamTypes {
     val SOURCE_DIRECTION: ContextParamType<Vector> =
         ContextParamType.builder<Vector>("source_direction")
             .optionalIn(BlockPlace, BlockBreak, BlockInteract)
+            .copiedBy(Vector::clone)
             .autofilledBy(::SOURCE_LOCATION) { it.direction }
             .build()
     

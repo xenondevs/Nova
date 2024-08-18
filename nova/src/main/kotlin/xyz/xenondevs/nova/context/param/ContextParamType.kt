@@ -40,6 +40,8 @@ sealed interface ContextParamType<V : Any> {
     
     val autofillers: List<Autofiller<V>>
     
+    val copy: (V) -> V
+    
     companion object {
         
         fun <V : Any> builder(addon: Addon, name: String): ContextParamTypeBuilder<V> {
@@ -74,6 +76,7 @@ internal open class ContextParamTypeImpl<V : Any>(
     override val id: ResourceLocation,
     override val requirements: List<Requirement<V>>,
     override val autofillers: List<Autofiller<V>>,
+    override val copy: (V) -> V
 ) : ContextParamType<V> {
     
     override fun toString() = id.toString()
@@ -85,12 +88,14 @@ internal class DefaultingContextParamTypeImpl<V : Any>(
     override val defaultValue: V,
     requirements: List<Requirement<V>>,
     autofillers: List<Autofiller<V>>,
-) : ContextParamTypeImpl<V>(id, requirements, autofillers), DefaultingContextParamType<V>
+    copy: (V) -> V
+) : ContextParamTypeImpl<V>(id, requirements, autofillers, copy), DefaultingContextParamType<V>
 
 class ContextParamTypeBuilder<V : Any> internal constructor(private val id: ResourceLocation) {
     
     private val requirements = ArrayList<Requirement<V>>()
     private val autofillers = ArrayList<Autofiller<V>>()
+    private var copy: (V) -> V = { it }
     
     private val requiredIntentions = HashSet<ContextIntention>()
     private val optionalIntentions = HashSet<ContextIntention>()
@@ -149,14 +154,19 @@ class ContextParamTypeBuilder<V : Any> internal constructor(private val id: Reso
         return this
     }
     
+    fun copiedBy(copy: (V) -> V): ContextParamTypeBuilder<V> {
+        this.copy = copy
+        return this
+    }
+    
     fun build(): ContextParamType<V> {
-        val type = ContextParamTypeImpl(id, requirements, autofillers)
+        val type = ContextParamTypeImpl(id, requirements, autofillers, copy)
         register(type)
         return type
     }
     
     fun build(default: V): DefaultingContextParamType<V> {
-        val type = DefaultingContextParamTypeImpl(id, default, requirements, autofillers)
+        val type = DefaultingContextParamTypeImpl(id, default, requirements, autofillers, copy)
         register(type)
         return type
     }
