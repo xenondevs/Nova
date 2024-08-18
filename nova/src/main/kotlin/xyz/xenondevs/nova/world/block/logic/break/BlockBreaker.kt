@@ -21,7 +21,6 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.EntityUtils
@@ -46,6 +45,7 @@ import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.item.tool.ToolCategory
 
 internal class NovaBlockBreaker(
     player: Player,
@@ -106,7 +106,7 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
     protected val hardness: Double = block.hardness
     protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
     protected val itemToolCategories: Set<ToolCategory> = ToolCategory.ofItem(tool)
-    protected val drops: Boolean = ToolUtils.isCorrectToolForDrops(block, tool)
+    protected val drops: Boolean = player.gameMode == GameMode.CREATIVE || ToolUtils.isCorrectToolForDrops(block, tool)
     
     var destroyTicks = 0
         private set
