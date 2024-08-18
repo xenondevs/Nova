@@ -313,8 +313,8 @@ object DefaultContextParamTypes {
     val TOOL_ITEM_STACK: ContextParamType<ItemStack> =
         ContextParamType.builder<ItemStack>("tool_item_stack")
             .optionalIn(BlockBreak)
-            .autofilledBy(::SOURCE_ENTITY, ::INTERACTION_HAND) { entity, hand ->
-                (entity as? LivingEntity)?.equipment?.getItem(hand)?.takeUnlessEmpty()
+            .autofilledBy(::SOURCE_ENTITY) { entity ->
+                (entity as? LivingEntity)?.equipment?.itemInMainHand?.takeUnlessEmpty()
             }
             .build()
     

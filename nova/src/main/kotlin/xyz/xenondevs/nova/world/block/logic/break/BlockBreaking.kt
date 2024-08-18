@@ -21,6 +21,9 @@ import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -139,15 +142,24 @@ internal object BlockBreaking : Listener, PacketListener {
             return
         }
         
-        // call block state attack (i.e. teleport dragon egg, play note block sound...)
+        // call block state attack (e.g. teleport dragon egg, play note block sound...)
+        val novaBlockState = WorldDataManager.getBlockState(pos)
         if (player.gameMode != GameMode.CREATIVE) {
-            val serverLevel = pos.world.serverLevel
-            val nmsPos = pos.nmsPos
-            serverLevel.getBlockState(nmsPos).attack(serverLevel, nmsPos, player.serverPlayer)
+            if (novaBlockState != null) {
+                val ctx = Context.intention(BlockBreak)
+                    .param(DefaultContextParamTypes.BLOCK_POS, pos)
+                    .param(DefaultContextParamTypes.BLOCK_STATE_NOVA, novaBlockState)
+                    .param(DefaultContextParamTypes.SOURCE_PLAYER, player)
+                    .build()
+                novaBlockState.block.handleAttack(pos, novaBlockState, ctx)
+            } else {
+                val serverLevel = pos.world.serverLevel
+                val nmsPos = pos.nmsPos
+                serverLevel.getBlockState(nmsPos).attack(serverLevel, nmsPos, player.serverPlayer)
+            }
         }
         
         // start breaker
-        val novaBlockState = WorldDataManager.getBlockState(pos)
         val breaker: BlockBreaker
         if (novaBlockState != null) {
             // don't do any breaking logic if the block doesn't have the breakable behavior
