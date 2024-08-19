@@ -66,6 +66,6 @@ test = ["kotlin-test-junit", "junit-jupiter"]
 xenondevs-commons = ["commons-collections", "commons-gson", "commons-guava", "commons-provider", "commons-reflection"]
 
 [plugins]
-dokka = { id = "org.jetbrains.dokka", version = "1.8.20" }
+dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
