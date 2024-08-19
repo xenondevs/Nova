@@ -132,7 +132,7 @@ object ToolUtils {
         
         var speedMultiplier = speed
         
-        speedMultiplier += efficiency
+        if (speedMultiplier > 1) speedMultiplier += efficiency
         speedMultiplier *= hasteLevel * 0.2 + 1
         speedMultiplier *= getFatigueMultiplier(fatigueLevel)
         speedMultiplier *= blockBreakSpeed
