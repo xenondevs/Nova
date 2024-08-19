@@ -53,7 +53,7 @@ minecraft-model-renderer = { group = "xyz.xenondevs", name = "minecraft-model-re
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version = "2.7" }
 zip4j = { group = "net.lingala.zip4j", name = "zip4j", version = "2.11.5" }
-zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.6-3" }
+zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.6-4" }
 
 [bundles]
 cbf = ["cosmic-binary-format", "cosmic-binary-format-provider"]
