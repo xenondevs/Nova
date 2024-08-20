@@ -12,10 +12,8 @@ abstract class MultiModel {
     protected val models = HashMap<Model, FakeItemDisplay>()
     private var closed = false
     
-    @Synchronized
     fun addAll(vararg models: Model) = addAll(models.asList())
     
-    @Synchronized
     fun addAll(models: Iterable<Model>) {
         if (closed)
             return
@@ -23,19 +21,17 @@ abstract class MultiModel {
         models.forEach(this::add)
     }
     
-    @Synchronized
     fun add(model: Model) {
         val itemDisplay = model.createFakeItemDisplay()
         models.put(model, itemDisplay)?.remove()
     }
     
-    @Synchronized
     fun clear() {
         models.values.forEach(FakeItemDisplay::remove)
         models.clear()
     }
     
-    @Synchronized
+    @Deprecated("Use clear() instead", ReplaceWith("clear()"))
     fun close() {
         clear()
         closed = true
@@ -48,17 +44,14 @@ class MovableMultiModel : MultiModel() {
     val itemDisplays: Collection<FakeItemDisplay>
         get() = models.values
     
-    @Synchronized
     fun use(run: (FakeItemDisplay) -> Unit) {
         models.values.forEach(run)
     }
     
-    @Synchronized
     fun useMetadata(sendPacket: Boolean = true, run: (ItemDisplayMetadata) -> Unit) {
         models.values.forEach { it.updateEntityData(sendPacket, run) }
     }
     
-    @Synchronized
     fun removeIf(predicate: (FakeItemDisplay) -> Boolean) {
         models.removeIf { (_, display) ->
             if (predicate(display)) {
@@ -72,7 +65,6 @@ class MovableMultiModel : MultiModel() {
 
 class FixedMultiModel : MultiModel() {
     
-    @Synchronized
     fun replaceModels(newModels: Set<Model>) {
         val availableDisplays = HashMap<Location, HashSet<FakeItemDisplay>>()
         for ((model, itemDisplay) in models) {
@@ -107,7 +99,6 @@ class FixedMultiModel : MultiModel() {
         }
     }
     
-    @Synchronized
     fun removeIf(predicate: (Model, FakeItemDisplay) -> Boolean) {
         models.removeIf { (model, display) ->
             if (predicate(model, display)) {
