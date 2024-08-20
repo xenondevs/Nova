@@ -1,9 +1,11 @@
 <!doctype html>
-<html>
+<html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Companion</title>
-<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
     if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
@@ -16,12 +18,13 @@
         }
     }
     </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
 <link href="../../../../styles/style.css" rel="Stylesheet">
-<link href="../../../../styles/jetbrains-mono.css" rel="Stylesheet">
 <link href="../../../../styles/main.css" rel="Stylesheet">
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
@@ -29,26 +32,32 @@
 <script type="text/javascript" src="../../../../scripts/prism.js" async></script>
 <script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
-<div class="navigation-wrapper" id="navigation-wrapper">
-    <div id="leftToggler"><span class="icon-toggler"></span></div>
-    <div class="library-name">
-<a href="../../../../index.html">
-<span>nova-parent</span>            </a>    </div>
-    <div>0.17-alpha.8
-    </div>
-    <div class="pull-right d-flex">
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+<a class="library-name--link" href="../../../../index.html">
+                            nova-parent
+                    </a>            </div>
+            <div class="library-version">0.17-alpha.9
+            </div>
+        </div>
         <div class="filter-section" id="filter-section">
                 <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova:dokkaHtmlPartial/main">jvm</button>
         </div>
-        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
-        <div id="searchBar"></div>
     </div>
-</div>
-<div id="container">
-    <div id="leftColumn">
-        <div id="sideMenu"></div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
     </div>
-    <div id="main">
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.world.block.sound/SoundGroup.Companion///PointingToDeclaration//2031297628">
   <div class="breadcrumbs"><a href="../../../index.html">nova</a><span class="delimiter">/</span><a href="../../index.html">xyz.xenondevs.nova.world.block.sound</a><span class="delimiter">/</span><a href="../index.html">SoundGroup</a><span class="delimiter">/</span><span class="current">Companion</span></div>
   <div class="cover ">
@@ -70,7 +79,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-a-m-e-t-h-y-s-t.html">AMETHYST</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-m-e-t-h-y-s-t.html">AMETHYST</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -85,7 +94,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-a-m-e-t-h-y-s-t_-c-l-u-s-t-e-r.html">AMETHYST_CLUSTER</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-m-e-t-h-y-s-t_-c-l-u-s-t-e-r.html">AMETHYST_CLUSTER</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -100,7 +109,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-a-n-c-i-e-n-t_-d-e-b-r-i-s.html">ANCIENT_DEBRIS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-n-c-i-e-n-t_-d-e-b-r-i-s.html">ANCIENT_DEBRIS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -115,7 +124,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-a-n-v-i-l.html">ANVIL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-n-v-i-l.html">ANVIL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -130,7 +139,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-a-z-a-l-e-a.html">AZALEA</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-z-a-l-e-a.html">AZALEA</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -145,7 +154,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-a-z-a-l-e-a_-l-e-a-v-e-s.html">AZALEA_LEAVES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-z-a-l-e-a_-l-e-a-v-e-s.html">AZALEA_LEAVES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -160,7 +169,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-b-a-m-b-o-o.html">BAMBOO</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-a-m-b-o-o.html">BAMBOO</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -175,7 +184,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-b-a-m-b-o-o_-s-a-p-l-i-n-g.html">BAMBOO_SAPLING</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-a-m-b-o-o_-s-a-p-l-i-n-g.html">BAMBOO_SAPLING</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -190,7 +199,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-b-a-m-b-o-o_-w-o-o-d.html">BAMBOO_WOOD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-a-m-b-o-o_-w-o-o-d.html">BAMBOO_WOOD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -205,7 +214,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-b-a-m-b-o-o_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html">BAMBOO_WOOD_HANGING_SIGN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-a-m-b-o-o_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html">BAMBOO_WOOD_HANGING_SIGN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -220,7 +229,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-b-a-s-a-l-t.html">BASALT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-a-s-a-l-t.html">BASALT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -235,7 +244,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-b-i-g_-d-r-i-p-l-e-a-f.html">BIG_DRIPLEAF</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-i-g_-d-r-i-p-l-e-a-f.html">BIG_DRIPLEAF</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -250,7 +259,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-b-o-n-e_-b-l-o-c-k.html">BONE_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-o-n-e_-b-l-o-c-k.html">BONE_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -265,7 +274,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-a-l-c-i-t-e.html">CALCITE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-l-c-i-t-e.html">CALCITE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -280,7 +289,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-a-n-d-l-e.html">CANDLE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-n-d-l-e.html">CANDLE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -295,7 +304,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-a-v-e_-v-i-n-e-s.html">CAVE_VINES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-v-e_-v-i-n-e-s.html">CAVE_VINES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -310,7 +319,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-h-a-i-n.html">CHAIN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-h-a-i-n.html">CHAIN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -325,7 +334,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-h-e-r-r-y_-l-e-a-v-e-s.html">CHERRY_LEAVES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-h-e-r-r-y_-l-e-a-v-e-s.html">CHERRY_LEAVES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -340,7 +349,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-h-e-r-r-y_-s-a-p-l-i-n-g.html">CHERRY_SAPLING</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-h-e-r-r-y_-s-a-p-l-i-n-g.html">CHERRY_SAPLING</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -355,7 +364,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-h-e-r-r-y_-w-o-o-d.html">CHERRY_WOOD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-h-e-r-r-y_-w-o-o-d.html">CHERRY_WOOD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -370,7 +379,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-h-e-r-r-y_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html">CHERRY_WOOD_HANGING_SIGN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-h-e-r-r-y_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html">CHERRY_WOOD_HANGING_SIGN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -385,7 +394,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-h-i-s-e-l-e-d_-b-o-o-k-s-h-e-l-f.html">CHISELED_BOOKSHELF</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-h-i-s-e-l-e-d_-b-o-o-k-s-h-e-l-f.html">CHISELED_BOOKSHELF</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -400,7 +409,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-o-b-w-e-b.html">COBWEB</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-o-b-w-e-b.html">COBWEB</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -415,7 +424,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-o-p-p-e-r.html">COPPER</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-o-p-p-e-r.html">COPPER</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -430,7 +439,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-o-p-p-e-r_-b-u-l-b.html">COPPER_BULB</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-o-p-p-e-r_-b-u-l-b.html">COPPER_BULB</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -445,7 +454,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-o-p-p-e-r_-g-r-a-t-e.html">COPPER_GRATE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-o-p-p-e-r_-g-r-a-t-e.html">COPPER_GRATE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -460,7 +469,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-o-r-a-l_-b-l-o-c-k.html">CORAL_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-o-r-a-l_-b-l-o-c-k.html">CORAL_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -475,7 +484,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-c-r-o-p.html">CROP</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-r-o-p.html">CROP</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -490,7 +499,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-d-e-c-o-r-a-t-e-d_-p-o-t.html">DECORATED_POT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-d-e-c-o-r-a-t-e-d_-p-o-t.html">DECORATED_POT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -505,7 +514,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-d-e-c-o-r-a-t-e-d_-p-o-t_-c-r-a-c-k-e-d.html">DECORATED_POT_CRACKED</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-d-e-c-o-r-a-t-e-d_-p-o-t_-c-r-a-c-k-e-d.html">DECORATED_POT_CRACKED</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -520,7 +529,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-d-e-e-p-s-l-a-t-e.html">DEEPSLATE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-d-e-e-p-s-l-a-t-e.html">DEEPSLATE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -535,7 +544,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-d-e-e-p-s-l-a-t-e_-b-r-i-c-k-s.html">DEEPSLATE_BRICKS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-d-e-e-p-s-l-a-t-e_-b-r-i-c-k-s.html">DEEPSLATE_BRICKS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -550,7 +559,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-d-e-e-p-s-l-a-t-e_-t-i-l-e-s.html">DEEPSLATE_TILES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-d-e-e-p-s-l-a-t-e_-t-i-l-e-s.html">DEEPSLATE_TILES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -565,7 +574,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-d-r-i-p-s-t-o-n-e_-b-l-o-c-k.html">DRIPSTONE_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-d-r-i-p-s-t-o-n-e_-b-l-o-c-k.html">DRIPSTONE_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -580,7 +589,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-f-l-o-w-e-r-i-n-g_-a-z-a-l-e-a.html">FLOWERING_AZALEA</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-l-o-w-e-r-i-n-g_-a-z-a-l-e-a.html">FLOWERING_AZALEA</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -595,7 +604,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-f-r-o-g-l-i-g-h-t.html">FROGLIGHT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-r-o-g-l-i-g-h-t.html">FROGLIGHT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -610,7 +619,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-f-r-o-g-s-p-a-w-n.html">FROGSPAWN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-r-o-g-s-p-a-w-n.html">FROGSPAWN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -625,7 +634,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-f-u-n-g-u-s.html">FUNGUS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-u-n-g-u-s.html">FUNGUS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -640,7 +649,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-g-i-l-d-e-d_-b-l-a-c-k-s-t-o-n-e.html">GILDED_BLACKSTONE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-g-i-l-d-e-d_-b-l-a-c-k-s-t-o-n-e.html">GILDED_BLACKSTONE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -655,7 +664,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-g-l-a-s-s.html">GLASS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-g-l-a-s-s.html">GLASS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -670,7 +679,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-g-l-o-w_-l-i-c-h-e-n.html">GLOW_LICHEN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-g-l-o-w_-l-i-c-h-e-n.html">GLOW_LICHEN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -685,7 +694,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-g-r-a-s-s.html">GRASS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-g-r-a-s-s.html">GRASS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -700,7 +709,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-g-r-a-v-e-l.html">GRAVEL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-g-r-a-v-e-l.html">GRAVEL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -715,7 +724,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-h-a-n-g-i-n-g_-r-o-o-t-s.html">HANGING_ROOTS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-h-a-n-g-i-n-g_-r-o-o-t-s.html">HANGING_ROOTS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -730,7 +739,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-h-a-n-g-i-n-g_-s-i-g-n.html">HANGING_SIGN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-h-a-n-g-i-n-g_-s-i-g-n.html">HANGING_SIGN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -745,7 +754,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-h-a-r-d_-c-r-o-p.html">HARD_CROP</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-h-a-r-d_-c-r-o-p.html">HARD_CROP</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -760,7 +769,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-h-e-a-v-y_-c-o-r-e.html">HEAVY_CORE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-h-e-a-v-y_-c-o-r-e.html">HEAVY_CORE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -775,7 +784,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-h-o-n-e-y_-b-l-o-c-k.html">HONEY_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-h-o-n-e-y_-b-l-o-c-k.html">HONEY_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -790,7 +799,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-l-a-d-d-e-r.html">LADDER</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-l-a-d-d-e-r.html">LADDER</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -805,7 +814,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-l-a-n-t-e-r-n.html">LANTERN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-l-a-n-t-e-r-n.html">LANTERN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -820,7 +829,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-l-a-r-g-e_-a-m-e-t-h-y-s-t_-b-u-d.html">LARGE_AMETHYST_BUD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-l-a-r-g-e_-a-m-e-t-h-y-s-t_-b-u-d.html">LARGE_AMETHYST_BUD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -835,7 +844,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-l-i-l-y_-p-a-d.html">LILY_PAD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-l-i-l-y_-p-a-d.html">LILY_PAD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -850,7 +859,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-l-o-d-e-s-t-o-n-e.html">LODESTONE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-l-o-d-e-s-t-o-n-e.html">LODESTONE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -865,7 +874,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-m-a-n-g-r-o-v-e_-r-o-o-t-s.html">MANGROVE_ROOTS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-a-n-g-r-o-v-e_-r-o-o-t-s.html">MANGROVE_ROOTS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -880,7 +889,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-m-e-d-i-u-m_-a-m-e-t-h-y-s-t_-b-u-d.html">MEDIUM_AMETHYST_BUD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-e-d-i-u-m_-a-m-e-t-h-y-s-t_-b-u-d.html">MEDIUM_AMETHYST_BUD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -895,7 +904,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-m-e-t-a-l.html">METAL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-e-t-a-l.html">METAL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -910,7 +919,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-m-o-s-s.html">MOSS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-o-s-s.html">MOSS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -925,7 +934,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-m-o-s-s_-c-a-r-p-e-t.html">MOSS_CARPET</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-o-s-s_-c-a-r-p-e-t.html">MOSS_CARPET</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -940,7 +949,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-m-u-d.html">MUD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-u-d.html">MUD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -955,7 +964,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-m-u-d_-b-r-i-c-k-s.html">MUD_BRICKS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-u-d_-b-r-i-c-k-s.html">MUD_BRICKS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -970,7 +979,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-m-u-d-d-y_-m-a-n-g-r-o-v-e_-r-o-o-t-s.html">MUDDY_MANGROVE_ROOTS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-m-u-d-d-y_-m-a-n-g-r-o-v-e_-r-o-o-t-s.html">MUDDY_MANGROVE_ROOTS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -985,7 +994,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-b-r-i-c-k-s.html">NETHER_BRICKS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-b-r-i-c-k-s.html">NETHER_BRICKS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1000,7 +1009,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-g-o-l-d_-o-r-e.html">NETHER_GOLD_ORE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-g-o-l-d_-o-r-e.html">NETHER_GOLD_ORE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1015,7 +1024,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-o-r-e.html">NETHER_ORE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-o-r-e.html">NETHER_ORE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1030,7 +1039,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-s-p-r-o-u-t-s.html">NETHER_SPROUTS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-s-p-r-o-u-t-s.html">NETHER_SPROUTS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1045,7 +1054,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-w-a-r-t.html">NETHER_WART</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-w-a-r-t.html">NETHER_WART</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1060,7 +1069,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-w-o-o-d.html">NETHER_WOOD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-w-o-o-d.html">NETHER_WOOD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1075,7 +1084,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html">NETHER_WOOD_HANGING_SIGN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-e-t-h-e-r_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html">NETHER_WOOD_HANGING_SIGN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1090,7 +1099,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-n-e-t-h-e-r-i-t-e_-b-l-o-c-k.html">NETHERITE_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-e-t-h-e-r-i-t-e_-b-l-o-c-k.html">NETHERITE_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1105,7 +1114,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-n-e-t-h-e-r-r-a-c-k.html">NETHERRACK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-e-t-h-e-r-r-a-c-k.html">NETHERRACK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1120,7 +1129,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-n-y-l-i-u-m.html">NYLIUM</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-n-y-l-i-u-m.html">NYLIUM</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1135,7 +1144,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-p-a-c-k-e-d_-m-u-d.html">PACKED_MUD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-p-a-c-k-e-d_-m-u-d.html">PACKED_MUD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1150,7 +1159,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-p-i-n-k_-p-e-t-a-l-s.html">PINK_PETALS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-p-i-n-k_-p-e-t-a-l-s.html">PINK_PETALS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1165,7 +1174,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-p-o-i-n-t-e-d_-d-r-i-p-s-t-o-n-e.html">POINTED_DRIPSTONE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-p-o-i-n-t-e-d_-d-r-i-p-s-t-o-n-e.html">POINTED_DRIPSTONE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1180,7 +1189,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-p-o-l-i-s-h-e-d_-d-e-e-p-s-l-a-t-e.html">POLISHED_DEEPSLATE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-p-o-l-i-s-h-e-d_-d-e-e-p-s-l-a-t-e.html">POLISHED_DEEPSLATE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1195,7 +1204,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-p-o-l-i-s-h-e-d_-t-u-f-f.html">POLISHED_TUFF</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-p-o-l-i-s-h-e-d_-t-u-f-f.html">POLISHED_TUFF</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1210,7 +1219,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-p-o-w-d-e-r_-s-n-o-w.html">POWDER_SNOW</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-p-o-w-d-e-r_-s-n-o-w.html">POWDER_SNOW</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1225,7 +1234,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-r-o-o-t-e-d_-d-i-r-t.html">ROOTED_DIRT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-r-o-o-t-e-d_-d-i-r-t.html">ROOTED_DIRT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1240,7 +1249,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-r-o-o-t-s.html">ROOTS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-r-o-o-t-s.html">ROOTS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1255,7 +1264,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-a-n-d.html">SAND</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-a-n-d.html">SAND</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1270,7 +1279,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-c-a-f-f-o-l-d-i-n-g.html">SCAFFOLDING</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-c-a-f-f-o-l-d-i-n-g.html">SCAFFOLDING</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1285,7 +1294,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-c-u-l-k.html">SCULK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-c-u-l-k.html">SCULK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1300,7 +1309,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-c-u-l-k_-c-a-t-a-l-y-s-t.html">SCULK_CATALYST</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-c-u-l-k_-c-a-t-a-l-y-s-t.html">SCULK_CATALYST</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1315,7 +1324,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-c-u-l-k_-s-e-n-s-o-r.html">SCULK_SENSOR</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-c-u-l-k_-s-e-n-s-o-r.html">SCULK_SENSOR</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1330,7 +1339,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-c-u-l-k_-s-h-r-i-e-k-e-r.html">SCULK_SHRIEKER</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-c-u-l-k_-s-h-r-i-e-k-e-r.html">SCULK_SHRIEKER</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1345,7 +1354,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-c-u-l-k_-v-e-i-n.html">SCULK_VEIN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-c-u-l-k_-v-e-i-n.html">SCULK_VEIN</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1360,7 +1369,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-h-r-o-o-m-l-i-g-h-t.html">SHROOMLIGHT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-h-r-o-o-m-l-i-g-h-t.html">SHROOMLIGHT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1375,7 +1384,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-l-i-m-e_-b-l-o-c-k.html">SLIME_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-l-i-m-e_-b-l-o-c-k.html">SLIME_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1390,7 +1399,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-m-a-l-l_-a-m-e-t-h-y-s-t_-b-u-d.html">SMALL_AMETHYST_BUD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-m-a-l-l_-a-m-e-t-h-y-s-t_-b-u-d.html">SMALL_AMETHYST_BUD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1405,7 +1414,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-m-a-l-l_-d-r-i-p-l-e-a-f.html">SMALL_DRIPLEAF</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-m-a-l-l_-d-r-i-p-l-e-a-f.html">SMALL_DRIPLEAF</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1420,7 +1429,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-n-o-w.html">SNOW</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-n-o-w.html">SNOW</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1435,7 +1444,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-o-u-l_-s-a-n-d.html">SOUL_SAND</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-o-u-l_-s-a-n-d.html">SOUL_SAND</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1450,7 +1459,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-o-u-l_-s-o-i-l.html">SOUL_SOIL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-o-u-l_-s-o-i-l.html">SOUL_SOIL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1465,7 +1474,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-p-o-n-g-e.html">SPONGE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-p-o-n-g-e.html">SPONGE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1480,7 +1489,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-p-o-r-e_-b-l-o-s-s-o-m.html">SPORE_BLOSSOM</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-p-o-r-e_-b-l-o-s-s-o-m.html">SPORE_BLOSSOM</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1495,7 +1504,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-t-e-m.html">STEM</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-t-e-m.html">STEM</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1510,7 +1519,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-t-o-n-e.html">STONE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-t-o-n-e.html">STONE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1525,7 +1534,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-u-s-p-i-c-i-o-u-s_-g-r-a-v-e-l.html">SUSPICIOUS_GRAVEL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-u-s-p-i-c-i-o-u-s_-g-r-a-v-e-l.html">SUSPICIOUS_GRAVEL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1540,7 +1549,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-u-s-p-i-c-i-o-u-s_-s-a-n-d.html">SUSPICIOUS_SAND</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-u-s-p-i-c-i-o-u-s_-s-a-n-d.html">SUSPICIOUS_SAND</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1555,7 +1564,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-s-w-e-e-t_-b-e-r-r-y_-b-u-s-h.html">SWEET_BERRY_BUSH</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-w-e-e-t_-b-e-r-r-y_-b-u-s-h.html">SWEET_BERRY_BUSH</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1570,7 +1579,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-t-r-i-a-l_-s-p-a-w-n-e-r.html">TRIAL_SPAWNER</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-t-r-i-a-l_-s-p-a-w-n-e-r.html">TRIAL_SPAWNER</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1585,7 +1594,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-t-u-f-f.html">TUFF</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-t-u-f-f.html">TUFF</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1600,7 +1609,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-t-u-f-f_-b-r-i-c-k-s.html">TUFF_BRICKS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-t-u-f-f_-b-r-i-c-k-s.html">TUFF_BRICKS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1615,7 +1624,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-t-w-i-s-t-i-n-g_-v-i-n-e-s.html">TWISTING_VINES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-t-w-i-s-t-i-n-g_-v-i-n-e-s.html">TWISTING_VINES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1630,7 +1639,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-v-a-u-l-t.html">VAULT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-v-a-u-l-t.html">VAULT</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1645,7 +1654,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-v-i-n-e.html">VINE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-v-i-n-e.html">VINE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1660,7 +1669,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-w-a-r-t_-b-l-o-c-k.html">WART_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-w-a-r-t_-b-l-o-c-k.html">WART_BLOCK</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1675,7 +1684,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-w-e-e-p-i-n-g_-v-i-n-e-s.html">WEEPING_VINES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-w-e-e-p-i-n-g_-v-i-n-e-s.html">WEEPING_VINES</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1690,7 +1699,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-w-e-t_-g-r-a-s-s.html">WET_GRASS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-w-e-t_-g-r-a-s-s.html">WET_GRASS</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1705,7 +1714,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-w-e-t_-s-p-o-n-g-e.html">WET_SPONGE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-w-e-t_-s-p-o-n-g-e.html">WET_SPONGE</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1720,7 +1729,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-w-o-o-d.html">WOOD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-w-o-o-d.html">WOOD</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1735,7 +1744,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="-w-o-o-l.html">WOOL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-w-o-o-l.html">WOOL</a><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1754,7 +1763,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="from.html"><span class="token function">from</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">soundType<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.block/SoundType///PointingToDeclaration/">SoundType</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="from.html"><span class="token function">from</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">soundGroup<span class="token operator">: </span><span data-unresolved-link="org.bukkit/SoundGroup///PointingToDeclaration/">SoundGroup</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="from.html"><span class="token function">from</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">soundType<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.block/SoundType///PointingToDeclaration/">SoundType</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="from.html"><span class="token function">from</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">soundGroup<span class="token operator">: </span><span data-unresolved-link="org.bukkit/SoundGroup///PointingToDeclaration/">SoundGroup</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../index.html">SoundGroup</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -1767,8 +1776,9 @@
       <div class="footer">
         <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
       </div>
+            </div>
+        </div>
     </div>
-</div>
 </body>
 </html>
 
