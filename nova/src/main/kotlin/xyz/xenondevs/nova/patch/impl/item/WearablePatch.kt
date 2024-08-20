@@ -157,7 +157,7 @@ internal class WatchedArmorList(player: Player) : NonNullList<ItemStack>(
     
     override fun set(index: Int, element: ItemStack): ItemStack {
         if (initialized) {
-            if (player !== null) {
+            if (player != null) {
                 val previous = previousStacks[index]
                 if (ItemStack.matches(previous, element))
                     return element

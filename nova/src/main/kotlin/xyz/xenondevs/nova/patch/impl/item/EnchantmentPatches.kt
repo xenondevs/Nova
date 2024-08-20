@@ -135,7 +135,7 @@ internal object EnchantmentPatches : MultiTransformer(Enchantment::class, Enchan
     @JvmStatic
     fun isEnchantable(itemStack: ItemStack): Boolean {
         val enchantments = itemStack.get(DataComponents.ENCHANTMENTS)
-        if (enchantments === null || !enchantments.isEmpty)
+        if (enchantments == null || !enchantments.isEmpty)
             return false
         
         val novaItem = itemStack.novaItem

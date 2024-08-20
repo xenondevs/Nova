@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemStack
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.world.item.logic.PacketItems
 import xyz.xenondevs.nova.network.PacketIdRegistry
 import xyz.xenondevs.nova.network.send
 import xyz.xenondevs.nova.util.NMSUtils
@@ -22,6 +21,7 @@ import xyz.xenondevs.nova.util.toPackedByte
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.metadata.Metadata
+import xyz.xenondevs.nova.world.item.logic.PacketItems
 import java.util.*
 import java.util.logging.Level
 import org.bukkit.inventory.ItemStack as BukkitStack
@@ -198,7 +198,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
                 }
             }
             
-            if (buf !== null) {
+            if (buf != null) {
                 viewers.forEach { it.send(buf) }
                 buf.release() // no longer required
             }

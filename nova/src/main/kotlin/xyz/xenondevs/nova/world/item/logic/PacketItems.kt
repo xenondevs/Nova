@@ -183,7 +183,7 @@ internal object PacketItems : Listener, PacketListener {
         if (itemStack.isEmpty)
             return itemStack
         
-        return if (itemStack.unsafeNovaTag !== null) {
+        return if (itemStack.unsafeNovaTag != null) {
             getClientSideNovaStack(player, itemStack, storeServerSideTag)
         } else getClientSideVanillaStack(player, itemStack, storeServerSideTag)
     }

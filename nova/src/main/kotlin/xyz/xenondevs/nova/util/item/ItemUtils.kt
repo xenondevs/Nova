@@ -70,7 +70,7 @@ var MojangStack.novaModel: String?
         update(DataComponents.CUSTOM_DATA) { customData ->
             customData.update { tag ->
                 val novaCompound = tag.getCompoundOrNull("nova")
-                if (novaCompound !== null) {
+                if (novaCompound != null) {
                     if (model != null) {
                         novaCompound.putString("modelId", model)
                     } else {
@@ -353,7 +353,7 @@ object ItemUtils {
             }
             
             val customData = dataComponentPatch.get(DataComponents.CUSTOM_DATA)?.getOrNull()
-            if (customData !== null)
+            if (customData != null)
                 customTag.merge(customData.unsafe)
         }
         

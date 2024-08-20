@@ -39,7 +39,7 @@ fun obtainNovaItemAdvancement(
     require(addon.description.id == item.id.namespace) { "The specified item is from a different addon" }
     val id = item.id
     return advancement(addon, "obtain_${id.name}") {
-        if (parent !== null)
+        if (parent != null)
             parent(parent)
         
         display(DisplayInfo(
@@ -65,7 +65,7 @@ fun obtainNovaItemsAdvancement(
     require(items.all { it.id.namespace == addon.description.id }) { "At least one of the specified items is from a different addon" }
     val namespace = addon.description.id
     return advancement(addon, name) {
-        if (parent !== null)
+        if (parent != null)
             parent(parent)
         
         display(DisplayInfo(
