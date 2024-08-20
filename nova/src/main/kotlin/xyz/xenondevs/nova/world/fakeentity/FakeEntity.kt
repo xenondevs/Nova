@@ -31,7 +31,7 @@ import org.bukkit.inventory.ItemStack as BukkitStack
  */
 abstract class FakeEntity<M : Metadata> internal constructor(location: Location) {
     
-    protected abstract val metadata: M
+    abstract val metadata: M
     protected abstract val entityType: EntityType<*>
     
     private var registered = false
