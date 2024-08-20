@@ -10,14 +10,10 @@ import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemDisplayMetadata
 abstract class MultiModel {
     
     protected val models = HashMap<Model, FakeItemDisplay>()
-    private var closed = false
     
     fun addAll(vararg models: Model) = addAll(models.asList())
     
     fun addAll(models: Iterable<Model>) {
-        if (closed)
-            return
-        
         models.forEach(this::add)
     }
     
@@ -34,7 +30,6 @@ abstract class MultiModel {
     @Deprecated("Use clear() instead", ReplaceWith("clear()"))
     fun close() {
         clear()
-        closed = true
     }
     
 }
