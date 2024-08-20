@@ -17,9 +17,10 @@ abstract class MultiModel {
         models.forEach(this::add)
     }
     
-    fun add(model: Model) {
+    fun add(model: Model): FakeItemDisplay {
         val itemDisplay = model.createFakeItemDisplay()
         models.put(model, itemDisplay)?.remove()
+        return itemDisplay
     }
     
     fun clear() {
