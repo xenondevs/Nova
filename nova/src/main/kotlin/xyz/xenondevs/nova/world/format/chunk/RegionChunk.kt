@@ -252,20 +252,39 @@ internal class RegionChunk(
                 }
             }
             
-            if (tileEntity.block.tickrate > 0)
+            if (tileEntity.block.tickrate > 0) {
                 tickingTileEntityCount++
+                
+                if (isTicking) {
+                    try {
+                        tileEntity.coroutineSupervisor = SupervisorJob(coroutineSupervisor)
+                        tileEntity.handleEnableTicking()
+                    } catch (t: Throwable) {
+                        LOGGER.log(Level.SEVERE, "Failed to enable ticking for $tileEntity", t)
+                    }
+                }
+            }
         }
         
         if (previous != null) {
+            if (previous.block.tickrate > 0) {
+                tickingTileEntityCount--
+                
+                if (isTicking) {
+                    try {
+                        previous.handleDisableTicking()
+                    } catch(t: Throwable) {
+                        LOGGER.log(Level.SEVERE, "Failed to disable ticking for $tileEntity", t)
+                    }
+                }
+            }
+            
             try {
                 previous.handleDisable()
             } catch (t: Throwable) {
                 LOGGER.log(Level.SEVERE, "Failed to disable tile-entity $previous", t)
             }
             previous.isEnabled = false
-            
-            if (previous.block.tickrate > 0)
-                tickingTileEntityCount--
         }
         
         reconsiderTicking()
@@ -422,8 +441,12 @@ internal class RegionChunk(
             if (tileEntity.block.tickrate <= 0)
                 continue
             
-            tileEntity.coroutineSupervisor = SupervisorJob(chunkSupervisor)
-            tileEntity.handleEnableTicking()
+            try {
+                tileEntity.coroutineSupervisor = SupervisorJob(chunkSupervisor)
+                tileEntity.handleEnableTicking()
+            } catch (t: Throwable) {
+                LOGGER.log(Level.SEVERE, "Failed to enable ticking for $tileEntity", t)
+            }
         }
         
         isTicking = true
@@ -445,7 +468,11 @@ internal class RegionChunk(
             if (tileEntity.block.tickrate <= 0)
                 continue
             
-            tileEntity.handleDisableTicking()
+            try {
+                tileEntity.handleDisableTicking()
+            } catch (t: Throwable) {
+                LOGGER.log(Level.SEVERE, "Failed to disable ticking for $tileEntity", t)
+            }
         }
         
         isTicking = false
