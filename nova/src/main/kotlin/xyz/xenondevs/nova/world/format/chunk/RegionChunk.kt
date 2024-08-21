@@ -302,7 +302,6 @@ internal class RegionChunk(
      * Gets the index of the [RegionChunkSection] at the given [y] coordinate.
      */
     private fun getSectionIndex(y: Int): Int {
-        require(y in minHeight..maxHeight) { "Invalid y coordinate $y" }
         return (y - minHeight) shr 4
     }
     
