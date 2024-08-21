@@ -3,8 +3,7 @@
 package xyz.xenondevs.nova.world.item.logic
 
 import com.mojang.serialization.Dynamic
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
+import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentPredicate
@@ -15,6 +14,7 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
+import net.minecraft.network.chat.Component
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.resources.RegistryOps
@@ -55,9 +55,7 @@ import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.bukkitMirror
-import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
-import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
-import xyz.xenondevs.nova.util.component.adventure.toPlainText
+import xyz.xenondevs.nova.util.component.adventure.isEmpty
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
@@ -286,17 +284,16 @@ internal object PacketItems : Listener, PacketListener {
         return MojangStack(Items.BARRIER).apply {
             set(
                 DataComponents.ITEM_NAME,
-                Component.text(
-                    "Unknown item: $id" + if (modelId != "default") ":$modelId" else "",
-                    NamedTextColor.RED
-                ).toNMSComponent()
+                Component.literal(
+                    "Unknown item: $id" + if (modelId != "default") ":$modelId" else ""
+                ).withStyle(ChatFormatting.RED)
             )
             storeServerSideTag(this, itemStack)
         }
     }
     
     private fun generateNovaTooltipLore(player: Player?, novaItem: NovaItem, cbfTagCount: Int, itemStack: MojangStack): List<Component> {
-        val isAdvanced = player?.let(AdvancedTooltips::hasNovaTooltips) ?: false
+        val isAdvanced = player?.let(AdvancedTooltips::hasNovaTooltips) == true
         val lore = generateTooltipLore(player, itemStack).toMutableList()
         
         // entire tooltip is hidden
@@ -305,17 +302,15 @@ internal object PacketItems : Listener, PacketListener {
         
         if (isAdvanced) {
             // nova item id
-            lore[lore.size - 2] = Component.text(
-                novaItem.id.toString(),
-                NamedTextColor.DARK_GRAY
-            )
+            lore[lore.size - 2] = Component.literal(novaItem.id.toString()).withStyle(ChatFormatting.DARK_GRAY)
             
             // cbf tag count
             if (cbfTagCount > 0) {
-                lore += Component.translatable(
-                    "item.cbf_tags",
-                    NamedTextColor.DARK_GRAY,
-                    Component.text(cbfTagCount)
+                lore.add(
+                    Component.translatable(
+                        "item.cbf_tags",
+                        Component.literal(cbfTagCount.toString())
+                    ).withStyle(ChatFormatting.DARK_GRAY)
                 )
             }
         }
@@ -361,20 +356,20 @@ internal object PacketItems : Listener, PacketListener {
     //<editor-fold desc="tooltip", defaultstate="collapsed">
     private fun applyServerSideTooltip(itemStack: ItemStack, tooltip: List<Component>) {
         val lore = tooltip.fold(ItemLore.EMPTY) { l, line ->
-            l.withLineAdded(line.withoutPreFormatting().toNMSComponent())
+            l.withLineAdded(line.withoutPreFormatting())
         }
         itemStack.set(DataComponents.LORE, lore)
         disableClientSideTooltip(itemStack)
     }
     
     private fun generateTooltipLore(player: Player?, itemStack: MojangStack): List<Component> {
-        val isAdvanced = player?.let(AdvancedTooltips::hasNovaTooltips) ?: false
+        val isAdvanced = player?.let(AdvancedTooltips::hasNovaTooltips) == true
         
         val lore = itemStack.getTooltipLines(
             Item.TooltipContext.of(REGISTRY_ACCESS),
             player?.serverPlayer,
             if (isAdvanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
-        ).mapTo(ArrayList()) { it.toAdventureComponent() }
+        )
         
         // entire tooltip is hidden
         if (lore.isEmpty())
@@ -403,8 +398,7 @@ internal object PacketItems : Listener, PacketListener {
     private fun shouldHideEntireTooltip(itemStack: MojangStack): Boolean {
         // all items in InvUI guis have a "slot" tag in the pdc
         // the goal here is to hide the tooltip of all gui items with no name
-        return itemStack.asBukkitMirror().persistentDataContainer.has(INVUI_SLOT_KEY)
-            && itemStack.hoverName.toAdventureComponent().toPlainText().isBlank()
+        return itemStack.asBukkitMirror().persistentDataContainer.has(INVUI_SLOT_KEY) && itemStack.hoverName.isEmpty()
     }
     //</editor-fold>
     //</editor-fold>

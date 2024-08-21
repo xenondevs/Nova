@@ -12,6 +12,9 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.StringTag
+import net.minecraft.network.chat.Style
+import net.minecraft.network.chat.contents.PlainTextContents
+import net.minecraft.network.chat.contents.TranslatableContents
 import org.bukkit.entity.Player
 import xyz.xenondevs.inventoryaccess.util.AdventureComponentUtils
 import xyz.xenondevs.nova.resources.CharSizes
@@ -19,6 +22,7 @@ import xyz.xenondevs.nova.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.MoveCharacters
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import java.awt.Color
+import java.util.LinkedList
 import net.minecraft.network.chat.Component as MojangComponent
 
 fun String.toAdventureComponent(): Component {
@@ -79,6 +83,53 @@ fun Component.fontName(): String? {
 
 fun Component.withoutPreFormatting(): Component {
     return AdventureComponentUtils.withoutPreFormatting(this)
+}
+
+private val DEFAULT_STYLE = Style.EMPTY
+    .withColor(0xFFFFFF)
+    .withBold(false)
+    .withItalic(false)
+    .withUnderlined(false)
+    .withStrikethrough(false)
+    .withObfuscated(false)
+
+fun MojangComponent.withoutPreFormatting(): MojangComponent {
+    return MojangComponent.literal("")
+        .withStyle(DEFAULT_STYLE)
+        .append(this)
+}
+
+internal fun MojangComponent.isEmpty(): Boolean {
+    val queue = LinkedList<MojangComponent>()
+    queue.add(this)
+    
+    while (queue.isNotEmpty()) {
+        val current = queue.poll()
+        
+        when (val contents = current.contents) {
+            is PlainTextContents -> {
+                if (contents.text().isNotEmpty())
+                    return false
+            }
+            
+            is TranslatableContents -> {
+                if (contents.key.isNotEmpty() || !contents.fallback.isNullOrEmpty())
+                    return false
+                
+                for (arg in contents.args) {
+                    if (arg is MojangComponent) {
+                        queue.add(arg)
+                    }
+                }
+            }
+            
+            else -> return false // TODO: support other content types
+        }
+        
+        queue.addAll(current.siblings)
+    }
+    
+    return true
 }
 
 fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.font(font: String): B {
