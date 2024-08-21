@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.item.builder.addLoreLines
-import xyz.xenondevs.nova.ui.menu.item.reactiveItem
+import xyz.xenondevs.invui.item.impl.AutoUpdateItem
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.EnergyNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.DefaultEnergyHolder
@@ -15,11 +15,16 @@ import xyz.xenondevs.nova.world.item.DefaultGuiItems
  */
 class EnergyBar(
     height: Int,
-    private val energy: Provider<Long>,
-    private val maxEnergy: Provider<Long>,
-    private val energyPlus: Provider<Long>,
-    private val energyMinus: Provider<Long>,
+    energy: Provider<Long>,
+    maxEnergy: Provider<Long>,
+    energyPlus: Provider<Long>,
+    energyMinus: Provider<Long>,
 ) : VerticalBar(height) {
+    
+    private val energy by energy
+    private val maxEnergy by maxEnergy
+    private val energyPlus by energyPlus
+    private val energyMinus by energyMinus
     
     constructor(height: Int, energyHolder: DefaultEnergyHolder) : this(
         height,
@@ -27,9 +32,7 @@ class EnergyBar(
         energyHolder.energyPlusProvider, energyHolder.energyMinusProvider
     )
     
-    override fun createBarItem(section: Int) = reactiveItem(
-        energy, maxEnergy, energyPlus, energyMinus
-    ) { energy, maxEnergy, energyPlus, energyMinus ->
+    override fun createBarItem(section: Int) = AutoUpdateItem(1) {
         val builder = createItemBuilder(DefaultGuiItems.BAR_RED, section, energy.toDouble() / maxEnergy.toDouble())
         
         if (energy == Long.MAX_VALUE) {
