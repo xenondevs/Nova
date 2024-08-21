@@ -7,11 +7,11 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.collections.enumSet
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
+import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.DefaultItemHolder.Companion.DEFAULT_CHANNELS
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.util.CUBE_FACES
 
 internal abstract class VanillaItemHolder(
     compound: Provider<Compound>
@@ -19,9 +19,9 @@ internal abstract class VanillaItemHolder(
     
     override val mergedInventory: NetworkedInventory? = null
     
-    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType> by
-    compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-        .defaultsToLazily { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.INSERT } }
+    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
+        by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
+            .defaultsToLazily { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.BUFFER } }
     
     override val allowedFaces: Set<BlockFace>
         get() = connectionConfig.mapNotNullTo(enumSet()) { (face, type) ->
