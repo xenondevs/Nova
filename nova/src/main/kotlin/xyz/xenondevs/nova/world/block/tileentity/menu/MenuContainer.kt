@@ -12,13 +12,18 @@ import kotlin.reflect.KParameter
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.isAccessible
 
+// TODO: simplify this and make everything individual menus
+
 abstract class MenuContainer internal constructor() {
     
     private val openWindows = ArrayList<Window>()
     
     fun registerWindow(window: Window) {
         window.addOpenHandler { openWindows += window }
-        window.addCloseHandler { openWindows -= window }
+        window.addCloseHandler { 
+            openWindows -= window 
+            handleClosed(window.viewer!!)
+        }
     }
     
     fun closeWindows() {
@@ -34,6 +39,8 @@ abstract class MenuContainer internal constructor() {
     }
     
     abstract fun openWindow(player: Player)
+    
+    protected abstract fun handleClosed(player: Player)
     
     @PublishedApi
     internal abstract fun getMenusInternal(): Sequence<TileEntity.TileEntityMenu>
@@ -75,6 +82,10 @@ internal class IndividualMenuContainer internal constructor(
         menus.getOrPut(player) { ctor.call(tileEntity, player) }.openWindow()
     }
     
+    override fun handleClosed(player: Player) {
+        menus.remove(player)
+    }
+    
     override fun getMenusInternal(): Sequence<TileEntity.TileEntityMenu> {
         return menus.values.asSequence()
     }
@@ -82,11 +93,12 @@ internal class IndividualMenuContainer internal constructor(
 }
 
 internal class GlobalMenuContainer internal constructor(
-    tileEntity: TileEntity,
-    ctor: KFunction<GlobalTileEntityMenu>
+    private val tileEntity: TileEntity,
+    private val ctor: KFunction<GlobalTileEntityMenu>
 ) : MenuContainer() {
     
-    private val menu = lazy { ctor.call(tileEntity) }
+    private var menu: GlobalTileEntityMenu? = null
+    private var viewers = 0
     
     init {
         val params = ctor.parameters
@@ -96,11 +108,21 @@ internal class GlobalMenuContainer internal constructor(
     }
     
     override fun openWindow(player: Player) {
-        menu.value.openWindow(player)
+        menu = ctor.call(tileEntity)
+            .also { it.openWindow(player) }
+        viewers++
+    }
+    
+    override fun handleClosed(player: Player) {
+        viewers--
+        if (viewers <= 0) {
+            menu = null
+        }
     }
     
     override fun getMenusInternal(): Sequence<TileEntity.TileEntityMenu> {
-        return if (menu.isInitialized()) sequenceOf(menu.value) else emptySequence()
+        val menu = menu
+        return if (menu != null) sequenceOf(menu) else emptySequence()
     }
     
 }
