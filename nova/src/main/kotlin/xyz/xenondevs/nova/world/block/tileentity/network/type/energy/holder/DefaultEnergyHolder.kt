@@ -49,7 +49,7 @@ class DefaultEnergyHolder(
     /**
      * The maximum amount of energy this [EnergyHolder] can store.
      */
-    val maxEnergy: Long by maxEnergyProvider
+    override val maxEnergy: Long by maxEnergyProvider
     
     /**
      * A [Provider] for the current energy amount.
@@ -69,12 +69,14 @@ class DefaultEnergyHolder(
     /**
      * The amount of energy that was extracted during the last energy network tick.
      */
-    val energyMinus: Long by _energyMinusProvider
+    var energyMinus: Long by _energyMinusProvider
+        private set
     
     /**
      * The amount of energy that was inserted during the last energy network tick.
      */
-    val energyPlus: Long by _energyPlusProvider
+    var energyPlus: Long by _energyPlusProvider
+        private set
     
     override var energy: Long
         get() = _energyProvider.get()
@@ -83,17 +85,14 @@ class DefaultEnergyHolder(
             if (_energyProvider.get() != capped) {
                 val energyDelta = capped - _energyProvider.get()
                 if (energyDelta > 0) {
-                    _energyPlusProvider.add(energyDelta)
+                    energyPlus += energyDelta
                 } else {
-                    _energyMinusProvider.add(-energyDelta)
+                    energyMinus -= energyDelta
                 }
                 
                 _energyProvider.set(capped)
             }
         }
-    
-    override val requestedEnergy: Long
-        get() = maxEnergy - energy
     
     internal companion object {
         

@@ -28,9 +28,9 @@ interface EnergyHolder : EndPointDataHolder {
     var energy: Long
     
     /**
-     * The requested amount of energy that networks should try to insert into this [EnergyHolder].
+     * The maximum amount of energy this [EnergyHolder] can store.
      */
-    val requestedEnergy: Long
+    val maxEnergy: Long
     
     override val allowedFaces: Set<BlockFace>
         get() = connectionConfig.mapNotNullTo(enumSet()) { (face, type) ->

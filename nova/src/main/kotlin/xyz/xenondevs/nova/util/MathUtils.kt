@@ -27,16 +27,19 @@ internal fun Double.roundToDecimalPlaces(n: Int): Double {
 }
 
 internal inline fun <T> Iterable<T>.sumOfNoOverflow(selector: (T) -> Long): Long {
-    return try {
-        var sum = 0L
-        for (element in this) {
-            sum = Math.addExact(sum, selector(element))
-        }
+    var sum = 0L
+    for (element in this) {
+        val element = selector(element)
+        val result = sum + element
         
-        sum
-    } catch (e: ArithmeticException) {
-        Long.MAX_VALUE
+        // if the sign of both arguments is different from the result, an overflow occurred
+        if ((sum xor result) and (element xor result) < 0)
+            return Long.MAX_VALUE
+        
+        sum = result
     }
+    
+    return sum
 }
 
 internal fun Int.ceilDiv(other: Int): Int = (this + other - 1) / other

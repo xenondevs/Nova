@@ -6,13 +6,13 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.util.sumOfNoOverflow
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.EnergyHolder
-import xyz.xenondevs.nova.util.sumOfNoOverflow
-import java.util.concurrent.ConcurrentHashMap
+import java.util.BitSet
 import kotlin.math.min
 import kotlin.math.roundToLong
 
@@ -20,18 +20,11 @@ class EnergyNetwork internal constructor(
     networkData: NetworkData<EnergyNetwork>
 ) : Network<EnergyNetwork>, NetworkData<EnergyNetwork> by networkData {
     
-    private val providers = HashSet<EnergyHolder>()
-    private val consumers = HashSet<EnergyHolder>()
-    private val buffers = HashSet<EnergyHolder>()
+    private val providers = ArrayList<EnergyHolder>()
+    private val consumers = ArrayList<EnergyHolder>()
+    private val buffers = ArrayList<EnergyHolder>()
     private val complexity: Int
-    
     private val transferRate: Long
-    private val availableProviderEnergy: Long
-        get() = providers.sumOfNoOverflow { it.energy }
-    private val availableBufferEnergy: Long
-        get() = buffers.sumOfNoOverflow { it.energy }
-    private val requestedConsumerEnergy: Long
-        get() = consumers.sumOfNoOverflow { it.requestedEnergy }
     
     init {
         var transferRate = DEFAULT_TRANSFER_RATE
@@ -69,94 +62,161 @@ class EnergyNetwork internal constructor(
     }
     
     /**
-     * Called every tick to transfer energy.
+     * Transfers energy between [providers], [consumers] and [buffers] in four steps:
+     * 
+     * 1. Transfer energy from [providers] to [consumers], giving an equal amount of energy to every consumer
+     * and taking an equal amount of energy from every provider, if possible.
+     * 2. Transfer energy from [buffers] to [consumers], giving an equal amount of energy to every consumer
+     * and taking an equal amount of energy from every buffer, if possible.
+     * 3. Transfer energy from [providers] to [buffers], giving an equal amount of energy to every buffer
+     * and taking an equal amount of energy from every provider, if possible.
+     * 4. Balance the energy between [buffers] so that all buffers have the same percentage of energy filled.
+     * 
+     * Depending on the [transferRate] and amount of energy transferred in each step, later steps might not be executed.
      */
     fun tick() {
         if (MAX_COMPLEXITY != -1 && complexity > MAX_COMPLEXITY)
             return
         
-        val providerEnergy = min(transferRate, availableProviderEnergy)
-        val bufferEnergy = min(transferRate - providerEnergy, availableBufferEnergy)
-        val requestedEnergy = min(transferRate, requestedConsumerEnergy)
+        var transferCapacity = transferRate
+        val ignoredProviders = BitSet(providers.size)
+        val ignoredConsumers = BitSet(consumers.size)
         
-        val useBuffers = requestedEnergy > providerEnergy
+        // 1. transfer energy from providers to consumers
+        if (providers.isNotEmpty() && consumers.isNotEmpty()) {
+            val energy = min(transferCapacity, providers.sumOfNoOverflow { it.energy })
+            val distributed = distributeEqually(energy, consumers, ignoredConsumers)
+            takeEqually(distributed, providers, ignoredProviders)
+            transferCapacity -= distributed
+            if (transferCapacity <= 0)
+                return
+        }
         
-        val availableEnergy = providerEnergy + if (useBuffers) bufferEnergy else 0
+        // 2. transfer energy from buffers to consumers
+        if (buffers.isNotEmpty() && consumers.isNotEmpty()) {
+            val energy = min(transferCapacity, buffers.sumOfNoOverflow { it.energy })
+            val distributed = distributeEqually(energy, consumers, ignoredConsumers)
+            takeEqually(distributed, buffers, BitSet(buffers.size))
+            transferCapacity -= distributed
+            if (transferCapacity <= 0)
+                return
+        }
         
-        var energy = availableEnergy
-        energy = distributeEqually(energy, consumers)
-        if (!useBuffers && energy > 0) energy = distributeEqually(energy, buffers) // didn't take energy from buffers, can fill them up
+        // 3. transfer energy from providers to buffers
+        if (providers.isNotEmpty() && buffers.isNotEmpty()) {
+            val energy = min(transferCapacity, providers.sumOfNoOverflow { it.energy })
+            val distributed = distributeEqually(energy, buffers, BitSet(buffers.size))
+            takeEqually(distributed, providers, ignoredProviders)
+            transferCapacity -= distributed
+            if (transferCapacity <= 0)
+                return
+        }
         
-        var energyDeficit = availableEnergy - energy
-        energyDeficit = takeEqually(energyDeficit, providers)
-        if (energyDeficit != 0L && useBuffers) energyDeficit = takeEqually(energyDeficit, buffers)
-        
-        if (energyDeficit != 0L) throw IllegalStateException("Not enough energy: $energyDeficit") // should never happen
+        // 4. balance buffers
+        if (buffers.size >= 2) {
+            balance(transferCapacity, buffers)
+        }
     }
     
-    private fun distributeEqually(energy: Long, consumers: Iterable<EnergyHolder>): Long {
-        var availableEnergy = energy
+    private fun distributeEqually(energy: Long, consumers: List<EnergyHolder>, ignored: BitSet) =
+        modifyEqually(energy, consumers, ignored, { it.maxEnergy - it.energy }, { holder, energy -> holder.energy += energy })
+    
+    private fun takeEqually(energy: Long, providers: List<EnergyHolder>, ignored: BitSet) =
+        modifyEqually(energy, providers, ignored, EnergyHolder::energy) { holder, energy -> holder.energy -= energy }
+    
+    private inline fun modifyEqually(
+        energy: Long,
+        holders: List<EnergyHolder>,
+        ignored: BitSet,
+        value: (EnergyHolder) -> Long,
+        apply: (EnergyHolder, Long) -> Unit
+    ): Long {
+        var remaining = energy
         
-        val consumerMap = ConcurrentHashMap<EnergyHolder, Long>()
-        consumerMap += consumers
-            .filterNot { it.requestedEnergy == 0L }
-            .map { it to it.requestedEnergy }
-        
-        while (availableEnergy != 0L && consumerMap.isNotEmpty()) {
-            val distribution = availableEnergy / consumerMap.size
-            if (distribution == 0L) break
+        while (remaining > 0) {
+            val ignoredHolderCount = ignored.cardinality()
+            if (ignoredHolderCount == holders.size)
+                break
             
-            for ((consumer, requestedAmount) in consumerMap) {
-                val energyToGive = min(distribution, requestedAmount)
-                consumer.energy += energyToGive
-                if (energyToGive == requestedAmount) consumerMap -= consumer // consumer is satisfied
-                else consumerMap[consumer] = requestedAmount - energyToGive // consumer is not satisfied
-                availableEnergy -= energyToGive
+            val energyPerHolder = remaining / (holders.size - ignoredHolderCount)
+            if (energyPerHolder <= 0)
+                break
+            
+            for ((idx, holder) in holders.withIndex()) {
+                if (ignored[idx])
+                    continue
+                
+                val energyForHolder = min(energyPerHolder, value(holder))
+                apply(holder, energyForHolder)
+                remaining -= energyForHolder
+                
+                if (value(holder) <= 0)
+                    ignored.set(idx)
             }
         }
         
-        return availableEnergy
-    }
-    
-    private fun takeEqually(energy: Long, providers: Iterable<EnergyHolder>): Long {
-        var energyDeficit = energy
-        
-        val providerMap = ConcurrentHashMap<EnergyHolder, Long>()
-        providerMap += providers
-            .filterNot { it.energy == 0L }
-            .map { it to it.energy }
-        
-        while (energyDeficit != 0L && providerMap.isNotEmpty()) {
-            val distribution = energyDeficit / providerMap.size
-            if (distribution != 0L) {
-                for ((provider, providedAmount) in providerMap) {
-                    val take = min(distribution, providedAmount)
-                    energyDeficit -= take
-                    provider.energy -= take
-                    if (take == providedAmount) providerMap -= provider // provider has no more energy
-                    else providerMap[provider] = providedAmount - take // provider has less energy
-                }
-            } else {
-                // can't split up equally
-                return takeFirst(energyDeficit, providers)
+        // The remaining energy is smaller than the non-ignored holder count and can thus not be distributed equally to all holders.
+        // Instead, the remaining energy is just given to the first holders that can take it.
+        if (remaining > 0) {
+            for ((idx, holder) in holders.withIndex()) {
+                if (ignored[idx])
+                    continue
+                
+                val energyForHolder = min(remaining, value(holder))
+                apply(holder, energyForHolder)
+                remaining -= energyForHolder
+                
+                if (remaining <= 0)
+                    break
             }
         }
         
-        return energyDeficit
+        return energy - remaining
     }
     
-    private fun takeFirst(energy: Long, providers: Iterable<EnergyHolder>): Long {
-        var energyDeficit = energy
-        for (provider in providers) {
-            val take = min(energyDeficit, provider.energy)
-            energyDeficit -= take
-            provider.energy -= take
-            
-            if (energyDeficit == 0L) break
-        }
+    private fun balance(energy: Long, buffers: List<EnergyHolder>) {
+        var transferCapacity = energy
         
-        return energyDeficit
+        val totalEnergy = buffers.sumOfNoOverflow { it.energy }
+        val totalCapacity = buffers.sumOfNoOverflow { it.maxEnergy }
+        val targetFillFrac = totalEnergy.toDouble() / totalCapacity.toDouble()
+        
+        val sortedBuffers = buffers.toMutableList()
+        while (transferCapacity > 0 && sortedBuffers.size >= 2) {
+            sortedBuffers.sortBy { it.fillFrac }
+            
+            val lowestFillHolder = sortedBuffers.first()
+            val highestFillHolder = sortedBuffers.last()
+            val lowestFillFrac = lowestFillHolder.fillFrac
+            val highestFillFrac = highestFillHolder.fillFrac
+            
+            // are buffers already balanced?
+            if (highestFillFrac <= lowestFillFrac)
+                break
+            
+            val available = ((highestFillHolder.fillFrac - targetFillFrac) * highestFillHolder.maxEnergy).toLong()
+            val required = ((targetFillFrac - lowestFillHolder.fillFrac) * lowestFillHolder.maxEnergy).toLong()
+            
+            // the holders with highest/lowest fraction don't necessarily have the highest resolution
+            // so we remove them from the list if they can't transfer any energy
+            if (available <= 0 || required <= 0) {
+                if (available <= 0)
+                    sortedBuffers.removeLast()
+                if (required <= 0)
+                    sortedBuffers.removeFirst()
+                
+                continue
+            }
+            
+            val transferAmount = minOf(transferCapacity, available, required)
+            highestFillHolder.energy -= transferAmount
+            lowestFillHolder.energy += transferAmount
+            transferCapacity -= transferAmount
+        }
     }
+    
+    private val EnergyHolder.fillFrac: Double
+        get() = energy.toDouble() / maxEnergy.toDouble()
     
     companion object {
         
