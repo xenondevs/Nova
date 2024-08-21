@@ -44,13 +44,13 @@ class ItemModelData internal constructor(
      * Creates a new [ItemBuilder] in client-side format, using the given [name], [lore], and [modelId].
      */
     fun createClientsideItemBuilder(name: Component? = null, lore: List<Component>? = null, modelId: String = "default"): ItemBuilder =
-        ItemBuilder(createClientsideItemStack(modelId)).apply(name, lore)
+        ItemBuilder(clientsideProviders[modelId]!!.get().clone()).apply(name, lore)
     
     /**
      * Creates a new [ItemBuilder] in client-side format using the given [name], [lore] and [modelId].
      */
     fun createClientsideItemBuilder(name: Component? = null, lore: List<Component>? = null, modelId: Int): ItemBuilder =
-        ItemBuilder(createClientsideItemStack(modelId)).apply(name, lore)
+        ItemBuilder(unnamedClientsideProviders[modelId].get().clone()).apply(name, lore)
     
     private fun ItemBuilder.apply(name: Component? = null, lore: List<Component>? = null): ItemBuilder {
         if (name != null)
