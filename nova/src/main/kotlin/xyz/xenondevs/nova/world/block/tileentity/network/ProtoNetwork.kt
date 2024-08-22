@@ -335,6 +335,10 @@ class ProtoNetwork<T : Network<T>>(
         dirty = false
     }
     
+    override fun toString(): String {
+        return "ProtoNetwork(type=$type, uuid=$uuid, nodes=$nodes)"
+    }
+    
     companion object {
         
         private const val MAGIC: Int = 0x4E564E54 // "NVNT" 

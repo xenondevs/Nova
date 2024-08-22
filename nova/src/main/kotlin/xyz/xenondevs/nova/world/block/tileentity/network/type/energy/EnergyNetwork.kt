@@ -30,30 +30,35 @@ class EnergyNetwork internal constructor(
         var transferRate = DEFAULT_TRANSFER_RATE
         var complexity = 0
         
-        for ((node, faces) in networkData.nodes.values) {
-            if (node is NetworkEndPoint) {
-                val energyHolder = node.holders.firstInstanceOfOrNull<EnergyHolder>()
-                    ?: continue
-                
-                var insert = false
-                var extract = false
-                for (face in faces) {
-                    val connectionType = energyHolder.connectionConfig[face]
-                        ?: throw IllegalArgumentException("Missing connection config for $face")
-                    insert = insert || connectionType.insert
-                    extract = extract || connectionType.extract
+        for ((pos, con) in networkData.nodes) {
+            val (node, faces) = con
+            try {
+                if (node is NetworkEndPoint) {
+                    val energyHolder = node.holders.firstInstanceOfOrNull<EnergyHolder>()
+                        ?: continue
+                    
+                    var insert = false
+                    var extract = false
+                    for (face in faces) {
+                        val connectionType = energyHolder.connectionConfig[face]
+                            ?: throw IllegalArgumentException("Missing connection config for $face")
+                        insert = insert || connectionType.insert
+                        extract = extract || connectionType.extract
+                    }
+                    
+                    when (NetworkConnectionType.of(insert, extract)) {
+                        NetworkConnectionType.BUFFER -> buffers += energyHolder
+                        NetworkConnectionType.INSERT -> consumers += energyHolder
+                        NetworkConnectionType.EXTRACT -> providers += energyHolder
+                        else -> throw IllegalArgumentException("Invalid connection config for $energyHolder")
+                    }
+                    
+                    complexity++
+                } else if (node is EnergyBridge) {
+                    transferRate = min(transferRate, node.energyTransferRate)
                 }
-                
-                when (NetworkConnectionType.of(insert, extract)) {
-                    NetworkConnectionType.BUFFER -> buffers += energyHolder
-                    NetworkConnectionType.INSERT -> consumers += energyHolder
-                    NetworkConnectionType.EXTRACT -> providers += energyHolder
-                    else -> throw IllegalArgumentException("Invalid connection config for $energyHolder")
-                }
-                
-                complexity++
-            } else if (node is EnergyBridge) {
-                transferRate = min(transferRate, node.energyTransferRate)
+            } catch (e: Exception) {
+                throw Exception("Failed to add to energy network: $pos $con", e)
             }
         }
         
@@ -63,7 +68,7 @@ class EnergyNetwork internal constructor(
     
     /**
      * Transfers energy between [providers], [consumers] and [buffers] in four steps:
-     * 
+     *
      * 1. Transfer energy from [providers] to [consumers], giving an equal amount of energy to every consumer
      * and taking an equal amount of energy from every provider, if possible.
      * 2. Transfer energy from [buffers] to [consumers], giving an equal amount of energy to every consumer
@@ -71,7 +76,7 @@ class EnergyNetwork internal constructor(
      * 3. Transfer energy from [providers] to [buffers], giving an equal amount of energy to every buffer
      * and taking an equal amount of energy from every provider, if possible.
      * 4. Balance the energy between [buffers] so that all buffers have the same percentage of energy filled.
-     * 
+     *
      * Depending on the [transferRate] and amount of energy transferred in each step, later steps might not be executed.
      */
     fun tick() {

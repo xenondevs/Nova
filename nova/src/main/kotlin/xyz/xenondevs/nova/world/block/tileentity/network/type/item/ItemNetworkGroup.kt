@@ -3,12 +3,12 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.item
 
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.util.RoundRobinCounter
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkGroup
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkGroupData
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemNetwork.Companion.MAX_COMPLEXITY
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.channel.FilteredNetworkedInventory
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
-import xyz.xenondevs.nova.util.RoundRobinCounter
 
 internal class ItemNetworkGroup(data: NetworkGroupData<ItemNetwork>) : NetworkGroup<ItemNetwork>, NetworkGroupData<ItemNetwork> by data {
     

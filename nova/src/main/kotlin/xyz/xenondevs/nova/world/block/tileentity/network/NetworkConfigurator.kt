@@ -20,14 +20,14 @@ import xyz.xenondevs.commons.collections.mapToBooleanArray
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.task.LoadChunkTask
 import xyz.xenondevs.nova.world.block.tileentity.network.task.NetworkTask
 import xyz.xenondevs.nova.world.block.tileentity.network.task.ProtectedNodeNetworkTask
 import xyz.xenondevs.nova.world.block.tileentity.network.task.ProtectionResult
 import xyz.xenondevs.nova.world.block.tileentity.network.task.UnloadChunkTask
-import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
@@ -181,11 +181,15 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     }
     
     private fun <T : Network<T>> buildDirtyNetwork(protoNetwork: ProtoNetwork<T>): Network<T> {
-        val data = protoNetwork.immutableCopy()
-        val network = protoNetwork.type.createNetwork(data)
-        protoNetwork.network = network
-        protoNetwork.markClean()
-        return network
+        try {
+            val data = protoNetwork.immutableCopy()
+            val network = protoNetwork.type.createNetwork(data)
+            protoNetwork.network = network
+            protoNetwork.markClean()
+            return network
+        } catch(e: Exception) {
+            throw Exception("Failed to build dirty network: $protoNetwork", e)
+        }
     }
     
     private fun verifyClusters(protoClusters: Set<ProtoNetworkCluster>) {

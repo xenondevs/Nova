@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHo
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-// TODO: block updates
+// TODO: block updates?
 class ItemNetwork internal constructor(
     networkData: NetworkData<ItemNetwork>
 ) : Network<ItemNetwork>, NetworkData<ItemNetwork> by networkData {
@@ -31,15 +31,20 @@ class ItemNetwork internal constructor(
         var transferRate = DEFAULT_TRANSFER_RATE
         var complexity = 0
         val channelsBuilder = ItemChannelsBuilder()
-        for ((node, faces) in nodes.values) {
-            if (node is NetworkEndPoint) {
-                val itemHolder = node.holders.firstInstanceOfOrNull<ItemHolder>()
-                    ?: continue
-                
-                channelsBuilder.addHolder(itemHolder, faces)
-                complexity++
-            } else if (node is ItemBridge) {
-                transferRate = min(transferRate, node.itemTransferRate)
+        for ((pos, con) in nodes) {
+            val (node, faces) = con
+            try {
+                if (node is NetworkEndPoint) {
+                    val itemHolder = node.holders.firstInstanceOfOrNull<ItemHolder>()
+                        ?: continue
+                    
+                    channelsBuilder.addHolder(itemHolder, faces)
+                    complexity++
+                } else if (node is ItemBridge) {
+                    transferRate = min(transferRate, node.itemTransferRate)
+                }
+            } catch (e: Exception) {
+                throw Exception("Failed to add to item network: $pos $con", e)
             }
         }
         

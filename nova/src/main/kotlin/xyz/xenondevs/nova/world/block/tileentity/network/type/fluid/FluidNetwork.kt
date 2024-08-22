@@ -31,21 +31,26 @@ class FluidNetwork internal constructor(
         var transferRate = DEFAULT_TRANSFER_RATE
         var complexity = 0
         
-        for ((node, faces) in networkData.nodes.values) {
-            if (node is NetworkEndPoint) {
-                val fluidHolder = node.holders.firstInstanceOfOrNull<FluidHolder>()
-                    ?: continue
-                
-                for ((face, channelId) in fluidHolder.channels) {
-                    if (face in faces) {
-                        val channel = channels.getOrSet(channelId, ::FluidNetworkChannel)
-                        channel.addHolder(fluidHolder, face)
+        for ((pos, con) in networkData.nodes) {
+            val (node, faces) = con
+            try {
+                if (node is NetworkEndPoint) {
+                    val fluidHolder = node.holders.firstInstanceOfOrNull<FluidHolder>()
+                        ?: continue
+                    
+                    for ((face, channelId) in fluidHolder.channels) {
+                        if (face in faces) {
+                            val channel = channels.getOrSet(channelId, ::FluidNetworkChannel)
+                            channel.addHolder(fluidHolder, face)
+                        }
                     }
+                    
+                    complexity++
+                } else if (node is FluidBridge) {
+                    transferRate = min(transferRate, node.fluidTransferRate)
                 }
-                
-                complexity++
-            } else if (node is FluidBridge) {
-                transferRate = min(transferRate, node.fluidTransferRate)
+            } catch (e: Exception) {
+                throw Exception("Failed to add to fluid network: $pos $con", e)
             }
         }
         
