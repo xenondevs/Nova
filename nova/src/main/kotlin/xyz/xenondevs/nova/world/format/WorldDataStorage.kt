@@ -118,18 +118,18 @@ internal class WorldDataStorage(val world: World) {
      * Saves all Nova data related to this world.
      */
     suspend fun save(unload: Boolean = true) = withContext(Dispatchers.Default) { // TODO: save in background
-        for ((rid, deferredRegionFile) in blockRegionFiles) {
-            launch {
-                val regionFile = deferredRegionFile.await()
-                regionFile.save()
-                
-                // unload unused region files
-                if (unload && !regionFile.isAnyChunkEnabled())
-                    blockRegionFiles -= rid
-            }
-        }
-        
         networkState.mutex.withLock {
+            for ((rid, deferredRegionFile) in blockRegionFiles) {
+                launch {
+                    val regionFile = deferredRegionFile.await()
+                    regionFile.save()
+                    
+                    // unload unused region files
+                    if (unload && !regionFile.isAnyChunkEnabled())
+                        blockRegionFiles -= rid
+                }
+            }
+            
             for ((rid, deferredRegionFile) in networkRegionFiles) {
                 launch {
                     val regionFile = deferredRegionFile.await()
