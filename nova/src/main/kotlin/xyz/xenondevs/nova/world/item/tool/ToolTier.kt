@@ -2,16 +2,19 @@
 
 package xyz.xenondevs.nova.world.item.tool
 
+import net.minecraft.core.HolderSet
+import net.minecraft.core.component.DataComponents
 import net.minecraft.resources.ResourceLocation
-import org.bukkit.Material
+import net.minecraft.tags.BlockTags
 import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.world.item.behavior.Tool
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.novaBlock
+import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
+import xyz.xenondevs.nova.world.item.behavior.Tool
 
 class ToolTier(
     val id: ResourceLocation,
@@ -57,15 +60,38 @@ class ToolTier(
             if (novaLevel != null)
                 return novaLevel
             
-            return when (item.type) {
-                Material.WOODEN_SWORD, Material.WOODEN_SHOVEL, Material.WOODEN_PICKAXE, Material.WOODEN_AXE, Material.WOODEN_HOE -> VanillaToolTiers.WOOD
-                Material.GOLDEN_SWORD, Material.GOLDEN_SHOVEL, Material.GOLDEN_PICKAXE, Material.GOLDEN_AXE, Material.GOLDEN_HOE -> VanillaToolTiers.GOLD
-                Material.STONE_SWORD, Material.STONE_SHOVEL, Material.STONE_PICKAXE, Material.STONE_AXE, Material.STONE_HOE -> VanillaToolTiers.STONE
-                Material.IRON_SWORD, Material.IRON_SHOVEL, Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_HOE -> VanillaToolTiers.IRON
-                Material.DIAMOND_SWORD, Material.DIAMOND_SHOVEL, Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_HOE -> VanillaToolTiers.DIAMOND
-                Material.NETHERITE_SWORD, Material.NETHERITE_SHOVEL, Material.NETHERITE_PICKAXE, Material.NETHERITE_AXE, Material.NETHERITE_HOE -> VanillaToolTiers.NETHERITE
-                else -> null
+            val rules = item.unwrap().get(DataComponents.TOOL)?.rules
+                ?: return null
+            
+            val tiers = HashSet<ToolTier>()
+            for (rule in rules) {
+                val correctForDrops = rule.correctForDrops
+                if (correctForDrops.isEmpty)
+                    continue
+                
+                val key = (rule.blocks as? HolderSet.Named<*>)?.key()
+                    ?: continue
+                
+                if (correctForDrops.get()) {
+                    tiers += when (key) {
+                        BlockTags.NEEDS_DIAMOND_TOOL -> VanillaToolTiers.DIAMOND
+                        BlockTags.NEEDS_IRON_TOOL -> VanillaToolTiers.IRON
+                        BlockTags.NEEDS_STONE_TOOL -> VanillaToolTiers.STONE
+                        else -> continue
+                    }
+                } else {
+                    tiers += when (key) {
+                        BlockTags.INCORRECT_FOR_NETHERITE_TOOL -> VanillaToolTiers.NETHERITE
+                        BlockTags.INCORRECT_FOR_DIAMOND_TOOL -> VanillaToolTiers.DIAMOND
+                        BlockTags.INCORRECT_FOR_IRON_TOOL -> VanillaToolTiers.IRON
+                        BlockTags.INCORRECT_FOR_STONE_TOOL -> VanillaToolTiers.STONE
+                        BlockTags.INCORRECT_FOR_WOODEN_TOOL -> VanillaToolTiers.WOOD
+                        else -> continue
+                    }
+                }
             }
+            
+            return tiers.maxBy { it.levelValue }
         }
         
         fun isCorrectLevel(block: Block, tool: ItemStack?): Boolean {

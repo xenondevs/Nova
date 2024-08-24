@@ -1,14 +1,18 @@
 package xyz.xenondevs.nova.world.item.tool
 
+import net.minecraft.core.HolderSet
+import net.minecraft.core.component.DataComponents
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.BlockTags
 import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.world.item.behavior.Tool
 import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.item.behavior.Tool
 import xyz.xenondevs.nova.world.pos
 
 /**
@@ -34,20 +38,25 @@ open class ToolCategory internal constructor(
             if (novaCategory != null)
                 return novaCategory
             
-            val type = item.type
+            val rules = item.unwrap().get(DataComponents.TOOL)?.rules
+                ?: return emptySet()
+            
             val categories = HashSet<ToolCategory>()
-            if (Tag.ITEMS_SHOVELS.isTagged(type))
-                categories.add(VanillaToolCategories.SHOVEL)
-            if (Tag.ITEMS_PICKAXES.isTagged(type))
-                categories.add(VanillaToolCategories.PICKAXE)
-            if (Tag.ITEMS_AXES.isTagged(type))
-                categories.add(VanillaToolCategories.AXE)
-            if (Tag.ITEMS_HOES.isTagged(type))
-                categories.add(VanillaToolCategories.HOE)
-            if (Tag.ITEMS_SWORDS.isTagged(type))
-                categories.add(VanillaToolCategories.SWORD)
-            if (type == Material.SHEARS)
-                categories.add(VanillaToolCategories.SHEARS)
+            for (rule in rules) {
+                if (!rule.correctForDrops.orElse(false))
+                    continue
+                val tagKey = (rule.blocks as? HolderSet.Named<*>)?.key()
+                    ?: continue
+                
+                categories += when (tagKey) {
+                    BlockTags.MINEABLE_WITH_AXE -> VanillaToolCategories.AXE
+                    BlockTags.MINEABLE_WITH_HOE -> VanillaToolCategories.HOE
+                    BlockTags.MINEABLE_WITH_PICKAXE -> VanillaToolCategories.PICKAXE
+                    BlockTags.MINEABLE_WITH_SHOVEL -> VanillaToolCategories.SHOVEL
+                    BlockTags.LEAVES, BlockTags.WOOL -> VanillaToolCategories.SHEARS
+                    else -> continue
+                }
+            }
             
             return categories
         }

@@ -34,7 +34,6 @@ import xyz.xenondevs.nova.world.item.tool.ToolTier
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.world.pos
-import kotlin.jvm.optionals.getOrNull
 import net.minecraft.world.item.component.Tool as MojangTool
 import net.minecraft.world.level.block.Block as MojangBlock
 
@@ -53,17 +52,11 @@ object ToolUtils {
         } else if (!(block as CraftBlock).nms.requiresCorrectToolForDrops()) return true
         
         val toolComponent = tool?.unwrap()?.get(DataComponents.TOOL)
-        if (toolComponent != null) {
-            if (novaBlock != null) {
-                // vanilla tool, Nova block
-                val blockCategories = novaBlock.getBehaviorOrNull<Breakable>()?.toolCategories ?: emptySet()
-                return findMatchingToolComponentRules(toolComponent, blockCategories)
-                    .any { it.correctForDrops.getOrNull() == true }
-            } else {
-                // vanilla tool, vanilla block
-                return toolComponent.isCorrectForDrops(block.nmsState)
-            }
+        if (toolComponent != null && novaBlock == null) {
+            // vanilla tool, vanilla block
+            return toolComponent.isCorrectForDrops(block.nmsState)
         } else {
+            // mix of vanilla and Nova tool/block
             return ToolCategory.hasCorrectToolCategory(block, tool) && ToolTier.isCorrectLevel(block, tool)
         }
     }
