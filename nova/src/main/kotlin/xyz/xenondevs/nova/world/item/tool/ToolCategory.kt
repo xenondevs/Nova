@@ -38,25 +38,42 @@ open class ToolCategory internal constructor(
             if (novaCategory != null)
                 return novaCategory
             
-            val rules = item.unwrap().get(DataComponents.TOOL)?.rules
-                ?: return emptySet()
-            
             val categories = HashSet<ToolCategory>()
-            for (rule in rules) {
-                if (!rule.correctForDrops.orElse(false))
-                    continue
-                val tagKey = (rule.blocks as? HolderSet.Named<*>)?.key()
-                    ?: continue
-                
-                categories += when (tagKey) {
-                    BlockTags.MINEABLE_WITH_AXE -> VanillaToolCategories.AXE
-                    BlockTags.MINEABLE_WITH_HOE -> VanillaToolCategories.HOE
-                    BlockTags.MINEABLE_WITH_PICKAXE -> VanillaToolCategories.PICKAXE
-                    BlockTags.MINEABLE_WITH_SHOVEL -> VanillaToolCategories.SHOVEL
-                    BlockTags.LEAVES, BlockTags.WOOL -> VanillaToolCategories.SHEARS
-                    else -> continue
+            
+            // guess type from tool rules
+            val rules = item.unwrap().get(DataComponents.TOOL)?.rules
+            if (rules != null) {
+                for (rule in rules) {
+                    if (!rule.correctForDrops.orElse(false))
+                        continue
+                    val tagKey = (rule.blocks as? HolderSet.Named<*>)?.key()
+                        ?: continue
+                    
+                    categories += when (tagKey) {
+                        BlockTags.MINEABLE_WITH_AXE -> VanillaToolCategories.AXE
+                        BlockTags.MINEABLE_WITH_HOE -> VanillaToolCategories.HOE
+                        BlockTags.MINEABLE_WITH_PICKAXE -> VanillaToolCategories.PICKAXE
+                        BlockTags.MINEABLE_WITH_SHOVEL -> VanillaToolCategories.SHOVEL
+                        BlockTags.LEAVES, BlockTags.WOOL -> VanillaToolCategories.SHEARS
+                        else -> continue
+                    }
                 }
             }
+            
+            // read type from type tags
+            val type = item.type
+            if (Tag.ITEMS_SHOVELS.isTagged(type))
+                categories += VanillaToolCategories.SHOVEL
+            if (Tag.ITEMS_PICKAXES.isTagged(type))
+                categories += VanillaToolCategories.PICKAXE
+            if (Tag.ITEMS_AXES.isTagged(type))
+                categories += VanillaToolCategories.AXE
+            if (Tag.ITEMS_HOES.isTagged(type))
+                categories += VanillaToolCategories.HOE
+            if (Tag.ITEMS_SWORDS.isTagged(type))
+                categories += VanillaToolCategories.SWORD
+            if (type == Material.SHEARS)
+                categories += VanillaToolCategories.SHEARS
             
             return categories
         }
