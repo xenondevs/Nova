@@ -19,6 +19,7 @@ internal data class NoteBackingStateConfig(
     
     override val type = NoteBackingStateConfig
     override val id = getIdOf(instrument, note, powered)
+    override val waterlogged = false
     override val variantString = "instrument=${instrument.name.lowercase()},note=$note,powered=$powered"
     override val vanillaBlockState: BlockState = Blocks.NOTE_BLOCK.defaultBlockState()
         .setValue(NoteBlock.INSTRUMENT, instrument.nmsInstrument)
@@ -35,7 +36,10 @@ internal data class NoteBackingStateConfig(
             return instrument.ordinal * NOTE_BASE * POWERED_BASE + note * POWERED_BASE + powered.intValue
         }
         
-        override fun of(id: Int): NoteBackingStateConfig {
+        override fun of(id: Int, waterlogged: Boolean): NoteBackingStateConfig {
+            if (waterlogged)
+                throw UnsupportedOperationException("Note block cannot be waterlogged")
+            
             return NoteBackingStateConfig(
                 Instrument.entries[id / POWERED_BASE / NOTE_BASE % INSTRUMENT_BASE],
                 id / POWERED_BASE % NOTE_BASE,

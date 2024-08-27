@@ -11,17 +11,17 @@ import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
-import xyz.xenondevs.nova.world.block.tileentity.TileEntity
-import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
-import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
-import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
-import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.addPrioritized
 import xyz.xenondevs.nova.util.dropItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
+import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
+import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
+import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
+import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.world.format.WorldDataManager
 
 /**
@@ -141,7 +141,7 @@ object Bucketable : BlockBehavior {
         return null
     }
     
-    private fun emptyBucketInHand(player: Player, hand: EquipmentSlot) {
+    internal fun emptyBucketInHand(player: Player, hand: EquipmentSlot) {
         val itemStack = player.inventory.getItem(hand)
         val bucket = ItemStack(Material.BUCKET)
         if (itemStack.amount > 1) {
@@ -154,7 +154,7 @@ object Bucketable : BlockBehavior {
         }
     }
     
-    private fun fillBucketInHand(player: Player, hand: EquipmentSlot, fluidType: FluidType) {
+    internal fun fillBucketInHand(player: Player, hand: EquipmentSlot, fluidType: FluidType) {
         val bucket = fluidType.bucket
         player.inventory.getItem(hand).amount--
         player.inventory.addPrioritized(hand, bucket)

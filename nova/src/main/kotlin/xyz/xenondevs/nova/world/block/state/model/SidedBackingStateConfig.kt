@@ -13,6 +13,7 @@ private val POSSIBLE_FACES = arrayOf(BlockFace.NORTH, BlockFace.EAST, BlockFace.
 internal abstract class SidedBackingStateConfig(val faces: Set<BlockFace>, block: Block) : BackingStateConfig() {
     
     override val id = getIdOf(faces)
+    override val waterlogged = false
     override val variantString = POSSIBLE_FACES.joinToString(",") { "${it.name.lowercase()}=${it in faces}" }
     override val vanillaBlockState: BlockState = block.defaultBlockState()
         .setValue(BlockStateProperties.NORTH, BlockFace.NORTH in faces)
@@ -38,7 +39,10 @@ internal abstract class SidedBackingStateConfigType<T : SidedBackingStateConfig>
     override val blockedIds = setOf(63)
     override val defaultStateConfig = of(63)
     
-    final override fun of(id: Int): T {
+    final override fun of(id: Int, waterlogged: Boolean): T {
+        if (waterlogged)
+            throw UnsupportedOperationException("${this.javaClass.simpleName} cannot be waterlogged")
+        
         var i = id
         val faces = enumSet<BlockFace>()
         repeat(POSSIBLE_FACES.size) {

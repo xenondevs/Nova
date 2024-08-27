@@ -7,6 +7,7 @@ internal abstract class BackingStateConfig internal constructor() {
     
     abstract val type: BackingStateConfigType<*>
     abstract val id: Int
+    abstract val waterlogged: Boolean
     abstract val variantString: String
     abstract val vanillaBlockState: BlockState
     
@@ -14,12 +15,13 @@ internal abstract class BackingStateConfig internal constructor() {
         if (other !is BackingStateConfig)
             return false
         
-        return type == other.type && id == other.id
+        return type == other.type && id == other.id && waterlogged == other.waterlogged
     }
     
     override fun hashCode(): Int {
         var result = type.hashCode()
         result = 31 * result + id
+        result = 31 * result + waterlogged.hashCode()
         return result
     }
     
@@ -32,7 +34,7 @@ internal abstract class BackingStateConfigType<T : BackingStateConfig> internal 
     
     abstract val blockedIds: Set<Int>
     
-    abstract fun of(id: Int): T
+    abstract fun of(id: Int, waterlogged: Boolean = false): T
     abstract fun of(properties: Map<String, String>): T
     internal open fun handleMerged(occupiedIds: Set<Int>) = Unit
     

@@ -13,6 +13,7 @@ internal class TripwireBackingStateConfig(
     disarmed: Boolean, powered: Boolean
 ) : BackingStateConfig() {
     
+    override val waterlogged = false
     override val id = 0 or
         (powered.intValue shl 5) or
         (disarmed.intValue shl 4) or
@@ -52,7 +53,10 @@ internal abstract class TripwireBackingStateConfigType private constructor(
     
     override val blockedIds = IntArraySet((0..15).toIntArray())
     
-    override fun of(id: Int): TripwireBackingStateConfig {
+    override fun of(id: Int, waterlogged: Boolean): TripwireBackingStateConfig {
+        if (waterlogged)
+            throw UnsupportedOperationException("Tripwire cannot be waterlogged")
+        
         return TripwireBackingStateConfig(
             this,
             (id and 1) == 1,
@@ -67,12 +71,12 @@ internal abstract class TripwireBackingStateConfigType private constructor(
     override fun of(properties: Map<String, String>): TripwireBackingStateConfig {
         return TripwireBackingStateConfig(
             this,
-            properties["north"]?.toBoolean() ?: false,
-            properties["east"]?.toBoolean() ?: false,
-            properties["south"]?.toBoolean() ?: false,
-            properties["west"]?.toBoolean() ?: false,
-            properties["disarmed"]?.toBoolean() ?: false,
-            properties["powered"]?.toBoolean() ?: false
+            properties["north"]?.toBoolean() == true,
+            properties["east"]?.toBoolean() == true,
+            properties["south"]?.toBoolean() == true,
+            properties["west"]?.toBoolean() == true,
+            properties["disarmed"]?.toBoolean() == true,
+            properties["powered"]?.toBoolean() == true
         )
     }
     

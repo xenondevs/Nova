@@ -6,6 +6,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import xyz.xenondevs.commons.gson.getBoolean
 import xyz.xenondevs.commons.gson.getInt
 import xyz.xenondevs.commons.gson.getString
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
@@ -20,6 +21,7 @@ internal object BackingStateConfigSerialization : JsonSerializer<BackingStateCon
         val obj = JsonObject()
         obj.addProperty("type", src::class.jvmName)
         obj.addProperty("id", src.id)
+        obj.addProperty("waterlogged", src.waterlogged)
         return obj
     }
     
@@ -29,7 +31,7 @@ internal object BackingStateConfigSerialization : JsonSerializer<BackingStateCon
         // TODO: it might be better have a registry for this
         val kclass = Class.forName(json.getString("type")).kotlin
         val type = (kclass.objectInstance ?: kclass.companionObjectInstance) as BackingStateConfigType<BackingStateConfig>
-        return type.of(json.getInt("id"))
+        return type.of(json.getInt("id"), json.getBoolean("waterlogged"))
     }
     
 }
