@@ -194,6 +194,10 @@ open class NovaBlock internal constructor(
         checkServerThread()
         return behaviors.sumOf { it.getExp(pos, state, ctx) }
     }
+    
+    fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack? {
+        return behaviors.firstNotNullOfOrNull { it.pickBlockCreative(pos, state, ctx) } ?: item?.createItemStack()
+    }
     //</editor-fold>
     
     override fun toString() = id.toString()

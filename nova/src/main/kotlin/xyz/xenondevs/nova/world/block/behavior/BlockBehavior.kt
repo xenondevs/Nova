@@ -93,6 +93,11 @@ interface BlockBehavior : BlockBehaviorHolder {
      */
     fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> = emptyList()
     
+    /**
+     * Chooses the [ItemStack] that should be given to the player when mid-clicking a block of [state] at [pos] with the given [ctx] in creative mode.
+     */
+    fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack? = null
+    
 }
 
 /**
