@@ -175,7 +175,7 @@ internal object BlockPlacing : Listener {
             ProtectionManager.canPlace(player, handItem, pos)
             && canPlace(player, handItem, pos, placedOn)
         ) {
-            val placed = BlockUtils.placeVanillaBlock(pos, player.serverPlayer, handItem, true)
+            val placed = BlockUtils.placeVanillaBlock(pos, event.blockFace, player.serverPlayer, handItem, true)
             if (placed && player.gameMode != GameMode.CREATIVE) {
                 player.inventory.setItem(event.hand!!, handItem.apply { amount -= 1 })
             }

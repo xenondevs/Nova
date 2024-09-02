@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.util
 
 import net.kyori.adventure.text.Component
-import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.particles.ParticleTypes
@@ -29,6 +28,7 @@ import net.minecraft.world.phys.shapes.CollisionContext
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.block.Campfire
 import org.bukkit.block.Chest
 import org.bukkit.block.Container
@@ -285,7 +285,14 @@ object BlockUtils {
                     ctx[DefaultContextParamTypes.SOURCE_LOCATION] ?: pos.location,
                     UUID.randomUUID(), ""
                 )
-                return placeVanillaBlock(pos, fakePlayer, itemStack, placeEffects)
+                
+                return placeVanillaBlock(
+                    pos,
+                    ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE] ?: BlockFace.UP, 
+                    fakePlayer, 
+                    itemStack, 
+                    placeEffects
+                )
             }
         }
         
@@ -314,7 +321,7 @@ object BlockUtils {
      * @param placeEffects If the place effects should be played
      * @return If the item could be placed
      */
-    internal fun placeVanillaBlock(pos: BlockPos, player: ServerPlayer, itemStack: ItemStack, placeEffects: Boolean): Boolean {
+    internal fun placeVanillaBlock(pos: BlockPos, clickedFace: BlockFace, player: ServerPlayer, itemStack: ItemStack, placeEffects: Boolean): Boolean {
         val nmsStack = itemStack.unwrap().copy()
         val blockItem = nmsStack.item as BlockItem
         val result = blockItem.place(BlockPlaceContext(UseOnContext(
@@ -324,7 +331,7 @@ object BlockUtils {
             nmsStack,
             BlockHitResult(
                 Vec3(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()),
-                Direction.UP,
+                clickedFace.nmsDirection,
                 pos.nmsPos,
                 false
             )
