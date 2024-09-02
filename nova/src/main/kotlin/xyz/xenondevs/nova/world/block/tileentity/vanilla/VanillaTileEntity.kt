@@ -14,9 +14,6 @@ internal abstract class VanillaTileEntity internal constructor(
     override val data: Compound
 ) : DataHolder(false) {
     
-    val isChunkLoaded
-        get() = pos.chunkPos.isLoaded()
-    
     open fun handleEnable() = Unit
     open fun handleDisable() = Unit
     open fun handlePlace() = Unit
@@ -41,7 +38,7 @@ internal abstract class VanillaTileEntity internal constructor(
         BARREL(::VanillaContainerTileEntity, setOf(Material.BARREL)),
         DISPENSER(::VanillaContainerTileEntity, setOf(Material.DISPENSER)),
         DROPPER(::VanillaContainerTileEntity, setOf(Material.DROPPER)),
-        HOPPER(::VanillaContainerTileEntity, setOf(Material.HOPPER)),
+        HOPPER(::VanillaHopperTileEntity, setOf(Material.HOPPER)),
         SHULKER_BOX(::VanillaContainerTileEntity, setOf(Material.SHULKER_BOX)),
         CAULDRON(::VanillaCauldronTileEntity, setOf(Material.CAULDRON, Material.WATER_CAULDRON, Material.LAVA_CAULDRON), false),
         CRAFTER(::VanillaCrafterTileEntity, setOf(Material.CRAFTER)),

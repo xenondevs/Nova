@@ -5,6 +5,7 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.provider.entry
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.collections.enumSet
+import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
 import xyz.xenondevs.nova.util.CUBE_FACES
@@ -14,14 +15,15 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.Defaul
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 
 internal abstract class VanillaItemHolder(
-    compound: Provider<Compound>
+    compound: Provider<Compound>,
+    defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType>
 ) : ItemHolder {
     
     override val mergedInventory: NetworkedInventory? = null
     
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
         by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-            .defaultsToLazily { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.BUFFER } }
+            .defaultsToLazily { defaultConnectionConfig().toEnumMap() }
     
     override val allowedFaces: Set<BlockFace>
         get() = connectionConfig.mapNotNullTo(enumSet()) { (face, type) ->
@@ -56,8 +58,9 @@ internal abstract class VanillaItemHolder(
 
 internal class StaticVanillaItemHolder(
     compound: Provider<Compound>,
-    override val containerConfig: MutableMap<BlockFace, NetworkedInventory>
-) : VanillaItemHolder(compound) {
+    override val containerConfig: MutableMap<BlockFace, NetworkedInventory>,
+    defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = { CUBE_FACES.associate { it to NetworkConnectionType.BUFFER } }
+) : VanillaItemHolder(compound, defaultConnectionConfig) {
     
     override val blockedFaces: Set<BlockFace>
         get() = emptySet()
@@ -67,8 +70,9 @@ internal class StaticVanillaItemHolder(
 internal class DynamicVanillaItemHolder(
     compound: Provider<Compound>,
     val inventoriesGetter: () -> MutableMap<BlockFace, NetworkedInventory>,
-    val allowedConnectionTypesGetter: () -> Map<NetworkedInventory, NetworkConnectionType>
-) : VanillaItemHolder(compound) {
+    val allowedConnectionTypesGetter: () -> Map<NetworkedInventory, NetworkConnectionType>,
+    defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = { CUBE_FACES.associate { it to NetworkConnectionType.BUFFER } }
+) : VanillaItemHolder(compound, defaultConnectionConfig) {
     
     override val blockedFaces: Set<BlockFace>
         get() = emptySet()
