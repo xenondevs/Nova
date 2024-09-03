@@ -525,12 +525,13 @@ object BlockUtils {
                 preventPacketBroadcast(willDestroy)
             }
             
+            val blockEntity = level.getBlockEntity(nmsPos)
             val removed = level.removeBlock(nmsPos, false)
             if (removed) {
                 block.destroy(level, nmsPos, state)
                 
-                if (drops && !player.isCreative) {
-                    block.playerDestroy(level, player, nmsPos, state, level.getBlockEntity(nmsPos), tool.unwrap().copy())
+                if (!player.isCreative) {
+                    block.playerDestroy(level, player, nmsPos, state, blockEntity, tool.unwrap().copy(), drops, false)
                 }
             }
         }.map { it.item.asBukkitMirror() }
