@@ -4,19 +4,18 @@ import jdk.jfr.Category
 import jdk.jfr.Event
 import jdk.jfr.Label
 import jdk.jfr.Name
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
-import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
@@ -54,7 +53,7 @@ internal class LoadChunkTask(
                 if (node == null || node in state)
                     continue
                 
-                launch(Dispatchers.IO) { // state.resolveOrLoadNetwork likely causes file read
+                launch {
                     when {
                         node is NetworkBridge && data is NetworkBridgeData -> {
                             val networks = data.networks
