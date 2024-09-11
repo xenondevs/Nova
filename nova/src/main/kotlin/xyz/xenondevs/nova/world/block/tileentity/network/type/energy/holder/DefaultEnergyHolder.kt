@@ -8,7 +8,6 @@ import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.MutableProvider
 import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
-import xyz.xenondevs.commons.provider.mutable.orElse
 import xyz.xenondevs.nova.serialization.DataHolder
 import xyz.xenondevs.nova.util.ResettingLongProvider
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
@@ -20,19 +19,21 @@ import kotlin.math.min
  * The default [EnergyHolder] implementation.
  *
  * @param compound the [Compound] for data storage and retrieval
+ * @param energy the [Provider] for the current energy amount
  * @param maxEnergyProvider the maximum amount of energy this [EnergyHolder] can store
  * @param allowedConnectionType determines whether energy can be inserted, extracted, or both
  * @param defaultConnectionConfig the default ([BlockFace], [NetworkConnectionType]) to be used if no configuration is stored
  */
 class DefaultEnergyHolder(
     compound: Provider<Compound>,
+    energy: MutableProvider<Long>,
     val maxEnergyProvider: Provider<Long>,
     override val allowedConnectionType: NetworkConnectionType,
     blockedFaces: Set<BlockFace>,
     defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType>
 ) : EnergyHolder {
     
-    private val _energyProvider: MutableProvider<Long> = compound.entry<Long>("energy").orElse(0L)
+    private val _energyProvider: MutableProvider<Long> = energy
     private val _energyMinusProvider = ResettingLongProvider(EnergyNetwork.TICK_DELAY_PROVIDER)
     private val _energyPlusProvider = ResettingLongProvider(EnergyNetwork.TICK_DELAY_PROVIDER)
     

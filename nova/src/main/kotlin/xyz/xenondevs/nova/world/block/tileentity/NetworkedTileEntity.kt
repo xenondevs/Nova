@@ -12,6 +12,11 @@ import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
+import xyz.xenondevs.nova.util.BlockSide
+import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
@@ -27,11 +32,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHo
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedMultiVirtualInventory
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedVirtualInventory
-import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import java.util.*
 
 abstract class NetworkedTileEntity(
@@ -95,8 +95,16 @@ abstract class NetworkedTileEntity(
         blockedFaces: Set<BlockFace> = emptySet(),
         defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = { CUBE_FACES.associateWithTo(enumMap()) { allowedConnectionType } }
     ): DefaultEnergyHolder {
+        if (hasData("energyHolder")) {
+            val holderCompound = retrieveDataOrNull<Compound>("energyHolder")!!
+            val energy = holderCompound.get<Long>("energy") ?: 0L
+            holderCompound.remove("energy")
+            storeData("energy", energy, true)
+        }
+        
         val holder = DefaultEnergyHolder(
             storedValue("energyHolder", ::Compound),
+            storedValue("energy", true) { 0L },
             maxEnergy,
             allowedConnectionType,
             blockedFaces,
