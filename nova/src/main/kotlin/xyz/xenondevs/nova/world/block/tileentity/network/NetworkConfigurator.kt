@@ -5,12 +5,14 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -82,13 +84,18 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     }
     
     /**
+     * Supervisor job for protection queries.
+     */
+    private val protectionSupervisor = SupervisorJob(NetworkManager.SUPERVISOR)
+    
+    /**
      * Enqueues the [task] to be processed by the appropriate coroutine.
      * Also queries protection in case of [ProtectedNodeNetworkTask].
      */
     fun queueTask(task: NetworkTask): Unit = runBlocking {
         queueLock.withLock {
             if (task is ProtectedNodeNetworkTask)
-                protectionResults[task] = async(Dispatchers.Default) { queryProtection(task.node) }
+                protectionResults[task] = CoroutineScope(protectionSupervisor).async(Dispatchers.Default) { queryProtection(task.node) }
             
             // ensure load chunk task is queued before any other task that might need its data
             val chunkPos = task.chunkPos
@@ -111,6 +118,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
      * Closes the [channel] and waits for all queued tasks to be processed.
      */
     suspend fun awaitShutdown() {
+        protectionSupervisor.cancel()
         channel.close()
         job.join()
     }
@@ -123,7 +131,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
         val owner = node.owner
         if (owner != null) {
             CUBE_FACES
-                .map { face -> async { ProtectionManager.canUseBlock(owner, null, node.pos.advance(face, 1)) } }
+                .map { face -> ProtectionManager.canUseBlockAsync(owner, null, node.pos.advance(face, 1)) }
                 .mapToBooleanArray { it.await() }
                 .let(::ProtectionResult)
         } else ProtectionResult.ALL_ALLOWED
