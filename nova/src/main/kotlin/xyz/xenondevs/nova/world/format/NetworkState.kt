@@ -25,6 +25,8 @@ import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.commons.guava.set
+import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
@@ -32,8 +34,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
 import xyz.xenondevs.nova.world.format.chunk.NetworkNodeData
@@ -169,7 +169,7 @@ class NetworkState internal constructor(
         if (!file.exists())
             return null
         
-        val network = file.inputStream().use { inp ->
+        val network = file.inputStream().buffered().use { inp ->
             val reader = ByteReader.fromStream(inp)
             ProtoNetwork.read(networkId, world, this, reader)
         }
