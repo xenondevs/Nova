@@ -145,8 +145,6 @@ class NetworkState internal constructor(
     
     /**
      * Resolves a network by its [networkId], loading it from disk if necessary.
-     *
-     * This function may be called concurrently, outside the network configurator context.
      */
     suspend fun resolveNetwork(networkId: UUID): ProtoNetwork<*> = coroutineScope {
         return@coroutineScope networksById.computeIfAbsent(networkId) {
