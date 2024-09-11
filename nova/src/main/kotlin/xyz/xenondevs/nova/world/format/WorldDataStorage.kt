@@ -34,25 +34,13 @@ internal class WorldDataStorage(val world: World) {
         networkFolder.mkdirs()
     }
     
-    @Suppress("DeferredResultUnused")
-    suspend fun loadAsync(pos: ChunkPos) {
-        getOrLoadNetworkRegionAsync(pos)
-        getOrLoadRegionAsync(pos)
-    }
-    
     suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile =
-        getOrLoadRegionAsync(pos).await()
-    
-    private suspend fun getOrLoadRegionAsync(pos: ChunkPos): Deferred<RegionFile> =
         getOrLoadRegionizedFileAsync(pos, blockRegionFiles, RegionFile, blockRegionFolder, "nvr")
-    
-    suspend fun getOrLoadNetworkRegion(pos: ChunkPos): NetworkRegionFile =
-        getOrLoadNetworkRegionAsync(pos).await()
     
     suspend fun getOrLoadNetworkChunk(pos: ChunkPos): NetworkChunk =
         getOrLoadNetworkRegion(pos).getChunk(pos)
     
-    private suspend fun getOrLoadNetworkRegionAsync(pos: ChunkPos): Deferred<NetworkRegionFile> =
+    suspend fun getOrLoadNetworkRegion(pos: ChunkPos): NetworkRegionFile =
         getOrLoadRegionizedFileAsync(pos, networkRegionFiles, NetworkRegionFile, networkRegionFolder, "nvnr")
     
     private suspend fun <C : RegionizedChunk, F : RegionizedFile<C>> getOrLoadRegionizedFileAsync(
@@ -61,7 +49,7 @@ internal class WorldDataStorage(val world: World) {
         reader: RegionizedFileReader<C, F>,
         folder: File,
         extension: String,
-    ): Deferred<F> = coroutineScope {
+    ): F = coroutineScope {
         val regionX = pos.x shr 5
         val regionZ = pos.z shr 5
         val regionId = getRegionId(regionX, regionZ)
@@ -71,7 +59,7 @@ internal class WorldDataStorage(val world: World) {
                 val file = File(folder, "r.$regionX.$regionZ.$extension")
                 reader.read(file, world, regionX, regionZ)
             }
-        }
+        }.await()
     }
     
     fun getBlockChunkOrThrow(pos: ChunkPos): RegionChunk =
