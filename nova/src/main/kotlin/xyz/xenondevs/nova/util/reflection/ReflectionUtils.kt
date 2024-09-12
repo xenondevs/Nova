@@ -136,6 +136,15 @@ internal object ReflectionUtils {
     }
     
     @JvmStatic
+    fun getFieldOrNull(clazz: Class<*>, name: String): Field? {
+         try {
+            return getField(clazz, name)
+        } catch (_: NoSuchFieldException) {
+            return null
+        }
+    }
+    
+    @JvmStatic
     fun getServerSoftwareField(clazz: KClass<*>, name: String, serverSoftware: ServerSoftware): Field? {
         if (serverSoftware !in ServerUtils.SERVER_SOFTWARE.superSoftwares)
             return null

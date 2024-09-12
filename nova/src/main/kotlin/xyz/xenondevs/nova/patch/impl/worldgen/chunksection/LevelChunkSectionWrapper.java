@@ -32,6 +32,7 @@ import java.lang.reflect.Field;
 @ApiStatus.Internal
 public class LevelChunkSectionWrapper extends LevelChunkSection {
     
+    // Paper
     private static final MethodHandle GET_STATES;
     private static final MethodHandle GET_BIOMES;
     private static final MethodHandle GET_NON_EMPTY_BLOCK_COUNT;
@@ -44,9 +45,14 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
     private static final MethodHandle SET_SPECIAL_COLLIDING_BLOCKS;
     private static final Field TICKING_BLOCKS;
     
+    // Pufferfish
+    private static final MethodHandle GET_FLUID_STATE_COUNT;
+    private static final MethodHandle SET_FLUID_STATE_COUNT;
+    
     static {
         try {
             var lookup = MethodHandles.privateLookupIn(LevelChunkSection.class, MethodHandles.lookup());
+            
             GET_STATES = lookup.findGetter(LevelChunkSection.class, "states", PalettedContainer.class);
             GET_BIOMES = lookup.findGetter(LevelChunkSection.class, "biomes", PalettedContainer.class);
             GET_NON_EMPTY_BLOCK_COUNT = lookup.findGetter(LevelChunkSection.class, "nonEmptyBlockCount", short.class);
@@ -58,6 +64,15 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
             GET_SPECIAL_COLLIDING_BLOCKS = lookup.findGetter(LevelChunkSection.class, "specialCollidingBlocks", int.class);
             SET_SPECIAL_COLLIDING_BLOCKS = lookup.findSetter(LevelChunkSection.class, "specialCollidingBlocks", int.class);
             TICKING_BLOCKS = ReflectionUtils.getField(LevelChunkSection.class, "tickingBlocks");
+            
+            Field fluidStateCount = ReflectionUtils.getFieldOrNull(LevelChunkSection.class, "fluidStateCount");
+            if (fluidStateCount != null) {
+                GET_FLUID_STATE_COUNT = lookup.unreflectGetter(fluidStateCount);
+                SET_FLUID_STATE_COUNT = lookup.unreflectSetter(fluidStateCount);
+            } else {
+                GET_FLUID_STATE_COUNT = null;
+                SET_FLUID_STATE_COUNT = null;
+            }
         } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
@@ -152,6 +167,9 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
             SET_TICKING_BLOCK_COUNT.invoke(this, GET_TICKING_BLOCK_COUNT.invoke(delegate));
             SET_TICKING_FLUID_COUNT.invoke(this, GET_TICKING_FLUID_COUNT.invoke(delegate));
             SET_SPECIAL_COLLIDING_BLOCKS.invoke(this, GET_SPECIAL_COLLIDING_BLOCKS.invoke(delegate));
+            if (GET_FLUID_STATE_COUNT != null && SET_FLUID_STATE_COUNT != null) {
+                SET_FLUID_STATE_COUNT.invoke(this, GET_FLUID_STATE_COUNT.invoke(delegate));
+            }
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
