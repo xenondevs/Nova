@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.patch.impl.FieldFilterPatch
 import xyz.xenondevs.nova.patch.impl.block.BlockBehaviorPatches
 import xyz.xenondevs.nova.patch.impl.block.BlockMigrationPatches
 import xyz.xenondevs.nova.patch.impl.block.DisableBackingStateLogicPatch
+import xyz.xenondevs.nova.patch.impl.block.FluidFlowPatch
 import xyz.xenondevs.nova.patch.impl.block.TripwireLogicPatch
 import xyz.xenondevs.nova.patch.impl.bossbar.BossBarOriginPatch
 import xyz.xenondevs.nova.patch.impl.chunk.ChunkSchedulingPatch
@@ -64,7 +65,7 @@ internal object Patcher {
             BroadcastPacketPatch, EventPreventionPatch, WearablePatch, BossBarOriginPatch,
             FakePlayerLastHurtPatch, BlockBehaviorPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
             ItemStackDataComponentsPatch, EnchantmentPatches, TagsPatch, RepairPatches, BlockMigrationPatches,
-            TripwireLogicPatch
+            TripwireLogicPatch, FluidFlowPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     
