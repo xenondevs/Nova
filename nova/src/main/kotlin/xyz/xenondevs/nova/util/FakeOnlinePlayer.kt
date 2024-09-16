@@ -118,8 +118,6 @@ abstract class FakeOnlinePlayer(
                 }
             }
             
-            File("FakeOnlinePlayer.class").writeBytes(classWrapper.assemble(false))
-            
             return ClassWrapperLoader(NOVA::class.java.classLoader)
                 .loadClass(classWrapper)
                 .getConstructor(OfflinePlayer::class.java, Location::class.java) as Constructor<FakeOnlinePlayer>
