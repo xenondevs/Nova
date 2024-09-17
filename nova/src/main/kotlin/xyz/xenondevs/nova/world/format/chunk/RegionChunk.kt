@@ -46,6 +46,10 @@ internal class RegionChunk(
     @Volatile
     var isEnabled = false
         private set
+    @Volatile
+    var hasBeenEnabled = false
+        private set
+    
     private var tickingAllowed = false
     private var isTicking = false
     
@@ -353,6 +357,7 @@ internal class RegionChunk(
                 }
             }
             
+            hasBeenEnabled = true
             isEnabled = true
         }
     }

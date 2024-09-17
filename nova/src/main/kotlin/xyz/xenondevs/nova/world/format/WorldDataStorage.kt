@@ -113,7 +113,7 @@ internal class WorldDataStorage(val world: World) {
                     regionFile.save()
                     
                     // unload unused region files
-                    if (unload && !regionFile.isAnyChunkEnabled())
+                    if (unload && regionFile.isInactive())
                         blockRegionFiles -= rid
                 }
             }

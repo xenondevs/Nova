@@ -15,12 +15,12 @@ internal class RegionFile(
     chunks: Array<RegionChunk>
 ) : RegionizedFile<RegionChunk>(MAGIC, VERSION, file, world, regionX, regionZ, chunks) {
     
-    fun isAnyChunkEnabled(): Boolean {
+    fun isInactive(): Boolean {
         for (chunk in chunks) {
-            if (chunk.isEnabled)
-                return true
+            if (chunk.isEnabled || !chunk.hasBeenEnabled)
+                return false
         }
-        return false
+        return true
     }
     
     companion object : RegionizedFileReader<RegionChunk, RegionFile>(
