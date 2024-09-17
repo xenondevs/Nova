@@ -2,7 +2,7 @@
 format.version = "1.1"
 
 [versions]
-cbf = "0.13"
+cbf = "0.14"
 invui = "1.37"
 jgrapht = "1.5.2"
 kotlin = "2.0.20"
