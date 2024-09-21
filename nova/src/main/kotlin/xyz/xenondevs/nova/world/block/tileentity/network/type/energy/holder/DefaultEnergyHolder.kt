@@ -98,23 +98,14 @@ class DefaultEnergyHolder(
     internal companion object {
         
         fun tryConvertLegacy(dataHolder: DataHolder): Compound? {
-            val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>? =
-                dataHolder.retrieveDataOrNull("energyConfig")
-            val energy: Long? =
-                dataHolder.retrieveDataOrNull("energy")
-            
-            if (connectionConfig == null &&
-                energy == null
-            ) return null
+            val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>? = dataHolder.retrieveDataOrNull("energyConfig")
+                ?: return null
             
             dataHolder.removeData("energyConfig")
-            dataHolder.removeData("energy")
             
             val compound = Compound() // new format
             if (connectionConfig != null)
                 compound["connectionConfig"] = connectionConfig
-            if (energy != null)
-                compound["energy"] = energy
             
             return compound
         }

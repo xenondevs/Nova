@@ -97,9 +97,11 @@ abstract class NetworkedTileEntity(
     ): DefaultEnergyHolder {
         if (hasData("energyHolder")) {
             val holderCompound = retrieveDataOrNull<Compound>("energyHolder")!!
-            val energy = holderCompound.get<Long>("energy") ?: 0L
-            holderCompound.remove("energy")
-            storeData("energy", energy, true)
+            val energy = holderCompound.get<Long>("energy")
+            if (energy != null) {
+                holderCompound.remove("energy")
+                storeData("energy", energy, true)
+            }
         }
         
         val holder = DefaultEnergyHolder(
