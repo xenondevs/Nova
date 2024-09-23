@@ -39,11 +39,11 @@ internal class ConfigExtractor(extractedConfigs: MutableProvider<Map<String, Str
         val severCfg: Node
         if (!destFile.exists() || extractedCfg == null) {
             severCfg = internalCfg
-            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configPath, writeYaml(severCfg, true)) } // https://bitbucket.org/snakeyaml/snakeyaml-engine/issues/53/serialization-failure-of-commented-node
+            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configPath, writeYaml(severCfg, false)) }
         } else {
             severCfg = loadYaml(destFile)
             updateExistingConfig(severCfg, extractedCfg, internalCfg)
-            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configPath, writeYaml(extractedCfg, true)) } // https://bitbucket.org/snakeyaml/snakeyaml-engine/issues/53/serialization-failure-of-commented-node
+            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configPath, writeYaml(extractedCfg, false)) }
         }
         
         writeYaml(severCfg, destFile)
