@@ -4,13 +4,13 @@ plugins {
 }
 
 repositories {
-    maven("https://mvn.lumine.io/repository/maven-public/")
+    maven("https://nexus.phoenixdevt.fr/repository/maven-public/")
 }
 
 dependencies {
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(project(":nova"))
     implementation(project(":nova-api"))
-    compileOnly("net.Indyuce:MMOItems:6.7") { isTransitive = false }
-    compileOnly("io.lumine:MythicLib-dist:1.3") { isTransitive = false }
+    compileOnly("net.Indyuce:MMOItems-API:6.10-SNAPSHOT") { isTransitive = false }
+    compileOnly("io.lumine:MythicLib-dist:1.6.2-SNAPSHOT") { isTransitive = false }
 }
