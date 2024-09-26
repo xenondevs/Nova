@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockPistonRetractEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.inventory.InventoryCreativeEvent
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.AddonsInitializer
@@ -77,6 +78,9 @@ internal object BlockInteracting : Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleInventoryCreative(event: InventoryCreativeEvent) {
+        if (event.slotType != InventoryType.SlotType.QUICKBAR)
+            return
+        
         val player = event.whoClicked as Player
         val reach = player.getAttribute(Attribute.PLAYER_BLOCK_INTERACTION_RANGE)?.value ?: 8.0
         val rayTraceResult = player.rayTraceBlocks(reach)
