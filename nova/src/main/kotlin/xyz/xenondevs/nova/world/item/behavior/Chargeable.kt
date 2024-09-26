@@ -105,6 +105,14 @@ interface Chargeable {
             itemStack.novaCompound = compound
         }
         
+        override fun toString(itemStack: ItemStack): String {
+            return "Chargeable(" +
+                "energy=${getEnergy(itemStack)}," +
+                " maxEnergy=$maxEnergy," +
+                " affectsItemDurability=$affectsItemDurability" +
+                ")"
+        }
+        
     }
     
 }

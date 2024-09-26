@@ -9,6 +9,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.component.ItemAttributeModifiers
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.combinedProvider
 import xyz.xenondevs.commons.provider.immutable.map
@@ -147,6 +148,19 @@ class Tool(
         return@combinedProvider DataComponentMap.builder()
             .set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers.build())
             .build()
+    }
+    
+    override fun toString(itemStack: ItemStack): String {
+        return "Tool(" +
+            "tier=$tier, " +
+            "categories=$categories, " +
+            "breakSpeed=$breakSpeed, " +
+            "attackDamage=$attackDamage, " +
+            "attackSpeed=$attackSpeed, " +
+            "knockbackBonus=$knockbackBonus, " +
+            "canSweepAttack=$canSweepAttack, " +
+            "canBreakBlocksInCreative=$canBreakBlocksInCreative" +
+            ")"
     }
     
     companion object : ItemBehaviorFactory<Tool> {

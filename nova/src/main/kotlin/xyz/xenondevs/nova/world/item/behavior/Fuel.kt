@@ -7,8 +7,8 @@ import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.world.item.NovaItem
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
@@ -30,6 +30,10 @@ class Fuel(burnTime: Provider<Int>) : ItemBehavior {
      * @param burnTime The burn time of this fuel, in ticks.
      */
     constructor(burnTime: Int) : this(provider(burnTime))
+    
+    override fun toString(itemStack: BukkitStack): String {
+        return "Fuel(burnTime=$burnTime)"
+    }
     
     companion object : ItemBehaviorFactory<Fuel> {
         

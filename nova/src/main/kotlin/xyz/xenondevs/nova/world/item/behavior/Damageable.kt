@@ -2,11 +2,13 @@ package xyz.xenondevs.nova.world.item.behavior
 
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
 
 /**
@@ -41,6 +43,16 @@ class Damageable(
             .set(DataComponents.MAX_DAMAGE, it)
             .set(DataComponents.DAMAGE, 0)
             .build()
+    }
+    
+    override fun toString(itemStack: ItemStack): String {
+        return "Damageable(" +
+            "damage=${itemStack.unwrap().get(DataComponents.DAMAGE) ?: 0}, " +
+            "maxDurability=$maxDurability, " +
+            "itemDamageOnAttackEntity=$itemDamageOnAttackEntity, " +
+            "itemDamageOnBreakBlock=$itemDamageOnBreakBlock, " +
+            "repairIngredient=$repairIngredient" +
+            ")"
     }
     
     companion object : ItemBehaviorFactory<Damageable> {

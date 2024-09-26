@@ -27,6 +27,10 @@ class ToolTier(
         return levelValue.compareTo(other.levelValue)
     }
     
+    override fun toString(): String {
+        return id.toString()
+    }
+    
     companion object {
         
         /**

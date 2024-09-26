@@ -4,6 +4,7 @@ import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
@@ -45,6 +46,14 @@ class Enchantable(
         DataComponentMap.builder()
             .set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY)
             .build()
+    }
+    
+    override fun toString(itemStack: ItemStack): String {
+        return "Enchantable(" +
+            "enchantmentValue=$enchantmentValue, " +
+            "primaryEnchantments=${primaryEnchantments.joinToString { it.key.toString() }}, " +
+            "supportedEnchantments=${primaryEnchantments.joinToString { it.key.toString() }}" +
+            ")"
     }
     
     companion object : ItemBehaviorFactory<Enchantable> {

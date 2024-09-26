@@ -13,9 +13,9 @@ import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.immutable.mapNonNull
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.item.NovaItem
 import java.util.*
 
 /**
@@ -67,6 +67,17 @@ class Consumable(
                     FoodProperties.PossibleEffect(CraftPotionUtil.fromBukkit(potionEffect), probability)
                 }
             )).build()
+    }
+    
+    override fun toString(itemStack: ItemStack): String {
+        return "Consumable(" +
+            "nutrition=$nutrition, " +
+            "saturation=$saturation, " +
+            "canAlwaysEat=$canAlwaysEat, " +
+            "consumeTime=$consumeTime, " +
+            "remains=$remains, " +
+            "possibleEffects=$possibleEffects" +
+            ")"
     }
     
     companion object : ItemBehaviorFactory<Consumable> {

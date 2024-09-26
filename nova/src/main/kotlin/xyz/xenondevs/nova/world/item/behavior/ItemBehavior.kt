@@ -74,6 +74,11 @@ interface ItemBehavior : ItemBehaviorHolder {
      */
     fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound) = itemStack
     
+    /**
+     * Creates a string representation of this [ItemBehavior] and its data in [itemStack].
+     */
+    fun toString(itemStack: ItemStack): String = this.javaClass.simpleName
+    
 }
 
 interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {

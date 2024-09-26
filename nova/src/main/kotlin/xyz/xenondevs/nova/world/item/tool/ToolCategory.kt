@@ -22,6 +22,10 @@ open class ToolCategory internal constructor(
     val id: ResourceLocation
 ) {
     
+    override fun toString(): String {
+        return id.toString()
+    }
+    
     companion object {
         
         fun hasCorrectToolCategory(block: Block, tool: ItemStack?): Boolean {

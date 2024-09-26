@@ -56,7 +56,6 @@ import xyz.xenondevs.nova.util.data.getStringOrNull
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.customModelData
-import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.item.unsafeNovaTag
@@ -123,9 +122,9 @@ internal object NovaCommand : Command() {
             .then(literal("getBlockModelData")
                 .requiresPlayer()
                 .executes0(::showBlockModelData))
-            .then(literal("getItemData")
+            .then(literal("getItemBehaviors")
                 .requiresPlayer()
-                .executes0(::showItemData))
+                .executes0(::showItemBehaviors))
             .then(literal("getItemModelData")
                 .requiresPlayer()
                 .executes0(::showItemModelData))
@@ -478,22 +477,22 @@ internal object NovaCommand : Command() {
         }
     }
     
-    private fun showItemData(ctx: CommandContext<CommandSourceStack>) {
+    private fun showItemBehaviors(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         
-        val item = player.inventory.itemInMainHand.takeUnlessEmpty()
+        val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty()
+        val novaItem = itemStack?.novaItem
         
-        if (item != null) {
-            val novaCompound = item.novaCompound
-            if (novaCompound != null) {
-                ctx.source.sender.sendMessage(Component.translatable(
-                    "command.nova.show_item_data.success",
-                    NamedTextColor.GRAY,
-                    ItemUtils.getName(item).color(NamedTextColor.AQUA),
-                    Component.text(novaCompound.toString(), NamedTextColor.WHITE)
-                ))
-            } else ctx.source.sender.sendMessage(Component.translatable("command.nova.show_item.no_data", NamedTextColor.RED))
-        } else ctx.source.sender.sendMessage(Component.translatable("command.nova.show_item_data.no_item", NamedTextColor.RED))
+        if (novaItem != null) {
+            val behaviors = novaItem.behaviors
+            ctx.source.sender.sendMessage(Component.translatable(
+                "command.nova.show_item_behaviors.success",
+                NamedTextColor.GRAY,
+                ItemUtils.getName(itemStack).color(NamedTextColor.AQUA),
+                Component.text(behaviors.size).color(NamedTextColor.AQUA),
+                Component.text(behaviors.joinToString("\n") { it.toString(itemStack) }, NamedTextColor.WHITE)
+            ))
+        } else ctx.source.sender.sendMessage(Component.translatable("command.nova.show_item_behaviors.no_item", NamedTextColor.RED))
     }
     
     private fun showItemModelData(ctx: CommandContext<CommandSourceStack>) {

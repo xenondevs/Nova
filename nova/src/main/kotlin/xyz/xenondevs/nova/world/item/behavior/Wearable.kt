@@ -244,6 +244,15 @@ class Wearable(
         return itemStack
     }
     
+    override fun toString(itemStack: BukkitStack): String {
+        return "Wearable(" +
+            "slot=$slot, " +
+            "armor=$armor, " +
+            "armorToughness=$armorToughness, " +
+            "knockbackResistance=$knockbackResistance" +
+            ")"
+    }
+    
     companion object {
         
         /**
