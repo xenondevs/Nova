@@ -54,7 +54,6 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
-import xyz.xenondevs.nova.util.bukkitMirror
 import xyz.xenondevs.nova.util.component.adventure.isEmpty
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.NBTUtils
@@ -322,35 +321,51 @@ internal object PacketItems : Listener, PacketListener {
     //<editor-fold desc="Vanilla", defaultstate="collapsed">
     private fun getClientSideVanillaStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean): MojangStack {
         val newItemStack = itemStack.copy()
+        var modified = false
         
-        correctArmorColor(newItemStack)
+        if (correctArmorColor(newItemStack)) {
+            modified = true
+        }
         if (shouldHideEntireTooltip(itemStack)) {
             newItemStack.set(DataComponents.HIDE_TOOLTIP, Unit.INSTANCE)
+            modified = true
         } else if (itemStack.unsafeCustomData?.contains(SKIP_SERVER_SIDE_TOOLTIP) != true) {
             val isAdvanced = player?.let(AdvancedTooltips::hasVanillaTooltips) == true
-            applyServerSideTooltip(newItemStack, generateTooltipLore(player, isAdvanced, itemStack))
+            if (isAdvanced || modified) { // server-side tooltip is only required if the server-side stack differs from the client-side stack
+                applyServerSideTooltip(newItemStack, generateTooltipLore(player, isAdvanced, itemStack))
+                modified = true
+            }
         } else {
             disableClientSideTooltip(newItemStack)
+            modified = true
         }
         
         // save server-side nbt data (for creative mode)
         // this also drops existing custom data, which is ignored by the client anyway
-        if (storeServerSideTag)
+        if (modified && storeServerSideTag)
             storeServerSideTag(newItemStack, itemStack)
         
         return newItemStack
     }
     
-    private fun correctArmorColor(itemStack: MojangStack) {
-        itemStack.update(DataComponents.DYED_COLOR) { color ->
-            val rgb = color.rgb
-            
-            // custom armor only uses odd color codes, items from custom armor services are allowed to have any color
-            if (rgb % 2 != 0 && CustomItemServiceManager.getId(itemStack.bukkitMirror) == null) {
-                return@update DyedItemColor(rgb - 1, color.showInTooltip)
-            }
-            return@update DyedItemColor(rgb, color.showInTooltip)
-        }
+    /**
+     * Fixes the [DataComponents.DYED_COLOR] rgb value of vanilla armor items to prevent accidental use of
+     * custom textures and returns whether the item stack was modified.
+     */
+    private fun correctArmorColor(itemStack: MojangStack): Boolean {
+        val color = itemStack.get(DataComponents.DYED_COLOR)
+            ?: return false
+        val rgb = color.rgb
+        
+        if (rgb % 2 == 0)
+            return false
+        
+        if (CustomItemServiceManager.getId(itemStack.asBukkitMirror()) != null)
+            return false
+        
+        itemStack.set(DataComponents.DYED_COLOR, DyedItemColor(rgb - 1, color.showInTooltip))
+        
+        return true
     }
     //</editor-fold>
     
