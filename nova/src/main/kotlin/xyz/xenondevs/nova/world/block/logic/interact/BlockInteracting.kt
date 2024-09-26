@@ -108,6 +108,7 @@ internal object BlockInteracting : Listener {
         
         val novaCloneStack = novaBlockState.block.pickBlockCreative(targetPos, novaBlockState, ctx) ?: ItemStack.empty()
         event.cursor = novaCloneStack
+        player.updateInventory()
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
