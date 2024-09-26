@@ -294,7 +294,7 @@ internal object PacketItems : Listener, PacketListener {
     
     private fun generateNovaTooltipLore(player: Player?, novaItem: NovaItem, cbfTagCount: Int, itemStack: MojangStack): List<Component> {
         val isAdvanced = player?.let(AdvancedTooltips::hasNovaTooltips) == true
-        val lore = generateTooltipLore(player, itemStack).toMutableList()
+        val lore = generateTooltipLore(player, isAdvanced, itemStack).toMutableList()
         
         // entire tooltip is hidden
         if (lore.isEmpty())
@@ -327,7 +327,8 @@ internal object PacketItems : Listener, PacketListener {
         if (shouldHideEntireTooltip(itemStack)) {
             newItemStack.set(DataComponents.HIDE_TOOLTIP, Unit.INSTANCE)
         } else if (itemStack.unsafeCustomData?.contains(SKIP_SERVER_SIDE_TOOLTIP) != true) {
-            applyServerSideTooltip(newItemStack, generateTooltipLore(player, itemStack))
+            val isAdvanced = player?.let(AdvancedTooltips::hasVanillaTooltips) == true
+            applyServerSideTooltip(newItemStack, generateTooltipLore(player, isAdvanced, itemStack))
         } else {
             disableClientSideTooltip(newItemStack)
         }
@@ -362,13 +363,11 @@ internal object PacketItems : Listener, PacketListener {
         disableClientSideTooltip(itemStack)
     }
     
-    private fun generateTooltipLore(player: Player?, itemStack: MojangStack): List<Component> {
-        val isAdvanced = player?.let(AdvancedTooltips::hasNovaTooltips) == true
-        
+    private fun generateTooltipLore(player: Player?, advancedTooltips: Boolean, itemStack: MojangStack): List<Component> {
         val lore = itemStack.getTooltipLines(
             Item.TooltipContext.of(REGISTRY_ACCESS),
             player?.serverPlayer,
-            if (isAdvanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
+            if (advancedTooltips) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
         )
         
         // entire tooltip is hidden
