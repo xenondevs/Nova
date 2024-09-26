@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.ui.waila.info
 
 import net.minecraft.resources.ResourceLocation
+import xyz.xenondevs.nova.resources.builder.task.font.TextureIconContent
+import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories.AXE
@@ -15,10 +17,17 @@ import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers.IRON
 import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers.NETHERITE
 import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers.STONE
 import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers.WOOD
-import xyz.xenondevs.nova.util.name
 
+/**
+ * Chooses tool icons for WAILA.
+ */
 interface WailaToolIconProvider {
-    
+
+    /**
+     * Returns a [ResourceLocation] for the location of the texture to be used for tools of the given [category] and [tier].
+     * Note that textures which are intended to be used for these icons need to be added to the texture icon font via [TextureIconContent.addIcons]
+     * using a custom resource pack task.
+     */
     fun getIcon(category: ToolCategory, tier: ToolTier?): ResourceLocation?
     
 }
