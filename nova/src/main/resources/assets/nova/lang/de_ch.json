@@ -159,5 +159,7 @@
   "command.nova.reload_configs.failure": "Das Neuladen der Konfigurationen ist fehlgeschlagen, überprüfen Sie die Konsole für weitere Informationen.",
   "command.nova.reload_recipes.failure": "Das Nachladen von Rezepten ist fehlgeschlagen, überprüfen Sie die Konsole für weitere Informationen.",
   "block.nova.unknown": "Unbekannter Block",
-  "command.nova.reload_configs.none": "Es wurden keine Konfigurationen geändert."
+  "command.nova.reload_configs.none": "Es wurden keine Konfigurationen geändert.",
+  "command.nova.show_item_behaviors.success": "Dieser %s hat %s Gegenstand Verhalten(e):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Bitte halten Sie einen Gegenstand in Ihrer Haupthand und versuchen Sie es erneut."
 }

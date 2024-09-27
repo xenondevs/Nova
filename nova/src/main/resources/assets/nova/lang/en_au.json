@@ -159,5 +159,7 @@
   "command.nova.reload_configs.none": "No configs were changed.",
   "command.nova.reload_configs.failure": "Failed to reload configs, check the console for more information.",
   "command.nova.reload_recipes.failure": "Failed to reload recipes, check the console for more information.",
-  "command.nova.network_debug.nova.energy.on": "Enabled debug-view for Energy-Networks."
+  "command.nova.network_debug.nova.energy.on": "Enabled debug-view for Energy-Networks.",
+  "command.nova.show_item_behaviors.success": "This %s has %s item behavior(s):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Please hold an item in your main hand and try again."
 }

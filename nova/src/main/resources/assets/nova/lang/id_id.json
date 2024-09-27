@@ -159,5 +159,7 @@
   "command.nova.reload_configs.failure": "Gagal memuat ulang konfigurasi, periksa konsol untuk informasi lebih lanjut.",
   "command.nova.reload_recipes.failure": "Gagal memuat ulang resep, periksa konsol untuk informasi lebih lanjut.",
   "item.nova.unknown_item_filter": "Filter Item Tidak Dikenal",
-  "command.nova.search_block.result": "Ditemukan %s pada %s."
+  "command.nova.search_block.result": "Ditemukan %s pada %s.",
+  "command.nova.show_item_behaviors.success": "%s ini memiliki perilaku item %s:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Peganglah sebuah benda di tangan utama Anda dan coba lagi."
 }

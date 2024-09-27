@@ -159,5 +159,7 @@
   "command.nova.reload_configs.failure": "No se ha podido recargar la configuración, compruebe la consola para obtener más información.",
   "command.nova.reload_recipes.failure": "Fallo al recargar recetas, compruebe la consola para más información.",
   "item.nova.unknown_item_filter": "Filtro de artículos desconocidos",
-  "command.nova.fill.success": "Rellenado con éxito el área desde x: %s, y: %s, z: %s hasta x: %s, y: %s, z: %s con %s."
+  "command.nova.fill.success": "Rellenado con éxito el área desde x: %s, y: %s, z: %s hasta x: %s, y: %s, z: %s con %s.",
+  "command.nova.show_item_behaviors.success": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s"
 }

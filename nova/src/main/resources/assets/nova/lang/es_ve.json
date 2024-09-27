@@ -159,5 +159,7 @@
   "item.nova.unknown_item_filter": "Filtro de artículo desconocido",
   "item.nova.unknown_item_filter.description": "El addon que gestiona este tipo de filtro de elementos no está presente o no lo ha registrado.",
   "command.nova.network_debug.nova.energy.on": "Activada la vista de depuración para redes de energía.",
-  "command.nova.show_network_node_info.connected_nodes.header": "Conexiones (%s):"
+  "command.nova.show_network_node_info.connected_nodes.header": "Conexiones (%s):",
+  "command.nova.show_item_behaviors.success": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s"
 }

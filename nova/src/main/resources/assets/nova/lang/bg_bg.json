@@ -159,5 +159,7 @@
   "command.nova.search_block.done": "Търсенето е завършено.",
   "command.nova.reload_configs.failure": "Неуспешно презареждане на конфигурациите, проверете конзолата за повече информация.",
   "command.nova.reload_recipes.failure": "Не успя да презареди рецепти, проверете конзолата за повече информация.",
-  "command.nova.reload_configs.none": "Не са променени никакви конфигурации."
+  "command.nova.reload_configs.none": "Не са променени никакви конфигурации.",
+  "command.nova.show_item_behaviors.success": "Този %s има %s поведение(я) на елемента:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Моля, дръжте предмет в основната си ръка и опитайте отново."
 }

@@ -159,5 +159,7 @@
   "block.nova.unknown": "Bloco desconhecido",
   "block.nova.unknown.message": "Nenhum addon registrou esse estado de bloco: ID: %s, Serializado: %s",
   "enchantment.nova.unknown": "Encantamento desconhecido: %s",
-  "command.nova.show_network_node_info.end_point.header": "Esse %s (ponto final) tem os seguintes dados:"
+  "command.nova.show_network_node_info.end_point.header": "Esse %s (ponto final) tem os seguintes dados:",
+  "command.nova.show_item_behaviors.success": "Este %s tem %s comportamento(s) de item:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Segure um item em sua mão principal e tente novamente."
 }

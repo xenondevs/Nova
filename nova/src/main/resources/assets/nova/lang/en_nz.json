@@ -159,5 +159,7 @@
   "block.nova.unknown": "Unknown Block",
   "block.nova.unknown.message": "No addon registered this block state: ID: %s, Serialized: %s",
   "command.nova.network_debug.nova.energy.on": "Enabled debug-view for Energy-Networks.",
-  "command.nova.show_network_node_info.node": "Name: %s\nworld: %s, x: %s, y: %s, z: %s"
+  "command.nova.show_network_node_info.node": "Name: %s\nworld: %s, x: %s, y: %s, z: %s",
+  "command.nova.show_item_behaviors.success": "This %s has %s item behavior(s):\n%s",
+  "command.nova.show_item_behaviors.no_item": "This %s has %s item behavior(s):\n%s"
 }

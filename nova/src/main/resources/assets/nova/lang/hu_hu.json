@@ -159,5 +159,7 @@
   "command.nova.reload_configs.none": "A konfigurációk nem változtak.",
   "command.nova.reload_configs.failure": "A konfigurációk újratöltése sikertelen, további információkért ellenőrizze a konzolt.",
   "command.nova.reload_recipes.failure": "Nem sikerült újratölteni a recepteket, további információkért ellenőrizze a konzolt.",
-  "command.nova.show_network_node_info.end_point.networks.entry": "Típus: %s, Irány: %s, Azonosító: %s"
+  "command.nova.show_network_node_info.end_point.networks.entry": "Típus: %s, Irány: %s, Azonosító: %s",
+  "command.nova.show_item_behaviors.success": "Ez a %s %s elem viselkedése(i):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Kérjük, tartson egy tárgyat a fő kezében, és próbálja meg újra."
 }

@@ -159,5 +159,7 @@
   "command.nova.reload_recipes.failure": "Reîncărcarea rețetelor a eșuat, verificați consola pentru mai multe informații.",
   "command.nova.network_debug.nova.energy.on": "Activat debug-view pentru Energy-Networks.",
   "command.nova.network_debug.nova.energy.off": "Dezactivat debug-view pentru Energy-Networks.",
-  "command.nova.show_network_node_info.initialized": "Rețea inițializată: %s"
+  "command.nova.show_network_node_info.initialized": "Rețea inițializată: %s",
+  "command.nova.show_item_behaviors.success": "Acest %s are %s comportament(uri) de articol:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Vă rugăm să țineți un obiect în mâna principală și să încercați din nou."
 }

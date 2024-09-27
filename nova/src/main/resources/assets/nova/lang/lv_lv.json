@@ -159,5 +159,7 @@
   "command.nova.reload_configs.none": "Nekādas konfigurācijas netika mainītas.",
   "command.nova.reload_configs.failure": "Neizdevās pārlādēt konfigurācijas, pārbaudiet konsoles konsoles failu, lai iegūtu vairāk informācijas.",
   "command.nova.reload_recipes.failure": "Receptes neizdevās ielādēt, pārbaudiet konsoles ekrānā papildu informāciju.",
-  "item.nova.unknown_item_filter": "Nezināms vienuma filtrs"
+  "item.nova.unknown_item_filter": "Nezināms vienuma filtrs",
+  "command.nova.show_item_behaviors.success": "Šim %s ir %s elementu uzvedība(-as):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Lūdzu, paturiet priekšmetu galvenajā rokā un mēģiniet vēlreiz."
 }
