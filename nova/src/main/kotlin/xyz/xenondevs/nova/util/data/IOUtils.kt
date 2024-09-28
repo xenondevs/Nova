@@ -20,7 +20,6 @@ import kotlin.io.path.extension
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 import kotlin.math.max
-import kotlin.streams.asSequence
 
 private val ZIP_FILE = ZipFile(NOVA.novaJar)
 
@@ -29,17 +28,20 @@ private val ZIP_FILE = ZipFile(NOVA.novaJar)
  *
  * @param directory The directory the resources should be in
  */
-internal fun getResources(directory: String = ""): Sequence<String> {
-    return ZIP_FILE.stream().asSequence().filter {
-        it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class")
-    }.map(ZipEntry::getName)
+internal fun getResources(directory: String = ""): List<String> {
+    return ZIP_FILE.stream()
+        .filter { it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class") }
+        .map(ZipEntry::getName)
+        .toList()
 }
 
-// FIXME: resource leak
-internal fun getResources(file: File, directory: String = ""): Sequence<String> {
-    return ZipFile(file).stream().asSequence().filter {
-        it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class")
-    }.map(ZipEntry::getName)
+internal fun getResources(file: File, directory: String = ""): List<String> {
+    return ZipFile(file).use {
+        it.stream()
+            .filter { it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class") }
+            .map(ZipEntry::getName)
+            .toList()
+    }
 }
 
 /**
