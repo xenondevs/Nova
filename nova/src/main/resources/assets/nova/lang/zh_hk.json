@@ -159,5 +159,7 @@
   "command.nova.reload_recipes.failure": "重新加载配方失败，请查看控制台了解更多信息。",
   "item.nova.unknown_item_filter": "未知项目过滤器",
   "block.nova.unknown": "未知块",
-  "command.nova.reload_configs.none": "没有更改配置。"
+  "command.nova.reload_configs.none": "没有更改配置。",
+  "command.nova.show_item_behaviors.success": "该 %s 具有 %s 项行为：\n%s",
+  "command.nova.show_item_behaviors.no_item": "请用您的主手拿着一件物品再试一次。"
 }

@@ -159,5 +159,7 @@
   "command.nova.reload_configs.failure": "Απέτυχε η επαναφόρτωση των ρυθμίσεων, ελέγξτε την κονσόλα για περισσότερες πληροφορίες.",
   "command.nova.reload_recipes.failure": "Απέτυχε η επαναφόρτωση συνταγών, ελέγξτε την κονσόλα για περισσότερες πληροφορίες.",
   "command.nova.network_debug.nova.energy.on": "Ενεργοποιήθηκε η προβολή εντοπισμού σφαλμάτων για το Energy-Networks.",
-  "command.nova.show_network_node_info.bridge.networks.entry": "Τύπος: %s, ID: %s"
+  "command.nova.show_network_node_info.bridge.networks.entry": "Τύπος: %s, ID: %s",
+  "command.nova.show_item_behaviors.success": "Αυτό το %s έχει %s συμπεριφορά(ες) στοιχείου:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Κρατήστε ένα αντικείμενο στο κύριο χέρι σας και προσπαθήστε ξανά."
 }

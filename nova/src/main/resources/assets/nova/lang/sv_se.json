@@ -159,5 +159,7 @@
   "command.nova.reload_configs.failure": "Misslyckades med att ladda om konfigurationer, kontrollera konsolen för mer information.",
   "command.nova.reload_recipes.failure": "Misslyckades med att ladda om recept, kontrollera konsolen för mer information.",
   "block.nova.unknown.message": "Ingen addon registrerade detta blocktillstånd: ID: %s, Serialiserad: %s",
-  "command.nova.give_clientside_stack.success": "Lade till en klientversion av %s i din inventering."
+  "command.nova.give_clientside_stack.success": "Lade till en klientversion av %s i din inventering.",
+  "command.nova.show_item_behaviors.success": "Denna %s har %s objektbeteende(n):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Håll ett föremål i din huvudhand och försök igen."
 }

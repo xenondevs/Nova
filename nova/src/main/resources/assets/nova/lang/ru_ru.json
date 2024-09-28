@@ -159,5 +159,7 @@
   "command.nova.search_block.done": "Поиск завершен.",
   "command.nova.reload_configs.none": "Никакие конфигурации не были изменены.",
   "command.nova.reload_configs.failure": "Не удалось перезагрузить конфигурацию, проверьте консоль для получения дополнительной информации.",
-  "command.nova.reload_recipes.failure": "Не удалось перезагрузить рецепты, проверьте консоль для получения дополнительной информации."
+  "command.nova.reload_recipes.failure": "Не удалось перезагрузить рецепты, проверьте консоль для получения дополнительной информации.",
+  "command.nova.show_item_behaviors.success": "У этого %s есть %s поведение(и) предмета:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Пожалуйста, возьмите предмет в основную руку и повторите попытку."
 }

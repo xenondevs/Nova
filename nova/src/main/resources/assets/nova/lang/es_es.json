@@ -159,5 +159,7 @@
   "command.nova.reload_configs.none": "No se ha modificado ninguna configuración.",
   "command.nova.reload_configs.failure": "No se ha podido recargar la configuración, compruebe la consola para obtener más información.",
   "command.nova.reload_recipes.failure": "Fallo al recargar recetas, compruebe la consola para más información.",
-  "command.nova.show_item_model_data.success": "Nombre: %s\nmundo: %s, x: %s, y: %s, z: %s"
+  "command.nova.show_item_model_data.success": "Nombre: %s\nmundo: %s, x: %s, y: %s, z: %s",
+  "command.nova.show_item_behaviors.success": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s"
 }

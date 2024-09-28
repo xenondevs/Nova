@@ -159,5 +159,7 @@
   "command.nova.reload_configs.failure": "Konfiguraatioiden uudelleenlataus epäonnistui, tarkista lisätietoja konsolista.",
   "command.nova.reload_recipes.failure": "Reseptien uudelleenlataaminen epäonnistui, tarkista lisätietoja konsolista.",
   "item.nova.unknown_item_filter": "Tuntematon kohde suodatin",
-  "command.nova.search_block.done": "Haku suoritettu."
+  "command.nova.search_block.done": "Haku suoritettu.",
+  "command.nova.show_item_behaviors.success": "Tällä %s:llä on %s kohteen käyttäytymistä:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Pidä esinettä pääkädessäsi ja yritä uudelleen."
 }

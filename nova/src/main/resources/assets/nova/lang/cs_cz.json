@@ -159,5 +159,7 @@
   "command.nova.copy_clientside_stack.success": "Do inventáře byla přidána kopie %s na straně klienta.",
   "command.nova.reload_configs.none": "Žádné konfigurace nebyly změněny.",
   "command.nova.reload_configs.failure": "Nepodařilo se načíst konfigurace, další informace získáte v konzoli.",
-  "command.nova.reload_recipes.failure": "Nepodařilo se načíst recepty, další informace získáte v konzoli."
+  "command.nova.reload_recipes.failure": "Nepodařilo se načíst recepty, další informace získáte v konzoli.",
+  "command.nova.show_item_behaviors.success": "Tento %s má chování %s položek:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Podržte prosím předmět v hlavní ruce a zkuste to znovu."
 }

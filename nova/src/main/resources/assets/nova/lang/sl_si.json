@@ -159,5 +159,7 @@
   "command.nova.reload_recipes.failure": "Receptov ni uspelo ponovno naložiti, za več informacij preverite konzolo.",
   "item.nova.unknown_item_filter": "Filter neznanega predmeta",
   "command.nova.search_block.result": "Najdeno %s na %s.",
-  "command.nova.reload_configs.none": "Konfiguracije niso bile spremenjene."
+  "command.nova.reload_configs.none": "Konfiguracije niso bile spremenjene.",
+  "command.nova.show_item_behaviors.success": "Ta %s ima %s obnašanja elementov:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Držite predmet v glavni roki in poskusite znova."
 }

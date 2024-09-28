@@ -159,5 +159,7 @@
   "command.nova.reload_configs.none": "Ühtegi seadistust ei muudetud.",
   "command.nova.reload_configs.failure": "Configide ümberlaadimine ebaõnnestus, kontrollige konsooli lisateavet.",
   "command.nova.reload_recipes.failure": "Retseptide ümberlaadimine ebaõnnestus, kontrollige konsooli lisateavet.",
-  "command.nova.show_network_node_info.initialized": "Võrk initsialiseeritud: %s"
+  "command.nova.show_network_node_info.initialized": "Võrk initsialiseeritud: %s",
+  "command.nova.show_item_behaviors.success": "Sellel %s on %s elemendi käitumine(d):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Palun hoidke eset oma põhikäes ja proovige uuesti."
 }

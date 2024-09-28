@@ -159,5 +159,7 @@
   "command.nova.reload_configs.failure": "Kunne ikke laste inn konfigurasjoner på nytt, sjekk konsollen for mer informasjon.",
   "command.nova.reload_recipes.failure": "Kunne ikke laste inn oppskrifter på nytt, sjekk konsollen for mer informasjon.",
   "enchantment.nova.unknown": "Ukjent fortryllelse: %s",
-  "command.nova.search_block.result": "Fant %s på %s."
+  "command.nova.search_block.result": "Fant %s på %s.",
+  "command.nova.show_item_behaviors.success": "Denne %s har %s elementatferd(er):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Hold en gjenstand i hovedhånden og prøv igjen."
 }

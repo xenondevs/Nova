@@ -159,5 +159,7 @@
   "command.nova.reload_recipes.failure": "Fallo al recargar recetas, compruebe la consola para más información.",
   "item.nova.unknown_item_filter": "Filtro de artículos desconocidos",
   "block.nova.unknown.message": "Ningún addon ha registrado este estado de bloque: ID: %s, Serializado: %s",
-  "command.nova.reload_configs.none": "No se ha modificado ninguna configuración."
+  "command.nova.reload_configs.none": "No se ha modificado ninguna configuración.",
+  "command.nova.show_item_behaviors.success": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s"
 }

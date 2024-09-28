@@ -159,5 +159,7 @@
   "command.nova.search_block.done": "Zoekopdracht voltooid.",
   "command.nova.reload_configs.failure": "Het is niet gelukt om configuraties opnieuw te laden, controleer de console voor meer informatie.",
   "command.nova.reload_recipes.failure": "Het opnieuw laden van recepten is mislukt, controleer de console voor meer informatie.",
-  "command.nova.reload_configs.none": "Er zijn geen configuraties gewijzigd."
+  "command.nova.reload_configs.none": "Er zijn geen configuraties gewijzigd.",
+  "command.nova.show_item_behaviors.success": "Deze %s heeft %s item gedrag(en):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Houd een voorwerp in je hoofdhand en probeer het opnieuw."
 }

@@ -159,5 +159,7 @@
   "command.nova.reload_configs.failure": "重新加载配置失败，请检查控制台以获取更多信息。",
   "command.nova.reload_recipes.failure": "重新加载配方失败，请查看控制台了解更多信息。",
   "block.nova.unknown.message": "没有插件注册此区块状态：ID: %s, 序列化: %s",
-  "command.nova.show_network_node_info.connected_nodes.header": "连接 (%s)："
+  "command.nova.show_network_node_info.connected_nodes.header": "连接 (%s)：",
+  "command.nova.show_item_behaviors.success": "该 %s 具有 %s 项行为：\n%s",
+  "command.nova.show_item_behaviors.no_item": "请用您的主手拿着一件物品再试一次。"
 }

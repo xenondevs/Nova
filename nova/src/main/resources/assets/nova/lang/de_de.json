@@ -159,5 +159,7 @@
   "command.nova.reload_configs.failure": "Das Neuladen der Konfigurationen ist fehlgeschlagen, überprüfen die Konsole für weitere Informationen.",
   "command.nova.reload_recipes.failure": "Das Nachladen von Rezepten ist fehlgeschlagen, überprüfen die Konsole für weitere Informationen.",
   "item.nova.unknown_item_filter": "Unbekannter Itemfilter",
-  "item.nova.unknown_item_filter.description": "Das Addon, das diese Itemfilterart verwaltet, ist entweder nicht vorhanden oder hat ihn nicht registriert."
+  "item.nova.unknown_item_filter.description": "Das Addon, das diese Itemfilterart verwaltet, ist entweder nicht vorhanden oder hat ihn nicht registriert.",
+  "command.nova.show_item_behaviors.success": "Dieser %s hat %s Gegenstand Verhalten(e):\n%s",
+  "command.nova.show_item_behaviors.no_item": "Dieser %s hat %s Gegenstand Verhalten(e):\n%s"
 }

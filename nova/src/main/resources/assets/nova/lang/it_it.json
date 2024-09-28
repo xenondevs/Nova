@@ -159,5 +159,7 @@
   "command.nova.reload_configs.failure": "Non è riuscito a ricaricare le configurazioni, controllare la console per ulteriori informazioni.",
   "command.nova.reload_recipes.failure": "Non è stato possibile ricaricare le ricette, controllare la console per ulteriori informazioni.",
   "block.nova.unknown": "Blocco sconosciuto",
-  "command.nova.search_block.done": "Ricerca completata."
+  "command.nova.search_block.done": "Ricerca completata.",
+  "command.nova.show_item_behaviors.no_item": "Tenere un oggetto nella mano principale e riprovare.",
+  "command.nova.show_item_behaviors.success": "Questo %s ha uno o più comportamenti dell'articolo %s:\n%s"
 }

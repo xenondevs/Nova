@@ -159,5 +159,7 @@
   "command.nova.reload_configs.none": "Żadna konfiguracja nie została zmieniona.",
   "command.nova.reload_configs.failure": "Nie udało się przeładować konfiguracji, sprawdź konsolę, aby uzyskać więcej informacji.",
   "command.nova.reload_recipes.failure": "Nie udało się przeładować receptur, sprawdź konsolę, aby uzyskać więcej informacji.",
-  "item.nova.unknown_item_filter": "Filtr nieznanych przedmiotów"
+  "item.nova.unknown_item_filter": "Filtr nieznanych przedmiotów",
+  "command.nova.show_item_behaviors.success": "Ten %s ma %s zachowań elementów:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Przytrzymaj przedmiot w głównej ręce i spróbuj ponownie."
 }

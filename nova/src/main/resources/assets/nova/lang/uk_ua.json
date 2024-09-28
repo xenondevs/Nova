@@ -159,5 +159,7 @@
   "command.nova.reload_configs.failure": "Не вдалося перезавантажити конфігурації, зверніться до консолі для отримання додаткової інформації.",
   "command.nova.reload_recipes.failure": "Не вдалося перезавантажити рецепти, зверніться до консолі для отримання додаткової інформації.",
   "command.nova.network_debug.nova.energy.on": "Увімкнено перегляд налагодження для Energy-Networks.",
-  "command.nova.show_network_node_info.initialized": "Ініціалізовано мережею: %s"
+  "command.nova.show_network_node_info.initialized": "Ініціалізовано мережею: %s",
+  "command.nova.show_item_behaviors.success": "Цей %s має поведінку %s елементів:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Будь ласка, візьміть предмет в основну руку і спробуйте ще раз."
 }

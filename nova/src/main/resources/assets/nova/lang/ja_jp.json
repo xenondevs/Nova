@@ -159,5 +159,7 @@
   "item.nova.unknown_item_filter": "不明アイテムフィルター",
   "item.nova.unknown_item_filter.description": "このアイテムフィルタータイプを管理するアドオンが存在しないか、登録されていません。",
   "block.nova.unknown": "不明ブロック",
-  "command.nova.reload_configs.none": "コンフィグは変更されていない。"
+  "command.nova.reload_configs.none": "コンフィグは変更されていない。",
+  "command.nova.show_item_behaviors.success": "この %s は %s 項目の動作を持っています：\n%s",
+  "command.nova.show_item_behaviors.no_item": "本手にアイテムを持って、もう一度試してください。"
 }
