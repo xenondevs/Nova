@@ -5,6 +5,7 @@ package xyz.xenondevs.nova.util.item
 import com.mojang.brigadier.StringReader
 import net.kyori.adventure.text.Component
 import net.minecraft.commands.arguments.item.ItemParser
+import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
@@ -12,8 +13,13 @@ import net.minecraft.core.component.TypedDataComponent
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.AdventureModePredicate
 import net.minecraft.world.item.ArmorItem
+import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.ItemAttributeModifiers
+import net.minecraft.world.item.component.ItemLore
+import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -46,8 +52,9 @@ import xyz.xenondevs.nova.world.item.recipe.ModelDataTest
 import xyz.xenondevs.nova.world.item.recipe.NovaIdTest
 import xyz.xenondevs.nova.world.item.recipe.NovaNameTest
 import xyz.xenondevs.nova.world.item.recipe.TagTest
+import java.util.Optional
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.jvm.optionals.getOrNull
+import kotlin.math.max
 import net.minecraft.world.item.ItemStack as MojangStack
 
 val ItemStack.novaItem: NovaItem?
@@ -335,32 +342,127 @@ object ItemUtils {
         return "minecraft:${itemStack.type.name.lowercase()}"
     }
     
-    internal fun mergeDataComponentPatches(vararg dataComponentPatches: DataComponentPatch): DataComponentPatch =
-        mergeDataComponentPatches(dataComponentPatches.toList())
-    
-    @Suppress("DEPRECATION")
+    @Suppress("UNCHECKED_CAST")
     internal fun mergeDataComponentPatches(dataComponentPatches: List<DataComponentPatch>): DataComponentPatch {
-        val builder = DataComponentPatch.builder()
-        val customTag = CompoundTag()
+        val components = HashMap<DataComponentType<Any>, ArrayList<Optional<Any>>>()
         
         for (dataComponentPatch in dataComponentPatches) {
-            for ((type, valueOpt) in dataComponentPatch.entrySet()) {
+            for ((type, newValueOpt) in dataComponentPatch.entrySet()) {
+                type as DataComponentType<Any>
+                newValueOpt as Optional<Any>
+                components.getOrPut(type, ::ArrayList) += newValueOpt
+            }
+        }
+        
+        val builder = DataComponentPatch.builder()
+        for ((type, valueOpts) in components) {
+            // only merge in data components that were added after the last unset (empty optional)
+            val valuesAfterUnset = ArrayList<Any>()
+            for (valueOpt in valueOpts) {
                 if (valueOpt.isPresent) {
-                    builder.set(TypedDataComponent.createUnchecked(type, valueOpt.get()))
+                    valuesAfterUnset += valueOpt.get()
                 } else {
-                    builder.remove(type)
+                    valuesAfterUnset.clear()
                 }
             }
             
-            val customData = dataComponentPatch.get(DataComponents.CUSTOM_DATA)?.getOrNull()
-            if (customData != null)
-                customTag.merge(customData.unsafe)
+            if (valuesAfterUnset.isNotEmpty()) {
+                builder.set(TypedDataComponent.createUnchecked(type, mergeDataComponents(type, valuesAfterUnset)))
+            } else {
+                builder.remove(type)
+            }
+        }
+        return builder.build()
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    internal fun mergeDataComponentMaps(dataComponentMaps: List<DataComponentMap>): DataComponentMap {
+        val components = HashMap<DataComponentType<Any>, ArrayList<Any>>()
+        
+        for (dataComponentMap in dataComponentMaps) {
+            for (typedComponent in dataComponentMap) {
+                val type = typedComponent.type as DataComponentType<Any>
+                val value = typedComponent.value
+                components.getOrPut(type, ::ArrayList) += value
+            }
         }
         
-        if (!customTag.isEmpty)
-            builder.set(DataComponents.CUSTOM_DATA, CustomData.of(customTag))
-        
+        val builder = DataComponentMap.builder()
+        for ((type, values) in components) {
+            builder.set(type, mergeDataComponents(type, values))
+        }
         return builder.build()
+    }
+    
+    @Suppress("UNCHECKED_CAST") // not sure why Kotlin cannot infer the types here
+    internal fun <T> mergeDataComponents(type: DataComponentType<T>, values: List<T>): T {
+        require(values.isNotEmpty())
+        if (values.size == 1)
+            return values.first()
+        
+        return when (type) {
+            DataComponents.ATTRIBUTE_MODIFIERS -> mergeAttributeModifiers(values as List<ItemAttributeModifiers>)
+            DataComponents.BLOCK_ENTITY_DATA -> mergeCustomData(values as List<CustomData>)
+            DataComponents.CAN_BREAK -> mergeAdventureModePredicate(values as List<AdventureModePredicate>)
+            DataComponents.CAN_PLACE_ON -> mergeAdventureModePredicate(values as List<AdventureModePredicate>)
+            DataComponents.CUSTOM_DATA -> mergeCustomData(values as List<CustomData>)
+            DataComponents.ENCHANTMENTS -> mergeEnchantments(values as List<ItemEnchantments>)
+            DataComponents.ENTITY_DATA -> mergeCustomData(values as List<CustomData>)
+            DataComponents.LORE -> mergeLore(values as List<ItemLore>)
+            DataComponents.POTION_CONTENTS -> mergePotionContents(values as List<PotionContents>)
+            DataComponents.RECIPES -> mergeResourceLocations(values as List<List<ResourceLocation>>)
+            DataComponents.STORED_ENCHANTMENTS -> mergeEnchantments(values as List<ItemEnchantments>)
+            else -> values.last()
+        } as T
+    }
+    
+    internal fun mergeAttributeModifiers(values: List<ItemAttributeModifiers>): ItemAttributeModifiers {
+        val builder = ItemAttributeModifiers.builder()
+        for (itemAttributeModifiers in values) {
+            for (modifier in itemAttributeModifiers.modifiers) {
+                builder.add(modifier.attribute, modifier.modifier, modifier.slot)
+            }
+        }
+        return builder.build()
+    }
+    
+    internal fun mergeAdventureModePredicate(values: List<AdventureModePredicate>): AdventureModePredicate {
+        return AdventureModePredicate(values.flatMap { it.predicates }, values.any { it.showInTooltip() })
+    }
+    
+    @Suppress("DEPRECATION")
+    internal fun mergeCustomData(values: List<CustomData>): CustomData {
+        val nbt = CompoundTag()
+        for (customData in values) {
+            nbt.merge(customData.unsafe)
+        }
+        return CustomData.of(nbt)
+    }
+    
+    internal fun mergeEnchantments(values: List<ItemEnchantments>): ItemEnchantments {
+        val enchantments = ItemEnchantments.Mutable(ItemEnchantments.EMPTY)
+        for (itemEnchantments in values) {
+            for ((enchantment, level) in itemEnchantments.entrySet()) {
+                enchantments.set(enchantment, max(enchantments.getLevel(enchantment), level))
+            }
+        }
+        return enchantments.toImmutable()
+    }
+    
+    internal fun mergeLore(values: List<ItemLore>): ItemLore {
+        return ItemLore(values.flatMap {it.lines }, values.flatMap { it.styledLines })
+    }
+    
+    internal fun mergePotionContents(values: List<PotionContents>): PotionContents {
+        return PotionContents(Optional.empty(), Optional.empty(), values.flatMap { it.allEffects })
+    }
+    
+    internal fun mergeResourceLocations(values: List<List<ResourceLocation>>): List<ResourceLocation> {
+        val set = LinkedHashSet<ResourceLocation>()
+        for (value in values) {
+            set.addAll(value)
+        }
+        return ArrayList(set)
     }
     
 }

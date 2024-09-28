@@ -54,7 +54,6 @@ import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.player.equipment.ArmorEquipEvent
 import java.util.logging.Level
 import kotlin.Unit
-import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 import net.minecraft.util.Unit as MojangUnit
@@ -136,11 +135,12 @@ class NovaItem internal constructor(
         }
         builder.set(DataComponents.ATTRIBUTE_MODIFIERS, loadConfiguredAttributeModifiers())
         builder.set(DataComponents.MAX_STACK_SIZE, maxStackSize)
-        for (dataComponentMap in dataComponentMaps) {
-            builder.addAll(dataComponentMap) // TODO: proper merging (customdata, attributemodifiers)
+        val base = builder.build()
+        val allMaps = buildList {
+            add(base)
+            addAll(dataComponentMaps)
         }
-        
-        builder.build()
+        return@combinedProvider ItemUtils.mergeDataComponentMaps(allMaps)
     }
     
     /**
@@ -149,18 +149,19 @@ class NovaItem internal constructor(
     internal val defaultPatch: DataComponentPatch by combinedProvider(
         behaviors.map(ItemBehavior::defaultPatch)
     ) { dataComponentPatches ->
-        val patch = ItemUtils.mergeDataComponentPatches(dataComponentPatches)
-        var customData = patch.get(DataComponents.CUSTOM_DATA)?.getOrNull() ?: CustomData.EMPTY
-        customData = customData.update { compoundTag ->
-            compoundTag.put("nova", CompoundTag().also {
-                it.putString("id", id.toString())
-            })
-            defaultCompound?.let { compoundTag.putByteArray("nova_cbf", CBF.write(it)) }
-        }
-        
-        DataComponentPatch.builder().apply { copy(patch) }
-            .set(DataComponents.CUSTOM_DATA, customData)
+        val base = DataComponentPatch.builder()
+            .set(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag().also { compoundTag ->
+                compoundTag.put("nova", CompoundTag().also {
+                    it.putString("id", id.toString())
+                })
+                defaultCompound?.let { compoundTag.putByteArray("nova_cbf", CBF.write(it)) }
+            }))
             .build()
+        val allPatches = buildList {
+            add(base)
+            addAll(dataComponentPatches)
+        }
+        return@combinedProvider ItemUtils.mergeDataComponentPatches(allPatches)
     }
     
     /**

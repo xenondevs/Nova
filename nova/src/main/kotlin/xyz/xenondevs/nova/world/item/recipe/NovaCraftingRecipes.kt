@@ -21,13 +21,13 @@ import net.minecraft.world.level.Level
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.commons.collections.removeFirstWhere
-import xyz.xenondevs.nova.world.item.logic.PacketItems
 import xyz.xenondevs.nova.util.NonNullList
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.data.nmsCategory
 import xyz.xenondevs.nova.util.data.toNmsIngredient
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.item.logic.PacketItems
 import java.util.*
 import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
 import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
@@ -330,7 +330,7 @@ internal class NovaSmithingTransformRecipe(private val bukkitRecipe: BukkitSmith
     
     override fun assemble(input: SmithingRecipeInput, lookup: HolderLookup.Provider): ItemStack {
         val recipeResult = bukkitRecipe.result.unwrap()
-        val mergedPatch = ItemUtils.mergeDataComponentPatches(input.base.componentsPatch, recipeResult.componentsPatch) // recipeResult overrides input
+        val mergedPatch = ItemUtils.mergeDataComponentPatches(listOf(input.base.componentsPatch, recipeResult.componentsPatch)) // recipeResult overrides input
         return ItemStack(recipeResult.itemHolder, recipeResult.count, mergedPatch)
     }
     
