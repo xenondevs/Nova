@@ -35,11 +35,12 @@ internal fun getResources(directory: String = ""): Sequence<String> {
     }.map(ZipEntry::getName)
 }
 
-// FIXME: resource leak
 internal fun getResources(file: File, directory: String = ""): Sequence<String> {
-    return ZipFile(file).stream().asSequence().filter {
-        it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class")
-    }.map(ZipEntry::getName)
+    return ZipFile(file).use {
+        it.stream().asSequence().filter {
+            it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class")
+        }.map(ZipEntry::getName)
+    }
 }
 
 /**

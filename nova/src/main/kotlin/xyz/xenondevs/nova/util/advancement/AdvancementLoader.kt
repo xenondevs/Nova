@@ -37,7 +37,6 @@ object AdvancementLoader {
         advancementTree.addAll(filtered)
         for (root in advancementTree.roots()) {
             if (root.holder().value().display().isPresent) {
-                // TODO: open positioning up to the api
                 TreeNodePosition.run(root)
             }
         }

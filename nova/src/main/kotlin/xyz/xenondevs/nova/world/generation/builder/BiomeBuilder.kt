@@ -348,10 +348,6 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
     
     /**
      * Sets the [MobSpawnSettings] of this biome. As the name suggests, this is used to configure the spawning of mobs.
-     *
-     * For more information on mob spawning, check out the [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/mob-spawning/).
-     *
-     * TODO PRE 0.13: change link ^^^^^^^^^^
      */
     fun mobSpawnSettings(mobSpawnSettings: MobSpawnSettings) {
         this.mobSpawnSettings = mobSpawnSettings
@@ -360,10 +356,6 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
     /**
      * Sets the [MobSpawnSettings] of this biome using a [MobSpawnSettingsBuilder]. As the name suggests, this is used to
      * configure the spawning of mobs.
-     *
-     * For more information on mob spawning, check out the [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/mob-spawning/).
-     *
-     * TODO PRE 0.13: change link ^^^^^^^^^^
      */
     @WorldGenDsl
     fun mobSpawnSettings(mobSpawnSettings: MobSpawnSettingsBuilder.() -> Unit) {

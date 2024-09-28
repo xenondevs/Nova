@@ -28,7 +28,6 @@ internal object BackingStateConfigSerialization : JsonSerializer<BackingStateCon
     @Suppress("UNCHECKED_CAST")
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): BackingStateConfig {
         json as JsonObject
-        // TODO: it might be better have a registry for this
         val kclass = Class.forName(json.getString("type")).kotlin
         val type = (kclass.objectInstance ?: kclass.companionObjectInstance) as BackingStateConfigType<BackingStateConfig>
         return type.of(json.getInt("id"), json.getBoolean("waterlogged"))

@@ -198,7 +198,6 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
     /**
      * Writes all block state files to the resource pack.
      */
-    // TODO: support base pack merging
     @PackTask(runAfter = ["ModelContent#discoverAllModels"])
     private fun writeBlockStateFiles() {
         variantByConfig.entries

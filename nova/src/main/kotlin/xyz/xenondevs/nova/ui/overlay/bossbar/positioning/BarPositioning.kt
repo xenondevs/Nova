@@ -83,7 +83,6 @@ abstract class BarPositioning(
     
     companion object {
         
-        // TODO: clean up
         fun sort(overlays: List<BossBarOverlayCompound>): List<BossBarOverlayCompound> {
             val inp = overlays.toMutableList()
             val out = ArrayList<BossBarOverlayCompound>()
