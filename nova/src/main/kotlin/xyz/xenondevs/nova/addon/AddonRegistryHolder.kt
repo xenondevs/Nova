@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.addon.registry.RecipeTypeRegistry
 import xyz.xenondevs.nova.addon.registry.ToolCategoryRegistry
 import xyz.xenondevs.nova.addon.registry.ToolTierRegistry
 import xyz.xenondevs.nova.addon.registry.WailaInfoProviderRegistry
+import xyz.xenondevs.nova.addon.registry.WailaToolIconProviderRegistry
 import xyz.xenondevs.nova.addon.registry.worldgen.BiomeRegistry
 import xyz.xenondevs.nova.addon.registry.worldgen.CarverRegistry
 import xyz.xenondevs.nova.addon.registry.worldgen.DimensionRegistry
@@ -25,5 +26,6 @@ class AddonRegistryHolder internal constructor(
     override val addon: Addon
 ) : AbilityTypeRegistry, AttachmentTypeRegistry, BlockRegistry, EnchantmentRegistry,
     ItemRegistry, NetworkTypeRegistry, RecipeTypeRegistry, ToolCategoryRegistry, ToolTierRegistry,
-    WailaInfoProviderRegistry, MinecraftUtilTypeRegistry, BiomeRegistry, CarverRegistry, DimensionRegistry,
-    FeatureRegistry, NoiseRegistry, StructureRegistry, ArmorRegistry, GuiTextureRegistry, ItemFilterTypeRegistry
+    WailaInfoProviderRegistry, WailaToolIconProviderRegistry, MinecraftUtilTypeRegistry, BiomeRegistry,
+    CarverRegistry, DimensionRegistry, FeatureRegistry, NoiseRegistry, StructureRegistry, ArmorRegistry,
+    GuiTextureRegistry, ItemFilterTypeRegistry
