@@ -40,7 +40,7 @@ internal object VanillaWailaToolIconProvider : WailaToolIconProvider {
             SHOVEL, PICKAXE, AXE, HOE, SWORD -> when (tier) {
                 WOOD, GOLD -> "${tier.id.name}en_${category.id.name}"
                 STONE, IRON, DIAMOND, NETHERITE -> "${tier.id.name}_${category.id.name}"
-                else -> "wooden_${category.id.name}"
+                else -> null
             }
             
             else -> null
