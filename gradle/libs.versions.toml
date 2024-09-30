@@ -13,7 +13,7 @@ paperweight = "1.7.2"
 xenondevs-commons = "1.17"
 
 [libraries]
-awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.28.6" }
+awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.28.11" }
 bstats = { group = "xyz.xenondevs.bstats", name = "bstats-bukkit", version = "3.0.1" }
 bytbase-runtime = { group = "xyz.xenondevs.bytebase", name = "ByteBase-Runtime", version = "0.4.8" }
 caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version = "3.1.8" }
