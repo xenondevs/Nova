@@ -34,6 +34,6 @@ jobs:
             --scan
       
       - name: Deploy to Github Pages
-        uses: JamesIves/github-pages-deploy-action@v4.6.4
+        uses: JamesIves/github-pages-deploy-action@v4.6.8
         with:
           folder: build/dokka/htmlMultiModule
