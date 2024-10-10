@@ -33,6 +33,8 @@ internal class VanillaHopperTileEntity(type: Type, pos: BlockPos, data: Compound
             map[facing] = NetworkConnectionType.EXTRACT
             map
         }
+        
+        super.handleEnable()
     }
     
 }
