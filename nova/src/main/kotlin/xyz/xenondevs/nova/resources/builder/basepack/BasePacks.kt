@@ -82,7 +82,7 @@ class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
                 }
                 
                 val relPath = file.relativeTo(packDir)
-                val packFile = ResourcePackBuilder.PACK_DIR.resolve(relPath)
+                val packFile = ResourcePackBuilder.PACK_DIR.resolve(relPath.invariantSeparatorsPathString)
                 
                 packFile.parent.createDirectories()
                 val fileMerger = mergers.firstOrNull { it.acceptsFile(relPath) }
