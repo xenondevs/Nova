@@ -422,13 +422,15 @@ internal object PacketItems : Listener, PacketListener {
         val serversideTag = itemStack.get(DataComponents.CUSTOM_DATA)?.unsafe
             ?.getCompoundOrNull("NovaServerSideTag")
             ?: return itemStack
+        val serversideComponents = decodeComponents(serversideTag)
         
         // use server-side item for all Nova items, otherwise keep current item
-        val item = if (serversideTag.contains("nova", NBTUtils.TAG_COMPOUND))
+        val serversideCustomData = serversideComponents.get(DataComponents.CUSTOM_DATA)?.orElse(null)
+        val item = if (serversideCustomData?.unsafe?.contains("nova", NBTUtils.TAG_COMPOUND) == true)
             SERVER_SIDE_ITEM_HOLDER
         else itemStack.itemHolder
         
-        return MojangStack(item, itemStack.count, decodeComponents(serversideTag))
+        return MojangStack(item, itemStack.count, serversideComponents)
     }
     //</editor-fold>
     
