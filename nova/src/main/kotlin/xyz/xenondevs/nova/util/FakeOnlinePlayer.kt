@@ -5,6 +5,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.permissions.Permission
+import org.bukkit.persistence.PersistentDataContainer
 import org.objectweb.asm.Opcodes
 import xyz.xenondevs.bytebase.ClassWrapperLoader
 import xyz.xenondevs.bytebase.jvm.ClassWrapper
@@ -14,7 +15,6 @@ import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.integration.permission.PermissionManager
 import xyz.xenondevs.nova.util.data.AsmUtils
-import java.io.File
 import java.lang.reflect.Constructor
 import java.util.*
 
@@ -69,6 +69,10 @@ abstract class FakeOnlinePlayer(
     
     override fun getName(): String {
         return offlinePlayer.name ?: "OfflinePlayer"
+    }
+    
+    override fun getPersistentDataContainer(): PersistentDataContainer {
+        throw UnsupportedOperationException()
     }
     
     companion object {
