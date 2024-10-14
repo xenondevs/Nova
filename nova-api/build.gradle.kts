@@ -7,7 +7,7 @@ plugins {
 }
 
 dependencies {
-    implementation("org.jetbrains:annotations:25.0.0")
+    implementation("org.jetbrains:annotations:26.0.0")
     compileOnly(libs.paper.api)
 }
 
