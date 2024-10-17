@@ -5,18 +5,18 @@ import net.minecraft.world.level.block.LayeredCauldronBlock
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.commons.provider.immutable.provider
-import xyz.xenondevs.commons.provider.mutable.mutableProvider
+import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.commons.provider.mutableProvider
+import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.setBlockState
+import xyz.xenondevs.nova.util.withoutBlockMigration
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.FluidContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.DefaultFluidHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
-import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.setBlockState
-import xyz.xenondevs.nova.util.withoutBlockMigration
-import xyz.xenondevs.nova.world.BlockPos
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -73,8 +73,8 @@ internal class VanillaCauldronTileEntity internal constructor(
     
     override fun handleBlockStateChange(blockState: BlockState) {
         currentBlockState = blockState
-        container.typeProvider.update()
-        container.amountProvider.update()
+        container.typeProvider.set(getFluidType())
+        container.amountProvider.set(getFluidAmount())
     }
     
     fun postNetworkTickSync() {

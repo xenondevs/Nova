@@ -6,6 +6,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundActionBarPacketEvent
@@ -30,7 +31,7 @@ object ActionbarOverlayManager : PacketListener {
     init {
         val enabled = MAIN_CONFIG.entry<Boolean>("overlay", "actionbar", "enabled")
         enabled.subscribe(::reload)
-        enabled.update()
+        reload(enabled.get())
     }
     
     private fun reload(enabled: Boolean) {

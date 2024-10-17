@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container
 
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.cbf.provider.entry
+import xyz.xenondevs.cbf.entry
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.mutable.MutableProvider
-import xyz.xenondevs.commons.provider.mutable.defaultsTo
+import xyz.xenondevs.commons.provider.MutableProvider
+import xyz.xenondevs.commons.provider.defaultsTo
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import java.util.*
 import kotlin.math.min

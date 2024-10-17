@@ -21,10 +21,11 @@ import org.bukkit.event.block.Action
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.combinedProvider
-import xyz.xenondevs.commons.provider.immutable.map
-import xyz.xenondevs.commons.provider.immutable.orElse
-import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.commons.provider.weakMap
+import xyz.xenondevs.nova.config.weakOptionalEntry
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
@@ -75,11 +76,11 @@ fun Wearable(armor: Armor?, slot: BukkitEquipmentSlot, equipSound: String? = nul
         override fun create(item: NovaItem): Wearable {
             val cfg = item.config
             return Wearable(
-                ResourceLookups.ARMOR_COLOR_LOOKUP.provider.map { map -> armor?.let(map::get) },
+                ResourceLookups.ARMOR_COLOR_LOOKUP.provider.weakMap { map -> armor?.let(map::get) },
                 provider(slot),
-                cfg.optionalEntry<Double>("armor").orElse(0.0),
-                cfg.optionalEntry<Double>("armor_toughness").orElse(0.0),
-                cfg.optionalEntry<Double>("knockback_resistance").orElse(0.0),
+                cfg.weakOptionalEntry<Double>("armor").orElse(0.0),
+                cfg.weakOptionalEntry<Double>("armor_toughness").orElse(0.0),
+                cfg.weakOptionalEntry<Double>("knockback_resistance").orElse(0.0),
                 provider(equipSound)
             )
         }

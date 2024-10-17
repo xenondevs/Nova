@@ -2,9 +2,10 @@ package xyz.xenondevs.nova.ui.waila.overlay
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.entity.Player
-import xyz.xenondevs.commons.provider.immutable.combinedProvider
-import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay

@@ -1,13 +1,14 @@
 package xyz.xenondevs.nova.addon.registry
 
-import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.Configs
-import xyz.xenondevs.nova.world.item.tool.ToolTier
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.registry.HardcodedProperties
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.world.item.tool.ToolTier
 
 interface ToolTierRegistry : AddonGetter {
     

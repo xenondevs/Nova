@@ -4,9 +4,8 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
+import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.mutable.MutableProvider
-import xyz.xenondevs.commons.provider.mutable.map
 import xyz.xenondevs.nova.ui.menu.item.AddNumberItem
 import xyz.xenondevs.nova.ui.menu.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.menu.item.RemoveNumberItem
@@ -31,9 +30,7 @@ class DynamicRegion internal constructor(
     
     val minSize by minSize
     val maxSize by maxSize
-    
-    private val _size = size.map({ it.coerceIn(minSize.get(), maxSize.get()) }, { it })
-    var size by _size
+    var size by size
     
     private lateinit var _region: Region
     private var region: Region
@@ -53,12 +50,14 @@ class DynamicRegion internal constructor(
             updateSizeControls()
             updateRegion()
         }
-        
-        minSize.addChild(_size)
-        maxSize.addChild(_size)
-        
-        minSize.subscribe { updateSizeControls() }
-        maxSize.subscribe { updateSizeControls() }
+        minSize.subscribe {
+            size.set(size.get().coerceIn(it, maxSize.get()))
+            updateSizeControls()
+        }
+        maxSize.subscribe {
+            size.set(size.get().coerceIn(minSize.get(), it))
+            updateSizeControls()
+        }
     }
     
     fun createVisualizeRegionItem(player: Player): VisualizeRegionItem {

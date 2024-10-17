@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.resources.lookup
 
 import net.minecraft.resources.ResourceLocation
-import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.reflection.createType
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.resources.ResourcePath
@@ -15,13 +15,12 @@ open class ResourceLookup<T : Any> internal constructor(
     empty: T,
 ) {
     
-    var value: T = empty
-    val provider = provider { value }
+    val provider = mutableProvider(empty)
+    val value by provider
     
     internal open fun set(value: T) {
-        this.value = value
         PermanentStorage.store(key, value)
-        provider.update()
+        provider.set(value)
     }
     
     internal fun load() {

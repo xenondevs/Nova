@@ -6,8 +6,10 @@ import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.orElse
-import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.nova.config.weakEntry
+import xyz.xenondevs.nova.config.weakOptionalEntry
 import xyz.xenondevs.nova.world.item.NovaItem
 
 /**
@@ -60,10 +62,10 @@ class Enchantable(
         
         override fun create(item: NovaItem): Enchantable {
             val cfg = item.config
-            val supportedEnchantments = cfg.optionalEntry<Set<Enchantment>>("supported_enchantments").orElse(emptySet())
+            val supportedEnchantments = cfg.weakOptionalEntry<Set<Enchantment>>("supported_enchantments").orElse(emptySet())
             return Enchantable(
-                cfg.entry("enchantment_value"),
-                cfg.optionalEntry<Set<Enchantment>>("primary_enchantments").orElse(supportedEnchantments),
+                cfg.weakEntry("enchantment_value"),
+                cfg.weakOptionalEntry<Set<Enchantment>>("primary_enchantments").orElse(supportedEnchantments),
                 supportedEnchantments
             )
         }

@@ -6,6 +6,7 @@ import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.typeOf

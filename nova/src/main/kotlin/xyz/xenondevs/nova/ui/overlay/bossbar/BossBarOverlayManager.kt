@@ -15,6 +15,8 @@ import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.inventoryaccess.util.ReflectionRegistry
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.config.node
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit

@@ -1,9 +1,10 @@
 package xyz.xenondevs.nova.resources.builder.basepack
 
 import org.bukkit.Material
-import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.basepack.merger.FileMerger

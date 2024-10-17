@@ -2,11 +2,13 @@ package xyz.xenondevs.nova.world.block.behavior
 
 import org.bukkit.Material
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.orElse
-import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.nova.config.weakEntry
+import xyz.xenondevs.nova.config.weakOptionalEntry
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
-import xyz.xenondevs.nova.world.block.NovaBlock
 
 fun Breakable(
     hardness: Double,
@@ -104,12 +106,12 @@ interface Breakable {
         override fun create(block: NovaBlock): Default {
             val cfg = block.config
             return Default(
-                cfg.entry<Double>("hardness"),
-                cfg.entry<Set<ToolCategory>>("toolCategories"),
-                cfg.optionalEntry<ToolTier>("toolTier"),
-                cfg.entry<Boolean>("requiresToolForDrops"),
-                cfg.optionalEntry<Material>("breakParticles"),
-                cfg.optionalEntry<Boolean>("showBreakAnimation").orElse(true)
+                cfg.weakEntry<Double>("hardness"),
+                cfg.weakEntry<Set<ToolCategory>>("toolCategories"),
+                cfg.weakOptionalEntry<ToolTier>("toolTier"),
+                cfg.weakEntry<Boolean>("requiresToolForDrops"),
+                cfg.weakOptionalEntry<Material>("breakParticles"),
+                cfg.weakOptionalEntry<Boolean>("showBreakAnimation").orElse(true)
             )
         }
         

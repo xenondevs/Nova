@@ -15,24 +15,24 @@ import xyz.xenondevs.nova.world.item.DefaultGuiItems
  */
 class EnergyBar(
     height: Int,
-    energy: Provider<Long>,
-    maxEnergy: Provider<Long>,
-    energyPlus: Provider<Long>,
-    energyMinus: Provider<Long>,
+    private val energy: Provider<Long>,
+    private val maxEnergy: Provider<Long>,
+    private val getEnergyPlus: () -> Long,
+    private val getEnergyMinus: () -> Long
 ) : VerticalBar(height) {
-    
-    private val energy by energy
-    private val maxEnergy by maxEnergy
-    private val energyPlus by energyPlus
-    private val energyMinus by energyMinus
     
     constructor(height: Int, energyHolder: DefaultEnergyHolder) : this(
         height,
         energyHolder.energyProvider, energyHolder.maxEnergyProvider,
-        energyHolder.energyPlusProvider, energyHolder.energyMinusProvider
+        {energyHolder.energyPlus}, {energyHolder.energyMinus}
     )
     
     override fun createBarItem(section: Int) = AutoUpdateItem(1) {
+        val energy = energy.get()
+        val maxEnergy = maxEnergy.get()
+        val energyPlus = getEnergyPlus()
+        val energyMinus = getEnergyMinus()
+        
         val builder = createItemBuilder(DefaultGuiItems.BAR_RED, section, energy.toDouble() / maxEnergy.toDouble())
         
         if (energy == Long.MAX_VALUE) {

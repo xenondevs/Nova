@@ -12,7 +12,8 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.config.ConfigProvider
+import org.spongepowered.configurate.CommentedConfigurationNode
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
@@ -53,11 +54,9 @@ open class NovaBlock internal constructor(
     
     /**
      * The configuration for this [NovaBlock].
-     * Trying to read config values from this when no config is present will result in an exception.
-     *
-     * Use the extension functions `entry` and `optionalEntry` to get values from the config.
+     * May be an empty node if the config file does not exist.
      */
-    val config: ConfigProvider by lazy { Configs[configId] }
+    val config: Provider<CommentedConfigurationNode> = Configs[configId]
     
     /**
      * A list of all [BlockBehaviors][BlockBehavior] of this [NovaBlock].

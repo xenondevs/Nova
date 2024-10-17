@@ -29,9 +29,10 @@ import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.PermanentStorage
-import xyz.xenondevs.nova.serialization.cbf.CBFAdapters
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.registry.NovaRegistryAccess
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
+import xyz.xenondevs.nova.serialization.cbf.CBFAdapters
 import xyz.xenondevs.nova.ui.menu.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.addon.AddonsLoader
@@ -18,7 +19,6 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.set
 import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
@@ -41,13 +41,10 @@ object Configs {
     private val extractor = ConfigExtractor(PermanentStorage.storedValue("storedConfigs", ::HashMap))
     private val configProviders = HashMap<String, RootConfigProvider>()
     
-    private var mainLoaded = false
-    private var loaded = false
     private var lastReload = -1L
     
     internal fun extractDefaultConfig() {
-        NOVA.novaJar.useZip { extractConfig(it.resolve(DEFAULT_CONFIG_PATH), DEFAULT_CONFIG_NAME, DEFAULT_CONFIG_PATH, ::mainLoaded) }
-        mainLoaded = true
+        NOVA.novaJar.useZip { extractConfig(it.resolve(DEFAULT_CONFIG_PATH), DEFAULT_CONFIG_NAME, DEFAULT_CONFIG_PATH) }
     }
     
     @InitFun
@@ -57,12 +54,10 @@ object Configs {
             extractConfigs(id, loader.file, "configs/")
         }
         
-        loaded = true
         lastReload = System.currentTimeMillis()
-        
         configProviders.values.asSequence()
             .filter { it.path.exists() }
-            .forEach(ConfigProvider::update)
+            .forEach { it.set(createLoader(it.path).load()) }
     }
     
     private fun extractConfigs(namespace: String, zipFile: File, configsPath: String) {
@@ -74,30 +69,31 @@ object Configs {
                     val relPath = config.relativeTo(configsDir).invariantSeparatorsPathString
                     val configName = "$namespace:${relPath.substringBeforeLast('.')}"
                     val configPath = "configs/$namespace/$relPath"
-                    extractConfig(config, configName, configPath, ::loaded)
+                    extractConfig(config, configName, configPath)
                 }
         }
     }
     
-    private fun extractConfig(config: Path, configId: String, configPath: String, loadValidation: () -> Boolean) {
+    private fun extractConfig(config: Path, configId: String, configPath: String) {
         val destFile = File(NOVA.dataFolder, configPath).toPath()
         extractor.extract(configPath, config, destFile)
-        if (configId !in configProviders)
-            configProviders[configId] = RootConfigProvider(destFile, configPath, loadValidation)
+        
+        val provider = configProviders.getOrPut(configId) { RootConfigProvider(destFile, configPath) }
+        provider.set(createLoader(destFile).load())
     }
     
-    private fun createConfigProvider(configId: String, loadValidation: () -> Boolean): RootConfigProvider {
+    private fun createConfigProvider(configId: String): RootConfigProvider {
         val (namespace, path) = configId.split(':')
         val relPath = "configs/$namespace/$path.yml"
         val file = File(NOVA.dataFolder, relPath).toPath()
-        return RootConfigProvider(file, relPath, loadValidation)
+        return RootConfigProvider(file, relPath)
     }
     
     internal fun reload(): List<String> {
         val reloadedConfigs = configProviders.asSequence()
             .filter { (_, provider) -> provider.path.exists() }
             .filter { (_, provider) -> provider.path.getLastModifiedTime().toMillis() > lastReload } // only reload updated configs
-            .onEach { (_, provider) -> provider.update() }
+            .onEach { (_, provider) -> provider.set(createLoader(provider.path).load()) }
             .mapTo(ArrayList()) { (id, _) -> id }
         lastReload = System.currentTimeMillis()
         
@@ -106,23 +102,17 @@ object Configs {
         return reloadedConfigs
     }
     
-    operator fun get(id: ResourceLocation): ConfigProvider =
+    operator fun get(id: ResourceLocation): Provider<CommentedConfigurationNode> =
         get(id.toString())
     
-    operator fun get(id: String): ConfigProvider =
-        configProviders.getOrPut(id) { createConfigProvider(id, ::loaded) }
-    
-    fun getProviderOrNull(id: ResourceLocation): ConfigProvider? =
-        getProviderOrNull(id.toString())
-    
-    fun getProviderOrNull(id: String): ConfigProvider? =
-        configProviders[id]
+    operator fun get(id: String): Provider<CommentedConfigurationNode> =
+        configProviders.getOrPut(id) { createConfigProvider(id) }
     
     fun getOrNull(id: ResourceLocation): CommentedConfigurationNode? =
         getOrNull(id.toString())
     
     fun getOrNull(id: String): CommentedConfigurationNode? =
-        configProviders[id]?.get()
+        configProviders[id]?.takeIf { it.loaded }?.get()
     
     fun save(id: ResourceLocation) =
         save(id.toString())

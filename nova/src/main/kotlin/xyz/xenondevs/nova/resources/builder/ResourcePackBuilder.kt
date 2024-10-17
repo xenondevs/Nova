@@ -5,12 +5,16 @@ import com.google.common.jimfs.Jimfs
 import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
 import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.combinedProvider
-import xyz.xenondevs.commons.provider.immutable.flatten
-import xyz.xenondevs.commons.provider.immutable.map
-import xyz.xenondevs.commons.provider.immutable.mapNonNull
-import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatMap
+import xyz.xenondevs.commons.provider.flattenIterables
+import xyz.xenondevs.commons.provider.map
+import xyz.xenondevs.commons.provider.mapNonNull
+import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
@@ -56,6 +60,7 @@ import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import kotlin.time.Duration
 import kotlin.time.measureTime
+import xyz.xenondevs.nova.config.entry
 
 private val EXTRACTION_MODE by MAIN_CONFIG.entry<String>("resource_pack", "generation", "minecraft_assets_source").map {
     when (it.lowercase()) {
@@ -85,7 +90,7 @@ private val CORE_RESOURCE_FILTERS by combinedProvider(listOf(
             )
         } else emptyList()
     }
-)).flatten()
+)).flattenIterables()
 
 private val COMPRESSION_LEVEL by MAIN_CONFIG.entry<Int>("resource_pack", "generation", "compression_level")
 private val PACK_DESCRIPTION by MAIN_CONFIG.entry<String>("resource_pack", "generation", "description")
@@ -98,7 +103,11 @@ class ResourcePackBuilder internal constructor() {
     
     companion object {
         
-        private var JIMFS_PROVIDER: Provider<FileSystem?> = IN_MEMORY_PROVIDER.map { if (it) Jimfs.newFileSystem(Configuration.unix()) else null }
+        
+        private val JIMFS_PROVIDER: MutableProvider<FileSystem> = mutableProvider { Jimfs.newFileSystem(Configuration.unix())  }
+        private val FILE_SYSTEM_PROVIDER: Provider<FileSystem> = IN_MEMORY_PROVIDER.flatMap { inMemory ->
+            if (inMemory) JIMFS_PROVIDER else provider(FileSystems.getDefault())
+        }
         
         //<editor-fold desc="never in memory">
         val RESOURCE_PACK_FILE: File = File(NOVA.dataFolder, "resource_pack/ResourcePack.zip")
@@ -109,7 +118,7 @@ class ResourcePackBuilder internal constructor() {
         //</editor-fold>
         
         //<editor-fold desc="potentially in memory">
-        private val RESOURCE_PACK_BUILD_DIR_PROVIDER: Provider<Path> = JIMFS_PROVIDER.mapNonNull { it.rootDirectories.first() }.orElse(RESOURCE_PACK_DIR.resolve(".build"))
+        private val RESOURCE_PACK_BUILD_DIR_PROVIDER: Provider<Path> = FILE_SYSTEM_PROVIDER.mapNonNull { it.rootDirectories.first() }.orElse(RESOURCE_PACK_DIR.resolve(".build"))
         private val TEMP_BASE_PACKS_DIR_PROVIDER: Provider<Path> = RESOURCE_PACK_BUILD_DIR_PROVIDER.map { it.resolve("base_packs") }
         private val PACK_DIR_PROVIDER: Provider<Path> = RESOURCE_PACK_BUILD_DIR_PROVIDER.map { it.resolve("pack") }
         private val ASSETS_DIR_PROVIDER: Provider<Path> = PACK_DIR_PROVIDER.map { it.resolve("assets") }
@@ -267,10 +276,10 @@ class ResourcePackBuilder internal constructor() {
     }
     
     private fun deleteBuildDir() {
-        val provider = JIMFS_PROVIDER.get()
-        if (provider != null) {
-            provider.close()
-            JIMFS_PROVIDER.update() // creates a new jimfs file system
+        if (IN_MEMORY) {
+            val jimfs = JIMFS_PROVIDER.get()
+            jimfs.close()
+            JIMFS_PROVIDER.set(Jimfs.newFileSystem(Configuration.unix()))
         } else {
             RESOURCE_PACK_BUILD_DIR.toFile().deleteRecursively()
         }

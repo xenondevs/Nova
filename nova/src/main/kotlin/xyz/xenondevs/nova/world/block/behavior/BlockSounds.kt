@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.world.block.behavior
 
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 
 /**

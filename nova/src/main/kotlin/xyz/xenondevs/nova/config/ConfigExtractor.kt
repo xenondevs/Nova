@@ -11,7 +11,7 @@ import org.snakeyaml.engine.v2.nodes.SequenceNode
 import org.snakeyaml.engine.v2.parser.ParserImpl
 import org.snakeyaml.engine.v2.scanner.StreamReader
 import org.snakeyaml.engine.v2.serializer.Serializer
-import xyz.xenondevs.commons.provider.mutable.MutableProvider
+import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.nova.util.data.NodeWalkDecision
 import xyz.xenondevs.nova.util.data.deepEquals
 import xyz.xenondevs.nova.util.data.get

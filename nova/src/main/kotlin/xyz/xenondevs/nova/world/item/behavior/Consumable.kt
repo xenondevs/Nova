@@ -8,11 +8,14 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.potion.PotionEffect
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.combinedProvider
-import xyz.xenondevs.commons.provider.immutable.map
-import xyz.xenondevs.commons.provider.immutable.mapNonNull
-import xyz.xenondevs.commons.provider.immutable.orElse
-import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.map
+import xyz.xenondevs.commons.provider.mapNonNull
+import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.nova.config.weakEntry
+import xyz.xenondevs.nova.config.weakNode
+import xyz.xenondevs.nova.config.weakOptionalEntry
 import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
@@ -85,13 +88,13 @@ class Consumable(
         override fun create(item: NovaItem): Consumable {
             val cfg = item.config
             return Consumable(
-                cfg.entry("nutrition"),
-                cfg.entry("saturation"),
-                cfg.optionalEntry<Boolean>("can_always_eat").orElse(false),
-                cfg.entry("consume_time"),
+                cfg.weakEntry("nutrition"),
+                cfg.weakEntry("saturation"),
+                cfg.weakOptionalEntry<Boolean>("can_always_eat").orElse(false),
+                cfg.weakEntry("consume_time"),
                 // RecipeChoice is not optimal here, but ItemStack currently has no serializer
-                cfg.optionalEntry<RecipeChoice>("remains").mapNonNull { it.getInputStacks()[0] },
-                cfg.node("effects").map {
+                cfg.weakOptionalEntry<RecipeChoice>("remains").mapNonNull { it.getInputStacks()[0] },
+                cfg.weakNode("effects").map {
                     it.childrenList().associate { e ->
                         val effect = e.get(PotionEffect::class.java)!!
                         val probability = e.node("probability").getFloat(1.0f)

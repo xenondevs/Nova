@@ -26,12 +26,13 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
+import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.cbf.CBF
-import xyz.xenondevs.commons.provider.immutable.combinedProvider
-import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -90,9 +91,9 @@ class NovaItem internal constructor(
     
     /**
      * The configuration for this [NovaItem].
-     * Trying to read config values from this when no config is present will result in an exception.
+     * May be an empty node if the config file does not exist.
      */
-    val config: ConfigProvider = Configs[configId]
+    val config: Provider<CommentedConfigurationNode> = Configs[configId]
     
     /**
      * The [ItemBehaviors][ItemBehavior] of this [NovaItem].
@@ -252,6 +253,7 @@ class NovaItem internal constructor(
         return behaviors.fold(itemStack) { stack, behavior -> behavior.modifyClientSideStack(player, stack, data) }
     }
     
+    // TODO: config reloading
     private fun loadConfiguredAttributeModifiers(): ItemAttributeModifiers {
         val section = Configs.getOrNull(configId)?.node("attribute_modifiers")
         if (section == null || section.virtual())

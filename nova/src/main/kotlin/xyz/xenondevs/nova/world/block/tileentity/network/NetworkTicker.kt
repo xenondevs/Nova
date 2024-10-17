@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.bukkit.World
 import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.serverTick
 import java.util.concurrent.ConcurrentHashMap

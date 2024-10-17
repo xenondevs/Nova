@@ -1,34 +1,30 @@
 package xyz.xenondevs.nova.util
 
-import xyz.xenondevs.commons.provider.AbstractProvider
 import xyz.xenondevs.commons.provider.Provider
+import kotlin.reflect.KProperty
 
-internal class ResettingLongProvider(
-    resetDelay: Provider<Int>
-) : AbstractProvider<Long>() {
+internal class TimedResettingLong(resetDelay: Provider<Int>) {
     
     private val resetDelay by resetDelay
     private var lastReset = 0
     
-    override fun loadValue(): Long {
-        return 0L
-    }
+    private var value = 0L
     
-    override fun get(): Long {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): Long {
         if ((serverTick - lastReset) / resetDelay > 0) {
             lastReset = serverTick
-            set(0)
+            value = 0
         }
         
-        return super.get()
+        return value
     }
     
     fun add(value: Long) {
         if ((serverTick - lastReset) / resetDelay > 0) {
             lastReset = serverTick
-            set(value)
+            this.value = value
         } else {
-            set(get() + value)
+            this.value += value
         }
     }
     

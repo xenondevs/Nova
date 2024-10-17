@@ -3,9 +3,8 @@ package xyz.xenondevs.nova.serialization
 import net.minecraft.server.commands.data.DataAccessor
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.cbf.provider.entry
-import xyz.xenondevs.commons.provider.mutable.MutableProvider
-import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
+import xyz.xenondevs.commons.provider.MutableProvider
+import xyz.xenondevs.commons.provider.orElseNew
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -117,11 +116,13 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
      * Creates a [MutableProvider] to which properties can delegate.
      *
      * The [MutableProvider] will contain the data of type [T] under [key] or the result of [defaultValue] if there is no data stored under that [key].
+     * For mutable data types, it is required that [defaultValue] returns a new instance every time it is called,
+     * and that all instances are [equal][Any.equals] to each other.
      *
      * @param persistent If the data should also be stored in the [ItemStack].
      */
     inline fun <reified T : Any> storedValue(key: String, persistent: Boolean, noinline defaultValue: () -> T): MutableProvider<T> =
-        storedValue<T>(key, persistent).defaultsToLazily(defaultValue)
+        storedValue<T>(key, persistent).orElseNew(defaultValue)
     
     /**
      * Creates a [MutableProvider] to which properties can delegate.

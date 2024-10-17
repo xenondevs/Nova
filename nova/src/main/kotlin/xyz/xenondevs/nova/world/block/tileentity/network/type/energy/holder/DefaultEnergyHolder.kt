@@ -2,14 +2,14 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.cbf.provider.entry
+import xyz.xenondevs.cbf.entry
 import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.collections.toEnumSet
+import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.mutable.MutableProvider
-import xyz.xenondevs.commons.provider.mutable.defaultsToLazily
+import xyz.xenondevs.commons.provider.orElseNew
 import xyz.xenondevs.nova.serialization.DataHolder
-import xyz.xenondevs.nova.util.ResettingLongProvider
+import xyz.xenondevs.nova.util.TimedResettingLong
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.EnergyNetwork
 import kotlin.math.max
@@ -34,13 +34,13 @@ class DefaultEnergyHolder(
 ) : EnergyHolder {
     
     private val _energyProvider: MutableProvider<Long> = energy
-    private val _energyMinusProvider = ResettingLongProvider(EnergyNetwork.TICK_DELAY_PROVIDER)
-    private val _energyPlusProvider = ResettingLongProvider(EnergyNetwork.TICK_DELAY_PROVIDER)
+    private val _energyMinus = TimedResettingLong(EnergyNetwork.TICK_DELAY_PROVIDER)
+    private val _energyPlus = TimedResettingLong(EnergyNetwork.TICK_DELAY_PROVIDER)
     
     override val blockedFaces = blockedFaces.toEnumSet()
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
         by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-            .defaultsToLazily {
+            .orElseNew {
                 val map = defaultConnectionConfig().toEnumMap()
                 for (face in blockedFaces)
                     map[face] = NetworkConnectionType.NONE
@@ -57,27 +57,17 @@ class DefaultEnergyHolder(
      */
     val energyProvider: Provider<Long> get() = _energyProvider
     
-    /**
-     * A [Provider] that shows the amount of energy that was extracted during the last energy network tick.
-     */
-    val energyMinusProvider: Provider<Long> = _energyMinusProvider
-    
-    /**
-     * A [Provider] that shows the amount of energy that was inserted during the last energy network tick.
-     */
-    val energyPlusProvider: Provider<Long> = _energyPlusProvider
+    private var energyDeltaLastResetTick = 0
     
     /**
      * The amount of energy that was extracted during the last energy network tick.
      */
-    var energyMinus: Long by _energyMinusProvider
-        private set
+    val energyMinus: Long by _energyMinus
     
     /**
      * The amount of energy that was inserted during the last energy network tick.
      */
-    var energyPlus: Long by _energyPlusProvider
-        private set
+    val energyPlus: Long by _energyPlus
     
     override var energy: Long
         get() = _energyProvider.get()
@@ -86,9 +76,9 @@ class DefaultEnergyHolder(
             if (_energyProvider.get() != capped) {
                 val energyDelta = capped - _energyProvider.get()
                 if (energyDelta > 0) {
-                    energyPlus += energyDelta
+                    _energyPlus.add(energyDelta)
                 } else {
-                    energyMinus -= energyDelta
+                    _energyMinus.add(-energyDelta)
                 }
                 
                 _energyProvider.set(capped)

@@ -5,8 +5,8 @@ import com.google.gson.JsonObject
 import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
-import xyz.xenondevs.commons.provider.mutable.MutableProvider
-import xyz.xenondevs.commons.provider.mutable.mutableProvider
+import xyz.xenondevs.commons.provider.MutableProvider
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.serialization.json.GSON
 import java.io.File
 import java.lang.reflect.Type

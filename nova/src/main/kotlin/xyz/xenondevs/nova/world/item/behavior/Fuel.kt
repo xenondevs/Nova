@@ -6,7 +6,8 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.nova.config.weakEntry
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.world.item.NovaItem
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -42,7 +43,7 @@ class Fuel(burnTime: Provider<Int>) : ItemBehavior {
             .mapKeysTo(enumMap()) { (item, _) -> CraftMagicNumbers.getMaterial(item) }
         
         override fun create(item: NovaItem): Fuel {
-            return Fuel(item.config.entry<Int>("burn_time"))
+            return Fuel(item.config.weakEntry<Int>("burn_time"))
         }
         
         fun isFuel(material: Material): Boolean = material in VANILLA_FUELS

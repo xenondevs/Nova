@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.config
 
 import com.google.common.jimfs.Jimfs
 import org.junit.jupiter.api.Test
-import xyz.xenondevs.commons.provider.mutable.mutableProvider
+import xyz.xenondevs.commons.provider.mutableProvider
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.readText
