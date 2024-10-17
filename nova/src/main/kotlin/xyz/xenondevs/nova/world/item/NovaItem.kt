@@ -7,14 +7,9 @@ import net.kyori.adventure.text.format.Style
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponents
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.entity.EquipmentSlotGroup
-import net.minecraft.world.entity.ai.attributes.Attribute
-import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.item.component.CustomData
-import net.minecraft.world.item.component.ItemAttributeModifiers
 import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -27,12 +22,10 @@ import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.CommentedConfigurationNode
-import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -41,23 +34,19 @@ import xyz.xenondevs.nova.resources.layout.item.RequestedItemModelLayout
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.resources.model.ItemModelData
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
-import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
-import xyz.xenondevs.nova.util.data.get
-import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
+import xyz.xenondevs.nova.world.item.behavior.DefaultBehavior
 import xyz.xenondevs.nova.world.item.behavior.ItemBehavior
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorFactory
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.world.item.logic.PacketItems
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.player.equipment.ArmorEquipEvent
-import java.util.logging.Level
 import kotlin.Unit
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
-import net.minecraft.util.Unit as MojangUnit
 import net.minecraft.world.item.ItemStack as MojangStack
 
 /**
@@ -72,22 +61,9 @@ class NovaItem internal constructor(
     private val _craftingRemainingItem: ItemStack?,
     val isHidden: Boolean,
     val block: NovaBlock?,
-    private val configId: String,
+    configId: String,
     internal val requestedLayout: RequestedItemModelLayout
 ) {
-    
-    /**
-     * The [ItemStack] that is left over after this [NovaItem] was
-     * used in a crafting recipe.
-     */
-    val craftingRemainingItem: ItemStack?
-        get() = _craftingRemainingItem?.clone()
-    
-    val model: ItemModelData by ResourceLookups.ITEM_MODEL_LOOKUP.provider.map {
-        val material = vanillaMaterial
-        val models = it[this]?.get(material) ?: emptyMap()
-        ItemModelData(this, models)
-    }
     
     /**
      * The configuration for this [NovaItem].
@@ -96,13 +72,33 @@ class NovaItem internal constructor(
     val config: Provider<CommentedConfigurationNode> = Configs[configId]
     
     /**
+     * The [ItemStack] that is left over after this [NovaItem] was
+     * used in a crafting recipe.
+     */
+    val craftingRemainingItem: ItemStack?
+        get() = _craftingRemainingItem?.clone()
+    
+    /**
+     * The model data (vanilla item types and custom model data values) of this [NovaItem].
+     */
+    val model: ItemModelData by ResourceLookups.ITEM_MODEL_LOOKUP.provider.map {
+        val material = vanillaMaterial
+        val models = it[this]?.get(material) ?: emptyMap()
+        ItemModelData(this, models)
+    }
+    
+    /**
      * The [ItemBehaviors][ItemBehavior] of this [NovaItem].
      */
-    val behaviors: List<ItemBehavior> = behaviorHolders.map { holder ->
-        when (holder) {
-            is ItemBehavior -> holder
-            is ItemBehaviorFactory<*> -> holder.create(this)
+    val behaviors: List<ItemBehavior> = buildList {
+        val behaviors = behaviorHolders.map { holder ->
+            when (holder) {
+                is ItemBehavior -> holder
+                is ItemBehaviorFactory<*> -> holder.create(this@NovaItem)
+            }
         }
+        add(DefaultBehavior.create(this@NovaItem, behaviors))
+        addAll(behaviors)
     }
     
     /**
@@ -126,58 +122,17 @@ class NovaItem internal constructor(
      * The base data components of this [NovaItem].
      */
     internal val baseDataComponents: DataComponentMap by combinedProvider(
-        behaviors.map(ItemBehavior::baseDataComponents)
-    ) { dataComponentMaps ->
-        val builder = DataComponentMap.builder()
-        if (name != null) {
-            builder.set(DataComponents.ITEM_NAME, name.toNMSComponent())
-        } else {
-            builder.set(DataComponents.HIDE_TOOLTIP, MojangUnit.INSTANCE)
-        }
-        builder.set(DataComponents.ATTRIBUTE_MODIFIERS, loadConfiguredAttributeModifiers())
-        builder.set(DataComponents.MAX_STACK_SIZE, maxStackSize)
-        val base = builder.build()
-        val allMaps = buildList {
-            add(base)
-            addAll(dataComponentMaps)
-        }
-        return@combinedProvider ItemUtils.mergeDataComponentMaps(allMaps)
-    }
+        behaviors.map(ItemBehavior::baseDataComponents),
+        ItemUtils::mergeDataComponentMaps
+    )
     
     /**
      * The default components patch applied to all [ItemStacks][ItemStack] of this [NovaItem].
      */
     internal val defaultPatch: DataComponentPatch by combinedProvider(
-        behaviors.map(ItemBehavior::defaultPatch)
-    ) { dataComponentPatches ->
-        val base = DataComponentPatch.builder()
-            .set(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag().also { compoundTag ->
-                compoundTag.put("nova", CompoundTag().also {
-                    it.putString("id", id.toString())
-                })
-                defaultCompound?.let { compoundTag.putByteArray("nova_cbf", CBF.write(it)) }
-            }))
-            .build()
-        val allPatches = buildList {
-            add(base)
-            addAll(dataComponentPatches)
-        }
-        return@combinedProvider ItemUtils.mergeDataComponentPatches(allPatches)
-    }
-    
-    /**
-     * The default [NamespacedCompound] that is applied to all [ItemStacks][ItemStack] of this [NovaItem].
-     */
-    private val defaultCompound: NamespacedCompound? by combinedProvider(
-        behaviors.map(ItemBehavior::defaultCompound)
-    ) { defaultCompounds ->
-        val compound = NamespacedCompound()
-        for (defaultCompound in defaultCompounds) {
-            compound.putAll(defaultCompound)
-        }
-        
-        compound.takeUnless { it.isEmpty() }
-    }
+        behaviors.map(ItemBehavior::defaultPatch),
+        ItemUtils::mergeDataComponentPatches
+    )
     
     /**
      * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in server-side format.
@@ -251,51 +206,6 @@ class NovaItem internal constructor(
      */
     internal fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
         return behaviors.fold(itemStack) { stack, behavior -> behavior.modifyClientSideStack(player, stack, data) }
-    }
-    
-    // TODO: config reloading
-    private fun loadConfiguredAttributeModifiers(): ItemAttributeModifiers {
-        val section = Configs.getOrNull(configId)?.node("attribute_modifiers")
-        if (section == null || section.virtual())
-            return ItemAttributeModifiers.EMPTY
-        
-        val builder = ItemAttributeModifiers.builder()
-        for ((slotName, attributesNode) in section.childrenMap()) {
-            try {
-                val slotGroup = EquipmentSlotGroup.entries.firstOrNull { it.name.equals(slotName as String, true) }
-                    ?: throw IllegalArgumentException("Unknown equipment slot group: $slotName")
-                
-                for ((idx, attributeNode) in attributesNode.childrenList().withIndex()) {
-                    try {
-                        val attribute = attributeNode.node("attribute").get<Attribute>()
-                            ?: throw NoSuchElementException("Missing value 'attribute'")
-                        val operation = attributeNode.node("operation").get<AttributeModifier.Operation>()
-                            ?: throw NoSuchElementException("Missing value 'operation'")
-                        val value = attributeNode.node("value").get<Double>()
-                            ?: throw NoSuchElementException("Missing value 'value'")
-                        
-                        builder.add(
-                            BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute),
-                            AttributeModifier(
-                                ResourceLocation.fromNamespaceAndPath(
-                                    "nova",
-                                    "configured_attribute_modifier_${slotGroup}_$idx"
-                                ),
-                                value,
-                                operation
-                            ),
-                            slotGroup
-                        )
-                    } catch (e: Exception) {
-                        LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $this, $slotGroup with index $idx", e)
-                    }
-                }
-            } catch (e: Exception) {
-                LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $this", e)
-            }
-        }
-        
-        return builder.build()
     }
     
     //<editor-fold desc="event methods", defaultstate="collapsed">
