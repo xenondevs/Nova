@@ -20,7 +20,6 @@ interface ToolTierRegistry : AddonGetter {
         return tier
     }
     
-    @HardcodedProperties
     fun registerToolTier(name: String, level: Double): ToolTier {
         val id = ResourceLocation(addon, name)
         val tier = ToolTier(id, provider(level))
