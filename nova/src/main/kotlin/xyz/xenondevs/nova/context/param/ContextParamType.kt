@@ -6,12 +6,12 @@ import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.context.intention.ContextIntention
 
-class Requirement<V : Any>(
+internal class Requirement<V : Any>(
     val validator: (V) -> Boolean,
     val errorGenerator: (V) -> String
 )
 
-class Autofiller<V : Any>(
+internal class Autofiller<V : Any>(
     lazyParamTypes: List<Lazy<ContextParamType<*>>>,
     val filler: Function<V?>
 ) {
@@ -26,21 +26,29 @@ class Autofiller<V : Any>(
 /**
  * A context parameter type.
  */
-sealed interface ContextParamType<V : Any> {
+sealed class ContextParamType<V : Any> {
     
     /**
      * The ID of this parameter type.
      */
-    val id: ResourceLocation
+    abstract val id: ResourceLocation
     
     /**
      * A list of requirements that must be fulfilled for a value of this parameter type to be valid.
      */
-    val requirements: List<Requirement<V>>
+    internal abstract val requirements: List<Requirement<V>>
     
-    val autofillers: List<Autofiller<V>>
+    /**
+     * A list of autofillers that can create a value of this parameter type based on other parameters.
+     */
+    internal abstract val autofillers: List<Autofiller<V>>
     
-    val copy: (V) -> V
+    /**
+     * A function that creates a copy of a value of this parameter type.
+     */
+    internal abstract val copy: (V) -> V
+    
+    override fun toString() = id.toString()
     
     companion object {
         
@@ -63,12 +71,12 @@ sealed interface ContextParamType<V : Any> {
 /**
  * A context parameter type that has a default value instead of null.
  */
-sealed interface DefaultingContextParamType<V : Any> : ContextParamType<V> {
+sealed class DefaultingContextParamType<V : Any> : ContextParamType<V>() {
     
     /**
      * The default intermediate value of this parameter type.
      */
-    val defaultValue: V
+    abstract val defaultValue: V
     
 }
 
@@ -77,19 +85,19 @@ internal open class ContextParamTypeImpl<V : Any>(
     override val requirements: List<Requirement<V>>,
     override val autofillers: List<Autofiller<V>>,
     override val copy: (V) -> V
-) : ContextParamType<V> {
+) : ContextParamType<V>() {
     
     override fun toString() = id.toString()
     
 }
 
 internal class DefaultingContextParamTypeImpl<V : Any>(
-    id: ResourceLocation,
+    override val id: ResourceLocation,
     override val defaultValue: V,
-    requirements: List<Requirement<V>>,
-    autofillers: List<Autofiller<V>>,
-    copy: (V) -> V
-) : ContextParamTypeImpl<V>(id, requirements, autofillers, copy), DefaultingContextParamType<V>
+    override val requirements: List<Requirement<V>>,
+    override val autofillers: List<Autofiller<V>>,
+    override val copy: (V) -> V
+) : DefaultingContextParamType<V>()
 
 class ContextParamTypeBuilder<V : Any> internal constructor(private val id: ResourceLocation) {
     
@@ -101,11 +109,7 @@ class ContextParamTypeBuilder<V : Any> internal constructor(private val id: Reso
     private val optionalIntentions = HashSet<ContextIntention>()
     
     fun require(validator: (V) -> Boolean, errorGenerator: (V) -> String): ContextParamTypeBuilder<V> {
-        return require(Requirement(validator, errorGenerator))
-    }
-    
-    fun require(requirement: Requirement<V>): ContextParamTypeBuilder<V> {
-        requirements += requirement
+        requirements += Requirement(validator, errorGenerator)
         return this
     }
     
