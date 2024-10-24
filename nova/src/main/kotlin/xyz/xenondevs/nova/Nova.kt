@@ -9,7 +9,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.gson.*
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
-import xyz.xenondevs.nova.addon.AddonManager
 import xyz.xenondevs.nova.api.ApiBlockManager
 import xyz.xenondevs.nova.api.ApiBlockRegistry
 import xyz.xenondevs.nova.api.ApiItemRegistry
@@ -22,7 +21,6 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.data.Version
-import java.util.logging.Level
 import java.util.logging.Logger
 import xyz.xenondevs.nova.api.Nova as INova
 import xyz.xenondevs.nova.api.block.BlockManager as IBlockManager
@@ -51,8 +49,6 @@ internal class Nova : JavaPlugin(), INova {
     val version = Version(description.version)
     val lastVersion = PermanentStorage.retrieveOrNull<Version>("last_version")
     val novaJar = file
-    
-    internal val disableHandlers = ArrayList<() -> Unit>()
     
     init {
         NOVA = this
@@ -90,13 +86,7 @@ internal class Nova : JavaPlugin(), INova {
     
     override fun onDisable() {
         if (Initializer.isDone) {
-            AddonManager.disableAddons()
             Initializer.disable()
-            disableHandlers.forEach {
-                runCatching(it).onFailure { ex ->
-                    LOGGER.log(Level.SEVERE, "An exception occurred while running a disable handler", ex)
-                }
-            }
         }
         
         if (ServerUtils.isReload()) {

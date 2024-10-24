@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.data
 
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.data.decodeWithBase64
 import xyz.xenondevs.nova.util.data.encodeWithBase64
@@ -12,10 +12,6 @@ import java.io.InputStream
 object UpdatableFile {
     
     private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve("updatableFileHashes") { HashMap() }
-    
-    init {
-        NOVA.disableHandlers += { PermanentStorage.store("updatableFileHashes", fileHashes) }
-    }
     
     fun load(file: File, getStream: () -> InputStream) {
         val storedHash = getStoredHash(file)
@@ -43,6 +39,11 @@ object UpdatableFile {
             // Store the hash
             fileHashes[file.absolutePath] = file.getMD5Hash().encodeWithBase64()
         }
+    }
+    
+    @DisableFun
+    private fun disable() {
+        PermanentStorage.store("updatableFileHashes", fileHashes)
     }
     
     fun getStoredHashString(file: File): String? =
