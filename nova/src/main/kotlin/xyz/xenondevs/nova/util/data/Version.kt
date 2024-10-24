@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.util.data
 
 import com.google.common.collect.HashBiMap
-import org.bukkit.Bukkit
+import io.papermc.paper.ServerBuildInfo
 import xyz.xenondevs.commons.collections.mapToIntArray
 import kotlin.math.max
 
@@ -138,7 +138,7 @@ class Version : Comparable<Version> {
         
         init {
             val versionPattern = Regex("""(1\.\d{1,2}(\.\d{1,2})?)""")
-            SERVER_VERSION = Version(versionPattern.find(Bukkit.getVersion())!!.groupValues[1])
+            SERVER_VERSION = Version(versionPattern.find(ServerBuildInfo.buildInfo().minecraftVersionId())!!.groupValues[1])
         }
         
     }

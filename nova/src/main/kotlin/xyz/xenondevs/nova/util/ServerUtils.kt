@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.util
 
+import io.papermc.paper.ServerBuildInfo
+import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.CraftServer
 import xyz.xenondevs.nova.util.ServerSoftware.*
@@ -7,13 +9,11 @@ import xyz.xenondevs.nova.util.ServerSoftware.*
 object ServerUtils {
     
     val SERVER_SOFTWARE by lazy {
-        when (Bukkit.getVersion().substringAfter('-').substringBefore('-')) {
-            "Bukkit" -> CRAFT_BUKKIT
-            "Spigot" -> SPIGOT
-            "Paper" -> PAPER
-            "Folia" -> FOLIA
-            "Pufferfish" -> PUFFERFISH
-            "Purpur" -> PURPUR
+        when (ServerBuildInfo.buildInfo().brandId()) {
+            Key.key("papermc", "paper") -> PAPER
+            Key.key("papermc", "folia") -> FOLIA
+            Key.key("pufferfish", "pufferfish") -> PUFFERFISH
+            Key.key("purpurmc", "purpur") -> PURPUR
             else -> UNKNOWN
         }
     }
@@ -25,9 +25,7 @@ object ServerUtils {
 enum class ServerSoftware(private val upstream: ServerSoftware? = null) {
     
     UNKNOWN,
-    CRAFT_BUKKIT,
-    SPIGOT(CRAFT_BUKKIT),
-    PAPER(SPIGOT),
+    PAPER(),
     FOLIA(PAPER),
     PUFFERFISH(PAPER),
     PURPUR(PUFFERFISH);
