@@ -17,7 +17,6 @@ import org.bukkit.event.inventory.InventoryCreativeEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
@@ -37,7 +36,7 @@ import xyz.xenondevs.nova.world.pos
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [AddonsInitializer::class, WorldDataManager::class]
+    dependsOn = [WorldDataManager::class]
 )
 internal object BlockInteracting : Listener {
     

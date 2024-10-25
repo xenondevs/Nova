@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.addon.registry.worldgen
 
 import net.minecraft.world.level.biome.Biome
-import xyz.xenondevs.nova.addon.registry.AddonGetter
+import xyz.xenondevs.nova.addon.registry.AddonHolder
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.world.generation.builder.BiomeBuilder
 import xyz.xenondevs.nova.world.generation.builder.BiomeInjectionBuilder
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 
-interface BiomeRegistry : AddonGetter {
+interface BiomeRegistry : AddonHolder {
     
     @ExperimentalWorldGen
     fun biomeInjection(name: String, biomeInjection: BiomeInjectionBuilder.() -> Unit): BiomeInjection =

@@ -8,6 +8,7 @@ import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.util.name
 import java.util.*
 import kotlin.reflect.KType
@@ -36,7 +37,7 @@ class NamespacedCompound internal constructor(
     }
     
     fun set(type: KType, addon: Addon, key: String, value: Any?) {
-        set(type, addon.description.id, key, value)
+        set(type, addon.id, key, value)
     }
     
     
@@ -70,7 +71,7 @@ class NamespacedCompound internal constructor(
     }
     
     fun <T> get(type: KType, addon: Addon, key: String): T? {
-        return get(type, addon.description.id, key)
+        return get(type, addon.id, key)
     }
     
     
@@ -104,7 +105,7 @@ class NamespacedCompound internal constructor(
     }
     
     inline fun <reified T> getOrPut(addon: Addon, key: String, defaultValue: () -> T): T {
-        return getOrPut(addon.description.id, key, defaultValue)
+        return getOrPut(addon.id, key, defaultValue)
     }
     
     
@@ -123,7 +124,7 @@ class NamespacedCompound internal constructor(
     }
     
     fun remove(addon: Addon, key: String) {
-        remove(addon.description.id, key)
+        remove(addon.id, key)
     }
     
     operator fun minusAssign(id: ResourceLocation) {
@@ -149,7 +150,7 @@ class NamespacedCompound internal constructor(
     }
     
     fun contains(addon: Addon, key: String): Boolean {
-        return contains(addon.description.id, key)
+        return contains(addon.id, key)
     }
     
     

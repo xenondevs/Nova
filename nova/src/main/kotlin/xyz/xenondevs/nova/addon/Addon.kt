@@ -1,29 +1,41 @@
-@file:Suppress("LeakingThis")
+@file:Suppress("LeakingThis", "UnstableApiUsage")
 
 package xyz.xenondevs.nova.addon
 
+import org.bukkit.plugin.java.JavaPlugin
+import xyz.xenondevs.nova.addon.registry.AddonHolder
 import xyz.xenondevs.nova.update.ProjectDistributor
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import java.io.File
-import java.util.logging.Logger
 
-abstract class Addon {
-    
-    lateinit var logger: Logger internal set
-    lateinit var addonFile: File internal set
-    lateinit var dataFolder: File internal set
-    lateinit var description: AddonDescription internal set
+private val JAVA_PLUGIN_GET_FILE = ReflectionUtils.getMethodHandle(JavaPlugin::class, "getFile")
+
+@PublishedApi
+internal val Addon.name: String
+    get() = (this as JavaPlugin).pluginMeta.name
+
+@PublishedApi
+internal val Addon.id: String
+    get() = (this as JavaPlugin).pluginMeta.name.lowercase()
+
+@PublishedApi
+internal val Addon.version: String
+    get() = (this as JavaPlugin).pluginMeta.version
+
+@PublishedApi
+internal val Addon.file: File
+    get() = JAVA_PLUGIN_GET_FILE.invoke(this as JavaPlugin) as File
+
+interface Addon : AddonHolder {
     
     /**
-     * A list of [ProjectDistributors][ProjectDistributor] that distribute this addon.
-     *
-     * This list is used to check for updates.
+     * A list of [ProjectDistributors][ProjectDistributor] that distribute this addon
+     * and should be checked for updates.
      */
-    open val projectDistributors: List<ProjectDistributor> = emptyList()
+    val projectDistributors: List<ProjectDistributor>
+        get() = emptyList()
     
-    val registry = AddonRegistryHolder(this)
-    
-    open fun init() = Unit
-    open fun onEnable() = Unit
-    open fun onDisable() = Unit
+    override val addon: Addon
+        get() = this
     
 }

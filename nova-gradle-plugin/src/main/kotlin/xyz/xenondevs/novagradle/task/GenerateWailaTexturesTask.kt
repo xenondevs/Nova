@@ -8,14 +8,12 @@ import org.gradle.api.tasks.TaskAction
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.novagradle.util.AddonResourcePack
+import xyz.xenondevs.novagradle.util.TaskUtils
 import xyz.xenondevs.renderer.MinecraftModelRenderer
 import xyz.xenondevs.renderer.model.resource.ZipResourcePack
 import java.io.File
 
 abstract class GenerateWailaTexturesTask : DefaultTask() {
-    
-    @get:Input
-    abstract val novaVersion: Property<String>
     
     @get:Input
     abstract val addonId: Property<String>
@@ -29,7 +27,7 @@ abstract class GenerateWailaTexturesTask : DefaultTask() {
     @TaskAction
     fun run() {
         // download minecraft models and textures
-        val mcAssetsDir = File(project.buildDir, "mcassets")
+        val mcAssetsDir = File(project.layout.buildDirectory.get().asFile, "mcassets")
         if (!mcAssetsDir.exists()) {
             runBlocking {
                 MinecraftAssetsDownloader(outputDirectory = mcAssetsDir, mode = ExtractionMode.MOJANG_API_CLIENT).downloadAssets()
@@ -45,10 +43,7 @@ abstract class GenerateWailaTexturesTask : DefaultTask() {
         )
         
         // add nova resource pack
-        val novaJar = project.configurations.detachedConfiguration(
-            project.dependencies.create("xyz.xenondevs.nova:nova:${novaVersion.get()}")
-        ).files.first()
-        renderer.loader.resourcePacks += ZipResourcePack(novaJar.toPath())
+        renderer.loader.resourcePacks += ZipResourcePack(TaskUtils.findNovaArtifact(project).file.toPath())
         
         // add addon resource pack
         renderer.loader.resourcePacks += AddonResourcePack(project, addonId.get())

@@ -8,7 +8,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import net.minecraft.world.level.levelgen.placement.PlacementModifier
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType
-import xyz.xenondevs.nova.addon.registry.AddonGetter
+import xyz.xenondevs.nova.addon.registry.AddonHolder
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.FeatureType
 import xyz.xenondevs.nova.world.generation.builder.PlacedFeatureBuilder
 
-interface FeatureRegistry : AddonGetter {
+interface FeatureRegistry : AddonHolder {
     
     @ExperimentalWorldGen
     fun placedFeature(name: String, placedFeature: PlacedFeatureBuilder.() -> Unit): PlacedFeature =

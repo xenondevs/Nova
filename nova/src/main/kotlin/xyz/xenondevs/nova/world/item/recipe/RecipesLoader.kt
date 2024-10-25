@@ -8,8 +8,10 @@ import xyz.xenondevs.commons.gson.hasArray
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.addon.loader.AddonLoader
+import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.addon.AddonBootstrapper
+import xyz.xenondevs.nova.addon.file
+import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.data.UpdatableFile
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.serialization.json.serializer.RecipeDeserializer
@@ -36,7 +38,7 @@ internal object RecipesLoader {
         existingPaths += getResources("recipes/").mapNotNull(::extractRecipe)
         
         // Extract recipes from addons
-        AddonManager.loaders.values.forEach { loader ->
+        AddonBootstrapper.addons.forEach { loader ->
             existingPaths += getResources(loader.file, "recipes/").mapNotNull { extractRecipe(it, loader) }
         }
         
@@ -55,8 +57,8 @@ internal object RecipesLoader {
         }
     }
     
-    private fun extractRecipe(path: String, addon: AddonLoader? = null): String? {
-        val namespace = addon?.description?.id ?: "nova"
+    private fun extractRecipe(path: String, addon: Addon? = null): String? {
+        val namespace = addon?.id ?: "nova"
         val file = File(NOVA.dataFolder, path).let { File(it.parent, namespace + "_" + it.name) }
         if (file.name.matches(RECIPE_FILE_PATTERN)) {
             UpdatableFile.load(file) { if (addon != null) getResourceAsStream(addon.file, path)!! else getResourceAsStream(path)!! }

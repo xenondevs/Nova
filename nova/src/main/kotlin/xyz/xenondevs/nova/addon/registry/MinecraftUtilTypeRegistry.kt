@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 
-interface MinecraftUtilTypeRegistry : AddonGetter {
+interface MinecraftUtilTypeRegistry : AddonHolder {
     
     fun <T : RuleTest> registerRuleTestType(name: String, ruleTestType: RuleTestType<T>): RuleTestType<T> {
         val id = ResourceLocation(addon, name)

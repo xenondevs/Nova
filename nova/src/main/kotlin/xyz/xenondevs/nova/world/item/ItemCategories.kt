@@ -10,7 +10,9 @@ import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.nova.addon.AddonManager
+import xyz.xenondevs.nova.addon.AddonBootstrapper
+import xyz.xenondevs.nova.addon.id
+import xyz.xenondevs.nova.addon.name
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -23,9 +25,7 @@ import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaItem
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD
-)
+@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object ItemCategories {
     
     lateinit var CATEGORIES: List<ItemCategory>
@@ -46,15 +46,15 @@ internal object ItemCategories {
     }
     
     private fun getDefaultItemCategories(): List<ItemCategory> =
-        AddonManager.addons.values
-            .sortedBy { it.description.name }
+        AddonBootstrapper.addons
+            .sortedBy { it.name }
             .mapNotNull { addon ->
                 NovaRegistries.ITEM
-                    .filter { it.id.namespace == addon.description.id && !it.isHidden }
+                    .filter { it.id.namespace == addon.id && !it.isHidden }
                     .takeUnlessEmpty()
                     ?.let { items ->
                         ItemCategory(
-                            items[0].model.createClientsideItemBuilder(Component.text(addon.description.name)).setLore(emptyList()),
+                            items[0].model.createClientsideItemBuilder(Component.text(addon.name)).setLore(emptyList()),
                             items.map { CategorizedItem(it.id.toString()) }
                         )
                     }

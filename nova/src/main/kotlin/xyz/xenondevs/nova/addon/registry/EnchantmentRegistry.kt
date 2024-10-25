@@ -4,7 +4,7 @@ import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.enchantments.Enchantment
 import xyz.xenondevs.nova.world.item.enchantment.EnchantmentBuilder
 
-interface EnchantmentRegistry : AddonGetter {
+interface EnchantmentRegistry : AddonHolder {
     
     fun enchantment(name: String, enchantment: EnchantmentBuilder.() -> Unit): Enchantment {
         val builder = EnchantmentBuilder(addon, name)

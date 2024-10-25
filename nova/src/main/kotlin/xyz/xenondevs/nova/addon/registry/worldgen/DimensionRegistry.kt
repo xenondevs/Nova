@@ -1,14 +1,14 @@
 package xyz.xenondevs.nova.addon.registry.worldgen
 
 import net.minecraft.world.level.dimension.DimensionType
-import xyz.xenondevs.nova.addon.registry.AddonGetter
+import xyz.xenondevs.nova.addon.registry.AddonHolder
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.builder.DimensionTypeBuilder
 
-interface DimensionRegistry : AddonGetter {
+interface DimensionRegistry : AddonHolder {
     
     @ExperimentalWorldGen
     fun dimensionType(name: String, dimensionType: DimensionTypeBuilder.() -> Unit): DimensionType =

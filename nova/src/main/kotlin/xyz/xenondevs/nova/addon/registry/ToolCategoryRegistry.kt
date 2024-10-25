@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 
-interface ToolCategoryRegistry : AddonGetter {
+interface ToolCategoryRegistry : AddonHolder {
     
     fun registerToolCategory(name: String): ToolCategory {
         val id = ResourceLocation(addon, name)

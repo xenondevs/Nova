@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 import kotlin.reflect.KClass
 
-interface NetworkTypeRegistry : AddonGetter {
+interface NetworkTypeRegistry : AddonHolder {
     
     fun <T : Network<T>> registerNetworkType(
         name: String,

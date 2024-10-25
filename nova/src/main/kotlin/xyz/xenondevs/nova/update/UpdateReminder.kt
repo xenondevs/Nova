@@ -11,7 +11,9 @@ import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.addon.AddonManager
+import xyz.xenondevs.nova.addon.AddonBootstrapper
+import xyz.xenondevs.nova.addon.name
+import xyz.xenondevs.nova.addon.version
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.node
 import xyz.xenondevs.nova.initialize.Dispatcher
@@ -64,7 +66,7 @@ internal object UpdateReminder : Listener {
     
     private fun checkForUpdates() {
         checkVersion(null)
-        AddonManager.addons.values
+        AddonBootstrapper.addons
             .filter { it.projectDistributors.isNotEmpty() }
             .forEach(UpdateReminder::checkVersion)
         
@@ -72,7 +74,7 @@ internal object UpdateReminder : Listener {
             needsUpdate.asSequence()
                 .filter { it.key !in alreadyNotified }
                 .forEach { (addon, resourcePage) ->
-                    val name = addon?.description?.name ?: "Nova"
+                    val name = addon?.name ?: "Nova"
                     LOGGER.warning("You're running an outdated version of $name. Please download the latest version at $resourcePage")
                     alreadyNotified += addon
                 }
@@ -88,7 +90,7 @@ internal object UpdateReminder : Listener {
         
         if (addon != null) {
             distributors = addon.projectDistributors
-            currentVersion = Version(addon.description.version)
+            currentVersion = Version(addon.version)
         } else {
             distributors = NOVA_DISTRIBUTORS
             currentVersion = NOVA.version
@@ -111,7 +113,7 @@ internal object UpdateReminder : Listener {
         val player = event.player
         if (player.hasPermission("nova.misc.updateReminder") && needsUpdate.isNotEmpty()) {
             needsUpdate.forEach { (addon, resourcePage) ->
-                val name = addon?.description?.name ?: "Nova"
+                val name = addon?.name ?: "Nova"
                 val msg = Component.translatable(
                     "nova.outdated_version",
                     NamedTextColor.RED,

@@ -10,7 +10,6 @@ plugins {
 dependencies {
     // server
     paperweight.paperDevBundle(libs.versions.paper)
-    compileOnly(libs.bundles.maven.resolver)
     
     // api dependencies
     novaLoaderApi(libs.bundles.kotlin)
@@ -25,7 +24,7 @@ dependencies {
     novaLoader(libs.bundles.minecraft.assets)
     novaLoader(libs.inventoryaccess)
     novaLoader(libs.bstats)
-    novaLoader(libs.bytbase.runtime)
+    novaLoader(libs.bytebase.runtime)
     novaLoader(libs.fuzzywuzzy)
     novaLoader(libs.awssdk.s3)
     novaLoader(libs.jimfs)
@@ -45,7 +44,9 @@ sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
 tasks {
     withType<ProcessResources> {
         filesMatching("paper-plugin.yml") {
-            expand(project.properties)
+            val properties = HashMap(project.properties)
+            properties["apiVersion"] = libs.versions.paper.get().substring(0, 4)
+            expand(properties)
         }
     }
     

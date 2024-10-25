@@ -4,7 +4,7 @@ import xyz.xenondevs.nova.world.item.armor.Armor
 import xyz.xenondevs.nova.world.item.armor.ArmorBuilder
 import xyz.xenondevs.nova.util.ResourceLocation
 
-interface ArmorRegistry : AddonGetter {
+interface ArmorRegistry : AddonHolder {
     
     fun armor(name: String, layout: ArmorBuilder.() -> Unit): Armor =
         ArmorBuilder(ResourceLocation(addon, name)).apply(layout).register()

@@ -3,6 +3,7 @@ package xyz.xenondevs.nova;
 import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
 import io.papermc.paper.plugin.loader.PluginLoader;
 import io.papermc.paper.plugin.loader.library.impl.JarLibrary;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -12,6 +13,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @SuppressWarnings({"UnstableApiUsage", "unused"})
+@ApiStatus.Internal
 public class NovaLoader implements PluginLoader {
     
     @Override

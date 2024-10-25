@@ -25,7 +25,10 @@ import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
-import xyz.xenondevs.nova.addon.AddonManager
+import xyz.xenondevs.nova.addon.AddonBootstrapper
+import xyz.xenondevs.nova.addon.file
+import xyz.xenondevs.nova.addon.name
+import xyz.xenondevs.nova.addon.version
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.PermanentStorage
@@ -62,16 +65,24 @@ internal object Initializer : Listener {
      * Stats the initialization process.
      */
     fun start() {
-        val (initializables, disableables) = collectRunnables(NOVA.novaJar, Nova::class.java.classLoader)
-        addRunnables(initializables, disableables)
+        collectAndRegisterRunnables(NOVA.novaJar, Nova::class.java.classLoader)
+        for (addon in AddonBootstrapper.addons) {
+            collectAndRegisterRunnables(addon.file, addon.javaClass.classLoader)
+        }
+        
         initPreWorld()
+    }
+    
+    private fun collectAndRegisterRunnables(file: File, classLoader: ClassLoader) {
+        val (initializables, disableables) = collectRunnables(file, classLoader)
+        addRunnables(initializables, disableables)
     }
     
     /**
      * Searches [file] and collects classes annotated by [InternalInit] and [Init] and functions
      * annotated by [InitFun] and [DisableFun] as [Initializables][Initializable] and [DisableableFunctions][DisableableFunction].
      */
-    fun collectRunnables(file: File, classLoader: ClassLoader): Pair<List<Initializable>, List<DisableableFunction>> {
+    private fun collectRunnables(file: File, classLoader: ClassLoader): Pair<List<Initializable>, List<DisableableFunction>> {
         val initializables = ArrayList<Initializable>()
         val disableables = ArrayList<DisableableFunction>()
         val initializableClasses = HashMap<String, InitializableClass>()
@@ -121,7 +132,7 @@ internal object Initializer : Listener {
      *
      * This method can only be invoked during the pre-world initialization phase or before the [start] method is called.
      */
-    fun addRunnables(initializables: List<Initializable>, disableables: List<DisableableFunction>) {
+    private fun addRunnables(initializables: List<Initializable>, disableables: List<DisableableFunction>) {
         check(!preWorldInitialized) { "Cannot add additional callables after pre-world initialization!" }
         
         // add vertices
@@ -225,7 +236,6 @@ internal object Initializer : Listener {
         
         PermanentStorage.store("last_version", NOVA.pluginMeta.version)
         setGlobalIngredients()
-        AddonManager.enableAddons()
         setupMetrics()
         LOGGER.info("Done loading")
     }
@@ -317,8 +327,8 @@ internal object Initializer : Listener {
         metrics.addCustomChart(DrilldownPie("addons") {
             val map = HashMap<String, Map<String, Int>>()
             
-            AddonManager.addons.values.forEach {
-                map[it.description.name] = mapOf(it.description.version to 1)
+            for (addon in AddonBootstrapper.addons) {
+                map[addon.name] = mapOf(addon.version to 1)
             }
             
             return@DrilldownPie map

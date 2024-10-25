@@ -18,16 +18,17 @@ import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.item.NovaItem
 import java.util.*
 
 fun advancement(addon: Addon, name: String, init: Advancement.Builder.() -> Unit): AdvancementHolder {
     val builder = Advancement.Builder()
     builder.init()
-    return builder.build(ResourceLocation.fromNamespaceAndPath(addon.description.id, name))
+    return builder.build(ResourceLocation.fromNamespaceAndPath(addon.id, name))
 }
 
 fun obtainNovaItemAdvancement(
@@ -36,7 +37,7 @@ fun obtainNovaItemAdvancement(
     item: NovaItem,
     frameType: AdvancementType = AdvancementType.TASK
 ): AdvancementHolder {
-    require(addon.description.id == item.id.namespace) { "The specified item is from a different addon" }
+    require(addon.id == item.id.namespace) { "The specified item is from a different addon" }
     val id = item.id
     return advancement(addon, "obtain_${id.name}") {
         if (parent != null)
@@ -62,8 +63,8 @@ fun obtainNovaItemsAdvancement(
     items: List<NovaItem>, requireAll: Boolean,
     frameType: AdvancementType = AdvancementType.TASK
 ): AdvancementHolder {
-    require(items.all { it.id.namespace == addon.description.id }) { "At least one of the specified items is from a different addon" }
-    val namespace = addon.description.id
+    require(items.all { it.id.namespace == addon.id }) { "At least one of the specified items is from a different addon" }
+    val namespace = addon.id
     return advancement(addon, name) {
         if (parent != null)
             parent(parent)

@@ -15,9 +15,6 @@ import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.serialization.persistentdata.get
-import xyz.xenondevs.nova.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -27,6 +24,8 @@ import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetPassengersPacketEvent
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.registry.NovaRegistries.ATTACHMENT_TYPE
+import xyz.xenondevs.nova.serialization.persistentdata.get
+import xyz.xenondevs.nova.serialization.persistentdata.set
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.runTaskTimer
@@ -34,10 +33,7 @@ import kotlin.collections.set
 
 private val ATTACHMENTS_KEY = NamespacedKey(NOVA, "attachments1")
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dependsOn = [AddonsInitializer::class]
-)
+@InternalInit(stage = InternalInitStage.POST_WORLD)
 object AttachmentManager : Listener, PacketListener {
     
     private val activeAttachments = HashMap<Player, HashMap<AttachmentType<*>, Attachment>>()

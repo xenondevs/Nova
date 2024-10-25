@@ -9,6 +9,8 @@ import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.util.ServerSoftware
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_DEFINE_CLASS_METHOD
+import java.lang.invoke.MethodHandle
+import java.lang.invoke.MethodHandles
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -81,6 +83,12 @@ internal object ReflectionUtils {
         val method = if (declared) clazz.declaredMethods.first { it.name == methodName } else clazz.methods.first { it.name == methodName }
         if (declared) method.isAccessible = true
         return method
+    }
+    
+    @JvmStatic
+    fun getMethodHandle(clazz: KClass<*>, methodName: String, vararg args: KClass<*>): MethodHandle {
+        val method = getMethod(clazz, methodName, *args)
+        return MethodHandles.privateLookupIn(clazz.java, MethodHandles.lookup()).unreflect(method)
     }
     
     @JvmStatic

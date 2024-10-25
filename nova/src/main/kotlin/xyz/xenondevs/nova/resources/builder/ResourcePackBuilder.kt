@@ -12,16 +12,19 @@ import xyz.xenondevs.commons.provider.flatMap
 import xyz.xenondevs.commons.provider.flattenIterables
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mapNonNull
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.AddonManager
+import xyz.xenondevs.nova.addon.AddonBootstrapper
+import xyz.xenondevs.nova.addon.file
+import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.resources.builder.task.ArmorContent
@@ -60,7 +63,6 @@ import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import kotlin.time.Duration
 import kotlin.time.measureTime
-import xyz.xenondevs.nova.config.entry
 
 private val EXTRACTION_MODE by MAIN_CONFIG.entry<String>("resource_pack", "generation", "minecraft_assets_source").map {
     when (it.lowercase()) {
@@ -288,7 +290,7 @@ class ResourcePackBuilder internal constructor() {
     @Suppress("RemoveExplicitTypeArguments")
     private fun loadAssetPacks(): List<AssetPack> {
         return buildList<Triple<String, File, String>> {
-            this += AddonManager.loaders.map { (id, loader) -> Triple(id, loader.file, "assets/") }
+            this += AddonBootstrapper.addons.map { addon -> Triple(addon.id, addon.file, "assets/") }
             this += Triple("nova", NOVA.novaJar, "assets/nova/")
         }.map { (namespace, file, assetsPath) ->
             val zip = FileSystems.newFileSystem(file.toPath())

@@ -8,8 +8,9 @@ import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.addon.AddonsLoader
+import xyz.xenondevs.nova.addon.AddonBootstrapper
+import xyz.xenondevs.nova.addon.file
+import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -33,8 +34,7 @@ private const val DEFAULT_CONFIG_PATH = "configs/config.yml"
 val MAIN_CONFIG by lazy { Configs[DEFAULT_CONFIG_NAME] }
 
 @InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
-    dependsOn = [AddonsLoader::class]
+    stage = InternalInitStage.PRE_WORLD
 )
 object Configs {
     
@@ -50,8 +50,8 @@ object Configs {
     @InitFun
     private fun extractAllConfigs() {
         extractConfigs("nova", NOVA.novaJar, "configs/nova/")
-        for ((id, loader) in AddonManager.loaders) {
-            extractConfigs(id, loader.file, "configs/")
+        for (addon in AddonBootstrapper.addons) {
+            extractConfigs(addon.id, addon.file, "configs/")
         }
         
         lastReload = System.currentTimeMillis()

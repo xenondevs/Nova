@@ -11,15 +11,14 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.level.levelgen.structure.StructureSet
 import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
-import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.data.DataFileParser
-import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.patch.Patcher
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
-import xyz.xenondevs.nova.patch.Patcher
+import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.util.data.decodeJsonFile
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
 import xyz.xenondevs.nova.util.set
@@ -28,7 +27,7 @@ import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 @OptIn(ExperimentalWorldGen::class)
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
-    dependsOn = [Patcher::class, ResourceGeneration.PreWorld::class, AddonsInitializer::class, DataFileParser::class]
+    dependsOn = [Patcher::class, ResourceGeneration.PreWorld::class, DataFileParser::class]
 )
 internal object WorldGenManager {
     

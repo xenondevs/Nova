@@ -61,12 +61,13 @@ import org.bukkit.util.Vector
 import org.spongepowered.configurate.serialize.TypeSerializer
 import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.resources.ResourcePath
-import xyz.xenondevs.nova.serialization.configurate.RegistryEntrySerializer
-import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
-import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
+import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.patch.impl.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
+import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
+import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
+import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.serialization.configurate.RegistryEntrySerializer
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
@@ -541,7 +542,7 @@ fun ResourceLocation.toString(separator: String): String {
 }
 
 fun ResourceLocation(addon: Addon, name: String): ResourceLocation {
-    return ResourceLocation.fromNamespaceAndPath(addon.description.id, name)
+    return ResourceLocation.fromNamespaceAndPath(addon.id, name)
 }
 
 // TODO: replace with static extension once available

@@ -1,9 +1,10 @@
 name: Nova
 version: "${version}"
-api-version: "1.20"
+api-version: "${apiVersion}"
 authors: [ "StudioCode", "ByteZ1337", "Javahase" ]
 website: "https://github.com/xenondevs/Nova/"
 loader: xyz.xenondevs.nova.NovaLoader
+bootstrapper: xyz.xenondevs.nova.NovaBootstrapper
 main: xyz.xenondevs.nova.Nova
 load: STARTUP
 

@@ -19,7 +19,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.context.Context
@@ -54,7 +53,7 @@ private val BREAK_COOLDOWN by MAIN_CONFIG.entry<Int>("world", "block_breaking", 
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [AddonsInitializer::class, WorldDataManager::class]
+    dependsOn = [WorldDataManager::class]
 )
 internal object BlockBreaking : Listener, PacketListener {
     

@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlockBuilder
 import xyz.xenondevs.nova.world.block.TileEntityConstructor
 
-interface BlockRegistry : AddonGetter {
+interface BlockRegistry : AddonHolder {
     
     fun tileEntity(name: String, constructor: TileEntityConstructor, tileEntity: NovaTileEntityBlockBuilder.() -> Unit): NovaTileEntityBlock =
         NovaTileEntityBlockBuilder(addon, name, constructor).apply(tileEntity).register()

@@ -11,16 +11,26 @@ import xyz.xenondevs.nova.util.data.useZip
 import kotlin.io.path.notExists
 import kotlin.jvm.JvmStatic
 
+@Suppress("unused") // called by generated bootstrap code
 internal object AddonBootstrapper {
     
-    // TODO: register plugin as Nova addon, scan for initializables
+    private val _addons = ArrayList<Addon>()
+    val addons: List<Addon>
+        get() = _addons
+    
     @JvmStatic
     fun createJavaPlugin(context: PluginProviderContext, classLoader: ClassLoader): JavaPlugin {
         checkRequiredNovaVersion(context)
         checkRequiredMinecraftVersion(context)
         
         val mainClass = Class.forName(context.configuration.mainClass, true, classLoader).kotlin
-        return mainClass.objectInstance as JavaPlugin
+        val obj = mainClass.objectInstance
+        
+        require(obj is Addon) { "Main class does not implement Addon" }
+        require(obj is JavaPlugin) { "Main class does not extend JavaPlugin" }
+        
+        _addons += obj as Addon
+        return obj as JavaPlugin
     }
     
     @JvmStatic

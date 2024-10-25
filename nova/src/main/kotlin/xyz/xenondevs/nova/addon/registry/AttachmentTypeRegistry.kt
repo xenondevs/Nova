@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 
-interface AttachmentTypeRegistry : AddonGetter {
+interface AttachmentTypeRegistry : AddonHolder {
     
     fun <T : Attachment> registerAttachmentType(name: String, constructor: (Player) -> T): AttachmentType<T> {
         val id = ResourceLocation(addon, name)

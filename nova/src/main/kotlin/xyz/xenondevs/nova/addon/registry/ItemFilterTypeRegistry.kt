@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterTyp
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 
-interface ItemFilterTypeRegistry : AddonGetter {
+interface ItemFilterTypeRegistry : AddonHolder {
     
     fun registerItemFilterType(name: String, itemFilterType: ItemFilterType<*>) {
         NovaRegistries.ITEM_FILTER_TYPE[ResourceLocation(addon, name)] = itemFilterType

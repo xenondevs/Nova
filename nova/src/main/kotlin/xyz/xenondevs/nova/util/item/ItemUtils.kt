@@ -31,6 +31,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.api.NamespacedId
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -184,12 +185,12 @@ var MojangStack.novaCompound: NamespacedCompound?
 
 inline fun <reified T : Any> ItemStack.retrieveData(key: NamespacedKey): T? = retrieveData(key.namespace, key.key)
 inline fun <reified T : Any> ItemStack.retrieveData(id: ResourceLocation): T? = retrieveData(id.namespace, id.path)
-inline fun <reified T : Any> ItemStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.description.id, key)
+inline fun <reified T : Any> ItemStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.id, key)
 inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, key: String): T? = novaCompound?.get(namespace, key)
 
 inline fun <reified T : Any> ItemStack.storeData(key: NamespacedKey, data: T?) = storeData(key.namespace, key.key, data)
 inline fun <reified T : Any> ItemStack.storeData(id: ResourceLocation, data: T?) = storeData(id.namespace, id.path, data)
-inline fun <reified T : Any> ItemStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.description.id, key, data)
+inline fun <reified T : Any> ItemStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.id, key, data)
 inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String, data: T?) {
     val novaCompound = this.novaCompound ?: NamespacedCompound()
     novaCompound[namespace, key] = data
@@ -198,12 +199,12 @@ inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String,
 
 inline fun <reified T : Any> MojangStack.retrieveData(key: NamespacedKey): T? = retrieveData(key.namespace, key.key)
 inline fun <reified T : Any> MojangStack.retrieveData(id: ResourceLocation): T? = retrieveData(id.namespace, id.path)
-inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.description.id, key)
+inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.id, key)
 inline fun <reified T : Any> MojangStack.retrieveData(namespace: String, key: String): T? = novaCompound?.get(namespace, key)
 
 inline fun <reified T : Any> MojangStack.storeData(key: NamespacedKey, data: T?) = storeData(key.namespace, key.key, data)
 inline fun <reified T : Any> MojangStack.storeData(id: ResourceLocation, data: T?) = storeData(id.namespace, id.path, data)
-inline fun <reified T : Any> MojangStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.description.id, key, data)
+inline fun <reified T : Any> MojangStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.id, key, data)
 inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: String, data: T?) {
     val novaCompound = this.novaCompound ?: NamespacedCompound()
     novaCompound[namespace, key] = data

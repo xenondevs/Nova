@@ -9,7 +9,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.DisableFun
@@ -31,7 +30,7 @@ private val Player.isWailaEnabled: Boolean
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [ResourceGeneration.PostWorld::class, AddonsInitializer::class]
+    dependsOn = [ResourceGeneration.PostWorld::class]
 )
 internal object WailaManager : Listener, IWailaManager {
     

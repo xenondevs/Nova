@@ -14,7 +14,6 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.InitFun
@@ -50,7 +49,7 @@ private val ALLOWED_RECIPES = setOf(NamespacedKey("minecraft", "repair_item"))
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [AddonsInitializer::class, HooksLoader::class, VanillaRecipeTypes::class]
+    dependsOn = [HooksLoader::class, VanillaRecipeTypes::class]
 )
 object RecipeManager : Listener, PacketListener {
     

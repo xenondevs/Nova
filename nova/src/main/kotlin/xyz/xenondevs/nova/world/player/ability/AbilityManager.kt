@@ -10,24 +10,20 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.serialization.persistentdata.get
-import xyz.xenondevs.nova.serialization.persistentdata.set
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries.ABILITY_TYPE
+import xyz.xenondevs.nova.serialization.persistentdata.get
+import xyz.xenondevs.nova.serialization.persistentdata.set
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
 private val ABILITIES_KEY = NamespacedKey(NOVA, "abilities1")
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dependsOn = [AddonsInitializer::class]
-)
+@InternalInit(stage = InternalInitStage.POST_WORLD)
 object AbilityManager : Listener {
     
     internal val activeAbilities = HashMap<Player, HashMap<AbilityType<*>, Ability>>()

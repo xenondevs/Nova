@@ -4,9 +4,10 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.addon.AddonsInitializer
-import xyz.xenondevs.nova.addon.loader.AddonLoader
+import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.addon.AddonBootstrapper
+import xyz.xenondevs.nova.addon.file
+import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -18,8 +19,7 @@ import java.io.File
 import java.io.FileFilter
 
 @InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
-    dependsOn = [AddonsInitializer::class]
+    stage = InternalInitStage.PRE_WORLD
 )
 internal object DataFileParser {
     
@@ -34,8 +34,8 @@ internal object DataFileParser {
         existingPaths += getResources("data/").mapNotNull(::extractFile)
         
         // Extract data files from addons
-        AddonManager.loaders.values.forEach { loader ->
-            existingPaths += getResources(loader.file, "data/").mapNotNull { extractFile(it, loader) }
+        AddonBootstrapper.addons.forEach { addon -> 
+            existingPaths += getResources(addon.file, "data/").mapNotNull { extractFile(it, addon) }
         }
         
         // find unedited data files that are no longer default and remove them
@@ -54,8 +54,8 @@ internal object DataFileParser {
     }
     
     
-    private fun extractFile(path: String, addon: AddonLoader? = null): String? {
-        val namespace = addon?.description?.id ?: "nova"
+    private fun extractFile(path: String, addon: Addon? = null): String? {
+        val namespace = addon?.id ?: "nova"
         val file = File(NOVA.dataFolder, path.insertAfter('/', "$namespace/")).let { File(it.parent, it.name) }
         if (file.name.matches(FILE_PATTERN)) {
             UpdatableFile.load(file) { if (addon != null) getResourceAsStream(addon.file, path)!! else getResourceAsStream(path)!! }

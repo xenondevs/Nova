@@ -4,13 +4,13 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList
 import it.unimi.dsi.fastutil.doubles.DoubleList
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings
 import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
-import xyz.xenondevs.nova.addon.registry.AddonGetter
+import xyz.xenondevs.nova.addon.registry.AddonHolder
 import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
-interface NoiseRegistry : AddonGetter {
+interface NoiseRegistry : AddonHolder {
     
     @ExperimentalWorldGen
     fun registerNoiseParameters(name: String, noiseParams: NoiseParameters): NoiseParameters {

@@ -30,7 +30,6 @@ interface ProjectDistributor {
          * An update provider for [GitHub](https://github.com).
          *
          * @param repo The repository in the format `owner/repo`.
-         * @param onlyRelease Whether to only check for releases and not for pre-releases.
          */
         fun github(repo: String): ProjectDistributor = GitHub(repo)
         
@@ -38,7 +37,6 @@ interface ProjectDistributor {
          * An update provider for [Hangar](https://hangar.papermc.io).
          *
          * @param id The id of the project in the format `owner/repo`.
-         * @param onlyRelease Whether to only check for updates in the release channel.
          */
         fun hangar(id: String): ProjectDistributor = Hangar(id)
         
@@ -46,7 +44,6 @@ interface ProjectDistributor {
          * An update provider for [Modrinth](https://modrinth.com).
          *
          * @param id The id of the project.
-         * @param onlyRelease Whether to only check for updates in the release channel.
          */
         fun modrinth(id: String): ProjectDistributor = Modrinth(id)
         

@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.context.param
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.context.intention.ContextIntention
 
 internal class Requirement<V : Any>(
@@ -53,7 +54,7 @@ sealed class ContextParamType<V : Any> {
     companion object {
         
         fun <V : Any> builder(addon: Addon, name: String): ContextParamTypeBuilder<V> {
-            return builder(ResourceLocation.fromNamespaceAndPath(addon.description.id, name))
+            return builder(ResourceLocation.fromNamespaceAndPath(addon.id, name))
         }
         
         internal fun <V : Any> builder(name: String): ContextParamTypeBuilder<V> {

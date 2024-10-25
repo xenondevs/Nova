@@ -4,8 +4,9 @@ import kotlinx.coroutines.runBlocking
 import xyz.xenondevs.inventoryaccess.util.DataUtils
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA
-import xyz.xenondevs.nova.addon.AddonManager
-import xyz.xenondevs.nova.addon.AddonsInitializer
+import xyz.xenondevs.nova.addon.AddonBootstrapper
+import xyz.xenondevs.nova.addon.id
+import xyz.xenondevs.nova.addon.version
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
@@ -40,7 +41,6 @@ internal object ResourceGeneration {
         stage = InternalInitStage.PRE_WORLD,
         dispatcher = Dispatcher.ASYNC,
         dependsOn = [
-            AddonsInitializer::class,
             DefaultItems::class,
             DefaultGuiItems::class,
             DefaultBlocks::class,
@@ -101,10 +101,9 @@ internal object ResourceGeneration {
         digest.update(NOVA.version.toString().toByteArray())
         
         // Addon versions
-        AddonManager.loaders.forEach { (id, loader) ->
-            // id and version
-            digest.update(id.toByteArray())
-            digest.update(loader.description.version.toByteArray())
+        for (addon in AddonBootstrapper.addons) {
+            digest.update(addon.id.toByteArray())
+            digest.update(addon.version.toByteArray())
         }
         
         return DataUtils.toHexadecimalString(digest.digest())
