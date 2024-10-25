@@ -6,7 +6,6 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.runBlocking
 import xyz.xenondevs.commons.gson.getArray
 import xyz.xenondevs.commons.gson.getString
 import xyz.xenondevs.nova.HTTP_CLIENT
@@ -22,7 +21,7 @@ interface ProjectDistributor {
     /**
      * Returns the latest version of the plugin.
      */
-    fun getLatestVersion(onlyRelease: Boolean): Version
+    suspend fun getLatestVersion(onlyRelease: Boolean): Version
     
     companion object {
         
@@ -56,12 +55,12 @@ interface ProjectDistributor {
         
         override val projectUrl = "https://github.com/$repo"
         
-        override fun getLatestVersion(onlyRelease: Boolean): Version = runBlocking {
+        override suspend fun getLatestVersion(onlyRelease: Boolean): Version {
             val versionJson = if (onlyRelease)
                 HTTP_CLIENT.get(releaseVersionUrl).body<JsonObject>()
             else HTTP_CLIENT.get(latestVersionUrl).body<JsonArray>().first().asJsonObject
             
-            return@runBlocking Version(versionJson.getString("tag_name").removePrefix("v"))
+            return Version(versionJson.getString("tag_name").removePrefix("v"))
         }
         
     }
@@ -73,18 +72,17 @@ interface ProjectDistributor {
         
         override val projectUrl = "https://hangar.papermc.io/$id"
         
-        override fun getLatestVersion(onlyRelease: Boolean): Version =
-            runBlocking {
-                val version: String
-                if (onlyRelease) {
-                    version = HTTP_CLIENT.get(releaseVersionUrl) { accept(ContentType.Text.Plain) }.bodyAsText()
-                } else {
-                    val json = HTTP_CLIENT.get(allVersionsUrl).body<JsonObject>()
-                    version = json.getArray("result").first().asJsonObject.getString("name")
-                }
-                
-                return@runBlocking Version(version)
+        override suspend fun getLatestVersion(onlyRelease: Boolean): Version {
+            val version: String
+            if (onlyRelease) {
+                version = HTTP_CLIENT.get(releaseVersionUrl) { accept(ContentType.Text.Plain) }.bodyAsText()
+            } else {
+                val json = HTTP_CLIENT.get(allVersionsUrl).body<JsonObject>()
+                version = json.getArray("result").first().asJsonObject.getString("name")
             }
+            
+            return Version(version)
+        }
         
     }
     
@@ -93,15 +91,14 @@ interface ProjectDistributor {
         private val versionsUrl = "https://api.modrinth.com/v2/project/$id/version"
         override val projectUrl = "https://modrinth.com/plugin/$id"
         
-        override fun getLatestVersion(onlyRelease: Boolean): Version =
-            runBlocking {
-                val versions = HTTP_CLIENT.get(versionsUrl).body<JsonArray>()
-                val latestVersion = if (onlyRelease)
-                    versions.first { it.asJsonObject.getString("version_type") == "release" }.asJsonObject
-                else versions.first().asJsonObject
-                
-                return@runBlocking Version(latestVersion.getString("version_number"))
-            }
+        override suspend fun getLatestVersion(onlyRelease: Boolean): Version {
+            val versions = HTTP_CLIENT.get(versionsUrl).body<JsonArray>()
+            val latestVersion = if (onlyRelease)
+                versions.first { it.asJsonObject.getString("version_type") == "release" }.asJsonObject
+            else versions.first().asJsonObject
+            
+            return Version(latestVersion.getString("version_number"))
+        }
         
     }
     

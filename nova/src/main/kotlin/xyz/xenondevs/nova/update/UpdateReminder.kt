@@ -1,12 +1,15 @@
 package xyz.xenondevs.nova.update
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.scheduler.BukkitTask
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.Nova
@@ -19,9 +22,9 @@ import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.runAsyncTaskTimer
 import xyz.xenondevs.nova.util.unregisterEvents
 
 private val NOVA_DISTRIBUTORS = listOf(
@@ -36,7 +39,7 @@ private val NOVA_DISTRIBUTORS = listOf(
 )
 internal object UpdateReminder : Listener {
     
-    private var task: BukkitTask? = null
+    private var job: Job? = null
     private val needsUpdate = HashMap<Addon?, String>()
     private val alreadyNotified = ArrayList<Addon?>()
     
@@ -51,23 +54,26 @@ internal object UpdateReminder : Listener {
         val enabled = cfg.node("enabled").boolean
         val interval = cfg.node("interval").long
         
-        if (task == null && enabled) {
+        if (job == null && enabled) {
             // Enable reminder
             registerEvents()
-            task = runAsyncTaskTimer(0, interval, ::checkForUpdates)
-        } else if (task != null && !enabled) {
+            job = CoroutineScope(AsyncExecutor.SUPERVISOR).launch {
+                checkForUpdates()
+                delay(interval)
+            }
+        } else if (job != null && !enabled) {
             // Disable reminder
             unregisterEvents()
-            task?.cancel()
-            task = null
+            job?.cancel()
+            job = null
         }
     }
     
-    private fun checkForUpdates() {
+    private suspend fun checkForUpdates() {
         checkVersion(null)
         AddonBootstrapper.addons
             .filter { it.projectDistributors.isNotEmpty() }
-            .forEach(UpdateReminder::checkVersion)
+            .forEach { checkVersion(it) }
         
         if (needsUpdate.isNotEmpty()) {
             needsUpdate.asSequence()
@@ -80,7 +86,7 @@ internal object UpdateReminder : Listener {
         }
     }
     
-    private fun checkVersion(addon: Addon?) {
+    private suspend fun checkVersion(addon: Addon?) {
         if (addon in needsUpdate)
             return
         
@@ -102,7 +108,7 @@ internal object UpdateReminder : Listener {
                     needsUpdate[addon] = distributor.projectUrl
                     break
                 }
-            } catch (ignored: Throwable) {
+            } catch (_: Throwable) {
             }
         }
     }
