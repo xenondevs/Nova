@@ -54,9 +54,9 @@ internal fun ByteArray.decompress(): ByteArray {
     }
 }
 
-internal fun ByteArray.encodeWithBase64(): String = Base64.getEncoder().encodeToString(this)
+internal fun ByteArray.encodeBase64(): String = Base64.getEncoder().encodeToString(this)
 
-internal fun String.decodeWithBase64(): ByteArray = Base64.getDecoder().decode(this)
+internal fun String.decodeBase64(): ByteArray = Base64.getDecoder().decode(this)
 
 internal fun ByteBuf.writeUUID(uuid: UUID) {
     writeLong(uuid.mostSignificantBits)

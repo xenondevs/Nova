@@ -213,7 +213,7 @@ internal object NovaCommand : Command() {
                     Component.text(reloadedConfigs.size),
                     Component.join(
                         JoinConfiguration.commas(true),
-                        reloadedConfigs.map { cfgName -> Component.text(cfgName, NamedTextColor.AQUA) }
+                        reloadedConfigs.map { cfgId -> Component.text(cfgId.toString(), NamedTextColor.AQUA) }
                     )
                 ))
             } else {

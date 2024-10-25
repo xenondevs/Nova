@@ -19,8 +19,6 @@ annotation class Hook(
 
 /**
  * A listener that is used to wait for a plugin to finish loading.
- *
- * @see AwaitLoaded
  */
 interface LoadListener {
     

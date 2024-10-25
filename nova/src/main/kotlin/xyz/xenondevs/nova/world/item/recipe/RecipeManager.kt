@@ -108,7 +108,7 @@ object RecipeManager : Listener, PacketListener {
     }
     
     private fun loadRecipes() {
-        RecipesLoader.loadRecipes().forEach(RecipeManager::loadRecipe)
+        RecipesLoader.extractAndLoadRecipes().forEach(RecipeManager::loadRecipe)
         hardcodedRecipes.forEach(RecipeManager::loadRecipe)
     }
     

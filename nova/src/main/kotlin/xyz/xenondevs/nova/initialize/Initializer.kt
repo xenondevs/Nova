@@ -27,10 +27,10 @@ import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.file
-import xyz.xenondevs.nova.addon.name
 import xyz.xenondevs.nova.addon.version
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.registry.NovaRegistryAccess
@@ -45,7 +45,7 @@ import java.lang.reflect.InvocationTargetException
 import java.util.logging.Level
 import xyz.xenondevs.inventoryaccess.component.i18n.Languages as InvUILanguages
 
-private val LOGGING by Configs["config"].entry<Boolean>("debug", "logging", "initializer")
+private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "initializer")
 
 internal object Initializer : Listener {
     

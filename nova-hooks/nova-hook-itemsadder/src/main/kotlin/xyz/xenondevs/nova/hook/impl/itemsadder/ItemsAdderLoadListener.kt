@@ -4,10 +4,10 @@ package xyz.xenondevs.nova.hook.impl.itemsadder
 
 import dev.lone.itemsadder.api.Events.ItemsAdderLoadDataEvent
 import dev.lone.itemsadder.api.ItemsAdder
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import xyz.xenondevs.nova.integration.LoadListener
-import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.unregisterEvents
 import java.util.concurrent.CompletableFuture
 
@@ -19,7 +19,7 @@ internal object ItemsAdderLoadListener : LoadListener, Listener {
         if (ItemsAdder.areItemsLoaded()) {
             loaded.complete(true)
         } else {
-            registerEvents()
+            Bukkit.getPluginManager().registerEvents(this, Bukkit.getPluginManager().getPlugin("Nova")!!)
         }
     }
     

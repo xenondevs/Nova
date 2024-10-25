@@ -41,7 +41,7 @@ internal object AddonBootstrapper {
             .meta.version
             .let(::Version)
         
-        context.pluginSource.useZip { fs -> 
+        context.pluginSource.useZip { fs ->
             val metaPath = fs.resolve("/nova-addon.yml")
             if (metaPath.notExists())
                 throw IllegalStateException("Nova addon meta file not found!")

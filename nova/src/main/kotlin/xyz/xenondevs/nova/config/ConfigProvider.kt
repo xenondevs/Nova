@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.config
 
+import net.minecraft.resources.ResourceLocation
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ScopedConfigurationNode
@@ -336,7 +337,7 @@ private fun Provider<ConfigurationNode>.findFilePath(): String? {
     while (queue.isNotEmpty()) {
         val current = queue.removeFirst()
         if (current is RootConfigProvider) {
-            return current.relPath
+            return current.configId.toString()
         }
         queue.addAll(current.parents)
     }
@@ -347,7 +348,7 @@ private fun Provider<ConfigurationNode>.findFilePath(): String? {
 @OptIn(UnstableProviderApi::class)
 internal class RootConfigProvider internal constructor(
     val path: Path,
-    val relPath: String
+    val configId: ResourceLocation
 ) : AbstractProvider<CommentedConfigurationNode>(ReentrantLock()) {
     
     @Volatile

@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.config
 
+import net.minecraft.resources.ResourceLocation
 import org.snakeyaml.engine.v2.api.DumpSettings
 import org.snakeyaml.engine.v2.api.LoadSettings
 import org.snakeyaml.engine.v2.api.YamlOutputStreamWriter
@@ -28,22 +29,22 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
-internal class ConfigExtractor(extractedConfigs: MutableProvider<Map<String, String>>) {
+internal class ConfigExtractor(extractedConfigs: MutableProvider<Map<ResourceLocation, String>>) {
     
-    private var extractedConfigs: Map<String, String> by extractedConfigs
+    private var extractedConfigs: Map<ResourceLocation, String> by extractedConfigs
     
-    fun extract(configPath: String, fileInZip: Path, destFile: Path) {
+    fun extract(configId: ResourceLocation, fileInZip: Path, destFile: Path) {
         val internalCfg = loadYaml(fileInZip)
-        val extractedCfg = extractedConfigs[configPath]?.let(::loadYaml)
+        val extractedCfg = extractedConfigs[configId]?.let(::loadYaml)
         
         val severCfg: Node
         if (!destFile.exists() || extractedCfg == null) {
             severCfg = internalCfg
-            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configPath, writeYaml(severCfg, false)) }
+            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configId, writeYaml(severCfg, false)) }
         } else {
             severCfg = loadYaml(destFile)
             updateExistingConfig(severCfg, extractedCfg, internalCfg)
-            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configPath, writeYaml(extractedCfg, false)) }
+            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configId, writeYaml(extractedCfg, false)) }
         }
         
         writeYaml(severCfg, destFile)

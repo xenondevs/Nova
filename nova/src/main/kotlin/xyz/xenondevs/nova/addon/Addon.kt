@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.addon
 
+import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.addon.registry.AddonHolder
 import xyz.xenondevs.nova.update.ProjectDistributor
@@ -26,7 +27,7 @@ internal val Addon.version: String
 internal val Addon.file: File
     get() = JAVA_PLUGIN_GET_FILE.invoke(this as JavaPlugin) as File
 
-interface Addon : AddonHolder {
+interface Addon : Plugin, AddonHolder {
     
     /**
      * A list of [ProjectDistributors][ProjectDistributor] that distribute this addon

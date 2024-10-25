@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.resources.builder.AssetPack
 import xyz.xenondevs.nova.resources.builder.PNGMetadataRemover
 import xyz.xenondevs.nova.resources.builder.ResourceFilter
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.util.data.openZip
+import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
 import kotlin.io.path.CopyActionResult
 import kotlin.io.path.copyTo
@@ -27,32 +27,33 @@ class ExtractTask(private val builder: ResourcePackBuilder) : PackTaskHolder {
     }
     
     private fun extractMinecraftAssets() {
-        val zip = NOVA.novaJar.openZip()
         val filters = builder.getResourceFilters(ResourceFilter.Stage.ASSET_PACK)
-        zip.resolve("assets/minecraft/")
-            .copyToRecursively(
-                ResourcePackBuilder.MINECRAFT_ASSETS_DIR,
-                followLinks = false,
-            ) { source, target ->
-                if (source.isDirectory())
-                    return@copyToRecursively CopyActionResult.CONTINUE
-                
-                val relPath = target.relativeTo(ResourcePackBuilder.MINECRAFT_ASSETS_DIR)
-                
-                if (!filters.all { filter -> filter.allows("minecraft/$relPath") })
-                    return@copyToRecursively CopyActionResult.SKIP_SUBTREE
-                
-                source.inputStream().use { ins ->
-                    target.parent.createDirectories()
-                    target.outputStream().use { out ->
-                        if (source.extension.equals("png", true))
-                            PNGMetadataRemover.remove(ins, out)
-                        else ins.transferTo(out)
+        NOVA.novaJar.useZip { zip ->
+            zip.resolve("assets/minecraft/")
+                .copyToRecursively(
+                    ResourcePackBuilder.MINECRAFT_ASSETS_DIR,
+                    followLinks = false,
+                ) { source, target ->
+                    if (source.isDirectory())
+                        return@copyToRecursively CopyActionResult.CONTINUE
+                    
+                    val relPath = target.relativeTo(ResourcePackBuilder.MINECRAFT_ASSETS_DIR)
+                    
+                    if (!filters.all { filter -> filter.allows("minecraft/$relPath") })
+                        return@copyToRecursively CopyActionResult.SKIP_SUBTREE
+                    
+                    source.inputStream().use { ins ->
+                        target.parent.createDirectories()
+                        target.outputStream().use { out ->
+                            if (source.extension.equals("png", true))
+                                PNGMetadataRemover.remove(ins, out)
+                            else ins.transferTo(out)
+                        }
                     }
+                    
+                    CopyActionResult.CONTINUE
                 }
-                
-                CopyActionResult.CONTINUE
-            }
+        }
     }
     
     private fun extractAssetPacks() {

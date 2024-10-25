@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.resources.builder.basepack.merger.FileMerger
 import xyz.xenondevs.nova.resources.builder.task.ArmorData
 import xyz.xenondevs.nova.resources.builder.task.font.MovedFontContent
 import xyz.xenondevs.nova.util.StringUtils
-import xyz.xenondevs.nova.util.data.openZip
+import xyz.xenondevs.nova.util.data.useZip
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
 import java.io.File
 import java.nio.file.Path
@@ -53,7 +53,7 @@ class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
             if (it.isFile && it.extension.equals("zip", true)) {
                 val dir = ResourcePackBuilder.TEMP_BASE_PACKS_DIR.resolve("${it.nameWithoutExtension}-${StringUtils.randomString(5)}")
                 dir.createDirectories()
-                it.openZip().copyToRecursively(dir, followLinks = false, overwrite = true)
+                it.useZip { zip -> zip.copyToRecursively(dir, followLinks = false, overwrite = true) }
                 
                 return@map dir
             }

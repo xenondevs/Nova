@@ -13,7 +13,6 @@ import java.io.OutputStream
 import java.io.RandomAccessFile
 import java.nio.file.FileSystems
 import java.nio.file.Path
-import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import javax.imageio.ImageIO
 import kotlin.io.path.extension
@@ -24,27 +23,6 @@ import kotlin.math.max
 private val ZIP_FILE by lazy { ZipFile(NOVA.novaJar) }
 
 /**
- * Returns a list of all resources in the plugin.
- *
- * @param directory The directory the resources should be in
- */
-internal fun getResources(directory: String = ""): List<String> {
-    return ZIP_FILE.stream()
-        .filter { it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class") }
-        .map(ZipEntry::getName)
-        .toList()
-}
-
-internal fun getResources(file: File, directory: String = ""): List<String> {
-    return ZipFile(file).use {
-        it.stream()
-            .filter { it.name.startsWith(directory) && !it.isDirectory && !it.name.endsWith(".class") }
-            .map(ZipEntry::getName)
-            .toList()
-    }
-}
-
-/**
  * Searches a resource with the given [name] and returns
  * the data as a stream.
  */
@@ -52,14 +30,6 @@ internal fun getResourceAsStream(name: String): InputStream? {
     val entry = ZIP_FILE.getEntry(name) ?: return null
     return ZIP_FILE.getInputStream(entry)
 }
-
-internal fun getResourceAsStream(file: File, name: String): InputStream? {
-    val zipFile = ZipFile(file)
-    return zipFile.getInputStream(zipFile.getEntry(name) ?: return null)
-}
-
-internal fun hasResource(name: String): Boolean =
-    ZIP_FILE.getEntry(name) != null
 
 internal fun getResourceData(name: String): ByteArray {
     val stream = getResourceAsStream(name) ?: return byteArrayOf()
@@ -254,9 +224,6 @@ internal fun Path.readImage(): BufferedImage {
 internal fun Path.writeImage(image: RenderedImage, formatName: String) {
     outputStream().buffered().use { ImageIO.write(image, formatName, it) }
 }
-
-internal fun File.openZip(): Path =
-    toPath().openZip()
 
 internal fun <T> File.useZip(create: Boolean = false, run: (Path) -> T): T =
     toPath().useZip(create, run)
