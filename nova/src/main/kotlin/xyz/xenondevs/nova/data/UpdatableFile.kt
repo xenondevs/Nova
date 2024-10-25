@@ -23,11 +23,12 @@ import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 import kotlin.io.path.writeBytes
 
+private const val STORAGE_KEY = "updatable_file_hashes"
 private val PLUGINS_DIR = Nova.dataFolder.parentFile.toPath()
 
 object UpdatableFile {
     
-    private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve("updatable_file_hashes") { HashMap() }
+    private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve(STORAGE_KEY) { HashMap() }
     
     internal fun extractIdNamedFromAllAddons(dirName: String) {
         for (addon in AddonBootstrapper.addons) {
@@ -93,7 +94,7 @@ object UpdatableFile {
     
     @DisableFun
     private fun disable() {
-        PermanentStorage.store("updatableFileHashes", fileHashes)
+        PermanentStorage.store(STORAGE_KEY, fileHashes)
     }
     
     fun storeHash(file: Path, hash: ByteArray) {
