@@ -23,7 +23,6 @@ import org.jgrapht.nio.dot.DOTExporter
 import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.file
@@ -65,7 +64,7 @@ internal object Initializer : Listener {
      * Stats the initialization process.
      */
     fun start() {
-        collectAndRegisterRunnables(NOVA.novaJar, Nova::class.java.classLoader)
+        collectAndRegisterRunnables(Nova.novaJar, Nova::class.java.classLoader)
         for (addon in AddonBootstrapper.addons) {
             collectAndRegisterRunnables(addon.file, addon.javaClass.classLoader)
         }
@@ -205,7 +204,7 @@ internal object Initializer : Listener {
         Configs.extractDefaultConfig()
         VanillaRegistryAccess.unfreezeAll()
         registerEvents()
-        InvUI.getInstance().setPlugin(NOVA)
+        InvUI.getInstance().setPlugin(Nova)
         InvUILanguages.getInstance().enableServerSideTranslations(false)
         CBFAdapters.register()
         
@@ -234,7 +233,7 @@ internal object Initializer : Listener {
         isDone = true
         callEvent(NovaLoadDataEvent())
         
-        PermanentStorage.store("last_version", NOVA.pluginMeta.version)
+        PermanentStorage.store("last_version", Nova.pluginMeta.version)
         setGlobalIngredients()
         setupMetrics()
         LOGGER.info("Done loading")
@@ -323,7 +322,7 @@ internal object Initializer : Listener {
     }
     
     private fun setupMetrics() {
-        val metrics = Metrics(NOVA, 11927)
+        val metrics = Metrics(Nova, 11927)
         metrics.addCustomChart(DrilldownPie("addons") {
             val map = HashMap<String, Map<String, Int>>()
             

@@ -29,11 +29,11 @@ import kotlin.io.path.walk
 // TODO: Remove in 0.19
 internal object LegacyDataFolderMigrator {
     
-    private val PLUGINS_DIR = NOVA.dataFolder.parentFile.toPath()
+    private val PLUGINS_DIR = Nova.dataFolder.parentFile.toPath()
     
     fun migrate() {
         // addons need to be moved manually because plugins are already loaded at this point
-        val addonsDir = NOVA.dataFolder.toPath().resolve("addons")
+        val addonsDir = Nova.dataFolder.toPath().resolve("addons")
         if (addonsDir.exists() && addonsDir.listDirectoryEntries().isNotEmpty()) {
             throw Exception("plugins/Nova/addons exists, but addons are plugins now. Please move all addons to plugins/")
         }
@@ -66,7 +66,7 @@ internal object LegacyDataFolderMigrator {
     }
     
     private fun migrateConfigs() {
-        val configs = NOVA.dataFolder.toPath().resolve("configs")
+        val configs = Nova.dataFolder.toPath().resolve("configs")
         if (configs.exists()) {
             // move plugins/Nova/configs/nova/ contents to plugins/Nova/configs/
             val configsNova = configs.resolve("nova")
@@ -110,7 +110,7 @@ internal object LegacyDataFolderMigrator {
     }
     
     private fun migratePrefixedDataFiles(dir: String) {
-        val legacyDir = NOVA.dataFolder.toPath().resolve(dir)
+        val legacyDir = Nova.dataFolder.toPath().resolve(dir)
         if (legacyDir.exists()) {
             val oldUpdatableFiles: Map<String, String> = PermanentStorage.retrieve("updatableFileHashes", ::HashMap)
             val newUpdatableFiles: MutableMap<String, String> = PermanentStorage.retrieve("updatable_file_hashes", ::HashMap)
@@ -140,7 +140,7 @@ internal object LegacyDataFolderMigrator {
     }
     
     private fun migrateWorldgen() {
-        val data = NOVA.dataFolder.toPath().resolve("data")
+        val data = Nova.dataFolder.toPath().resolve("data")
         if (data.exists()) {
             val oldUpdatableFiles: Map<String, String> = PermanentStorage.retrieve("updatableFileHashes", ::HashMap)
             val newUpdatableFiles: MutableMap<String, String> = PermanentStorage.retrieve("updatable_file_hashes", ::HashMap)

@@ -7,7 +7,7 @@ import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.file
@@ -43,16 +43,16 @@ object Configs {
     private var lastReload = -1L
     
     internal fun extractDefaultConfig() {
-        NOVA.novaJar.useZip { zip ->
+        Nova.novaJar.useZip { zip ->
             val from = zip.resolve(DEFAULT_CONFIG_PATH)
-            val to = NOVA.dataFolder.toPath().resolve(DEFAULT_CONFIG_PATH)
+            val to = Nova.dataFolder.toPath().resolve(DEFAULT_CONFIG_PATH)
             extractConfig(from, to, DEFAULT_CONFIG_ID)
         }
     }
     
     @InitFun
     private fun extractAllConfigs() {
-        extractConfigs("nova", NOVA.novaJar, NOVA.dataFolder.toPath())
+        extractConfigs("nova", Nova.novaJar, Nova.dataFolder.toPath())
         for (addon in AddonBootstrapper.addons) {
             extractConfigs(addon.id, addon.file, addon.dataFolder.toPath())
         }
@@ -84,7 +84,7 @@ object Configs {
     
     private fun resolveConfigPath(configId: ResourceLocation): Path {
         val dataFolder = when(configId.namespace) {
-            "nova" -> NOVA.dataFolder
+            "nova" -> Nova.dataFolder
             else -> AddonBootstrapper.addons.firstOrNull { it.id == configId.namespace }?.dataFolder
                 ?: throw IllegalArgumentException("No addon with id ${configId.namespace} found")
         }.toPath()

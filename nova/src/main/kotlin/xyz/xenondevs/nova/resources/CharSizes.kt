@@ -8,7 +8,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.Dispatcher
@@ -47,7 +47,7 @@ data class CharOptions(
 )
 object CharSizes {
     
-    private val CHAR_SIZES_DIR = File(NOVA.dataFolder, ".internal_data/char_sizes/")
+    private val CHAR_SIZES_DIR = File(Nova.dataFolder, ".internal_data/char_sizes/")
     private val loadedTables = HashMap<String, CharSizeTable>()
     private val componentCache: Cache<Pair<Component, String>, ComponentSize> = CacheBuilder.newBuilder()
         .expireAfterAccess(5, TimeUnit.MINUTES)

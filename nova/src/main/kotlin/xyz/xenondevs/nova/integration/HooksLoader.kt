@@ -5,7 +5,7 @@ package xyz.xenondevs.nova.integration
 import org.bukkit.Bukkit
 import org.objectweb.asm.Type
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.resources.upload.UploadService
@@ -31,7 +31,7 @@ internal object HooksLoader {
     @InitFun
     private fun loadHooks() {
         JarUtils.findAnnotatedClasses(
-            NOVA.novaJar,
+            Nova.novaJar,
             listOf(Hook::class), emptyList(),
             "xyz/xenondevs/nova/hook/impl/"
         ).classes[Hook::class]?.forEach { (className, annotations) ->

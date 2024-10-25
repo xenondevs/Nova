@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.util.data
 
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import java.awt.Dimension
 import java.awt.image.BufferedImage
 import java.awt.image.RenderedImage
@@ -20,7 +20,7 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 import kotlin.math.max
 
-private val ZIP_FILE by lazy { ZipFile(NOVA.novaJar) }
+private val ZIP_FILE by lazy { ZipFile(Nova.novaJar) }
 
 /**
  * Searches a resource with the given [name] and returns

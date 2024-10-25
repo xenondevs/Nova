@@ -18,7 +18,7 @@ import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.file
 import xyz.xenondevs.nova.addon.id
@@ -112,8 +112,8 @@ class ResourcePackBuilder internal constructor() {
         }
         
         //<editor-fold desc="never in memory">
-        val RESOURCE_PACK_FILE: File = File(NOVA.dataFolder, "resource_pack/ResourcePack.zip")
-        val RESOURCE_PACK_DIR: Path = File(NOVA.dataFolder, "resource_pack").toPath()
+        val RESOURCE_PACK_FILE: File = File(Nova.dataFolder, "resource_pack/ResourcePack.zip")
+        val RESOURCE_PACK_DIR: Path = File(Nova.dataFolder, "resource_pack").toPath()
         val BASE_PACKS_DIR: Path = RESOURCE_PACK_DIR.resolve("base_packs")
         val MCASSETS_DIR: Path = RESOURCE_PACK_DIR.resolve(".mcassets")
         val MCASSETS_ASSETS_DIR: Path = MCASSETS_DIR.resolve("assets")
@@ -184,12 +184,12 @@ class ResourcePackBuilder internal constructor() {
     
     init {
         // delete legacy resource pack files
-        File(NOVA.dataFolder, "ResourcePack").deleteRecursively()
+        File(Nova.dataFolder, "ResourcePack").deleteRecursively()
         File(RESOURCE_PACK_DIR.toFile(), "asset_packs").deleteRecursively()
         File(RESOURCE_PACK_DIR.toFile(), "pack").deleteRecursively()
         if (!IN_MEMORY) RESOURCE_PACK_BUILD_DIR.toFile().deleteRecursively()
         
-        if (NOVA.lastVersion != null && NOVA.lastVersion!! < Version("0.10")) {
+        if (Nova.lastVersion != null && Nova.lastVersion!! < Version("0.10")) {
             BASE_PACKS_DIR.toFile().delete()
         }
         
@@ -291,7 +291,7 @@ class ResourcePackBuilder internal constructor() {
     private fun loadAssetPacks(): List<AssetPack> {
         return buildList<Triple<String, File, String>> {
             this += AddonBootstrapper.addons.map { addon -> Triple(addon.id, addon.file, "assets/") }
-            this += Triple("nova", NOVA.novaJar, "assets/nova/")
+            this += Triple("nova", Nova.novaJar, "assets/nova/")
         }.map { (namespace, file, assetsPath) ->
             val zip = FileSystems.newFileSystem(file.toPath())
             AssetPack(namespace, zip.getPath(assetsPath))

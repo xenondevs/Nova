@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.inventoryaccess.util.ReflectionRegistry
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.config.node
@@ -361,7 +361,7 @@ object BossBarOverlayManager : Listener, PacketListener {
             }
         }
         
-        if (plugin != null && plugin != NOVA) {
+        if (plugin != null && plugin != Nova) {
             trackedOrigins[event.id] = BarOrigin.Plugin(plugin!!)
         }
     }

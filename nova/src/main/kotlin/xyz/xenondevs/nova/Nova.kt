@@ -32,7 +32,6 @@ import xyz.xenondevs.nova.api.tileentity.TileEntityManager as ITileEntityManager
 
 private val REQUIRED_SERVER_VERSION = Version("1.21.1")..Version("1.21.1")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
-internal lateinit var NOVA: Nova private set
 internal lateinit var LOGGER: Logger private set
 
 internal val HTTP_CLIENT = HttpClient(CIO) {
@@ -44,14 +43,13 @@ internal val HTTP_CLIENT = HttpClient(CIO) {
     expectSuccess = false
 }
 
-internal class Nova : JavaPlugin(), INova {
+internal object Nova : JavaPlugin(), INova {
     
     val version = Version(description.version)
     val lastVersion = PermanentStorage.retrieveOrNull<Version>("last_version")
     val novaJar = file
     
     init {
-        NOVA = this
         LOGGER = logger
     }
     

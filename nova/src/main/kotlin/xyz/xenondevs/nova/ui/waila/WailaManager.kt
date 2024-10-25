@@ -8,7 +8,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.scheduler.BukkitTask
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.DisableFun
@@ -23,7 +23,7 @@ import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.unregisterEvents
 import xyz.xenondevs.nova.api.player.WailaManager as IWailaManager
 
-private val WAILA_ENABLED_KEY = NamespacedKey(NOVA, "waila")
+private val WAILA_ENABLED_KEY = NamespacedKey(Nova, "waila")
 
 private val Player.isWailaEnabled: Boolean
     get() = persistentDataContainer.get<Boolean>(WAILA_ENABLED_KEY) != false

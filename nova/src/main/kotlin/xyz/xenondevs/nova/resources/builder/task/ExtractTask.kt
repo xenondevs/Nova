@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.resources.builder.task
 
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.resources.builder.AssetPack
 import xyz.xenondevs.nova.resources.builder.PNGMetadataRemover
 import xyz.xenondevs.nova.resources.builder.ResourceFilter
@@ -28,7 +28,7 @@ class ExtractTask(private val builder: ResourcePackBuilder) : PackTaskHolder {
     
     private fun extractMinecraftAssets() {
         val filters = builder.getResourceFilters(ResourceFilter.Stage.ASSET_PACK)
-        NOVA.novaJar.useZip { zip ->
+        Nova.novaJar.useZip { zip ->
             zip.resolve("assets/minecraft/")
                 .copyToRecursively(
                     ResourcePackBuilder.MINECRAFT_ASSETS_DIR,

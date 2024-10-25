@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.data
 
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.file
 import xyz.xenondevs.nova.config.PermanentStorage
@@ -23,7 +23,7 @@ import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 import kotlin.io.path.writeBytes
 
-private val PLUGINS_DIR = NOVA.dataFolder.parentFile.toPath()
+private val PLUGINS_DIR = Nova.dataFolder.parentFile.toPath()
 
 object UpdatableFile {
     

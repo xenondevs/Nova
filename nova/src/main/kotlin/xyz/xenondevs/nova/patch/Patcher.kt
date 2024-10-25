@@ -10,7 +10,6 @@ import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
@@ -78,7 +77,7 @@ internal object Patcher {
     private fun init() {
         try {
             LOGGER.info("Applying patches...")
-            VirtualClassPath.classLoaders += NOVA.javaClass.classLoader
+            VirtualClassPath.classLoaders += Nova.javaClass.classLoader
             redefineModule()
             defineInjectedClasses()
             runTransformers()

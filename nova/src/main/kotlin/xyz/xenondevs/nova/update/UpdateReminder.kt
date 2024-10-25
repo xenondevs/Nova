@@ -9,10 +9,9 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.scheduler.BukkitTask
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.addon.name
 import xyz.xenondevs.nova.addon.version
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.node
@@ -93,7 +92,7 @@ internal object UpdateReminder : Listener {
             currentVersion = Version(addon.version)
         } else {
             distributors = NOVA_DISTRIBUTORS
-            currentVersion = NOVA.version
+            currentVersion = Nova.version
         }
         
         for (distributor in distributors) {

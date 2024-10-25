@@ -19,7 +19,7 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.associateByNotNull
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
@@ -60,7 +60,7 @@ import kotlin.random.Random
 )
 internal object BlockMigrator : Listener {
     
-    private val MIGRATION_ID_KEY = NamespacedKey(NOVA, "migration_id")
+    private val MIGRATION_ID_KEY = NamespacedKey(Nova, "migration_id")
     private var migrationId by PermanentStorage.storedValue("migration_id") { Random.nextInt() }
     
     private val migrations = ArrayList<BlockMigration>()

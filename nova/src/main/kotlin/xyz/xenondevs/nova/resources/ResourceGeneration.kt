@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.resources
 import kotlinx.coroutines.runBlocking
 import xyz.xenondevs.inventoryaccess.util.DataUtils
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.addon.version
@@ -98,7 +98,7 @@ internal object ResourceGeneration {
         val digest = MessageDigest.getInstance("MD5")
         
         // Nova version
-        digest.update(NOVA.version.toString().toByteArray())
+        digest.update(Nova.version.toString().toByteArray())
         
         // Addon versions
         for (addon in AddonBootstrapper.addons) {

@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.PluginManager
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.patch.impl.misc.EventPreventionPatch
 
 fun Action.isClickBlock() = this == Action.LEFT_CLICK_BLOCK || this == Action.RIGHT_CLICK_BLOCK
@@ -33,7 +33,7 @@ fun callEvent(event: Event) = Bukkit.getPluginManager().callEvent(event)
  * Shortcut for [PluginManager.registerEvents], registered under the Nova plugin.
  */
 fun Listener.registerEvents() {
-    Bukkit.getPluginManager().registerEvents(this, NOVA)
+    Bukkit.getPluginManager().registerEvents(this, Nova)
 }
 
 /**
