@@ -85,9 +85,9 @@ object UpdatableFile {
                 }
             }
         } else if (storedHash == null) {
-            // The file is not on the server and has also never been extracted before
+            // The file is not on the server and/or has never been extracted before
             to.parent.createDirectories()
-            from.copyTo(to)
+            from.copyTo(to, true)
             storeHash(to)
         }
     }
