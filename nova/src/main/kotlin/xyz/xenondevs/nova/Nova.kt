@@ -60,6 +60,9 @@ internal class Nova : JavaPlugin(), INova {
             LOGGER.warning("Running in dev mode! Never use this on a production server!")
         
         if (checkStartup()) {
+            if (lastVersion != null && lastVersion < Version("0.18-SNAPSHOT"))
+                LegacyDataFolderMigrator.migrate()
+            
             Initializer.start()
         }
     }

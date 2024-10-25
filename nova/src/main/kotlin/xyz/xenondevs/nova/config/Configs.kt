@@ -37,7 +37,7 @@ val MAIN_CONFIG = Configs[DEFAULT_CONFIG_ID]
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
 object Configs {
     
-    private val extractor = ConfigExtractor(PermanentStorage.storedValue("storedConfigs", ::HashMap))
+    private val extractor = ConfigExtractor(PermanentStorage.storedValue("stored_configs", ::HashMap))
     private val configProviders = HashMap<ResourceLocation, RootConfigProvider>()
     
     private var lastReload = -1L

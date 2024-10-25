@@ -27,7 +27,7 @@ private val PLUGINS_DIR = NOVA.dataFolder.parentFile.toPath()
 
 object UpdatableFile {
     
-    private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve("updatableFileHashes") { HashMap() }
+    private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve("updatable_file_hashes") { HashMap() }
     
     internal fun extractIdNamedFromAllAddons(dirName: String) {
         for (addon in AddonBootstrapper.addons) {
