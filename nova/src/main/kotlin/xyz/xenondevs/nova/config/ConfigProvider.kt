@@ -17,6 +17,7 @@ import java.lang.ref.WeakReference
 import java.lang.reflect.Type
 import java.nio.file.Path
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.io.path.exists
 import kotlin.reflect.KType
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.typeOf
@@ -355,8 +356,19 @@ internal class RootConfigProvider internal constructor(
     var loaded = false
         private set
     
+    @Volatile
+    var fileExisted = false
+        private set
+    
     init {
-        subscribe { loaded = true }
+        subscribe { 
+            loaded = true
+            fileExisted = path.exists()
+        }
+    }
+    
+    fun reload() {
+        set(Configs.createLoader(path).load())
     }
     
     override fun pull(): CommentedConfigurationNode {

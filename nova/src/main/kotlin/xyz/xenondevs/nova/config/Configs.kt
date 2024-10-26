@@ -79,11 +79,11 @@ object Configs {
     private fun extractConfig(from: Path, to: Path, configId: ResourceLocation) {
         extractor.extract(configId, from, to)
         val provider = configProviders.getOrPut(configId) { RootConfigProvider(to, configId) }
-        provider.set(createLoader(to).load())
+        provider.reload()
     }
     
     private fun resolveConfigPath(configId: ResourceLocation): Path {
-        val dataFolder = when(configId.namespace) {
+        val dataFolder = when (configId.namespace) {
             "nova" -> Nova.dataFolder
             else -> AddonBootstrapper.addons.firstOrNull { it.id == configId.namespace }?.dataFolder
                 ?: throw IllegalArgumentException("No addon with id ${configId.namespace} found")
@@ -93,9 +93,11 @@ object Configs {
     
     internal fun reload(): List<ResourceLocation> {
         val reloadedConfigs = configProviders.asSequence()
-            .filter { (_, provider) -> provider.path.exists() }
-            .filter { (_, provider) -> provider.path.getLastModifiedTime().toMillis() > lastReload } // only reload updated configs
-            .onEach { (_, provider) -> provider.set(createLoader(provider.path).load()) }
+            .filter { (_, provider) ->
+                !provider.path.exists() && provider.fileExisted
+                    || provider.path.exists() && provider.path.getLastModifiedTime().toMillis() > lastReload
+            } // only reload updated configs
+            .onEach { (_, provider) -> provider.reload() }
             .mapTo(ArrayList()) { (id, _) -> id }
         lastReload = System.currentTimeMillis()
         
@@ -111,7 +113,7 @@ object Configs {
         get(ResourceLocation(addon, path))
     
     operator fun get(id: ResourceLocation): Provider<CommentedConfigurationNode> =
-        configProviders.getOrPut(id) { RootConfigProvider(resolveConfigPath(id), id) }
+        configProviders.getOrPut(id) { RootConfigProvider(resolveConfigPath(id), id).also { if (lastReload > -1) it.reload() } }
     
     fun getOrNull(id: String): CommentedConfigurationNode? =
         getOrNull(ResourceLocation.parse(id))
