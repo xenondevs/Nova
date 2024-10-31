@@ -8,6 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.commons.collections.weakHashSet
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
@@ -91,7 +92,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             "x x x x x x x x x"
         )
         .addIngredient('s', openSearchItem)
-        .setTabs(ItemCategories.CATEGORIES.map(::createCategoryGui))
+        .setTabs(ItemCategories.CATEGORIES.map(::createCategoryGui).takeUnlessEmpty() ?: listOf(Gui.empty(9, 4)))
         .addModifier { it.fillRectangle(0, 0, tabPagesGui, true) }
         .build()
     
