@@ -3,7 +3,7 @@ format.version = "1.1"
 
 [versions]
 cbf = "0.14"
-invui = "1.39"
+invui = "1.40"
 jgrapht = "1.5.2"
 kotlin = "2.0.21"
 kotlinx-coroutines = "1.9.0"
