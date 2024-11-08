@@ -109,7 +109,7 @@ object ToolUtils {
         
         val novaItem = tool?.novaItem
         if (novaItem != null) {
-            damage = novaItem.modifyBlockDamage(player, tool, damage)
+            damage = novaItem.modifyBlockDamage(player, tool, block, damage)
         }
         
         return damage

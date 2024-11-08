@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.component.CustomData
 import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -195,10 +196,10 @@ class NovaItem internal constructor(
         getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
     
     /**
-     * Modifies the block damage of this [NovaItem] when breaking a block.
+     * Modifies the block [damage] of this [NovaItem] when using [itemStack] to break [block].
      */
-    internal fun modifyBlockDamage(player: Player, itemStack: ItemStack, damage: Double): Double {
-        return behaviors.fold(damage) { currentDamage, behavior -> behavior.modifyBlockDamage(player, itemStack, currentDamage) }
+    internal fun modifyBlockDamage(player: Player, itemStack: ItemStack, block: Block, damage: Double): Double {
+        return behaviors.fold(damage) { currentDamage, behavior -> behavior.modifyBlockDamage(player, itemStack, block, currentDamage) }
     }
     
     /**
