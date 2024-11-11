@@ -55,6 +55,10 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
         }
     }
     
+    override fun toString(): String {
+        return "NetworkCluster(uuid=$uuid, networks=$networks)"
+    }
+    
 }
 
 /**

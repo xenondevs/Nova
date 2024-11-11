@@ -84,6 +84,10 @@ class FluidNetwork internal constructor(
         }
     }
     
+    override fun toString(): String {
+        return "FluidNetwork(nodes=$nodes)"
+    }
+    
     companion object {
         
         private val FLUID_NETWORK = MAIN_CONFIG.node("network", "fluid")

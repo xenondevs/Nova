@@ -69,6 +69,10 @@ class ItemNetwork internal constructor(
         } while (transfersLeft != 0 && nextChannel != startingChannel)
     }
     
+    override fun toString(): String {
+        return "ItemNetwork(nodes=$nodes)"
+    }
+    
     companion object {
         
         private val ITEM_NETWORK = MAIN_CONFIG.node("network", "item")

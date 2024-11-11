@@ -223,6 +223,10 @@ class EnergyNetwork internal constructor(
     private val EnergyHolder.fillFrac: Double
         get() = energy.toDouble() / maxEnergy.toDouble()
     
+    override fun toString(): String {
+        return "EnergyNetwork(nodes=$nodes)"
+    }
+    
     companion object {
         
         private val ENERGY_NETWORK = MAIN_CONFIG.node("network", "energy")

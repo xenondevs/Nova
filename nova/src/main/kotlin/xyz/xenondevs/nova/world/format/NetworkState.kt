@@ -169,12 +169,14 @@ class NetworkState internal constructor(
         if (!file.exists())
             return null
         
-        val network = file.inputStream().buffered().use { inp ->
-            val reader = ByteReader.fromStream(inp)
-            ProtoNetwork.read(networkId, world, this, reader)
+        try {
+            return file.inputStream().buffered().use { inp ->
+                val reader = ByteReader.fromStream(inp)
+                ProtoNetwork.read(networkId, world, this, reader)
+            }
+        } catch (e: Exception) {
+            throw Exception("Failed to load network from file $file", e)
         }
-        
-        return network
     }
     
     /**
