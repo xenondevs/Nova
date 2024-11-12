@@ -44,7 +44,7 @@ import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
 annotation class HardcodedRecipes
 
 private val ALLOW_RESULT_OVERWRITE by MAIN_CONFIG.entry<Boolean>("debug", "allow_craft_result_overwrite")
-private val ALLOWED_RECIPES = setOf(NamespacedKey("minecraft", "repair_item"))
+private val ALLOWED_RECIPES = setOf(NamespacedKey("minecraft", "repair_item"), NamespacedKey("minecraft", "armor_dye"))
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,

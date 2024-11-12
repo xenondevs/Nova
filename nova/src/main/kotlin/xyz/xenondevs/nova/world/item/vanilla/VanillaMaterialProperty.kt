@@ -7,25 +7,13 @@ enum class VanillaMaterialProperty {
      */
     CREATIVE_NON_BLOCK_BREAKING,
     
+    // this is a vanilla material property because we don't want to make non-dyeable items (shulker shell) dyeable server-side,
+    // so instead we can just use an item type that is already dyeable
+    // (the client checks whether items are in the dyeable tag for armor rendering)
     /**
-     * The item can render a custom helmet texture.
+     * The item is in the DYEABLE tag.
      */
-    HELMET,
-    
-    /**
-     * The item can render a custom chestplate texture.
-     */
-    CHESTPLATE,
-    
-    /**
-     * The item can render a custom leggings texture.
-     */
-    LEGGINGS,
-    
-    /**
-     * The item can render a custom boots texture.
-     */
-    BOOTS,
+    DYEABLE,
     
     /**
      * The item can show bundle contents.

@@ -9,10 +9,7 @@ internal object VanillaMaterialTypes {
     
     private val MATERIAL_TYPES = enumMapOf(
         Material.WOODEN_SWORD to setOf(VanillaMaterialProperty.CREATIVE_NON_BLOCK_BREAKING),
-        Material.LEATHER_HELMET to setOf(VanillaMaterialProperty.HELMET),
-        Material.LEATHER_CHESTPLATE to setOf(VanillaMaterialProperty.CHESTPLATE),
-        Material.LEATHER_LEGGINGS to setOf(VanillaMaterialProperty.LEGGINGS),
-        Material.LEATHER_BOOTS to setOf(VanillaMaterialProperty.BOOTS),
+        Material.LEATHER_HELMET to setOf(VanillaMaterialProperty.DYEABLE),
         Material.BUNDLE to setOf(VanillaMaterialProperty.BUNDLE)
     )
     
