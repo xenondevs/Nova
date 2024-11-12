@@ -66,7 +66,7 @@ internal object ChunkAccessSectionsPatch : MethodTransformer(CHUNK_ACCESS_CONSTR
             getField(ChunkAccess::class.internalName, "chunkPos", "Lnet/minecraft/world/level/ChunkPos;")
             iLoad(11) // i
             aLoad(3) // LevelHeightAccessor
-            invokeInterface(LevelHeightAccessor::getMinSection)
+            invokeInterface(LevelHeightAccessor::getMinSectionY)
             iadd()
             ldc(4)
             ishl()

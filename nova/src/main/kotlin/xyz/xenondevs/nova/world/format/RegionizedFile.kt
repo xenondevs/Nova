@@ -158,7 +158,7 @@ internal abstract class RegionizedFileReader<C : RegionizedChunk, F : Regionized
         }
         
         fun restoreBackup(file: File, backupFile: File) {
-            LOGGER.warning("Restoring region file $file from backup $backupFile")
+            LOGGER.warn("Restoring region file $file from backup $backupFile")
             val ins = DataInputStream(backupFile.inputStream().buffered())
             val out = file.outputStream().buffered()
             
@@ -166,7 +166,7 @@ internal abstract class RegionizedFileReader<C : RegionizedChunk, F : Regionized
                 val length = ins.readLong()
                 if (length == backupFile.length() - 8) {
                     ins.copyTo(out)
-                } else LOGGER.warning("Backup file $backupFile is corrupted")
+                } else LOGGER.warn("Backup file $backupFile is corrupted")
             }
             backupFile.delete()
         }

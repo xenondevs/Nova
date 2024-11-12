@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova.addon.registry.worldgen
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.core.Holder
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
 import net.minecraft.world.level.levelgen.feature.Feature
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
@@ -9,61 +10,40 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import net.minecraft.world.level.levelgen.placement.PlacementModifier
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType
 import xyz.xenondevs.nova.addon.registry.AddonHolder
-import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
+import xyz.xenondevs.nova.patch.impl.registry.set
+import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
+import xyz.xenondevs.nova.registry.buildRegistryElementLater
 import xyz.xenondevs.nova.util.ResourceLocation
-import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
-import xyz.xenondevs.nova.world.generation.FeatureType
 import xyz.xenondevs.nova.world.generation.builder.PlacedFeatureBuilder
 
+@RegistryElementBuilderDsl
 interface FeatureRegistry : AddonHolder {
     
     @ExperimentalWorldGen
-    fun placedFeature(name: String, placedFeature: PlacedFeatureBuilder.() -> Unit): PlacedFeature =
-        PlacedFeatureBuilder(ResourceLocation(addon, name)).apply(placedFeature).register()
+    fun placedFeature(name: String, placedFeature: PlacedFeatureBuilder.() -> Unit): ResourceKey<PlacedFeature> =
+        buildRegistryElementLater(addon, name, Registries.PLACED_FEATURE, ::PlacedFeatureBuilder, placedFeature)
     
     @ExperimentalWorldGen
-    fun <FC : FeatureConfiguration> registerFeatureType(name: String, feature: FeatureType<FC>): FeatureType<FC> {
-        val id = ResourceLocation(addon, name)
-        VanillaRegistries.FEATURE[id] = feature
-        return feature
+    fun <FC : FeatureConfiguration, F : Feature<FC>> configuredFeature(name: String, feature: F, config: FC): ResourceKey<ConfiguredFeature<*, *>> =
+        configuredFeature(name, ConfiguredFeature(feature, config))
+    
+    @ExperimentalWorldGen
+    fun <F : ConfiguredFeature<*, *>> configuredFeature(name: String, configuredFeature: F): ResourceKey<ConfiguredFeature<*, *>> {
+        val key = ResourceKey.create(Registries.CONFIGURED_FEATURE, ResourceLocation(addon, name))
+        Registries.CONFIGURED_FEATURE[key] = configuredFeature
+        return key
     }
     
     @ExperimentalWorldGen
-    fun <FC : FeatureConfiguration, F : Feature<FC>> registerConfiguredFeature(name: String, configuredFeature: ConfiguredFeature<FC, F>): ConfiguredFeature<FC, F> {
+    fun <P : PlacementModifier> placementModifierType(name: String, placementModifierType: PlacementModifierType<P>): PlacementModifierType<P> {
         val id = ResourceLocation(addon, name)
-        VanillaRegistries.CONFIGURED_FEATURE[id] = configuredFeature
-        return configuredFeature
-    }
-    
-    @ExperimentalWorldGen
-    fun <FC : FeatureConfiguration, F : Feature<FC>> registerConfiguredFeature(name: String, feature: F, config: FC): ConfiguredFeature<FC, F> =
-        registerConfiguredFeature(name, ConfiguredFeature(feature, config))
-    
-    @ExperimentalWorldGen
-    fun registerPlacedFeature(name: String, placedFeature: PlacedFeature): PlacedFeature {
-        val id = ResourceLocation(addon, name)
-        VanillaRegistries.PLACED_FEATURE[id] = placedFeature
-        return placedFeature
-    }
-    
-    @ExperimentalWorldGen
-    fun registerPlacedFeature(name: String, config: ConfiguredFeature<*, *>, vararg modifiers: PlacementModifier): PlacedFeature =
-        registerPlacedFeature(name, PlacedFeature(Holder.direct(config), modifiers.toList()))
-    
-    @ExperimentalWorldGen
-    fun registerPlacedFeature(name: String, config: ConfiguredFeature<*, *>, modifiers: List<PlacementModifier>): PlacedFeature =
-        registerPlacedFeature(name, PlacedFeature(Holder.direct(config), modifiers))
-    
-    @ExperimentalWorldGen
-    fun <P : PlacementModifier> registerPlacementModifierType(name: String, placementModifierType: PlacementModifierType<P>): PlacementModifierType<P> {
-        val id = ResourceLocation(addon, name)
-        VanillaRegistries.PLACEMENT_MODIFIER_TYPE[id] = placementModifierType
+        Registries.PLACEMENT_MODIFIER_TYPE[id] = placementModifierType
         return placementModifierType
     }
     
     @ExperimentalWorldGen
-    fun <P : PlacementModifier> registerPlacementModifierType(name: String, codec: MapCodec<P>): PlacementModifierType<P> =
-        registerPlacementModifierType(name) { codec }
+    fun <P : PlacementModifier> placementModifierType(name: String, codec: MapCodec<P>): PlacementModifierType<P> =
+        placementModifierType(name) { codec }
     
 }

@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.world.block.tileentity.vanilla
 
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.nova.util.dropItem
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
-import xyz.xenondevs.nova.util.dropItem
-import xyz.xenondevs.nova.world.BlockPos
 
 internal abstract class ItemStorageVanillaTileEntity internal constructor(
     type: Type,

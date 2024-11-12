@@ -4,9 +4,9 @@ package xyz.xenondevs.nova.api
 
 import com.mojang.datafixers.util.Either
 import org.bukkit.Location
-import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.api.block.NovaBlock as INovaBlock
 import xyz.xenondevs.nova.api.block.NovaTileEntityState as INovaTileEntityState
 import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial

@@ -27,8 +27,8 @@ internal object FluidFlowPatch : MultiTransformer(FlowingFluid::class) {
     override fun transform() {
         VirtualClassPath[FLOWING_FLUID_CAN_HOLD_FLUID].instructions.insert(buildInsnList {
             addLabel()
-            aLoad(1) // level
-            aLoad(2) // pos
+            aLoad(0) // level
+            aLoad(1) // pos
             invokeStatic(::cannotHoldFluid)
             
             // if (cannotHoldFluid(level, pos, state)) return false

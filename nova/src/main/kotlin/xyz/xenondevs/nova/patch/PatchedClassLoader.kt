@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.patch
 
 import org.bukkit.Bukkit
-import xyz.xenondevs.nova.Nova
+import xyz.xenondevs.nova.NovaBootstrapper
 
 /**
  * The class loader that is responsible for loading all Bukkit and Minecraft classes.
@@ -11,7 +11,7 @@ private val PAPER_CLASS_LOADER = Bukkit::class.java.classLoader
 /**
  * The class loader responsible for loading Nova and its libraries.
  */
-private val NOVA_CLASS_LOADER = Nova.javaClass.classLoader
+private val NOVA_CLASS_LOADER = NovaBootstrapper::class.java.classLoader
 
 /**
  * The [PatchedClassLoader] is a class loader that is injected in the class loading hierarchy.

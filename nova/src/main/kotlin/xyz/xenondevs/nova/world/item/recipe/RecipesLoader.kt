@@ -13,7 +13,9 @@ import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.serialization.json.serializer.RecipeDeserializer
 import java.io.File
-import java.util.logging.Level
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.name
+import kotlin.io.path.walk
 
 internal object RecipesLoader {
     
@@ -34,9 +36,9 @@ internal object RecipesLoader {
     private fun <T : Any> loadRecipes(folder: String, deserializer: RecipeDeserializer<T>): List<T> {
         return AddonBootstrapper.addons.flatMap { addon ->
             val recipesDirectory = addon.dataFolder.resolve("recipes/$folder")
-            recipesDirectory.walkTopDown()
-                .filter { it.isFile && ResourcePath.NON_NAMESPACED_ENTRY.matches(it.name) }
-                .mapNotNullTo(ArrayList()) { loadRecipe(it, deserializer) }
+            recipesDirectory.walk()
+                .filter { it.isRegularFile() && ResourcePath.NON_NAMESPACED_ENTRY.matches(it.name) }
+                .mapNotNullTo(ArrayList()) { loadRecipe(it.toFile(), deserializer) }
         }
     }
     
@@ -69,9 +71,9 @@ internal object RecipesLoader {
             
             // Log exceptions if all fallbacks failed
             if (!failSilently)
-                exceptions.forEachIndexed { i, e -> LOGGER.log(Level.SEVERE, "Could not load recipe in file $file (recipe fallback $i)", e) }
+                exceptions.forEachIndexed { i, e -> LOGGER.error("Could not load recipe in file $file (recipe fallback $i)", e) }
         } else {
-            LOGGER.log(Level.SEVERE, "Invalid recipe file $file: Recipe is neither a json object nor an array of json objects")
+            LOGGER.error("Invalid recipe file $file: Recipe is neither a json object nor an array of json objects")
         }
         
         return null

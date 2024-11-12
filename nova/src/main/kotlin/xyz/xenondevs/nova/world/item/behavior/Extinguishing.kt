@@ -10,7 +10,6 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.damageItemInHand
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.particle.particle
@@ -18,6 +17,7 @@ import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.sendTo
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 

@@ -183,3 +183,7 @@ debug:
   logging:
     # Logs initializer runnable calls
     initializer: false
+    # Logs biome injects
+    biome_injections: false
+    # Logs registry freezing
+    registry_freeze: false

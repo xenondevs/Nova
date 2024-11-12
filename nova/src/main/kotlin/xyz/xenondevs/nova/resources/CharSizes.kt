@@ -8,7 +8,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
-import xyz.xenondevs.nova.Nova
+import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.Dispatcher
@@ -18,10 +18,19 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.component.adventure.chars
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
-import java.io.File
 import java.nio.ByteBuffer
+import java.nio.file.Path
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.io.path.createDirectories
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.exists
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.readBytes
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
+import kotlin.io.path.writeBytes
 
 private val LOAD_CHAR_SIZES_ON_STARTUP by MAIN_CONFIG.entry<Boolean>("performance", "load_char_sizes_on_startup")
 private val FORCE_UNIFORM_FONT by MAIN_CONFIG.entry<Boolean>("resource_pack", "force_uniform_font")
@@ -47,7 +56,7 @@ data class CharOptions(
 )
 object CharSizes {
     
-    private val CHAR_SIZES_DIR = File(Nova.dataFolder, ".internal_data/char_sizes/")
+    private val CHAR_SIZES_DIR = DATA_FOLDER.resolve(".internal_data/char_sizes/")
     private val loadedTables = HashMap<String, CharSizeTable>()
     private val componentCache: Cache<Pair<Component, String>, ComponentSize> = CacheBuilder.newBuilder()
         .expireAfterAccess(5, TimeUnit.MINUTES)
@@ -140,7 +149,7 @@ object CharSizes {
         if (LOAD_CHAR_SIZES_ON_STARTUP) {
             val service = Executors.newCachedThreadPool()
             
-            CHAR_SIZES_DIR.walkTopDown().filter(File::isFile).forEach {
+            CHAR_SIZES_DIR.walk().filter(Path::isRegularFile).forEach {
                 val fontName = getFontName(it)
                 if (fontName !in loadedTables) {
                     service.submit {
@@ -159,8 +168,8 @@ object CharSizes {
         componentCache.invalidateAll()
     }
     
-    private fun getFontName(file: File): String {
-        val fontNameParts = file.relativeTo(CHAR_SIZES_DIR).invariantSeparatorsPath
+    private fun getFontName(file: Path): String {
+        val fontNameParts = file.relativeTo(CHAR_SIZES_DIR).invariantSeparatorsPathString
             .substringBeforeLast('.')
             .split('/')
         return "${fontNameParts[0]}:" + fontNameParts.drop(1).joinToString("/")
@@ -202,13 +211,13 @@ object CharSizes {
     
     internal fun deleteTable(font: String) {
         loadedTables -= font
-        getFile(font).delete()
+        getFile(font).deleteIfExists()
     }
     
-    private fun getFile(font: String): File {
+    private fun getFile(font: String): Path {
         val path = ResourcePath.of(font, "minecraft")
-        val file = File(CHAR_SIZES_DIR, "${path.namespace}/${path.path}.bin")
-        file.parentFile.mkdirs()
+        val file = CHAR_SIZES_DIR.resolve("${path.namespace}/${path.path}.bin")
+        file.parent.createDirectories()
         return file
     }
     
@@ -258,7 +267,7 @@ internal class CharSizeTable(
         return char in sizes
     }
     
-    fun write(file: File) {
+    fun write(file: Path) {
         val buf = ByteBuffer.allocate(sizes.size * 16) // 1 int, 3 floats, 4 bytes each
         for (entry in sizes.int2ObjectEntrySet()) {
             val codePoint = entry.intKey
@@ -275,19 +284,17 @@ internal class CharSizeTable(
     
     companion object {
         
-        fun load(file: File): CharSizeTable {
-            file.inputStream().use {
-                val bytes = it.readAllBytes()
-                val din = DataInputStream(ByteArrayInputStream(bytes))
-                val sizes = Int2ObjectOpenHashMap<FloatArray>()
-                
-                while (din.available() >= 16) {
-                    // char code, width, yMin, yMax
-                    sizes[din.readInt()] = floatArrayOf(din.readFloat(), din.readFloat(), din.readFloat())
-                }
-                
-                return CharSizeTable(sizes)
+        fun load(file: Path): CharSizeTable {
+            val bytes = file.readBytes()
+            val din = DataInputStream(ByteArrayInputStream(bytes))
+            val sizes = Int2ObjectOpenHashMap<FloatArray>()
+            
+            while (din.available() >= 16) {
+                // char code, width, yMin, yMax
+                sizes[din.readInt()] = floatArrayOf(din.readFloat(), din.readFloat(), din.readFloat())
             }
+            
+            return CharSizeTable(sizes)
         }
         
     }

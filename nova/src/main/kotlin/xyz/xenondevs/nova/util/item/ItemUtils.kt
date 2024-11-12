@@ -14,7 +14,6 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.AdventureModePredicate
-import net.minecraft.world.item.ArmorItem
 import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.ItemAttributeModifiers
@@ -26,7 +25,6 @@ import org.bukkit.NamespacedKey
 import org.bukkit.Tag
 import org.bukkit.World
 import org.bukkit.craftbukkit.inventory.CraftItemStack
-import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.cbf.CBF
@@ -42,11 +40,10 @@ import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
 import xyz.xenondevs.nova.util.data.getByteArrayOrNull
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import xyz.xenondevs.nova.util.get
-import xyz.xenondevs.nova.util.name
+import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.behavior.Wearable
 import xyz.xenondevs.nova.world.item.recipe.ComplexTest
 import xyz.xenondevs.nova.world.item.recipe.CustomRecipeChoice
 import xyz.xenondevs.nova.world.item.recipe.ModelDataTest
@@ -70,7 +67,7 @@ var ItemStack.novaModel: String?
 val MojangStack.novaItem: NovaItem?
     get() = unsafeNovaTag
         ?.getString("id")
-        ?.let(NovaRegistries.ITEM::get)
+        ?.let(NovaRegistries.ITEM::getValue)
 
 var MojangStack.novaModel: String?
     get() = unsafeNovaTag?.getString("modelId")
@@ -130,21 +127,14 @@ val ItemStack.craftingRemainingItem: ItemStack?
         return type.craftingRemainingItem?.let(::ItemStack)
     }
 
-val ItemStack.equipSound: String?
-    get() {
-        val novaItem = novaItem
-        if (novaItem != null)
-            return novaItem.getBehaviorOrNull<Wearable>()?.equipSound
-        
-        val armorMaterial = (CraftMagicNumbers.getItem(type) as? ArmorItem)?.material?.value()
-        return armorMaterial?.equipSound()?.value()?.location?.toString()
-    }
-
 fun ItemStack.takeUnlessEmpty(): ItemStack? =
     if (type.isAir || amount <= 0) null else this
 
-fun ItemStack?.isEmpty(): Boolean =
+fun ItemStack?.isNullOrEmpty(): Boolean =
     this == null || type.isAir || amount <= 0
+
+fun ItemStack?.isNotNullOrEmpty(): Boolean =
+    this != null && !type.isAir && amount > 0
 
 internal fun <T> MojangStack.update(type: DataComponentType<T>, action: (T) -> T): T? =
     get(type)?.let { set(type, action(it)) }
@@ -257,7 +247,7 @@ object ItemUtils {
                     }
                     
                     else -> {
-                        val novaItems = NovaRegistries.ITEM[id]
+                        val novaItems = NovaRegistries.ITEM.getValue(id)
                         if (novaItems != null) {
                             return@map NovaIdTest(id, novaItems.createItemStack())
                         } else {
@@ -289,9 +279,9 @@ object ItemUtils {
      */
     fun getItemStack(id: ResourceLocation): ItemStack {
         return when (id.namespace) {
-            "minecraft" -> ItemStack(BuiltInRegistries.ITEM.get(id).bukkitMaterial)
-            "nova" -> NovaRegistries.ITEM.getByName(id.name).firstOrNull()?.createItemStack()
-            else -> NovaRegistries.ITEM[id]?.createItemStack()
+            "minecraft" -> ItemStack(BuiltInRegistries.ITEM.getValue(id).bukkitMaterial)
+            "nova" -> NovaRegistries.ITEM.getByName(id.path).firstOrNull()?.createItemStack()
+            else -> NovaRegistries.ITEM.getValue(id)?.createItemStack()
                 ?: CustomItemServiceManager.getItemByName(id.toString())
         } ?: throw IllegalArgumentException("Could not find item with id $id")
     }
@@ -455,7 +445,12 @@ object ItemUtils {
     }
     
     internal fun mergePotionContents(values: List<PotionContents>): PotionContents {
-        return PotionContents(Optional.empty(), Optional.empty(), values.flatMap { it.allEffects })
+        return PotionContents(
+            Optional.empty(),
+            Optional.empty(),
+            values.flatMap { it.allEffects },
+            values.asSequence().map { it.customName }.lastOrNull { it.isPresent } ?: Optional.empty()
+        )
     }
     
     internal fun mergeResourceLocations(values: List<List<ResourceLocation>>): List<ResourceLocation> {

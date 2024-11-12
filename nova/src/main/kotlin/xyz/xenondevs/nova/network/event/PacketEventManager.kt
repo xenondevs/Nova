@@ -17,6 +17,10 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetSlotP
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundLevelChunkWithLightPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundLevelEventPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundMerchantOffersPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundOpenScreenPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlaceGhostRecipePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundRecipeBookAddPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetCursorItemPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEquipmentPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetPassengersPacketEvent
@@ -25,15 +29,16 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSystemChatPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAttributesPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
-import xyz.xenondevs.nova.network.event.clientbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClickPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlaceRecipePacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundSelectBundleItemPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundUseItemPacketEvent
 import java.lang.reflect.Method
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import kotlin.reflect.KClass
 import net.minecraft.network.PacketListener as MojangPacketListener
 
@@ -41,7 +46,7 @@ private data class Listener(val instance: Any, val method: Method, val priority:
 
 object PacketEventManager {
     
-    private val LOCK = ReentrantReadWriteLock()
+    private val LOCK = ReentrantLock()
     
     private val eventTypes = HashMap<KClass<out Packet<*>>, KClass<out PacketEvent<*>>>()
     private val eventConstructors = HashMap<KClass<out Packet<*>>, (Packet<*>) -> PacketEvent<Packet<*>>>()
@@ -71,6 +76,10 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundLevelEventPacketEvent)
         registerPlayerEventType(::ClientboundContainerSetDataPacketEvent)
         registerPlayerEventType(::ClientboundUpdateAttributesPacketEvent)
+        registerPlayerEventType(::ClientboundSetCursorItemPacketEvent)
+        registerPlayerEventType(::ClientboundOpenScreenPacketEvent)
+        registerPlayerEventType(::ClientboundRecipeBookAddPacketEvent)
+        registerPlayerEventType(::ClientboundPlaceGhostRecipePacketEvent)
         
         // serverbound - player
         registerPlayerEventType(::ServerboundPlaceRecipePacketEvent)
@@ -78,6 +87,8 @@ object PacketEventManager {
         registerPlayerEventType(::ServerboundPlayerActionPacketEvent)
         registerPlayerEventType(::ServerboundUseItemPacketEvent)
         registerPlayerEventType(::ServerboundInteractPacketEvent)
+        registerPlayerEventType(::ServerboundContainerClickPacketEvent)
+        registerPlayerEventType(::ServerboundSelectBundleItemPacketEvent)
     }
     
     private inline fun <reified P : Packet<*>, reified E : PlayerPacketEvent<P>> registerEventType(noinline constructor: (P) -> E) {
@@ -90,23 +101,21 @@ object PacketEventManager {
         playerEventConstructors[P::class] = constructor as (Player, Packet<*>) -> PlayerPacketEvent<Packet<*>>
     }
     
-    internal fun <T : MojangPacketListener, P : Packet<in T>> createAndCallEvent(player: Player?, packet: P): PacketEvent<P>? {
-        LOCK.read {
-            val packetClass = packet::class
+    internal fun <T : MojangPacketListener, P : Packet<in T>> createAndCallEvent(player: Player?, packet: P): PacketEvent<P>? = LOCK.withLock {
+        val packetClass = packet::class
+        
+        val packetEventClass = eventTypes[packetClass]
+        if (packetEventClass != null && listeners[packetEventClass] != null) {
+            val event = playerEventConstructors[packetClass]?.invoke(player ?: return null, packet)
+                ?: eventConstructors[packetClass]?.invoke(packet)
+                ?: return null
             
-            val packetEventClass = eventTypes[packetClass]
-            if (packetEventClass != null && listeners[packetEventClass] != null) {
-                val event = playerEventConstructors[packetClass]?.invoke(player ?: return null, packet)
-                    ?: eventConstructors[packetClass]?.invoke(packet)
-                    ?: return null
-                
-                callEvent(event)
-                
-                return event as PacketEvent<P>
-            }
+            callEvent(event)
             
-            return null
+            return event as PacketEvent<P>
         }
+        
+        return null
     }
     
     private fun callEvent(event: PacketEvent<*>) {
@@ -121,48 +130,44 @@ object PacketEventManager {
         }
     }
     
-    fun registerListener(listener: PacketListener) {
-        LOCK.write {
-            val instanceListeners = ArrayList<Listener>()
-            
-            listener::class.java.declaredMethods.forEach { method ->
-                if (method.isAnnotationPresent(PacketHandler::class.java) && method.parameters.size == 1) {
-                    val param = method.parameters.first().type.kotlin
-                    if (param in eventTypes.values) {
-                        param as KClass<out PacketEvent<*>>
-                        method.isAccessible = true
-                        
-                        val priority = method.getAnnotation(PacketHandler::class.java).priority
-                        val ignoreIfCancelled = method.getAnnotation(PacketHandler::class.java).ignoreIfCancelled
-                        
-                        val listener = Listener(listener, method, priority, ignoreIfCancelled)
-                        instanceListeners += listener
-                        
-                        val list = listeners[param]?.let(::ArrayList) ?: ArrayList()
-                        list += listener
-                        list.sortBy { it.priority }
-                        
-                        listeners[param] = list
-                    }
+    fun registerListener(listener: PacketListener): Unit = LOCK.withLock {
+        val instanceListeners = ArrayList<Listener>()
+        
+        listener::class.java.declaredMethods.forEach { method ->
+            if (method.isAnnotationPresent(PacketHandler::class.java) && method.parameters.size == 1) {
+                val param = method.parameters.first().type.kotlin
+                if (param in eventTypes.values) {
+                    param as KClass<out PacketEvent<*>>
+                    method.isAccessible = true
+                    
+                    val priority = method.getAnnotation(PacketHandler::class.java).priority
+                    val ignoreIfCancelled = method.getAnnotation(PacketHandler::class.java).ignoreIfCancelled
+                    
+                    val listener = Listener(listener, method, priority, ignoreIfCancelled)
+                    instanceListeners += listener
+                    
+                    val list = listeners[param]?.let(::ArrayList) ?: ArrayList()
+                    list += listener
+                    list.sortBy { it.priority }
+                    
+                    listeners[param] = list
                 }
             }
-            
-            if (instanceListeners.isNotEmpty())
-                listenerInstances[listener] = instanceListeners
         }
+        
+        if (instanceListeners.isNotEmpty())
+            listenerInstances[listener] = instanceListeners
     }
     
-    fun unregisterListener(listener: PacketListener) {
-        LOCK.write {
-            val toRemove = listenerInstances[listener]?.toHashSet() ?: return
-            
-            listeners.removeIf { (_, list) ->
-                list.removeIf { it in toRemove }
-                return@removeIf list.isEmpty()
-            }
-            
-            listenerInstances -= listener
+    fun unregisterListener(listener: PacketListener): Unit = LOCK.withLock {
+        val toRemove = listenerInstances[listener]?.toHashSet() ?: return
+        
+        listeners.removeIf { (_, list) ->
+            list.removeIf { it in toRemove }
+            return@removeIf list.isEmpty()
         }
+        
+        listenerInstances -= listener
     }
     
 }

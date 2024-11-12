@@ -6,6 +6,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkGroup
@@ -21,7 +22,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.Fluid
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemNetworkGroup
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
-import xyz.xenondevs.nova.util.set
 import java.util.*
 import kotlin.reflect.KClass
 

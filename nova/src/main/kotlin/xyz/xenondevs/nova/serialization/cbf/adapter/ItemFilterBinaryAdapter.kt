@@ -24,7 +24,7 @@ internal object ItemFilterBinaryAdapter : ComplexBinaryAdapter<ItemFilter<*>> {
         val filterTypeId = ResourceLocation.parse(reader.readString())
         return createFilter(
             filterTypeId,
-            NovaRegistries.ITEM_FILTER_TYPE[filterTypeId],
+            NovaRegistries.ITEM_FILTER_TYPE.getValue(filterTypeId),
             CBF.read<Compound>(reader)!!
         )
     }
@@ -40,7 +40,7 @@ internal object ItemFilterBinaryAdapter : ComplexBinaryAdapter<ItemFilter<*>> {
         compound["items"] = items
         compound["whitelist"] = whitelist
         
-        return createFilter(id, NovaRegistries.ITEM_FILTER_TYPE[id], compound)
+        return createFilter(id, NovaRegistries.ITEM_FILTER_TYPE.getValue(id), compound)
     }
     
     private fun createFilter(id: ResourceLocation, filterType: ItemFilterType<*>?, compound: Compound): ItemFilter<*> {

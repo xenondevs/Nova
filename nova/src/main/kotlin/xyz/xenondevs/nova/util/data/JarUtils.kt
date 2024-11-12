@@ -4,10 +4,11 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
 import xyz.xenondevs.bytebase.util.toMap
-import java.io.File
 import java.io.InputStream
+import java.nio.file.Path
 import java.util.jar.JarEntry
 import java.util.jar.JarInputStream
+import kotlin.io.path.inputStream
 import kotlin.reflect.KClass
 
 internal data class AnnotationSearchResult(
@@ -20,7 +21,7 @@ internal object JarUtils {
     // TODO: find annotated classes during build and write them to a file 
     
     fun findAnnotatedClasses(
-        file: File,
+        file: Path,
         classAnnotations: List<KClass<out Annotation>>,
         functionAnnotations: List<KClass<out Annotation>>,
         path: String = ""
@@ -62,7 +63,7 @@ internal object JarUtils {
         return AnnotationSearchResult(classes, functions)
     }
     
-    private fun loopClasses(file: File, filter: (JarEntry) -> Boolean = { true }, action: (JarEntry, InputStream) -> Unit) {
+    private fun loopClasses(file: Path, filter: (JarEntry) -> Boolean = { true }, action: (JarEntry, InputStream) -> Unit) {
         JarInputStream(file.inputStream()).use { jis ->
             generateSequence(jis::getNextJarEntry)
                 .filter(filter)

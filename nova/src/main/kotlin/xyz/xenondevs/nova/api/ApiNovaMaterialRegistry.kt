@@ -4,12 +4,12 @@ package xyz.xenondevs.nova.api
 
 import com.mojang.datafixers.util.Either
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
-import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 import xyz.xenondevs.nova.api.material.NovaMaterial as INovaMaterial
 import xyz.xenondevs.nova.api.material.NovaMaterialRegistry as INovaMaterialRegistry
@@ -34,9 +34,9 @@ internal object NovaMaterialRegistry : INovaMaterialRegistry {
     
     @Deprecated("")
     override fun getOrNull(id: String): INovaMaterial? {
-        val novaItem = NovaRegistries.ITEM[id]
+        val novaItem = NovaRegistries.ITEM.getValue(id)
         if (novaItem != null) return LegacyMaterialWrapper(Either.left(novaItem))
-        val novaBlock = NovaRegistries.BLOCK[id]
+        val novaBlock = NovaRegistries.BLOCK.getValue(id)
         if (novaBlock != null) return LegacyMaterialWrapper(Either.right(novaBlock))
         return null
     }

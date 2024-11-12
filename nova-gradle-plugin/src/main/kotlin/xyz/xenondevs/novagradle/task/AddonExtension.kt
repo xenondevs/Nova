@@ -12,6 +12,7 @@ abstract class AddonExtension {
     abstract val name: Property<String>
     abstract val version: Property<String>
     abstract val main: Property<String>
+    abstract val pluginMain: Property<String>
     abstract val bootstrapper: Property<String>
     abstract val loader: Property<String>
     abstract val dependencies: ListProperty<PluginDependency>

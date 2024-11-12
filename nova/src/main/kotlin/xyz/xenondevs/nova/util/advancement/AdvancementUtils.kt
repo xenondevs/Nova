@@ -20,7 +20,6 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
-import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
 import java.util.*
@@ -39,20 +38,20 @@ fun obtainNovaItemAdvancement(
 ): AdvancementHolder {
     require(addon.id == item.id.namespace) { "The specified item is from a different addon" }
     val id = item.id
-    return advancement(addon, "obtain_${id.name}") {
+    return advancement(addon, "obtain_${id.path}") {
         if (parent != null)
             parent(parent)
         
         display(DisplayInfo(
             item.model.clientsideProvider.get().unwrap().copy(),
-            Component.translatable("advancement.${id.namespace}.${id.name}.title").toNMSComponent(),
-            Component.translatable("advancement.${id.namespace}.${id.name}.description").toNMSComponent(),
+            Component.translatable("advancement.${id.namespace}.${id.path}.title").toNMSComponent(),
+            Component.translatable("advancement.${id.namespace}.${id.path}.description").toNMSComponent(),
             Optional.empty(),
             frameType,
             true, true, false
         ))
         
-        addCriterion("obtain_${id.name}", createObtainNovaItemCriterion(item))
+        addCriterion("obtain_${id.path}", createObtainNovaItemCriterion(item))
     }
 }
 
@@ -81,7 +80,7 @@ fun obtainNovaItemsAdvancement(
         val criteriaNames = ArrayList<String>()
         
         for (item in items) {
-            val criterionName = "obtain_${item.id.name}"
+            val criterionName = "obtain_${item.id.path}"
             addCriterion(criterionName, createObtainNovaItemCriterion(item))
             criteriaNames += criterionName
         }

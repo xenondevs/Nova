@@ -24,7 +24,7 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
         val event = wrappedEvent.event
         
         val data = itemStack.novaCompound ?: return
-        val filterType = NovaRegistries.ITEM_FILTER_TYPE[data.get<ResourceLocation>(ID_KEY)] ?: return
+        val filterType = NovaRegistries.ITEM_FILTER_TYPE.getValue(data.get<ResourceLocation>(ID_KEY)) ?: return
         val filterStack = filterType.deserialize(data.get<Compound>(DATA_KEY)!!)
             .toItemStack()
             .apply { amount = itemStack.amount }

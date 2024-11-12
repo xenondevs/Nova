@@ -6,11 +6,12 @@ import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.orElse
-import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.weakEntry
-import xyz.xenondevs.nova.config.weakOptionalEntry
+import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.config.optionalEntry
 import xyz.xenondevs.nova.world.item.NovaItem
+import net.minecraft.world.item.enchantment.Enchantable as EnchantableComponent
 
 /**
  * Makes an item enchantable.
@@ -44,9 +45,10 @@ class Enchantable(
      */
     val supportedEnchantments by supportedEnchantments
     
-    override val baseDataComponents = provider {
+    override val baseDataComponents = enchantmentValue.map { enchantmentValue ->
         DataComponentMap.builder()
             .set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY)
+            .set(DataComponents.ENCHANTABLE, EnchantableComponent(enchantmentValue))
             .build()
     }
     
@@ -62,10 +64,10 @@ class Enchantable(
         
         override fun create(item: NovaItem): Enchantable {
             val cfg = item.config
-            val supportedEnchantments = cfg.weakOptionalEntry<Set<Enchantment>>("supported_enchantments").orElse(emptySet())
+            val supportedEnchantments = cfg.optionalEntry<Set<Enchantment>>("supported_enchantments").orElse(emptySet())
             return Enchantable(
-                cfg.weakEntry("enchantment_value"),
-                cfg.weakOptionalEntry<Set<Enchantment>>("primary_enchantments").orElse(supportedEnchantments),
+                cfg.entry("enchantment_value"),
+                cfg.optionalEntry<Set<Enchantment>>("primary_enchantments").orElse(supportedEnchantments),
                 supportedEnchantments
             )
         }

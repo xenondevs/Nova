@@ -19,7 +19,6 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.associateByNotNull
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
@@ -31,7 +30,6 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.util.bukkitMaterial
-import xyz.xenondevs.nova.util.instrument
 import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.setBlockStateSilently
@@ -48,7 +46,6 @@ import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
-import java.util.logging.Level
 import kotlin.random.Random
 
 @InternalInit(
@@ -60,7 +57,7 @@ import kotlin.random.Random
 )
 internal object BlockMigrator : Listener {
     
-    private val MIGRATION_ID_KEY = NamespacedKey(Nova, "migration_id")
+    private val MIGRATION_ID_KEY = NamespacedKey("nova", "migration_id")
     private var migrationId by PermanentStorage.storedValue("migration_id") { Random.nextInt() }
     
     private val migrations = ArrayList<BlockMigration>()
@@ -95,7 +92,7 @@ internal object BlockMigrator : Listener {
             Blocks.NOTE_BLOCK, DefaultBlocks.NOTE_BLOCK
         ) { vanilla ->
             DefaultBlocks.NOTE_BLOCK.defaultBlockState
-                .with(DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT, vanilla.getValue(NoteBlock.INSTRUMENT).instrument)
+                .with(DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT, vanilla.getValue(NoteBlock.INSTRUMENT))
                 .with(DefaultBlockStateProperties.NOTE_BLOCK_NOTE, vanilla.getValue(NoteBlock.NOTE))
                 .with(DefaultBlockStateProperties.POWERED, vanilla.getValue(NoteBlock.POWERED))
         }
@@ -170,23 +167,21 @@ internal object BlockMigrator : Listener {
         
         // migrate vanilla block states that are used by Nova 
         val levelChunk = chunk.levelChunk
-        BlockStateSearcher.searchChunk(chunk.pos, queries)
-            .withIndex()
-            .forEach { (_, result) ->
-                if (result == null)
-                    return@forEach
-                
-                for ((pos, blockState) in result) {
-                    if (WorldDataManager.getBlockState(pos) == null &&
-                        CustomItemServiceManager.getBlockType(pos.block) == null
-                    ) {
-                        pos.setBlockStateSilently(blockState) // LevelChunkSectionWrapper will then call handleBlockStatePlaced 
-                        val blockEntity = levelChunk.getBlockEntity(pos.nmsPos)
-                        if (blockEntity != null && WorldDataManager.getVanillaTileEntity(pos) == null)
-                            handleBlockEntityPlaced(pos, blockEntity)
-                    }
+        BlockStateSearcher.searchChunk(chunk.pos, queries).forEach { result ->
+            if (result == null)
+                return@forEach
+            
+            for ((pos, blockState) in result) {
+                if (WorldDataManager.getBlockState(pos) == null &&
+                    CustomItemServiceManager.getBlockType(pos.block) == null
+                ) {
+                    pos.setBlockStateSilently(blockState) // LevelChunkSectionWrapper will then call handleBlockStatePlaced 
+                    val blockEntity = levelChunk.getBlockEntity(pos.nmsPos)
+                    if (blockEntity != null && WorldDataManager.getVanillaTileEntity(pos) == null)
+                        handleBlockEntityPlaced(pos, blockEntity)
                 }
             }
+        }
         
         pdc.set(MIGRATION_ID_KEY, PersistentDataType.INTEGER, migrationId)
     }
@@ -202,7 +197,7 @@ internal object BlockMigrator : Listener {
                 is ComplexBlockMigration -> migration.novaToVanilla(migration.vanillaToNova(blockState))
             }
         } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "Failed to migrate block state $blockState at $pos", e)
+            LOGGER.error("Failed to migrate block state $blockState at $pos", e)
         }
         
         return blockState
@@ -267,7 +262,7 @@ internal object BlockMigrator : Listener {
         // which means that there should never be a vanilla tile entity registered when this method is called.
         val previousVte = WorldDataManager.setVanillaTileEntity(pos, null)
         if (previousVte != null) {
-            LOGGER.log(Level.SEVERE, "Vanilla tile entity $previousVte registered at $pos when handling block entity placed with $blockEntity", Exception())
+            LOGGER.error("Vanilla tile entity $previousVte registered at $pos when handling block entity placed with $blockEntity", Exception())
             previousVte.handleBreak()
         }
         

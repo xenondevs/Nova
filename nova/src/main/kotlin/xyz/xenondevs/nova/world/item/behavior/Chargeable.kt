@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.weakEntry
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
@@ -25,7 +25,7 @@ private val ENERGY_KEY = ResourceLocation.fromNamespaceAndPath("nova", "energy")
 fun Chargeable(affectsItemDurability: Boolean): ItemBehaviorFactory<Chargeable.Default> =
     object : ItemBehaviorFactory<Chargeable.Default> {
         override fun create(item: NovaItem): Chargeable.Default {
-            return Chargeable.Default(item.config.weakEntry("max_energy"), affectsItemDurability)
+            return Chargeable.Default(item.config.entry("max_energy"), affectsItemDurability)
         }
     }
 
@@ -57,7 +57,7 @@ interface Chargeable {
     companion object : ItemBehaviorFactory<Default> {
         
         override fun create(item: NovaItem): Default {
-            return Default(item.config.weakEntry<Long>("max_energy"), true)
+            return Default(item.config.entry<Long>("max_energy"), true)
         }
         
     }

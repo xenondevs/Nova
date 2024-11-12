@@ -21,9 +21,8 @@ import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.replaceFirst
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
 import xyz.xenondevs.nova.patch.MultiTransformer
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getMethod
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlock
@@ -31,14 +30,14 @@ import java.util.*
 
 private val REGISTRY_OPS_GETTER_METHOD =
     getMethod(RegistryOps::class, "getter", ResourceKey::class)
-private val REGISTRY_GET_HOLDER_METHOD =
-    getMethod(Registry::class, "getHolder", ResourceLocation::class)
+private val REGISTRY_GET_METHOD =
+    getMethod(Registry::class, "get", ResourceLocation::class)
 private val REGISTRY_FILE_CODEC_DECODE_METHOD =
     getMethod(RegistryFileCodec::class, "decode", DynamicOps::class, Any::class)
 private val REGISTRY_REFERENCE_HOLDER_WITH_LIFECYCLE_LAMBDA =
     getMethod(Registry::class, "lambda\$referenceHolderWithLifecycle\$4", ResourceLocation::class)
-private val DEFAULTED_MAPPED_REGISTRY_GET_METHOD =
-    getMethod(DefaultedMappedRegistry::class, "get", ResourceLocation::class)
+private val DEFAULTED_MAPPED_REGISTRY_GET_VALUE_METHOD =
+    getMethod(DefaultedMappedRegistry::class, "getValue", ResourceLocation::class)
 
 /**
  * Allows accessing Nova's registry from Minecraft's Block registry.
@@ -78,14 +77,14 @@ internal object RegistryCodecPatch : MultiTransformer(RegistryFileCodec::class, 
                 val vanilla = getter.get(key)
                 if (vanilla.isPresent)
                     return vanilla
-                return NovaRegistries.WRAPPER_BLOCK.getHolder(key.location()) as Optional<Holder.Reference<Block>>
+                return NovaRegistries.WRAPPER_BLOCK.get(key.location()) as Optional<Holder.Reference<Block>>
             }
             
             override fun get(tag: TagKey<Block>): Optional<HolderSet.Named<Block>> {
                 val vanilla = getter.get(tag)
                 if (vanilla.isPresent)
                     return vanilla
-                return NovaRegistries.WRAPPER_BLOCK.getHolder(tag.location()) as Optional<HolderSet.Named<Block>>
+                return NovaRegistries.WRAPPER_BLOCK.get(tag.location()) as Optional<HolderSet.Named<Block>>
             }
             
         }
@@ -94,7 +93,7 @@ internal object RegistryCodecPatch : MultiTransformer(RegistryFileCodec::class, 
     }
     
     /**
-     * Intercepts a [Registry.getHolder] call in [Registry.referenceHolderWithLifecycle] to also produce [WrapperBlocks][WrapperBlock].
+     * Intercepts a [Registry.get] call in [Registry.referenceHolderWithLifecycle] to also produce [WrapperBlocks][WrapperBlock].
      */
     private fun patchRegistryReferenceHolderWithLifecycle() {
         // Mapping name will 100% change in the future, check for these params and method structure: https://i.imgur.com/4ix2zLq.png
@@ -103,21 +102,21 @@ internal object RegistryCodecPatch : MultiTransformer(RegistryFileCodec::class, 
             buildInsnList {
                 invokeStatic(::getHolder)
             }
-        ) { it.opcode == Opcodes.INVOKEINTERFACE && (it as MethodInsnNode).calls(REGISTRY_GET_HOLDER_METHOD) }
+        ) { it.opcode == Opcodes.INVOKEINTERFACE && (it as MethodInsnNode).calls(REGISTRY_GET_METHOD) }
     }
     
     @JvmStatic
     fun getHolder(registry: Registry<*>, id: ResourceLocation): Optional<out Holder.Reference<*>> {
-        var holder: Optional<out Holder.Reference<*>> = registry.getHolder(id)
-        if (holder.isEmpty && registry == VanillaRegistries.BLOCK) {
-            holder = NovaRegistries.WRAPPER_BLOCK.getHolder(id)
+        var holder: Optional<out Holder.Reference<*>> = registry.get(id)
+        if (holder.isEmpty && registry.key() == Registries.BLOCK) {
+            holder = NovaRegistries.WRAPPER_BLOCK.get(id)
         }
         
         return holder
     }
     
     private fun patchDefaultedMappedRegistry() {
-        val instructions = VirtualClassPath[DEFAULTED_MAPPED_REGISTRY_GET_METHOD].instructions
+        val instructions = VirtualClassPath[DEFAULTED_MAPPED_REGISTRY_GET_VALUE_METHOD].instructions
         instructions.insert(buildInsnList {
             val continueLabel = instructions.first as LabelNode
             aLoad(1)

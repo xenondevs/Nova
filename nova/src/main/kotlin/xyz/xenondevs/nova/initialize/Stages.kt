@@ -4,7 +4,6 @@ import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.resources.ResourceGeneration
-import xyz.xenondevs.nova.patch.Patcher
 import kotlin.reflect.KClass
 
 /**
@@ -40,17 +39,17 @@ enum class InitStage(
     /**
      * Before the world is loaded.
      */
-    PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class, Patcher::class)),
+    PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class)),
     
     /**
      * Before the resource pack generation starts.
      */
-    PRE_PACK(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class, Patcher::class), runBefore = setOf(ResourceGeneration.PreWorld::class)),
+    PRE_PACK(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class), runBefore = setOf(ResourceGeneration.PreWorld::class)),
     
     /**
      * After the first stage of resource pack generation ("pre-world") has finished. Lookup registries are now loaded.
      */
-    POST_PACK_PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class, Patcher::class, ResourceGeneration.PreWorld::class)),
+    POST_PACK_PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class, ResourceGeneration.PreWorld::class)),
     
     /**
      * After the world has been loaded.

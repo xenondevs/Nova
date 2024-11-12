@@ -61,8 +61,8 @@ public class LevelChunkSectionWrapper extends LevelChunkSection {
             SET_TICKING_BLOCK_COUNT = lookup.findSetter(LevelChunkSection.class, "tickingBlockCount", short.class);
             GET_TICKING_FLUID_COUNT = lookup.findGetter(LevelChunkSection.class, "tickingFluidCount", short.class);
             SET_TICKING_FLUID_COUNT = lookup.findSetter(LevelChunkSection.class, "tickingFluidCount", short.class);
-            GET_SPECIAL_COLLIDING_BLOCKS = lookup.findGetter(LevelChunkSection.class, "specialCollidingBlocks", int.class);
-            SET_SPECIAL_COLLIDING_BLOCKS = lookup.findSetter(LevelChunkSection.class, "specialCollidingBlocks", int.class);
+            GET_SPECIAL_COLLIDING_BLOCKS = lookup.findGetter(LevelChunkSection.class, "specialCollidingBlocks", short.class);
+            SET_SPECIAL_COLLIDING_BLOCKS = lookup.findSetter(LevelChunkSection.class, "specialCollidingBlocks", short.class);
             TICKING_BLOCKS = ReflectionUtils.getField(LevelChunkSection.class, "tickingBlocks");
             
             Field fluidStateCount = ReflectionUtils.getFieldOrNull(LevelChunkSection.class, "fluidStateCount");

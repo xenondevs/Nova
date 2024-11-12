@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.resources.layout.block.BlockModelLayoutBuilder
 import xyz.xenondevs.nova.util.ResourceLocation
-import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
@@ -25,7 +24,7 @@ abstract class AbstractNovaBlockBuilder<B : NovaBlock> internal constructor(
     internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
     protected var style: Style = Style.empty()
-    protected var name: Component = Component.translatable("block.${id.namespace}.${id.name}")
+    protected var name: Component = Component.translatable("block.${id.namespace}.${id.path}")
     protected var behaviors = ArrayList<BlockBehaviorHolder>()
     protected val stateProperties = ArrayList<ScopedBlockStateProperty<*>>()
     internal var requestedLayout = BlockModelLayout.DEFAULT
@@ -90,13 +89,6 @@ abstract class AbstractNovaBlockBuilder<B : NovaBlock> internal constructor(
      */
     open fun behaviors(vararg behaviors: BlockBehaviorHolder) {
         this.behaviors += behaviors
-    }
-    
-    /**
-     * Adds the [behaviors] to the behaviors of this block.
-     */
-    open fun addBehaviors(vararg block: BlockBehaviorHolder) {
-        this.behaviors += block
     }
     
     /**

@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
+import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
-import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.WorldDataManager
 
 /**

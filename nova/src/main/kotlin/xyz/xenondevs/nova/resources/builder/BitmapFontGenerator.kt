@@ -37,7 +37,7 @@ internal class BitmapFontGenerator(
             when (provider) {
                 is ReferenceProvider, is SpaceProvider, is BitmapProvider<*> -> providers.add(provider)
                 is UnihexProvider -> providers.addAll(convertUnihexProvider(provider))
-                else -> LOGGER.warning("Skipping unsupported font provider type: ${provider::class.simpleName}")
+                else -> LOGGER.warn("Skipping unsupported font provider type: ${provider::class.simpleName}")
             }
         }
         

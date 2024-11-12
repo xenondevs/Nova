@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.network.event.PacketEventManager
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.logging.Level
 
 private typealias PacketCondition = (Packet<*>) -> Boolean
 
@@ -62,7 +61,7 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
                 super.write(ctx, msg, promise)
             }
         } catch (t: Throwable) {
-            LOGGER.log(Level.SEVERE, "An exception occurred while handling a clientbound packet.", t)
+            LOGGER.error("An exception occurred while handling a clientbound packet.", t)
         }
     }
     
@@ -83,7 +82,7 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
                 }
             }
         } catch (t: Throwable) {
-            LOGGER.log(Level.SEVERE, "An exception occurred while handling a serverbound packet.", t)
+            LOGGER.error("An exception occurred while handling a serverbound packet.", t)
         }
     }
     
@@ -116,7 +115,7 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
             }
             super.flush(ctx)
         } catch (t: Throwable) {
-            LOGGER.log(Level.SEVERE, "An exception occurred trying to flush packets", t)
+            LOGGER.error("An exception occurred trying to flush packets", t)
         }
     }
     

@@ -2,15 +2,23 @@
 
 package xyz.xenondevs.nova.resources
 
+import kotlinx.serialization.Serializable
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.serialization.kotlinx.ResourcePathAsStringSerializer
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Path
 import kotlin.io.path.exists
 
+@Serializable(with = ResourcePathAsStringSerializer::class)
 data class ResourcePath(val namespace: String, val path: String) {
     
     private val id = "$namespace:$path"
+    
+    init {
+        require(namespace.matches(NON_NAMESPACED_ENTRY)) { "Invalid namespace: $namespace" }
+        require(path.matches(NON_NAMESPACED_ENTRY)) { "Invalid path: $path" }
+    }
     
     fun getFile(assetsDir: File, extraPath: String? = null, extension: String? = null): File {
         return File(assetsDir, "$namespace/${extraPath ?: ""}/$path" + (extension?.let { ".$it" } ?: ""))
@@ -21,8 +29,8 @@ data class ResourcePath(val namespace: String, val path: String) {
     }
     
     internal fun findInAssetsOrNull(extraPath: String? = null, extension: String? = null): Path? {
-        return getPath(ResourcePackBuilder.MCASSETS_ASSETS_DIR, extraPath, extension).takeIf(Path::exists)
-            ?: getPath(ResourcePackBuilder.ASSETS_DIR, extraPath, extension).takeIf(Path::exists)
+        return getPath(ResourcePackBuilder.ASSETS_DIR, extraPath, extension).takeIf(Path::exists)
+            ?: getPath(ResourcePackBuilder.MCASSETS_ASSETS_DIR, extraPath, extension).takeIf(Path::exists)
     }
     
     internal fun findInAssets(extraPath: String? = null, extension: String? = null): Path {

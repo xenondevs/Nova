@@ -6,10 +6,7 @@ import net.minecraft.world.level.block.LeavesBlock
 import net.minecraft.world.level.block.TripWireBlock
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.patch.Patcher
 import xyz.xenondevs.nova.resources.layout.block.BackingStateCategory
-import xyz.xenondevs.nova.util.bukkitBlockData
-import xyz.xenondevs.nova.util.item.soundGroup
 import xyz.xenondevs.nova.world.block.behavior.BlockSounds
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.behavior.LeavesBehavior
@@ -34,10 +31,7 @@ import xyz.xenondevs.nova.world.block.state.property.DefaultScopedBlockStateProp
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
 import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers
 
-@InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
-    dependsOn = [Patcher::class]
-)
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 internal object DefaultBlocks {
     
     val UNKNOWN = block("unknown") {
@@ -64,7 +58,7 @@ internal object DefaultBlocks {
             DefaultScopedBlockStateProperties.NOTE_BLOCK_NOTE,
             DefaultScopedBlockStateProperties.POWERED
         )
-        models { modelLess { NoteBackingStateConfig.defaultStateConfig.vanillaBlockState.bukkitBlockData } }
+        models { modelLess { NoteBackingStateConfig.defaultStateConfig.vanillaBlockState } }
     }
     
     val TRIPWIRE = block("tripwire") {
@@ -90,7 +84,6 @@ internal object DefaultBlocks {
                     .setValue(TripWireBlock.SOUTH, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_SOUTH))
                     .setValue(TripWireBlock.WEST, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_WEST))
                     .setValue(TripWireBlock.ATTACHED, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_ATTACHED))
-                    .bukkitBlockData
             }
         }
     }
@@ -109,7 +102,7 @@ internal object DefaultBlocks {
     private fun leaves(cfg: LeavesBackingStateConfigType<*>): NovaBlock = block(cfg.fileName) {
         behaviors(
             LeavesBehavior,
-            BlockSounds(SoundGroup.from(cfg.defaultStateConfig.vanillaBlockState.bukkitMaterial.soundGroup)),
+            BlockSounds(SoundGroup.from(cfg.defaultStateConfig.vanillaBlockState.soundType)),
             Breakable(
                 hardness = 0.2,
                 toolCategories = setOf(VanillaToolCategories.HOE, VanillaToolCategories.SHEARS),
@@ -127,7 +120,6 @@ internal object DefaultBlocks {
             modelLess {
                 cfg.defaultStateConfig.vanillaBlockState
                     .setValue(LeavesBlock.WATERLOGGED, getPropertyValueOrThrow(DefaultBlockStateProperties.WATERLOGGED))
-                    .bukkitBlockData
             }
         }
     }

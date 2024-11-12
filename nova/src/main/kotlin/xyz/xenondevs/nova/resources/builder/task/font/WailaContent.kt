@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.resources.builder.task.font
 import org.bukkit.Material
 import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.builder.AssetPack
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
@@ -10,11 +11,8 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder.Companion.ASSETS
 import xyz.xenondevs.nova.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.ui.waila.WailaManager
-import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.renderer.MinecraftModelRenderer
-import java.util.logging.Level
 import kotlin.io.path.copyTo
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
@@ -239,17 +237,17 @@ class WailaContent internal constructor(
             
             CustomItemServiceManager.getBlockItemModelPaths().forEach { (id, path) ->
                 try {
-                    val file = ResourcePackBuilder.PACK_DIR.resolve("assets/nova/textures/waila_generated/${id.namespace}/${id.name}.png")
+                    val file = ResourcePackBuilder.PACK_DIR.resolve("assets/nova/textures/waila_generated/${id.namespace}/${id.path}.png")
                     file.parent.createDirectories()
                     renderer.renderModelToFile(path.toString(), file)
-                    addEntry(id.toString(), ResourcePath("nova", "waila_generated/${id.namespace}/${id.name}.png"), SIZE, ASCENT)
+                    addEntry(id.toString(), ResourcePath("nova", "waila_generated/${id.namespace}/${id.path}.png"), SIZE, ASCENT)
                     count++
                 } catch (e: Exception) {
-                    LOGGER.log(Level.WARNING, "Failed to render $id ($path) ", e)
+                    LOGGER.warn("Failed to render $id ($path) ", e)
                 }
             }
         } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "Failed to render WAILA textures for custom item services. (Misconfigured base packs?)", e)
+            LOGGER.error("Failed to render WAILA textures for custom item services. (Misconfigured base packs?)", e)
         } finally {
             LOGGER.info("Rendered $count WAILA textures")
         }

@@ -10,6 +10,7 @@ import xyz.xenondevs.commons.gson.toJsonTreeTyped
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.serialization.json.serializer.BackingStateConfigSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.BlockDataTypeAdapter
+import xyz.xenondevs.nova.serialization.json.serializer.BlockStateSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.BlockStateVariantDataSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.EnumMapInstanceCreator
 import xyz.xenondevs.nova.serialization.json.serializer.FontCharSerialization
@@ -52,6 +53,7 @@ private val GSON_BUILDER = GsonBuilder()
     .registerTypeHierarchyAdapter(VersionSerialization)
     .registerTypeHierarchyAdapter(ModelTypeAdapter.nullSafe())
     .registerTypeHierarchyAdapter(RegistryElementSerializer(NovaRegistries.BLOCK))
+    .registerTypeHierarchyAdapter(BlockStateSerialization.nullSafe())
     .registerTypeHierarchyAdapter(NovaBlockStateSerialization)
     .registerTypeHierarchyAdapter(BlockStateVariantDataSerialization)
     .registerTypeHierarchyAdapter(BackingStateConfigSerialization)
@@ -59,7 +61,7 @@ private val GSON_BUILDER = GsonBuilder()
     .registerTypeHierarchyAdapter(Matrix4fcTypeAdapter.nullSafe())
     .registerTypeAdapter(RegistryElementSerializer(NovaRegistries.ITEM))
     .registerTypeAdapter(RegistryElementSerializer(NovaRegistries.GUI_TEXTURE))
-    .registerTypeAdapter(RegistryElementSerializer(NovaRegistries.ARMOR))
+    .registerTypeAdapter(RegistryElementSerializer(NovaRegistries.EQUIPMENT))
     .registerTypeAdapter(SizeOverrideSerialization)
     .registerTypeAdapter(FontCharSerialization)
     .registerTypeAdapter(EnumMapInstanceCreator)

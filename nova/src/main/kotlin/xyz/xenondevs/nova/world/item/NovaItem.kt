@@ -172,6 +172,12 @@ class NovaItem internal constructor(
         behaviors.any { type.isSuperclassOf(it::class) }
     
     /**
+     * Checks whether this [NovaItem] has the specific [behavior] instance.
+     */
+    fun hasBehavior(behavior: ItemBehavior): Boolean =
+        behaviors.contains(behavior)
+    
+    /**
      * Gets the first [ItemBehavior] that is an instance of [T], or null if there is none.
      */
     inline fun <reified T : Any> getBehaviorOrNull(): T? =
@@ -256,6 +262,10 @@ class NovaItem internal constructor(
     
     internal fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) {
         behaviors.forEach { it.handleRelease(player, itemStack, event) }
+    }
+    
+    internal fun handleInventoryTick(player: Player, itemStack: ItemStack, slot: Int) {
+        behaviors.forEach { it.handleInventoryTick(player, itemStack, slot) }
     }
     //</editor-fold>
     

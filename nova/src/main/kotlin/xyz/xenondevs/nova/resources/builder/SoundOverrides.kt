@@ -2,12 +2,9 @@ package xyz.xenondevs.nova.resources.builder
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import net.minecraft.core.Holder
-import net.minecraft.sounds.SoundEvent
-import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.level.block.SoundType
+import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Material
-import org.bukkit.SoundGroup
-import org.bukkit.block.data.BlockData
 import xyz.xenondevs.commons.gson.getBooleanOrNull
 import xyz.xenondevs.commons.gson.getOrPut
 import xyz.xenondevs.commons.gson.getStringOrNull
@@ -15,58 +12,36 @@ import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.item.soundGroup
+import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import java.nio.file.Path
-import java.util.logging.Level
 import kotlin.io.path.exists
 
 /**
  * Removes the break, hit, step and fall sounds for blocks used by Nova to display custom blocks (note block, mushroom blocks,
- * specified armor stand hitbox blocks) and all armor equip sounds and copies them to the Nova namespace, so that they can be completely controlled by the server.
+ * specified armor stand hitbox blocks) and copies them to the Nova namespace, so that they can be completely controlled by the server.
  */
 class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTaskHolder {
     
-    private val soundGroups = HashSet<SoundGroup>()
-    private val soundEvents = ArrayList<String>()
-    
-    init {
-        // Armor equip sounds
-        addSoundEvent(SoundEvents.ARMOR_EQUIP_CHAIN)
-        addSoundEvent(SoundEvents.ARMOR_EQUIP_DIAMOND)
-        addSoundEvent(SoundEvents.ARMOR_EQUIP_ELYTRA)
-        addSoundEvent(SoundEvents.ARMOR_EQUIP_GENERIC)
-        addSoundEvent(SoundEvents.ARMOR_EQUIP_GOLD)
-        addSoundEvent(SoundEvents.ARMOR_EQUIP_IRON)
-        addSoundEvent(SoundEvents.ARMOR_EQUIP_LEATHER)
-        addSoundEvent(SoundEvents.ARMOR_EQUIP_NETHERITE)
-        addSoundEvent(SoundEvents.ARMOR_EQUIP_TURTLE)
-    }
+    private val soundEvents = HashSet<String>()
     
     private fun useMaterial(material: Material) {
-        val soundGroup = material.soundGroup
-        if (soundGroup !in soundGroups) {
-            addSoundGroup(soundGroup)
-            soundGroups += soundGroup
-        }
+        val soundType = material.nmsBlock.defaultBlockState().soundType
+        addSoundType(soundType)
     }
     
-    private fun addSoundGroup(group: SoundGroup) {
-        soundEvents += group.breakSound.key.key
-        soundEvents += group.hitSound.key.key
-        soundEvents += group.stepSound.key.key
-        soundEvents += group.fallSound.key.key
-    }
-    
-    private fun addSoundEvent(event: Holder<SoundEvent>) {
-        soundEvents += event.value().location.path
+    private fun addSoundType(type: SoundType) {
+        soundEvents += type.breakSound.location.path
+        soundEvents += type.hitSound.location.path
+        soundEvents += type.stepSound.location.path
+        soundEvents += type.fallSound.location.path
     }
     
     @PackTask(
@@ -79,7 +54,7 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
                 when (blockState.modelProvider.provider) {
                     DisplayEntityBlockModelProvider -> {
                         val info = blockState.modelProvider.info as DisplayEntityBlockModelData
-                        useMaterial(info.hitboxType.material)
+                        useMaterial(info.hitboxType.bukkitMaterial)
                     }
                     
                     BackingStateBlockModelProvider -> {
@@ -88,8 +63,8 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
                     }
                     
                     ModelLessBlockModelProvider -> {
-                        val info = blockState.modelProvider.info as BlockData
-                        useMaterial(info.material)
+                        val info = blockState.modelProvider.info as BlockState
+                        useMaterial(info.bukkitMaterial)
                     }
                 }
             }
@@ -146,7 +121,7 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
             // write overridden sound events to permanent storage
             PermanentStorage.store("soundOverrides", soundEvents)
         } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "Failed to write block sound overrides", e)
+            LOGGER.error("Failed to write block sound overrides", e)
         }
     }
     

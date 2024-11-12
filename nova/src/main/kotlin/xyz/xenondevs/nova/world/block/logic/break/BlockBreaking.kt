@@ -47,7 +47,6 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.concurrent.ConcurrentHashMap
-import java.util.logging.Level
 
 private val BREAK_COOLDOWN by MAIN_CONFIG.entry<Int>("world", "block_breaking", "break_cooldown")
 
@@ -112,7 +111,7 @@ internal object BlockBreaking : Listener, PacketListener {
                 if (!breaker.isStopped)
                     breaker.handleTick()
             } catch (e: Exception) {
-                LOGGER.log(Level.SEVERE, "An exception occurred in BlockBreaker tick", e)
+                LOGGER.error("An exception occurred in BlockBreaker tick", e)
             }
             
             return@removeIf breaker.isStopped

@@ -8,33 +8,33 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.flatMap
 import xyz.xenondevs.commons.provider.flattenIterables
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.orElse
-import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
+import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.Nova
+import xyz.xenondevs.nova.NOVA_JAR
+import xyz.xenondevs.nova.PREVIOUS_NOVA_VERSION
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.addon.file
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.resources.builder.task.ArmorContent
 import xyz.xenondevs.nova.resources.builder.task.AtlasContent
 import xyz.xenondevs.nova.resources.builder.task.BarOverlayTask
 import xyz.xenondevs.nova.resources.builder.task.BuildStage
+import xyz.xenondevs.nova.resources.builder.task.EquipmentContent
 import xyz.xenondevs.nova.resources.builder.task.ExtractTask
 import xyz.xenondevs.nova.resources.builder.task.LanguageContent
 import xyz.xenondevs.nova.resources.builder.task.PackFunction
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
+import xyz.xenondevs.nova.resources.builder.task.TextureContent
 import xyz.xenondevs.nova.resources.builder.task.font.FontContent
 import xyz.xenondevs.nova.resources.builder.task.font.GuiContent
 import xyz.xenondevs.nova.resources.builder.task.font.MoveCharactersContent
@@ -54,10 +54,12 @@ import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.createDirectories
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
+import kotlin.io.path.outputStream
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 import kotlin.io.path.writeText
@@ -105,15 +107,14 @@ class ResourcePackBuilder internal constructor() {
     
     companion object {
         
-        
         private val JIMFS_PROVIDER: MutableProvider<FileSystem> = mutableProvider { Jimfs.newFileSystem(Configuration.unix())  }
-        private val FILE_SYSTEM_PROVIDER: Provider<FileSystem> = IN_MEMORY_PROVIDER.flatMap { inMemory ->
-            if (inMemory) JIMFS_PROVIDER else provider(FileSystems.getDefault())
-        }
+        private val FILE_SYSTEM_PROVIDER: Provider<FileSystem> = combinedProvider(
+            IN_MEMORY_PROVIDER, JIMFS_PROVIDER
+        ) { inMemory, jimfs -> if (inMemory) jimfs else FileSystems.getDefault() }
         
         //<editor-fold desc="never in memory">
-        val RESOURCE_PACK_FILE: File = File(Nova.dataFolder, "resource_pack/ResourcePack.zip")
-        val RESOURCE_PACK_DIR: Path = File(Nova.dataFolder, "resource_pack").toPath()
+        val RESOURCE_PACK_FILE: Path = DATA_FOLDER.resolve("resource_pack/ResourcePack.zip")
+        val RESOURCE_PACK_DIR: Path = DATA_FOLDER.resolve("resource_pack")
         val BASE_PACKS_DIR: Path = RESOURCE_PACK_DIR.resolve("base_packs")
         val MCASSETS_DIR: Path = RESOURCE_PACK_DIR.resolve(".mcassets")
         val MCASSETS_ASSETS_DIR: Path = MCASSETS_DIR.resolve("assets")
@@ -148,10 +149,10 @@ class ResourcePackBuilder internal constructor() {
          * A list of constructors for [PackTaskHolders][PackTaskHolder] that should be used to build the resource pack.
          */
         private val holderCreators: MutableList<(ResourcePackBuilder) -> PackTaskHolder> = mutableListOf(
-            ::ExtractTask, ::ArmorContent, ::GuiContent, ::LanguageContent, ::TextureIconContent,
+            ::ExtractTask, ::EquipmentContent, ::GuiContent, ::LanguageContent, ::TextureIconContent,
             ::AtlasContent, ::WailaContent, ::MovedFontContent, ::CharSizeCalculator, ::SoundOverrides, ::FontContent,
             ::BarOverlayTask, ::MoveCharactersContent, ::ModelContent, ::BlockModelContent,
-            ::ItemModelContent
+            ::ItemModelContent, ::TextureContent
         )
         
         /**
@@ -184,12 +185,12 @@ class ResourcePackBuilder internal constructor() {
     
     init {
         // delete legacy resource pack files
-        File(Nova.dataFolder, "ResourcePack").deleteRecursively()
+        File(DATA_FOLDER.toFile(), "ResourcePack").deleteRecursively()
         File(RESOURCE_PACK_DIR.toFile(), "asset_packs").deleteRecursively()
         File(RESOURCE_PACK_DIR.toFile(), "pack").deleteRecursively()
         if (!IN_MEMORY) RESOURCE_PACK_BUILD_DIR.toFile().deleteRecursively()
         
-        if (Nova.lastVersion != null && Nova.lastVersion!! < Version("0.10")) {
+        if (PREVIOUS_NOVA_VERSION != null && PREVIOUS_NOVA_VERSION < Version("0.10")) {
             BASE_PACKS_DIR.toFile().delete()
         }
         
@@ -289,11 +290,11 @@ class ResourcePackBuilder internal constructor() {
     
     @Suppress("RemoveExplicitTypeArguments")
     private fun loadAssetPacks(): List<AssetPack> {
-        return buildList<Triple<String, File, String>> {
+        return buildList<Triple<String, Path, String>> {
             this += AddonBootstrapper.addons.map { addon -> Triple(addon.id, addon.file, "assets/") }
-            this += Triple("nova", Nova.novaJar, "assets/nova/")
+            this += Triple("nova", NOVA_JAR, "assets/nova/")
         }.map { (namespace, file, assetsPath) ->
-            val zip = FileSystems.newFileSystem(file.toPath())
+            val zip = FileSystems.newFileSystem(file)
             AssetPack(namespace, zip.getPath(assetsPath))
         }
     }
@@ -313,7 +314,7 @@ class ResourcePackBuilder internal constructor() {
     
     private fun createZip() {
         // delete old zip file
-        RESOURCE_PACK_FILE.delete()
+        RESOURCE_PACK_FILE.deleteIfExists()
         
         // pack zip
         LOGGER.info("Packing zip...")

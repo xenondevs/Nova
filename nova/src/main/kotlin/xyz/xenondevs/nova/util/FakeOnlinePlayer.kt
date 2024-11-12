@@ -12,7 +12,6 @@ import xyz.xenondevs.bytebase.jvm.ClassWrapper
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.MethodNode
 import xyz.xenondevs.bytebase.util.internalName
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.integration.permission.PermissionManager
 import xyz.xenondevs.nova.util.data.AsmUtils
 import java.lang.reflect.Constructor
@@ -122,7 +121,7 @@ abstract class FakeOnlinePlayer(
                 }
             }
             
-            return ClassWrapperLoader(Nova::class.java.classLoader)
+            return ClassWrapperLoader(this.javaClass.classLoader)
                 .loadClass(classWrapper)
                 .getConstructor(OfflinePlayer::class.java, Location::class.java) as Constructor<FakeOnlinePlayer>
         }

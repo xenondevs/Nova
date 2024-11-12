@@ -48,7 +48,7 @@ internal abstract class KeyedArgumentType<T : Any> : CustomArgumentType.Converte
         }
     }
     
-    override fun <S : Any?> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
+    override fun <S : Any> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
         val arg = context.input.split(" ").last()
         val items = getEntries()
             .filter { toId(it).toString().contains(arg) }

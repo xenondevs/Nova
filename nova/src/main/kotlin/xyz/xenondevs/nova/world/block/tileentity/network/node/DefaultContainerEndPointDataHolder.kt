@@ -11,8 +11,8 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.observed
 import xyz.xenondevs.commons.provider.orElseNew
-import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import java.util.*
 
 abstract class DefaultContainerEndPointDataHolder<C : EndPointContainer> internal constructor(

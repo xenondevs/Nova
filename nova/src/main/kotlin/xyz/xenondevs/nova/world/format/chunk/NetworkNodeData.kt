@@ -14,8 +14,8 @@ import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.commons.guava.set
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.getValueOrThrow
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
-import xyz.xenondevs.nova.util.getOrThrow
 import java.util.*
 
 sealed interface NetworkNodeData {
@@ -117,7 +117,7 @@ private fun ByteReader.readNetworkTypeCubeFaceSetMap(): MutableMap<NetworkType<*
     val size = readVarInt()
     val map = HashMap<NetworkType<*>, MutableSet<BlockFace>>(size)
     repeat(size) {
-        val networkType = NovaRegistries.NETWORK_TYPE.getOrThrow(readString())
+        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
         val set = readCubeFaceSet()
         
         map[networkType] = set
@@ -138,7 +138,7 @@ private fun ByteReader.readNetworkTypeBlockFaceUUIDTable(): Table<NetworkType<*>
     val size = readVarInt()
     val table = HashBasedTable.create<NetworkType<*>, BlockFace, UUID>()
     repeat(size) {
-        val networkType = NovaRegistries.NETWORK_TYPE.getOrThrow(readString())
+        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
         val face = BlockFace.entries[readByte().toInt()]
         val uuid = readUUID()
         
@@ -169,7 +169,7 @@ private fun ByteReader.readNetworkTypeUUIDMap(): MutableMap<NetworkType<*>, UUID
     val size = readVarInt()
     val map = HashMap<NetworkType<*>, UUID>(size)
     repeat(size) {
-        val networkType = NovaRegistries.NETWORK_TYPE.getOrThrow(readString())
+        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
         val uuid = readUUID()
         
         map[networkType] = uuid
@@ -189,7 +189,7 @@ private fun ByteReader.readNetworkTypeSet(): MutableSet<NetworkType<*>> {
     val size = readVarInt()
     val set = HashSet<NetworkType<*>>(size)
     repeat(size) {
-        set += NovaRegistries.NETWORK_TYPE.getOrThrow(readString())
+        set += NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
     }
     
     return set

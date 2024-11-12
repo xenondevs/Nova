@@ -1,17 +1,23 @@
 package xyz.xenondevs.nova.world.item.behavior
 
+import it.unimi.dsi.fastutil.objects.Object2IntSortedMap
 import net.minecraft.world.item.Item
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
+import net.minecraft.world.level.block.entity.FuelValues
 import org.bukkit.Material
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.weakEntry
+import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.world.item.NovaItem
+import java.lang.invoke.MethodHandles
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
+
+private val FUEL_VALUES_VALUES = MethodHandles.privateLookupIn(FuelValues::class.java, MethodHandles.lookup())
+    .findGetter(FuelValues::class.java, "values", Object2IntSortedMap::class.java)
 
 /**
  * Allows items to be used as fuel in furnaces.
@@ -38,12 +44,16 @@ class Fuel(burnTime: Provider<Int>) : ItemBehavior {
     
     companion object : ItemBehaviorFactory<Fuel> {
         
-        private val NMS_VANILLA_FUELS: Map<Item, Int> = AbstractFurnaceBlockEntity.getFuel()
-        private val VANILLA_FUELS: Map<Material, Int> = NMS_VANILLA_FUELS
-            .mapKeysTo(enumMap()) { (item, _) -> CraftMagicNumbers.getMaterial(item) }
+        @Suppress("UNCHECKED_CAST")
+        private val NMS_VANILLA_FUELS: Map<Item, Int> by lazy {
+            FUEL_VALUES_VALUES.invoke(MINECRAFT_SERVER.fuelValues()) as Map<Item, Int>
+        }
+        private val VANILLA_FUELS: Map<Material, Int> by lazy {
+            NMS_VANILLA_FUELS.mapKeysTo(enumMap()) { (item, _) -> CraftMagicNumbers.getMaterial(item) }
+        }
         
         override fun create(item: NovaItem): Fuel {
-            return Fuel(item.config.weakEntry<Int>("burn_time"))
+            return Fuel(item.config.entry<Int>("burn_time"))
         }
         
         fun isFuel(material: Material): Boolean = material in VANILLA_FUELS

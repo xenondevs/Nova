@@ -2,12 +2,16 @@
 
 package xyz.xenondevs.nova.addon;
 
+import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginProviderContext
 import io.papermc.paper.plugin.entrypoint.LaunchEntryPointHandler
 import org.bukkit.plugin.java.JavaPlugin
+import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
+import xyz.xenondevs.nova.BOOTSTRAPPER
 import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.useZip
+import kotlin.io.path.Path
 import kotlin.io.path.notExists
 import kotlin.jvm.JvmStatic
 
@@ -19,45 +23,66 @@ internal object AddonBootstrapper {
         get() = _addons
     
     @JvmStatic
-    fun createJavaPlugin(context: PluginProviderContext, classLoader: ClassLoader): JavaPlugin {
-        checkRequiredNovaVersion(context)
+    fun bootstrap(context: BootstrapContext, classLoader: ClassLoader) {
+        val addonMeta = readAddonMeta(context)
+        
+        checkRequiredNovaVersion(context, addonMeta)
         checkRequiredMinecraftVersion(context)
         
-        val mainClass = Class.forName(context.configuration.mainClass, true, classLoader).kotlin
-        val obj = mainClass.objectInstance
+        val addon = getAddonInstance(addonMeta, classLoader)
+        addon.pluginMeta = context.pluginMeta
+        addon.file = context.pluginSource
+        addon.dataFolder = Path("plugins", context.pluginMeta.name)
+        addon.logger = context.logger
         
-        require(obj is Addon) { "Main class does not implement Addon" }
-        require(obj is JavaPlugin) { "Main class does not extend JavaPlugin" }
-        
-        _addons += obj as Addon
-        return obj as JavaPlugin
+        _addons += addon
+        BOOTSTRAPPER.handleAddonBootstrap(context)
     }
     
     @JvmStatic
-    private fun checkRequiredNovaVersion(context: PluginProviderContext) {
-        val novaVersion = LaunchEntryPointHandler.INSTANCE.storage.asSequence()
-            .flatMap { (_, storage) -> storage.registeredProviders }
-            .first { it.meta.name == "Nova" }
-            .meta.version
-            .let(::Version)
-        
+    fun handleJavaPluginCreated(plugin: JavaPlugin, context: PluginProviderContext, classLoader: ClassLoader) {
+        val addonMeta = readAddonMeta(context)
+        getAddonInstance(addonMeta, classLoader).plugin = plugin
+    }
+    
+    private fun readAddonMeta(context: PluginProviderContext): ConfigurationNode {
         context.pluginSource.useZip { fs ->
             val metaPath = fs.resolve("/nova-addon.yml")
             if (metaPath.notExists())
                 throw IllegalStateException("Nova addon meta file not found!")
             
             val loader = YamlConfigurationLoader.builder().path(metaPath).build()
-            val meta = loader.load()
-            
-            val requiredNovaVersion = Version(meta.node("nova_version").string!!)
-            
-            if (novaVersion.compareTo(requiredNovaVersion, 2) != 0)
-                throw IllegalArgumentException("Cannot load Nova addon ${context.configuration.displayName} as it requires Nova version " +
-                    "$requiredNovaVersion, but the server is running Nova version $novaVersion!")
+            return loader.load()
         }
     }
     
-    @JvmStatic
+    private fun getAddonInstance(addonMeta: ConfigurationNode, classLoader: ClassLoader): Addon {
+        val mainClass = Class.forName(
+            addonMeta.node("main").string ?: throw NoSuchElementException("Missing entry 'main' in nova-addon.yml"),
+            true,
+            classLoader
+        ).kotlin
+        val addon = mainClass.objectInstance
+        require(addon is Addon) { "Main class does not extend Addon" }
+        return addon
+    }
+    
+    private fun checkRequiredNovaVersion(context: PluginProviderContext, addonMeta: ConfigurationNode) {
+        val novaVersion = LaunchEntryPointHandler.INSTANCE.storage.asSequence()
+            .flatMap { (_, storage) -> storage.registeredProviders }
+            .first { it.meta.name == "Nova" }
+            .meta.version
+            .let(::Version)
+        
+        val requiredNovaVersion = Version(
+            addonMeta.node("nova_version").string ?: throw NoSuchElementException("Missing entry 'nova_version' in nova-addon.yml")
+        )
+        
+        if (novaVersion.compareTo(requiredNovaVersion, 2) != 0)
+            throw IllegalArgumentException("Cannot load Nova addon ${context.configuration.displayName} as it requires Nova version " +
+                "$requiredNovaVersion, but the server is running Nova version $novaVersion!")
+    }
+    
     private fun checkRequiredMinecraftVersion(context: PluginProviderContext) {
         val apiVersion = context.configuration.apiVersion?.let(::Version)
             ?: throw IllegalArgumentException("Missing api version")

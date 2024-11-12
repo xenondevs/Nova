@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.ItemAttributeModifiers
+import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.commons.provider.Provider
@@ -26,7 +27,6 @@ import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.world.item.NovaItem
-import java.util.logging.Level
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.iterator
@@ -122,11 +122,11 @@ internal class DefaultBehavior(
                                 slotGroup
                             )
                         } catch (e: Exception) {
-                            LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $this, $slotGroup with index $idx", e)
+                            LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $this, $slotGroup with index $idx", e)
                         }
                     }
                 } catch (e: Exception) {
-                    LOGGER.logExceptionMessages(Level.WARNING, "Failed to load attribute modifier for $this", e)
+                    LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $this", e)
                 }
             }
             

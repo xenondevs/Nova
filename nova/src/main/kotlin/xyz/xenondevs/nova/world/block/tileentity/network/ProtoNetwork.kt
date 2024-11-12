@@ -10,7 +10,7 @@ import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.getOrThrow
+import xyz.xenondevs.nova.util.getValueOrThrow
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.MutableNetworkNodeConnection
@@ -353,7 +353,7 @@ class ProtoNetwork<T : Network<T>>(
             check(reader.readInt() == MAGIC) { "Invalid network file" }
             check(reader.readByte() == FILE_VERSION) { "Invalid network file version" }
             
-            val type = NovaRegistries.NETWORK_TYPE.getOrThrow(reader.readString())
+            val type = NovaRegistries.NETWORK_TYPE.getValueOrThrow(reader.readString())
             val size = reader.readVarInt()
             val nodes = HashMap<BlockPos, MutableNetworkNodeConnection>()
             for (i in 0 until size) {

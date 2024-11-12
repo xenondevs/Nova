@@ -81,7 +81,7 @@ internal object BlockInteracting : Listener {
             return
         
         val player = event.whoClicked as Player
-        val reach = player.getAttribute(Attribute.PLAYER_BLOCK_INTERACTION_RANGE)?.value ?: 8.0
+        val reach = player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE)?.value ?: 8.0
         val rayTraceResult = player.rayTraceBlocks(reach)
             ?: return
         val targetBlock = rayTraceResult.hitBlock

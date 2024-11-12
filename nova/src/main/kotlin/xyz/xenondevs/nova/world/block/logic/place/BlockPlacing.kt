@@ -145,7 +145,7 @@ internal object BlockPlacing : Listener {
         
         val vanillaState = when (val info = newState.modelProvider.info) {
             is BackingStateConfig -> info.vanillaBlockState.bukkitBlockData
-            is DisplayEntityBlockModelData -> info.hitboxType
+            is DisplayEntityBlockModelData -> info.hitboxType.bukkitBlockData
             is BlockData -> info
             else -> throw UnsupportedOperationException()
         }

@@ -11,7 +11,6 @@ import net.minecraft.core.RegistrationInfo
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
 import xyz.xenondevs.nova.util.data.asDataResult
-import xyz.xenondevs.nova.util.name
 
 /**
  * [InstantBindMappedRegistry] implementation that stores an additional [Map] of all entries that maps non-namespaced
@@ -30,7 +29,7 @@ class FuzzyMappedRegistry<T : Any>(
                 getByName(name).firstOrNull().asDataResult("No entry with name $name found in registry $this")
             },
             { value ->
-                DataResult.success(getKey(value)!!.name)
+                DataResult.success(getKey(value)!!.path)
             }
         )).xmap(
             { it.left().orElseGet { it.right().get() } },

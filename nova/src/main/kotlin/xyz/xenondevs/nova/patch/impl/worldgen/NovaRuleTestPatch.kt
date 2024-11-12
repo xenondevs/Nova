@@ -67,7 +67,7 @@ internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, Re
             aLoad(23)
             aLoad(1)
             aLoad(58)
-            invokeStatic(ReflectionUtils.getMethodByName(NovaRuleTestPatch::class, false, "checkOreNovaRuleTest"))
+            invokeStatic(ReflectionUtils.getMethodByName(NovaRuleTestPatch::class, "checkOreNovaRuleTest"))
             ifeq(cantPlaceLabel)
         })
         val canPlaceMethod = VirtualClassPath[ORE_FEATURE_CAN_PLACE_ORE_METHOD]
@@ -105,7 +105,7 @@ internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, Re
             aLoad(3)
             aLoad(2)
             aLoad(6)
-            invokeStatic(ReflectionUtils.getMethodByName(NovaRuleTestPatch::class, false, "checkOreNovaRuleTest"))
+            invokeStatic(ReflectionUtils.getMethodByName(NovaRuleTestPatch::class, "checkOreNovaRuleTest"))
             ifne(trueLabel)
             
             addLabel()
@@ -121,7 +121,7 @@ internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, Re
             0,
             buildInsnList {
                 aLoad(1)
-                invokeStatic(ReflectionUtils.getMethodByName(NovaRuleTestPatch::class, false, "testProcessorRule"))
+                invokeStatic(ReflectionUtils.getMethodByName(NovaRuleTestPatch::class, "testProcessorRule"))
             }
         ) { it.opcode == INVOKEVIRTUAL && (it as MethodInsnNode).calls(PROCESSOR_RULE_TEST_METHOD) }
     }

@@ -1,16 +1,15 @@
 package xyz.xenondevs.nova.util.data
 
-import java.util.logging.Level
-import java.util.logging.Logger
+import org.slf4j.Logger
 
-internal fun Logger.logExceptionMessages(level: Level, message: String, throwable: Throwable) {
-    log(level, message)
+internal fun Logger.logExceptionMessages(log: Logger.(String) -> Unit, message: String, throwable: Throwable) {
+    log(message)
     
     var t: Throwable? = throwable
     var depth = 1
     
     while (t != null) {
-        log(level, "  ".repeat(depth) + t::class.simpleName + ": " + t.message)
+        log("  ".repeat(depth) + t::class.simpleName + ": " + t.message)
         
         t = t.cause
         depth++

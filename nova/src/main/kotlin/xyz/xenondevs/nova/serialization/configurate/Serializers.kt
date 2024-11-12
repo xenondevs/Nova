@@ -1,14 +1,12 @@
 package xyz.xenondevs.nova.serialization.configurate
 
 import io.leangen.geantyref.TypeToken
-import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import net.minecraft.core.registries.BuiltInRegistries
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import xyz.xenondevs.commons.reflection.javaTypeOf
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.byNameTypeSerializer
 
 val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
     // -- Nova Serializers --
@@ -28,7 +26,7 @@ val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColle
     .register(ItemCategorySerializer)
     // -- Vanilla Registries --
     .register(BuiltInRegistries.ATTRIBUTE.byNameTypeSerializer())
-    .register(RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).byNameTypeSerializer())
+    .register(RegistryKey.ENCHANTMENT.byNameTypeSerializer())
     // -- Nova Registries --
     .register(NovaRegistries.NETWORK_TYPE.byNameTypeSerializer())
     .register(NovaRegistries.ABILITY_TYPE.byNameTypeSerializer())

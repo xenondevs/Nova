@@ -5,8 +5,8 @@ import net.minecraft.world.level.block.LayeredCauldronBlock
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.commons.provider.mutableProvider
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.setBlockState
 import xyz.xenondevs.nova.util.withoutBlockMigration

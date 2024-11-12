@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.resources.layout.gui
 
 import org.joml.Vector2i
 import org.joml.Vector2ic
-import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
+import xyz.xenondevs.nova.resources.ResourcePath
 
 internal class GuiTextureLayout(
     val texture: ResourcePath,

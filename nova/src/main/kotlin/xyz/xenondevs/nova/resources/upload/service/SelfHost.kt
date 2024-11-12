@@ -14,8 +14,9 @@ import xyz.xenondevs.nova.util.concurrent.Latch
 import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import xyz.xenondevs.nova.util.startsWithAny
-import java.io.File
+import java.nio.file.Path
 import kotlin.concurrent.thread
+import kotlin.io.path.exists
 
 @Suppress("HttpUrlsUsage", "ExtractKtorModule")
 internal object SelfHost : UploadService {
@@ -23,7 +24,7 @@ internal object SelfHost : UploadService {
     override val names = listOf("self_host", "selfhost")
     internal val startedLatch = Latch()
     
-    private lateinit var server: CIOApplicationEngine
+    private lateinit var server: EmbeddedServer<CIOApplicationEngine, *>
     
     private lateinit var host: String
     private var port = 38519
@@ -52,11 +53,11 @@ internal object SelfHost : UploadService {
                 routing {
                     get("*") {
                         val packFile = ResourcePackBuilder.RESOURCE_PACK_FILE
-                        if (packFile.exists()) call.respondFile(packFile)
+                        if (packFile.exists()) call.respondFile(packFile.toFile())
                         else call.respond(HttpStatusCode.NotFound)
                     }
                 }
-                environment.monitor.subscribe(ServerReady) {
+                monitor.subscribe(ServerReady) {
                     thread(isDaemon = true) {
                         startedLatch.open()
                     }
@@ -70,7 +71,7 @@ internal object SelfHost : UploadService {
         server.stop(1000, 1000)
     }
     
-    override suspend fun upload(file: File): String {
+    override suspend fun upload(file: Path): String {
         return url + "/" + StringUtils.randomString(5) // https://bugs.mojang.com/browse/MC-251126
     }
     

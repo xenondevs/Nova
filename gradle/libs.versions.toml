@@ -3,15 +3,15 @@ format.version = "1.1"
 
 [versions]
 bytebase = "0.4.8"
-cbf = "0.16"
-invui = "1.39"
+cbf = "0.17"
+invui = "1.41"
 jgrapht = "1.5.2"
-kotlin = "2.0.21"
+kotlin = "2.1.0-RC"
 kotlinx-coroutines = "1.9.0"
-ktor = "2.3.12"
-paper = "1.21.1-R0.1-SNAPSHOT"
-paperweight = "1.7.3"
-xenondevs-commons = "1.19"
+ktor = "3.0.1"
+paper = "1.21.3-R0.1-SNAPSHOT"
+paperweight = "1.7.4"
+xenondevs-commons = "1.20"
 
 [libraries]
 awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.28.21" }
@@ -28,7 +28,7 @@ configurate-yaml = { group = "org.spongepowered", name = "configurate-yaml", ver
 cosmic-binary-format = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format", version.ref = "cbf" }
 fuzzywuzzy = { group = "me.xdrop", name = "fuzzywuzzy", version = "1.4.0" }
 gson = { group = "com.google.code.gson", name = "gson", version = "2.11.0" }
-inventoryaccess = { group = "xyz.xenondevs.invui", name = "inventory-access-r20", version.ref = "invui" }
+inventoryaccess = { group = "xyz.xenondevs.invui", name = "inventory-access-r21", version.ref = "invui" }
 invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version.ref = "invui" }
 jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jgrapht" }
 jgrapht-io = { group = "org.jgrapht", name = "jgrapht-io", version.ref = "jgrapht" }
@@ -40,6 +40,7 @@ kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", versio
 kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 kotlinx-coroutines-core-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core-jvm", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.7.3" }
 ktor-client-cio-jvm = { group = "io.ktor", name = "ktor-client-cio-jvm", version.ref = "ktor" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-core-jvm = { group = "io.ktor", name = "ktor-client-core-jvm", version.ref = "ktor" }
@@ -47,7 +48,7 @@ ktor-serialization-gson-jvm = { group = "io.ktor", name = "ktor-serialization-gs
 ktor-server-cio-jvm = { group = "io.ktor", name = "ktor-server-cio-jvm", version.ref = "ktor" }
 ktor-server-core-jvm = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor" }
 lz4 = { group = "org.lz4", name = "lz4-java", version = "1.8.0" }
-minecraft-asset-downloader = { group = "xyz.xenondevs", name = "minecraft-asset-downloader", version = "1.3" }
+minecraft-asset-downloader = { group = "xyz.xenondevs", name = "minecraft-asset-downloader", version = "1.4" }
 minecraft-model-renderer = { group = "xyz.xenondevs", name = "minecraft-model-renderer", version = "1.3" }
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version = "2.8" }
@@ -65,4 +66,6 @@ xenondevs-commons = ["commons-collections", "commons-gson", "commons-guava", "co
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }

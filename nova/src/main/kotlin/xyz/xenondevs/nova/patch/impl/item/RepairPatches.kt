@@ -14,11 +14,11 @@ import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.isClass
 import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.bytebase.util.replaceFirstRange
-import xyz.xenondevs.nova.world.item.behavior.Damageable
 import xyz.xenondevs.nova.patch.MultiTransformer
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.item.behavior.Damageable
 
 private val ITEM_STACK_ITEM_CONSTRUCTOR = ReflectionUtils.getConstructor(ItemStack::class, ItemLike::class)
 private val ITEM_STACK_IS_ITEM_METHOD = ReflectionUtils.getMethod(ItemStack::class, "is", Item::class)
@@ -32,16 +32,15 @@ internal object RepairPatches : MultiTransformer(Item::class, AnvilMenu::class, 
     }
     
     private fun patchItemIsValidRepairItem() {
-        VirtualClassPath[Item::isValidRepairItem].delegateStatic(::isValidRepairItem)
+        VirtualClassPath[ItemStack::isValidRepairItem].delegateStatic(::isValidRepairItem)
     }
     
     @JvmStatic
-    fun isValidRepairItem(item: Item, itemStack: ItemStack, ingredient: ItemStack): Boolean {
+    fun isValidRepairItem(itemStack: ItemStack, ingredient: ItemStack): Boolean {
         return itemStack.novaItem
             ?.getBehaviorOrNull<Damageable>()
             ?.repairIngredient
-            ?.test(ingredient.asBukkitMirror())
-            ?: false
+            ?.test(ingredient.asBukkitMirror()) == true
     }
     
     /**

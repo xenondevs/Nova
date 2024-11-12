@@ -32,9 +32,6 @@ object RecipeRegistry {
     val creationInfo = HashMap<String, String>()
     val usageInfo = HashMap<String, String>()
     
-    @Deprecated("Misleading name, does not register any recipes.", ReplaceWith("addFakeRecipes(recipes)"))
-    fun addHardcodedRecipes(recipes: List<NovaRecipe>) = addFakeRecipes(recipes)
-    
     fun addFakeRecipes(recipes: List<NovaRecipe>) {
         check(!isInitialized) { "Recipes are already initialized" }
         fakeRecipes += recipes

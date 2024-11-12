@@ -5,8 +5,8 @@ package xyz.xenondevs.nova.api
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.block.NovaBlock
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
+import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 import xyz.xenondevs.nova.api.item.NovaItem as INovaItem
 

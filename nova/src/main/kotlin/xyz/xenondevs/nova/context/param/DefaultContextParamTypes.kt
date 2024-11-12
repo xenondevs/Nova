@@ -104,7 +104,7 @@ object DefaultContextParamTypes {
     val BLOCK_TYPE_NOVA: ContextParamType<NovaBlock> =
         ContextParamType.builder<NovaBlock>("block_type_nova")
             .optionalIn(BlockPlace, BlockBreak, BlockInteract)
-            .autofilledBy(::BLOCK_TYPE) { NovaRegistries.BLOCK[it] }
+            .autofilledBy(::BLOCK_TYPE) { NovaRegistries.BLOCK.getValue(it) }
             .autofilledBy(::BLOCK_STATE_NOVA) { it.block }
             .build()
     

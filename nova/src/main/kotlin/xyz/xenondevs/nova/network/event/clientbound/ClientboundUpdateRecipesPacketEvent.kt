@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.network.event.clientbound
 
 import net.minecraft.network.protocol.game.ClientboundUpdateRecipesPacket
-import net.minecraft.world.item.crafting.RecipeHolder
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 
@@ -10,14 +9,20 @@ class ClientboundUpdateRecipesPacketEvent(
     packet: ClientboundUpdateRecipesPacket
 ) : PlayerPacketEvent<ClientboundUpdateRecipesPacket>(player, packet) {
     
-    var recipes: List<RecipeHolder<*>> = packet.recipes
+    var itemSets = packet.itemSets
+        set(value) {
+            field = value
+            changed = true
+        }
+    
+    var stonecutterRecipes = packet.stonecutterRecipes
         set(value) {
             field = value
             changed = true
         }
     
     override fun buildChangedPacket(): ClientboundUpdateRecipesPacket {
-        return ClientboundUpdateRecipesPacket(recipes)
+        return ClientboundUpdateRecipesPacket(itemSets, stonecutterRecipes)
     }
     
 }

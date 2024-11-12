@@ -14,7 +14,7 @@ import com.sk89q.worldedit.world.block.BlockTypes
 import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.contains
-import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.getValueOrThrow
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.stream.Stream
@@ -63,7 +63,7 @@ internal class NovaBlockExtent(private val event: EditSessionEvent) : AbstractDe
     override fun <T : BlockStateHolder<T>?> setBlock(x: Int, y: Int, z: Int, block: T): Boolean {
         if (block is NovaBlock) {
             val pos = BlockPos(BukkitAdapter.adapt(event.world), x, y, z)
-            WorldDataManager.setBlockState(pos, NovaRegistries.BLOCK[block.novaId]!!.defaultBlockState)
+            WorldDataManager.setBlockState(pos, NovaRegistries.BLOCK.getValueOrThrow(block.novaId).defaultBlockState)
             return true
         }
         

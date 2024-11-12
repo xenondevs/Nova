@@ -6,7 +6,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
-import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.Dispatcher
@@ -58,7 +57,7 @@ object PermissionManager {
             .build { hasOfflinePermission(it.world, it.player, it.permission) }
         
         if (integrations.size > 1)
-            LOGGER.warning("Multiple permission integrations have been registered: ${integrations.joinToString { it::class.simpleName!! }}, Nova will use the first one")
+            LOGGER.warn("Multiple permission integrations have been registered: ${integrations.joinToString { it::class.simpleName!! }}, Nova will use the first one")
     }
     
     @DisableFun

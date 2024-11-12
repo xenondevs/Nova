@@ -98,32 +98,36 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
             .forEach { block ->
                 val layout = block.requestedLayout
                 for (blockState in block.blockStates) {
-                    val scope = BlockModelSelectorScope(blockState, builder, modelContent)
-                    when (layout.type) {
-                        LayoutType.STATE_BACKED -> {
-                            val modelBuilder = layout.modelSelector(scope)
-                            val cfg = assignModelToVanillaBlockState(layout, modelBuilder, blockState[WATERLOGGED] == true)
-                            if (cfg != null) {
-                                lookup[blockState] = LinkedBlockModelProvider(BackingStateBlockModelProvider, cfg)
-                            } else if (block is NovaTileEntityBlock) {
-                                LOGGER.warning("No more block states for $blockState with layout, falling back to display entity.")
-                                val data = DisplayEntityBlockModelData(assignModelToItem(modelBuilder), layout.stateSelector(scope))
-                                lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
-                            } else throw IllegalStateException("Ran out of backing states trying to assign a model to $blockState")
-                        }
-                        
-                        LayoutType.ENTITY_BACKED -> {
-                            if (block !is NovaTileEntityBlock)
-                                throw IllegalArgumentException("$block cannot use entity-backed block models, as it is not a tile-entity")
+                    try {
+                        val modelScope = BlockModelSelectorScope(blockState, builder, modelContent)
+                        when (layout.type) {
+                            LayoutType.STATE_BACKED -> {
+                                val modelBuilder = layout.modelSelector(modelScope)
+                                val cfg = assignModelToVanillaBlockState(layout, modelBuilder, blockState[WATERLOGGED] == true)
+                                if (cfg != null) {
+                                    lookup[blockState] = LinkedBlockModelProvider(BackingStateBlockModelProvider, cfg)
+                                } else if (block is NovaTileEntityBlock) {
+                                    LOGGER.warn("No more block states for $blockState with layout, falling back to display entity.")
+                                    val data = DisplayEntityBlockModelData(assignModelToItem(modelBuilder), layout.stateSelector(modelScope))
+                                    lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
+                                } else throw IllegalStateException("Ran out of backing states trying to assign a model to $blockState")
+                            }
                             
-                            val modelBuilder = layout.modelSelector(BlockModelSelectorScope(blockState, builder, modelContent))
-                            val data = DisplayEntityBlockModelData(assignModelToItem(modelBuilder), layout.stateSelector(scope))
-                            lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
+                            LayoutType.ENTITY_BACKED -> {
+                                if (block !is NovaTileEntityBlock)
+                                    throw IllegalArgumentException("$block cannot use entity-backed block models, as it is not a tile-entity")
+                                
+                                val modelBuilder = layout.modelSelector(BlockModelSelectorScope(blockState, builder, modelContent))
+                                val data = DisplayEntityBlockModelData(assignModelToItem(modelBuilder), layout.stateSelector(modelScope))
+                                lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
+                            }
+                            
+                            LayoutType.MODEL_LESS -> {
+                                lookup[blockState] = LinkedBlockModelProvider(ModelLessBlockModelProvider, layout.stateSelector(modelScope))
+                            }
                         }
-                        
-                        LayoutType.MODEL_LESS -> {
-                            lookup[blockState] = LinkedBlockModelProvider(ModelLessBlockModelProvider, layout.stateSelector(scope))
-                        }
+                    } catch (e: Exception) {
+                        throw Exception("Failed to assign model to $blockState", e)
                     }
                 }
             }

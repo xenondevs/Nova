@@ -4,7 +4,6 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import java.util.*
-import java.util.logging.Level
 import kotlin.random.Random
 
 /**
@@ -49,7 +48,7 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
                 try {
                     tickFun.invoke(group)
                 } catch (e: Exception) {
-                    LOGGER.log(Level.SEVERE, "An exception occurred trying to tick $group in cluster $this", e)
+                    LOGGER.error("An exception occurred trying to tick $group in cluster $this", e)
                 }
             }
         }

@@ -2,99 +2,109 @@
 
 package xyz.xenondevs.nova.world.item.behavior
 
+import net.kyori.adventure.key.Key
+import net.minecraft.core.Holder
+import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.EquipmentSlotGroup
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
-import net.minecraft.world.item.BlockItem
-import net.minecraft.world.item.Equipable
-import net.minecraft.world.item.component.DyedItemColor
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.ItemAttributeModifiers
-import org.bukkit.GameMode
+import net.minecraft.world.item.equipment.Equippable
+import org.bukkit.Bukkit
 import org.bukkit.Sound
+import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Horse
+import org.bukkit.entity.HumanEntity
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Llama
+import org.bukkit.entity.Piglin
 import org.bukkit.entity.Player
-import org.bukkit.event.block.Action
-import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.ItemStack
+import org.bukkit.entity.Skeleton
+import org.bukkit.entity.Wolf
+import org.bukkit.entity.Zombie
+import xyz.xenondevs.commons.collections.getCoerced
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.commons.provider.weakMap
-import xyz.xenondevs.nova.config.weakOptionalEntry
+import xyz.xenondevs.nova.config.optionalEntry
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.network.ClientboundSetEquipmentPacket
+import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
-import xyz.xenondevs.nova.util.bukkitEquipmentSlot
-import xyz.xenondevs.nova.util.item.isActuallyInteractable
+import xyz.xenondevs.nova.util.getOrNull
+import xyz.xenondevs.nova.util.getOrThrow
 import xyz.xenondevs.nova.util.item.novaItem
-import xyz.xenondevs.nova.util.item.takeUnlessEmpty
+import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
+import xyz.xenondevs.nova.util.runTaskTimer
+import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.util.toResourceLocation
 import xyz.xenondevs.nova.util.unwrap
-import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.armor.Armor
-import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
-import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
-import net.minecraft.world.item.ItemStack as MojangStack
+import xyz.xenondevs.nova.world.item.equipment.Equipment
+import java.util.Optional
+import org.bukkit.entity.EntityType as BukkitEntityType
 import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 /**
  * Allows items to be worn in armor slots.
  *
- * @param armor The custom armor texture, or null if no custom texture should be used.
+ * @param equipment The custom armor texture, or null if no custom texture should be used.
  * @param slot The slot in which the item can be worn.
- * @param equipSound The sound that is played when the item is equipped, or null if no sound should be played.
+ * @param equipSound The sound that is played when the item is equipped.
  */
-fun Wearable(armor: Armor?, slot: BukkitEquipmentSlot, equipSound: Sound): ItemBehaviorFactory<Wearable> =
-    Wearable(armor, slot, equipSound.key.toString())
+fun Wearable(
+    equipment: Equipment?,
+    slot: BukkitEquipmentSlot,
+    equipSound: Key
+): ItemBehaviorFactory<Wearable> =
+    Wearable(
+        equipment, slot,
+        BuiltInRegistries.SOUND_EVENT.getOrNull(equipSound)
+            ?: Holder.direct(SoundEvent(equipSound.toResourceLocation(), Optional.empty()))
+    )
 
 /**
  * Allows items to be worn in armor slots.
  *
- * @param armor The custom armor texture, or null if no custom texture should be used.
+ * @param equipment The custom armor texture, or null if no custom texture should be used.
  * @param slot The slot in which the item can be worn.
- * @param equipSound The sound that is played when the item is equipped, or null if no sound should be played.
+ * @param equipSound The sound that is played when the item is equipped.
  */
-fun Wearable(armor: Armor?, slot: BukkitEquipmentSlot, equipSound: SoundEvent): ItemBehaviorFactory<Wearable> =
-    Wearable(armor, slot, equipSound.location.toString())
-
-/**
- * Allows items to be worn in armor slots.
- *
- * @param armor The custom armor texture, or null if no custom texture should be used.
- * @param slot The slot in which the item can be worn.
- * @param equipSound The sound that is played when the item is equipped, or null if no sound should be played.
- */
-fun Wearable(armor: Armor?, slot: BukkitEquipmentSlot, equipSound: String? = null): ItemBehaviorFactory<Wearable> {
-    return object : ItemBehaviorFactory<Wearable> {
-        override fun create(item: NovaItem): Wearable {
-            val cfg = item.config
-            return Wearable(
-                ResourceLookups.ARMOR_COLOR_LOOKUP.provider.weakMap { map -> armor?.let(map::get) },
-                provider(slot),
-                cfg.weakOptionalEntry<Double>("armor").orElse(0.0),
-                cfg.weakOptionalEntry<Double>("armor_toughness").orElse(0.0),
-                cfg.weakOptionalEntry<Double>("knockback_resistance").orElse(0.0),
-                provider(equipSound)
-            )
-        }
-    }
+fun Wearable(
+    equipment: Equipment?,
+    slot: BukkitEquipmentSlot, 
+    equipSound: Holder<SoundEvent> = SoundEvents.ARMOR_EQUIP_GENERIC
+) = ItemBehaviorFactory<Wearable> {
+    val cfg = it.config
+    Wearable(
+        provider(equipment),
+        provider(slot),
+        cfg.optionalEntry<Double>("armor").orElse(0.0),
+        cfg.optionalEntry<Double>("armor_toughness").orElse(0.0),
+        cfg.optionalEntry<Double>("knockback_resistance").orElse(0.0),
+        provider(equipSound),
+        cfg.optionalEntry<Set<BukkitEntityType>>("allowed_entities"),
+        cfg.optionalEntry<Boolean>("dispensable").orElse(true),
+        cfg.optionalEntry<Boolean>("swappable").orElse(true),
+        cfg.optionalEntry<Boolean>("damage_on_hurt").orElse(true)
+    )
 }
-
-private val EquipmentSlot.inventorySlot
-    get() = when (this) {
-        EquipmentSlot.HEAD -> 5
-        EquipmentSlot.CHEST -> 6
-        EquipmentSlot.LEGS -> 7
-        EquipmentSlot.FEET -> 8
-        else -> throw UnsupportedOperationException()
-    }
 
 /**
  * Allows items to be worn in armor slots.
@@ -107,18 +117,46 @@ private val EquipmentSlot.inventorySlot
  * @param equipSound The sound that is played when the item is equipped, or null if no sound should be played.
  */
 class Wearable(
-    texture: Provider<Int?>,
+    texture: Provider<Equipment?>,
     slot: Provider<BukkitEquipmentSlot>,
     armor: Provider<Double>,
     armorToughness: Provider<Double>,
     knockbackResistance: Provider<Double>,
-    equipSound: Provider<String?>
+    equipSound: Provider<Holder<SoundEvent>>,
+    allowedEntities: Provider<Set<BukkitEntityType>?>,
+    dispensable: Provider<Boolean>,
+    swappable: Provider<Boolean>,
+    damageOnHurt: Provider<Boolean>,
 ) : ItemBehavior {
     
+    constructor(
+        texture: Equipment?,
+        slot: BukkitEquipmentSlot,
+        armor: Double,
+        armorToughness: Double,
+        knockbackResistance: Double,
+        equipSound: Sound,
+        allowedEntities: Set<BukkitEntityType>,
+        dispensable: Boolean,
+        swappable: Boolean,
+        damageOnHurt: Boolean,
+    ) : this(
+        provider(texture),
+        provider(slot),
+        provider(armor),
+        provider(armorToughness),
+        provider(knockbackResistance),
+        provider { BuiltInRegistries.SOUND_EVENT.getOrThrow(equipSound.key()) },
+        provider(allowedEntities),
+        provider(dispensable),
+        provider(swappable),
+        provider(damageOnHurt),
+    )
+    
     /**
-     * The leather armor color used for the custom texture.
+     * The custom armor texture, or null if no custom texture should be used.
      */
-    val texture: Int? by texture
+    val texture by texture
     
     /**
      * The slot in which the item can be worn.
@@ -143,106 +181,130 @@ class Wearable(
     /**
      * The sound that is played when the item is equipped.
      */
-    val equipSound: String? by equipSound
+    val equipSound: Holder<SoundEvent> by equipSound
     
-    override val vanillaMaterialProperties = combinedProvider(slot, texture) { slot, texture ->
-        if (texture == null)
-            return@combinedProvider emptyList()
-        
-        return@combinedProvider listOf(
-            when (slot) {
-                BukkitEquipmentSlot.HEAD -> VanillaMaterialProperty.HELMET
-                BukkitEquipmentSlot.CHEST -> VanillaMaterialProperty.CHESTPLATE
-                BukkitEquipmentSlot.LEGS -> VanillaMaterialProperty.LEGGINGS
-                BukkitEquipmentSlot.FEET -> VanillaMaterialProperty.BOOTS
-                else -> throw IllegalArgumentException("Invalid wearable slot: $slot")
+    /**
+     * The [entity types][BukkitEntityType] that are allowed to wear this item.
+     */
+    val allowedEntities: Set<BukkitEntityType>? by allowedEntities
+    
+    /**
+     * Whether this item can be dispensed from a dispenser.
+     */
+    val dispensable: Boolean by dispensable
+    
+    /**
+     * Whether this item can be swapped with other items in the same slot.
+     */
+    val swappable: Boolean by swappable
+    
+    /**
+     * Whether this item will be damaged when the wearing entity is damaged.
+     */
+    val damageOnHurt: Boolean by damageOnHurt
+    
+    private val equipmentData: Provider<RuntimeEquipmentData?> = ResourceLookups.EQUIPMENT_LOOKUP.getProvider(texture)
+    
+    private val textureFrame = mutableProvider(0)
+    private val overlayFrame = mutableProvider(0)
+    
+    init {
+        equipmentData.subscribe { equipmentData ->
+            animatedWearables -= this
+            if (equipmentData != null && equipmentData.isAnimated) {
+                animatedWearables += this
             }
-        )
+        }
+    }
+    
+    /**
+     * Provider for a 2d array of [Equippable] components, where the first index is the texture frame and the second index is the overlay frame.
+     */
+    private val equippableComponentFrames: Provider<Array<Array<Equippable>>> = combinedProvider(
+        equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt
+    ) { equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt ->
+        val equipmentSlot = slot.nmsEquipmentSlot
+        
+        val textureFrames = equipmentData?.textureFrames
+        val overlayFrames = equipmentData?.cameraOverlayFrames
+            ?.takeUnless { slot != BukkitEquipmentSlot.HEAD }
+        
+        val allowedNmsEntities = allowedEntities
+            ?.map { BuiltInRegistries.ENTITY_TYPE.getOrThrow(it.key()) }
+            ?.let { HolderSet.direct(it) as HolderSet<EntityType<*>> }
+        
+        Array(textureFrames?.size ?: 1) { textureFrame ->
+            Array(overlayFrames?.size ?: 1) { overlayFrame ->
+                Equippable(
+                    equipmentSlot,
+                    equipSound,
+                    Optional.ofNullable(textureFrames?.getOrNull(textureFrame)),
+                    Optional.ofNullable(overlayFrames?.getOrNull(overlayFrame)),
+                    Optional.ofNullable(allowedNmsEntities),
+                    dispensable, swappable, damageOnHurt
+                )
+            }
+        }
+    }
+    
+    /**
+     * Provider for the attribute modifiers.
+     */
+    private val attributeModifiersComponent: Provider<ItemAttributeModifiers> = combinedProvider(
+        slot, armor, armorToughness, knockbackResistance
+    ) { slot, armor, armorToughness, knockbackResistance ->
+        val equipmentSlot = slot.nmsEquipmentSlot
+        val builder = ItemAttributeModifiers.builder()
+        if (armor != 0.0) {
+            builder.add(
+                Attributes.ARMOR,
+                AttributeModifier(
+                    ResourceLocation.fromNamespaceAndPath("nova", "armor_${slot.name.lowercase()}"),
+                    armor,
+                    Operation.ADD_VALUE
+                ),
+                EquipmentSlotGroup.bySlot(equipmentSlot)
+            )
+        }
+        
+        if (armorToughness != 0.0) {
+            builder.add(
+                Attributes.ARMOR_TOUGHNESS,
+                AttributeModifier(
+                    ResourceLocation.fromNamespaceAndPath("nova", "armor_toughness_${slot.name.lowercase()}"),
+                    armorToughness,
+                    Operation.ADD_VALUE
+                ),
+                EquipmentSlotGroup.bySlot(equipmentSlot)
+            )
+        }
+        
+        if (knockbackResistance != 0.0) {
+            builder.add(
+                Attributes.KNOCKBACK_RESISTANCE,
+                AttributeModifier(
+                    ResourceLocation.fromNamespaceAndPath("nova", "knockback_resistance_${slot.name.lowercase()}"),
+                    knockbackResistance,
+                    Operation.ADD_VALUE
+                ),
+                EquipmentSlotGroup.bySlot(equipmentSlot)
+            )
+        }
+        
+        return@combinedProvider builder.build()
     }
     
     override val baseDataComponents = combinedProvider(
-        slot, armor, armorToughness, knockbackResistance
-    ) { slot, armor, armorToughness, knockBackResistance ->
-        if (armor == 0.0 && armorToughness == 0.0 && knockBackResistance == 0.0)
-            return@combinedProvider DataComponentMap.EMPTY
+        equippableComponentFrames, textureFrame, overlayFrame, attributeModifiersComponent
+    ) { equippableFrames, textureFrame, overlayFrame, attributeModifiers ->
+        val equippable = equippableFrames
+            .getCoerced(textureFrame)
+            .getCoerced(overlayFrame)
         
-        val equipmentSlot = slot.nmsEquipmentSlot
-        DataComponentMap.builder().set(
-            DataComponents.ATTRIBUTE_MODIFIERS,
-            ItemAttributeModifiers.builder().apply {
-                if (armor != 0.0) {
-                    add(
-                        Attributes.ARMOR,
-                        AttributeModifier(
-                            ResourceLocation.fromNamespaceAndPath("nova", "armor_${slot.name.lowercase()}"),
-                            armor,
-                            Operation.ADD_VALUE
-                        ),
-                        EquipmentSlotGroup.bySlot(equipmentSlot)
-                    )
-                }
-                
-                if (armorToughness != 0.0) {
-                    add(
-                        Attributes.ARMOR_TOUGHNESS,
-                        AttributeModifier(
-                            ResourceLocation.fromNamespaceAndPath("nova", "armor_toughness_${slot.name.lowercase()}"),
-                            armorToughness,
-                            Operation.ADD_VALUE
-                        ),
-                        EquipmentSlotGroup.bySlot(equipmentSlot)
-                    )
-                }
-                
-                if (knockBackResistance != 0.0) {
-                    add(
-                        Attributes.KNOCKBACK_RESISTANCE,
-                        AttributeModifier(
-                            ResourceLocation.fromNamespaceAndPath("nova", "knockback_resistance_${slot.name.lowercase()}"),
-                            knockBackResistance,
-                            Operation.ADD_VALUE
-                        ),
-                        EquipmentSlotGroup.bySlot(equipmentSlot)
-                    )
-                }
-            }.build()
-        ).build()
-    }
-    
-    override fun handleInteract(player: Player, itemStack: BukkitStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        val event = wrappedEvent.event
-        val inventory = player.inventory
-        if (!wrappedEvent.actionPerformed && (action == Action.RIGHT_CLICK_AIR || (action == Action.RIGHT_CLICK_BLOCK && !event.clickedBlock!!.type.isActuallyInteractable()))) {
-            event.isCancelled = true
-            
-            val hand = event.hand!!
-            val previous = inventory.getItem(slot).takeUnlessEmpty()
-            if (previous != null) {
-                // swap armor
-                inventory.setItem(slot, itemStack)
-                inventory.setItem(hand, previous)
-            } else {
-                // equip armor
-                inventory.setItem(slot, itemStack)
-                if (player.gameMode != GameMode.CREATIVE) inventory.setItem(hand, null)
-            }
-            
-            player.swingHand(hand)
-            player.serverPlayer.onEquipItem(slot.nmsEquipmentSlot, previous.unwrap().copy(), itemStack.unwrap().copy())
-            wrappedEvent.actionPerformed = true
-        } else {
-            // basically marks the remote armor slot as dirty, see https://hub.spigotmc.org/jira/browse/SPIGOT-7500
-            player.serverPlayer.inventoryMenu.setRemoteSlot(slot.inventorySlot, itemStack.unwrap().copy())
-        }
-    }
-    
-    override fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
-        val texture = texture
-        if (texture != null) {
-            itemStack.unwrap().set(DataComponents.DYED_COLOR, DyedItemColor(texture, false))
-        }
-        
-        return itemStack
+        DataComponentMap.builder()
+            .set(DataComponents.EQUIPPABLE, equippable)
+            .set(DataComponents.ATTRIBUTE_MODIFIERS, attributeModifiers)
+            .build()
     }
     
     override fun toString(itemStack: BukkitStack): String {
@@ -254,47 +316,81 @@ class Wearable(
             ")"
     }
     
-    companion object {
+    @InternalInit(stage = InternalInitStage.POST_WORLD)
+    internal companion object {
         
-        /**
-         * Checks whether the specified [itemStack] is wearable.
-         */
-        fun isWearable(itemStack: BukkitStack): Boolean =
-            isWearable(itemStack.unwrap().copy())
+        private val ARMOR_EQUIPMENT_SLOTS = listOf(
+            BukkitEquipmentSlot.FEET,
+            BukkitEquipmentSlot.LEGS, 
+            BukkitEquipmentSlot.CHEST, 
+            BukkitEquipmentSlot.HEAD,
+            BukkitEquipmentSlot.BODY
+        )
+        private val animatedWearables = HashSet<Wearable>()
         
-        /**
-         * Checks whether the specified [itemStack] is wearable.
-         */
-        fun isWearable(itemStack: MojangStack): Boolean {
-            val novaItem = itemStack.novaItem
-            if (novaItem != null)
-                return novaItem.hasBehavior<Wearable>()
-            
-            val item = itemStack.item
-            return item is Equipable || item is BlockItem && item.block is Equipable
+        @InitFun
+        private fun startAnimationTask() {
+            runTaskTimer(0, 1, ::handleTick)
         }
         
-        /**
-         * Gets the [BukkitEquipmentSlot] of the specified [itemStack], or null if it is not wearable.
-         */
-        fun getSlot(itemStack: BukkitStack): BukkitEquipmentSlot? =
-            getSlot(itemStack.unwrap().copy())?.bukkitEquipmentSlot
+        private fun handleTick() {
+            if (animatedWearables.isEmpty())
+                return
+            
+            for (wearable in animatedWearables) {
+                val textureFrames = wearable.equipmentData.get()?.textureFrames?.size ?: 1
+                val overlayFrames = wearable.equipmentData.get()?.cameraOverlayFrames?.size ?: 1
+                wearable.textureFrame.set((wearable.textureFrame.get() + 1) % textureFrames)
+                wearable.overlayFrame.set((wearable.overlayFrame.get() + 1) % overlayFrames)
+            }
+            
+            Bukkit.getWorlds().asSequence()
+                .flatMap { it.livingEntities }
+                .forEach { entity ->
+                    when (entity) {
+                        is Player -> updatePlayerArmor(entity)
+                        
+                        is HumanEntity, is Zombie, is Skeleton, is Piglin,
+                        is ArmorStand, is Horse, is Llama, is Wolf -> updateNonPlayerArmor(entity)
+                    }
+                }
+        }
         
-        /**
-         * Gets the [MojangEquipmentSlot] of the specified [itemStack], or null if it is not wearable.
-         */
-        fun getSlot(itemStack: MojangStack): MojangEquipmentSlot? {
-            val novaItem = itemStack.novaItem
-            if (novaItem != null)
-                return novaItem.getBehaviorOrNull<Wearable>()?.slot?.nmsEquipmentSlot
+        private fun updatePlayerArmor(player: Player) {
+            val serverPlayer = player.serverPlayer
+            for ((armorSlot, armorStack) in serverPlayer.inventory.armor.withIndex()) {
+                var equipment = HashMap<EquipmentSlot, ItemStack>()
+                if (armorStack?.novaItem?.getBehavior<Wearable>()?.equipmentData?.get()?.isAnimated == true) {
+                    serverPlayer.inventoryMenu.setRemoteSlot(8 - armorSlot, ItemStack.EMPTY) // mark as dirty, force update
+                    equipment[EquipmentSlot.entries[armorSlot + 2]] = armorStack
+                }
+                
+                // update for other players
+                val packet = ClientboundSetEquipmentPacket(player.entityId, equipment)
+                serverPlayer.serverLevel().chunkSource.broadcast(serverPlayer, packet)
+            }
+        }
+        
+        private fun updateNonPlayerArmor(entity: LivingEntity) {
+            val equipment = entity.equipment ?: return
             
-            val equipable = when (val item = itemStack.item) {
-                is Equipable -> item
-                is BlockItem -> item.block as? Equipable
-                else -> null
-            } ?: return null
+            var updatedEquipment: HashMap<EquipmentSlot, ItemStack>? = null
+            for (slot in ARMOR_EQUIPMENT_SLOTS) {
+                if (!entity.canUseEquipmentSlot(slot))
+                    continue
+                
+                val itemStack = equipment.getItem(slot)
+                if (itemStack.novaItem?.getBehavior<Wearable>()?.equipmentData?.get()?.isAnimated == true) {
+                    if (updatedEquipment == null)
+                        updatedEquipment = HashMap()
+                    updatedEquipment[slot.nmsEquipmentSlot] = itemStack.unwrap()
+                }
+            }
             
-            return equipable.equipmentSlot
+            if (updatedEquipment != null) {
+                val packet = ClientboundSetEquipmentPacket(entity.entityId, updatedEquipment)
+                entity.world.serverLevel.chunkSource.broadcast(entity.nmsEntity, packet)
+            }
         }
         
     }

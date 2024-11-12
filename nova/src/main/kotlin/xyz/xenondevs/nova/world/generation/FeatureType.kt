@@ -44,8 +44,6 @@ abstract class FeatureType<FC : FeatureConfiguration>(codec: Codec<FC>) : Featur
     
     /**
      * Sets the block at the given position to the given [NovaBlock].
-     *
-     * **Note: Nova blocks won't be properly placed/loaded until the chunk is loaded! (i.e. the chunk finished generating)**
      */
     protected fun setBlock(level: WorldGenLevel, pos: BlockPos, block: NovaBlock) {
         WorldDataManager.setBlockState(pos.toNovaPos(level.level.world), block.defaultBlockState)

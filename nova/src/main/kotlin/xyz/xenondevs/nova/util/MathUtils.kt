@@ -58,10 +58,78 @@ internal fun max(a: Vector3d, b: Vector3d): Vector3d {
 
 internal object MathUtils {
     
+    /**
+     * Returns the greatest common divisor of the given numbers.
+     */
+    fun gcd(a: Int, b: Int): Int {
+        // Euclidean algorithm
+        var a = a
+        var b = b
+        while (b > 0) {
+            var temp = b
+            b = a % b
+            a = temp
+        }
+        return a
+    }
+    
+    /**
+     * Returns the greatest common divisor of the given [numbers].
+     */
+    fun gcd(vararg numbers: Int): Int {
+        var gcd = numbers[0]
+        for (i in 1..<numbers.size) {
+            gcd = gcd(gcd, numbers[i])
+        }
+        return gcd
+    }
+    
+    /**
+     * Returns the greatest common divisor of all numbers provided by [numbers].
+     */
+    fun gcd(numbers: Iterator<Int>): Int {
+        if (!numbers.hasNext())
+            throw IllegalArgumentException("Iterator has no elements")
+        
+        var gcd = numbers.next()
+        while (numbers.hasNext()) {
+            gcd = gcd(gcd, numbers.next())
+        }
+        
+        return gcd
+    }
+    
+    fun gcd(numbers: Iterable<Int>): Int {
+        return gcd(numbers.iterator())
+    }
+    
+    fun gcd(numbers: Sequence<Int>): Int {
+        return gcd(numbers.iterator())
+    }
+    
+    /**
+     * Returns the least common multiple of the given numbers.
+     */
+    fun lcm(a: Int, b: Int): Int {
+        return a * (b / gcd(a, b))
+    }
+    
+    /**
+     * Returns the least common multiple of the given [numbers].
+     */
+    fun lcm(vararg numbers: Int): Int {
+        var lcm = numbers[0]
+        for (i in 1..<numbers.size) {
+            lcm = lcm(lcm, numbers[i])
+        }
+        return lcm
+    }
+    
     fun convertBooleanArrayToInt(array: BooleanArray): Int {
         var i = 0
-        for (element in array)
+        for (element in array) {
             i = (i shl 1) or if (element) 1 else 0
+        }
         
         return i
     }

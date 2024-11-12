@@ -3,10 +3,10 @@ package xyz.xenondevs.nova.world.fakeentity.metadata
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.network.syncher.EntityDataSerializers
-import xyz.xenondevs.nova.world.item.logic.PacketItems
 import xyz.xenondevs.nova.network.PacketIdRegistry
 import xyz.xenondevs.nova.util.RegistryFriendlyByteBuf
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.item.logic.PacketItems
 import java.util.*
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack

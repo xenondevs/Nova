@@ -1,8 +1,7 @@
 package xyz.xenondevs.nova.data
 
-import xyz.xenondevs.nova.Nova
+import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.addon.file
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.resources.ResourcePath
@@ -24,7 +23,7 @@ import kotlin.io.path.walk
 import kotlin.io.path.writeBytes
 
 private const val STORAGE_KEY = "updatable_file_hashes"
-private val PLUGINS_DIR = Nova.dataFolder.parentFile.toPath()
+private val PLUGINS_DIR = DATA_FOLDER.parent
 
 object UpdatableFile {
     
@@ -35,7 +34,7 @@ object UpdatableFile {
             addon.file.useZip { zip ->
                 extractAll(
                     zip.resolve(dirName), 
-                    addon.dataFolder.toPath().resolve(dirName)
+                    addon.dataFolder.resolve(dirName)
                 ) { ResourcePath.NON_NAMESPACED_ENTRY.matches(it.name) }
             }  
         }

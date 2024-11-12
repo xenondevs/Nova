@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -31,7 +30,7 @@ import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
-private val ATTACHMENTS_KEY = NamespacedKey(Nova, "attachments1")
+private val ATTACHMENTS_KEY = NamespacedKey("nova", "attachments1")
 
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 object AttachmentManager : Listener, PacketListener {
@@ -138,10 +137,10 @@ object AttachmentManager : Listener, PacketListener {
     
     private fun activateAttachments(player: Player, attachmentIds: Set<ResourceLocation>) {
         attachmentIds.forEach {
-            val type = ATTACHMENT_TYPE[it]
+            val type = ATTACHMENT_TYPE.getValue(it)
             if (type != null) {
                 addAttachment(player, type)
-            } else LOGGER.severe("Unknown attachment type $it on player ${player.name}")
+            } else LOGGER.error("Unknown attachment type $it on player ${player.name}")
         }
     }
     

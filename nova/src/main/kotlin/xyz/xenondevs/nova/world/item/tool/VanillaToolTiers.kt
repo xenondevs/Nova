@@ -6,7 +6,6 @@ import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.set
 
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
@@ -21,7 +20,7 @@ object VanillaToolTiers {
     
     private fun register(name: String): ToolTier {
         val id = ResourceLocation.withDefaultNamespace(name)
-        val level = ToolTier(id, Configs["nova:tool_levels"].entry(id.name))
+        val level = ToolTier(id, Configs["nova:tool_levels"].entry(id.path))
         
         NovaRegistries.TOOL_TIER[id] = level
         return level

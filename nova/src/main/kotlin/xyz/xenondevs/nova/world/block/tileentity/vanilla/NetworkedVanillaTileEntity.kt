@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.world.block.tileentity.vanilla
 
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
-import xyz.xenondevs.nova.world.BlockPos
 
 internal abstract class NetworkedVanillaTileEntity internal constructor(
     type: Type,

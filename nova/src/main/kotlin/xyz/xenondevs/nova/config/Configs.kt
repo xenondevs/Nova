@@ -7,10 +7,10 @@ import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.Nova
+import xyz.xenondevs.nova.DATA_FOLDER
+import xyz.xenondevs.nova.NOVA_JAR
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.addon.file
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -18,7 +18,6 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.serialization.configurate.NOVA_CONFIGURATE_SERIALIZERS
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.data.useZip
-import java.io.File
 import java.nio.file.Path
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -43,18 +42,18 @@ object Configs {
     private var lastReload = -1L
     
     internal fun extractDefaultConfig() {
-        Nova.novaJar.useZip { zip ->
+        NOVA_JAR.useZip { zip ->
             val from = zip.resolve(DEFAULT_CONFIG_PATH)
-            val to = Nova.dataFolder.toPath().resolve(DEFAULT_CONFIG_PATH)
+            val to = DATA_FOLDER.resolve(DEFAULT_CONFIG_PATH)
             extractConfig(from, to, DEFAULT_CONFIG_ID)
         }
     }
     
     @InitFun
     private fun extractAllConfigs() {
-        extractConfigs("nova", Nova.novaJar, Nova.dataFolder.toPath())
+        extractConfigs("nova", NOVA_JAR, DATA_FOLDER)
         for (addon in AddonBootstrapper.addons) {
-            extractConfigs(addon.id, addon.file, addon.dataFolder.toPath())
+            extractConfigs(addon.id, addon.file, addon.dataFolder)
         }
         
         lastReload = System.currentTimeMillis()
@@ -63,7 +62,7 @@ object Configs {
             .forEach { it.set(createLoader(it.path).load()) }
     }
     
-    private fun extractConfigs(namespace: String, zipFile: File, dataFolder: Path) {
+    private fun extractConfigs(namespace: String, zipFile: Path, dataFolder: Path) {
         zipFile.useZip { zip ->
             val configsDir = zip.resolve("configs/")
             configsDir.walk()
@@ -84,10 +83,10 @@ object Configs {
     
     private fun resolveConfigPath(configId: ResourceLocation): Path {
         val dataFolder = when (configId.namespace) {
-            "nova" -> Nova.dataFolder
+            "nova" -> DATA_FOLDER
             else -> AddonBootstrapper.addons.firstOrNull { it.id == configId.namespace }?.dataFolder
                 ?: throw IllegalArgumentException("No addon with id ${configId.namespace} found")
-        }.toPath()
+        }
         return dataFolder.resolve("configs").resolve(configId.path + ".yml")
     }
     

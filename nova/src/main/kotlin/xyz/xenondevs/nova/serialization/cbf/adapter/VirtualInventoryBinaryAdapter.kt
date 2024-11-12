@@ -9,7 +9,7 @@ import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.nova.util.DATA_VERSION
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.ceilDiv
-import xyz.xenondevs.nova.util.item.isEmpty
+import xyz.xenondevs.nova.util.item.isNullOrEmpty
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.unwrap
 import java.util.*
@@ -72,13 +72,13 @@ internal object VirtualInventoryBinaryAdapter : ComplexBinaryAdapter<VirtualInve
         
         val itemsMask = BitSet(size)
         for ((slot, itemStack) in items.withIndex()) {
-            if (!itemStack.isEmpty())
+            if (!itemStack.isNullOrEmpty())
                 itemsMask.set(slot)
         }
         writer.writeBytes(Arrays.copyOf(itemsMask.toByteArray(), size.ceilDiv(8)))
         
         for (itemStack in obj.items) {
-            if (itemStack.isEmpty())
+            if (itemStack.isNullOrEmpty())
                 continue
             
             val nmsStack = itemStack.unwrap()

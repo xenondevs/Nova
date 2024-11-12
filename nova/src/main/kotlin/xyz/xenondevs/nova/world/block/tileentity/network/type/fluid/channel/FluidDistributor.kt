@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.channel
 
+import xyz.xenondevs.nova.util.sumOfNoOverflow
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
-import xyz.xenondevs.nova.util.sumOfNoOverflow
 import kotlin.math.min
 
 internal class FluidDistributor(

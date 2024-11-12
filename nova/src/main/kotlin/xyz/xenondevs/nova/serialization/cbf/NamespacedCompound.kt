@@ -9,7 +9,6 @@ import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
-import xyz.xenondevs.nova.util.name
 import java.util.*
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -29,7 +28,7 @@ class NamespacedCompound internal constructor(
     }
     
     fun set(type: KType, id: ResourceLocation, value: Any?) {
-        set(type, id.namespace, id.name, value)
+        set(type, id.namespace, id.path, value)
     }
     
     fun set(type: KType, key: NamespacedKey, value: Any?) {
@@ -63,7 +62,7 @@ class NamespacedCompound internal constructor(
     }
     
     fun <T> get(type: KType, id: ResourceLocation): T? {
-        return get(type, id.namespace, id.name)
+        return get(type, id.namespace, id.path)
     }
     
     fun <T> get(type: KType, key: NamespacedKey): T? {
@@ -116,7 +115,7 @@ class NamespacedCompound internal constructor(
     }
     
     fun remove(id: ResourceLocation) {
-        remove(id.namespace, id.name)
+        remove(id.namespace, id.path)
     }
     
     fun remove(key: NamespacedKey) {
@@ -142,7 +141,7 @@ class NamespacedCompound internal constructor(
     }
     
     fun contains(id: ResourceLocation): Boolean {
-        return contains(id.namespace, id.name)
+        return contains(id.namespace, id.path)
     }
     
     fun contains(key: NamespacedKey): Boolean {

@@ -159,9 +159,9 @@ open class NovaBlock internal constructor(
         behaviors.forEach { it.handleBreak(pos, state, ctx) }
     }
     
-    fun handleNeighborChanged(pos: BlockPos, state: NovaBlockState, neighborPos: BlockPos) {
+    fun handleNeighborChanged(pos: BlockPos, state: NovaBlockState) {
         checkServerThread()
-        behaviors.forEach { it.handleNeighborChanged(pos, state, neighborPos) }
+        behaviors.forEach { it.handleNeighborChanged(pos, state) }
     }
     
     fun updateShape(pos: BlockPos, state: NovaBlockState, neighborPos: BlockPos): NovaBlockState {

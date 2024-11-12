@@ -6,12 +6,12 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
-import net.minecraft.world.ItemInteractionResult
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.LevelAccessor
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.ScheduledTickAccess
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.HugeMushroomBlock
 import net.minecraft.world.level.block.Mirror
@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.block.TripWireBlock
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.redstone.Orientation
 import net.minecraft.world.phys.BlockHitResult
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
@@ -28,13 +29,13 @@ import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 private val NOTE_BLOCK_UPDATE_SHAPE = ReflectionUtils.getMethod(
     NoteBlock::class,
     "updateShape",
-    BlockState::class, Direction::class, BlockState::class, LevelAccessor::class, BlockPos::class, BlockPos::class
+    BlockState::class, LevelReader::class, ScheduledTickAccess::class, BlockPos::class, Direction::class, BlockPos::class, BlockState::class, RandomSource::class
 )
 
 private val NOTE_BLOCK_NEIGHBOR_CHANGED = ReflectionUtils.getMethod(
     NoteBlock::class,
     "neighborChanged",
-    BlockState::class, Level::class, BlockPos::class, Block::class, BlockPos::class, Boolean::class
+    BlockState::class, Level::class, BlockPos::class, Block::class, Orientation::class, Boolean::class
 )
 
 private val NOTE_BLOCK_USE_ITEM_ON = ReflectionUtils.getMethod(
@@ -64,7 +65,7 @@ private val NOTE_BLOCK_TRIGGER_EVENT = ReflectionUtils.getMethod(
 private val HUGE_MUSHROOM_BLOCK_UPDATE_SHAPE = ReflectionUtils.getMethod(
     HugeMushroomBlock::class,
     "updateShape",
-    BlockState::class, Direction::class, BlockState::class, LevelAccessor::class, BlockPos::class, BlockPos::class
+    BlockState::class, LevelReader::class, ScheduledTickAccess::class, BlockPos::class, Direction::class, BlockPos::class, BlockState::class, RandomSource::class
 )
 
 private val HUGE_MUSHROOM_BLOCK_ROTATE = ReflectionUtils.getMethod(
@@ -114,13 +115,13 @@ internal object DisableBackingStateLogicPatch : MultiTransformer(NoteBlock::clas
         
         val failItemInteraction = buildInsnList {
             addLabel()
-            getStatic(ItemInteractionResult.FAIL)
+            getStatic(InteractionResult::FAIL)
             areturn()
         }
         
         val passInteraction = buildInsnList {
             addLabel()
-            getStatic(InteractionResult.PASS)
+            getStatic(InteractionResult::PASS)
             areturn()
         }
         

@@ -639,12 +639,12 @@ object BlockUtils {
     }
     
     internal fun getVanillaFurnaceExp(furnace: AbstractFurnaceBlockEntity): Int {
-        return furnace.recipesUsed.object2IntEntrySet().sumOf { entry ->
+        return furnace.recipesUsed.reference2IntEntrySet().sumOf { entry ->
             val recipeHolder = MINECRAFT_SERVER.recipeManager.byKey(entry.key).orElse(null)
             val recipe = recipeHolder?.value as? AbstractCookingRecipe
             
             val amount = entry.intValue
-            val expPerRecipe = recipe?.experience?.toDouble() ?: 0.0
+            val expPerRecipe = recipe?.experience()?.toDouble() ?: 0.0
             
             // Minecraft's logic to calculate the furnace exp
             var exp = floor(amount * expPerRecipe).toInt()

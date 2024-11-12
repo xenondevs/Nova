@@ -1,15 +1,16 @@
 package xyz.xenondevs.nova.world.block.state.property
 
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
 import org.bukkit.Axis
 import org.bukkit.Fluid
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.BlockFaceUtils
-import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.calculateYaw
 import xyz.xenondevs.nova.util.calculateYawPitch
 import xyz.xenondevs.nova.world.block.behavior.LeavesBehavior
+import xyz.xenondevs.nova.world.block.behavior.NoteBlockBehavior
 import xyz.xenondevs.nova.world.block.state.property.impl.BooleanProperty
 import xyz.xenondevs.nova.world.block.state.property.impl.EnumProperty
 import xyz.xenondevs.nova.world.block.state.property.impl.IntProperty
@@ -36,7 +37,7 @@ object DefaultBlockStateProperties {
      */
     val POWERED: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "powered"))
     
-    internal val NOTE_BLOCK_INSTRUMENT: EnumProperty<Instrument> = EnumProperty(ResourceLocation.fromNamespaceAndPath("nova", "instrument"))
+    internal val NOTE_BLOCK_INSTRUMENT: EnumProperty<NoteBlockInstrument> = EnumProperty(ResourceLocation.fromNamespaceAndPath("nova", "instrument"))
     internal val NOTE_BLOCK_NOTE: IntProperty = IntProperty(ResourceLocation.fromNamespaceAndPath("nova", "note"))
     internal val LEAVES_DISTANCE: IntProperty = IntProperty(ResourceLocation.fromNamespaceAndPath("nova", "distance"))
     internal val LEAVES_PERSISTENT: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "persistent"))
@@ -149,9 +150,9 @@ object DefaultScopedBlockStateProperties {
             ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS).block.isBlockIndirectlyPowered
         }
     
-    internal val NOTE_BLOCK_INSTRUMENT: ScopedBlockStateProperty<Instrument> =
-        DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT.scope { ctx ->
-            Instrument.determineInstrument(ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS))
+    internal val NOTE_BLOCK_INSTRUMENT: ScopedBlockStateProperty<NoteBlockInstrument> =
+        DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT.scope { ctx -> 
+            NoteBlockBehavior.determineInstrument(ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS))
         }
     
     internal val NOTE_BLOCK_NOTE: ScopedBlockStateProperty<Int> =

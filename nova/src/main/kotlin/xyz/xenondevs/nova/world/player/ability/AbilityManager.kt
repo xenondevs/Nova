@@ -9,7 +9,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.commons.collections.removeIf
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -21,7 +20,7 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import kotlin.collections.set
 
-private val ABILITIES_KEY = NamespacedKey(Nova, "abilities1")
+private val ABILITIES_KEY = NamespacedKey("nova", "abilities1")
 
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 object AbilityManager : Listener {
@@ -95,7 +94,7 @@ object AbilityManager : Listener {
         val ids = dataContainer.get<List<ResourceLocation>>(ABILITIES_KEY)
         
         ids?.forEach {
-            val abilityType = ABILITY_TYPE[it]
+            val abilityType = ABILITY_TYPE.getValue(it)
             if (abilityType != null)
                 giveAbility(player, abilityType)
         }

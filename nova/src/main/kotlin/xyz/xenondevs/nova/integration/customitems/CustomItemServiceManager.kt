@@ -6,8 +6,8 @@ import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 
 object CustomItemServiceManager {
     

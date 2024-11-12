@@ -8,8 +8,6 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.tags.BlockTags
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.item.ArmorItem
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
@@ -17,13 +15,9 @@ import org.objectweb.asm.Opcodes
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.replaceFirst
-import xyz.xenondevs.nova.world.item.behavior.Wearable
 import xyz.xenondevs.nova.patch.MultiTransformer
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
-import xyz.xenondevs.nova.util.forcePacketBroadcast
-import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.soundGroup
-import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.util.novaSoundGroup
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
@@ -114,12 +108,12 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
         val vanillaSoundType = state.soundType
         if (novaState != null) {
             val soundGroup = novaState.block.getBehaviorOrNull<BlockSounds>()?.soundGroup ?: return
-            oldSound = vanillaSoundType.stepSound.location.name
+            oldSound = vanillaSoundType.stepSound.location.path
             newSound = soundGroup.stepSound
             volume = soundGroup.volume * volumeMultiplier
             pitch = soundGroup.pitch * pitchMultiplier
         } else {
-            oldSound = vanillaSoundType.stepSound.location.name
+            oldSound = vanillaSoundType.stepSound.location.path
             newSound = oldSound
             volume = vanillaSoundType.volume * volumeMultiplier
             pitch = vanillaSoundType.pitch * pitchMultiplier
@@ -189,7 +183,7 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
     fun playBreakSound(level: Level, pos: MojangBlockPos) {
         val novaPos = pos.toNovaPos(level.world)
         val soundGroup = novaPos.block.novaSoundGroup ?: return
-        val oldSound = novaPos.block.type.soundGroup.breakSound.key.key
+        val oldSound = novaPos.block.type.soundGroup.breakSound.key().value()
         
         // send custom break sound if it's overridden
         if (SoundEngine.overridesSound(oldSound)) {
@@ -211,29 +205,6 @@ internal object SoundPatches : MultiTransformer(MojangPlayer::class, MojangLivin
                 )
             )
         }
-    }
-    
-    @JvmStatic
-    fun getEquipSound(itemStack: MojangStack): SoundEvent? {
-        val novaItem = itemStack.novaItem
-        if (novaItem != null) {
-            val soundEventName = novaItem.getBehaviorOrNull(Wearable::class)?.equipSound
-                ?: return null
-            return SoundEvent.createVariableRangeEvent(ResourceLocation.parse(soundEventName))
-        }
-        
-        return (itemStack.item as? ArmorItem)?.material?.value()?.equipSound?.value()
-    }
-    
-    @JvmStatic
-    fun playEquipSound(entity: LivingEntity, itemStack: MojangStack) {
-        if (itemStack.isEmpty || entity.isSpectator)
-            return
-        
-        val equipSound = (itemStack.item as? ArmorItem)?.material?.value()?.equipSound?.value()
-            ?: return
-        
-        forcePacketBroadcast { entity.playSound(equipSound, 1f, 1f) }
     }
     
 }

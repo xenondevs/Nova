@@ -4,10 +4,10 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.config.PermanentStorage
-import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.resources.ResourceGeneration
 
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,

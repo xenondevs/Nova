@@ -6,7 +6,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nova.config.MAIN_CONFIG
-import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.config.strongEntry
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundActionBarPacketEvent
@@ -29,7 +29,7 @@ object ActionbarOverlayManager : PacketListener {
     private val interceptedActionbars = HashMap<UUID, Pair<Component, Long>>()
     
     init {
-        val enabled = MAIN_CONFIG.entry<Boolean>("overlay", "actionbar", "enabled")
+        val enabled = MAIN_CONFIG.strongEntry<Boolean>("overlay", "actionbar", "enabled")
         enabled.subscribe(::reload)
         reload(enabled.get())
     }

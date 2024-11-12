@@ -10,19 +10,20 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.tags.FluidTags
 import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.item.ItemEntity
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.craftbukkit.entity.CraftEntity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
-import xyz.xenondevs.nova.world.item.behavior.Damageable
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
-import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
+import xyz.xenondevs.nova.world.item.behavior.Damageable
+import xyz.xenondevs.nova.world.item.tool.ToolCategory
+import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -203,6 +204,7 @@ object EntityUtils {
     fun deserializeAndSpawn(
         data: ByteArray,
         location: Location,
+        spawnReason: EntitySpawnReason = EntitySpawnReason.MOB_SUMMONED,
         nbtModifier: ((CompoundTag) -> CompoundTag)? = null
     ): MojangEntity {
         // get world
@@ -222,7 +224,7 @@ object EntityUtils {
         if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag)
         
         // deserialize compound tag to entity
-        return NMSEntityType.loadEntityRecursive(compoundTag, level) { entity ->
+        return NMSEntityType.loadEntityRecursive(compoundTag, level, spawnReason) { entity ->
             // assign new uuid
             entity.uuid = UUID.randomUUID()
             

@@ -15,8 +15,8 @@ import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.weakEntry
-import xyz.xenondevs.nova.config.weakOptionalEntry
+import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.config.optionalEntry
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
@@ -170,14 +170,14 @@ class Tool(
         override fun create(item: NovaItem): Tool {
             val cfg = item.config
             return Tool(
-                cfg.weakEntry<ToolTier>(arrayOf("tool_tier"), arrayOf("tool_level")),
-                cfg.weakEntry<Set<ToolCategory>>("tool_category"),
-                cfg.weakEntry<Double>("break_speed"),
-                cfg.weakOptionalEntry<Double>("attack_damage"),
-                cfg.weakOptionalEntry<Double>("attack_speed"),
-                cfg.weakOptionalEntry<Int>("knockback_bonus").orElse(0),
-                cfg.weakOptionalEntry<Boolean>("can_sweep_attack").orElse(false),
-                cfg.weakOptionalEntry<Boolean>("can_break_blocks_in_creative").orElse(true)
+                cfg.entry<ToolTier>(arrayOf("tool_tier"), arrayOf("tool_level")),
+                cfg.entry<Set<ToolCategory>>("tool_category"),
+                cfg.entry<Double>("break_speed"),
+                cfg.optionalEntry<Double>("attack_damage"),
+                cfg.optionalEntry<Double>("attack_speed"),
+                cfg.optionalEntry<Int>("knockback_bonus").orElse(0),
+                cfg.optionalEntry<Boolean>("can_sweep_attack").orElse(false),
+                cfg.optionalEntry<Boolean>("can_break_blocks_in_creative").orElse(true)
             )
         }
         

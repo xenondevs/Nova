@@ -356,13 +356,13 @@ object BossBarOverlayManager : Listener, PacketListener {
         var plugin: Plugin? = null
         StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).forEach {
             val classLoader = it.declaringClass.classLoader
-            if (classLoader?.javaClass == ReflectionRegistry.PLUGIN_CLASS_LOADER_CLASS) {
+            if (classLoader?.javaClass == ReflectionRegistry.PLUGIN_CLASS_LOADER_CLASS) { // TODO: paper plugin class loader
                 plugin = ReflectionRegistry.PLUGIN_CLASS_LOADER_PLUGIN_FIELD.get(classLoader) as Plugin
             }
         }
         
         if (plugin != null && plugin != Nova) {
-            trackedOrigins[event.id] = BarOrigin.Plugin(plugin!!)
+            trackedOrigins[event.id] = BarOrigin.Plugin(plugin)
         }
     }
     

@@ -7,7 +7,9 @@ import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.nova.HTTP_CLIENT
 import xyz.xenondevs.nova.resources.upload.UploadService
 import xyz.xenondevs.nova.util.data.get
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.name
+import kotlin.io.path.readBytes
 
 internal abstract class MultiPart : UploadService {
     
@@ -16,7 +18,7 @@ internal abstract class MultiPart : UploadService {
     protected abstract val urlRegex: Regex?
     protected abstract val extraParams: Map<String, String>
     
-    override suspend fun upload(file: File): String {
+    override suspend fun upload(file: Path): String {
         val response = HTTP_CLIENT.submitFormWithBinaryData(url, formData {
             append(filePartName, file.readBytes(), Headers.build {
                 append(HttpHeaders.ContentType, ContentType.Application.Zip)

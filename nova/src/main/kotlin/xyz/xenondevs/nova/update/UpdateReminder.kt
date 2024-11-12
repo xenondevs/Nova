@@ -12,12 +12,13 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.Nova
+import xyz.xenondevs.nova.NOVA_VERSION
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonBootstrapper
+import xyz.xenondevs.nova.addon.name
 import xyz.xenondevs.nova.addon.version
 import xyz.xenondevs.nova.config.MAIN_CONFIG
-import xyz.xenondevs.nova.config.node
+import xyz.xenondevs.nova.config.strongNode
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -45,7 +46,7 @@ internal object UpdateReminder : Listener {
     
     @InitFun
     private fun init() {
-        val cfg = MAIN_CONFIG.node("update_reminder")
+        val cfg = MAIN_CONFIG.strongNode("update_reminder")
         cfg.subscribe(::reload)
         reload(cfg.get())
     }
@@ -80,7 +81,7 @@ internal object UpdateReminder : Listener {
                 .filter { it.key !in alreadyNotified }
                 .forEach { (addon, resourcePage) ->
                     val name = addon?.name ?: "Nova"
-                    LOGGER.warning("You're running an outdated version of $name. Please download the latest version at $resourcePage")
+                    LOGGER.warn("You're running an outdated version of $name. Please download the latest version at $resourcePage")
                     alreadyNotified += addon
                 }
         }
@@ -98,7 +99,7 @@ internal object UpdateReminder : Listener {
             currentVersion = Version(addon.version)
         } else {
             distributors = NOVA_DISTRIBUTORS
-            currentVersion = Nova.version
+            currentVersion = NOVA_VERSION
         }
         
         for (distributor in distributors) {

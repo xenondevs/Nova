@@ -15,7 +15,6 @@ import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.serialization.json.GSON
 import java.nio.file.Path
-import java.util.logging.Level
 import kotlin.io.path.bufferedReader
 import kotlin.io.path.bufferedWriter
 import kotlin.io.path.createParentDirectories
@@ -29,7 +28,8 @@ import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 
 /**
- * A [PackTaskHolder] that deals with model files. Everything related to model files should run through this.
+ * A [PackTaskHolder] that deals with item/block model files.
+ * Everything related to item/block model files should run through this.
  */
 class ModelContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder, Iterable<Map.Entry<ResourcePath, Model>> {
     
@@ -171,7 +171,7 @@ class ModelContent internal constructor(private val builder: ResourcePackBuilder
         try {
             return path.bufferedReader().use { GSON.fromJson<Model>(it) }
         } catch (e: Exception) {
-            LOGGER.log(Level.WARNING, "Failed to parse model file $path", e)
+            LOGGER.warn("Failed to parse model file $path", e)
         }
         
         return null

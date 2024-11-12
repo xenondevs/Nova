@@ -4,13 +4,14 @@ package xyz.xenondevs.nova.resources.lookup
 
 import org.bukkit.Material
 import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.resources.builder.task.font.GuiTextureData
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
 import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.armor.Armor
+import xyz.xenondevs.nova.world.item.equipment.Equipment
 import java.util.*
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -49,15 +50,14 @@ internal object ResourceLookups {
     var ITEM_MODEL: Map<NovaItem, Map<Material, Map<String, Int>>> by ITEM_MODEL_LOOKUP
     
     /**
-     * Lookup for getting the leather armor color value for every custom [Armor] type.
+     * Lookup containing texture and camera overlay locations for every [Equipment].
      */
-    val ARMOR_COLOR_LOOKUP: ResourceLookup<Map<Armor, Int>> =
-        resourceLookup("armor_color", emptyMap(), typeOf<HashMap<Armor, Int>>())
+    val EQUIPMENT_LOOKUP: MapResourceLookup<Equipment, RuntimeEquipmentData> = mapResourceLookup("equipment")
     
     /**
-     * Map of [Armor] to the leather armor color value.
+     * Map of [Equipment] to the relevant [RuntimeEquipmentData].
      */
-    var ARMOR_COLOR: Map<Armor, Int> by ARMOR_COLOR_LOOKUP
+    var EQUIPMENT: Map<Equipment, RuntimeEquipmentData> by EQUIPMENT_LOOKUP
     
     /**
      * Lookup for getting translations.
@@ -110,6 +110,12 @@ internal object ResourceLookups {
     
     private fun <T : Any> resourceLookup(key: String, empty: T, type: KType): ResourceLookup<T> {
         val lookup = ResourceLookup(key, type, empty)
+        lookups += lookup
+        return lookup
+    }
+    
+    private inline fun <reified K: Any, reified V: Any> mapResourceLookup(key: String): MapResourceLookup<K, V> {
+        val lookup = MapResourceLookup<K, V>(key, typeOf<K>(), typeOf<V>())
         lookups += lookup
         return lookup
     }

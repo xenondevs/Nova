@@ -53,9 +53,9 @@ interface BlockBehavior : BlockBehaviorHolder {
     fun handleBreak(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) = Unit
     
     /**
-     * Called when a block at [neighborPos] changed next to this [state] at [pos].
+     * Called when a redstone update happened that may affect this [state] at [pos].
      */
-    fun handleNeighborChanged(pos: BlockPos, state: NovaBlockState, neighborPos: BlockPos) = Unit
+    fun handleNeighborChanged(pos: BlockPos, state: NovaBlockState) = Unit
     
     /**
      * Called when a block at [neighborPos] changed to update the [NovaBlockState] of this [state] at [pos].

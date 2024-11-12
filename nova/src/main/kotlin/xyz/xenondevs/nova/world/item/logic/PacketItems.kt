@@ -3,6 +3,7 @@
 package xyz.xenondevs.nova.world.item.logic
 
 import com.mojang.serialization.Dynamic
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
 import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch
@@ -15,6 +16,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
+import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.resources.RegistryOps
@@ -23,19 +25,30 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.item.component.BundleContents
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.CustomModelData
 import net.minecraft.world.item.component.DyedItemColor
 import net.minecraft.world.item.component.ItemLore
-import net.minecraft.world.item.crafting.RecipeHolder
+import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.crafting.display.FurnaceRecipeDisplay
+import net.minecraft.world.item.crafting.display.RecipeDisplay
+import net.minecraft.world.item.crafting.display.RecipeDisplayEntry
+import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay
+import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay
+import net.minecraft.world.item.crafting.display.SlotDisplay
+import net.minecraft.world.item.crafting.display.SmithingRecipeDisplay
+import net.minecraft.world.item.crafting.display.StonecutterRecipeDisplay
 import net.minecraft.world.item.trading.ItemCost
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
+import org.apache.commons.lang3.math.Fraction
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -45,10 +58,13 @@ import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetContentPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundMerchantOffersPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundPlaceGhostRecipePacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundRecipeBookAddPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetCursorItemPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEquipmentPacketEvent
-import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import xyz.xenondevs.nova.network.event.registerPacketListener
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClickPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourceGeneration
@@ -60,7 +76,7 @@ import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
 import xyz.xenondevs.nova.util.data.getStringOrNull
-import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.unsafeCustomData
 import xyz.xenondevs.nova.util.item.unsafeNovaTag
@@ -69,9 +85,15 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.recipe.RecipeManager
+import java.lang.invoke.MethodHandles
+import java.lang.invoke.MethodType
+import java.util.Optional
+import kotlin.collections.map
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
+
+private val BUNDLE_CONSTRUCTOR = MethodHandles.privateLookupIn(BundleContents::class.java, MethodHandles.lookup())
+    .findConstructor(BundleContents::class.java, MethodType.methodType(Void.TYPE, List::class.java, Fraction::class.java, Int::class.java))
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -110,6 +132,11 @@ internal object PacketItems : Listener, PacketListener {
     }
     
     @PacketHandler
+    private fun handleSetCursorPacket(event: ClientboundSetCursorItemPacketEvent) {
+        event.item = getClientSideStack(event.player, event.item.copy())
+    }
+    
+    @PacketHandler
     private fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
         val oldItems = event.packedItems
         val newItems = ArrayList<DataValue<*>>()
@@ -142,16 +169,37 @@ internal object PacketItems : Listener, PacketListener {
     }
     
     @PacketHandler
+    private fun handleClick(event: ServerboundContainerClickPacketEvent) {
+        event.carriedItem = getServerSideStack(event.carriedItem)
+        event.changedSlots = event.changedSlots.mapValuesTo(Int2ObjectArrayMap()) { (_, item) -> getServerSideStack(item) }
+    }
+    
+    @PacketHandler
     private fun handleCreativeSetItem(event: ServerboundSetCreativeModeSlotPacketEvent) {
         event.itemStack = getServerSideStack(event.itemStack)
     }
     
     @PacketHandler
-    private fun handleRecipes(event: ClientboundUpdateRecipesPacketEvent) {
-        event.recipes = event.recipes.map { recipe ->
-            val id = recipe.id
-            RecipeManager.clientsideRecipes[id]?.let { RecipeHolder(id, it) } ?: recipe
+    private fun handleRecipeBookAdd(event: ClientboundRecipeBookAddPacketEvent) {
+        event.entries = event.entries.map { entry ->
+            val contents = entry.contents
+            ClientboundRecipeBookAddPacket.Entry(
+                RecipeDisplayEntry(
+                    contents.id,
+                    getClientSideRecipeDisplay(contents.display),
+                    contents.group,
+                    contents.category,
+                    getClientSideIngredientList(contents.craftingRequirements)
+                ),
+                entry.notification(),
+                entry.highlight()
+            )
         }
+    }
+    
+    @PacketHandler
+    private fun handlePlaceGhostRecipe(event: ClientboundPlaceGhostRecipePacketEvent) {
+        event.recipeDisplay = getClientSideRecipeDisplay(event.recipeDisplay)
     }
     
     @PacketHandler
@@ -175,6 +223,92 @@ internal object PacketItems : Listener, PacketListener {
     }
     //</editor-fold>
     
+    //<editor-fold desc="server-side recipe -> client-side recipe">
+    private fun getClientSideIngredientList(optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
+        optList.map { ingredientList ->
+            ingredientList.map { ingredient ->
+                val itemStacks = ingredient.itemStacks()
+                if (itemStacks != null)
+                    Ingredient.ofStacks(itemStacks.map { getClientSideStack(null, it, false) })
+                else ingredient
+            }
+        }
+    
+    private fun getClientSideRecipeDisplay(display: RecipeDisplay): RecipeDisplay = when (display) {
+        is FurnaceRecipeDisplay -> FurnaceRecipeDisplay(
+            getClientSideSlotDisplay(display.ingredient),
+            getClientSideSlotDisplay(display.fuel),
+            getClientSideSlotDisplay(display.result),
+            getClientSideSlotDisplay(display.craftingStation),
+            display.duration,
+            display.experience
+        )
+        
+        is ShapedCraftingRecipeDisplay -> ShapedCraftingRecipeDisplay(
+            display.width, display.height,
+            display.ingredients.map(::getClientSideSlotDisplay),
+            getClientSideSlotDisplay(display.result),
+            getClientSideSlotDisplay(display.craftingStation)
+        )
+        
+        is ShapelessCraftingRecipeDisplay -> ShapelessCraftingRecipeDisplay(
+            display.ingredients.map(::getClientSideSlotDisplay),
+            getClientSideSlotDisplay(display.result),
+            getClientSideSlotDisplay(display.craftingStation)
+        )
+        
+        is SmithingRecipeDisplay -> SmithingRecipeDisplay(
+            getClientSideSlotDisplay(display.template),
+            getClientSideSlotDisplay(display.base),
+            getClientSideSlotDisplay(display.addition),
+            getClientSideSlotDisplay(display.result),
+            getClientSideSlotDisplay(display.craftingStation)
+        )
+        
+        is StonecutterRecipeDisplay -> StonecutterRecipeDisplay(
+            getClientSideSlotDisplay(display.input),
+            getClientSideSlotDisplay(display.result),
+            getClientSideSlotDisplay(display.craftingStation)
+        )
+        
+        else -> {
+            LOGGER.warn("Unknown recipe display type: ${display.javaClass}")
+            display
+        }
+    }
+    
+    private fun getClientSideSlotDisplay(display: SlotDisplay): SlotDisplay = when (display) {
+        is SlotDisplay.Composite -> SlotDisplay.Composite(
+            display.contents.map(::getClientSideSlotDisplay)
+        )
+        
+        is SlotDisplay.ItemStackSlotDisplay -> SlotDisplay.ItemStackSlotDisplay(
+            getClientSideNovaStack(null, display.stack, false)
+        )
+        
+        is SlotDisplay.SmithingTrimDemoSlotDisplay -> SlotDisplay.SmithingTrimDemoSlotDisplay(
+            getClientSideSlotDisplay(display.base),
+            getClientSideSlotDisplay(display.material),
+            getClientSideSlotDisplay(display.pattern)
+        )
+        
+        is SlotDisplay.WithRemainder -> SlotDisplay.WithRemainder(
+            getClientSideSlotDisplay(display.input),
+            getClientSideSlotDisplay(display.remainder)
+        )
+        
+        is SlotDisplay.AnyFuel,
+        is SlotDisplay.Empty,
+        is SlotDisplay.ItemSlotDisplay,
+        is SlotDisplay.TagSlotDisplay -> display
+        
+        else -> {
+            LOGGER.warn("Unknown slot display type: ${display.javaClass}")
+            display
+        }
+    }
+    //</editor-fold>
+    
     //<editor-fold desc="server-side stack -> client-side stack", defaultstate="collapsed">
     fun getClientSideStack(player: Player?, itemStack: MojangStack, storeServerSideTag: Boolean = true): MojangStack {
         if (itemStack.isEmpty)
@@ -191,7 +325,7 @@ internal object PacketItems : Listener, PacketListener {
             ?: return itemStack
         val id = novaTag.getStringOrNull("id")
             ?: return getUnknownItem(itemStack, null)
-        val novaItem = NovaRegistries.ITEM[id]
+        val novaItem = NovaRegistries.ITEM.getValue(id)
             ?: return getUnknownItem(itemStack, id)
         
         // client-side item stack copy
@@ -240,6 +374,9 @@ internal object PacketItems : Listener, PacketListener {
         
         // remove vanilla default base components
         for (vanillaBase in vanilla.components()) {
+            if (vanillaBase.type == DataComponents.ITEM_MODEL) // removing item_model breaks custom model data
+                continue
+            
             builder.remove(vanillaBase.type)
         }
         
@@ -323,9 +460,11 @@ internal object PacketItems : Listener, PacketListener {
         val newItemStack = itemStack.copy()
         var modified = false
         
-        if (correctArmorColor(newItemStack)) {
+        if (fixArmorColor(newItemStack))
             modified = true
-        }
+        if (fixBundleContents(player, newItemStack))
+            modified = true
+        
         if (shouldHideEntireTooltip(itemStack)) {
             newItemStack.set(DataComponents.HIDE_TOOLTIP, Unit.INSTANCE)
             modified = true
@@ -350,9 +489,9 @@ internal object PacketItems : Listener, PacketListener {
     
     /**
      * Fixes the [DataComponents.DYED_COLOR] rgb value of vanilla armor items to prevent accidental use of
-     * custom textures and returns whether the item stack was modified.
+     * custom textures and returns whether the [itemStack] was modified.
      */
-    private fun correctArmorColor(itemStack: MojangStack): Boolean {
+    private fun fixArmorColor(itemStack: MojangStack): Boolean {
         val color = itemStack.get(DataComponents.DYED_COLOR)
             ?: return false
         val rgb = color.rgb
@@ -364,6 +503,25 @@ internal object PacketItems : Listener, PacketListener {
             return false
         
         itemStack.set(DataComponents.DYED_COLOR, DyedItemColor(rgb - 1, color.showInTooltip))
+        
+        return true
+    }
+    
+    /**
+     * Updates the [BundleContents.items] to use client-side item stacks
+     * and returns whether the [itemStack] was modified.
+     */
+    private fun fixBundleContents(player: Player?, itemStack: MojangStack): Boolean {
+        if (!itemStack.has(DataComponents.BUNDLE_CONTENTS))
+            return false
+        
+        itemStack.update(DataComponents.BUNDLE_CONTENTS) { bundleContents ->
+            BUNDLE_CONSTRUCTOR.invoke(
+                bundleContents.items().map { getClientSideStack(player, it, false) },
+                Fraction.getFraction(0.0),
+                bundleContents.selectedItem
+            ) as BundleContents
+        }
         
         return true
     }
@@ -404,9 +562,11 @@ internal object PacketItems : Listener, PacketListener {
         itemStack.update(DataComponents.STORED_ENCHANTMENTS) { it.withTooltip(false) }
         itemStack.update(DataComponents.TRIM) { it.withTooltip(false) }
         itemStack.update(DataComponents.UNBREAKABLE) { it.withTooltip(false) }
-        // this disables all other tooltips that cannot be disabled through a specific component
-        // it also disables the bundle preview image, but since bundles are still experimental, this is fine
-        itemStack.set(DataComponents.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE)
+        
+        // this disables all other tooltips that cannot be disabled through a specific component, for example firework effects
+        // since the bundle preview cannot be rendered server-side, HIDE_ADDITIONAL_TOOLTIP cannot be applied to bundles
+        if (!itemStack.has(DataComponents.BUNDLE_CONTENTS))
+            itemStack.set(DataComponents.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE)
     }
     
     private fun shouldHideEntireTooltip(itemStack: MojangStack): Boolean {

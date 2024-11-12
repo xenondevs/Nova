@@ -67,7 +67,7 @@ internal object LeavesBehavior : BlockBehavior {
             .withParameter(LootContextParams.TOOL, ctx[DefaultContextParamTypes.TOOL_ITEM_STACK].unwrap())
             .withParameter(LootContextParams.BLOCK_STATE, nmsState)
             .create(LootContextParamSets.BLOCK)
-        val lootTable = MINECRAFT_SERVER.reloadableRegistries().getLootTable(nmsState.block.lootTable)
+        val lootTable = MINECRAFT_SERVER.reloadableRegistries().getLootTable(nmsState.block.lootTable.get())
         return lootTable.getRandomItems(params).map { it.asBukkitMirror() }
     }
     

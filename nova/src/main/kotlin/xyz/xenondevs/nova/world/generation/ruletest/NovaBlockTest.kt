@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import net.minecraft.world.level.block.state.BlockState as MojangState
 
 @ExperimentalWorldGen
-abstract class NovaMaterialTest : NovaRuleTest() {
+abstract class NovaBlockTest : NovaRuleTest() {
     
     final override fun test(level: Level, pos: BlockPos, state: MojangState, random: RandomSource): Boolean {
         val blockState = WorldDataManager.getBlockState(pos.toNovaPos(level.world)) ?: return false

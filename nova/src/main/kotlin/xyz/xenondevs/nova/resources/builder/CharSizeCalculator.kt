@@ -8,7 +8,6 @@ import xyz.xenondevs.nova.resources.builder.font.provider.ReferenceProvider
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.resources.builder.task.font.FontContent
-import java.util.logging.Level
 
 class CharSizeCalculator internal constructor(builder: ResourcePackBuilder) : PackTaskHolder {
     
@@ -43,7 +42,7 @@ class CharSizeCalculator internal constructor(builder: ResourcePackBuilder) : Pa
                 
                 CharSizes.storeTable(id, table)
             } catch (t: Throwable) {
-                LOGGER.log(Level.SEVERE, "Failed to calculate char sizes for font ${font.id}", t)
+                LOGGER.error("Failed to calculate char sizes for font ${font.id}", t)
             }
         }
         

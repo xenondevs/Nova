@@ -5,10 +5,8 @@ package xyz.xenondevs.nova.integration
 import org.bukkit.Bukkit
 import org.objectweb.asm.Type
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.Nova
+import xyz.xenondevs.nova.NOVA_JAR
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
-import xyz.xenondevs.nova.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.resources.upload.UploadService
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -18,8 +16,9 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.permission.PermissionIntegration
 import xyz.xenondevs.nova.integration.permission.PermissionManager
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.resources.upload.AutoUploadManager
+import xyz.xenondevs.nova.resources.upload.UploadService
 import xyz.xenondevs.nova.util.data.JarUtils
-import java.util.logging.Level
 import kotlin.reflect.KClass
 
 @InternalInit(
@@ -31,7 +30,7 @@ internal object HooksLoader {
     @InitFun
     private fun loadHooks() {
         JarUtils.findAnnotatedClasses(
-            Nova.novaJar,
+            NOVA_JAR,
             listOf(Hook::class), emptyList(),
             "xyz/xenondevs/nova/hook/impl/"
         ).classes[Hook::class]?.forEach { (className, annotations) ->
@@ -48,7 +47,7 @@ internal object HooksLoader {
                 if (shouldLoadHook(plugins, unless, requireAll))
                     loadHook(className.replace('/', '.'), loadListener)
             } catch (t: Throwable) {
-                LOGGER.log(Level.SEVERE, "Failed to load hook $className", t)
+                LOGGER.error("Failed to load hook $className", t)
             }
         }
     }

@@ -2,7 +2,8 @@ package xyz.xenondevs.nova.world.item.behavior
 
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
-import net.minecraft.util.Unit
+import net.minecraft.tags.DamageTypeTags
+import net.minecraft.world.item.component.DamageResistant
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
 
@@ -12,6 +13,10 @@ import xyz.xenondevs.commons.provider.provider
 object FireResistant : ItemBehavior {
     
     override val baseDataComponents: Provider<DataComponentMap>
-        get() = provider(DataComponentMap.builder().set(DataComponents.FIRE_RESISTANT, Unit.INSTANCE).build())
+        get() = provider(
+            DataComponentMap.builder()
+                .set(DataComponents.DAMAGE_RESISTANT, DamageResistant(DamageTypeTags.IS_FIRE))
+                .build()
+        )
     
 }

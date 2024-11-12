@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.resources.layout.item
 
 import org.bukkit.Material
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
+import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 
 private typealias ItemModelSelector = ItemModelSelectorScope.() -> ModelBuilder
 private typealias NumberedItemModelSelector = ItemModelSelectorScope.(Int) -> ModelBuilder
@@ -36,7 +36,8 @@ class ItemModelLayoutBuilder internal constructor() {
      * that can be targeted using [VanillaMaterialProperty].
      */
     fun itemType(material: Material) {
-        require(material.isItem) { "Material must be an item" }
+        material.key
+//        require(material.isItem) { "Material must be an item" } fixme: registry not available
         this.itemType = material
     }
     

@@ -200,11 +200,11 @@ data class SoundGroup(
             return SoundGroup(
                 soundGroup.volume,
                 soundGroup.pitch,
-                soundGroup.breakSound.key.toString(),
-                soundGroup.stepSound.key.toString(),
-                soundGroup.placeSound.key.toString(),
-                soundGroup.hitSound.key.toString(),
-                soundGroup.fallSound.key.toString()
+                soundGroup.breakSound.key().toString(),
+                soundGroup.stepSound.key().toString(),
+                soundGroup.placeSound.key().toString(),
+                soundGroup.hitSound.key().toString(),
+                soundGroup.fallSound.key().toString()
             )
         }
         

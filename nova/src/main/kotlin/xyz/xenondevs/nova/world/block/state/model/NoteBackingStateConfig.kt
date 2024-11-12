@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.world.block.state.model
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.state.BlockState
-import xyz.xenondevs.nova.util.Instrument
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
 import xyz.xenondevs.nova.util.intValue
 
 // The base of the number system - i.e. how many values each property can have
@@ -12,7 +12,7 @@ private const val INSTRUMENT_BASE = 23
 private const val POWERED_BASE = 2
 
 internal data class NoteBackingStateConfig(
-    val instrument: Instrument,
+    val instrument: NoteBlockInstrument,
     val note: Int,
     val powered: Boolean
 ) : BackingStateConfig() {
@@ -22,7 +22,7 @@ internal data class NoteBackingStateConfig(
     override val waterlogged = false
     override val variantString = "instrument=${instrument.name.lowercase()},note=$note,powered=$powered"
     override val vanillaBlockState: BlockState = Blocks.NOTE_BLOCK.defaultBlockState()
-        .setValue(NoteBlock.INSTRUMENT, instrument.nmsInstrument)
+        .setValue(NoteBlock.INSTRUMENT, instrument)
         .setValue(NoteBlock.NOTE, note)
         .setValue(NoteBlock.POWERED, powered)
     
@@ -32,7 +32,7 @@ internal data class NoteBackingStateConfig(
     
     companion object : DynamicDefaultingBackingStateConfigType<NoteBackingStateConfig>(1149, "note_block") {
         
-        fun getIdOf(instrument: Instrument, note: Int, powered: Boolean): Int {
+        fun getIdOf(instrument: NoteBlockInstrument, note: Int, powered: Boolean): Int {
             return instrument.ordinal * NOTE_BASE * POWERED_BASE + note * POWERED_BASE + powered.intValue
         }
         
@@ -41,7 +41,7 @@ internal data class NoteBackingStateConfig(
                 throw UnsupportedOperationException("Note block cannot be waterlogged")
             
             return NoteBackingStateConfig(
-                Instrument.entries[id / POWERED_BASE / NOTE_BASE % INSTRUMENT_BASE],
+                NoteBlockInstrument.entries[id / POWERED_BASE / NOTE_BASE % INSTRUMENT_BASE],
                 id / POWERED_BASE % NOTE_BASE,
                 id % POWERED_BASE == 1
             )
@@ -49,7 +49,7 @@ internal data class NoteBackingStateConfig(
         
         override fun of(properties: Map<String, String>): NoteBackingStateConfig {
             return NoteBackingStateConfig(
-                properties["instrument"]?.let { Instrument.valueOf(it.uppercase()) } ?: Instrument.HARP,
+                properties["instrument"]?.let { NoteBlockInstrument.valueOf(it.uppercase()) } ?: NoteBlockInstrument.HARP,
                 properties["note"]?.toInt() ?: 0,
                 properties["powered"]?.toBoolean() ?: false
             )

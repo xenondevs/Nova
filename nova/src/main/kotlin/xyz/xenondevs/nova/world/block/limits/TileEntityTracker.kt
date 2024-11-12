@@ -10,15 +10,15 @@ import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import java.lang.Integer.max
 import java.util.*
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
+@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object TileEntityTracker {
     
     private val BLOCK_COUNTER: HashMap<UUID, HashMap<ResourceLocation, Int>> =

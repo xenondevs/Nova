@@ -10,11 +10,7 @@ import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.initialize.DisableFun
-import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.patch.adapter.LcsWrapperAdapter
 import xyz.xenondevs.nova.patch.impl.FieldFilterPatch
 import xyz.xenondevs.nova.patch.impl.block.BlockBehaviorPatches
@@ -24,26 +20,23 @@ import xyz.xenondevs.nova.patch.impl.block.FluidFlowPatch
 import xyz.xenondevs.nova.patch.impl.block.TripwireLogicPatch
 import xyz.xenondevs.nova.patch.impl.bossbar.BossBarOriginPatch
 import xyz.xenondevs.nova.patch.impl.chunk.ChunkSchedulingPatch
+import xyz.xenondevs.nova.patch.impl.item.ArmorEquipEventPatch
 import xyz.xenondevs.nova.patch.impl.item.EnchantmentPatches
 import xyz.xenondevs.nova.patch.impl.item.FuelPatches
 import xyz.xenondevs.nova.patch.impl.item.ItemStackDataComponentsPatch
 import xyz.xenondevs.nova.patch.impl.item.RemainingItemPatches
 import xyz.xenondevs.nova.patch.impl.item.RepairPatches
 import xyz.xenondevs.nova.patch.impl.item.ToolPatches
-import xyz.xenondevs.nova.patch.impl.item.WearablePatch
 import xyz.xenondevs.nova.patch.impl.misc.EventPreventionPatch
 import xyz.xenondevs.nova.patch.impl.misc.FakePlayerLastHurtPatch
 import xyz.xenondevs.nova.patch.impl.playerlist.BroadcastPacketPatch
-import xyz.xenondevs.nova.patch.impl.registry.TagsPatch
+import xyz.xenondevs.nova.patch.impl.registry.RegistryEventsPatch
 import xyz.xenondevs.nova.patch.impl.sound.SoundPatches
-import xyz.xenondevs.nova.patch.impl.worldgen.FeatureSorterPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.NovaRuleTestPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.WrapperBlockPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.ChunkAccessSectionsPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionPatch
-import xyz.xenondevs.nova.patch.impl.worldgen.registry.MappedRegistryPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.registry.RegistryCodecPatch
-import xyz.xenondevs.nova.util.data.getResourceData
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_PARENT_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.reflection.defineClass
@@ -52,19 +45,18 @@ import java.lang.instrument.ClassDefinition
 import java.lang.management.ManagementFactory
 import java.lang.reflect.Field
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
 internal object Patcher {
     
     private val extraOpens = setOf("java.lang", "java.lang.reflect", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
         sequenceOf(
             FieldFilterPatch, ToolPatches,
-            LevelChunkSectionPatch, ChunkAccessSectionsPatch, FeatureSorterPatch, RegistryCodecPatch,
-            WrapperBlockPatch, MappedRegistryPatch, NovaRuleTestPatch, FuelPatches, RemainingItemPatches, SoundPatches,
-            BroadcastPacketPatch, EventPreventionPatch, WearablePatch, BossBarOriginPatch,
+            LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
+            WrapperBlockPatch, NovaRuleTestPatch, FuelPatches, RemainingItemPatches, SoundPatches,
+            BroadcastPacketPatch, EventPreventionPatch, ArmorEquipEventPatch, BossBarOriginPatch,
             FakePlayerLastHurtPatch, BlockBehaviorPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
-            ItemStackDataComponentsPatch, EnchantmentPatches, TagsPatch, RepairPatches, BlockMigrationPatches,
-            TripwireLogicPatch, FluidFlowPatch
+            ItemStackDataComponentsPatch, EnchantmentPatches, RepairPatches, BlockMigrationPatches,
+            TripwireLogicPatch, FluidFlowPatch, RegistryEventsPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     
@@ -73,11 +65,10 @@ internal object Patcher {
         "xyz/xenondevs/nova/patch/impl/worldgen/chunksection/LevelChunkSectionWrapper" to LcsWrapperAdapter
     )
     
-    @InitFun
-    private fun init() {
+    fun run() {
         try {
             LOGGER.info("Applying patches...")
-            VirtualClassPath.classLoaders += Nova.javaClass.classLoader
+            VirtualClassPath.classLoaders += javaClass.classLoader
             redefineModule()
             defineInjectedClasses()
             runTransformers()
@@ -89,7 +80,7 @@ internal object Patcher {
     }
     
     private fun redefineModule() {
-        val novaModule = setOf(Nova::class.java.module)
+        val novaModule = setOf(javaClass.module)
         val javaBase = Field::class.java.module
         
         INSTRUMENTATION.redefineModule(
@@ -105,7 +96,7 @@ internal object Patcher {
     private fun defineInjectedClasses() {
         //(javaClass.classLoader as NovaClassLoader).addInjectedClasses(injectedClasses.keys.map { it.replace('/', '.') })
         injectedClasses.forEach { (name, adapter) ->
-            var bytes = getResourceData("$name.class")
+            var bytes = javaClass.getResourceAsStream("/$name.class")!!.readBytes()
             if (bytes.isEmpty()) throw IllegalStateException("Failed to load injected class $name (Wrong path?)")
             val minecraftServerClass = MinecraftServer::class.java
             if (adapter != null) {

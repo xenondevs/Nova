@@ -18,8 +18,8 @@ object NovaRegistryAccess : RegistryAccess {
     
     private val registries = Object2ObjectOpenHashMap<ResourceKey<out Registry<*>>, Registry<*>>()
     
-    override fun <E : Any> registry(registry: ResourceKey<out Registry<out E>>): Optional<Registry<E>> {
-        return Optional.ofNullable(registries[registry] as Registry<E>)
+    override fun <E : Any> lookup(registry: ResourceKey<out Registry<out E>>): Optional<Registry<E>> {
+        return Optional.ofNullable(registries[registry] as? Registry<E>)
     }
     
     override fun registries(): Stream<RegistryAccess.RegistryEntry<*>> = registries.asSequence().map {

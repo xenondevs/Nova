@@ -23,7 +23,6 @@ import xyz.xenondevs.nova.world.chunkPos
 import xyz.xenondevs.nova.world.fakeentity.metadata.Metadata
 import xyz.xenondevs.nova.world.item.logic.PacketItems
 import java.util.*
-import java.util.logging.Level
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 /**
@@ -66,7 +65,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         if (!registered) {
             FakeEntityManager.addEntity(chunk, this)
             registered = true
-        } else LOGGER.log(Level.WARNING, "Duplicate FakeEntity registration", Exception())
+        } else LOGGER.warn("Duplicate FakeEntity registration", Exception())
     }
     
     /**

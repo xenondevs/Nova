@@ -75,13 +75,13 @@ internal object ReflectionUtils {
     }
     
     @JvmStatic
-    fun getMethodByName(clazz: KClass<*>, declared: Boolean, methodName: String): Method =
-        getMethodByName(clazz.java, declared, methodName)
+    fun getMethodByName(clazz: KClass<*>, methodName: String): Method =
+        getMethodByName(clazz.java, methodName)
     
     @JvmStatic
-    fun getMethodByName(clazz: Class<*>, declared: Boolean, methodName: String): Method {
-        val method = if (declared) clazz.declaredMethods.first { it.name == methodName } else clazz.methods.first { it.name == methodName }
-        if (declared) method.isAccessible = true
+    fun getMethodByName(clazz: Class<*>, methodName: String): Method {
+        val method = clazz.declaredMethods.first { it.name == methodName }
+        method.isAccessible = true
         return method
     }
     
@@ -89,6 +89,18 @@ internal object ReflectionUtils {
     fun getMethodHandle(clazz: KClass<*>, methodName: String, vararg args: KClass<*>): MethodHandle {
         val method = getMethod(clazz, methodName, *args)
         return MethodHandles.privateLookupIn(clazz.java, MethodHandles.lookup()).unreflect(method)
+    }
+    
+    @JvmStatic
+    fun getGetterHandle(clazz: KClass<*>, fieldName: String): MethodHandle {
+        val field = getField(clazz, fieldName)
+        return MethodHandles.privateLookupIn(clazz.java, MethodHandles.lookup()).unreflectGetter(field)
+    }
+    
+    @JvmStatic
+    fun getSetterHandle(clazz: KClass<*>, fieldName: String): MethodHandle {
+        val field = getField(clazz, fieldName)
+        return MethodHandles.privateLookupIn(clazz.java, MethodHandles.lookup()).unreflectSetter(field)
     }
     
     @JvmStatic
@@ -119,6 +131,12 @@ internal object ReflectionUtils {
         val constructor = clazz.getDeclaredConstructor(*args)
         constructor.isAccessible = true
         return constructor
+    }
+    
+    @JvmStatic
+    fun getConstructorMethodHandle(clazz: KClass<*>, vararg args: KClass<*>): MethodHandle {
+        val constructor = getConstructor(clazz, *args)
+        return MethodHandles.privateLookupIn(clazz.java, MethodHandles.lookup()).unreflectConstructor(constructor)
     }
     
     @JvmStatic

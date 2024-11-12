@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.debug.DebugProbes
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -20,29 +19,23 @@ import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
 import org.jgrapht.nio.DefaultAttribute
 import org.jgrapht.nio.dot.DOTExporter
-import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.NOVA_JAR
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.addon.file
+import xyz.xenondevs.nova.addon.name
 import xyz.xenondevs.nova.addon.version
 import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
-import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.registry.NovaRegistryAccess
-import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
-import xyz.xenondevs.nova.serialization.cbf.CBFAdapters
 import xyz.xenondevs.nova.ui.menu.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils
-import xyz.xenondevs.nova.util.registerEvents
 import java.io.File
 import java.lang.reflect.InvocationTargetException
-import java.util.logging.Level
-import xyz.xenondevs.inventoryaccess.component.i18n.Languages as InvUILanguages
+import java.nio.file.Path
 
 private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "initializer")
 
@@ -63,8 +56,8 @@ internal object Initializer : Listener {
     /**
      * Stats the initialization process.
      */
-    fun start() {
-        collectAndRegisterRunnables(Nova.novaJar, Nova::class.java.classLoader)
+    fun start() = tryInit {
+        collectAndRegisterRunnables(NOVA_JAR, this.javaClass.classLoader)
         for (addon in AddonBootstrapper.addons) {
             collectAndRegisterRunnables(addon.file, addon.javaClass.classLoader)
         }
@@ -72,7 +65,7 @@ internal object Initializer : Listener {
         initPreWorld()
     }
     
-    private fun collectAndRegisterRunnables(file: File, classLoader: ClassLoader) {
+    private fun collectAndRegisterRunnables(file: Path, classLoader: ClassLoader) {
         val (initializables, disableables) = collectRunnables(file, classLoader)
         addRunnables(initializables, disableables)
     }
@@ -81,7 +74,7 @@ internal object Initializer : Listener {
      * Searches [file] and collects classes annotated by [InternalInit] and [Init] and functions
      * annotated by [InitFun] and [DisableFun] as [Initializables][Initializable] and [DisableableFunctions][DisableableFunction].
      */
-    private fun collectRunnables(file: File, classLoader: ClassLoader): Pair<List<Initializable>, List<DisableableFunction>> {
+    private fun collectRunnables(file: Path, classLoader: ClassLoader): Pair<List<Initializable>, List<DisableableFunction>> {
         val initializables = ArrayList<Initializable>()
         val disableables = ArrayList<DisableableFunction>()
         val initializableClasses = HashMap<String, InitializableClass>()
@@ -196,18 +189,6 @@ internal object Initializer : Listener {
      * Stats the pre-world initialization process.
      */
     private fun initPreWorld() = runBlocking {
-        if (IS_DEV_SERVER) {
-            DebugProbes.install()
-            DebugProbes.enableCreationStackTraces = true
-        }
-        
-        Configs.extractDefaultConfig()
-        VanillaRegistryAccess.unfreezeAll()
-        registerEvents()
-        InvUI.getInstance().setPlugin(Nova)
-        InvUILanguages.getInstance().enableServerSideTranslations(false)
-        CBFAdapters.register()
-        
         tryInit {
             coroutineScope {
                 preWorldScope = this
@@ -215,8 +196,6 @@ internal object Initializer : Listener {
             }
         }
         
-        NovaRegistryAccess.freezeAll()
-        VanillaRegistryAccess.freezeAll()
         preWorldInitialized = true
     }
     
@@ -233,6 +212,7 @@ internal object Initializer : Listener {
         isDone = true
         callEvent(NovaLoadDataEvent())
         
+        @Suppress("UnstableApiUsage")
         PermanentStorage.store("last_version", Nova.pluginMeta.version)
         setGlobalIngredients()
         setupMetrics()
@@ -292,12 +272,12 @@ internal object Initializer : Listener {
         } catch (t: Throwable) {
             val cause = if (t is InvocationTargetException) t.targetException else t
             if (cause is InitializationException) {
-                LOGGER.severe(cause.message)
+                LOGGER.error(cause.message)
             } else {
-                LOGGER.log(Level.SEVERE, "An exception occurred during initialization", cause)
+                LOGGER.error("An exception occurred during initialization", cause)
             }
             
-            LOGGER.severe("Initialization failure")
+            LOGGER.error("Initialization failure")
             (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
             Runtime.getRuntime().halt(-1) // force-quit process to prevent further errors
         }
@@ -310,7 +290,7 @@ internal object Initializer : Listener {
         if (isDone) {
             coroutineScope { launchAll(this, disable) }
         } else {
-            LOGGER.warning("Skipping disable phase due to incomplete initialization")
+            LOGGER.warn("Skipping disable phase due to incomplete initialization")
         }
     }
     
@@ -318,7 +298,7 @@ internal object Initializer : Listener {
     private fun handleServerStarted(event: ServerLoadEvent) {
         if (preWorldInitialized) {
             initPostWorld()
-        } else LOGGER.warning("Skipping post world initialization")
+        } else LOGGER.warn("Skipping post world initialization")
     }
     
     private fun setupMetrics() {

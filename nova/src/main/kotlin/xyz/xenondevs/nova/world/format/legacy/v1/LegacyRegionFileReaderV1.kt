@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -50,7 +50,7 @@ internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChun
             val isVanillaBlock = type.startsWith("minecraft:")
             var blockType: NovaBlock? = null
             
-            if (!isVanillaBlock && NovaRegistries.BLOCK[type]?.also { blockType = it } == null) {
+            if (!isVanillaBlock && NovaRegistries.BLOCK.getValue(type)?.also { blockType = it } == null) {
                 throw LegacyConversionException("Could not load block at $pos: Unknown id $type")
             }
             

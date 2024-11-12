@@ -10,7 +10,7 @@ internal object ApiBlockRegistry : NovaBlockRegistry {
     
     override fun getOrNull(id: String): NovaBlock? {
         val loc = ResourceLocation.parse(id)
-        return NovaRegistries.BLOCK[loc]?.let(::ApiBlockWrapper)
+        return NovaRegistries.BLOCK.getValue(loc)?.let(::ApiBlockWrapper)
     }
     
     override fun getOrNull(id: NamespacedId) = getOrNull(id.toString())

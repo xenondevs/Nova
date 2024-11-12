@@ -18,7 +18,9 @@ import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
+import net.minecraft.world.level.block.Block
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import org.joml.Matrix4f
@@ -27,12 +29,14 @@ import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
+import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.command.Command
 import xyz.xenondevs.nova.command.argument.NetworkTypeArgumentType
 import xyz.xenondevs.nova.command.argument.NovaBlockArgumentType
 import xyz.xenondevs.nova.command.argument.NovaItemArgumentType
+import xyz.xenondevs.nova.command.argument.VanillaBlockArgumentType
 import xyz.xenondevs.nova.command.executes0
 import xyz.xenondevs.nova.command.get
 import xyz.xenondevs.nova.command.player
@@ -61,7 +65,9 @@ import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.item.unsafeNovaTag
 import xyz.xenondevs.nova.util.novaBlock
 import xyz.xenondevs.nova.util.runAsyncTask
+import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -92,7 +98,6 @@ import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.world.toNovaPos
 import java.text.DecimalFormat
 import java.util.*
-import java.util.logging.Level
 import kotlin.math.max
 import kotlin.math.min
 import org.bukkit.inventory.ItemStack as BukkitStack
@@ -156,11 +161,16 @@ internal object NovaCommand : Command() {
                 .executes0(::copyClientsideStack)
                 .then(argument("item", NovaItemArgumentType)
                     .executes0(::giveClientsideStack)))
-            .then(literal("searchBlock")
+            .then(literal("searchVanillaBlock")
+                .requiresPlayer()
+                .then(argument("block", VanillaBlockArgumentType)
+                    .then(argument("range", IntegerArgumentType.integer(1, 10))
+                        .executes0(::searchVanillaBlock))))
+            .then(literal("searchNovaBlock")
                 .requiresPlayer()
                 .then(argument("block", NovaBlockArgumentType)
                     .then(argument("range", IntegerArgumentType.integer(1, 10))
-                        .executes0(::searchBlock)))))
+                        .executes0(::searchNovaBlock)))))
         .then(literal("items")
             .requiresPlayer()
             .requiresPermission("nova.command.items")
@@ -201,7 +211,25 @@ internal object NovaCommand : Command() {
                 .executes0(::reloadConfigs))
             .then(literal("recipes")
                 .executes0(::reloadRecipes)))
+        .then(literal("testBukkit").executes0 { testBukkit(it) })
+        .then(literal("testNms").executes0 { testNms(it) })
         .build()
+    
+    private fun testBukkit(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        val inv = player.inventory
+        for (i in 0..<inv.size) {
+            inv.setItem(i, ItemBuilder(Material.DIAMOND).setDisplayName("$i").get())
+        }
+    }
+    
+    private fun testNms(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player.serverPlayer
+        val inv = player.inventory
+        for (i in 0..<inv.containerSize) {
+            inv.setItem(i, ItemBuilder(Material.DIRT).setDisplayName("$i").get().unwrap())
+        }
+    }
     
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {
         try {
@@ -223,7 +251,7 @@ internal object NovaCommand : Command() {
             if (ctx.source.sender is Player)
                 ctx.source.sender.sendMessage(Component.translatable("command.nova.reload_configs.failure", NamedTextColor.RED))
             
-            LOGGER.log(Level.SEVERE, "Failed to reload configs", e)
+            LOGGER.error("Failed to reload configs", e)
         }
     }
     
@@ -236,7 +264,7 @@ internal object NovaCommand : Command() {
             if (ctx.source.sender is Player)
                 ctx.source.sender.sendMessage(Component.translatable("command.nova.reload_recipes.failure", NamedTextColor.RED))
             
-            LOGGER.log(Level.SEVERE, "Failed to reload recipes", e)
+            LOGGER.error("Failed to reload recipes", e)
         }
     }
     
@@ -466,7 +494,7 @@ internal object NovaCommand : Command() {
                             "command.nova.show_block_model_data.display_entity",
                             NamedTextColor.GRAY,
                             Component.text(novaBlockState.toString(), NamedTextColor.AQUA),
-                            Component.translatable(info.hitboxType.material.blockTranslationKey ?: "", NamedTextColor.AQUA),
+                            Component.translatable(info.hitboxType.bukkitMaterial.blockTranslationKey ?: "", NamedTextColor.AQUA),
                             Component.text(info.models.size),
                             Component.join(JoinConfiguration.newlines(), modelComponents)
                         )
@@ -839,7 +867,25 @@ internal object NovaCommand : Command() {
         ))
     }
     
-    private fun searchBlock(ctx: CommandContext<CommandSourceStack>) = runBlocking {
+    private fun searchVanillaBlock(ctx: CommandContext<CommandSourceStack>) {
+        val player = ctx.player
+        val block: Block = ctx["block"]
+        val range: Int = ctx["range"]
+        
+        val center = player.location.chunkPos
+        for (xOff in -range..range) {
+            for (zOff in -range..range) {
+                val chunkPos = ChunkPos(center.worldUUID, center.x + xOff, center.z + zOff)
+                BlockStateSearcher.searchChunk(chunkPos, listOf { it.block == block })[0]?.forEach { (pos, _) ->
+                    sendBlockSearchResult(ctx, Component.translatable(block.descriptionId), pos.x, pos.y, pos.z)
+                }
+            }
+        }
+        
+        ctx.source.sender.sendMessage(Component.translatable("command.nova.search_block.done", NamedTextColor.GRAY))
+    }
+    
+    private fun searchNovaBlock(ctx: CommandContext<CommandSourceStack>) = runBlocking {
         val player = ctx.player
         val block: NovaBlock = ctx["block"]
         val range: Int = ctx["range"]
@@ -852,18 +898,21 @@ internal object NovaCommand : Command() {
                     if (blockState.block != block)
                         return@forEachNonEmpty
                     
-                    ctx.source.sender.sendMessage(Component.translatable(
-                        "command.nova.search_block.result",
-                        NamedTextColor.GRAY,
-                        block.name,
-                        Component.text("x=${pos.x}, y=${pos.y}, z=${pos.z}", NamedTextColor.AQUA)
-                            .clickEvent(ClickEvent.suggestCommand("/tp ${pos.x} ${pos.y} ${pos.z}"))
-                    ))
+                    sendBlockSearchResult(ctx, block.name, pos.x, pos.y, pos.z)
                 }
             }
         }
         
         ctx.source.sender.sendMessage(Component.translatable("command.nova.search_block.done", NamedTextColor.GRAY))
+    }
+    
+    private fun sendBlockSearchResult(ctx: CommandContext<CommandSourceStack>, blockName: Component, x: Int, y: Int, z: Int) {
+        ctx.source.sender.sendMessage(Component.translatable(
+            "command.nova.search_block.result",
+            NamedTextColor.GRAY,
+            blockName,
+            Component.text("x=$x, y=$y, z=$z", NamedTextColor.AQUA).clickEvent(ClickEvent.suggestCommand("/tp $x $y $z"))
+        ))
     }
     
     private fun openItemInventory(ctx: CommandContext<CommandSourceStack>) {

@@ -1,19 +1,19 @@
 package xyz.xenondevs.nova.resources.layout.block
 
-import org.bukkit.Material
-import org.bukkit.block.data.BlockData
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.commons.collections.flatMap
+import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout.LayoutType
-import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 
-private typealias BlockStateSelector = BlockSelectorScope.() -> BlockData
+private typealias BlockStateSelector = BlockSelectorScope.() -> BlockState
 private typealias BlockModelSelector = BlockModelSelectorScope.() -> ModelBuilder
 
-private val DEFAULT_STATE_SELECTOR: BlockStateSelector = { Material.BARRIER.createBlockData() }
+private val DEFAULT_STATE_SELECTOR: BlockStateSelector = { Blocks.BARRIER.defaultBlockState() }
 private val DEFAULT_MODEL_SELECTOR: BlockModelSelector = { defaultModel }
 
 internal class BlockModelLayout(

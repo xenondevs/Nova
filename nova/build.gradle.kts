@@ -2,6 +2,7 @@ plugins {
     java
     `maven-publish`
     alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.dokka)
     id("xyz.xenondevs.bundler-plugin")
     alias(libs.plugins.paperweight)
@@ -33,6 +34,7 @@ dependencies {
     novaLoader(libs.zstd)
     novaLoader(libs.bundles.jgrapht)
     novaLoader(libs.snakeyaml.engine)
+    novaLoader(libs.kotlinx.serialization.json)
     
     // test dependencies
     testImplementation(libs.bundles.test)

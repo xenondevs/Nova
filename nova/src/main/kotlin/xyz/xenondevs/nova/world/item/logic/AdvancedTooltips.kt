@@ -7,12 +7,11 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.serialization.persistentdata.get
 import xyz.xenondevs.nova.serialization.persistentdata.set
 import xyz.xenondevs.nova.util.registerEvents
 
-private val ADVANCED_TOOLTIPS_KEY = NamespacedKey(Nova, "advancedTooltipsType")
+private val ADVANCED_TOOLTIPS_KEY = NamespacedKey("nova", "advancedtooltipstype")
 
 internal object AdvancedTooltips : Listener {
     

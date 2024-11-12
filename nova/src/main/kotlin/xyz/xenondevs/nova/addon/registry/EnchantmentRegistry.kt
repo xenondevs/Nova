@@ -2,14 +2,16 @@ package xyz.xenondevs.nova.addon.registry
 
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.enchantments.Enchantment
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.nova.world.item.enchantment.EnchantmentBuilder
 
 interface EnchantmentRegistry : AddonHolder {
     
-    fun enchantment(name: String, enchantment: EnchantmentBuilder.() -> Unit): Enchantment {
+    fun enchantment(name: String, enchantment: EnchantmentBuilder.() -> Unit): Provider<Enchantment> {
         val builder = EnchantmentBuilder(addon, name)
         builder.enchantment()
-        return CraftEnchantment.minecraftToBukkit(builder.register())
+        return builder.register().map(CraftEnchantment::minecraftToBukkit)
     }
     
 }

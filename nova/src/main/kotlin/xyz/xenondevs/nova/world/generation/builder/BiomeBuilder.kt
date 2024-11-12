@@ -4,9 +4,11 @@ package xyz.xenondevs.nova.world.generation.builder
 
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
+import net.minecraft.core.WritableRegistry
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.registries.Registries
+import net.minecraft.resources.RegistryOps.RegistryInfoLookup
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.Music
@@ -30,8 +32,8 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.addon.registry.worldgen.BiomeRegistry
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
-import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
-import xyz.xenondevs.nova.util.getOrCreateHolder
+import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
+import xyz.xenondevs.nova.util.lookupGetterOrThrow
 import xyz.xenondevs.nova.util.particle.ParticleBuilder
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_CLIMATE_SETTINGS_CONSTRUCTOR
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_CONSTRUCTOR
@@ -44,8 +46,8 @@ import java.awt.Color
 import java.util.*
 
 /**
- * Builder for [Biomes][Biome]. Use [build] to get the [Biome] instance or [register] to register it. Check out the
- * [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/biome/) on biomes for more information.
+ * Builder for [Biomes][Biome].
+ * Check out the [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/biome/) on biomes for more information.
  *
  * @see [BiomeRegistry]
  * @see [BiomeClimateSettingsBuilder]
@@ -54,11 +56,18 @@ import java.util.*
  * @see [FeatureType]
  */
 @ExperimentalWorldGen
-class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(VanillaRegistries.BIOME, id) {
+class BiomeBuilder internal constructor(
+    id: ResourceLocation,
+    registry: WritableRegistry<Biome>,
+    private val lookup: RegistryInfoLookup
+) : RegistryElementBuilder<Biome>(registry, id) {
+    
+    private val configuredCarverRegistry = lookup.lookupGetterOrThrow(Registries.CONFIGURED_CARVER)
+    private val placedFeatureRegistry = lookup.lookupGetterOrThrow(Registries.PLACED_FEATURE)
     
     private var climateSettings: ClimateSettings? = null
     private var specialEffects: BiomeSpecialEffects? = null
-    private val carvers: MutableMap<GenerationStep.Carving, MutableList<Holder<ConfiguredWorldCarver<*>>>> = enumMap()
+    private val carvers = ArrayList<Holder<ConfiguredWorldCarver<*>>>()
     private val features = Array(11) { mutableListOf<Holder<PlacedFeature>>() }
     private var mobSpawnSettings: MobSpawnSettings? = null
     
@@ -78,16 +87,23 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
      *
      * Check out the [BiomeClimateSettingsBuilder] documentation for a list of all available settings.
      */
-    @WorldGenDsl
     fun climateSettings(climateSettings: BiomeClimateSettingsBuilder.() -> Unit) {
         this.climateSettings = BiomeClimateSettingsBuilder().apply(climateSettings).build()
     }
     
     /**
-     * Resets the [ClimateSettings] of this biome to the default values.
+     * Sets the [MobSpawnSettings] of this biome. As the name suggests, this is used to configure the spawning of mobs.
      */
-    fun defaultClimateSettings() {
-        climateSettings = null
+    fun mobSpawnSettings(mobSpawnSettings: MobSpawnSettings) {
+        this.mobSpawnSettings = mobSpawnSettings
+    }
+    
+    /**
+     * Sets the [MobSpawnSettings] of this biome using a [MobSpawnSettingsBuilder]. As the name suggests, this is used to
+     * configure the spawning of mobs.
+     */
+    fun mobSpawnSettings(mobSpawnSettings: MobSpawnSettingsBuilder.() -> Unit) {
+        this.mobSpawnSettings = MobSpawnSettingsBuilder().apply(mobSpawnSettings).build()
     }
     
     /**
@@ -105,261 +121,31 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
      *
      * Check out the [BiomeSpecialEffectsBuilder] documentation for a list of all available settings.
      */
-    @WorldGenDsl
     fun specialEffects(specialEffects: BiomeSpecialEffectsBuilder.() -> Unit) {
-        this.specialEffects = BiomeSpecialEffectsBuilder().apply(specialEffects).build()
+        this.specialEffects = BiomeSpecialEffectsBuilder(lookup).apply(specialEffects).build()
     }
     
     /**
-     * Resets the [BiomeSpecialEffects] of this biome to the default values.
-     */
-    fun defaultSpecialEffects() {
-        specialEffects = null
-    }
-    
-    //<editor-fold desc="Carvers/Features" defaultstate="collapsed">
-    
-    /**
-     * Adds a [ConfiguredWorldCarver] to this biome. The [step] parameter specifies the step at which the carver should
-     * be executed (`AIR` or `LIQUID`).
+     * Adds [configuredCarvers] to the biome.
      *
      * For more information on carvers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/carvers/carvers/).
      */
-    fun carver(step: GenerationStep.Carving, configuredCarver: ConfiguredWorldCarver<*>): BiomeBuilder {
-        carvers.getOrPut(step, ::ArrayList).add(Holder.direct(configuredCarver))
-        return this
+    fun carvers(vararg configuredCarvers: ResourceKey<ConfiguredWorldCarver<*>>) {
+        for (key in configuredCarvers) {
+            carvers += configuredCarverRegistry.getOrThrow(key)
+        }
     }
     
     /**
-     * Adds a [ConfiguredWorldCarver] to this biome via a [Holder] that either already contains the [ConfiguredWorldCarver],
-     * or is set later by the [ConfiguredWorldCarver Registry][Registries.CONFIGURED_FEATURE]. The [step] parameter specifies
-     * the step at which the carver should be executed (`AIR` or `LIQUID`).
-     *
-     * For more information on carvers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/carvers/carvers/).
-     */
-    fun carver(step: GenerationStep.Carving, configuredCarver: Holder<ConfiguredWorldCarver<*>>): BiomeBuilder {
-        carvers.getOrPut(step, ::ArrayList).add(configuredCarver)
-        return this
-    }
-    
-    /**
-     * Adds a [ConfiguredWorldCarver] to this biome via its [ResourceLocation]. If the [ConfiguredWorldCarver] is not
-     * yet registered, an empty [Holder] will be created and the [ConfiguredWorldCarver] will be set later by the
-     * [ConfiguredWorldCarver Registry][Registries.CONFIGURED_FEATURE]. The [step] parameter specifies the step at which
-     * the carver should be executed (`AIR` or `LIQUID`).
-     *
-     * For more information on carvers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/carvers/carvers/).
-     */
-    fun carver(step: GenerationStep.Carving, configuredCarverId: ResourceLocation): BiomeBuilder {
-        carvers.getOrPut(step, ::ArrayList).add(VanillaRegistries.CONFIGURED_CARVER.getOrCreateHolder(configuredCarverId))
-        return this
-    }
-    
-    /**
-     * Adds a [ConfiguredWorldCarver] to this biome via its [ResourceKey]. If the [ConfiguredWorldCarver] is not
-     * yet registered, an empty [Holder] will be created and the [ConfiguredWorldCarver] will be set later by the
-     * [ConfiguredWorldCarver Registry][Registries.CONFIGURED_FEATURE]. The [step] parameter specifies the step at which
-     * the carver should be executed (`AIR` or `LIQUID`).
-     *
-     * For more information on carvers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/carvers/carvers/).
-     */
-    fun carver(step: GenerationStep.Carving, configuredCarverKey: ResourceKey<ConfiguredWorldCarver<*>>): BiomeBuilder {
-        return carver(step, configuredCarverKey.location())
-    }
-    
-    /**
-     * Adds multiple [ConfiguredWorldCarvers][ConfiguredWorldCarver] to this biome. The [step] parameter specifies the step at which these carvers
-     * should be executed (`AIR` or `LIQUID`).
-     *
-     * For more information on carvers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/carvers/carvers/).
-     */
-    fun carvers(step: GenerationStep.Carving, vararg configuredCarvers: ConfiguredWorldCarver<*>): BiomeBuilder {
-        carvers.getOrPut(step, ::ArrayList).addAll(configuredCarvers.map { Holder.direct(it) })
-        return this
-    }
-    
-    /**
-     * Adds multiple [ConfiguredWorldCarvers][ConfiguredWorldCarver] to this biome via [Holders][Holder] that either
-     * already contain a [ConfiguredWorldCarver], or are set later by the [ConfiguredWorldCarver Registry][Registries.CONFIGURED_FEATURE].
-     * The [step] parameter specifies the step at which these carvers should be executed (`AIR` or `LIQUID`).
-     *
-     * For more information on carvers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/carvers/carvers/).
-     */
-    fun carvers(step: GenerationStep.Carving, vararg configuredCarvers: Holder<ConfiguredWorldCarver<*>>): BiomeBuilder {
-        carvers.getOrPut(step, ::ArrayList).addAll(configuredCarvers)
-        return this
-    }
-    
-    /**
-     * Adds multiple [ConfiguredWorldCarvers][ConfiguredWorldCarver] to this biome via their [ResourceLocation]. If a
-     * [ConfiguredWorldCarver] is not yet registered, an empty [Holder] will be created and the [ConfiguredWorldCarver]
-     * will be set later by the [ConfiguredWorldCarver Registry][Registries.CONFIGURED_FEATURE]. The [step] parameter
-     * specifies the step at which these carvers should be executed (`AIR` or `LIQUID`).
-     *
-     * For more information on carvers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/carvers/carvers/).
-     */
-    fun carvers(step: GenerationStep.Carving, vararg configuredCarverIds: ResourceLocation): BiomeBuilder {
-        carvers.getOrPut(step, ::ArrayList).addAll(configuredCarverIds.map { VanillaRegistries.CONFIGURED_CARVER.getOrCreateHolder(it) })
-        return this
-    }
-    
-    /**
-     * Adds multiple [ConfiguredWorldCarvers][ConfiguredWorldCarver] to this biome via their [ResourceKey]. If a [ConfiguredWorldCarver]
-     * is not yet registered, an empty [Holder] will be created and the [ConfiguredWorldCarver] will be set later by the
-     * [ConfiguredWorldCarver Registry][Registries.CONFIGURED_FEATURE]. The [step] parameter specifies the step at which
-     * these carvers should be executed (`AIR` or `LIQUID`).
-     *
-     * For more information on carvers, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/carvers/carvers/).
-     */
-    fun carvers(step: GenerationStep.Carving, vararg configuredCarverKeys: ResourceKey<ConfiguredWorldCarver<*>>): BiomeBuilder {
-        return carvers(step, *configuredCarverKeys.map { it.location() }.toTypedArray())
-    }
-    
-    /**
-     * Removes all [ConfiguredWorldCarvers][ConfiguredWorldCarver] from this biome that are executed at the specified [step].
-     */
-    fun resetCarvers(step: GenerationStep.Carving): BiomeBuilder {
-        carvers[step] = ArrayList()
-        return this
-    }
-    
-    /**
-     * Removes all [ConfiguredWorldCarvers][ConfiguredWorldCarver] from this biome.
-     */
-    fun resetCarvers(): BiomeBuilder {
-        carvers.clear()
-        return this
-    }
-    
-    /**
-     * Adds a [PlacedFeature] to this biome. The [step] parameter specifies the step at which the feature should be
-     * executed (For a list of all steps, check out the [GenerationStep.Decoration] enum).
+     * Adds [placedFeatures] to the biome at the specified [step], which determines when the features are executed
+     * during world generation.
      *
      * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
      */
-    fun feature(step: GenerationStep.Decoration, placedFeature: PlacedFeature): BiomeBuilder {
-        features[step.ordinal].add(Holder.direct(placedFeature))
-        return this
-    }
-    
-    /**
-     * Adds a [PlacedFeature] to this biome via a [Holder] that either already contains a [PlacedFeature], or is set
-     * later by the [PlacedFeature Registry][Registries.PLACED_FEATURE]. The [step] parameter specifies the step at which
-     * the feature should be executed (For a list of all steps, check out the [GenerationStep.Decoration] enum).
-     *
-     * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
-     */
-    fun feature(step: GenerationStep.Decoration, placedFeature: Holder<PlacedFeature>): BiomeBuilder {
-        features[step.ordinal].add(placedFeature)
-        return this
-    }
-    
-    /**
-     * Adds a [PlacedFeature] to this biome via its [ResourceLocation]. If the [PlacedFeature] is not yet registered, an
-     * empty [Holder] will be created and the [PlacedFeature] will be set later by the [PlacedFeature Registry][Registries.PLACED_FEATURE].
-     * The [step] parameter specifies the step at which the feature should be executed (For a list of all steps, check out
-     * the [GenerationStep.Decoration] enum).
-     *
-     * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
-     */
-    fun feature(step: GenerationStep.Decoration, placedFeature: ResourceLocation): BiomeBuilder {
-        features[step.ordinal].add(VanillaRegistries.PLACED_FEATURE.getOrCreateHolder(placedFeature))
-        return this
-    }
-    
-    /**
-     * Adds a [PlacedFeature] to this biome via its [ResourceKey]. If the [PlacedFeature] is not yet registered, an
-     * empty [Holder] will be created and the [PlacedFeature] will be set later by the [PlacedFeature Registry][Registries.PLACED_FEATURE].
-     * The [step] parameter specifies the step at which the feature should be executed (For a list of all steps, check out
-     * the [GenerationStep.Decoration] enum).
-     *
-     * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
-     */
-    fun feature(step: GenerationStep.Decoration, featureKey: ResourceKey<PlacedFeature>): BiomeBuilder {
-        return feature(step, featureKey.location())
-    }
-    
-    /**
-     * Adds multiple [PlacedFeatures][PlacedFeature] to this biome. The [step] parameter specifies the step at which
-     * the features should be executed (For a list of all steps, check out the [GenerationStep.Decoration] enum).
-     *
-     * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
-     */
-    fun features(step: GenerationStep.Decoration, vararg placedFeatures: PlacedFeature): BiomeBuilder {
-        features[step.ordinal].addAll(placedFeatures.map { Holder.direct(it) })
-        return this
-    }
-    
-    /**
-     * Adds multiple [PlacedFeatures][PlacedFeature] to this biome via [Holders][Holder] that either already contain a
-     * [PlacedFeature], or are set later by the [PlacedFeature Registry][Registries.PLACED_FEATURE]. The [step] parameter
-     * specifies the step at which the features should be executed (For a list of all steps, check out the [GenerationStep.Decoration] enum).
-     *
-     * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
-     */
-    fun features(step: GenerationStep.Decoration, vararg placedFeatures: Holder<PlacedFeature>): BiomeBuilder {
-        features[step.ordinal].addAll(placedFeatures)
-        return this
-    }
-    
-    /**
-     * Adds multiple [PlacedFeatures][PlacedFeature] to this biome via their [ResourceLocation]. If a [PlacedFeature] is
-     * not yet registered, an empty [Holder] will be created and the [PlacedFeature] will be set later by the [PlacedFeature Registry][Registries.PLACED_FEATURE].
-     * The [step] parameter specifies the step at which the features should be executed (For a list of all steps, check out
-     * the [GenerationStep.Decoration] enum).
-     *
-     * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
-     */
-    fun features(step: GenerationStep.Decoration, vararg placedFeatureIds: ResourceLocation): BiomeBuilder {
-        features[step.ordinal].addAll(placedFeatureIds.map { VanillaRegistries.PLACED_FEATURE.getOrCreateHolder(it) })
-        return this
-    }
-    
-    /**
-     * Adds multiple [PlacedFeatures][PlacedFeature] to this biome via their [ResourceKey]. If a [PlacedFeature] is not
-     * yet registered, an empty [Holder] will be created and the [PlacedFeature] will be set later by the [PlacedFeature Registry][Registries.PLACED_FEATURE].
-     * The [step] parameter specifies the step at which the features should be executed (For a list of all steps, check out
-     * the [GenerationStep.Decoration] enum).
-     *
-     * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
-     */
-    fun features(step: GenerationStep.Decoration, vararg placedFeatureKeys: ResourceKey<PlacedFeature>): BiomeBuilder {
-        placedFeatureKeys.forEach { feature(step, it.location()) }
-        return this
-    }
-    
-    /**
-     * Removes all [PlacedFeatures][PlacedFeature] from this biome at the specified [step].
-     */
-    fun resetFeatures(step: GenerationStep.Decoration): BiomeBuilder {
-        features[step.ordinal] = ArrayList()
-        return this
-    }
-    
-    /**
-     * Removes all [PlacedFeatures][PlacedFeature] from this biome.
-     */
-    fun resetFeatures(): BiomeBuilder {
-        features.forEach { it.clear() }
-        return this
-    }
-    
-    //</editor-fold>
-    
-    /**
-     * Sets the [MobSpawnSettings] of this biome. As the name suggests, this is used to configure the spawning of mobs.
-     */
-    fun mobSpawnSettings(mobSpawnSettings: MobSpawnSettings) {
-        this.mobSpawnSettings = mobSpawnSettings
-    }
-    
-    /**
-     * Sets the [MobSpawnSettings] of this biome using a [MobSpawnSettingsBuilder]. As the name suggests, this is used to
-     * configure the spawning of mobs.
-     */
-    @WorldGenDsl
-    fun mobSpawnSettings(mobSpawnSettings: MobSpawnSettingsBuilder.() -> Unit) {
-        this.mobSpawnSettings = MobSpawnSettingsBuilder().apply(mobSpawnSettings).build()
+    fun features(step: GenerationStep.Decoration, vararg placedFeatures: ResourceKey<PlacedFeature>) {
+        for (key in placedFeatures) {
+            features[step.ordinal] += placedFeatureRegistry.getOrThrow(key)
+        }
     }
     
     /**
@@ -367,8 +153,8 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
      */
     override fun build(): Biome {
         val climateSettings = this.climateSettings ?: BiomeClimateSettingsBuilder().build()
-        val specialEffects = this.specialEffects ?: BiomeSpecialEffectsBuilder().build()
-        val generationSettings = BIOME_GENERATION_SETTINGS_CONSTRUCTOR.newInstance(carvers, features.map { HolderSet.direct(it) })
+        val specialEffects = this.specialEffects ?: BiomeSpecialEffectsBuilder(lookup).build()
+        val generationSettings = BIOME_GENERATION_SETTINGS_CONSTRUCTOR.newInstance(HolderSet.direct(carvers), features.map { HolderSet.direct(it) })
         val mobSpawnSettings = this.mobSpawnSettings ?: MobSpawnSettings.EMPTY
         return BIOME_CONSTRUCTOR.newInstance(climateSettings, specialEffects, generationSettings, mobSpawnSettings)
     }
@@ -384,7 +170,8 @@ class BiomeBuilder(id: ResourceLocation) : RegistryElementBuilder<Biome>(Vanilla
  * * [downfall] - Controls foliage color. Any value above `0.85` leads to fire burning out faster.
  */
 @ExperimentalWorldGen
-class BiomeClimateSettingsBuilder {
+@RegistryElementBuilderDsl
+class BiomeClimateSettingsBuilder internal constructor() {
     
     private var hasPrecipitation: Boolean = false
     private var temperature: Float = 0.5f
@@ -444,29 +231,26 @@ class BiomeClimateSettingsBuilder {
  * * `waterFogColor` - The color of the water fog in this biome.
  * * `skyColor` - The color of the sky in this biome.
  * * `foliageColorOverride` - Overrides the foliage color of this biome. If `null`, the foliage color will be calculated
- *   based on the [ClimateSettings.temperature] and [ClimateSettings.downfall] settings of the [ClimateSettings]. Use
- *   [defaultFoliageColor] to set the override back to `null`.
+ *   based on the [ClimateSettings.temperature] and [ClimateSettings.downfall] settings of the [ClimateSettings].
  * * `grassColorOverride` - Overrides the grass color of this biome. If `null`, the grass color will be calculated
- *   based on the [ClimateSettings.temperature] and [ClimateSettings.downfall] settings of the [ClimateSettings]. Use
- *   [defaultGrassColor] to set the override back to `null`.
+ *   based on the [ClimateSettings.temperature] and [ClimateSettings.downfall] settings of the [ClimateSettings].
  * * `grassColorModifier` - Adjusts the previously specified grass color before calculating the final grass color (See
  *   [GrassColorModifier]).
  * * `ambientParticleSettings` - Ambient particles that will randomly spawn around the biome. If `null`, no ambient
- *   particles will be spawned. Use [disableAmbientParticles] to set the setting back to `null`. For more information on
- *   particles, check out NMS-Utilities [ParticleBuilder] documentation.
- * * `ambientLoopSoundEvent` - Ambient sound that will play in this biome. If `null`, no ambient sound will be played.
- *   Use [disableAmbientLoopSoundEvent] to set the setting back to `null`.
+ *   particles will be spawned.
+ * * `ambientLoopSoundEvent` - Ambient sound that will play in this biome. 
  * * `ambientMoodSettings` - Ambient mood sounds (also known as cave sounds) that will play in this biome. If you're
  *   unfamiliar with Minecraft's mood sound system, check out the [Minecraft Wiki](https://minecraft.wiki/w/Ambience#Mood_algorithm).
- *   If `null`, no ambient mood sounds will be played. Use [disableAmbientMoodSound] to set the setting back to `null`.
+ *   If `null`, no ambient mood sounds will be played.
  * * `ambientAdditionsSettings` - The ambient additions sound is a sound that will be played each tick at the probability
- *   defined at [AmbientAdditionsSettings.tickChance]. If `null`, no ambient additions sound will be played. Use
- *   [disableAmbientAdditionsSound] to set the setting back to `null`.
+ *   defined at [AmbientAdditionsSettings.tickChance]. If `null`, no ambient additions sound will be played. 
  * * `backgroundMusic` - The background music that will play in this biome. If `null`, no background music will be played.
- *   Use [disableBackgroundMusic] to set the setting back to `null`.
  */
 @ExperimentalWorldGen
-class BiomeSpecialEffectsBuilder {
+@RegistryElementBuilderDsl
+class BiomeSpecialEffectsBuilder internal constructor(private val lookup: RegistryInfoLookup) {
+    
+    private val soundEventRegistry = lookup.lookupGetterOrThrow(Registries.SOUND_EVENT)
     
     private var fogColor: Int = 0xC0D8FF
     private var waterColor: Int = 0x3F76E4
@@ -541,7 +325,6 @@ class BiomeSpecialEffectsBuilder {
     
     /**
      * Sets the `foliageColorOverride` and overrides the calculated foliage color of the biome via a [Color] instance.
-     * To reset the foliage color back to the default (`null`), use [defaultFoliageColor].
      */
     fun foliageColor(color: Color) {
         this.foliageColorOverride = color.rgb
@@ -549,23 +332,14 @@ class BiomeSpecialEffectsBuilder {
     
     /**
      * Sets the `foliageColorOverride` and overrides the calculated foliage color of the biome via an RGB value (e.g.
-     * `0x0E8C00`). To reset the foliage color back to the default (`null`), use [defaultFoliageColor].
+     * `0x0E8C00`).
      */
     fun foliageColor(color: Int) {
         this.foliageColorOverride = color
     }
     
     /**
-     * Resets the `foliageColorOverride` setting back to `null`, which will cause the foliage color to be calculated
-     * based on the [ClimateSettings.temperature] and [ClimateSettings.downfall] settings of the [ClimateSettings].
-     */
-    fun defaultFoliageColor() {
-        this.foliageColorOverride = null
-    }
-    
-    /**
-     * Sets the `grassColorOverride` and overrides the calculated grass color of the biome via a [Color] instance. To
-     * reset the grass color back to the default (`null`), use [defaultGrassColor].
+     * Sets the `grassColorOverride` and overrides the calculated grass color of the biome via a [Color] instance.
      */
     fun grassColor(color: Color) {
         this.grassColorOverride = color.rgb
@@ -573,18 +347,10 @@ class BiomeSpecialEffectsBuilder {
     
     /**
      * Sets the `grassColorOverride` and overrides the calculated grass color of the biome via an RGB value (e.g.
-     * `0x0E8C00`). To reset the grass color back to the default (`null`), use [defaultGrassColor].
+     * `0x0E8C00`).
      */
     fun grassColor(color: Int) {
         this.grassColorOverride = color
-    }
-    
-    /**
-     * Resets the `grassColorOverride` setting back to `null`, which will cause the grass color to be calculated
-     * based on the [ClimateSettings.temperature] and [ClimateSettings.downfall] settings of the [ClimateSettings].
-     */
-    fun defaultGrassColor() {
-        this.grassColorOverride = null
     }
     
     /**
@@ -604,9 +370,7 @@ class BiomeSpecialEffectsBuilder {
     /**
      * Sets the `ambientParticle` setting of the biome's special effects. This setting is used to add ambient particles
      * to the biome. The particles are spawned randomly in the air, and the probability of spawning each tick is
-     * determined by the [AmbientParticleSettings.probability] setting. To disable ambient particles again, use
-     * [disableAmbientParticles].  For more information on particles, check out the NMS-Utilities [ParticleBuilder]
-     * documentation.
+     * determined by the [AmbientParticleSettings.probability] setting.
      */
     fun ambientParticles(ambientParticleSettings: AmbientParticleSettings) {
         this.ambientParticleSettings = ambientParticleSettings
@@ -615,19 +379,10 @@ class BiomeSpecialEffectsBuilder {
     /**
      * Sets the `ambientParticle` setting of the biome's special effects by using a [ParticleBuilder]. This setting is
      * used to add ambient particles to the biome. The particles are spawned randomly in the air, and the probability
-     * of spawning each tick is determined by the [AmbientParticleSettings.probability] setting. To disable ambient
-     * particles again, use [disableAmbientParticles]. For more information on particles, check out the NMS-Utilities
-     * [ParticleBuilder] documentation.
+     * of spawning each tick is determined by the [AmbientParticleSettings.probability] setting.
      */
     fun <T : ParticleOptions> ambientParticles(particle: ParticleType<T>, probability: Float, builder: ParticleBuilder<T>.() -> Unit = {}) {
         this.ambientParticleSettings = AmbientParticleSettings(ParticleBuilder(particle).apply(builder).getOptions(), probability)
-    }
-    
-    /**
-     * Sets the `ambientParticle` setting of the biome's special effects back to `null` to disable ambient particles.
-     */
-    fun disableAmbientParticles() {
-        this.ambientParticleSettings = null
     }
     
     //</editor-fold>
@@ -635,52 +390,36 @@ class BiomeSpecialEffectsBuilder {
     //<editor-fold desc="Ambient sounds" defaultstate="collapsed">
     
     /**
-     * Sets the `ambientLoopSoundEvent` setting of the biome's special effects. This setting is used to add ambient
-     * sounds to the biome. The sound is played randomly. To disable ambient sounds again, use [disableAmbientLoopSoundEvent].
-     * To disable ambient sounds again, use [disableAmbientLoopSoundEvent].
+     * Sets the `ambientLoopSoundEvent` setting of the biome's special effects to [ambientLoopSoundEvent].
      */
     fun ambientLoopSoundEvent(ambientLoopSoundEvent: SoundEvent) {
         this.ambientLoopSoundEvent = Holder.direct(ambientLoopSoundEvent)
     }
     
     /**
-     * Sets the `ambientLoopSoundEvent` setting of the biome's special effects via a Holder that either already contains
-     * the [SoundEvent], or is set later by the [SoundEvent Registry][Registries.SOUND_EVENT]. To disable ambient sounds
-     * again, use [disableAmbientLoopSoundEvent].
+     * Sets the `ambientLoopSoundEvent` setting of the biome's special effects to [ambientLoopSoundEvent].
      */
     fun ambientLoopSoundEvent(ambientLoopSoundEvent: Holder<SoundEvent>) {
         this.ambientLoopSoundEvent = ambientLoopSoundEvent
     }
     
     /**
-     * Sets the `ambientLoopSoundEvent` setting of the biome's special effects via its [ResourceLocation]. If the
-     * [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
-     * the [SoundEvent Registry][Registries.SOUND_EVENT]. To disable ambient sounds again, use [disableAmbientLoopSoundEvent].
+     * Sets the `ambientLoopSoundEvent` setting of the biome's special effects via its [ResourceLocation].
      */
     fun ambientLoopSoundEvent(soundEventId: ResourceLocation) {
-        this.ambientLoopSoundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId)
+        ambientLoopSoundEvent(ResourceKey.create(Registries.SOUND_EVENT, soundEventId))
     }
     
     /**
-     * Sets the `ambientLoopSoundEvent` setting of the biome's special effects via its [ResourceKey]. If the
-     * [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
-     * the [SoundEvent Registry][Registries.SOUND_EVENT]. To disable ambient sounds again, use [disableAmbientLoopSoundEvent].
+     * Sets the `ambientLoopSoundEvent` setting of the biome's special effects via its [ResourceKey].
      */
     fun ambientLoopSoundEvent(soundEventKey: ResourceKey<SoundEvent>) {
-        this.ambientLoopSoundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventKey.location())
-    }
-    
-    /**
-     * Sets the `ambientLoopSoundEvent` setting of the biome's special effects back to `null` to disable ambient sounds.
-     */
-    fun disableAmbientLoopSoundEvent() {
-        this.ambientLoopSoundEvent = null
+        this.ambientLoopSoundEvent = soundEventRegistry.getOrThrow(soundEventKey)
     }
     
     /**
      * Sets the `ambientMoodSettings` (also known as cave sounds) setting of the biome's special effects. If you're
      * unfamiliar with Minecraft's mood sound system, check out the [Minecraft Wiki](https://minecraft.wiki/w/Ambience#Mood_algorithm).
-     * To disable ambient sounds again, use [disableAmbientMoodSound].
      */
     fun ambientMoodSound(moodSettings: AmbientMoodSettings) {
         this.ambientMoodSettings = moodSettings
@@ -689,87 +428,61 @@ class BiomeSpecialEffectsBuilder {
     /**
      * Sets the `ambientMoodSettings` (also known as cave sounds) setting of the biome's special effects by using a
      * [AmbientMoodSoundBuilder]. If you're unfamiliar with Minecraft's mood sound system, check out the
-     * [Minecraft Wiki](https://minecraft.wiki/w/Ambience#Mood_algorithm). To disable ambient sounds again,
-     * use [disableAmbientMoodSound].
+     * [Minecraft Wiki](https://minecraft.wiki/w/Ambience#Mood_algorithm).
      */
     fun ambientMoodSound(builder: AmbientMoodSoundBuilder.() -> Unit) {
-        this.ambientMoodSettings = AmbientMoodSoundBuilder().apply(builder).build()
-    }
-    
-    /**
-     * Sets the `ambientMoodSettings` (also known as cave sounds) setting of the biome's special effects back to `null`
-     * to disable ambient sounds.
-     */
-    fun disableAmbientMoodSound() {
-        this.ambientMoodSettings = null
+        this.ambientMoodSettings = AmbientMoodSoundBuilder(lookup).apply(builder).build()
     }
     
     /**
      * Sets the `ambientAdditionsSettings` setting of the biome's special effects. This setting is used to add ambient
      * sounds to the biome. The sound is played each tick at the probability defined at [AmbientAdditionsSettings.tickChance].
-     * To disable ambient sounds again, use [disableAmbientAdditionsSound].
      */
     fun ambientAdditionsSound(additionsSettings: AmbientAdditionsSettings) {
         this.ambientAdditionsSettings = additionsSettings
     }
     
     /**
-     * Sets the `ambientAdditionsSettings` setting of the biome's special effects by creating a new [AmbientAdditionsSettings]
-     * instance out of the given [soundEvent] and [tickProbability]. To disable ambient sounds again, use [disableAmbientAdditionsSound].
+     * Sets the `ambientAdditionsSettings` setting of the biome's special effects to [soundEvent] with [tickProbability].
      */
     fun ambientAdditionsSound(soundEvent: SoundEvent, tickProbability: Double) {
         this.ambientAdditionsSettings = AmbientAdditionsSettings(Holder.direct(soundEvent), tickProbability)
     }
     
     /**
-     * Sets the `ambientAdditionsSettings` setting of the biome's special effects by creating a new [AmbientAdditionsSettings]
-     * instance out of the given [soundEvent] [Holder] and [tickProbability]. The [Holder] can either already contain the
-     * [SoundEvent], or be set later by the [SoundEvent Registry][Registries.SOUND_EVENT]. To disable ambient sounds again,
-     * use [disableAmbientAdditionsSound].
+     * Sets the `ambientAdditionsSettings` setting of the biome's special effects to [soundEvent] with [tickProbability].
      */
     fun ambientAdditionsSound(soundEvent: Holder<SoundEvent>, tickProbability: Double) {
         this.ambientAdditionsSettings = AmbientAdditionsSettings(soundEvent, tickProbability)
     }
     
     /**
-     * Sets the `ambientAdditionsSettings` setting of the biome's special effects by creating a new [AmbientAdditionsSettings]
-     * instance out of the given [soundEventId] [ResourceLocation] and [tickProbability]. If the [SoundEvent] is not yet registered,
-     * an empty [Holder] will be created and the [SoundEvent] will be set later by the [SoundEvent Registry][Registries.SOUND_EVENT].
-     * To disable ambient sounds again, use [disableAmbientAdditionsSound].
+     * Sets the `ambientAdditionsSettings` setting of the biome's special effects to [soundEventId] with [tickProbability].
      */
     fun ambientAdditionsSound(soundEventId: ResourceLocation, tickProbability: Double) {
-        this.ambientAdditionsSettings = AmbientAdditionsSettings(VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId), tickProbability)
+        ambientAdditionsSound(ResourceKey.create(Registries.SOUND_EVENT, soundEventId), tickProbability)
     }
     
     /**
-     * Sets the `ambientAdditionsSettings` setting of the biome's special effects back to `null` to disable ambient
-     * additions sounds.
+     * Sets the `ambientAdditionsSettings` setting of the biome's special effects to [soundEventKey] with [tickProbability].
      */
-    fun disableAmbientAdditionsSound() {
-        this.ambientAdditionsSettings = null
+    fun ambientAdditionsSound(soundEventKey: ResourceKey<SoundEvent>, tickProbability: Double) {
+        this.ambientAdditionsSettings = AmbientAdditionsSettings(soundEventRegistry.getOrThrow(soundEventKey), tickProbability)
     }
     
     /**
      * Sets the `backgroundMusic` setting of the biome's special effects. This setting is used to add background music
-     * to the biome. To disable background music again, use [disableBackgroundMusic].
+     * to the biome.
      */
     fun backgroundMusic(music: Music) {
         this.backgroundMusic = music
     }
     
     /**
-     * Sets the `backgroundMusic` setting of the biome's special effects by using a [MusicBuilder]. To disable background
-     * music again, use [disableBackgroundMusic].
+     * Sets the `backgroundMusic` setting of the biome's special effects by using a [MusicBuilder].
      */
     fun backgroundMusic(builder: MusicBuilder.() -> Unit) {
-        this.backgroundMusic = MusicBuilder().apply(builder).build()
-    }
-    
-    /**
-     * Sets the `backgroundMusic` setting of the biome's special effects back to `null` to disable background music.
-     */
-    fun disableBackgroundMusic() {
-        this.backgroundMusic = null
+        this.backgroundMusic = MusicBuilder(lookup).apply(builder).build()
     }
     
     //</editor-fold>
@@ -777,7 +490,7 @@ class BiomeSpecialEffectsBuilder {
     /**
      * Builds a [BiomeSpecialEffects] instance from the current state of this builder.
      */
-    fun build(): BiomeSpecialEffects {
+    internal fun build(): BiomeSpecialEffects {
         return BIOME_SPECIAL_EFFECTS_CONSTRUCTOR.newInstance(
             fogColor,
             waterColor,
@@ -805,7 +518,8 @@ class BiomeSpecialEffectsBuilder {
  *   on Minecraft's spawn costs system, check out the [Minecraft Wiki](https://minecraft.wiki/w/Spawn#Spawn_costs)
  */
 @ExperimentalWorldGen
-class MobSpawnSettingsBuilder {
+@RegistryElementBuilderDsl
+class MobSpawnSettingsBuilder internal constructor() {
     
     private var creatureGenerationProbability = 0.1f
     private val spawners = enumMap<MobCategory, MutableList<SpawnerData>>()
@@ -857,7 +571,7 @@ class MobSpawnSettingsBuilder {
     /**
      * Builds a [MobSpawnSettings] instance from the current state of this builder.
      */
-    fun build(): MobSpawnSettings {
+    internal fun build(): MobSpawnSettings {
         return MOB_SPAWN_SETTINGS_CONSTRUCTOR.newInstance(
             creatureGenerationProbability,
             spawners,
@@ -879,7 +593,10 @@ class MobSpawnSettingsBuilder {
  * * `soundPositionOffset` - The offset of the sound position.
  */
 @ExperimentalWorldGen
-class AmbientMoodSoundBuilder {
+@RegistryElementBuilderDsl
+class AmbientMoodSoundBuilder internal constructor(lookup: RegistryInfoLookup) {
+    
+    private val soundEventRegistry = lookup.lookupGetterOrThrow(Registries.SOUND_EVENT)
     
     private lateinit var soundEvent: Holder<SoundEvent>
     private var tickDelay: Int = 6000
@@ -894,29 +611,24 @@ class AmbientMoodSoundBuilder {
     }
     
     /**
-     * Sets the `soundEvent` setting of the biome's ambient mood sound to the given [soundEvent] via a [Holder] that
-     * either already contains a [SoundEvent], or is set later by the [SoundEvent Registry][Registries.SOUND_EVENT].
+     * Sets the `soundEvent` setting of the biome's ambient mood sound to the given [soundEvent].
      */
     fun soundEvent(soundEvent: Holder<SoundEvent>) {
         this.soundEvent = soundEvent
     }
     
     /**
-     * Sets the `soundEvent` setting of the biome's ambient mood sound to the given [soundEventId] via its [ResourceLocation].
-     * If the [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
-     * the [SoundEvent Registry][Registries.SOUND_EVENT].
+     * Sets the `soundEvent` setting of the biome's ambient mood sound to the given [soundEventId].
      */
     fun soundEvent(soundEventId: ResourceLocation) {
-        this.soundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId)
+        soundEvent(ResourceKey.create(Registries.SOUND_EVENT, soundEventId))
     }
     
     /**
-     * Sets the `soundEvent` setting of the biome's ambient mood sound to the given [soundEventId] via its [ResourceKey].
-     * If the [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
-     * the [SoundEvent Registry][Registries.SOUND_EVENT].
+     * Sets the `soundEvent` setting of the biome's ambient mood sound to the given [soundEventKey].
      */
-    fun soundEvent(soundEventId: ResourceKey<SoundEvent>) {
-        this.soundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId.location())
+    fun soundEvent(soundEventKey: ResourceKey<SoundEvent>) {
+        this.soundEvent = soundEventRegistry.getOrThrow(soundEventKey)
     }
     
     /**
@@ -940,10 +652,7 @@ class AmbientMoodSoundBuilder {
         this.soundPositionOffset = soundPositionOffset
     }
     
-    /**
-     * Builds a [AmbientMoodSettings] instance from the current state of this builder.
-     */
-    fun build() = AmbientMoodSettings(soundEvent, tickDelay, blockSearchExtent, soundPositionOffset)
+    internal fun build() = AmbientMoodSettings(soundEvent, tickDelay, blockSearchExtent, soundPositionOffset)
     
 }
 
@@ -951,7 +660,10 @@ class AmbientMoodSoundBuilder {
  * Builder for [Music].
  */
 @ExperimentalWorldGen
-class MusicBuilder {
+@RegistryElementBuilderDsl
+class MusicBuilder internal constructor(lookup: RegistryInfoLookup) {
+    
+    private val soundEventRegistry = lookup.lookupGetterOrThrow(Registries.SOUND_EVENT)
     
     private lateinit var soundEvent: Holder<SoundEvent>
     private var minDelay: Int = 12000
@@ -966,29 +678,24 @@ class MusicBuilder {
     }
     
     /**
-     * Sets the `soundEvent` setting of the music to the given [soundEvent] via a [Holder] that
-     * either already contains a [SoundEvent], or is set later by the [SoundEvent Registry][Registries.SOUND_EVENT].
+     * Sets the `soundEvent` setting of the music to the given [soundEvent].
      */
     fun soundEvent(soundEvent: Holder<SoundEvent>) {
         this.soundEvent = soundEvent
     }
     
     /**
-     * Sets the `soundEvent` setting of the music to the given [soundEventId] via its [ResourceLocation].
-     * If the [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
-     * the [SoundEvent Registry][Registries.SOUND_EVENT].
+     * Sets the `soundEvent` setting of the music to the given [soundEventId].
      */
     fun soundEvent(soundEventId: ResourceLocation) {
-        this.soundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId)
+        soundEvent(ResourceKey.create(Registries.SOUND_EVENT, soundEventId))
     }
     
     /**
-     * Sets the `soundEvent` setting of the music to the given [soundEventId] via its [ResourceKey].
-     * If the [SoundEvent] is not yet registered, an empty [Holder] will be created and the [SoundEvent] will be set later by
-     * the [SoundEvent Registry][Registries.SOUND_EVENT].
+     * Sets the `soundEvent` setting of the music to the given [soundEventId].
      */
     fun soundEvent(soundEventId: ResourceKey<SoundEvent>) {
-        this.soundEvent = VanillaRegistries.SOUND_EVENT.getOrCreateHolder(soundEventId.location())
+        this.soundEvent = soundEventRegistry.getOrThrow(soundEventId)
     }
     
     /**
@@ -1015,6 +722,6 @@ class MusicBuilder {
     /**
      * Builds a [Music] instance from the current state of this builder.
      */
-    fun build() = Music(soundEvent, minDelay, maxDelay, replaceCurrentMusic)
+    internal fun build() = Music(soundEvent, minDelay, maxDelay, replaceCurrentMusic)
     
 }

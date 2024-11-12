@@ -24,7 +24,6 @@ import xyz.xenondevs.invui.window.AnvilWindow
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.changeTitle
 import xyz.xenondevs.invui.window.type.context.setTitle
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.ui.menu.applyDefaultTPIngredients
 import xyz.xenondevs.nova.ui.menu.explorer.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.AnvilTextItem
@@ -297,7 +296,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     }
     
     companion object {
-        val CHEAT_MODE_KEY = NamespacedKey(Nova, "cheat_mode")
+        val CHEAT_MODE_KEY = NamespacedKey("nova", "cheat_mode")
         val cheaters = weakHashSet<Player>()
     }
     

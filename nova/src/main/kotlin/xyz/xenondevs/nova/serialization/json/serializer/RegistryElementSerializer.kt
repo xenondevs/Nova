@@ -4,7 +4,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import net.minecraft.core.Registry
-import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.getValueOrThrow
 
 internal class RegistryElementSerializer<T : Any>(private val registry: Registry<T>) : TypeAdapter<T>() {
     
@@ -14,7 +14,7 @@ internal class RegistryElementSerializer<T : Any>(private val registry: Registry
     
     override fun read(reader: JsonReader): T {
         val id = reader.nextString()
-        return registry[id] ?: throw IllegalArgumentException("Unknown registry element: $id")
+        return registry.getValueOrThrow(id)
     }
     
 }

@@ -63,6 +63,7 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
     fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
+    fun handleInventoryTick(player: Player, itemStack: ItemStack, slot: Int) = Unit
     
     /**
      * Modifies the [damage] when [player] is breaking a [block] with [itemStack].
@@ -82,6 +83,6 @@ interface ItemBehavior : ItemBehaviorHolder {
     
 }
 
-interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
+fun interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
     fun create(item: NovaItem): T
 }

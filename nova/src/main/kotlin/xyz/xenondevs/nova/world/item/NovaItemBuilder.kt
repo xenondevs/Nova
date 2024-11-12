@@ -7,24 +7,22 @@ import net.kyori.adventure.text.format.TextDecoration
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.config.ConfigurableRegistryElementBuilder
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.resources.layout.item.ItemModelLayoutBuilder
 import xyz.xenondevs.nova.resources.layout.item.RequestedItemModelLayout
-import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
-import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
-import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 
 class NovaItemBuilder internal constructor(
     id: ResourceLocation
 ) : ConfigurableRegistryElementBuilder<NovaItem>(NovaRegistries.ITEM, id) {
     
     private var style: Style = Style.empty()
-    private var name: Component? = Component.translatable("item.${id.namespace}.${id.name}")
+    private var name: Component? = Component.translatable("item.${id.namespace}.${id.path}")
     private var behaviors: MutableList<ItemBehaviorHolder> = ArrayList()
     private var maxStackSize = 64
     private var craftingRemainingItem: ItemStack? = null

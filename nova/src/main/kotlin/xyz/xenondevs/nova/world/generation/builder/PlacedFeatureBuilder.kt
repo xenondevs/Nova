@@ -1,26 +1,23 @@
-@file:Suppress("DEPRECATION")
-
 package xyz.xenondevs.nova.world.generation.builder
 
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
+import net.minecraft.core.WritableRegistry
 import net.minecraft.core.registries.Registries
 import net.minecraft.data.worldgen.placement.PlacementUtils
+import net.minecraft.resources.RegistryOps.RegistryInfoLookup
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.valueproviders.ConstantInt
 import net.minecraft.util.valueproviders.IntProvider
-import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.level.levelgen.VerticalAnchor
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate
-import net.minecraft.world.level.levelgen.carver.WorldCarver
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider
 import net.minecraft.world.level.levelgen.heightproviders.UniformHeight
 import net.minecraft.world.level.levelgen.placement.BiomeFilter
 import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter
-import net.minecraft.world.level.levelgen.placement.CarvingMaskPlacement
 import net.minecraft.world.level.levelgen.placement.CountOnEveryLayerPlacement
 import net.minecraft.world.level.levelgen.placement.CountPlacement
 import net.minecraft.world.level.levelgen.placement.EnvironmentScanPlacement
@@ -38,14 +35,14 @@ import net.minecraft.world.level.levelgen.placement.SurfaceWaterDepthFilter
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.registry.worldgen.FeatureRegistry
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
-import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
-import xyz.xenondevs.nova.util.getOrCreateHolder
+import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
+import xyz.xenondevs.nova.util.lookupGetterOrThrow
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.FeatureType
 
 /**
- * Builder for [PlacedFeatures][PlacedFeature]. Use [build] to get the [PlacedFeature] instance or [register] to register
- * it. Check out the [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/placed-feature/) on
+ * Builder for [PlacedFeatures][PlacedFeature]. 
+ * Check out the [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/placed-feature/) on
  * [PlacedFeatures][PlacedFeature] for more information.
  *
  * @see [FeatureRegistry]
@@ -54,48 +51,26 @@ import xyz.xenondevs.nova.world.generation.FeatureType
  * @see [FeatureType]
  */
 @ExperimentalWorldGen
-class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<PlacedFeature>(VanillaRegistries.PLACED_FEATURE, id) {
+@RegistryElementBuilderDsl
+class PlacedFeatureBuilder internal constructor(
+    id: ResourceLocation,
+    registry: WritableRegistry<PlacedFeature>,
+    lookup: RegistryInfoLookup
+) : RegistryElementBuilder<PlacedFeature>(registry, id) {
+    
+    private val configuredFeatureRegistry = lookup.lookupGetterOrThrow(Registries.CONFIGURED_FEATURE)
     
     private var configuredFeature: Holder<ConfiguredFeature<*, *>>? = null
     private val modifiers = mutableListOf<PlacementModifier>()
     
+   
     /**
-     * Sets the [ConfiguredFeature] that should be placed by this [PlacedFeature].
-     */
-    fun configuredFeature(configuredFeature: ConfiguredFeature<*, *>) {
-        this.configuredFeature = Holder.direct(configuredFeature)
-    }
-    
-    /**
-     * Sets the [ConfiguredFeature] that should be placed by this [PlacedFeature] via a [Holder] that either already
-     * contains the [ConfiguredFeature], or is set later by the [ConfiguredFeature Registry][Registries.CONFIGURED_FEATURE].
+     * Sets the [ConfiguredFeature] that should be placed by this [PlacedFeature] to [configuredFeature].
      *
      * For more information on configured features, check out their [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/features/#2-configured-feature).
      */
-    fun configuredFeature(configuredFeature: Holder<ConfiguredFeature<*, *>>) {
-        this.configuredFeature = configuredFeature
-    }
-    
-    /**
-     * Sets the [ConfiguredFeature] that should be placed by this [PlacedFeature] via its [ResourceLocation]. If the
-     * [ConfiguredFeature] is not yet registered, an empty [Holder] will be created and the [ConfiguredFeature] will be
-     * set later by the [ConfiguredFeature Registry][Registries.CONFIGURED_FEATURE].
-     *
-     * For more information on configured features, check out their [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/features/#2-configured-feature).
-     */
-    fun configuredFeature(configuredFeatureId: ResourceLocation) {
-        this.configuredFeature = VanillaRegistries.CONFIGURED_FEATURE.getOrCreateHolder(configuredFeatureId)
-    }
-    
-    /**
-     * Sets the [ConfiguredFeature] that should be placed by this [PlacedFeature] via its [ResourceKey]. If the
-     * [ConfiguredFeature] is not yet registered, an empty [Holder] will be created and the [ConfiguredFeature] will be
-     * set later by the [ConfiguredFeature Registry][Registries.CONFIGURED_FEATURE].
-     *
-     * For more information on configured features, check out their [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/features/#2-configured-feature).
-     */
-    fun configuredFeature(configuredFeatureKey: ResourceKey<ConfiguredFeature<*, *>>) {
-        this.configuredFeature = VanillaRegistries.CONFIGURED_FEATURE.getOrCreateHolder(configuredFeatureKey.location())
+    fun configuredFeature(configuredFeature: ResourceKey<ConfiguredFeature<*, *>>) {
+        this.configuredFeature = configuredFeatureRegistry.getOrThrow(configuredFeature)
     }
     
     /**
@@ -142,14 +117,6 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
     }
     
     /**
-     * Adds a [CarvingMaskPlacement] [PlacementModifier] to this [PlacedFeature], which returns all positions in the
-     * given position's chunk that were carved out by a [WorldCarver] in the specified [GenerationStep.Carving].
-     */
-    fun carvingMaskBlocks(step: GenerationStep.Carving) {
-        modifiers += CarvingMaskPlacement.forStep(step)
-    }
-    
-    /**
      * Adds a [CountPlacement] [PlacementModifier] with the given [count] to this [PlacedFeature], which returns the
      * given position [count] times.
      */
@@ -165,11 +132,13 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
         modifiers += CountPlacement.of(count)
     }
     
+    @Suppress("DEPRECATION")
     @Deprecated("Deprecated in vanilla.")
     fun countOnEveryLayer(count: Int) {
         modifiers += CountOnEveryLayerPlacement.of(count)
     }
     
+    @Suppress("DEPRECATION")
     @Deprecated("Deprecated in vanilla.")
     fun countOnEveryLayer(count: IntProvider) {
         modifiers += CountOnEveryLayerPlacement.of(count)
@@ -408,7 +377,7 @@ class PlacedFeatureBuilder(id: ResourceLocation) : RegistryElementBuilder<Placed
     override fun build(): PlacedFeature {
         requireNotNull(configuredFeature) { "No configured feature was set for placed feature $id" }
         if (modifiers.isEmpty())
-            LOGGER.warning("Placed feature $id has no placement modifiers!")
+            LOGGER.warn("Placed feature $id has no placement modifiers!")
         
         return PlacedFeature(configuredFeature!!, modifiers)
     }

@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.resources.layout.item
 import org.joml.Vector3d
 import org.joml.Vector4d
 import xyz.xenondevs.commons.collections.mapToArray
+import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.model.Model
@@ -12,7 +13,6 @@ import xyz.xenondevs.nova.resources.builder.model.Model.Element.Face
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
 import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 
 @RegistryElementBuilderDsl
 class ItemModelSelectorScope internal constructor(

@@ -1,9 +1,10 @@
-package xyz.xenondevs.nova.network.event.clientbound
+package xyz.xenondevs.nova.network.event.serverbound
 
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.phys.Vec3
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.network.ServerboundInteractPacket
 import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 import java.lang.invoke.MethodHandles
 
@@ -55,7 +56,7 @@ class ServerboundInteractPacketEvent(
         }
     
     override fun buildChangedPacket(): ServerboundInteractPacket =
-        xyz.xenondevs.nova.network.ServerboundInteractPacket(entityId, action, isUsingSecondaryAction)
+        ServerboundInteractPacket(entityId, action, isUsingSecondaryAction)
     
     sealed interface Action {
         

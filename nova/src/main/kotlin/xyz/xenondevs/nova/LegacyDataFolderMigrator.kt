@@ -29,11 +29,11 @@ import kotlin.io.path.walk
 // TODO: Remove in 0.19
 internal object LegacyDataFolderMigrator {
     
-    private val PLUGINS_DIR = Nova.dataFolder.parentFile.toPath()
+    private val PLUGINS_DIR = DATA_FOLDER.parent
     
     fun migrate() {
         // addons need to be moved manually because plugins are already loaded at this point
-        val addonsDir = Nova.dataFolder.toPath().resolve("addons")
+        val addonsDir = DATA_FOLDER.resolve("addons")
         if (addonsDir.exists() && addonsDir.listDirectoryEntries().isNotEmpty()) {
             throw Exception("plugins/Nova/addons exists, but addons are plugins now. Please move all addons to plugins/")
         }
@@ -50,7 +50,7 @@ internal object LegacyDataFolderMigrator {
     private fun determineDataFolder(namespace: String): Path? {
         for (addon in AddonBootstrapper.addons) {
             if (addon.id == namespace)
-                return addon.dataFolder.toPath()
+                return addon.dataFolder
         }
         
         return null
@@ -59,14 +59,14 @@ internal object LegacyDataFolderMigrator {
     private fun determineDataFolder(prefixedFile: Path): Path? {
         for (addon in AddonBootstrapper.addons) {
             if (prefixedFile.name.startsWith("${addon.id}_"))
-                return addon.dataFolder.toPath()
+                return addon.dataFolder
         }
         
         return null
     }
     
     private fun migrateConfigs() {
-        val configs = Nova.dataFolder.toPath().resolve("configs")
+        val configs = DATA_FOLDER.resolve("configs")
         if (configs.exists()) {
             // move plugins/Nova/configs/nova/ contents to plugins/Nova/configs/
             val configsNova = configs.resolve("nova")
@@ -89,7 +89,7 @@ internal object LegacyDataFolderMigrator {
                         legacyConfigDir.copyToRecursively(newConfigDir, followLinks = false, overwrite = true)
                         legacyConfigDir.deleteRecursively()
                     } else {
-                        LOGGER.warning("Could not resolve addon ${legacyConfigDir.name} for config relocation")
+                        LOGGER.warn("Could not resolve addon ${legacyConfigDir.name} for config relocation")
                     }
                 }
         }
@@ -110,7 +110,7 @@ internal object LegacyDataFolderMigrator {
     }
     
     private fun migratePrefixedDataFiles(dir: String) {
-        val legacyDir = Nova.dataFolder.toPath().resolve(dir)
+        val legacyDir = DATA_FOLDER.resolve(dir)
         if (legacyDir.exists()) {
             val oldUpdatableFiles: Map<String, String> = PermanentStorage.retrieve("updatableFileHashes", ::HashMap)
             val newUpdatableFiles: MutableMap<String, String> = PermanentStorage.retrieve("updatable_file_hashes", ::HashMap)
@@ -129,7 +129,7 @@ internal object LegacyDataFolderMigrator {
                         
                         newUpdatableFiles[newFile.relativeTo(PLUGINS_DIR).invariantSeparatorsPathString] = oldUpdatableFiles[legacyFile.absolutePathString()]!!
                     } else {
-                        LOGGER.warning("Could not resolve addon for prefixed data file relocation of $legacyFile")
+                        LOGGER.warn("Could not resolve addon for prefixed data file relocation of $legacyFile")
                     }
                 }
             
@@ -140,7 +140,7 @@ internal object LegacyDataFolderMigrator {
     }
     
     private fun migrateWorldgen() {
-        val data = Nova.dataFolder.toPath().resolve("data")
+        val data = DATA_FOLDER.resolve("data")
         if (data.exists()) {
             val oldUpdatableFiles: Map<String, String> = PermanentStorage.retrieve("updatableFileHashes", ::HashMap)
             val newUpdatableFiles: MutableMap<String, String> = PermanentStorage.retrieve("updatable_file_hashes", ::HashMap)
@@ -170,7 +170,7 @@ internal object LegacyDataFolderMigrator {
                         oldWorldgen.deleteRecursively()
                     }
                 } else {
-                    LOGGER.warning("Could not resolve addon $addonId for worldgen relocation")
+                    LOGGER.warn("Could not resolve addon $addonId for worldgen relocation")
                 }
             }
             

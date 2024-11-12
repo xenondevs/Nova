@@ -13,6 +13,7 @@ internal object VanillaMaterialTypes {
         Material.LEATHER_CHESTPLATE to setOf(VanillaMaterialProperty.CHESTPLATE),
         Material.LEATHER_LEGGINGS to setOf(VanillaMaterialProperty.LEGGINGS),
         Material.LEATHER_BOOTS to setOf(VanillaMaterialProperty.BOOTS),
+        Material.BUNDLE to setOf(VanillaMaterialProperty.BUNDLE)
     )
     
     val DEFAULT_MATERIAL = Material.SHULKER_SHELL

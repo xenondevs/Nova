@@ -18,13 +18,16 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
+import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.util.MethodNode
+import xyz.xenondevs.bytebase.util.insertBeforeEvery
 import xyz.xenondevs.novagradle.util.TaskUtils
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteExisting
+import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.name
 import kotlin.io.path.notExists
@@ -33,10 +36,13 @@ import kotlin.io.path.writeBytes
 
 private const val PAPER_PLUGIN_YML = "paper-plugin.yml"
 private const val NOVA_ADDON_YML = "nova-addon.yml"
+private const val JAVA_PLUGIN_NAME = "xyz.xenondevs.addonloader.JavaPlugin"
 private const val BOOTSTRAPPER_NAME = "xyz.xenondevs.addonloader.Bootstrapper"
 private const val PLUGIN_LOADER_NAME = "xyz.xenondevs.addonloader.PluginLoader"
+private val JAVA_PLUGIN_INTERNAL_NAME = JAVA_PLUGIN_NAME.replace('.', '/')
 private val BOOTSTRAPPER_INTERNAL_NAME = BOOTSTRAPPER_NAME.replace('.', '/')
 private val PLUGIN_LOADER_INTERNAL_NAME = PLUGIN_LOADER_NAME.replace('.', '/')
+private val JAVA_PLUGIN_FILE_PATH = "$JAVA_PLUGIN_INTERNAL_NAME.class"
 private val PLUGIN_LOADER_FILE_PATH = "$PLUGIN_LOADER_INTERNAL_NAME.class"
 
 @DisableCachingByDefault
@@ -50,6 +56,10 @@ abstract class AddonJarTask : DefaultTask() {
     
     @get:Input
     abstract val main: Property<String>
+    
+    @get:Input
+    @get:Optional
+    abstract val pluginMain: Property<String>
     
     @get:Input
     @get:Optional
@@ -104,6 +114,8 @@ abstract class AddonJarTask : DefaultTask() {
             writePaperPluginYml(apiVersion, root.resolve(PAPER_PLUGIN_YML))
             writeNovaAddonYml(novaVersion, root.resolve(NOVA_ADDON_YML))
             generateBootstrapper(root.resolve(bootstrapper.getOrElse(BOOTSTRAPPER_NAME).replace('.', '/') + ".class"))
+            if (!pluginMain.isPresent)
+                generateJavaPlugin(root.resolve(JAVA_PLUGIN_FILE_PATH))
             if (!loader.isPresent) // only generate loader if no custom loader is specified
                 generateLoader(root.resolve(PLUGIN_LOADER_FILE_PATH))
         }
@@ -120,7 +132,6 @@ abstract class AddonJarTask : DefaultTask() {
         // generic metadata
         pluginYml.node("name").set(addonName.get())
         pluginYml.node("version").set(version.get())
-        pluginYml.node("main").set(main.get())
         pluginYml.node("api-version").set(apiVersion)
         if (addonDescription.isPresent) {
             pluginYml.node("description").set(addonDescription.get())
@@ -138,7 +149,8 @@ abstract class AddonJarTask : DefaultTask() {
             pluginYml.node("prefix").set(prefix.get())
         }
         
-        // loader & bootstrapper
+        // main, loader, bootstrapper
+        pluginYml.node("main").set(pluginMain.getOrElse(JAVA_PLUGIN_NAME))
         pluginYml.node("loader").set(loader.getOrElse(PLUGIN_LOADER_NAME))
         pluginYml.node("bootstrapper").set(bootstrapper.getOrElse(BOOTSTRAPPER_NAME))
         
@@ -157,9 +169,40 @@ abstract class AddonJarTask : DefaultTask() {
         val addonYmlLoader = YamlConfigurationLoader.builder().path(path).build()
         val addonYml = addonYmlLoader.load()
         
+        addonYml.node("main").set(main.get())
         addonYml.node("nova_version").set(novaVersion)
         
         addonYmlLoader.save(addonYml)
+    }
+    
+    private fun generateJavaPlugin(path: Path) {
+        if (path.exists())
+            return
+        
+        val javaPlugin = ClassNode(Opcodes.ASM9).apply {
+            version = Opcodes.V21
+            name = JAVA_PLUGIN_INTERNAL_NAME
+            access = Opcodes.ACC_PUBLIC
+            superName = "org/bukkit/plugin/java/JavaPlugin"
+            
+            methods = mutableListOf(
+                // <init>
+                MethodNode(
+                    Opcodes.ACC_PUBLIC,
+                    "<init>",
+                    "()V"
+                ) {
+                    addLabel()
+                    aLoad(0)
+                    invokeSpecial("org/bukkit/plugin/java/JavaPlugin", "<init>", "()V")
+                    _return()
+                }
+            )
+        }
+        
+        val bin = ClassWriter(ClassWriter.COMPUTE_FRAMES).also(javaPlugin::accept).toByteArray()
+        path.parent.createDirectories()
+        path.writeBytes(bin)
     }
     
     private fun generateBootstrapper(path: Path) {
@@ -192,6 +235,24 @@ abstract class AddonJarTask : DefaultTask() {
                     ) {
                         addLabel()
                         _return()
+                    },
+                    
+                    // createPlugin (calls interface default)
+                    MethodNode(
+                        Opcodes.ACC_PUBLIC,
+                        "createPlugin",
+                        "(Lio/papermc/paper/plugin/bootstrap/PluginProviderContext;)Lorg/bukkit/plugin/java/JavaPlugin;"
+                    ) {
+                        addLabel()
+                        aLoad(0)
+                        aLoad(1)
+                        invokeSpecial(
+                            "io/papermc/paper/plugin/bootstrap/PluginBootstrap",
+                            "createPlugin",
+                            "(Lio/papermc/paper/plugin/bootstrap/PluginProviderContext;)Lorg/bukkit/plugin/java/JavaPlugin;",
+                            isInterface = true
+                        )
+                        areturn()
                     }
                 )
             }
@@ -202,25 +263,33 @@ abstract class AddonJarTask : DefaultTask() {
             }
         }
         
-        // return AddonBootstrapper.createJavaPlugin(context, getClass().getClassLoader())
-        bootstrapper.methods.add(MethodNode(
-            Opcodes.ACC_PUBLIC,
-            "createPlugin",
-            "(Lio/papermc/paper/plugin/bootstrap/PluginProviderContext;)Lorg/bukkit/plugin/java/JavaPlugin;"
-        ) {
+        // inserts AddonBootstrapper.bootstrap(context, getClass().getClassLoader()) at beginning
+        bootstrapper.methods.first { it.name == "bootstrap" }.instructions.insert(buildInsnList {
             addLabel()
             aLoad(1)
             aLoad(0)
             invokeVirtual("java/lang/Object", "getClass", "()Ljava/lang/Class;")
             invokeVirtual("java/lang/Class", "getClassLoader", "()Ljava/lang/ClassLoader;")
-            
             invokeStatic(
                 "xyz/xenondevs/nova/addon/AddonBootstrapper",
-                "createJavaPlugin",
-                "(Lio/papermc/paper/plugin/bootstrap/PluginProviderContext;Ljava/lang/ClassLoader;)Lorg/bukkit/plugin/java/JavaPlugin;"
+                "bootstrap",
+                "(Lio/papermc/paper/plugin/bootstrap/BootstrapContext;Ljava/lang/ClassLoader;)V"
             )
-            areturn()
         })
+        
+        // inserts AddonBootstrapper.handleJavaPluginCreated(JavaPlugin, PluginProviderContext, ClassLoader) before return
+        bootstrapper.methods.first { it.name == "createPlugin" }.insertBeforeEvery(buildInsnList {
+            dup()
+            aLoad(1) // PluginProviderContext
+            aLoad(0)
+            invokeVirtual("java/lang/Object", "getClass", "()Ljava/lang/Class;")
+            invokeVirtual("java/lang/Class", "getClassLoader", "()Ljava/lang/ClassLoader;")
+            invokeStatic(
+                "xyz/xenondevs/nova/addon/AddonBootstrapper",
+                "handleJavaPluginCreated",
+                "(Lorg/bukkit/plugin/java/JavaPlugin;Lio/papermc/paper/plugin/bootstrap/PluginProviderContext;Ljava/lang/ClassLoader;)V"
+            )
+        }) { it.opcode == Opcodes.ARETURN }
         
         val bin = ClassWriter(ClassWriter.COMPUTE_FRAMES).also(bootstrapper::accept).toByteArray()
         path.parent.createDirectories()

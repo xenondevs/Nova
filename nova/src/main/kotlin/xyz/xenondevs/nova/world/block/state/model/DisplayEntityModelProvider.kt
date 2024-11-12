@@ -1,13 +1,13 @@
 package xyz.xenondevs.nova.world.block.state.model
 
+import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Material
-import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Display.Brightness
 import org.bukkit.inventory.ItemStack
 import org.joml.Matrix4fc
 import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.util.item.requiresLight
-import xyz.xenondevs.nova.util.nmsBlockState
+import xyz.xenondevs.nova.util.setBlockState
 import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.util.withoutBlockMigration
@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 internal data class DisplayEntityBlockModelData(
     val models: List<Model>,
-    val hitboxType: BlockData,
+    val hitboxType: BlockState
 ) {
     
     internal data class Model(val material: Material, val customModelData: Int, val transform: Matrix4fc) {
@@ -46,9 +46,9 @@ internal data object DisplayEntityBlockModelProvider : BlockModelProvider<Displa
     private fun placeHitbox(pos: BlockPos, info: DisplayEntityBlockModelData, method: BlockUpdateMethod) {
         withoutBlockMigration(pos) {
             when (method) {
-                BlockUpdateMethod.DEFAULT -> pos.block.blockData = info.hitboxType
-                BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.hitboxType.nmsBlockState)
-                BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.hitboxType.nmsBlockState)
+                BlockUpdateMethod.DEFAULT -> pos.setBlockState(info.hitboxType)
+                BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.hitboxType)
+                BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.hitboxType)
             }
         }
     }
@@ -89,7 +89,7 @@ internal data object DisplayEntityBlockModelProvider : BlockModelProvider<Displa
     
     private fun setMetadata(data: ItemDisplayMetadata, info: DisplayEntityBlockModelData, model: DisplayEntityBlockModelData.Model) {
         // TODO: proper light level
-        if (info.hitboxType.material.requiresLight) {
+        if (info.hitboxType.bukkitMaterial.requiresLight) {
             data.brightness = Brightness(15, 15)
         }
         

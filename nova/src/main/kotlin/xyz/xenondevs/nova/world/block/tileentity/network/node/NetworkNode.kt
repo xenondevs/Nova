@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.node
 
 import org.bukkit.OfflinePlayer
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.format.NetworkState
 
 /**

@@ -1,20 +1,26 @@
 package xyz.xenondevs.nova.util.data
 
+import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import com.mojang.datafixers.util.Either
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
+import com.mojang.serialization.DynamicOps
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
-import xyz.xenondevs.nova.util.NMSUtils
 import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.reader
 import com.mojang.datafixers.util.Pair as MojangPair
 
-fun <T> Codec<T>.decodeJsonFile(file: File) =
-    decode(NMSUtils.REGISTRY_OPS, file.reader().use(JsonParser::parseReader))!!
+fun <T> Codec<T>.decodeJsonFile(dynamicOps: DynamicOps<JsonElement>, file: File) =
+    decodeJsonFile(dynamicOps, file.toPath())
+
+fun <T> Codec<T>.decodeJsonFile(dynamicOps: DynamicOps<JsonElement>, file: Path) =
+    file.reader().use { decode(dynamicOps, file.reader().use(JsonParser::parseReader))!! }
 
 inline fun <reified T : S, S : Any> Codec<S>.subType(): Codec<T> =
     this.comapFlatMap({ (it as? T).asDataResult("Expected subtype ${T::class.simpleName} but got ${it::class.simpleName}") }, { it })

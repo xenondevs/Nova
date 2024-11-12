@@ -16,14 +16,13 @@ import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.patch.MultiTransformer
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.data.getCompoundOrNull
+import xyz.xenondevs.nova.util.getValue
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.legacy.ItemStackLegacyConversion
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.patch.MultiTransformer
-import xyz.xenondevs.nova.util.data.getCompoundOrNull
-import xyz.xenondevs.nova.util.get
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
-import java.util.logging.Level
 import kotlin.jvm.optionals.getOrNull
 
 private val ITEM_STACK_CONSTRUCTOR = ReflectionUtils.getConstructor(
@@ -46,7 +45,7 @@ internal object ItemStackDataComponentsPatch : MultiTransformer(ItemStack::class
         val novaItem = patch.get(DataComponents.CUSTOM_DATA)?.getOrNull()?.unsafe
             ?.getCompoundOrNull("nova")
             ?.getString("id")
-            ?.let(NovaRegistries.ITEM::get)
+            ?.let(NovaRegistries.ITEM::getValue)
         
         return PatchedDataComponentMap.fromPatch(
             if (novaItem != null) NovaDataComponentMap(novaItem) else base,
@@ -63,7 +62,7 @@ internal class NovaDataComponentMap(private val novaItem: NovaItem) : DataCompon
         try {
             return novaItem.baseDataComponents.get(type)
         } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "Failed to retrieve base data components for $novaItem", e)
+            LOGGER.error("Failed to retrieve base data components for $novaItem", e)
         }
         
         return null
@@ -73,7 +72,7 @@ internal class NovaDataComponentMap(private val novaItem: NovaItem) : DataCompon
         try {
             return novaItem.baseDataComponents.keySet()
         } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "Failed to retrieve base data components for $novaItem", e)
+            LOGGER.error("Failed to retrieve base data components for $novaItem", e)
         }
         
         return emptySet()

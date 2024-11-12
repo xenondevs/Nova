@@ -98,11 +98,11 @@ object ToolUtils {
             hardness = block.hardness,
             correctForDrops = isCorrectToolForDrops(block, tool),
             speed = getDestroySpeed(block, tool),
-            efficiency = player.getAttribute(Attribute.PLAYER_MINING_EFFICIENCY)?.value ?: 0.0,
+            efficiency = player.getAttribute(Attribute.MINING_EFFICIENCY)?.value ?: 0.0,
             hasteLevel = player.getPotionEffect(PotionEffectType.HASTE)?.amplifier?.plus(1) ?: 0,
             fatigueLevel = player.getPotionEffect(PotionEffectType.MINING_FATIGUE)?.amplifier?.plus(1) ?: 0,
-            blockBreakSpeed = player.getAttribute(Attribute.PLAYER_BLOCK_BREAK_SPEED)?.value ?: 1.0,
-            submergedMiningSpeed = player.getAttribute(Attribute.PLAYER_SUBMERGED_MINING_SPEED)?.value ?: 0.2,
+            blockBreakSpeed = player.getAttribute(Attribute.BLOCK_BREAK_SPEED)?.value ?: 1.0,
+            submergedMiningSpeed = player.getAttribute(Attribute.SUBMERGED_MINING_SPEED)?.value ?: 0.2,
             isOnGround = player.isOnGround,
             isUnderWater = player.eyeInWater && player.inventory.helmet?.containsEnchantment(Enchantment.AQUA_AFFINITY) != true
         )

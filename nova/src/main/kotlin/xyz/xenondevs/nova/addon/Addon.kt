@@ -2,41 +2,68 @@
 
 package xyz.xenondevs.nova.addon
 
-import org.bukkit.plugin.Plugin
+import io.papermc.paper.plugin.configuration.PluginMeta
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.addon.registry.AddonHolder
+import xyz.xenondevs.nova.addon.registry.AddonRegistryHolder
 import xyz.xenondevs.nova.update.ProjectDistributor
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
-import java.io.File
-
-private val JAVA_PLUGIN_GET_FILE = ReflectionUtils.getMethodHandle(JavaPlugin::class, "getFile")
+import java.nio.file.Path
 
 @PublishedApi
 internal val Addon.name: String
-    get() = (this as JavaPlugin).pluginMeta.name
+    get() = pluginMeta.name
 
 @PublishedApi
 internal val Addon.id: String
-    get() = (this as JavaPlugin).pluginMeta.name.lowercase()
+    get() = pluginMeta.name.lowercase()
 
 @PublishedApi
 internal val Addon.version: String
-    get() = (this as JavaPlugin).pluginMeta.version
+    get() = pluginMeta.version
 
-@PublishedApi
-internal val Addon.file: File
-    get() = JAVA_PLUGIN_GET_FILE.invoke(this as JavaPlugin) as File
-
-interface Addon : Plugin, AddonHolder {
+abstract class Addon : AddonHolder {
+    
+    final override val addon: Addon
+        get() = this
+    
+    val registry = AddonRegistryHolder(this)
     
     /**
      * A list of [ProjectDistributors][ProjectDistributor] that distribute this addon
      * and should be checked for updates.
      */
-    val projectDistributors: List<ProjectDistributor>
+    open val projectDistributors: List<ProjectDistributor>
         get() = emptyList()
     
-    override val addon: Addon
-        get() = this
+    /**
+     * The [JavaPlugin] instance of this addon, null during bootstrap phase.
+     */
+    var plugin: JavaPlugin? = null
+        internal set
+    
+    /**
+     * The [PluginMeta] of this addon.
+     */
+    lateinit var pluginMeta: PluginMeta
+        internal set
+    
+    /**
+     * The [Path] of the file of this addon.
+     */
+    lateinit var file: Path
+        internal set
+    
+    /**
+     * The [Path] of the data folder of this addon.
+     */
+    lateinit var dataFolder: Path
+        internal set
+    
+    /**
+     * The [ComponentLogger] of this addon.
+     */
+    lateinit var logger: ComponentLogger
+        internal set
     
 }

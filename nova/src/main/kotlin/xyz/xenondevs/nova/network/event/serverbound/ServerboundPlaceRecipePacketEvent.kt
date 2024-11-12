@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.network.event.serverbound
 
 import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.network.ServerboundPlaceRecipePacket
 import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 
 class ServerboundPlaceRecipePacketEvent(
@@ -20,14 +19,14 @@ class ServerboundPlaceRecipePacketEvent(
             field = value
             changed = true
         }
-    var shiftDown = packet.isShiftDown
+    var useMaxItems = packet.useMaxItems
         set(value) {
             field = value
             changed = true
         }
     
     override fun buildChangedPacket(): ServerboundPlaceRecipePacket {
-        return ServerboundPlaceRecipePacket(containerId, recipe, shiftDown)
+        return ServerboundPlaceRecipePacket(containerId, recipe, useMaxItems)
     }
     
 }

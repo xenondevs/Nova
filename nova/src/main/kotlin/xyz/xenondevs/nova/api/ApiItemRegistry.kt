@@ -12,7 +12,7 @@ internal object ApiItemRegistry : NovaItemRegistry {
     
     override fun getOrNull(id: String): NovaItem? {
         val loc = ResourceLocation.parse(id)
-        return NovaRegistries.ITEM[loc]?.let(::ApiItemWrapper)
+        return NovaRegistries.ITEM.getValue(loc)?.let(::ApiItemWrapper)
     }
     
     override fun getOrNull(id: NamespacedId): NovaItem? =

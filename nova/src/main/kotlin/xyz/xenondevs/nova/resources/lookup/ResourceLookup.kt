@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.resources.lookup
 
 import net.minecraft.resources.ResourceLocation
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.reflection.createType
 import xyz.xenondevs.nova.config.PermanentStorage
@@ -9,7 +11,7 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
-open class ResourceLookup<T : Any> internal constructor(
+internal open class ResourceLookup<T : Any>(
     val key: String,
     private val type: KType,
     empty: T,
@@ -37,7 +39,24 @@ open class ResourceLookup<T : Any> internal constructor(
     
 }
 
-class IdResourceLookup<T : Any> internal constructor(
+internal class MapResourceLookup<K: Any, V : Any>(
+    key: String,
+    typeK: KType,
+    typeV: KType
+) : ResourceLookup<Map<K, V>>(key, HashMap::class.createType(typeK, typeV), emptyMap()) {
+    
+    operator fun get(key: K): V? =
+        value[key]
+    
+    fun getOrThrow(key: K): V =
+        value[key] ?: throw IllegalArgumentException("Resource lookup ${this.key} does not contain $key")
+    
+    fun getProvider(keyProvider: Provider<K?>): Provider<V?> =
+        combinedProvider(provider, keyProvider) { map, key -> key?.let(map::get) }
+    
+}
+
+internal class IdResourceLookup<T : Any>(
     key: String,
     type: KType
 ) : ResourceLookup<Map<String, T>>(key, HashMap::class.createType(typeOf<String>(), type), emptyMap()) {

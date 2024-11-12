@@ -2,18 +2,11 @@ package xyz.xenondevs.nova.patch.impl.item
 
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
-import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.enchantment.Enchantment
 import net.minecraft.world.item.enchantment.EnchantmentHelper
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment
-import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.MethodInsnNode
-import org.objectweb.asm.tree.MethodNode
-import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
-import xyz.xenondevs.bytebase.util.calls
-import xyz.xenondevs.bytebase.util.replaceFirstRange
 import xyz.xenondevs.nova.patch.MultiTransformer
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.world.item.behavior.Enchantable
@@ -32,31 +25,6 @@ internal object EnchantmentPatches : MultiTransformer(Enchantment::class, Enchan
         VirtualClassPath[Enchantment::getMaxCost].delegateStatic(::getMaxCost)
         VirtualClassPath[Enchantment::areCompatible].delegateStatic(::areCompatible)
         VirtualClassPath[ItemStack::isEnchantable].delegateStatic(::isEnchantable)
-        patchEnchantmentCostRetrieval(VirtualClassPath[EnchantmentHelper::getEnchantmentCost])
-        patchEnchantmentCostRetrieval(VirtualClassPath[EnchantmentHelper::selectEnchantment])
-    }
-    
-    private fun patchEnchantmentCostRetrieval(methodNode: MethodNode) {
-        // EnchantmentHelper::getEnchantmentCost and EnchantmentHelper::selectEnchantment only use Item instance to retrieve enchantmentValue
-        
-        methodNode.replaceFirstRange(
-            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(ItemStack::getItem) },
-            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Item::getEnchantmentValue) },
-            0, 0,
-            buildInsnList {
-                invokeStatic(::getEnchantmentValue)
-            }
-        )
-    }
-    
-    @JvmStatic
-    fun getEnchantmentValue(itemStack: ItemStack): Int {
-        val novaItem = itemStack.novaItem
-        if (novaItem != null) {
-            return novaItem.getBehaviorOrNull<Enchantable>()?.enchantmentValue ?: 0
-        }
-        
-        return itemStack.item.enchantmentValue
     }
     
     @JvmStatic
@@ -142,7 +110,7 @@ internal object EnchantmentPatches : MultiTransformer(Enchantment::class, Enchan
         if (novaItem != null) {
             return novaItem.hasBehavior<Enchantable>()
         } else {
-            return itemStack.item.isEnchantable(itemStack)
+            return itemStack.isEnchantable
         }
     }
     

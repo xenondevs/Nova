@@ -2,158 +2,100 @@
 
 package xyz.xenondevs.nova.patch.impl.item
 
+import net.minecraft.core.NonNullList
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.crafting.BannerDuplicateRecipe
 import net.minecraft.world.item.crafting.BookCloningRecipe
-import net.minecraft.world.item.crafting.Recipe
+import net.minecraft.world.item.crafting.CraftingInput
+import net.minecraft.world.item.crafting.CraftingRecipe
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity
-import org.bukkit.craftbukkit.CraftServer
-import org.bukkit.craftbukkit.util.CraftMagicNumbers
-import org.bukkit.inventory.ItemStack
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
-import org.objectweb.asm.tree.TypeInsnNode
+import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.calls
-import xyz.xenondevs.bytebase.util.isClass
 import xyz.xenondevs.bytebase.util.replaceEvery
-import xyz.xenondevs.bytebase.util.replaceEveryRange
+import xyz.xenondevs.bytebase.util.replaceFirst
 import xyz.xenondevs.nova.patch.MultiTransformer
 import xyz.xenondevs.nova.util.item.novaItem
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ABSTRACT_FURNACE_BLOCK_ENTITY_ITEMS_FIELD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ITEM_STACK_CONSTRUCTOR
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.NON_NULL_LIST_SET_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.RECIPE_GET_REMAINING_ITEMS_METHOD
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.unwrap
 import net.minecraft.world.item.ItemStack as MojangStack
-import org.bukkit.inventory.ItemStack as BukkitStack
+
+private val BREWING_STAND_BLOCK_ENTITY_DO_BREW = ReflectionUtils.getMethodByName(BrewingStandBlockEntity::class, "doBrew")
 
 internal object RemainingItemPatches : MultiTransformer(
-    BannerDuplicateRecipe::class, BookCloningRecipe::class, Recipe::class,
-    AbstractFurnaceBlockEntity::class, BrewingStandBlockEntity::class, CraftServer::class
+    BannerDuplicateRecipe::class, BookCloningRecipe::class, CraftingRecipe::class,
+    AbstractFurnaceBlockEntity::class, BrewingStandBlockEntity::class
 ) {
     
     override fun transform() {
         listOf(
             VirtualClassPath[BannerDuplicateRecipe::getRemainingItems],
             VirtualClassPath[BookCloningRecipe::getRemainingItems],
-            VirtualClassPath[BREWING_STAND_BLOCK_ENTITY_DO_BREW_METHOD]
-        ).forEach(::patchUsualGetAndConstructNewStackPattern)
+            VirtualClassPath[BREWING_STAND_BLOCK_ENTITY_DO_BREW]
+        ).forEach(::patchGetItemGetCraftingRemainder)
         
-        patchRecipeGetRemainingItems()
+        VirtualClassPath[CraftingRecipe::defaultCraftingReminder].delegateStatic(::defaultCraftingRemainder)
         patchAbstractFurnaceBlockEntityServerTick()
     }
     
     /**
-     * Replaces ItemStack.getItem().getCraftingRemainingItem() with RemainingItemStackPatches.getCraftingRemainingItem(ItemStack)
+     * Replaces ItemStack.getItem().getCraftingRemainder() with RemainingItemStackPatches.getCraftingRemainder(ItemStack)
      *
      * Target instructions:
-     * new net/minecraft/world/item/ItemStack
-     * [...]
-     * invokespecial net/minecraft/world/item/ItemStack.<init> (Lnet/minecraft/world/level/ItemLike;)V
+     * INVOKEVIRTUAL net/minecraft/world/item/ItemStack.getItem ()Lnet/minecraft/world/item/Item;
+     * INVOKEVIRTUAL net/minecraft/world/item/Item.getCraftingRemainder ()Lnet/minecraft/world/item/ItemStack;
      */
-    private fun patchUsualGetAndConstructNewStackPattern(node: MethodNode) {
+    private fun patchGetItemGetCraftingRemainder(node: MethodNode) {
         node.localVariables.clear()
         
-        patchHasCraftingRemainingItem(node)
-        
-        node.replaceEveryRange(
-            { it.opcode == Opcodes.NEW && (it as TypeInsnNode).isClass(MojangStack::class) },
-            { it.opcode == Opcodes.INVOKESPECIAL && (it as MethodInsnNode).calls(ITEM_STACK_CONSTRUCTOR) },
-            0, 0,
+        node.replaceEvery(
+            0, 1,
+            { invokeStatic(::getRemainingItemStack) },
             {
-                aLoad(4)
-                invokeStatic(::getRemainingItemStack)
-            }
+                it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(MojangStack::getItem)
+                    && it.next.opcode == Opcodes.INVOKEVIRTUAL && (it.next as MethodInsnNode).calls(Item::getCraftingRemainder)
+            },
         )
     }
     
     /**
-     * Replaces ItemStack.getItem().getCraftingRemainingItem() with RemainingItemStackPatches.getCraftingRemainingItem(ItemStack)
-     *
-     * Target instructions:
-     * invokevirtual net/minecraft/world/item/ItemStack.getItem()Lnet/minecraft/world/item/Item;
-     * invokevirtual net/minecraft/world/item/Item.hasCraftingRemainingItem()Z
-     */
-    private fun patchHasCraftingRemainingItem(node: MethodNode) {
-        node.replaceEvery(1, 0, {
-            invokeStatic(::hasCraftingRemainingItem)
-        }) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Item::hasCraftingRemainingItem) }
-    }
-    
-    /**
-     * Replaces this code: https://i.imgur.com/S5Ir112.png with a call to [getRemainingItemStack].
-     * Range: https://i.imgur.com/jA78A3s.png
-     */
-    private fun patchRecipeGetRemainingItems() {
-        val methodNode = VirtualClassPath[RECIPE_GET_REMAINING_ITEMS_METHOD]
-        methodNode.localVariables.clear()
-        methodNode.replaceEveryRange(
-            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(MojangStack::getItem) },
-            { it.opcode == Opcodes.INVOKESPECIAL && (it as MethodInsnNode).calls(ITEM_STACK_CONSTRUCTOR) },
-            0, 0,
-            {
-                invokeStatic(::getRemainingItemStack)
-                aLoad(2) // NonNullList
-                swap()
-                iLoad(3) // for loop index
-                swap()
-            }
-        )
-    }
-    
-    /**
-     * Replaces this code: https://i.imgur.com/YeHuixV.png with a call to [getRemainingItemStack].
+     * Changes `blockEntity.items.set(1, item.getCraftingRemainder());` to
+     * `blockEntity.items.set(1, RemainingItemPatches.getRemainingItemStack(itemStack));`
      */
     private fun patchAbstractFurnaceBlockEntityServerTick() {
         val methodNode = VirtualClassPath[AbstractFurnaceBlockEntity::serverTick]
         methodNode.localVariables.clear()
-        methodNode.replaceEveryRange(
-            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Item::getCraftingRemainingItem) },
-            { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(NON_NULL_LIST_SET_METHOD) },
-            1, -1,
-            {
-                aLoad(3) // AbstractFurnaceBlockEntity
-                getField(ABSTRACT_FURNACE_BLOCK_ENTITY_ITEMS_FIELD)
+        methodNode.replaceFirst(
+            1, 0, // drop aLoad for item
+            buildInsnList {
                 aLoad(6) // ItemStack
                 invokeStatic(::getRemainingItemStack)
-                ldc(1) // slot
-                swap()
             }
-        )
+        ) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Item::getCraftingRemainder) }
     }
     
     @JvmStatic
-    fun hasCraftingRemainingItem(itemStack: MojangStack): Boolean {
-        val novaItem = itemStack.novaItem
-        if (novaItem != null)
-            return novaItem.craftingRemainingItem != null
+    fun defaultCraftingRemainder(input: CraftingInput): NonNullList<MojangStack> {
+        val list = NonNullList.withSize(input.size(), MojangStack.EMPTY);
         
-        return itemStack.item.hasCraftingRemainingItem()
+        for (i in list.indices) {
+            list[i] = getRemainingItemStack(input.getItem(i));
+        }
+        return list;
     }
+    
     
     @JvmStatic
     fun getRemainingItemStack(itemStack: MojangStack): MojangStack {
         val novaItem = itemStack.novaItem
         if (novaItem != null)
-            return novaItem.craftingRemainingItem?.let { it.unwrap().copy() } ?: MojangStack.EMPTY
+            return novaItem.craftingRemainingItem?.unwrap()?.copy() ?: MojangStack.EMPTY
         
-        // retrieve item directly from field as count = 0 causes getItem to return air
-        val item = ReflectionRegistry.ITEM_STACK_ITEM_FIELD.get(itemStack) as Item?
-        return item?.craftingRemainingItem?.let(::MojangStack) ?: MojangStack.EMPTY
-    }
-    
-    @JvmStatic
-    fun getRemainingBukkitItemStack(itemStack: MojangStack): BukkitStack? {
-        val novaItem = itemStack.novaItem
-        if (novaItem != null)
-            return novaItem.craftingRemainingItem
-        
-        return itemStack.item.craftingRemainingItem?.let { ItemStack(CraftMagicNumbers.getMaterial(it)) }
+        return itemStack.item.craftingRemainder
     }
     
 }

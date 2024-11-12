@@ -51,7 +51,7 @@ fun Player.send(vararg bufs: FriendlyByteBuf, retain: Boolean = true, flush: Boo
     if (flush) packetHandler.channel.flush()
 }
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
+@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object PacketManager : Listener {
     
     private lateinit var serverChannel: Channel

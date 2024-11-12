@@ -203,22 +203,13 @@ fun ParticleBuilder<BlockParticleOption>.block(blockState: MojangBlockState) = o
 }
 
 fun ParticleBuilder<DustParticleOptions>.dust(color: Color, size: Float = 1f) = options {
-    DustParticleOptions(Vector3f(color.red / 255f, color.green / 255f, color.blue / 255f), size)
-}
-
-fun ParticleBuilder<DustParticleOptions>.dust(color: Vector3f, size: Float = 1f) = options {
-    DustParticleOptions(color, size)
+    DustParticleOptions(color.rgb, size)
 }
 
 fun ParticleBuilder<DustParticleOptions>.color(color: Color) = dust(color)
 
 fun ParticleBuilder<DustColorTransitionOptions>.dustTransition(from: Color, to: Color, size: Float = 1f) = options {
-    DustColorTransitionOptions(Vector3f(from.red / 255f, from.green / 255f, from.blue / 255f),
-        Vector3f(to.red / 255f, to.green / 255f, to.blue / 255f), size)
-}
-
-fun ParticleBuilder<DustColorTransitionOptions>.dustTransition(from: Vector3f, to: Vector3f, size: Float = 1f) = options {
-    DustColorTransitionOptions(from, to, size)
+    DustColorTransitionOptions(from.rgb, to.rgb, size)
 }
 
 fun ParticleBuilder<DustColorTransitionOptions>.color(from: Color, to: Color) = dustTransition(from, to)

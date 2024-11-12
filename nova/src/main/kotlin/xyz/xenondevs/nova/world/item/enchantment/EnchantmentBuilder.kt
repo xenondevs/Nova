@@ -1,31 +1,31 @@
 package xyz.xenondevs.nova.world.item.enchantment
 
+import io.papermc.paper.registry.TypedKey
 import net.kyori.adventure.text.Component
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponentMap
+import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.EnchantmentTags
-import net.minecraft.world.item.enchantment.Enchantment
+import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.world.item.behavior.Enchantable
-import xyz.xenondevs.nova.registry.RegistryElementBuilder
-import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
 import xyz.xenondevs.nova.patch.impl.item.EnchantmentPatches
-import xyz.xenondevs.nova.patch.impl.registry.TagsPatch
+import xyz.xenondevs.nova.patch.impl.registry.plusAssign
+import xyz.xenondevs.nova.registry.LazyRegistryElementBuilder
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
-import xyz.xenondevs.nova.util.name
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HOLDER_REFERENCE_BIND_VALUE_METHOD
-import xyz.xenondevs.nova.util.register
+import xyz.xenondevs.nova.world.item.behavior.Enchantable
 import java.util.*
 import net.minecraft.world.item.enchantment.Enchantment as MojangEnchantment
+import org.bukkit.enchantments.Enchantment as BukkitEnchantment
 
 internal class CustomEnchantmentLogic(
     private val primaryItem: (ItemStack) -> Boolean,
     private val supportedItem: (ItemStack) -> Boolean,
     private val tableLevelRequirement: (Int) -> IntRange,
-    private val compatability: (MojangEnchantment) -> Boolean
+    private val compatibility: (MojangEnchantment) -> Boolean
 ) {
     
     fun isPrimaryItem(itemStack: ItemStack): Boolean =
@@ -35,7 +35,7 @@ internal class CustomEnchantmentLogic(
         supportedItem(itemStack)
     
     fun compatibleWith(other: MojangEnchantment): Boolean =
-        compatability(other)
+        compatibility(other)
     
     fun getMinCost(level: Int): Int =
         tableLevelRequirement(level).first
@@ -45,10 +45,12 @@ internal class CustomEnchantmentLogic(
     
 }
 
-class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryElementBuilder<MojangEnchantment>(VanillaRegistries.ENCHANTMENT, id) {
+class EnchantmentBuilder internal constructor(
+    id: ResourceLocation,
+) : LazyRegistryElementBuilder<MojangEnchantment>(Registries.ENCHANTMENT, id) {
     
     // enchantment definition
-    private var name: Component = Component.translatable("enchantment.${id.namespace}.${id.name}")
+    private var name: Component = Component.translatable("enchantment.${id.namespace}.${id.path}")
     private var maxLevel: Int = 1
     private var rarity: Int = 10
     private var anvilCost: Int = 4
@@ -184,8 +186,8 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
      *
      * This option is exclusive with [compatibleWith] and [incompatibleWith].
      */
-    fun compatibility(compatibility: (MojangEnchantment) -> Boolean) {
-        this.compatibility = compatibility
+    fun compatibility(compatibility: (BukkitEnchantment) -> Boolean) {
+        this.compatibility = { compatibility(CraftEnchantment.minecraftToBukkit(it)) }
     }
     
     /**
@@ -193,8 +195,10 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
      *
      * This option is exclusive with [compatibility] and [incompatibleWith].
      */
-    fun compatibleWith(vararg enchantments: MojangEnchantment) {
-        this.compatibility = { it in enchantments }
+    @Suppress("UnstableApiUsage")
+    fun compatibleWith(vararg enchantments: TypedKey<BukkitEnchantment>) {
+        val keySet = enchantments.mapTo(HashSet()) { it.key() }
+        this.compatibility = { CraftEnchantment.minecraftToBukkit(it).key() in keySet }
     }
     
     /**
@@ -202,8 +206,10 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
      *
      * This option is exclusive with [compatibility] and [compatibleWith].
      */
-    fun incompatibleWith(vararg enchantments: MojangEnchantment) {
-        this.compatibility = { it !in enchantments }
+    @Suppress("UnstableApiUsage")
+    fun incompatibleWith(vararg enchantments: TypedKey<BukkitEnchantment>) {
+        val keySet = enchantments.mapTo(HashSet()) { it.key() }
+        this.compatibility = { CraftEnchantment.minecraftToBukkit(it).key() !in keySet }
     }
     
     /**
@@ -232,27 +238,27 @@ class EnchantmentBuilder internal constructor(id: ResourceLocation) : RegistryEl
         return enchantment
     }
     
-    override fun register(): Enchantment {
-        val enchantment = build()
-        val holder = registry.register(id, enchantment)
-        HOLDER_REFERENCE_BIND_VALUE_METHOD.invoke(holder, enchantment)
+    override fun register(): Provider<MojangEnchantment> {
+        val provider = super.register()
         
-        EnchantmentPatches.customEnchantments[enchantment] = CustomEnchantmentLogic(
-            primaryItem, supportedItem, tableLeveRequirement, compatibility
-        )
+        provider.subscribe { enchantment ->
+            EnchantmentPatches.customEnchantments[enchantment] = CustomEnchantmentLogic(
+                primaryItem, supportedItem, tableLeveRequirement, compatibility
+            )
+        }
         
         if (isTableDiscoverable)
-            TagsPatch.addExtra(EnchantmentTags.IN_ENCHANTING_TABLE, holder)
+            EnchantmentTags.IN_ENCHANTING_TABLE += id
         if (isCurse)
-            TagsPatch.addExtra(EnchantmentTags.CURSE, holder)
+            EnchantmentTags.CURSE += id
         if (isTradeable)
-            TagsPatch.addExtra(EnchantmentTags.TRADEABLE, holder)
+            EnchantmentTags.TRADEABLE += id
         if (isTreasure)
-            TagsPatch.addExtra(EnchantmentTags.TREASURE, holder)
+            EnchantmentTags.TREASURE += id
         
         UnknownEnchantments.rememberEnchantmentId(id)
         
-        return enchantment
+        return provider
     }
     
 }

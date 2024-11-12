@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova.resources.layout.block
 
-import org.bukkit.Material
-import org.bukkit.block.data.BlockData
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.world.block.state.model.AcaciaLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.AzaleaLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
@@ -28,7 +29,7 @@ import xyz.xenondevs.nova.world.block.state.model.TripwireBackingStateConfigType
  * @param fallbackHitbox The hitbox block type if display entities are used instead.
  */
 enum class BackingStateCategory(
-    internal val fallbackHitbox: BlockData,
+    internal val fallbackHitbox: BlockState,
     internal vararg val backingStateConfigTypes: BackingStateConfigType<*>
 ) {
     
@@ -43,7 +44,7 @@ enum class BackingStateCategory(
      * - Client-side arm swing animation on right-click
      */
     NOTE_BLOCK(
-        fallbackHitbox = Material.BARRIER,
+        fallbackHitbox = Blocks.BARRIER,
         NoteBackingStateConfig
     ),
     
@@ -57,7 +58,7 @@ enum class BackingStateCategory(
      * - Cannot be waterlogged
      */
     MUSHROOM_BLOCK(
-        fallbackHitbox = Material.BARRIER,
+        fallbackHitbox = Blocks.BARRIER,
         RedMushroomBackingStateConfig, BrownMushroomBackingStateConfig, MushroomStemBackingStateConfig
     ),
     
@@ -72,7 +73,7 @@ enum class BackingStateCategory(
      * - Some shaders might animate blocks of this type to blow in the wind
      */
     LEAVES(
-        fallbackHitbox = Material.BARRIER,
+        fallbackHitbox = Blocks.BARRIER,
         OakLeavesBackingStateConfig, SpruceLeavesBackingStateConfig, BirchLeavesBackingStateConfig,
         JungleLeavesBackingStateConfig, AcaciaLeavesBackingStateConfig, DarkOakLeavesBackingStateConfig,
         MangroveLeavesBackingStateConfig, CherryLeavesBackingStateConfig, AzaleaLeavesBackingStateConfig,
@@ -81,7 +82,7 @@ enum class BackingStateCategory(
     
     /**
      * The block model uses tripwire block states.
-     * 
+     *
      * - Limited to 48 different models
      * - Models can be transparent
      * - Half-height block hitbox
@@ -89,13 +90,13 @@ enum class BackingStateCategory(
      * - Cannot be waterlogged
      */
     TRIPWIRE_UNATTACHED(
-        fallbackHitbox = Material.STRUCTURE_VOID,
+        fallbackHitbox = Blocks.STRUCTURE_VOID,
         TripwireBackingStateConfigType.Unattached
     ),
     
     /**
      * The block model uses tripwire block states.
-     * 
+     *
      * - Limited to 48 different models
      * - Models can be transparent
      * - Block hitbox: 1x0.09375x1, offset by +0.0625y
@@ -103,11 +104,11 @@ enum class BackingStateCategory(
      * - Cannot be waterlogged
      */
     TRIPWIRE_ATTACHED(
-        fallbackHitbox = Material.STRUCTURE_VOID,
+        fallbackHitbox = Blocks.STRUCTURE_VOID,
         TripwireBackingStateConfigType.Attached
     );
     
-    constructor(fallbackHitbox: Material, vararg backingStateConfigTypes: BackingStateConfigType<*>) :
-        this(fallbackHitbox.createBlockData(), *backingStateConfigTypes)
+    constructor(fallbackHitbox: Block, vararg backingStateConfigTypes: BackingStateConfigType<*>) :
+        this(fallbackHitbox.defaultBlockState(), *backingStateConfigTypes)
     
 }

@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type.item.channel
 
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.mapToArray
-import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.util.RoundRobinCounter
+import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 import java.util.*
 import kotlin.math.min
 

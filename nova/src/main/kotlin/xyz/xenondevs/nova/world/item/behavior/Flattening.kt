@@ -6,10 +6,10 @@ import org.bukkit.SoundCategory
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.util.damageItemInMainHand
 import xyz.xenondevs.nova.util.playSoundNearby
 import xyz.xenondevs.nova.util.runTaskLater
+import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 
 private val FLATTENABLES: Set<Material> = hashSetOf(
     Material.GRASS_BLOCK,

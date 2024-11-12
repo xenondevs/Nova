@@ -10,7 +10,8 @@ import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.nova.HTTP_CLIENT
 import xyz.xenondevs.nova.resources.upload.UploadService
 import xyz.xenondevs.nova.util.data.http.BinaryBufferedBody
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.inputStream
 
 internal object Xenondevs : UploadService {
     
@@ -24,7 +25,7 @@ internal object Xenondevs : UploadService {
             ?: throw IllegalArgumentException("No key specified for xenondevs upload service")
     }
     
-    override suspend fun upload(file: File): String {
+    override suspend fun upload(file: Path): String {
         val json = HTTP_CLIENT.preparePut(API_URL) {
             header("key", key)
             setBody(BinaryBufferedBody(file.inputStream(), contentType = Zip))

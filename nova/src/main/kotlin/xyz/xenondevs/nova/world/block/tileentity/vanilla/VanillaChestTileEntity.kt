@@ -8,6 +8,9 @@ import net.minecraft.world.level.block.state.properties.ChestType
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
+import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.concurrent.checkServerThread
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.DefaultItemHolder
@@ -17,9 +20,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.Net
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.DoubleChestItemStackContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.NetworkedNMSInventory
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.SimpleItemStackContainer
-import xyz.xenondevs.nova.util.CUBE_FACES
-import xyz.xenondevs.nova.util.concurrent.checkServerThread
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.*
 

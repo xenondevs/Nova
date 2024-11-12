@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNodeConnection
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
-import xyz.xenondevs.nova.world.BlockPos
 import java.util.*
 
 /**

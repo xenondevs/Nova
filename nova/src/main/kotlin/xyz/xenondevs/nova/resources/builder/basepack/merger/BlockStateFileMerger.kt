@@ -14,7 +14,6 @@ import xyz.xenondevs.nova.world.block.state.model.MushroomStemBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
 import java.nio.file.Path
-import java.util.logging.Level
 import kotlin.io.path.copyTo
 import kotlin.io.path.exists
 import kotlin.io.path.nameWithoutExtension
@@ -72,7 +71,7 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerge
                 variants.add(variantString, JsonObject().apply { addProperty("model", model) })
             }
         } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "Failed to convert multipart to variants, some block states might be missing", e)
+            LOGGER.error("Failed to convert multipart to variants, some block states might be missing", e)
         }
         
         return variants
@@ -96,7 +95,7 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerge
             
             configType.handleMerged(occupied)
         } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "Failed to process variants for $configType in $obj", e)
+            LOGGER.error("Failed to process variants for $configType in $obj", e)
         }
     }
     

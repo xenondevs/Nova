@@ -1,9 +1,11 @@
 package xyz.xenondevs.nova.network
 
+import com.mojang.datafixers.util.Pair
 import io.netty.buffer.Unpooled
 import net.minecraft.core.Holder
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
+import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
 import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket
@@ -13,7 +15,9 @@ import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
-import xyz.xenondevs.nova.network.event.clientbound.ServerboundInteractPacketEvent
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.item.ItemStack
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
 import xyz.xenondevs.nova.util.RegistryFriendlyByteBuf
 import xyz.xenondevs.nova.util.bossbar.operation.BossBarOperation
 import java.lang.invoke.MethodHandles
@@ -89,4 +93,9 @@ fun ServerboundInteractPacket(entityId: Int, action: ServerboundInteractPacketEv
     buf.writeBoolean(isUsingSecondaryAction)
     
     return ServerboundInteractPacket.STREAM_CODEC.decode(buf)
+}
+
+fun ClientboundSetEquipmentPacket(entityId: Int, equipment: Map<EquipmentSlot, ItemStack>): ClientboundSetEquipmentPacket {
+    val equipmentList = equipment.map { (slot, itemStack) -> Pair(slot, itemStack) }
+    return ClientboundSetEquipmentPacket(entityId, equipmentList)
 }

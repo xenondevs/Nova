@@ -73,9 +73,11 @@ operator fun Any.plus(other: String) = this.toString() + other
 
 object StringUtils {
     
-    private val ALPHABET = ('a'..'z') + ('A'..'Z')
+    val UPPER_CASE_ALPHABET = CharArray(26) { 'A' + it }
+    val LOWER_CASE_ALPHABET = CharArray(26) { 'a' + it }
+    val ALPHABET = UPPER_CASE_ALPHABET + LOWER_CASE_ALPHABET
     
-    fun randomString(length: Int, dict: List<Char> = ALPHABET) =
+    fun randomString(length: Int, dict: CharArray = ALPHABET) =
         buildString {
             repeat(length) {
                 append(dict.random())

@@ -25,6 +25,11 @@ enum class VanillaMaterialProperty {
     /**
      * The item can render a custom boots texture.
      */
-    BOOTS
+    BOOTS,
+    
+    /**
+     * The item can show bundle contents.
+     */
+    BUNDLE
     
 }

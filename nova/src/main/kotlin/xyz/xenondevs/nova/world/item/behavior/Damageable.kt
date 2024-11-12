@@ -8,8 +8,8 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.weakEntry
-import xyz.xenondevs.nova.config.weakOptionalEntry
+import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.config.optionalEntry
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
 
@@ -62,10 +62,10 @@ class Damageable(
         override fun create(item: NovaItem): Damageable {
             val cfg = item.config
             return Damageable(
-                cfg.weakEntry<Int>(arrayOf("max_durability"), arrayOf("durability")),
-                cfg.weakOptionalEntry<Int>("item_damage_on_attack_entity").orElse(0),
-                cfg.weakOptionalEntry<Int>("item_damage_on_break_block").orElse(0),
-                cfg.weakOptionalEntry<RecipeChoice>("repair_ingredient")
+                cfg.entry<Int>(arrayOf("max_durability"), arrayOf("durability")),
+                cfg.optionalEntry<Int>("item_damage_on_attack_entity").orElse(0),
+                cfg.optionalEntry<Int>("item_damage_on_break_block").orElse(0),
+                cfg.optionalEntry<RecipeChoice>("repair_ingredient")
             )
         }
         

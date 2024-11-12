@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.item.legacy
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.ByteArrayTag
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
@@ -10,12 +11,11 @@ import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.CBF
-import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.data.getByteArrayOrNull
 import xyz.xenondevs.nova.util.data.getIntOrNull
 import xyz.xenondevs.nova.util.data.getOrNull
-import xyz.xenondevs.nova.util.getHolderOrThrow
+import xyz.xenondevs.nova.util.getOrThrow
 import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.KType
 
@@ -145,7 +145,7 @@ internal data object ItemStackEnchantmentsConverter : ItemStackLegacyConverter {
             val componentEnchantments = patch.get(component)?.getOrNull() ?: ItemEnchantments.EMPTY
             val mutableEnchantments = ItemEnchantments.Mutable(componentEnchantments)
             for ((id, level) in legacy) {
-                mutableEnchantments.set(VanillaRegistries.ENCHANTMENT.getHolderOrThrow(id), level)
+                mutableEnchantments.set(Registries.ENCHANTMENT.getOrThrow(id), level)
             }
             builder.set(component, mutableEnchantments.toImmutable())
         }

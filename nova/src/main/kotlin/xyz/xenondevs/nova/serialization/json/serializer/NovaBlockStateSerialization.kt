@@ -11,7 +11,7 @@ import xyz.xenondevs.commons.gson.getObject
 import xyz.xenondevs.commons.gson.getString
 import xyz.xenondevs.commons.gson.isString
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 import java.lang.reflect.Type
@@ -47,7 +47,7 @@ internal object NovaBlockStateSerialization : JsonSerializer<NovaBlockState>, Js
         if (json is JsonObject) deserialize(json) else null
     
     fun deserialize(json: JsonObject): NovaBlockState? {
-        val block = NovaRegistries.BLOCK[json.getString("block")] ?: return null
+        val block = NovaRegistries.BLOCK.getValue(json.getString("block")) ?: return null
         val propertyMap = json.getObject("properties").entrySet().associate { (propertyName, value) ->
             require(value.isString()) { "Property value must be a string" }
             

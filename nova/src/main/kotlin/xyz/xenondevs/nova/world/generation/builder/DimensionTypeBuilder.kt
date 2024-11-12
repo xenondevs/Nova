@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.generation.builder
 
+import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.TagKey
@@ -11,19 +12,22 @@ import net.minecraft.world.level.dimension.DimensionType
 import net.minecraft.world.level.dimension.DimensionType.MonsterSettings
 import xyz.xenondevs.nova.addon.registry.worldgen.DimensionRegistry
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
-import xyz.xenondevs.nova.registry.vanilla.VanillaRegistries
+import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import java.util.*
 
 /**
- * Builder for [DimensionTypes][DimensionType]. Use [build] to get the [DimensionType] instance or [register] to register
- * it. Check out the [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/dimension/) on dimensions for more information.
+ * Builder for [DimensionTypes][DimensionType]. 
+ * Check out the [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/dimension/) on dimensions for more information.
  *
  * @see [DimensionRegistry]
  * @see [MobSpawnSettingsBuilder]
  */
 @ExperimentalWorldGen
-class DimensionTypeBuilder(id: ResourceLocation) : RegistryElementBuilder<DimensionType>(VanillaRegistries.DIMENSION_TYPE, id) {
+class DimensionTypeBuilder internal constructor(
+    id: ResourceLocation,
+    registry: WritableRegistry<DimensionType>
+) : RegistryElementBuilder<DimensionType>(registry, id) {
     
     private var fixedTime: Long? = null
     private var hasSkyLight: Boolean = true
@@ -39,21 +43,14 @@ class DimensionTypeBuilder(id: ResourceLocation) : RegistryElementBuilder<Dimens
     private var infiniBurn: TagKey<Block> = BlockTags.INFINIBURN_OVERWORLD
     private var effects: ResourceLocation = BuiltinDimensionTypes.OVERWORLD_EFFECTS
     private var ambientLight: Float = 0.0f
-    private var monsterSettings: MonsterSettings = MonsterSettingsBuilder().build()
+    private var monsterSettings: MonsterSettings? = null
     
     /**
      * Sets the `fixedTime` property of this [DimensionType]. If this is set the tick time of any level of this dimension
-     * type will be fixed to the given value. To revert it back to `null` use [noFixedTime].
+     * type will be fixed to the given value.
      */
     fun fixedTime(time: Long) {
         fixedTime = time
-    }
-    
-    /**
-     * Sets the `fixedTime` property of this [DimensionType] to `null` and thus re-enables a normal day/light cycle.
-     */
-    fun noFixedTime() {
-        fixedTime = null
     }
     
     /**
@@ -180,14 +177,10 @@ class DimensionTypeBuilder(id: ResourceLocation) : RegistryElementBuilder<Dimens
     /**
      * Sets the [MonsterSettings] of this [DimensionType] using a [MonsterSettingsBuilder].
      */
-    @WorldGenDsl
     fun monsterSettings(builder: MonsterSettingsBuilder.() -> Unit) {
         this.monsterSettings = MonsterSettingsBuilder().apply(builder).build()
     }
     
-    /**
-     * Builds a [DimensionType] instance from the current state of this builder.
-     */
     override fun build(): DimensionType {
         return DimensionType(
             fixedTime?.let(OptionalLong::of) ?: OptionalLong.empty(),
@@ -204,7 +197,7 @@ class DimensionTypeBuilder(id: ResourceLocation) : RegistryElementBuilder<Dimens
             infiniBurn,
             effects,
             ambientLight,
-            monsterSettings
+            monsterSettings ?: MonsterSettingsBuilder().build()
         )
     }
     
@@ -219,7 +212,8 @@ class DimensionTypeBuilder(id: ResourceLocation) : RegistryElementBuilder<Dimens
  * * [monsterSpawnBlockLightLimit] - The maximum light level a block can have to allow monsters to spawn. (Value between 0 and 15)
  */
 @ExperimentalWorldGen
-class MonsterSettingsBuilder {
+@RegistryElementBuilderDsl
+class MonsterSettingsBuilder internal constructor() {
     
     private var piglinSafe: Boolean = false
     private var hasRaids: Boolean = false
@@ -256,10 +250,7 @@ class MonsterSettingsBuilder {
         this.monsterSpawnBlockLightLimit = limit
     }
     
-    /**
-     * Builds a [MonsterSettings] instance from the current state of this builder.
-     */
-    fun build(): MonsterSettings {
+    internal fun build(): MonsterSettings {
         return MonsterSettings(
             piglinSafe,
             hasRaids,

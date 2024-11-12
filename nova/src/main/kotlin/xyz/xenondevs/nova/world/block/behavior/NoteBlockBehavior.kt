@@ -5,7 +5,9 @@ import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.level.block.entity.SkullBlockEntity
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
 import org.bukkit.GameMode
+import org.bukkit.Instrument
 import org.bukkit.Material
 import org.bukkit.Note
 import org.bukkit.Tag
@@ -17,7 +19,6 @@ import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.BlockUtils
-import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.particle.noteColor
@@ -58,13 +59,13 @@ internal object NoteBlockBehavior : BlockBehavior {
         playNote(pos, state)
     }
     
-    override fun handleNeighborChanged(pos: BlockPos, state: NovaBlockState, neighborPos: BlockPos) {
+    override fun handleNeighborChanged(pos: BlockPos, state: NovaBlockState) {
         val poweredPreviously = state.getOrThrow(POWERED)
         val poweredNow = pos.block.isBlockIndirectlyPowered
         
         val newState = state
             .with(POWERED, poweredNow)
-            .with(NOTE_BLOCK_INSTRUMENT, Instrument.determineInstrument(pos))
+            .with(NOTE_BLOCK_INSTRUMENT, determineInstrument(pos))
         
         if (!poweredPreviously && poweredNow)
             playNote(pos, newState)
@@ -83,7 +84,7 @@ internal object NoteBlockBehavior : BlockBehavior {
         val instrument = state.getOrThrow(NOTE_BLOCK_INSTRUMENT)
         val note = state.getOrThrow(NOTE_BLOCK_NOTE)
         
-        if (!instrument.worksAboveNoteBlock && !pos.add(0, 1, 0).nmsBlockState.isAir)
+        if (!instrument.worksAboveNoteBlock() && !pos.add(0, 1, 0).nmsBlockState.isAir)
             return
         
         val event = NotePlayEvent(pos.block, instrument.bukkitInstrument, Note(note))
@@ -97,9 +98,9 @@ internal object NoteBlockBehavior : BlockBehavior {
         
     }
     
-    private fun playSound(pos: BlockPos, instrument: Instrument, note: Int): Boolean {
+    private fun playSound(pos: BlockPos, instrument: NoteBlockInstrument, note: Int): Boolean {
         val soundEvent: Holder<SoundEvent> =
-            if (instrument == Instrument.CUSTOM_HEAD) {
+            if (instrument == NoteBlockInstrument.CUSTOM_HEAD) {
                 val sound = (pos.world.serverLevel.getBlockEntity(pos.add(0, 1, 0).nmsPos) as? SkullBlockEntity)?.noteBlockSound
                     ?: return false
                 Holder.direct(SoundEvent.createVariableRangeEvent(sound))
@@ -131,5 +132,42 @@ internal object NoteBlockBehavior : BlockBehavior {
         
         return listOf(ItemStack(Material.NOTE_BLOCK))
     }
+    
+    fun determineInstrument(pos: BlockPos): NoteBlockInstrument {
+        var instrument = pos.add(0, 1, 0).nmsBlockState.instrument()
+        if (!instrument.worksAboveNoteBlock()) {
+            instrument = pos.add(0, -1, 0).nmsBlockState.instrument()
+            if (instrument.worksAboveNoteBlock())
+                instrument = NoteBlockInstrument.HARP
+        }
+        return instrument
+    }
+    
+    private val NoteBlockInstrument.bukkitInstrument: Instrument
+        get() = when (this) {
+            NoteBlockInstrument.HARP -> Instrument.PIANO
+            NoteBlockInstrument.BASEDRUM -> Instrument.BASS_DRUM
+            NoteBlockInstrument.SNARE -> Instrument.SNARE_DRUM
+            NoteBlockInstrument.HAT -> Instrument.STICKS
+            NoteBlockInstrument.BASS -> Instrument.BASS_GUITAR
+            NoteBlockInstrument.FLUTE -> Instrument.FLUTE
+            NoteBlockInstrument.BELL -> Instrument.BELL
+            NoteBlockInstrument.GUITAR -> Instrument.GUITAR
+            NoteBlockInstrument.CHIME -> Instrument.CHIME
+            NoteBlockInstrument.XYLOPHONE -> Instrument.XYLOPHONE
+            NoteBlockInstrument.IRON_XYLOPHONE -> Instrument.IRON_XYLOPHONE
+            NoteBlockInstrument.COW_BELL -> Instrument.COW_BELL
+            NoteBlockInstrument.DIDGERIDOO -> Instrument.DIDGERIDOO
+            NoteBlockInstrument.BIT -> Instrument.BIT
+            NoteBlockInstrument.BANJO -> Instrument.BANJO
+            NoteBlockInstrument.PLING -> Instrument.PLING
+            NoteBlockInstrument.ZOMBIE -> Instrument.ZOMBIE
+            NoteBlockInstrument.SKELETON ->  Instrument.SKELETON
+            NoteBlockInstrument.CREEPER -> Instrument.CREEPER
+            NoteBlockInstrument.DRAGON -> Instrument.DRAGON
+            NoteBlockInstrument.WITHER_SKELETON -> Instrument.WITHER_SKELETON
+            NoteBlockInstrument.PIGLIN -> Instrument.PIGLIN
+            NoteBlockInstrument.CUSTOM_HEAD -> Instrument.CUSTOM_HEAD
+        }
     
 }

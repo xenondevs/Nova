@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.ui.waila.info.line
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.DefaultEnergyHolder
 import xyz.xenondevs.nova.ui.waila.info.WailaLine
 import xyz.xenondevs.nova.util.NumberFormatUtils
+import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.DefaultEnergyHolder
 
 private const val ENERGY_BAR_LENGTH = 40
 

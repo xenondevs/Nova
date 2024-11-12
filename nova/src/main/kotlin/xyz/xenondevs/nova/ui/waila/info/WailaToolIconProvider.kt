@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.ui.waila.info
 
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.resources.builder.task.font.TextureIconContent
-import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories.AXE
@@ -38,8 +37,8 @@ internal object VanillaWailaToolIconProvider : WailaToolIconProvider {
         val name = when (category) {
             SHEARS -> "shears"
             SHOVEL, PICKAXE, AXE, HOE, SWORD -> when (tier) {
-                WOOD, GOLD -> "${tier.id.name}en_${category.id.name}"
-                STONE, IRON, DIAMOND, NETHERITE -> "${tier.id.name}_${category.id.name}"
+                WOOD, GOLD -> "${tier.id.path}en_${category.id.path}"
+                STONE, IRON, DIAMOND, NETHERITE -> "${tier.id.path}_${category.id.path}"
                 else -> null
             }
             

@@ -12,8 +12,8 @@ import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.resources.upload.UploadService
 import xyz.xenondevs.nova.util.StringUtils
 import xyz.xenondevs.nova.util.addSuffix
-import java.io.File
 import java.net.URI
+import java.nio.file.Path
 
 internal object S3 : UploadService {
     
@@ -56,13 +56,13 @@ internal object S3 : UploadService {
         urlFormat = "https://$endpoint/$bucket/$directory%s"
     }
     
-    override suspend fun upload(file: File): String {
+    override suspend fun upload(file: Path): String {
         val name = StringUtils.randomString(5)
         val req = PutObjectRequest.builder()
             .bucket(bucket)
             .key(directory + name)
             .build()
-        val resp = client!!.putObject(req, file.toPath()).sdkHttpResponse()
+        val resp = client!!.putObject(req, file).sdkHttpResponse()
         
         if (!resp.isSuccessful)
             throw IllegalStateException("S3 upload failed with code ${resp.statusCode()} " + resp.statusText().orElse(""))
@@ -77,7 +77,7 @@ internal object S3 : UploadService {
             
             val delResp = client!!.deleteObject(delReq)
             if (!delResp.sdkHttpResponse().isSuccessful)
-                LOGGER.warning("S3 delete of old resourcepack failed with code ${delResp.sdkHttpResponse().statusCode()} "
+                LOGGER.warn("S3 delete of old resourcepack failed with code ${delResp.sdkHttpResponse().statusCode()} "
                     + delResp.sdkHttpResponse().statusText().orElse(""))
         }
         

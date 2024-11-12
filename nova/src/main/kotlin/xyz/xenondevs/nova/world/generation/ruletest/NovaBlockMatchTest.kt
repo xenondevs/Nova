@@ -10,25 +10,25 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
 @ExperimentalWorldGen
-class MaterialMatchTest(val material: NovaBlock) : NovaMaterialTest() {
+class NovaBlockMatchTest(val block: NovaBlock) : NovaBlockTest() {
     
     override fun test(material: NovaBlock, level: Level, pos: BlockPos, state: BlockState, random: RandomSource): Boolean {
-        return material == this.material
+        return material == this.block
     }
     
     override fun getType(): RuleTestType<*> {
-        return MaterialMatchTestType
+        return NovaBlockMatchTestType
     }
     
 }
 
 @ExperimentalWorldGen
-object MaterialMatchTestType : RuleTestType<MaterialMatchTest> {
+object NovaBlockMatchTestType : RuleTestType<NovaBlockMatchTest> {
     
-    private val CODEC: MapCodec<MaterialMatchTest> =
+    private val CODEC: MapCodec<NovaBlockMatchTest> =
         NovaBlock.CODEC
-            .fieldOf("material")
-            .xmap(::MaterialMatchTest, MaterialMatchTest::material)
+            .fieldOf("block")
+            .xmap(::NovaBlockMatchTest, NovaBlockMatchTest::block)
     
     override fun codec() = CODEC
     

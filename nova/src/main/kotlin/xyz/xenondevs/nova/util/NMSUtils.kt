@@ -3,11 +3,11 @@
 package xyz.xenondevs.nova.util
 
 import com.mojang.datafixers.util.Either
-import com.mojang.serialization.JsonOps
-import io.leangen.geantyref.TypeToken
 import io.netty.buffer.Unpooled
+import net.kyori.adventure.key.Key
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
+import net.minecraft.core.HolderGetter
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
 import net.minecraft.core.RegistrationInfo
@@ -17,7 +17,7 @@ import net.minecraft.core.Rotations
 import net.minecraft.core.WritableRegistry
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.Packet
-import net.minecraft.resources.RegistryOps
+import net.minecraft.resources.RegistryOps.RegistryInfoLookup
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.dedicated.DedicatedServer
@@ -58,19 +58,14 @@ import org.bukkit.entity.Pose
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
-import org.spongepowered.configurate.serialize.TypeSerializer
-import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.patch.impl.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
-import xyz.xenondevs.nova.registry.RegistryBinaryAdapter
-import xyz.xenondevs.nova.registry.vanilla.VanillaRegistryAccess
 import xyz.xenondevs.nova.resources.ResourcePath
-import xyz.xenondevs.nova.serialization.configurate.RegistryEntrySerializer
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
+import java.util.Optional
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
@@ -84,6 +79,10 @@ import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.level.block.Block as MojangBlock
 
+val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
+val REGISTRY_ACCESS: RegistryAccess by lazy { MINECRAFT_SERVER.registryAccess() }
+val DATA_VERSION: Int by lazy { CraftMagicNumbers.INSTANCE.dataVersion }
+
 val Entity.nmsEntity: MojangEntity
     get() = (this as CraftEntity).handle
 
@@ -94,23 +93,8 @@ val Player.serverPlayer: ServerPlayer
 val ItemStack?.nmsCopy: MojangStack
     get() = unwrap().copy()
 
-// TODO: remove in 0.18
-@Deprecated("All bukkit stacks now wrap an nms stack", ReplaceWith("unwrap()", "xyz.xenondevs.nova.util.unwrap"))
-val ItemStack?.nmsVersion: MojangStack
-    get() = unwrap()
-
 fun ItemStack?.unwrap(): MojangStack =
     this?.let(CraftItemStack::unwrap) ?: MojangStack.EMPTY
-
-// TODO: remove in 0.18
-@Deprecated("Non-extension method available", ReplaceWith("asBukkitCopy()"))
-val MojangStack.bukkitCopy: ItemStack
-    get() = asBukkitCopy()
-
-// TODO: remove in 0.18
-@Deprecated("Non-extension method available", ReplaceWith("asBukkitMirror()"))
-val MojangStack.bukkitMirror: ItemStack
-    get() = asBukkitMirror()
 
 val BlockData.nmsBlockState: BlockState
     get() = (this as CraftBlockData).state
@@ -148,8 +132,17 @@ val NamespacedKey.resourceLocation: ResourceLocation
 val ResourceLocation.namespacedKey: NamespacedKey
     get() = NamespacedKey(namespace, path)
 
-internal val ResourceLocation.name: String
-    get() = path
+fun ResourcePath.toResourceLocation(): ResourceLocation =
+    ResourceLocation.fromNamespaceAndPath(namespace, path)
+
+fun ResourceLocation.toResourcePath(): ResourcePath =
+    ResourcePath(namespace, path)
+
+fun Key.toResourceLocation(): ResourceLocation =
+    ResourceLocation.fromNamespaceAndPath(namespace(), value())
+
+fun ResourceLocation.toKey(): Key =
+    Key.key(namespace, path)
 
 val EquipmentSlot.nmsInteractionHand: InteractionHand
     get() = when (this) {
@@ -222,37 +215,39 @@ val Direction.blockFace: BlockFace
 
 val Attribute.nmsAttribute: MojangAttribute
     get() = when (this) {
-        Attribute.GENERIC_MAX_HEALTH -> Attributes.MAX_HEALTH
-        Attribute.GENERIC_FOLLOW_RANGE -> Attributes.FOLLOW_RANGE
-        Attribute.GENERIC_KNOCKBACK_RESISTANCE -> Attributes.KNOCKBACK_RESISTANCE
-        Attribute.GENERIC_MOVEMENT_SPEED -> Attributes.MOVEMENT_SPEED
-        Attribute.GENERIC_FLYING_SPEED -> Attributes.FLYING_SPEED
-        Attribute.GENERIC_ATTACK_DAMAGE -> Attributes.ATTACK_DAMAGE
-        Attribute.GENERIC_ATTACK_KNOCKBACK -> Attributes.ATTACK_KNOCKBACK
-        Attribute.GENERIC_ATTACK_SPEED -> Attributes.ATTACK_SPEED
-        Attribute.GENERIC_ARMOR -> Attributes.ARMOR
-        Attribute.GENERIC_ARMOR_TOUGHNESS -> Attributes.ARMOR_TOUGHNESS
-        Attribute.GENERIC_FALL_DAMAGE_MULTIPLIER -> Attributes.FALL_DAMAGE_MULTIPLIER
-        Attribute.GENERIC_LUCK -> Attributes.LUCK
-        Attribute.GENERIC_MAX_ABSORPTION -> Attributes.MAX_ABSORPTION
-        Attribute.GENERIC_SAFE_FALL_DISTANCE -> Attributes.SAFE_FALL_DISTANCE
-        Attribute.GENERIC_SCALE -> Attributes.SCALE
-        Attribute.GENERIC_STEP_HEIGHT -> Attributes.STEP_HEIGHT
-        Attribute.GENERIC_GRAVITY -> Attributes.GRAVITY
-        Attribute.GENERIC_JUMP_STRENGTH -> Attributes.JUMP_STRENGTH
-        Attribute.GENERIC_BURNING_TIME -> Attributes.BURNING_TIME
-        Attribute.GENERIC_EXPLOSION_KNOCKBACK_RESISTANCE -> Attributes.EXPLOSION_KNOCKBACK_RESISTANCE
-        Attribute.GENERIC_MOVEMENT_EFFICIENCY -> Attributes.MOVEMENT_EFFICIENCY
-        Attribute.GENERIC_OXYGEN_BONUS -> Attributes.OXYGEN_BONUS
-        Attribute.GENERIC_WATER_MOVEMENT_EFFICIENCY -> Attributes.WATER_MOVEMENT_EFFICIENCY
-        Attribute.PLAYER_BLOCK_INTERACTION_RANGE -> Attributes.BLOCK_INTERACTION_RANGE
-        Attribute.PLAYER_ENTITY_INTERACTION_RANGE -> Attributes.ENTITY_INTERACTION_RANGE
-        Attribute.PLAYER_BLOCK_BREAK_SPEED -> Attributes.BLOCK_BREAK_SPEED
-        Attribute.PLAYER_MINING_EFFICIENCY -> Attributes.MINING_EFFICIENCY
-        Attribute.PLAYER_SNEAKING_SPEED -> Attributes.SNEAKING_SPEED
-        Attribute.PLAYER_SUBMERGED_MINING_SPEED -> Attributes.SUBMERGED_MINING_SPEED
-        Attribute.PLAYER_SWEEPING_DAMAGE_RATIO -> Attributes.SWEEPING_DAMAGE_RATIO
-        Attribute.ZOMBIE_SPAWN_REINFORCEMENTS -> Attributes.SPAWN_REINFORCEMENTS_CHANCE
+        Attribute.MAX_HEALTH -> Attributes.MAX_HEALTH
+        Attribute.FOLLOW_RANGE -> Attributes.FOLLOW_RANGE
+        Attribute.KNOCKBACK_RESISTANCE -> Attributes.KNOCKBACK_RESISTANCE
+        Attribute.MOVEMENT_SPEED -> Attributes.MOVEMENT_SPEED
+        Attribute.FLYING_SPEED -> Attributes.FLYING_SPEED
+        Attribute.ATTACK_DAMAGE -> Attributes.ATTACK_DAMAGE
+        Attribute.ATTACK_KNOCKBACK -> Attributes.ATTACK_KNOCKBACK
+        Attribute.ATTACK_SPEED -> Attributes.ATTACK_SPEED
+        Attribute.ARMOR -> Attributes.ARMOR
+        Attribute.ARMOR_TOUGHNESS -> Attributes.ARMOR_TOUGHNESS
+        Attribute.FALL_DAMAGE_MULTIPLIER -> Attributes.FALL_DAMAGE_MULTIPLIER
+        Attribute.LUCK -> Attributes.LUCK
+        Attribute.MAX_ABSORPTION -> Attributes.MAX_ABSORPTION
+        Attribute.SAFE_FALL_DISTANCE -> Attributes.SAFE_FALL_DISTANCE
+        Attribute.SCALE -> Attributes.SCALE
+        Attribute.STEP_HEIGHT -> Attributes.STEP_HEIGHT
+        Attribute.GRAVITY -> Attributes.GRAVITY
+        Attribute.JUMP_STRENGTH -> Attributes.JUMP_STRENGTH
+        Attribute.BURNING_TIME -> Attributes.BURNING_TIME
+        Attribute.EXPLOSION_KNOCKBACK_RESISTANCE -> Attributes.EXPLOSION_KNOCKBACK_RESISTANCE
+        Attribute.MOVEMENT_EFFICIENCY -> Attributes.MOVEMENT_EFFICIENCY
+        Attribute.OXYGEN_BONUS -> Attributes.OXYGEN_BONUS
+        Attribute.WATER_MOVEMENT_EFFICIENCY -> Attributes.WATER_MOVEMENT_EFFICIENCY
+        Attribute.TEMPT_RANGE -> Attributes.TEMPT_RANGE
+        Attribute.BLOCK_INTERACTION_RANGE -> Attributes.BLOCK_INTERACTION_RANGE
+        Attribute.ENTITY_INTERACTION_RANGE -> Attributes.ENTITY_INTERACTION_RANGE
+        Attribute.BLOCK_BREAK_SPEED -> Attributes.BLOCK_BREAK_SPEED
+        Attribute.MINING_EFFICIENCY -> Attributes.MINING_EFFICIENCY
+        Attribute.SNEAKING_SPEED -> Attributes.SNEAKING_SPEED
+        Attribute.SUBMERGED_MINING_SPEED -> Attributes.SUBMERGED_MINING_SPEED
+        Attribute.SWEEPING_DAMAGE_RATIO -> Attributes.SWEEPING_DAMAGE_RATIO
+        Attribute.SPAWN_REINFORCEMENTS -> Attributes.SPAWN_REINFORCEMENTS_CHANCE
+        else -> throw UnsupportedOperationException("Unknown attribute: $this")
     }.value()
 
 val AttributeModifier.Operation.nmsOperation: MojangAttributeModifier.Operation
@@ -351,10 +346,6 @@ fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
 fun Rotations.add(x: Float, y: Float, z: Float) =
     Rotations(this.x + x, this.y + y, this.z + z)
 
-val MINECRAFT_SERVER: DedicatedServer = (Bukkit.getServer() as CraftServer).server
-val REGISTRY_ACCESS: RegistryAccess = MINECRAFT_SERVER.registryAccess()
-val DATA_VERSION: Int = CraftMagicNumbers.INSTANCE.dataVersion
-
 val serverTick: Int
     get() = MINECRAFT_SERVER.tickCount
 
@@ -442,40 +433,56 @@ fun PlayerList.broadcast(exclude: Player?, location: Location, maxDistance: Doub
 fun PlayerList.broadcast(exclude: Player?, block: Block, maxDistance: Double, packet: Packet<*>) =
     broadcast(exclude?.serverPlayer, block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), maxDistance, block.world.serverLevel.dimension(), packet)
 
-fun <T : Any> Registry<T>.byNameBinaryAdapter(): BinaryAdapter<T> {
-    return RegistryBinaryAdapter(this)
-}
-
-inline fun <reified T : Any> Registry<T>.byNameTypeSerializer(): TypeSerializer<T> {
-    return RegistryEntrySerializer(this, object : TypeToken<T>() {})
-}
-
-operator fun <T> Registry<T>.get(key: String): T? {
-    val id = ResourceLocation.tryParse(key) ?: return null
+operator fun <T> Registry<T>.get(key: String): Optional<Holder.Reference<T>> {
+    val id = ResourceLocation.tryParse(key) ?: return Optional.empty()
     return get(id)
 }
 
-fun <T> Registry<T>.getOrThrow(id: ResourceLocation): T {
-    return getOrThrow(ResourceKey.create(key(), id))
+fun <T> Registry<T>.get(id: ResourceLocation): Holder<T>? {
+    val key = ResourceKey.create(key(), id)
+    return get(key).getOrNull()
 }
 
-fun <T> Registry<T>.getOrThrow(key: String): T {
+fun <T> Registry<T>.getOrNull(key: String): Holder.Reference<T>? {
+    return get(key).getOrNull()
+}
+
+fun <T> Registry<T>.getOrNull(id: ResourceLocation): Holder.Reference<T>? {
+    return get(id).getOrNull()
+}
+
+fun <T> Registry<T>.getOrNull(key: Key): Holder.Reference<T>? {
+    return getOrNull(ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value()))
+}
+
+fun <T> Registry<T>.getOrThrow(key: String): Holder<T> {
     return getOrThrow(ResourceLocation.parse(key))
 }
 
-fun <T> Registry<T>.getHolder(id: ResourceLocation): Holder<T>? {
+fun <T> Registry<T>.getOrThrow(id: ResourceLocation): Holder<T> {
     val key = ResourceKey.create(key(), id)
-    return getHolder(key).getOrNull()
+    return getOrThrow(key)
 }
 
-fun <T> Registry<T>.getHolderOrThrow(id: ResourceLocation): Holder<T> {
-    val key = ResourceKey.create(key(), id)
-    return getHolderOrThrow(key)
+fun <T> Registry<T>.getOrThrow(key: Key): Holder<T> {
+    return getOrThrow(ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value()))
+}
+
+fun <T> Registry<T>.getValue(key: String): T? {
+    return get(key).getOrNull()?.value()
+}
+
+fun <T> Registry<T>.getValueOrThrow(key: String): T {
+    return getValueOrThrow(ResourceLocation.parse(key))
+}
+
+fun <T> Registry<T>.getValueOrThrow(id: ResourceLocation): T {
+    return getOrThrow(ResourceKey.create(key(), id)).value()
 }
 
 fun <T> Registry<T>.getOrCreateHolder(id: ResourceLocation): Holder<T> {
     val key = ResourceKey.create(key(), id)
-    val holder = getHolder(key)
+    val holder = get(key)
     
     if (holder.isPresent)
         return holder.get()
@@ -499,6 +506,10 @@ operator fun <T : Any> WritableRegistry<T>.set(id: ResourceLocation, value: T) {
     register(ResourceKey.create(key(), id), value, RegistrationInfo.BUILT_IN)
 }
 
+operator fun <T : Any> WritableRegistry<T>.set(key: ResourceKey<T>, value: T) {
+    register(key, value, RegistrationInfo.BUILT_IN)
+}
+
 operator fun <T : Any> WritableRegistry<T>.set(addon: Addon, key: String, value: T) {
     register(ResourceKey.create(key(), ResourceLocation(addon, key)), value, RegistrationInfo.BUILT_IN)
 }
@@ -510,7 +521,7 @@ fun <T : Any> WritableRegistry<T>.register(id: ResourceLocation, value: T): Hold
 fun <T> Registry<T>.toHolderMap(): Map<ResourceLocation, Holder<T>> {
     val map = HashMap<ResourceLocation, Holder<T>>()
     for (key in registryKeySet()) {
-        val holderOptional = getHolder(key)
+        val holderOptional = get(key)
         if (holderOptional.isEmpty)
             continue
         
@@ -523,7 +534,7 @@ fun <T> Registry<T>.toHolderMap(): Map<ResourceLocation, Holder<T>> {
 fun <T> Registry<T>.toMap(): Map<ResourceLocation, T> {
     val map = HashMap<ResourceLocation, T>()
     for (key in registryKeySet()) {
-        val holderOptional = getHolder(key)
+        val holderOptional = get(key)
         if (holderOptional.isEmpty)
             continue
         
@@ -537,6 +548,54 @@ fun <T> Registry<T>.toMap(): Map<ResourceLocation, T> {
     return map
 }
 
+operator fun <T> ResourceKey<Registry<T>>.get(key: ResourceKey<T>): Holder.Reference<T>? {
+    return REGISTRY_ACCESS.get(key).getOrNull()
+}
+
+operator fun <T> ResourceKey<Registry<T>>.get(id: ResourceLocation): Holder.Reference<T>? {
+    return get(ResourceKey.create<T>(this, id))
+}
+
+operator fun <T> ResourceKey<Registry<T>>.get(id: String): Holder.Reference<T>? {
+    return get(ResourceLocation.parse(id))
+}
+
+fun <T> ResourceKey<Registry<T>>.getOrThrow(key: ResourceKey<T>): Holder.Reference<T> {
+    return REGISTRY_ACCESS.get(key).get()
+}
+
+fun <T> ResourceKey<Registry<T>>.getOrThrow(id: ResourceLocation): Holder.Reference<T> {
+    return REGISTRY_ACCESS.get(ResourceKey.create<T>(this, id)).get()
+}
+
+fun <T> ResourceKey<Registry<T>>.getOrThrow(key: String): Holder.Reference<T> {
+    return getOrThrow(ResourceLocation.parse(key))
+}
+
+fun <T> ResourceKey<Registry<T>>.getValue(id: ResourceLocation): T? {
+    return get(id)?.value()
+}
+
+fun <T> ResourceKey<Registry<T>>.getValue(key: String): T? {
+    return get(key)?.value()
+}
+
+fun <T : Any> RegistryAccess.getOrThrow(key: ResourceKey<T>): Holder.Reference<T> {
+    return REGISTRY_ACCESS.get(key).get()
+}
+
+fun <T : Any> RegistryAccess.getValue(key: ResourceKey<T>): T? {
+    return REGISTRY_ACCESS.get(key).getOrNull()?.value()
+}
+
+fun <T : Any> RegistryAccess.getValueOrThrow(key: ResourceKey<T>): T {
+    return REGISTRY_ACCESS.get(key).get().value()
+}
+
+fun <T> RegistryInfoLookup.lookupGetterOrThrow(key: ResourceKey<Registry<T>>): HolderGetter<T> {
+    return lookup(key).getOrNull()?.getter ?: throw IllegalArgumentException("Registry not found: $key")
+}
+
 fun ResourceLocation.toString(separator: String): String {
     return namespace + separator + path
 }
@@ -545,7 +604,6 @@ fun ResourceLocation(addon: Addon, name: String): ResourceLocation {
     return ResourceLocation.fromNamespaceAndPath(addon.id, name)
 }
 
-// TODO: replace with static extension once available
 internal fun parseResourceLocation(id: String, fallbackNamespace: String = "minecraft"): ResourceLocation {
     return if (ResourcePath.NON_NAMESPACED_ENTRY.matches(id)) {
         ResourceLocation.fromNamespaceAndPath(fallbackNamespace, id)
@@ -600,30 +658,12 @@ fun RegistryFriendlyByteBuf(): RegistryFriendlyByteBuf =
 
 object NMSUtils {
     
-    val ENTITY_COUNTER = ReflectionUtils.getField(
-        MojangEntity::class.java,
-        true,
-        "ENTITY_COUNTER"
-    ).get(null) as AtomicInteger
-    
-    val REGISTRY_OPS = RegistryOps.create(JsonOps.INSTANCE, VanillaRegistryAccess)
-    
-    fun freezeRegistry(registry: Registry<*>) {
-        if (registry !is MappedRegistry) return
-        ReflectionRegistry.MAPPED_REGISTRY_FROZEN_FIELD[registry] = true
-    }
-    
-    fun unfreezeRegistry(registry: Registry<*>) {
-        if (registry !is MappedRegistry) return
-        ReflectionRegistry.MAPPED_REGISTRY_FROZEN_FIELD[registry] = false
-    }
-    
-    fun <T, R : Registry<T>> getRegistry(location: ResourceKey<R>) =
-        REGISTRY_ACCESS.registry(location).getOrNull() ?: throw IllegalArgumentException("Registry $location does not exist!")
-    
-    fun <T, R : Registry<T>> getHolder(key: ResourceKey<T>): Holder.Reference<T> {
-        val registry = ResourceKey.createRegistryKey<T>(key.registry())
-        return REGISTRY_ACCESS.registryOrThrow(registry).getHolderOrThrow(key)
+    val ENTITY_COUNTER by lazy {
+        ReflectionUtils.getField(
+            MojangEntity::class.java,
+            true,
+            "ENTITY_COUNTER"
+        ).get(null) as AtomicInteger
     }
     
 }

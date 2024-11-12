@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.ui.waila.overlay
 
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.entity.Player
+import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.map
-import xyz.xenondevs.commons.provider.weakCombinedProvider
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.CharSizes
@@ -26,7 +26,7 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
     
     override var hasChanged = false
     
-    override val positioning by weakCombinedProvider(MARGIN_TOP, MARGIN_BOTTOM, MATCH_ABOVE, MATCH_BELOW)
+    override val positioning by combinedProvider(MARGIN_TOP, MARGIN_BOTTOM, MATCH_ABOVE, MATCH_BELOW)
         .map { (marginTop, marginBottom, matchAbove, matchBelow) ->
             BarPositioning.Dynamic(marginTop, marginBottom, BAR_MATCH_INFO, matchAbove, matchBelow)
         }

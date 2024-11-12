@@ -5,7 +5,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
-import xyz.xenondevs.nova.config.node
+import xyz.xenondevs.nova.config.strongNode
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
@@ -19,8 +19,8 @@ import xyz.xenondevs.nova.resources.upload.service.S3
 import xyz.xenondevs.nova.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.resources.upload.service.Xenondevs
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
-import java.io.File
-import java.util.logging.Level
+import java.nio.file.Path
+import kotlin.io.path.exists
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -50,7 +50,7 @@ internal object AutoUploadManager {
     
     @InitFun
     private fun init() {
-        val cfg = MAIN_CONFIG.node("resource_pack")
+        val cfg = MAIN_CONFIG.strongNode("resource_pack")
         cfg.subscribe { disable(); enable(it, fromReload = true) }
         enable(cfg.get(), fromReload = false)
         
@@ -69,7 +69,7 @@ internal object AutoUploadManager {
             val url = cfg.node("url").string
             if (!url.isNullOrEmpty()) {
                 if (enabled)
-                    LOGGER.warning("The resource pack url is set in the config, but the auto upload is also enabled. Defaulting to the url in the config.")
+                    LOGGER.warn("The resource pack url is set in the config, but the auto upload is also enabled. Defaulting to the url in the config.")
                 explicitUrl = true
                 if (this.url != url) {
                     this.url = url
@@ -93,7 +93,7 @@ internal object AutoUploadManager {
             
             selectedService = service
         } else {
-            LOGGER.warning("No uploading service specified! Available: " + services.joinToString { it.names[0] })
+            LOGGER.warn("No uploading service specified! Available: " + services.joinToString { it.names[0] })
             return
         }
         
@@ -103,7 +103,7 @@ internal object AutoUploadManager {
             runBlocking {
                 val url = uploadPack(ResourcePackBuilder.RESOURCE_PACK_FILE)
                 if (url == null)
-                    LOGGER.warning("The resource pack was not uploaded. (Misconfigured auto uploader?)")
+                    LOGGER.warn("The resource pack was not uploaded. (Misconfigured auto uploader?)")
             }
             lastConfig = configHash
             
@@ -118,16 +118,16 @@ internal object AutoUploadManager {
         selectedService = null
     }
     
-    suspend fun uploadPack(pack: File): String? {
+    suspend fun uploadPack(pack: Path): String? {
         try {
             if (selectedService == SelfHost)
                 SelfHost.startedLatch.await()
             
-            require(pack.exists()) { pack.absolutePath + " not found!" }
+            require(pack.exists()) { pack + " not found!" }
             
             this.url = selectedService?.upload(pack)
         } catch (e: Exception) {
-            LOGGER.log(Level.SEVERE, "Failed to upload the resource pack!", e)
+            LOGGER.error("Failed to upload the resource pack!", e)
         }
         
         forceResourcePack()
@@ -141,13 +141,13 @@ internal object AutoUploadManager {
         val url = url
         if (url != null && !ConnectionUtils.isURL(url)) {
             if (selectedService == CustomMultiPart) {
-                LOGGER.log(Level.SEVERE, "Invalid resource pack URL: $url. Please check your CustomMultiPart config!")
+                LOGGER.error("Invalid resource pack URL: $url. Please check your CustomMultiPart config!")
                 if (CustomMultiPart.urlRegex != null)
-                    LOGGER.log(Level.SEVERE, "Your urlRegex might be wrong: ${CustomMultiPart.urlRegex}")
+                    LOGGER.error("Your urlRegex might be wrong: ${CustomMultiPart.urlRegex}")
             } else if (enabled) {
-                LOGGER.log(Level.SEVERE, "Server responded with an invalid pack URL: $url")
+                LOGGER.error("Server responded with an invalid pack URL: $url")
             } else {
-                LOGGER.log(Level.SEVERE, "Invalid resource pack URL: $url")
+                LOGGER.error("Invalid resource pack URL: $url")
             }
             this.url = null
             return
