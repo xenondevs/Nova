@@ -91,7 +91,7 @@
   "command.nova.show_block_model_data.model_less": "This %s uses the following vanilla block: %s.",
   "command.nova.show_block_model_data.backing_state": "This %s uses the following backing state configuration:\nBlock: %s\nVariant: %s",
   "command.nova.show_block_model_data.display_entity": "This %s uses the following display entity configuration:\nHitbox type: %s\nModels (%s):\n%s",
-  "command.nova.show_block_model_data.display_entity.model": "- Model: %s\n  Translation: %s\n  Left rotation: %s\n  Scale: %s\n  Right rotation: %s",
+  "command.nova.show_block_model_data.display_entity.model": "- Model: %s with custom model data: %s\n  Translation: %s\n  Left rotation: %s\n  Scale: %s\n  Right rotation: %s",
   "command.nova.show_block_model_data.failure": "Please look at a Nova block and try again.",
   "command.nova.show_network_node_info.end_point.header": "This %s (end point) has the following data:",
   "command.nova.show_network_node_info.end_point.networks.entry": "Type: %s, Direction: %s, ID: %s",
