@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -135,6 +136,14 @@ internal object ItemListener : Listener, PacketListener {
         val item = event.player.inventory.itemInMainHand
         
         item.novaItem?.handleBlockBreakAction(player, item, event)
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private fun handleConsume(event: PlayerItemConsumeEvent) {
+        val player = event.player
+        val item = event.item
+        
+        item.novaItem?.handleConsume(player, item, event)
     }
     
     // This method stores the last used item for the RELEASE_USE_ITEM action below

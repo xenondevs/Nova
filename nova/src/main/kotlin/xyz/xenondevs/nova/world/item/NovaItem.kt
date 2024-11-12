@@ -20,6 +20,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.CommentedConfigurationNode
@@ -258,6 +259,10 @@ class NovaItem internal constructor(
     
     internal fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) {
         behaviors.forEach { it.handleBlockBreakAction(player, itemStack, event) }
+    }
+    
+    internal fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
+        behaviors.forEach { it.handleConsume(player, itemStack, event) }
     }
     
     internal fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) {
