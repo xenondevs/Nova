@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.patch.impl.item
 
+import net.minecraft.core.component.DataComponents
 import net.minecraft.world.inventory.AnvilMenu
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -37,6 +38,10 @@ internal object RepairPatches : MultiTransformer(Item::class, AnvilMenu::class, 
     
     @JvmStatic
     fun isValidRepairItem(itemStack: ItemStack, ingredient: ItemStack): Boolean {
+        val repairable = itemStack.get(DataComponents.REPAIRABLE)
+        if (repairable != null)
+            return repairable.isValidRepairItem(ingredient)
+        
         return itemStack.novaItem
             ?.getBehaviorOrNull<Damageable>()
             ?.repairIngredient
