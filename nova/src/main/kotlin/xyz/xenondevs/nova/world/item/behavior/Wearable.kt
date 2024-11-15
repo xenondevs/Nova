@@ -12,49 +12,25 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.EquipmentSlotGroup
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.ItemAttributeModifiers
 import net.minecraft.world.item.equipment.Equippable
-import org.bukkit.Bukkit
 import org.bukkit.Sound
-import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Horse
-import org.bukkit.entity.HumanEntity
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Llama
-import org.bukkit.entity.Piglin
-import org.bukkit.entity.Player
-import org.bukkit.entity.Skeleton
-import org.bukkit.entity.Wolf
-import org.bukkit.entity.Zombie
-import xyz.xenondevs.commons.collections.getCoerced
+import xyz.xenondevs.commons.collections.getMod
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.optionalEntry
-import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.network.ClientboundSetEquipmentPacket
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.getOrNull
 import xyz.xenondevs.nova.util.getOrThrow
-import xyz.xenondevs.nova.util.item.novaItem
-import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
-import xyz.xenondevs.nova.util.runTaskTimer
-import xyz.xenondevs.nova.util.serverLevel
-import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.toResourceLocation
-import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.equipment.Equipment
 import java.util.Optional
 import org.bukkit.entity.EntityType as BukkitEntityType
@@ -203,16 +179,13 @@ class Wearable(
      */
     val damageOnHurt: Boolean by damageOnHurt
     
-    private val equipmentData: Provider<RuntimeEquipmentData?> = ResourceLookups.EQUIPMENT_LOOKUP.getProvider(texture)
-    
-    private val textureFrame = mutableProvider(0)
-    private val overlayFrame = mutableProvider(0)
+    internal val equipmentData: Provider<RuntimeEquipmentData?> = ResourceLookups.EQUIPMENT_LOOKUP.getProvider(texture)
     
     init {
         equipmentData.subscribe { equipmentData ->
-            animatedWearables -= this
+            EquipmentAnimator.animatedBehaviors -= this
             if (equipmentData != null && equipmentData.isAnimated) {
-                animatedWearables += this
+                EquipmentAnimator.animatedBehaviors += this
             }
         }
     }
@@ -295,12 +268,9 @@ class Wearable(
     }
     
     override val baseDataComponents = combinedProvider(
-        equippableComponentFrames, textureFrame, overlayFrame, attributeModifiersComponent
-    ) { equippableFrames, textureFrame, overlayFrame, attributeModifiers ->
-        val equippable = equippableFrames
-            .getCoerced(textureFrame)
-            .getCoerced(overlayFrame)
-        
+        equippableComponentFrames, EquipmentAnimator.tick, attributeModifiersComponent
+    ) { equippableFrames, tick, attributeModifiers ->
+        val equippable = equippableFrames.getMod(tick).getMod(tick)
         DataComponentMap.builder()
             .set(DataComponents.EQUIPPABLE, equippable)
             .set(DataComponents.ATTRIBUTE_MODIFIERS, attributeModifiers)
@@ -314,85 +284,6 @@ class Wearable(
             "armorToughness=$armorToughness, " +
             "knockbackResistance=$knockbackResistance" +
             ")"
-    }
-    
-    @InternalInit(stage = InternalInitStage.POST_WORLD)
-    internal companion object {
-        
-        private val ARMOR_EQUIPMENT_SLOTS = listOf(
-            BukkitEquipmentSlot.FEET,
-            BukkitEquipmentSlot.LEGS, 
-            BukkitEquipmentSlot.CHEST, 
-            BukkitEquipmentSlot.HEAD,
-            BukkitEquipmentSlot.BODY
-        )
-        private val animatedWearables = HashSet<Wearable>()
-        
-        @InitFun
-        private fun startAnimationTask() {
-            runTaskTimer(0, 1, ::handleTick)
-        }
-        
-        private fun handleTick() {
-            if (animatedWearables.isEmpty())
-                return
-            
-            for (wearable in animatedWearables) {
-                val textureFrames = wearable.equipmentData.get()?.textureFrames?.size ?: 1
-                val overlayFrames = wearable.equipmentData.get()?.cameraOverlayFrames?.size ?: 1
-                wearable.textureFrame.set((wearable.textureFrame.get() + 1) % textureFrames)
-                wearable.overlayFrame.set((wearable.overlayFrame.get() + 1) % overlayFrames)
-            }
-            
-            Bukkit.getWorlds().asSequence()
-                .flatMap { it.livingEntities }
-                .forEach { entity ->
-                    when (entity) {
-                        is Player -> updatePlayerArmor(entity)
-                        
-                        is HumanEntity, is Zombie, is Skeleton, is Piglin,
-                        is ArmorStand, is Horse, is Llama, is Wolf -> updateNonPlayerArmor(entity)
-                    }
-                }
-        }
-        
-        private fun updatePlayerArmor(player: Player) {
-            val serverPlayer = player.serverPlayer
-            for ((armorSlot, armorStack) in serverPlayer.inventory.armor.withIndex()) {
-                var equipment = HashMap<EquipmentSlot, ItemStack>()
-                if (armorStack?.novaItem?.getBehavior<Wearable>()?.equipmentData?.get()?.isAnimated == true) {
-                    serverPlayer.inventoryMenu.setRemoteSlot(8 - armorSlot, ItemStack.EMPTY) // mark as dirty, force update
-                    equipment[EquipmentSlot.entries[armorSlot + 2]] = armorStack
-                }
-                
-                // update for other players
-                val packet = ClientboundSetEquipmentPacket(player.entityId, equipment)
-                serverPlayer.serverLevel().chunkSource.broadcast(serverPlayer, packet)
-            }
-        }
-        
-        private fun updateNonPlayerArmor(entity: LivingEntity) {
-            val equipment = entity.equipment ?: return
-            
-            var updatedEquipment: HashMap<EquipmentSlot, ItemStack>? = null
-            for (slot in ARMOR_EQUIPMENT_SLOTS) {
-                if (!entity.canUseEquipmentSlot(slot))
-                    continue
-                
-                val itemStack = equipment.getItem(slot)
-                if (itemStack.novaItem?.getBehavior<Wearable>()?.equipmentData?.get()?.isAnimated == true) {
-                    if (updatedEquipment == null)
-                        updatedEquipment = HashMap()
-                    updatedEquipment[slot.nmsEquipmentSlot] = itemStack.unwrap()
-                }
-            }
-            
-            if (updatedEquipment != null) {
-                val packet = ClientboundSetEquipmentPacket(entity.entityId, updatedEquipment)
-                entity.world.serverLevel.chunkSource.broadcast(entity.nmsEntity, packet)
-            }
-        }
-        
     }
     
 }

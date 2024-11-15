@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.pos
@@ -21,7 +20,7 @@ import xyz.xenondevs.nova.world.pos
 /**
  * Makes items dyeable.
  */
-class Dyeable private constructor() : ItemBehavior {
+object Dyeable : ItemBehavior {
     
     override val vanillaMaterialProperties = provider(listOf(VanillaMaterialProperty.DYEABLE))
     
@@ -44,17 +43,6 @@ class Dyeable private constructor() : ItemBehavior {
             player.serverPlayer.awardStat(Stats.CLEAN_ARMOR)
             wrappedEvent.actionPerformed = true
         }
-    }
-    
-    /**
-     * Makes items dyeable.
-     */
-    companion object : ItemBehaviorFactory<Dyeable> {
-        
-        override fun create(item: NovaItem): Dyeable {
-            return Dyeable()
-        }
-        
     }
     
 }

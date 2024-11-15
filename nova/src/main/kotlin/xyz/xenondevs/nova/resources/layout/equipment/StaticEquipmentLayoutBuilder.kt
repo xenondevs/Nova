@@ -25,7 +25,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
      * @see wings
      */
     fun humanoid(builder: StaticArmorLayersBuilder<ResourceType.HumanoidEquipmentTexture>.() -> Unit) {
-        layers[EquipmentModel.Type.HUMANOID_LEGGINGS] = StaticArmorLayersBuilder(namespace, ResourceType.HumanoidEquipmentTexture, resourcePackBuilder).apply(builder).build()
+        layers[EquipmentModel.Type.HUMANOID] = StaticArmorLayersBuilder(namespace, ResourceType.HumanoidEquipmentTexture, resourcePackBuilder).apply(builder).build()
     }
     
     /**

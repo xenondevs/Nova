@@ -9,7 +9,7 @@ import xyz.xenondevs.commons.reflection.javaTypeOf
 import xyz.xenondevs.nova.registry.NovaRegistries
 
 val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
-    // -- Nova Serializers --
+    .register(ColorSerializer)
     .register(BarMatcherSerializer)
     .register(BarMatcherCombinedAnySerializer)
     .register(BarMatcherCombinedAllSerializer)

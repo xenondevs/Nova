@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.util.data
 
 import org.joml.Vector2i
 import org.joml.Vector2ic
+import java.awt.Color
 import java.awt.Point
 import java.awt.image.BufferedImage
 import java.awt.image.ColorModel
@@ -183,6 +184,31 @@ internal object ImageUtils {
         return result
     }
     
+    /**
+     * Linearly interpolates between [from] and [to] using the given [blendFactor].
+     */
+    fun lerp(from: Color, to: Color, blendFactor: Float): Color {
+        val fromA = from.alpha
+        val fromR = from.red
+        val fromG = from.green
+        val fromB = from.blue
+        
+        val toA = to.alpha
+        val toR = to.red
+        val toG = to.green
+        val toB = to.blue
+        
+        val resultA = (fromA + (toA - fromA) * blendFactor).toInt()
+        val resultR = (fromR + (toR - fromR) * blendFactor).toInt()
+        val resultG = (fromG + (toG - fromG) * blendFactor).toInt()
+        val resultB = (fromB + (toB - fromB) * blendFactor).toInt()
+        
+        return Color(resultR, resultG, resultB, resultA)
+    }
+    
+    /**
+     * Creates a copy of [image] into [BufferedImage.TYPE_INT_ARGB].
+     */
     fun copyToARGB(image: BufferedImage): BufferedImage {
         val copy = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_ARGB)
         val graphics = copy.createGraphics()
