@@ -20,7 +20,6 @@ import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.world.level.block.Block
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import org.joml.Matrix4f
@@ -29,7 +28,6 @@ import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
-import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.command.Command
@@ -65,7 +63,6 @@ import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.item.unsafeNovaTag
 import xyz.xenondevs.nova.util.novaBlock
 import xyz.xenondevs.nova.util.runAsyncTask
-import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.world.BlockPos
@@ -211,25 +208,7 @@ internal object NovaCommand : Command() {
                 .executes0(::reloadConfigs))
             .then(literal("recipes")
                 .executes0(::reloadRecipes)))
-        .then(literal("testBukkit").executes0 { testBukkit(it) })
-        .then(literal("testNms").executes0 { testNms(it) })
         .build()
-    
-    private fun testBukkit(ctx: CommandContext<CommandSourceStack>) {
-        val player = ctx.player
-        val inv = player.inventory
-        for (i in 0..<inv.size) {
-            inv.setItem(i, ItemBuilder(Material.DIAMOND).setDisplayName("$i").get())
-        }
-    }
-    
-    private fun testNms(ctx: CommandContext<CommandSourceStack>) {
-        val player = ctx.player.serverPlayer
-        val inv = player.inventory
-        for (i in 0..<inv.containerSize) {
-            inv.setItem(i, ItemBuilder(Material.DIRT).setDisplayName("$i").get().unwrap())
-        }
-    }
     
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {
         try {
