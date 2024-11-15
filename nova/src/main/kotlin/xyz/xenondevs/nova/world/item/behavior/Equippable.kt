@@ -17,7 +17,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.component.ItemAttributeModifiers
-import net.minecraft.world.item.equipment.Equippable
 import org.bukkit.Sound
 import xyz.xenondevs.commons.collections.getMod
 import xyz.xenondevs.commons.provider.Provider
@@ -33,6 +32,7 @@ import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.toResourceLocation
 import xyz.xenondevs.nova.world.item.equipment.Equipment
 import java.util.Optional
+import net.minecraft.world.item.equipment.Equippable as EquippableComponent
 import org.bukkit.entity.EntityType as BukkitEntityType
 import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
 import org.bukkit.inventory.ItemStack as BukkitStack
@@ -44,12 +44,12 @@ import org.bukkit.inventory.ItemStack as BukkitStack
  * @param slot The slot in which the item can be worn.
  * @param equipSound The sound that is played when the item is equipped.
  */
-fun Wearable(
+fun Equippable(
     equipment: Equipment?,
     slot: BukkitEquipmentSlot,
     equipSound: Key
-): ItemBehaviorFactory<Wearable> =
-    Wearable(
+): ItemBehaviorFactory<Equippable> =
+    Equippable(
         equipment, slot,
         BuiltInRegistries.SOUND_EVENT.getOrNull(equipSound)
             ?: Holder.direct(SoundEvent(equipSound.toResourceLocation(), Optional.empty()))
@@ -62,13 +62,13 @@ fun Wearable(
  * @param slot The slot in which the item can be worn.
  * @param equipSound The sound that is played when the item is equipped.
  */
-fun Wearable(
+fun Equippable(
     equipment: Equipment?,
-    slot: BukkitEquipmentSlot, 
+    slot: BukkitEquipmentSlot,
     equipSound: Holder<SoundEvent> = SoundEvents.ARMOR_EQUIP_GENERIC
-) = ItemBehaviorFactory<Wearable> {
+) = ItemBehaviorFactory<Equippable> {
     val cfg = it.config
-    Wearable(
+    Equippable(
         provider(equipment),
         provider(slot),
         cfg.optionalEntry<Double>("armor").orElse(0.0),
@@ -92,7 +92,7 @@ fun Wearable(
  * @param knockbackResistance The amount of knockback resistance this item provides.
  * @param equipSound The sound that is played when the item is equipped, or null if no sound should be played.
  */
-class Wearable(
+class Equippable(
     texture: Provider<Equipment?>,
     slot: Provider<BukkitEquipmentSlot>,
     armor: Provider<Double>,
@@ -191,9 +191,9 @@ class Wearable(
     }
     
     /**
-     * Provider for a 2d array of [Equippable] components, where the first index is the texture frame and the second index is the overlay frame.
+     * Provider for a 2d array of [EquippableComponent] components, where the first index is the texture frame and the second index is the overlay frame.
      */
-    private val equippableComponentFrames: Provider<Array<Array<Equippable>>> = combinedProvider(
+    private val equippableComponentFrames: Provider<Array<Array<EquippableComponent>>> = combinedProvider(
         equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt
     ) { equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt ->
         val equipmentSlot = slot.nmsEquipmentSlot
@@ -208,7 +208,7 @@ class Wearable(
         
         Array(textureFrames?.size ?: 1) { textureFrame ->
             Array(overlayFrames?.size ?: 1) { overlayFrame ->
-                Equippable(
+                EquippableComponent(
                     equipmentSlot,
                     equipSound,
                     Optional.ofNullable(textureFrames?.getOrNull(textureFrame)),
