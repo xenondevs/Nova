@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.ItemAttributeModifiers
+import net.minecraft.world.item.component.ItemLore
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.cbf.CBF
@@ -37,19 +38,24 @@ internal class DefaultBehavior(
     id: ResourceLocation,
     name: Provider<Component?>,
     style: Provider<Style>,
+    lore: Provider<List<Component>>,
     maxStackSize: Provider<Int>,
     attributeModifiers: Provider<ItemAttributeModifiers>,
     defaultCompound: Provider<NamespacedCompound?>
 ) : ItemBehavior {
     
     override val baseDataComponents = combinedProvider(
-        name, style, maxStackSize, attributeModifiers
-    ) { name, style, maxStackSize, attributeModifiers ->
+        name, style, lore, maxStackSize, attributeModifiers
+    ) { name, style, lore, maxStackSize, attributeModifiers ->
         val builder = DataComponentMap.builder()
         if (name != null) {
             builder.set(DataComponents.ITEM_NAME, name.style(style).toNMSComponent())
         } else {
             builder.set(DataComponents.HIDE_TOOLTIP, MojangUnit.INSTANCE)
+        }
+        
+        if (lore.isNotEmpty()) {
+            builder.set(DataComponents.LORE, ItemLore(lore.map(Component::toNMSComponent)))
         }
         
         builder.set(DataComponents.ATTRIBUTE_MODIFIERS, attributeModifiers)

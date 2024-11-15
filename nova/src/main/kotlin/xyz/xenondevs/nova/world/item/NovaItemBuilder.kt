@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.resources.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.resources.layout.item.ItemModelLayoutBuilder
 import xyz.xenondevs.nova.resources.layout.item.RequestedItemModelLayout
 import xyz.xenondevs.nova.util.ResourceLocation
+import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 
@@ -23,6 +24,7 @@ class NovaItemBuilder internal constructor(
     
     private var style: Style = Style.empty()
     private var name: Component? = Component.translatable("item.${id.namespace}.${id.path}")
+    private val lore = ArrayList<Component>()
     private var behaviors: MutableList<ItemBehaviorHolder> = ArrayList()
     private var maxStackSize = 64
     private var craftingRemainingItem: ItemStack? = null
@@ -89,6 +91,13 @@ class NovaItemBuilder internal constructor(
     }
     
     /**
+     * Adds lore lines (tooltip) to the item.
+     */
+    fun lore(vararg lines: Component) {
+        this.lore += lines.map { it.withoutPreFormatting() }
+    }
+    
+    /**
      * Sets the maximum stack size of the item. Cannot exceed the maximum client-side stack size.
      */
     fun maxStackSize(maxStackSize: Int) {
@@ -140,6 +149,7 @@ class NovaItemBuilder internal constructor(
         val item = NovaItem(
             id,
             name?.style(style),
+            lore,
             style,
             behaviors,
             maxStackSize,

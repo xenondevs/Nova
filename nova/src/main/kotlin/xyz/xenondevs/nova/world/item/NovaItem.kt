@@ -57,6 +57,7 @@ import net.minecraft.world.item.ItemStack as MojangStack
 class NovaItem internal constructor(
     val id: ResourceLocation,
     val name: Component?,
+    val lore: List<Component>,
     val style: Style,
     behaviorHolders: List<ItemBehaviorHolder>,
     val maxStackSize: Int,
