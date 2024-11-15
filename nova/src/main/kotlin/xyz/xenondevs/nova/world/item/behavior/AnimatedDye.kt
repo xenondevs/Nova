@@ -6,10 +6,8 @@ import net.minecraft.world.item.component.DyedItemColor
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.getMod
-import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.config.optionalEntry
+import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.util.data.ImageUtils
 import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
 import java.awt.Color
@@ -28,13 +26,8 @@ fun AnimatedDye(
 ) = ItemBehaviorFactory<AnimatedDye> {
     val config = it.config
     AnimatedDye(
-        // TODO: add a more generic entryOrElse method to the config API
-        if (defaultTicksPerColor != null)
-            config.optionalEntry<Int>("ticks_per_color").orElse(defaultTicksPerColor)
-        else config.entry("ticks_per_color"),
-        if (defaultColors != null)
-            config.optionalEntry<List<Color>>("colors").orElse(defaultColors)
-        else config.entry("colors")
+        config.entryOrElse(defaultTicksPerColor, "ticks_per_color"),
+        config.entryOrElse(defaultColors, "colors")
     )
 }
 
