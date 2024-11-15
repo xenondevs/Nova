@@ -37,6 +37,12 @@ enum class InitStage(
 ) {
     
     /**
+     * Before configs are initialized.
+     * Can be used to register custom config serializers via [Configs.registerSerializers].
+     */
+    PRE_CONFIG(InternalInitStage.PRE_WORLD, runBefore = setOf(Configs::class)),
+    
+    /**
      * Before the world is loaded.
      */
     PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class)),

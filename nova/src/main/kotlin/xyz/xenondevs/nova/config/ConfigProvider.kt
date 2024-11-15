@@ -412,12 +412,12 @@ internal class RootConfigProvider internal constructor(
     }
     
     fun reload() {
-        set(Configs.createLoader(path).load())
+        set(Configs.createLoader(configId.namespace, path).load())
     }
     
     override fun pull(): CommentedConfigurationNode {
         // empty placeholder that is replaced by the actual node when the config is loaded
-        return Configs.createBuilder().build().createNode()
+        return Configs.createBuilder(configId.namespace).build().createNode()
     }
     
 }

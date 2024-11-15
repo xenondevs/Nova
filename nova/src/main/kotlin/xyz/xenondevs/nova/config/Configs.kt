@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.spongepowered.configurate.CommentedConfigurationNode
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import xyz.xenondevs.commons.provider.Provider
@@ -36,6 +37,8 @@ val MAIN_CONFIG = Configs[DEFAULT_CONFIG_ID]
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
 object Configs {
     
+    private val customSerializers = HashMap<String, ArrayList<TypeSerializerCollection>>()
+    
     private val extractor = ConfigExtractor(PermanentStorage.storedValue("stored_configs", ::HashMap))
     private val configProviders = HashMap<ResourceLocation, RootConfigProvider>()
     
@@ -59,7 +62,7 @@ object Configs {
         lastReload = System.currentTimeMillis()
         configProviders.values.asSequence()
             .filter { it.path.exists() }
-            .forEach { it.set(createLoader(it.path).load()) }
+            .forEach { it.set(createLoader(it.configId.namespace, it.path).load()) }
     }
     
     private fun extractConfigs(namespace: String, zipFile: Path, dataFolder: Path) {
@@ -127,21 +130,28 @@ object Configs {
         val config = getOrNull(id)
             ?: return
         
-        createLoader(resolveConfigPath(id)).save(config)
+        createLoader(id.namespace, resolveConfigPath(id)).save(config)
     }
     
-    internal fun createBuilder(): YamlConfigurationLoader.Builder =
+    /**
+     * Registers custom [serializers] for configs of [addon].
+     */
+    fun registerSerializers(addon: Addon, serializers: TypeSerializerCollection) {
+        customSerializers.getOrPut(addon.id, ::ArrayList) += serializers
+    }
+    
+    internal fun createBuilder(namespace: String): YamlConfigurationLoader.Builder =
         YamlConfigurationLoader.builder()
             .nodeStyle(NodeStyle.BLOCK)
             .indent(2)
             .defaultOptions { opts ->
                 opts.serializers { builder ->
                     builder.registerAll(NOVA_CONFIGURATE_SERIALIZERS)
-                    // TODO: allow addons to register their own serializers
+                    customSerializers[namespace]?.forEach(builder::registerAll)
                 }
             }
     
-    internal fun createLoader(path: Path): YamlConfigurationLoader =
-        createBuilder().path(path).build()
+    internal fun createLoader(namespace: String, path: Path): YamlConfigurationLoader =
+        createBuilder(namespace).path(path).build()
     
 }
