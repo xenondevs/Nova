@@ -4,22 +4,23 @@ import org.joml.Vector2i
 import org.joml.Vector2ic
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 
 internal class GuiTextureLayout(
-    val texture: ResourcePath,
+    val texture: ResourcePath<ResourceType.Texture>,
     val alignment: GuiTextureAlignment
 )
 
 @RegistryElementBuilderDsl
 class GuiTextureLayoutBuilder(private val namespace: String) {
     
-    private var texture: ResourcePath? = null
+    private var texture: ResourcePath<ResourceType.Texture>? = null
     private var alignment: GuiTextureAlignment? = null
     
     /**
      * Sets the [path] to the gui texture.
      */
-    fun path(path: ResourcePath) {
+    fun path(path: ResourcePath<ResourceType.Texture>) {
         this.texture = path
     }
     
@@ -27,7 +28,7 @@ class GuiTextureLayoutBuilder(private val namespace: String) {
      * Sets the path to the gui texture.
      */
     fun path(name: String) {
-        this.texture = ResourcePath.of(name, namespace)
+        this.texture = ResourcePath.of(ResourceType.Texture, name, namespace)
     }
     
     /**

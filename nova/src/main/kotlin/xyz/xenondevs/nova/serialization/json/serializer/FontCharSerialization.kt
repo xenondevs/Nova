@@ -6,6 +6,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.commons.gson.getInt
 import xyz.xenondevs.commons.gson.getString
 import xyz.xenondevs.nova.resources.builder.task.font.FontChar
@@ -15,14 +16,14 @@ internal object FontCharSerialization : JsonSerializer<FontChar>, JsonDeserializ
     
     override fun serialize(src: FontChar, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         return JsonObject().apply {
-            addProperty("font", src.font)
+            addProperty("font", src.font.toString())
             addProperty("char", src.codePoint)
         }
     }
     
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): FontChar {
         json as JsonObject
-        return FontChar(json.getString("font"), json.getInt("char"))
+        return FontChar(Key.key(json.getString("font")), json.getInt("char"))
     }
     
 }

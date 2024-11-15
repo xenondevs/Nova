@@ -4,6 +4,7 @@ import org.bukkit.Axis
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
@@ -55,16 +56,16 @@ class BlockModelSelectorScope internal constructor(
      * with parent `minecraft:block/cube_all` and `"all": "namespace:block/name"`.
      */
     val defaultModel: ModelBuilder by lazy {
-        val path = ResourcePath(id.namespace, "block/${id.path}")
+        val path = ResourcePath(ResourceType.Model, id.namespace, "block/${id.path}")
         modelContent[path]
             ?.let(::ModelBuilder)
-            ?: createCubeModel(ResourcePath(id.namespace, "block/${id.path}"))
+            ?: createCubeModel(ResourcePath(ResourceType.Model, id.namespace, "block/${id.path}"))
     }
     
     /**
      * Gets the model under the given [path] or throws an exception if it does not exist.
      */
-    fun getModel(path: ResourcePath): ModelBuilder =
+    fun getModel(path: ResourcePath<ResourceType.Model>): ModelBuilder =
         modelContent[path]
             ?.let(::ModelBuilder)
             ?: throw IllegalArgumentException("Model $path does not exist")
@@ -73,7 +74,7 @@ class BlockModelSelectorScope internal constructor(
      * Gets the model under the given [path] after or throws an exception if it does not exist.
      */
     fun getModel(path: String): ModelBuilder =
-        getModel(ResourcePath.of(path, id.namespace))
+        getModel(ResourcePath.of(ResourceType.Model, path, id.namespace))
     
     /**
      * Rotates the builder based on the built-in facing [BlockStateProperties][BlockStateProperty]:
@@ -107,11 +108,11 @@ class BlockModelSelectorScope internal constructor(
     // TODO: utility methods to generate cube models from textures
     
     fun createCubeModel(all: String): ModelBuilder =
-        createCubeModel(ResourcePath.of(all, id.namespace))
+        createCubeModel(ResourcePath.of(ResourceType.Model, all, id.namespace))
     
-    fun createCubeModel(all: ResourcePath): ModelBuilder = ModelBuilder(
+    fun createCubeModel(all: ResourcePath<ResourceType.Model>): ModelBuilder = ModelBuilder(
         Model(
-            parent = ResourcePath("minecraft", "block/cube_all"),
+            parent = ResourcePath(ResourceType.Model, "minecraft", "block/cube_all"),
             textures = mapOf("all" to all.toString())
         )
     )

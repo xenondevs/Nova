@@ -20,14 +20,15 @@ import org.bukkit.SoundCategory
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.world.item.recipe.ModelDataTest
-import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
-import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.integration.customitems.CustomBlockType
 import xyz.xenondevs.nova.integration.customitems.CustomItemService
 import xyz.xenondevs.nova.integration.customitems.CustomItemType
+import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.util.item.customModelData
+import xyz.xenondevs.nova.world.item.recipe.ModelDataTest
+import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 import kotlin.streams.asSequence
@@ -168,7 +169,7 @@ internal object OraxenItemService : CustomItemService {
         return getOraxenDrop(block)?.isToolEnough(tool) ?: return null
     }
     
-    override fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath> {
+    override fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath<ResourceType.Model>> {
         return OraxenItems.entryStream().asSequence()
             .filter { (id, builder) -> id != null && builder.oraxenMeta?.modelName != null }
             .filter { (id, _) -> BLOCK_MECHANIC_FACTORIES.any { it.getMechanic(id) != null } }
@@ -176,7 +177,7 @@ internal object OraxenItemService : CustomItemService {
                 val modelName = builder.oraxenMeta.modelName
                 
                 val id = ResourceLocation.fromNamespaceAndPath("oraxen", name)
-                val path = ResourcePath("oraxen_converted", "oraxen/$modelName")
+                val path = ResourcePath(ResourceType.Model, "oraxen_converted", "oraxen/$modelName")
                 
                 id to path
             }

@@ -8,11 +8,12 @@ import it.unimi.dsi.fastutil.ints.IntSet
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectList
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.provider.FontProvider
 import xyz.xenondevs.nova.serialization.json.addSerialized
 import xyz.xenondevs.nova.serialization.json.getDeserialized
 import xyz.xenondevs.nova.util.data.useZip
-import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.extension
@@ -32,7 +33,7 @@ data class SizeOverride(val from: Int, val to: Int, val left: Int, val right: In
  * Represents a `unihex` font provider.
  */
 abstract class UnihexProvider internal constructor(
-    val hexFile: ResourcePath
+    val hexFile: ResourcePath<ResourceType.UnihexZip>
 ) : FontProvider() {
     
     protected abstract val sizeOverrides: ObjectList<SizeOverride>
@@ -190,11 +191,11 @@ abstract class UnihexProvider internal constructor(
         return intArrayOf(left, right)
     }
     
-    override fun write(assetsDir: Path) {
+    override fun write(builder: ResourcePackBuilder) {
         if (!glyphsChanged)
             return
         
-        val zipFile = hexFile.getPath(assetsDir)
+        val zipFile = builder.resolve(hexFile)
         zipFile.parent.createDirectories()
         zipFile.deleteIfExists()
         
@@ -210,7 +211,7 @@ abstract class UnihexProvider internal constructor(
         addSerialized("size_overrides", sizeOverrides)
     }
     
-    private class Custom(hexFile: ResourcePath) : UnihexProvider(hexFile) {
+    private class Custom(hexFile: ResourcePath<ResourceType.UnihexZip>) : UnihexProvider(hexFile) {
         
         override val sizeOverrides = ObjectArrayList<SizeOverride>()
         override val glyphs = UnihexGlyphs()
@@ -223,7 +224,8 @@ abstract class UnihexProvider internal constructor(
     }
     
     private class LazyLoaded(
-        hexFile: ResourcePath,
+        private val builder: ResourcePackBuilder,
+        hexFile: ResourcePath<ResourceType.UnihexZip>,
         sizeOverrides: List<SizeOverride>
     ) : UnihexProvider(hexFile) {
         
@@ -234,7 +236,7 @@ abstract class UnihexProvider internal constructor(
             val glyphs = UnihexGlyphs()
             
             // hexFile: zip file that contains .hex files
-            hexFile.findInAssets().useZip { zip ->
+            builder.findOrThrow(hexFile).useZip { zip ->
                 zip.walk()
                     .filter { it.extension == "hex" }
                     .forEach { glyphs.merge(UnihexGlyphs.readUnihexFile(it)) }
@@ -252,18 +254,19 @@ abstract class UnihexProvider internal constructor(
          *
          * @param hexFile The hex zip file where glyphs will be written to.
          */
-        fun create(hexFile: ResourcePath): UnihexProvider =
+        fun create(hexFile: ResourcePath<ResourceType.UnihexZip>): UnihexProvider =
             Custom(hexFile)
         
         /**
          * Reads a [UnihexProvider] from disk.
          *
+         * @param builder The [ResourcePackBuilder] to use for loading the unihex zip file.
          * @param provider The json object containing the provider data.
          */
-        fun fromDisk(provider: JsonObject): UnihexProvider {
-            val hexFile = provider.getDeserialized<ResourcePath>("hex_file")
+        fun fromDisk(builder: ResourcePackBuilder, provider: JsonObject): UnihexProvider {
+            val hexFile = provider.getDeserialized<ResourcePath<ResourceType.UnihexZip>>("hex_file")
             val sizeOverrides = provider.getDeserialized<List<SizeOverride>>("size_overrides")
-            return LazyLoaded(hexFile, sizeOverrides)
+            return LazyLoaded(builder, hexFile, sizeOverrides)
         }
         
     }

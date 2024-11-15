@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.serialization.json.serializer.NamespacedKeyTypeAdapter
 import xyz.xenondevs.nova.serialization.json.serializer.NovaBlockStateSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.RegistryElementSerializer
 import xyz.xenondevs.nova.serialization.json.serializer.ResourceLocationTypeAdapter
-import xyz.xenondevs.nova.serialization.json.serializer.ResourcePathTypeAdapter
+import xyz.xenondevs.nova.serialization.json.serializer.ResourcePathSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.SizeOverrideSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.UUIDTypeAdapter
 import xyz.xenondevs.nova.serialization.json.serializer.VersionSerialization
@@ -41,7 +41,7 @@ private val GSON_BUILDER = GsonBuilder()
     .registerTypeHierarchyAdapter(NamespacedIdTypeAdapter.nullSafe())
     .registerTypeHierarchyAdapter(NamespacedKeyTypeAdapter.nullSafe())
     .registerTypeHierarchyAdapter(ResourceLocationTypeAdapter.nullSafe())
-    .registerTypeHierarchyAdapter(ResourcePathTypeAdapter.nullSafe())
+    .registerTypeHierarchyAdapter(ResourcePathSerialization)
     .registerTypeHierarchyAdapter(ItemStackSerialization)
     .registerTypeHierarchyAdapter(LocationSerialization)
     .registerTypeHierarchyAdapter(WorldTypeAdapter.nullSafe())

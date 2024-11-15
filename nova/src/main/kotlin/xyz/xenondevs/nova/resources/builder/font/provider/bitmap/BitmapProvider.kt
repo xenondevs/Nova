@@ -6,12 +6,11 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.ints.IntSet
 import xyz.xenondevs.commons.gson.toJsonArray
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.provider.FontProvider
-import xyz.xenondevs.nova.util.data.readImage
-import xyz.xenondevs.nova.util.data.writeImage
+import xyz.xenondevs.nova.resources.builder.task.TextureContent
 import java.awt.image.BufferedImage
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
 import kotlin.math.roundToInt
 
 /**
@@ -22,7 +21,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
     /**
      * A [ResourcePath] to the texture file.
      */
-    abstract val file: ResourcePath
+    abstract val file: ResourcePath<ResourceType.FontTexture>
     
     /**
      * The height of the characters in this [BitmapProvider].
@@ -42,7 +41,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
     protected abstract val glyphImageType: BitmapGlyphImageType<T>
     
     /**
-     * The code points, aligned in a grid pointing to the glyphs,
+     * The code points, aligned in a grid pointing to the glyphs.
      */
     protected abstract val codePointGrid: CodePointGrid
     
@@ -58,10 +57,8 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
     
     override val charSizes: Int2ObjectMap<FloatArray> by lazy(::calculateCharSizes)
     
-    override fun write(assetsDir: Path) {
-        val file = file.getPath(assetsDir, "textures")
-        file.parent.createDirectories()
-        file.writeImage(glyphGrid.toImage(), "PNG")
+    override fun write(builder: ResourcePackBuilder) {
+        builder.writeImage(file, glyphGrid.toImage())
     }
     
     override fun toJson() = JsonObject().apply {
@@ -123,7 +120,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
         override val ascent: Int
     ) : BitmapProvider<T>() {
         
-        override val file: ResourcePath
+        override val file: ResourcePath<ResourceType.FontTexture>
             get() = delegate.file
         override val height: Int
             get() = delegate.height
@@ -136,7 +133,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
         
         override val charSizes by lazy(::calculateCharSizes)
         
-        override fun write(assetsDir: Path) = Unit
+        override fun write(builder: ResourcePackBuilder) = Unit
         
         override fun toJson() = delegate.toJson().apply {
             addProperty("ascent", ascent)
@@ -166,7 +163,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
      * An immutable [BitmapProvider] that contains only one [BufferedImage] glyph.
      */
     private class SingleBufferedImage(
-        override val file: ResourcePath,
+        override val file: ResourcePath<ResourceType.FontTexture>,
         texture: BufferedImage,
         codePoint: Int,
         override val height: Int,
@@ -184,7 +181,8 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
      * An immutable [BitmapProvider] that lazily loads a single [BufferedImage] glyph.
      */
     private class SingleLazyLoaded(
-        override val file: ResourcePath,
+        builder: ResourcePackBuilder,
+        override val file: ResourcePath<ResourceType.FontTexture>,
         codePoint: Int,
         override val height: Int,
         override val ascent: Int,
@@ -193,10 +191,10 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
         override val glyphImageType = BitmapGlyphImageType.BUFFERED_IMAGE
         
         override val codePointGrid = CodePointGrid.single(codePoint)
-        override val glyphGrid by lazy { GlyphGrid.single(file.findInAssets("textures").readImage()) }
+        override val glyphGrid by lazy { GlyphGrid.single(builder.getHolder<TextureContent>().getImage(file)) }
         
         // not necessary because the image is loaded from disk and cannot be changed
-        override fun write(assetsDir: Path) = Unit
+        override fun write(builder: ResourcePackBuilder) = Unit
         
     }
     
@@ -205,7 +203,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
      */
     private class Custom<T>(
         override val glyphImageType: BitmapGlyphImageType<T>,
-        override val file: ResourcePath,
+        override val file: ResourcePath<ResourceType.FontTexture>,
         override val codePointGrid: CodePointGrid,
         override val glyphGrid: GlyphGrid<T>,
         override val height: Int,
@@ -224,7 +222,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
          * the glyphs will be scaled, keeping the aspect ratio. This is the `height` property in json.
          * @param ascent The defined character ascent. This is the `ascent` property in json.
          */
-        fun custom(file: ResourcePath, codePointGrid: CodePointGrid, glyphGrid: GlyphGrid<BufferedImage>, height: Int, ascent: Int): BitmapProvider<BufferedImage> =
+        fun custom(file: ResourcePath<ResourceType.FontTexture>, codePointGrid: CodePointGrid, glyphGrid: GlyphGrid<BufferedImage>, height: Int, ascent: Int): BitmapProvider<BufferedImage> =
             Custom(BitmapGlyphImageType.BUFFERED_IMAGE, file, codePointGrid, glyphGrid, height, ascent)
         
         /**
@@ -238,7 +236,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
          * @param ascent The defined character ascent. This is the `ascent` property in json.
          */
         @JvmName("custom1")
-        fun custom(file: ResourcePath, codePointGrid: CodePointGrid, glyphGrid: GlyphGrid<IntArray>, height: Int, ascent: Int): BitmapProvider<IntArray> =
+        fun custom(file: ResourcePath<ResourceType.FontTexture>, codePointGrid: CodePointGrid, glyphGrid: GlyphGrid<IntArray>, height: Int, ascent: Int): BitmapProvider<IntArray> =
             Custom(BitmapGlyphImageType.ARGB_ARRAY, file, codePointGrid, glyphGrid, height, ascent)
         
         /**
@@ -259,20 +257,21 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
          * the glyphs will be scaled, keeping the aspect ratio. This is the `height` property in json.
          * @param ascent The defined character ascent. This is the `ascent` property in json.
          */
-        fun single(file: ResourcePath, texture: BufferedImage, codePoint: Int, height: Int, ascent: Int): BitmapProvider<BufferedImage> =
+        fun single(file: ResourcePath<ResourceType.FontTexture>, texture: BufferedImage, codePoint: Int, height: Int, ascent: Int): BitmapProvider<BufferedImage> =
             SingleBufferedImage(file, texture, codePoint, height, ascent)
         
         /**
          * Creates an immutable [BitmapProvider] with a single glyph, assuming the texture will exist.
          *
+         * @param builder The resource pack builder to use for loading the texture under [file].
          * @param file The path where the texture will be read from and saved to.
          * @param codePoint The code point of the glyph.
          * @param height The height that glyphs will be rendered as. If this does not match the glyphs actual height,
          * the glyphs will be scaled, keeping the aspect ratio. This is the `height` property in json.
          * @param ascent The defined character ascent. This is the `ascent` property in json.
          */
-        fun single(file: ResourcePath, codePoint: Int, height: Int, ascent: Int): BitmapProvider<BufferedImage> =
-            SingleLazyLoaded(file, codePoint, height, ascent)
+        fun single(builder: ResourcePackBuilder, file: ResourcePath<ResourceType.FontTexture>, codePoint: Int, height: Int, ascent: Int): BitmapProvider<BufferedImage> =
+            SingleLazyLoaded(builder, file, codePoint, height, ascent)
         
     }
     

@@ -8,6 +8,7 @@ import xyz.xenondevs.commons.collections.repeated
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.model.EquipmentModel
 import xyz.xenondevs.nova.resources.layout.equipment.AnimatedEquipmentLayout
@@ -17,13 +18,9 @@ import xyz.xenondevs.nova.resources.layout.equipment.StaticEquipmentLayout
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.MathUtils
 import xyz.xenondevs.nova.util.data.ImageUtils
-import xyz.xenondevs.nova.util.data.writeImage
-import xyz.xenondevs.nova.util.data.writeJson
 import xyz.xenondevs.nova.util.toResourceLocation
 import xyz.xenondevs.nova.util.toResourcePath
 import java.awt.image.BufferedImage
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
 
 internal class RuntimeEquipmentData(
     val textureFrames: List<ResourceLocation>?,
@@ -51,7 +48,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
      * Caches interpolated textures.
      * Format: Map<Pair<FromFile, ToFile>, Map<Blend 0-255, InterpolatedImage>>
      */
-    private val interpolationCache = HashMap<Pair<Path, Path>, Int2ObjectMap<BufferedImage>>()
+    private val interpolationCache = HashMap<Pair<ResourcePath<ResourceType.Texture>, ResourcePath<ResourceType.Texture>>, Int2ObjectMap<BufferedImage>>()
     private var generatedCount = 0
     
     @PackTask(
@@ -61,14 +58,14 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
     private fun write() {
         ResourceLookups.EQUIPMENT = NovaRegistries.EQUIPMENT.associateWith { equipment ->
             when (val layout = equipment.makeLayout(builder)) {
-                is StaticEquipmentLayout -> generatedStaticEquipmentModel(equipment.id.toResourcePath(), layout)
-                is AnimatedEquipmentLayout -> generateAnimatedEquipmentModel(equipment.id.toResourcePath(), layout)
+                is StaticEquipmentLayout -> generatedStaticEquipmentModel(equipment.id.toResourcePath(ResourceType.Equipment), layout)
+                is AnimatedEquipmentLayout -> generateAnimatedEquipmentModel(equipment.id.toResourcePath(ResourceType.Equipment), layout)
             }
         }
     }
     
-    private fun generatedStaticEquipmentModel(id: ResourcePath, layout: StaticEquipmentLayout): RuntimeEquipmentData {
-        for ((equipmentType, layers) in layout.layers) {
+    private fun generatedStaticEquipmentModel(id: ResourcePath<ResourceType.Equipment>, layout: StaticEquipmentLayout): RuntimeEquipmentData {
+        for ((equipmentType, layers) in layout.types) {
             for(layer in layers) {
                 if (layer.emissivityMap != null) {
                     applyEmissivityMap(layer.texture, layer.emissivityMap, "textures/entity/equipment/$equipmentType/")
@@ -79,9 +76,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
         val model = layout.toEquipmentModel()
         validateEquipmentModel(model)
         
-        val file = id.getPath(ResourcePackBuilder.ASSETS_DIR, "models/equipment/", "json")
-        file.parent.createDirectories()
-        file.writeJson(model)
+        builder.writeJson(id, model)
         
         return RuntimeEquipmentData(
             listOf(id.toResourceLocation()),
@@ -89,7 +84,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
         )
     }
     
-    private fun generateAnimatedEquipmentModel(id: ResourcePath, layout: AnimatedEquipmentLayout): RuntimeEquipmentData {
+    private fun generateAnimatedEquipmentModel(id: ResourcePath<ResourceType.Equipment>, layout: AnimatedEquipmentLayout): RuntimeEquipmentData {
         val textureFrames = generateAnimatedEquipmentTexture(id, layout)
         val cameraOverlayFrames = generateAnimatedCameraOverlay(layout)
         return RuntimeEquipmentData(textureFrames, cameraOverlayFrames)
@@ -98,36 +93,36 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
     private fun generateAnimatedCameraOverlay(layout: AnimatedEquipmentLayout): List<ResourceLocation>? {
         val cameraOverlay = layout.cameraOverlay
         val cameraOverlayFrameCount: Int
-        val cameraOverlayFrames: List<ResourcePath>
+        val cameraOverlayFrames: List<ResourcePath<ResourceType.Texture>>
         if (cameraOverlay != null) {
             cameraOverlayFrameCount = cameraOverlay.frames.size * cameraOverlay.ticksPerFrame
-            cameraOverlayFrames = generateTextureAnimation(cameraOverlay, "textures/")
+            cameraOverlayFrames = generateTextureAnimation(cameraOverlay, ResourceType.Texture)
         } else {
             cameraOverlayFrameCount = 0
             cameraOverlayFrames = emptyList()
         }
         
-        return cameraOverlayFrames.map(ResourcePath::toResourceLocation).takeUnlessEmpty()
+        return cameraOverlayFrames.map(ResourcePath<*>::toResourceLocation).takeUnlessEmpty()
     }
     
-    private fun generateAnimatedEquipmentTexture(id: ResourcePath, layout: AnimatedEquipmentLayout): List<ResourceLocation> {
+    private fun generateAnimatedEquipmentTexture(id: ResourcePath<ResourceType.Equipment>, layout: AnimatedEquipmentLayout): List<ResourceLocation> {
         // generate all animations (merge with emissivity map, apply interpolation)
-        val animations: Map<EquipmentModel.Type, List<List<ResourcePath>>> = layout.layers.mapValues { (equipmentType, layers) ->
-            layers.map { generateLayerAnimation(it, "textures/entity/equipment/$equipmentType/") }
-        }
+        // [equipmentType][layer][frame]
+        val animations: Map<EquipmentModel.Type, List<List<ResourcePath<ResourceType.EquipmentTexture>>>> =
+            layout.types.mapValues { (_, layers) -> layers.map(::generateLayerAnimation) }
         
         // find the total frame count needed to display all animations using a single frame number
         // (least common multiple of all frame counts)
         val textureFrameCount: Int = animations.values.asSequence().flatten()
             .fold(1) { acc, layer -> MathUtils.lcm(acc, layer.size) }
         
-        val textureFrames = ArrayList<ResourcePath>(textureFrameCount)
+        val textureFrames = ArrayList<ResourcePath<ResourceType.Equipment>>(textureFrameCount)
         repeat(textureFrameCount) { frame ->
-            val path = ResourcePath(id.namespace, id.path + "_$frame")
+            val path = ResourcePath(ResourceType.Equipment, id.namespace, id.path + "_$frame")
             textureFrames += path
             
             val equipmentModelForFrame = EquipmentModel(
-                layout.layers.mapValues { (equipmentType, layers) ->
+                layout.types.mapValues { (equipmentType, layers) ->
                     layers.withIndex().map { (layerIdx, layer) ->
                         val layerFrames = animations[equipmentType]!![layerIdx]
                         val texture = layerFrames[frame % layerFrames.size]
@@ -136,31 +131,29 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
                 }
             )
             
-            val file = path.getPath(ResourcePackBuilder.ASSETS_DIR, "models/equipment/", "json")
-            file.parent.createDirectories()
-            file.writeJson(equipmentModelForFrame)
+            builder.writeJson(path, equipmentModelForFrame)
         }
         
-        return textureFrames.map(ResourcePath::toResourceLocation)
+        return textureFrames.map(ResourcePath<*>::toResourceLocation)
     }
     
     /**
      * Generates/collects the textures required for animated equipment layers (texture and emissivity map), then returns
      * the sequence of [ResourcePaths][ResourcePath] pointing to the (generated) textures.
      */
-    private fun generateLayerAnimation(layer: AnimatedEquipmentLayout.Layer, textureDir: String): List<ResourcePath> {
+    private fun <T : ResourceType.EquipmentTexture> generateLayerAnimation(layer: AnimatedEquipmentLayout.Layer<T>): List<ResourcePath<T>> {
         if (layer.emissivityMap != null) {
-            var textureImages = generateTextureAnimationImages(layer.texture, textureDir)
-            var emissivityMapImages = generateTextureAnimationImages(layer.emissivityMap, textureDir)
+            var textureImages = generateTextureAnimationImages(layer.texture)
+            var emissivityMapImages = generateTextureAnimationImages(layer.emissivityMap)
             
             val frameCount = MathUtils.lcm(textureImages.size, emissivityMapImages.size)
             textureImages = textureImages.repeated(frameCount / textureImages.size).map(ImageUtils::copyToARGB) // conversion to ARGB is important to support alpha in image!
             emissivityMapImages = emissivityMapImages.repeated(frameCount / emissivityMapImages.size).map(ImageUtils::copyToARGB)
             
             applyEmissivityMaps(textureImages, emissivityMapImages)
-            return writeImages(textureImages, textureDir)
+            return writeImages(textureImages, layer.resourceType)
         } else {
-            return generateTextureAnimation(layer.texture, textureDir)
+            return generateTextureAnimation(layer.texture, layer.resourceType)
         }
     }
     
@@ -186,13 +179,12 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
     /**
      * Applies the emissivity map from [emissivityMap] to the texture under [texture] in [textureDir].
      */
-    private fun applyEmissivityMap(texture: ResourcePath, emissivityMap: ResourcePath, textureDir: String) {
-        val textureFile = texture.findInAssets(textureDir, "png")
-        var textureImage = ImageUtils.copyToARGB(textureContent.getImage(textureFile))
-        val emissivityMapImage = textureContent.getImage(emissivityMap.findInAssets(textureDir, "png"))
+    private fun applyEmissivityMap(texture: ResourcePath<ResourceType.Texture>, emissivityMap: ResourcePath<ResourceType.Texture>, textureDir: String) {
+        var textureImage = ImageUtils.copyToARGB(textureContent.getImage(texture))
+        val emissivityMapImage = textureContent.getImage(emissivityMap)
         
         applyEmissivityMap(textureImage, emissivityMapImage)
-        textureFile.writeImage(textureImage, "PNG")
+        builder.writeImage(texture, textureImage)
     }
     
     /**
@@ -224,21 +216,21 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
      * Generates/collects the textures required for [animation], then returns the sequence of [ResourcePaths][ResourcePath]
      * pointing to the (generated) textures.
      */
-    private fun generateTextureAnimation(animation: Animation, textureDir: String): List<ResourcePath> {
+    private fun <T : ResourceType.Texture> generateTextureAnimation(animation: Animation<T>, location: T): List<ResourcePath<T>> {
         val (keyFrames, ticksPerFrame, interpolationMode) = animation
-        if (interpolationMode == InterpolationMode.NONE)
+        if (interpolationMode == InterpolationMode.NONE) {
             return keyFrames.eachRepeated(ticksPerFrame)
+        }
         
-        val frames = ArrayList<ResourcePath>(keyFrames.size * ticksPerFrame)
+        val frames = ArrayList<ResourcePath<T>>(keyFrames.size * ticksPerFrame)
         for ((keyFrameId, keyFrame) in keyFrames.withIndex()) {
             frames += keyFrame
             frames += writeImages(
                 generateInterpolatedImages(
                     keyFrame, keyFrames[(keyFrameId + 1) % keyFrames.size],
-                    ticksPerFrame - 1,
-                    textureDir
+                    ticksPerFrame - 1
                 ),
-                textureDir
+                location
             )
         }
         
@@ -248,21 +240,20 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
     /**
      * Generates a sequence of [BufferedImages][BufferedImage] representing the [animation] by interpolating between the key frames.
      */
-    private fun generateTextureAnimationImages(animation: Animation, textureDir: String): List<BufferedImage> {
+    private fun generateTextureAnimationImages(animation: Animation<*>): List<BufferedImage> {
         val (keyFrames, ticksPerFrame, interpolationMode) = animation
         
-        val keyFrameImages = keyFrames.map { textureContent.getImage(it.findInAssets(textureDir, "png")) }
+        val keyFrameImages = keyFrames.map { textureContent.getImage(it) }
         if (interpolationMode == InterpolationMode.NONE)
             return keyFrameImages.eachRepeated(ticksPerFrame).map(ImageUtils::copyToARGB)
         
         val frames = ArrayList<BufferedImage>(keyFrames.size * ticksPerFrame)
         for ((keyFrameId, keyFrame) in keyFrames.withIndex()) {
-            frames += textureContent.getImage(keyFrame.findInAssets(textureDir, "png"))
+            frames += textureContent.getImage(keyFrame)
             
             frames += generateInterpolatedImages(
                 keyFrame, keyFrames[(keyFrameId + 1) % keyFrames.size],
-                ticksPerFrame - 1,
-                textureDir
+                ticksPerFrame - 1
             )
         }
         
@@ -272,21 +263,22 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
     /**
      * Generates [count] interpolated images between [from] and [to].
      */
-    private fun generateInterpolatedImages(from: ResourcePath, to: ResourcePath, count: Int, textureDir: String): List<BufferedImage> {
+    private fun generateInterpolatedImages(
+        from: ResourcePath<ResourceType.Texture>,
+        to: ResourcePath<ResourceType.Texture>, 
+        count: Int
+    ): List<BufferedImage> {
         if (count <= 0)
             return emptyList()
         
-        val fromFile = from.findInAssets(textureDir, "png")
-        val toFile = to.findInAssets(textureDir, "png")
-        
-        val fromImage by textureContent.getImageLazily(fromFile)
-        val toImage by textureContent.getImageLazily(toFile)
+        val fromImage by textureContent.getImageLazily(from)
+        val toImage by textureContent.getImageLazily(to)
         
         val interpolatedImages = ArrayList<BufferedImage>()
         for (frame in 0..<count) {
             val progress = frame * 255 / count
             interpolatedImages += interpolationCache
-                .getOrPut(fromFile to toFile, ::Int2ObjectOpenHashMap)
+                .getOrPut(from to to, ::Int2ObjectOpenHashMap)
                 .getOrPut(progress) { ImageUtils.lerp(fromImage, toImage, progress / 255f) }
         }
         
@@ -297,17 +289,15 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
      * Writes the [images] to the texture directory and returns the [ResourcePaths][ResourcePath]
      * pointing to the written images.
      */
-    private fun writeImages(images: List<BufferedImage>, textureDir: String): List<ResourcePath> =
-        images.map { writeImage(it, textureDir) }
+    private fun <T : ResourceType.Texture> writeImages(images: List<BufferedImage>, location: T): List<ResourcePath<T>> =
+        images.map { writeImage(it, location) }
     
     /**
      * Writes the [image] to the texture directory and returns the [ResourcePath] pointing to the written image.
      */
-    private fun writeImage(image: BufferedImage, textureDir: String): ResourcePath {
-        val path = ResourcePath("nova", "generated/equipment_${generatedCount++}")
-        val file = path.getPath(ResourcePackBuilder.ASSETS_DIR, textureDir, "png")
-        file.parent.createDirectories()
-        file.writeImage(image, "PNG")
+    private fun <T : ResourceType.Texture> writeImage(image: BufferedImage, location: T): ResourcePath<T> {
+        val path = ResourcePath(location, "nova", "generated/equipment_${generatedCount++}")
+        builder.writeImage(path, image)
         return path
     }
     
@@ -315,9 +305,9 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
      * Checks whether all textures referenced in [model] exist and throws an exception if not.
      */
     private fun validateEquipmentModel(model: EquipmentModel) {
-        for ((equipmentType, layers) in model.layers) {
+        for ((_, layers) in model.layers) {
             for (layer in layers) {
-                layer.texture.findInAssets("textures/entity/equipment/$equipmentType", "png")
+                builder.findOrThrow(layer.texture)
             }
         }
     }

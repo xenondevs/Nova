@@ -4,9 +4,9 @@ import com.google.gson.JsonObject
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.IntSet
 import xyz.xenondevs.commons.gson.getString
+import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.provider.bitmap.MutableBitmapProvider
 import xyz.xenondevs.nova.resources.builder.font.provider.unihex.UnihexProvider
-import java.nio.file.Path
 
 abstract class FontProvider internal constructor() {
     
@@ -37,16 +37,16 @@ abstract class FontProvider internal constructor() {
     /**
      * Writes additional data to the assets directory, such as bitmaps or unihex files.
      */
-    open fun write(assetsDir: Path) = Unit
+    open fun write(builder: ResourcePackBuilder) = Unit
     
     companion object {
         
-        fun fromDisk(provider: JsonObject): FontProvider =
+        fun fromDisk(builder: ResourcePackBuilder, provider: JsonObject): FontProvider =
             when (val type = provider.getString("type")) {
                 "reference" -> ReferenceProvider.of(provider)
                 "space" -> SpaceProvider.of(provider)
-                "bitmap" -> MutableBitmapProvider.fromDisk(provider)
-                "unihex" -> UnihexProvider.fromDisk(provider)
+                "bitmap" -> MutableBitmapProvider.fromDisk(builder, provider)
+                "unihex" -> UnihexProvider.fromDisk(builder, provider)
                 else -> throw UnsupportedOperationException("Unsupported font provider type: $type")
             }
         

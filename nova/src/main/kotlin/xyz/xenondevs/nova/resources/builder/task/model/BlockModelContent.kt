@@ -10,6 +10,7 @@ import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.PackTask
@@ -229,7 +230,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
 }
 
 internal data class BlockStateVariantData(
-    val model: ResourcePath,
+    val model: ResourcePath<ResourceType.Model>,
     val x: Int,
     val y: Int
 )

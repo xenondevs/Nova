@@ -7,6 +7,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 
 enum class CustomBlockType { NORMAL, CROP }
@@ -93,6 +94,6 @@ interface CustomItemService {
      *
      * example: [minecraft:dirt -> minecraft:item/dirt]
      */
-    fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath>
+    fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath<ResourceType.Model>>
     
 }

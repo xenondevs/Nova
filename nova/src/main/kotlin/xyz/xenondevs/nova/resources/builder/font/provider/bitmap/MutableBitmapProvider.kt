@@ -7,15 +7,16 @@ import xyz.xenondevs.commons.gson.getInt
 import xyz.xenondevs.commons.gson.getIntOrNull
 import xyz.xenondevs.commons.gson.toJsonArray
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.builder.task.TextureContent
 import xyz.xenondevs.nova.serialization.json.getDeserialized
-import xyz.xenondevs.nova.util.data.readImage
 import java.awt.image.BufferedImage
-import java.nio.file.Path
 
 abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
     
     // -- Mutable properties --
-    abstract override var file: ResourcePath
+    abstract override var file: ResourcePath<ResourceType.FontTexture>
     abstract override var height: Int
     abstract override var ascent: Int
     abstract override val codePointGrid: MutableCodePointGrid
@@ -30,7 +31,6 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
      * Whether code points have been updated.
      */
     protected var codePointsChanged = false
-    
     
     /**
      * Puts the given [codePoint] and [glyph] into the grid at [x] and [y].
@@ -66,9 +66,9 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
         return glyphGrid.create(x, y)
     }
     
-    override fun write(assetsDir: Path) {
+    override fun write(builder: ResourcePackBuilder) {
         if (glyphsChanged) {
-            super.write(assetsDir)
+            super.write(builder)
         }
     }
     
@@ -76,8 +76,9 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
      * A [MutableBitmapProvider] that is read lazily.
      */
     private class LazyLoaded(
+        private val builder: ResourcePackBuilder,
         private val codePointRows: List<String>,
-        override var file: ResourcePath,
+        override var file: ResourcePath<ResourceType.FontTexture>,
         override var height: Int,
         override var ascent: Int
     ) : MutableBitmapProvider<BufferedImage>() {
@@ -88,7 +89,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
         override val glyphGrid: ReferenceGlyphGrid by lazy(::loadGlyphGrid)
         
         private fun loadGlyphGrid(): ReferenceGlyphGrid {
-            val img = file.findInAssets("textures").readImage()
+            val img = builder.getHolder<TextureContent>().getImage(file)
             val codePoints = codePointGrid
             
             require(img.width % codePoints.width == 0 && img.height % codePoints.height == 0) {
@@ -116,7 +117,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
      */
     private class Custom<T>(
         override val glyphImageType: BitmapGlyphImageType<T>,
-        override var file: ResourcePath,
+        override var file: ResourcePath<ResourceType.FontTexture>,
         override val codePointGrid: MutableCodePointGrid,
         override val glyphGrid: MutableGlyphGrid<T>,
         override var height: Int,
@@ -135,7 +136,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
          * the glyphs will be scaled, keeping the aspect ratio. This is the `height` property in json.
          * @param ascent The defined character ascent. This is the `ascent` property in json.
          */
-        fun create(file: ResourcePath, glyphWidth: Int, glyphHeight: Int, height: Int, ascent: Int): MutableBitmapProvider<BufferedImage> =
+        fun create(file: ResourcePath<ResourceType.FontTexture>, glyphWidth: Int, glyphHeight: Int, height: Int, ascent: Int): MutableBitmapProvider<BufferedImage> =
             Custom(
                 BitmapGlyphImageType.BUFFERED_IMAGE,
                 file,
@@ -153,7 +154,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
          * the glyphs will be scaled, keeping the aspect ratio. This is the `height` property in json.
          * @param ascent The defined character ascent. This is the `ascent` property in json.
          */
-        fun custom(file: ResourcePath, codePointGrid: MutableCodePointGrid, glyphGrid: MutableGlyphGrid<BufferedImage>, height: Int, ascent: Int): MutableBitmapProvider<BufferedImage> =
+        fun custom(file: ResourcePath<ResourceType.FontTexture>, codePointGrid: MutableCodePointGrid, glyphGrid: MutableGlyphGrid<BufferedImage>, height: Int, ascent: Int): MutableBitmapProvider<BufferedImage> =
             Custom(BitmapGlyphImageType.BUFFERED_IMAGE, file, codePointGrid, glyphGrid, height, ascent)
         
         /**
@@ -167,7 +168,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
          * @param ascent The defined character ascent. This is the `ascent` property in json.
          */
         @JvmName("custom1")
-        fun custom(file: ResourcePath, codePointGrid: MutableCodePointGrid, glyphGrid: MutableGlyphGrid<IntArray>, height: Int, ascent: Int): MutableBitmapProvider<IntArray> =
+        fun custom(file: ResourcePath<ResourceType.FontTexture>, codePointGrid: MutableCodePointGrid, glyphGrid: MutableGlyphGrid<IntArray>, height: Int, ascent: Int): MutableBitmapProvider<IntArray> =
             Custom(BitmapGlyphImageType.ARGB_ARRAY, file, codePointGrid, glyphGrid, height, ascent)
         
         /**
@@ -180,7 +181,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
          * the glyphs will be scaled, keeping the aspect ratio. This is the `height` property in json.
          * @param ascent The defined character ascent. This is the `ascent` property in json.
          */
-        fun single(file: ResourcePath, texture: BufferedImage, codePoint: Int, height: Int, ascent: Int): MutableBitmapProvider<BufferedImage> {
+        fun single(file: ResourcePath<ResourceType.FontTexture>, texture: BufferedImage, codePoint: Int, height: Int, ascent: Int): MutableBitmapProvider<BufferedImage> {
             val provider = create(file, texture.width, texture.height, height, ascent)
             provider.set(0, 0, codePoint, texture)
             return provider
@@ -189,13 +190,14 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
         /**
          * Reads a [BitmapProvider] from disk.
          *
+         * @param builder The [ResourcePackBuilder] to use for loading the texture.
          * @param provider The json object containing the provider data. Might be modified by the resulting [BitmapProvider].
          */
-        fun fromDisk(provider: JsonObject): MutableBitmapProvider<BufferedImage> {
-            val file = provider.getDeserialized<ResourcePath>("file")
+        fun fromDisk(builder: ResourcePackBuilder, provider: JsonObject): MutableBitmapProvider<BufferedImage> {
+            val file = provider.getDeserialized<ResourcePath<ResourceType.FontTexture>>("file")
             val height = provider.getIntOrNull("height") ?: 8
             val ascent = provider.getInt("ascent")
-            return LazyLoaded(provider.getArray("chars").getAllStrings(), file, height, ascent)
+            return LazyLoaded(builder, provider.getArray("chars").getAllStrings(), file, height, ascent)
         }
         
     }

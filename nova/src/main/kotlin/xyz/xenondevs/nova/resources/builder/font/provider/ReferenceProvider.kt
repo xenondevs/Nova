@@ -5,11 +5,12 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.IntSet
 import xyz.xenondevs.commons.gson.getString
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 
 /**
  * Represents a `reference` font provider.
  */
-class ReferenceProvider(var id: ResourcePath) : FontProvider() {
+class ReferenceProvider(var id: ResourcePath<ResourceType.Font>) : FontProvider() {
     
     override val codePoints: IntSet
         get() = throw UnsupportedOperationException("Cannot retrieve codePoints from reference provider")
@@ -25,7 +26,7 @@ class ReferenceProvider(var id: ResourcePath) : FontProvider() {
     companion object {
         
         fun of(provider: JsonObject) = ReferenceProvider(
-            ResourcePath.of(provider.getString("id"))
+            ResourcePath.of(ResourceType.Font, provider.getString("id"))
         )
         
     }

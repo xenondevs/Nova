@@ -83,7 +83,7 @@ internal object WorldGenFileParser {
     ) {
         for (addon in AddonBootstrapper.addons) {
             addon.dataFolder.resolve(dirName).walk()
-                .filter { it.isRegularFile() && it.extension == "json" && ResourcePath.NON_NAMESPACED_ENTRY.matches(it.name) }
+                .filter { it.isRegularFile() && it.extension == "json" && ResourcePath.isValidPath(it.name) }
                 .forEach { file ->
                     val id = ResourceLocation.fromNamespaceAndPath(addon.id, file.nameWithoutExtension)
                     registry[id] = codec.decodeJsonFile(

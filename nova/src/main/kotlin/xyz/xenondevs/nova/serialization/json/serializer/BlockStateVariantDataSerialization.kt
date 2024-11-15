@@ -9,6 +9,7 @@ import com.google.gson.JsonSerializer
 import xyz.xenondevs.commons.gson.getIntOrNull
 import xyz.xenondevs.commons.gson.getString
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.task.model.BlockStateVariantData
 import java.lang.reflect.Type
 
@@ -27,7 +28,7 @@ internal object BlockStateVariantDataSerialization : JsonSerializer<BlockStateVa
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): BlockStateVariantData {
         json as JsonObject
         return BlockStateVariantData(
-            ResourcePath.of(json.getString("model")),
+            ResourcePath.of(ResourceType.Model, json.getString("model")),
             json.getIntOrNull("x") ?: 0,
             json.getIntOrNull("y") ?: 0
         )

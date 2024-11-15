@@ -7,6 +7,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 
 object CustomItemServiceManager {
@@ -65,8 +66,8 @@ object CustomItemServiceManager {
         return services.firstNotNullOfOrNull { it.canBreakBlock(block, tool) }
     }
     
-    fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath> {
-        val map = HashMap<ResourceLocation, ResourcePath>()
+    fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath<ResourceType.Model>> {
+        val map = HashMap<ResourceLocation, ResourcePath<ResourceType.Model>>()
         services.forEach { map += it.getBlockItemModelPaths() }
         return map
     }

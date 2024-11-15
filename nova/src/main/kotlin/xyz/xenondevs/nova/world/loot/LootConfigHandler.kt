@@ -26,7 +26,7 @@ internal object LootConfigHandler {
     private fun loadLootTables() {
         for (addon in AddonBootstrapper.addons) {
             addon.dataFolder.resolve("loot").walk()
-                .filter { it.isRegularFile() && it.extension == "json" && ResourcePath.NON_NAMESPACED_ENTRY.matches(it.name) }
+                .filter { it.isRegularFile() && it.extension == "json" && ResourcePath.isValidPath(it.name) }
                 .forEach { file ->
                     val lootTable = GSON.fromJson<LootTable>(file)
                     if (lootTable == null) {

@@ -35,7 +35,7 @@ object UpdatableFile {
                 extractAll(
                     zip.resolve(dirName), 
                     addon.dataFolder.resolve(dirName)
-                ) { ResourcePath.NON_NAMESPACED_ENTRY.matches(it.name) }
+                ) { ResourcePath.isValidPath(it.name) }
             }  
         }
     }

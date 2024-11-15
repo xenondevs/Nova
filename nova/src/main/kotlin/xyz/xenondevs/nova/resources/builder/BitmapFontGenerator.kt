@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.resources.builder
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.font.Font
 import xyz.xenondevs.nova.resources.builder.font.provider.FontProvider
 import xyz.xenondevs.nova.resources.builder.font.provider.ReferenceProvider
@@ -21,6 +22,7 @@ private const val GLYPH_HEIGHT = 16
  * @param font The font to generate the bitmap font for.
  */
 internal class BitmapFontGenerator(
+    private val builder: ResourcePackBuilder,
     private val font: Font
 ) {
     
@@ -52,7 +54,7 @@ internal class BitmapFontGenerator(
     private fun convertUnihexProvider(provider: UnihexProvider): List<BitmapProvider<IntArray>> =
         provider.glyphRasters.map { (width, glyphRasters) ->
             val bitmapProvider = buildBitmapProvider(width, glyphRasters)
-            bitmapProvider.write(ResourcePackBuilder.ASSETS_DIR)
+            bitmapProvider.write(builder)
             return@map bitmapProvider
         }
     
@@ -81,7 +83,7 @@ internal class BitmapFontGenerator(
         
         val id = font.id
         return BitmapProvider.custom(
-            ResourcePath(font.id.namespace, "font/${id.path}/nova_bmp/${width}x16.png"),
+            ResourcePath(ResourceType.FontTexture, font.id.namespace, "font/${id.path}/nova_bmp/${width}x16.png"),
             ArrayCodePointGrid(arrayOf(codePoints)), RasterGlyphGrid(glyphCount, 1, width, 16, raster),
             8, 7
         )

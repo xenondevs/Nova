@@ -4,6 +4,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.BitmapFontGenerator
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.Font
@@ -13,7 +14,7 @@ import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import java.util.*
 
-private val MOVED_FONT_BLACKLIST by MAIN_CONFIG.entry<Set<ResourcePath>>("resource_pack", "generation", "font", "moved_font_blacklist")
+private val MOVED_FONT_BLACKLIST by MAIN_CONFIG.entry<Set<ResourcePath<ResourceType.Font>>>("resource_pack", "generation", "font", "moved_font_blacklist")
 
 class MovedFontContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
     
@@ -22,27 +23,27 @@ class MovedFontContent internal constructor(private val builder: ResourcePackBui
     /**
      * A cache for generated bitmap fonts
      */
-    private val bitmapFonts = HashMap<ResourcePath, Font>()
+    private val bitmapFonts = HashMap<ResourcePath<ResourceType.Font>, Font>()
     
     /**
      * A set keeping track of requested font variants.
      */
-    private val requested = HashSet<Pair<ResourcePath, Int>>()
+    private val requested = HashSet<Pair<ResourcePath<ResourceType.Font>, Int>>()
     
     /**
      * A queue of font variants that need to be generated.
      */
-    private val queue = LinkedList<Pair<ResourcePath, Int>>()
+    private val queue = LinkedList<Pair<ResourcePath<ResourceType.Font>, Int>>()
     
-    fun requestMovedFonts(font: ResourcePath, range: IntRange) {
+    fun requestMovedFonts(font: ResourcePath<ResourceType.Font>, range: IntRange) {
         for (y in range) requestMovedFont(font, y)
     }
     
-    fun requestMovedFonts(font: ResourcePath, range: IntProgression) {
+    fun requestMovedFonts(font: ResourcePath<ResourceType.Font>, range: IntProgression) {
         for (y in range) requestMovedFont(font, y)
     }
     
-    private fun requestMovedFont(font: ResourcePath, y: Int) {
+    private fun requestMovedFont(font: ResourcePath<ResourceType.Font>, y: Int) {
         if (font in MOVED_FONT_BLACKLIST)
             return
         
@@ -61,7 +62,7 @@ class MovedFontContent internal constructor(private val builder: ResourcePackBui
         while (queue.isNotEmpty()) {
             val (font, y) = queue.poll()
             
-            val movedFont = Font(ResourcePath(font.namespace, font.path + "/$y"))
+            val movedFont = Font(ResourcePath(ResourceType.Font, font.namespace, font.path + "/$y"))
             val bitmapFont = getBitmapFont(font)
             
             for (provider in bitmapFont.providers) {
@@ -71,7 +72,7 @@ class MovedFontContent internal constructor(private val builder: ResourcePackBui
                     is ReferenceProvider -> {
                         val id = provider.id
                         requestMovedFont(id, y)
-                        ReferenceProvider(ResourcePath(id.namespace, id.path + "/$y"))
+                        ReferenceProvider(ResourcePath(ResourceType.Font, id.namespace, id.path + "/$y"))
                     }
                     
                     else -> provider
@@ -82,12 +83,12 @@ class MovedFontContent internal constructor(private val builder: ResourcePackBui
         }
     }
     
-    private fun getBitmapFont(id: ResourcePath): Font {
+    private fun getBitmapFont(id: ResourcePath<ResourceType.Font>): Font {
         return bitmapFonts.getOrPut(id) {
             val font = fontContent.mergedFonts[id]
                 ?: throw IllegalStateException("Font $id does not exist or is not loaded in FontContent")
             
-            BitmapFontGenerator(font).generateBitmapFont()
+            BitmapFontGenerator(builder, font).generateBitmapFont()
         }
     }
     

@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.resources.builder.task.font
 import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.Font
 import xyz.xenondevs.nova.resources.builder.font.provider.ReferenceProvider
@@ -40,7 +41,7 @@ class MoveCharactersContent(private val builder: ResourcePackBuilder) : PackTask
         // .25, .5, ..., 8192
         for (i in 0..<SIZE) advances[range[i + SIZE]] = 2.0.pow(i - EXP_SHIFT).toFloat()
         
-        val moveFontId = ResourcePath("nova", "move")
+        val moveFontId = ResourcePath(ResourceType.Font, "nova", "move")
         val spaceFont = Font(moveFontId, listOf(SpaceProvider(advances)))
         fontContent += spaceFont
         

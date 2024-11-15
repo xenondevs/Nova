@@ -10,6 +10,7 @@ import org.joml.Vector4d
 import org.joml.Vector4dc
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.model.Model.*
 import xyz.xenondevs.nova.resources.builder.model.Model.Element.Face
@@ -282,7 +283,7 @@ internal object ModelTypeAdapter : TypeAdapter<Model>() {
         
         reader.endObject()
         return Model(
-            parentName?.let(ResourcePath::of),
+            parentName?.let { ResourcePath.of(ResourceType.Model, it) },
             textures ?: emptyMap(),
             elements,
             ambientOcclusion,
@@ -477,12 +478,12 @@ internal object ModelTypeAdapter : TypeAdapter<Model>() {
         reader.beginObject()
         
         var predicate: Map<String, Number>? = null
-        var model: ResourcePath? = null
+        var model: ResourcePath<ResourceType.Model>? = null
         
         while (reader.peek() == JsonToken.NAME) {
             when (reader.nextName()) {
                 "predicate" -> predicate = readPredicate(reader)
-                "model" -> model = ResourcePath.of(reader.nextString())
+                "model" -> model = ResourcePath.of(ResourceType.Model, reader.nextString())
                 else -> reader.skipValue()
             }
         }

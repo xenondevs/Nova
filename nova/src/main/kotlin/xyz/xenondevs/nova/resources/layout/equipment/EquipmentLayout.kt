@@ -1,45 +1,48 @@
 package xyz.xenondevs.nova.resources.layout.equipment
 
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.model.EquipmentModel
 
 internal sealed interface EquipmentLayout
 
 internal data class StaticEquipmentLayout(
-    val layers: Map<EquipmentModel.Type, List<Layer>>,
-    val cameraOverlay: ResourcePath?
+    val types: Map<EquipmentModel.Type, List<Layer<*>>>,
+    val cameraOverlay: ResourcePath<ResourceType.Texture>?
 ) : EquipmentLayout {
     
     fun toEquipmentModel() = EquipmentModel(
-        layers.mapValues { (_, layers) ->
+        types.mapValues { (_, layers) ->
             layers.map { layer ->
                 EquipmentModel.Layer(layer.texture, layer.usePlayerTexture, layer.dyeable)
             }
         }
     )
     
-    data class Layer(
-        val texture: ResourcePath,
+    data class Layer<out T : ResourceType.EquipmentTexture>(
+        val resourceType: T,
+        val texture: ResourcePath<T>,
         val usePlayerTexture: Boolean,
-        val emissivityMap: ResourcePath?,
+        val emissivityMap: ResourcePath<T>?,
         val dyeable: EquipmentModel.Layer.Dyeable?
     )
     
 }
 
 internal data class AnimatedEquipmentLayout(
-    val layers: Map<EquipmentModel.Type, List<Layer>>,
-    val cameraOverlay: Animation?
+    val types: Map<EquipmentModel.Type, List<Layer<*>>>,
+    val cameraOverlay: Animation<ResourceType.Texture>?
 ) : EquipmentLayout {
     
-    internal data class Layer(
-        val texture: Animation,
-        val emissivityMap: Animation?,
+    internal data class Layer<out T : ResourceType.EquipmentTexture>(
+        val resourceType: T,
+        val texture: Animation<T>,
+        val emissivityMap: Animation<T>?,
         val dyeable: EquipmentModel.Layer.Dyeable?
     )
     
-    internal data class Animation(
-        val frames: List<ResourcePath>,
+    internal data class Animation<out T : ResourceType.Texture>(
+        val frames: List<ResourcePath<T>>,
         val ticksPerFrame: Int,
         val interpolationMode: InterpolationMode
     ) {

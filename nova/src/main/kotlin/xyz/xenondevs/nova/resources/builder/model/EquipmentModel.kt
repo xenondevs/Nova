@@ -6,6 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.serialization.kotlinx.ColorAsIntSerializer
 import java.awt.Color
 
@@ -16,7 +17,7 @@ internal class EquipmentModel(
     
     @Serializable
     class Layer(
-        val texture: ResourcePath,
+        val texture: ResourcePath<ResourceType.EquipmentTexture>,
         @SerialName("use_player_texture")
         val usePlayerTexture: Boolean = false,
         val dyeable: Dyeable? = null,

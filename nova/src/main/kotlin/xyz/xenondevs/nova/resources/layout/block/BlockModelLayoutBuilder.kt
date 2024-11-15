@@ -5,6 +5,7 @@ import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout.LayoutType
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
@@ -130,7 +131,7 @@ class BlockModelLayoutBuilder internal constructor() {
      * Configures the models based on the given [property].
      */
     @JvmName("selectModelResourcePath")
-    fun <T : Any> selectModel(property: BlockStateProperty<T>, vararg models: Pair<T, ResourcePath>) {
+    fun <T : Any> selectModel(property: BlockStateProperty<T>, vararg models: Pair<T, ResourcePath<ResourceType.Model>>) {
         selectModel(property, models.toMap(HashMap()))
     }
     
@@ -138,7 +139,7 @@ class BlockModelLayoutBuilder internal constructor() {
      * Configures the models based on the given [property].
      */
     @JvmName("selectModelResourcePath")
-    fun <T : Any> selectModel(property: BlockStateProperty<T>, models: Map<T, ResourcePath>) {
+    fun <T : Any> selectModel(property: BlockStateProperty<T>, models: Map<T, ResourcePath<ResourceType.Model>>) {
         selectModel {
             val state = getPropertyValueOrNull(property)
             models[state]?.let(::getModel) ?: defaultModel

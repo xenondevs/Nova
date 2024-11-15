@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.resources.lookup
 
+import net.kyori.adventure.key.Key
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
@@ -67,7 +68,7 @@ internal class IdResourceLookup<T : Any>(
     operator fun get(id: ResourceLocation): T? =
         value[id.toString()]
     
-    operator fun get(id: ResourcePath): T? =
+    operator fun get(id: Key): T? =
         value[id.toString()]
     
     fun getOrThrow(id: String): T =
@@ -76,7 +77,7 @@ internal class IdResourceLookup<T : Any>(
     fun getOrThrow(id: ResourceLocation): T =
         getOrThrow(id.toString())
     
-    fun getOrThrow(id: ResourcePath): T =
+    fun getOrThrow(id: Key): T =
         getOrThrow(id.toString())
     
     operator fun contains(id: String): Boolean =
@@ -85,7 +86,7 @@ internal class IdResourceLookup<T : Any>(
     operator fun contains(id: ResourceLocation): Boolean =
         id.toString() in value
     
-    operator fun contains(id: ResourcePath): Boolean =
+    operator fun contains(id: Key): Boolean =
         id.toString() in value
     
     fun toMap(): HashMap<String, T> =
@@ -96,14 +97,14 @@ internal class IdResourceLookup<T : Any>(
     
     override fun set(value: Map<String, T>) {
         for (key in value.keys) {
-            require(ResourcePath.NAMESPACED_ENTRY.matches(key)) { "Illegal key $key" }
+            require(ResourcePath.isValid(key)) { "Illegal key $key" }
         }
         
         super.set(value)
     }
     
     @JvmName("set1")
-    fun set(value: Map<ResourcePath, T>) {
+    fun set(value: Map<Key, T>) {
         super.set(value.mapKeysTo(HashMap()) { it.key.toString() })
     }
     

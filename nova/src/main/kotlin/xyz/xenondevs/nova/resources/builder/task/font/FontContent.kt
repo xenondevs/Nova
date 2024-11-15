@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.resources.builder.task.font
 
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder.Companion.ASSETS_DIR
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder.Companion.MCASSETS_ASSETS_DIR
@@ -15,15 +16,15 @@ import kotlin.io.path.walk
 
 class FontContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
     
-    private val _vanillaFonts = HashMap<ResourcePath, Font>()
-    val vanillaFonts: Map<ResourcePath, Font>
+    private val _vanillaFonts = HashMap<ResourcePath<ResourceType.Font>, Font>()
+    val vanillaFonts: Map<ResourcePath<ResourceType.Font>, Font>
         get() = _vanillaFonts
     
-    private val _customFonts = HashMap<ResourcePath, Font>()
-    val customFonts: Map<ResourcePath, Font>
+    private val _customFonts = HashMap<ResourcePath<ResourceType.Font>, Font>()
+    val customFonts: Map<ResourcePath<ResourceType.Font>, Font>
         get() = _customFonts
     
-    val mergedFonts: Map<ResourcePath, Font>
+    val mergedFonts: Map<ResourcePath<ResourceType.Font>, Font>
         get() {
             val map = HashMap(_customFonts)
             for ((id, font) in _vanillaFonts) {
@@ -38,11 +39,11 @@ class FontContent internal constructor(private val builder: ResourcePackBuilder)
             return map
         }
     
-    operator fun get(id: ResourcePath): Font? {
+    operator fun get(id: ResourcePath<ResourceType.Font>): Font? {
         return _customFonts[id]
     }
     
-    fun getOrCreate(id: ResourcePath): Font {
+    fun getOrCreate(id: ResourcePath<ResourceType.Font>): Font {
         return _customFonts.getOrPut(id) { Font(id) }
     }
     
@@ -54,11 +55,11 @@ class FontContent internal constructor(private val builder: ResourcePackBuilder)
         _customFonts[font.id] = font
     }
     
-    fun remove(id: ResourcePath) {
+    fun remove(id: ResourcePath<ResourceType.Font>) {
         _customFonts.remove(id)
     }
     
-    operator fun minusAssign(id: ResourcePath) {
+    operator fun minusAssign(id: ResourcePath<ResourceType.Font>) {
         _customFonts.remove(id)
     }
     
@@ -76,7 +77,7 @@ class FontContent internal constructor(private val builder: ResourcePackBuilder)
         discoverFonts(ASSETS_DIR, _customFonts)
     }
     
-    private fun discoverFonts(assetsDir: Path, map: MutableMap<ResourcePath, Font>) {
+    private fun discoverFonts(assetsDir: Path, map: MutableMap<ResourcePath<ResourceType.Font>, Font>) {
         assetsDir.listDirectoryEntries()
             .map { it.resolve("font") }
             .filter { it.exists() }
@@ -84,7 +85,7 @@ class FontContent internal constructor(private val builder: ResourcePackBuilder)
                 fontDir.walk()
                     .filter { it.extension.equals("json", true) }
                     .forEach { path ->
-                        val font = Font.fromDisk(assetsDir, path)
+                        val font = Font.fromDisk(builder, assetsDir, path)
                         map[font.id] = font
                     }
             }
@@ -92,7 +93,7 @@ class FontContent internal constructor(private val builder: ResourcePackBuilder)
     
     @PackTask(runAfter = ["FontContent#discoverAllFonts"])
     private fun write() {
-        _customFonts.values.forEach { it.write(ASSETS_DIR) }
+        _customFonts.values.forEach { it.write(builder) }
     }
     
 }

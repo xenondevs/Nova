@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.resources.builder.task.font
 
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
@@ -16,30 +18,29 @@ class TextureIconContent internal constructor(
     true
 ) {
     
-    private val added = HashSet<ResourcePath>()
+    private val added = HashSet<ResourcePath<ResourceType.Texture>>()
     
     /**
      * Request additional icons to be added to the texture icon font.
      * Ids should be in the format `namespace:path`, i.e. `minecraft:item/stone_sword`.
      */
     fun addIcons(vararg ids: String) {
-        for (id in ids) addIcon(ResourcePath.of(id))
+        for (id in ids) addIcon(ResourcePath.of(ResourceType.Texture, id))
     }
     
     /**
      * Request additional icons to be added to the texture icon font.
      * File extension should not be included in the path.
      */
-    fun addIcons(ids: Iterable<ResourcePath>) {
+    fun addIcons(ids: Iterable<ResourcePath<ResourceType.Texture>>) {
         for (id in ids) addIcon(id)
     }
     
-    private fun addIcon(path: ResourcePath) {
+    private fun addIcon(path: ResourcePath<ResourceType.Texture>) {
         if (path in added)
             return
         
-        val id = ResourcePath(path.namespace, path.path)
-        addEntry(id, path.copy(path = path.path + ".png"), HEIGHT, ASCENT)
+        addEntry(path, path.toType(ResourceType.FontTexture), HEIGHT, ASCENT)
         added += path
     }
     
@@ -61,7 +62,7 @@ class TextureIconContent internal constructor(
     
     companion object {
         
-        fun getIcon(id: ResourcePath): FontChar? =
+        fun getIcon(id: Key): FontChar? =
             ResourceLookups.TEXTURE_ICON_LOOKUP[id]
         
     }

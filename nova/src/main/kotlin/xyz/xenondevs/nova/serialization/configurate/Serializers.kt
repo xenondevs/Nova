@@ -16,6 +16,7 @@ val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColle
     .register(BlockLimiterSerializer)
     .register(ComponentSerializer)
     .register(EnumSerializer)
+    .register(KeySerializer)
     .register(NamespacedKeySerializer)
     .register(ResourceLocationSerializer)
     .register(ResourcePathSerializer)

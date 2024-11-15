@@ -63,6 +63,7 @@ import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.patch.impl.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.Optional
@@ -132,11 +133,8 @@ val NamespacedKey.resourceLocation: ResourceLocation
 val ResourceLocation.namespacedKey: NamespacedKey
     get() = NamespacedKey(namespace, path)
 
-fun ResourcePath.toResourceLocation(): ResourceLocation =
-    ResourceLocation.fromNamespaceAndPath(namespace, path)
-
-fun ResourceLocation.toResourcePath(): ResourcePath =
-    ResourcePath(namespace, path)
+fun <C: ResourceType> ResourceLocation.toResourcePath(type: C): ResourcePath<C> =
+    ResourcePath(type, namespace, path)
 
 fun Key.toResourceLocation(): ResourceLocation =
     ResourceLocation.fromNamespaceAndPath(namespace(), value())
@@ -602,17 +600,6 @@ fun ResourceLocation.toString(separator: String): String {
 
 fun ResourceLocation(addon: Addon, name: String): ResourceLocation {
     return ResourceLocation.fromNamespaceAndPath(addon.id, name)
-}
-
-internal fun parseResourceLocation(id: String, fallbackNamespace: String = "minecraft"): ResourceLocation {
-    return if (ResourcePath.NON_NAMESPACED_ENTRY.matches(id)) {
-        ResourceLocation.fromNamespaceAndPath(fallbackNamespace, id)
-    } else {
-        val match = ResourcePath.NAMESPACED_ENTRY.matchEntire(id)
-            ?: throw IllegalArgumentException("Invalid resource id: $id")
-        
-        ResourceLocation.fromNamespaceAndPath(match.groupValues[1], match.groupValues[2])
-    }
 }
 
 fun preventPacketBroadcast(run: () -> Unit) {

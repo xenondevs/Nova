@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.basepack.merger.FileMerger
 import xyz.xenondevs.nova.resources.builder.task.font.MovedFontContent
@@ -74,8 +75,8 @@ class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
                 }
                 
                 // Validate file name
-                if (!ResourcePath.NON_NAMESPACED_ENTRY.matches(file.name)) {
-                    LOGGER.warn("Skipping file $file as its name does not match regex ${ResourcePath.NON_NAMESPACED_ENTRY}")
+                if (!ResourcePath.isValidPath(file.name)) {
+                    LOGGER.warn("Skipping file $file as its name does not match regex [a-z0-9_.-]")
                     return@forEach
                 }
                 
@@ -111,7 +112,7 @@ class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
                             .split('/')
                         
                         builder.getHolder<MovedFontContent>().requestMovedFonts(
-                            ResourcePath(fontNameParts[0], fontNameParts.drop(2).joinToString("/")),
+                            ResourcePath(ResourceType.Font, fontNameParts[0], fontNameParts.drop(2).joinToString("/")),
                             1..19
                         )
                     }

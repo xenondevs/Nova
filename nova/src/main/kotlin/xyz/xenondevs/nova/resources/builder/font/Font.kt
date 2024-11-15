@@ -8,6 +8,8 @@ import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.toJsonArray
 import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.provider.FontProvider
 import xyz.xenondevs.nova.resources.builder.font.provider.ReferenceProvider
 import java.nio.file.Path
@@ -16,7 +18,7 @@ import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.relativeTo
 
 class Font(
-    val id: ResourcePath,
+    val id: ResourcePath<ResourceType.Font>,
     providers: List<FontProvider> = emptyList()
 ) {
     
@@ -106,11 +108,11 @@ class Font(
      *
      * Depending on the providers, additional files (such as bitmaps or unihex zips) might be written to the [assetsDir].
      */
-    fun write(assetsDir: Path) {
-        val file = id.getPath(assetsDir, "font", "json")
+    fun write(builder: ResourcePackBuilder) {
+        val file = builder.resolve(id)
         
         val obj = JsonObject()
-        val providers = providers.map { it.write(assetsDir); it.toJson() }
+        val providers = providers.map { it.write(builder); it.toJson() }
         obj.add("providers", providers.toJsonArray())
         
         file.parent.createDirectories()
@@ -121,21 +123,21 @@ class Font(
     
     companion object {
         
-        val DEFAULT = ResourcePath("minecraft", "default")
-        val UNIFORM = ResourcePath("minecraft", "uniform")
+        val DEFAULT = ResourcePath(ResourceType.Font, "minecraft", "default")
+        val UNIFORM = ResourcePath(ResourceType.Font, "minecraft", "uniform")
         val PRIVATE_USE_AREA = 0xE000..0xF8FF
         
         private val FONT_NAME_REGEX = Regex("""^([a-z0-9._-]+)/font/([a-z0-9/._-]+)$""")
         
-        fun fromDisk(assetsDir: Path, fontFile: Path): Font {
+        fun fromDisk(builder: ResourcePackBuilder, assetsDir: Path, fontFile: Path): Font {
             val id = readIdFromPath(assetsDir, fontFile)
             val providers = fontFile.parseJson().asJsonObject.getArray("providers")
-                .mapTo(ArrayList()) { FontProvider.fromDisk(it.asJsonObject) }
+                .mapTo(ArrayList()) { FontProvider.fromDisk(builder, it.asJsonObject) }
             
             return Font(id, providers)
         }
         
-        private fun readIdFromPath(assetsDir: Path, file: Path): ResourcePath {
+        private fun readIdFromPath(assetsDir: Path, file: Path): ResourcePath<ResourceType.Font> {
             val relPath = file.relativeTo(assetsDir)
                 .invariantSeparatorsPathString
                 .substringBeforeLast('.') // example: minecraft/font/default
@@ -143,7 +145,7 @@ class Font(
             val result = FONT_NAME_REGEX.matchEntire(relPath)
                 ?: throw IllegalArgumentException("File $file is not a font file")
             
-            return ResourcePath(result.groupValues[1], result.groupValues[2])
+            return ResourcePath(ResourceType.Font, result.groupValues[1], result.groupValues[2])
         }
         
         /**

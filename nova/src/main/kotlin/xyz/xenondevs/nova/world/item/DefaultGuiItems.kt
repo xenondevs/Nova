@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.world.item
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.layout.item.ItemModelLayoutBuilder
 import xyz.xenondevs.nova.util.data.writeImage
@@ -186,13 +185,13 @@ object DefaultBlockOverlays {
     
     val BREAK_STAGE_OVERLAY = hiddenItem("break_stage_overlay") {
         selectModels(0..9, true) {
-            getModel(ResourcePath("nova", "block/break_stage/$it"))
+            getModel("nova:block/break_stage/$it")
         }
     }
     
     val TRANSPARENT_BLOCK = hiddenItem("transparent_block") {
         selectModel {
-            getModel(ResourcePath("nova", "block/transparent"))
+            getModel("nova:block/transparent")
         }
     }
     

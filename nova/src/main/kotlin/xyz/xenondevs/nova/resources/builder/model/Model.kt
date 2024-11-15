@@ -6,6 +6,7 @@ import org.joml.Vector4d
 import org.joml.Vector4dc
 import org.joml.primitives.AABBd
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
 import java.util.*
 
@@ -22,7 +23,7 @@ import java.util.*
  * or more predicates that determine whether the override model should be used.
  */
 data class Model(
-    val parent: ResourcePath? = null,
+    val parent: ResourcePath<ResourceType.Model>? = null,
     val textures: Map<String, String> = emptyMap(),
     val elements: List<Element>? = null,
     
@@ -43,7 +44,7 @@ data class Model(
     /**
      * Determines a case in which a different [model] should be used based on the given [predicate].
      */
-    data class Override(val predicate: Map<String, Number>, val model: ResourcePath)
+    data class Override(val predicate: Map<String, Number>, val model: ResourcePath<ResourceType.Model>)
     
     /**
      * An axis in 3D space.

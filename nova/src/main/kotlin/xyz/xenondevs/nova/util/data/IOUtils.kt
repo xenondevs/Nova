@@ -66,6 +66,7 @@ internal inline fun <T> Path.useZip(create: Boolean = false, run: (Path) -> T): 
 /**
  * Encodes [value] to JSON via kotlinx.serialization-json as [T] and writes it to the file.
  */
+@PublishedApi
 @OptIn(ExperimentalSerializationApi::class)
 internal inline fun <reified T> Path.writeJson(value: T) {
     outputStream().use { Json.encodeToStream(value, it) }

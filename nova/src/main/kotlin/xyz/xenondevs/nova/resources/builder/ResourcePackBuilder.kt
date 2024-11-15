@@ -24,6 +24,8 @@ import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.resources.builder.task.AtlasContent
@@ -46,7 +48,10 @@ import xyz.xenondevs.nova.resources.builder.task.model.ItemModelContent
 import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
 import xyz.xenondevs.nova.serialization.json.GSON
 import xyz.xenondevs.nova.util.data.Version
+import xyz.xenondevs.nova.util.data.writeImage
+import xyz.xenondevs.nova.util.data.writeJson
 import xyz.xenondevs.nova.util.runAsyncTask
+import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
@@ -378,5 +383,58 @@ class ResourcePackBuilder internal constructor() {
      * Creates a [Lazy] that retrieves an instantiated [PackTaskHolder] of the specified type.
      */
     inline fun <reified T : PackTaskHolder> getHolderLazily(): Lazy<T> = lazy { getHolder<T>() }
+    
+    /**
+     * Searches for a file under [path] in both the resource pack and vanilla minecraft assets,
+     * returning the [Path] if it exists or `null` if it doesn't.
+     */
+    fun findOrNull(path: ResourcePath<*>): Path? = 
+        resolve(path).takeIf(Path::exists) ?: resolveVanilla(path).takeIf(Path::exists)
+    
+    /**
+     * Searches for a file under [path] in both the resource pack and vanilla minecraft assets,
+     * returning the [Path] if it exists or throwing an [IllegalArgumentException] if it doesn't.
+     */
+    fun findOrThrow(path: ResourcePath<*>): Path =
+        findOrNull(path) ?: throw IllegalArgumentException("Resource not found: ${path.filePath}")
+    
+    /**
+     * Resolves the file under [path] in the vanilla minecraft assets.
+     */
+    fun resolveVanilla(path: ResourcePath<*>): Path =
+        MCASSETS_DIR.resolve(path.filePath)
+    
+    /**
+     * Resolves the file under [path] in the resource pack.
+     */
+    fun resolve(path: ResourcePath<*>): Path =
+        PACK_DIR.resolve(path.filePath)
+    
+    /**
+     * Resolves the file under [path] in the resource pack.
+     * 
+     * Example paths: `pack.json`, `assets/minecraft/textures/block/dirt.png`
+     */
+    fun resolve(path: String): Path =
+        PACK_DIR.resolve(path)
+    
+    /**
+     * Serializes [value] to JSON using `kotlinx.serialization` and writes it to the file
+     * under [path], creating parent directories if necessary.
+     */
+    inline fun <reified V> writeJson(path: ResourcePath<ResourceType.JsonFile>, value: V) {
+        val file = resolve(path)
+        file.parent.createDirectories()
+        file.writeJson(value)
+    }
+    
+    /**
+     * Writes the [image] to the file under [path], creating parent directories if necessary.
+     */
+    fun writeImage(path: ResourcePath<ResourceType.PngFile>, image: BufferedImage) {
+        val file = resolve(path)
+        file.parent.createDirectories()
+        file.writeImage(image, "PNG")
+    }
     
 }

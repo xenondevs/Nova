@@ -37,7 +37,7 @@ internal object RecipesLoader {
         return AddonBootstrapper.addons.flatMap { addon ->
             val recipesDirectory = addon.dataFolder.resolve("recipes/$folder")
             recipesDirectory.walk()
-                .filter { it.isRegularFile() && ResourcePath.NON_NAMESPACED_ENTRY.matches(it.name) }
+                .filter { it.isRegularFile() && ResourcePath.isValidPath(it.name) }
                 .mapNotNullTo(ArrayList()) { loadRecipe(it.toFile(), deserializer) }
         }
     }

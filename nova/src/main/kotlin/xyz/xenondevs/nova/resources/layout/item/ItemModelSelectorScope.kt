@@ -5,6 +5,7 @@ import org.joml.Vector4d
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.model.Model.Direction
@@ -31,12 +32,12 @@ class ItemModelSelectorScope internal constructor(
      * layered model using the texture under `namespace:item/name`.
      */
     val defaultModel: ModelBuilder by lazy {
-        val path = ResourcePath(id.namespace, "item/${id.path}")
+        val path = ResourcePath(ResourceType.Model, id.namespace, "item/${id.path}")
         modelContent[path]
             ?.let(::ModelBuilder)
             ?: createLayeredModel(
                 // empty layer 0 for the case that this used for leather armor (layer 0 is colored)
-                ResourcePath("nova", "item/empty"),
+                ResourcePath(ResourceType.Model, "nova", "item/empty"),
                 path
             )
     }
@@ -44,7 +45,7 @@ class ItemModelSelectorScope internal constructor(
     /**
      * Gets the model under the given [path] or throws an exception if it does not exist.
      */
-    fun getModel(path: ResourcePath): ModelBuilder =
+    fun getModel(path: ResourcePath<ResourceType.Model>): ModelBuilder =
         modelContent[path]?.let(::ModelBuilder)
             ?: throw IllegalArgumentException("Model $path does not exist")
     
@@ -52,20 +53,20 @@ class ItemModelSelectorScope internal constructor(
      * Gets the model under the given [path] or throws an exception if it does not exist.
      */
     fun getModel(path: String): ModelBuilder =
-        getModel(ResourcePath.of(path, id.namespace))
+        getModel(ResourcePath.of(ResourceType.Model, path, id.namespace))
     
     /**
      * Creates a new layered model using the given [layers] as the textures.
      */
     fun createLayeredModel(vararg layers: String): ModelBuilder =
-        createLayeredModel(*layers.map { ResourcePath.of(it, id.namespace) }.toTypedArray())
+        createLayeredModel(*layers.map { ResourcePath.of(ResourceType.Model, it, id.namespace) }.toTypedArray())
     
     /**
      * Creates a new layered model using the given [layers] as raw paths to the textures.
      */
-    fun createLayeredModel(vararg layers: ResourcePath): ModelBuilder = ModelBuilder(
+    fun createLayeredModel(vararg layers: ResourcePath<ResourceType.Model>): ModelBuilder = ModelBuilder(
         Model(
-            parent = ResourcePath("minecraft", "item/generated"),
+            parent = ResourcePath(ResourceType.Model, "minecraft", "item/generated"),
             textures = layers.mapIndexed { index, layer -> "layer$index" to layer.toString() }.toMap()
         )
     )
@@ -79,7 +80,7 @@ class ItemModelSelectorScope internal constructor(
      * with the actual texture placed at (0, 0) to (18, 18).
      */
     fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: String): ModelBuilder =
-        createGuiModel(background, stretched, *layers.mapToArray { ResourcePath.of(it, id.namespace) })
+        createGuiModel(background, stretched, *layers.mapToArray { ResourcePath.of(ResourceType.Model, it, id.namespace) })
     
     /**
      * Creates a new GUI model using the given [layers] as texture
@@ -89,7 +90,7 @@ class ItemModelSelectorScope internal constructor(
      * With [stretched], the model will be stretched to 18x18 pixels. Due to mip mapping, this requires a 32x32 texture
      * with the actual texture placed at (0, 0) to (18, 18).
      */
-    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: ResourcePath): ModelBuilder {
+    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: ResourcePath<ResourceType.Model>): ModelBuilder {
         if (!background && !stretched)
             return createLayeredModel(*layers)
         
@@ -129,7 +130,7 @@ class ItemModelSelectorScope internal constructor(
             )
         }
         
-        return ModelBuilder(Model(ResourcePath("nova", "item/gui_item"), textures, elements))
+        return ModelBuilder(Model(ResourcePath(ResourceType.Model, "nova", "item/gui_item"), textures, elements))
     }
     
 }
