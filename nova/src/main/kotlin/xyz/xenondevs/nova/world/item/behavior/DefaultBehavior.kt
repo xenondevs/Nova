@@ -14,6 +14,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.ItemAttributeModifiers
 import net.minecraft.world.item.component.ItemLore
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.cbf.CBF
@@ -25,13 +27,17 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.node
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
+import xyz.xenondevs.nova.util.component.adventure.toNmsStyle
 import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.data.logExceptionMessages
+import xyz.xenondevs.nova.util.item.update
+import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.iterator
 import kotlin.collections.map
+import net.minecraft.network.chat.Component as MojangComponent
 import net.minecraft.util.Unit as MojangUnit
 
 internal class DefaultBehavior(
@@ -43,6 +49,8 @@ internal class DefaultBehavior(
     attributeModifiers: Provider<ItemAttributeModifiers>,
     defaultCompound: Provider<NamespacedCompound?>
 ) : ItemBehavior {
+    
+    private val style by style.map { it.toNmsStyle() }
     
     override val baseDataComponents = combinedProvider(
         name, style, lore, maxStackSize, attributeModifiers
@@ -75,6 +83,16 @@ internal class DefaultBehavior(
             .build()
     }
     
+    override fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
+        itemStack.unwrap().update(DataComponents.CUSTOM_NAME) {
+            val wrappingComponent = MojangComponent.literal("")
+            wrappingComponent.setStyle(style)
+            wrappingComponent.append(it)
+            return@update wrappingComponent
+        }
+        return itemStack
+    }
+    
     companion object {
         
         fun create(item: NovaItem, behaviors: List<ItemBehavior>) =
@@ -82,6 +100,7 @@ internal class DefaultBehavior(
                 item.id,
                 provider(item.name),
                 provider(item.style),
+                provider(item.lore),
                 provider(item.maxStackSize),
                 item.config.node("attribute_modifiers").map(::loadConfiguredAttributeModifiers),
                 combinedProvider(

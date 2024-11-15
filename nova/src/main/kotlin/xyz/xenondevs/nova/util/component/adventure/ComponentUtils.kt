@@ -7,12 +7,13 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentBuilder
+import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.StringTag
-import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import org.bukkit.entity.Player
@@ -21,9 +22,11 @@ import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.MoveCharacters
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
+import xyz.xenondevs.nova.util.toResourceLocation
 import java.awt.Color
 import java.util.LinkedList
 import net.minecraft.network.chat.Component as MojangComponent
+import net.minecraft.network.chat.Style as MojangStyle
 
 fun String.toAdventureComponent(): Component {
     return GsonComponentSerializer.gson().deserialize(this)
@@ -85,7 +88,7 @@ fun Component.withoutPreFormatting(): Component {
     return AdventureComponentUtils.withoutPreFormatting(this)
 }
 
-private val DEFAULT_STYLE = Style.EMPTY
+private val DEFAULT_STYLE = MojangStyle.EMPTY
     .withColor(0xFFFFFF)
     .withBold(false)
     .withItalic(false)
@@ -97,6 +100,44 @@ fun MojangComponent.withoutPreFormatting(): MojangComponent {
     return MojangComponent.literal("")
         .withStyle(DEFAULT_STYLE)
         .append(this)
+}
+
+fun Style.toNmsStyle(): MojangStyle {
+    var style = MojangStyle.EMPTY
+    color()?.let { style = style.withColor(it.value()) }
+    font()?.let { style = style.withFont(it.toResourceLocation()) }
+    
+    when (decoration(TextDecoration.BOLD)) {
+        TextDecoration.State.TRUE -> style = style.withBold(true)
+        TextDecoration.State.FALSE -> style = style.withBold(false)
+        else -> Unit
+    }
+    
+    when (decoration(TextDecoration.ITALIC)) {
+        TextDecoration.State.TRUE -> style = style.withItalic(true)
+        TextDecoration.State.FALSE -> style = style.withItalic(false)
+        else -> Unit
+    }
+    
+    when (decoration(TextDecoration.UNDERLINED)) {
+        TextDecoration.State.TRUE -> style = style.withUnderlined(true)
+        TextDecoration.State.FALSE -> style = style.withUnderlined(false)
+        else -> Unit
+    }
+    
+    when (decoration(TextDecoration.STRIKETHROUGH)) {
+        TextDecoration.State.TRUE -> style = style.withStrikethrough(true)
+        TextDecoration.State.FALSE -> style = style.withStrikethrough(false)
+        else -> Unit
+    }
+    
+    when (decoration(TextDecoration.OBFUSCATED)) {
+        TextDecoration.State.TRUE -> style = style.withObfuscated(true)
+        TextDecoration.State.FALSE -> style = style.withObfuscated(false)
+        else -> Unit
+    }
+    
+    return style
 }
 
 internal fun MojangComponent.isEmpty(): Boolean {
