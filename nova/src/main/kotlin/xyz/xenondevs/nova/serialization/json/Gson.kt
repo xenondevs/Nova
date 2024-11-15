@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.serialization.json.serializer.EnumMapInstanceCreator
 import xyz.xenondevs.nova.serialization.json.serializer.FontCharSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.IntRangeSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.ItemStackSerialization
+import xyz.xenondevs.nova.serialization.json.serializer.KeyTypeAdapter
 import xyz.xenondevs.nova.serialization.json.serializer.LinkedBlockModelProviderSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.LocationSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.LootItemSerialization
@@ -37,11 +38,12 @@ import xyz.xenondevs.nova.serialization.json.serializer.YamlConfigurationTypeAda
 private val GSON_BUILDER = GsonBuilder()
     .disableHtmlEscaping()
     .enableComplexMapKeySerialization()
-    .registerTypeHierarchyAdapter(UUIDTypeAdapter.nullSafe())
-    .registerTypeHierarchyAdapter(NamespacedIdTypeAdapter.nullSafe())
-    .registerTypeHierarchyAdapter(NamespacedKeyTypeAdapter.nullSafe())
-    .registerTypeHierarchyAdapter(ResourceLocationTypeAdapter.nullSafe())
-    .registerTypeHierarchyAdapter(ResourcePathSerialization)
+    .registerTypeAdapter(UUIDTypeAdapter.nullSafe())
+    .registerTypeAdapter(KeyTypeAdapter.nullSafe())
+    .registerTypeAdapter(NamespacedIdTypeAdapter.nullSafe())
+    .registerTypeAdapter(NamespacedKeyTypeAdapter.nullSafe())
+    .registerTypeAdapter(ResourceLocationTypeAdapter.nullSafe())
+    .registerTypeAdapter(ResourcePathSerialization)
     .registerTypeHierarchyAdapter(ItemStackSerialization)
     .registerTypeHierarchyAdapter(LocationSerialization)
     .registerTypeHierarchyAdapter(WorldTypeAdapter.nullSafe())
