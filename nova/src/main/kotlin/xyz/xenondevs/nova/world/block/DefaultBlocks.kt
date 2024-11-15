@@ -47,7 +47,7 @@ internal object DefaultBlocks {
             BlockSounds(SoundGroup.WOOD),
             Breakable(
                 hardness = 0.8,
-                toolCategory = VanillaToolCategories.AXE,
+                toolCategories = setOf(VanillaToolCategories.AXE),
                 toolTier = VanillaToolTiers.WOOD,
                 requiresToolForDrops = false,
                 breakParticles = null

@@ -103,7 +103,7 @@ interface BlockBehavior : BlockBehaviorHolder {
 /**
  * Factory for creating [BlockBehavior] instances of [T] based on a [NovaBlock].
  */
-interface BlockBehaviorFactory<T : BlockBehavior> : BlockBehaviorHolder {
+fun interface BlockBehaviorFactory<T : BlockBehavior> : BlockBehaviorHolder {
     
     /**
      *  Creates a new [BlockBehavior] instance of [T] based on the given [block].

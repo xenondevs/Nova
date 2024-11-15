@@ -8,10 +8,40 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.orElse
-import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.config.optionalEntry
-import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.config.entryOrElse
 import net.minecraft.world.item.enchantment.Enchantable as EnchantableComponent
+
+/**
+ * Creates a factory for [Enchantable] behaviors using the given values, if not specified otherwise in the item's config.
+ * 
+ * @param enchantmentValue The enchantment value of the item.
+ * A higher enchantment value brings more secondary and higher-level enchantments in the enchanting table.
+ * Vanilla enchantment values: wood: 15, stone: 5, iron: 14, diamond: 10, gold: 22, netherite: 15
+ * Used when `enchantment_value` is not specified in the item's config, or null to require the presence of a config entry.
+ * 
+ * @param primaryEnchantments The enchantments that appear in the enchanting table. Falls back to [supportedEnchantments] if not specified.
+ * Used when `primary_enchantments` is not specified in the item's config, or null to require the presence of a config entry.
+ * 
+ * @param supportedEnchantments The enchantments that can be applied to the item, i.e. via an anvil or commands.
+ * Used when `supported_enchantments` is not specified in the item's config, or null to require the presence of a config entry.
+ */
+@Suppress("FunctionName")
+fun Enchantable(
+    enchantmentValue: Int? = null,
+    primaryEnchantments: Provider<Set<Enchantment>>? = null,
+    supportedEnchantments: Provider<Set<Enchantment>>? = null
+) = ItemBehaviorFactory<Enchantable> {
+    val cfg = it.config
+    
+    val supportedEnchantments = cfg.entryOrElse(supportedEnchantments, "supported_enchantments")
+    val primaryEnchantments = cfg.entryOrElse(primaryEnchantments, "primary_enchantments").orElse(supportedEnchantments)
+    
+    Enchantable(
+        cfg.entryOrElse(enchantmentValue, "enchantment_value"),
+        primaryEnchantments,
+        supportedEnchantments
+    )
+}
 
 /**
  * Makes an item enchantable.
@@ -58,20 +88,6 @@ class Enchantable(
             "primaryEnchantments=${primaryEnchantments.joinToString { it.key.toString() }}, " +
             "supportedEnchantments=${primaryEnchantments.joinToString { it.key.toString() }}" +
             ")"
-    }
-    
-    companion object : ItemBehaviorFactory<Enchantable> {
-        
-        override fun create(item: NovaItem): Enchantable {
-            val cfg = item.config
-            val supportedEnchantments = cfg.optionalEntry<Set<Enchantment>>("supported_enchantments").orElse(emptySet())
-            return Enchantable(
-                cfg.entry("enchantment_value"),
-                cfg.optionalEntry<Set<Enchantment>>("primary_enchantments").orElse(supportedEnchantments),
-                supportedEnchantments
-            )
-        }
-        
     }
     
 }

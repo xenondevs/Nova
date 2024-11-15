@@ -13,18 +13,64 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.map
-import xyz.xenondevs.commons.provider.orElse
-import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.config.optionalEntry
-import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
-import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
 import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
 
 private const val PLAYER_ATTACK_SPEED = 4.0
 private const val PLAYER_ATTACK_DAMAGE = 1.0
+
+/**
+ * Creates a factory for [Tool] behaviors using the given values, if not specified otherwise in the config.
+ * 
+ * @param tier The [ToolTier] of the tool.
+ * Used when `tool_tier` is not specified in the config, or null to require the presence of a config entry.
+ * 
+ * @param categories The [ToolCategory] of the tool.
+ * Used when `tool_category` is not specified in the config, or null to require the presence of a config entry.
+ * 
+ * @param breakSpeed The break speed of the tool.
+ * Used when `break_speed` is not specified in the config, or null to require the presence of a config entry.
+ * 
+ * @param attackDamage The attack damage of the tool.
+ * Used when `attack_damage` is not specified in the config, or null to require the presence of a config entry.
+ * 
+ * @param attackSpeed The attack speed of the tool.
+ * Used when `attack_speed` is not specified in the config, or null to require the presence of a config entry.
+ * 
+ * @param knockbackBonus The knockback bonus of the tool when attacking.
+ * Used when `knockback_bonus` is not specified in the config.
+ * 
+ * @param canSweepAttack Whether the tool can perform a sweep attack.
+ * Used when `can_sweep_attack` is not specified in the config.
+ * 
+ * @param canBreakBlocksInCreative Whether the tool can break blocks in creative mode.
+ * Used when `can_break_blocks_in_creative` is not specified in the config.
+ */
+@Suppress("FunctionName")
+fun Tool(
+    tier: ToolTier? = null,
+    categories: Set<ToolCategory>? = null,
+    breakSpeed: Double? = null,
+    attackDamage: Double? = null,
+    attackSpeed: Double? = null,
+    knockbackBonus: Int = 0,
+    canSweepAttack: Boolean = false,
+    canBreakBlocksInCreative: Boolean = true
+) = ItemBehaviorFactory<Tool> {
+    val cfg = it.config
+    Tool(
+        cfg.entryOrElse(tier, arrayOf("tool_tier"), arrayOf("tool_level")),
+        cfg.entryOrElse(categories, "tool_category"),
+        cfg.entryOrElse(breakSpeed, "break_speed"),
+        cfg.entryOrElse(attackDamage, "attack_damage"),
+        cfg.entryOrElse(attackSpeed, "attack_speed"),
+        cfg.entryOrElse(knockbackBonus, "knockback_bonus"),
+        cfg.entryOrElse(canSweepAttack, "can_sweep_attack"),
+        cfg.entryOrElse(canBreakBlocksInCreative, "can_break_blocks_in_creative")
+    )
+}
 
 /**
  * Allows items to be used as tools, by specifying break and attack properties.
@@ -79,26 +125,6 @@ class Tool(
      * Whether this tool can break blocks in creative mode.
      */
     val canBreakBlocksInCreative by canBreakBlocksInCreative
-    
-    constructor(
-        tier: ToolTier,
-        categories: Set<ToolCategory>,
-        breakSpeed: Double,
-        attackDamage: Double?,
-        attackSpeed: Double?,
-        knockbackBonus: Int,
-        canSweepAttack: Boolean = false,
-        canBreakBlocksInCreative: Boolean = categories != setOf(VanillaToolCategories.SWORD)
-    ) : this(
-        provider(tier),
-        provider(categories),
-        provider(breakSpeed),
-        provider(attackDamage),
-        provider(attackSpeed),
-        provider(knockbackBonus),
-        provider(canSweepAttack),
-        provider(canBreakBlocksInCreative)
-    )
     
     override val vanillaMaterialProperties = canBreakBlocksInCreative.map { canBreakBlocksInCreative ->
         buildList {
@@ -163,24 +189,6 @@ class Tool(
             "canSweepAttack=$canSweepAttack, " +
             "canBreakBlocksInCreative=$canBreakBlocksInCreative" +
             ")"
-    }
-    
-    companion object : ItemBehaviorFactory<Tool> {
-        
-        override fun create(item: NovaItem): Tool {
-            val cfg = item.config
-            return Tool(
-                cfg.entry<ToolTier>(arrayOf("tool_tier"), arrayOf("tool_level")),
-                cfg.entry<Set<ToolCategory>>("tool_category"),
-                cfg.entry<Double>("break_speed"),
-                cfg.optionalEntry<Double>("attack_damage"),
-                cfg.optionalEntry<Double>("attack_speed"),
-                cfg.optionalEntry<Int>("knockback_bonus").orElse(0),
-                cfg.optionalEntry<Boolean>("can_sweep_attack").orElse(false),
-                cfg.optionalEntry<Boolean>("can_break_blocks_in_creative").orElse(true)
-            )
-        }
-        
     }
     
 }

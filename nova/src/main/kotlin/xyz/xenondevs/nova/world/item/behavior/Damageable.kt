@@ -7,11 +7,40 @@ import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.orElse
-import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.config.optionalEntry
 import xyz.xenondevs.nova.util.unwrap
-import xyz.xenondevs.nova.world.item.NovaItem
+
+/**
+ * Creates a factory for [Damageable] behaviors using the given values, if not specified otherwise in the item's config.
+ * 
+ * @param maxDurability The maximum durability of the item.
+ * Used when `max_durability` is not specified in the item's config, or `null` to require the presence of a config entry.
+ * 
+ * @param itemDamageOnAttackEntity The amount of damage the item receives when attacking an entity.
+ * Used when `item_damage_on_attack_entity` is not specified in the item's config, or `null` to require the presence of a config entry.
+ * 
+ * @param itemDamageOnBreakBlock The amount of damage the item receives when breaking a block.
+ * Used when `item_damage_on_break_block` is not specified in the item's config, or `null` to require the presence of a config entry.
+ * 
+ * @param repairIngredient The ingredient required to repair the item. Can be null for items that cannot be repaired.
+ * Used when `repair_ingredient` is not specified in the item's config.
+ */
+@Suppress("FunctionName")
+fun Damageable(
+    maxDurability: Int? = null,
+    itemDamageOnAttackEntity: Int? = null,
+    itemDamageOnBreakBlock: Int? = null,
+    repairIngredient: RecipeChoice? = null
+) = ItemBehaviorFactory<Damageable> {
+    val cfg = it.config
+    Damageable(
+        cfg.entryOrElse(maxDurability, arrayOf("max_durability"), arrayOf("durability")),
+        cfg.entryOrElse(itemDamageOnAttackEntity, "item_damage_on_attack_entity"),
+        cfg.entryOrElse(itemDamageOnBreakBlock, "item_damage_on_break_block"),
+        cfg.optionalEntry<RecipeChoice>("repair_ingredient").orElse(repairIngredient)
+    )
+}
 
 /**
  * Allows items to store and receive damage.
@@ -28,18 +57,6 @@ class Damageable(
     val itemDamageOnBreakBlock by itemDamageOnBreakBlock
     val repairIngredient by repairIngredient
     
-    constructor(
-        maxDurability: Int,
-        itemDamageOnAttackEntity: Int,
-        itemDamageOnBreakBlock: Int,
-        repairIngredient: RecipeChoice? = null
-    ) : this(
-        provider(maxDurability),
-        provider(itemDamageOnAttackEntity),
-        provider(itemDamageOnBreakBlock),
-        provider(repairIngredient)
-    )
-    
     override val baseDataComponents = maxDurability.map {
         DataComponentMap.builder()
             .set(DataComponents.MAX_DAMAGE, it)
@@ -55,20 +72,6 @@ class Damageable(
             "itemDamageOnBreakBlock=$itemDamageOnBreakBlock, " +
             "repairIngredient=$repairIngredient" +
             ")"
-    }
-    
-    companion object : ItemBehaviorFactory<Damageable> {
-        
-        override fun create(item: NovaItem): Damageable {
-            val cfg = item.config
-            return Damageable(
-                cfg.entry<Int>(arrayOf("max_durability"), arrayOf("durability")),
-                cfg.optionalEntry<Int>("item_damage_on_attack_entity").orElse(0),
-                cfg.optionalEntry<Int>("item_damage_on_break_block").orElse(0),
-                cfg.optionalEntry<RecipeChoice>("repair_ingredient")
-            )
-        }
-        
     }
     
 }

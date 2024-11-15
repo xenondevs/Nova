@@ -17,16 +17,16 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.component.ItemAttributeModifiers
-import org.bukkit.Sound
 import xyz.xenondevs.commons.collections.getMod
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.config.optionalEntry
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.util.getOrNull
 import xyz.xenondevs.nova.util.getOrThrow
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.toResourceLocation
@@ -38,62 +38,136 @@ import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 /**
- * Allows items to be worn in armor slots.
+ * Creates a factory for [Equippable] behaviors using the given values, if not specified in the item's configuration.
  *
- * @param equipment The custom armor texture, or null if no custom texture should be used.
+ * @param equipment The equipment texture to use, or null for no texture.
+ *
  * @param slot The slot in which the item can be worn.
+ *
+ * @param armor The amount of armor this item provides.
+ * Used when `armor` is not specified in the config.
+ *
+ * @param armorToughness The amount of armor toughness this item provides.
+ * Used when `armor_toughness` is not specified in the config.
+ *
+ * @param knockbackResistance The amount of knockback resistance this item provides.
+ * Used when `knockback_resistance` is not specified in the config.
+ *
  * @param equipSound The sound that is played when the item is equipped.
+ * Used when `equip_sound` is not specified in the config.
+ *
+ * @param allowedEntities The entity types that are allowed to wear this item, or null for all entities.
+ * Used when `allowed_entities` is not specified in the config.
+ *
+ * @param dispensable Whether this item can be dispensed from a dispenser.
+ * Used when `dispensable` is not specified in the config.
+ *
+ * @param swappable Whether this item can be swapped with other items in the same slot.
+ * Used when `swappable` is not specified in the config.
+ *
+ * @param damageOnHurt Whether this item will be damaged when the wearing entity is damaged.
+ * Used when `damage_on_hurt` is not specified in the config.
  */
 fun Equippable(
-    equipment: Equipment?,
+    equipment: Equipment,
     slot: BukkitEquipmentSlot,
-    equipSound: Key
-): ItemBehaviorFactory<Equippable> =
-    Equippable(
-        equipment, slot,
-        BuiltInRegistries.SOUND_EVENT.getOrNull(equipSound)
-            ?: Holder.direct(SoundEvent(equipSound.toResourceLocation(), Optional.empty()))
-    )
+    armor: Double = 0.0,
+    armorToughness: Double = 0.0,
+    knockbackResistance: Double = 0.0,
+    equipSound: Key,
+    allowedEntities: Set<BukkitEntityType>? = null,
+    dispensable: Boolean = true,
+    swappable: Boolean = true,
+    damageOnHurt: Boolean = true
+) = Equippable(
+    equipment,
+    slot,
+    armor, 
+    armorToughness,
+    knockbackResistance,
+    Holder.direct(SoundEvent(equipSound.toResourceLocation(), Optional.empty())),
+    allowedEntities, 
+    dispensable,
+    swappable,
+    damageOnHurt
+)
 
 /**
- * Allows items to be worn in armor slots.
- *
- * @param equipment The custom armor texture, or null if no custom texture should be used.
+ * Creates a factory for [Equippable] behaviors using the given values, if not specified in the item's configuration.
+ * 
+ * @param equipment The equipment texture to use, or null for no texture.
+ * 
  * @param slot The slot in which the item can be worn.
+ * 
+ * @param armor The amount of armor this item provides.
+ * Used when `armor` is not specified in the config.
+ * 
+ * @param armorToughness The amount of armor toughness this item provides.
+ * Used when `armor_toughness` is not specified in the config.
+ * 
+ * @param knockbackResistance The amount of knockback resistance this item provides.
+ * Used when `knockback_resistance` is not specified in the config.
+ * 
  * @param equipSound The sound that is played when the item is equipped.
+ * Used when `equip_sound` is not specified in the config.
+ * 
+ * @param allowedEntities The entity types that are allowed to wear this item, or null for all entities.
+ * Used when `allowed_entities` is not specified in the config.
+ * 
+ * @param dispensable Whether this item can be dispensed from a dispenser.
+ * Used when `dispensable` is not specified in the config.
+ * 
+ * @param swappable Whether this item can be swapped with other items in the same slot.
+ * Used when `swappable` is not specified in the config.
+ * 
+ * @param damageOnHurt Whether this item will be damaged when the wearing entity is damaged.
+ * Used when `damage_on_hurt` is not specified in the config.
  */
 fun Equippable(
     equipment: Equipment?,
     slot: BukkitEquipmentSlot,
-    equipSound: Holder<SoundEvent> = SoundEvents.ARMOR_EQUIP_GENERIC
+    armor: Double = 0.0,
+    armorToughness: Double = 0.0,
+    knockbackResistance: Double = 0.0,
+    equipSound: Holder<SoundEvent> = SoundEvents.ARMOR_EQUIP_GENERIC,
+    allowedEntities: Set<BukkitEntityType>? = null,
+    dispensable: Boolean = true,
+    swappable: Boolean = true,
+    damageOnHurt: Boolean = true
 ) = ItemBehaviorFactory<Equippable> {
     val cfg = it.config
     Equippable(
         provider(equipment),
         provider(slot),
-        cfg.optionalEntry<Double>("armor").orElse(0.0),
-        cfg.optionalEntry<Double>("armor_toughness").orElse(0.0),
-        cfg.optionalEntry<Double>("knockback_resistance").orElse(0.0),
-        provider(equipSound),
-        cfg.optionalEntry<Set<BukkitEntityType>>("allowed_entities"),
-        cfg.optionalEntry<Boolean>("dispensable").orElse(true),
-        cfg.optionalEntry<Boolean>("swappable").orElse(true),
-        cfg.optionalEntry<Boolean>("damage_on_hurt").orElse(true)
+        cfg.entryOrElse(armor, "armor"),
+        cfg.entryOrElse(armorToughness, "armor_toughness"),
+        cfg.entryOrElse(knockbackResistance, "knockback_resistance"),
+        cfg.optionalEntry<ResourceLocation>("equip_sound")
+            .mapNonNull { BuiltInRegistries.SOUND_EVENT.getOrThrow(it) }
+            .orElse(equipSound),
+        cfg.optionalEntry<Set<BukkitEntityType>>("allowed_entities").orElse(allowedEntities),
+        cfg.entryOrElse(dispensable, "dispensable"),
+        cfg.entryOrElse(swappable, "swappable"),
+        cfg.entryOrElse(damageOnHurt, "damage_on_hurt")
     )
 }
 
 /**
  * Allows items to be worn in armor slots.
  *
- * @param texture The leather armor color used for the custom texture, or null if no custom texture should be used.
+ * @param equipment The equipment texture to use, or null for no texture.
  * @param slot The slot in which the item can be worn.
  * @param armor The amount of armor this item provides.
  * @param armorToughness The amount of armor toughness this item provides.
  * @param knockbackResistance The amount of knockback resistance this item provides.
- * @param equipSound The sound that is played when the item is equipped, or null if no sound should be played.
+ * @param equipSound The sound that is played when the item is equipped.
+ * @param allowedEntities The entity types that are allowed to wear this item, or null for all entities.
+ * @param dispensable Whether this item can be dispensed from a dispenser.
+ * @param swappable Whether this item can be swapped with other items in the same slot.
+ * @param damageOnHurt Whether this item will be damaged when the wearing entity is damaged.
  */
 class Equippable(
-    texture: Provider<Equipment?>,
+    equipment: Provider<Equipment?>,
     slot: Provider<BukkitEquipmentSlot>,
     armor: Provider<Double>,
     armorToughness: Provider<Double>,
@@ -105,34 +179,10 @@ class Equippable(
     damageOnHurt: Provider<Boolean>,
 ) : ItemBehavior {
     
-    constructor(
-        texture: Equipment?,
-        slot: BukkitEquipmentSlot,
-        armor: Double,
-        armorToughness: Double,
-        knockbackResistance: Double,
-        equipSound: Sound,
-        allowedEntities: Set<BukkitEntityType>,
-        dispensable: Boolean,
-        swappable: Boolean,
-        damageOnHurt: Boolean,
-    ) : this(
-        provider(texture),
-        provider(slot),
-        provider(armor),
-        provider(armorToughness),
-        provider(knockbackResistance),
-        provider { BuiltInRegistries.SOUND_EVENT.getOrThrow(equipSound.key()) },
-        provider(allowedEntities),
-        provider(dispensable),
-        provider(swappable),
-        provider(damageOnHurt),
-    )
-    
     /**
      * The custom armor texture, or null if no custom texture should be used.
      */
-    val texture by texture
+    val texture by equipment
     
     /**
      * The slot in which the item can be worn.
@@ -179,7 +229,7 @@ class Equippable(
      */
     val damageOnHurt: Boolean by damageOnHurt
     
-    internal val equipmentData: Provider<RuntimeEquipmentData?> = ResourceLookups.EQUIPMENT_LOOKUP.getProvider(texture)
+    internal val equipmentData: Provider<RuntimeEquipmentData?> = ResourceLookups.EQUIPMENT_LOOKUP.getProvider(equipment)
     
     init {
         equipmentData.subscribe { equipmentData ->

@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
@@ -16,23 +16,35 @@ import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.retrieveData
 import xyz.xenondevs.nova.util.item.storeData
 import xyz.xenondevs.nova.util.unwrap
-import xyz.xenondevs.nova.world.item.NovaItem
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 private val ENERGY_KEY = ResourceLocation.fromNamespaceAndPath("nova", "energy")
 
+/**
+ * Creates a factory for [Chargeable] behaviors using the given values, if not specified otherwise in the item's config.
+ * 
+ * @param maxEnergy The maximum amount of energy the item can store.
+ * Used when `max_energy` is not specified in the config, or `null` to require the presence of a config entry.
+ * 
+ * @param affectsItemDurability Whether the item's durability bar should be used to visualize the amount
+ * of energy stored in the item. Used when `charge_affects_item_durability` is not specified in the config.
+ */
 @Suppress("FunctionName")
-fun Chargeable(affectsItemDurability: Boolean): ItemBehaviorFactory<Chargeable.Default> =
-    object : ItemBehaviorFactory<Chargeable.Default> {
-        override fun create(item: NovaItem): Chargeable.Default {
-            return Chargeable.Default(item.config.entry("max_energy"), affectsItemDurability)
-        }
-    }
+fun Chargeable(
+    maxEnergy: Long? = null,
+    affectsItemDurability: Boolean = true
+) = ItemBehaviorFactory<Chargeable> {
+    val cfg = it.config
+    Chargeable.Default(
+        cfg.entryOrElse(maxEnergy, "max_energy"),
+        cfg.entryOrElse<Boolean>(affectsItemDurability, "charge_affects_item_durability")
+    )
+}
 
 /**
  * Allows items to store energy and be charged.
  */
-interface Chargeable {
+interface Chargeable : ItemBehavior {
     
     /**
      * The maximum amount of energy this item can store.
@@ -54,20 +66,13 @@ interface Chargeable {
      */
     fun addEnergy(itemStack: BukkitStack, energy: Long)
     
-    companion object : ItemBehaviorFactory<Default> {
-        
-        override fun create(item: NovaItem): Default {
-            return Default(item.config.entry<Long>("max_energy"), true)
-        }
-        
-    }
-    
     class Default(
         maxEnergy: Provider<Long>,
-        private val affectsItemDurability: Boolean
+        affectsItemDurability: Provider<Boolean>
     ) : ItemBehavior, Chargeable {
         
         override val maxEnergy by maxEnergy
+        private val affectsItemDurability by affectsItemDurability
         
         override val defaultCompound = provider {
             NamespacedCompound().apply { this[ENERGY_KEY] = 0L }
