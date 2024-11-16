@@ -37,6 +37,7 @@ internal class RemoveEndPointTask(
         state.forEachConnectedNode(node) { type, face, connectedNode ->
             state.removeConnection(connectedNode, type, face.oppositeFace)
             if (connectedNode is NetworkEndPoint) {
+                state.getNetwork(connectedNode, type, face.oppositeFace)?.removeFace(connectedNode, face.oppositeFace)
                 state.removeNetwork(connectedNode, type, face.oppositeFace)
             }
             nodesToUpdate += connectedNode
