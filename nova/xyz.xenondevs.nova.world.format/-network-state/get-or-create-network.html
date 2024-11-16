@@ -2,7 +2,7 @@
 <html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
-    <title>resolveNetwork</title>
+    <title>getOrCreateNetwork</title>
 <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
     <script>document.documentElement.classList.replace("no-js","js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
@@ -41,7 +41,7 @@
 <a class="library-name--link" href="../../../index.html">
                             nova-parent
                     </a>            </div>
-            <div class="library-version">0.17-alpha.29
+            <div class="library-version">0.17-alpha.30
             </div>
         </div>
         <div class="filter-section" id="filter-section">
@@ -58,12 +58,12 @@
                 <div class="sidebar--inner" id="sideMenu"></div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="member" id="content" pageids="nova::xyz.xenondevs.nova.world.format/NetworkState/resolveNetwork/#java.util.UUID/PointingToDeclaration//2031297628">
-  <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.world.format</a><span class="delimiter">/</span><a href="index.html">NetworkState</a><span class="delimiter">/</span><span class="current">resolveNetwork</span></div>
+<div class="main-content" data-page-type="member" id="content" pageids="nova::xyz.xenondevs.nova.world.format/NetworkState/getOrCreateNetwork/#xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType[TypeParam(bounds=[xyz.xenondevs.nova.world.block.tileentity.network.Network[^]])]#java.util.UUID/PointingToDeclaration//2031297628">
+  <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.world.format</a><span class="delimiter">/</span><a href="index.html">NetworkState</a><span class="delimiter">/</span><span class="current">getOrCreateNetwork</span></div>
   <div class="cover ">
-    <h1 class="cover"><span>resolve</span><wbr><span><span>Network</span></span></h1>
+    <h1 class="cover"><span>get</span><wbr><span>Or</span><wbr><span>Create</span><wbr><span><span>Network</span></span></h1>
   </div>
-  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="resolve-network.html"><span class="token function">resolveNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">networkId<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></div><p class="paragraph">Resolves a network by its <a href="resolve-network.html">networkId</a>, loading it from disk if necessary.</p></div></div>
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-or-create-network.html">T</a><span class="token operator"> : </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-network/index.html">Network</a><span class="token operator">&lt;</span><a href="get-or-create-network.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span><a href="get-or-create-network.html"><span class="token function">getOrCreateNetwork</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.type/-network-type/index.html">NetworkType</a><span class="token operator">&lt;</span><a href="get-or-create-network.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">networkId<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token operator"> = </span>UUID.randomUUID()</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><a href="get-or-create-network.html">T</a><span class="token operator">&gt;</span></div><p class="paragraph">Gets or creates a <a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a> with the given <a href="get-or-create-network.html">type</a> and <a href="get-or-create-network.html">networkId</a>.</p><h4 class="">Throws</h4><div class="table"><div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-illegal-argument-exception/index.html"><span>Illegal</span><wbr><span>Argument</span><wbr><span><span>Exception</span></span></a></div></span></div><div><div class="title"><p class="paragraph">If a network with the same <a href="get-or-create-network.html">networkId</a> exists, but is not of the given <a href="get-or-create-network.html">type</a>.</p></div></div></div></div></div></div></div>
 </div>
       <div class="footer">
         <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2024 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
