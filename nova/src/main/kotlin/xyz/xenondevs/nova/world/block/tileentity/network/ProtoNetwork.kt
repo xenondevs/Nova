@@ -159,11 +159,9 @@ class ProtoNetwork<T : Network<T>>(
     
     /**
      * Checks whether this [ProtoNetwork] is empty.
-     * A [ProtoNetwork] is considered empty if it has no [NetworkBridge] and
-     * less than two [NetworkEndPoints][NetworkEndPoint].
      */
     fun isEmpty(): Boolean {
-        return nodes.size < 2 && nodes.none { (_, con) -> con.node is NetworkBridge }
+        return nodes.isEmpty()
     }
     
     /**
