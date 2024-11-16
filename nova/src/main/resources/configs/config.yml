@@ -24,10 +24,11 @@ resource_pack:
     description: Nova (%s asset pack(s), %s base pack(s))
     # Resource packs that should be merged with Nova's resource pack.
     # More information about base packs can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/setup/#optional-resourcepack-merging
+    # Files in plugins/Nova/resource_pack/base_packs/ do NOT need to be listed here, they are included automatically.
     base_packs: [ ]
     # The zip compression level, ranging from 0 (no compression) to 9 (best compression) or -1 for default.
     compression_level: -1
-    # If the generation process should take place entirely in memory. This increases memory usage but improves generation speed.
+    # If the generation process should take place entirely in memory. This increases memory usage during pack generation but improves generation speed.
     in_memory: true
     # Settings regarding the generation of font files.
     font:
