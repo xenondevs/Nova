@@ -10,8 +10,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
-import org.bukkit.event.block.BlockMultiPlaceEvent
-import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
@@ -63,18 +61,10 @@ internal object BlockPlacing : Listener {
     // However, we want to permit this for built-in custom blocks, as those might have their
     // WorldDataManager entry set before this event is called (block migration patch)
     
-    @EventHandler(ignoreCancelled = true)
-    private fun handleBlockPlace(event: BlockPlaceEvent) {
-        val blockState = WorldDataManager.getBlockState(event.block.pos)
-        event.isCancelled = blockState != null && blockState.block.id.namespace != "nova"
-    }
-    
-    @EventHandler(ignoreCancelled = true)
-    private fun handleBlockPlace(event: BlockMultiPlaceEvent) {
-        event.isCancelled = event.replacedBlockStates.any {
-            val blockState = WorldDataManager.getBlockState(it.location.pos)
-            blockState != null && blockState.block.id.namespace != "nova"
-        }
+    // requires earlier block place event because BlockMigrator has already removed WorldDataManager entry already otherwise
+    fun handleBlockPlace(pos: BlockPos): Boolean {
+        val blockState = WorldDataManager.getBlockState(pos)
+        return blockState == null || blockState.block.id.namespace == "nova"
     }
     
     @EventHandler(ignoreCancelled = true)
