@@ -100,10 +100,18 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
             // ensure load chunk task is queued before any other task that might need its data
             val chunkPos = task.chunkPos
             if (task is LoadChunkTask) {
+                // ignore duplicate chunk load requests
+                if (chunkPos in loadedChunks)
+                    return@runBlocking
+                
                 channel.send(task)
                 loadedChunks += chunkPos
                 taskBacklog.remove(chunkPos)?.forEach { channel.send(it) }
             } else if (task is UnloadChunkTask) {
+                // ignore duplicate chunk unload requests
+                if (chunkPos !in loadedChunks)
+                    return@runBlocking
+                
                 channel.send(task)
                 loadedChunks -= chunkPos
             } else if (chunkPos !in loadedChunks) {
