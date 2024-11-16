@@ -38,6 +38,7 @@ internal abstract class SidedBackingStateConfigType<T : SidedBackingStateConfig>
     
     override val blockedIds = setOf(63)
     override val defaultStateConfig = of(63)
+    override val properties = hashSetOf("north", "east", "south", "west", "up", "down")
     
     final override fun of(id: Int, waterlogged: Boolean): T {
         if (waterlogged)

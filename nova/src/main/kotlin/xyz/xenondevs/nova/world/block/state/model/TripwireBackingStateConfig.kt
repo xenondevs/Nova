@@ -52,6 +52,7 @@ internal abstract class TripwireBackingStateConfigType private constructor(
 ) : BackingStateConfigType<TripwireBackingStateConfig>(63, "tripwire") {
     
     override val blockedIds = IntArraySet((0..15).toIntArray())
+    override val properties = hashSetOf("north", "east", "south", "west", "disarmed", "powered")
     
     override fun of(id: Int, waterlogged: Boolean): TripwireBackingStateConfig {
         if (waterlogged)

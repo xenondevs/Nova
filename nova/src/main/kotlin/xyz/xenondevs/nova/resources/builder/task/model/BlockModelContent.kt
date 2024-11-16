@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.resources.builder.task.model
 
 import com.google.gson.JsonObject
 import org.joml.Matrix4f
+import xyz.xenondevs.commons.collections.associateNotNull
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.commons.gson.getObjectOrNull
@@ -60,13 +61,27 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                 if (file.exists()) {
                     val blockStateJson = file.parseJson() as JsonObject
                     
-                    if (blockStateJson.has("multipart"))
-                        throw IllegalArgumentException("Block state file $file contains multipart block states, which are not supported")
+                    if (blockStateJson.has("multipart")) {
+                        LOGGER.warning("Block state file $file contains multipart block states, which are not supported. " +
+                            "Block states defined in this file will be ignored and potentially overwritten.")
+                        return@forEach
+                    }
                     
                     blockStateJson.getObjectOrNull("variants")?.entrySet()
                         ?.forEach { (variantStr, variantOpts) ->
-                            val properties = variantStr.split(',')
-                                .associate { val s = it.split('='); s[0] to s[1] }
+                            val properties = variantStr.split(',').associateNotNull {
+                                val parts = it.split('=')
+                                if (parts.size == 2)
+                                    parts[0] to parts[1]
+                                else null
+                            }
+                            
+                            if (properties.keys != type.properties) {
+                                LOGGER.warning("Variant '$variantStr' in block state file $file does not specify all properties explicitly " +
+                                    "(got ${properties.keys}, expected ${type.properties}). " +
+                                    "This variant will be ignored and potentially overwritten.")
+                                return@forEach
+                            }
                             
                             val config = type.of(properties)
                             val variant = GSON.fromJson<BlockStateVariantData>(variantOpts)!!
@@ -212,7 +227,6 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                 val blockStateFile = getBlockStateFile(type)
                 blockStateFile.createParentDirectories()
                 obj.writeToFile(blockStateFile)
-                
             }
     }
     

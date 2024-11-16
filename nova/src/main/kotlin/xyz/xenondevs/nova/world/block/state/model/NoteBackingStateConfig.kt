@@ -32,6 +32,8 @@ internal data class NoteBackingStateConfig(
     
     companion object : DynamicDefaultingBackingStateConfigType<NoteBackingStateConfig>(1149, "note_block") {
         
+        override val properties = hashSetOf("instrument", "note", "powered")
+        
         fun getIdOf(instrument: Instrument, note: Int, powered: Boolean): Int {
             return instrument.ordinal * NOTE_BASE * POWERED_BASE + note * POWERED_BASE + powered.intValue
         }
