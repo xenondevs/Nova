@@ -1,10 +1,12 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla
 
+import net.minecraft.world.level.block.entity.CrafterBlockEntity
 import xyz.xenondevs.nova.util.unwrap
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 internal class NetworkedCrafterInventory(
+    private val entity: CrafterBlockEntity,
     container: ItemStackContainer
 ) : NetworkedNMSInventory(container) {
     
@@ -17,6 +19,9 @@ internal class NetworkedCrafterInventory(
         outer@ while (remaining > 0) {
             var bestPartial: MojangStack? = null
             for ((slot, slotStack) in container.withIndex()) {
+                if (entity.isSlotDisabled(slot))
+                    continue
+                
                 if (slotStack.isEmpty) {
                     container[slot] = itemStack.copyWithCount(1)
                     remaining--
