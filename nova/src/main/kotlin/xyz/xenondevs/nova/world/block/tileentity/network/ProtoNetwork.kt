@@ -1,16 +1,11 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
-import org.bukkit.World
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.cbf.io.ByteReader
-import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.getOrThrow
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.MutableNetworkNodeConnection
@@ -19,8 +14,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.format.NetworkState
-import xyz.xenondevs.nova.world.format.chunk.readCubeFaceSet
-import xyz.xenondevs.nova.world.format.chunk.writeCubeFaceSet
 import java.util.*
 
 /**
@@ -57,6 +50,7 @@ class ProtoNetwork<T : Network<T>>(
      */
     fun addAll(network: NetworkData<T>) {
         for ((node, faces) in network.nodes.values) {
+            require(node !is GhostNetworkNode)
             val (_, myFaces) = this.nodes.getOrPut(node.pos) { MutableNetworkNodeConnection(node) }
             myFaces += faces
         }
@@ -67,6 +61,7 @@ class ProtoNetwork<T : Network<T>>(
      * Adds a [bridge] to this [ProtoNetwork].
      */
     fun addBridge(bridge: NetworkBridge) {
+        require(bridge !is GhostNetworkNode)
         nodes[bridge.pos] = MutableNetworkNodeConnection(bridge, Collections.emptySet())
         markDirty()
     }
@@ -79,6 +74,7 @@ class ProtoNetwork<T : Network<T>>(
      * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.pos]
      */
     fun addEndPoint(endPoint: NetworkNode, face: BlockFace): Boolean {
+        require(endPoint !is GhostNetworkNode)
         val presentFaces = nodes[endPoint.pos]?.faces
         if (presentFaces != null) {
             if (presentFaces.add(face)) {
@@ -100,6 +96,7 @@ class ProtoNetwork<T : Network<T>>(
      * - `false` if there already was a [NetworkEndPoint] at [NetworkEndPoint.pos]
      */
     fun addEndPoint(endPoint: NetworkNode, faces: Set<BlockFace>): Boolean {
+        require(endPoint !is GhostNetworkNode)
         val presentFaces = nodes[endPoint.pos]?.faces
         if (presentFaces != null) {
             if (presentFaces.addAll(faces)) {
@@ -161,43 +158,12 @@ class ProtoNetwork<T : Network<T>>(
     }
     
     /**
-     * Replaces a ghost node with the regular [node].
-     *
-     * @throws IllegalStateException If there is no ghost node for [node].
-     */
-    fun loadNode(node: NetworkNode) {
-        val connection = nodes[node.pos]
-            ?: throw IllegalStateException("No node present at ${node.pos}")
-        
-        nodes[node.pos] = connection.copy(node = node)
-        markDirty()
-    }
-    
-    /**
-     * Replaces [node] with a ghost node.
-     */
-    fun unloadNode(node: NetworkNode) {
-        val connection = nodes.remove(node.pos)
-            ?: return
-        
-        nodes[node.pos] = connection.copy(node = GhostNetworkNode.fromNode(node))
-        markDirty()
-    }
-    
-    /**
      * Checks whether this [ProtoNetwork] is empty.
      * A [ProtoNetwork] is considered empty if it has no [NetworkBridge] and
      * less than two [NetworkEndPoints][NetworkEndPoint].
      */
     fun isEmpty(): Boolean {
         return nodes.size < 2 && nodes.none { (_, con) -> con.node is NetworkBridge }
-    }
-    
-    /**
-     * Checks whether all nodes in this [ProtoNetwork] are unloaded.
-     */
-    fun isUnloaded(): Boolean {
-        return nodes.values.all { it.node is GhostNetworkNode }
     }
     
     /**
@@ -284,16 +250,16 @@ class ProtoNetwork<T : Network<T>>(
         
         when (node) {
             is NetworkEndPoint -> {
-                for ((_, _, otherNetworkId) in state.getNetworks(node)) {
-                    val otherNetwork = state.resolveNetwork(otherNetworkId)
+                for ((otherNetworkType, _, otherNetworkId) in state.getNetworks(node)) {
+                    val otherNetwork = state.getNetworkOrThrow(otherNetworkType, otherNetworkId)
                     if (otherNetwork !in cluster)
                         queue += otherNetwork
                 }
             }
             
             is NetworkBridge -> {
-                for ((_, otherNetworkId) in state.getNetworks(node)) {
-                    val otherNetwork = state.resolveNetwork(otherNetworkId)
+                for ((otherNetworkType, otherNetworkId) in state.getNetworks(node)) {
+                    val otherNetwork = state.getNetworkOrThrow(otherNetworkType, otherNetworkId)
                     if (otherNetwork !in cluster)
                         queue += otherNetwork
                 }
@@ -337,58 +303,6 @@ class ProtoNetwork<T : Network<T>>(
     
     override fun toString(): String {
         return "ProtoNetwork(type=$type, uuid=$uuid, nodes=$nodes)"
-    }
-    
-    companion object {
-        
-        private const val MAGIC: Int = 0x4E564E54 // "NVNT" 
-        private const val FILE_VERSION: Byte = 1
-        
-        /**
-         * Reads a [ProtoNetwork] from the given [reader].
-         *
-         * May suspend to wait for network region load.
-         */
-        internal suspend fun read(uuid: UUID, world: World, state: NetworkState, reader: ByteReader): ProtoNetwork<*> {
-            check(reader.readInt() == MAGIC) { "Invalid network file" }
-            check(reader.readByte() == FILE_VERSION) { "Invalid network file version" }
-            
-            val type = NovaRegistries.NETWORK_TYPE.getOrThrow(reader.readString())
-            val size = reader.readVarInt()
-            val nodes = HashMap<BlockPos, MutableNetworkNodeConnection>()
-            for (i in 0 until size) {
-                val pos = BlockPos(
-                    world,
-                    reader.readVarInt(),
-                    reader.readVarInt(),
-                    reader.readVarInt()
-                )
-                
-                nodes[pos] = MutableNetworkNodeConnection(
-                    GhostNetworkNode.fromData(pos, state.getNodeData(pos)),
-                    reader.readCubeFaceSet()
-                )
-            }
-            return ProtoNetwork(state, type, uuid, nodes)
-        }
-        
-        /**
-         * Writes the given [network] to the [writer].
-         */
-        internal fun write(network: ProtoNetwork<*>, writer: ByteWriter) {
-            writer.writeInt(MAGIC)
-            writer.writeByte(FILE_VERSION)
-            
-            writer.writeString(network.type.toString())
-            writer.writeVarInt(network.nodes.size)
-            for ((pos, connection) in network.nodes) {
-                writer.writeVarInt(pos.x)
-                writer.writeVarInt(pos.y)
-                writer.writeVarInt(pos.z)
-                writer.writeCubeFaceSet(connection.faces)
-            }
-        }
-        
     }
     
 }

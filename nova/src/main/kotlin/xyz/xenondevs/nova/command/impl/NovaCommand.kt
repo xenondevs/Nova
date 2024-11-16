@@ -595,8 +595,8 @@ internal object NovaCommand : Command() {
             NetworkManager.queueRead(pos.chunkPos) { state ->
                 val connectedNodes = state.getConnectedNodes(node)
                 
-                suspend fun buildNetworkInfoComponent(id: UUID): Component {
-                    val network = state.resolveNetwork(id)
+                suspend fun buildNetworkInfoComponent(type: NetworkType<*>, id: UUID): Component {
+                    val network = state.getNetworkOrThrow(type, id)
                     return Component.translatable(
                         "command.nova.show_network_node_info.network", NamedTextColor.GRAY,
                         Component.text(network.type.id.toString(), NamedTextColor.AQUA),
@@ -668,7 +668,7 @@ internal object NovaCommand : Command() {
                                     Component.text(type.id.toString(), NamedTextColor.AQUA),
                                     Component
                                         .text(id.toString().take(8) + "...", NamedTextColor.AQUA)
-                                        .hoverEvent(buildNetworkInfoComponent(id))
+                                        .hoverEvent(buildNetworkInfoComponent(type, id))
                                 ))
                                 .appendNewline()
                         }
@@ -695,7 +695,7 @@ internal object NovaCommand : Command() {
                                     Component.text(face.name, NamedTextColor.AQUA),
                                     Component
                                         .text(id.toString().take(8) + "...", NamedTextColor.AQUA)
-                                        .hoverEvent(buildNetworkInfoComponent(id))
+                                        .hoverEvent(buildNetworkInfoComponent(type, id))
                                 ))
                                 .appendNewline()
                         }

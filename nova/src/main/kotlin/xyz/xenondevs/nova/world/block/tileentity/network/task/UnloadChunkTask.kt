@@ -4,12 +4,12 @@ import jdk.jfr.Category
 import jdk.jfr.Event
 import jdk.jfr.Label
 import jdk.jfr.Name
+import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
-import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
@@ -38,7 +38,7 @@ internal class UnloadChunkTask(
         val clustersToInit = HashSet<ProtoNetwork<*>>()
         
         fun remove(node: NetworkNode, network: ProtoNetwork<*>) {
-            network.unloadNode(node)
+            network.removeNode(node)
             network.cluster?.forEach { previouslyClusteredNetwork ->
                 previouslyClusteredNetwork.invalidateCluster()
                 clustersToInit += previouslyClusteredNetwork
@@ -69,8 +69,8 @@ internal class UnloadChunkTask(
         }
         
         for (network in clustersToInit) {
-            if (network.isUnloaded()) {
-                state.unloadNetwork(network)
+            if (network.isEmpty()) {
+                state -= network
             } else {
                 network.initCluster()
             }

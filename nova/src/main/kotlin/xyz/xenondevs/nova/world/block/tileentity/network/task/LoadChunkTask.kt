@@ -4,8 +4,6 @@ import jdk.jfr.Category
 import jdk.jfr.Event
 import jdk.jfr.Label
 import jdk.jfr.Name
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
@@ -19,7 +17,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
-import java.util.concurrent.ConcurrentHashMap
 
 internal class LoadChunkTask(
     state: NetworkState,
@@ -42,57 +39,43 @@ internal class LoadChunkTask(
     //</editor-fold>
     
     override suspend fun run(): Boolean {
-        val updatedNetworks = ConcurrentHashMap<ProtoNetwork<*>, MutableSet<NetworkNode>>()
-        val networkLessNodes = ConcurrentHashMap.newKeySet<NetworkNode>()
+        val updatedNetworks = HashMap<ProtoNetwork<*>, MutableSet<NetworkNode>>()
         
-        coroutineScope {
-            val chunkNodes = NetworkManager.getNodes(chunkPos).associateByTo(HashMap(), NetworkNode::pos)
-            val networkNodes = state.storage.getOrLoadNetworkRegion(chunkPos).getChunk(chunkPos).getData()
-            for ((pos, data) in networkNodes) {
-                val node = chunkNodes[pos]
-                if (node == null || node in state)
-                    continue
-                
-                launch {
-                    when {
-                        node is NetworkBridge && data is NetworkBridgeData -> {
-                            val networks = data.networks
-                            if (networks.isNotEmpty()) {
-                                for ((_, id) in networks) {
-                                    val network = state.resolveNetwork(id)
-                                    updatedNetworks.compute(network) { _, nodes -> nodes?.also { it += node } ?: hashSetOf(node) }
-                                }
-                            } else {
-                                networkLessNodes += node
-                            }
-                        }
-                        
-                        node is NetworkEndPoint && data is NetworkEndPointData -> {
-                            val networks = data.networks
-                            if (!networks.isEmpty) {
-                                for ((_, _, id) in networks) {
-                                    val network = state.resolveNetwork(id)
-                                    updatedNetworks.compute(network) { _, nodes -> nodes?.also { it += node } ?: hashSetOf(node) }
-                                }
-                            } else {
-                                networkLessNodes += node
-                            }
-                        }
-                        
-                        else -> throw IllegalStateException("Node type and data type do not match")
+        val chunkNodes = NetworkManager.getNodes(chunkPos).associateByTo(HashMap(), NetworkNode::pos)
+        val networkNodes = state.storage.getOrLoadNetworkRegion(chunkPos).getChunk(chunkPos).getData()
+        
+        for ((pos, data) in networkNodes) {
+            val node = chunkNodes[pos]
+            if (node == null || node in state)
+                continue
+            
+            when {
+                node is NetworkBridge && data is NetworkBridgeData -> {
+                    val networks = data.networks
+                    for ((type, id) in networks) {
+                        val network = state.getOrCreateNetwork(type, id)
+                        network.addBridge(node)
+                        updatedNetworks.getOrPut(network, ::HashSet) += node
                     }
                 }
+                
+                node is NetworkEndPoint && data is NetworkEndPointData -> {
+                    val networks = data.networks
+                    for ((type, face, id) in networks) {
+                        val network = state.getOrCreateNetwork(type, id)
+                        network.addEndPoint(node, face)
+                        updatedNetworks.getOrPut(network, ::HashSet) += node
+                    }
+                }
+                
+                else -> throw IllegalStateException("Node type and data type do not match")
             }
-        }
-        
-        for (node in networkLessNodes) {
+            
             state += node
         }
         
         for ((network, nodes) in updatedNetworks) {
             for (node in nodes) {
-                state += node
-                network.loadNode(node)
                 node.handleNetworkLoaded(state)
             }
             

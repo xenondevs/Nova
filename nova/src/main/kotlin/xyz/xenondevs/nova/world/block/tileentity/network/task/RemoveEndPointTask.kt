@@ -43,12 +43,12 @@ internal class RemoveEndPointTask(
         }
         
         // remove endpoint from all networks
-        for ((_, _, networkId) in state.getNetworks(node)) {
-            val network = state.resolveNetwork(networkId)
+        for ((networkType, _, networkId) in state.getNetworks(node)) {
+            val network = state.getNetworkOrThrow(networkType, networkId)
             network.removeNode(node)
             
             if (network.isEmpty()) {
-                state.deleteNetwork(network)
+                state -= network
                 reclusterize(network)
             } else {
                 reclusterize(network)

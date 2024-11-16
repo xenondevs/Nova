@@ -4,18 +4,9 @@ package xyz.xenondevs.nova.world.format
 
 import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Table
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import org.bukkit.World
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.cbf.io.ByteReader
-import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.commons.collections.associateWithNotNullTo
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.collections.enumSet
@@ -37,9 +28,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
 import xyz.xenondevs.nova.world.format.chunk.NetworkNodeData
-import java.io.File
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.full.isSuperclassOf
 
 /**
@@ -53,11 +42,8 @@ class NetworkState internal constructor(
     internal val storage: WorldDataStorage
 ) {
     
-    private val networksById = ConcurrentHashMap<UUID, Deferred<ProtoNetwork<*>?>>()
+    private val networksById = HashMap<UUID, ProtoNetwork<*>>()
     private val nodesByPos = HashMap<BlockPos, NetworkNode>()
-    
-    private val pendingRemovalNetworks = HashSet<UUID>()
-    private val pendingUnloadNetworks = ConcurrentHashMap<UUID, ProtoNetwork<*>>()
     
     /**
      * Mutex for all data governed by this [NetworkState].
@@ -65,14 +51,10 @@ class NetworkState internal constructor(
     internal val mutex = Mutex()
     
     /**
-     * A sequence of all loaded [ProtoNetworks][ProtoNetwork].
-     *
-     * @throws IllegalStateException If a network is currently being loaded
+     * A sequence of all [ProtoNetworks][ProtoNetwork].
      */
     val networks: Sequence<ProtoNetwork<*>>
         get() = networksById.values.asSequence()
-            .map { it.getCompleted() }
-            .filterNotNull()
     
     /**
      * Adds [node] to the network state.
@@ -92,7 +74,7 @@ class NetworkState internal constructor(
      * Adds [network] to the network state.
      */
     operator fun plusAssign(network: ProtoNetwork<*>) {
-        networksById[network.uuid] = CompletableDeferred(network)
+        networksById[network.uuid] = network
     }
     
     /**
@@ -105,21 +87,10 @@ class NetworkState internal constructor(
     }
     
     /**
-     * Removes the [network] from the network state and schedules the deletion
-     * of its data from disk.
+     * Removes the [network] from the network state.
      */
-    fun deleteNetwork(network: ProtoNetwork<*>) {
+    operator fun minusAssign(network: ProtoNetwork<*>) {
         networksById -= network.uuid
-        pendingRemovalNetworks += network.uuid
-    }
-    
-    /**
-     * Unloads the [network] from the network state, but does not delete
-     * any data associated with it.
-     */
-    fun unloadNetwork(network: ProtoNetwork<*>) {
-        networksById -= network.uuid
-        pendingUnloadNetworks[network.uuid] = network
     }
     
     /**
@@ -135,48 +106,40 @@ class NetworkState internal constructor(
         node.pos in nodesByPos
     
     /**
-     * Creates a new [ProtoNetwork] with the given [type] and [networkId].
+     * Gets the [ProtoNetwork] with the given [networkId] and [type], or throws an exception
+     * if no such network exists.
+     * 
+     * @throws IllegalArgumentException If no network with [networkId] exists, or it is not of [type].
      */
-    fun <T : Network<T>> createNetwork(type: NetworkType<T>, networkId: UUID = UUID.randomUUID()): ProtoNetwork<T> {
+    fun <T : Network<T>> getNetworkOrThrow(type: NetworkType<T>, networkId: UUID): ProtoNetwork<T> {
+        val network = networksById[networkId]
+        if (network == null)
+            throw IllegalArgumentException("Network with id $networkId does not exist")
+        if (network.type != type)
+            throw IllegalArgumentException("Network with id $networkId is not of type $type")
+        return network as ProtoNetwork<T>
+    }
+    
+    /**
+     * Creates a new [ProtoNetwork] with the given [type] and a random UUID.
+     */
+    fun <T : Network<T>> createNetwork(type: NetworkType<T>): ProtoNetwork<T> {
+        val networkId = UUID.randomUUID()
         val network = ProtoNetwork(this, type, networkId)
-        networksById[networkId] = CompletableDeferred(network)
+        networksById[networkId] = network
         return network
     }
     
     /**
-     * Resolves a network by its [networkId], loading it from disk if necessary.
+     * Gets or creates a [ProtoNetwork] with the given [type] and [networkId].
+     * 
+     * @throws IllegalArgumentException If a network with the same [networkId] exists, but is not of the given [type].
      */
-    suspend fun resolveNetwork(networkId: UUID): ProtoNetwork<*> = coroutineScope {
-        return@coroutineScope networksById.computeIfAbsent(networkId) {
-            // The network might be unloaded, but not yet written to disk
-            val pendingNetwork = pendingUnloadNetworks.remove(networkId)
-            if (pendingNetwork != null)
-                return@computeIfAbsent CompletableDeferred(pendingNetwork)
-            
-            // The network needs to be read from disk
-            async(Dispatchers.IO) { loadNetwork(networkId) }
-        }.await() ?: throw IllegalArgumentException("Network with id $networkId not found")
-    }
-    
-    /**
-     * Attempts to load a [ProtoNetwork] from disk, returning `null` if
-     * no network file exists for the given [networkId].
-     *
-     * May suspend to await network region load.
-     */
-    private suspend fun loadNetwork(networkId: UUID): ProtoNetwork<*>? {
-        val file = File(storage.networkFolder, "$networkId.nvnt")
-        if (!file.exists())
-            return null
-        
-        try {
-            return file.inputStream().buffered().use { inp ->
-                val reader = ByteReader.fromStream(inp)
-                ProtoNetwork.read(networkId, world, this, reader)
-            }
-        } catch (e: Exception) {
-            throw Exception("Failed to load network from file $file", e)
-        }
+    fun <T : Network<T>> getOrCreateNetwork(type: NetworkType<T>, networkId: UUID = UUID.randomUUID()): ProtoNetwork<T> {
+        val network = networksById.computeIfAbsent(networkId) { ProtoNetwork(this, type, networkId) }
+        if (network.type != type)
+            throw IllegalArgumentException("Network with id $networkId exists, but is not of type $type")
+        return network as ProtoNetwork<T>
     }
     
     /**
@@ -446,7 +409,7 @@ class NetworkState internal constructor(
      * Gets the network of [endPoint] at [face], or `null` if there is no connection.
      */
     suspend fun <T : Network<T>> getNetwork(endPoint: NetworkEndPoint, networkType: NetworkType<T>, face: BlockFace): ProtoNetwork<T>? =
-        getEndPointData(endPoint).networks[networkType, face]?.let { resolveNetwork(it) } as ProtoNetwork<T>?
+        getEndPointData(endPoint).networks[networkType, face]?.let { getNetworkOrThrow(networkType, it) }
     
     /**
      * Gets the network map of [bridge].
@@ -471,7 +434,7 @@ class NetworkState internal constructor(
      * @throws IllegalStateException If the referenced network is currently being loaded.
      */
     suspend fun <T : Network<T>> getNetwork(bridge: NetworkBridge, networkType: NetworkType<T>): ProtoNetwork<T>? =
-        getNetworks(bridge)[networkType]?.let { resolveNetwork(it) } as ProtoNetwork<T>?
+        getNetworks(bridge)[networkType]?.let { getNetworkOrThrow(networkType, it) }
     
     /**
      * Iterates over all networks of [bridge], calling [action] for each network.
@@ -482,7 +445,7 @@ class NetworkState internal constructor(
     suspend inline fun forEachNetwork(bridge: NetworkBridge, action: (NetworkType<*>, ProtoNetwork<*>) -> Unit) {
         val networks = getNetworks(bridge)
         for ((networkType, networkId) in networks) {
-            val network = resolveNetwork(networkId)
+            val network = getNetworkOrThrow(networkType, networkId)
             action(networkType, network)
         }
     }
@@ -498,7 +461,7 @@ class NetworkState internal constructor(
     suspend inline fun forEachNetwork(endPoint: NetworkEndPoint, action: (NetworkType<*>, BlockFace, ProtoNetwork<*>) -> Unit) {
         val networks = getNetworks(endPoint)
         for ((networkType, face, networkId) in networks) {
-            val network = resolveNetwork(networkId)
+            val network = getNetworkOrThrow(networkType, networkId)
             action(networkType, face, network)
         }
     }
@@ -513,7 +476,7 @@ class NetworkState internal constructor(
     suspend inline fun <T : Network<T>> forEachNetwork(endPoint: NetworkEndPoint, networkType: NetworkType<T>, action: (BlockFace, ProtoNetwork<T>) -> Unit) {
         val networks = getNetworks(endPoint).row(networkType)
         for ((face, networkId) in networks) {
-            val network = resolveNetwork(networkId) as ProtoNetwork<T>
+            val network = getNetworkOrThrow(networkType, networkId)
             action(face, network)
         }
     }
@@ -660,7 +623,7 @@ class NetworkState internal constructor(
         network.removeNode(other)
         
         check(network.isEmpty()) // this must've been a local network, so it should be empty now
-        deleteNetwork(network)
+        this -= network
         
         removeConnection(endPoint, networkType, face)
         removeConnection(other, networkType, oppositeFace)
@@ -713,46 +676,6 @@ class NetworkState internal constructor(
         
         endPoint.handleNetworkUpdate(this)
         neighbor?.handleNetworkUpdate(this)
-    }
-    
-    internal fun save(scope: CoroutineScope) {
-        // save active networks
-        for (deferredNetwork in networksById.values) {
-            scope.launch(Dispatchers.IO) {
-                val network = deferredNetwork.await()
-                    ?: return@launch
-                save(network)
-            }
-        }
-        
-        // save unloaded networks
-        val pendingUnloadIterator = pendingUnloadNetworks.iterator()
-        while (pendingUnloadIterator.hasNext()) {
-            val (_, network) = pendingUnloadIterator.next()
-            if (network.isUnloaded()) {
-                pendingUnloadIterator.remove()
-                scope.launch(Dispatchers.IO) { save(network) }
-            }
-        }
-        
-        // delete removed networks
-        val pendingRemovalIterator = pendingRemovalNetworks.iterator()
-        while (pendingRemovalIterator.hasNext()) {
-            val networkId = pendingRemovalIterator.next()
-            pendingRemovalIterator.remove()
-            scope.launch(Dispatchers.IO) {
-                val file = File(storage.networkFolder, "$networkId.nvnt")
-                file.delete()
-            }
-        }
-    }
-    
-    private fun save(network: ProtoNetwork<*>) {
-        val file = File(storage.networkFolder, "${network.uuid}.nvnt")
-        file.outputStream().buffered().use { out ->
-            val writer = ByteWriter.fromStream(out)
-            ProtoNetwork.write(network, writer)
-        }
     }
     
 }

@@ -85,6 +85,28 @@ internal class AddBridgeTask(
     }
     
     /**
+     * Connects the bridge [self] to the given [neighbors] using [network].
+     */
+    private suspend fun connectBridgeToEndPoints(
+        self: NetworkBridge,
+        neighbors: Map<BlockFace, NetworkEndPoint>,
+        network: ProtoNetwork<*>
+    ) {
+        val networkType = network.type
+        for ((face, neighbor) in neighbors) {
+            val oppositeFace = face.oppositeFace
+            
+            // add endpoint to network
+            network.addEndPoint(neighbor, oppositeFace)
+            
+            // remember connections in self and neighbor
+            state.setConnection(self, networkType, face)
+            state.setConnection(neighbor, networkType, oppositeFace)
+            state.setNetwork(neighbor, oppositeFace, network)
+        }
+    }
+    
+    /**
      * Connects the bridge [self] to the given [neighbors]. Then returns the network that the bridge is now connected to.
      * Depending on the amount of neighboring [ProtoNetworks][ProtoNetwork], this function my either merge networks,
      * add the bridge to an existing [ProtoNetwork], or create a new [ProtoNetwork].
@@ -106,7 +128,7 @@ internal class AddBridgeTask(
         // depending on how many networks there are, perform the required action
         val network = when {
             // Merge network
-            previousNetworks.size > 1 -> mergeNetworks(networkType, previousNetworks)
+            previousNetworks.size > 1 -> mergeNetworks(self, networkType, previousNetworks)
             // Connect to existing network
             previousNetworks.size == 1 -> previousNetworks.first()
             // Make a new network
@@ -124,53 +146,43 @@ internal class AddBridgeTask(
      * Merges the given [networks] into a single network of [type].
      */
     private suspend fun <T : Network<T>> mergeNetworks(
+        self: NetworkBridge,
         type: NetworkType<T>,
         networks: Set<ProtoNetwork<T>>
     ): ProtoNetwork<T> {
         // remove old networks
         for (previousNetwork in networks) {
-            state.deleteNetwork(previousNetwork)
+            state -= previousNetwork
         }
         
         // create and populate new network
         val mergedNetwork = state.createNetwork(type)
         for (previousNetwork in networks) {
             // move nodes from previous network to new network
-            for ((node, _) in previousNetwork.nodes.values) {
-                moveNetwork(node, previousNetwork.uuid, mergedNetwork.uuid)
-            }
+            reassignNetworks(self, type, networks.mapTo(HashSet()) { it.uuid }, mergedNetwork.uuid)
             mergedNetwork.addAll(previousNetwork)
         }
         
         return mergedNetwork
     }
     
-    private suspend fun moveNetwork(node: NetworkNode, previous: UUID, now: UUID) {
-        when (node) {
-            is NetworkBridge -> state.getNetworks(node).replaceAll { _, id -> if (id == previous) now else id }
-            is NetworkEndPoint -> state.getNetworks(node).replaceAll { _, _, id -> if (id == previous) now else id }
-        }
-    }
-    
-    /**
-     * Connects the bridge [self] to the given [neighbors] using [network].
-     */
-    private suspend fun connectBridgeToEndPoints(
-        self: NetworkBridge,
-        neighbors: Map<BlockFace, NetworkEndPoint>,
-        network: ProtoNetwork<*>
-    ) {
-        val networkType = network.type
-        for ((face, neighbor) in neighbors) {
-            val oppositeFace = face.oppositeFace
+    private suspend fun reassignNetworks(start: NetworkNode, type: NetworkType<*>, previous: Set<UUID>, now: UUID) {
+        val exploredNodes = HashSet<NetworkNode>()
+        val queue = LinkedList<NetworkNode>()
+        queue += start
+        while (queue.isNotEmpty()) {
+            val node = queue.poll()
+            exploredNodes += node
             
-            // add endpoint to network
-            network.addEndPoint(neighbor, oppositeFace)
+            when (node) {
+                is NetworkBridge -> state.getNetworks(node).replaceAll {_, id -> if (id in previous) now else id }
+                is NetworkEndPoint -> state.getNetworks(node).replaceAll { _, _, id -> if (id in previous) now else id }
+            }
             
-            // remember connections in self and neighbor
-            state.setConnection(self, networkType, face)
-            state.setConnection(neighbor, networkType, oppositeFace)
-            state.setNetwork(neighbor, oppositeFace, network)
+            state.forEachConnectedNode(node, type) { _, connectedNode ->
+                if (connectedNode !in exploredNodes)
+                    queue += connectedNode
+            }
         }
     }
     
