@@ -7,17 +7,16 @@ import net.kyori.adventure.text.format.TextDecoration
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.config.ConfigurableRegistryElementBuilder
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.resources.layout.item.ItemModelLayoutBuilder
 import xyz.xenondevs.nova.resources.layout.item.RequestedItemModelLayout
-import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
-import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.name
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 
 class NovaItemBuilder internal constructor(
     id: ResourceLocation
@@ -155,10 +154,10 @@ class NovaItemBuilder internal constructor(
         return item
     }
     
-    companion object {
+    internal companion object {
         
-        fun fromBlock(block: NovaBlock): NovaItemBuilder {
-            return NovaItemBuilder(block.id).apply {
+        fun fromBlock(id: ResourceLocation, block: NovaBlock): NovaItemBuilder {
+            return NovaItemBuilder(id).apply {
                 this.block = block
                 name(block.name)
                 models {
