@@ -4,14 +4,15 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.util.BoundingBox
 import org.joml.Vector3d
-import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.util.Location
 import xyz.xenondevs.nova.util.LocationUtils
 import xyz.xenondevs.nova.util.add
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 
 /**
  * Creates a [Region] from this [Location] to the given [Location].
@@ -24,7 +25,20 @@ operator fun Location.rangeTo(loc: Location) = Region(this, loc)
  * @param min The start of the region, inclusive.
  * @param max The end of the region, inclusive.
  */
-class Region(val min: Location, val max: Location) {
+class Region(min: Location, max: Location) {
+    
+    private val _min = min.clone()
+    private val _max = max.clone()
+    
+    /**
+     * The start of the region, inclusive.
+     */
+    val min: Location get() = _min.clone()
+    
+    /**
+     * The end of the region, inclusive.
+     */
+    val max: Location get() = _max.clone()
     
     /**
      * The [World] that this [Region] is in.
@@ -39,10 +53,10 @@ class Region(val min: Location, val max: Location) {
      * Checks whether the given [Location] is inside this [Region].
      */
     operator fun contains(loc: Location): Boolean {
-        return loc.world == min.world
-            && loc.x >= min.x && loc.x <= max.x
-            && loc.y >= min.y && loc.y <= max.y
-            && loc.z >= min.z && loc.z <= max.z
+        return loc.world == _min.world
+            && loc.x >= _min.x && loc.x <= _max.x
+            && loc.y >= _min.y && loc.y <= _max.y
+            && loc.z >= _min.z && loc.z <= _max.z
     }
     
     /**
@@ -50,11 +64,17 @@ class Region(val min: Location, val max: Location) {
      */
     operator fun contains(block: Block): Boolean {
         val loc = block.location
-        return loc.world == min.world
-            && loc.x >= min.x && loc.x < max.x
-            && loc.y >= min.y && loc.y < max.y
-            && loc.z >= min.z && loc.z < max.z
+        return loc.world == _min.world
+            && loc.x >= _min.x && loc.x < _max.x
+            && loc.y >= _min.y && loc.y < _max.y
+            && loc.z >= _min.z && loc.z < _max.z
     }
+    
+    /**
+     * Converts this [Region] to a [BoundingBox].
+     */
+    fun toBoundingBox(): BoundingBox =
+        BoundingBox(_min.x, _min.y, _min.z, _max.x, _max.y, _max.z)
     
     companion object {
         

@@ -4,6 +4,7 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
+import org.bukkit.util.BoundingBox
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutable.MutableProvider
 import xyz.xenondevs.commons.provider.mutable.map
@@ -100,6 +101,8 @@ class DynamicRegion internal constructor(
     
     operator fun contains(loc: Location): Boolean = region.contains(loc)
     operator fun contains(block: Block): Boolean = region.contains(block)
+    
+    fun toBoundingBox(): BoundingBox = region.toBoundingBox()
     //</editor-fold>
     
 }
