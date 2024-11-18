@@ -22,7 +22,6 @@ internal class WorldDataStorage(val world: World) {
     
     private val blockRegionFolder = File(world.worldFolder, "nova_region")
     private val networkRegionFolder = File(world.worldFolder, "nova_network_region")
-    val networkFolder = File(world.worldFolder, "nova_network")
     
     private val blockRegionFiles = ConcurrentHashMap<Long, Deferred<RegionFile>>()
     private val networkRegionFiles = ConcurrentHashMap<Long, Deferred<NetworkRegionFile>>()
@@ -31,7 +30,6 @@ internal class WorldDataStorage(val world: World) {
     init {
         blockRegionFolder.mkdirs()
         networkRegionFolder.mkdirs()
-        networkFolder.mkdirs()
     }
     
     suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile =
