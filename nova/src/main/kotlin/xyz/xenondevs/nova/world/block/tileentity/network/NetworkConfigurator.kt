@@ -198,22 +198,24 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     }
     
     private suspend fun buildClusters(): List<NetworkCluster> = coroutineScope {
-        // collect proto clusters
-        val protoClusters = state.networks
-            .mapTo(HashSet()) { it.cluster ?: throw IllegalStateException("Cluster for $it is uninitialized") }
-        // debug: verify proto clusters
-        if (IS_DEV_SERVER)
-            verifyClusters(protoClusters)
-        
-        // build clusters
-        return@coroutineScope protoClusters
-            .map { cluster ->
-                if (cluster.dirty) {
-                    async { buildDirtyCluster(cluster) }
-                } else {
-                    CompletableDeferred(cluster.cluster)
-                }
-            }.awaitAll()
+        state.mutex.withLock {
+            // collect proto clusters
+            val protoClusters = state.networks
+                .mapTo(HashSet()) { it.cluster ?: throw IllegalStateException("Cluster for $it is uninitialized") }
+            // debug: verify proto clusters
+            if (IS_DEV_SERVER)
+                verifyClusters(protoClusters)
+            
+            // build clusters
+            return@coroutineScope protoClusters
+                .map { cluster ->
+                    if (cluster.dirty) {
+                        async { buildDirtyCluster(cluster) }
+                    } else {
+                        CompletableDeferred(cluster.cluster)
+                    }
+                }.awaitAll()
+        }
     }
     
     private fun buildDirtyCluster(protoCluster: ProtoNetworkCluster): NetworkCluster {
