@@ -278,7 +278,7 @@ class ProtoNetwork<T : Network<T>>(
     fun immutableCopy(): NetworkData<T> =
         ImmutableNetworkData(
             type, uuid,
-            nodes.mapValuesTo(HashMap()) { (_, con) ->
+            nodes.mapValuesTo(HashMap(nodes.size)) { (_, con) ->
                 con.copy(faces = con.faces.toEnumSet())
             }
         )
