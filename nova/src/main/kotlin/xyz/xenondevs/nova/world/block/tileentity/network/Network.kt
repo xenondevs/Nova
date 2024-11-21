@@ -1,12 +1,15 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNodeConnection
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
-import xyz.xenondevs.nova.world.BlockPos
 import java.util.*
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.iterator
 
 /**
  * The data of a network, containing all [NetworkNodes][NetworkNode] and their connections,
@@ -43,4 +46,18 @@ internal class ImmutableNetworkData<T : Network<T>>(
  *
  * It contains [NetworkNodes][NetworkNode] and handles the ticking logic.
  */
-interface Network<S : Network<S>> : NetworkData<S>
+interface Network<S : Network<S>> : NetworkData<S> {
+    
+    /**
+     * Checks whether this [Network] is valid, i.e. if it is allowed to tick.
+     */
+    fun isValid(): Boolean {
+        for ((_, con) in nodes) {
+            if (!con.node.isValid)
+                return false
+        }
+        
+        return true
+    }
+    
+}

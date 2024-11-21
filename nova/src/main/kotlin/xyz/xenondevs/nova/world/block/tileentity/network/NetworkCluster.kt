@@ -42,13 +42,10 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     
     private fun updateIsValid() {
         for (network in networks) {
-            for ((_, con) in network.nodes) {
-                if (!con.node.isValid) {
-                    isValid = false
-                    return
-                    
-                }
-            }
+            if (!network.isValid()) {
+                isValid = false
+                return
+            }           
         }
         
         isValid = true

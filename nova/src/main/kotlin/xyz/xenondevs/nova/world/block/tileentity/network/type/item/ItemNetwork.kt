@@ -21,6 +21,7 @@ class ItemNetwork internal constructor(
     networkData: NetworkData<ItemNetwork>
 ) : Network<ItemNetwork>, NetworkData<ItemNetwork> by networkData {
     
+    private val endPoints = ArrayList<NetworkEndPoint>()
     internal val channels: Array<ItemDistributor?>
     private val transferRate: Int
     val complexity: Int
@@ -39,6 +40,7 @@ class ItemNetwork internal constructor(
                         ?: continue
                     
                     channelsBuilder.addHolder(itemHolder, faces)
+                    endPoints += node
                     complexity++
                 } else if (node is ItemBridge) {
                     transferRate = min(transferRate, node.itemTransferRate)
@@ -52,6 +54,9 @@ class ItemNetwork internal constructor(
         this.complexity = complexity
         channels = channelsBuilder.build()
     }
+    
+    override fun isValid(): Boolean =
+        endPoints.all { it.isValid }
     
     internal fun tick() {
         if (MAX_COMPLEXITY != -1 && complexity > MAX_COMPLEXITY)

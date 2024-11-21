@@ -20,6 +20,7 @@ class EnergyNetwork internal constructor(
     networkData: NetworkData<EnergyNetwork>
 ) : Network<EnergyNetwork>, NetworkData<EnergyNetwork> by networkData {
     
+    private val endPoints = ArrayList<NetworkEndPoint>()
     private val providers = ArrayList<EnergyHolder>()
     private val consumers = ArrayList<EnergyHolder>()
     private val buffers = ArrayList<EnergyHolder>()
@@ -53,6 +54,7 @@ class EnergyNetwork internal constructor(
                         else -> throw IllegalArgumentException("Invalid connection config for $energyHolder")
                     }
                     
+                    endPoints += node
                     complexity++
                 } else if (node is EnergyBridge) {
                     transferRate = min(transferRate, node.energyTransferRate)
@@ -65,6 +67,9 @@ class EnergyNetwork internal constructor(
         this.transferRate = transferRate
         this.complexity = complexity
     }
+    
+    override fun isValid(): Boolean =
+        endPoints.all { it.isValid }
     
     /**
      * Transfers energy between [providers], [consumers] and [buffers] in four steps:

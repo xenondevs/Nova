@@ -21,8 +21,9 @@ class FluidNetwork internal constructor(
     networkData: NetworkData<FluidNetwork>
 ) : Network<FluidNetwork>, NetworkData<FluidNetwork> by networkData {
     
-    private val channels: Array<FluidNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
+    private val endPoints = ArrayList<NetworkEndPoint>()
     private val cauldrons = ArrayList<VanillaCauldronTileEntity>()
+    private val channels: Array<FluidNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     private val transferRate: Long
     private val complexity: Int
     
@@ -46,13 +47,13 @@ class FluidNetwork internal constructor(
                         }
                     }
                     
+                    if (node is VanillaCauldronTileEntity) {
+                        cauldrons += node
+                    }
+                    endPoints += node
                     complexity++
                 } else if (node is FluidBridge) {
                     transferRate = min(transferRate, node.fluidTransferRate)
-                }
-                
-                if (node is VanillaCauldronTileEntity) {
-                    cauldrons += node
                 }
             } catch (e: Exception) {
                 throw Exception("Failed to add to fluid network: $pos $con", e)
@@ -65,6 +66,9 @@ class FluidNetwork internal constructor(
         for (channel in channels)
             channel?.createDistributor()
     }
+    
+    override fun isValid(): Boolean =
+        endPoints.all { it.isValid }
     
     fun tick() {
         if (MAX_COMPLEXITY != -1 && complexity > MAX_COMPLEXITY)
