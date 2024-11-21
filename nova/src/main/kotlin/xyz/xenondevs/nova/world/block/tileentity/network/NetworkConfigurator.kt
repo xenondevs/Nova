@@ -1,5 +1,9 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
+import jdk.jfr.Category
+import jdk.jfr.Event
+import jdk.jfr.Label
+import jdk.jfr.Name
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -10,11 +14,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.bukkit.World
@@ -35,6 +39,17 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 
 internal class NetworkConfigurator(private val world: World, private val ticker: NetworkTicker) {
+    
+    //<editor-fold desc="jfr event", defaultstate="collapsed">
+    @Suppress("unused")
+    @Name("xyz.xenondevs.BuildNetworks")
+    @Label("Build Networks")
+    @Category("Nova", "TileEntity Network")
+    private inner class BuildNetworksEvent : Event() {
+        @Label("World")
+        var worldName: String = world.name
+    }
+    //</editor-fold>
     
     /**
      * Lock for [loadedChunks] and [taskBacklog].
@@ -66,19 +81,39 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     /**
      * The channel responsible for processing [NetworkTasks][NetworkTask].
      */
-    private val channel = Channel<NetworkTask>(capacity = UNLIMITED)
+    private val taskChannel = Channel<NetworkTask>(capacity = UNLIMITED)
+    
+    /**
+     * This channel is used to notify the configurator that there are dirty networks that need to be rebuilt.
+     */
+    private var dirtyNotificationChannel = Channel<Unit>(Channel.CONFLATED)
     
     /**
      * The coroutine responsible for processing [NetworkTasks][NetworkTask].
      */
     private val job = CoroutineScope(NetworkManager.SUPERVISOR).launch(CoroutineName("Network configurator ${world.name}")) {
-        channel.consumeEach { task ->
-            try {
-                task.event.begin()
-                processTask(task)
-                task.event.commit()
-            } catch (e: Exception) {
-                LOGGER.log(Level.SEVERE, "An exception occurred trying to process NetworkTask: $task", e)
+        while (true) {
+            select<Unit> {
+                // Work off all tasks first, then build dirty networks
+                taskChannel.onReceive { task ->
+                    try {
+                        task.event.begin()
+                        processTask(task)
+                        task.event.commit()
+                    } catch (e: Exception) {
+                        LOGGER.log(Level.SEVERE, "An exception occurred trying to process NetworkTask: $task", e)
+                    }
+                }
+                dirtyNotificationChannel.onReceive {
+                    try {
+                        val event = BuildNetworksEvent()
+                        event.begin()
+                        ticker.submit(world, buildClusters())
+                        event.commit()
+                    } catch (e: Exception) {
+                        LOGGER.log(Level.SEVERE, "An exception occurred trying to build dirty networks", e)
+                    }
+                }
             }
         }
     }
@@ -104,30 +139,30 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
                 if (chunkPos in loadedChunks)
                     return@runBlocking
                 
-                channel.send(task)
+                taskChannel.send(task)
                 loadedChunks += chunkPos
-                taskBacklog.remove(chunkPos)?.forEach { channel.send(it) }
+                taskBacklog.remove(chunkPos)?.forEach { taskChannel.send(it) }
             } else if (task is UnloadChunkTask) {
                 // ignore duplicate chunk unload requests
                 if (chunkPos !in loadedChunks)
                     return@runBlocking
                 
-                channel.send(task)
+                taskChannel.send(task)
                 loadedChunks -= chunkPos
             } else if (chunkPos !in loadedChunks) {
                 taskBacklog.getOrPut(chunkPos, ::ArrayList) += task
             } else {
-                channel.send(task)
+                taskChannel.send(task)
             }
         }
     }
     
     /**
-     * Closes the [channel] and waits for all queued tasks to be processed.
+     * Closes the [taskChannel] and waits for all queued tasks to be processed.
      */
     suspend fun awaitShutdown() {
         protectionSupervisor.cancel()
-        channel.close()
+        taskChannel.close()
         job.join()
     }
     
@@ -156,11 +191,9 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
                 task.result = protectionResults.remove(task)?.await()
                     ?: throw IllegalStateException("Protection was not queried")
             }
-            val hasWritten = task.run()
-            if (!hasWritten)
-                return
             
-            ticker.submit(world, buildClusters())
+            if (task.run())
+                dirtyNotificationChannel.send(Unit)
         }
     }
     
@@ -203,7 +236,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
             protoNetwork.network = network
             protoNetwork.markClean()
             return network
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             throw Exception("Failed to build dirty network: $protoNetwork", e)
         }
     }
