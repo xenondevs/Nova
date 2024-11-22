@@ -74,30 +74,33 @@ internal class NovaBootstrapper : PluginBootstrap {
             .filterIsInstance<PaperPluginParent.PaperBootstrapProvider>()
             .count { it.source.useZip { it.resolve("nova-addon.yml").exists() } }
         
-        if (IS_DEV_SERVER) {
-            DebugProbes.install()
-            DebugProbes.enableCreationStackTraces = true
-        }
-        Configs.extractDefaultConfig()
-        CBFAdapters.register()
-        Patcher.run()
-        
         // Immediately start initializer if no addons are installed
         if (remainingAddons == 0) {
-            Initializer.start()
+            init()
         }
     }
     
     fun handleAddonBootstrap(context: BootstrapContext) {
         if (--remainingAddons == 0) {
             LIFECYCLE_MANAGER = context.lifecycleManager
-            
-            // legacy data folder migration if updating from 0.17 or earlier
-            if (PREVIOUS_NOVA_VERSION != null && PREVIOUS_NOVA_VERSION < Version("0.18-SNAPSHOT"))
-                LegacyDataFolderMigrator.migrate()
-            
-            Initializer.start()
+            init()
         }
+    }
+    
+    private fun init() {
+        // legacy data folder migration if updating from 0.17 or earlier
+        if (PREVIOUS_NOVA_VERSION != null && PREVIOUS_NOVA_VERSION < Version("0.18-SNAPSHOT"))
+            LegacyDataFolderMigrator.migrate()
+        
+        if (IS_DEV_SERVER) {
+            DebugProbes.install()
+            DebugProbes.enableCreationStackTraces = true
+        }
+        
+        Patcher.run()
+        Configs.extractDefaultConfig()
+        CBFAdapters.register()
+        Initializer.start()
     }
     
     override fun createPlugin(context: PluginProviderContext): JavaPlugin = Nova
