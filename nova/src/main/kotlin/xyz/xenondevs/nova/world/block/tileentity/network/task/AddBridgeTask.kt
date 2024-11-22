@@ -158,21 +158,30 @@ internal class AddBridgeTask(
         // create and populate new network
         val mergedNetwork = state.createNetwork(type)
         for (previousNetwork in networks) {
-            // move nodes from previous network to new network
-            reassignNetworks(self, type, networks.mapTo(HashSet()) { it.uuid }, mergedNetwork.uuid)
             mergedNetwork.addAll(previousNetwork)
         }
+        reassignNetworks(mergedNetwork, networks.mapTo(HashSet()) { it.uuid })
         
         return mergedNetwork
     }
     
-    private suspend fun reassignNetworks(start: NetworkNode, type: NetworkType<*>, previous: Set<UUID>, now: UUID) {
-        val exploredNodes = HashSet<NetworkNode>()
+    private suspend fun <T : Network<T>> reassignNetworks(
+        mergedNetwork: ProtoNetwork<T>,
+        previous: Set<UUID>
+    ) {
         val queue = LinkedList<NetworkNode>()
-        queue += start
+        val exploredNodes = HashSet<NetworkNode>()
+        for ((_, con) in mergedNetwork.nodes) {
+            val node = con.node
+            queue += node
+            exploredNodes += node
+        }
+        
+        val type = mergedNetwork.type
+        val now = mergedNetwork.uuid
+        
         while (queue.isNotEmpty()) {
             val node = queue.poll()
-            exploredNodes += node
             
             when (node) {
                 is NetworkBridge -> state.getNetworks(node).replaceAll {_, id -> if (id in previous) now else id }
@@ -180,8 +189,10 @@ internal class AddBridgeTask(
             }
             
             state.forEachConnectedNode(node, type) { _, connectedNode ->
-                if (connectedNode !in exploredNodes)
+                if (connectedNode !in exploredNodes) {
                     queue += connectedNode
+                    exploredNodes += connectedNode
+                }
             }
         }
     }
