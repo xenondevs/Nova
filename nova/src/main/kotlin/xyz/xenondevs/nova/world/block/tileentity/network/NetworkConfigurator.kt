@@ -14,8 +14,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.future.await
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
@@ -92,29 +94,32 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
      * The coroutine responsible for processing [NetworkTasks][NetworkTask].
      */
     private val job = CoroutineScope(NetworkManager.SUPERVISOR).launch(CoroutineName("Network configurator ${world.name}")) {
-        while (true) {
-            select<Unit> {
-                // Work off all tasks first, then build dirty networks
-                taskChannel.onReceive { task ->
-                    try {
-                        task.event.begin()
-                        processTask(task)
-                        task.event.commit()
-                    } catch (e: Exception) {
-                        LOGGER.log(Level.SEVERE, "An exception occurred trying to process NetworkTask: $task", e)
+        try {
+            while (isActive) {
+                select {
+                    // Work off all tasks first, then build dirty networks
+                    taskChannel.onReceive { task ->
+                        try {
+                            task.event.begin()
+                            processTask(task)
+                            task.event.commit()
+                        } catch (e: Exception) {
+                            LOGGER.log(Level.SEVERE, "An exception occurred trying to process NetworkTask: $task", e)
+                        }
                     }
-                }
-                dirtyNotificationChannel.onReceive {
-                    try {
-                        val event = BuildNetworksEvent()
-                        event.begin()
-                        ticker.submit(world, buildClusters())
-                        event.commit()
-                    } catch (e: Exception) {
-                        LOGGER.log(Level.SEVERE, "An exception occurred trying to build dirty networks", e)
+                    dirtyNotificationChannel.onReceive {
+                        try {
+                            val event = BuildNetworksEvent()
+                            event.begin()
+                            ticker.submit(world, buildClusters())
+                            event.commit()
+                        } catch (e: Exception) {
+                            LOGGER.log(Level.SEVERE, "An exception occurred trying to build dirty networks", e)
+                        }
                     }
                 }
             }
+        } catch(_: ClosedReceiveChannelException) {
         }
     }
     
@@ -163,6 +168,8 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     suspend fun awaitShutdown() {
         protectionSupervisor.cancel()
         taskChannel.close()
+        // dirtyNetworkChannel is intentionally NOT closed to ensure that the configurator coroutine works off all tasks
+        // otherwise the select expression may fail too early
         job.join()
     }
     
