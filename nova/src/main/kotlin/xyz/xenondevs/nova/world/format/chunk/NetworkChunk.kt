@@ -5,18 +5,13 @@ import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.chunk.RegionizedChunk.Companion.packBlockPos
-import java.util.concurrent.locks.ReentrantReadWriteLock
-import kotlin.concurrent.read
-import kotlin.concurrent.write
 
 internal class NetworkChunk(
     private val bridges: MutableMap<BlockPos, NetworkBridgeData> = HashMap(),
     private val endPoints: MutableMap<BlockPos, NetworkEndPointData> = HashMap()
 ) : RegionizedChunk {
     
-    private val lock = ReentrantReadWriteLock(true)
-    
-    fun getData(): Map<BlockPos, NetworkNodeData> = lock.read {
+    fun getData(): Map<BlockPos, NetworkNodeData> {
         val map = HashMap<BlockPos, NetworkNodeData>(bridges.size + endPoints.size)
         map.putAll(bridges)
         map.putAll(endPoints)
@@ -24,15 +19,15 @@ internal class NetworkChunk(
     }
     
     fun getData(pos: BlockPos): NetworkNodeData? =
-        lock.read { bridges[pos] ?: endPoints[pos] }
+        bridges[pos] ?: endPoints[pos]
     
     fun getBridgeData(pos: BlockPos): NetworkBridgeData? =
-        lock.read { bridges[pos] }
+        bridges[pos]
     
     fun getEndPointData(pos: BlockPos): NetworkEndPointData? =
-        lock.read { endPoints[pos] }
+        endPoints[pos]
     
-    fun setData(pos: BlockPos, data: NetworkNodeData?) = lock.write {
+    fun setData(pos: BlockPos, data: NetworkNodeData?) {
         when (data) {
             is NetworkBridgeData -> {
                 bridges[pos] = data
@@ -51,7 +46,7 @@ internal class NetworkChunk(
         }
     }
     
-    fun setBridgeData(pos: BlockPos, data: NetworkBridgeData?) = lock.write {
+    fun setBridgeData(pos: BlockPos, data: NetworkBridgeData?) {
         if (data != null) {
             bridges[pos] = data
         } else {
@@ -59,7 +54,7 @@ internal class NetworkChunk(
         }
     }
     
-    fun setEndPointData(pos: BlockPos, data: NetworkEndPointData?) = lock.write {
+    fun setEndPointData(pos: BlockPos, data: NetworkEndPointData?) {
         if (data != null) {
             endPoints[pos] = data
         } else {
@@ -67,7 +62,7 @@ internal class NetworkChunk(
         }
     }
     
-    override fun write(writer: ByteWriter): Boolean = lock.read {
+    override fun write(writer: ByteWriter): Boolean {
         if (bridges.isEmpty() && endPoints.isEmpty())
             return false
         

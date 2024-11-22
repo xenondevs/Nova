@@ -33,6 +33,7 @@ internal abstract class BackingStateConfigType<T : BackingStateConfig> internal 
 ) {
     
     abstract val blockedIds: Set<Int>
+    abstract val properties: Set<String>
     
     abstract fun of(id: Int, waterlogged: Boolean = false): T
     abstract fun of(properties: Map<String, String>): T

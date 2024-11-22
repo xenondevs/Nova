@@ -38,7 +38,7 @@ internal class UnloadChunkTask(
         val clustersToInit = HashSet<ProtoNetwork<*>>()
         
         fun remove(node: NetworkNode, network: ProtoNetwork<*>) {
-            network.unloadNode(node)
+            network.removeNode(node)
             network.cluster?.forEach { previouslyClusteredNetwork ->
                 previouslyClusteredNetwork.invalidateCluster()
                 clustersToInit += previouslyClusteredNetwork
@@ -69,8 +69,8 @@ internal class UnloadChunkTask(
         }
         
         for (network in clustersToInit) {
-            if (network.isUnloaded()) {
-                state.unloadNetwork(network)
+            if (network.isEmpty()) {
+                state -= network
             } else {
                 network.initCluster()
             }

@@ -163,10 +163,10 @@ class NovaItemBuilder internal constructor(
         return item
     }
     
-    companion object {
+    internal companion object {
         
-        fun fromBlock(block: NovaBlock): NovaItemBuilder {
-            return NovaItemBuilder(block.id).apply {
+        fun fromBlock(id: ResourceLocation, block: NovaBlock): NovaItemBuilder {
+            return NovaItemBuilder(id).apply {
                 this.block = block
                 name(block.name)
                 models {

@@ -40,7 +40,8 @@ private val BASE_PACKS by MAIN_CONFIG.entry<List<File>>("resource_pack", "genera
 class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
     
     private val mergers = FileMerger.createMergers(this)
-    private val packs = BASE_PACKS + (ResourcePackBuilder.BASE_PACKS_DIR.toFile().listFiles() ?: emptyArray())
+    private val packs = (BASE_PACKS + (ResourcePackBuilder.BASE_PACKS_DIR.toFile().listFiles() ?: emptyArray()))
+        .mapTo(HashSet()) { it.absoluteFile } // deduplicate
     
     val packAmount = packs.size
     val occupiedModelData = HashMap<Material, HashSet<Int>>()

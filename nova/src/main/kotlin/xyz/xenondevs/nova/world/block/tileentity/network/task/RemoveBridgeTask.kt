@@ -5,7 +5,6 @@ import jdk.jfr.Event
 import jdk.jfr.Label
 import jdk.jfr.Name
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.MutableNetworkNodeConnection
@@ -13,10 +12,15 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
+import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
 import java.util.*
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.filterTo
 
 internal class RemoveBridgeTask(
     state: NetworkState,
@@ -41,18 +45,21 @@ internal class RemoveBridgeTask(
     
     override suspend fun remove() {
         for ((networkType, currentNetworkId) in state.getNetworks(node)) {
-            val currentNetwork = state.resolveNetwork(currentNetworkId)
+            val currentNetwork = state.getNetworkOrThrow(networkType, currentNetworkId)
             
             val connectedBridges = HashSet<NetworkBridge>()
             val connectedEndPoints = HashSet<NetworkEndPoint>()
             disconnectConnectedNodes(currentNetwork, connectedBridges, connectedEndPoints)
             
             if (connectedBridges.size > 1) { // destroying this bridge might split network, recalculation required
-                val recalculatedNetworks = recalculateNetworks(node, connectedBridges, networkType)
-                if (recalculatedNetworks != null) { // null means no split in networks
-                    state.deleteNetwork(currentNetwork)
+                val recalculatedNetworkLayouts = recalculateNetworks(node, connectedBridges, networkType)
+                if (recalculatedNetworkLayouts != null) { // null means no split in networks
+                    val recalculatedNetworks = recalculatedNetworkLayouts.map { nodes ->
+                        ProtoNetwork(state, networkType, nodes = nodes.filterTo(HashMap()) { (_, con) -> con.node !is GhostNetworkNode }) 
+                    }
+                    state -= currentNetwork
                     state += recalculatedNetworks
-                    reassignNetworks(recalculatedNetworks)
+                    reassignNetworks(recalculatedNetworkLayouts, recalculatedNetworks)
                     clustersToInit += recalculatedNetworks
                     reclusterize(currentNetwork)
                 } else {
@@ -65,7 +72,7 @@ internal class RemoveBridgeTask(
                 currentNetwork.removeNode(node)
                 
                 if (currentNetwork.isEmpty()) {
-                    state.deleteNetwork(currentNetwork)
+                    state -= currentNetwork
                     reclusterize(currentNetwork)
                 } else if (connectedEndPoints.isNotEmpty()) { // networks have not been split, only detached end points could de-cluster
                     reclusterize(currentNetwork)
@@ -120,12 +127,16 @@ internal class RemoveBridgeTask(
     }
     
     /**
-     * Reassigns the networks inside [NetworkBridgeData.networks] and [NetworkEndPointData.networks] for all
-     * nodes in [networks].
+     * Reassigns the networks inside [NetworkBridgeData.networks] and [NetworkEndPointData.networks]
+     * for all nodes in [layouts], assuming [layouts] indices correspond the [networks] indices.
      */
-    private suspend fun reassignNetworks(networks: List<ProtoNetwork<*>>) {
-        for (network in networks) {
-            for ((node, faces) in network.nodes.values) {
+    private suspend fun reassignNetworks(
+        layouts: List<Map<BlockPos, MutableNetworkNodeConnection>>,
+        networks: List<ProtoNetwork<*>>
+    ) {
+        for ((i, layout) in layouts.withIndex()) {
+            val network = networks[i]
+            for ((node, faces) in layout.values) {
                 when (node) {
                     is NetworkBridge -> state.setNetwork(node, network)
                     is NetworkEndPoint -> state.setNetwork(node, faces, network)
@@ -138,13 +149,14 @@ internal class RemoveBridgeTask(
      * Recalculates networks for the case that [bridge] was destroyed and previously connected to at least two other bridges, stored in [connectedPreviously].
      * It is assumed, that [bridge] has been removed from the connections of attached [NetworkNodes][NetworkNode].
      *
-     * @return A list of new [ProtoNetworks][NetworkData], or null if the networks haven't been split. Will not contain duplicates.
+     * @return A list of new network layouts, or null if the networks haven't been split.
+     * Will not contain duplicates. May contain [GhostNetworkNodes][GhostNetworkNode], which need to be removed before creating a [ProtoNetwork].
      */
     private suspend fun recalculateNetworks(
         bridge: NetworkBridge,
         connectedPreviously: Set<NetworkBridge>,
         networkType: NetworkType<*>
-    ): List<ProtoNetwork<*>>? {
+    ): List<Map<BlockPos, MutableNetworkNodeConnection>>? {
         require(connectedPreviously.size > 1) { "Recalculating networks is not required" }
         
         val potentialNetworks = ArrayList<MutableMap<BlockPos, MutableNetworkNodeConnection>>()
@@ -201,7 +213,7 @@ internal class RemoveBridgeTask(
             previouslyExploredBridges += exploredBridges
         }
         
-        return potentialNetworks.map { ProtoNetwork(state, networkType, UUID.randomUUID(), it) }
+        return potentialNetworks
     }
     
 }

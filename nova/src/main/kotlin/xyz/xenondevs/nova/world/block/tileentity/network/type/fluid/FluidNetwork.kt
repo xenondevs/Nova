@@ -23,6 +23,8 @@ class FluidNetwork internal constructor(
     networkData: NetworkData<FluidNetwork>
 ) : Network<FluidNetwork>, NetworkData<FluidNetwork> by networkData {
     
+    private val endPoints = ArrayList<NetworkEndPoint>()
+    private val cauldrons = ArrayList<VanillaCauldronTileEntity>()
     private val channels: Array<FluidNetworkChannel?> = arrayOfNulls(CHANNEL_AMOUNT)
     private val transferRate: Long
     private val complexity: Int
@@ -47,6 +49,10 @@ class FluidNetwork internal constructor(
                         }
                     }
                     
+                    if (node is VanillaCauldronTileEntity) {
+                        cauldrons += node
+                    }
+                    endPoints += node
                     complexity++
                 } else if (node is FluidBridge) {
                     transferRate = min(transferRate, node.fluidTransferRate)
@@ -63,6 +69,9 @@ class FluidNetwork internal constructor(
             channel?.createDistributor()
     }
     
+    override fun isValid(): Boolean =
+        endPoints.all { it.isValid }
+    
     fun tick() {
         if (MAX_COMPLEXITY != -1 && complexity > MAX_COMPLEXITY)
             return
@@ -78,12 +87,13 @@ class FluidNetwork internal constructor(
     }
     
     fun postTickSync() {
-        for ((_, connection) in nodes) {
-            val (node, _) = connection
-            if (node is VanillaCauldronTileEntity) {
-                node.postNetworkTickSync()
-            }
+        for (cauldron in cauldrons) {
+            cauldron.postNetworkTickSync()
         }
+    }
+    
+    override fun toString(): String {
+        return "FluidNetwork(nodes=$nodes)"
     }
     
     companion object {

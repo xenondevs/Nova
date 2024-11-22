@@ -4,6 +4,7 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
+import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.intValue
 
 // The base of the number system - i.e. how many values each property can have
@@ -31,6 +32,8 @@ internal data class NoteBackingStateConfig(
     }
     
     companion object : DynamicDefaultingBackingStateConfigType<NoteBackingStateConfig>(1149, "note_block") {
+        
+        override val properties = hashSetOf("instrument", "note", "powered")
         
         fun getIdOf(instrument: NoteBlockInstrument, note: Int, powered: Boolean): Int {
             return instrument.ordinal * NOTE_BASE * POWERED_BASE + note * POWERED_BASE + powered.intValue

@@ -37,18 +37,19 @@ internal class RemoveEndPointTask(
         state.forEachConnectedNode(node) { type, face, connectedNode ->
             state.removeConnection(connectedNode, type, face.oppositeFace)
             if (connectedNode is NetworkEndPoint) {
+                state.getNetwork(connectedNode, type, face.oppositeFace)?.removeFace(connectedNode, face.oppositeFace)
                 state.removeNetwork(connectedNode, type, face.oppositeFace)
             }
             nodesToUpdate += connectedNode
         }
         
         // remove endpoint from all networks
-        for ((_, _, networkId) in state.getNetworks(node)) {
-            val network = state.resolveNetwork(networkId)
+        for ((networkType, _, networkId) in state.getNetworks(node)) {
+            val network = state.getNetworkOrThrow(networkType, networkId)
             network.removeNode(node)
             
             if (network.isEmpty()) {
-                state.deleteNetwork(network)
+                state -= network
                 reclusterize(network)
             } else {
                 reclusterize(network)

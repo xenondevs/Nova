@@ -22,7 +22,6 @@ internal class WorldDataStorage(val world: World) {
     
     private val blockRegionFolder = File(world.worldFolder, "nova_region")
     private val networkRegionFolder = File(world.worldFolder, "nova_network_region")
-    val networkFolder = File(world.worldFolder, "nova_network")
     
     private val blockRegionFiles = ConcurrentHashMap<Long, Deferred<RegionFile>>()
     private val networkRegionFiles = ConcurrentHashMap<Long, Deferred<NetworkRegionFile>>()
@@ -31,7 +30,6 @@ internal class WorldDataStorage(val world: World) {
     init {
         blockRegionFolder.mkdirs()
         networkRegionFolder.mkdirs()
-        networkFolder.mkdirs()
     }
     
     suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile =
@@ -106,7 +104,7 @@ internal class WorldDataStorage(val world: World) {
      * Saves all Nova data related to this world.
      */
     suspend fun save(unload: Boolean = true) = withContext(Dispatchers.Default) { // TODO: save in background
-        networkState.mutex.withLock {
+        networkState.mutex.withLock { // network-related data is stored in network region files and tile-entity data (block region files)
             for ((rid, deferredRegionFile) in blockRegionFiles) {
                 launch {
                     val regionFile = deferredRegionFile.await()
@@ -130,8 +128,6 @@ internal class WorldDataStorage(val world: World) {
                         networkRegionFiles -= rid
                 }
             }
-            
-            networkState.save(this)
         }
     }
     

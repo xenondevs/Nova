@@ -4,13 +4,17 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import xyz.xenondevs.commons.provider.MutableProvider
+import org.bukkit.util.BoundingBox
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.mutable.MutableProvider
+import xyz.xenondevs.commons.provider.mutable.map
 import xyz.xenondevs.nova.ui.menu.item.AddNumberItem
 import xyz.xenondevs.nova.ui.menu.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.menu.item.RemoveNumberItem
 import xyz.xenondevs.nova.ui.menu.item.VisualizeRegionItem
 import java.util.*
+import kotlin.text.get
+import kotlin.text.set
 
 class DynamicRegion internal constructor(
     val uuid: UUID,
@@ -99,6 +103,8 @@ class DynamicRegion internal constructor(
     
     operator fun contains(loc: Location): Boolean = region.contains(loc)
     operator fun contains(block: Block): Boolean = region.contains(block)
+    
+    fun toBoundingBox(): BoundingBox = region.toBoundingBox()
     //</editor-fold>
     
 }

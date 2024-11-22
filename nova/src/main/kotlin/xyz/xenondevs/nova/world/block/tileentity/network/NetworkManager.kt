@@ -10,7 +10,6 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
-import org.bukkit.event.world.WorldLoadEvent
 import org.bukkit.event.world.WorldUnloadEvent
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.Dispatcher
@@ -66,13 +65,6 @@ object NetworkManager : Listener {
     
     internal val SUPERVISOR = SupervisorJob()
     
-    @InitFun(runBefore = [WorldDataManager::class])
-    private fun initConfigurators() {
-        for (world in Bukkit.getWorlds()) {
-            makeConfigurator(world)
-        }
-    }
-    
     @InitFun(runAfter = [WorldDataManager::class])
     private fun runConfigurators() {
         for (world in Bukkit.getWorlds()) {
@@ -91,10 +83,6 @@ object NetworkManager : Listener {
             configurator.awaitShutdown()
         }
         SUPERVISOR.cancel("NetworkManager disabled")
-    }
-    
-    private fun makeConfigurator(world: World) {
-        configurators[world] = NetworkConfigurator(world, ticker)
     }
     
     private fun removeConfigurator(world: World) {
@@ -192,8 +180,7 @@ object NetworkManager : Listener {
      * Queues a network task in [world], using the [makeTask] function to create the task.
      */
     private fun queueTask(world: World, makeTask: (NetworkState) -> NetworkTask) {
-        val configurator = configurators[world]
-            ?: throw IllegalStateException("No NetworkConfigurator for world $world")
+        val configurator = configurators.computeIfAbsent(world) { NetworkConfigurator(world, ticker) }
         val task = makeTask(configurator.state)
         configurator.queueTask(task)
     }
@@ -226,11 +213,6 @@ object NetworkManager : Listener {
         }
         
         return null
-    }
-    
-    @EventHandler
-    private fun handleWorldLoad(event: WorldLoadEvent) {
-        makeConfigurator(event.world)
     }
     
     @EventHandler

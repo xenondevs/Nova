@@ -23,6 +23,7 @@ internal abstract class LeavesBackingStateConfigType<T : LeavesBackingStateConfi
     
     override val defaultStateConfig = ctor(7, true, false)
     override val blockedIds = hashSetOf(13)
+    override val properties = hashSetOf("distance", "persistent", "waterlogged")
     
     override fun of(id: Int, waterlogged: Boolean): T {
         return ctor((id shr 1) + 1, (id and 1) == 1, waterlogged)
@@ -30,7 +31,7 @@ internal abstract class LeavesBackingStateConfigType<T : LeavesBackingStateConfi
     
     override fun of(properties: Map<String, String>): T {
         return ctor(
-            properties["distance"]?.toInt() ?: 0,
+            properties["distance"]?.toInt() ?: 1,
             properties["persistent"]?.toBoolean() == true,
             properties["waterlogged"]?.toBoolean() == true
         )

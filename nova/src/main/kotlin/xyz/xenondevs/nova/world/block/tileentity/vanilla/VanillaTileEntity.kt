@@ -39,7 +39,16 @@ internal abstract class VanillaTileEntity internal constructor(
         DISPENSER(::VanillaContainerTileEntity, setOf(Material.DISPENSER)),
         DROPPER(::VanillaContainerTileEntity, setOf(Material.DROPPER)),
         HOPPER(::VanillaHopperTileEntity, setOf(Material.HOPPER)),
-        SHULKER_BOX(::VanillaContainerTileEntity, setOf(Material.SHULKER_BOX)),
+        SHULKER_BOX(
+            ::VanillaContainerTileEntity,
+            setOf(
+                Material.SHULKER_BOX,
+                Material.WHITE_SHULKER_BOX, Material.ORANGE_SHULKER_BOX, Material.MAGENTA_SHULKER_BOX, Material.LIGHT_BLUE_SHULKER_BOX,
+                Material.YELLOW_SHULKER_BOX, Material.LIME_SHULKER_BOX, Material.PINK_SHULKER_BOX, Material.GRAY_SHULKER_BOX,
+                Material.LIGHT_GRAY_SHULKER_BOX, Material.CYAN_SHULKER_BOX, Material.PURPLE_SHULKER_BOX, Material.BLUE_SHULKER_BOX,
+                Material.BROWN_SHULKER_BOX, Material.GREEN_SHULKER_BOX, Material.RED_SHULKER_BOX, Material.BLACK_SHULKER_BOX
+            )
+        ),
         CAULDRON(::VanillaCauldronTileEntity, setOf(Material.CAULDRON, Material.WATER_CAULDRON, Material.LAVA_CAULDRON), false),
         CRAFTER(::VanillaCrafterTileEntity, setOf(Material.CRAFTER)),
         BREWING_STAND(::VanillaBrewingStandTileEntity, setOf(Material.BREWING_STAND));

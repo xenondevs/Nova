@@ -37,7 +37,7 @@ internal class ModelFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(bas
             }
         }
         
-        source.copyTo(destination)
+        source.copyTo(destination, overwrite = true)
         processOverrides(destination)
     }
     

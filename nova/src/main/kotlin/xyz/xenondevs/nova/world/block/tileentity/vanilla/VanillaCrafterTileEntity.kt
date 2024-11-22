@@ -22,7 +22,7 @@ internal class VanillaCrafterTileEntity(
     
     override fun handleEnable() {
         val blockEntity = pos.nmsBlockEntity as CrafterBlockEntity
-        val inventory = NetworkedCrafterInventory(SimpleItemStackContainer(blockEntity.contents))
+        val inventory = NetworkedCrafterInventory(blockEntity, SimpleItemStackContainer(blockEntity.contents))
         val inventories = CUBE_FACES.associateWithTo(enumMap<BlockFace, NetworkedInventory>()) { inventory }
         itemHolder = StaticVanillaItemHolder(storedValue("itemHolder", ::Compound), inventories)
         

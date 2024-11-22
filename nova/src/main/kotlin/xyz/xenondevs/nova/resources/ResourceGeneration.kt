@@ -54,6 +54,7 @@ internal object ResourceGeneration {
         private fun init() {
             versionHash = calculateVersionHash()
             if (System.getProperty(FORCE_REBUILD_FLAG) != null
+                || !ResourcePackBuilder.RESOURCE_PACK_FILE.exists()
                 || PermanentStorage.retrieveOrNull<String>(VERSION_HASH) != versionHash
                 || !ResourceLookups.hasAllLookups()
                 || !ResourceLookups.tryLoadAll()

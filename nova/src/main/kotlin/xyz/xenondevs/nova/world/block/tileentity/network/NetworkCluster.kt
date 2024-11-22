@@ -16,12 +16,18 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     private val groups = networks.groupBy { it.type }
         .map { (type, networks) -> createGroup(type, networks) }
     
+    @Volatile
+    private var isValid: Boolean = false
+    
     init {
         val maxTickDelay = networks.maxOfOrNull { it.type.tickDelay } ?: 1
         tickOffset = Random.nextInt(maxTickDelay)
     }
     
-    fun preTickSync(tick: Int) = tickNetworks(tick, NetworkGroup<*>::preTickSync)
+    fun preTickSync(tick: Int) {
+        updateIsValid()
+        tickNetworks(tick, NetworkGroup<*>::preTickSync)
+    }
     fun preTick(tick: Int) = tickNetworks(tick, NetworkGroup<*>::preTick)
     fun tick(tick: Int) = tickNetworks(tick, NetworkGroup<*>::tick)
     fun postTick(tick: Int) = tickNetworks(tick, NetworkGroup<*>::postTick)
@@ -33,14 +39,21 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
         return (type as NetworkType<T>).createGroup(data)
     }
     
+    private fun updateIsValid() {
+        for (network in networks) {
+            if (!network.isValid()) {
+                isValid = false
+                return
+            }           
+        }
+        
+        isValid = true
+    }
+    
     private inline fun tickNetworks(tick: Int, tickFun: NetworkGroup<*>.() -> Unit) {
         // skip ticks for clusters that include invalid nodes
-        for (network in networks) {
-            for ((_, con) in network.nodes) {
-                if (!con.node.isValid)
-                    return
-            }
-        }
+        if (!isValid)
+            return
         
         for (group in groups) {
             val tickDelay = group.type.tickDelay
@@ -52,6 +65,10 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
                 }
             }
         }
+    }
+    
+    override fun toString(): String {
+        return "NetworkCluster(uuid=$uuid, networks=$networks)"
     }
     
 }

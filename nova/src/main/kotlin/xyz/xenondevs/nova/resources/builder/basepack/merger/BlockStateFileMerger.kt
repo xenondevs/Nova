@@ -47,7 +47,7 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerge
             return
         }
         
-        source.copyTo(destination)
+        source.copyTo(destination, overwrite = true)
     }
     
     private fun getVariants(file: Path): JsonObject {

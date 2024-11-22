@@ -11,6 +11,7 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.commons.collections.mapToIntArray
+import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.ceilDiv
@@ -332,6 +333,13 @@ internal class RegionChunk(
                 } else {
                     vanillaTileEntityData -= pos
                 }
+            }
+            
+            // remove vanilla tile entities that have de-synced from the block type
+            vanillaTileEntities.removeIf { (pos, vte) -> 
+                val invalid = pos.block.type !in vte.type.materials
+                if (invalid) vanillaTileEntityData.remove(pos)
+                invalid
             }
             
             // load models

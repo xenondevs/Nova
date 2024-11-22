@@ -10,7 +10,6 @@ import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.patch.adapter.LcsWrapperAdapter
 import xyz.xenondevs.nova.patch.impl.FieldFilterPatch
 import xyz.xenondevs.nova.patch.impl.block.BlockBehaviorPatches
@@ -57,7 +56,7 @@ internal object Patcher {
             BroadcastPacketPatch, EventPreventionPatch, ArmorEquipEventPatch, BossBarOriginPatch,
             FakePlayerLastHurtPatch, BlockBehaviorPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
             ItemStackDataComponentsPatch, EnchantmentPatches, RepairPatches, BlockMigrationPatches,
-            TripwireLogicPatch, FluidFlowPatch, RegistryEventsPatch, DyeablePatches
+            TripwireLogicPatch, FluidFlowPatch, RegistryEventsPatch, DyeablePatches, EarlyBlockPlaceEventPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     
@@ -169,12 +168,6 @@ internal object Patcher {
     private fun insertPatchedLoader() {
         val spigotLoader = Bukkit::class.java.classLoader
         ReflectionUtils.setFinalField(CLASS_LOADER_PARENT_FIELD, spigotLoader, PatchedClassLoader())
-    }
-    
-    @DisableFun
-    private fun removePatchedLoader() {
-        val spigotLoader = Bukkit::class.java.classLoader
-        ReflectionUtils.setFinalField(CLASS_LOADER_PARENT_FIELD, spigotLoader, spigotLoader.parent.parent)
     }
     
 }

@@ -18,7 +18,7 @@ internal class AtlasFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(bas
             destAtlasSources.addAll(sourceAtlasSources)
             destJson.writeToFile(destination)
         } else {
-            source.copyTo(destination)
+            source.copyTo(destination, overwrite = true)
         }
     }
     
