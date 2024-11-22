@@ -24,7 +24,6 @@ internal object EarlyBlockPlaceEventPatch : MultiTransformer(BlockItem::class) {
             0, 0,
             { invokeStatic(::placeBlock) }
         ) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(BLOCK_ITEM_PLACE_BLOCK) }
-        dumpAll()
     }
     
     @JvmStatic
