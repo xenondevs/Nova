@@ -90,8 +90,9 @@ internal object BlockPlacing : Listener {
         if (action == Action.RIGHT_CLICK_BLOCK) {
             val handItem = event.item
             val block = event.clickedBlock!!
+            val novaBlockState = WorldDataManager.getBlockState(block.pos)
             
-            if (!block.type.isActuallyInteractable() || player.isSneaking) {
+            if (novaBlockState != null || !block.type.isActuallyInteractable() || player.isSneaking) {
                 val novaItem = handItem?.novaItem
                 val novaBlock = novaItem?.block
                 if (novaBlock != null) {
@@ -100,7 +101,7 @@ internal object BlockPlacing : Listener {
                     
                     placeNovaBlock(event, novaBlock)
                 } else if (
-                    WorldDataManager.getBlockState(block.pos) != null // the block placed against is from Nova
+                    novaBlockState != null // the block placed against is from Nova
                     && block.type.isReplaceable() // and will be replaced without special behavior
                     && novaItem == null
                     && handItem?.type?.isBlock == true // a vanilla block material is used 
