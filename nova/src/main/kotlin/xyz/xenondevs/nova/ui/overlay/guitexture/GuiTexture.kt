@@ -5,7 +5,6 @@ import net.kyori.adventure.text.format.TextColor
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.resources.layout.gui.GuiTextureLayout
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.moveToStart
 

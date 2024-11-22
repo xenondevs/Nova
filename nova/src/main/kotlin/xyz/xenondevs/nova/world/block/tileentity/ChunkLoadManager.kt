@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.world.block.tileentity
 
 import org.bukkit.Bukkit
-import xyz.xenondevs.nova.NOVA
+import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
@@ -20,7 +20,7 @@ object ChunkLoadManager {
         Bukkit.getWorlds().flatMap { it.forceLoadedChunks }.forEach { it.isForceLoaded = false } // TODO: remove in future version
         
         for (chunk in forceLoadedChunks.keys) {
-            chunk.world?.addPluginChunkTicket(chunk.x, chunk.z, NOVA)
+            chunk.world?.addPluginChunkTicket(chunk.x, chunk.z, Nova)
         }
     }
     
@@ -32,7 +32,7 @@ object ChunkLoadManager {
     fun submitChunkLoadRequest(chunk: ChunkPos, uuid: UUID) {
         val requesterSet = getChunkLoaderSet(chunk)
         if (requesterSet.isEmpty()) {
-            chunk.world?.addPluginChunkTicket(chunk.x, chunk.z, NOVA)
+            chunk.world?.addPluginChunkTicket(chunk.x, chunk.z, Nova)
         }
         requesterSet.add(uuid)
     }
@@ -41,7 +41,7 @@ object ChunkLoadManager {
         val requesterSet = getChunkLoaderSet(chunk)
         requesterSet.remove(uuid)
         if (requesterSet.isEmpty()) {
-            chunk.world?.removePluginChunkTicket(chunk.x, chunk.z, NOVA)
+            chunk.world?.removePluginChunkTicket(chunk.x, chunk.z, Nova)
             forceLoadedChunks.remove(chunk)
         }
     }

@@ -15,6 +15,7 @@ import xyz.xenondevs.nova.patch.impl.FieldFilterPatch
 import xyz.xenondevs.nova.patch.impl.block.BlockBehaviorPatches
 import xyz.xenondevs.nova.patch.impl.block.BlockMigrationPatches
 import xyz.xenondevs.nova.patch.impl.block.DisableBackingStateLogicPatch
+import xyz.xenondevs.nova.patch.impl.block.EarlyBlockPlaceEventPatch
 import xyz.xenondevs.nova.patch.impl.block.FluidFlowPatch
 import xyz.xenondevs.nova.patch.impl.block.TripwireLogicPatch
 import xyz.xenondevs.nova.patch.impl.bossbar.BossBarOriginPatch

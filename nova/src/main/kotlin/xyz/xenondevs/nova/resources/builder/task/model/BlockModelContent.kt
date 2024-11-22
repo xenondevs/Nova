@@ -63,7 +63,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                     val blockStateJson = file.parseJson() as JsonObject
                     
                     if (blockStateJson.has("multipart")) {
-                        LOGGER.warning("Block state file $file contains multipart block states, which are not supported. " +
+                        LOGGER.warn("Block state file $file contains multipart block states, which are not supported. " +
                             "Block states defined in this file will be ignored and potentially overwritten.")
                         return@forEach
                     }
@@ -78,7 +78,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                             }
                             
                             if (properties.keys != type.properties) {
-                                LOGGER.warning("Variant '$variantStr' in block state file $file does not specify all properties explicitly " +
+                                LOGGER.warn("Variant '$variantStr' in block state file $file does not specify all properties explicitly " +
                                     "(got ${properties.keys}, expected ${type.properties}). " +
                                     "This variant will be ignored and potentially overwritten.")
                                 return@forEach

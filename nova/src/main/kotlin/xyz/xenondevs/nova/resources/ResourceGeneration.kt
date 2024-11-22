@@ -24,6 +24,7 @@ import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.DefaultItems
 import java.security.MessageDigest
+import kotlin.io.path.notExists
 
 private const val FORCE_REBUILD_FLAG = "NovaForceRegenerateResourcePack"
 private const val VERSION_HASH = "version_hash"
@@ -54,7 +55,7 @@ internal object ResourceGeneration {
         private fun init() {
             versionHash = calculateVersionHash()
             if (System.getProperty(FORCE_REBUILD_FLAG) != null
-                || !ResourcePackBuilder.RESOURCE_PACK_FILE.exists()
+                || ResourcePackBuilder.RESOURCE_PACK_FILE.notExists()
                 || PermanentStorage.retrieveOrNull<String>(VERSION_HASH) != versionHash
                 || !ResourceLookups.hasAllLookups()
                 || !ResourceLookups.tryLoadAll()

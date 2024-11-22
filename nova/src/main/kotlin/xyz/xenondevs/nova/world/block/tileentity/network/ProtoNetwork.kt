@@ -1,16 +1,11 @@
 package xyz.xenondevs.nova.world.block.tileentity.network
 
-import org.bukkit.World
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.cbf.io.ByteReader
-import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.getOrThrow
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.GhostNetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.MutableNetworkNodeConnection
@@ -19,8 +14,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.format.NetworkState
-import xyz.xenondevs.nova.world.format.chunk.readCubeFaceSet
-import xyz.xenondevs.nova.world.format.chunk.writeCubeFaceSet
 import java.util.*
 
 /**

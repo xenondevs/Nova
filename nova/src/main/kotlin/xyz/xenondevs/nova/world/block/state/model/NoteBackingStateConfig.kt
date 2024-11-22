@@ -4,7 +4,6 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
-import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.intValue
 
 // The base of the number system - i.e. how many values each property can have

@@ -2,10 +2,10 @@ package xyz.xenondevs.nova.addon.registry
 
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.util.ResourceLocation
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.NovaItemBuilder
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
-import xyz.xenondevs.nova.world.block.NovaBlock
 
 interface ItemRegistry : AddonHolder {
     
