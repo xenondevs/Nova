@@ -77,7 +77,6 @@ private data class CanHurtEntityTileArgs(override val tileEntity: TileEntity, va
     override val location: Location = entity.location
 }
 //</editor-fold>
-
 /**
  * Handles protection checks using registered [ProtectionIntegrations][ProtectionIntegration].
  *
@@ -165,22 +164,40 @@ object ProtectionManager {
     /**
      * Checks if the [tileEntity] can place that [item] at that [pos].
      */
-    suspend fun canPlace(tileEntity: TileEntity, item: ItemStack, pos: BlockPos): Boolean {
-        if (tileEntity.owner == null) return true
-        return cacheCanPlaceTile.get(CanPlaceTileArgs(tileEntity, item.clone(), pos.location)).await()
+    fun canPlaceAsync(tileEntity: TileEntity, item: ItemStack, pos: BlockPos): CompletableFuture<Boolean> {
+        if (tileEntity.owner == null)
+            return CompletableFuture.completedFuture(true)
+        if (!::cacheCanPlaceTile.isInitialized)
+            return CompletableFuture.completedFuture(false)
+        return cacheCanPlaceTile.get(CanPlaceTileArgs(tileEntity, item.clone(), pos.location))
+    }
+    
+    /**
+     * Checks if the [tileEntity] can place that [item] at that [pos].
+     */
+    suspend fun canPlace(tileEntity: TileEntity, item: ItemStack, pos: BlockPos): Boolean =
+        canPlaceAsync(tileEntity, item, pos).await()
+    
+    /**
+     * Checks if the [player] can place that [item] at that [pos].
+     */
+    fun canPlaceAsync(player: OfflinePlayer, item: ItemStack, pos: BlockPos): CompletableFuture<Boolean> {
+        if (!::cacheCanPlaceUser.isInitialized)
+            return CompletableFuture.completedFuture(false)
+        return cacheCanPlaceUser.get(CanPlaceUserArgs(player, item.clone(), pos.location))
     }
     
     /**
      * Checks if the [player] can place that [item] at that [pos].
      */
     suspend fun canPlace(player: OfflinePlayer, item: ItemStack, pos: BlockPos): Boolean =
-        cacheCanPlaceUser.get(CanPlaceUserArgs(player, item.clone(), pos.location)).await()
+        canPlaceAsync(player, item, pos).await()
     
     /**
      * Checks if the [player] can place that [item] at that [pos].
      */
     fun canPlace(player: Player, item: ItemStack, pos: BlockPos): Boolean =
-        cacheCanPlaceUser.get(CanPlaceUserArgs(player, item.clone(), pos.location)).get()
+        canPlaceAsync(player, item, pos).get()
     
     /**
      * Checks whether the given [ctx] passes break permission checks.
@@ -203,22 +220,40 @@ object ProtectionManager {
     /**
      * Checks if that [tileEntity] can break a block at that [pos] using that [item].
      */
-    suspend fun canBreak(tileEntity: TileEntity, item: ItemStack?, pos: BlockPos): Boolean {
-        if (tileEntity.owner == null) return true
-        return cacheCanBreakTile.get(CanBreakTileArgs(tileEntity, item?.clone(), pos.location)).await()
+    fun canBreakAsync(tileEntity: TileEntity, item: ItemStack?, pos: BlockPos): CompletableFuture<Boolean> {
+        if (tileEntity.owner == null)
+            return CompletableFuture.completedFuture(true)
+        if (!::cacheCanBreakTile.isInitialized)
+            return CompletableFuture.completedFuture(false)
+        return cacheCanBreakTile.get(CanBreakTileArgs(tileEntity, item?.clone(), pos.location))
+    }
+    
+    /**
+     * Checks if that [tileEntity] can break a block at that [pos] using that [item].
+     */
+    suspend fun canBreak(tileEntity: TileEntity, item: ItemStack?, pos: BlockPos): Boolean =
+        canBreakAsync(tileEntity, item, pos).await()
+    
+    /**
+     * Checks if that [player] can break a block at that [pos] using that [item].
+     */
+    fun canBreakAsync(player: OfflinePlayer, item: ItemStack?, pos: BlockPos): CompletableFuture<Boolean> {
+        if (!::cacheCanBreakUser.isInitialized)
+            return CompletableFuture.completedFuture(false)
+        return cacheCanBreakUser.get(CanBreakUserArgs(player, item?.clone(), pos.location))
     }
     
     /**
      * Checks if that [player] can break a block at that [pos] using that [item].
      */
     suspend fun canBreak(player: OfflinePlayer, item: ItemStack?, pos: BlockPos): Boolean =
-        cacheCanBreakUser.get(CanBreakUserArgs(player, item?.clone(), pos.location)).await()
+        canBreakAsync(player, item, pos).await()
     
     /**
      * Checks if that [player] can break a block at that [pos] using that [item].
      */
     fun canBreak(player: Player, item: ItemStack?, pos: BlockPos): Boolean =
-        cacheCanBreakUser.get(CanBreakUserArgs(player, item?.clone(), pos.location)).get()
+        canBreakAsync(player, item, pos).get()
     
     /**
      * Checks whether the given [ctx] passes block interaction permission checks.
@@ -244,71 +279,75 @@ object ProtectionManager {
     fun canUseBlockAsync(tileEntity: TileEntity, item: ItemStack?, pos: BlockPos): CompletableFuture<Boolean> {
         if (tileEntity.owner == null)
             return CompletableFuture.completedFuture(true)
+        if (!::cacheCanUseBlockTile.isInitialized)
+            return CompletableFuture.completedFuture(false)
         return cacheCanUseBlockTile.get(CanUseBlockTileArgs(tileEntity, item?.clone(), pos.location))
     }
     
     /**
      * Checks if the [tileEntity] can interact with a block at that [pos] using that [item].
      */
-    suspend fun canUseBlock(tileEntity: TileEntity, item: ItemStack?, pos: BlockPos): Boolean {
-        if (tileEntity.owner == null)
-            return true
-        return cacheCanUseBlockTile.get(CanUseBlockTileArgs(tileEntity, item?.clone(), pos.location)).await()
+    suspend fun canUseBlock(tileEntity: TileEntity, item: ItemStack?, pos: BlockPos): Boolean =
+        canUseBlockAsync(tileEntity, item, pos).await()
+    
+    /**
+     * Checks if the [player] can interact with a block at that [pos] using that [item].
+     */
+    fun canUseBlockAsync(player: OfflinePlayer, item: ItemStack?, pos: BlockPos): CompletableFuture<Boolean> {
+        if (!::cacheCanUseBlockUser.isInitialized)
+            return CompletableFuture.completedFuture(false)
+        return cacheCanUseBlockUser.get(CanUseBlockUserArgs(player, item?.clone(), pos.location))
     }
     
     /**
      * Checks if the [player] can interact with a block at that [pos] using that [item].
      */
-    fun canUseBlockAsync(player: OfflinePlayer, item: ItemStack?, pos: BlockPos): CompletableFuture<Boolean> =
-        cacheCanUseBlockUser.get(CanUseBlockUserArgs(player, item?.clone(), pos.location))
-    
-    /**
-     * Checks if the [player] can interact with a block at that [pos] using that [item].
-     */
     suspend fun canUseBlock(player: OfflinePlayer, item: ItemStack?, pos: BlockPos): Boolean =
-        cacheCanUseBlockUser.get(CanUseBlockUserArgs(player, item?.clone(), pos.location)).await()
+        canUseBlockAsync(player, item, pos).await()
     
     /**
      * Checks if the [player] can interact with a block at that [pos] using that [item].
      */
     fun canUseBlock(player: Player, item: ItemStack?, pos: BlockPos): Boolean =
-        cacheCanUseBlockUser.get(CanUseBlockUserArgs(player, item?.clone(), pos.location)).get()
+        canUseBlockAsync(player, item, pos).get()
     
     /**
      * Checks if the [tileEntity] can use that [item] at that [location].
      */
     fun canUseItemAsync(tileEntity: TileEntity, item: ItemStack, location: Location): CompletableFuture<Boolean> {
-        if (tileEntity.owner == null) 
+        if (tileEntity.owner == null)
             return CompletableFuture.completedFuture(true)
+        if (!::cacheCanUseItemTile.isInitialized)
+            return CompletableFuture.completedFuture(false)
         return cacheCanUseItemTile.get(CanUseItemTileArgs(tileEntity, item.clone(), location))
     }
     
     /**
      * Checks if the [tileEntity] can use that [item] at that [location].
      */
-    suspend fun canUseItem(tileEntity: TileEntity, item: ItemStack, location: Location): Boolean {
-        if (tileEntity.owner == null)
-            return true
-        return cacheCanUseItemTile.get(CanUseItemTileArgs(tileEntity, item.clone(), location.clone())).await()
+    suspend fun canUseItem(tileEntity: TileEntity, item: ItemStack, location: Location): Boolean =
+        canUseItemAsync(tileEntity, item, location).await()
+    
+    /**
+     * Checks if the [player] can use that [item] at that [location].
+     */
+    fun canUseItemAsync(player: OfflinePlayer, item: ItemStack, location: Location): CompletableFuture<Boolean> {
+        if (!::cacheCanUseItemUser.isInitialized)
+            return CompletableFuture.completedFuture(false)
+        return cacheCanUseItemUser.get(CanUseItemUserArgs(player, item.clone(), location))
     }
     
     /**
      * Checks if the [player] can use that [item] at that [location].
      */
-    fun canUseItemAsync(player: OfflinePlayer, item: ItemStack, location: Location): CompletableFuture<Boolean> =
-        cacheCanUseItemUser.get(CanUseItemUserArgs(player, item.clone(), location))
-    
-    /**
-     * Checks if the [player] can use that [item] at that [location].
-     */
     suspend fun canUseItem(player: OfflinePlayer, item: ItemStack, location: Location): Boolean =
-        cacheCanUseItemUser.get(CanUseItemUserArgs(player, item.clone(), location.clone())).await()
+        canUseItemAsync(player, item, location).await()
     
     /**
      * Checks if the [player] can use that [item] at that [location].
      */
     fun canUseItem(player: Player, item: ItemStack, location: Location): Boolean =
-        cacheCanUseItemUser.get(CanUseItemUserArgs(player, item.clone(), location.clone())).get()
+        canUseItemAsync(player, item, location).get()
     
     /**
      * Checks if the [tileEntity] can interact with the [entity] while holding that [item].
@@ -316,34 +355,37 @@ object ProtectionManager {
     fun canInteractWithEntityAsync(tileEntity: TileEntity, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> {
         if (tileEntity.owner == null)
             return CompletableFuture.completedFuture(true)
+        if (!::cacheCanInteractWithEntityTile.isInitialized)
+            return CompletableFuture.completedFuture(false)
         return cacheCanInteractWithEntityTile.get(CanInteractWithEntityTileArgs(tileEntity, entity, item?.clone()))
     }
     
     /**
      * Checks if the [tileEntity] can interact with the [entity] wile holding that [item].
      */
-    suspend fun canInteractWithEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): Boolean {
-        if (tileEntity.owner == null) return true
-        return cacheCanInteractWithEntityTile.get(CanInteractWithEntityTileArgs(tileEntity, entity, item?.clone())).await()
+    suspend fun canInteractWithEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): Boolean =
+        canInteractWithEntityAsync(tileEntity, entity, item).await()
+    
+    /**
+     * Checks if the [player] can interact with the [entity] while holding that [item].
+     */
+    fun canInteractWithEntityAsync(player: OfflinePlayer, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> {
+        if (!::cacheCanInteractWithEntityUser.isInitialized)
+            return CompletableFuture.completedFuture(false)
+        return cacheCanInteractWithEntityUser.get(CanInteractWithEntityUserArgs(player, entity, item?.clone()))
     }
     
     /**
      * Checks if the [player] can interact with the [entity] while holding that [item].
      */
-    fun canInteractWithEntityAsync(player: OfflinePlayer, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> =
-        cacheCanInteractWithEntityUser.get(CanInteractWithEntityUserArgs(player, entity, item?.clone()))
-    
-    /**
-     * Checks if the [player] can interact with the [entity] while holding that [item].
-     */
     suspend fun canInteractWithEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): Boolean =
-        cacheCanInteractWithEntityUser.get(CanInteractWithEntityUserArgs(player, entity, item?.clone())).await()
+        canInteractWithEntityAsync(player, entity, item).await()
     
     /**
      * Checks if the [player] can interact with the [entity] while holding that [item].
      */
     fun canInteractWithEntity(player: Player, entity: Entity, item: ItemStack?): Boolean =
-        cacheCanInteractWithEntityUser.get(CanInteractWithEntityUserArgs(player, entity, item?.clone())).get()
+        canInteractWithEntityAsync(player, entity, item).get()
     
     /**
      * Checks if the [tileEntity] can hurt the [entity] with this [item].
@@ -351,34 +393,37 @@ object ProtectionManager {
     fun canHurtEntityAsync(tileEntity: TileEntity, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> {
         if (tileEntity.owner == null)
             return CompletableFuture.completedFuture(true)
+        if (!::cacheCanHurtEntityTile.isInitialized)
+            return CompletableFuture.completedFuture(false)
         return cacheCanHurtEntityTile.get(CanHurtEntityTileArgs(tileEntity, entity, item?.clone()))
     }
     
     /**
      * Checks if the [tileEntity] can hurt the [entity] with this [item].
      */
-    suspend fun canHurtEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): Boolean {
-        if (tileEntity.owner == null) return true
-        return cacheCanHurtEntityTile.get(CanHurtEntityTileArgs(tileEntity, entity, item?.clone())).await()
+    suspend fun canHurtEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): Boolean =
+        canHurtEntityAsync(tileEntity, entity, item).await()
+    
+    /**
+     * Checks if the [player] can hurt the [entity] with this [item].
+     */
+    fun canHurtEntityAsync(player: OfflinePlayer, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> {
+        if (!::cacheCanHurtEntityUser.isInitialized)
+            return CompletableFuture.completedFuture(false)
+        return cacheCanHurtEntityUser.get(CanHurtEntityUserArgs(player, entity, item?.clone()))
     }
     
     /**
      * Checks if the [player] can hurt the [entity] with this [item].
      */
-    fun canHurtEntityAsync(player: OfflinePlayer, entity: Entity, item: ItemStack?): CompletableFuture<Boolean> =
-        cacheCanHurtEntityUser.get(CanHurtEntityUserArgs(player, entity, item?.clone()))
-    
-    /**
-     * Checks if the [player] can hurt the [entity] with this [item].
-     */
     suspend fun canHurtEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): Boolean =
-        cacheCanHurtEntityUser.get(CanHurtEntityUserArgs(player, entity, item?.clone())).await()
+        canHurtEntityAsync(player, entity, item).await()
     
     /**
      * Checks if the [player] can hurt the [entity] with this [item].
      */
     fun canHurtEntity(player: Player, entity: Entity, item: ItemStack?): Boolean =
-        cacheCanHurtEntityUser.get(CanHurtEntityUserArgs(player, entity, item?.clone())).get()
+        canHurtEntityAsync(player, entity, item).get()
     
     private fun checkProtection(
         args: ProtectionArgs,
@@ -426,4 +471,3 @@ object ProtectionManager {
     }
     
 }
-
