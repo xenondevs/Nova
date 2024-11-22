@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.world.block.tileentity
 
 import org.bukkit.Bukkit
-import xyz.xenondevs.commons.collections.removeIf
+import xyz.xenondevs.nova.NOVA
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
@@ -17,8 +17,11 @@ object ChunkLoadManager {
     
     @InitFun
     private fun init() {
-        Bukkit.getWorlds().flatMap { it.forceLoadedChunks }.forEach { it.isForceLoaded = false }
-        forceLoadedChunks.removeIf { it.key.chunk?.apply { isForceLoaded = true } == null }
+        Bukkit.getWorlds().flatMap { it.forceLoadedChunks }.forEach { it.isForceLoaded = false } // TODO: remove in future version
+        
+        for (chunk in forceLoadedChunks.keys) {
+            chunk.world?.addPluginChunkTicket(chunk.x, chunk.z, NOVA)
+        }
     }
     
     @DisableFun
@@ -28,7 +31,9 @@ object ChunkLoadManager {
     
     fun submitChunkLoadRequest(chunk: ChunkPos, uuid: UUID) {
         val requesterSet = getChunkLoaderSet(chunk)
-        if (requesterSet.isEmpty()) chunk.chunk!!.isForceLoaded = true
+        if (requesterSet.isEmpty()) {
+            chunk.world?.addPluginChunkTicket(chunk.x, chunk.z, NOVA)
+        }
         requesterSet.add(uuid)
     }
     
@@ -36,7 +41,7 @@ object ChunkLoadManager {
         val requesterSet = getChunkLoaderSet(chunk)
         requesterSet.remove(uuid)
         if (requesterSet.isEmpty()) {
-            chunk.chunk?.isForceLoaded = false
+            chunk.world?.removePluginChunkTicket(chunk.x, chunk.z, NOVA)
             forceLoadedChunks.remove(chunk)
         }
     }
