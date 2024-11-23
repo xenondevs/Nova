@@ -157,7 +157,8 @@ object DefaultContextParamTypes {
      * - [BlockPlace]
      *
      * Autofilled by:
-     * - [BLOCK_ITEM_STACK] if data is present
+     * - [BLOCK_ITEM_STACK] in [BlockPlace] if data is present
+     * - [TILE_ENTITY_NOVA] in [BlockBreak] and [BlockInteract]
      *
      * Autofills: none
      */
@@ -165,7 +166,9 @@ object DefaultContextParamTypes {
         ContextParamType.builder<Compound>("tile_entity_data_nova")
             .optionalIn(BlockPlace)
             .copiedBy(Compound::copy)
-            .autofilledBy(::BLOCK_ITEM_STACK) { itemStack ->
+            .autofilledBy(BlockBreak, ::TILE_ENTITY_NOVA) { tileEntity -> tileEntity.data }
+            .autofilledBy(BlockInteract, ::TILE_ENTITY_NOVA) { tileEntity -> tileEntity.data }
+            .autofilledBy(BlockPlace, ::BLOCK_ITEM_STACK) { itemStack ->
                 itemStack.novaCompound
                     ?.get<Compound>(TileEntity.TILE_ENTITY_DATA_KEY)
                     ?.let { persistentData -> Compound().also { it["persistent"] = persistentData } }

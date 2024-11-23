@@ -13,14 +13,16 @@ internal class Requirement<V : Any>(
 )
 
 internal class Autofiller<V : Any>(
+    val intention: ContextIntention? = null,
     lazyParamTypes: List<Lazy<ContextParamType<*>>>,
     val filler: Function<V?>
 ) {
     
     val params: List<ContextParamType<*>> by lazy { lazyParamTypes.map { it.value } }
     
-    operator fun component1(): List<ContextParamType<*>> = params
-    operator fun component2(): Function<V?> = filler
+    operator fun component1(): ContextIntention? = intention
+    operator fun component2(): List<ContextParamType<*>> = params
+    operator fun component3(): Function<V?> = filler
     
 }
 
@@ -144,7 +146,47 @@ class ContextParamTypeBuilder<V : Any> internal constructor(private val id: Reso
         vararg lazyParamTypes: () -> ContextParamType<*>
     ): ContextParamTypeBuilder<V> {
         val paramTypes = lazyParamTypes.map(::lazy)
-        autofillers += Autofiller(paramTypes, fillValue)
+        autofillers += Autofiller(null, paramTypes, fillValue)
+        return this
+    }
+    
+    fun <A : Any> autofilledBy(
+        inIntention: ContextIntention,
+        lazyParamType: () -> ContextParamType<A>,
+        fillValue: (A) -> V?
+    ) = autofilledBy(fillValue, lazyParamType)
+    
+    fun <A : Any, B : Any> autofilledBy(
+        inIntention: ContextIntention,
+        lazyParamTypeA: () -> ContextParamType<A>,
+        lazyParamTypeB: () -> ContextParamType<B>,
+        fillValue: (A, B) -> V?
+    ) = autofilledBy(fillValue, lazyParamTypeA, lazyParamTypeB)
+    
+    fun <A : Any, B : Any, C : Any> autofilledBy(
+        inIntention: ContextIntention,
+        lazyParamTypeA: () -> ContextParamType<A>,
+        lazyParamTypeB: () -> ContextParamType<B>,
+        lazyParamTypeC: () -> ContextParamType<C>,
+        fillValue: (A, B, C) -> V?
+    ) = autofilledBy(fillValue, lazyParamTypeA, lazyParamTypeB, lazyParamTypeC)
+    
+    fun <A : Any, B : Any, C : Any, D : Any> autofilledBy(
+        inIntention: ContextIntention,
+        lazyParamTypeA: () -> ContextParamType<A>,
+        lazyParamTypeB: () -> ContextParamType<B>,
+        lazyParamTypeC: () -> ContextParamType<C>,
+        lazyParamTypeD: () -> ContextParamType<D>,
+        fillValue: (A, B, C, D) -> V?
+    ) = autofilledBy(fillValue, lazyParamTypeA, lazyParamTypeB, lazyParamTypeC, lazyParamTypeD)
+    
+    private fun autofilledBy(
+        inIntention: ContextIntention,
+        fillValue: Function<V?>,
+        vararg lazyParamTypes: () -> ContextParamType<*>
+    ): ContextParamTypeBuilder<V> {
+        val paramTypes = lazyParamTypes.map(::lazy)
+        autofillers += Autofiller(inIntention, paramTypes, fillValue)
         return this
     }
     

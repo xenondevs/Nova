@@ -79,7 +79,11 @@ class Context<I : ContextIntention> private constructor(
         // try to resolve value through autofillers
         val autofillers = paramType.autofillers
         var value: V? = null
-        autofiller@ for ((requiredParamTypes, fillerFunction) in autofillers) {
+        autofiller@ for ((autofillerIntention, requiredParamTypes, fillerFunction) in autofillers) {
+            // skip autofiller if it is not intended for this context
+            if (autofillerIntention != null && autofillerIntention != intention)
+                continue
+            
             // load params required by autofiller
             val requiredParamValues = arrayOfNulls<Any>(requiredParamTypes.size)
             for ((i, requiredParamType) in requiredParamTypes.withIndex()) {
