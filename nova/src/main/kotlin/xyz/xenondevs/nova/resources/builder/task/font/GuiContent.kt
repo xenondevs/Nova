@@ -28,7 +28,7 @@ class GuiContent internal constructor(
         val guiTextures = HashMap<GuiTexture, GuiTextureData>()
         
         for (guiTexture in NovaRegistries.GUI_TEXTURE) {
-            val layout = guiTexture.layout
+            val layout = guiTexture.makeLayout(builder)
             val texture = layout.texture.toType(ResourceType.FontTexture)
             val dim = builder.resolve(texture).readImageDimensions()
             val offset = layout.alignment.getOffset(dim.width, dim.height)

@@ -5,6 +5,7 @@ import org.joml.Vector2ic
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 
 internal class GuiTextureLayout(
     val texture: ResourcePath<ResourceType.Texture>,
@@ -12,7 +13,10 @@ internal class GuiTextureLayout(
 )
 
 @RegistryElementBuilderDsl
-class GuiTextureLayoutBuilder(private val namespace: String) {
+class GuiTextureLayoutBuilder internal constructor(
+    private val namespace: String,
+    val resourcePackBuilder: ResourcePackBuilder
+) {
     
     private var texture: ResourcePath<ResourceType.Texture>? = null
     private var alignment: GuiTextureAlignment? = null
