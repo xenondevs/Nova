@@ -106,7 +106,6 @@ class ContextParamTypeBuilder<V : Any> internal constructor(private val id: Reso
     private val autofillers = ArrayList<Autofiller<V>>()
     private var copy: (V) -> V = { it }
     
-    private val requiredIntentions = HashSet<ContextIntention>()
     private val optionalIntentions = HashSet<ContextIntention>()
     
     fun require(validator: (V) -> Boolean, errorGenerator: (V) -> String): ContextParamTypeBuilder<V> {
@@ -149,11 +148,6 @@ class ContextParamTypeBuilder<V : Any> internal constructor(private val id: Reso
         return this
     }
     
-    fun requiredIn(vararg intention: ContextIntention): ContextParamTypeBuilder<V> {
-        requiredIntentions += intention
-        return this
-    }
-    
     fun optionalIn(vararg intention: ContextIntention): ContextParamTypeBuilder<V> {
         optionalIntentions += intention
         return this
@@ -177,9 +171,6 @@ class ContextParamTypeBuilder<V : Any> internal constructor(private val id: Reso
     }
     
     private fun register(type: ContextParamType<V>) {
-        for (intention in requiredIntentions) {
-            intention.addRequired(type)
-        }
         for (intention in optionalIntentions) {
             intention.addOptional(type)
         }

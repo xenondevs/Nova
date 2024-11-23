@@ -60,7 +60,6 @@ object DefaultContextParamTypes {
      */
     val BLOCK_POS: ContextParamType<BlockPos> =
         ContextParamType.builder<BlockPos>("block_pos")
-            .requiredIn(BlockPlace, BlockBreak, BlockInteract)
             .build()
     
     /**
@@ -80,7 +79,6 @@ object DefaultContextParamTypes {
      */
     val BLOCK_WORLD: ContextParamType<World> =
         ContextParamType.builder<World>("block_world")
-            .requiredIn(BlockPlace, BlockBreak, BlockInteract)
             .autofilledBy(::BLOCK_POS) { it.world }
             .build()
     
