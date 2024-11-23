@@ -19,7 +19,6 @@ import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.MathUtils
 import xyz.xenondevs.nova.util.data.ImageUtils
 import xyz.xenondevs.nova.util.toResourceLocation
-import xyz.xenondevs.nova.util.toResourcePath
 import java.awt.image.BufferedImage
 
 internal class RuntimeEquipmentData(
@@ -57,9 +56,10 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
     )
     private fun write() {
         ResourceLookups.EQUIPMENT = NovaRegistries.EQUIPMENT.associateWith { equipment ->
+            val path = ResourcePath.of(ResourceType.Equipment, equipment.id)
             when (val layout = equipment.makeLayout(builder)) {
-                is StaticEquipmentLayout -> generatedStaticEquipmentModel(equipment.id.toResourcePath(ResourceType.Equipment), layout)
-                is AnimatedEquipmentLayout -> generateAnimatedEquipmentModel(equipment.id.toResourcePath(ResourceType.Equipment), layout)
+                is StaticEquipmentLayout -> generatedStaticEquipmentModel(path, layout)
+                is AnimatedEquipmentLayout -> generateAnimatedEquipmentModel(path, layout)
             }
         }
     }

@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlock
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
-import xyz.xenondevs.nova.world.item.equipment.Equipment
+import xyz.xenondevs.nova.world.item.Equipment
 import xyz.xenondevs.nova.world.item.recipe.RecipeType
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier

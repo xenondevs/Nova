@@ -30,7 +30,7 @@ import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.getOrThrow
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.toResourceLocation
-import xyz.xenondevs.nova.world.item.equipment.Equipment
+import xyz.xenondevs.nova.world.item.Equipment
 import java.util.Optional
 import net.minecraft.world.item.equipment.Equippable as EquippableComponent
 import org.bukkit.entity.EntityType as BukkitEntityType

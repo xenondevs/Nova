@@ -1,12 +1,11 @@
 package xyz.xenondevs.nova.ui.overlay.guitexture
 
-import xyz.xenondevs.nova.Nova
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.layout.gui.GuiTextureAlignment
 import xyz.xenondevs.nova.resources.layout.gui.GuiTextureLayoutBuilder
-import xyz.xenondevs.nova.util.data.Key
 import xyz.xenondevs.nova.util.set
 
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
@@ -51,7 +50,7 @@ object DefaultGuiTextures {
     }
     
     private fun guiTexture(name: String, texture: GuiTextureLayoutBuilder.() -> Unit): GuiTexture {
-        val id = Key(Nova, name)
+        val id = Key.key("nova", name)
         val texture = GuiTexture(id) { GuiTextureLayoutBuilder(id.namespace(), it).apply(texture).build() }
         NovaRegistries.GUI_TEXTURE[id] = texture
         return texture

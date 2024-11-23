@@ -1,6 +1,6 @@
-package xyz.xenondevs.nova.world.item.equipment
+package xyz.xenondevs.nova.world.item
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.layout.equipment.EquipmentLayout
 
@@ -8,6 +8,6 @@ import xyz.xenondevs.nova.resources.layout.equipment.EquipmentLayout
  * Represents a custom armor texture.
  */
 class Equipment internal constructor(
-    val id: ResourceLocation,
+    val id: Key,
     internal val makeLayout: (ResourcePackBuilder) -> EquipmentLayout
 )

@@ -10,8 +10,8 @@ import xyz.xenondevs.nova.resources.builder.task.font.GuiTextureData
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
+import xyz.xenondevs.nova.world.item.Equipment
 import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.equipment.Equipment
 import java.util.*
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
