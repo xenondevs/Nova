@@ -2,6 +2,8 @@ package xyz.xenondevs.nova.ui.overlay.guitexture
 
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.layout.gui.GuiTextureLayout
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
@@ -13,11 +15,11 @@ class GuiTexture internal constructor(
     internal val makeLayout: (ResourcePackBuilder) -> GuiTextureLayout
 ) {
     
-    val component: Component by lazy {
-        val data = ResourceLookups.GUI_TEXTURE[this]!!
+    val component: Component by ResourceLookups.GUI_TEXTURE_LOOKUP.getProvider(this).map { data ->
+        checkNotNull(data)
         Component.text()
             .move(data.offset)
-            .append(Component.text(Character.toString(data.codePoint)).font(data.font))
+            .append(Component.text(Character.toString(data.codePoint), NamedTextColor.WHITE).font(data.font))
             .build()
     }
     
