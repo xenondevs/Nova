@@ -26,7 +26,7 @@ internal object ResourceLookups {
     /**
      * Lookup for getting the relevant [LinkedBlockModelProvider] for every [NovaBlockState].
      */
-    var BLOCK_MODEL_LOOKUP: ResourceLookup<Map<NovaBlockState, LinkedBlockModelProvider<*>>> =
+    val BLOCK_MODEL_LOOKUP: ResourceLookup<Map<NovaBlockState, LinkedBlockModelProvider<*>>> =
         resourceLookup("block_models", emptyMap(), typeOf<HashMap<NovaBlockState, LinkedBlockModelProvider<*>>>())
     
     /**
@@ -39,7 +39,7 @@ internal object ResourceLookups {
      *
      * Format: ``Map<NovaItem, Map<Vanilla Material, Map<Model Name, Custom Model Data>>>``
      */
-    var ITEM_MODEL_LOOKUP: ResourceLookup<Map<NovaItem, Map<Material, Map<String, Int>>>> =
+    val ITEM_MODEL_LOOKUP: ResourceLookup<Map<NovaItem, Map<Material, Map<String, Int>>>> =
         resourceLookup("item_models", emptyMap(), typeOf<HashMap<NovaItem, EnumMap<Material, LinkedHashMap<String, Int>>>>())
     
     /**
@@ -64,7 +64,7 @@ internal object ResourceLookups {
      *
      * Format: ``Map<Language, Map<TranslationKey, Translation>>``
      */
-    var LANGUAGE_LOOKUP: ResourceLookup<Map<String, Map<String, String>>> =
+    val LANGUAGE_LOOKUP: ResourceLookup<Map<String, Map<String, String>>> =
         resourceLookup("language_lookup", emptyMap(), typeOf<HashMap<String, HashMap<String, String>>>())
     
     /**

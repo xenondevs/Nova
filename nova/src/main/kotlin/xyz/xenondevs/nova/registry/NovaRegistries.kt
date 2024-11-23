@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlock
 import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.equipment.Equipment
 import xyz.xenondevs.nova.world.item.recipe.RecipeType
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
@@ -66,6 +67,9 @@ object NovaRegistries {
     
     @JvmField
     val ITEM_FILTER_TYPE: WritableRegistry<ItemFilterType<*>> = simpleRegistry("item_filter_type")
+    
+    @JvmField
+    val TOOLTIP_STYLE: WritableRegistry<TooltipStyle> = simpleRegistry("tooltip_style")
     
     private fun <E : Any> simpleRegistry(name: String): WritableRegistry<E> {
         val resourceLocation = ResourceLocation.fromNamespaceAndPath("nova", name)

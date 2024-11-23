@@ -4,6 +4,7 @@ import net.kyori.adventure.key.Key
 import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.reflection.createType
 import xyz.xenondevs.nova.config.PermanentStorage
@@ -51,6 +52,9 @@ internal class MapResourceLookup<K: Any, V : Any>(
     
     fun getOrThrow(key: K): V =
         value[key] ?: throw IllegalArgumentException("Resource lookup ${this.key} does not contain $key")
+    
+    fun getProvider(key: K): Provider<V?> =
+        provider.map { it[key] }
     
     fun getProvider(keyProvider: Provider<K?>): Provider<V?> =
         combinedProvider(provider, keyProvider) { map, key -> key?.let(map::get) }

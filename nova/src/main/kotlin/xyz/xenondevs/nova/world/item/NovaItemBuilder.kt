@@ -30,6 +30,7 @@ class NovaItemBuilder internal constructor(
     private var craftingRemainingItem: ItemStack? = null
     private var isHidden = false
     private var block: NovaBlock? = null
+    private var tooltipStyle: TooltipStyle? = null
     private var requestedLayout = RequestedItemModelLayout.DEFAULT
     
     internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
@@ -139,6 +140,16 @@ class NovaItemBuilder internal constructor(
         this.isHidden = hidden
     }
     
+    /**
+     * Sets the tooltip style of the item.
+     */
+    fun tooltipStyle(tooltipStyle: TooltipStyle) {
+        this.tooltipStyle = tooltipStyle
+    }
+    
+    /**
+     * Configures the models of the item.
+     */
     fun models(init: ItemModelLayoutBuilder.() -> Unit) {
         val builder = ItemModelLayoutBuilder()
         builder.init()
@@ -157,6 +168,7 @@ class NovaItemBuilder internal constructor(
             isHidden,
             block,
             configId,
+            tooltipStyle,
             requestedLayout
         )
         block?.item = item

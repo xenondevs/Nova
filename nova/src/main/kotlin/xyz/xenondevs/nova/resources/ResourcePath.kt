@@ -24,11 +24,10 @@ class ResourcePath<out T : ResourceType>(val type: T, val namespace: String, val
      * The full path to the file in the resource pack, starting with assets/.
      */
     val filePath = buildString {
-        append("assets/$namespace/${type.path}/$path")
-        if (type.extension.isNotBlank())
-            append(".${type.extension}")
+        append("assets/$namespace/${type.prefix}/$path")
+        if (type.suffix.isNotBlank())
+            append(type.suffix)
     }
-    
     
     init {
         require(isValidNamespace(namespace)) { "Non [a-z0-9_.-] character in $namespace" }
@@ -46,17 +45,17 @@ class ResourcePath<out T : ResourceType>(val type: T, val namespace: String, val
         if (this.type == newType)
             return this as ResourcePath<NT>
         
-        var fullPath = type.path + path
-        if (type.extension.isNotBlank())
-            fullPath += ".${type.extension}"
+        var fullPath = type.prefix + path
+        if (type.suffix.isNotBlank())
+            fullPath += type.suffix
         
-        if (!fullPath.startsWith(newType.path))
-            throw IllegalArgumentException("Cannot switch type to $newType, because $fullPath does not start with ${newType.path}")
+        if (!fullPath.startsWith(newType.prefix))
+            throw IllegalArgumentException("Cannot switch type to $newType, because $fullPath does not start with ${newType.prefix}")
         
-        if (!fullPath.endsWith(newType.extension))
-            throw IllegalArgumentException("Cannot switch type to $newType, because $fullPath does not end with ${newType.extension}")
+        if (!fullPath.endsWith(newType.suffix))
+            throw IllegalArgumentException("Cannot switch type to $newType, because $fullPath does not end with ${newType.suffix}")
         
-        return ResourcePath(newType, namespace, fullPath.removePrefix(newType.path).removeSuffix(newType.extension))
+        return ResourcePath(newType, namespace, fullPath.removePrefix(newType.prefix).removeSuffix(newType.suffix))
     }
     
     override fun namespace(): String = namespace
@@ -155,35 +154,32 @@ sealed interface ResourceType {
     /**
      * The directory under which resources of this type are stored.
      */
-    val path: String
+    val prefix: String
     
     /**
      * The file extension of resources of this type.
      */
-    val extension: String
+    val suffix: String
+    
+    /**
+     * Marker interface that specifies that a [ResourceType] has a corresponding `.mcmeta` file.
+     */
+    sealed interface HasMcMeta : ResourceType
     
     /**
      * Resources of type `.json`.
      */
     sealed interface JsonFile : ResourceType {
-        override val extension
-            get() = "json"
+        override val suffix
+            get() = ".json"
     }
     
     /**
      * Resources of type `.png`.
      */
     sealed interface PngFile : ResourceType {
-        override val extension
-            get() = "png"
-    }
-    
-    /**
-     * Resources of type `.png.mcmeta`.
-     */
-    sealed interface PngMcmetaFile : ResourceType {
-        override val extension
-            get() = "png.mcmeta"
+        override val suffix
+            get() = ".png"
     }
     
     /**
@@ -193,7 +189,7 @@ sealed interface ResourceType {
      */
     @Serializable
     data object Model : JsonFile {
-        override val path = "models"
+        override val prefix = "models"
     }
     
     /**
@@ -203,7 +199,7 @@ sealed interface ResourceType {
      */
     @Serializable
     data object Equipment : JsonFile {
-        override val path = "models/equipment"
+        override val prefix = "models/equipment"
     }
     
     /**
@@ -218,19 +214,9 @@ sealed interface ResourceType {
          */
         @Serializable
         companion object : Texture {
-            override val path = "textures"
+            override val prefix = "textures"
         }
         
-    }
-    
-    /**
-     * Texture mcmeta files
-     *
-     * path: `textures/`, extension: `png.mcmeta`
-     */
-    @Serializable
-    data object TextureMeta : PngMcmetaFile {
-        override val path = "textures"
     }
     
     /**
@@ -245,7 +231,7 @@ sealed interface ResourceType {
      */
     @Serializable
     data object HumanoidEquipmentTexture : EquipmentTexture {
-        override val path = "textures/entity/equipment/humanoid"
+        override val prefix = "textures/entity/equipment/humanoid"
     }
     
     /**
@@ -255,7 +241,7 @@ sealed interface ResourceType {
      */
     @Serializable
     data object HumanoidLegginsEquipmentTexture : EquipmentTexture {
-        override val path = "textures/entity/equipment/humanoid_leggings"
+        override val prefix = "textures/entity/equipment/humanoid_leggings"
     }
     
     /**
@@ -265,7 +251,7 @@ sealed interface ResourceType {
      */
     @Serializable
     data object WingsEquipmentTexture : EquipmentTexture {
-        override val path = "textures/entity/equipment/wings"
+        override val prefix = "textures/entity/equipment/wings"
     }
     
     /**
@@ -275,7 +261,7 @@ sealed interface ResourceType {
      */
     @Serializable
     data object HorseBodyEquipmentTexture : EquipmentTexture {
-        override val path = "textures/entity/equipment/horse_body"
+        override val prefix = "textures/entity/equipment/horse_body"
     }
     
     
@@ -286,7 +272,7 @@ sealed interface ResourceType {
      */
     @Serializable
     data object LlamaBodyEquipmentTexture : EquipmentTexture {
-        override val path = "textures/entity/equipment/llama_body"
+        override val prefix = "textures/entity/equipment/llama_body"
     }
     
     /**
@@ -296,7 +282,42 @@ sealed interface ResourceType {
      */
     @Serializable
     data object WolfBodyEquipmentTexture : EquipmentTexture {
-        override val path = "textures/entity/equipment/wolf_body"
+        override val prefix = "textures/entity/equipment/wolf_body"
+    }
+    
+    /**
+     * Tooltip textures
+     * 
+     * path: `textures/gui/sprites/tooltip/`, extension: `png`
+     */
+    interface TooltipTexture : Texture, HasMcMeta {
+        
+        override val prefix
+            get() = "textures/gui/sprites/tooltip/"
+        
+        @Serializable
+        companion object : TooltipTexture
+    
+    }
+    
+    /**
+     * Tooltip background textures
+     * 
+     * path: `textures/gui/sprites/tooltip/`, suffix: `_background`, extension: `png`
+     */
+    @Serializable
+    data object TooltipBackgroundTexture : TooltipTexture {
+        override val suffix = "_background.png"
+    }
+    
+    /**
+     * Tooltip frame textures
+     * 
+     * path: `textures/gui/sprites/tooltip/`, suffix: `_frame`, extension: `png`
+     */
+    @Serializable
+    data object TooltipFrameTexture : TooltipTexture {
+        override val suffix = "_frame.png"
     }
     
     /**
@@ -306,7 +327,7 @@ sealed interface ResourceType {
      */
     @Serializable
     data object Font : JsonFile {
-        override val path = "font"
+        override val prefix = "font"
     }
     
     /**
@@ -316,8 +337,8 @@ sealed interface ResourceType {
      */
     @Serializable
     data object FontTexture : Texture {
-        override val path = "textures"
-        override val extension = ""
+        override val prefix = "textures"
+        override val suffix = ""
     }
     
     /**
@@ -327,8 +348,8 @@ sealed interface ResourceType {
      */
     @Serializable
     data object UnihexZip : ResourceType {
-        override val path = ""
-        override val extension = ""
+        override val prefix = ""
+        override val suffix = ""
     }
     
 }

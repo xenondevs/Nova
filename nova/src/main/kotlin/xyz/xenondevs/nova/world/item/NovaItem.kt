@@ -65,6 +65,7 @@ class NovaItem internal constructor(
     val isHidden: Boolean,
     val block: NovaBlock?,
     configId: String,
+    val tooltipStyle: TooltipStyle?,
     internal val requestedLayout: RequestedItemModelLayout
 ) {
     

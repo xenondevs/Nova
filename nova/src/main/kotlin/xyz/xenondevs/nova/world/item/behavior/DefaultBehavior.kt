@@ -31,8 +31,10 @@ import xyz.xenondevs.nova.util.component.adventure.toNmsStyle
 import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.item.update
+import xyz.xenondevs.nova.util.toResourceLocation
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.TooltipStyle
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.iterator
@@ -45,6 +47,7 @@ internal class DefaultBehavior(
     name: Provider<Component?>,
     style: Provider<Style>,
     lore: Provider<List<Component>>,
+    tooltipStyle: Provider<TooltipStyle?>,
     maxStackSize: Provider<Int>,
     attributeModifiers: Provider<ItemAttributeModifiers>,
     defaultCompound: Provider<NamespacedCompound?>
@@ -53,8 +56,8 @@ internal class DefaultBehavior(
     private val style by style.map { it.toNmsStyle() }
     
     override val baseDataComponents = combinedProvider(
-        name, style, lore, maxStackSize, attributeModifiers
-    ) { name, style, lore, maxStackSize, attributeModifiers ->
+        name, style, lore, tooltipStyle, maxStackSize, attributeModifiers
+    ) { name, style, lore, tooltipStyle, maxStackSize, attributeModifiers ->
         val builder = DataComponentMap.builder()
         if (name != null) {
             builder.set(DataComponents.ITEM_NAME, name.style(style).toNMSComponent())
@@ -64,6 +67,10 @@ internal class DefaultBehavior(
         
         if (lore.isNotEmpty()) {
             builder.set(DataComponents.LORE, ItemLore(lore.map(Component::toNMSComponent)))
+        }
+        
+        if (tooltipStyle != null) {
+            builder.set(DataComponents.TOOLTIP_STYLE, tooltipStyle.id.toResourceLocation())
         }
         
         builder.set(DataComponents.ATTRIBUTE_MODIFIERS, attributeModifiers)
@@ -101,6 +108,7 @@ internal class DefaultBehavior(
                 provider(item.name),
                 provider(item.style),
                 provider(item.lore),
+                provider(item.tooltipStyle),
                 provider(item.maxStackSize),
                 item.config.node("attribute_modifiers").map(::loadConfiguredAttributeModifiers),
                 combinedProvider(

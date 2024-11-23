@@ -512,6 +512,10 @@ operator fun <T : Any> WritableRegistry<T>.set(addon: Addon, key: String, value:
     register(ResourceKey.create(key(), ResourceLocation(addon, key)), value, RegistrationInfo.BUILT_IN)
 }
 
+operator fun <T : Any> WritableRegistry<T>.set(key: Key, value: T) {
+    register(key.toResourceLocation(), value)
+}
+
 fun <T : Any> WritableRegistry<T>.register(id: ResourceLocation, value: T): Holder.Reference<T> {
     return register(ResourceKey.create(key(), id), value, RegistrationInfo.BUILT_IN)
 }

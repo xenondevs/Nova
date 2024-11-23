@@ -37,6 +37,7 @@ import xyz.xenondevs.nova.resources.builder.task.LanguageContent
 import xyz.xenondevs.nova.resources.builder.task.PackFunction
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.resources.builder.task.TextureContent
+import xyz.xenondevs.nova.resources.builder.task.TooltipStyleContent
 import xyz.xenondevs.nova.resources.builder.task.font.FontContent
 import xyz.xenondevs.nova.resources.builder.task.font.GuiContent
 import xyz.xenondevs.nova.resources.builder.task.font.MoveCharactersContent
@@ -112,7 +113,7 @@ class ResourcePackBuilder internal constructor() {
     
     companion object {
         
-        private val JIMFS_PROVIDER: MutableProvider<FileSystem> = mutableProvider { Jimfs.newFileSystem(Configuration.unix())  }
+        private val JIMFS_PROVIDER: MutableProvider<FileSystem> = mutableProvider { Jimfs.newFileSystem(Configuration.unix()) }
         private val FILE_SYSTEM_PROVIDER: Provider<FileSystem> = combinedProvider(
             IN_MEMORY_PROVIDER, JIMFS_PROVIDER
         ) { inMemory, jimfs -> if (inMemory) jimfs else FileSystems.getDefault() }
@@ -157,7 +158,7 @@ class ResourcePackBuilder internal constructor() {
             ::ExtractTask, ::EquipmentContent, ::GuiContent, ::LanguageContent, ::TextureIconContent,
             ::AtlasContent, ::WailaContent, ::MovedFontContent, ::CharSizeCalculator, ::SoundOverrides, ::FontContent,
             ::BarOverlayTask, ::MoveCharactersContent, ::ModelContent, ::BlockModelContent,
-            ::ItemModelContent, ::TextureContent
+            ::ItemModelContent, ::TextureContent, ::TooltipStyleContent
         )
         
         /**
@@ -388,7 +389,7 @@ class ResourcePackBuilder internal constructor() {
      * Searches for a file under [path] in both the resource pack and vanilla minecraft assets,
      * returning the [Path] if it exists or `null` if it doesn't.
      */
-    fun findOrNull(path: ResourcePath<*>): Path? = 
+    fun findOrNull(path: ResourcePath<*>): Path? =
         resolve(path).takeIf(Path::exists) ?: resolveVanilla(path).takeIf(Path::exists)
     
     /**
@@ -405,14 +406,26 @@ class ResourcePackBuilder internal constructor() {
         MCASSETS_DIR.resolve(path.filePath)
     
     /**
+     * Resolves the corresponding `.mcmeta` file for the specified [path] in the vanilla minecraft assets.
+     */
+    fun resolveVanillaMeta(path: ResourcePath<ResourceType.HasMcMeta>): Path =
+        MCASSETS_DIR.resolve("${path.filePath}.mcmeta")
+    
+    /**
      * Resolves the file under [path] in the resource pack.
      */
     fun resolve(path: ResourcePath<*>): Path =
         PACK_DIR.resolve(path.filePath)
     
     /**
+     * Resolves the corresponding `.mcmeta` file for the specified [path].
+     */
+    fun resolveMeta(path: ResourcePath<ResourceType.HasMcMeta>): Path =
+        PACK_DIR.resolve("${path.filePath}.mcmeta")
+    
+    /**
      * Resolves the file under [path] in the resource pack.
-     * 
+     *
      * Example paths: `pack.json`, `assets/minecraft/textures/block/dirt.png`
      */
     fun resolve(path: String): Path =
@@ -424,6 +437,16 @@ class ResourcePackBuilder internal constructor() {
      */
     inline fun <reified V> writeJson(path: ResourcePath<ResourceType.JsonFile>, value: V) {
         val file = resolve(path)
+        file.parent.createDirectories()
+        file.writeJson(value)
+    }
+    
+    /**
+     * Serializes [value] to JSON using `kotlinx.serialization` and writes it to the
+     * corresponding `.mcmeta` file for the specified [path], creating parent directories if necessary.
+     */
+    inline fun <reified V> writeMeta(path: ResourcePath<ResourceType.HasMcMeta>, value: V) {
+        val file = resolveMeta(path)
         file.parent.createDirectories()
         file.writeJson(value)
     }

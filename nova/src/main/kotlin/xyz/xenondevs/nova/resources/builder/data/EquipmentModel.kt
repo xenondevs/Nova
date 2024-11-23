@@ -1,6 +1,6 @@
 @file:UseSerializers(ColorAsIntSerializer::class)
 
-package xyz.xenondevs.nova.resources.builder.model
+package xyz.xenondevs.nova.resources.builder.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
