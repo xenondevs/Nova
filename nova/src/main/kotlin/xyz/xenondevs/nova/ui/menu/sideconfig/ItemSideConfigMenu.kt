@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.DefaultNetworkType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 
-internal fun ItemSideConfigMenu(
+fun ItemSideConfigMenu(
     endPoint: NetworkEndPoint,
     holder: ItemHolder,
     namedInventories: Map<NetworkedInventory, String>
@@ -16,7 +16,7 @@ internal fun ItemSideConfigMenu(
     else ItemSideConfigMenu(endPoint, holder, namedInventories, null)
 }
 
-internal class ItemSideConfigMenu(
+class ItemSideConfigMenu(
     endPoint: NetworkEndPoint,
     holder: ItemHolder,
     namedInventories: Map<NetworkedInventory, String>,

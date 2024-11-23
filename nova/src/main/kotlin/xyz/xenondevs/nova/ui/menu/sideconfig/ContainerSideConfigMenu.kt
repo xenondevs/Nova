@@ -25,11 +25,11 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionT
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 
-internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPointDataHolder<C>>(
+abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPointDataHolder<C>> internal constructor(
     endPoint: NetworkEndPoint,
     networkType: NetworkType<*>,
     holder: H,
-    val namedContainers: Map<C, String>
+    private val namedContainers: Map<C, String>
 ) : AbstractSideConfigMenu<H>(endPoint, networkType, holder) {
     
     protected abstract val hasSimpleVersion: Boolean
@@ -135,7 +135,7 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
         holder.connectionConfig[face] = type
     }
     
-    abstract fun isSimpleConfiguration(): Boolean
+    protected abstract fun isSimpleConfiguration(): Boolean
     
     private inner class ContainerConfigItem(side: BlockSide) : ConfigItem(side) {
         

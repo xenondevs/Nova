@@ -27,30 +27,30 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionT
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 
-internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
-    val endPoint: NetworkEndPoint,
-    val networkType: NetworkType<*>,
-    val holder: H
+abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal constructor(
+    protected val endPoint: NetworkEndPoint,
+    protected val networkType: NetworkType<*>,
+    protected val holder: H
 ) {
     
     val gui = Gui.empty(9, 3)
     
     private val configItems = ArrayList<ConfigItem>()
-    protected val connectionConfigItems = enumMap<BlockFace, ArrayList<ConnectionConfigItem>>()
+    internal val connectionConfigItems = enumMap<BlockFace, ArrayList<ConnectionConfigItem>>()
     
     open fun initAsync() {
         configItems.forEach { it.updateAsync() }
         runTask { configItems.forEach { it.notifyWindows() } }
     }
     
-    fun getFaceFromSide(blockSide: BlockSide): Pair<BlockSide?, BlockFace> {
+    private fun getFaceFromSide(blockSide: BlockSide): Pair<BlockSide?, BlockFace> {
         val facing = (endPoint as? TileEntity)?.blockState?.get(DefaultBlockStateProperties.FACING)
         return if (facing != null)
             blockSide to blockSide.getBlockFace(facing)
         else null to blockSide.getBlockFace(0f)
     }
     
-    fun getSideName(blockSide: BlockSide?, blockFace: BlockFace): Component {
+    protected fun getSideName(blockSide: BlockSide?, blockFace: BlockFace): Component {
         if (blockSide != null) {
             return Component.text()
                 .color(NamedTextColor.GRAY)
@@ -86,7 +86,7 @@ internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
     
     protected abstract fun setConnectionType(face: BlockFace, type: NetworkConnectionType)
     
-    inner class ConnectionConfigItem(blockSide: BlockSide) : ConfigItem(blockSide) {
+    internal inner class ConnectionConfigItem(blockSide: BlockSide) : ConfigItem(blockSide) {
         
         init {
             connectionConfigItems.getOrPut(face, ::ArrayList) += this
@@ -122,7 +122,7 @@ internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
         
     }
     
-    abstract inner class ConfigItem(blockSide: BlockSide) : AsyncItem() {
+    internal abstract inner class ConfigItem(blockSide: BlockSide) : AsyncItem() {
         
         protected val blockSide: BlockSide?
         protected val face: BlockFace
