@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 class IntProperty(id: ResourceLocation) : BlockStateProperty<Int>(id) {
     
     fun scope(range: IntRange, initializer: BlockStatePropertyInitializer<Int> = { range.first }): ScopedBlockStateProperty<Int> {
-        return scope(range.toSet(), initializer)
+        return scope(range.toSet(), initializer) // keep order
     }
     
     override fun scope(values: Set<Int>, initializer: BlockStatePropertyInitializer<Int>): ScopedBlockStateProperty<Int> {
@@ -25,7 +25,7 @@ internal class ScopedIntProperty(
     initializer: BlockStatePropertyInitializer<Int>
 ) : ScopedBlockStateProperty<Int>(property, IntOpenHashSet(values), initializer) {
     
-    private val idToValue = values.toIntArray().apply(IntArray::sort)
+    private val idToValue = values.toIntArray()
     private val valueToId = values.withIndex().associateTo(Int2IntOpenHashMap()) { (index, value) -> value to index }
     
     override fun isValidValue(value: Int): Boolean =
