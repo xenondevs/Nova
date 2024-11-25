@@ -114,7 +114,7 @@ object DefaultScopedBlockStateProperties {
      * A scope for [DefaultBlockStateProperties.AXIS] for all three axes [Axis.X], [Axis.Y] and [Axis.Z].
      */
     val AXIS: ScopedBlockStateProperty<Axis> =
-        DefaultBlockStateProperties.AXIS.scope(Axis.X, Axis.Y, Axis.Z) { ctx ->
+        DefaultBlockStateProperties.AXIS.scope(Axis.Y, Axis.X, Axis.Z) { ctx ->
             ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
                 ?.calculateYawPitch()
                 ?.let { (yaw, pitch) -> BlockFaceUtils.toAxis(yaw, pitch) }

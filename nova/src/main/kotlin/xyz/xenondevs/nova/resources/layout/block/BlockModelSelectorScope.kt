@@ -77,13 +77,14 @@ class BlockModelSelectorScope internal constructor(
     
     /**
      * Rotates the builder based on the built-in facing [BlockStateProperties][BlockStateProperty]:
-     * [DefaultBlockStateProperties.FACING], [DefaultBlockStateProperties.AXIS]
+     * [DefaultBlockStateProperties.FACING] (assuming that the model is facing [BlockFace.NORTH]),
+     * [DefaultBlockStateProperties.AXIS] (assuming that the model is aligned with the [Axis.Y] axis).
      */
     fun ModelBuilder.rotated(uvLock: Boolean = false): ModelBuilder =
         when (getPropertyValueOrNull(DefaultBlockStateProperties.FACING)
             ?: getPropertyValueOrNull(DefaultBlockStateProperties.AXIS)
         ) {
-            BlockFace.NORTH, Axis.Z -> this
+            BlockFace.NORTH -> this
             BlockFace.NORTH_NORTH_WEST -> rotateY(22.5, uvLock)
             BlockFace.NORTH_WEST -> rotateY(45.0, uvLock)
             BlockFace.WEST_NORTH_WEST -> rotateY(67.5, uvLock)
@@ -95,12 +96,15 @@ class BlockModelSelectorScope internal constructor(
             BlockFace.SOUTH_SOUTH_EAST -> rotateY(202.5, uvLock)
             BlockFace.SOUTH_EAST -> rotateY(225.0, uvLock)
             BlockFace.EAST_SOUTH_EAST -> rotateY(247.5, uvLock)
-            BlockFace.EAST, Axis.X -> rotateY(270.0, uvLock)
+            BlockFace.EAST -> rotateY(270.0, uvLock)
             BlockFace.EAST_NORTH_EAST -> rotateY(292.5, uvLock)
             BlockFace.NORTH_EAST -> rotateY(315.0, uvLock)
             BlockFace.NORTH_NORTH_EAST -> rotateY(337.5, uvLock)
             BlockFace.UP -> rotateX(-90.0, uvLock)
-            BlockFace.DOWN, Axis.Y -> rotateX(90.0, uvLock)
+            BlockFace.DOWN -> rotateX(90.0, uvLock)
+            Axis.Y -> this
+            Axis.X -> rotateX(90.0, uvLock).rotateY(270.0, uvLock)
+            Axis.Z -> rotateX(90.0, uvLock)
             else -> this
         }
     
