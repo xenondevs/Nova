@@ -19,8 +19,8 @@ class EnumPropertyTest {
         
         val property2 = EnumProperty<Axis>(ResourceLocation.withDefaultNamespace("")).scope(Axis.Z, Axis.X)
         
-        assertEquals(0, property2.valueToId(Axis.X))
-        assertEquals(1, property2.valueToId(Axis.Z))
+        assertEquals(0, property2.valueToId(Axis.Z))
+        assertEquals(1, property2.valueToId(Axis.X))
         assertThrows<IllegalArgumentException> { property2.valueToId(Axis.Y)  }
     }
     
@@ -34,8 +34,8 @@ class EnumPropertyTest {
         
         val property2 = EnumProperty<Axis>(ResourceLocation.withDefaultNamespace("")).scope(Axis.Z, Axis.X)
         
-        assertEquals(Axis.X, property2.idToValue(0))
-        assertEquals(Axis.Z, property2.idToValue(1))
+        assertEquals(Axis.Z, property2.idToValue(0))
+        assertEquals(Axis.X, property2.idToValue(1))
         assertThrows<IllegalArgumentException> { property2.idToValue(2) }
     }
     
