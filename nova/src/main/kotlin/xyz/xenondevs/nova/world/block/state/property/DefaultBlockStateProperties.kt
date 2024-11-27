@@ -7,6 +7,7 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.Instrument
+import xyz.xenondevs.nova.util.axis
 import xyz.xenondevs.nova.util.calculateYaw
 import xyz.xenondevs.nova.util.calculateYawPitch
 import xyz.xenondevs.nova.world.block.behavior.LeavesBehavior
@@ -115,10 +116,7 @@ object DefaultScopedBlockStateProperties {
      */
     val AXIS: ScopedBlockStateProperty<Axis> =
         DefaultBlockStateProperties.AXIS.scope(Axis.Y, Axis.X, Axis.Z) { ctx ->
-            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
-                ?.calculateYawPitch()
-                ?.let { (yaw, pitch) -> BlockFaceUtils.toAxis(yaw, pitch) }
-                ?: Axis.Y
+            ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]?.axis ?: Axis.Y
         }
     
     /**
@@ -126,10 +124,7 @@ object DefaultScopedBlockStateProperties {
      */
     val AXIS_HORIZONTAL: ScopedBlockStateProperty<Axis> =
         DefaultBlockStateProperties.AXIS.scope(Axis.X, Axis.Z) { ctx ->
-            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
-                ?.calculateYaw()
-                ?.let { BlockFaceUtils.toAxis(it) }
-                ?: Axis.X
+            ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]?.axis ?: Axis.X
         }
     
     /**
@@ -156,12 +151,12 @@ object DefaultScopedBlockStateProperties {
     
     internal val NOTE_BLOCK_NOTE: ScopedBlockStateProperty<Int> =
         DefaultBlockStateProperties.NOTE_BLOCK_NOTE.scope(0..24) { 0 }
-
+    
     internal val LEAVES_DISTANCE: ScopedBlockStateProperty<Int> =
         DefaultBlockStateProperties.LEAVES_DISTANCE.scope(1..7) { ctx ->
             LeavesBehavior.calculateDistance(ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS))
         }
-
+    
     internal val LEAVES_PERSISTENT: ScopedBlockStateProperty<Boolean> =
         DefaultBlockStateProperties.LEAVES_PERSISTENT.scope { ctx ->
             ctx[DefaultContextParamTypes.SOURCE_UUID] != null
