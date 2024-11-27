@@ -163,8 +163,10 @@ internal object BlockBreaking : Listener, PacketListener {
         val breaker: BlockBreaker
         if (novaBlockState != null) {
             // don't do any breaking logic if the block doesn't have the breakable behavior
-            if (!novaBlockState.block.hasBehavior<Breakable>())
+            if (!novaBlockState.block.hasBehavior<Breakable>()) {
+                player.send(ClientboundBlockChangedAckPacket(sequence))
                 return
+            }
             
             breaker = NovaBlockBreaker(player, pos, novaBlockState, sequence, breakCooldowns[player] ?: 0)
         } else {
