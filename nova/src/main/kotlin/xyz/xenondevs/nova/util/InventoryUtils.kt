@@ -12,6 +12,7 @@ import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.invui.util.InventoryUtils
+import xyz.xenondevs.nova.util.item.isEmpty
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
 /**
@@ -45,6 +46,13 @@ fun Inventory.addItemCorrectly(itemStack: ItemStack, blockedSlots: BooleanArray 
 
 /**
  * Adds [items] to the [Player's][Player] inventory or drops them on
+ * the ground if there is not enough space
+ */
+fun Player.addToInventoryOrDrop(vararg items: ItemStack) =
+    addToInventoryOrDrop(items.asList())
+
+/**
+ * Adds [items] to the [Player's][Player] inventory or drops them on
  * the ground if there is not enough space.
  */
 fun Player.addToInventoryOrDrop(items: List<ItemStack>) {
@@ -55,6 +63,32 @@ fun Player.addToInventoryOrDrop(items: List<ItemStack>) {
             val drop = it.clone().apply { amount = leftover }
             InventoryUtils.dropItemLikePlayer(this, drop)
         }
+    }
+}
+
+/**
+ * Puts an [ItemStack] on the [prioritizedSlot] or adds it to the [Inventory][PlayerInventory]
+ * if the given slot is occupied or drops it on the ground if there is not enough space.
+ */
+fun Player.addToInventoryPrioritizedOrDrop(prioritizedSlot: EquipmentSlot, itemStack: ItemStack) {
+    val inventory = inventory
+    if (inventory.getItem(prioritizedSlot).isEmpty) {
+        inventory.setItem(prioritizedSlot, itemStack)
+    } else {
+        addToInventoryOrDrop(itemStack)
+    }
+}
+
+/**
+ * Puts an [ItemStack] on the [prioritizedSlot] or adds it to the [Inventory]
+ * if the given slot is occupied or drops it on the ground if there is not enough space.
+ */
+fun Player.addToInventoryPrioritizedOrDrop(prioritizedSlot: Int, itemStack: ItemStack) {
+    val inventory = inventory
+    if (inventory.getItem(prioritizedSlot).isEmpty()) {
+        inventory.setItem(prioritizedSlot, itemStack)
+    } else {
+        addToInventoryOrDrop(itemStack)
     }
 }
 
