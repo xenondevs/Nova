@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.patch.impl.registry
 
-import io.papermc.paper.registry.data.util.Conversions
 import io.papermc.paper.tag.TagEventConfig
 import net.minecraft.core.Registry
 import net.minecraft.core.WritableRegistry
@@ -15,10 +14,14 @@ import net.minecraft.tags.TagEntry
 import net.minecraft.tags.TagKey
 import net.minecraft.tags.TagLoader
 import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.IntInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
+import org.objectweb.asm.tree.VarInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.calls
+import xyz.xenondevs.bytebase.util.insertAfterFirst
+import xyz.xenondevs.bytebase.util.insertBeforeEvery
 import xyz.xenondevs.bytebase.util.replaceEvery
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
@@ -32,10 +35,13 @@ private val LOG_REGISTRY_FREEZE by MAIN_CONFIG.entry<Boolean>("debug", "logging"
 
 private val BUILTIN_REGISTRIES_FREEZE = ReflectionUtils.getMethod(BuiltInRegistries::class, "freeze")
 private val REGISTRY_DATA_LOADER_LOADER = ReflectionUtils.getClass("net.minecraft.resources.RegistryDataLoader\$Loader").kotlin
-private val REGISTRY_DATA_LOADER_LOAD_FOR_EACH = ReflectionUtils.getMethod(
-    RegistryDataLoader::class, true, "lambda\$load\$6",
-    Conversions::class, Map::class, REGISTRY_DATA_LOADER_LOADER
+private val REGISTRY_DATA_LOADER_LOADING_FUNCTION = ReflectionUtils.getClass("net.minecraft.resources.RegistryDataLoader\$LoadingFunction").kotlin
+private val REGISTRY_DATA_LOADER_LOAD = ReflectionUtils.getMethod(
+    RegistryDataLoader::class, "load",
+    REGISTRY_DATA_LOADER_LOADING_FUNCTION, List::class, List::class
 )
+
+private val REGISTRY_DATA_LOADER_LOADER_GET_REGISTRY = ReflectionUtils.getMethodHandle(REGISTRY_DATA_LOADER_LOADER, "registry")
 
 private typealias PreFreezeListener<T> = (registry: WritableRegistry<T>, lookup: RegistryOps.RegistryInfoLookup) -> Unit
 private typealias PostFreezeListener<T> = (registry: Registry<T>, lookup: RegistryOps.RegistryInfoLookup) -> Unit
@@ -53,27 +59,24 @@ internal object RegistryEventsPatch : MultiTransformer(BuiltInRegistries::class,
             0, 0,
             {
                 dup()
-                getStatic(BuiltInRegistries::BUILT_IN_CONVERSIONS)
-                invokeStatic(::handlePreFreeze)
+                invokeStatic(::handlePreFreeze1)
                 dup()
                 invokeInterface(Registry<*>::freeze)
-                getStatic(BuiltInRegistries::BUILT_IN_CONVERSIONS)
-                invokeStatic(::handlePostFreeze)
+                invokeStatic(::handlePostFreeze1)
             }
         ) { it.opcode == Opcodes.INVOKEINTERFACE && (it as MethodInsnNode).calls(Registry<*>::freeze) }
         
-        VirtualClassPath[REGISTRY_DATA_LOADER_LOAD_FOR_EACH].replaceEvery(
-            0, 0,
-            {
-                dup()
-                aLoad(0) // Conversions
-                invokeStatic(::handlePreFreeze)
-                dup()
-                invokeInterface(Registry<*>::freeze)
-                aLoad(0) // Conversions
-                invokeStatic(::handlePostFreeze)
-            }
-        ) { it.opcode == Opcodes.INVOKEINTERFACE && (it as MethodInsnNode).calls(Registry<*>::freeze) }
+        VirtualClassPath[REGISTRY_DATA_LOADER_LOAD].insertAfterFirst(buildInsnList {
+            aLoad(4) // List<RegistryDataLoader.Loader>
+            aLoad(5) // RegistryInfoLookup
+            invokeStatic(::handlePreFreeze2)
+        }) { it.opcode == Opcodes.ASTORE && (it as VarInsnNode).`var` == 5 } // ASTORE registryInfoLookup
+        
+        VirtualClassPath[REGISTRY_DATA_LOADER_LOAD].insertBeforeEvery(buildInsnList {
+            aLoad(4) // List<RegistryDataLoader.Loader>
+            aLoad(5) // RegistryInfoLookup
+            invokeStatic(::handlePostFreeze2)
+        }) { it.opcode == Opcodes.ARETURN }
         
         VirtualClassPath[TagLoader<*>::build].instructions.insert(buildInsnList {
             addLabel()
@@ -84,9 +87,21 @@ internal object RegistryEventsPatch : MultiTransformer(BuiltInRegistries::class,
     }
     
     @JvmStatic
-    fun handlePreFreeze(registry: WritableRegistry<*>, conversions: Conversions) {
+    fun handlePreFreeze1(registry: WritableRegistry<*>) {
+        handlePreFreeze(registry, BuiltInRegistries.BUILT_IN_CONVERSIONS.lookup())
+    }
+    
+    @JvmStatic
+    fun handlePreFreeze2(loaders: List<Any>, lookup: RegistryOps.RegistryInfoLookup) {
+        for (loader in loaders) {
+            val registry = REGISTRY_DATA_LOADER_LOADER_GET_REGISTRY(loader) as WritableRegistry<*>
+            handlePreFreeze(registry, lookup)
+        }
+    }
+    
+    @JvmStatic
+    fun handlePreFreeze(registry: WritableRegistry<*>, lookup: RegistryOps.RegistryInfoLookup) {
         val key = registry.key()
-        val lookup = conversions.lookup()
         try {
             preFreezeListeners[key]?.forEach { it(registry, lookup) }
             preFreezeListeners.remove(key)
@@ -100,9 +115,21 @@ internal object RegistryEventsPatch : MultiTransformer(BuiltInRegistries::class,
     }
     
     @JvmStatic
-    fun handlePostFreeze(registry: Registry<*>, conversions: Conversions) {
+    fun handlePostFreeze1(registry: WritableRegistry<*>) {
+        handlePostFreeze(registry, BuiltInRegistries.BUILT_IN_CONVERSIONS.lookup())
+    }
+    
+    @JvmStatic
+    fun handlePostFreeze2(loaders: List<Any>, lookup: RegistryOps.RegistryInfoLookup) {
+        for (loader in loaders) {
+            val registry = REGISTRY_DATA_LOADER_LOADER_GET_REGISTRY(loader) as WritableRegistry<*>
+            handlePreFreeze(registry, lookup)
+        }
+    }
+    
+    @JvmStatic
+    fun handlePostFreeze(registry: Registry<*>, lookup: RegistryOps.RegistryInfoLookup) {
         val key = registry.key()
-        val lookup = conversions.lookup()
         try {
             postFreezeListeners[key]?.forEach { it(registry, lookup) }
             postFreezeListeners.remove(key)
