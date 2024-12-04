@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkGroupConstr
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import kotlin.reflect.KClass
 
-interface NetworkTypeRegistry : AddonHolder {
+interface NetworkTypeRegistry : AddonGetter {
     
     fun <T : Network<T>> registerNetworkType(
         name: String,

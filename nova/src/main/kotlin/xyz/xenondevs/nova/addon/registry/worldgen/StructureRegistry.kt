@@ -11,12 +11,12 @@ import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType
-import xyz.xenondevs.nova.addon.registry.AddonHolder
+import xyz.xenondevs.nova.addon.registry.AddonGetter
 import xyz.xenondevs.nova.patch.impl.registry.set
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
-interface StructureRegistry : AddonHolder {
+interface StructureRegistry : AddonGetter {
     
     @ExperimentalWorldGen
     fun registerStructure(name: String, structure: Structure): Structure {

@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.addon.registry
 
 import xyz.xenondevs.nova.addon.Addon
 
-interface AddonHolder {
+interface AddonGetter {
     
     val addon: Addon
     

@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 
-interface ToolCategoryRegistry : AddonHolder {
+interface ToolCategoryRegistry : AddonGetter {
     
     fun registerToolCategory(name: String): ToolCategory {
         val id = Key(addon, name)

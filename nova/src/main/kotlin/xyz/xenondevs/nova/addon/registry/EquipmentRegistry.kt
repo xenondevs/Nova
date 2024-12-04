@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.item.Equipment
 
-interface EquipmentRegistry : AddonHolder {
+interface EquipmentRegistry : AddonGetter {
     
     fun equipment(name: String, layout: StaticEquipmentLayoutBuilder.() -> Unit): Equipment =
         registerEquipment(name) { StaticEquipmentLayoutBuilder(addon.id, it).apply(layout).build() }

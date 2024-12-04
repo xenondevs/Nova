@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.NovaItemBuilder
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 
-interface ItemRegistry : AddonHolder {
+interface ItemRegistry : AddonGetter {
     
     fun item(name: String, item: NovaItemBuilder.() -> Unit): NovaItem =
         NovaItemBuilder(addon, name).apply(item).register()

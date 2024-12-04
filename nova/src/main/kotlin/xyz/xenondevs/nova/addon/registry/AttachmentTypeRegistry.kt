@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.player.attachment.Attachment
 import xyz.xenondevs.nova.world.player.attachment.AttachmentType
 
-interface AttachmentTypeRegistry : AddonHolder {
+interface AttachmentTypeRegistry : AddonGetter {
     
     fun <T : Attachment> registerAttachmentType(name: String, constructor: (Player) -> T): AttachmentType<T> {
         val id = Key(addon, name)

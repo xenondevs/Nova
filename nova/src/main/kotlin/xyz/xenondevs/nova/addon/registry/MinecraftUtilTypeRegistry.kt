@@ -7,7 +7,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType
 import xyz.xenondevs.nova.patch.impl.registry.set
 import xyz.xenondevs.nova.util.ResourceLocation
 
-interface MinecraftUtilTypeRegistry : AddonHolder {
+interface MinecraftUtilTypeRegistry : AddonGetter {
     
     fun <T : RuleTest> registerRuleTestType(name: String, ruleTestType: RuleTestType<T>): RuleTestType<T> {
         val id = ResourceLocation(addon, name)

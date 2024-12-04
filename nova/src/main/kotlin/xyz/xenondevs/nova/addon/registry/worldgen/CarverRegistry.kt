@@ -4,12 +4,12 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.levelgen.carver.CarverConfiguration
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver
 import net.minecraft.world.level.levelgen.carver.WorldCarver
-import xyz.xenondevs.nova.addon.registry.AddonHolder
+import xyz.xenondevs.nova.addon.registry.AddonGetter
 import xyz.xenondevs.nova.patch.impl.registry.set
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
-interface CarverRegistry : AddonHolder {
+interface CarverRegistry : AddonGetter {
     
     @ExperimentalWorldGen
     fun <CC : CarverConfiguration> registerCarver(name: String, carver: WorldCarver<CC>): WorldCarver<CC> {

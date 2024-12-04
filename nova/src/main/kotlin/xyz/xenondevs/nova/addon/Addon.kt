@@ -5,7 +5,7 @@ package xyz.xenondevs.nova.addon
 import io.papermc.paper.plugin.configuration.PluginMeta
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.plugin.java.JavaPlugin
-import xyz.xenondevs.nova.addon.registry.AddonHolder
+import xyz.xenondevs.nova.addon.registry.AddonGetter
 import xyz.xenondevs.nova.addon.registry.AddonRegistryHolder
 import xyz.xenondevs.nova.update.ProjectDistributor
 import java.nio.file.Path
@@ -22,7 +22,7 @@ internal val Addon.id: String
 internal val Addon.version: String
     get() = pluginMeta.version
 
-abstract class Addon : AddonHolder {
+abstract class Addon : AddonGetter {
     
     final override val addon: Addon
         get() = this

@@ -6,7 +6,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.nova.world.item.enchantment.EnchantmentBuilder
 
-interface EnchantmentRegistry : AddonHolder {
+interface EnchantmentRegistry : AddonGetter {
     
     fun enchantment(name: String, enchantment: EnchantmentBuilder.() -> Unit): Provider<Enchantment> {
         val builder = EnchantmentBuilder(addon, name)

@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.set
 
-interface GuiTextureRegistry : AddonHolder {
+interface GuiTextureRegistry : AddonGetter {
     
     fun guiTexture(name: String, texture: GuiTextureLayoutBuilder.() -> Unit): GuiTexture {
         val id = Key(addon, name)

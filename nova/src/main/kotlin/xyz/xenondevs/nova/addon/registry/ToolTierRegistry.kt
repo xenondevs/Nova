@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.item.tool.ToolTier
 
-interface ToolTierRegistry : AddonHolder {
+interface ToolTierRegistry : AddonGetter {
     
     fun registerToolTier(name: String): ToolTier {
         val id = Key(addon, name)

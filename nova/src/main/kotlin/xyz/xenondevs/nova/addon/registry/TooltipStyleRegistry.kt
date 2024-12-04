@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.item.TooltipStyle
 
-interface TooltipStyleRegistry : AddonHolder {
+interface TooltipStyleRegistry : AddonGetter {
     
     /**
      * Registers a new [TooltipStyle] with the specified [name] and [meta].
