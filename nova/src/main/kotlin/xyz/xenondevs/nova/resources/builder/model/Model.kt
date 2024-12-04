@@ -115,7 +115,9 @@ data class Model(
         val to: Vector3dc,
         val rotation: Rotation? = null,
         val faces: Map<Direction, Face>,
-        val shade: Boolean = true
+        val shade: Boolean = true,
+        @SerialName("light_emission")
+        val lightEmission: Int = 0
     ) {
         
         /**
