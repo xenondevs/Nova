@@ -10,6 +10,8 @@ import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
 import io.papermc.paper.plugin.provider.type.paper.PaperPluginParent
 import kotlinx.coroutines.debug.DebugProbes
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.PermanentStorage
@@ -88,19 +90,25 @@ internal class NovaBootstrapper : PluginBootstrap {
     }
     
     private fun init() {
-        // legacy data folder migration if updating from 0.17 or earlier
-        if (PREVIOUS_NOVA_VERSION != null && PREVIOUS_NOVA_VERSION < Version("0.18-SNAPSHOT"))
-            LegacyDataFolderMigrator.migrate()
-        
-        if (IS_DEV_SERVER) {
-            DebugProbes.install()
-            DebugProbes.enableCreationStackTraces = true
+        try {
+            // legacy data folder migration if updating from 0.17 or earlier
+            if (PREVIOUS_NOVA_VERSION != null && PREVIOUS_NOVA_VERSION < Version("0.18-SNAPSHOT"))
+                LegacyDataFolderMigrator.migrate()
+            
+            if (IS_DEV_SERVER) {
+                DebugProbes.install()
+                DebugProbes.enableCreationStackTraces = true
+            }
+            
+            Patcher.run()
+            Configs.extractDefaultConfig()
+            CBFAdapters.register()
+            Initializer.start()
+        } catch(e: Exception) {
+            LOGGER.error("", e)
+            (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
+            Runtime.getRuntime().halt(-1) // force-quit
         }
-        
-        Patcher.run()
-        Configs.extractDefaultConfig()
-        CBFAdapters.register()
-        Initializer.start()
     }
     
     override fun createPlugin(context: PluginProviderContext): JavaPlugin = Nova

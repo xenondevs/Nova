@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova
 
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.core.LoggerContext
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.config.PermanentStorage
@@ -37,9 +35,7 @@ internal object LegacyDataFolderMigrator {
         // addons need to be moved manually because plugins are already loaded at this point
         val addonsDir = DATA_FOLDER.resolve("addons")
         if (addonsDir.exists() && addonsDir.listDirectoryEntries().isNotEmpty()) {
-            LOGGER.error("plugins/Nova/addons exists, but addons are plugins now. Please move all addons to plugins/")
-            (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
-            Runtime.getRuntime().halt(-1) // force-quit
+            throw Exception("plugins/Nova/addons exists, but addons are plugins now. Please move all addons to plugins/")
         }
         
         migrateConfigs()
