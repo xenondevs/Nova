@@ -1,13 +1,12 @@
 package xyz.xenondevs.nova.world.item.recipe
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Keyed
-import xyz.xenondevs.nova.util.resourceLocation
 
 class RecipeContainer(val recipe: Any) {
     
-    private val id: ResourceLocation = when (recipe) {
-        is Keyed -> recipe.key.resourceLocation
+    private val id: Key = when (recipe) {
+        is Keyed -> recipe.key
         is NovaRecipe -> recipe.id
         else -> throw IllegalArgumentException("Could not find a recipe key")
     }

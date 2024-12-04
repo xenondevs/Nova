@@ -184,7 +184,7 @@ internal class AddBridgeTask(
             val node = queue.poll()
             
             when (node) {
-                is NetworkBridge -> state.getNetworks(node).replaceAll {_, id -> if (id in previous) now else id }
+                is NetworkBridge -> state.getNetworks(node).replaceAll { _, id -> if (id in previous) now else id }
                 is NetworkEndPoint -> state.getNetworks(node).replaceAll { _, _, id -> if (id in previous) now else id }
             }
             

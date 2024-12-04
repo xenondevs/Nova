@@ -22,7 +22,7 @@ internal object TripwireLogicPatch : MultiTransformer(TripWireHookBlock::class, 
         VirtualClassPath[TripWireHookBlock::calculateState].replaceEvery(
             0, 0,
             { invokeStatic(::getBlockState) }
-        ) {it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Level::getBlockState)}
+        ) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Level::getBlockState) }
     }
     
     @JvmStatic

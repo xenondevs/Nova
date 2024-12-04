@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.LeavesBlock
 import net.minecraft.world.level.block.TripWireBlock
@@ -119,7 +119,7 @@ internal object DefaultBlocks {
     }
     
     private fun block(name: String, run: NovaBlockBuilder.() -> Unit): NovaBlock {
-        val builder = NovaBlockBuilder(ResourceLocation.fromNamespaceAndPath("nova", name))
+        val builder = NovaBlockBuilder(Key.key("nova", name))
         builder.run()
         return builder.register()
     }

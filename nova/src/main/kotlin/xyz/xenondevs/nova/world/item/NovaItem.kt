@@ -2,13 +2,13 @@
 
 package xyz.xenondevs.nova.world.item
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.component.CustomData
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -27,9 +27,9 @@ import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -57,7 +57,7 @@ import net.minecraft.world.item.ItemStack as MojangStack
  * Represents an item type in Nova.
  */
 class NovaItem internal constructor(
-    val id: ResourceLocation,
+    val id: Key,
     val name: Component?,
     val lore: List<Component>,
     val style: Style,

@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.resources.builder.task
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.commons.collections.eachRepeated
 import xyz.xenondevs.commons.collections.repeated
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
@@ -18,12 +18,11 @@ import xyz.xenondevs.nova.resources.builder.layout.equipment.StaticEquipmentLayo
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.MathUtils
 import xyz.xenondevs.nova.util.data.ImageUtils
-import xyz.xenondevs.nova.util.toResourceLocation
 import java.awt.image.BufferedImage
 
 internal class RuntimeEquipmentData(
-    val textureFrames: List<ResourceLocation>?,
-    val cameraOverlayFrames: List<ResourceLocation>?
+    val textureFrames: List<Key>?,
+    val cameraOverlayFrames: List<Key>?
 ) {
     
     init {
@@ -66,7 +65,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
     
     private fun generatedStaticEquipmentModel(id: ResourcePath<ResourceType.Equipment>, layout: StaticEquipmentLayout): RuntimeEquipmentData {
         for ((equipmentType, layers) in layout.types) {
-            for(layer in layers) {
+            for (layer in layers) {
                 if (layer.emissivityMap != null) {
                     applyEmissivityMap(layer.texture, layer.emissivityMap, "textures/entity/equipment/$equipmentType/")
                 }
@@ -79,8 +78,8 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
         builder.writeJson(id, model)
         
         return RuntimeEquipmentData(
-            listOf(id.toResourceLocation()),
-            layout.cameraOverlay?.let { listOf(it.toResourceLocation()) }
+            listOf(id),
+            layout.cameraOverlay?.let { listOf(it) }
         )
     }
     
@@ -90,7 +89,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
         return RuntimeEquipmentData(textureFrames, cameraOverlayFrames)
     }
     
-    private fun generateAnimatedCameraOverlay(layout: AnimatedEquipmentLayout): List<ResourceLocation>? {
+    private fun generateAnimatedCameraOverlay(layout: AnimatedEquipmentLayout): List<Key>? {
         val cameraOverlay = layout.cameraOverlay
         val cameraOverlayFrameCount: Int
         val cameraOverlayFrames: List<ResourcePath<ResourceType.Texture>>
@@ -102,10 +101,10 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
             cameraOverlayFrames = emptyList()
         }
         
-        return cameraOverlayFrames.map(ResourcePath<*>::toResourceLocation).takeUnlessEmpty()
+        return cameraOverlayFrames.takeUnlessEmpty()
     }
     
-    private fun generateAnimatedEquipmentTexture(id: ResourcePath<ResourceType.Equipment>, layout: AnimatedEquipmentLayout): List<ResourceLocation> {
+    private fun generateAnimatedEquipmentTexture(id: ResourcePath<ResourceType.Equipment>, layout: AnimatedEquipmentLayout): List<Key> {
         // generate all animations (merge with emissivity map, apply interpolation)
         // [equipmentType][layer][frame]
         val animations: Map<EquipmentModel.Type, List<List<ResourcePath<ResourceType.EquipmentTexture>>>> =
@@ -134,7 +133,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
             builder.writeJson(path, equipmentModelForFrame)
         }
         
-        return textureFrames.map(ResourcePath<*>::toResourceLocation)
+        return textureFrames
     }
     
     /**
@@ -206,7 +205,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
                 // expected to be black/white, so we can just use any channel
                 val emissivity = emissivityMap.getRGB(x, y) and 0xFF
                 val alpha = (255 - emissivity).coerceAtLeast(1)
-
+                
                 texture.setRGB(x, y, (alpha shl 24) or (red shl 16) or (green shl 8) or blue)
             }
         }
@@ -265,7 +264,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
      */
     private fun generateInterpolatedImages(
         from: ResourcePath<ResourceType.Texture>,
-        to: ResourcePath<ResourceType.Texture>, 
+        to: ResourcePath<ResourceType.Texture>,
         count: Int
     ): List<BufferedImage> {
         if (count <= 0)

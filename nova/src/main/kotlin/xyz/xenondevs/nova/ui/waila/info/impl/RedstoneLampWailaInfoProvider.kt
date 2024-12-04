@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.data.Lightable
 import org.bukkit.entity.Player
@@ -13,7 +13,7 @@ internal object RedstoneLampWailaInfoProvider : VanillaWailaInfoProvider<Lightab
     override fun getInfo(player: Player, pos: BlockPos, blockState: Lightable): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
         if (blockState.isLit) {
-            info.icon = ResourceLocation.withDefaultNamespace("redstone_lamp_on")
+            info.icon = Key.key("redstone_lamp_on")
         }
         
         return info

@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.generation.builder
 
+import net.kyori.adventure.key.Key
 import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
@@ -17,7 +18,7 @@ import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import java.util.*
 
 /**
- * Builder for [DimensionTypes][DimensionType]. 
+ * Builder for [DimensionTypes][DimensionType].
  * Check out the [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/dimension/) on dimensions for more information.
  *
  * @see [DimensionRegistry]
@@ -25,7 +26,7 @@ import java.util.*
  */
 @ExperimentalWorldGen
 class DimensionTypeBuilder internal constructor(
-    id: ResourceLocation,
+    id: Key,
     registry: WritableRegistry<DimensionType>
 ) : RegistryElementBuilder<DimensionType>(registry, id) {
     

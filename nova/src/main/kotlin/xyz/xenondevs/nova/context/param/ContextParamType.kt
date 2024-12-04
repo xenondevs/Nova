@@ -2,7 +2,7 @@
 
 package xyz.xenondevs.nova.context.param
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.context.intention.ContextIntention
@@ -34,7 +34,7 @@ sealed class ContextParamType<V : Any> {
     /**
      * The ID of this parameter type.
      */
-    abstract val id: ResourceLocation
+    abstract val id: Key
     
     /**
      * A list of requirements that must be fulfilled for a value of this parameter type to be valid.
@@ -56,14 +56,14 @@ sealed class ContextParamType<V : Any> {
     companion object {
         
         fun <V : Any> builder(addon: Addon, name: String): ContextParamTypeBuilder<V> {
-            return builder(ResourceLocation.fromNamespaceAndPath(addon.id, name))
+            return builder(Key.key(addon.id, name))
         }
         
         internal fun <V : Any> builder(name: String): ContextParamTypeBuilder<V> {
-            return builder(ResourceLocation.fromNamespaceAndPath("nova", name))
+            return builder(Key.key("nova", name))
         }
         
-        fun <V : Any> builder(id: ResourceLocation): ContextParamTypeBuilder<V> {
+        fun <V : Any> builder(id: Key): ContextParamTypeBuilder<V> {
             return ContextParamTypeBuilder(id)
         }
         
@@ -84,7 +84,7 @@ sealed class DefaultingContextParamType<V : Any> : ContextParamType<V>() {
 }
 
 internal open class ContextParamTypeImpl<V : Any>(
-    override val id: ResourceLocation,
+    override val id: Key,
     override val requirements: List<Requirement<V>>,
     override val autofillers: List<Autofiller<V>>,
     override val copy: (V) -> V
@@ -95,14 +95,14 @@ internal open class ContextParamTypeImpl<V : Any>(
 }
 
 internal class DefaultingContextParamTypeImpl<V : Any>(
-    override val id: ResourceLocation,
+    override val id: Key,
     override val defaultValue: V,
     override val requirements: List<Requirement<V>>,
     override val autofillers: List<Autofiller<V>>,
     override val copy: (V) -> V
 ) : DefaultingContextParamType<V>()
 
-class ContextParamTypeBuilder<V : Any> internal constructor(private val id: ResourceLocation) {
+class ContextParamTypeBuilder<V : Any> internal constructor(private val id: Key) {
     
     private val requirements = ArrayList<Requirement<V>>()
     private val autofillers = ArrayList<Autofiller<V>>()

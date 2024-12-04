@@ -36,22 +36,22 @@ fun obtainNovaItemAdvancement(
     item: NovaItem,
     frameType: AdvancementType = AdvancementType.TASK
 ): AdvancementHolder {
-    require(addon.id == item.id.namespace) { "The specified item is from a different addon" }
+    require(addon.id == item.id.namespace()) { "The specified item is from a different addon" }
     val id = item.id
-    return advancement(addon, "obtain_${id.path}") {
+    return advancement(addon, "obtain_${id.value()}") {
         if (parent != null)
             parent(parent)
         
         display(DisplayInfo(
             item.clientsideProvider.get().unwrap().copy(),
-            Component.translatable("advancement.${id.namespace}.${id.path}.title").toNMSComponent(),
-            Component.translatable("advancement.${id.namespace}.${id.path}.description").toNMSComponent(),
+            Component.translatable("advancement.${id.namespace()}.${id.value()}.title").toNMSComponent(),
+            Component.translatable("advancement.${id.namespace()}.${id.value()}.description").toNMSComponent(),
             Optional.empty(),
             frameType,
             true, true, false
         ))
         
-        addCriterion("obtain_${id.path}", createObtainNovaItemCriterion(item))
+        addCriterion("obtain_${id.value()}", createObtainNovaItemCriterion(item))
     }
 }
 
@@ -62,7 +62,7 @@ fun obtainNovaItemsAdvancement(
     items: List<NovaItem>, requireAll: Boolean,
     frameType: AdvancementType = AdvancementType.TASK
 ): AdvancementHolder {
-    require(items.all { it.id.namespace == addon.id }) { "At least one of the specified items is from a different addon" }
+    require(items.all { it.id.namespace() == addon.id }) { "At least one of the specified items is from a different addon" }
     val namespace = addon.id
     return advancement(addon, name) {
         if (parent != null)
@@ -80,7 +80,7 @@ fun obtainNovaItemsAdvancement(
         val criteriaNames = ArrayList<String>()
         
         for (item in items) {
-            val criterionName = "obtain_${item.id.path}"
+            val criterionName = "obtain_${item.id.value()}"
             addCriterion(criterionName, createObtainNovaItemCriterion(item))
             criteriaNames += criterionName
         }

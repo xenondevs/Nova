@@ -28,6 +28,7 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
         updateIsValid()
         tickNetworks(tick, NetworkGroup<*>::preTickSync)
     }
+    
     fun preTick(tick: Int) = tickNetworks(tick, NetworkGroup<*>::preTick)
     fun tick(tick: Int) = tickNetworks(tick, NetworkGroup<*>::tick)
     fun postTick(tick: Int) = tickNetworks(tick, NetworkGroup<*>::postTick)
@@ -44,7 +45,7 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
             if (!network.isValid()) {
                 isValid = false
                 return
-            }           
+            }
         }
         
         isValid = true

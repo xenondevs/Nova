@@ -82,11 +82,11 @@ fun Equippable(
 ) = Equippable(
     equipment,
     slot,
-    armor, 
+    armor,
     armorToughness,
     knockbackResistance,
     Holder.direct(SoundEvent(equipSound.toResourceLocation(), Optional.empty())),
-    allowedEntities, 
+    allowedEntities,
     dispensable,
     swappable,
     damageOnHurt
@@ -94,32 +94,32 @@ fun Equippable(
 
 /**
  * Creates a factory for [Equippable] behaviors using the given values, if not specified in the item's configuration.
- * 
+ *
  * @param equipment The equipment texture to use, or null for no texture.
- * 
+ *
  * @param slot The slot in which the item can be worn.
- * 
+ *
  * @param armor The amount of armor this item provides.
  * Used when `armor` is not specified in the config.
- * 
+ *
  * @param armorToughness The amount of armor toughness this item provides.
  * Used when `armor_toughness` is not specified in the config.
- * 
+ *
  * @param knockbackResistance The amount of knockback resistance this item provides.
  * Used when `knockback_resistance` is not specified in the config.
- * 
+ *
  * @param equipSound The sound that is played when the item is equipped.
  * Used when `equip_sound` is not specified in the config.
- * 
+ *
  * @param allowedEntities The entity types that are allowed to wear this item, or null for all entities.
  * Used when `allowed_entities` is not specified in the config.
- * 
+ *
  * @param dispensable Whether this item can be dispensed from a dispenser.
  * Used when `dispensable` is not specified in the config.
- * 
+ *
  * @param swappable Whether this item can be swapped with other items in the same slot.
  * Used when `swappable` is not specified in the config.
- * 
+ *
  * @param damageOnHurt Whether this item will be damaged when the wearing entity is damaged.
  * Used when `damage_on_hurt` is not specified in the config.
  */
@@ -142,7 +142,7 @@ fun Equippable(
         cfg.entryOrElse(armor, "armor"),
         cfg.entryOrElse(armorToughness, "armor_toughness"),
         cfg.entryOrElse(knockbackResistance, "knockback_resistance"),
-        cfg.optionalEntry<ResourceLocation>("equip_sound")
+        cfg.optionalEntry<Key>("equip_sound")
             .mapNonNull { BuiltInRegistries.SOUND_EVENT.getOrThrow(it) }
             .orElse(equipSound),
         cfg.optionalEntry<Set<BukkitEntityType>>("allowed_entities").orElse(allowedEntities),
@@ -261,8 +261,8 @@ class Equippable(
                 EquippableComponent(
                     equipmentSlot,
                     equipSound,
-                    Optional.ofNullable(textureFrames?.getOrNull(textureFrame)),
-                    Optional.ofNullable(overlayFrames?.getOrNull(overlayFrame)),
+                    Optional.ofNullable(textureFrames?.getOrNull(textureFrame)?.toResourceLocation()),
+                    Optional.ofNullable(overlayFrames?.getOrNull(overlayFrame)?.toResourceLocation()),
                     Optional.ofNullable(allowedNmsEntities),
                     dispensable, swappable, damageOnHurt
                 )

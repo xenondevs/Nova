@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.resources.lookup
 
 import net.kyori.adventure.key.Key
-import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.map
@@ -41,7 +40,7 @@ internal open class ResourceLookup<T : Any>(
     
 }
 
-internal class MapResourceLookup<K: Any, V : Any>(
+internal class MapResourceLookup<K : Any, V : Any>(
     key: String,
     typeK: KType,
     typeV: KType
@@ -69,26 +68,17 @@ internal class IdResourceLookup<T : Any>(
     operator fun get(id: String): T? =
         value[id]
     
-    operator fun get(id: ResourceLocation): T? =
-        value[id.toString()]
-    
     operator fun get(id: Key): T? =
         value[id.toString()]
     
     fun getOrThrow(id: String): T =
         value[id] ?: throw IllegalArgumentException("Resource lookup $key does not contain $id")
     
-    fun getOrThrow(id: ResourceLocation): T =
-        getOrThrow(id.toString())
-    
     fun getOrThrow(id: Key): T =
         getOrThrow(id.toString())
     
     operator fun contains(id: String): Boolean =
         id in value
-    
-    operator fun contains(id: ResourceLocation): Boolean =
-        id.toString() in value
     
     operator fun contains(id: Key): Boolean =
         id.toString() in value

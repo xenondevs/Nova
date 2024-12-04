@@ -38,25 +38,25 @@ import net.minecraft.world.item.component.Consumable as ConsumableComponent
  *
  * @param saturation The saturation that consuming the item provides.
  * Used when `saturation` is not specified in the config.
- * 
+ *
  * @param canAlwaysEat Whether the item can always be eaten, even if the player is not hungry.
  * Used when `can_always_eat` is not specified in the config.
- * 
+ *
  * @param consumeTime The time it takes to consume the item in ticks.
  * Used when `consume_time` is not specified in the config.
- * 
+ *
  * @param remains The item that remains after consuming the item.
  * Used when `remains` is not specified in the config.
- * 
+ *
  * @param possibleEffects The possible effects that consuming the item can apply.
  * Used when `effects` is not specified in the config.
- * 
+ *
  * @param animation The animation that is played when consuming the item.
  * Used when `animation` is not specified in the config.
- * 
+ *
  * @param sound The sound that is played when consuming the item.
  * Used when `sound` is not specified in the config.
- * 
+ *
  * @param particles Whether particles are spawned when consuming the item.
  * Used when `particles` is not specified in the config.
  */

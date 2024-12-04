@@ -7,16 +7,15 @@ import net.minecraft.world.item.component.UseCooldown
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.nova.config.entryOrElse
-import xyz.xenondevs.nova.util.toKey
 import xyz.xenondevs.nova.util.toResourceLocation
 import java.util.Optional
 
 /**
  * Creates a factory for [Cooldown] behaviors using the given values, if not specified otherwise in the item's config.
- * 
+ *
  * @param cooldown The cooldown, in ticks.
  * Used when `cooldown` is not specified in the item's config, or `null` to require the presence of a config entry.
- * 
+ *
  * @param group The cooldown group. Falls back to the item's id if not specified.
  * Used when `cooldown_group is not specified in the item's config.
  */
@@ -28,7 +27,7 @@ fun Cooldown(
     val cfg = it.config
     Cooldown(
         cfg.entryOrElse(cooldown, "cooldown"),
-        cfg.entryOrElse(group ?: it.id.toKey(), "cooldown_group")
+        cfg.entryOrElse(group ?: it.id, "cooldown_group")
     )
 }
 

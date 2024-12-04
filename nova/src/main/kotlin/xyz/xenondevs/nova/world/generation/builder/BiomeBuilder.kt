@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.world.generation.builder
 
+import net.kyori.adventure.key.Key
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
 import net.minecraft.core.WritableRegistry
@@ -57,7 +58,7 @@ import java.util.*
  */
 @ExperimentalWorldGen
 class BiomeBuilder internal constructor(
-    id: ResourceLocation,
+    id: Key,
     registry: WritableRegistry<Biome>,
     private val lookup: RegistryInfoLookup
 ) : RegistryElementBuilder<Biome>(registry, id) {
@@ -238,12 +239,12 @@ class BiomeClimateSettingsBuilder internal constructor() {
  *   [GrassColorModifier]).
  * * `ambientParticleSettings` - Ambient particles that will randomly spawn around the biome. If `null`, no ambient
  *   particles will be spawned.
- * * `ambientLoopSoundEvent` - Ambient sound that will play in this biome. 
+ * * `ambientLoopSoundEvent` - Ambient sound that will play in this biome.
  * * `ambientMoodSettings` - Ambient mood sounds (also known as cave sounds) that will play in this biome. If you're
  *   unfamiliar with Minecraft's mood sound system, check out the [Minecraft Wiki](https://minecraft.wiki/w/Ambience#Mood_algorithm).
  *   If `null`, no ambient mood sounds will be played.
  * * `ambientAdditionsSettings` - The ambient additions sound is a sound that will be played each tick at the probability
- *   defined at [AmbientAdditionsSettings.tickChance]. If `null`, no ambient additions sound will be played. 
+ *   defined at [AmbientAdditionsSettings.tickChance]. If `null`, no ambient additions sound will be played.
  * * `backgroundMusic` - The background music that will play in this biome. If `null`, no background music will be played.
  */
 @ExperimentalWorldGen

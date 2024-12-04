@@ -2,7 +2,7 @@
 
 package xyz.xenondevs.nova.serialization.cbf.adapter
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
@@ -10,6 +10,7 @@ import xyz.xenondevs.cbf.adapter.ComplexBinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterType
 import xyz.xenondevs.nova.world.item.behavior.UnknownItemFilter
@@ -21,7 +22,7 @@ internal object ItemFilterBinaryAdapter : ComplexBinaryAdapter<ItemFilter<*>> {
         if (id == 1.toUByte())
             return readLegacy(reader)
         
-        val filterTypeId = ResourceLocation.parse(reader.readString())
+        val filterTypeId = Key.key(reader.readString())
         return createFilter(
             filterTypeId,
             NovaRegistries.ITEM_FILTER_TYPE.getValue(filterTypeId),
@@ -35,7 +36,7 @@ internal object ItemFilterBinaryAdapter : ComplexBinaryAdapter<ItemFilter<*>> {
         val size = reader.readVarInt()
         val items: List<ItemStack> = Array(size) { CBF.read(reader) ?: ItemStack.empty() }.toList()
         
-        val id = ResourceLocation.fromNamespaceAndPath("logistics", if (nbt) "nbt_item_filter" else "type_item_filter")
+        val id = Key.key("logistics", if (nbt) "nbt_item_filter" else "type_item_filter")
         val compound = Compound()
         compound["items"] = items
         compound["whitelist"] = whitelist
@@ -43,7 +44,7 @@ internal object ItemFilterBinaryAdapter : ComplexBinaryAdapter<ItemFilter<*>> {
         return createFilter(id, NovaRegistries.ITEM_FILTER_TYPE.getValue(id), compound)
     }
     
-    private fun createFilter(id: ResourceLocation, filterType: ItemFilterType<*>?, compound: Compound): ItemFilter<*> {
+    private fun createFilter(id: Key, filterType: ItemFilterType<*>?, compound: Compound): ItemFilter<*> {
         if (filterType == null)
             return UnknownItemFilter(id, compound)
         return filterType.deserialize(compound)

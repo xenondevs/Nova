@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.world.item.behavior
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.core.component.DataComponents
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
@@ -18,14 +18,14 @@ import xyz.xenondevs.nova.util.item.storeData
 import xyz.xenondevs.nova.util.unwrap
 import org.bukkit.inventory.ItemStack as BukkitStack
 
-private val ENERGY_KEY = ResourceLocation.fromNamespaceAndPath("nova", "energy")
+private val ENERGY_KEY = Key.key("nova", "energy")
 
 /**
  * Creates a factory for [Chargeable] behaviors using the given values, if not specified otherwise in the item's config.
- * 
+ *
  * @param maxEnergy The maximum amount of energy the item can store.
  * Used when `max_energy` is not specified in the config, or `null` to require the presence of a config entry.
- * 
+ *
  * @param affectsItemDurability Whether the item's durability bar should be used to visualize the amount
  * of energy stored in the item. Used when `charge_affects_item_durability` is not specified in the config.
  */

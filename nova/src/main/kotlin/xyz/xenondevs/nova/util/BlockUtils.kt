@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
@@ -75,12 +76,12 @@ import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.level.block.Block as MojangBlock
 
 /**
- * The [ResourceLocation] of this block, considering blocks from Nova, custom item services and vanilla.
+ * The [Key] of this block, considering blocks from Nova, custom item services and vanilla.
  */
-val Block.id: ResourceLocation
+val Block.id: Key
     get() = WorldDataManager.getBlockState(pos)?.block?.id
-        ?: CustomItemServiceManager.getId(this)?.let { ResourceLocation.parse(it) }
-        ?: ResourceLocation.withDefaultNamespace(type.name.lowercase())
+        ?: CustomItemServiceManager.getId(this)?.let { Key.key(it) }
+        ?: type.key()
 
 /**
  * The [NovaBlockState] at the position of this [Block].
@@ -288,9 +289,9 @@ object BlockUtils {
                 
                 return placeVanillaBlock(
                     pos,
-                    ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE] ?: BlockFace.UP, 
-                    fakePlayer, 
-                    itemStack, 
+                    ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE] ?: BlockFace.UP,
+                    fakePlayer,
+                    itemStack,
                     placeEffects
                 )
             }

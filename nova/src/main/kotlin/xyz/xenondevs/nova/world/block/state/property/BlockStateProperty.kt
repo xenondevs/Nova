@@ -1,13 +1,13 @@
 package xyz.xenondevs.nova.world.block.state.property
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
 
 /**
  * Represents a property-type of a block state.
  */
-abstract class BlockStateProperty<T : Any>(val id: ResourceLocation) {
+abstract class BlockStateProperty<T : Any>(val id: Key) {
     
     /**
      * Creates a new [ScopedBlockStateProperty] of this property that is limited to the given [values]

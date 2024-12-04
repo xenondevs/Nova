@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.serialization.configurate
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializer
 import xyz.xenondevs.nova.util.data.get
@@ -24,9 +24,9 @@ internal object BlockLimiterSerializer : TypeSerializer<List<BlockLimiter>> {
     
     private fun deserializeLimiter(type: String, node: ConfigurationNode): BlockLimiter {
         return when (type) {
-            "type" -> TypeBlacklist(node.get<HashSet<ResourceLocation>>()!!)
+            "type" -> TypeBlacklist(node.get<HashSet<Key>>()!!)
             "world" -> WorldBlacklist(node.get<HashSet<String>>()!!)
-            "type_world" -> TypeWorldBlacklist(node.get<HashMap<String, HashSet<ResourceLocation>>>()!!)
+            "type_world" -> TypeWorldBlacklist(node.get<HashMap<String, HashSet<Key>>>()!!)
             "amount" -> AmountLimiter(AmountLimiter.Type.GLOBAL, deserializeAmountLimiterMap(node))
             "amount_per_world" -> AmountLimiter(AmountLimiter.Type.PER_WORLD, deserializeAmountLimiterMap(node))
             "amount_per_chunk" -> AmountLimiter(AmountLimiter.Type.PER_CHUNK, deserializeAmountLimiterMap(node))
@@ -34,11 +34,11 @@ internal object BlockLimiterSerializer : TypeSerializer<List<BlockLimiter>> {
         }
     }
     
-    private fun deserializeAmountLimiterMap(node: ConfigurationNode): Map<ResourceLocation?, Int> {
-        val map = HashMap<ResourceLocation?, Int>()
+    private fun deserializeAmountLimiterMap(node: ConfigurationNode): Map<Key?, Int> {
+        val map = HashMap<Key?, Int>()
         for ((key, value) in node.childrenMap()) {
             key as String
-            val id = if (key == "*") null else ResourceLocation.parse(key)
+            val id = if (key == "*") null else Key.key(key)
             map[id] = value.int
         }
         return map

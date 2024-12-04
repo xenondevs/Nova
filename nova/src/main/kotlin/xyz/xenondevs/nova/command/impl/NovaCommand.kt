@@ -519,7 +519,7 @@ internal object NovaCommand : Command() {
         val enabled = NetworkDebugger.toggleDebugger(type, player)
         
         ctx.source.sender.sendMessage(Component.translatable(
-            "command.nova.network_debug.${type.id.toLanguageKey()}.${if (enabled) "on" else "off"}",
+            "command.nova.network_debug.${type.id.namespace()}.${type.id.value()}.${if (enabled) "on" else "off"}",
             NamedTextColor.GRAY
         ))
     }

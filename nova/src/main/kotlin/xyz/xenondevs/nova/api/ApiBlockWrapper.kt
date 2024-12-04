@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 
 internal class ApiBlockWrapper(val block: NovaBlock) : INovaBlock {
     
-    override fun getId(): INamespacedId = NamespacedId(block.id.namespace, block.id.path)
+    override fun getId(): INamespacedId = NamespacedId(block.id.namespace(), block.id.value())
     override fun getItem(): NovaItem? = block.item?.let(::ApiItemWrapper)
     override fun getName(): Component = block.name
     override fun getPlaintextName(locale: String): String = block.name.toPlainText(locale)

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.data.type.Campfire
 import org.bukkit.entity.Player
@@ -14,7 +14,7 @@ internal object CampfireWailaInfoProvider : VanillaWailaInfoProvider<Campfire>(
     
     override fun getInfo(player: Player, pos: BlockPos, blockState: Campfire): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
-        info.icon = ResourceLocation.withDefaultNamespace(if (blockState.isLit) blockState.material.name.lowercase() else "campfire_off")
+        info.icon = Key.key(if (blockState.isLit) blockState.material.name.lowercase() else "campfire_off")
         return info
     }
     

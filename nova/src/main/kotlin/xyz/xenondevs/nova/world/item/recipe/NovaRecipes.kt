@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.item.recipe
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 
@@ -8,7 +8,7 @@ import org.bukkit.inventory.RecipeChoice
  * The interface for all recipes for Nova blocks.
  */
 interface NovaRecipe {
-    val id: ResourceLocation
+    val id: Key
     val type: RecipeType<out NovaRecipe>
 }
 
@@ -82,7 +82,7 @@ interface MultiInputChoiceRecipe : InputChoiceRecipe {
  * The abstract base class for all recipes that convert one [input] into a [result] in a defined [time].
  */
 abstract class ConversionNovaRecipe(
-    override val id: ResourceLocation,
+    override val id: Key,
     override val input: RecipeChoice,
     override val result: ItemStack,
     val time: Int

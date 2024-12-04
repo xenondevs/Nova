@@ -20,7 +20,7 @@ private val FUEL_VALUES_VALUES = MethodHandles.privateLookupIn(FuelValues::class
 
 /**
  * Creates a factory for [Fuel] behaviors using the given values, if not specified otherwise in the item's config.
- * 
+ *
  * @param burnTime The burn time of the fuel, in ticks.
  * Used when `burn_time` is not specified in the item's config, or `null` to require the presence of a config entry.
  */

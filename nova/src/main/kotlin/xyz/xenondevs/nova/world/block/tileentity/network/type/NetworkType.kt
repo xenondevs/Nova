@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -22,7 +22,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.Fluid
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemNetworkGroup
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
-import java.util.*
 import kotlin.reflect.KClass
 
 internal typealias NetworkConstructor<T> = (NetworkData<T>) -> T
@@ -34,12 +33,12 @@ internal typealias LocalValidator = (NetworkEndPoint, NetworkEndPoint, BlockFace
  *
  * @param id The unique identifier of this [NetworkType].
  * @param createNetwork The constructor to instantiate a [Network] of this [NetworkType].
- * @param tickDelay The delay between [network ticks][Network.tick].
+ * @param tickDelay The delay between [network ticks][NetworkGroup.tick].
  * @param holderTypes The types of [EndPointDataHolders][EndPointDataHolder]
  * that are required for end points of this [NetworkType].
  */
 class NetworkType<T : Network<T>> internal constructor(
-    val id: ResourceLocation,
+    val id: Key,
     val createNetwork: NetworkConstructor<T>,
     val createGroup: NetworkGroupConstructor<T>,
     val validateLocal: LocalValidator,
@@ -48,7 +47,7 @@ class NetworkType<T : Network<T>> internal constructor(
 ) {
     
     /**
-     * The delay between [network ticks][Network.tick].
+     * The delay between [network ticks][NetworkGroup.tick].
      */
     val tickDelay: Int by tickDelay
     
@@ -110,7 +109,7 @@ object DefaultNetworkTypes {
         tickDelay: Provider<Int>,
         vararg holderTypes: KClass<out EndPointDataHolder>
     ): NetworkType<T> {
-        val id = ResourceLocation.fromNamespaceAndPath("nova", name)
+        val id = Key.key("nova", name)
         val type = NetworkType(
             id,
             createNetwork, createGroup,

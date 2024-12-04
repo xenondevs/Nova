@@ -2,12 +2,12 @@ package xyz.xenondevs.nova.world.block.state.property.impl
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.block.state.property.BlockStatePropertyInitializer
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 
-class IntProperty(id: ResourceLocation) : BlockStateProperty<Int>(id) {
+class IntProperty(id: Key) : BlockStateProperty<Int>(id) {
     
     fun scope(range: IntRange, initializer: BlockStatePropertyInitializer<Int> = { range.first }): ScopedBlockStateProperty<Int> {
         return scope(range.toSet(), initializer)

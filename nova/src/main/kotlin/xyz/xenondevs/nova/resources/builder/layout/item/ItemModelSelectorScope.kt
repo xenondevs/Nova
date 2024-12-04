@@ -33,7 +33,7 @@ class ItemModelSelectorScope internal constructor(
      * layered model using the texture under `namespace:item/name`.
      */
     override val defaultModel: ModelBuilder by lazy {
-        val path = ResourcePath(ResourceType.Model, id.namespace, "item/${id.path}")
+        val path = ResourcePath(ResourceType.Model, id.namespace(), "item/${id.value()}")
         modelContent[path]
             ?.let(::ModelBuilder)
             ?: createLayeredModel(
@@ -54,13 +54,13 @@ class ItemModelSelectorScope internal constructor(
      * Gets the model under the given [path] or throws an exception if it does not exist.
      */
     override fun getModel(path: String): ModelBuilder =
-        getModel(ResourcePath.of(ResourceType.Model, path, id.namespace))
+        getModel(ResourcePath.of(ResourceType.Model, path, id.namespace()))
     
     /**
      * Creates a new layered model using the given [layers] as the textures.
      */
     fun createLayeredModel(vararg layers: String): ModelBuilder =
-        createLayeredModel(*layers.map { ResourcePath.of(ResourceType.Model, it, id.namespace) }.toTypedArray())
+        createLayeredModel(*layers.map { ResourcePath.of(ResourceType.Model, it, id.namespace()) }.toTypedArray())
     
     /**
      * Creates a new layered model using the given [layers] as raw paths to the textures.
@@ -81,7 +81,7 @@ class ItemModelSelectorScope internal constructor(
      * with the actual texture placed at (0, 0) to (18, 18).
      */
     fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: String): ModelBuilder =
-        createGuiModel(background, stretched, *layers.mapToArray { ResourcePath.of(ResourceType.Model, it, id.namespace) })
+        createGuiModel(background, stretched, *layers.mapToArray { ResourcePath.of(ResourceType.Model, it, id.namespace()) })
     
     /**
      * Creates a new GUI model using the given [layers] as texture

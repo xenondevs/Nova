@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.config
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.snakeyaml.engine.v2.api.DumpSettings
 import org.snakeyaml.engine.v2.api.LoadSettings
 import org.snakeyaml.engine.v2.api.YamlOutputStreamWriter
@@ -29,11 +29,11 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 
-internal class ConfigExtractor(extractedConfigs: MutableProvider<Map<ResourceLocation, String>>) {
+internal class ConfigExtractor(extractedConfigs: MutableProvider<Map<Key, String>>) {
     
-    private var extractedConfigs: Map<ResourceLocation, String> by extractedConfigs
+    private var extractedConfigs: Map<Key, String> by extractedConfigs
     
-    fun extract(configId: ResourceLocation, fileInZip: Path, destFile: Path) {
+    fun extract(configId: Key, fileInZip: Path, destFile: Path) {
         val internalCfg = loadYaml(fileInZip)
         val extractedCfg = extractedConfigs[configId]?.let(::loadYaml)
         

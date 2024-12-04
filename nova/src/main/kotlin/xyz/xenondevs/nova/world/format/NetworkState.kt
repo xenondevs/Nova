@@ -108,7 +108,7 @@ class NetworkState internal constructor(
     /**
      * Gets the [ProtoNetwork] with the given [networkId] and [type], or throws an exception
      * if no such network exists.
-     * 
+     *
      * @throws IllegalArgumentException If no network with [networkId] exists, or it is not of [type].
      */
     fun <T : Network<T>> getNetworkOrThrow(type: NetworkType<T>, networkId: UUID): ProtoNetwork<T> {
@@ -132,7 +132,7 @@ class NetworkState internal constructor(
     
     /**
      * Gets or creates a [ProtoNetwork] with the given [type] and [networkId].
-     * 
+     *
      * @throws IllegalArgumentException If a network with the same [networkId] exists, but is not of the given [type].
      */
     fun <T : Network<T>> getOrCreateNetwork(type: NetworkType<T>, networkId: UUID = UUID.randomUUID()): ProtoNetwork<T> {

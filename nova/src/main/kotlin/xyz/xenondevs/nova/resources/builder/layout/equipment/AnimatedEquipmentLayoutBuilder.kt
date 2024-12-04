@@ -20,7 +20,7 @@ class AnimatedEquipmentLayoutBuilder internal constructor(
     /**
      * Defines humanoid equipment layers. Textures are expected to be located under
      * `textures/entity/equipment/humanoid/`.
-     * 
+     *
      * @see humanoidLeggings
      * @see wings
      */
@@ -32,13 +32,13 @@ class AnimatedEquipmentLayoutBuilder internal constructor(
     /**
      * Defines humanoid leggings equipment layers. Textures are expected to be located under
      * `textures/entity/equipment/humanoid_leggings/`.
-     * 
+     *
      * @see humanoid
      * @see wings
      */
     fun humanoidLeggings(builder: AnimatedEquipmentLayersBuilder<ResourceType.HumanoidLegginsEquipmentTexture>.() -> Unit) {
         val humanoidLayers = AnimatedEquipmentLayersBuilder(namespace, ResourceType.HumanoidLegginsEquipmentTexture, resourcePackBuilder).apply(builder).build()
-        layers[EquipmentModel.Type.HUMANOID_LEGGINGS] = humanoidLayers        
+        layers[EquipmentModel.Type.HUMANOID_LEGGINGS] = humanoidLayers
     }
     
     /**
@@ -68,7 +68,7 @@ class AnimatedEquipmentLayoutBuilder internal constructor(
     /**
      * Defines elytra equipment layers. Textures are expected to be located under
      * `textures/entity/equipment/elytra/`.
-     * 
+     *
      * @see humanoid
      * @see humanoidLeggings
      */
@@ -169,7 +169,7 @@ class AnimatedEquipmentLayerBuilder<T : ResourceType.EquipmentTexture> internal 
     }
     
     /**
-     * Uses all textures `assets/<namespace>/textures/entity/equipment/<type>/<texture>.png`, where 
+     * Uses all textures `assets/<namespace>/textures/entity/equipment/<type>/<texture>.png`, where
      * `namespace` and `texture` are defined by each frame from [frames] and `type` is the current entity type.
      */
     fun texture(ticksPerFrame: Int, interpolationMode: InterpolationMode, vararg frames: ResourcePath<T>) {

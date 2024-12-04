@@ -33,10 +33,10 @@ object UpdatableFile {
         for (addon in AddonBootstrapper.addons) {
             addon.file.useZip { zip ->
                 extractAll(
-                    zip.resolve(dirName), 
+                    zip.resolve(dirName),
                     addon.dataFolder.resolve(dirName)
                 ) { ResourcePath.isValidPath(it.name) }
-            }  
+            }
         }
     }
     

@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.world.block
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
-import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 typealias TileEntityConstructor = ((BlockPos, NovaBlockState, Compound) -> TileEntity)
 
 class NovaTileEntityBlock internal constructor(
-    id: ResourceLocation,
+    id: Key,
     name: Component,
     style: Style,
     behaviors: List<BlockBehaviorHolder>,

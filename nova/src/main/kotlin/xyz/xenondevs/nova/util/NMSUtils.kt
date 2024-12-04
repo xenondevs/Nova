@@ -5,6 +5,7 @@ package xyz.xenondevs.nova.util
 import com.mojang.datafixers.util.Either
 import io.netty.buffer.Unpooled
 import net.kyori.adventure.key.Key
+import net.minecraft.core.DefaultedRegistry
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderGetter
@@ -133,7 +134,7 @@ val NamespacedKey.resourceLocation: ResourceLocation
 val ResourceLocation.namespacedKey: NamespacedKey
     get() = NamespacedKey(namespace, path)
 
-fun <C: ResourceType> ResourceLocation.toResourcePath(type: C): ResourcePath<C> =
+fun <C : ResourceType> ResourceLocation.toResourcePath(type: C): ResourcePath<C> =
     ResourcePath(type, namespace, path)
 
 fun Key.toResourceLocation(): ResourceLocation =
@@ -466,8 +467,20 @@ fun <T> Registry<T>.getOrThrow(key: Key): Holder<T> {
     return getOrThrow(ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value()))
 }
 
-fun <T> Registry<T>.getValue(key: String): T? {
-    return get(key).getOrNull()?.value()
+fun <T> Registry<T>.getValue(key: String?): T? {
+    return getValue(key?.let(ResourceLocation::parse))
+}
+
+fun <T> Registry<T>.getValue(key: Key?): T? {
+    return getValue(key?.toResourceLocation())
+}
+
+fun <T> DefaultedRegistry<T>.getValue(key: String?): T {
+    return getValue(key?.let(ResourceLocation::parse))
+}
+
+fun <T> DefaultedRegistry<T>.getValue(key: Key?): T {
+    return getValue(key?.toResourceLocation())
 }
 
 fun <T> Registry<T>.getValueOrThrow(key: String): T {
@@ -496,6 +509,10 @@ operator fun Registry<*>.contains(key: String): Boolean {
     return containsKey(id)
 }
 
+operator fun Registry<*>.contains(key: Key): Boolean {
+    return containsKey(key.toResourceLocation())
+}
+
 operator fun <T : Any> WritableRegistry<T>.set(name: String, value: T) {
     register(ResourceKey.create(key(), ResourceLocation.parse(name)), value, RegistrationInfo.BUILT_IN)
 }
@@ -518,6 +535,10 @@ operator fun <T : Any> WritableRegistry<T>.set(key: Key, value: T) {
 
 fun <T : Any> WritableRegistry<T>.register(id: ResourceLocation, value: T): Holder.Reference<T> {
     return register(ResourceKey.create(key(), id), value, RegistrationInfo.BUILT_IN)
+}
+
+fun <T : Any> WritableRegistry<T>.register(id: Key, value: T): Holder.Reference<T> {
+    return register(id.toResourceLocation(), value)
 }
 
 fun <T> Registry<T>.toHolderMap(): Map<ResourceLocation, Holder<T>> {
@@ -568,6 +589,10 @@ fun <T> ResourceKey<Registry<T>>.getOrThrow(key: ResourceKey<T>): Holder.Referen
 
 fun <T> ResourceKey<Registry<T>>.getOrThrow(id: ResourceLocation): Holder.Reference<T> {
     return REGISTRY_ACCESS.get(ResourceKey.create<T>(this, id)).get()
+}
+
+fun <T> ResourceKey<Registry<T>>.getOrThrow(id: Key): Holder.Reference<T> {
+    return getOrThrow(id.toResourceLocation())
 }
 
 fun <T> ResourceKey<Registry<T>>.getOrThrow(key: String): Holder.Reference<T> {

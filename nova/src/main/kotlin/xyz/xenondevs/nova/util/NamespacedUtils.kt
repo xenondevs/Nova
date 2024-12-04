@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.util.data
+package xyz.xenondevs.nova.util
 
 import net.kyori.adventure.key.Key
 import org.bukkit.NamespacedKey
@@ -24,3 +24,15 @@ fun Key(plugin: Plugin, value: String): Key =
  */
 fun Key(addon: Addon, value: String): Key =
     Key.key(addon.id, value)
+
+/**
+ * Converts this [Key] to a [NamespacedKey].
+ */
+fun Key.toNamespacedKey(): NamespacedKey =
+    NamespacedKey(this.namespace(), this.value())
+
+/**
+ * Converts this [Key] to a string by concatenating the [Key.namespace] and [Key.value] with [separator].
+ */
+fun Key.toString(separator: String): String =
+    "${namespace()}$separator${value()}"

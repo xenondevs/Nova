@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.world.item.tool
 
+import net.kyori.adventure.key.Key
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
 import org.bukkit.Material
 import org.bukkit.Tag
@@ -16,10 +16,10 @@ import xyz.xenondevs.nova.world.item.behavior.Tool
 import xyz.xenondevs.nova.world.pos
 
 /**
- * @param id The [ResourceLocation] of this [ToolCategory]
+ * @param id The [Key] of this [ToolCategory]
  */
 open class ToolCategory internal constructor(
-    val id: ResourceLocation
+    val id: Key
 ) {
     
     override fun toString(): String {
@@ -112,7 +112,7 @@ open class ToolCategory internal constructor(
 }
 
 class VanillaToolCategory internal constructor(
-    id: ResourceLocation,
+    id: Key,
     val canSweepAttack: Boolean,
     val canBreakBlocksInCreative: Boolean,
     val itemDamageOnAttackEntity: Int,

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.data.Hatchable
 import org.bukkit.entity.Player
@@ -12,7 +12,7 @@ internal object HatchableWailaInfoProvider : VanillaWailaInfoProvider<Hatchable>
     
     override fun getInfo(player: Player, pos: BlockPos, blockState: Hatchable): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
-        info.icon = ResourceLocation.withDefaultNamespace("${blockState.material.name.lowercase()}_${blockState.hatch}")
+        info.icon = Key.key("${blockState.material.name.lowercase()}_${blockState.hatch}")
         return info
     }
     

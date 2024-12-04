@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.overlay.bossbar.positioning
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.util.bossbar.BossBar
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import java.util.*
@@ -20,7 +20,7 @@ data class BarMatchInfo(
         fun fromPlugin(bossBar: BossBar, barIndex: Int, plugin: BukkitPlugin): BarMatchInfo =
             BarMatchInfo(bossBar, barIndex, BarOrigin.Plugin(plugin))
         
-        fun fromAddon(id: ResourceLocation): BarMatchInfo =
+        fun fromAddon(id: Key): BarMatchInfo =
             BarMatchInfo(null, null, BarOrigin.Addon(id))
         
     }
@@ -75,6 +75,6 @@ sealed interface BarOrigin {
     
     data class Plugin(val plugin: BukkitPlugin) : BarOrigin
     
-    data class Addon(val id: ResourceLocation) : BarOrigin
+    data class Addon(val id: Key) : BarOrigin
     
 }

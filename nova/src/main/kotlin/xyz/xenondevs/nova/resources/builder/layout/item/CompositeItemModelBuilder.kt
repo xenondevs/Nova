@@ -12,7 +12,7 @@ import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 
 /**
  * A collection of [ItemModels][ItemModel].
- * 
+ *
  * @see CompositeItemModelBuilder
  */
 class ItemModelsCollection<S : ModelSelectorScope> internal constructor(
@@ -34,14 +34,14 @@ class ItemModelsCollection<S : ModelSelectorScope> internal constructor(
     operator fun plusAssign(model: ItemModel) {
         models += model
     }
-
+    
 }
 
 @RegistryElementBuilderDsl
 class CompositeItemModelBuilder<S : ModelSelectorScope> internal constructor(
     resourcePackBuilder: ResourcePackBuilder,
     selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
-): ItemModelCreationScope<S>(resourcePackBuilder, selectAndBuild) {
+) : ItemModelCreationScope<S>(resourcePackBuilder, selectAndBuild) {
     
     /**
      * The collection of models displayed in this composite model.

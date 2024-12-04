@@ -123,7 +123,7 @@ object WorldDataManager : Listener {
         worlds.values.flatMap { it.getTileEntities() }
     
     fun setTileEntity(pos: BlockPos, tileEntity: TileEntity?): TileEntity? {
-        check(!disabled) { "WorldDataManager is already disabled"}
+        check(!disabled) { "WorldDataManager is already disabled" }
         return getChunkOrThrow(pos.chunkPos).setTileEntity(pos, tileEntity)
     }
     

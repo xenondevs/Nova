@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.config
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.spongepowered.configurate.CommentedConfigurationNode
@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.serialization.configurate.NOVA_CONFIGURATE_SERIALIZERS
-import xyz.xenondevs.nova.util.ResourceLocation
+import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
 import kotlin.collections.component1
@@ -30,7 +30,7 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 
-private val DEFAULT_CONFIG_ID = ResourceLocation.fromNamespaceAndPath("nova", "config")
+private val DEFAULT_CONFIG_ID = Key.key("nova", "config")
 private const val DEFAULT_CONFIG_PATH = "configs/config.yml"
 val MAIN_CONFIG = Configs[DEFAULT_CONFIG_ID]
 
@@ -40,7 +40,7 @@ object Configs {
     private val customSerializers = HashMap<String, ArrayList<TypeSerializerCollection>>()
     
     private val extractor = ConfigExtractor(PermanentStorage.storedValue("stored_configs", ::HashMap))
-    private val configProviders = HashMap<ResourceLocation, RootConfigProvider>()
+    private val configProviders = HashMap<Key, RootConfigProvider>()
     
     private var lastReload = -1L
     
@@ -62,7 +62,7 @@ object Configs {
         lastReload = System.currentTimeMillis()
         configProviders.values.asSequence()
             .filter { it.path.exists() }
-            .forEach { it.set(createLoader(it.configId.namespace, it.path).load()) }
+            .forEach { it.set(createLoader(it.configId.namespace(), it.path).load()) }
     }
     
     private fun extractConfigs(namespace: String, zipFile: Path, dataFolder: Path) {
@@ -72,28 +72,28 @@ object Configs {
                 .filter { !it.isDirectory() && it.extension.equals("yml", true) }
                 .forEach { config ->
                     val relPath = config.relativeTo(configsDir).invariantSeparatorsPathString
-                    val configId = ResourceLocation.fromNamespaceAndPath(namespace, relPath.substringBeforeLast('.'))
+                    val configId = Key.key(namespace, relPath.substringBeforeLast('.'))
                     extractConfig(config, dataFolder.resolve("configs").resolve(relPath), configId)
                 }
         }
     }
     
-    private fun extractConfig(from: Path, to: Path, configId: ResourceLocation) {
+    private fun extractConfig(from: Path, to: Path, configId: Key) {
         extractor.extract(configId, from, to)
         val provider = configProviders.getOrPut(configId) { RootConfigProvider(to, configId) }
         provider.reload()
     }
     
-    private fun resolveConfigPath(configId: ResourceLocation): Path {
-        val dataFolder = when (configId.namespace) {
+    private fun resolveConfigPath(configId: Key): Path {
+        val dataFolder = when (configId.namespace()) {
             "nova" -> DATA_FOLDER
-            else -> AddonBootstrapper.addons.firstOrNull { it.id == configId.namespace }?.dataFolder
-                ?: throw IllegalArgumentException("No addon with id ${configId.namespace} found")
+            else -> AddonBootstrapper.addons.firstOrNull { it.id == configId.namespace() }?.dataFolder
+                ?: throw IllegalArgumentException("No addon with id ${configId.namespace()} found")
         }
-        return dataFolder.resolve("configs").resolve(configId.path + ".yml")
+        return dataFolder.resolve("configs").resolve(configId.value() + ".yml")
     }
     
-    internal fun reload(): List<ResourceLocation> {
+    internal fun reload(): List<Key> {
         val reloadedConfigs = configProviders.asSequence()
             .filter { (_, provider) ->
                 !provider.path.exists() && provider.fileExisted
@@ -109,28 +109,28 @@ object Configs {
     }
     
     operator fun get(id: String): Provider<CommentedConfigurationNode> =
-        get(ResourceLocation.parse(id))
+        get(Key.key(id))
     
     operator fun get(addon: Addon, path: String): Provider<CommentedConfigurationNode> =
-        get(ResourceLocation(addon, path))
+        get(Key(addon, path))
     
-    operator fun get(id: ResourceLocation): Provider<CommentedConfigurationNode> =
+    operator fun get(id: Key): Provider<CommentedConfigurationNode> =
         configProviders.getOrPut(id) { RootConfigProvider(resolveConfigPath(id), id).also { if (lastReload > -1) it.reload() } }
     
     fun getOrNull(id: String): CommentedConfigurationNode? =
-        getOrNull(ResourceLocation.parse(id))
+        getOrNull(Key.key(id))
     
-    fun getOrNull(id: ResourceLocation): CommentedConfigurationNode? =
+    fun getOrNull(id: Key): CommentedConfigurationNode? =
         configProviders[id]?.takeIf { it.loaded }?.get()
     
     fun save(id: String): Unit =
-        save(ResourceLocation.parse(id))
+        save(Key.key(id))
     
-    fun save(id: ResourceLocation) {
+    fun save(id: Key) {
         val config = getOrNull(id)
             ?: return
         
-        createLoader(id.namespace, resolveConfigPath(id)).save(config)
+        createLoader(id.namespace(), resolveConfigPath(id)).save(config)
     }
     
     /**

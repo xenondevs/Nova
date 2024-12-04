@@ -24,5 +24,5 @@ class ServerboundSelectBundleItemPacketEvent(
         return ServerboundSelectBundleItemPacket(slotId, selectedItemIndex)
     }
     
-
+    
 }

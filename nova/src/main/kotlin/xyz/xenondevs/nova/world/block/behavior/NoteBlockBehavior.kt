@@ -162,7 +162,7 @@ internal object NoteBlockBehavior : BlockBehavior {
             NoteBlockInstrument.BANJO -> Instrument.BANJO
             NoteBlockInstrument.PLING -> Instrument.PLING
             NoteBlockInstrument.ZOMBIE -> Instrument.ZOMBIE
-            NoteBlockInstrument.SKELETON ->  Instrument.SKELETON
+            NoteBlockInstrument.SKELETON -> Instrument.SKELETON
             NoteBlockInstrument.CREEPER -> Instrument.CREEPER
             NoteBlockInstrument.DRAGON -> Instrument.DRAGON
             NoteBlockInstrument.WITHER_SKELETON -> Instrument.WITHER_SKELETON

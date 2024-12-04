@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.data.type.DaylightDetector
 import org.bukkit.entity.Player
@@ -13,7 +13,7 @@ internal object DaylightDetectorWailaInfoProvider : VanillaWailaInfoProvider<Day
     override fun getInfo(player: Player, pos: BlockPos, blockState: DaylightDetector): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
         if (blockState.isInverted) {
-            info.icon = ResourceLocation.withDefaultNamespace("daylight_detector_inverted")
+            info.icon = Key.key("daylight_detector_inverted")
         }
         return info
     }

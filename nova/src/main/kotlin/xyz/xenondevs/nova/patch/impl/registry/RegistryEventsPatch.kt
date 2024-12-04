@@ -3,6 +3,7 @@
 package xyz.xenondevs.nova.patch.impl.registry
 
 import io.papermc.paper.tag.TagEventConfig
+import net.kyori.adventure.key.Key
 import net.minecraft.core.Registry
 import net.minecraft.core.WritableRegistry
 import net.minecraft.core.registries.BuiltInRegistries
@@ -14,7 +15,6 @@ import net.minecraft.tags.TagEntry
 import net.minecraft.tags.TagKey
 import net.minecraft.tags.TagLoader
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.IntInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.VarInsnNode
 import xyz.xenondevs.bytebase.asm.buildInsnList
@@ -191,10 +191,18 @@ internal operator fun <T : Any> ResourceKey<out Registry<T>>.set(id: ResourceLoc
     preFreeze { registry, _ -> registry[id] = value }
 }
 
+internal operator fun <T : Any> ResourceKey<out Registry<T>>.set(id: Key, value: T) {
+    this[id.toResourceLocation()] = value
+}
+
 internal operator fun <T : Any> ResourceKey<out Registry<T>>.set(id: ResourceKey<T>, value: T) {
     preFreeze { registry, _ -> registry[id] = value }
 }
 
 internal operator fun TagKey<*>.plusAssign(id: ResourceLocation) {
     RegistryEventsPatch.addTagEntry(this, id)
+}
+
+internal operator fun TagKey<*>.plusAssign(id: Key) {
+    this += id.toResourceLocation()
 }

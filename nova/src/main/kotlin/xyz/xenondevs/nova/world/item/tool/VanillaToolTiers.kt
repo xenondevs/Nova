@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.item.tool
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -19,8 +19,8 @@ object VanillaToolTiers {
     val NETHERITE = register("netherite")
     
     private fun register(name: String): ToolTier {
-        val id = ResourceLocation.withDefaultNamespace(name)
-        val level = ToolTier(id, Configs["nova:tool_levels"].entry(id.path))
+        val id = Key.key(name)
+        val level = ToolTier(id, Configs["nova:tool_levels"].entry(id.value()))
         
         NovaRegistries.TOOL_TIER[id] = level
         return level

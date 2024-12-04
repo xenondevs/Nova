@@ -20,7 +20,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
     /**
      * Defines humanoid equipment layers. Textures are expected to be located under
      * `textures/entity/equipment/humanoid/`.
-     * 
+     *
      * @see humanoidLeggings
      * @see wings
      */
@@ -31,7 +31,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
     /**
      * Defines humanoid leggings equipment layers. Textures are expected to be located under
      * `textures/entity/equipment/humanoid_leggings/`.
-     * 
+     *
      * @see humanoid
      * @see wings
      */
@@ -66,7 +66,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
     /**
      * Defines elytra equipment layers. Textures are expected to be located under
      * `textures/entity/equipment/elytra/`.
-     * 
+     *
      * @see humanoid
      * @see humanoidLeggings
      */
@@ -96,7 +96,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
 }
 
 @RegistryElementBuilderDsl
-class StaticArmorLayersBuilder<T: ResourceType.EquipmentTexture> internal constructor(
+class StaticArmorLayersBuilder<T : ResourceType.EquipmentTexture> internal constructor(
     private val namespace: String,
     private val textureType: T,
     val resourcePackBuilder: ResourcePackBuilder

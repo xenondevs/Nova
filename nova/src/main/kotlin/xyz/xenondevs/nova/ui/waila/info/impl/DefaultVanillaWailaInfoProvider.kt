@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.data.BlockData
 import org.bukkit.block.data.type.PistonHead
@@ -39,7 +39,7 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(nul
             this += ToolLine.getToolLine(player, pos.block)
         }
         
-        return WailaInfo(ResourceLocation.withDefaultNamespace(mainMaterial.name.lowercase()), lines)
+        return WailaInfo(Key.key(mainMaterial.name.lowercase()), lines)
     }
     
     private fun getMainMaterial(blockState: BlockData): Material {

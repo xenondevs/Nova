@@ -3,8 +3,8 @@
 package xyz.xenondevs.nova.world.block.tileentity
 
 import kotlinx.coroutines.Job
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
@@ -65,7 +65,7 @@ abstract class TileEntity(
         /**
          * The key under which [TileEntity] data is stored in [ItemStacks][ItemStack].
          */
-        val TILE_ENTITY_DATA_KEY = ResourceLocation.fromNamespaceAndPath("nova", "tileentity")
+        val TILE_ENTITY_DATA_KEY = Key.key("nova", "tileentity")
         
     }
     

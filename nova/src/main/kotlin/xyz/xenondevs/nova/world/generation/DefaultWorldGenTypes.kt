@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.world.generation
 
+import net.kyori.adventure.key.Key
 import net.minecraft.core.registries.Registries
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -15,7 +15,7 @@ object DefaultWorldGenTypes {
     val BLOCK_MATCH_TEST_TYPE = registerRuleTestType("block_match", NovaBlockMatchTestType)
     
     private fun registerRuleTestType(id: String, type: RuleTestType<*>): RuleTestType<*> {
-        Registries.RULE_TEST[ResourceLocation.fromNamespaceAndPath("nova", id)] = type
+        Registries.RULE_TEST[Key.key("nova", id)] = type
         return type
     }
     

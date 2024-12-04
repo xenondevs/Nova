@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.world.item.legacy
 
+import net.kyori.adventure.key.Key
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.ByteArrayTag
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.NamespacedKey
@@ -104,9 +104,9 @@ internal data object ItemStackNovaDamageConverter : ItemStackLegacyConverter {
             ?: return patch
         val damage = novaCompound.get<Int>("nova", "damage")
             ?: return patch
-       
+        
         novaCompound.remove("nova", "damage")
-       
+        
         val tag = unsafeTag.copy()
         if (novaCompound.isNotEmpty()) {
             tag.putByteArray("nova_cbf", CBF.write(novaCompound))
@@ -114,7 +114,7 @@ internal data object ItemStackNovaDamageConverter : ItemStackLegacyConverter {
             tag.remove("nova_cbf")
         }
         
-        return DataComponentPatch.builder().apply { 
+        return DataComponentPatch.builder().apply {
             copy(patch)
             set(DataComponents.CUSTOM_DATA, CustomData.of(tag))
             set(DataComponents.DAMAGE, damage)
@@ -135,13 +135,13 @@ internal data object ItemStackEnchantmentsConverter : ItemStackLegacyConverter {
         val builder = DataComponentPatch.builder()
         builder.copy(patch)
         
-        val enchantments: Map<ResourceLocation, Int>? = novaCompound["nova", "enchantments"]
-        val storedEnchantments: Map<ResourceLocation, Int>? = novaCompound["nova", "stored_enchantments"]
+        val enchantments: Map<Key, Int>? = novaCompound["nova", "enchantments"]
+        val storedEnchantments: Map<Key, Int>? = novaCompound["nova", "stored_enchantments"]
         
         if (enchantments == null && storedEnchantments == null)
             return patch // nothing to convert
         
-        fun convertEnchantments(component: DataComponentType<ItemEnchantments>, legacy: Map<ResourceLocation, Int>) {
+        fun convertEnchantments(component: DataComponentType<ItemEnchantments>, legacy: Map<Key, Int>) {
             val componentEnchantments = patch.get(component)?.getOrNull() ?: ItemEnchantments.EMPTY
             val mutableEnchantments = ItemEnchantments.Mutable(componentEnchantments)
             for ((id, level) in legacy) {

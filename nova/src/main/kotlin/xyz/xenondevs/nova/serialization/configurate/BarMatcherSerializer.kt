@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.serialization.configurate
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializer
@@ -72,7 +72,7 @@ internal object BarMatcherSerializer : TypeSerializer<BarMatcher> {
             "overlay" -> {
                 val id = map["id"]?.string
                     ?: throw NoSuchElementException("Missing value 'id'")
-                val namespacedId = ResourceLocation.parse(id)
+                val namespacedId = Key.key(id)
                 
                 return BarMatcher.Origin(BarOrigin.Addon(namespacedId))
             }

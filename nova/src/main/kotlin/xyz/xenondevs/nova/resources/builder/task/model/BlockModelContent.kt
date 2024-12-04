@@ -140,7 +140,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                                     throw IllegalArgumentException("$block cannot use entity-backed block models, as it is not a tile-entity")
                                 
                                 val scope = BlockModelSelectorScope(blockState, builder, modelContent)
-                                val models = when(layout) {
+                                val models = when (layout) {
                                     is BlockModelLayout.SimpleEntityBacked -> assignModelToItem(layout.modelSelector(scope))
                                     is BlockModelLayout.ItemEntityBacked -> listOf(assignModelToItem(scope, layout.definitionConfigurator))
                                 }

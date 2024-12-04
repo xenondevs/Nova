@@ -3,11 +3,10 @@ package xyz.xenondevs.nova.ui.menu.item
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.invui.item.ItemBuilder
-import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.Click
+import xyz.xenondevs.invui.item.ItemBuilder
+import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems

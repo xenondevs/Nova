@@ -2,9 +2,9 @@
 
 package xyz.xenondevs.nova.world.item.tool
 
+import net.kyori.adventure.key.Key
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
 import org.bukkit.Tag
 import org.bukkit.block.Block
@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.item.behavior.Tool
 
 class ToolTier(
-    val id: ResourceLocation,
+    val id: Key,
     levelValue: Provider<Double>
 ) : Comparable<ToolTier> {
     

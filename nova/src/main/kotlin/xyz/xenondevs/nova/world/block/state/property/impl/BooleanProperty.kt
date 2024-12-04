@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.world.block.state.property.impl
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.block.state.property.BlockStatePropertyInitializer
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 
-class BooleanProperty(id: ResourceLocation) : BlockStateProperty<Boolean>(id) {
+class BooleanProperty(id: Key) : BlockStateProperty<Boolean>(id) {
     
     override fun scope(values: Set<Boolean>, initializer: BlockStatePropertyInitializer<Boolean>): ScopedBlockStateProperty<Boolean> {
         return ScopedBooleanProperty(this, initializer)

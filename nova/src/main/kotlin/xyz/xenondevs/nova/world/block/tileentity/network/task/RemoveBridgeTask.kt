@@ -54,7 +54,7 @@ internal class RemoveBridgeTask(
                 val recalculatedNetworkLayouts = recalculateNetworks(node, connectedBridges, networkType)
                 if (recalculatedNetworkLayouts != null) { // null means no split in networks
                     val recalculatedNetworks = recalculatedNetworkLayouts.map { nodes ->
-                        ProtoNetwork(state, networkType, nodes = nodes.filterTo(HashMap()) { (_, con) -> con.node !is GhostNetworkNode }) 
+                        ProtoNetwork(state, networkType, nodes = nodes.filterTo(HashMap()) { (_, con) -> con.node !is GhostNetworkNode })
                     }
                     state -= currentNetwork
                     state += recalculatedNetworks

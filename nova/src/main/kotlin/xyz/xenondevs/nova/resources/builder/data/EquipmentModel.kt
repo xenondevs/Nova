@@ -35,14 +35,19 @@ internal class EquipmentModel(
         
         @SerialName("horse_body")
         HORSE_BODY,
+        
         @SerialName("humanoid")
         HUMANOID,
+        
         @SerialName("humanoid_leggings")
         HUMANOID_LEGGINGS,
+        
         @SerialName("llama_body")
         LLAMA_BODY,
+        
         @SerialName("wings")
         WINGS,
+        
         @SerialName("wolf_body")
         WOLF_BODY;
         

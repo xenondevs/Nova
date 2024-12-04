@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.waila.info
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
@@ -21,7 +21,7 @@ data class WailaLine(val text: Component, val alignment: Alignment) {
     
 }
 
-data class WailaInfo(var icon: ResourceLocation, var lines: List<WailaLine>)
+data class WailaInfo(var icon: Key, var lines: List<WailaLine>)
 
 sealed interface WailaInfoProvider<T> {
     fun getInfo(player: Player, pos: BlockPos, blockState: T): WailaInfo

@@ -2,8 +2,8 @@
 
 package xyz.xenondevs.nova.context.param
 
+import net.kyori.adventure.key.Key
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Material
@@ -24,12 +24,13 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.Location
 import xyz.xenondevs.nova.util.bukkitMaterial
+import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
-import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.util.pitch
+import xyz.xenondevs.nova.util.toResourceLocation
 import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -194,7 +195,7 @@ object DefaultContextParamTypes {
         ContextParamType.builder<Material>("block_type_vanilla")
             .optionalIn(BlockPlace, BlockBreak, BlockInteract)
             .require({ it.isBlock }, { "$it is not a block" })
-            .autofilledBy(::BLOCK_TYPE) { BuiltInRegistries.BLOCK.getOptional(it).getOrNull()?.bukkitMaterial }
+            .autofilledBy(::BLOCK_TYPE) { BuiltInRegistries.BLOCK.getOptional(it.toResourceLocation()).getOrNull()?.bukkitMaterial }
             .build()
     
     // TODO: block state vanilla
@@ -219,12 +220,12 @@ object DefaultContextParamTypes {
      * - [BLOCK_TYPE_NOVA] if Nova block
      * - [BLOCK_TYPE_VANILLA] if vanilla block
      */
-    val BLOCK_TYPE: ContextParamType<ResourceLocation> =
-        ContextParamType.builder<ResourceLocation>("block_type")
+    val BLOCK_TYPE: ContextParamType<Key> =
+        ContextParamType.builder<Key>("block_type")
             .optionalIn(BlockPlace, BlockBreak, BlockInteract)
             .autofilledBy(::BLOCK_TYPE_NOVA) { it.id }
-            .autofilledBy(::BLOCK_TYPE_VANILLA) { BuiltInRegistries.BLOCK.getKey(it.nmsBlock) }
-            .autofilledBy(::BLOCK_ITEM_STACK) { ResourceLocation.parse(ItemUtils.getId(it)) }
+            .autofilledBy(::BLOCK_TYPE_VANILLA) { it.key() }
+            .autofilledBy(::BLOCK_ITEM_STACK) { Key.key(ItemUtils.getId(it)) }
             .build()
     
     /**

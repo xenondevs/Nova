@@ -14,19 +14,19 @@ import xyz.xenondevs.nova.world.item.tool.ToolTier
  *
  * @param hardness The hardness of the block.
  * Used when `hardness` is not specified in the config, or `null` to require the presence of a config entry.
- * 
+ *
  * @param toolCategories The [ToolCategories][ToolCategory] required to break the block.
  * Used when `tool_categories` is not specified in the config.
- * 
+ *
  * @param toolTier The [ToolTier] required to break the block. Can be null to not require a specific tool tier.
  * Used when `tool_tier` is not specified in the config.
- * 
+ *
  * @param requiresToolForDrops Whether the block requires a tool to drop its item.
  * Used when `requires_tool_for_drops` is not specified in the config, or `null` to require the presence of a config entry.
- * 
+ *
  * @param breakParticles The type break particles to spawn in case the block is backed by barriers. Can be null.
  * Used when `break_particles` is not specified in the config.
- * 
+ *
  * @param showBreakAnimation Whether the break animation should be shown.
  * Used when `show_break_animation` is not specified in the config.
  */

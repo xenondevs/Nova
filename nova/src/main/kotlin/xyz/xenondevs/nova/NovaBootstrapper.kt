@@ -104,7 +104,7 @@ internal class NovaBootstrapper : PluginBootstrap {
             Configs.extractDefaultConfig()
             CBFAdapters.register()
             Initializer.start()
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             LOGGER.error("", e)
             (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
             Runtime.getRuntime().halt(-1) // force-quit

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.data.type.Repeater
 import org.bukkit.entity.Player
@@ -16,8 +16,8 @@ internal object RepeaterWailaInfoProvider : VanillaWailaInfoProvider<Repeater>(s
         return info
     }
     
-    private fun getIconName(repeater: Repeater): ResourceLocation {
-        return ResourceLocation.withDefaultNamespace(
+    private fun getIconName(repeater: Repeater): Key {
+        return Key.key(
             "repeater_${repeater.delay}tick"
                 + (if (repeater.isPowered) "_on" else "")
                 + (if (repeater.isLocked) "_locked" else "")

@@ -2,11 +2,11 @@
 
 package xyz.xenondevs.nova.world.block
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
-import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.config.ConfigurableRegistryElementBuilder
@@ -19,19 +19,19 @@ import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_MODEL_SEL
 import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_STATE_SELECTOR
 import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_ENTITY_BLOCK_MODEL_SELECTOR
 import xyz.xenondevs.nova.resources.builder.layout.block.ItemDefinitionConfigurator
-import xyz.xenondevs.nova.util.ResourceLocation
+import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 
 abstract class AbstractNovaBlockBuilder<B : NovaBlock> internal constructor(
-    id: ResourceLocation
+    id: Key
 ) : ConfigurableRegistryElementBuilder<B>(NovaRegistries.BLOCK, id) {
     
-    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
+    internal constructor(addon: Addon, name: String) : this(Key(addon, name))
     
     protected var style: Style = Style.empty()
-    protected var name: Component = Component.translatable("block.${id.namespace}.${id.path}")
+    protected var name: Component = Component.translatable("block.${id.namespace()}.${id.value()}")
     protected var behaviors = ArrayList<BlockBehaviorHolder>()
     protected val stateProperties = ArrayList<ScopedBlockStateProperty<*>>()
     internal var layout: BlockModelLayout = BlockModelLayout.DEFAULT
@@ -172,7 +172,7 @@ abstract class AbstractNovaBlockBuilder<B : NovaBlock> internal constructor(
     
     /**
      * Configures the model and hitbox type of this entity-based block model via [stateSelector] and [itemSelector] respectively.
-     * 
+     *
      * Entity-backed custom block models based on custom item definitions are less performant than state-backed models, but a lot more flexible.
      * In contrast to [entityBacked], models defined via custom item definitions cannot benefit from display entity transformations, as some
      * selection functionality is client-side only. As such, oversized models are not supported.
@@ -204,9 +204,9 @@ abstract class AbstractNovaBlockBuilder<B : NovaBlock> internal constructor(
     
 }
 
-class NovaBlockBuilder internal constructor(id: ResourceLocation) : AbstractNovaBlockBuilder<NovaBlock>(id) {
+class NovaBlockBuilder internal constructor(id: Key) : AbstractNovaBlockBuilder<NovaBlock>(id) {
     
-    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
+    internal constructor(addon: Addon, name: String) : this(Key(addon, name))
     
     override fun build() = NovaBlock(
         id,
@@ -221,7 +221,7 @@ class NovaBlockBuilder internal constructor(id: ResourceLocation) : AbstractNova
 }
 
 class NovaTileEntityBlockBuilder internal constructor(
-    id: ResourceLocation,
+    id: Key,
     private val tileEntity: TileEntityConstructor
 ) : AbstractNovaBlockBuilder<NovaTileEntityBlock>(id) {
     
@@ -232,7 +232,7 @@ class NovaTileEntityBlockBuilder internal constructor(
         addon: Addon,
         name: String,
         tileEntity: TileEntityConstructor
-    ) : this(ResourceLocation(addon, name), tileEntity)
+    ) : this(Key(addon, name), tileEntity)
     
     /**
      * Configures the amount of times [TileEntity.handleTick] is called per second.

@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.resources.builder.layout.item.DisplayContext as Displa
 
 /**
  * A collection of cases for a select item model.
- * 
+ *
  * @see SelectItemModelBuilder
  */
 class SelectCases<T, S : ModelSelectorScope> internal constructor(
@@ -149,7 +149,7 @@ sealed class SelectItemModelProperty<T>(internal val property: SelectItemModel.P
     
     /**
      * Returns the current time in [timeZone] formatted according to the given [pattern]
-     * 
+     *
      * @param timeZone The time zone to use for formatting the time.
      * @param locale The locale to use for formatting the time, or `null` for the root locale.
      * @param pattern The pattern to use for formatting the time, interpreted by [SimpleDateFormat].

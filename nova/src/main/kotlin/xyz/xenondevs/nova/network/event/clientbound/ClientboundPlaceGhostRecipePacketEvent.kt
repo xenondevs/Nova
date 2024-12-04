@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 class ClientboundPlaceGhostRecipePacketEvent(
     player: Player,
     packet: ClientboundPlaceGhostRecipePacket
-) : PlayerPacketEvent<ClientboundPlaceGhostRecipePacket>(player, packet){
+) : PlayerPacketEvent<ClientboundPlaceGhostRecipePacket>(player, packet) {
     
     var containerId: Int = packet.containerId
         set(value) {

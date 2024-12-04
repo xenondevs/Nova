@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.world.item.recipe
 
+import net.kyori.adventure.key.Key
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.crafting.RecipeHolder
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -54,10 +54,10 @@ object RecipeManager : Listener, PacketListener {
     
     private val registeredVanillaRecipes = HashMap<ResourceKey<MojangRecipe<*>>, RecipeHolder<*>>()
     private val customVanillaRecipes = HashMap<ResourceKey<MojangRecipe<*>>, MojangRecipe<*>>()
-    private val _novaRecipes = HashMap<RecipeType<*>, HashMap<ResourceLocation, NovaRecipe>>()
+    private val _novaRecipes = HashMap<RecipeType<*>, HashMap<Key, NovaRecipe>>()
     private val hardcodedRecipes = ArrayList<Any>()
     
-    val novaRecipes: Map<RecipeType<*>, Map<ResourceLocation, NovaRecipe>>
+    val novaRecipes: Map<RecipeType<*>, Map<Key, NovaRecipe>>
         get() = _novaRecipes
     
     @InitFun
@@ -96,10 +96,8 @@ object RecipeManager : Listener, PacketListener {
         return _novaRecipes[type]?.values?.firstOrNull { (it as ConversionNovaRecipe).input.test(input) } as T?
     }
     
-    fun <T : NovaRecipe> getRecipe(type: RecipeType<T>, key: NamespacedKey): T? = getRecipe(type, key.resourceLocation)
-    
     @Suppress("UNCHECKED_CAST")
-    fun <T : NovaRecipe> getRecipe(type: RecipeType<T>, id: ResourceLocation): T? {
+    fun <T : NovaRecipe> getRecipe(type: RecipeType<T>, id: Key): T? {
         return _novaRecipes[type]?.get(id) as T?
     }
     

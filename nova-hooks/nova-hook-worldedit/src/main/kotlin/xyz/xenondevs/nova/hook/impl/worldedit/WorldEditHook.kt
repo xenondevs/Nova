@@ -46,7 +46,7 @@ internal class NovaBlockInputParser(worldEdit: WorldEdit) : InputParser<BaseBloc
     
     override fun getSuggestions(input: String): Stream<String> {
         return NovaRegistries.BLOCK.stream()
-            .filter { it.id.toString().startsWith(input) || it.id.path.startsWith(input) }
+            .filter { it.id.toString().startsWith(input) || it.id.value().startsWith(input) }
             .map { it.id.toString() }
     }
     

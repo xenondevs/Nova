@@ -184,7 +184,7 @@ sealed interface ResourceType {
     
     /**
      * Item model definitions
-     * 
+     *
      * path: `items/`, extension: `json`
      */
     data object ItemModelDefinition : JsonFile {
@@ -321,7 +321,7 @@ sealed interface ResourceType {
     
     /**
      * Tooltip textures
-     * 
+     *
      * path: `textures/gui/sprites/tooltip/`, extension: `png`
      */
     interface TooltipTexture : Texture, HasMcMeta {
@@ -331,12 +331,12 @@ sealed interface ResourceType {
         
         @Serializable
         companion object : TooltipTexture
-    
+        
     }
     
     /**
      * Tooltip background textures
-     * 
+     *
      * path: `textures/gui/sprites/tooltip/`, suffix: `_background`, extension: `png`
      */
     @Serializable
@@ -346,7 +346,7 @@ sealed interface ResourceType {
     
     /**
      * Tooltip frame textures
-     * 
+     *
      * path: `textures/gui/sprites/tooltip/`, suffix: `_frame`, extension: `png`
      */
     @Serializable
@@ -377,7 +377,7 @@ sealed interface ResourceType {
     
     /**
      * Unihex zip files. Assumed to contain the file extension `.zip` inside [ResourcePath.path].
-     * 
+     *
      * path: none, extension: none
      */
     @Serializable

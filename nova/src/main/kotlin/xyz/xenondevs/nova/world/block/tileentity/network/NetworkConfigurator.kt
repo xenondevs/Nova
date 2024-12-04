@@ -118,7 +118,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
                     }
                 }
             }
-        } catch(_: ClosedReceiveChannelException) {
+        } catch (_: ClosedReceiveChannelException) {
         }
     }
     

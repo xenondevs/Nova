@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.config
 
 import com.google.common.jimfs.Jimfs
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.Test
 import xyz.xenondevs.commons.provider.mutableProvider
 import java.nio.file.Path
@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 
 class ConfigExtractorTest {
     
-    private val CONFIG_ID = ResourceLocation.fromNamespaceAndPath("nova", "config")
+    private val CONFIG_ID = Key.key("nova", "config")
     
     @Test
     fun `test initial extraction`() {

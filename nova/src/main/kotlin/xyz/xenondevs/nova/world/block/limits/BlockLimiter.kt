@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block.limits
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.World
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
@@ -35,7 +35,7 @@ internal abstract class SimpleBlockLimiter(denyMessage: String) : BlockLimiter {
     
 }
 
-internal class TypeBlacklist(private val blacklist: Set<ResourceLocation>) : SimpleBlockLimiter("nova.tile_entity_limits.type_blacklist.deny") {
+internal class TypeBlacklist(private val blacklist: Set<Key>) : SimpleBlockLimiter("nova.tile_entity_limits.type_blacklist.deny") {
     
     override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
         return material.id !in blacklist
@@ -46,12 +46,12 @@ internal class TypeBlacklist(private val blacklist: Set<ResourceLocation>) : Sim
 internal class WorldBlacklist(private val blacklist: Set<String>) : SimpleBlockLimiter("nova.tile_entity_limits.world_blacklist.deny") {
     
     override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
-        return !blacklist.contains("*") && ctx.get(DefaultContextParamTypes.BLOCK_WORLD)!!.name !in blacklist
+        return !blacklist.contains("*") && ctx[DefaultContextParamTypes.BLOCK_WORLD]!!.name !in blacklist
     }
     
 }
 
-internal class TypeWorldBlacklist(private val blacklist: Map<String, Set<ResourceLocation>>) : SimpleBlockLimiter("nova.tile_entity_limits.type_world_blacklist.deny") {
+internal class TypeWorldBlacklist(private val blacklist: Map<String, Set<Key>>) : SimpleBlockLimiter("nova.tile_entity_limits.type_world_blacklist.deny") {
     
     override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
         val id = material.id
@@ -61,13 +61,13 @@ internal class TypeWorldBlacklist(private val blacklist: Map<String, Set<Resourc
     
 }
 
-internal class AmountLimiter(private val type: Type, private val limits: Map<ResourceLocation?, Int>) : BlockLimiter {
+internal class AmountLimiter(private val type: Type, private val limits: Map<Key?, Int>) : BlockLimiter {
     
     private val deniedSpecific = PlaceResult(false, "nova.tile_entity_limits.amount_${type.name.lowercase()}.deny")
     private val deniedTotal = PlaceResult(false, "nova.tile_entity_limits.amount_${type.name.lowercase()}_total.deny")
     
     override fun canPlace(material: NovaBlock, ctx: Context<BlockPlace>): PlaceResult {
-        val id: ResourceLocation = material.id
+        val id: Key = material.id
         val owner: UUID = ctx[DefaultContextParamTypes.SOURCE_UUID] ?: return ALLOWED
         val pos: BlockPos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
         

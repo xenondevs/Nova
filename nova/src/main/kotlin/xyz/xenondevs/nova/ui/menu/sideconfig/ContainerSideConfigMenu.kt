@@ -5,7 +5,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.commons.collections.after
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.invui.gui.Gui

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block.state.property
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import xyz.xenondevs.nova.world.block.state.property.impl.IntProperty
@@ -10,7 +10,7 @@ class IntPropertyTest {
     
     @Test
     fun testValueToId() {
-        val property = IntProperty(ResourceLocation.withDefaultNamespace("")).scope(10, 20, 30)
+        val property = IntProperty(Key.key("")).scope(10, 20, 30)
         
         assertEquals(0, property.valueToId(10))
         assertEquals(1, property.valueToId(20))
@@ -20,7 +20,7 @@ class IntPropertyTest {
     
     @Test
     fun testValueFromId() {
-        val property = IntProperty(ResourceLocation.withDefaultNamespace("")).scope(10, 20, 30)
+        val property = IntProperty(Key.key("")).scope(10, 20, 30)
         
         assertEquals(10, property.idToValue(0))
         assertEquals(20, property.idToValue(1))
@@ -30,7 +30,7 @@ class IntPropertyTest {
     
     @Test
     fun testValueToString() {
-        val property = IntProperty(ResourceLocation.withDefaultNamespace("")).scope(10, 20, 30)
+        val property = IntProperty(Key.key("")).scope(10, 20, 30)
         
         assertEquals("10", property.valueToString(10))
         assertEquals("20", property.valueToString(20))
@@ -40,7 +40,7 @@ class IntPropertyTest {
     
     @Test
     fun testStringToValue() {
-        val property = IntProperty(ResourceLocation.withDefaultNamespace("")).scope(10, 20, 30)
+        val property = IntProperty(Key.key("")).scope(10, 20, 30)
         
         assertEquals(10, property.stringToValue("10"))
         assertEquals(20, property.stringToValue("20"))

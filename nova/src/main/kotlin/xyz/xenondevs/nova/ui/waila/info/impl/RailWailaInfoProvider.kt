@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.data.type.RedstoneRail
 import org.bukkit.entity.Player
@@ -14,7 +14,7 @@ internal object RailWailaInfoProvider : VanillaWailaInfoProvider<RedstoneRail>(
     
     override fun getInfo(player: Player, pos: BlockPos, blockState: RedstoneRail): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
-        info.icon = ResourceLocation.withDefaultNamespace(blockState.material.name.lowercase() + if (blockState.isPowered) "_on" else "")
+        info.icon = Key.key(blockState.material.name.lowercase() + if (blockState.isPowered) "_on" else "")
         return info
     }
     

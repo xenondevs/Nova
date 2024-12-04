@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.van
 
 internal class VanillaCrafterTileEntity(
     type: Type,
-    pos: BlockPos, 
+    pos: BlockPos,
     data: Compound
 ) : ItemStorageVanillaTileEntity(type, pos, data) {
     

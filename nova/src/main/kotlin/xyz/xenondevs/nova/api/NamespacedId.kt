@@ -2,13 +2,8 @@
 
 package xyz.xenondevs.nova.api
 
-import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.NamespacedKey
-import org.bukkit.plugin.Plugin
-import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.util.data.asDataResult
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 
@@ -26,10 +21,6 @@ internal operator fun <T> MutableMap<NamespacedId, T>.get(namespace: String, key
     return this[NamespacedId(namespace, key)]
 }
 
-internal fun NamespacedId.toResourceLocation(): ResourceLocation {
-    return ResourceLocation.fromNamespaceAndPath(namespace, name)
-}
-
 @Suppress("DEPRECATION")
 @Deprecated("Use ResourceLocation instead")
 internal class NamespacedId(@JvmField val namespace: String, @JvmField val name: String) : INamespacedId {
@@ -38,12 +29,6 @@ internal class NamespacedId(@JvmField val namespace: String, @JvmField val name:
     
     val namespacedKey: NamespacedKey
         get() = NamespacedKey(namespace, name)
-    val resourceLocation: ResourceLocation
-        get() = ResourceLocation.fromNamespaceAndPath(namespace, name)
-    
-    constructor(plugin: Plugin, name: String) : this(plugin.name.lowercase(), name)
-    constructor(addon: Addon, name: String) : this(addon.id, name)
-    constructor(name: String) : this("nova", name)
     
     init {
         require(namespace.matches(PART_PATTERN)) { "Namespace \"$namespace\" does not match pattern $PART_PATTERN" }
@@ -68,8 +53,6 @@ internal class NamespacedId(@JvmField val namespace: String, @JvmField val name:
     }
     
     companion object {
-        
-        val CODEC: Codec<NamespacedId> = Codec.STRING.comapFlatMap(::ofSafe, NamespacedId::toString).stable()
         
         val PART_PATTERN = Regex("""^[a-z][a-z\d_-]*$""")
         val COMPLETE_PATTERN = Regex("""^[a-z][a-z\d_-]*:[a-z][a-z\d_-]*$""")

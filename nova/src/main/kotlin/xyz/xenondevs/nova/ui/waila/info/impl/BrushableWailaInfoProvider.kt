@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.data.Brushable
 import org.bukkit.entity.Player
@@ -14,7 +14,7 @@ internal object BrushableWailaInfoProvider : VanillaWailaInfoProvider<Brushable>
     
     override fun getInfo(player: Player, pos: BlockPos, blockState: Brushable): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
-        info.icon = ResourceLocation.withDefaultNamespace("${blockState.material.name.lowercase()}_${blockState.dusted}")
+        info.icon = Key.key("${blockState.material.name.lowercase()}_${blockState.dusted}")
         return info
     }
     

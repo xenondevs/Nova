@@ -23,28 +23,28 @@ private const val PLAYER_ATTACK_DAMAGE = 1.0
 
 /**
  * Creates a factory for [Tool] behaviors using the given values, if not specified otherwise in the config.
- * 
+ *
  * @param tier The [ToolTier] of the tool.
  * Used when `tool_tier` is not specified in the config, or null to require the presence of a config entry.
- * 
+ *
  * @param categories The [ToolCategory] of the tool.
  * Used when `tool_category` is not specified in the config, or null to require the presence of a config entry.
- * 
+ *
  * @param breakSpeed The break speed of the tool.
  * Used when `break_speed` is not specified in the config, or null to require the presence of a config entry.
- * 
+ *
  * @param attackDamage The attack damage of the tool.
  * Used when `attack_damage` is not specified in the config, or null to require the presence of a config entry.
- * 
+ *
  * @param attackSpeed The attack speed of the tool.
  * Used when `attack_speed` is not specified in the config, or null to require the presence of a config entry.
- * 
+ *
  * @param knockbackBonus The knockback bonus of the tool when attacking.
  * Used when `knockback_bonus` is not specified in the config.
- * 
+ *
  * @param canSweepAttack Whether the tool can perform a sweep attack.
  * Used when `can_sweep_attack` is not specified in the config.
- * 
+ *
  * @param canBreakBlocksInCreative Whether the tool can break blocks in creative mode.
  * Used when `can_break_blocks_in_creative` is not specified in the config.
  */

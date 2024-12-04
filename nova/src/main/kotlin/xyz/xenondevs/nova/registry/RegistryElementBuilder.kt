@@ -1,18 +1,21 @@
 package xyz.xenondevs.nova.registry
 
+import net.kyori.adventure.key.Key
 import net.minecraft.core.Registry
 import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.patch.impl.registry.preFreeze
 import xyz.xenondevs.nova.util.ResourceLocation
+import xyz.xenondevs.nova.util.contains
+import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HOLDER_REFERENCE_BIND_VALUE_METHOD
 import xyz.xenondevs.nova.util.register
 import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.util.toKey
 
 @DslMarker
 internal annotation class RegistryElementBuilderDsl
@@ -20,13 +23,13 @@ internal annotation class RegistryElementBuilderDsl
 @RegistryElementBuilderDsl
 abstract class RegistryElementBuilder<T : Any>(
     protected val registry: WritableRegistry<in T>,
-    val id: ResourceLocation
+    val id: Key
 ) {
     
     protected abstract fun build(): T
     
     internal open fun register(): T {
-        if (registry.containsKey(id))
+        if (id in registry)
             throw IllegalStateException("Tried to register duplicate element $id in $registry")
         
         val element = build()
@@ -39,7 +42,7 @@ abstract class RegistryElementBuilder<T : Any>(
 
 abstract class LazyRegistryElementBuilder<T : Any>(
     protected val registryKey: ResourceKey<Registry<T>>,
-    protected val id: ResourceLocation
+    protected val id: Key
 ) {
     
     protected abstract fun build(): T
@@ -47,11 +50,11 @@ abstract class LazyRegistryElementBuilder<T : Any>(
     @Suppress("UNCHECKED_CAST")
     internal open fun register(): Provider<T> {
         val provider = mutableProvider<T> {
-            throw UninitializedRegistryElementException(registryKey, id) 
+            throw UninitializedRegistryElementException(registryKey, id)
         }
         
         registryKey.preFreeze { registry, _ ->
-            if (registry.containsKey(id))
+            if (registry.contains(id))
                 throw IllegalStateException("Tried to register duplicate element $id in $registryKey")
             
             val element = build()
@@ -66,14 +69,14 @@ abstract class LazyRegistryElementBuilder<T : Any>(
 
 internal fun <T : Any, B : RegistryElementBuilder<T>> buildRegistryElementLater(
     addon: Addon, name: String,
-    registryKey: ResourceKey<out Registry<T>>, 
-    makeBuilder: (ResourceLocation, WritableRegistry<T>, RegistryOps.RegistryInfoLookup) -> B,
+    registryKey: ResourceKey<out Registry<T>>,
+    makeBuilder: (Key, WritableRegistry<T>, RegistryOps.RegistryInfoLookup) -> B,
     configureBuilder: B.() -> Unit
 ): ResourceKey<T> {
     val id = ResourceLocation(addon, name)
     val key = ResourceKey.create(registryKey, id)
     registryKey.preFreeze { registry, lookup ->
-        makeBuilder(id, registry, lookup).apply(configureBuilder).register()
+        makeBuilder(id.toKey(), registry, lookup).apply(configureBuilder).register()
     }
     return key
 }
@@ -82,13 +85,13 @@ internal fun <T : Any, B : RegistryElementBuilder<T>> buildRegistryElementLater(
 internal fun <T : Any, B : RegistryElementBuilder<T>> buildRegistryElementLater(
     addon: Addon, name: String,
     registryKey: ResourceKey<out Registry<T>>,
-    makeBuilder: (ResourceLocation, WritableRegistry<T>) -> B,
+    makeBuilder: (Key, WritableRegistry<T>) -> B,
     configureBuilder: B.() -> Unit
 ): ResourceKey<T> {
     val id = ResourceLocation(addon, name)
     val key = ResourceKey.create(registryKey, id)
     registryKey.preFreeze { registry, _ ->
-        makeBuilder(id, registry).apply(configureBuilder).register()
+        makeBuilder(id.toKey(), registry).apply(configureBuilder).register()
         
     }
     return key
@@ -98,15 +101,15 @@ internal fun <T : Any, B : RegistryElementBuilder<T>> buildRegistryElementLater(
 internal fun <T : Any, B : RegistryElementBuilder<T>> buildRegistryElementLater(
     addon: Addon, name: String,
     registryKey: ResourceKey<out Registry<*>>,
-    makeBuilder: (ResourceLocation, RegistryOps.RegistryInfoLookup) -> B,
+    makeBuilder: (Key, RegistryOps.RegistryInfoLookup) -> B,
     configureBuilder: B.() -> Unit
 ) {
-    val id = ResourceLocation(addon, name)
+    val id = Key(addon, name)
     registryKey.preFreeze { lookup ->
         makeBuilder(id, lookup).apply(configureBuilder).register()
     }
 }
 
-class UninitializedRegistryElementException(registryKey: ResourceKey<*>, id: ResourceLocation) : Exception(
+class UninitializedRegistryElementException(registryKey: ResourceKey<*>, id: Key) : Exception(
     "Tried to access unregistered registry element $id in $registryKey"
 )

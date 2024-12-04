@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayoutBuilder
 import xyz.xenondevs.nova.resources.builder.layout.equipment.EquipmentLayout
 import xyz.xenondevs.nova.resources.builder.layout.equipment.StaticEquipmentLayoutBuilder
-import xyz.xenondevs.nova.util.data.Key
+import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.item.Equipment
 

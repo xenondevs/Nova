@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.integration.customitems
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
@@ -94,6 +94,6 @@ interface CustomItemService {
      *
      * example: [minecraft:dirt -> minecraft:item/dirt]
      */
-    fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath<ResourceType.Model>>
+    fun getBlockItemModelPaths(): Map<Key, ResourcePath<ResourceType.Model>>
     
 }

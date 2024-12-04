@@ -10,7 +10,7 @@ object DefaultContextIntentions {
     
     /**
      * The intention to place a block.
-     * 
+     *
      * Required param types:
      * - [BLOCK_POS]
      * - [BLOCK_WORLD]
@@ -21,7 +21,7 @@ object DefaultContextIntentions {
     
     /**
      * The intention to break a block.
-     * 
+     *
      * Required param types:
      * - [BLOCK_POS]
      * - [BLOCK_WORLD]

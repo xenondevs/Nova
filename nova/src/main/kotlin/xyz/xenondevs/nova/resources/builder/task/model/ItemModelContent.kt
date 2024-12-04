@@ -9,7 +9,6 @@ import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuild
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
-import xyz.xenondevs.nova.util.toKey
 import kotlin.collections.first
 
 /**
@@ -74,7 +73,7 @@ class ItemModelContent internal constructor(val builder: ResourcePackBuilder) : 
                 id
             }.apply(item.configureDefinition).build()
             
-            val path = ResourcePath.of(ResourceType.ItemModelDefinition, item.id.toKey())
+            val path = ResourcePath.of(ResourceType.ItemModelDefinition, item.id)
             set(path, definition)
         }
     }

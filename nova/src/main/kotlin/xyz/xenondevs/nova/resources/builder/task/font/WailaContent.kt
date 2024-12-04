@@ -14,7 +14,6 @@ import xyz.xenondevs.nova.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.ui.waila.WailaManager
-import xyz.xenondevs.nova.util.toKey
 import xyz.xenondevs.renderer.MinecraftModelRenderer
 import kotlin.io.path.copyTo
 import kotlin.io.path.createDirectories
@@ -240,10 +239,10 @@ class WailaContent internal constructor(
             
             CustomItemServiceManager.getBlockItemModelPaths().forEach { (id, path) ->
                 try {
-                    val file = ResourcePackBuilder.PACK_DIR.resolve("assets/nova/textures/waila_generated/${id.namespace}/${id.path}.png")
+                    val file = ResourcePackBuilder.PACK_DIR.resolve("assets/nova/textures/waila_generated/${id.namespace()}/${id.value()}.png")
                     file.parent.createDirectories()
                     renderer.renderModelToFile(path.toString(), file)
-                    addEntry(id.toKey(), ResourcePath(ResourceType.FontTexture, "nova", "waila_generated/${id.namespace}/${id.path}.png"), SIZE, ASCENT)
+                    addEntry(id, ResourcePath(ResourceType.FontTexture, "nova", "waila_generated/${id.namespace()}/${id.value()}.png"), SIZE, ASCENT)
                     count++
                 } catch (e: Exception) {
                     LOGGER.warn("Failed to render $id ($path) ", e)

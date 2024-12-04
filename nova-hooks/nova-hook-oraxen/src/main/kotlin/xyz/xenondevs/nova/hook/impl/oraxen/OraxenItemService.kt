@@ -11,8 +11,8 @@ import io.th0rgal.oraxen.mechanics.provided.gameplay.noteblock.NoteBlockMechanic
 import io.th0rgal.oraxen.mechanics.provided.gameplay.stringblock.StringBlockMechanic
 import io.th0rgal.oraxen.utils.blocksounds.BlockSounds
 import io.th0rgal.oraxen.utils.drops.Drop
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.Rotation
@@ -169,14 +169,14 @@ internal object OraxenItemService : CustomItemService {
         return getOraxenDrop(block)?.isToolEnough(tool) ?: return null
     }
     
-    override fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath<ResourceType.Model>> {
+    override fun getBlockItemModelPaths(): Map<Key, ResourcePath<ResourceType.Model>> {
         return OraxenItems.entryStream().asSequence()
             .filter { (id, builder) -> id != null && builder.oraxenMeta?.modelName != null }
             .filter { (id, _) -> BLOCK_MECHANIC_FACTORIES.any { it.getMechanic(id) != null } }
             .associateTo(HashMap()) { (name, builder) ->
                 val modelName = builder.oraxenMeta.modelName
                 
-                val id = ResourceLocation.fromNamespaceAndPath("oraxen", name)
+                val id = Key.key("oraxen", name)
                 val path = ResourcePath(ResourceType.Model, "oraxen_converted", "oraxen/$modelName")
                 
                 id to path

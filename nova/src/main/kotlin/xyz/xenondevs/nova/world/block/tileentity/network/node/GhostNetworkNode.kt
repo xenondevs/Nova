@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.node
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import xyz.xenondevs.nova.world.BlockPos
@@ -47,7 +47,7 @@ internal sealed interface GhostNetworkNode {
 internal class GhostNetworkBridge(
     override val pos: BlockPos,
     override val owner: OfflinePlayer?,
-    override val typeId: ResourceLocation
+    override val typeId: Key
 ) : NetworkBridge, GhostNetworkNode {
     
     override val isValid = true

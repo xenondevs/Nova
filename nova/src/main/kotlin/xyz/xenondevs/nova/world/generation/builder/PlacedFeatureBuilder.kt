@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.generation.builder
 
+import net.kyori.adventure.key.Key
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.WritableRegistry
@@ -7,7 +8,6 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.data.worldgen.placement.PlacementUtils
 import net.minecraft.resources.RegistryOps.RegistryInfoLookup
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.valueproviders.ConstantInt
 import net.minecraft.util.valueproviders.IntProvider
 import net.minecraft.world.level.levelgen.Heightmap
@@ -41,7 +41,7 @@ import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.FeatureType
 
 /**
- * Builder for [PlacedFeatures][PlacedFeature]. 
+ * Builder for [PlacedFeatures][PlacedFeature].
  * Check out the [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/placed-feature/) on
  * [PlacedFeatures][PlacedFeature] for more information.
  *
@@ -53,7 +53,7 @@ import xyz.xenondevs.nova.world.generation.FeatureType
 @ExperimentalWorldGen
 @RegistryElementBuilderDsl
 class PlacedFeatureBuilder internal constructor(
-    id: ResourceLocation,
+    id: Key,
     registry: WritableRegistry<PlacedFeature>,
     lookup: RegistryInfoLookup
 ) : RegistryElementBuilder<PlacedFeature>(registry, id) {
@@ -63,7 +63,7 @@ class PlacedFeatureBuilder internal constructor(
     private var configuredFeature: Holder<ConfiguredFeature<*, *>>? = null
     private val modifiers = mutableListOf<PlacementModifier>()
     
-   
+    
     /**
      * Sets the [ConfiguredFeature] that should be placed by this [PlacedFeature] to [configuredFeature].
      *

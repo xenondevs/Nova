@@ -1,16 +1,16 @@
 package xyz.xenondevs.nova.world.block.state.property.impl
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.block.state.property.BlockStatePropertyInitializer
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 import java.util.*
 
-inline fun <reified E : Enum<E>> EnumProperty(id: ResourceLocation): EnumProperty<E> =
+inline fun <reified E : Enum<E>> EnumProperty(id: Key): EnumProperty<E> =
     EnumProperty(id, E::class.java)
 
 class EnumProperty<E : Enum<E>>(
-    id: ResourceLocation,
+    id: Key,
     private val enumClass: Class<E>,
 ) : BlockStateProperty<E>(id) {
     

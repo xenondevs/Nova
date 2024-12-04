@@ -3,6 +3,7 @@
 package xyz.xenondevs.nova.util.item
 
 import com.mojang.brigadier.StringReader
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.commands.arguments.item.ItemParser
 import net.minecraft.core.component.DataComponentMap
@@ -30,16 +31,15 @@ import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
-import xyz.xenondevs.nova.api.NamespacedId
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.bukkitMaterial
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
+import xyz.xenondevs.nova.util.contains
 import xyz.xenondevs.nova.util.data.getByteArrayOrNull
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
-import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
@@ -154,13 +154,11 @@ var MojangStack.novaCompound: NamespacedCompound?
         }
     }
 
-inline fun <reified T : Any> ItemStack.retrieveData(key: NamespacedKey): T? = retrieveData(key.namespace, key.key)
-inline fun <reified T : Any> ItemStack.retrieveData(id: ResourceLocation): T? = retrieveData(id.namespace, id.path)
+inline fun <reified T : Any> ItemStack.retrieveData(key: Key): T? = retrieveData(key.namespace(), key.value())
 inline fun <reified T : Any> ItemStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.id, key)
 inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, key: String): T? = novaCompound?.get(namespace, key)
 
-inline fun <reified T : Any> ItemStack.storeData(key: NamespacedKey, data: T?) = storeData(key.namespace, key.key, data)
-inline fun <reified T : Any> ItemStack.storeData(id: ResourceLocation, data: T?) = storeData(id.namespace, id.path, data)
+inline fun <reified T : Any> ItemStack.storeData(key: Key, data: T?) = storeData(key.namespace(), key.value(), data)
 inline fun <reified T : Any> ItemStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.id, key, data)
 inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String, data: T?) {
     val novaCompound = this.novaCompound ?: NamespacedCompound()
@@ -168,13 +166,11 @@ inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String,
     this.novaCompound = novaCompound
 }
 
-inline fun <reified T : Any> MojangStack.retrieveData(key: NamespacedKey): T? = retrieveData(key.namespace, key.key)
-inline fun <reified T : Any> MojangStack.retrieveData(id: ResourceLocation): T? = retrieveData(id.namespace, id.path)
+inline fun <reified T : Any> MojangStack.retrieveData(key: Key): T? = retrieveData(key.namespace(), key.value())
 inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.id, key)
 inline fun <reified T : Any> MojangStack.retrieveData(namespace: String, key: String): T? = novaCompound?.get(namespace, key)
 
-inline fun <reified T : Any> MojangStack.storeData(key: NamespacedKey, data: T?) = storeData(key.namespace, key.key, data)
-inline fun <reified T : Any> MojangStack.storeData(id: ResourceLocation, data: T?) = storeData(id.namespace, id.path, data)
+inline fun <reified T : Any> MojangStack.storeData(key: Key, data: T?) = storeData(key.namespace(), key.value(), data)
 inline fun <reified T : Any> MojangStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.id, key, data)
 inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: String, data: T?) {
     val novaCompound = this.novaCompound ?: NamespacedCompound()
@@ -187,11 +183,11 @@ object ItemUtils {
     
     fun isIdRegistered(id: String): Boolean {
         try {
-            val nid = NamespacedId.of(id, "minecraft")
-            return when (nid.namespace) {
-                "minecraft" -> runCatching { Material.valueOf(nid.name.uppercase()) }.isSuccess
-                "nova" -> NovaRegistries.ITEM.getByName(nid.name).isNotEmpty()
-                else -> NovaRegistries.ITEM[id] != null || CustomItemServiceManager.getItemByName(id) != null
+            val nid = Key.key(id)
+            return when (nid.namespace()) {
+                "minecraft" -> runCatching { Material.valueOf(nid.value().uppercase()) }.isSuccess
+                "nova" -> NovaRegistries.ITEM.getByName(nid.value()).isNotEmpty()
+                else -> nid in NovaRegistries.ITEM || CustomItemServiceManager.getItemByName(id) != null
             }
         } catch (ignored: Exception) {
         }
@@ -251,17 +247,17 @@ object ItemUtils {
     fun getItemStack(s: String): ItemStack {
         return when (s.substringBefore(':')) {
             "minecraft" -> toItemStack(s)
-            else -> getItemStack(ResourceLocation.parse(s))
+            else -> getItemStack(Key.key(s))
         }
     }
     
     /**
      * Creates an [ItemStack] from the given [id]. Resolves ids from vanilla, nova and custom item services.
      */
-    fun getItemStack(id: ResourceLocation): ItemStack {
-        return when (id.namespace) {
+    fun getItemStack(id: Key): ItemStack {
+        return when (id.namespace()) {
             "minecraft" -> ItemStack(BuiltInRegistries.ITEM.getValue(id).bukkitMaterial)
-            "nova" -> NovaRegistries.ITEM.getByName(id.path).firstOrNull()?.createItemStack()
+            "nova" -> NovaRegistries.ITEM.getByName(id.value()).firstOrNull()?.createItemStack()
             else -> NovaRegistries.ITEM.getValue(id)?.createItemStack()
                 ?: CustomItemServiceManager.getItemByName(id.toString())
         } ?: throw IllegalArgumentException("Could not find item with id $id")
@@ -422,7 +418,7 @@ object ItemUtils {
     }
     
     internal fun mergeLore(values: List<ItemLore>): ItemLore {
-        return ItemLore(values.flatMap {it.lines }, values.flatMap { it.styledLines })
+        return ItemLore(values.flatMap { it.lines }, values.flatMap { it.styledLines })
     }
     
     internal fun mergePotionContents(values: List<PotionContents>): PotionContents {

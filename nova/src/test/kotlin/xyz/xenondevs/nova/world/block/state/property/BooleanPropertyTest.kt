@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block.state.property
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import xyz.xenondevs.nova.world.block.state.property.impl.BooleanProperty
@@ -10,7 +10,7 @@ class BooleanPropertyTest {
     
     @Test
     fun testValueToId() {
-        val property = BooleanProperty(ResourceLocation.withDefaultNamespace("")).scope()
+        val property = BooleanProperty(Key.key("")).scope()
         
         assertEquals(0, property.valueToId(false))
         assertEquals(1, property.valueToId(true))
@@ -18,7 +18,7 @@ class BooleanPropertyTest {
     
     @Test
     fun testValueFromId() {
-        val property = BooleanProperty(ResourceLocation.withDefaultNamespace("")).scope()
+        val property = BooleanProperty(Key.key("")).scope()
         
         assertEquals(false, property.idToValue(0))
         assertEquals(true, property.idToValue(1))
@@ -27,7 +27,7 @@ class BooleanPropertyTest {
     
     @Test
     fun testValueToString() {
-        val property = BooleanProperty(ResourceLocation.withDefaultNamespace("")).scope()
+        val property = BooleanProperty(Key.key("")).scope()
         
         assertEquals("false", property.valueToString(false))
         assertEquals("true", property.valueToString(true))
@@ -35,7 +35,7 @@ class BooleanPropertyTest {
     
     @Test
     fun testStringToValue() {
-        val property = BooleanProperty(ResourceLocation.withDefaultNamespace("")).scope()
+        val property = BooleanProperty(Key.key("")).scope()
         
         assertEquals(false, property.stringToValue("false"))
         assertEquals(true, property.stringToValue("true"))

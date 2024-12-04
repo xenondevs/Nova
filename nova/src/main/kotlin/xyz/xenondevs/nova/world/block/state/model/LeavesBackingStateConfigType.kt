@@ -40,7 +40,7 @@ internal abstract class LeavesBackingStateConfigType<T : LeavesBackingStateConfi
 }
 
 internal class OakLeavesBackingStateConfig(
-    distance: Int, 
+    distance: Int,
     persistent: Boolean,
     waterlogged: Boolean
 ) : LeavesBackingStateConfig(Blocks.OAK_LEAVES, distance, persistent, waterlogged) {
@@ -50,7 +50,7 @@ internal class OakLeavesBackingStateConfig(
 }
 
 internal class SpruceLeavesBackingStateConfig(
-    distance: Int, 
+    distance: Int,
     persistent: Boolean,
     waterlogged: Boolean
 ) : LeavesBackingStateConfig(Blocks.SPRUCE_LEAVES, distance, persistent, waterlogged) {

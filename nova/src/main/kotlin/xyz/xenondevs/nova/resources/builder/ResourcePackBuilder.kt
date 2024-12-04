@@ -443,7 +443,7 @@ class ResourcePackBuilder internal constructor() {
     }
     
     /**
-     * Serializes [value] to JSON using [json] and writes it to the file 
+     * Serializes [value] to JSON using [json] and writes it to the file
      * under [path], creating parent directories if necessary.
      */
     inline fun <reified V> writeJson(path: ResourcePath<ResourceType.JsonFile>, value: V, json: Json = Json) {

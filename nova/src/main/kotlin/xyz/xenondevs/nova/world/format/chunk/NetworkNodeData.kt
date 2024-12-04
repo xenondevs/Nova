@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.world.format.chunk
 
 import com.google.common.collect.HashBasedTable
 import com.google.common.collect.Table
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.OfflinePlayer
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.io.ByteReader
@@ -29,7 +29,7 @@ sealed interface NetworkNodeData {
 }
 
 data class NetworkBridgeData(
-    val typeId: ResourceLocation,
+    val typeId: Key,
     override val owner: UUID,
     override val connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>> = HashMap(),
     val networks: MutableMap<NetworkType<*>, UUID> = HashMap(),
@@ -38,7 +38,7 @@ data class NetworkBridgeData(
 ) : NetworkNodeData {
     
     constructor(
-        typeId: ResourceLocation,
+        typeId: Key,
         owner: OfflinePlayer?,
         connections: MutableMap<NetworkType<*>, MutableSet<BlockFace>> = HashMap(),
         networks: MutableMap<NetworkType<*>, UUID> = HashMap(),
@@ -66,7 +66,7 @@ data class NetworkBridgeData(
         
         fun read(reader: ByteReader): NetworkBridgeData =
             NetworkBridgeData(
-                ResourceLocation.parse(reader.readString()),
+                Key.key(reader.readString()),
                 reader.readUUID(),
                 reader.readNetworkTypeCubeFaceSetMap(),
                 reader.readNetworkTypeUUIDMap(),

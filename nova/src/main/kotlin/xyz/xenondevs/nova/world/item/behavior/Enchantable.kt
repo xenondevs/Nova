@@ -13,15 +13,15 @@ import net.minecraft.world.item.enchantment.Enchantable as EnchantableComponent
 
 /**
  * Creates a factory for [Enchantable] behaviors using the given values, if not specified otherwise in the item's config.
- * 
+ *
  * @param enchantmentValue The enchantment value of the item.
  * A higher enchantment value brings more secondary and higher-level enchantments in the enchanting table.
  * Vanilla enchantment values: wood: 15, stone: 5, iron: 14, diamond: 10, gold: 22, netherite: 15
  * Used when `enchantment_value` is not specified in the item's config, or null to require the presence of a config entry.
- * 
+ *
  * @param primaryEnchantments The enchantments that appear in the enchanting table. Falls back to [supportedEnchantments] if not specified.
  * Used when `primary_enchantments` is not specified in the item's config, or null to require the presence of a config entry.
- * 
+ *
  * @param supportedEnchantments The enchantments that can be applied to the item, i.e. via an anvil or commands.
  * Used when `supported_enchantments` is not specified in the item's config, or null to require the presence of a config entry.
  */

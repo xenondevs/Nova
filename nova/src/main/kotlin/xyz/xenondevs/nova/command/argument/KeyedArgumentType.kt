@@ -11,17 +11,16 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType
 import me.xdrop.fuzzywuzzy.FuzzySearch
-import net.minecraft.resources.ResourceLocation
-import org.bukkit.NamespacedKey
+import net.kyori.adventure.key.Key
 import java.util.concurrent.CompletableFuture
 
-internal abstract class KeyedArgumentType<T : Any> : CustomArgumentType.Converted<T, NamespacedKey> {
+internal abstract class KeyedArgumentType<T : Any> : CustomArgumentType.Converted<T, Key> {
     
-    override fun getNativeType() = ArgumentTypes.namespacedKey()
+    override fun getNativeType() = ArgumentTypes.key()
     
-    override fun convert(nativeType: NamespacedKey): T {
-        val arg = if (nativeType.namespace == "minecraft")
-            nativeType.key
+    override fun convert(nativeType: Key): T {
+        val arg = if (nativeType.namespace() == "minecraft")
+            nativeType.value()
         else nativeType.toString()
         
         val exact = getEntries()
@@ -30,7 +29,7 @@ internal abstract class KeyedArgumentType<T : Any> : CustomArgumentType.Converte
             return exact
         
         val loose = getEntries()
-            .filter { toId(it).path == arg }
+            .filter { toId(it).value() == arg }
             .toList()
         
         when (loose.size) {
@@ -61,6 +60,6 @@ internal abstract class KeyedArgumentType<T : Any> : CustomArgumentType.Converte
     
     abstract fun getEntries(): Sequence<T>
     
-    abstract fun toId(t: T): ResourceLocation
+    abstract fun toId(t: T): Key
     
 }

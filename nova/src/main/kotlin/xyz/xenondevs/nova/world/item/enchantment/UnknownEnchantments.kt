@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.world.item.enchantment
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -15,8 +15,8 @@ import xyz.xenondevs.nova.resources.ResourceGeneration
 )
 internal object UnknownEnchantments {
     
-    private var customEnchantmentIds: Set<ResourceLocation> by PermanentStorage.storedValue<Set<ResourceLocation>>("custom_enchantment_ids", ::HashSet)
-    private val registeredIds = HashSet<ResourceLocation>()
+    private var customEnchantmentIds: Set<Key> by PermanentStorage.storedValue<Set<Key>>("custom_enchantment_ids", ::HashSet)
+    private val registeredIds = HashSet<Key>()
     
     @InitFun
     private fun addUnknownEnchantments() {
@@ -34,7 +34,7 @@ internal object UnknownEnchantments {
         }
     }
     
-    fun rememberEnchantmentId(id: ResourceLocation) {
+    fun rememberEnchantmentId(id: Key) {
         customEnchantmentIds = customEnchantmentIds + id
         registeredIds += id
     }

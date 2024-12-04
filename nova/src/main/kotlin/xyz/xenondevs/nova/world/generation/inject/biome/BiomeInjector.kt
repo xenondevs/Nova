@@ -69,5 +69,5 @@ internal object BiomeInjector {
         
         ReflectionUtils.setFinalField(BIOME_BIOME_GENERATION_SETTINGS_FIELD, biome, newGenSettings)
     }
-
+    
 }

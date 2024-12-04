@@ -3,14 +3,13 @@ package xyz.xenondevs.nova.world.item
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
-import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.Click
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.addon.name
@@ -51,7 +50,7 @@ internal object ItemCategories {
             .sortedBy { it.name }
             .mapNotNull { addon ->
                 NovaRegistries.ITEM
-                    .filter { it.id.namespace == addon.id && !it.isHidden }
+                    .filter { it.id.namespace() == addon.id && !it.isHidden }
                     .takeUnlessEmpty()
                     ?.let { items ->
                         ItemCategory(

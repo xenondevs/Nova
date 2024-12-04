@@ -163,7 +163,7 @@ internal object ReflectionUtils {
     
     @JvmStatic
     fun getFieldOrNull(clazz: Class<*>, name: String): Field? {
-         try {
+        try {
             return getField(clazz, name)
         } catch (_: NoSuchFieldException) {
             return null

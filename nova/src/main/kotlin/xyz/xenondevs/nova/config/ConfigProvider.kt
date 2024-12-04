@@ -2,7 +2,7 @@
 
 package xyz.xenondevs.nova.config
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ScopedConfigurationNode
@@ -435,7 +435,7 @@ private fun Provider<ConfigurationNode>.findFilePath(): String? {
 @OptIn(UnstableProviderApi::class)
 internal class RootConfigProvider internal constructor(
     val path: Path,
-    val configId: ResourceLocation
+    val configId: Key
 ) : AbstractProvider<CommentedConfigurationNode>(ReentrantLock()) {
     
     @Volatile
@@ -454,12 +454,12 @@ internal class RootConfigProvider internal constructor(
     }
     
     fun reload() {
-        set(Configs.createLoader(configId.namespace, path).load())
+        set(Configs.createLoader(configId.namespace(), path).load())
     }
     
     override fun pull(): CommentedConfigurationNode {
         // empty placeholder that is replaced by the actual node when the config is loaded
-        return Configs.createBuilder(configId.namespace).build().createNode()
+        return Configs.createBuilder(configId.namespace()).build().createNode()
     }
     
 }

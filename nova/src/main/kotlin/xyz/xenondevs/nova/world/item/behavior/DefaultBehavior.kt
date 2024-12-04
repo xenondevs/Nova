@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.item.behavior
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.core.component.DataComponentMap
@@ -43,7 +44,7 @@ import net.minecraft.network.chat.Component as MojangComponent
 import net.minecraft.util.Unit as MojangUnit
 
 internal class DefaultBehavior(
-    id: ResourceLocation,
+    id: Key,
     name: Provider<Component?>,
     style: Provider<Style>,
     lore: Provider<List<Component>>,
@@ -75,7 +76,7 @@ internal class DefaultBehavior(
         
         builder.set(DataComponents.ATTRIBUTE_MODIFIERS, attributeModifiers)
         builder.set(DataComponents.MAX_STACK_SIZE, maxStackSize)
-        builder.set(DataComponents.ITEM_MODEL, id)
+        builder.set(DataComponents.ITEM_MODEL, id.toResourceLocation())
         
         builder.build()
     }

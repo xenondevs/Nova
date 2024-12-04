@@ -2,7 +2,7 @@
 
 package xyz.xenondevs.nova.world.item.recipe
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.inventory.BlastingRecipe
 import org.bukkit.inventory.CampfireRecipe
 import org.bukkit.inventory.FurnaceRecipe
@@ -37,13 +37,13 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 
 class RecipeType<T : Any> internal constructor(
-    val id: ResourceLocation,
+    val id: Key,
     val recipeClass: KClass<T>,
     val group: RecipeGroup<in T>,
     val deserializer: RecipeDeserializer<T>?
 ) {
     
-    val dirName get() = id.namespace + "/" + id.path
+    val dirName get() = id.namespace() + "/" + id.value()
     
     companion object {
         
@@ -69,7 +69,7 @@ object VanillaRecipeTypes {
     val SMITING_TRANSFORM = register("smithing_transform", SmithingTransformRecipe::class, SmithingTransformRecipeGroup, SmithingTransformRecipeDeserializer)
     
     private fun <T : Any> register(name: String, recipeClass: KClass<T>, group: RecipeGroup<in T>, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
-        val id = ResourceLocation.withDefaultNamespace(name)
+        val id = Key.key(name)
         val recipeType = RecipeType(id, recipeClass, group, deserializer)
         NovaRegistries.RECIPE_TYPE[id] = recipeType
         return recipeType

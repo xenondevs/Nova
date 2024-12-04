@@ -2,12 +2,12 @@ package xyz.xenondevs.nova.world.generation
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.JsonOps
+import net.kyori.adventure.key.Key
 import net.minecraft.core.Registry
 import net.minecraft.core.WritableRegistry
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.dimension.DimensionType
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings
@@ -85,7 +85,7 @@ internal object WorldGenFileParser {
             addon.dataFolder.resolve(dirName).walk()
                 .filter { it.isRegularFile() && it.extension == "json" && ResourcePath.isValidPath(it.name) }
                 .forEach { file ->
-                    val id = ResourceLocation.fromNamespaceAndPath(addon.id, file.nameWithoutExtension)
+                    val id = Key.key(addon.id, file.nameWithoutExtension)
                     registry[id] = codec.decodeJsonFile(
                         RegistryOps.create(JsonOps.INSTANCE, lookup),
                         file

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.item.tool
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_CATEGORY
@@ -50,7 +50,7 @@ object VanillaToolCategories {
         canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int
     ): VanillaToolCategory {
-        val id = ResourceLocation.withDefaultNamespace(name)
+        val id = Key.key(name)
         val category = VanillaToolCategory(
             id,
             canDoSweepAttack, canBreakBlocksInCreative,

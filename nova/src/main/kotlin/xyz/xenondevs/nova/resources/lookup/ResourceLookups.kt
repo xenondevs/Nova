@@ -60,7 +60,7 @@ internal object ResourceLookups {
     /**
      * Lookup for getting the [FontChar] for every [GuiTexture].
      */
-    val GUI_TEXTURE_LOOKUP: MapResourceLookup<GuiTexture, GuiTextureData> = mapResourceLookup("gui_texture_lookup" )
+    val GUI_TEXTURE_LOOKUP: MapResourceLookup<GuiTexture, GuiTextureData> = mapResourceLookup("gui_texture_lookup")
     
     /**
      * Map of [GuiTexture] to the [FontChar].
@@ -96,7 +96,7 @@ internal object ResourceLookups {
         return lookup
     }
     
-    private inline fun <reified K: Any, reified V: Any> mapResourceLookup(key: String): MapResourceLookup<K, V> {
+    private inline fun <reified K : Any, reified V : Any> mapResourceLookup(key: String): MapResourceLookup<K, V> {
         val lookup = MapResourceLookup<K, V>(key, typeOf<K>(), typeOf<V>())
         lookups += lookup
         return lookup

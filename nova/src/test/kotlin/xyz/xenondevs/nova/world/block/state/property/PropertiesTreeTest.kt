@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block.state.property
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.block.BlockFace
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -20,10 +20,10 @@ class PropertiesTreeTest {
     
     private companion object {
         
-        val FACING = EnumProperty<BlockFace>(ResourceLocation.fromNamespaceAndPath("nova", "facing"))
+        val FACING = EnumProperty<BlockFace>(Key.key("nova", "facing"))
         val SCOPED_FACING = FACING.scope(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST)
         
-        val NUMBER = IntProperty(ResourceLocation.fromNamespaceAndPath("nova", "number"))
+        val NUMBER = IntProperty(Key.key("nova", "number"))
         val SCOPED_NUMBER = NUMBER.scope(0..15)
         
     }

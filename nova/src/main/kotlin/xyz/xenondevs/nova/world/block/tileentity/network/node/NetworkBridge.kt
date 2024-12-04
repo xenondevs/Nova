@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.node
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 
 /**
  * A type of [NetworkNode] that can connect multiple [NetworkEndPoints][NetworkEndPoint],
@@ -18,6 +18,6 @@ interface NetworkBridge : NetworkNode {
     /**
      * An identifier that defines which [NetworkBridges][NetworkBridge] can connect to each other.
      */
-    val typeId: ResourceLocation
+    val typeId: Key
     
 }

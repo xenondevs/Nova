@@ -47,7 +47,7 @@ class NovaIdTest(private val id: String, override val example: ItemStack) : Sing
 class NovaNameTest(private val name: String, override val examples: List<ItemStack>) : MultiItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return item.novaItem?.id?.path == name
+        return item.novaItem?.id?.value() == name
     }
     
 }

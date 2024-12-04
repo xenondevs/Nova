@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.hook.impl.mmoitems
 import io.lumine.mythic.lib.api.item.NBTItem
 import net.Indyuce.mmoitems.MMOItems
 import net.Indyuce.mmoitems.api.Type
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -103,7 +103,7 @@ internal object MMOItemsHook : CustomItemService {
         return null
     }
     
-    override fun getBlockItemModelPaths(): Map<ResourceLocation, ResourcePath<ResourceType.Model>> {
+    override fun getBlockItemModelPaths(): Map<Key, ResourcePath<ResourceType.Model>> {
         return emptyMap()
     }
     

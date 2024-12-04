@@ -6,9 +6,9 @@ import com.mojang.serialization.Codec
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
@@ -37,7 +37,7 @@ import kotlin.reflect.full.isSuperclassOf
  * Represents a block type in Nova.
  */
 open class NovaBlock internal constructor(
-    val id: ResourceLocation,
+    val id: Key,
     val name: Component,
     val style: Style,
     behaviors: List<BlockBehaviorHolder>,

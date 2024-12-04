@@ -20,8 +20,8 @@ abstract class MenuContainer internal constructor() {
     
     fun registerWindow(window: Window) {
         window.addOpenHandler { openWindows += window }
-        window.addCloseHandler { 
-            openWindows -= window 
+        window.addCloseHandler {
+            openWindows -= window
             handleClosed(window.viewer!!)
         }
     }

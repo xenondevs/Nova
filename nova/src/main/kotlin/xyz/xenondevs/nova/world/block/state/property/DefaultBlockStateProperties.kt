@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block.state.property
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
 import org.bukkit.Axis
 import org.bukkit.Fluid
@@ -20,33 +20,33 @@ object DefaultBlockStateProperties {
     /**
      * A property for the [BlockFace] a block is facing.
      */
-    val FACING: EnumProperty<BlockFace> = EnumProperty(ResourceLocation.fromNamespaceAndPath("nova", "facing"))
+    val FACING: EnumProperty<BlockFace> = EnumProperty(Key.key("nova", "facing"))
     
     /**
      * A property for the [Axis] a block is aligned to.
      */
-    val AXIS: EnumProperty<Axis> = EnumProperty(ResourceLocation.fromNamespaceAndPath("nova", "axis"))
+    val AXIS: EnumProperty<Axis> = EnumProperty(Key.key("nova", "axis"))
     
     /**
      * A property for the waterlogged state of a block.
      */
-    val WATERLOGGED: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "waterlogged"))
+    val WATERLOGGED: BooleanProperty = BooleanProperty(Key.key("nova", "waterlogged"))
     
     /**
      * A property for the redstone powered state of a block.
      */
-    val POWERED: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "powered"))
+    val POWERED: BooleanProperty = BooleanProperty(Key.key("nova", "powered"))
     
-    internal val NOTE_BLOCK_INSTRUMENT: EnumProperty<NoteBlockInstrument> = EnumProperty(ResourceLocation.fromNamespaceAndPath("nova", "instrument"))
-    internal val NOTE_BLOCK_NOTE: IntProperty = IntProperty(ResourceLocation.fromNamespaceAndPath("nova", "note"))
-    internal val LEAVES_DISTANCE: IntProperty = IntProperty(ResourceLocation.fromNamespaceAndPath("nova", "distance"))
-    internal val LEAVES_PERSISTENT: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "persistent"))
-    internal val TRIPWIRE_NORTH: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "north"))
-    internal val TRIPWIRE_EAST: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "east"))
-    internal val TRIPWIRE_SOUTH: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "south"))
-    internal val TRIPWIRE_WEST: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "west"))
-    internal val TRIPWIRE_ATTACHED: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "attached"))
-    internal val TRIPWIRE_DISARMED: BooleanProperty = BooleanProperty(ResourceLocation.fromNamespaceAndPath("nova", "disarmed"))
+    internal val NOTE_BLOCK_INSTRUMENT: EnumProperty<NoteBlockInstrument> = EnumProperty(Key.key("nova", "instrument"))
+    internal val NOTE_BLOCK_NOTE: IntProperty = IntProperty(Key.key("nova", "note"))
+    internal val LEAVES_DISTANCE: IntProperty = IntProperty(Key.key("nova", "distance"))
+    internal val LEAVES_PERSISTENT: BooleanProperty = BooleanProperty(Key.key("nova", "persistent"))
+    internal val TRIPWIRE_NORTH: BooleanProperty = BooleanProperty(Key.key("nova", "north"))
+    internal val TRIPWIRE_EAST: BooleanProperty = BooleanProperty(Key.key("nova", "east"))
+    internal val TRIPWIRE_SOUTH: BooleanProperty = BooleanProperty(Key.key("nova", "south"))
+    internal val TRIPWIRE_WEST: BooleanProperty = BooleanProperty(Key.key("nova", "west"))
+    internal val TRIPWIRE_ATTACHED: BooleanProperty = BooleanProperty(Key.key("nova", "attached"))
+    internal val TRIPWIRE_DISARMED: BooleanProperty = BooleanProperty(Key.key("nova", "disarmed"))
     
 }
 
@@ -151,18 +151,18 @@ object DefaultScopedBlockStateProperties {
         }
     
     internal val NOTE_BLOCK_INSTRUMENT: ScopedBlockStateProperty<NoteBlockInstrument> =
-        DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT.scope { ctx -> 
+        DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT.scope { ctx ->
             NoteBlockBehavior.determineInstrument(ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS))
         }
     
     internal val NOTE_BLOCK_NOTE: ScopedBlockStateProperty<Int> =
         DefaultBlockStateProperties.NOTE_BLOCK_NOTE.scope(0..24) { 0 }
-
+    
     internal val LEAVES_DISTANCE: ScopedBlockStateProperty<Int> =
         DefaultBlockStateProperties.LEAVES_DISTANCE.scope(1..7) { ctx ->
             LeavesBehavior.calculateDistance(ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS))
         }
-
+    
     internal val LEAVES_PERSISTENT: ScopedBlockStateProperty<Boolean> =
         DefaultBlockStateProperties.LEAVES_PERSISTENT.scope { ctx ->
             ctx[DefaultContextParamTypes.SOURCE_UUID] != null

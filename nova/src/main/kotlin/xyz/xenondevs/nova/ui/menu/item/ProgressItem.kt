@@ -2,11 +2,10 @@ package xyz.xenondevs.nova.ui.menu.item
 
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.invui.item.Item
-import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.Click
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.world.item.NovaItem
 
 /**

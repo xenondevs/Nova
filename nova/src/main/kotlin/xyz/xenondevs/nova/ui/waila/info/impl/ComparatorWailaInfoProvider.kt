@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.ui.waila.info.impl
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.data.type.Comparator
 import org.bukkit.entity.Player
@@ -16,8 +16,8 @@ internal object ComparatorWailaInfoProvider : VanillaWailaInfoProvider<Comparato
         return info
     }
     
-    private fun getComparatorIcon(comparator: Comparator): ResourceLocation {
-        return ResourceLocation.withDefaultNamespace(
+    private fun getComparatorIcon(comparator: Comparator): Key {
+        return Key.key(
             "comparator"
                 + (if (comparator.isPowered) "_on" else "")
                 + (if (comparator.mode == Comparator.Mode.SUBTRACT) "_subtract" else "")

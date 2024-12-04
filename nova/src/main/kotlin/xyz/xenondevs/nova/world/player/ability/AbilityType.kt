@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.player.ability
 
-import net.minecraft.resources.ResourceLocation
+import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 
-class AbilityType<T : Ability> internal constructor(val id: ResourceLocation, val createAbility: (Player) -> T)
+class AbilityType<T : Ability> internal constructor(val id: Key, val createAbility: (Player) -> T)

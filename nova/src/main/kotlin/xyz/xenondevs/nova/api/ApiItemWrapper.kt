@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.api.item.NovaItem as INovaItem
 
 internal class ApiItemWrapper(private val item: NovaItem) : INovaItem {
     
-    override fun getId(): INamespacedId = NamespacedId(item.id.namespace, item.id.path)
+    override fun getId(): INamespacedId = NamespacedId(item.id.namespace(), item.id.value())
     override fun getBlock(): NovaBlock? = item.block?.let(::ApiBlockWrapper)
     override fun getMaxStackSize(): Int = item.maxStackSize
     

@@ -46,6 +46,7 @@ internal class RegionChunk(
     @Volatile
     var isEnabled = false
         private set
+    
     @Volatile
     var hasBeenEnabled = false
         private set
@@ -277,7 +278,7 @@ internal class RegionChunk(
                 if (isTicking) {
                     try {
                         previous.handleDisableTicking()
-                    } catch(t: Throwable) {
+                    } catch (t: Throwable) {
                         LOGGER.error("Failed to disable ticking for $tileEntity", t)
                     }
                 }
@@ -336,7 +337,7 @@ internal class RegionChunk(
             }
             
             // remove vanilla tile entities that have de-synced from the block type
-            vanillaTileEntities.removeIf { (pos, vte) -> 
+            vanillaTileEntities.removeIf { (pos, vte) ->
                 val invalid = pos.block.type !in vte.type.materials
                 if (invalid) vanillaTileEntityData.remove(pos)
                 invalid

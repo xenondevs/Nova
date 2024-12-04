@@ -33,7 +33,7 @@ internal object EarlyBlockPlaceEventPatch : MultiTransformer(BlockItem::class) {
                 context.player?.containerMenu?.sendAllDataToRemote()
                 return false
             }
-        } catch(t: Throwable) {
+        } catch (t: Throwable) {
             LOGGER.error("An exception occurred while handling early block place event", t)
         }
         

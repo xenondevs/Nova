@@ -12,6 +12,6 @@ interface DimensionRegistry : AddonHolder {
     
     @ExperimentalWorldGen
     fun dimensionType(name: String, dimensionType: DimensionTypeBuilder.() -> Unit): ResourceKey<DimensionType> =
-         buildRegistryElementLater(addon, name, Registries.DIMENSION_TYPE, ::DimensionTypeBuilder, dimensionType)
+        buildRegistryElementLater(addon, name, Registries.DIMENSION_TYPE, ::DimensionTypeBuilder, dimensionType)
     
 }

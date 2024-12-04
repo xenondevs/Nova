@@ -1,12 +1,12 @@
 package xyz.xenondevs.nova.world.generation.builder
 
 import com.mojang.datafixers.util.Either
+import net.kyori.adventure.key.Key
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.RegistryOps.RegistryInfoLookup
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.levelgen.GenerationStep
@@ -20,14 +20,14 @@ import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 
 /**
- * Builder for [BiomeInjections][BiomeInjection]. 
+ * Builder for [BiomeInjections][BiomeInjection].
  * Check out the [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/inject/biome/) on biome injections for more information.
  *
  * @see [BiomeRegistry]
  */
 @ExperimentalWorldGen
 class BiomeInjectionBuilder internal constructor(
-    id: ResourceLocation,
+    id: Key,
     lookup: RegistryInfoLookup
 ) : RegistryElementBuilder<BiomeInjection>(NovaRegistries.BIOME_INJECTION, id) {
     
@@ -56,7 +56,7 @@ class BiomeInjectionBuilder internal constructor(
     
     /**
      * Adds [features] to the list of features this [BiomeInjection] should add.
-     * 
+     *
      * For more information on features, check out their [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/features/features/).
      */
     fun features(index: GenerationStep.Decoration, vararg features: ResourceKey<PlacedFeature>) {

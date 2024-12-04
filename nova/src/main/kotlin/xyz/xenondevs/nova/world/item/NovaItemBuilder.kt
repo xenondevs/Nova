@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.world.item
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.Addon
@@ -14,17 +14,17 @@ import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
-import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
+import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 
 class NovaItemBuilder internal constructor(
-    id: ResourceLocation
+    id: Key
 ) : ConfigurableRegistryElementBuilder<NovaItem>(NovaRegistries.ITEM, id) {
     
     private var style: Style = Style.empty()
-    private var name: Component? = Component.translatable("item.${id.namespace}.${id.path}")
+    private var name: Component? = Component.translatable("item.${id.namespace()}.${id.value()}")
     private val lore = ArrayList<Component>()
     private var behaviors: MutableList<ItemBehaviorHolder> = ArrayList()
     private var maxStackSize = 64
@@ -34,7 +34,7 @@ class NovaItemBuilder internal constructor(
     private var tooltipStyle: TooltipStyle? = null
     private var configureDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit = {}
     
-    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
+    internal constructor(addon: Addon, name: String) : this(Key(addon, name))
     
     /**
      * Sets the style of the item name.
@@ -176,7 +176,7 @@ class NovaItemBuilder internal constructor(
     
     internal companion object {
         
-        fun fromBlock(id: ResourceLocation, block: NovaBlock): NovaItemBuilder {
+        fun fromBlock(id: Key, block: NovaBlock): NovaItemBuilder {
             return NovaItemBuilder(id).apply {
                 this.block = block
                 name(block.name)

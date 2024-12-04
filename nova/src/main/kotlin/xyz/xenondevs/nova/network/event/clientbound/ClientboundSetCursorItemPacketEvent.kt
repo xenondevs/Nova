@@ -6,7 +6,7 @@ import org.bukkit.entity.Player
 import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 
 class ClientboundSetCursorItemPacketEvent(
-    player: Player, 
+    player: Player,
     packet: ClientboundSetCursorItemPacket
 ) : PlayerPacketEvent<ClientboundSetCursorItemPacket>(player, packet) {
     

@@ -19,7 +19,7 @@ internal class LegacyMaterialWrapper(val material: Either<NovaItem, NovaBlock>) 
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")
     override fun getId(): INamespacedId {
         val map = material.map(NovaItem::id, NovaBlock::id)
-        return NamespacedId(map.namespace, map.path)
+        return NamespacedId(map.namespace(), map.value())
     }
     
     @Deprecated("Use NovaBlockRegistry and NovaItemRegistry instead")

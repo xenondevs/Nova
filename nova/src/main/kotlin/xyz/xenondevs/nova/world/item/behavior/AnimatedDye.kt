@@ -17,7 +17,7 @@ import java.awt.Color
  *
  * @param defaultTicksPerColor The default value for the amount of ticks between each color.
  * Used when `ticks_per_color` is not specified in the config, or null to require the presence of a config entry.
- * 
+ *
  * @param defaultColors The default value for the list of colors to cycle through,
  * to be used when `colors` is not specified in the config, or null to require the presence of a config entry.
  */
@@ -35,7 +35,7 @@ fun AnimatedDye(
 
 /**
  * Animates the `minecraft:dyed_color` component by interpolating between a given set of colors.
- * 
+ *
  * @param ticksPerColor The amount of ticks between each color.
  * @param colors The list of colors to cycle through.
  */

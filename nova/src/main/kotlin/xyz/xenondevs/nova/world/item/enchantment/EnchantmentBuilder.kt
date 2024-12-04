@@ -1,11 +1,11 @@
 package xyz.xenondevs.nova.world.item.enchantment
 
 import io.papermc.paper.registry.TypedKey
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.registries.Registries
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.EnchantmentTags
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.inventory.ItemStack
@@ -14,8 +14,8 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.patch.impl.item.EnchantmentPatches
 import xyz.xenondevs.nova.patch.impl.registry.plusAssign
 import xyz.xenondevs.nova.registry.LazyRegistryElementBuilder
-import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
+import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.world.item.behavior.Enchantable
 import java.util.*
 import net.minecraft.world.item.enchantment.Enchantment as MojangEnchantment
@@ -46,11 +46,11 @@ internal class CustomEnchantmentLogic(
 }
 
 class EnchantmentBuilder internal constructor(
-    id: ResourceLocation,
+    id: Key,
 ) : LazyRegistryElementBuilder<MojangEnchantment>(Registries.ENCHANTMENT, id) {
     
     // enchantment definition
-    private var name: Component = Component.translatable("enchantment.${id.namespace}.${id.path}")
+    private var name: Component = Component.translatable("enchantment.${id.namespace()}.${id.value()}")
     private var maxLevel: Int = 1
     private var rarity: Int = 10
     private var anvilCost: Int = 4
@@ -67,7 +67,7 @@ class EnchantmentBuilder internal constructor(
     private var isTradeable: Boolean = false
     private var isCurse: Boolean = false
     
-    internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
+    internal constructor(addon: Addon, name: String) : this(Key(addon, name))
     
     /**
      * Sets the name of the enchantment.

@@ -11,9 +11,9 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterTyp
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 import xyz.xenondevs.nova.world.generation.wrapper.WrapperBlock
+import xyz.xenondevs.nova.world.item.Equipment
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
-import xyz.xenondevs.nova.world.item.Equipment
 import xyz.xenondevs.nova.world.item.recipe.RecipeType
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier

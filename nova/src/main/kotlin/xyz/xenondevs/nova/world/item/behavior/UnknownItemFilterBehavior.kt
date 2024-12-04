@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.world.item.behavior
 
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.minecraft.resources.ResourceLocation
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemStack
@@ -10,13 +10,14 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
+import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.item.DefaultItems
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 
-private val ID_KEY = ResourceLocation.fromNamespaceAndPath("nova", "unknown_item_filter_original_id")
-private val DATA_KEY = ResourceLocation.fromNamespaceAndPath("nova", "unknown_item_filter_original_data")
+private val ID_KEY = Key.key("nova", "unknown_item_filter_original_id")
+private val DATA_KEY = Key.key("nova", "unknown_item_filter_original_data")
 
 internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<UnknownItemFilter> {
     
@@ -24,7 +25,7 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
         val event = wrappedEvent.event
         
         val data = itemStack.novaCompound ?: return
-        val filterType = NovaRegistries.ITEM_FILTER_TYPE.getValue(data.get<ResourceLocation>(ID_KEY)) ?: return
+        val filterType = NovaRegistries.ITEM_FILTER_TYPE.getValue(data.get<Key>(ID_KEY)) ?: return
         val filterStack = filterType.deserialize(data.get<Compound>(DATA_KEY)!!)
             .toItemStack()
             .apply { amount = itemStack.amount }
@@ -57,7 +58,7 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
     override fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
         val lore = ArrayList<Component>()
         lore += Component.translatable("item.nova.unknown_item_filter.description", NamedTextColor.RED)
-        lore += Component.text(data.get<ResourceLocation>(ID_KEY).toString(), NamedTextColor.GRAY)
+        lore += Component.text(data.get<Key>(ID_KEY).toString(), NamedTextColor.GRAY)
         lore += data.get<Compound>(DATA_KEY).toString()
             .lineSequence()
             .flatMap { it.chunkedSequence(100) }
@@ -69,15 +70,15 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
     
     override fun toString(itemStack: ItemStack): String {
         return "UnknownItemFilterBehavior(" +
-            "id=${itemStack.novaCompound?.get<ResourceLocation>(ID_KEY)}, " +
+            "id=${itemStack.novaCompound?.get<Key>(ID_KEY)}, " +
             "data=${itemStack.novaCompound?.get<Compound>(DATA_KEY)})"
-            ")"
+        ")"
     }
     
 }
 
 internal class UnknownItemFilter(
-    val originalId: ResourceLocation,
+    val originalId: Key,
     val originalData: Compound
 ) : ItemFilter<UnknownItemFilter> {
     
