@@ -4,10 +4,10 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.builder.setDisplayName
-import xyz.xenondevs.invui.item.impl.AbstractItem
+import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
@@ -22,9 +22,9 @@ open class ChangeNumberItem(
     private val offProvider: ItemProvider
 ) : AbstractItem() {
     
-    override fun getItemProvider(): ItemProvider = if (canModify()) onProvider else offProvider
+    override fun getItemProvider(player: Player): ItemProvider = if (canModify()) onProvider else offProvider
     
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) {
         if (canModify()) {
             player.playClickSound()
             setNumber((getNumber() + if (clickType.isShiftClick) shiftSizeModifier else sizeModifier).coerceIn(getRange()))
@@ -39,15 +39,17 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
     
     constructor(getNumber: () -> Int) : this(getNumber, null)
     
-    override fun getItemProvider(): ItemProvider {
+    override fun getItemProvider(player: Player): ItemProvider {
         val number = getNumber().coerceIn(0..999)
-        return if (localizedName != null) {
-            DefaultGuiItems.NUMBER.model.createClientsideItemBuilder(modelId = number)
-                .setDisplayName(Component.translatable(localizedName, Component.text(number)))
-        } else DefaultGuiItems.NUMBER.model.unnamedClientsideProviders[number]
+        val builder = DefaultGuiItems.NUMBER
+            .createClientsideItemBuilder()
+            .addCustomModelData(number)
+        if (localizedName != null)
+            builder.setName(Component.translatable(localizedName, Component.text(number)))
+        return builder
     }
     
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) = Unit
     
 }
 
@@ -63,9 +65,9 @@ class AddNumberItem(
     getNumber,
     setNumber,
     localizedName
-        ?.let { DefaultGuiItems.PLUS_BTN_ON.model.createClientsideItemBuilder().setDisplayName(Component.translatable(it)) }
-        ?: DefaultGuiItems.PLUS_BTN_ON.model.clientsideProvider,
-    DefaultGuiItems.PLUS_BTN_OFF.model.clientsideProvider
+        ?.let { DefaultGuiItems.PLUS_BTN_ON.createClientsideItemBuilder().setName(Component.translatable(it)) }
+        ?: DefaultGuiItems.PLUS_BTN_ON.clientsideProvider,
+    DefaultGuiItems.PLUS_BTN_OFF.clientsideProvider
 )
 
 class RemoveNumberItem(
@@ -80,9 +82,9 @@ class RemoveNumberItem(
     getNumber,
     setNumber,
     localizedName
-        ?.let { DefaultGuiItems.MINUS_BTN_ON.model.createClientsideItemBuilder().setDisplayName(Component.translatable(it)) }
-        ?: DefaultGuiItems.MINUS_BTN_ON.model.clientsideProvider,
-    DefaultGuiItems.MINUS_BTN_OFF.model.clientsideProvider
+        ?.let { DefaultGuiItems.MINUS_BTN_ON.createClientsideItemBuilder().setName(Component.translatable(it)) }
+        ?: DefaultGuiItems.MINUS_BTN_ON.clientsideProvider,
+    DefaultGuiItems.MINUS_BTN_OFF.clientsideProvider
 )
 
 open class AioNumberItem(
@@ -95,10 +97,10 @@ open class AioNumberItem(
     private val builder: ItemBuilder
 ) : AbstractItem() {
     
-    override fun getItemProvider(): ItemProvider =
-        builder.setDisplayName(Component.translatable(localizedName, Component.text(getNumber())))
+    override fun getItemProvider(player: Player): ItemProvider =
+        builder.setName(Component.translatable(localizedName, Component.text(getNumber())))
     
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) {
         val numberModifier = when (clickType) {
             ClickType.LEFT -> numberModifier
             ClickType.SHIFT_LEFT -> shiftNumberModifier

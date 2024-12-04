@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.util.data
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import java.awt.Dimension
 import java.awt.image.BufferedImage
@@ -64,10 +65,19 @@ internal inline fun <T> Path.useZip(create: Boolean = false, run: (Path) -> T): 
 }
 
 /**
- * Encodes [value] to JSON via kotlinx.serialization-json as [T] and writes it to the file.
+ * Decodes [value] from JSON via [json] as [T] from the file.
  */
 @PublishedApi
 @OptIn(ExperimentalSerializationApi::class)
-internal inline fun <reified T> Path.writeJson(value: T) {
-    outputStream().use { Json.encodeToStream(value, it) }
+internal inline fun <reified T> Path.readJson(json: Json = Json): T {
+    return inputStream().use { json.decodeFromStream(it) }
+}
+
+/**
+ * Encodes [value] to JSON via [json] as [T] and writes it to the file.
+ */
+@PublishedApi
+@OptIn(ExperimentalSerializationApi::class)
+internal inline fun <reified T> Path.writeJson(value: T, json: Json = Json) {
+    outputStream().use { json.encodeToStream(value, it) }
 }

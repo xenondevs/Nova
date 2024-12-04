@@ -13,7 +13,6 @@ import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.builder.setDisplayName
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.data.getInputStacks
@@ -49,8 +48,8 @@ abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
         if (time != 0) {
             builder.addIngredient(
                 't',
-                DefaultGuiItems.TP_STOPWATCH.model.createClientsideItemBuilder()
-                    .setDisplayName(Component.translatable("menu.nova.recipe.time", Component.text(time / 20.0)))
+                DefaultGuiItems.TP_STOPWATCH.createClientsideItemBuilder()
+                    .setName(Component.translatable("menu.nova.recipe.time", Component.text(time / 20.0)))
             )
         }
         

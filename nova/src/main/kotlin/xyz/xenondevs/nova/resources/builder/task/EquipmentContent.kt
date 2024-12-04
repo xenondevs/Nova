@@ -11,10 +11,10 @@ import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.data.EquipmentModel
-import xyz.xenondevs.nova.resources.layout.equipment.AnimatedEquipmentLayout
-import xyz.xenondevs.nova.resources.layout.equipment.AnimatedEquipmentLayout.Animation
-import xyz.xenondevs.nova.resources.layout.equipment.InterpolationMode
-import xyz.xenondevs.nova.resources.layout.equipment.StaticEquipmentLayout
+import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayout
+import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayout.Animation
+import xyz.xenondevs.nova.resources.builder.layout.equipment.InterpolationMode
+import xyz.xenondevs.nova.resources.builder.layout.equipment.StaticEquipmentLayout
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.MathUtils
 import xyz.xenondevs.nova.util.data.ImageUtils

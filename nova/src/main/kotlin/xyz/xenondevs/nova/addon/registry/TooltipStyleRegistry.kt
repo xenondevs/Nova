@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.addon.registry
 
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.resources.layout.gui.TooltipStyleBuilder
+import xyz.xenondevs.nova.resources.builder.layout.gui.TooltipStyleBuilder
 import xyz.xenondevs.nova.util.data.Key
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.item.TooltipStyle

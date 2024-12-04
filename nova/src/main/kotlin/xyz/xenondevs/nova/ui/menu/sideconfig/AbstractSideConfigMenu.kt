@@ -11,8 +11,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.commons.collections.after
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.item.builder.addLoreLines
-import xyz.xenondevs.invui.item.builder.setDisplayName
+import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.invui.item.notifyWindows
 import xyz.xenondevs.nova.ui.menu.item.AsyncItem
 import xyz.xenondevs.nova.util.BlockSide
@@ -97,25 +96,25 @@ internal abstract class AbstractSideConfigMenu<H : EndPointDataHolder>(
             provider.set(
                 when (connectionType) {
                     NetworkConnectionType.NONE ->
-                        DefaultGuiItems.GRAY_BTN.model.createClientsideItemBuilder()
+                        DefaultGuiItems.GRAY_BTN.createClientsideItemBuilder()
                             .addLoreLines(Component.translatable("menu.nova.side_config.none", NamedTextColor.GRAY))
                     
                     NetworkConnectionType.EXTRACT ->
-                        DefaultGuiItems.ORANGE_BTN.model.createClientsideItemBuilder()
+                        DefaultGuiItems.ORANGE_BTN.createClientsideItemBuilder()
                             .addLoreLines(Component.translatable("menu.nova.side_config.output", NamedTextColor.GOLD))
                     
                     NetworkConnectionType.INSERT ->
-                        DefaultGuiItems.BLUE_BTN.model.createClientsideItemBuilder()
+                        DefaultGuiItems.BLUE_BTN.createClientsideItemBuilder()
                             .addLoreLines(Component.translatable("menu.nova.side_config.input", NamedTextColor.AQUA))
                     
                     NetworkConnectionType.BUFFER ->
-                        DefaultGuiItems.GREEN_BTN.model.createClientsideItemBuilder()
+                        DefaultGuiItems.GREEN_BTN.createClientsideItemBuilder()
                             .addLoreLines(Component.translatable("menu.nova.side_config.input_output", NamedTextColor.GREEN))
-                }.setDisplayName(getSideName(blockSide, face))
+                }.setName(getSideName(blockSide, face))
             )
         }
         
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
             player.playClickSound()
             queueCycleConnectionType(face, if (clickType.isLeftClick) 1 else -1)
         }

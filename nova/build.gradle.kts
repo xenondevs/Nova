@@ -18,12 +18,12 @@ dependencies {
     novaLoaderApi(libs.bundles.xenondevs.commons)
     novaLoaderApi(libs.invui.kotlin)
     novaLoaderApi(libs.joml.primitives)
+    novaLoaderApi(libs.icu4j)
     
     // internal dependencies
     compileOnly(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
-    novaLoader(libs.inventoryaccess)
     novaLoader(libs.bstats)
     novaLoader(libs.bytebase.runtime)
     novaLoader(libs.fuzzywuzzy)

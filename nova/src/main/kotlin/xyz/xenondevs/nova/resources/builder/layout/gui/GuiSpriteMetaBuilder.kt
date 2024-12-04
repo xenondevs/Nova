@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.layout.gui
+package xyz.xenondevs.nova.resources.builder.layout.gui
 
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder

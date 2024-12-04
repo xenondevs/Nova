@@ -6,8 +6,8 @@ import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
 import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.internal.util.SlotUtils
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.util.SlotUtils
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.intValue

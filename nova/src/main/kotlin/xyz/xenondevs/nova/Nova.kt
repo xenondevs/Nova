@@ -9,8 +9,8 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.gson.*
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
-import xyz.xenondevs.inventoryaccess.component.i18n.Languages
 import xyz.xenondevs.invui.InvUI
+import xyz.xenondevs.invui.i18n.Languages
 import xyz.xenondevs.nova.api.ApiBlockManager
 import xyz.xenondevs.nova.api.ApiBlockRegistry
 import xyz.xenondevs.nova.api.ApiItemRegistry

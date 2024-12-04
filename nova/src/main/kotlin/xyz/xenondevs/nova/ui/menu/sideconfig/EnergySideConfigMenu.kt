@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.menu.sideconfig
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.invui.gui.structure.Structure
+import xyz.xenondevs.invui.gui.Structure
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.DefaultNetworkTypes

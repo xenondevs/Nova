@@ -6,7 +6,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.commons.collections.weakHashSet
@@ -14,16 +13,14 @@ import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.TabGui
+import xyz.xenondevs.invui.item.AbstractPagedGuiBoundItem
+import xyz.xenondevs.invui.item.AbstractTabGuiBoundItem
+import xyz.xenondevs.invui.item.BoundItem.gui
+import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.builder.setDisplayName
-import xyz.xenondevs.invui.item.impl.SimpleItem
-import xyz.xenondevs.invui.item.impl.controlitem.PageItem
-import xyz.xenondevs.invui.item.impl.controlitem.TabItem
 import xyz.xenondevs.invui.window.AnvilWindow
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.invui.window.changeTitle
-import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.ui.menu.applyDefaultTPIngredients
 import xyz.xenondevs.nova.ui.menu.explorer.ItemMenu
 import xyz.xenondevs.nova.ui.menu.item.AnvilTextItem
@@ -51,12 +48,15 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     
     private var currentWindow: Window? = null
     
-    private val openSearchItem = SimpleItem(DefaultGuiItems.TP_SEARCH.model.clientsideProvider) { openSearchWindow() }
+    private val openSearchItem = Item.builder()
+        .setItemProvider(DefaultGuiItems.TP_SEARCH.clientsideProvider)
+        .addClickHandler { _, _ -> openSearchWindow() }
+        .build()
     
     private val toggleCheatModeItem = ToggleItem(
         player in cheaters,
-        DefaultGuiItems.TP_CHEATING_ON.model.clientsideProvider,
-        DefaultGuiItems.TP_CHEATING_OFF.model.clientsideProvider,
+        DefaultGuiItems.TP_CHEATING_ON.clientsideProvider,
+        DefaultGuiItems.TP_CHEATING_OFF.clientsideProvider,
     ) {
         if (player.hasPermission(GIVE_PERMISSION)) {
             player.persistentDataContainer.set(CHEAT_MODE_KEY, PersistentDataType.BOOLEAN, it)
@@ -66,10 +66,11 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         return@ToggleItem false
     }
     
-    private val openMainWindowItem = SimpleItem(
-        DefaultGuiItems.ARROW_UP_ON.model.createClientsideItemBuilder()
-            .setDisplayName(Component.translatable("menu.nova.items.search.back", NamedTextColor.GRAY))
-    ) { openMainWindow() }
+    private val openMainWindowItem = Item.builder()
+        .setItemProvider(
+            DefaultGuiItems.ARROW_UP_ON.createClientsideItemBuilder()
+                .setName(Component.translatable("menu.nova.items.search.back", NamedTextColor.GRAY))
+        ).addClickHandler { _, _ -> openMainWindow() }
     
     private val tabPagesGui = PagedGui.items()
         .setStructure(
@@ -118,7 +119,7 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
         .addIngredient('s', openMainWindowItem)
         .build()
     
-    private val textItem = AnvilTextItem(DefaultGuiItems.INVISIBLE_ITEM.model.createClientsideItemBuilder(), "")
+    private val textItem = AnvilTextItem(DefaultGuiItems.INVISIBLE_ITEM.createClientsideItemBuilder(), "")
     
     private var filteredItems: List<Item>? = null
     private var filter = ""
@@ -132,8 +133,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     init {
         val tabButtons = ItemCategories.CATEGORIES
             .withIndex()
-            .map { (index, category) -> CreativeTabItem(index, category).apply { gui = mainGui } }
-        tabPagesGui.setContent(tabButtons)
+            .map { (index, category) -> CreativeTabItem(index, category).apply { bind(mainGui) } }
+        tabPagesGui.content = tabButtons
         
         updateFilteredItems()
         if (player.hasPermission(GIVE_PERMISSION)) {
@@ -152,8 +153,8 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
     }
     
     private fun handleTabPageChange(newTab: Int) {
-        mainGui.setTab(newTab * 5)
-        currentWindow?.changeTitle(getMainWindowTitle())
+        mainGui.tab = newTab * 5
+        currentWindow?.setTitle(getMainWindowTitle())
     }
     
     private fun updateFilteredItems() {
@@ -175,14 +176,14 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             }
         } else OBTAINABLE_ITEMS.toList()
         
-        searchResultsGui.setContent(filteredItems)
-        searchPreviewGui.setContent(filteredItems)
+        searchResultsGui.content = filteredItems ?: emptyList()
+        searchPreviewGui.content = filteredItems ?: emptyList()
     }
     
     private fun getMainWindowTitle(): Component {
         return if (filter == "") {
             Component.text()
-                .append(TAB_BUTTON_TEXTURES[mainGui.currentTab % 5].component)
+                .append(TAB_BUTTON_TEXTURES[mainGui.tab % 5].component)
                 .build()
         } else {
             val title = Component.text()
@@ -246,51 +247,55 @@ internal class ItemsWindow(val player: Player) : ItemMenu {
             .build()
     }
     
-    private inner class CreativeTabItem(private val tab: Int, private val category: ItemCategory) : TabItem(tab) {
+    private inner class CreativeTabItem(private val tab: Int, private val category: ItemCategory) : AbstractTabGuiBoundItem() {
         
-        override fun getItemProvider(gui: TabGui) = category.icon
+        override fun getItemProvider(player: Player) = category.icon
         
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            if (clickType == ClickType.LEFT && gui.isTabAvailable(tab) && gui.currentTab != tab) {
+        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
+            if (clickType == ClickType.LEFT && gui.isTabAvailable(tab) && gui.tab != tab) {
                 player.playClickSound()
-                gui.setTab(tab)
+                gui.tab = tab
                 
-                currentWindow?.changeTitle(getMainWindowTitle())
+                currentWindow?.setTitle(getMainWindowTitle())
             }
         }
         
     }
     
-    private class TabPageBackItem : PageItem(false) {
+    private class TabPageBackItem : AbstractPagedGuiBoundItem() {
         
-        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+        override fun getItemProvider(player: Player): ItemProvider {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
             else if (gui.hasPreviousPage())
-                DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.model.clientsideProvider
-            else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF.model.clientsideProvider
+                DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.clientsideProvider
+            else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF.clientsideProvider
         }
         
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            super.handleClick(clickType, player, event)
-            player.playClickSound()
+        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
+            if (clickType == ClickType.LEFT) {
+                gui.page--
+                player.playClickSound()
+            }
         }
         
     }
     
-    private class TabPageForwardItem : PageItem(true) {
+    private class TabPageForwardItem : AbstractPagedGuiBoundItem() {
         
-        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+        override fun getItemProvider(player: Player): ItemProvider {
             return if (gui.pageAmount <= 1)
                 ItemProvider.EMPTY
             else if (gui.hasNextPage())
-                DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON.model.clientsideProvider
-            else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF.model.clientsideProvider
+                DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON.clientsideProvider
+            else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF.clientsideProvider
         }
         
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            super.handleClick(clickType, player, event)
-            player.playClickSound()
+        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
+            if (clickType == ClickType.LEFT) {
+                gui.page++
+                player.playClickSound()
+            }
         }
         
     }

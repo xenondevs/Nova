@@ -4,8 +4,8 @@ import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.resources.layout.gui.GuiTextureAlignment
-import xyz.xenondevs.nova.resources.layout.gui.GuiTextureLayoutBuilder
+import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureAlignment
+import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureLayoutBuilder
 import xyz.xenondevs.nova.util.set
 
 @InternalInit(stage = InternalInitStage.PRE_WORLD)

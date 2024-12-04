@@ -1,5 +1,10 @@
+@file:UseSerializers(Vector3dcAsArraySerializer::class, Vector4dcAsArraySerializer::class)
+
 package xyz.xenondevs.nova.resources.builder.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import org.joml.Vector3d
 import org.joml.Vector3dc
 import org.joml.Vector4d
@@ -8,6 +13,8 @@ import org.joml.primitives.AABBd
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.serialization.kotlinx.Vector3dcAsArraySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.Vector4dcAsArraySerializer
 import java.util.*
 
 /**
@@ -19,48 +26,78 @@ import java.util.*
  * @param ambientOcclusion (Only relevant for block models) Whether ambient occlusion is enabled for the model.
  * @param guiLight (Only relevant for item models) The direction of the light for the item model in the GUI.
  * @param display (Only relevant for item models) A map of display positions to display settings.
- * @param overrides (Only relevant for item models) A list of overrides for the item model. Every override has one
- * or more predicates that determine whether the override model should be used.
  */
+@Serializable
 data class Model(
     val parent: ResourcePath<ResourceType.Model>? = null,
     val textures: Map<String, String> = emptyMap(),
     val elements: List<Element>? = null,
     
     // block-specific
+    @SerialName("ambientocclusion")
     val ambientOcclusion: Boolean? = null,
     
     // item-specific
+    @SerialName("gui_light")
     val guiLight: GuiLight? = null,
-    val display: Map<Display.Position, Display> = emptyMap(),
-    val overrides: List<Override> = emptyList()
+    val display: Map<Display.Position, Display> = emptyMap()
 ) {
     
     /**
      * Specifies the direction of the light for the item model in the GUI.
      */
-    enum class GuiLight { FRONT, SIDE }
-    
-    /**
-     * Determines a case in which a different [model] should be used based on the given [predicate].
-     */
-    data class Override(val predicate: Map<String, Number>, val model: ResourcePath<ResourceType.Model>)
+    @Serializable
+    enum class GuiLight {
+        
+        @SerialName("front")
+        FRONT,
+        
+        @SerialName("side")
+        SIDE
+        
+    }
     
     /**
      * An axis in 3D space.
      */
-    enum class Axis { X, Y, Z }
+    @Serializable
+    enum class Axis {
+        
+        @SerialName("x")
+        X,
+        
+        @SerialName("y")
+        Y,
+        
+        @SerialName("z")
+        Z
+        
+    }
     
     /**
      * A direction in 3D space.
      */
+    @Serializable
     enum class Direction(val axis: Axis) {
+        
+        @SerialName("north")
         NORTH(Axis.Z),
+        
+        @SerialName("east")
         EAST(Axis.X),
+        
+        @SerialName("south")
         SOUTH(Axis.Z),
+        
+        @SerialName("west")
         WEST(Axis.X),
+        
+        @SerialName("up")
         UP(Axis.Y),
+        
+        @SerialName("down")
         DOWN(Axis.Y)
+        
     }
     
     /**
@@ -72,12 +109,13 @@ data class Model(
      * @param faces A map of the voxel's faces.
      * @params shade Whether shadows are rendered.
      */
+    @Serializable
     data class Element(
         val from: Vector3dc,
         val to: Vector3dc,
-        val rotation: Rotation?,
+        val rotation: Rotation? = null,
         val faces: Map<Direction, Face>,
-        val shade: Boolean
+        val shade: Boolean = true
     ) {
         
         /**
@@ -90,12 +128,14 @@ data class Model(
          * @param rotation The rotation of the texture.
          * @param tintIndex Specifies the tint color for certain block- and item types.
          */
+        @Serializable
         data class Face(
-            val uv: Vector4dc?,
+            val uv: Vector4dc? = null,
             val texture: String,
-            val cullface: Direction?,
-            val rotation: Int,
-            val tintIndex: Int
+            val cullface: Direction? = null,
+            val rotation: Int = 0,
+            @SerialName("tintindex")
+            val tintIndex: Int = -1
         )
         
         /**
@@ -107,11 +147,12 @@ data class Model(
          * @param rescale Whether the model should be rescaled to fit the new size.
          * (for example a 45° rotation stretches the element by sqrt(2))
          */
+        @Serializable
         data class Rotation(
             val angle: Double,
             val axis: Axis,
             val origin: Vector3dc,
-            val rescale: Boolean
+            val rescale: Boolean = false
         )
         
         /**
@@ -135,24 +176,43 @@ data class Model(
      * @param translation The translation of the model.
      * @param scale The scale of the model.
      */
+    @Serializable
     data class Display(
-        val rotation: Vector3dc,
-        val translation: Vector3dc,
-        val scale: Vector3dc
+        val rotation: Vector3dc = Vector3d(0.0, 0.0, 0.0),
+        val translation: Vector3dc = Vector3d(0.0, 0.0, 0.0),
+        val scale: Vector3dc = Vector3d(1.0, 1.0, 1.0)
     ) {
         
         /**
          * The different places where an item model can be displayed.
          */
+        @Serializable
         enum class Position {
+            
+            @SerialName("thirdperson_righthand")
             THIRDPERSON_RIGHTHAND,
+            
+            @SerialName("thirdperson_lefthand")
             THIRDPERSON_LEFTHAND,
+            
+            @SerialName("firstperson_righthand")
             FIRSTPERSON_RIGHTHAND,
+            
+            @SerialName("firstperson_lefthand")
             FIRSTPERSON_LEFTHAND,
+            
+            @SerialName("head")
             HEAD,
+            
+            @SerialName("gui")
             GUI,
+            
+            @SerialName("ground")
             GROUND,
+            
+            @SerialName("fixed")
             FIXED
+            
         }
         
     }
@@ -170,7 +230,6 @@ data class Model(
         var ambientOcclusion = true
         var guiLight = GuiLight.SIDE
         val display = HashMap<Display.Position, Display>()
-        val overrides = ArrayList<Override>()
         
         val hierarchy = LinkedList<Model>()
         var parent: Model? = this
@@ -187,7 +246,6 @@ data class Model(
             if (model.ambientOcclusion != null) ambientOcclusion = model.ambientOcclusion
             if (model.guiLight != null) guiLight = model.guiLight
             display.putAll(model.display)
-            overrides.addAll(model.overrides)
         }
         
         return Model(
@@ -195,8 +253,7 @@ data class Model(
             elements = elements,
             ambientOcclusion = ambientOcclusion,
             guiLight = guiLight,
-            display = display,
-            overrides = overrides
+            display = display
         )
     }
     

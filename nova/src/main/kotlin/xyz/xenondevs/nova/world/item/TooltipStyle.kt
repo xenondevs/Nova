@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.world.item
 
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.layout.gui.TooltipStyleLayout
+import xyz.xenondevs.nova.resources.builder.layout.gui.TooltipStyleLayout
 
 /**
  * Represents a custom tooltip texture.

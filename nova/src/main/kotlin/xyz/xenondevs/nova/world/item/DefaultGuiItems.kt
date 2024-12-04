@@ -4,10 +4,10 @@ import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.layout.item.ItemModelLayoutBuilder
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
 import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
-import xyz.xenondevs.nova.world.item.logic.PacketItems
 import java.awt.Color
 import java.awt.image.BufferedImage
 
@@ -89,7 +89,7 @@ object DefaultGuiItems {
     val CHEATING_OFF = guiItem("cheating_off", "menu.nova.items.cheat_mode.off")
     val COLOR_PICKER = guiItem("color_picker", "menu.nova.color_picker")
     val NUMBER = hiddenItem("gui/opaque/number") {
-        selectModels(0..999, true) {
+        model = numberedModels(0..999) {
             createGuiModel(true, false, "item/gui/number/$it")
         }
     }
@@ -169,8 +169,8 @@ object DefaultGuiItems {
     val TP_CHEATING_ON = tpGuiItem("cheating_on", "menu.nova.items.cheat_mode.on")
     val TP_CHEATING_OFF = tpGuiItem("cheating_off", "menu.nova.items.cheat_mode.off")
     val TP_COLOR_PICKER = tpGuiItem("color_picker", "menu.nova.color_picker")
-    val TP_NUMBER = hiddenItem("number") {
-        selectModels(0..999, true) {
+    val TP_NUMBER = hiddenItem("gui/transparent/number") {
+        model = numberedModels(0..999) {
             createGuiModel(false, false, "item/gui/number/$it")
         }
     }
@@ -184,15 +184,13 @@ object DefaultGuiItems {
 object DefaultBlockOverlays {
     
     val BREAK_STAGE_OVERLAY = hiddenItem("break_stage_overlay") {
-        selectModels(0..9, true) {
+        model = numberedModels(0..9) {
             getModel("nova:block/break_stage/$it")
         }
     }
     
     val TRANSPARENT_BLOCK = hiddenItem("transparent_block") {
-        selectModel {
-            getModel("nova:block/transparent")
-        }
+        model = buildModel { getModel("nova:block/transparent") }
     }
     
 }
@@ -213,25 +211,21 @@ private fun hiddenItem(
     } else localizedName(localizedName)
     behaviors(*itemBehaviors)
     hidden(true)
-    models {
-        itemType(PacketItems.SERVER_SIDE_MATERIAL)
-        selectModel { createLayeredModel("item/$name") }
+    modelDefinition {
+        model = buildModel { createLayeredModel("item/$name") }
     }
 }
 
 private fun hiddenItem(
     name: String,
     localizedName: String? = "",
-    run: ItemModelLayoutBuilder.() -> Unit
+    itemModelDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit
 ): NovaItem = item(name) {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
     hidden(true)
-    models {
-        itemType(PacketItems.SERVER_SIDE_MATERIAL)
-        run()
-    }
+    modelDefinition(itemModelDefinition)
 }
 
 private fun guiItem(
@@ -243,9 +237,8 @@ private fun guiItem(
         name(null)
     } else localizedName(localizedName)
     hidden(true)
-    models {
-        itemType(PacketItems.SERVER_SIDE_MATERIAL)
-        selectModel { createGuiModel(true, stretched, "item/gui/$name") }
+    modelDefinition {
+        model = buildModel { createGuiModel(true, stretched, "item/gui/$name") }
     }
 }
 
@@ -258,18 +251,16 @@ private fun tpGuiItem(
         name(null)
     } else localizedName(localizedName)
     hidden(true)
-    models {
-        itemType(PacketItems.SERVER_SIDE_MATERIAL)
-        selectModel { createGuiModel(false, stretched, "item/gui/$name") }
+    modelDefinition {
+        model = buildModel { createGuiModel(false, stretched, "item/gui/$name") }
     }
 }
 
 private fun barGuiItem(name: String, color: Color, background: Boolean): NovaItem = item(name) {
     localizedName("")
     hidden(true)
-    models {
-        itemType(PacketItems.SERVER_SIDE_MATERIAL)
-        selectModels(0..18, true) { level ->
+    modelDefinition {
+        model = rangedModels(19) { level ->
             val levelTexture = BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB)
             val graphics = levelTexture.createGraphics()
             graphics.color = color

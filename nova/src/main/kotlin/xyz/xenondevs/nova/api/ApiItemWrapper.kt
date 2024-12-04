@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.block.NovaBlock
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
+import xyz.xenondevs.nova.util.item.clientsideCopy
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.api.data.NamespacedId as INamespacedId
 import xyz.xenondevs.nova.api.item.NovaItem as INovaItem
@@ -24,7 +25,7 @@ internal class ApiItemWrapper(private val item: NovaItem) : INovaItem {
     }
     
     override fun createClientsideItemStack(amount: Int): ItemStack {
-        return item.model.createClientsideItemStack().apply { setAmount(amount) }
+        return item.createItemStack(amount).clientsideCopy()
     }
     
 }

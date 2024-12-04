@@ -17,7 +17,7 @@ import net.minecraft.nbt.StringTag
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import org.bukkit.entity.Player
-import xyz.xenondevs.inventoryaccess.util.AdventureComponentUtils
+import xyz.xenondevs.invui.internal.util.ComponentUtils
 import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.MoveCharacters
@@ -85,7 +85,7 @@ fun Component.fontName(): String? {
 }
 
 fun Component.withoutPreFormatting(): Component {
-    return AdventureComponentUtils.withoutPreFormatting(this)
+    return ComponentUtils.withoutPreFormatting(this)
 }
 
 private val DEFAULT_STYLE = MojangStyle.EMPTY

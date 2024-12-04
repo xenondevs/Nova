@@ -10,9 +10,10 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.config.ConfigurableRegistryElementBuilder
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.resources.layout.block.BlockModelSelectorScope
-import xyz.xenondevs.nova.resources.layout.item.ItemModelLayoutBuilder
-import xyz.xenondevs.nova.resources.layout.item.RequestedItemModelLayout
+import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
+import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -31,7 +32,7 @@ class NovaItemBuilder internal constructor(
     private var isHidden = false
     private var block: NovaBlock? = null
     private var tooltipStyle: TooltipStyle? = null
-    private var requestedLayout = RequestedItemModelLayout.DEFAULT
+    private var configureDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit = {}
     
     internal constructor(addon: Addon, name: String) : this(ResourceLocation(addon, name))
     
@@ -148,12 +149,10 @@ class NovaItemBuilder internal constructor(
     }
     
     /**
-     * Configures the models of the item.
+     * Configures the [item model definition](https://minecraft.wiki/w/Items_model_definition) of the item.
      */
-    fun models(init: ItemModelLayoutBuilder.() -> Unit) {
-        val builder = ItemModelLayoutBuilder()
-        builder.init()
-        requestedLayout = builder.build()
+    fun modelDefinition(itemModelDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit) {
+        this.configureDefinition = itemModelDefinition
     }
     
     override fun build(): NovaItem {
@@ -169,7 +168,7 @@ class NovaItemBuilder internal constructor(
             block,
             configId,
             tooltipStyle,
-            requestedLayout
+            configureDefinition
         )
         block?.item = item
         return item
@@ -181,11 +180,22 @@ class NovaItemBuilder internal constructor(
             return NovaItemBuilder(id).apply {
                 this.block = block
                 name(block.name)
-                models {
-                    selectModel {
-                        val scope = BlockModelSelectorScope(block.defaultBlockState, resourcePackBuilder, modelContent)
-                        block.requestedLayout.modelSelector.invoke(scope)
+                when (val layout = block.layout) {
+                    is BlockModelLayout.StateBacked, is BlockModelLayout.SimpleEntityBacked -> {
+                        modelDefinition {
+                            model = buildModel {
+                                val scope = BlockModelSelectorScope(block.defaultBlockState, resourcePackBuilder, modelContent)
+                                val selector = when (layout) {
+                                    is BlockModelLayout.StateBacked -> layout.modelSelector
+                                    is BlockModelLayout.SimpleEntityBacked -> layout.modelSelector
+                                    else -> throw UnsupportedOperationException()
+                                }
+                                selector(scope)
+                            }
+                        }
                     }
+                    
+                    else -> Unit
                 }
             }
         }

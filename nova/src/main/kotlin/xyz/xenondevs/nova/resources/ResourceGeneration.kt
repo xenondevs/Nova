@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.resources
 
 import kotlinx.coroutines.runBlocking
-import xyz.xenondevs.inventoryaccess.util.DataUtils
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_VERSION
 import xyz.xenondevs.nova.addon.AddonBootstrapper
@@ -24,6 +23,7 @@ import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.DefaultItems
 import java.security.MessageDigest
+import java.util.HexFormat
 import kotlin.io.path.notExists
 
 private const val FORCE_REBUILD_FLAG = "NovaForceRegenerateResourcePack"
@@ -108,7 +108,7 @@ internal object ResourceGeneration {
             digest.update(addon.version.toByteArray())
         }
         
-        return DataUtils.toHexadecimalString(digest.digest())
+        return HexFormat.of().formatHex(digest.digest())
     }
     
     /**

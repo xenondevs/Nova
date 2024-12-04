@@ -4,6 +4,7 @@ import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
 import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
@@ -49,6 +50,7 @@ import xyz.xenondevs.nova.resources.builder.task.model.ItemModelContent
 import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
 import xyz.xenondevs.nova.serialization.json.GSON
 import xyz.xenondevs.nova.util.data.Version
+import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.util.data.writeJson
 import xyz.xenondevs.nova.util.runAsyncTask
@@ -432,23 +434,32 @@ class ResourcePackBuilder internal constructor() {
         PACK_DIR.resolve(path)
     
     /**
-     * Serializes [value] to JSON using `kotlinx.serialization` and writes it to the file
-     * under [path], creating parent directories if necessary.
+     * Deserializes the JSON content of the file under [path] in the resource pack
+     * to [V] using [json], or returns `null` if the file does not exist.
      */
-    inline fun <reified V> writeJson(path: ResourcePath<ResourceType.JsonFile>, value: V) {
+    inline fun <reified V> readJson(path: ResourcePath<ResourceType.JsonFile>, json: Json = Json): V? {
         val file = resolve(path)
-        file.parent.createDirectories()
-        file.writeJson(value)
+        return if (file.exists()) file.readJson(json) else null
     }
     
     /**
-     * Serializes [value] to JSON using `kotlinx.serialization` and writes it to the
+     * Serializes [value] to JSON using [json] and writes it to the file 
+     * under [path], creating parent directories if necessary.
+     */
+    inline fun <reified V> writeJson(path: ResourcePath<ResourceType.JsonFile>, value: V, json: Json = Json) {
+        val file = resolve(path)
+        file.parent.createDirectories()
+        file.writeJson(value, json)
+    }
+    
+    /**
+     * Serializes [value] to JSON using [json] and writes it to the
      * corresponding `.mcmeta` file for the specified [path], creating parent directories if necessary.
      */
-    inline fun <reified V> writeMeta(path: ResourcePath<ResourceType.HasMcMeta>, value: V) {
+    inline fun <reified V> writeMeta(path: ResourcePath<ResourceType.HasMcMeta>, value: V, json: Json = Json) {
         val file = resolveMeta(path)
         file.parent.createDirectories()
-        file.writeJson(value)
+        file.writeJson(value, json)
     }
     
     /**

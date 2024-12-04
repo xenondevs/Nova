@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.layout.gui
+package xyz.xenondevs.nova.resources.builder.layout.gui
 
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl

@@ -4,7 +4,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.impl.AbstractItem
+import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.region.Region
@@ -24,13 +25,13 @@ class VisualizeRegionItem(
     private val getRegion: () -> Region,
 ) : AbstractItem() {
     
-    override fun getItemProvider(): ItemProvider {
+    override fun getItemProvider(player: Player): ItemProvider {
         val visible = VisualRegion.isVisible(player, regionUUID)
-        return if (visible) DefaultGuiItems.AREA_BTN_ON.model.clientsideProvider
-        else DefaultGuiItems.AREA_BTN_OFF.model.clientsideProvider
+        return if (visible) DefaultGuiItems.AREA_BTN_ON.clientsideProvider
+        else DefaultGuiItems.AREA_BTN_OFF.clientsideProvider
     }
     
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) {
         player.playClickSound()
         VisualRegion.toggleView(player, regionUUID, getRegion())
         notifyWindows()

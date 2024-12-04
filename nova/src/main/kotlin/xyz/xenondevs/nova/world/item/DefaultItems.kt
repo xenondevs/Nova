@@ -10,7 +10,7 @@ internal object DefaultItems {
     
     val UNKNOWN_ITEM_FILTER = item("unknown_item_filter") {
         behaviors(UnknownItemFilterBehavior)
-        models { selectModel { createLayeredModel("block/unknown") } }
+        modelDefinition { model = buildModel { createLayeredModel("block/unknown") } }
     }
     
     private fun item(name: String, run: NovaItemBuilder.() -> Unit): NovaItem {

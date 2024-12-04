@@ -26,17 +26,19 @@ import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.map
-import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.task.model.VanillaMaterialTypes
-import xyz.xenondevs.nova.resources.layout.item.RequestedItemModelLayout
-import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.resources.model.ItemModelData
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.item.behavior.DefaultBehavior
@@ -66,7 +68,7 @@ class NovaItem internal constructor(
     val block: NovaBlock?,
     configId: String,
     val tooltipStyle: TooltipStyle?,
-    internal val requestedLayout: RequestedItemModelLayout
+    internal val configureDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit
 ) {
     
     /**
@@ -83,15 +85,6 @@ class NovaItem internal constructor(
         get() = _craftingRemainingItem?.clone()
     
     /**
-     * The model data (vanilla item types and custom model data values) of this [NovaItem].
-     */
-    val model: ItemModelData by ResourceLookups.ITEM_MODEL_LOOKUP.provider.map {
-        val material = vanillaMaterial
-        val models = it[this]?.get(material) ?: emptyMap()
-        ItemModelData(this, models)
-    }
-    
-    /**
      * The [ItemBehaviors][ItemBehavior] of this [NovaItem].
      */
     val behaviors: List<ItemBehavior> = buildList {
@@ -106,21 +99,30 @@ class NovaItem internal constructor(
     }
     
     /**
+     * An [ItemProvider] containing the client-side [ItemStack] of this [NovaItem],
+     * intended for use in [Guis][Gui].
+     */
+    val clientsideProvider: ItemProvider by lazy {
+        val clientStack = PacketItems.getClientSideStack(
+            player = null,
+            itemStack = createItemStack().unwrap(),
+            storeServerSideTag = false
+        )
+        
+        // remove existing custom data and tag item to not receive server-side tooltip (again)
+        clientStack.set(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag().apply {
+            putBoolean(PacketItems.SKIP_SERVER_SIDE_TOOLTIP, true)
+        }))
+        
+        ItemWrapper(clientStack.asBukkitMirror())
+    }
+    
+    /**
      * The underlying vanilla material of this [NovaItem].
      */
     internal val vanillaMaterial: Material by combinedProvider(
-        ResourceLookups.ITEM_MODEL_LOOKUP.provider,
-        combinedProvider(behaviors.map(ItemBehavior::vanillaMaterialProperties))
-    ) { lookup, properties ->
-        var vanillaMaterial = VanillaMaterialTypes.getMaterial(properties.flatten().toHashSet())
-        
-        // fall back to first available material if vanilla material is not present in lookups
-        val itemModels = lookup[this]
-        if (itemModels != null && vanillaMaterial !in itemModels)
-            vanillaMaterial = itemModels.keys.first()
-        
-        vanillaMaterial
-    }
+        behaviors.map(ItemBehavior::vanillaMaterialProperties)
+    ) { properties -> VanillaMaterialTypes.getMaterial(properties.flatten().toHashSet()) }
     
     /**
      * The base data components of this [NovaItem].
@@ -141,26 +143,21 @@ class NovaItem internal constructor(
     /**
      * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in server-side format.
      */
-    fun createItemBuilder(modelId: String = "default"): ItemBuilder =
-        ItemBuilder(createItemStack(1, modelId))
+    fun createItemBuilder(): ItemBuilder =
+        ItemBuilder(createItemStack(1))
     
     /**
-     * Creates an [ItemStack] of this [NovaItem] with the given [amount] and [modelId] in server-side format.
+     * Creates an [ItemStack] of this [NovaItem] with the given [amount] in server-side format.
      */
-    fun createItemStack(amount: Int = 1, modelId: String = "default"): ItemStack =
-        createItemStack { putString("modelId", modelId) }.also { it.amount = amount }
+    fun createItemStack(amount: Int = 1): ItemStack =
+        MojangStack(PacketItems.SERVER_SIDE_ITEM_HOLDER, 1, defaultPatch).asBukkitMirror()
     
-    private fun createItemStack(writeModelId: CompoundTag.() -> Unit): ItemStack {
-        val itemStack = MojangStack(PacketItems.SERVER_SIDE_ITEM_HOLDER, 1, defaultPatch)
-        itemStack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY) { customData ->
-            customData.update { compoundTag ->
-                val novaCompound = compoundTag.getCompound("nova") // should be present in defaultPatch
-                writeModelId(novaCompound)
-            }
-        }
-        
-        return itemStack.asBukkitMirror()
-    }
+    /**
+     * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in client-side format,
+     * intended for use in [Guis][Gui].
+     */
+    fun createClientsideItemBuilder(): ItemBuilder =
+        ItemBuilder(clientsideProvider.get())
     
     /**
      * Checks whether this [NovaItem] has an [ItemBehavior] of the reified type [T], or a subclass of it.

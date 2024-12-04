@@ -5,18 +5,21 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.impl.AbstractItem
+import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.nova.world.item.NovaItem
-import kotlin.math.roundToInt
 
 /**
  * An ui [Item] that changes its appearance based on a progress percentage.
  *
  * @param item The [NovaItem] that should be used for the progress item.
  * Its unnamed clientside providers will be used to display the progress.
- * @param maxState The maximum amount of states the item has.
+ * @param customModelDataIndex The custom model data index that the progress value should be written to.
  */
-open class ProgressItem(val item: NovaItem, private val maxState: Int) : AbstractItem() {
+open class ProgressItem(
+    val item: NovaItem,
+    private val customModelDataIndex: Int = 0
+) : AbstractItem() {
     
     /**
      * The current progress percentage.
@@ -34,10 +37,10 @@ open class ProgressItem(val item: NovaItem, private val maxState: Int) : Abstrac
             notifyWindows()
         }
     
-    override fun getItemProvider(): ItemProvider {
-        return item.model.unnamedClientsideProviders[(percentage * maxState).roundToInt()]
+    override fun getItemProvider(player: Player): ItemProvider {
+        return item.createClientsideItemBuilder().setCustomModelData(customModelDataIndex, percentage)
     }
     
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) = Unit
     
 }

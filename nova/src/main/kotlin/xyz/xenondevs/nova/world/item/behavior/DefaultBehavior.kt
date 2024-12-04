@@ -75,6 +75,7 @@ internal class DefaultBehavior(
         
         builder.set(DataComponents.ATTRIBUTE_MODIFIERS, attributeModifiers)
         builder.set(DataComponents.MAX_STACK_SIZE, maxStackSize)
+        builder.set(DataComponents.ITEM_MODEL, id)
         
         builder.build()
     }

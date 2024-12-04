@@ -183,6 +183,15 @@ sealed interface ResourceType {
     }
     
     /**
+     * Item model definitions
+     * 
+     * path: `items/`, extension: `json`
+     */
+    data object ItemModelDefinition : JsonFile {
+        override val prefix = "items"
+    }
+    
+    /**
      * Generic Item- and block models
      *
      * path: `models/`, extension: `json`
@@ -205,7 +214,7 @@ sealed interface ResourceType {
     /**
      * Resources that represent texture files.
      */
-    interface Texture : PngFile {
+    sealed interface Texture : PngFile {
         
         /**
          * Textures
@@ -217,6 +226,31 @@ sealed interface ResourceType {
             override val prefix = "textures"
         }
         
+    }
+    
+    @Serializable
+    data object EntityTexture : Texture {
+        override val prefix = "textures/entity/"
+    }
+    
+    @Serializable
+    data object BedTexture : Texture {
+        override val prefix = "textures/entity/bed"
+    }
+    
+    @Serializable
+    data object ChestTexture : Texture {
+        override val prefix = "textures/entity/chest/"
+    }
+    
+    @Serializable
+    data object ShulkerTexture : Texture {
+        override val prefix = "textures/entity/shulker/"
+    }
+    
+    @Serializable
+    data object SignTexture : Texture {
+        override val prefix = "textures/entity/signs/"
     }
     
     /**

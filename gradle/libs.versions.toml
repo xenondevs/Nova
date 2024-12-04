@@ -4,9 +4,9 @@ format.version = "1.1"
 [versions]
 bytebase = "0.4.8"
 cbf = "0.17"
-invui = "1.41"
+invui = "2.0.0-SNAPSHOT"
 jgrapht = "1.5.2"
-kotlin = "2.1.0-RC"
+kotlin = "2.1.0"
 kotlinx-coroutines = "1.9.0"
 ktor = "3.0.1"
 paper = "1.21.3-R0.1-SNAPSHOT"
@@ -27,7 +27,7 @@ commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflecti
 configurate-yaml = { group = "org.spongepowered", name = "configurate-yaml", version = "4.1.2" }
 cosmic-binary-format = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format", version.ref = "cbf" }
 fuzzywuzzy = { group = "me.xdrop", name = "fuzzywuzzy", version = "1.4.0" }
-inventoryaccess = { group = "xyz.xenondevs.invui", name = "inventory-access-r21", version.ref = "invui" }
+icu4j = { group = "com.ibm.icu", name = "icu4j", version = "76.1" }
 invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version.ref = "invui" }
 jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jgrapht" }
 jgrapht-io = { group = "org.jgrapht", name = "jgrapht-io", version.ref = "jgrapht" }

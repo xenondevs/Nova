@@ -6,7 +6,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import xyz.xenondevs.commons.gson.fromJson
+import kotlinx.serialization.json.Json
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -14,11 +14,8 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
-import xyz.xenondevs.nova.serialization.json.GSON
+import xyz.xenondevs.nova.util.data.readJson
 import java.nio.file.Path
-import kotlin.io.path.bufferedReader
-import kotlin.io.path.bufferedWriter
-import kotlin.io.path.createParentDirectories
 import kotlin.io.path.extension
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isDirectory
@@ -33,6 +30,8 @@ import kotlin.io.path.walk
  * Everything related to item/block model files should run through this.
  */
 class ModelContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder, Iterable<Map.Entry<ResourcePath<ResourceType.Model>, Model>> {
+    
+    private val json = Json { ignoreUnknownKeys = true }
     
     private val vanillaModelsByPath = HashMap<ResourcePath<ResourceType.Model>, Model?>(4096) // 3691 as of 1.20.2
     private val vanillaModelsByModel = HashMap<Model, HashSet<ResourcePath<ResourceType.Model>>>(4096)
@@ -170,7 +169,7 @@ class ModelContent internal constructor(private val builder: ResourcePackBuilder
             return null
         
         try {
-            return path.bufferedReader().use { GSON.fromJson<Model>(it) }
+            return path.readJson<Model>(json)
         } catch (e: Exception) {
             LOGGER.warn("Failed to parse model file $path", e)
         }
@@ -185,9 +184,7 @@ class ModelContent internal constructor(private val builder: ResourcePackBuilder
                 continue
             
             launch {
-                val path = builder.resolve(id)
-                path.createParentDirectories()
-                path.bufferedWriter().use { GSON.toJson(model, it) }
+                builder.writeJson(id, model)
             }
         }
     }

@@ -54,13 +54,10 @@ import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.component.adventure.indent
-import xyz.xenondevs.nova.util.data.getStringOrNull
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.item.ItemUtils
-import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
-import xyz.xenondevs.nova.util.item.unsafeNovaTag
 import xyz.xenondevs.nova.util.novaBlock
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.unwrap
@@ -97,7 +94,6 @@ import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
-import org.bukkit.inventory.ItemStack as BukkitStack
 
 internal object NovaCommand : Command() {
     
@@ -460,8 +456,7 @@ internal object NovaCommand : Command() {
                             Component.translatable(
                                 "command.nova.show_block_model_data.display_entity.model",
                                 NamedTextColor.GRAY,
-                                Component.translatable(model.material.itemTranslationKey ?: "", NamedTextColor.AQUA),
-                                Component.text(model.customModelData, NamedTextColor.AQUA),
+                                Component.text(model.model.toString(), NamedTextColor.AQUA),
                                 Component.text(transform.translation.toString(format), NamedTextColor.AQUA),
                                 Component.text(leftRotation, NamedTextColor.AQUA),
                                 Component.text(transform.scale.toString(format), NamedTextColor.AQUA),
@@ -508,27 +503,12 @@ internal object NovaCommand : Command() {
         val item = itemStack.novaItem
         
         if (item != null) {
-            val novaTag = itemStack.unwrap().unsafeNovaTag
-            val modelId = novaTag?.getStringOrNull("modelId")
-            
-            val modelName: String
-            val clientSideStack: BukkitStack
-            
-            if (modelId != null) {
-                modelName = modelId
-                clientSideStack = item.model.clientsideProviders[modelId]!!.get()
-            } else {
-                modelName = "default"
-                clientSideStack = item.model.clientsideProvider.get()
-            }
-            
             ctx.source.sender.sendMessage(Component.translatable(
                 "command.nova.show_item_model_data.success",
                 NamedTextColor.GRAY,
                 ItemUtils.getName(itemStack).color(NamedTextColor.AQUA),
-                Component.text(modelName, NamedTextColor.AQUA),
-                Component.translatable(clientSideStack.type.translationKey(), NamedTextColor.AQUA),
-                Component.text(clientSideStack.customModelData, NamedTextColor.AQUA)
+                Component.translatable(item.vanillaMaterial.translationKey(), NamedTextColor.AQUA),
+                Component.text(item.id.toString(), NamedTextColor.AQUA)
             ))
         } else ctx.source.sender.sendMessage(Component.translatable("command.nova.show_item_model_data.no_item", NamedTextColor.RED))
     }

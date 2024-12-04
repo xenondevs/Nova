@@ -43,7 +43,7 @@ fun obtainNovaItemAdvancement(
             parent(parent)
         
         display(DisplayInfo(
-            item.model.clientsideProvider.get().unwrap().copy(),
+            item.clientsideProvider.get().unwrap().copy(),
             Component.translatable("advancement.${id.namespace}.${id.path}.title").toNMSComponent(),
             Component.translatable("advancement.${id.namespace}.${id.path}.description").toNMSComponent(),
             Optional.empty(),
@@ -69,7 +69,7 @@ fun obtainNovaItemsAdvancement(
             parent(parent)
         
         display(DisplayInfo(
-            items[0].model.clientsideProvider.get().unwrap().copy(),
+            items[0].clientsideProvider.get().unwrap().copy(),
             Component.translatable("advancement.$namespace.$name.title").toNMSComponent(),
             Component.translatable("advancement.$namespace.$name.description").toNMSComponent(),
             Optional.empty(),

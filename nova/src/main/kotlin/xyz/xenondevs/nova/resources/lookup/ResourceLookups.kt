@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.resources.lookup
 
-import org.bukkit.Material
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.resources.builder.task.font.FontChar
@@ -11,7 +10,6 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
 import xyz.xenondevs.nova.world.item.Equipment
-import xyz.xenondevs.nova.world.item.NovaItem
 import java.util.*
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -33,21 +31,6 @@ internal object ResourceLookups {
      * Map of [NovaBlockState] to the relevant [LinkedBlockModelProvider].
      */
     var BLOCK_MODEL: Map<NovaBlockState, LinkedBlockModelProvider<*>> by BLOCK_MODEL_LOOKUP
-    
-    /**
-     * Lookup for getting the relevant custom-model-data using named item models.
-     *
-     * Format: ``Map<NovaItem, Map<Vanilla Material, Map<Model Name, Custom Model Data>>>``
-     */
-    val ITEM_MODEL_LOOKUP: ResourceLookup<Map<NovaItem, Map<Material, Map<String, Int>>>> =
-        resourceLookup("item_models", emptyMap(), typeOf<HashMap<NovaItem, EnumMap<Material, LinkedHashMap<String, Int>>>>())
-    
-    /**
-     * Map of [NovaItem] to the relevant custom-model-data using named item models.
-     *
-     * Format: ``Map<VanillaMaterial, Map<ModelName, CustomModelData>``
-     */
-    var ITEM_MODEL: Map<NovaItem, Map<Material, Map<String, Int>>> by ITEM_MODEL_LOOKUP
     
     /**
      * Lookup containing texture and camera overlay locations for every [Equipment].

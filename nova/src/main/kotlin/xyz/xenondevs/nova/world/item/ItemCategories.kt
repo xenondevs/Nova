@@ -9,7 +9,8 @@ import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.impl.AbstractItem
+import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.addon.name
@@ -54,7 +55,7 @@ internal object ItemCategories {
                     .takeUnlessEmpty()
                     ?.let { items ->
                         ItemCategory(
-                            items[0].model.createClientsideItemBuilder(Component.text(addon.name)).setLore(emptyList()),
+                            items[0].createClientsideItemBuilder().setName(Component.text(addon.name)).setLore(emptyList()),
                             items.map { CategorizedItem(it.id.toString()) }
                         )
                     }
@@ -70,16 +71,16 @@ internal class CategorizedItem(val id: String) : AbstractItem() {
     private val itemProvider: ItemProvider = ItemWrapper(itemStack)
     val name: Component = ItemUtils.getName(itemStack)
     
-    override fun getItemProvider() = itemProvider
+    override fun getItemProvider(player: Player) = itemProvider
     
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) {
         if (player in ItemsWindow.cheaters && player.hasPermission("nova.command.give")) {
             if (clickType == ClickType.MIDDLE) {
                 player.setItemOnCursor(itemStack.clone().apply { amount = novaItem?.maxStackSize ?: type.maxStackSize })
             } else if (clickType.isShiftClick) {
                 player.inventory.addItemCorrectly(itemStack)
             } else if (clickType == ClickType.NUMBER_KEY) {
-                player.inventory.setItem(event.hotbarButton, itemStack)
+                player.inventory.setItem(click.hotbarButton, itemStack)
             } else if (clickType.isMouseClick) {
                 if (player.itemOnCursor.isSimilar(itemStack)) {
                     player.setItemOnCursor(player.itemOnCursor.apply { amount = (amount + 1).coerceAtMost(novaItem?.maxStackSize ?: maxStackSize) })
@@ -88,7 +89,7 @@ internal class CategorizedItem(val id: String) : AbstractItem() {
                 }
             }
         } else {
-            handleRecipeChoiceItemClick(player, clickType, event, itemProvider)
+            handleRecipeChoiceItemClick(this, click)
         }
     }
     

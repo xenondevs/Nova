@@ -1,5 +1,8 @@
 package xyz.xenondevs.nova.world.item.vanilla
 
+/**
+ * Represents non-data-driven properties of items that are hardcoded to specific item types.
+ */
 enum class VanillaMaterialProperty {
     
     /**

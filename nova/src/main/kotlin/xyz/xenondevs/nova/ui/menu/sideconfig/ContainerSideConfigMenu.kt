@@ -9,8 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.commons.collections.after
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.item.builder.addLoreLines
-import xyz.xenondevs.invui.item.builder.setDisplayName
+import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.invui.item.notifyWindows
 import xyz.xenondevs.nova.ui.menu.item.AsyncItem
 import xyz.xenondevs.nova.ui.menu.item.BUTTON_COLORS
@@ -147,8 +146,8 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
             val container = holder.containerConfig[face] ?: throw IllegalStateException("No container at $face")
             val color = BUTTON_COLORS[containers.indexOf(container)]
             
-            val builder = color.model.createClientsideItemBuilder()
-                .setDisplayName(getSideName(blockSide, face))
+            val builder = color.createClientsideItemBuilder()
+                .setName(getSideName(blockSide, face))
                 .addLoreLines(Component.translatable(
                     namedContainers[container] ?: throw IllegalArgumentException("Missing name for $container"),
                     NamedTextColor.AQUA
@@ -157,7 +156,7 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
             provider.set(builder)
         }
         
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
             player.playClickSound()
             queueCycleContainer(face, if (clickType.isLeftClick) 1 else -1)
         }
@@ -169,16 +168,16 @@ internal abstract class ContainerSideConfigMenu<C : EndPointContainer, H : Conta
         override fun updateAsync() {
             val builder = if (simple) {
                 if (isSimpleConfiguration()) {
-                    DefaultGuiItems.SIMPLE_MODE_BTN_ON.model.clientsideProvider
-                } else DefaultGuiItems.SIMPLE_MODE_BTN_OFF.model.createClientsideItemBuilder()
-                    .setDisplayName(Component.translatable("menu.nova.side_config.simple_mode"))
+                    DefaultGuiItems.SIMPLE_MODE_BTN_ON.clientsideProvider
+                } else DefaultGuiItems.SIMPLE_MODE_BTN_OFF.createClientsideItemBuilder()
+                    .setName(Component.translatable("menu.nova.side_config.simple_mode"))
                     .addLoreLines(Component.translatable("menu.nova.side_config.simple_mode.unavailable", NamedTextColor.GRAY))
-            } else DefaultGuiItems.ADVANCED_MODE_BTN_ON.model.clientsideProvider
+            } else DefaultGuiItems.ADVANCED_MODE_BTN_ON.clientsideProvider
             
             provider.set(builder)
         }
         
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
             if (simple && !isSimpleConfiguration())
                 return
             

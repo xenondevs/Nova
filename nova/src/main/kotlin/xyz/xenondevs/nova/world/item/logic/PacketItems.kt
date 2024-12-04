@@ -27,7 +27,6 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.item.component.BundleContents
 import net.minecraft.world.item.component.CustomData
-import net.minecraft.world.item.component.CustomModelData
 import net.minecraft.world.item.component.DyedItemColor
 import net.minecraft.world.item.component.ItemLore
 import net.minecraft.world.item.crafting.Ingredient
@@ -336,18 +335,7 @@ internal object PacketItems : Listener, PacketListener {
             buildClientSideDataComponentsPatch(newItemType, novaItem, itemStack.componentsPatch)
         )
         
-        // custom model data
-        val namedModelId = novaTag.getStringOrNull("modelId")
-        val customModelData = when {
-            namedModelId != null -> novaItem.model.getCustomModelData(namedModelId)
-                ?: return getUnknownItem(itemStack, id, namedModelId)
-            
-            else -> novaItem.model.getCustomModelData("default")
-                ?: return getUnknownItem(itemStack, id)
-        }
-        newItemStack.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData(customModelData))
-        
-        // further customization through item behaviors
+        // customization through item behaviors
         val novaCompound = itemStack.novaCompound ?: NamespacedCompound.EMPTY
         newItemStack = novaItem.modifyClientSideStack(player, newItemStack.asBukkitMirror(), novaCompound).unwrap()
         

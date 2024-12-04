@@ -9,7 +9,9 @@ import kotlin.test.assertEquals
 
 object TestIntentions {
     
-    data object TestIntention : ContextIntention()
+    data object TestIntention : ContextIntention() {
+        override val required by lazy { setOf(TestParamTypes.STRING) }
+    }
     
 }
 
@@ -22,7 +24,6 @@ object TestParamTypes {
     
     val STRING: ContextParamType<String> =
         ContextParamType.builder<String>("string")
-            .requiredIn(TestIntentions.TestIntention)
             .autofilledBy(TestParamTypes::STRING_PARENT) { it }
             .build()
     

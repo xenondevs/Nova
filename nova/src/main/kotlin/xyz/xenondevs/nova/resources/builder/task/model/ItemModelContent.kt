@@ -1,151 +1,88 @@
 package xyz.xenondevs.nova.resources.builder.task.model
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap
-import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap
-import it.unimi.dsi.fastutil.ints.IntArrayList
-import it.unimi.dsi.fastutil.ints.IntList
-import org.bukkit.Material
-import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.model.Model.Override
+import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
-import xyz.xenondevs.nova.resources.layout.item.ItemModelSelectorScope
-import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
-
-private const val CUSTOM_MODEL_DATA_PREDICATE_KEY = "custom_model_data"
+import xyz.xenondevs.nova.util.toKey
+import kotlin.collections.first
 
 /**
- * A [PackTaskHolder] that deals with generating and assigning custom models to vanilla items
- * via custom-model-data.
+ * A [PackTaskHolder] that deals with generating item model definitions.
  */
 class ItemModelContent internal constructor(val builder: ResourcePackBuilder) : PackTaskHolder {
     
-    private val overridesById: MutableMap<Material, Int2ObjectSortedMap<ResourcePath<ResourceType.Model>>> = enumMap()
-    private val overridesByPath: MutableMap<Material, MutableMap<ResourcePath<ResourceType.Model>, IntList>> = enumMap()
-    private val currentModelData: MutableMap<Material, Int> = enumMap()
-    
     private val modelContent by builder.getHolderLazily<ModelContent>()
     
-    /**
-     * Creates a custom model data entry for [path] under all materials that can be targeted via [VanillaMaterialProperty]
-     * and returns a map of the materials to the custom model data.
-     */
-    fun registerAll(path: ResourcePath<ResourceType.Model>): Map<Material, Int> =
-        VanillaMaterialTypes.MATERIALS.associateWithTo(enumMap()) { registerCustom(path, it) }
+    private val customDefsByPath = HashMap<ResourcePath<ResourceType.ItemModelDefinition>, ItemModelDefinition>()
+    private val customDefsByDef = HashMap<ItemModelDefinition, HashSet<ResourcePath<ResourceType.ItemModelDefinition>>>()
+    
+    private var generatedDefCount = 0
     
     /**
-     * Creates a custom model data entry for [path] under the default material and returns the default material and the
-     * custom model data.
+     * Registers the given [def] under the given [path].
      */
-    fun registerDefault(path: ResourcePath<ResourceType.Model>): Pair<Material, Int> =
-        VanillaMaterialTypes.DEFAULT_MATERIAL to registerCustom(path, VanillaMaterialTypes.DEFAULT_MATERIAL)
+    internal fun set(path: ResourcePath<ResourceType.ItemModelDefinition>, def: ItemModelDefinition) {
+        customDefsByPath[path] = def
+        customDefsByDef.getOrPut(def, ::HashSet) += path
+    }
     
     /**
-     * Retrieves the first id that registers [path] using the default material, or registers the path.
+     * Retrieves the first [ResourcePath] the given [def] is registered under or
+     * creates a new [ResourcePath] using [createPath], registers [def] under it and returns it.
      */
-    fun getOrRegisterDefault(path: ResourcePath<ResourceType.Model>): Pair<Material, Int> {
-        val ids = overridesByPath[VanillaMaterialTypes.DEFAULT_MATERIAL]?.get(path)
-        if (!ids.isNullOrEmpty())
-            return VanillaMaterialTypes.DEFAULT_MATERIAL to ids.getInt(0)
+    internal fun getOrPut(
+        def: ItemModelDefinition,
+        createPath: () -> ResourcePath<ResourceType.ItemModelDefinition>
+    ): ResourcePath<ResourceType.ItemModelDefinition> {
+        val existingPath = customDefsByDef[def]
+        if (existingPath != null)
+            return existingPath.first()
         
-        return registerDefault(path)
+        val path = createPath()
+        set(path, def)
+        return path
     }
     
     /**
-     * Creates a custom model data entry for [path] under the specified [material] and returns the custom model data.
+     * Finds the [ResourcePath] of the given [def] or registers it in `nova:generated/`.
      */
-    fun registerCustom(path: ResourcePath<ResourceType.Model>, material: Material): Int {
-        val customModelData = nextCustomModelData(material)
-        overridesById.getOrPut(material, ::Int2ObjectRBTreeMap).put(customModelData, path)
-        overridesByPath.getOrPut(material, ::HashMap).getOrPut(path, ::IntArrayList).add(customModelData)
-        modelContent.rememberUsage(path)
-        return customModelData
-    }
-    
-    /**
-     * Checks whether the given [customModelData] is occupied under the specified [material].
-     */
-    fun isOccupied(material: Material, customModelData: Int): Boolean =
-        overridesById[material]?.keys?.contains(customModelData) ?: false
-    
-    /**
-     * Gets the next unused custom model data for the specified [material].
-     */
-    fun nextCustomModelData(material: Material): Int {
-        var customModelData = currentModelData[material] ?: 1
-        while (isOccupied(material, customModelData))
-            customModelData++
-        currentModelData[material] = customModelData
-        return customModelData
-    }
-    
-    @PackTask(runAfter = ["ModelContent#discoverAllModels"])
-    private fun loadOverrides() {
-        for ((id, model) in modelContent) {
-            if (id.namespace != "minecraft" || !id.path.startsWith("item/")) continue
-            val material = Material.getMaterial(id.path.substringAfter("item/").uppercase()) ?: continue
-            
-            val itemOverridesById = Int2ObjectRBTreeMap<ResourcePath<ResourceType.Model>>()
-            val itemOverridesByPath = HashMap<ResourcePath<ResourceType.Model>, IntList>()
-            for (override in model.overrides) {
-                val customModelData = override.predicate[CUSTOM_MODEL_DATA_PREDICATE_KEY] ?: continue
-                itemOverridesById.put(customModelData.toInt(), override.model)
-                itemOverridesByPath.getOrPut(override.model, ::IntArrayList).add(customModelData.toInt())
-            }
-            overridesById[material] = itemOverridesById
-            overridesByPath[material] = itemOverridesByPath
-        }
-    }
-    
-    @PackTask(runAfter = ["ItemModelContent#loadOverrides"])
-    private fun assignItemModels() {
-        // Map<NovaItem, Map<Material, Map<ModelName, CustomModelData>>>
-        val lookup = HashMap<NovaItem, Map<Material, Map<String, Int>>>()
-        
-        for (item in NovaRegistries.ITEM) {
-            val itemLookup = enumMap<Material, MutableMap<String, Int>>()
-            val requestedLayout = item.requestedLayout
-            for ((modelName, modelSelector) in requestedLayout.models) {
-                val (model, _) = modelSelector(ItemModelSelectorScope(item, builder, modelContent)).buildScaled(modelContent)
-                val path = modelContent.getOrPutGenerated(model)
-                
-                val reqItemType = requestedLayout.itemType
-                if (reqItemType != null) {
-                    itemLookup.getOrPut(reqItemType, ::LinkedHashMap)[modelName] = registerCustom(path, reqItemType)
-                } else {
-                    for ((itemType, customModelData) in registerAll(path)) {
-                        itemLookup.getOrPut(itemType, ::LinkedHashMap)[modelName] = customModelData
-                    }
-                }
-                
-                lookup[item] = itemLookup
-            }
-        }
-        
-        ResourceLookups.ITEM_MODEL = lookup
+    internal fun getOrPutGenerated(def: ItemModelDefinition): ResourcePath<ResourceType.ItemModelDefinition> {
+        return getOrPut(def) { ResourcePath(ResourceType.ItemModelDefinition, "nova", "generated/${generatedDefCount++}") }
     }
     
     @PackTask(
-        runAfter = ["ItemModelContent#loadOverrides", "ItemModelContent#assignItemModels"],
-        runBefore = ["ModelContent#write"]
+        runBefore = [
+            "ModelContent#write",
+            "ItemModelContent#write"
+        ]
     )
-    private fun writeOverrides() {
-        for ((material, materialOverrides) in overridesById) {
-            val path = ResourcePath(ResourceType.Model, "minecraft", "item/${material.name.lowercase()}")
-            val model = modelContent[path] ?: throw IllegalStateException("No model found for $path")
+    private fun generateItemDefinitions() {
+        for (item in NovaRegistries.ITEM) {
+            val definition = ItemModelDefinitionBuilder(
+                builder
+            ) { modelSelector ->
+                val scope = ItemModelSelectorScope(item, builder, modelContent)
+                val (model, _) = modelSelector(scope).buildScaled(modelContent)
+                val id = modelContent.getOrPutGenerated(model)
+                modelContent.rememberUsage(id)
+                id
+            }.apply(item.configureDefinition).build()
             
-            val overrides = materialOverrides.map { (customModelData, path) ->
-                Override(mapOf(CUSTOM_MODEL_DATA_PREDICATE_KEY to customModelData), path)
-            }
-            
-            modelContent[path] = model.copy(overrides = overrides)
-            modelContent.rememberUsage(path)
+            val path = ResourcePath.of(ResourceType.ItemModelDefinition, item.id.toKey())
+            set(path, definition)
+        }
+    }
+    
+    @PackTask
+    private fun write() {
+        for ((path, def) in customDefsByPath) {
+            builder.writeJson(path, def)
         }
     }
     

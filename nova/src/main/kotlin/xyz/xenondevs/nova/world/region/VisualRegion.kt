@@ -113,7 +113,7 @@ object VisualRegion {
         val center = from.clone().add(to).multiply(0.5)
         
         return FakeItemDisplay(center, false) { _, data ->
-            data.itemStack = DefaultBlockOverlays.TRANSPARENT_BLOCK.model.clientsideProvider.get()
+            data.itemStack = DefaultBlockOverlays.TRANSPARENT_BLOCK.clientsideProvider.get()
             data.scale = Vector3f(
                 (to.x - from.x + lineWidth).toFloat(),
                 (to.y - from.y + lineWidth).toFloat(),

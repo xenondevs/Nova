@@ -20,7 +20,7 @@ import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout
+import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
@@ -43,7 +43,7 @@ open class NovaBlock internal constructor(
     behaviors: List<BlockBehaviorHolder>,
     val stateProperties: List<ScopedBlockStateProperty<*>>,
     configId: String,
-    internal val requestedLayout: BlockModelLayout
+    internal val layout: BlockModelLayout
 ) {
     
     /**

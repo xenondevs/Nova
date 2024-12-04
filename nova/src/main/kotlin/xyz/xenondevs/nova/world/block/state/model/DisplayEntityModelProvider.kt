@@ -1,11 +1,12 @@
 package xyz.xenondevs.nova.world.block.state.model
 
+import io.papermc.paper.datacomponent.DataComponentTypes
+import net.kyori.adventure.key.Key
 import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Material
 import org.bukkit.entity.Display.Brightness
 import org.bukkit.inventory.ItemStack
 import org.joml.Matrix4fc
-import xyz.xenondevs.invui.item.builder.ItemBuilder
 import xyz.xenondevs.nova.util.item.requiresLight
 import xyz.xenondevs.nova.util.setBlockState
 import xyz.xenondevs.nova.util.setBlockStateNoUpdate
@@ -22,10 +23,13 @@ internal data class DisplayEntityBlockModelData(
     val hitboxType: BlockState
 ) {
     
-    internal data class Model(val material: Material, val customModelData: Int, val transform: Matrix4fc) {
+    internal data class Model(val model: Key, val transform: Matrix4fc) {
         
         val itemStack: ItemStack
-            get() = ItemBuilder(material).setCustomModelData(customModelData).get()
+            get() = ItemStack(Material.PAPER).apply {
+                @Suppress("UnstableApiUsage")
+                setData(DataComponentTypes.ITEM_MODEL, model)
+            }
         
     }
     

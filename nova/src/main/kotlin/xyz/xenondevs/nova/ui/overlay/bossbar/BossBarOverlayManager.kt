@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitTask
-import xyz.xenondevs.inventoryaccess.util.ReflectionRegistry
+import xyz.xenondevs.invui.internal.util.ReflectionRegistry
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry

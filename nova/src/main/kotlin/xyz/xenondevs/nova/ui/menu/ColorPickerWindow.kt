@@ -3,13 +3,11 @@ package xyz.xenondevs.nova.ui.menu
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.invui.item.impl.SimpleItem
+import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.invui.item.Click
+import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.ui.menu.item.AioNumberItem
 import xyz.xenondevs.nova.ui.menu.item.BackItem
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
@@ -94,12 +92,16 @@ abstract class ColorPreviewItem(color: Color) : AbstractItem() {
             notifyWindows()
         }
     
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) = Unit
     
 }
 
-class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : SimpleItem(DefaultGuiItems.TP_COLOR_PICKER.model.clientsideProvider) {
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : AbstractItem() {
+    
+    override fun getItemProvider(player: Player) = DefaultGuiItems.TP_COLOR_PICKER.clientsideProvider
+    
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) {
         window.openWindow(player)
     }
+    
 }

@@ -22,7 +22,6 @@ import xyz.xenondevs.nova.serialization.json.serializer.LocationSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.LootItemSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.LootTableSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.Matrix4fcTypeAdapter
-import xyz.xenondevs.nova.serialization.json.serializer.ModelTypeAdapter
 import xyz.xenondevs.nova.serialization.json.serializer.NamespacedIdTypeAdapter
 import xyz.xenondevs.nova.serialization.json.serializer.NamespacedKeyTypeAdapter
 import xyz.xenondevs.nova.serialization.json.serializer.NovaBlockStateSerialization
@@ -53,7 +52,6 @@ private val GSON_BUILDER = GsonBuilder()
     .registerTypeHierarchyAdapter(LootTableSerialization)
     .registerTypeHierarchyAdapter(LootItemSerialization)
     .registerTypeHierarchyAdapter(VersionSerialization)
-    .registerTypeHierarchyAdapter(ModelTypeAdapter.nullSafe())
     .registerTypeHierarchyAdapter(RegistryElementSerializer(NovaRegistries.BLOCK))
     .registerTypeHierarchyAdapter(BlockStateSerialization.nullSafe())
     .registerTypeHierarchyAdapter(NovaBlockStateSerialization)

@@ -3,9 +3,10 @@ package xyz.xenondevs.nova.ui.menu.item
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.impl.AbstractItem
+import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.invui.item.Click
 
 internal class AnvilTextItem(val builder: ItemBuilder, text: String) : AbstractItem() {
     
@@ -17,8 +18,8 @@ internal class AnvilTextItem(val builder: ItemBuilder, text: String) : AbstractI
             }
         }
     
-    override fun getItemProvider(): ItemProvider {
-        return builder.setDisplayName(text)
+    override fun getItemProvider(player: Player): ItemProvider {
+        return builder.setName(text)
     }
     
     fun resetText() {
@@ -26,6 +27,6 @@ internal class AnvilTextItem(val builder: ItemBuilder, text: String) : AbstractI
         text = ""
     }
     
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) = Unit
     
 }

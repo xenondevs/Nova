@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.LeavesBlock
 import net.minecraft.world.level.block.TripWireBlock
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.resources.layout.block.BackingStateCategory
+import xyz.xenondevs.nova.resources.builder.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.world.block.behavior.BlockSounds
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.behavior.LeavesBehavior
@@ -36,9 +36,7 @@ internal object DefaultBlocks {
     
     val UNKNOWN = block("unknown") {
         behaviors(UnknownBlockBehavior)
-        models {
-            stateBacked(Int.MAX_VALUE, BackingStateCategory.NOTE_BLOCK, BackingStateCategory.MUSHROOM_BLOCK)
-        }
+        stateBacked(Int.MAX_VALUE, BackingStateCategory.NOTE_BLOCK, BackingStateCategory.MUSHROOM_BLOCK)
     }
     
     val NOTE_BLOCK = block("note_block") {
@@ -58,7 +56,7 @@ internal object DefaultBlocks {
             DefaultScopedBlockStateProperties.NOTE_BLOCK_NOTE,
             DefaultScopedBlockStateProperties.POWERED
         )
-        models { modelLess { NoteBackingStateConfig.defaultStateConfig.vanillaBlockState } }
+        modelLess { NoteBackingStateConfig.defaultStateConfig.vanillaBlockState }
     }
     
     val TRIPWIRE = block("tripwire") {
@@ -76,15 +74,13 @@ internal object DefaultBlocks {
             DefaultScopedBlockStateProperties.TRIPWIRE_DISARMED,
             DefaultScopedBlockStateProperties.POWERED
         )
-        models {
-            modelLess {
-                Blocks.TRIPWIRE.defaultBlockState()
-                    .setValue(TripWireBlock.NORTH, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_NORTH))
-                    .setValue(TripWireBlock.EAST, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_EAST))
-                    .setValue(TripWireBlock.SOUTH, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_SOUTH))
-                    .setValue(TripWireBlock.WEST, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_WEST))
-                    .setValue(TripWireBlock.ATTACHED, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_ATTACHED))
-            }
+        modelLess {
+            Blocks.TRIPWIRE.defaultBlockState()
+                .setValue(TripWireBlock.NORTH, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_NORTH))
+                .setValue(TripWireBlock.EAST, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_EAST))
+                .setValue(TripWireBlock.SOUTH, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_SOUTH))
+                .setValue(TripWireBlock.WEST, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_WEST))
+                .setValue(TripWireBlock.ATTACHED, getPropertyValueOrThrow(DefaultBlockStateProperties.TRIPWIRE_ATTACHED))
         }
     }
     
@@ -116,11 +112,9 @@ internal object DefaultBlocks {
             DefaultScopedBlockStateProperties.LEAVES_PERSISTENT,
             DefaultScopedBlockStateProperties.WATERLOGGED
         )
-        models {
-            modelLess {
-                cfg.defaultStateConfig.vanillaBlockState
-                    .setValue(LeavesBlock.WATERLOGGED, getPropertyValueOrThrow(DefaultBlockStateProperties.WATERLOGGED))
-            }
+        modelLess {
+            cfg.defaultStateConfig.vanillaBlockState
+                .setValue(LeavesBlock.WATERLOGGED, getPropertyValueOrThrow(DefaultBlockStateProperties.WATERLOGGED))
         }
     }
     

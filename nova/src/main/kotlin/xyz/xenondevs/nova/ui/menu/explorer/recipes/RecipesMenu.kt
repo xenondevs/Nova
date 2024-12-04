@@ -5,22 +5,20 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
+import xyz.xenondevs.invui.gui.Structure
 import xyz.xenondevs.invui.gui.TabGui
-import xyz.xenondevs.invui.gui.structure.Structure
+import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.invui.item.AbstractPagedGuiBoundItem
+import xyz.xenondevs.invui.item.AbstractTabGuiBoundItem
+import xyz.xenondevs.invui.item.BoundItem.gui
+import xyz.xenondevs.invui.item.Click
+import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.builder.setDisplayName
-import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.invui.item.impl.controlitem.ControlItem
-import xyz.xenondevs.invui.item.impl.controlitem.TabItem
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.invui.window.changeTitle
-import xyz.xenondevs.invui.window.type.context.setTitle
 import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.ui.menu.explorer.ItemMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
@@ -135,8 +133,8 @@ private class RecipesWindow(
     }
     
     private fun getCurrentTitle(): Component {
-        val currentTab = mainGui.tabs[mainGui.currentTab] as PagedGui<*>
-        val pageNumberString = "${currentTab.currentPage + 1} / ${currentTab.pageAmount}"
+        val currentTab = mainGui.tabs[mainGui.tab] as PagedGui<*>
+        val pageNumberString = "${currentTab.page + 1} / ${currentTab.pageAmount}"
         val pageNumberComponent = Component.text(pageNumberString, NamedTextColor.WHITE).font("nova:recipes_numbers")
         return Component.text()
             .append(currentType.texture.component)
@@ -147,7 +145,7 @@ private class RecipesWindow(
     }
     
     private fun updateTitle() {
-        window.changeTitle(getCurrentTitle())
+        window.setTitle(getCurrentTitle())
     }
     
     override fun equals(other: Any?): Boolean {
@@ -158,13 +156,13 @@ private class RecipesWindow(
         return id
     }
     
-    private inner class CraftingTabItem(private val recipeGroup: RecipeGroup<*>, tab: Int) : TabItem(tab) {
+    private inner class CraftingTabItem(private val recipeGroup: RecipeGroup<*>, private val tab: Int) : AbstractTabGuiBoundItem() {
         
-        override fun getItemProvider(gui: TabGui) = recipeGroup.icon
+        override fun getItemProvider(player: Player) = recipeGroup.icon
         
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            super.handleClick(clickType, player, event)
+        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
             if (clickType == ClickType.LEFT) {
+                gui.tab = tab
                 currentType = recipeGroup
                 updateTitle()
             } else if (clickType == ClickType.RIGHT) {
@@ -177,24 +175,24 @@ private class RecipesWindow(
     
     private class InfoItem(private val info: String) : AbstractItem() {
         
-        override fun getItemProvider(): ItemBuilder =
+        override fun getItemProvider(player: Player): ItemBuilder =
             ItemBuilder(Material.KNOWLEDGE_BOOK)
-                .setDisplayName(Component.translatable("menu.nova.recipe.item_info"))
+                .setName(Component.translatable("menu.nova.recipe.item_info"))
         
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
             player.closeInventory()
             player.sendMessage(Component.translatable(info))
         }
         
     }
     
-    private inner class PageBackItem : ControlItem<PagedGui<*>>() {
+    private inner class PageBackItem : AbstractPagedGuiBoundItem() {
         
-        override fun getItemProvider(gui: PagedGui<*>) =
+        override fun getItemProvider(player: Player) =
             (if (gui.hasPreviousPage()) DefaultGuiItems.TP_ARROW_LEFT_BTN_ON else DefaultGuiItems.TP_ARROW_LEFT_BTN_OFF)
-                .model.clientsideProvider
+                .clientsideProvider
         
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
             if (clickType == ClickType.LEFT && gui.hasPreviousPage()) {
                 player.playClickSound()
                 gui.goBack()
@@ -204,13 +202,13 @@ private class RecipesWindow(
         
     }
     
-    private inner class PageForwardItem : ControlItem<PagedGui<*>>() {
+    private inner class PageForwardItem : AbstractPagedGuiBoundItem() {
         
-        override fun getItemProvider(gui: PagedGui<*>) =
+        override fun getItemProvider(player: Player) =
             (if (gui.hasNextPage()) DefaultGuiItems.TP_ARROW_RIGHT_BTN_ON else DefaultGuiItems.TP_ARROW_RIGHT_BTN_OFF)
-                .model.clientsideProvider
+                .clientsideProvider
         
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+        override fun handleClick(clickType: ClickType, player: Player, click: Click) {
             if (clickType == ClickType.LEFT && gui.hasNextPage()) {
                 player.playClickSound()
                 gui.goForward()
@@ -230,13 +228,13 @@ private class RecipesWindow(
 
 private class LastRecipeItem(private val viewerUUID: UUID) : AbstractItem() {
     
-    override fun getItemProvider(): ItemProvider {
+    override fun getItemProvider(player: Player): ItemProvider {
         return if (ItemMenu.hasHistory(viewerUUID)) {
-            DefaultGuiItems.TP_ARROW_LEFT_ON.model.clientsideProvider
+            DefaultGuiItems.TP_ARROW_LEFT_ON.clientsideProvider
         } else ItemWrapper(ItemStack(Material.AIR))
     }
     
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) {
         if (clickType == ClickType.LEFT && ItemMenu.hasHistory(viewerUUID)) ItemMenu.showPreviousMenu(viewerUUID)
     }
     

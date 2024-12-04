@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.layout.gui
+package xyz.xenondevs.nova.resources.builder.layout.gui
 
 import org.joml.Vector2i
 import org.joml.Vector2ic

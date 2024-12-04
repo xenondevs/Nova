@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.layout.block
+package xyz.xenondevs.nova.resources.builder.layout.block
 
 import org.bukkit.Axis
 import org.bukkit.block.BlockFace
@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
@@ -44,7 +45,7 @@ class BlockModelSelectorScope internal constructor(
     blockState: NovaBlockState,
     val resourcePackBuilder: ResourcePackBuilder,
     val modelContent: ModelContent
-) : BlockSelectorScope(blockState) {
+) : BlockSelectorScope(blockState), ModelSelectorScope {
     
     /**
      * The ID of the block.
@@ -55,7 +56,7 @@ class BlockModelSelectorScope internal constructor(
      * The default model for this block under `namespace:block/name` or a new model
      * with parent `minecraft:block/cube_all` and `"all": "namespace:block/name"`.
      */
-    val defaultModel: ModelBuilder by lazy {
+    override val defaultModel: ModelBuilder by lazy {
         val path = ResourcePath(ResourceType.Model, id.namespace, "block/${id.path}")
         modelContent[path]
             ?.let(::ModelBuilder)
@@ -65,7 +66,7 @@ class BlockModelSelectorScope internal constructor(
     /**
      * Gets the model under the given [path] or throws an exception if it does not exist.
      */
-    fun getModel(path: ResourcePath<ResourceType.Model>): ModelBuilder =
+    override fun getModel(path: ResourcePath<ResourceType.Model>): ModelBuilder =
         modelContent[path]
             ?.let(::ModelBuilder)
             ?: throw IllegalArgumentException("Model $path does not exist")
@@ -73,7 +74,7 @@ class BlockModelSelectorScope internal constructor(
     /**
      * Gets the model under the given [path] after or throws an exception if it does not exist.
      */
-    fun getModel(path: String): ModelBuilder =
+    override fun getModel(path: String): ModelBuilder =
         getModel(ResourcePath.of(ResourceType.Model, path, id.namespace))
     
     /**

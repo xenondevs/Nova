@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.layout.equipment
+package xyz.xenondevs.nova.resources.builder.layout.equipment
 
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath

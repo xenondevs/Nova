@@ -13,13 +13,17 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.builder.data.DefaultItemModel
+import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
+import xyz.xenondevs.nova.resources.builder.layout.block.BackingStateCategory
+import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
+import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
+import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_STATE_SELECTOR
+import xyz.xenondevs.nova.resources.builder.layout.block.ItemDefinitionConfigurator
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
-import xyz.xenondevs.nova.resources.layout.block.BackingStateCategory
-import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout
-import xyz.xenondevs.nova.resources.layout.block.BlockModelLayout.LayoutType
-import xyz.xenondevs.nova.resources.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.serialization.json.GSON
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
@@ -102,43 +106,50 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         runAfter = [
             "BlockModelContent#readBlockStateFiles",
             "ModelContent#discoverAllModels",
-            "ItemModelContent#loadOverrides"
         ],
-        runBefore = ["BlockModelContent#writeBlockStateFiles"]
+        runBefore = [
+            "BlockModelContent#writeBlockStateFiles",
+            "ItemModelContent#write"
+        ]
     )
     private fun assignBlockModels() {
         val lookup = HashMap<NovaBlockState, LinkedBlockModelProvider<*>>()
         
         NovaRegistries.BLOCK
-            .sortedByDescending { it.requestedLayout.priority }
+            .sortedByDescending { (it.layout as? BlockModelLayout.StateBacked)?.priority ?: 0 }
             .forEach { block ->
-                val layout = block.requestedLayout
+                val layout = block.layout
                 for (blockState in block.blockStates) {
                     try {
                         val modelScope = BlockModelSelectorScope(blockState, builder, modelContent)
-                        when (layout.type) {
-                            LayoutType.STATE_BACKED -> {
+                        when (layout) {
+                            is BlockModelLayout.StateBacked -> {
                                 val modelBuilder = layout.modelSelector(modelScope)
                                 val cfg = assignModelToVanillaBlockState(layout, modelBuilder, blockState[WATERLOGGED] == true)
                                 if (cfg != null) {
                                     lookup[blockState] = LinkedBlockModelProvider(BackingStateBlockModelProvider, cfg)
                                 } else if (block is NovaTileEntityBlock) {
                                     LOGGER.warn("No more block states for $blockState with layout, falling back to display entity.")
-                                    val data = DisplayEntityBlockModelData(assignModelToItem(modelBuilder), layout.stateSelector(modelScope))
+                                    val data = DisplayEntityBlockModelData(assignModelToItem(modelBuilder), DEFAULT_BLOCK_STATE_SELECTOR(modelScope))
                                     lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
                                 } else throw IllegalStateException("Ran out of backing states trying to assign a model to $blockState")
                             }
                             
-                            LayoutType.ENTITY_BACKED -> {
+                            is BlockModelLayout.EntityBacked -> {
                                 if (block !is NovaTileEntityBlock)
                                     throw IllegalArgumentException("$block cannot use entity-backed block models, as it is not a tile-entity")
                                 
-                                val modelBuilder = layout.modelSelector(BlockModelSelectorScope(blockState, builder, modelContent))
-                                val data = DisplayEntityBlockModelData(assignModelToItem(modelBuilder), layout.stateSelector(modelScope))
+                                val scope = BlockModelSelectorScope(blockState, builder, modelContent)
+                                val models = when(layout) {
+                                    is BlockModelLayout.SimpleEntityBacked -> assignModelToItem(layout.modelSelector(scope))
+                                    is BlockModelLayout.ItemEntityBacked -> listOf(assignModelToItem(scope, layout.definitionConfigurator))
+                                }
+                                
+                                val data = DisplayEntityBlockModelData(models, layout.stateSelector(modelScope))
                                 lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
                             }
                             
-                            LayoutType.MODEL_LESS -> {
+                            is BlockModelLayout.ModelLess -> {
                                 lookup[blockState] = LinkedBlockModelProvider(ModelLessBlockModelProvider, layout.stateSelector(modelScope))
                             }
                         }
@@ -156,12 +167,12 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
      * potentially re-using existing block state variants.
      * Then returns the [BackingStateConfig] the model was assigned to, or null if it wasn't assigned to any.
      */
-    private fun assignModelToVanillaBlockState(layout: BlockModelLayout, modelBuilder: ModelBuilder, waterlogged: Boolean): BackingStateConfig? {
+    private fun assignModelToVanillaBlockState(layout: BlockModelLayout.StateBacked, modelBuilder: ModelBuilder, waterlogged: Boolean): BackingStateConfig? {
         val (model, rotations) = modelBuilder.buildBlockStateVariant(modelContent)
         val variant = BlockStateVariantData(modelContent.getOrPutGenerated(model), rotations.x(), rotations.y())
         
         var cfg: BackingStateConfig? = null
-        for (configType in layout.backingStateConfigTypes) {
+        for (configType in layout.configTypes) {
             val match = configsByVariant[variant]?.firstOrNull { it.type == configType }
             if (match != null) {
                 cfg = if (match.waterlogged != waterlogged) configType.of(match.id, waterlogged) else match
@@ -203,15 +214,34 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
     }
     
     /**
-     * Assigns the block models generated by [modelBuilder] to the default item via custom-model-data and returns
-     * all models required to display the given [modelBuilder] using an item display entity.
+     * Generates the item model definition using [scope] and [configureDefinition] and returns
+     * the display entity configuration used to display it.
+     */
+    private fun assignModelToItem(scope: BlockModelSelectorScope, configureDefinition: ItemDefinitionConfigurator): DisplayEntityBlockModelData.Model {
+        val itemDefinition = ItemModelDefinitionBuilder(builder) { modelSelector ->
+            val builder = modelSelector(scope)
+            val id = modelContent.getOrPutGenerated(builder.build(modelContent))
+            modelContent.rememberUsage(id)
+            id
+        }.apply(configureDefinition).build()
+        
+        val itemId = itemModelContent.getOrPutGenerated(itemDefinition)
+        return DisplayEntityBlockModelData.Model(itemId, Matrix4f())
+    }
+    
+    /**
+     * Assigns the block models generated by [modelBuilder] to generated item definitions and returns
+     * all display entity configurations required to display the given [modelBuilder] using an item display entity.
      */
     private fun assignModelToItem(modelBuilder: ModelBuilder): List<DisplayEntityBlockModelData.Model> {
         return modelBuilder.buildDisplayEntity(modelContent).map { (model, transform) ->
             val modelId = modelContent.getOrPutGenerated(model)
             modelContent.rememberUsage(modelId)
-            val (material, customModelData) = itemModelContent.getOrRegisterDefault(modelId)
-            DisplayEntityBlockModelData.Model(material, customModelData, Matrix4f(transform))
+            
+            val itemDef = ItemModelDefinition(DefaultItemModel(modelId))
+            val itemId = itemModelContent.getOrPutGenerated(itemDef)
+            
+            DisplayEntityBlockModelData.Model(itemId, Matrix4f(transform))
         }
     }
     

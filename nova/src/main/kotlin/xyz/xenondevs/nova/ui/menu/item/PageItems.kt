@@ -4,37 +4,34 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.PagedGui
+import xyz.xenondevs.invui.item.AbstractPagedGuiBoundItem
+import xyz.xenondevs.invui.item.Click
+import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.builder.ItemBuilder
-import xyz.xenondevs.invui.item.builder.addLoreLines
-import xyz.xenondevs.invui.item.builder.setDisplayName
-import xyz.xenondevs.invui.item.impl.controlitem.ControlItem
-import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 
 /**
- * An ui [PageItem] for [PagedGuis][PagedGui] that goes back one page on left-click.
+ * A UI item for [PagedGuis][PagedGui] that goes back one page on left-click.
  */
 class PageBackItem(
-    private val on: ItemProvider = DefaultGuiItems.ARROW_LEFT_ON.model.clientsideProvider,
-    private val off: ItemProvider = DefaultGuiItems.ARROW_LEFT_OFF.model.clientsideProvider
-) : ControlItem<PagedGui<*>>() {
+    private val on: ItemProvider = DefaultGuiItems.ARROW_LEFT_ON.clientsideProvider,
+    private val off: ItemProvider = DefaultGuiItems.ARROW_LEFT_OFF.clientsideProvider
+) : AbstractPagedGuiBoundItem() {
     
-    override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+    override fun getItemProvider(player: Player): ItemProvider {
         val itemBuilder = ItemBuilder((if (gui.hasPreviousPage()) on else off).get())
-        itemBuilder.setDisplayName(Component.translatable("menu.nova.paged.back", NamedTextColor.GRAY))
+        itemBuilder.setName(Component.translatable("menu.nova.paged.back", NamedTextColor.GRAY))
         itemBuilder.addLoreLines(
             if (gui.hasInfinitePages()) {
-                if (gui.currentPage == 0) Component.translatable("menu.nova.paged.limit_min", NamedTextColor.DARK_GRAY)
-                else Component.translatable("menu.nova.paged.go_infinite", NamedTextColor.DARK_GRAY, Component.text(gui.currentPage))
+                if (gui.page == 0) Component.translatable("menu.nova.paged.limit_min", NamedTextColor.DARK_GRAY)
+                else Component.translatable("menu.nova.paged.go_infinite", NamedTextColor.DARK_GRAY, Component.text(gui.page))
             } else {
                 if (gui.hasPreviousPage())
                     Component.translatable(
                         "menu.nova.paged.go", NamedTextColor.DARK_GRAY,
-                        Component.text(gui.currentPage), Component.text(gui.pageAmount)
+                        Component.text(gui.page), Component.text(gui.pageAmount)
                     )
                 else Component.translatable("menu.nova.paged.limit_min", NamedTextColor.DARK_GRAY)
             }
@@ -42,7 +39,7 @@ class PageBackItem(
         return itemBuilder
     }
     
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) {
         if (clickType == ClickType.LEFT && gui.hasPreviousPage()) {
             player.playClickSound()
             gui.goBack()
@@ -52,27 +49,27 @@ class PageBackItem(
 }
 
 /**
- * An ui [PageItem] for [PagedGuis][PagedGui] that goes forward one page on left-click.
+ * A UI item for [PagedGuis][PagedGui] that goes forward one page on left-click.
  */
 class PageForwardItem(
-    private val on: ItemProvider = DefaultGuiItems.ARROW_RIGHT_ON.model.clientsideProvider,
-    private val off: ItemProvider = DefaultGuiItems.ARROW_RIGHT_OFF.model.clientsideProvider
-) : ControlItem<PagedGui<*>>() {
+    private val on: ItemProvider = DefaultGuiItems.ARROW_RIGHT_ON.clientsideProvider,
+    private val off: ItemProvider = DefaultGuiItems.ARROW_RIGHT_OFF.clientsideProvider
+) : AbstractPagedGuiBoundItem() {
     
-    override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+    override fun getItemProvider(player: Player): ItemProvider {
         val itemBuilder = ItemBuilder((if (gui.hasNextPage()) on else off).get())
-        itemBuilder.setDisplayName(Component.translatable("menu.nova.paged.forward", NamedTextColor.GRAY))
+        itemBuilder.setName(Component.translatable("menu.nova.paged.forward", NamedTextColor.GRAY))
         itemBuilder.addLoreLines(
             if (gui.hasInfinitePages()) {
                 Component.translatable(
                     "menu.nova.paged.go_infinite", NamedTextColor.DARK_GRAY,
-                    Component.text(gui.currentPage + 2)
+                    Component.text(gui.page + 2)
                 )
             } else {
                 if (gui.hasNextPage())
                     Component.translatable(
                         "menu.nova.paged.go", NamedTextColor.DARK_GRAY,
-                        Component.text(gui.currentPage + 2), Component.text(gui.pageAmount)
+                        Component.text(gui.page + 2), Component.text(gui.pageAmount)
                     )
                 else Component.translatable("menu.nova.paged.limit_max", NamedTextColor.DARK_GRAY)
             }
@@ -80,7 +77,7 @@ class PageForwardItem(
         return itemBuilder
     }
     
-    override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+    override fun handleClick(clickType: ClickType, player: Player, click: Click) {
         if (clickType == ClickType.LEFT && gui.hasNextPage()) {
             player.playClickSound()
             gui.goForward()

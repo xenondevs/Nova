@@ -1,18 +1,19 @@
 package xyz.xenondevs.nova.resources.builder.model
 
-import com.google.gson.GsonBuilder
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
 import org.joml.Vector3d
 import org.junit.jupiter.api.Test
-import xyz.xenondevs.commons.gson.fromJson
-import xyz.xenondevs.commons.gson.registerTypeAdapter
-import xyz.xenondevs.nova.serialization.json.serializer.ModelTypeAdapter
 
+@OptIn(ExperimentalSerializationApi::class)
 class ModelBuilderTest {
     
-    private val GSON = GsonBuilder()
-        .registerTypeAdapter(ModelTypeAdapter)
-        .setPrettyPrinting()
-        .create()
+    val json = Json {
+        prettyPrint = true
+        ignoreUnknownKeys = true
+    }
     
     @Test
     fun testScaleCentered() {
@@ -190,11 +191,11 @@ class ModelBuilderTest {
     }
     
     private fun deserializeModel(name: String): Model =
-        javaClass.getResourceAsStream("/models/$name.json")?.use { GSON.fromJson<Model>(it.reader())!! }
+        javaClass.getResourceAsStream("/models/$name.json")?.use { json.decodeFromStream(it)!! }
             ?: throw IllegalArgumentException("Model $name not found")
     
     private fun serializeModel(model: Model): String =
-        GSON.toJson(model)
+        json.encodeToString(model)
     
     private fun assertEquals(expected: Model, actual: ScaledModel) {
         if (expected != actual.model) {

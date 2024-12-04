@@ -1,14 +1,16 @@
 package xyz.xenondevs.nova.ui.menu
 
 import xyz.xenondevs.invui.item.Item
-import xyz.xenondevs.invui.item.builder.ItemBuilder
+import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.nova.world.item.NovaItem
 import java.util.function.Supplier
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.round
 
-abstract class VerticalBar(private val height: Int) : Supplier<Item> {
+abstract class VerticalBar(
+    private val height: Int,
+    private val customModelDataIndex: Int = 0
+) : Supplier<Item> {
     
     private var i = 0
     
@@ -22,8 +24,7 @@ abstract class VerticalBar(private val height: Int) : Supplier<Item> {
     protected fun createItemBuilder(item: NovaItem, section: Int, percentage: Double): ItemBuilder {
         val displayPercentageStart = (1.0 / height) * section
         val displayPercentage = max(min((percentage - displayPercentageStart) * height, 1.0), 0.0)
-        val state = round(displayPercentage * (item.model.size - 1)).toInt()
-        return item.model.createClientsideItemBuilder(modelId = state)
+        return item.createClientsideItemBuilder().setCustomModelData(customModelDataIndex, displayPercentage)
     }
     
 }

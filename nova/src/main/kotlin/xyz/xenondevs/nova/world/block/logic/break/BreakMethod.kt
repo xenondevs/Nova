@@ -90,9 +90,12 @@ internal class DisplayEntityBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos)
             
             field = stage
             itemDisplay.updateEntityData(true) {
-                itemStack = if (stage in 0..9)
-                    DefaultBlockOverlays.BREAK_STAGE_OVERLAY.model.unnamedClientsideProviders[stage].get()
-                else null
+                if (stage in 0..9) {
+                    itemStack = DefaultBlockOverlays.BREAK_STAGE_OVERLAY
+                        .createClientsideItemBuilder()
+                        .addCustomModelData(stage)
+                        .get()
+                } else null
             }
         }
     

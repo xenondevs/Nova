@@ -1,11 +1,11 @@
-package xyz.xenondevs.nova.resources.layout.equipment
+package xyz.xenondevs.nova.resources.builder.layout.equipment
 
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.data.EquipmentModel
-import xyz.xenondevs.nova.resources.layout.equipment.AnimatedEquipmentLayout.Animation
+import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayout.Animation
 import java.awt.Color
 
 @RegistryElementBuilderDsl

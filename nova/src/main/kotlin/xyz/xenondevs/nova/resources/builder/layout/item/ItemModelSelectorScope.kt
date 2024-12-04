@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.layout.item
+package xyz.xenondevs.nova.resources.builder.layout.item
 
 import org.joml.Vector3d
 import org.joml.Vector4d
@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.model.Model.Direction
 import xyz.xenondevs.nova.resources.builder.model.Model.Element
@@ -20,7 +21,7 @@ class ItemModelSelectorScope internal constructor(
     item: NovaItem,
     val resourcePackBuilder: ResourcePackBuilder,
     val modelContent: ModelContent
-) {
+) : ModelSelectorScope {
     
     /**
      * The ID of the item.
@@ -31,7 +32,7 @@ class ItemModelSelectorScope internal constructor(
      * The default model for this item under `namespace:item/name` or a new
      * layered model using the texture under `namespace:item/name`.
      */
-    val defaultModel: ModelBuilder by lazy {
+    override val defaultModel: ModelBuilder by lazy {
         val path = ResourcePath(ResourceType.Model, id.namespace, "item/${id.path}")
         modelContent[path]
             ?.let(::ModelBuilder)
@@ -45,14 +46,14 @@ class ItemModelSelectorScope internal constructor(
     /**
      * Gets the model under the given [path] or throws an exception if it does not exist.
      */
-    fun getModel(path: ResourcePath<ResourceType.Model>): ModelBuilder =
+    override fun getModel(path: ResourcePath<ResourceType.Model>): ModelBuilder =
         modelContent[path]?.let(::ModelBuilder)
             ?: throw IllegalArgumentException("Model $path does not exist")
     
     /**
      * Gets the model under the given [path] or throws an exception if it does not exist.
      */
-    fun getModel(path: String): ModelBuilder =
+    override fun getModel(path: String): ModelBuilder =
         getModel(ResourcePath.of(ResourceType.Model, path, id.namespace))
     
     /**
@@ -94,16 +95,7 @@ class ItemModelSelectorScope internal constructor(
         if (!background && !stretched)
             return createLayeredModel(*layers)
         
-        val textures = HashMap<String, String>()
         val elements = ArrayList<Element>()
-        
-        if (background) {
-            textures["background"] = "nova:item/gui/inventory_part"
-        }
-        for ((idx, layer) in layers.withIndex()) {
-            textures[idx.toString()] = layer.toString()
-        }
-        
         if (background) {
             elements += Element(
                 Vector3d(-1.0, -1.0, -1.0),
@@ -130,7 +122,19 @@ class ItemModelSelectorScope internal constructor(
             )
         }
         
-        return ModelBuilder(Model(ResourcePath(ResourceType.Model, "nova", "item/gui_item"), textures, elements))
+        val parent = Model(ResourcePath(ResourceType.Model, "nova", "item/gui_item"), elements = elements)
+        val parentId = modelContent.getOrPutGenerated(parent)
+        
+        val textures = HashMap<String, String>()
+        if (background) {
+            textures["background"] = "nova:item/gui/inventory_part"
+        }
+        for ((idx, layer) in layers.withIndex()) {
+            textures[idx.toString()] = layer.toString()
+        }
+        val model = Model(parentId, textures)
+        
+        return ModelBuilder(model)
     }
     
 }

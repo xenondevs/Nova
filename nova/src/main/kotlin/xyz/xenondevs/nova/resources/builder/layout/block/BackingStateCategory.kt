@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.layout.block
+package xyz.xenondevs.nova.resources.builder.layout.block
 
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
