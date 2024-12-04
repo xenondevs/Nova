@@ -30,6 +30,7 @@ class NovaGradlePlugin : Plugin<Project> {
         addonJarTask.configure {
             this.addonName.set(addonExt.name)
             this.main.set(addonExt.main)
+            this.pluginMain.set(addonExt.pluginMain)
             this.loader.set(addonExt.loader)
             this.bootstrapper.set(addonExt.bootstrapper)
             this.version.set(addonExt.version)
