@@ -12,7 +12,6 @@ internal typealias ItemDefinitionConfigurator = ItemModelDefinitionBuilder<Block
 
 internal val DEFAULT_BLOCK_STATE_SELECTOR: BlockStateSelector = { Blocks.BARRIER.defaultBlockState() }
 internal val DEFAULT_BLOCK_MODEL_SELECTOR: BlockModelSelector = { defaultModel }
-internal val DEFAULT_ENTITY_BLOCK_MODEL_SELECTOR: ItemDefinitionConfigurator = {}
 
 internal sealed interface BlockModelLayout {
     

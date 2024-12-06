@@ -108,10 +108,10 @@ class ModelContent internal constructor(private val builder: ResourcePackBuilder
     }
     
     /**
-     * Finds the [ResourcePath] of the given [model] or registers it in `nova:generated/`.
+     * Finds the [ResourcePath] of the given [model] or registers it in `nova:gen_model/`.
      */
     fun getOrPutGenerated(model: Model): ResourcePath<ResourceType.Model> {
-        return getOrPut(model) { ResourcePath(ResourceType.Model, "nova", "generated/${generatedModelCount++}") }
+        return getOrPut(model) { ResourcePath(ResourceType.Model, "nova", "gen_model/${generatedModelCount++}") }
     }
     
     /**

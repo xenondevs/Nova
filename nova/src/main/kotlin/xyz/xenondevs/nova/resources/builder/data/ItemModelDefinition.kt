@@ -8,6 +8,7 @@ import net.kyori.adventure.key.Key
 import org.bukkit.DyeColor
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.serialization.kotlinx.LowercaseDyeColorSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ValueOrListSerializer
 
 @Serializable
@@ -245,28 +246,35 @@ internal data class SpecialItemModel(
     sealed interface SpecialModel {
         
         @Serializable
+        @SerialName("minecraft:bed")
         data class Bed(
             val texture: ResourcePath<ResourceType.BedTexture>
         ) : SpecialModel
         
         @Serializable
+        @SerialName("minecraft:banner")
         data class Banner(
-            val color: DyeColor // TODO: lowercase enum required?
+            @Serializable(with = LowercaseDyeColorSerializer::class)
+            val color: DyeColor
         ) : SpecialModel
         
         @Serializable
+        @SerialName("minecraft:conduit")
         data object Conduit : SpecialModel
         
         @Serializable
+        @SerialName("minecraft:chest")
         data class Chest(
             val texture: ResourcePath<ResourceType.ChestTexture>,
             val openness: Double = 0.0
         ) : SpecialModel
         
         @Serializable
+        @SerialName("minecraft:decorated_pot")
         data object DecoratedPot : SpecialModel
         
         @Serializable
+        @SerialName("minecraft:head")
         data class Head(
             val kind: HeadKind,
             val texture: ResourcePath<ResourceType.EntityTexture>,
@@ -274,6 +282,7 @@ internal data class SpecialItemModel(
         ) : SpecialModel
         
         @Serializable
+        @SerialName("minecraft:shulker_box")
         data class ShulkerBox(
             val name: ResourcePath<ResourceType.ShulkerTexture>,
             val openness: Double = 0.0,
@@ -281,18 +290,22 @@ internal data class SpecialItemModel(
         ) : SpecialModel
         
         @Serializable
+        @SerialName("minecraft:shield")
         data object Shield : SpecialModel
         
         @Serializable
+        @SerialName("minecraft:standing_sign")
         data class StandingSign(
             val woodType: WoodType,
             val texture: ResourcePath<ResourceType.SignTexture>? = null
         ) : SpecialModel
         
         @Serializable
+        @SerialName("minecraft:trident")
         data object Trident : SpecialModel
         
         @Serializable
+        @SerialName("minecraft:hanging_sign")
         data class HangingSign(
             val woodType: WoodType,
             val texture: ResourcePath<ResourceType.SignTexture>? = null

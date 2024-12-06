@@ -49,10 +49,10 @@ class ItemModelContent internal constructor(val builder: ResourcePackBuilder) : 
     }
     
     /**
-     * Finds the [ResourcePath] of the given [def] or registers it in `nova:generated/`.
+     * Finds the [ResourcePath] of the given [def] or registers it in `nova:gen_item/`.
      */
     internal fun getOrPutGenerated(def: ItemModelDefinition): ResourcePath<ResourceType.ItemModelDefinition> {
-        return getOrPut(def) { ResourcePath(ResourceType.ItemModelDefinition, "nova", "generated/${generatedDefCount++}") }
+        return getOrPut(def) { ResourcePath(ResourceType.ItemModelDefinition, "nova", "gen_item/${generatedDefCount++}") }
     }
     
     @PackTask(

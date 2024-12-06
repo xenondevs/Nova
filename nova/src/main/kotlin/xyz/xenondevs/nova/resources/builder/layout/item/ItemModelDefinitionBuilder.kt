@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
 import xyz.xenondevs.nova.resources.builder.data.SpecialItemModel.SpecialModel
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
+import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 
 @RegistryElementBuilderDsl
@@ -19,7 +20,7 @@ class ItemModelDefinitionBuilder<S : ModelSelectorScope> internal constructor(
 ) : ItemModelCreationScope<S>(resourcePackBuilder, selectAndBuild) {
     
     /**
-     * The model of this item.
+     * The model of this item. Empty by default.
      */
     var model: ItemModel = empty()
     
@@ -30,6 +31,15 @@ class ItemModelDefinitionBuilder<S : ModelSelectorScope> internal constructor(
     var handAnimationOnSwap = true
     
     internal fun build() = ItemModelDefinition(model, handAnimationOnSwap)
+    
+    internal companion object {
+        
+        // it is not possible to just use the default model as default value, as that would result in
+        // selectAndBuild running for them, which is not desired (ModelContent would remember the models and keep them, even if unused)
+        val DEFAULT_CONFIGURE_ITEM_MODEL_SELECTOR: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit = { model = buildModel { defaultModel } }
+        val DEFAULT_CONFIGURE_BLOCK_MODEL_SELECTOR: ItemModelDefinitionBuilder<BlockModelSelectorScope>.() -> Unit = { model = buildModel { defaultModel } }
+        
+    }
     
 }
 

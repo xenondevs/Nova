@@ -108,6 +108,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
             "ModelContent#discoverAllModels",
         ],
         runBefore = [
+            "ModelContent#write",
             "BlockModelContent#writeBlockStateFiles",
             "ItemModelContent#write"
         ]

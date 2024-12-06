@@ -22,7 +22,7 @@ abstract class SpecialItemModelBuilder<S : ModelSelectorScope> internal construc
     /**
      * A function that selects the base model, which will be used for transformations, particle texture, GUI light, etc.
      */
-    var base: S.() -> ModelBuilder = { defaultModel }
+    var base: S.() -> ModelBuilder = { getModel("minecraft:block/block") }
     
     internal abstract fun build(): SpecialItemModel
     

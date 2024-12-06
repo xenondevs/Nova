@@ -17,8 +17,8 @@ import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelector
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockStateSelector
 import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_MODEL_SELECTOR
 import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_STATE_SELECTOR
-import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_ENTITY_BLOCK_MODEL_SELECTOR
 import xyz.xenondevs.nova.resources.builder.layout.block.ItemDefinitionConfigurator
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder.Companion.DEFAULT_CONFIGURE_BLOCK_MODEL_SELECTOR
 import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
@@ -188,7 +188,7 @@ abstract class AbstractNovaBlockBuilder<B : NovaBlock> internal constructor(
      */
     fun entityItemBacked(
         stateSelector: BlockStateSelector = DEFAULT_BLOCK_STATE_SELECTOR,
-        itemSelector: ItemDefinitionConfigurator = DEFAULT_ENTITY_BLOCK_MODEL_SELECTOR
+        itemSelector: ItemDefinitionConfigurator = DEFAULT_CONFIGURE_BLOCK_MODEL_SELECTOR
     ) {
         layout = BlockModelLayout.ItemEntityBacked(stateSelector, itemSelector)
     }

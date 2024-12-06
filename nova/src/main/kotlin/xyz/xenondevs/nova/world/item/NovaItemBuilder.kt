@@ -14,8 +14,8 @@ import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
-import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.Key
+import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 
@@ -32,7 +32,7 @@ class NovaItemBuilder internal constructor(
     private var isHidden = false
     private var block: NovaBlock? = null
     private var tooltipStyle: TooltipStyle? = null
-    private var configureDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit = {}
+    private var configureDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit = ItemModelDefinitionBuilder.DEFAULT_CONFIGURE_ITEM_MODEL_SELECTOR
     
     internal constructor(addon: Addon, name: String) : this(Key(addon, name))
     

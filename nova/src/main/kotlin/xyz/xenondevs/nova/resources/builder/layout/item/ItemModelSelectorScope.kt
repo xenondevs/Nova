@@ -101,7 +101,7 @@ class ItemModelSelectorScope internal constructor(
                 Vector3d(-1.0, -1.0, -1.0),
                 Vector3d(17.0, 17.0, -1.0),
                 null,
-                mapOf(Direction.SOUTH to Face(Vector4d(0.0, 0.0, 16.0, 16.0), "#background", null, 0, 0)),
+                mapOf(Direction.SOUTH to Face(Vector4d(0.0, 0.0, 16.0, 16.0), "#background")),
                 true
             )
         }
@@ -113,11 +113,13 @@ class ItemModelSelectorScope internal constructor(
             Vector4d(0.0, 0.0, 16.0, 16.0)
         }
         for (idx in layers.indices) {
+            // name first layer "particle", to stop the client from complaining about missing particle textures
+            val name = if (idx == 0) "particle" else idx.toString()
             elements += Element(
                 Vector3d(from, from, (idx.toDouble() / layers.size.toDouble())),
                 Vector3d(to, to, (idx.toDouble() / layers.size.toDouble())),
                 null,
-                mapOf(Direction.SOUTH to Face(uv, "#$idx", null, 0, 0)),
+                mapOf(Direction.SOUTH to Face(uv, name)),
                 true
             )
         }
@@ -130,7 +132,8 @@ class ItemModelSelectorScope internal constructor(
             textures["background"] = "nova:item/gui/inventory_part"
         }
         for ((idx, layer) in layers.withIndex()) {
-            textures[idx.toString()] = layer.toString()
+            val name = if (idx == 0) "particle" else idx.toString()
+            textures[name] = layer.toString()
         }
         val model = Model(parentId, textures)
         
