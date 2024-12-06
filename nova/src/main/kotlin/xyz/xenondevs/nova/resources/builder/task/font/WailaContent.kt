@@ -45,6 +45,7 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.WAXED_WEATHERED_COPPER_DOOR to "item/weathered_copper_door",
     Material.WAXED_OXIDIZED_COPPER_DOOR to "item/oxidized_copper_door",
     Material.WAXED_EXPOSED_COPPER_DOOR to "item/exposed_copper_door",
+    Material.PALE_OAK_DOOR to "item/pale_oak_door",
     
     // signs
     Material.OAK_SIGN to "item/oak_sign",
@@ -58,6 +59,7 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.WARPED_SIGN to "item/warped_sign",
     Material.BAMBOO_SIGN to "item/bamboo_sign",
     Material.CHERRY_SIGN to "item/cherry_sign",
+    Material.PALE_OAK_SIGN to "item/pale_oak_sign",
     
     // hanging signs
     Material.OAK_HANGING_SIGN to "item/oak_hanging_sign",
@@ -71,6 +73,7 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.WARPED_HANGING_SIGN to "item/warped_hanging_sign",
     Material.BAMBOO_HANGING_SIGN to "item/bamboo_hanging_sign",
     Material.CHERRY_HANGING_SIGN to "item/cherry_hanging_sign",
+    Material.PALE_OAK_HANGING_SIGN to "item/pale_oak_hanging_sign",
     
     // foliage
     Material.OAK_SAPLING to "block/oak_sapling",
@@ -82,6 +85,7 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.CHERRY_SAPLING to "block/cherry_sapling",
     Material.MANGROVE_PROPAGULE to "block/mangrove_propagule",
     Material.BAMBOO_SAPLING to "block/bamboo_stage0",
+    Material.PALE_OAK_SAPLING to "block/pale_oak_sapling",
     Material.DEAD_BUSH to "block/dead_bush",
     Material.SEAGRASS to "block/seagrass",
     Material.SEA_PICKLE to "block/sea_pickle",
@@ -96,6 +100,7 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.SUGAR_CANE to "block/sugar_cane",
     Material.PUMPKIN_STEM to "item/pumpkin_seeds",
     Material.MELON_STEM to "item/melon_seeds",
+    Material.PALE_HANGING_MOSS to "block/pale_hanging_moss",
     
     // flowers
     Material.DANDELION to "block/dandelion",
@@ -119,6 +124,8 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.PINK_PETALS to "item/pink_petals",
     Material.PITCHER_CROP to "item/pitcher_plant",
     Material.PITCHER_PLANT to "item/pitcher_plant",
+    Material.OPEN_EYEBLOSSOM to "block/open_eyeblossom",
+    Material.CLOSED_EYEBLOSSOM to "block/closed_eyeblossom",
     
     // mushrooms
     Material.BROWN_MUSHROOM to "block/brown_mushroom",
