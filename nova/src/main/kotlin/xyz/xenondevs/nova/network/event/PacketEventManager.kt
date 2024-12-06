@@ -31,6 +31,7 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAttributesP
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClickPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundPickItemFromBlockPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlaceRecipePacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSelectBundleItemPacketEvent
@@ -89,6 +90,7 @@ object PacketEventManager {
         registerPlayerEventType(::ServerboundInteractPacketEvent)
         registerPlayerEventType(::ServerboundContainerClickPacketEvent)
         registerPlayerEventType(::ServerboundSelectBundleItemPacketEvent)
+        registerPlayerEventType(::ServerboundPickItemFromBlockPacketEvent)
     }
     
     private inline fun <reified P : Packet<*>, reified E : PlayerPacketEvent<P>> registerEventType(noinline constructor: (P) -> E) {
