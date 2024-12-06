@@ -228,26 +228,51 @@ sealed interface ResourceType {
         
     }
     
+    /**
+     * Entity textures.
+     * 
+     * path: `textures/entity/`, extension: `png`
+     */
     @Serializable
     data object EntityTexture : Texture {
         override val prefix = "textures/entity/"
     }
     
+    /**
+     * Bed entity textures.
+     * 
+     * path: `textures/entity/bed/`, extension: `png`
+     */
     @Serializable
     data object BedTexture : Texture {
         override val prefix = "textures/entity/bed"
     }
     
+    /**
+     * Chest entity textures.
+     * 
+     * path: `textures/entity/chest/`, extension: `png`
+     */
     @Serializable
     data object ChestTexture : Texture {
         override val prefix = "textures/entity/chest/"
     }
     
+    /**
+     * Shulker entity textures.
+     * 
+     * path: `textures/entity/shulker/`, extension: `png`
+     */
     @Serializable
     data object ShulkerTexture : Texture {
         override val prefix = "textures/entity/shulker/"
     }
     
+    /**
+     * Sign entity textures.
+     * 
+     * path: `textures/entity/signs/`, extension: `png`
+     */
     @Serializable
     data object SignTexture : Texture {
         override val prefix = "textures/entity/signs/"
