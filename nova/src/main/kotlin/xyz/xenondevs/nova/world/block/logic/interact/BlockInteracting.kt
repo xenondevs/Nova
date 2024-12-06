@@ -1,5 +1,9 @@
 package xyz.xenondevs.nova.world.block.logic.interact
 
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.LevelReader
+import net.minecraft.world.level.block.state.BlockBehaviour
+import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.entity.EntityType
@@ -26,13 +30,18 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.BlockUtils
-import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.util.nmsState
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.pos
+import net.minecraft.world.item.ItemStack as MojangStack
+
+private val BLOCK_BEHAVIOR_GET_CLONE_ITEM_STACK = ReflectionUtils.getMethodHandle(
+    BlockBehaviour::class, "getCloneItemStack", LevelReader::class, BlockPos::class, BlockState::class, Boolean::class
+)
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -88,11 +97,11 @@ internal object BlockInteracting : Listener {
             ?: return
         val targetPos = targetBlock.pos
         
-        val vanillaCloneStack = targetBlock.type.nmsBlock.getCloneItemStack(
+        val vanillaCloneStack = (BLOCK_BEHAVIOR_GET_CLONE_ITEM_STACK.invoke(
             targetBlock.world.serverLevel,
             targetBlock.pos.nmsPos,
             targetBlock.nmsState
-        ).asBukkitMirror()
+        ) as MojangStack).asBukkitMirror()
         
         if (vanillaCloneStack != event.cursor)
             return

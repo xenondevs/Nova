@@ -8,6 +8,7 @@ import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
@@ -17,6 +18,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.component.ItemAttributeModifiers
+import net.minecraft.world.item.equipment.EquipmentAssets
 import xyz.xenondevs.commons.collections.getMod
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
@@ -261,7 +263,7 @@ class Equippable(
                 EquippableComponent(
                     equipmentSlot,
                     equipSound,
-                    Optional.ofNullable(textureFrames?.getOrNull(textureFrame)?.toResourceLocation()),
+                    Optional.ofNullable(textureFrames?.getOrNull(textureFrame)?.let { ResourceKey.create(EquipmentAssets.ROOT_ID, it.toResourceLocation()) }),
                     Optional.ofNullable(overlayFrames?.getOrNull(overlayFrame)?.toResourceLocation()),
                     Optional.ofNullable(allowedNmsEntities),
                     dispensable, swappable, damageOnHurt

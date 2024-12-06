@@ -42,7 +42,8 @@ class ParticleBuilder<T : ParticleOptions>(private val particle: ParticleType<T>
     
     private lateinit var options: T
     private lateinit var location: Location
-    private var longDistance: Boolean = true
+    private var overrideLimiter: Boolean = false
+    private var alwaysShow: Boolean = false
     private var offsetX: Float = 0f
     private var offsetY: Float = 0f
     private var offsetZ: Float = 0f
@@ -61,7 +62,9 @@ class ParticleBuilder<T : ParticleOptions>(private val particle: ParticleType<T>
     
     fun location(location: Location) = apply { this.location = location }
     
-    fun longDistance(longDistance: Boolean) = apply { this.longDistance = longDistance }
+    fun overrideLimiter(overrideLimiter: Boolean) = apply { this.overrideLimiter = overrideLimiter }
+    
+    fun alwaysShow(alwaysShow: Boolean) = apply { this.alwaysShow = alwaysShow }
     
     fun offsetX(offsetX: Float) = apply { this.offsetX = offsetX }
     
@@ -143,7 +146,8 @@ class ParticleBuilder<T : ParticleOptions>(private val particle: ParticleType<T>
     
     fun build() = ClientboundLevelParticlesPacket(
         options,
-        longDistance,
+        overrideLimiter,
+        alwaysShow,
         location.x,
         location.y,
         location.z,

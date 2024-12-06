@@ -39,7 +39,6 @@ import xyz.xenondevs.nova.util.particle.ParticleBuilder
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_CLIMATE_SETTINGS_CONSTRUCTOR
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_CONSTRUCTOR
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_GENERATION_SETTINGS_CONSTRUCTOR
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_SPECIAL_EFFECTS_CONSTRUCTOR
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.MOB_SPAWN_SETTINGS_CONSTRUCTOR
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.FeatureType
@@ -265,6 +264,7 @@ class BiomeSpecialEffectsBuilder internal constructor(private val lookup: Regist
     private var ambientMoodSettings: AmbientMoodSettings? = null
     private var ambientAdditionsSettings: AmbientAdditionsSettings? = null
     private var backgroundMusic: Music? = null
+    private var backgroundMusicVolume: Float = 1f
     
     //<editor-fold desc="Color setters" defaultstate="collapsed">
     
@@ -486,26 +486,35 @@ class BiomeSpecialEffectsBuilder internal constructor(private val lookup: Regist
         this.backgroundMusic = MusicBuilder(lookup).apply(builder).build()
     }
     
+    /**
+     * Sets the `backgroundMusicVolume` setting of the biome's special effects. This setting is used to adjust the volume
+     * of the background music.
+     */
+    fun backgroundMusicVolume(volume: Float) {
+        this.backgroundMusicVolume = volume
+    }
+    
     //</editor-fold>
     
     /**
      * Builds a [BiomeSpecialEffects] instance from the current state of this builder.
      */
     internal fun build(): BiomeSpecialEffects {
-        return BIOME_SPECIAL_EFFECTS_CONSTRUCTOR.newInstance(
-            fogColor,
-            waterColor,
-            waterFogColor,
-            skyColor,
-            Optional.ofNullable(foliageColorOverride),
-            Optional.ofNullable(grassColorOverride),
-            grassColorModifier,
-            Optional.ofNullable(ambientParticleSettings),
-            Optional.ofNullable(ambientLoopSoundEvent),
-            Optional.ofNullable(ambientMoodSettings),
-            Optional.ofNullable(ambientAdditionsSettings),
-            Optional.ofNullable(backgroundMusic)
-        )
+        return BiomeSpecialEffects.Builder().apply {
+            fogColor(fogColor)
+            waterColor(waterColor)
+            waterFogColor(waterFogColor)
+            skyColor(skyColor)
+            foliageColorOverride?.let(::foliageColor)
+            grassColorOverride?.let(::grassColor)
+            grassColorModifier(grassColorModifier)
+            ambientParticleSettings?.let(::ambientParticles)
+            ambientLoopSoundEvent?.let(::ambientLoopSoundEvent)
+            ambientMoodSettings?.let(::ambientMoodSound)
+            ambientAdditionsSettings?.let(::ambientAdditionsSound) // TODO: support weights
+            backgroundMusic?.let(::backgroundMusic)
+            backgroundMusicVolume(backgroundMusicVolume)
+        }.build()
     }
     
 }
