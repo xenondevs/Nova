@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -95,6 +96,7 @@ interface BlockBehavior : BlockBehaviorHolder {
     
     /**
      * Chooses the [ItemStack] that should be given to the player when mid-clicking a block of [state] at [pos] with the given [ctx] in creative mode.
+     * @see DefaultContextParamTypes.INCLUDE_DATA
      */
     fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack? = null
     

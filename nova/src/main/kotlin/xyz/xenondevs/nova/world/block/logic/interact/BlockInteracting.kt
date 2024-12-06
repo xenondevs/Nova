@@ -1,13 +1,7 @@
 package xyz.xenondevs.nova.world.block.logic.interact
 
-import net.minecraft.core.BlockPos
-import net.minecraft.world.level.LevelReader
-import net.minecraft.world.level.block.state.BlockBehaviour
-import net.minecraft.world.level.block.state.BlockState
-import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.entity.EntityType
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -17,10 +11,6 @@ import org.bukkit.event.block.BlockPistonExtendEvent
 import org.bukkit.event.block.BlockPistonRetractEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityExplodeEvent
-import org.bukkit.event.inventory.InventoryCreativeEvent
-import org.bukkit.event.inventory.InventoryType
-import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
@@ -29,29 +19,24 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.network.event.PacketListener
+import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.util.BlockUtils
-import xyz.xenondevs.nova.util.nmsState
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.pos
-import net.minecraft.world.item.ItemStack as MojangStack
-
-private val BLOCK_BEHAVIOR_GET_CLONE_ITEM_STACK = ReflectionUtils.getMethodHandle(
-    BlockBehaviour::class, "getCloneItemStack", LevelReader::class, BlockPos::class, BlockState::class, Boolean::class
-)
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
     dependsOn = [WorldDataManager::class]
 )
-internal object BlockInteracting : Listener {
+internal object BlockInteracting : Listener, PacketListener {
     
     @InitFun
     private fun init() {
         registerEvents()
+        registerPacketListener()
     }
     
     @EventHandler(priority = EventPriority.LOW)
@@ -82,45 +67,6 @@ internal object BlockInteracting : Listener {
                 wrappedEvent.actionPerformed = actionPerformed
             }
         }
-    }
-    
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private fun handleInventoryCreative(event: InventoryCreativeEvent) {
-        if (event.slotType != InventoryType.SlotType.QUICKBAR)
-            return
-        
-        val player = event.whoClicked as Player
-        val reach = player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE)?.value ?: 8.0
-        val rayTraceResult = player.rayTraceBlocks(reach)
-            ?: return
-        val targetBlock = rayTraceResult.hitBlock
-            ?: return
-        val targetPos = targetBlock.pos
-        
-        val vanillaCloneStack = (BLOCK_BEHAVIOR_GET_CLONE_ITEM_STACK.invoke(
-            targetBlock.world.serverLevel,
-            targetBlock.pos.nmsPos,
-            targetBlock.nmsState
-        ) as MojangStack).asBukkitMirror()
-        
-        if (vanillaCloneStack != event.cursor)
-            return
-        
-        val novaBlockState = WorldDataManager.getBlockState(targetPos)
-            ?: return
-        
-        val ctx = Context.intention(DefaultContextIntentions.BlockInteract)
-            .param(DefaultContextParamTypes.BLOCK_POS, targetPos)
-            .param(DefaultContextParamTypes.BLOCK_STATE_NOVA, novaBlockState)
-            .param(DefaultContextParamTypes.SOURCE_ENTITY, player)
-            .param(DefaultContextParamTypes.CLICKED_BLOCK_FACE, rayTraceResult.hitBlockFace)
-            .param(DefaultContextParamTypes.INTERACTION_HAND, EquipmentSlot.HAND)
-            .param(DefaultContextParamTypes.INTERACTION_ITEM_STACK, event.cursor)
-            .build()
-        
-        val novaCloneStack = novaBlockState.block.pickBlockCreative(targetPos, novaBlockState, ctx) ?: ItemStack.empty()
-        event.cursor = novaCloneStack
-        player.updateInventory()
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

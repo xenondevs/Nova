@@ -3,8 +3,11 @@ package xyz.xenondevs.nova.patch.impl.block
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelReader
 import net.minecraft.world.level.ScheduledTickAccess
@@ -14,11 +17,18 @@ import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.redstone.Orientation
 import org.bukkit.block.data.BlockData
+import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.MethodInsnNode
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
+import xyz.xenondevs.bytebase.util.replaceEvery
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.patch.MultiTransformer
 import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.toNovaPos
+import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.format.WorldDataManager
@@ -82,13 +92,21 @@ private val BLOCK_BEHAVIOR_ENTITY_INSIDE = BLOCK_BEHAVIOR_LOOKUP.findVirtual(
     )
 )
 
-internal object BlockBehaviorPatches : MultiTransformer(BlockStateBase::class) {
+internal object BlockBehaviorPatches : MultiTransformer(BlockStateBase::class, ServerGamePacketListenerImpl::class) {
     
     override fun transform() {
         VirtualClassPath[BlockStateBase::handleNeighborChanged].delegateStatic(::handleNeighborChanged)
         VirtualClassPath[BlockStateBase::updateShape].delegateStatic(::updateShape)
         VirtualClassPath[BlockStateBase::tick].delegateStatic(::tick)
         VirtualClassPath[BlockStateBase::entityInside].delegateStatic(::entityInside)
+        VirtualClassPath[ServerGamePacketListenerImpl::handlePickItemFromBlock].replaceEvery(
+            0, 0,
+            {
+                aLoad(0)
+                getField(ServerGamePacketListenerImpl::player)
+                invokeStatic(::getCloneItemStack)
+            }
+        ) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).name == "getCloneItemStack" }
     }
     
     @JvmStatic
@@ -167,6 +185,27 @@ internal object BlockBehaviorPatches : MultiTransformer(BlockStateBase::class) {
         } else {
             BLOCK_BEHAVIOR_ENTITY_INSIDE.invoke(thisRef.block, thisRef, level, pos, entity)
         }
+    }
+    
+    @JvmStatic
+    fun getCloneItemStack(blockState: BlockState, world: ServerLevel, pos: BlockPos, includeData: Boolean, player: Player): ItemStack {
+        val novaPos = pos.toNovaPos(world.world)
+        val novaState = WorldDataManager.getBlockState(novaPos)
+        if (novaState != null) {
+            try {
+                val ctx = Context.intention(DefaultContextIntentions.BlockInteract)
+                    .param(DefaultContextParamTypes.BLOCK_POS, novaPos)
+                    .param(DefaultContextParamTypes.BLOCK_STATE_NOVA, novaState)
+                    .param(DefaultContextParamTypes.INCLUDE_DATA, includeData)
+                    .param(DefaultContextParamTypes.SOURCE_ENTITY, player.bukkitEntity)
+                    .build()
+                return novaState.block.pickBlockCreative(novaPos, novaState, ctx).unwrap()
+            } catch (e: Exception) {
+                LOGGER.error("Failed to get clone item stack for $novaState at $novaPos", e)
+            }
+        }
+        
+        return blockState.getCloneItemStack(world, pos, includeData)
     }
     
 }

@@ -628,4 +628,21 @@ object DefaultContextParamTypes {
             .optionalIn(BlockPlace)
             .build(false)
     
+    /**
+     * Whether the data of the block should be included for creative-pick block interactions.
+     * 
+     * Required in intentions: none
+     * 
+     * Optional in intentions:
+     * - [BlockInteract]
+     * 
+     * Autofilled by: none
+     * 
+     * Autofills: none
+     */
+    val INCLUDE_DATA: DefaultingContextParamType<Boolean> =
+        ContextParamType.builder<Boolean>("include_data")
+            .optionalIn(BlockInteract)
+            .build(false)
+    
 }
