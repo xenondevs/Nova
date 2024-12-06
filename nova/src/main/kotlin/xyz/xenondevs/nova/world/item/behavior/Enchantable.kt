@@ -9,6 +9,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.nova.config.entryOrElse
+import xyz.xenondevs.nova.config.optionalEntry
 import net.minecraft.world.item.enchantment.Enchantable as EnchantableComponent
 
 /**
@@ -19,8 +20,8 @@ import net.minecraft.world.item.enchantment.Enchantable as EnchantableComponent
  * Vanilla enchantment values: wood: 15, stone: 5, iron: 14, diamond: 10, gold: 22, netherite: 15
  * Used when `enchantment_value` is not specified in the item's config, or null to require the presence of a config entry.
  *
- * @param primaryEnchantments The enchantments that appear in the enchanting table. Falls back to [supportedEnchantments] if not specified.
- * Used when `primary_enchantments` is not specified in the item's config, or null to require the presence of a config entry.
+ * @param primaryEnchantments The enchantments that appear in the enchanting table.
+ * Used when `primary_enchantments` is not specified in the item's config. Falls back to [supportedEnchantments] if unspecified.
  *
  * @param supportedEnchantments The enchantments that can be applied to the item, i.e. via an anvil or commands.
  * Used when `supported_enchantments` is not specified in the item's config, or null to require the presence of a config entry.
@@ -34,7 +35,7 @@ fun Enchantable(
     val cfg = it.config
     
     val supportedEnchantments = cfg.entryOrElse(supportedEnchantments, "supported_enchantments")
-    val primaryEnchantments = cfg.entryOrElse(primaryEnchantments, "primary_enchantments").orElse(supportedEnchantments)
+    val primaryEnchantments = cfg.optionalEntry<Set<Enchantment>>("primary_enchantments").orElse(primaryEnchantments).orElse(supportedEnchantments)
     
     Enchantable(
         cfg.entryOrElse(enchantmentValue, "enchantment_value"),
