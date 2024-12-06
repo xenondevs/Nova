@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.serialization.kotlinx.ColorAsIntSerializer
 import java.awt.Color
 
 @Serializable
-internal class EquipmentModel(
+internal class EquipmentDefinition(
     val layers: Map<Type, List<Layer>>
 ) {
     

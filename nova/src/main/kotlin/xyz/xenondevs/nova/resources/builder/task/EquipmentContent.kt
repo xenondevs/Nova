@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.data.EquipmentModel
+import xyz.xenondevs.nova.resources.builder.data.EquipmentDefinition
 import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayout
 import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayout.Animation
 import xyz.xenondevs.nova.resources.builder.layout.equipment.InterpolationMode
@@ -107,7 +107,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
     private fun generateAnimatedEquipmentTexture(id: ResourcePath<ResourceType.Equipment>, layout: AnimatedEquipmentLayout): List<Key> {
         // generate all animations (merge with emissivity map, apply interpolation)
         // [equipmentType][layer][frame]
-        val animations: Map<EquipmentModel.Type, List<List<ResourcePath<ResourceType.EquipmentTexture>>>> =
+        val animations: Map<EquipmentDefinition.Type, List<List<ResourcePath<ResourceType.EquipmentTexture>>>> =
             layout.types.mapValues { (_, layers) -> layers.map(::generateLayerAnimation) }
         
         // find the total frame count needed to display all animations using a single frame number
@@ -120,17 +120,17 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
             val path = ResourcePath(ResourceType.Equipment, id.namespace, id.path + "_$frame")
             textureFrames += path
             
-            val equipmentModelForFrame = EquipmentModel(
+            val equipmentDefinitionForFrame = EquipmentDefinition(
                 layout.types.mapValues { (equipmentType, layers) ->
                     layers.withIndex().map { (layerIdx, layer) ->
                         val layerFrames = animations[equipmentType]!![layerIdx]
                         val texture = layerFrames[frame % layerFrames.size]
-                        EquipmentModel.Layer(texture, false, layer.dyeable)
+                        EquipmentDefinition.Layer(texture, false, layer.dyeable)
                     }
                 }
             )
             
-            builder.writeJson(path, equipmentModelForFrame)
+            builder.writeJson(path, equipmentDefinitionForFrame)
         }
         
         return textureFrames
@@ -303,7 +303,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
     /**
      * Checks whether all textures referenced in [model] exist and throws an exception if not.
      */
-    private fun validateEquipmentModel(model: EquipmentModel) {
+    private fun validateEquipmentModel(model: EquipmentDefinition) {
         for ((_, layers) in model.layers) {
             for (layer in layers) {
                 builder.findOrThrow(layer.texture)

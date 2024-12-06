@@ -204,11 +204,11 @@ sealed interface ResourceType {
     /**
      * Equipment definitions
      *
-     * path: `models/equipment`, extension: `json`
+     * path: `equipment`, extension: `json`
      */
     @Serializable
     data object Equipment : JsonFile {
-        override val prefix = "models/equipment"
+        override val prefix = "equipment"
     }
     
     /**

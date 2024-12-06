@@ -4,7 +4,7 @@ import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.data.EquipmentModel
+import xyz.xenondevs.nova.resources.builder.data.EquipmentDefinition
 import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayout.Animation
 import java.awt.Color
 
@@ -14,7 +14,7 @@ class AnimatedEquipmentLayoutBuilder internal constructor(
     val resourcePackBuilder: ResourcePackBuilder
 ) {
     
-    private var layers = HashMap<EquipmentModel.Type, List<AnimatedEquipmentLayout.Layer<*>>>()
+    private var layers = HashMap<EquipmentDefinition.Type, List<AnimatedEquipmentLayout.Layer<*>>>()
     private var cameraOverlay: Animation<ResourceType.Texture>? = null
     
     /**
@@ -26,7 +26,7 @@ class AnimatedEquipmentLayoutBuilder internal constructor(
      */
     fun humanoid(builder: AnimatedEquipmentLayersBuilder<ResourceType.HumanoidEquipmentTexture>.() -> Unit) {
         val humanoidLayers = AnimatedEquipmentLayersBuilder(namespace, ResourceType.HumanoidEquipmentTexture, resourcePackBuilder).apply(builder).build()
-        layers[EquipmentModel.Type.HUMANOID] = humanoidLayers
+        layers[EquipmentDefinition.Type.HUMANOID] = humanoidLayers
     }
     
     /**
@@ -38,7 +38,7 @@ class AnimatedEquipmentLayoutBuilder internal constructor(
      */
     fun humanoidLeggings(builder: AnimatedEquipmentLayersBuilder<ResourceType.HumanoidLegginsEquipmentTexture>.() -> Unit) {
         val humanoidLayers = AnimatedEquipmentLayersBuilder(namespace, ResourceType.HumanoidLegginsEquipmentTexture, resourcePackBuilder).apply(builder).build()
-        layers[EquipmentModel.Type.HUMANOID_LEGGINGS] = humanoidLayers
+        layers[EquipmentDefinition.Type.HUMANOID_LEGGINGS] = humanoidLayers
     }
     
     /**
@@ -46,7 +46,7 @@ class AnimatedEquipmentLayoutBuilder internal constructor(
      * `textures/entity/equipment/wolf_body/`.
      */
     fun wolfBody(builder: AnimatedEquipmentLayersBuilder<ResourceType.WolfBodyEquipmentTexture>.() -> Unit) {
-        layers[EquipmentModel.Type.WOLF_BODY] = AnimatedEquipmentLayersBuilder(namespace, ResourceType.WolfBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
+        layers[EquipmentDefinition.Type.WOLF_BODY] = AnimatedEquipmentLayersBuilder(namespace, ResourceType.WolfBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
     }
     
     /**
@@ -54,7 +54,7 @@ class AnimatedEquipmentLayoutBuilder internal constructor(
      * `textures/entity/equipment/horse_body/`.
      */
     fun horseBody(builder: AnimatedEquipmentLayersBuilder<ResourceType.HorseBodyEquipmentTexture>.() -> Unit) {
-        layers[EquipmentModel.Type.HORSE_BODY] = AnimatedEquipmentLayersBuilder(namespace, ResourceType.HorseBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
+        layers[EquipmentDefinition.Type.HORSE_BODY] = AnimatedEquipmentLayersBuilder(namespace, ResourceType.HorseBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
     }
     
     /**
@@ -62,7 +62,7 @@ class AnimatedEquipmentLayoutBuilder internal constructor(
      * `textures/entity/equipment/llama_body/`.
      */
     fun llamaBody(builder: AnimatedEquipmentLayersBuilder<ResourceType.LlamaBodyEquipmentTexture>.() -> Unit) {
-        layers[EquipmentModel.Type.LLAMA_BODY] = AnimatedEquipmentLayersBuilder(namespace, ResourceType.LlamaBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
+        layers[EquipmentDefinition.Type.LLAMA_BODY] = AnimatedEquipmentLayersBuilder(namespace, ResourceType.LlamaBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
     }
     
     /**
@@ -73,7 +73,7 @@ class AnimatedEquipmentLayoutBuilder internal constructor(
      * @see humanoidLeggings
      */
     fun wings(builder: AnimatedEquipmentLayersBuilder<ResourceType.WingsEquipmentTexture>.() -> Unit) {
-        layers[EquipmentModel.Type.WINGS] = AnimatedEquipmentLayersBuilder(namespace, ResourceType.WingsEquipmentTexture, resourcePackBuilder).apply(builder).build()
+        layers[EquipmentDefinition.Type.WINGS] = AnimatedEquipmentLayersBuilder(namespace, ResourceType.WingsEquipmentTexture, resourcePackBuilder).apply(builder).build()
     }
     
     /**
@@ -146,7 +146,7 @@ class AnimatedEquipmentLayerBuilder<T : ResourceType.EquipmentTexture> internal 
     
     private var texture: Animation<T>? = null
     private var emissivityMap: Animation<T>? = null
-    private var dyeable: EquipmentModel.Layer.Dyeable? = null
+    private var dyeable: EquipmentDefinition.Layer.Dyeable? = null
     
     
     /**
@@ -225,7 +225,7 @@ class AnimatedEquipmentLayerBuilder<T : ResourceType.EquipmentTexture> internal 
      * Setting [defaultColor] to null makes undyed armor layers invisible.
      */
     fun dyeable(defaultColor: Color?) {
-        this.dyeable = EquipmentModel.Layer.Dyeable(defaultColor)
+        this.dyeable = EquipmentDefinition.Layer.Dyeable(defaultColor)
     }
     
     internal fun build(): AnimatedEquipmentLayout.Layer<T> {

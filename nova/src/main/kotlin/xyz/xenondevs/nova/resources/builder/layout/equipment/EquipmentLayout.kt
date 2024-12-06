@@ -2,19 +2,19 @@ package xyz.xenondevs.nova.resources.builder.layout.equipment
 
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
-import xyz.xenondevs.nova.resources.builder.data.EquipmentModel
+import xyz.xenondevs.nova.resources.builder.data.EquipmentDefinition
 
 internal sealed interface EquipmentLayout
 
 internal data class StaticEquipmentLayout(
-    val types: Map<EquipmentModel.Type, List<Layer<*>>>,
+    val types: Map<EquipmentDefinition.Type, List<Layer<*>>>,
     val cameraOverlay: ResourcePath<ResourceType.Texture>?
 ) : EquipmentLayout {
     
-    fun toEquipmentModel() = EquipmentModel(
+    fun toEquipmentModel() = EquipmentDefinition(
         types.mapValues { (_, layers) ->
             layers.map { layer ->
-                EquipmentModel.Layer(layer.texture, layer.usePlayerTexture, layer.dyeable)
+                EquipmentDefinition.Layer(layer.texture, layer.usePlayerTexture, layer.dyeable)
             }
         }
     )
@@ -24,13 +24,13 @@ internal data class StaticEquipmentLayout(
         val texture: ResourcePath<T>,
         val usePlayerTexture: Boolean,
         val emissivityMap: ResourcePath<T>?,
-        val dyeable: EquipmentModel.Layer.Dyeable?
+        val dyeable: EquipmentDefinition.Layer.Dyeable?
     )
     
 }
 
 internal data class AnimatedEquipmentLayout(
-    val types: Map<EquipmentModel.Type, List<Layer<*>>>,
+    val types: Map<EquipmentDefinition.Type, List<Layer<*>>>,
     val cameraOverlay: Animation<ResourceType.Texture>?
 ) : EquipmentLayout {
     
@@ -38,7 +38,7 @@ internal data class AnimatedEquipmentLayout(
         val resourceType: T,
         val texture: Animation<T>,
         val emissivityMap: Animation<T>?,
-        val dyeable: EquipmentModel.Layer.Dyeable?
+        val dyeable: EquipmentDefinition.Layer.Dyeable?
     )
     
     internal data class Animation<out T : ResourceType.Texture>(

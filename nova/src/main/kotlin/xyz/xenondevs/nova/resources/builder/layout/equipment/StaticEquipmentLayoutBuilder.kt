@@ -4,7 +4,7 @@ import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.data.EquipmentModel
+import xyz.xenondevs.nova.resources.builder.data.EquipmentDefinition
 import java.awt.Color
 import java.lang.IllegalArgumentException
 
@@ -14,7 +14,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
     val resourcePackBuilder: ResourcePackBuilder
 ) {
     
-    private val layers = HashMap<EquipmentModel.Type, List<StaticEquipmentLayout.Layer<*>>>()
+    private val layers = HashMap<EquipmentDefinition.Type, List<StaticEquipmentLayout.Layer<*>>>()
     private var cameraOverlay: ResourcePath<ResourceType.Texture>? = null
     
     /**
@@ -25,7 +25,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
      * @see wings
      */
     fun humanoid(builder: StaticArmorLayersBuilder<ResourceType.HumanoidEquipmentTexture>.() -> Unit) {
-        layers[EquipmentModel.Type.HUMANOID] = StaticArmorLayersBuilder(namespace, ResourceType.HumanoidEquipmentTexture, resourcePackBuilder).apply(builder).build()
+        layers[EquipmentDefinition.Type.HUMANOID] = StaticArmorLayersBuilder(namespace, ResourceType.HumanoidEquipmentTexture, resourcePackBuilder).apply(builder).build()
     }
     
     /**
@@ -36,7 +36,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
      * @see wings
      */
     fun humanoidLeggings(builder: StaticArmorLayersBuilder<ResourceType.HumanoidLegginsEquipmentTexture>.() -> Unit) {
-        layers[EquipmentModel.Type.HUMANOID_LEGGINGS] = StaticArmorLayersBuilder(namespace, ResourceType.HumanoidLegginsEquipmentTexture, resourcePackBuilder).apply(builder).build()
+        layers[EquipmentDefinition.Type.HUMANOID_LEGGINGS] = StaticArmorLayersBuilder(namespace, ResourceType.HumanoidLegginsEquipmentTexture, resourcePackBuilder).apply(builder).build()
     }
     
     /**
@@ -44,7 +44,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
      * `textures/entity/equipment/wolf_body/`.
      */
     fun wolfBody(builder: StaticArmorLayersBuilder<ResourceType.WolfBodyEquipmentTexture>.() -> Unit) {
-        layers[EquipmentModel.Type.WOLF_BODY] = StaticArmorLayersBuilder(namespace, ResourceType.WolfBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
+        layers[EquipmentDefinition.Type.WOLF_BODY] = StaticArmorLayersBuilder(namespace, ResourceType.WolfBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
     }
     
     /**
@@ -52,7 +52,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
      * `textures/entity/equipment/horse_body/`.
      */
     fun horseBody(builder: StaticArmorLayersBuilder<ResourceType.HorseBodyEquipmentTexture>.() -> Unit) {
-        layers[EquipmentModel.Type.HORSE_BODY] = StaticArmorLayersBuilder(namespace, ResourceType.HorseBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
+        layers[EquipmentDefinition.Type.HORSE_BODY] = StaticArmorLayersBuilder(namespace, ResourceType.HorseBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
     }
     
     /**
@@ -60,7 +60,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
      * `textures/entity/equipment/llama_body/`.
      */
     fun llamaBody(builder: StaticArmorLayersBuilder<ResourceType.LlamaBodyEquipmentTexture>.() -> Unit) {
-        layers[EquipmentModel.Type.LLAMA_BODY] = StaticArmorLayersBuilder(namespace, ResourceType.LlamaBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
+        layers[EquipmentDefinition.Type.LLAMA_BODY] = StaticArmorLayersBuilder(namespace, ResourceType.LlamaBodyEquipmentTexture, resourcePackBuilder).apply(builder).build()
     }
     
     /**
@@ -71,7 +71,7 @@ class StaticEquipmentLayoutBuilder internal constructor(
      * @see humanoidLeggings
      */
     fun wings(builder: StaticArmorLayersBuilder<ResourceType.WingsEquipmentTexture>.() -> Unit) {
-        layers[EquipmentModel.Type.WINGS] = StaticArmorLayersBuilder(namespace, ResourceType.WingsEquipmentTexture, resourcePackBuilder).apply(builder).build()
+        layers[EquipmentDefinition.Type.WINGS] = StaticArmorLayersBuilder(namespace, ResourceType.WingsEquipmentTexture, resourcePackBuilder).apply(builder).build()
     }
     
     /**
@@ -125,7 +125,7 @@ class StaticEquipmentLayerBuilder<T : ResourceType.EquipmentTexture> internal co
     private var texture: ResourcePath<T>? = null
     private var usePlayerTexture = false
     private var emissivityMap: ResourcePath<T>? = null
-    private var dyeable: EquipmentModel.Layer.Dyeable? = null
+    private var dyeable: EquipmentDefinition.Layer.Dyeable? = null
     
     /**
      * Uses the texture under `assets/<namespace>/textures/entity/equipment/<type>/<texture>.png`, where
@@ -170,7 +170,7 @@ class StaticEquipmentLayerBuilder<T : ResourceType.EquipmentTexture> internal co
      * Setting [defaultColor] to null makes undyed armor layers invisible.
      */
     fun dyeable(defaultColor: Color?) {
-        this.dyeable = EquipmentModel.Layer.Dyeable(defaultColor)
+        this.dyeable = EquipmentDefinition.Layer.Dyeable(defaultColor)
     }
     
     internal fun build(): StaticEquipmentLayout.Layer<T> {
