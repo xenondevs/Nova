@@ -18,10 +18,10 @@ import xyz.xenondevs.nova.util.unwrap
  * Used when `max_durability` is not specified in the item's config, or `null` to require the presence of a config entry.
  *
  * @param itemDamageOnAttackEntity The amount of damage the item receives when attacking an entity.
- * Used when `item_damage_on_attack_entity` is not specified in the item's config, or `null` to require the presence of a config entry.
+ * Used when `item_damage_on_attack_entity` is not specified in the item's config.
  *
  * @param itemDamageOnBreakBlock The amount of damage the item receives when breaking a block.
- * Used when `item_damage_on_break_block` is not specified in the item's config, or `null` to require the presence of a config entry.
+ * Used when `item_damage_on_break_block` is not specified in the item's config.
  *
  * @param repairIngredient The ingredient required to repair the item. Can be null for items that cannot be repaired.
  * Used when `repair_ingredient` is not specified in the item's config.
@@ -29,8 +29,8 @@ import xyz.xenondevs.nova.util.unwrap
 @Suppress("FunctionName")
 fun Damageable(
     maxDurability: Int? = null,
-    itemDamageOnAttackEntity: Int? = null,
-    itemDamageOnBreakBlock: Int? = null,
+    itemDamageOnAttackEntity: Int = 0,
+    itemDamageOnBreakBlock: Int = 0,
     repairIngredient: RecipeChoice? = null
 ) = ItemBehaviorFactory<Damageable> {
     val cfg = it.config
