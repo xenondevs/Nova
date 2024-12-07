@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.redstone.Orientation
-import org.bukkit.block.data.BlockData
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
@@ -26,7 +25,6 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.patch.MultiTransformer
-import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
@@ -136,7 +134,7 @@ internal object BlockBehaviorPatches : MultiTransformer(BlockStateBase::class, S
                         WorldDataManager.setBlockState(novaPos, newState)
                         return when (val info = newState.modelProvider.info) {
                             is BackingStateConfig -> info.vanillaBlockState
-                            is BlockData -> info.nmsBlockState
+                            is BlockState -> info
                             is DisplayEntityBlockModelData -> {
                                 novaState.modelProvider.unload(novaPos)
                                 newState.modelProvider.load(novaPos)

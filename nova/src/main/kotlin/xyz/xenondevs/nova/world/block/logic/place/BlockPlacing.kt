@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.world.block.logic.place
 
 import kotlinx.coroutines.runBlocking
 import net.minecraft.core.component.DataComponents
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
-import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -137,7 +137,7 @@ internal object BlockPlacing : Listener {
         val vanillaState = when (val info = newState.modelProvider.info) {
             is BackingStateConfig -> info.vanillaBlockState.bukkitBlockData
             is DisplayEntityBlockModelData -> info.hitboxType.bukkitBlockData
-            is BlockData -> info
+            is BlockState -> info.bukkitBlockData
             else -> throw UnsupportedOperationException()
         }
         
