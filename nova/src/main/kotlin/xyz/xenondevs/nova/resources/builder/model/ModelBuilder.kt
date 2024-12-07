@@ -11,6 +11,7 @@ import org.joml.primitives.AABBdc
 import xyz.xenondevs.nova.resources.builder.model.transform.BuildAction
 import xyz.xenondevs.nova.resources.builder.model.transform.CombinationAction
 import xyz.xenondevs.nova.resources.builder.model.transform.ContextualModelBuildAction
+import xyz.xenondevs.nova.resources.builder.model.transform.FlatteningAction
 import xyz.xenondevs.nova.resources.builder.model.transform.NonContextualModelBuildAction
 import xyz.xenondevs.nova.resources.builder.model.transform.RotationTransform
 import xyz.xenondevs.nova.resources.builder.model.transform.ScaleTransform
@@ -199,6 +200,12 @@ class ModelBuilder(private val base: Model) {
         action(CombinationAction(model))
     
     /**
+     * Flattens the model by merging it with all parents.
+     */
+    fun flatten(): ModelBuilder =
+        action(FlatteningAction())
+    
+    /**
      * Builds the model according to the configured [actions].
      *
      * The [context] parameter is only required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
@@ -293,6 +300,7 @@ class ModelBuilder(private val base: Model) {
         for (action in actions) {
             when (action) {
                 is Transform -> models.forEach { (_, matrix) -> action.apply(matrix) }
+                is FlatteningAction -> Unit // flattening should not be required for display entity models (?)
                 is CombinationAction -> models += action.other.buildDisplayEntity(context)
                     .map { (model, matrix) -> model to Matrix4d(matrix) }
             }
