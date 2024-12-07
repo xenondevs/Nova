@@ -1,8 +1,5 @@
 package xyz.xenondevs.nova.resources.builder.layout.item
 
-import com.ibm.icu.text.SimpleDateFormat
-import com.ibm.icu.util.TimeZone
-import com.ibm.icu.util.ULocale
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.EntityType
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
@@ -150,14 +147,23 @@ sealed class SelectItemModelProperty<T>(internal val property: SelectItemModel.P
     /**
      * Returns the current time in [timeZone] formatted according to the given [pattern]
      *
-     * @param timeZone The time zone to use for formatting the time.
-     * @param locale The locale to use for formatting the time, or `null` for the root locale.
-     * @param pattern The pattern to use for formatting the time, interpreted by [SimpleDateFormat].
+     * @param timeZone The time zone to use for formatting the time. If not present, defaults to the timezone set by the client.
+     * Examples:
+     * - `Europe/Stockholm`
+     * - `GMT+0:45`
+     * @param locale The locale to use for formatting the time, or `""` for the root locale.
+     * Examples:
+     * - `en_US`: English language (used for things like week names), formating as in the USA.
+     * - `cs_AU@numbers=thai;calendar=japanese`: Czech language, Australian formatting, Thai numerals and Japanese calendar
+     * @param pattern The pattern to be used for formatting the time.
+     * Examples:
+     * - `yyyy-MM-dd`: 4-digit year number, then 2-digit month number, then 2-digit day of month number, all zero-padded if needed, separated by `-`.
+     * - `HH:mm:ss`: current time (hours, minutes, seconds), 24-hour cycle, all zero-padded to 2 digits of needed, separated by `:`.
      */
     class LocalTime(
         private val pattern: String,
-        private val timeZone: TimeZone,
-        private val locale: ULocale? = null
+        private val timeZone: String? = null,
+        private val locale: String = ""
     ) : SelectItemModelProperty<String>(SelectItemModel.Property.LOCAL_TIME) {
         
         override fun toString(value: String) = value
@@ -167,8 +173,8 @@ sealed class SelectItemModelProperty<T>(internal val property: SelectItemModel.P
                 property,
                 cases,
                 fallback,
-                locale = locale?.name ?: "",
-                timeZone = timeZone.id,
+                locale = locale,
+                timeZone = timeZone,
                 pattern = pattern
             )
         

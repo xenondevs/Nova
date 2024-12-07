@@ -18,7 +18,6 @@ dependencies {
     novaLoaderApi(libs.bundles.xenondevs.commons)
     novaLoaderApi(libs.invui.kotlin)
     novaLoaderApi(libs.joml.primitives)
-    novaLoaderApi(libs.icu4j)
     
     // internal dependencies
     compileOnly(project(":nova-api"))
