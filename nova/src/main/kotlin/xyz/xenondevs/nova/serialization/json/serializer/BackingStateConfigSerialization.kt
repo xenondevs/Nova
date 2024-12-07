@@ -19,7 +19,7 @@ internal object BackingStateConfigSerialization : JsonSerializer<BackingStateCon
     
     override fun serialize(src: BackingStateConfig, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
         val obj = JsonObject()
-        obj.addProperty("type", src::class.jvmName)
+        obj.addProperty("type", src.type::class.jvmName)
         obj.addProperty("id", src.id)
         obj.addProperty("waterlogged", src.waterlogged)
         return obj
