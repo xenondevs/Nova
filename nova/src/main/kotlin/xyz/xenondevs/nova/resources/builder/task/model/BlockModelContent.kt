@@ -6,6 +6,7 @@ import xyz.xenondevs.commons.collections.associateNotNull
 import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.commons.gson.getObjectOrNull
+import xyz.xenondevs.commons.gson.getOrPut
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.LOGGER
@@ -211,7 +212,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         
         blockStatePosition[type] = pos
         
-        return if (pos < type.maxId) type.of(pos, waterlogged) else null
+        return if (pos <= type.maxId) type.of(pos, waterlogged) else null
     }
     
     /**
@@ -251,19 +252,25 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
      */
     @PackTask(runAfter = ["ModelContent#discoverAllModels"])
     private fun writeBlockStateFiles() {
+        // some backing state config types cover the same file
+        val fileContents = HashMap<Path, JsonObject>()
+        
         variantByConfig.entries
             .groupBy { (cfg, _) -> cfg.type }
             .forEach { (type, entries) ->
-                val obj = JsonObject()
-                val variantsObj = JsonObject().also { obj.add("variants", it) }
+                val blockStateFile = getBlockStateFile(type)
+                
+                val obj = fileContents.getOrPut(blockStateFile, ::JsonObject)
+                val variantsObj = obj.getOrPut("variants", ::JsonObject)
                 for ((cfg, variantData) in entries) {
                     variantsObj.add(cfg.variantString, GSON.toJsonTree(variantData))
                 }
-                
-                val blockStateFile = getBlockStateFile(type)
-                blockStateFile.createParentDirectories()
-                obj.writeToFile(blockStateFile)
             }
+        
+        for ((path, obj) in fileContents) {
+            path.createParentDirectories()
+            obj.writeToFile(path)
+        }
     }
     
     /**
