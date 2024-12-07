@@ -130,7 +130,7 @@
   "command.nova.show_block_model_data.model_less": "この %s は次のバニラ・ブロックを使用しています: %s。",
   "command.nova.show_block_model_data.backing_state": "この %s は以下のバッキング状態の構成を使用します：\nブロック: %s\nバリアント: %s",
   "command.nova.show_block_model_data.display_entity": "この %s は以下の表示エンティティ構成を使用します：\nヒットボックス・タイプ: %s\nモデル (%s)：\n%s",
-  "command.nova.show_block_model_data.display_entity.model": "- モデル: %s とカスタム・モデル・データ: %s\n  翻訳: %s\n  左回転: %s\n  スケール: %s\n  右回転: %s",
+  "command.nova.show_block_model_data.display_entity.model": "- 項目: %s\n  翻訳: %s\n  左回転: %s\n  スケール: %s\n  右回転: %s",
   "command.nova.show_block_model_data.failure": "ノヴァのブロックを見て、もう一度試してください。",
   "command.nova.show_network_node_info.end_point.header": "この %s（エンド・ポイント）には以下のデータがあります：",
   "command.nova.show_network_node_info.end_point.networks.entry": "タイプ：s、方向：%s、ID：%s",
