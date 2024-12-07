@@ -29,7 +29,7 @@ import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.command.Command
 import xyz.xenondevs.nova.command.argument.NetworkTypeArgumentType
 import xyz.xenondevs.nova.command.argument.NovaBlockArgumentType
@@ -891,10 +891,8 @@ internal object NovaCommand : Command() {
     }
     
     private fun sendAddons(ctx: CommandContext<CommandSourceStack>) {
-        val addons = Bukkit.getPluginManager().plugins
-            .filter { it is Addon }
-        
         val builder = Component.text()
+        val addons = AddonBootstrapper.addons
         builder.append(Component.translatable("command.nova.addons.header", Component.text(addons.size)))
         for ((i, addon) in addons.withIndex()) {
             val meta = addon.pluginMeta
