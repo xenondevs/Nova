@@ -14,8 +14,8 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.patch.impl.item.EnchantmentPatches
 import xyz.xenondevs.nova.patch.impl.registry.plusAssign
 import xyz.xenondevs.nova.registry.LazyRegistryElementBuilder
-import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.Key
+import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.world.item.behavior.Enchantable
 import java.util.*
 import net.minecraft.world.item.enchantment.Enchantment as MojangEnchantment

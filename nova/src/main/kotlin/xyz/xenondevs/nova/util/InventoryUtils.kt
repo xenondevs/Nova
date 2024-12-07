@@ -12,6 +12,7 @@ import xyz.xenondevs.invui.internal.util.InventoryUtils
 import xyz.xenondevs.invui.inventory.ReferencingInventory
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.UpdateReason
+import xyz.xenondevs.nova.util.item.isNullOrEmpty
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 
 /**
@@ -62,6 +63,31 @@ fun Player.addToInventoryOrDrop(items: List<ItemStack>) {
             val drop = it.clone().apply { amount = leftover }
             InventoryUtils.dropItemLikePlayer(this, drop)
         }
+    }
+}
+
+/**
+ * Puts an [ItemStack] on the [prioritizedSlot] or adds it to the [Inventory][PlayerInventory]
+ * if the given slot is occupied or drops it on the ground if there is not enough space.
+ */
+fun Player.addToInventoryPrioritizedOrDrop(prioritizedSlot: EquipmentSlot, itemStack: ItemStack) {
+    val inventory = inventory
+    if (inventory.getItem(prioritizedSlot).isEmpty) {
+        inventory.setItem(prioritizedSlot, itemStack)
+    } else {
+        addToInventoryOrDrop(itemStack)
+    }
+}
+/**
+ * Puts an [ItemStack] on the [prioritizedSlot] or adds it to the [Inventory]
+ * if the given slot is occupied or drops it on the ground if there is not enough space.
+ */
+fun Player.addToInventoryPrioritizedOrDrop(prioritizedSlot: Int, itemStack: ItemStack) {
+    val inventory = inventory
+    if (inventory.getItem(prioritizedSlot).isNullOrEmpty()) {
+        inventory.setItem(prioritizedSlot, itemStack)
+    } else {
+        addToInventoryOrDrop(itemStack)
     }
 }
 

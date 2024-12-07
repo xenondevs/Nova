@@ -5,7 +5,6 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
-import org.bukkit.block.data.BlockData
 import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -17,7 +16,6 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes

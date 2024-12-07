@@ -1,14 +1,12 @@
 package xyz.xenondevs.nova.world.block.state.property
 
 import net.kyori.adventure.key.Key
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
 import org.bukkit.Axis
 import org.bukkit.Fluid
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.BlockFaceUtils
-import xyz.xenondevs.nova.util.Instrument
 import xyz.xenondevs.nova.util.axis
 import xyz.xenondevs.nova.util.calculateYaw
 import xyz.xenondevs.nova.util.calculateYawPitch

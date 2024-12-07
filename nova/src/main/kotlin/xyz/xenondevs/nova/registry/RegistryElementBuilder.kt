@@ -9,9 +9,9 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.patch.impl.registry.preFreeze
+import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.contains
-import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HOLDER_REFERENCE_BIND_VALUE_METHOD
 import xyz.xenondevs.nova.util.register
 import xyz.xenondevs.nova.util.set
