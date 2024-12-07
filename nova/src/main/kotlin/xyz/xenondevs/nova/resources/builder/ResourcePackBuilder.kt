@@ -414,6 +414,12 @@ class ResourcePackBuilder internal constructor() {
         MCASSETS_DIR.resolve("${path.filePath}.mcmeta")
     
     /**
+     * Resolves the file under [path] in the vanilla minecraft assets.
+     */
+    fun resolveVanilla(path: String): Path =
+        MCASSETS_DIR.resolve(path)
+    
+    /**
      * Resolves the file under [path] in the resource pack.
      */
     fun resolve(path: ResourcePath<*>): Path =
