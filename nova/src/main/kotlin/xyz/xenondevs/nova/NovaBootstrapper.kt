@@ -43,7 +43,8 @@ internal class NovaBootstrapper : PluginBootstrap {
     /**
      * Numbers of addons that still await bootstrapping.
      */
-    private var remainingAddons = 0
+    var remainingAddons = 0
+        private set
     
     init {
         BOOTSTRAPPER = this

@@ -45,6 +45,9 @@ internal var PLUGIN_READY = false
 internal object Nova : JavaPlugin(), INova {
     
     override fun onEnable() {
+        if (BOOTSTRAPPER.remainingAddons > 0)
+            throw IllegalStateException("${BOOTSTRAPPER.remainingAddons} addons did not load.")
+        
         PLUGIN_READY = true
         LIFECYCLE_MANAGER = lifecycleManager
         
