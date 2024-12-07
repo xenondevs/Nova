@@ -11,9 +11,8 @@ import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
-import xyz.xenondevs.nova.util.addItemCorrectly
-import xyz.xenondevs.nova.util.addPrioritized
-import xyz.xenondevs.nova.util.dropItem
+import xyz.xenondevs.nova.util.addToInventoryOrDrop
+import xyz.xenondevs.nova.util.addToInventoryPrioritizedOrDrop
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -146,9 +145,7 @@ object Bucketable : BlockBehavior {
         val bucket = ItemStack(Material.BUCKET)
         if (itemStack.amount > 1) {
             itemStack.amount--
-            if (player.inventory.addItemCorrectly(bucket) > 0) {
-                player.location.dropItem(bucket)
-            }
+            player.addToInventoryOrDrop(bucket)
         } else {
             player.inventory.setItem(hand, bucket)
         }
@@ -157,7 +154,7 @@ object Bucketable : BlockBehavior {
     internal fun fillBucketInHand(player: Player, hand: EquipmentSlot, fluidType: FluidType) {
         val bucket = fluidType.bucket
         player.inventory.getItem(hand).amount--
-        player.inventory.addPrioritized(hand, bucket)
+        player.addToInventoryPrioritizedOrDrop(hand, bucket)
     }
     
 }

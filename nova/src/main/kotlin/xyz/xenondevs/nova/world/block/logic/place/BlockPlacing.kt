@@ -5,15 +5,19 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
+import org.bukkit.block.data.BlockData
+import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.addon.AddonsInitializer
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
@@ -24,6 +28,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.advance
 import xyz.xenondevs.nova.util.bukkitBlockData
+import xyz.xenondevs.nova.util.dropItem
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isReplaceable
@@ -76,6 +81,19 @@ internal object BlockPlacing : Listener {
     private fun handleFluidRemove(event: PlayerBucketFillEvent) {
         val blockState = WorldDataManager.getBlockState(event.block.pos)
         event.isCancelled = blockState != null && blockState.block.id.namespace() != "nova"
+    }
+    
+    @EventHandler(ignoreCancelled = true)
+    private fun handleFallingBlockLand(event: EntityChangeBlockEvent) {
+        val entity = event.entity
+        if (entity is FallingBlock) {
+            val pos = event.block.pos
+            val blockState = WorldDataManager.getBlockState(pos)
+            if (blockState != null) {
+                event.isCancelled = true
+                event.block.location.dropItem(ItemStack(entity.blockData.material))
+            }
+        }
     }
     
     @EventHandler(priority = EventPriority.HIGH)

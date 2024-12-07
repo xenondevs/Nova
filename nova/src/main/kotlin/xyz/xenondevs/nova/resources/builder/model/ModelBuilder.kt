@@ -323,11 +323,14 @@ class ModelBuilder(private val base: Model) {
         val revIt = actions.asReversed().iterator()
         while (revIt.hasNext()) {
             val tf = revIt.next()
-            when {
+            when { // rotation order in variant: x -> y
+                
                 tf is RotationTransform && tf.axis == Model.Axis.X && tf.rot % 90 == 0.0 ->
                     rotations.add(tf.rot.toInt(), 0)
                 
-                tf is RotationTransform && tf.axis == Model.Axis.Y && tf.rot % 90 == 0.0 ->
+                // y rotation can only be applied after x rotation, and since the order is reversed,
+                // we can only apply y rotation if x rotation was not already applied
+                tf is RotationTransform && tf.axis == Model.Axis.Y && tf.rot % 90 == 0.0 && rotations.x() == 0 ->
                     rotations.add(0, -tf.rot.toInt())
                 
                 else -> break

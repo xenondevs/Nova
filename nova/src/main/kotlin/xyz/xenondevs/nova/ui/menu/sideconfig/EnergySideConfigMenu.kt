@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.DefaultNetworkType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.EnergyHolder
 
-internal class EnergySideConfigMenu(
+class EnergySideConfigMenu(
     endPoint: NetworkEndPoint,
     holder: EnergyHolder
 ) : AbstractSideConfigMenu<EnergyHolder>(endPoint, DefaultNetworkTypes.ENERGY, holder) {

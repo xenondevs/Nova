@@ -5,7 +5,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.DefaultNetworkType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
 
-internal class FluidSideConfigMenu(
+class FluidSideConfigMenu(
     endPoint: NetworkEndPoint,
     holder: FluidHolder,
     containers: Map<NetworkedFluidContainer, String>

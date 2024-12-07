@@ -45,6 +45,13 @@ fun Inventory.addItemCorrectly(itemStack: ItemStack): Int =
 
 /**
  * Adds [items] to the [Player's][Player] inventory or drops them on
+ * the ground if there is not enough space
+ */
+fun Player.addToInventoryOrDrop(vararg items: ItemStack) =
+    addToInventoryOrDrop(items.asList())
+
+/**
+ * Adds [items] to the [Player's][Player] inventory or drops them on
  * the ground if there is not enough space.
  */
 fun Player.addToInventoryOrDrop(items: List<ItemStack>) {

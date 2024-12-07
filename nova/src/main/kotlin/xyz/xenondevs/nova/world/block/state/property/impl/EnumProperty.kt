@@ -26,9 +26,9 @@ internal class ScopedEnumProperty<E : Enum<E>>(
     enumClass: Class<E>,
     values: Set<E>,
     initializer: BlockStatePropertyInitializer<E>
-) : ScopedBlockStateProperty<E>(property, values, initializer) {
+) : ScopedBlockStateProperty<E>(property, EnumSet.copyOf(values), initializer) {
     
-    private val idToValue: List<E> = values.toList().sorted()
+    private val idToValue: List<E> = values.toList()
     private val valueToId: Map<E, Int> = idToValue.withIndex().associateTo(EnumMap(enumClass)) { (index, value) -> value to index }
     private val stringToValue: Map<String, E> = idToValue.associateByTo(HashMap()) { it.name.lowercase() }
     

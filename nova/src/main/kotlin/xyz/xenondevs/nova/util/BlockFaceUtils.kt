@@ -212,7 +212,7 @@ object BlockFaceUtils {
     /**
      * Gets the closest [BlockFace] to [yaw].
      */
-    fun toRotation(yaw: Float): BlockFace {
+    fun toRotation(yaw: Float): BlockFace { // fixme: should be toFace
         val yawMod = yaw.mod(360f)
         return when {
             yawMod >= 348.75 -> SOUTH

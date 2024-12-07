@@ -1,12 +1,15 @@
 package xyz.xenondevs.nova.world.block.state.property
 
 import net.kyori.adventure.key.Key
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
 import org.bukkit.Axis
 import org.bukkit.Fluid
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.util.BlockFaceUtils
+import xyz.xenondevs.nova.util.Instrument
+import xyz.xenondevs.nova.util.axis
 import xyz.xenondevs.nova.util.calculateYaw
 import xyz.xenondevs.nova.util.calculateYawPitch
 import xyz.xenondevs.nova.world.block.behavior.LeavesBehavior
@@ -115,11 +118,8 @@ object DefaultScopedBlockStateProperties {
      * A scope for [DefaultBlockStateProperties.AXIS] for all three axes [Axis.X], [Axis.Y] and [Axis.Z].
      */
     val AXIS: ScopedBlockStateProperty<Axis> =
-        DefaultBlockStateProperties.AXIS.scope(Axis.X, Axis.Y, Axis.Z) { ctx ->
-            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
-                ?.calculateYawPitch()
-                ?.let { (yaw, pitch) -> BlockFaceUtils.toAxis(yaw, pitch) }
-                ?: Axis.Y
+        DefaultBlockStateProperties.AXIS.scope(Axis.Y, Axis.X, Axis.Z) { ctx ->
+            ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]?.axis ?: Axis.Y
         }
     
     /**
@@ -127,10 +127,7 @@ object DefaultScopedBlockStateProperties {
      */
     val AXIS_HORIZONTAL: ScopedBlockStateProperty<Axis> =
         DefaultBlockStateProperties.AXIS.scope(Axis.X, Axis.Z) { ctx ->
-            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
-                ?.calculateYaw()
-                ?.let { BlockFaceUtils.toAxis(it) }
-                ?: Axis.X
+            ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]?.axis ?: Axis.X
         }
     
     /**

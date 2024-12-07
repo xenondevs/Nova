@@ -14,7 +14,7 @@ abstract class BlockStateProperty<T : Any>(val id: Key) {
      * and initialized using the given [initializer].
      */
     fun scope(vararg values: T, initializer: BlockStatePropertyInitializer<T> = { values[0] }): ScopedBlockStateProperty<T> =
-        scope(values.toHashSet(), initializer)
+        scope(values.toSet(), initializer) // keep order
     
     /**
      * Creates a new [ScopedBlockStateProperty] of this property that is limited to the given [values]
