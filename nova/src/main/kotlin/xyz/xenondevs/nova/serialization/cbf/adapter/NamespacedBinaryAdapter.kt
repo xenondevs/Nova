@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.serialization.cbf.adapter
 
+import net.kyori.adventure.key.Key
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.adapter.BinaryAdapter
@@ -53,6 +54,22 @@ internal object ResourceLocationBinaryAdapter : BinaryAdapter<ResourceLocation> 
     }
     
     override fun copy(obj: ResourceLocation, type: KType): ResourceLocation {
+        return obj
+    }
+    
+}
+
+internal object KeyBinaryAdapter : BinaryAdapter<Key> {
+    
+    override fun read(type: KType, reader: ByteReader): Key {
+        return Key.key(reader.readString())
+    }
+    
+    override fun write(obj: Key, type: KType, writer: ByteWriter) {
+        writer.writeString(obj.asString())
+    }
+    
+    override fun copy(obj: Key, type: KType): Key {
         return obj
     }
     

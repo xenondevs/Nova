@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.serialization.cbf.adapter.BlockPosBinaryAdapter
 import xyz.xenondevs.nova.serialization.cbf.adapter.BukkitItemStackBinaryAdapter
 import xyz.xenondevs.nova.serialization.cbf.adapter.ColorBinaryAdapter
 import xyz.xenondevs.nova.serialization.cbf.adapter.ItemFilterBinaryAdapter
+import xyz.xenondevs.nova.serialization.cbf.adapter.KeyBinaryAdapter
 import xyz.xenondevs.nova.serialization.cbf.adapter.LocationBinaryAdapter
 import xyz.xenondevs.nova.serialization.cbf.adapter.MojangItemStackBinaryAdapter
 import xyz.xenondevs.nova.serialization.cbf.adapter.NamespacedIdBinaryAdapter
@@ -45,6 +46,7 @@ internal object CBFAdapters {
         registerBinaryAdapter(NamespacedKeyBinaryAdapter)
         registerBinaryAdapter(NamespacedIdBinaryAdapter)
         registerBinaryAdapter(ResourceLocationBinaryAdapter)
+        registerBinaryAdapter(KeyBinaryAdapter)
         registerBinaryAdapter(VirtualInventoryBinaryAdapter)
         registerBinaryAdapter(BlockPosBinaryAdapter)
         registerBinaryAdapter(MojangItemStackBinaryAdapter)
