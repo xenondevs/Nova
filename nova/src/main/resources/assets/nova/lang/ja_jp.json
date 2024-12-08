@@ -147,7 +147,7 @@
   "command.nova.show_network_node_info.network": "タイプ：%s\nID: %s\nノード: %s (%s ブリッジ、%s エンドポイント)",
   "command.nova.show_network_node_info.node": "名前：%s\nworld: %s、x: %s、y: %s、z: %s",
   "command.nova.show_network_node_info.failure": "world: %s, x: %s, y: %s, z: %s のブロックはネットワーク・ノードではありません。",
-  "command.nova.show_item_model_data.success": "この %s with model %s はアイテム・タイプ %s とカスタム・モデル・データ %s を使用します。",
+  "command.nova.show_item_model_data.success": "この %s はモデル %s でアイテム・タイプ %s を使用しています。",
   "command.nova.show_item_model_data.no_item": "本手にノヴァのアイテムを持って、もう一度試してください。",
   "command.nova.fill.success": "x: %s, y: %s, z: %s から x: %s, y: %s, z: %s までの領域を %s で埋めることに成功しました。",
   "command.nova.give_clientside_stack.success": "インベントリにクライアント側バージョンの %s を追加しました。",

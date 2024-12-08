@@ -133,7 +133,7 @@
   "command.nova.show_block_model_data.model_less": "Estás viendo la vanilla tile-entity %s. Tiene los siguientes datos Nova:\n%s",
   "command.nova.show_block_model_data.backing_state": "Este %s utiliza la siguiente configuración de estado de respaldo:\nBloque: %s\nVariante: %s",
   "command.nova.show_block_model_data.display_entity": "Este %s utiliza la siguiente configuración de entidad de pantalla:\nTipo de Hitbox: %s\nModelos (%s):\n%s",
-  "command.nova.show_block_model_data.display_entity.model": "- Modelo: %s con datos de modelo personalizados: %s\n  Traducción: %s\n  Rotación izquierda: %s\n  Escala: %s\n  Rotación derecha: %s",
+  "command.nova.show_block_model_data.display_entity.model": "Este %s utiliza el tipo de artículo %s con el modelo %s.",
   "command.nova.show_block_model_data.failure": "Por favor, mire un bloque Nova e inténtelo de nuevo.",
   "command.nova.show_network_node_info.end_point.header": "Este %s (punto final) tiene los siguientes datos:",
   "command.nova.show_network_node_info.end_point.networks.entry": "Tipo: %s, Dirección: %s, ID: %s",
@@ -159,7 +159,7 @@
   "command.nova.reload_configs.none": "No se ha modificado ninguna configuración.",
   "command.nova.reload_configs.failure": "No se ha podido recargar la configuración, compruebe la consola para obtener más información.",
   "command.nova.reload_recipes.failure": "Fallo al recargar recetas, compruebe la consola para más información.",
-  "command.nova.show_item_model_data.success": "Nombre: %s\nmundo: %s, x: %s, y: %s, z: %s",
+  "command.nova.show_item_model_data.success": "Este %s utiliza el tipo de artículo %s con el modelo %s.",
   "command.nova.show_item_behaviors.success": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
   "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s"
 }
