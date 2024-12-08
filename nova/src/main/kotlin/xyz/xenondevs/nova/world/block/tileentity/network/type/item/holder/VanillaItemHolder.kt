@@ -7,6 +7,7 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.collections.enumSet
 import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.observed
 import xyz.xenondevs.commons.provider.orElseNew
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
@@ -24,6 +25,7 @@ internal abstract class VanillaItemHolder(
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
         by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
             .orElseNew { defaultConnectionConfig().toEnumMap() }
+            .observed()
     
     override val allowedFaces: Set<BlockFace>
         get() = connectionConfig.mapNotNullTo(enumSet()) { (face, type) ->
@@ -37,22 +39,27 @@ internal abstract class VanillaItemHolder(
     override val insertFilters: MutableMap<BlockFace, ItemFilter<*>>
         by compound.entry<MutableMap<BlockFace, ItemFilter<*>>>("insertFilters")
             .orElseNew(::enumMap)
+            .observed()
     
     override val extractFilters: MutableMap<BlockFace, ItemFilter<*>>
         by compound.entry<MutableMap<BlockFace, ItemFilter<*>>>("extractFilters")
             .orElseNew(::enumMap)
+            .observed()
     
     override val insertPriorities: MutableMap<BlockFace, Int>
         by compound.entry<MutableMap<BlockFace, Int>>("insertPriorities")
             .orElseNew(DefaultItemHolder.DEFAULT_PRIORITIES)
+            .observed()
     
     override val extractPriorities: MutableMap<BlockFace, Int>
         by compound.entry<MutableMap<BlockFace, Int>>("extractPriorities")
             .orElseNew(DefaultItemHolder.DEFAULT_PRIORITIES)
+            .observed()
     
     override val channels: MutableMap<BlockFace, Int>
         by compound.entry<MutableMap<BlockFace, Int>>("channels")
             .orElseNew(DEFAULT_CHANNELS)
+            .observed()
     
 }
 

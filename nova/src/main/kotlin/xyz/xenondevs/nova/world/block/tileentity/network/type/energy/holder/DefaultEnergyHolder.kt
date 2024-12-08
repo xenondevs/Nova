@@ -7,6 +7,7 @@ import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.observed
 import xyz.xenondevs.commons.provider.orElseNew
 import xyz.xenondevs.nova.serialization.DataHolder
 import xyz.xenondevs.nova.util.TimedResettingLong
@@ -46,6 +47,7 @@ class DefaultEnergyHolder(
                     map[face] = NetworkConnectionType.NONE
                 map
             }
+            .observed()
     
     /**
      * The maximum amount of energy this [EnergyHolder] can store.

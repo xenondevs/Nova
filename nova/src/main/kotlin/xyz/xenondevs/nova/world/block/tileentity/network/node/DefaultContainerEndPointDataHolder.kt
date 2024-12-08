@@ -49,18 +49,22 @@ abstract class DefaultContainerEndPointDataHolder<C : EndPointContainer> interna
                     map[face] = NetworkConnectionType.NONE
                 map
             }
+            .observed()
     
     final override val channels: MutableMap<BlockFace, Int>
         by compound.entry<MutableMap<BlockFace, Int>>("channels")
             .orElseNew(DEFAULT_CHANNEL_CONFIG)
+            .observed()
     
     final override val insertPriorities: MutableMap<BlockFace, Int>
         by compound.entry<MutableMap<BlockFace, Int>>("insertPriorities")
             .orElseNew(DEFAULT_PRIORITIES)
+            .observed()
     
     final override val extractPriorities: MutableMap<BlockFace, Int>
         by compound.entry<MutableMap<BlockFace, Int>>("extractPriorities")
             .orElseNew(DEFAULT_PRIORITIES)
+            .observed()
     
     internal companion object {
         

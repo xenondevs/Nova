@@ -7,6 +7,7 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.entry
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.observed
 import xyz.xenondevs.commons.provider.orElseNew
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.nova.serialization.DataHolder
@@ -53,10 +54,12 @@ class DefaultItemHolder(
     override val insertFilters: MutableMap<BlockFace, ItemFilter<*>>
         by compound.entry<MutableMap<BlockFace, ItemFilter<*>>>("insertFilters")
             .orElseNew(::enumMap)
+            .observed()
     
     override val extractFilters: MutableMap<BlockFace, ItemFilter<*>>
         by compound.entry<MutableMap<BlockFace, ItemFilter<*>>>("extractFilters")
             .orElseNew(::enumMap)
+            .observed()
     
     fun getNetworkedInventory(inv: VirtualInventory): NetworkedInventory =
         getNetworkedInventory(inv.uuid)
