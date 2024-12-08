@@ -4,7 +4,7 @@ import net.minecraft.server.commands.data.DataAccessor
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.provider.MutableProvider
-import xyz.xenondevs.commons.provider.orElseNew
+import xyz.xenondevs.commons.provider.defaultsToLazily
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -122,7 +122,7 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
      * @param persistent If the data should also be stored in the [ItemStack].
      */
     inline fun <reified T : Any> storedValue(key: String, persistent: Boolean, noinline defaultValue: () -> T): MutableProvider<T> =
-        storedValue<T>(key, persistent).orElseNew(defaultValue)
+        storedValue<T>(key, persistent).defaultsToLazily(defaultValue)
     
     /**
      * Creates a [MutableProvider] to which properties can delegate.
