@@ -11,7 +11,7 @@ internal class BinaryBufferedBody(val stream: InputStream, override val contentT
     override suspend fun writeTo(channel: ByteWriteChannel) {
         val buffer = ByteArray(8192)
         var len = 0
-        while ({ len = stream.read(buffer); len }() != 0) {
+        while ({ len = stream.read(buffer); len }() != -1) {
             channel.writeFully(buffer, 0, len)
         }
     }
