@@ -150,7 +150,7 @@ class NovaItem internal constructor(
      * Creates an [ItemStack] of this [NovaItem] with the given [amount] in server-side format.
      */
     fun createItemStack(amount: Int = 1): ItemStack =
-        MojangStack(PacketItems.SERVER_SIDE_ITEM_HOLDER, 1, defaultPatch).asBukkitMirror()
+        MojangStack(PacketItems.SERVER_SIDE_ITEM_HOLDER, amount, defaultPatch).asBukkitMirror()
     
     /**
      * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in client-side format,
