@@ -70,8 +70,22 @@ interface RecipeDeserializer<T> {
             return ItemUtils.getRecipeChoice(names)
         }
         
-        fun getRecipeKey(file: File): NamespacedKey =
-            NamespacedKey("nova", "${file.parentFile.name}.${file.nameWithoutExtension}")
+        /**
+         * Generates a [NamespacedKey] for a recipe file, assuming that is located under
+         * `plugins/<addon name>/recipes/<recipe type namespace>/<recipe type name>/<recipe name>.json`, which
+         * would generate the following key: `<addon id>:<recipe type namespace>/<recipe type name>/<recipe name>`
+         */
+        fun getRecipeKey(file: File): NamespacedKey {
+            val relativePathString = file.relativeTo(File("plugins/")).invariantSeparatorsPath
+            val addonId = relativePathString.substringBefore('/').lowercase()
+            return NamespacedKey(
+                addonId,
+                relativePathString
+                    .substringAfter('/') // Remove the addon id
+                    .substringAfter('/') // remove "recipes"
+                    .substringBeforeLast('.') // remove extension
+            )
+        }
         
     }
     
