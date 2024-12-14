@@ -4,6 +4,7 @@ import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelCreationScope
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
 import xyz.xenondevs.nova.util.data.writeImage
@@ -96,6 +97,17 @@ object DefaultGuiItems {
     val SEARCH = guiItem("search", "menu.nova.items.search-item")
     val STOPWATCH = guiItem("stopwatch")
     //</editor-fold>
+    
+    /**
+     * An 18x18 scale 1 [canvas][ItemModelCreationScope.canvasModel].
+     */
+    val CANVAS = item("gui/canvas") {
+        hidden(true)
+        name(null)
+        modelDefinition { 
+            model = canvasModel(18, 18)
+        }
+    }
     
     //<editor-fold desc="without background">
     // legacy InvUI gui items

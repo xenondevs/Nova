@@ -1,0 +1,6 @@
+{
+  "parent": "nova:item/gui_item",
+  "textures": {
+    "0": "nova:item/white"
+  }
+}

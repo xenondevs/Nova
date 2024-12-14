@@ -120,7 +120,7 @@ internal object ImageUtils {
     @JvmStatic
     fun createImageFromArgbRaster(width: Int, raster: IntArray): BufferedImage {
         // https://stackoverflow.com/questions/14416107/int-array-to-bufferedimage
-        val sm = SinglePixelPackedSampleModel(DataBuffer.TYPE_INT, width, 16, ARGB_BIT_MASKS)
+        val sm = SinglePixelPackedSampleModel(DataBuffer.TYPE_INT, width, raster.size / width, ARGB_BIT_MASKS)
         val db = DataBufferInt(raster, raster.size)
         val wr = Raster.createWritableRaster(sm, db, Point())
         return BufferedImage(ColorModel.getRGBdefault(), wr, false, null)

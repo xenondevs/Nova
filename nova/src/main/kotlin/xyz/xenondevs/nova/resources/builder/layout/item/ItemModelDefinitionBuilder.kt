@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.resources.builder.layout.item
 
+import org.joml.Vector3d
+import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -9,9 +11,14 @@ import xyz.xenondevs.nova.resources.builder.data.EmptyItemModel
 import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
 import xyz.xenondevs.nova.resources.builder.data.SpecialItemModel.SpecialModel
+import xyz.xenondevs.nova.resources.builder.data.TintSource
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
+import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
+import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.ui.menu.Canvas
+import java.awt.Color
 
 @RegistryElementBuilderDsl
 class ItemModelDefinitionBuilder<S : ModelSelectorScope> internal constructor(
@@ -194,5 +201,81 @@ sealed class ItemModelCreationScope<S : ModelSelectorScope>(
                 entry[i.toDouble() / (count - 1).toDouble()] = { selectModel(i) }
             }
         }
+    
+    /**
+     * Creates a canvas model, which is an item model with a flat texture where each pixel is individually
+     * addressable using the `colors` part of the `minecraft:custom_model_data` component, where
+     * the pixel at (x, y) is found under the index `y * width + x` and (0, 0) is the top-left pixel.
+     *
+     * The maximum [width] and [height] are `161 - |offsetX|` and `161 - |offsetY|` respectively.
+     * (Consider using multiple smaller canvases instead of a single large one to reduce the resource pack size.)
+     * 
+     * @param width The width of the canvas, in pixels.
+     * @param height The height of the canvas, in pixels.
+     * @param offsetX The x offset of the canvas texture to the item's center, pixels.
+     * @param offsetY The y offset of the canvas texture to the item's center, pixels.
+     * @param scale The size of the pixels in the canvas texture.
+     * A scale of 2 means each pixel is 2x2 pixels in game (assuming a client-side gui-scale of 1).
+     * Defaults to 1.
+     * 
+     * @see Canvas
+     */
+    fun canvasModel(
+        width: Int, height: Int,
+        offsetX: Double = 0.0, offsetY: Double = 0.0,
+        scale: Double = 1.0
+    ): ItemModel = select(SelectItemModelProperty.DisplayContext) {
+        // the actual width and height of the canvas, in pixel models needed, takes scale into account
+        val actualWidth = (width / scale).toInt()
+        val actualHeight = (height / scale).toInt()
+        
+        // the individual pixel models apply a display scale of 4, so actualScale counteracts this with 0.25
+        val actualScale = 0.25 * scale
+        
+        // parent model for all pixels with this scale
+        val parentModel = Model(
+            parent = ResourcePath(ResourceType.Model, "nova", "item/canvas_pixel"),
+            elements = listOf(
+                Model.Element(
+                    from = Vector3d(8.0, 8.0 - actualScale, 0.0),
+                    to = Vector3d(8.0 + actualScale, 8.0, 0.0),
+                    faces = enumMapOf(
+                        Model.Direction.SOUTH to Model.Element.Face(
+                            texture = "#0",
+                            tintIndex = 0
+                        )
+                    )
+                )
+            )
+        )
+        val parentModelId = resourcePackBuilder.getHolder<ModelContent>().getOrPutGenerated(parentModel)
+        
+        fallback = empty()
+        case[DisplayContext.GUI] = composite {
+            for (y in 0..<actualHeight) {
+                for (x in 0..<actualWidth) {
+                    val i = y * actualWidth + x
+                    models += model {
+                        tintSource[0] = TintSource.CustomModelData(Color.WHITE, i)
+                        model = {
+                            ModelBuilder(Model(
+                                parent = parentModelId,
+                                display = mapOf(
+                                    Model.Display.Position.GUI to Model.Display(
+                                        scale = Vector3d(4.0, 4.0, 4.0),
+                                        translation = Vector3d(
+                                            (width / -2.0) + offsetX + x * scale,
+                                            -((height / -2.0) + offsetY + y * scale),
+                                            0.0
+                                        )
+                                    )
+                                )
+                            ))
+                        }
+                    }
+                }
+            }
+        }
+    }
     
 }
