@@ -45,7 +45,6 @@ open class Canvas(
     constructor(image: BufferedImage) : this(DefaultGuiItems.CANVAS, 18, image)
     
     init {
-        require(image.type == BufferedImage.TYPE_INT_ARGB) { "Image needs to be TYPE_INT_ARGB" }
         require(image.height % itemResolution == 0) { "Image height needs to be divisible by $itemResolution" }
         require(image.width % itemResolution == 0) { "Image width needs to be divisible by $itemResolution" }
         
