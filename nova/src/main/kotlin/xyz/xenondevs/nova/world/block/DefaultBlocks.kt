@@ -63,7 +63,10 @@ internal object DefaultBlocks {
         behaviors(
             TripwireBehavior,
             BlockSounds(SoundGroup.STONE),
-            Breakable(hardness = 0.0)
+            Breakable(
+                hardness = 0.0,
+                requiresToolForDrops = false
+            )
         )
         stateProperties(
             DefaultScopedBlockStateProperties.TRIPWIRE_NORTH,
