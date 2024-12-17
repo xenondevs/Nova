@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity.GlobalTileEntityMenu
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity.IndividualTileEntityMenu
 import java.util.*
+import kotlin.math.max
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
@@ -16,13 +17,20 @@ import kotlin.reflect.jvm.isAccessible
 
 abstract class MenuContainer internal constructor() {
     
-    private val openWindows = ArrayList<Window>()
+    private val openWindows = HashSet<Window>()
+    protected val pendingWindows = WeakHashMap<Player, Int>()
     
     fun registerWindow(window: Window) {
-        window.addOpenHandler { openWindows += window }
+        pendingWindows.compute(window.viewer) { _, value -> (value ?: 0) + 1 }
+        
+        window.addOpenHandler {
+            openWindows += window
+            pendingWindows.compute(window.viewer) { _, value -> max((value ?: 0) - 1, 0) }
+            handleOpened(window.viewer)
+        }
         window.addCloseHandler {
             openWindows -= window
-            handleClosed(window.viewer!!)
+            handleClosed(window.viewer)
         }
     }
     
@@ -39,6 +47,8 @@ abstract class MenuContainer internal constructor() {
     }
     
     abstract fun openWindow(player: Player)
+    
+    protected abstract fun handleOpened(player: Player)
     
     protected abstract fun handleClosed(player: Player)
     
@@ -83,12 +93,15 @@ internal class IndividualMenuContainer internal constructor(
     }
     
     override fun handleClosed(player: Player) {
-        menus.remove(player)
+        if ((pendingWindows[player] ?: 0) == 0)
+            menus.remove(player)
     }
     
     override fun getMenusInternal(): Sequence<TileEntity.TileEntityMenu> {
         return menus.values.asSequence()
     }
+    
+    override fun handleOpened(player: Player) = Unit
     
 }
 
@@ -110,12 +123,15 @@ internal class GlobalMenuContainer internal constructor(
     override fun openWindow(player: Player) {
         menu = ctor.call(tileEntity)
             .also { it.openWindow(player) }
+    }
+    
+    override fun handleOpened(player: Player) {
         viewers++
     }
     
     override fun handleClosed(player: Player) {
         viewers--
-        if (viewers <= 0) {
+        if (viewers <= 0 && pendingWindows.all { (_, amountPending) -> amountPending == 0 }) {
             menu = null
         }
     }
