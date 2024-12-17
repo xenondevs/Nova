@@ -65,6 +65,7 @@ import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
 import java.util.*
@@ -475,7 +476,8 @@ object BlockUtils {
         }
         
         val soundGroup = state.block.getBehaviorOrNull<BlockSounds>()?.soundGroup
-        if (state.modelProvider.provider == BackingStateBlockModelProvider) {
+        val modelProvider = state.modelProvider.provider
+        if (modelProvider == BackingStateBlockModelProvider || modelProvider == ModelLessBlockModelProvider) {
             // use the level event packet for blocks that use block states
             val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, pos.nmsBlockState.id, false)
             broadcast(levelEventPacket, sendEffectsToBreaker)
