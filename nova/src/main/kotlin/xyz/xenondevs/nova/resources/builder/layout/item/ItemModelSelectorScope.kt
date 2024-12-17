@@ -79,9 +79,12 @@ class ItemModelSelectorScope internal constructor(
      *
      * With [stretched], the model will be stretched to 18x18 pixels. Due to mip mapping, this requires a 32x32 texture
      * with the actual texture placed at (0, 0) to (18, 18).
+     * 
+     * Using [display], additional transformations can be applied.
      */
-    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: String): ModelBuilder =
-        createGuiModel(background, stretched, *layers.mapToArray { ResourcePath.of(ResourceType.Model, it, id.namespace()) })
+    @JvmOverloads // TODO remove in 0.19
+    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: String, display: Model.Display? = null): ModelBuilder =
+        createGuiModel(background, stretched, *layers.mapToArray { ResourcePath.of(ResourceType.Model, it, id.namespace()) }, display = display)
     
     /**
      * Creates a new GUI model using the given [layers] as texture
@@ -90,9 +93,12 @@ class ItemModelSelectorScope internal constructor(
      *
      * With [stretched], the model will be stretched to 18x18 pixels. Due to mip mapping, this requires a 32x32 texture
      * with the actual texture placed at (0, 0) to (18, 18).
+     * 
+     * Using [display], additional transformations can be applied.
      */
-    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: ResourcePath<ResourceType.Model>): ModelBuilder {
-        if (!background && !stretched)
+    @JvmOverloads // TODO remove in 0.19
+    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: ResourcePath<ResourceType.Model>, display: Model.Display? = null): ModelBuilder {
+        if (!background && !stretched && display == null)
             return createLayeredModel(*layers)
         
         val elements = ArrayList<Element>()
@@ -124,7 +130,11 @@ class ItemModelSelectorScope internal constructor(
             )
         }
         
-        val parent = Model(ResourcePath(ResourceType.Model, "nova", "item/gui_item"), elements = elements)
+        val parent = Model(
+            ResourcePath(ResourceType.Model, "nova", "item/gui_item"),
+            elements = elements,
+            display = if (display != null) mapOf(Model.Display.Position.GUI to display) else emptyMap()
+        )
         val parentId = modelContent.getOrPutGenerated(parent)
         
         val textures = HashMap<String, String>()
