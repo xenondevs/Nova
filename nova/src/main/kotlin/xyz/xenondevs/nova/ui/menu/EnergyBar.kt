@@ -8,22 +8,26 @@ import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.EnergyNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.DefaultEnergyHolder
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.NovaItem
 
 /**
  * A multi-item gui component for displaying energy levels.
  */
-class EnergyBar(
+class EnergyBar @JvmOverloads constructor( // TODO: Remove @JvmOverloads in 0.19
     height: Int,
     private val energy: Provider<Long>,
     private val maxEnergy: Provider<Long>,
     private val getEnergyPlus: () -> Long,
-    private val getEnergyMinus: () -> Long
+    private val getEnergyMinus: () -> Long,
+    private val item: NovaItem = DefaultGuiItems.BAR_RED
 ) : VerticalBar(height) {
     
-    constructor(height: Int, energyHolder: DefaultEnergyHolder) : this(
+    @JvmOverloads
+    constructor(height: Int, energyHolder: DefaultEnergyHolder, item: NovaItem = DefaultGuiItems.BAR_RED) : this(
         height,
         energyHolder.energyProvider, energyHolder.maxEnergyProvider,
-        { energyHolder.energyPlus }, { energyHolder.energyMinus }
+        { energyHolder.energyPlus }, { energyHolder.energyMinus },
+        item
     )
     
     override fun createBarItem(section: Int) =
@@ -35,7 +39,7 @@ class EnergyBar(
                 val energyPlus = getEnergyPlus()
                 val energyMinus = getEnergyMinus()
                 
-                val builder = createItemBuilder(DefaultGuiItems.BAR_RED, section, energy.toDouble() / maxEnergy.toDouble())
+                val builder = createItemBuilder(item, section, energy.toDouble() / maxEnergy.toDouble())
                 
                 if (energy == Long.MAX_VALUE) {
                     builder.setName("∞ J / ∞ J")

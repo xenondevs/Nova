@@ -17,10 +17,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.Fluid
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.NovaItem
 
-private fun getFluidBarItem(type: FluidType?): NovaItem = when (type) {
-    FluidType.WATER -> DefaultGuiItems.BAR_BLUE
-    else -> DefaultGuiItems.BAR_ORANGE
-}
+private val DEFAULT_FLUID_BAR_ITEMS = mapOf(FluidType.WATER to DefaultGuiItems.BAR_BLUE, FluidType.LAVA to DefaultGuiItems.BAR_ORANGE)
 
 private fun ItemBuilder.setFluidDisplayName(amount: Long, capacity: Long): ItemBuilder {
     if (amount == Long.MAX_VALUE) {
@@ -37,26 +34,39 @@ private fun ItemBuilder.setFluidDisplayName(amount: Long, capacity: Long): ItemB
 /**
  * A multi-item gui component for displaying fluid levels.
  */
-class FluidBar(
+class FluidBar @JvmOverloads constructor( // TODO: Remove @JvmOverloads in 0.19
     height: Int,
     fluidHolder: FluidHolder,
     private val fluidContainer: NetworkedFluidContainer,
     private val capacity: Provider<Long>,
     private val type: Provider<FluidType?>,
-    private val amount: Provider<Long>
+    private val amount: Provider<Long>,
+    private val items: Map<FluidType, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
 ) : VerticalBar(height) {
     
     private val allowedConnectionType = fluidHolder.containers[fluidContainer]!!
     
-    constructor(height: Int, fluidHolder: FluidHolder, container: FluidContainer) : this(
-        height, fluidHolder, container, container.capacityProvider, container.typeProvider, container.amountProvider
+    @JvmOverloads
+    constructor(
+        height: Int,
+        fluidHolder: FluidHolder,
+        container: FluidContainer,
+        items: Map<FluidType, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
+    ) : this(
+        height, 
+        fluidHolder,
+        container,
+        container.capacityProvider,
+        container.typeProvider,
+        container.amountProvider,
+        items
     )
     
     @Suppress("DEPRECATION")
     override fun createBarItem(section: Int) = Item.builder()
         .setItemProvider(type, amount, capacity) { type, amount, capacity ->
             createItemBuilder(
-                getFluidBarItem(type),
+                items[type]!!,
                 section,
                 amount.toDouble() / capacity.toDouble()
             ).setFluidDisplayName(amount, capacity)
@@ -97,13 +107,14 @@ class StaticFluidBar(
     height: Int,
     private val capacity: Long,
     private val type: FluidType,
-    private val amount: Long
+    private val amount: Long,
+    private val items: Map<FluidType, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
 ) : VerticalBar(height) {
     
     override fun createBarItem(section: Int): Item {
         return Item.simple(
             createItemBuilder(
-                getFluidBarItem(type),
+                items[type]!!,
                 section,
                 amount.toDouble() / capacity.toDouble()
             ).setFluidDisplayName(amount, capacity)
