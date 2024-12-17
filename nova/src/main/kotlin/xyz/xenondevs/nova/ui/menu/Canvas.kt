@@ -70,12 +70,12 @@ open class Canvas(
      * Modifies the [itemBuilder] for the canvas part at the given [x] and [y] coordinates,
      * which will be displayed to [viewer].
      */
-    open fun modifyItemBuilder(x: Int, y: Int, viewer: Player, itemBuilder: ItemBuilder) = Unit
+    protected open fun modifyItemBuilder(x: Int, y: Int, viewer: Player, itemBuilder: ItemBuilder) = Unit
     
     /**
      * Handles a [click] on the canvas part at the given [x] and [y] coordinates.
      */
-    open fun handleClick(x: Int, y: Int, click: Click) = Unit
+    protected open fun handleClick(x: Int, y: Int, click: Click) = Unit
     
     private inner class CanvasPart(private val x: Int, private val y: Int) : AbstractItem() {
         
