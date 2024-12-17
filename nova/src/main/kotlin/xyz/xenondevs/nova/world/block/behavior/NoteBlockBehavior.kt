@@ -170,4 +170,8 @@ internal object NoteBlockBehavior : BlockBehavior {
             NoteBlockInstrument.CUSTOM_HEAD -> Instrument.CUSTOM_HEAD
         }
     
+    override fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack? {
+        return ItemStack.of(Material.NOTE_BLOCK)
+    }
+    
 }

@@ -6,6 +6,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.phys.Vec3
 import org.bukkit.GameMode
+import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.event.block.LeavesDecayEvent
 import org.bukkit.inventory.ItemStack
@@ -19,6 +20,7 @@ import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.LEAVES_DISTANCE
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.LEAVES_PERSISTENT
@@ -102,6 +104,24 @@ internal object LeavesBehavior : BlockBehavior {
         }
         
         return distance
+    }
+    
+    override fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<DefaultContextIntentions.BlockInteract>): ItemStack? {
+        val type = when (state.block) {
+            DefaultBlocks.OAK_LEAVES -> Material.OAK_LEAVES
+            DefaultBlocks.SPRUCE_LEAVES -> Material.SPRUCE_LEAVES
+            DefaultBlocks.BIRCH_LEAVES -> Material.BIRCH_LEAVES
+            DefaultBlocks.JUNGLE_LEAVES -> Material.JUNGLE_LEAVES
+            DefaultBlocks.ACACIA_LEAVES -> Material.ACACIA_LEAVES
+            DefaultBlocks.DARK_OAK_LEAVES -> Material.DARK_OAK_LEAVES
+            DefaultBlocks.MANGROVE_LEAVES -> Material.MANGROVE_LEAVES
+            DefaultBlocks.CHERRY_LEAVES -> Material.CHERRY_LEAVES
+            DefaultBlocks.AZALEA_LEAVES -> Material.AZALEA_LEAVES
+            DefaultBlocks.FLOWERING_AZALEA_LEAVES -> Material.FLOWERING_AZALEA_LEAVES
+            else -> throw UnsupportedOperationException("Unknown leaves block type: ${state.block}")
+        }
+        
+        return ItemStack.of(type)
     }
     
 }

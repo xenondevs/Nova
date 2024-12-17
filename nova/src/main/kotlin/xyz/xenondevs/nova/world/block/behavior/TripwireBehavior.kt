@@ -142,4 +142,8 @@ internal object TripwireBehavior : BlockBehavior {
             .setValue(TripWireBlock.ATTACHED, nova.getOrThrow(TRIPWIRE_ATTACHED))
             .setValue(TripWireBlock.POWERED, nova.getOrThrow(POWERED))
     
+    override fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<DefaultContextIntentions.BlockInteract>): ItemStack? {
+        return ItemStack.of(Material.STRING)
+    }
+    
 }
