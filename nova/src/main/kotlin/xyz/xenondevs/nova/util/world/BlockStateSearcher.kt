@@ -5,7 +5,6 @@ package xyz.xenondevs.nova.util.world
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
-import it.unimi.dsi.fastutil.ints.IntSet
 import net.minecraft.util.BitStorage
 import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap
 import net.minecraft.util.ZeroBitStorage
@@ -76,7 +75,11 @@ object BlockStateSearcher {
                         break
                     
                     val resultList = result.getOrSet(queryIdx, ::ArrayList)
-                    storage.runOnIds(ids.keys) { id, encodedPos ->
+                    for (encodedPos in 0..<storage.size) {
+                        val id = storage.get(encodedPos)
+                        if (!ids.keys.contains(id))
+                            continue
+                        
                         val x = encodedPos and 0xF
                         val z = (encodedPos shr 4) and 0xF
                         val y = encodedPos shr 8
@@ -151,30 +154,6 @@ object BlockStateSearcher {
             }
             
             return@getOrPut result
-        }
-    }
-    
-    @Suppress("NAME_SHADOWING")
-    private inline fun BitStorage.runOnIds(find: IntSet, run: (id: Int, pos: Int) -> Unit) {
-        val bits = bits
-        val data = raw
-        
-        val valuesPerLong = 64 / bits
-        val mask = (1L shl bits) - 1L
-        
-        var idx = 0
-        
-        for (l in data) {
-            var l = l
-            repeat(valuesPerLong) {
-                val id = (l and mask).toInt()
-                
-                if (find.contains(id))
-                    run(id, idx)
-                
-                l = l shr bits
-                idx++
-            }
         }
     }
     
