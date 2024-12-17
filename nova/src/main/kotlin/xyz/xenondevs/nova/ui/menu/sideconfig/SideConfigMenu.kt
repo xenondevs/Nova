@@ -13,6 +13,7 @@ import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.ui.menu.item.BackItem
 import xyz.xenondevs.nova.ui.menu.item.ClickyTabItem
 import xyz.xenondevs.nova.util.playClickSound
+import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.EnergyHolder
@@ -168,12 +169,18 @@ class SideConfigMenu(
      * Opens a [Window] of this [SideConfigMenu] for the given [player].
      */
     fun openWindow(player: Player) {
-        Window.single {
+        val window = Window.single {
             it.setViewer(player)
             it.setTitle(Component.translatable("menu.nova.side_config"))
             it.setGui(mainGui)
             it.addOpenHandler(::updateNetworkData)
-        }.open()
+        }
+        
+        if (endPoint is TileEntity) {
+            endPoint.menuContainer.registerWindow(window)
+        }
+        
+        window.open()
     }
     
     private fun updateNetworkData() {
