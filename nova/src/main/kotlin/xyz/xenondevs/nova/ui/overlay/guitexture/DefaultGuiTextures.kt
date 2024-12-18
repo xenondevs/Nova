@@ -45,6 +45,7 @@ object DefaultGuiTextures {
     val RECIPE_CONVERSION = guiTexture("recipe_conversion") {
         path("gui/recipe/conversion")
     }
+    @Deprecated("Color picker will be removed in a future version")
     val COLOR_PICKER = guiTexture("color_picker") {
         path("gui/color_picker")
     }

@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import java.awt.Color
 
+@Deprecated("Color picker will be removed in a future version")
 class ColorPickerWindow(
     private val colorPreviewItem: ColorPreviewItem,
     color: Color,
@@ -84,6 +85,7 @@ private class ChangeColorItem(
     localizedName, builder
 )
 
+@Deprecated("Color picker will be removed in a future version")
 abstract class ColorPreviewItem(color: Color) : AbstractItem() {
     
     var color: Color = color
@@ -96,6 +98,7 @@ abstract class ColorPreviewItem(color: Color) : AbstractItem() {
     
 }
 
+@Deprecated("Color picker will be removed in a future version")
 class OpenColorPickerWindowItem(private val window: ColorPickerWindow) : AbstractItem() {
     
     override fun getItemProvider(player: Player) = DefaultGuiItems.TP_COLOR_PICKER.clientsideProvider
