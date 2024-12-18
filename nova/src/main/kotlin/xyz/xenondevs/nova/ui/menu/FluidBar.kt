@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.Fluid
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.NovaItem
 
-private val DEFAULT_FLUID_BAR_ITEMS = mapOf(FluidType.WATER to DefaultGuiItems.BAR_BLUE, FluidType.LAVA to DefaultGuiItems.BAR_ORANGE)
+private val DEFAULT_FLUID_BAR_ITEMS = mapOf(null to DefaultGuiItems.BAR_BLUE, FluidType.WATER to DefaultGuiItems.BAR_BLUE, FluidType.LAVA to DefaultGuiItems.BAR_ORANGE)
 
 private fun ItemBuilder.setFluidDisplayName(amount: Long, capacity: Long): ItemBuilder {
     if (amount == Long.MAX_VALUE) {
@@ -41,7 +41,7 @@ class FluidBar @JvmOverloads constructor( // TODO: Remove @JvmOverloads in 0.19
     private val capacity: Provider<Long>,
     private val type: Provider<FluidType?>,
     private val amount: Provider<Long>,
-    private val items: Map<FluidType, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
+    private val items: Map<FluidType?, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
 ) : VerticalBar(height) {
     
     private val allowedConnectionType = fluidHolder.containers[fluidContainer]!!
@@ -51,7 +51,7 @@ class FluidBar @JvmOverloads constructor( // TODO: Remove @JvmOverloads in 0.19
         height: Int,
         fluidHolder: FluidHolder,
         container: FluidContainer,
-        items: Map<FluidType, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
+        items: Map<FluidType?, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
     ) : this(
         height, 
         fluidHolder,
@@ -108,7 +108,7 @@ class StaticFluidBar(
     private val capacity: Long,
     private val type: FluidType,
     private val amount: Long,
-    private val items: Map<FluidType, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
+    private val items: Map<FluidType?, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
 ) : VerticalBar(height) {
     
     override fun createBarItem(section: Int): Item {
