@@ -309,9 +309,9 @@ abstract class TileEntity(
         }.get()
         
         if (preUpdateHandler != null)
-            inventory.setPreUpdateHandler(preUpdateHandler)
+            inventory.addPreUpdateHandler(preUpdateHandler)
         if (postUpdateHandler != null)
-            inventory.setPostUpdateHandler(postUpdateHandler)
+            inventory.addPostUpdateHandler(postUpdateHandler)
         if (!persistent)
             dropProvider { inventory.items.filterNotNull() }
         

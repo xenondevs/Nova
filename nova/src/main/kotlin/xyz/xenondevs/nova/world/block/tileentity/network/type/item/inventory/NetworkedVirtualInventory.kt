@@ -22,7 +22,7 @@ open class NetworkedInvUIInventory(
     }
     
     override fun canTake(slot: Int, amount: Int): Boolean {
-        if (inventory.preUpdateHandler == null)
+        if (inventory.preUpdateHandlers.isEmpty())
             return true
         
         val itemStack = inventory.getUnsafeItem(slot) ?: return true

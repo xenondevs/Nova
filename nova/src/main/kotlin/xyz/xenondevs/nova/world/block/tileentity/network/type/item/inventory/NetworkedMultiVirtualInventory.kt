@@ -60,7 +60,7 @@ internal class NetworkedMultiVirtualInventory(
     
     override fun canTake(slot: Int, amount: Int): Boolean {
         val inv = inventoryBySlot[slot]
-        if (inv.preUpdateHandler == null)
+        if (inv.preUpdateHandlers.isEmpty())
             return true
         val invSlot = invSlotBySlot[slot]
         
