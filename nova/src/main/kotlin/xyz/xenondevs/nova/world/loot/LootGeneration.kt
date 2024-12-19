@@ -30,7 +30,8 @@ internal object LootGeneration : Listener {
     @EventHandler
     private fun handleLootGenerationEvent(event: LootGenerateEvent) {
         lootTables.forEach { loot ->
-            if (loot.isAllowed(event.lootTable.key))
+            @Suppress("SENSELESS_COMPARISON") // improperly annotated
+            if (event.lootTable != null && loot.isAllowed(event.lootTable.key))
                 event.loot.addAll(loot.getRandomItems())
         }
     }
