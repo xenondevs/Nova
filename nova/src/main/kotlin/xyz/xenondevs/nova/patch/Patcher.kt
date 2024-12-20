@@ -28,6 +28,7 @@ import xyz.xenondevs.nova.patch.impl.item.ItemStackDataComponentsPatch
 import xyz.xenondevs.nova.patch.impl.item.RemainingItemPatches
 import xyz.xenondevs.nova.patch.impl.item.RepairPatches
 import xyz.xenondevs.nova.patch.impl.item.ToolPatches
+import xyz.xenondevs.nova.patch.impl.misc.DontCloseAddonClassLoadersPatch
 import xyz.xenondevs.nova.patch.impl.misc.EventPreventionPatch
 import xyz.xenondevs.nova.patch.impl.misc.FakePlayerLastHurtPatch
 import xyz.xenondevs.nova.patch.impl.playerlist.BroadcastPacketPatch
@@ -57,7 +58,8 @@ internal object Patcher {
             BroadcastPacketPatch, EventPreventionPatch, ArmorEquipEventPatch, BossBarOriginPatch,
             FakePlayerLastHurtPatch, BlockBehaviorPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
             ItemStackDataComponentsPatch, EnchantmentPatches, RepairPatches, BlockMigrationPatches,
-            TripwireLogicPatch, FluidFlowPatch, RegistryEventsPatch, DyeablePatches, EarlyBlockPlaceEventPatch
+            TripwireLogicPatch, FluidFlowPatch, RegistryEventsPatch, DyeablePatches, EarlyBlockPlaceEventPatch,
+            DontCloseAddonClassLoadersPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     
