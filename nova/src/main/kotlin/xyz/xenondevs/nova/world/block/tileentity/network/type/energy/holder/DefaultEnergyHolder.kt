@@ -10,9 +10,8 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.observed
 import xyz.xenondevs.commons.provider.orElseNew
 import xyz.xenondevs.nova.serialization.DataHolder
-import xyz.xenondevs.nova.util.TimedResettingLong
+import xyz.xenondevs.nova.util.TickResettingLong
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
-import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.EnergyNetwork
 import kotlin.math.max
 import kotlin.math.min
 
@@ -35,8 +34,8 @@ class DefaultEnergyHolder(
 ) : EnergyHolder {
     
     private val _energyProvider: MutableProvider<Long> = energy
-    private val _energyMinus = TimedResettingLong(EnergyNetwork.TICK_DELAY_PROVIDER)
-    private val _energyPlus = TimedResettingLong(EnergyNetwork.TICK_DELAY_PROVIDER)
+    private val _energyMinus = TickResettingLong()
+    private val _energyPlus = TickResettingLong()
     
     override val blockedFaces = blockedFaces.toEnumSet()
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
@@ -59,15 +58,13 @@ class DefaultEnergyHolder(
      */
     val energyProvider: Provider<Long> get() = _energyProvider
     
-    private var energyDeltaLastResetTick = 0
-    
     /**
-     * The amount of energy that was extracted during the last energy network tick.
+     * The amount of energy that was extracted during the last server tick.
      */
     val energyMinus: Long by _energyMinus
     
     /**
-     * The amount of energy that was inserted during the last energy network tick.
+     * The amount of energy that was inserted during the last server tick.
      */
     val energyPlus: Long by _energyPlus
     
