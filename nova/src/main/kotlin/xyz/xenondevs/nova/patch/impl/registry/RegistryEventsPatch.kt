@@ -123,7 +123,7 @@ internal object RegistryEventsPatch : MultiTransformer(BuiltInRegistries::class,
     fun handlePostFreeze2(loaders: List<Any>, lookup: RegistryOps.RegistryInfoLookup) {
         for (loader in loaders) {
             val registry = REGISTRY_DATA_LOADER_LOADER_GET_REGISTRY(loader) as WritableRegistry<*>
-            handlePreFreeze(registry, lookup)
+            handlePostFreeze(registry, lookup)
         }
     }
     
