@@ -36,6 +36,13 @@ interface FeatureRegistry : AddonGetter {
     }
     
     @ExperimentalWorldGen
+    fun feature(name: String, feature: Feature<*>): ResourceKey<Feature<*>> {
+        val key = ResourceKey.create(Registries.FEATURE, ResourceLocation(addon, name))
+        Registries.FEATURE[key] = feature
+        return key
+    }
+    
+    @ExperimentalWorldGen
     fun <P : PlacementModifier> placementModifierType(name: String, placementModifierType: PlacementModifierType<P>): PlacementModifierType<P> {
         val id = ResourceLocation(addon, name)
         Registries.PLACEMENT_MODIFIER_TYPE[id] = placementModifierType
