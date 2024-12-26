@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.util.reflection
 
 import net.minecraft.core.BlockPos
-import net.minecraft.core.BlockPos.MutableBlockPos
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
 import net.minecraft.core.Registry
@@ -10,7 +9,6 @@ import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.LevelHeightAccessor
 import net.minecraft.world.level.LevelReader
-import net.minecraft.world.level.WorldGenLevel
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.biome.Biome.ClimateSettings
 import net.minecraft.world.level.biome.Biome.TemperatureModifier
@@ -24,9 +22,7 @@ import net.minecraft.world.level.chunk.LevelChunkSection
 import net.minecraft.world.level.chunk.UpgradeData
 import net.minecraft.world.level.levelgen.blending.BlendingData
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
-import net.minecraft.world.level.levelgen.feature.OreFeature
 import net.minecraft.world.level.levelgen.feature.ReplaceBlockFeature
-import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState
 import net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleProcessor
@@ -42,7 +38,6 @@ import java.security.ProtectionDomain
 import java.util.*
 import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 import net.minecraft.world.item.ItemStack as MojangStack
-import java.util.function.Function as JavaFunction
 
 // TODO: Retire ReflectionRegistry, put the fields as top level constants in the files that use them instead
 @Suppress("MemberVisibilityCanBePrivate")
@@ -64,8 +59,6 @@ internal object ReflectionRegistry {
     val LIVING_ENTITY_PLAY_BLOCK_FALL_SOUND_METHOD = getMethod(MojangLivingEntity::class, true, "playBlockFallSound")
     val RULE_PROCESSOR_PROCESS_BLOCK_METHOD = getMethod(RuleProcessor::class, false, "processBlock", LevelReader::class, BlockPos::class, BlockPos::class, StructureTemplate.StructureBlockInfo::class, StructureTemplate.StructureBlockInfo::class, StructurePlaceSettings::class)
     val PROCESSOR_RULE_TEST_METHOD = getMethod(ProcessorRule::class, false, "test", BlockState::class, BlockState::class, BlockPos::class, BlockPos::class, BlockPos::class, RandomSource::class)
-    val ORE_FEATURE_CAN_PLACE_ORE_METHOD = getMethod(OreFeature::class, true, "canPlaceOre", BlockState::class, JavaFunction::class, RandomSource::class, OreConfiguration::class, TargetBlockState::class, MutableBlockPos::class)
-    val ORE_FEATURE_DO_PLACE_METHOD = getMethod(OreFeature::class, true, "doPlace", WorldGenLevel::class, RandomSource::class, OreConfiguration::class, Double::class, Double::class, Double::class, Double::class, Double::class, Double::class, Int::class, Int::class, Int::class, Int::class, Int::class)
     val REPLACE_BLOCK_PLACE_METHOD = getMethod(ReplaceBlockFeature::class, false, "place", FeaturePlaceContext::class)
     val RULE_TEST_TEST_METHOD = getMethod(RuleTest::class, false, "test", BlockState::class, RandomSource::class)
     val BLOCK_GETTER_GET_BLOCK_STATE_METHOD = getMethod(BlockGetter::class, false, "getBlockState", BlockPos::class)

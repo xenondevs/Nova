@@ -13,7 +13,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.PosRuleTest
 import net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleProcessor
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
-import org.objectweb.asm.Opcodes.INVOKESTATIC
+import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.INVOKEVIRTUAL
 import org.objectweb.asm.tree.JumpInsnNode
 import org.objectweb.asm.tree.LabelNode
@@ -23,13 +23,11 @@ import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.next
 import xyz.xenondevs.bytebase.util.previousLabel
+import xyz.xenondevs.bytebase.util.replaceEvery
 import xyz.xenondevs.bytebase.util.replaceFirst
-import xyz.xenondevs.commons.collections.findNthOfType
 import xyz.xenondevs.nova.patch.MultiTransformer
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BLOCK_GETTER_GET_BLOCK_STATE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.FEATURE_PLACE_CONTEXT_RANDOM_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ORE_FEATURE_CAN_PLACE_ORE_METHOD
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.ORE_FEATURE_DO_PLACE_METHOD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.PROCESSOR_RULE_INPUT_PREDICATE_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.PROCESSOR_RULE_LOC_PREDICATE_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.PROCESSOR_RULE_POS_PREDICATE_FIELD
@@ -41,12 +39,26 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.TARGET_BLOCK_STATE_
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.ruletest.NovaRuleTest
+import java.util.function.Function
+
+private val ORE_FEATURE_DO_PLACE_METHOD = ReflectionUtils.getMethod(
+    OreFeature::class,
+    "doPlace",
+    WorldGenLevel::class, // level
+    RandomSource::class,  // random
+    OreConfiguration::class, // config
+    Double::class, Double::class, // minX, maxX
+    Double::class, Double::class, // minZ, maxZ
+    Double::class, Double::class, // minY, maxY
+    Int::class, Int::class, Int::class, // x, y, z
+    Int::class, Int::class // width, height
+)
 
 /**
  * This patch allows [NovaRuleTest]s to be used in [OreFeature]s, [ReplaceBlockFeature]s and structure [ProcessorRule]s
  */
 @OptIn(ExperimentalWorldGen::class)
-internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, ReplaceBlockFeature::class, RuleProcessor::class), computeFrames = true) {
+internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, ReplaceBlockFeature::class, RuleProcessor::class)) {
     
     override fun transform() {
         transformOreFeature()
@@ -55,30 +67,30 @@ internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, Re
     }
     
     private fun transformOreFeature() {
-        val placeMethod = VirtualClassPath[ORE_FEATURE_DO_PLACE_METHOD]
-        placeMethod.localVariables?.clear()
-        val canPlaceCall = placeMethod.instructions.find { it.opcode == INVOKESTATIC && (it as MethodInsnNode).calls(ORE_FEATURE_CAN_PLACE_ORE_METHOD) } as MethodInsnNode
-        val cantPlaceLabel = (canPlaceCall.next as JumpInsnNode).label
-        val prevLabel = canPlaceCall.previousLabel()
-        placeMethod.instructions.insertBefore(prevLabel, buildInsnList {
-            addLabel()
-            aLoad(56)
-            aLoad(2)
-            aLoad(23)
-            aLoad(1)
-            aLoad(58)
-            invokeStatic(ReflectionUtils.getMethodByName(NovaRuleTestPatch::class, "checkOreNovaRuleTest"))
-            ifeq(cantPlaceLabel)
-        })
-        val canPlaceMethod = VirtualClassPath[ORE_FEATURE_CAN_PLACE_ORE_METHOD]
-        val novaRuleLabel = canPlaceMethod.instructions.findNthOfType<LabelNode>(2)
-        canPlaceMethod.instructions.insert(buildInsnList {
-            addLabel()
-            aLoad(4)
-            getField(TARGET_BLOCK_STATE_TARGET_FIELD)
-            instanceOf(NovaRuleTest::class)
-            ifne(novaRuleLabel)
-        })
+        VirtualClassPath[ORE_FEATURE_DO_PLACE_METHOD].replaceEvery(
+            0, 0,
+            {
+                aLoad(1) // level
+                invokeStatic(::canPlaceOre)
+            }
+        ) { it.opcode == Opcodes.INVOKESTATIC && (it as MethodInsnNode).calls(OreFeature::canPlaceOre) }
+    }
+    
+    @JvmStatic
+    fun canPlaceOre(
+        state: BlockState,
+        adjacentStateAccessor: Function<BlockPos, BlockState>,
+        random: RandomSource,
+        config: OreConfiguration,
+        targetState: OreConfiguration.TargetBlockState,
+        pos: BlockPos.MutableBlockPos,
+        level: WorldGenLevel
+    ): Boolean {
+        if (targetState.target is NovaRuleTest) {
+            return checkOreNovaRuleTest(state, random, pos, level, targetState)
+        } else {
+            return OreFeature.canPlaceOre(state, adjacentStateAccessor, random, config, targetState, pos)
+        }
     }
     
     private fun transformReplaceBlockFeature() {
@@ -105,7 +117,7 @@ internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, Re
             aLoad(3)
             aLoad(2)
             aLoad(6)
-            invokeStatic(ReflectionUtils.getMethodByName(NovaRuleTestPatch::class, "checkOreNovaRuleTest"))
+            invokeStatic(::checkOreNovaRuleTest)
             ifne(trueLabel)
             
             addLabel()
@@ -121,7 +133,7 @@ internal object NovaRuleTestPatch : MultiTransformer(setOf(OreFeature::class, Re
             0,
             buildInsnList {
                 aLoad(1)
-                invokeStatic(ReflectionUtils.getMethodByName(NovaRuleTestPatch::class, "testProcessorRule"))
+                invokeStatic(::testProcessorRule)
             }
         ) { it.opcode == INVOKEVIRTUAL && (it as MethodInsnNode).calls(PROCESSOR_RULE_TEST_METHOD) }
     }
