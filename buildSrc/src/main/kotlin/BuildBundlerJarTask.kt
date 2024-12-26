@@ -43,7 +43,7 @@ abstract class BuildBundlerJarTask : DefaultTask() {
             
             // include dependencies
             val runtimeArtifacts = nova.configurations.getByName("mojangMappedServerRuntime").incoming.artifacts.artifacts
-                .mapTo(HashSet()) { (it.id.componentIdentifier as ModuleComponentIdentifier).moduleIdentifier }
+                .mapNotNullTo(HashSet()) { (it.id.componentIdentifier as? ModuleComponentIdentifier)?.moduleIdentifier }
             nova.configurations.getByName("novaLoader").incoming.artifacts.artifacts
                 .asSequence()
                 .filter { (it.id.componentIdentifier as ModuleComponentIdentifier).moduleIdentifier !in runtimeArtifacts }
