@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.ui.overlay.bossbar.vanilla
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.ShadowColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.minecraft.world.BossEvent.BossBarColor
@@ -65,7 +66,7 @@ internal class VanillaBossBarOverlay(
             
             builder
                 .move(-HALF_BOSS_BAR_LENGTH)
-                .append(Component.text('\uF000').font(BOSS_BAR_FONT)) // background
+                .append(Component.text('\uF000').font(BOSS_BAR_FONT).shadowColor(ShadowColor.none())) // background
                 .move(-BOSS_BAR_LENGTH - 1)
             
             val progress = getProgressComponent(bar.progress, color)
@@ -105,7 +106,7 @@ internal class VanillaBossBarOverlay(
         
         val i = (progress * BOSS_BAR_LENGTH).roundToInt()
         val char = (0xFF00 + i).toChar().toString()
-        val component = Component.text(char, Style.style(color)).font(BOSS_BAR_FONT)
+        val component = Component.text(char, Style.style(color)).font(BOSS_BAR_FONT).shadowColor(ShadowColor.none())
         return component to i
     }
     
@@ -118,7 +119,7 @@ internal class VanillaBossBarOverlay(
             BossBarStyle.NOTCHED_20 -> "\uF004"
         } ?: return null
         
-        return Component.text(char).font(BOSS_BAR_FONT)
+        return Component.text(char).font(BOSS_BAR_FONT).shadowColor(ShadowColor.none())
     }
     
     override fun toString(): String {
