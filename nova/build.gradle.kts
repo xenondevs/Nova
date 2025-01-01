@@ -43,24 +43,6 @@ dependencies {
 sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
 
 tasks {
-    // TODO: remove this workaround once the underlying bug is fixed
-    getByName("compileJava").dependsOn(
-        ":nova-hooks:nova-hook-fastasyncworldedit:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-griefprevention:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-itemsadder:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-luckperms:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-mmoitems:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-oraxen:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-plotsquared:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-protectionstones:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-quickshop:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-residence:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-towny:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-vault:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-worldedit:paperweightUserdevSetup",
-        ":nova-hooks:nova-hook-worldguard:paperweightUserdevSetup"
-    )
-    
     withType<ProcessResources> {
         filesMatching("paper-plugin.yml") {
             val properties = HashMap(project.properties)
