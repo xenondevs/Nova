@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.ui.waila.overlay
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.ShadowColor
 import xyz.xenondevs.nova.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
 import xyz.xenondevs.nova.util.component.adventure.append
@@ -122,7 +123,7 @@ internal class WailaImageOverlay : BossBarOverlay {
      * Valid [types][type] are 0: start, 1: part, 2: end.
      */
     private fun getComponent(lines: Int, type: Int): Component {
-        return Component.text(getChar(lines, type)).font(WAILA_FONT)
+        return Component.text(getChar(lines, type)).font(WAILA_FONT).shadowColor(ShadowColor.none())
     }
     
 }
