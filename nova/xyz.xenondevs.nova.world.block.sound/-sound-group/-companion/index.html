@@ -25,37 +25,69 @@
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../../index.html">
-                            nova-parent
-                    </a>            </div>
-            <div class="library-version">0.18-alpha.13
+                    nova-parent
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.18-alpha.14
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova:dokkaHtmlPartial/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova:dokkaHtmlPartial/main" data-filter=":nova:dokkaHtmlPartial/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova:dokkaHtmlPartial/main">jvm</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    nova-parent
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.world.block.sound/SoundGroup.Companion///PointingToDeclaration//2031297628">
@@ -88,7 +120,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-a-m-e-t-h-y-s-t_-c-l-u-s-t-e-r.html"><span><span>AMETHYST_CLUSTER</span></span></a></div>
+                  <div><a href="-a-m-e-t-h-y-s-t_-c-l-u-s-t-e-r.html"><span>AMETHYST_</span><wbr><span>CLUSTER</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-136484178%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -103,7 +135,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-a-n-c-i-e-n-t_-d-e-b-r-i-s.html"><span><span>ANCIENT_DEBRIS</span></span></a></div>
+                  <div><a href="-a-n-c-i-e-n-t_-d-e-b-r-i-s.html"><span>ANCIENT_</span><wbr><span>DEBRIS</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="114589780%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -148,7 +180,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-a-z-a-l-e-a_-l-e-a-v-e-s.html"><span><span>AZALEA_LEAVES</span></span></a></div>
+                  <div><a href="-a-z-a-l-e-a_-l-e-a-v-e-s.html"><span>AZALEA_</span><wbr><span>LEAVES</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1639284311%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -178,7 +210,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-b-a-m-b-o-o_-s-a-p-l-i-n-g.html"><span><span>BAMBOO_SAPLING</span></span></a></div>
+                  <div><a href="-b-a-m-b-o-o_-s-a-p-l-i-n-g.html"><span>BAMBOO_</span><wbr><span>SAPLING</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1276333239%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -193,7 +225,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-b-a-m-b-o-o_-w-o-o-d.html"><span><span>BAMBOO_WOOD</span></span></a></div>
+                  <div><a href="-b-a-m-b-o-o_-w-o-o-d.html"><span>BAMBOO_</span><wbr><span>WOOD</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-268635924%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -208,7 +240,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-b-a-m-b-o-o_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html"><span><span>BAMBOO_WOOD_HANGING_SIGN</span></span></a></div>
+                  <div><a href="-b-a-m-b-o-o_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html"><span>BAMBOO_</span><wbr><span>WOOD_</span><wbr><span>HANGING_</span><wbr><span>SIGN</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1275243747%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -238,7 +270,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-b-i-g_-d-r-i-p-l-e-a-f.html"><span><span>BIG_DRIPLEAF</span></span></a></div>
+                  <div><a href="-b-i-g_-d-r-i-p-l-e-a-f.html"><span>BIG_</span><wbr><span>DRIPLEAF</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="248237572%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -253,7 +285,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-b-o-n-e_-b-l-o-c-k.html"><span><span>BONE_BLOCK</span></span></a></div>
+                  <div><a href="-b-o-n-e_-b-l-o-c-k.html"><span>BONE_</span><wbr><span>BLOCK</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="717012132%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -298,7 +330,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-c-a-v-e_-v-i-n-e-s.html"><span><span>CAVE_VINES</span></span></a></div>
+                  <div><a href="-c-a-v-e_-v-i-n-e-s.html"><span>CAVE_</span><wbr><span>VINES</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1254101183%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -328,7 +360,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-c-h-e-r-r-y_-l-e-a-v-e-s.html"><span><span>CHERRY_LEAVES</span></span></a></div>
+                  <div><a href="-c-h-e-r-r-y_-l-e-a-v-e-s.html"><span>CHERRY_</span><wbr><span>LEAVES</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="537579906%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -343,7 +375,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-c-h-e-r-r-y_-s-a-p-l-i-n-g.html"><span><span>CHERRY_SAPLING</span></span></a></div>
+                  <div><a href="-c-h-e-r-r-y_-s-a-p-l-i-n-g.html"><span>CHERRY_</span><wbr><span>SAPLING</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1689044292%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -358,7 +390,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-c-h-e-r-r-y_-w-o-o-d.html"><span><span>CHERRY_WOOD</span></span></a></div>
+                  <div><a href="-c-h-e-r-r-y_-w-o-o-d.html"><span>CHERRY_</span><wbr><span>WOOD</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1840277295%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -373,7 +405,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-c-h-e-r-r-y_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html"><span><span>CHERRY_WOOD_HANGING_SIGN</span></span></a></div>
+                  <div><a href="-c-h-e-r-r-y_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html"><span>CHERRY_</span><wbr><span>WOOD_</span><wbr><span>HANGING_</span><wbr><span>SIGN</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="953991454%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -388,7 +420,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-c-h-i-s-e-l-e-d_-b-o-o-k-s-h-e-l-f.html"><span><span>CHISELED_BOOKSHELF</span></span></a></div>
+                  <div><a href="-c-h-i-s-e-l-e-d_-b-o-o-k-s-h-e-l-f.html"><span>CHISELED_</span><wbr><span>BOOKSHELF</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1790962401%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -433,7 +465,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-c-o-p-p-e-r_-b-u-l-b.html"><span><span>COPPER_BULB</span></span></a></div>
+                  <div><a href="-c-o-p-p-e-r_-b-u-l-b.html"><span>COPPER_</span><wbr><span>BULB</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="466397557%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -448,7 +480,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-c-o-p-p-e-r_-g-r-a-t-e.html"><span><span>COPPER_GRATE</span></span></a></div>
+                  <div><a href="-c-o-p-p-e-r_-g-r-a-t-e.html"><span>COPPER_</span><wbr><span>GRATE</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1673640587%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -463,7 +495,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-c-o-r-a-l_-b-l-o-c-k.html"><span><span>CORAL_BLOCK</span></span></a></div>
+                  <div><a href="-c-o-r-a-l_-b-l-o-c-k.html"><span>CORAL_</span><wbr><span>BLOCK</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-251675355%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -493,7 +525,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-d-e-c-o-r-a-t-e-d_-p-o-t.html"><span><span>DECORATED_POT</span></span></a></div>
+                  <div><a href="-d-e-c-o-r-a-t-e-d_-p-o-t.html"><span>DECORATED_</span><wbr><span>POT</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1635865879%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -508,7 +540,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-d-e-c-o-r-a-t-e-d_-p-o-t_-c-r-a-c-k-e-d.html"><span><span>DECORATED_POT_CRACKED</span></span></a></div>
+                  <div><a href="-d-e-c-o-r-a-t-e-d_-p-o-t_-c-r-a-c-k-e-d.html"><span>DECORATED_</span><wbr><span>POT_</span><wbr><span>CRACKED</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1658839587%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -538,7 +570,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-d-e-e-p-s-l-a-t-e_-b-r-i-c-k-s.html"><span><span>DEEPSLATE_BRICKS</span></span></a></div>
+                  <div><a href="-d-e-e-p-s-l-a-t-e_-b-r-i-c-k-s.html"><span>DEEPSLATE_</span><wbr><span>BRICKS</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="507907218%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -553,7 +585,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-d-e-e-p-s-l-a-t-e_-t-i-l-e-s.html"><span><span>DEEPSLATE_TILES</span></span></a></div>
+                  <div><a href="-d-e-e-p-s-l-a-t-e_-t-i-l-e-s.html"><span>DEEPSLATE_</span><wbr><span>TILES</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1026937295%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -568,7 +600,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-d-r-i-p-s-t-o-n-e_-b-l-o-c-k.html"><span><span>DRIPSTONE_BLOCK</span></span></a></div>
+                  <div><a href="-d-r-i-p-s-t-o-n-e_-b-l-o-c-k.html"><span>DRIPSTONE_</span><wbr><span>BLOCK</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-647530842%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -583,7 +615,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-f-l-o-w-e-r-i-n-g_-a-z-a-l-e-a.html"><span><span>FLOWERING_AZALEA</span></span></a></div>
+                  <div><a href="-f-l-o-w-e-r-i-n-g_-a-z-a-l-e-a.html"><span>FLOWERING_</span><wbr><span>AZALEA</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="718339678%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -643,7 +675,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-g-i-l-d-e-d_-b-l-a-c-k-s-t-o-n-e.html"><span><span>GILDED_BLACKSTONE</span></span></a></div>
+                  <div><a href="-g-i-l-d-e-d_-b-l-a-c-k-s-t-o-n-e.html"><span>GILDED_</span><wbr><span>BLACKSTONE</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1311981704%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -673,7 +705,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-g-l-o-w_-l-i-c-h-e-n.html"><span><span>GLOW_LICHEN</span></span></a></div>
+                  <div><a href="-g-l-o-w_-l-i-c-h-e-n.html"><span>GLOW_</span><wbr><span>LICHEN</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1471435801%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -718,7 +750,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-h-a-n-g-i-n-g_-r-o-o-t-s.html"><span><span>HANGING_ROOTS</span></span></a></div>
+                  <div><a href="-h-a-n-g-i-n-g_-r-o-o-t-s.html"><span>HANGING_</span><wbr><span>ROOTS</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1938012866%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -733,7 +765,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-h-a-n-g-i-n-g_-s-i-g-n.html"><span><span>HANGING_SIGN</span></span></a></div>
+                  <div><a href="-h-a-n-g-i-n-g_-s-i-g-n.html"><span>HANGING_</span><wbr><span>SIGN</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2006605898%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -748,7 +780,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-h-a-r-d_-c-r-o-p.html"><span><span>HARD_CROP</span></span></a></div>
+                  <div><a href="-h-a-r-d_-c-r-o-p.html"><span>HARD_</span><wbr><span>CROP</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="65770464%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -763,7 +795,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-h-e-a-v-y_-c-o-r-e.html"><span><span>HEAVY_CORE</span></span></a></div>
+                  <div><a href="-h-e-a-v-y_-c-o-r-e.html"><span>HEAVY_</span><wbr><span>CORE</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1254556479%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -778,7 +810,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-h-o-n-e-y_-b-l-o-c-k.html"><span><span>HONEY_BLOCK</span></span></a></div>
+                  <div><a href="-h-o-n-e-y_-b-l-o-c-k.html"><span>HONEY_</span><wbr><span>BLOCK</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="596571355%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -823,7 +855,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-l-a-r-g-e_-a-m-e-t-h-y-s-t_-b-u-d.html"><span><span>LARGE_AMETHYST_BUD</span></span></a></div>
+                  <div><a href="-l-a-r-g-e_-a-m-e-t-h-y-s-t_-b-u-d.html"><span>LARGE_</span><wbr><span>AMETHYST_</span><wbr><span>BUD</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1798895949%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -838,7 +870,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-l-i-l-y_-p-a-d.html"><span><span>LILY_PAD</span></span></a></div>
+                  <div><a href="-l-i-l-y_-p-a-d.html"><span>LILY_</span><wbr><span>PAD</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-5860072%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -868,7 +900,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-m-a-n-g-r-o-v-e_-r-o-o-t-s.html"><span><span>MANGROVE_ROOTS</span></span></a></div>
+                  <div><a href="-m-a-n-g-r-o-v-e_-r-o-o-t-s.html"><span>MANGROVE_</span><wbr><span>ROOTS</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="146364427%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -883,7 +915,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-m-e-d-i-u-m_-a-m-e-t-h-y-s-t_-b-u-d.html"><span><span>MEDIUM_AMETHYST_BUD</span></span></a></div>
+                  <div><a href="-m-e-d-i-u-m_-a-m-e-t-h-y-s-t_-b-u-d.html"><span>MEDIUM_</span><wbr><span>AMETHYST_</span><wbr><span>BUD</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1358993157%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -928,7 +960,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-m-o-s-s_-c-a-r-p-e-t.html"><span><span>MOSS_CARPET</span></span></a></div>
+                  <div><a href="-m-o-s-s_-c-a-r-p-e-t.html"><span>MOSS_</span><wbr><span>CARPET</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-819230756%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -958,7 +990,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-m-u-d_-b-r-i-c-k-s.html"><span><span>MUD_BRICKS</span></span></a></div>
+                  <div><a href="-m-u-d_-b-r-i-c-k-s.html"><span>MUD_</span><wbr><span>BRICKS</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1354245407%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -973,7 +1005,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-m-u-d-d-y_-m-a-n-g-r-o-v-e_-r-o-o-t-s.html"><span><span>MUDDY_MANGROVE_ROOTS</span></span></a></div>
+                  <div><a href="-m-u-d-d-y_-m-a-n-g-r-o-v-e_-r-o-o-t-s.html"><span>MUDDY_</span><wbr><span>MANGROVE_</span><wbr><span>ROOTS</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1645415485%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -988,7 +1020,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-n-e-t-h-e-r_-b-r-i-c-k-s.html"><span><span>NETHER_BRICKS</span></span></a></div>
+                  <div><a href="-n-e-t-h-e-r_-b-r-i-c-k-s.html"><span>NETHER_</span><wbr><span>BRICKS</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1307093323%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1003,7 +1035,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-n-e-t-h-e-r_-g-o-l-d_-o-r-e.html"><span><span>NETHER_GOLD_ORE</span></span></a></div>
+                  <div><a href="-n-e-t-h-e-r_-g-o-l-d_-o-r-e.html"><span>NETHER_</span><wbr><span>GOLD_</span><wbr><span>ORE</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-61935526%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1018,7 +1050,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-n-e-t-h-e-r_-o-r-e.html"><span><span>NETHER_ORE</span></span></a></div>
+                  <div><a href="-n-e-t-h-e-r_-o-r-e.html"><span>NETHER_</span><wbr><span>ORE</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1912838555%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1033,7 +1065,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-n-e-t-h-e-r_-s-p-r-o-u-t-s.html"><span><span>NETHER_SPROUTS</span></span></a></div>
+                  <div><a href="-n-e-t-h-e-r_-s-p-r-o-u-t-s.html"><span>NETHER_</span><wbr><span>SPROUTS</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="168560995%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1048,7 +1080,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-n-e-t-h-e-r_-w-a-r-t.html"><span><span>NETHER_WART</span></span></a></div>
+                  <div><a href="-n-e-t-h-e-r_-w-a-r-t.html"><span>NETHER_</span><wbr><span>WART</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="674574417%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1063,7 +1095,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-n-e-t-h-e-r_-w-o-o-d.html"><span><span>NETHER_WOOD</span></span></a></div>
+                  <div><a href="-n-e-t-h-e-r_-w-o-o-d.html"><span>NETHER_</span><wbr><span>WOOD</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1977928880%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1078,7 +1110,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-n-e-t-h-e-r_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html"><span><span>NETHER_WOOD_HANGING_SIGN</span></span></a></div>
+                  <div><a href="-n-e-t-h-e-r_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html"><span>NETHER_</span><wbr><span>WOOD_</span><wbr><span>HANGING_</span><wbr><span>SIGN</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-79532801%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1093,7 +1125,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-n-e-t-h-e-r-i-t-e_-b-l-o-c-k.html"><span><span>NETHERITE_BLOCK</span></span></a></div>
+                  <div><a href="-n-e-t-h-e-r-i-t-e_-b-l-o-c-k.html"><span>NETHERITE_</span><wbr><span>BLOCK</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-134370700%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1138,7 +1170,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-p-a-c-k-e-d_-m-u-d.html"><span><span>PACKED_MUD</span></span></a></div>
+                  <div><a href="-p-a-c-k-e-d_-m-u-d.html"><span>PACKED_</span><wbr><span>MUD</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1199159777%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1153,7 +1185,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-p-i-n-k_-p-e-t-a-l-s.html"><span><span>PINK_PETALS</span></span></a></div>
+                  <div><a href="-p-i-n-k_-p-e-t-a-l-s.html"><span>PINK_</span><wbr><span>PETALS</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2059097138%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1168,7 +1200,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-p-o-i-n-t-e-d_-d-r-i-p-s-t-o-n-e.html"><span><span>POINTED_DRIPSTONE</span></span></a></div>
+                  <div><a href="-p-o-i-n-t-e-d_-d-r-i-p-s-t-o-n-e.html"><span>POINTED_</span><wbr><span>DRIPSTONE</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1278279876%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1183,7 +1215,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-p-o-l-i-s-h-e-d_-d-e-e-p-s-l-a-t-e.html"><span><span>POLISHED_DEEPSLATE</span></span></a></div>
+                  <div><a href="-p-o-l-i-s-h-e-d_-d-e-e-p-s-l-a-t-e.html"><span>POLISHED_</span><wbr><span>DEEPSLATE</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1979029080%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1198,7 +1230,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-p-o-l-i-s-h-e-d_-t-u-f-f.html"><span><span>POLISHED_TUFF</span></span></a></div>
+                  <div><a href="-p-o-l-i-s-h-e-d_-t-u-f-f.html"><span>POLISHED_</span><wbr><span>TUFF</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-478340908%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1213,7 +1245,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-p-o-w-d-e-r_-s-n-o-w.html"><span><span>POWDER_SNOW</span></span></a></div>
+                  <div><a href="-p-o-w-d-e-r_-s-n-o-w.html"><span>POWDER_</span><wbr><span>SNOW</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1004400677%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1228,7 +1260,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-r-o-o-t-e-d_-d-i-r-t.html"><span><span>ROOTED_DIRT</span></span></a></div>
+                  <div><a href="-r-o-o-t-e-d_-d-i-r-t.html"><span>ROOTED_</span><wbr><span>DIRT</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="50781343%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1303,7 +1335,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-c-u-l-k_-c-a-t-a-l-y-s-t.html"><span><span>SCULK_CATALYST</span></span></a></div>
+                  <div><a href="-s-c-u-l-k_-c-a-t-a-l-y-s-t.html"><span>SCULK_</span><wbr><span>CATALYST</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1647497854%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1318,7 +1350,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-c-u-l-k_-s-e-n-s-o-r.html"><span><span>SCULK_SENSOR</span></span></a></div>
+                  <div><a href="-s-c-u-l-k_-s-e-n-s-o-r.html"><span>SCULK_</span><wbr><span>SENSOR</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1784198431%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1333,7 +1365,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-c-u-l-k_-s-h-r-i-e-k-e-r.html"><span><span>SCULK_SHRIEKER</span></span></a></div>
+                  <div><a href="-s-c-u-l-k_-s-h-r-i-e-k-e-r.html"><span>SCULK_</span><wbr><span>SHRIEKER</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1653653092%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1348,7 +1380,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-c-u-l-k_-v-e-i-n.html"><span><span>SCULK_VEIN</span></span></a></div>
+                  <div><a href="-s-c-u-l-k_-v-e-i-n.html"><span>SCULK_</span><wbr><span>VEIN</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1336080199%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1378,7 +1410,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-l-i-m-e_-b-l-o-c-k.html"><span><span>SLIME_BLOCK</span></span></a></div>
+                  <div><a href="-s-l-i-m-e_-b-l-o-c-k.html"><span>SLIME_</span><wbr><span>BLOCK</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="118894510%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1393,7 +1425,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-m-a-l-l_-a-m-e-t-h-y-s-t_-b-u-d.html"><span><span>SMALL_AMETHYST_BUD</span></span></a></div>
+                  <div><a href="-s-m-a-l-l_-a-m-e-t-h-y-s-t_-b-u-d.html"><span>SMALL_</span><wbr><span>AMETHYST_</span><wbr><span>BUD</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="239675263%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1408,7 +1440,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-m-a-l-l_-d-r-i-p-l-e-a-f.html"><span><span>SMALL_DRIPLEAF</span></span></a></div>
+                  <div><a href="-s-m-a-l-l_-d-r-i-p-l-e-a-f.html"><span>SMALL_</span><wbr><span>DRIPLEAF</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="67282443%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1438,7 +1470,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-o-u-l_-s-a-n-d.html"><span><span>SOUL_SAND</span></span></a></div>
+                  <div><a href="-s-o-u-l_-s-a-n-d.html"><span>SOUL_</span><wbr><span>SAND</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="227024756%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1453,7 +1485,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-o-u-l_-s-o-i-l.html"><span><span>SOUL_SOIL</span></span></a></div>
+                  <div><a href="-s-o-u-l_-s-o-i-l.html"><span>SOUL_</span><wbr><span>SOIL</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="690736089%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1483,7 +1515,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-p-o-r-e_-b-l-o-s-s-o-m.html"><span><span>SPORE_BLOSSOM</span></span></a></div>
+                  <div><a href="-s-p-o-r-e_-b-l-o-s-s-o-m.html"><span>SPORE_</span><wbr><span>BLOSSOM</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="367134043%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1528,7 +1560,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-u-s-p-i-c-i-o-u-s_-g-r-a-v-e-l.html"><span><span>SUSPICIOUS_GRAVEL</span></span></a></div>
+                  <div><a href="-s-u-s-p-i-c-i-o-u-s_-g-r-a-v-e-l.html"><span>SUSPICIOUS_</span><wbr><span>GRAVEL</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="994126779%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1543,7 +1575,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-u-s-p-i-c-i-o-u-s_-s-a-n-d.html"><span><span>SUSPICIOUS_SAND</span></span></a></div>
+                  <div><a href="-s-u-s-p-i-c-i-o-u-s_-s-a-n-d.html"><span>SUSPICIOUS_</span><wbr><span>SAND</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-946396642%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1558,7 +1590,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-s-w-e-e-t_-b-e-r-r-y_-b-u-s-h.html"><span><span>SWEET_BERRY_BUSH</span></span></a></div>
+                  <div><a href="-s-w-e-e-t_-b-e-r-r-y_-b-u-s-h.html"><span>SWEET_</span><wbr><span>BERRY_</span><wbr><span>BUSH</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1166981514%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1573,7 +1605,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-t-r-i-a-l_-s-p-a-w-n-e-r.html"><span><span>TRIAL_SPAWNER</span></span></a></div>
+                  <div><a href="-t-r-i-a-l_-s-p-a-w-n-e-r.html"><span>TRIAL_</span><wbr><span>SPAWNER</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-819529435%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1603,7 +1635,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-t-u-f-f_-b-r-i-c-k-s.html"><span><span>TUFF_BRICKS</span></span></a></div>
+                  <div><a href="-t-u-f-f_-b-r-i-c-k-s.html"><span>TUFF_</span><wbr><span>BRICKS</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2053614156%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1618,7 +1650,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-t-w-i-s-t-i-n-g_-v-i-n-e-s.html"><span><span>TWISTING_VINES</span></span></a></div>
+                  <div><a href="-t-w-i-s-t-i-n-g_-v-i-n-e-s.html"><span>TWISTING_</span><wbr><span>VINES</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="878766769%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1663,7 +1695,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-w-a-r-t_-b-l-o-c-k.html"><span><span>WART_BLOCK</span></span></a></div>
+                  <div><a href="-w-a-r-t_-b-l-o-c-k.html"><span>WART_</span><wbr><span>BLOCK</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="888826844%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1678,7 +1710,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-w-e-e-p-i-n-g_-v-i-n-e-s.html"><span><span>WEEPING_VINES</span></span></a></div>
+                  <div><a href="-w-e-e-p-i-n-g_-v-i-n-e-s.html"><span>WEEPING_</span><wbr><span>VINES</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1146992303%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1693,7 +1725,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-w-e-t_-g-r-a-s-s.html"><span><span>WET_GRASS</span></span></a></div>
+                  <div><a href="-w-e-t_-g-r-a-s-s.html"><span>WET_</span><wbr><span>GRASS</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="495037447%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1708,7 +1740,7 @@
           <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-w-e-t_-s-p-o-n-g-e.html"><span><span>WET_SPONGE</span></span></a></div>
+                  <div><a href="-w-e-t_-s-p-o-n-g-e.html"><span>WET_</span><wbr><span>SPONGE</span></a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1930340611%2FProperties%2F2031297628"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
@@ -1773,12 +1805,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2025 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-

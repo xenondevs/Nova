@@ -25,37 +25,69 @@
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
 <link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
 <script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
 <script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
 <body>
     <div class="root">
-<nav class="navigation" id="navigation-wrapper">
-    <div class="navigation--inner">
-        <div class="navigation-title">
-            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
-            <div class="library-name">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
 <a class="library-name--link" href="../../../index.html">
-                            nova-parent
-                    </a>            </div>
-            <div class="library-version">0.18-alpha.13
+                    nova-parent
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.18-alpha.14
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova:dokkaHtmlPartial/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova:dokkaHtmlPartial/main" data-filter=":nova:dokkaHtmlPartial/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
         </div>
-        <div class="filter-section" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova:dokkaHtmlPartial/main">jvm</button>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
         </div>
-    </div>
-    <div class="navigation-controls">
-        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
-        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
-    </div>
-</nav>
+    </nav>
         <div id="container">
             <div class="sidebar" id="leftColumn">
-                <div class="sidebar--inner" id="sideMenu"></div>
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    nova-parent
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
             </div>
             <div id="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.world.generation.builder/DimensionTypeBuilder///PointingToDeclaration//2031297628">
@@ -98,7 +130,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="ambient-light.html"><span class="token function">ambientLight</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ambientLight<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">ambientLight</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="ambient-light.html"><span class="token function">ambientLight</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ambientLight<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">ambientLight</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -113,7 +145,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="bed-works.html"><span class="token function">bedWorks</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bedWorks<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">bedWorks</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which will lead to beds blowing up when trying to sleep if set to <code class="lang-kotlin">false</code>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="bed-works.html"><span class="token function">bedWorks</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">bedWorks<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">bedWorks</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which will lead to beds blowing up when trying to sleep if set to <code class="lang-kotlin">false</code>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -128,7 +160,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="coordinate-scale.html"><span class="token function">coordinateScale</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scale<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-double/index.html">Double</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">coordinateScale</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines the multiplier applied to the coordinates when leaving the dimension. (e.g. 8.0 for the nether)</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="coordinate-scale.html"><span class="token function">coordinateScale</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scale<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">coordinateScale</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines the multiplier applied to the coordinates when leaving the dimension. (e.g. 8.0 for the nether)</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -158,7 +190,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="fixed-time.html"><span class="token function">fixedTime</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">time<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">fixedTime</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>. If this is set the tick time of any level of this dimension type will be fixed to the given value.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="fixed-time.html"><span class="token function">fixedTime</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">time<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">fixedTime</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>. If this is set the tick time of any level of this dimension type will be fixed to the given value.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -173,7 +205,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="has-ceiling.html"><span class="token function">hasCeiling</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ceiling<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">hasCeiling</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines if this dimension type has a bedrock ceiling (like the nether). Please note that this property won't actually lead to a bedrock ceiling being generated. It's only used to handle other gameplay mechanics like mob spawning or maps.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="has-ceiling.html"><span class="token function">hasCeiling</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ceiling<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">hasCeiling</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines if this dimension type has a bedrock ceiling (like the nether). Please note that this property won't actually lead to a bedrock ceiling being generated. It's only used to handle other gameplay mechanics like mob spawning or maps.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -188,7 +220,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="has-sky-light.html"><span class="token function">hasSkyLight</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">skylight<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">hasSkyLight</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines if this dimension type has a sky light source.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="has-sky-light.html"><span class="token function">hasSkyLight</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">skylight<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">hasSkyLight</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines if this dimension type has a sky light source.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -203,7 +235,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="height.html"><span class="token function">height</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">height<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">height</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines the amount of layers that can contain blocks. Must be a multiple of 16 and a value between <code class="lang-kotlin">0</code> and <code class="lang-kotlin">4096</code>. The max height <code class="lang-kotlin">(minY + height - 1)</code> cannot exceed <code class="lang-kotlin">2031</code>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="height.html"><span class="token function">height</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">height<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">height</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines the amount of layers that can contain blocks. Must be a multiple of 16 and a value between <code class="lang-kotlin">0</code> and <code class="lang-kotlin">4096</code>. The max height <code class="lang-kotlin">(minY + height - 1)</code> cannot exceed <code class="lang-kotlin">2031</code>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -233,7 +265,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="logical-height.html"><span class="token function">logicalHeight</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">logicalHeight<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">logicalHeight</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines the max y level a player can be teleported to by chorus fruits and nether portals. Can't be higher than the <code class="lang-kotlin">height</code> property.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="logical-height.html"><span class="token function">logicalHeight</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">logicalHeight<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">logicalHeight</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines the max y level a player can be teleported to by chorus fruits and nether portals. Can't be higher than the <code class="lang-kotlin">height</code> property.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -248,7 +280,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="min-y.html"><span class="token function">minY</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">minY<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">minY</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines the minimum y level that can contain blocks. Must be a multiple of 16 and a value between <code class="lang-kotlin">-2032</code> and <code class="lang-kotlin">2016</code>. The max height <code class="lang-kotlin">(minY + height - 1)</code> cannot exceed <code class="lang-kotlin">2031</code>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="min-y.html"><span class="token function">minY</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">minY<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">minY</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines the minimum y level that can contain blocks. Must be a multiple of 16 and a value between <code class="lang-kotlin">-2032</code> and <code class="lang-kotlin">2016</code>. The max height <code class="lang-kotlin">(minY + height - 1)</code> cannot exceed <code class="lang-kotlin">2031</code>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -263,7 +295,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="monster-settings.html"><span class="token function">monsterSettings</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">builder<span class="token operator">: </span><a href="../-monster-settings-builder/index.html">MonsterSettingsBuilder</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType.MonsterSettings///PointingToDeclaration/">MonsterSettings</span> of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span> using a <a href="../-monster-settings-builder/index.html">MonsterSettingsBuilder</a>.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="monster-settings.html"><span class="token function">monsterSettings</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">monsterSettings<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType.MonsterSettings///PointingToDeclaration/">DimensionType.MonsterSettings</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType.MonsterSettings///PointingToDeclaration/">MonsterSettings</span> of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>. For more information check out the <a href="../-monster-settings-builder/index.html">MonsterSettingsBuilder</a></p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="monster-settings.html"><span class="token function">monsterSettings</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">builder<span class="token operator">: </span><a href="../-monster-settings-builder/index.html">MonsterSettingsBuilder</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType.MonsterSettings///PointingToDeclaration/">MonsterSettings</span> of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span> using a <a href="../-monster-settings-builder/index.html">MonsterSettingsBuilder</a>.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="monster-settings.html"><span class="token function">monsterSettings</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">monsterSettings<span class="token operator">: </span><span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType.MonsterSettings///PointingToDeclaration/">DimensionType.MonsterSettings</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType.MonsterSettings///PointingToDeclaration/">MonsterSettings</span> of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>. For more information check out the <a href="../-monster-settings-builder/index.html">MonsterSettingsBuilder</a></p></div></div></div>
                 </div>
               </div>
             </div>
@@ -278,7 +310,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="natural.html"><span class="token function">natural</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">natural<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">natural</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>. If this is set to <code class="lang-kotlin">false</code>, compasses will spin randomly, beds are useless regarding spawn points. If <code class="lang-kotlin">true</code> they will work as expected and nether portals will spawn zombified piglins.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="natural.html"><span class="token function">natural</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">natural<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">natural</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>. If this is set to <code class="lang-kotlin">false</code>, compasses will spin randomly, beds are useless regarding spawn points. If <code class="lang-kotlin">true</code> they will work as expected and nether portals will spawn zombified piglins.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -293,7 +325,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="respawn-anchor-works.html"><span class="token function">respawnAnchorWorks</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">respawnAnchorWorks<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">respawnAnchorWorks</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which will lead to respawn anchors blowing up when trying to use them if set to <code class="lang-kotlin">false</code>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="respawn-anchor-works.html"><span class="token function">respawnAnchorWorks</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">respawnAnchorWorks<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">respawnAnchorWorks</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which will lead to respawn anchors blowing up when trying to use them if set to <code class="lang-kotlin">false</code>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -308,7 +340,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="ultra-warm.html"><span class="token function">ultraWarm</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ultraWarm<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">ultraWarm</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines if this dimension type should behave similar to the nether regarding water evaporation, lava spread or stalactite fluid drops.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="ultra-warm.html"><span class="token function">ultraWarm</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ultraWarm<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets the <code class="lang-kotlin">ultraWarm</code> property of this <span data-unresolved-link="net.minecraft.world.level.dimension/DimensionType///PointingToDeclaration/">DimensionType</span>, which determines if this dimension type should behave similar to the nether regarding water evaporation, lava spread or stalactite fluid drops.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -318,12 +350,18 @@
     </div>
   </div>
 </div>
-      <div class="footer">
-        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
-      </div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2025 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
             </div>
         </div>
     </div>
 </body>
 </html>
-
