@@ -3,7 +3,7 @@ format.version = "1.1"
 
 [versions]
 bytebase = "0.4.8"
-cbf = "0.17"
+cbf = "0.18"
 jgrapht = "1.5.2"
 kotlin = "2.1.0"
 kotlinx-coroutines = "1.10.1"
