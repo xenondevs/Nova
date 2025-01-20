@@ -1,24 +1,28 @@
 package xyz.xenondevs.nova.patch.impl.item
 
-import net.minecraft.world.item.SwordItem
+import net.minecraft.tags.ItemTags
+import net.minecraft.tags.TagKey
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.craftbukkit.block.CraftBlock
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.TypeInsnNode
-import xyz.xenondevs.bytebase.asm.buildInsnList
+import org.objectweb.asm.tree.FieldInsnNode
+import org.objectweb.asm.tree.MethodInsnNode
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
-import xyz.xenondevs.bytebase.util.isClass
-import xyz.xenondevs.bytebase.util.replaceFirst
+import xyz.xenondevs.bytebase.util.calls
+import xyz.xenondevs.bytebase.util.gets
+import xyz.xenondevs.bytebase.util.replaceEvery
 import xyz.xenondevs.nova.patch.MultiTransformer
 import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.item.behavior.Tool
-import xyz.xenondevs.nova.world.item.tool.ToolCategory
-import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.ItemStack as MojangStack
+
+private val ITEM_STACK_IS_TAG = ReflectionUtils.getMethod(ItemStack::class, "is", TagKey::class)
 
 @Suppress("unused")
 internal object ToolPatches : MultiTransformer(CraftBlock::class, MojangPlayer::class) {
@@ -50,10 +54,14 @@ internal object ToolPatches : MultiTransformer(CraftBlock::class, MojangPlayer::
      * Patches the Player#attack method to use properly perform sweep attacks.
      */
     private fun transformPlayerAttack() {
-        VirtualClassPath[MojangPlayer::attack]
-            .replaceFirst(1, 0, buildInsnList {
-                invokeStatic(::canDoSweepAttack)
-            }) { it.opcode == Opcodes.INSTANCEOF && (it as TypeInsnNode).isClass(SwordItem::class) }
+        VirtualClassPath[MojangPlayer::attack].replaceEvery(
+            0, 1,
+            { invokeStatic(::canDoSweepAttack) },
+            {
+                it.opcode == Opcodes.GETSTATIC && (it as FieldInsnNode).gets(ItemTags::SWORDS)
+                    && it.next.opcode == Opcodes.INVOKEVIRTUAL && (it.next as MethodInsnNode).calls(ITEM_STACK_IS_TAG)
+            }
+        )
     }
     
     @JvmStatic
@@ -61,10 +69,9 @@ internal object ToolPatches : MultiTransformer(CraftBlock::class, MojangPlayer::
         val novaItem = itemStack.novaItem
         
         if (novaItem != null) {
-            return novaItem.getBehaviorOrNull(Tool::class)?.canSweepAttack ?: false
+            return novaItem.getBehaviorOrNull<Tool>()?.canSweepAttack == true
         } else {
-            return ToolCategory.ofItem(itemStack.asBukkitMirror())
-                .any { it is VanillaToolCategory && it.canSweepAttack }
+            return itemStack.`is`(ItemTags.SWORDS)
         }
     }
     
