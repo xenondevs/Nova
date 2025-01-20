@@ -6,7 +6,6 @@ import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.TagKey
-import net.minecraft.world.item.SwordItem
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
 import org.bukkit.Material
@@ -20,7 +19,6 @@ import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.nova.util.eyeInWater
 import xyz.xenondevs.nova.util.hardness
-import xyz.xenondevs.nova.util.nmsItem
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.novaBlock
 import xyz.xenondevs.nova.util.roundToDecimalPlaces
@@ -91,7 +89,7 @@ object ToolUtils {
         
         // hardcoded in BambooSaplingBlock and BambooStalkBlock, ignores block break speed attribute
         // https://bugs.mojang.com/browse/MC-275705
-        if ((block.type == Material.BAMBOO || block.type == Material.BAMBOO_SAPLING) && tool?.type?.nmsItem is SwordItem)
+        if ((block.type == Material.BAMBOO || block.type == Material.BAMBOO_SAPLING) && VanillaToolCategories.SWORD in ToolCategory.ofItem(tool))
             return 1.0
         
         var damage = calculateDamage(
