@@ -46,7 +46,8 @@ private val STRIPPABLES: Map<Block, Block> = mapOf(
     Blocks.CRIMSON_HYPHAE to Blocks.STRIPPED_CRIMSON_HYPHAE,
     Blocks.MANGROVE_WOOD to Blocks.STRIPPED_MANGROVE_WOOD,
     Blocks.MANGROVE_LOG to Blocks.STRIPPED_MANGROVE_LOG,
-    Blocks.CHERRY_LOG to Blocks.STRIPPED_CHERRY_LOG
+    Blocks.CHERRY_LOG to Blocks.STRIPPED_CHERRY_LOG,
+    Blocks.PALE_OAK_LOG to Blocks.STRIPPED_PALE_OAK_LOG
 )
 
 /**
