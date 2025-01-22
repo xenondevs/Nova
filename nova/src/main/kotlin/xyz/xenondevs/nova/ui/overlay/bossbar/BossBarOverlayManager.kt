@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.ui.overlay.bossbar
 
+import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader
 import net.kyori.adventure.text.Component
 import net.minecraft.world.BossEvent
 import org.bukkit.Bukkit
@@ -12,7 +13,6 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent
 import org.bukkit.event.player.PlayerResourcePackStatusEvent.Status
 import org.bukkit.plugin.Plugin
 import org.bukkit.scheduler.BukkitTask
-import xyz.xenondevs.invui.internal.util.ReflectionRegistry
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
@@ -352,17 +352,18 @@ object BossBarOverlayManager : Listener, PacketListener {
         }
     }
     
+    @Suppress("UnstableApiUsage")
     internal fun handleBossBarAddPacketCreation(event: BossEvent) {
         var plugin: Plugin? = null
         StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).forEach {
             val classLoader = it.declaringClass.classLoader
-            if (classLoader?.javaClass == ReflectionRegistry.PLUGIN_CLASS_LOADER_CLASS) { // TODO: paper plugin class loader
-                plugin = ReflectionRegistry.PLUGIN_CLASS_LOADER_PLUGIN_FIELD.get(classLoader) as Plugin
+            if (classLoader is ConfiguredPluginClassLoader) {
+                plugin = classLoader.plugin
             }
         }
         
         if (plugin != null && plugin != Nova) {
-            trackedOrigins[event.id] = BarOrigin.Plugin(plugin)
+            trackedOrigins[event.id] = BarOrigin.Plugin(plugin!!)
         }
     }
     
