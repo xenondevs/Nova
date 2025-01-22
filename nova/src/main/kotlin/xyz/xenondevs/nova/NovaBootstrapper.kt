@@ -22,8 +22,6 @@ import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.data.VersionRange
 import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 
@@ -105,8 +103,8 @@ internal class NovaBootstrapper : PluginBootstrap {
             Configs.extractDefaultConfig()
             CBFAdapters.register()
             Initializer.start()
-        } catch (e: Exception) {
-            LOGGER.error("", e)
+        } catch (t: Throwable) {
+            LOGGER.error("", t)
             (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
             Runtime.getRuntime().halt(-1) // force-quit
         }

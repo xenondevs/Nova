@@ -7,6 +7,8 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.gson.*
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.invui.InvUI
@@ -42,18 +44,36 @@ internal val HTTP_CLIENT = HttpClient(CIO) {
 internal var PLUGIN_READY = false
     private set
 
+private val INCOMPATIBLE_PLUGINS = setOf(
+    // FAWE replaces LevelChunkSections, preventing Nova from doing block migrations & world gen
+    // https://github.com/xenondevs/Nova/issues/560
+    "FastAsyncWorldEdit"
+)
+
 internal object Nova : JavaPlugin(), INova {
     
     override fun onEnable() {
-        if (BOOTSTRAPPER.remainingAddons > 0)
-            throw IllegalStateException("${BOOTSTRAPPER.remainingAddons} addons did not load.")
-        
-        PLUGIN_READY = true
-        LIFECYCLE_MANAGER = lifecycleManager
-        
-        InvUI.getInstance().setPlugin(this)
-        Languages.getInstance().enableServerSideTranslations(false)
-        Initializer.registerEvents()
+        try {
+            if (BOOTSTRAPPER.remainingAddons > 0)
+                throw IllegalStateException("${BOOTSTRAPPER.remainingAddons} addons did not load.")
+            
+            val incompatibilities = Bukkit.getServer().pluginManager.plugins
+                .map { it.name }
+                .filter { it in INCOMPATIBLE_PLUGINS }
+            if (incompatibilities.isNotEmpty())
+                throw Exception("Nova is not compatible with the following plugin(s): ${incompatibilities.joinToString()}")
+            
+            PLUGIN_READY = true
+            LIFECYCLE_MANAGER = lifecycleManager
+            
+            InvUI.getInstance().setPlugin(this)
+            Languages.getInstance().enableServerSideTranslations(false)
+            Initializer.registerEvents()
+        } catch (t: Throwable) {
+            LOGGER.error("", t)
+            (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
+            Runtime.getRuntime().halt(-1) // force-quit
+        }
     }
     
     override fun onDisable() {

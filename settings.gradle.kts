@@ -6,7 +6,6 @@ include("nova-api")
 include("nova-gradle-plugin")
 
 // hooks
-include("nova-hooks:nova-hook-fastasyncworldedit")
 include("nova-hooks:nova-hook-griefprevention")
 include("nova-hooks:nova-hook-itemsadder")
 include("nova-hooks:nova-hook-luckperms")
