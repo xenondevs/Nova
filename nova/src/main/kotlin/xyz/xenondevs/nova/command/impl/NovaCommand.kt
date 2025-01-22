@@ -48,7 +48,7 @@ import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.ui.menu.explorer.creative.ItemsWindow
+import xyz.xenondevs.nova.ui.menu.explorer.creative.ItemsMenu
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.CUBE_FACES
@@ -875,7 +875,7 @@ internal object NovaCommand : Command() {
     }
     
     private fun openItemInventory(ctx: CommandContext<CommandSourceStack>) {
-        ItemsWindow(ctx.player).show()
+        ItemsMenu(ctx.player).show()
     }
     
     private fun setRenderDistance(ctx: CommandContext<CommandSourceStack>) {

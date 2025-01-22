@@ -4,8 +4,11 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack
-import org.spongepowered.configurate.CommentedConfigurationNode
+import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.flatMapCollection
+import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.invui.item.ItemProvider
@@ -14,36 +17,19 @@ import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.addon.name
 import xyz.xenondevs.nova.config.Configs
-import xyz.xenondevs.nova.initialize.InitFun
-import xyz.xenondevs.nova.initialize.InternalInit
-import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.ui.menu.explorer.creative.ItemsWindow
+import xyz.xenondevs.nova.ui.menu.explorer.creative.ItemsMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.handleRecipeChoiceItemClick
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaItem
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object ItemCategories {
     
-    lateinit var CATEGORIES: List<ItemCategory>
-        private set
-    lateinit var OBTAINABLE_ITEMS: List<CategorizedItem>
-        private set
-    
-    @InitFun
-    private fun init() {
-        val cfg = Configs["nova:item_categories"]
-        reload(cfg.get())
-        cfg.subscribe(::reload)
-    }
-    
-    private fun reload(cfg: CommentedConfigurationNode) {
-        CATEGORIES = cfg.get<List<ItemCategory>>()?.takeUnlessEmpty() ?: getDefaultItemCategories()
-        OBTAINABLE_ITEMS = CATEGORIES.flatMap(ItemCategory::items)
-    }
+    val categories: Provider<List<ItemCategory>> = Configs["nova:item_categories"]
+        .map { it.get<List<ItemCategory>>()?.takeUnlessEmpty() ?: getDefaultItemCategories() }
+    val obtainableItems: Provider<List<CategorizedItem>> = categories.flatMapCollection(ItemCategory::items)
     
     private fun getDefaultItemCategories(): List<ItemCategory> =
         AddonBootstrapper.addons
@@ -73,7 +59,9 @@ internal class CategorizedItem(val id: String) : AbstractItem() {
     override fun getItemProvider(player: Player) = itemProvider
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) {
-        if (player in ItemsWindow.cheaters && player.hasPermission("nova.command.give")) {
+        if (player.hasPermission("nova.command.give")
+            && player.persistentDataContainer.get(ItemsMenu.CHEAT_MODE_KEY, PersistentDataType.BOOLEAN) == true
+        ) {
             if (clickType == ClickType.MIDDLE) {
                 player.setItemOnCursor(itemStack.clone().apply { amount = novaItem?.maxStackSize ?: type.maxStackSize })
             } else if (clickType.isShiftClick) {

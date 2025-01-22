@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.ui.menu
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.IngredientMapper
 import xyz.xenondevs.invui.gui.Markers
+import xyz.xenondevs.invui.gui.Structure
 import xyz.xenondevs.invui.gui.Structure.addGlobalIngredient
 import xyz.xenondevs.invui.inventory.Inventory
 import xyz.xenondevs.nova.ui.menu.item.PageBackItem
@@ -29,6 +30,7 @@ internal fun setGlobalIngredients() {
     addGlobalIngredient('d', ::ScrollDownItem)
     addGlobalIngredient('<', ::PageBackItem)
     addGlobalIngredient('>', ::PageForwardItem)
+    Structure.freezeGlobalIngredients()
 }
 
 fun <S : IngredientMapper<S>> IngredientMapper<S>.addIngredient(char: Char, item: NovaItem): S =
