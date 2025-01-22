@@ -34,7 +34,7 @@ data class SizeOverride(val from: Int, val to: Int, val left: Int, val right: In
  */
 abstract class UnihexProvider internal constructor(
     val hexFile: ResourcePath<ResourceType.UnihexZip>
-) : FontProvider() {
+) : FontProvider("unihex") {
     
     protected abstract val sizeOverrides: ObjectList<SizeOverride>
     protected abstract val glyphs: UnihexGlyphs
@@ -205,8 +205,7 @@ abstract class UnihexProvider internal constructor(
         }
     }
     
-    override fun toJson() = JsonObject().apply {
-        addProperty("type", "unihex")
+    override fun toJson() = super.toJson().apply {
         addProperty("hex_file", hexFile.toString())
         addSerialized("size_overrides", sizeOverrides)
     }

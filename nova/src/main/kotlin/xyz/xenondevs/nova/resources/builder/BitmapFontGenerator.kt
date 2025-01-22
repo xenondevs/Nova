@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.resources.builder.font.provider.bitmap.ArrayCodePointG
 import xyz.xenondevs.nova.resources.builder.font.provider.bitmap.BitmapProvider
 import xyz.xenondevs.nova.resources.builder.font.provider.bitmap.RasterGlyphGrid
 import xyz.xenondevs.nova.resources.builder.font.provider.unihex.UnihexProvider
+import kotlin.io.path.exists
 
 private const val GLYPH_HEIGHT = 16
 
@@ -53,7 +54,7 @@ internal class BitmapFontGenerator(
      */
     private fun convertUnihexProvider(provider: UnihexProvider): List<BitmapProvider<IntArray>> =
         provider.glyphRasters.map { (width, glyphRasters) ->
-            val bitmapProvider = buildBitmapProvider(width, glyphRasters)
+            val bitmapProvider = buildBitmapProvider(provider, width, glyphRasters)
             bitmapProvider.write(builder)
             return@map bitmapProvider
         }
@@ -62,7 +63,7 @@ internal class BitmapFontGenerator(
      * Builds a bitmap provider for the given [glyphRasters] of [width].
      * The resulting rasters will only have one row.
      */
-    private fun buildBitmapProvider(width: Int, glyphRasters: Int2ObjectMap<IntArray>): BitmapProvider<IntArray> {
+    private fun buildBitmapProvider(original: UnihexProvider, width: Int, glyphRasters: Int2ObjectMap<IntArray>): BitmapProvider<IntArray> {
         val glyphCount = glyphRasters.size
         val rasterWidth = width * glyphCount // the length of one line in the resulting raster
         
@@ -81,12 +82,22 @@ internal class BitmapFontGenerator(
                 }
             }
         
-        val id = font.id
         return BitmapProvider.custom(
-            ResourcePath(ResourceType.FontTexture, font.id.namespace, "font/${id.path}/nova_bmp/${width}x16.png"),
+            determineBitmapTextureFilePath(font.id, width),
             ArrayCodePointGrid(arrayOf(codePoints)), RasterGlyphGrid(glyphCount, 1, width, 16, raster),
             8, 7
-        )
+        ).apply { filter.putAll(original.filter) }
+    }
+    
+    private fun determineBitmapTextureFilePath(id: ResourcePath<ResourceType.Font>, width: Int): ResourcePath<ResourceType.FontTexture> {
+        var i = 0
+        var path: ResourcePath<ResourceType.FontTexture>
+        do {
+            path = ResourcePath(ResourceType.FontTexture, id.namespace, "font/${id.path}/nova_bmp/${width}x16_$i.png")
+            i++
+        } while (builder.resolve(path).exists())
+        
+        return path
     }
     
 }

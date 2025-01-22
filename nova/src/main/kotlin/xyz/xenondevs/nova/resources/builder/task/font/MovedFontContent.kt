@@ -72,7 +72,9 @@ class MovedFontContent internal constructor(private val builder: ResourcePackBui
                     is ReferenceProvider -> {
                         val id = provider.id
                         requestMovedFont(id, y)
-                        ReferenceProvider(ResourcePath(ResourceType.Font, id.namespace, id.path + "/$y"))
+                        ReferenceProvider(ResourcePath(ResourceType.Font, id.namespace, id.path + "/$y")).apply { 
+                            filter.putAll(provider.filter)
+                        }
                     }
                     
                     else -> provider

@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.resources.ResourceType
 /**
  * Represents a `reference` font provider.
  */
-class ReferenceProvider(var id: ResourcePath<ResourceType.Font>) : FontProvider() {
+class ReferenceProvider(var id: ResourcePath<ResourceType.Font>) : FontProvider("reference") {
     
     override val codePoints: IntSet
         get() = throw UnsupportedOperationException("Cannot retrieve codePoints from reference provider")
@@ -18,8 +18,7 @@ class ReferenceProvider(var id: ResourcePath<ResourceType.Font>) : FontProvider(
     override val charSizes: Int2ObjectMap<FloatArray>
         get() = throw UnsupportedOperationException("Cannot retrieve charSizes from reference provider")
     
-    override fun toJson() = JsonObject().apply {
-        addProperty("type", "reference")
+    override fun toJson() = super.toJson().apply {
         addProperty("id", id.toString())
     }
     

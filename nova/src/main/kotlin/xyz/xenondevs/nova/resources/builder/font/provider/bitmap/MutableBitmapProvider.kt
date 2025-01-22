@@ -101,8 +101,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
             return ReferenceGlyphGrid.of(img, glyphWidth, glyphHeight)
         }
         
-        override fun toJson() = JsonObject().apply {
-            addProperty("type", "bitmap")
+        override fun toJson() = super.toJson().apply {
             addProperty("file", file.toString())
             addProperty("height", height)
             addProperty("ascent", ascent)

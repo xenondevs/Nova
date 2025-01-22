@@ -11,7 +11,7 @@ import xyz.xenondevs.commons.gson.getObject
 /**
  * Represents a `space` font provider.
  */
-class SpaceProvider(val advances: Int2FloatMap) : FontProvider() {
+class SpaceProvider(val advances: Int2FloatMap) : FontProvider("space") {
     
     override val codePoints: IntSet
         get() = advances.keys
@@ -27,8 +27,7 @@ class SpaceProvider(val advances: Int2FloatMap) : FontProvider() {
             return sizes
         }
     
-    override fun toJson() = JsonObject().apply {
-        addProperty("type", "space")
+    override fun toJson() = super.toJson().apply {
         add("advances", JsonObject().apply {
             for ((codePoint, width) in advances.int2FloatEntrySet())
                 addProperty(Character.toString(codePoint), width)

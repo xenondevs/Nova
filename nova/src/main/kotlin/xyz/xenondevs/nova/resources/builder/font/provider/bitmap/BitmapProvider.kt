@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.resources.builder.font.provider.bitmap
 
-import com.google.gson.JsonObject
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.ints.IntSet
@@ -16,7 +15,7 @@ import kotlin.math.roundToInt
 /**
  * Represents a `bitmap` font provider.
  */
-abstract class BitmapProvider<T> internal constructor() : FontProvider() {
+abstract class BitmapProvider<T> internal constructor() : FontProvider("bitmap") {
     
     /**
      * A [ResourcePath] to the texture file.
@@ -61,8 +60,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
         builder.writeImage(file, glyphGrid.toImage())
     }
     
-    override fun toJson() = JsonObject().apply {
-        addProperty("type", "bitmap")
+    override fun toJson() = super.toJson().apply {
         addProperty("file", file.toString())
         if (height != 8) addProperty("height", height)
         addProperty("ascent", ascent)
@@ -130,6 +128,8 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider() {
             get() = delegate.codePointGrid
         override val glyphGrid: GlyphGrid<T>
             get() = delegate.glyphGrid
+        override val filter: MutableMap<String, Boolean>
+            get() = delegate.filter
         
         override val charSizes by lazy(::calculateCharSizes)
         

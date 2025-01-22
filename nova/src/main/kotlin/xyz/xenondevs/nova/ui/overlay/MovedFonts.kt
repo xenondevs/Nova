@@ -3,12 +3,8 @@ package xyz.xenondevs.nova.ui.overlay
 import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentBuilder
-import xyz.xenondevs.nova.config.MAIN_CONFIG
-import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.component.adventure.fontName
-
-private val FORCE_UNIFORM_FONT by MAIN_CONFIG.entry<Boolean>("resource_pack", "force_uniform_font")
 
 object MovedFonts {
     
@@ -46,9 +42,6 @@ object MovedFonts {
                     currentDistance = match.groupValues[2].toInt()
                 }
             }
-            
-            if (FORCE_UNIFORM_FONT && (font == "default" || font == "minecraft:default"))
-                font = "uniform"
             
             val newDistance = if (addDistance) currentDistance + distance else distance
             if (newDistance != 0) {
