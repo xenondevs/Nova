@@ -63,18 +63,30 @@ internal object RemainingItemPatches : MultiTransformer(
     }
     
     /**
-     * Changes `blockEntity.items.set(1, item.getCraftingRemainder());` to
-     * `blockEntity.items.set(1, RemainingItemPatches.getRemainingItemStack(itemStack));`
+     * Changes
+     * ```java
+     * Item item = itemStack.getItem();
+     * ...
+     * furnace.items.set(1, item.getCraftingRemainder());
+     * ```
+     * to
+     * ```java
+     * ItemStack remainder = RemainingItemStackPatches.getCraftingRemainder(itemStack);
+     * ...
+     * furnace.items.set(1, remainder);
+     * ```
      */
     private fun patchAbstractFurnaceBlockEntityServerTick() {
         val methodNode = VirtualClassPath[AbstractFurnaceBlockEntity::serverTick]
         methodNode.localVariables.clear()
+        
         methodNode.replaceFirst(
-            1, 0, // drop aLoad for item
-            buildInsnList {
-                aLoad(6) // ItemStack
-                invokeStatic(::getRemainingItemStack)
-            }
+            0, 0,
+            buildInsnList { invokeStatic(::getRemainingItemStack) }
+        ) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(MojangStack::getItem) }
+        methodNode.replaceFirst(
+            0, 0,
+            buildInsnList { } // no changes, what was previously item is now already the crafting remainder item stack
         ) { it.opcode == Opcodes.INVOKEVIRTUAL && (it as MethodInsnNode).calls(Item::getCraftingRemainder) }
     }
     
