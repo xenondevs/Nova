@@ -11,14 +11,12 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.basepack.merger.FileMerger
 import xyz.xenondevs.nova.resources.builder.data.PackMcMeta
 import xyz.xenondevs.nova.resources.builder.task.font.MovedFontContent
-import xyz.xenondevs.nova.util.StringUtils
 import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.data.useZip
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.copyTo
-import kotlin.io.path.copyToRecursively
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.extension
@@ -50,19 +48,12 @@ class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
     internal val occupiedSolidIds = HashMap<BackingStateConfigType<*>, HashSet<Int>>()
     
     internal fun include() {
-        packs.map {
-            if (it.isFile && it.extension.equals("zip", true)) {
-                val dir = ResourcePackBuilder.TEMP_BASE_PACKS_DIR.resolve("${it.nameWithoutExtension}-${StringUtils.randomString(5)}")
-                dir.createDirectories()
-                it.useZip { zip -> zip.copyToRecursively(dir, followLinks = false, overwrite = true) }
-                
-                return@map dir
+        for (pack in packs) {
+            if (pack.isFile && pack.extension.equals("zip", true)) {
+                pack.useZip { zip -> mergeBasePack(zip) }
+            } else if (pack.isDirectory) {
+                mergeBasePack(pack.toPath())
             }
-            
-            return@map it.toPath()
-        }.forEach {
-            mergeBasePack(it)
-            requestMovedFonts(it)
         }
     }
     
@@ -89,6 +80,8 @@ class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
             for (assetDir in assetDirs) {
                 mergeAssetsDir(assetDir)
             }
+            
+            requestMovedFonts(packDir)
         } catch (e: Exception) {
             LOGGER.error("Failed to merge base pack in $packDir", e)
         }
