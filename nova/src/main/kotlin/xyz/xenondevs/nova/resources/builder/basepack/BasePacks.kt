@@ -9,8 +9,10 @@ import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.basepack.merger.FileMerger
+import xyz.xenondevs.nova.resources.builder.data.PackMcMeta
 import xyz.xenondevs.nova.resources.builder.task.font.MovedFontContent
 import xyz.xenondevs.nova.util.StringUtils
+import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.data.useZip
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
 import java.io.File
@@ -65,37 +67,63 @@ class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
     }
     
     private fun mergeBasePack(packDir: Path) {
-        LOGGER.info("Adding base pack $packDir")
-        packDir.walk()
+        try {
+            val packMcMetaFile = packDir.resolve("pack.mcmeta")
+            if (!packMcMetaFile.exists()) {
+                LOGGER.warn("Skipping base pack $packDir: No pack.mcmeta present")
+                return
+            }
+            
+            val packMcMeta = packMcMetaFile.readJson<PackMcMeta>()
+            LOGGER.info("Merging base pack \"${packMcMeta.pack.description}\"")
+            
+            val assetDirs: List<Path> = buildList {
+                add(packDir.resolve("assets"))
+                
+                val packMcMeta = packMcMetaFile.readJson<PackMcMeta>()
+                packMcMeta.overlays?.entries
+                    ?.filter { entry -> ResourcePackBuilder.PACK_VERSION in entry.formats }
+                    ?.forEach { entry -> add(packDir.resolve("${entry.directory}/assets")) }
+            }.filter { it.exists() }
+            
+            for (assetDir in assetDirs) {
+                mergeAssetsDir(assetDir)
+            }
+        } catch (e: Exception) {
+            LOGGER.error("Failed to merge base pack in $packDir", e)
+        }
+    }
+    
+    private fun mergeAssetsDir(assetsDir: Path) {
+        assetsDir.walk()
             .filter(Path::isRegularFile)
-            .forEach { file ->
+            .forEach { sourceFile ->
                 // Validate file extension
-                if (file.extension.lowercase() !in WHITELISTED_FILE_TYPES) {
-                    LOGGER.warn("Skipping file $file as it is not a resource pack file")
+                if (sourceFile.extension.lowercase() !in WHITELISTED_FILE_TYPES) {
+                    LOGGER.warn("Skipping file $sourceFile as it is not a resource pack file")
                     return@forEach
                 }
                 
                 // Validate file name
-                if (!ResourcePath.isValidPath(file.name)) {
-                    LOGGER.warn("Skipping file $file as its name does not match regex [a-z0-9_.-]")
+                if (!ResourcePath.isValidPath(sourceFile.name)) {
+                    LOGGER.warn("Skipping file $sourceFile as its name does not match regex [a-z0-9_.-]")
                     return@forEach
                 }
                 
-                val relPath = file.relativeTo(packDir)
-                val packFile = ResourcePackBuilder.PACK_DIR.resolve(relPath.invariantSeparatorsPathString)
+                // normalize assets dir name to "assets"
+                val relPath = "assets/" + sourceFile.relativeTo(assetsDir).invariantSeparatorsPathString
+                val destFile = ResourcePackBuilder.PACK_DIR.resolve(relPath)
                 
-                packFile.parent.createDirectories()
+                destFile.parent.createDirectories()
                 val fileMerger = mergers.firstOrNull { it.acceptsFile(relPath) }
                 if (fileMerger != null) {
                     try {
-                        fileMerger.merge(file, packFile, packDir, relPath)
+                        fileMerger.merge(sourceFile, destFile)
                     } catch (t: Throwable) {
-                        LOGGER.error("An exception occurred trying to merge base pack file \"$file\" with \"$packFile\"", t)
+                        LOGGER.error("An exception occurred trying to merge base pack file \"$sourceFile\" with \"$destFile\"", t)
                     }
-                } else if (!packFile.exists()) {
-                    file.copyTo(packFile)
                 } else {
-                    LOGGER.warn("Skipping file $file: File type cannot be merged")
+                    sourceFile.copyTo(destFile, overwrite = true)
                 }
             }
     }

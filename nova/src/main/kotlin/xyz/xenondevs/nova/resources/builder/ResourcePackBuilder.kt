@@ -5,15 +5,17 @@ import com.google.common.jimfs.Jimfs
 import com.google.gson.JsonObject
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import net.minecraft.SharedConstants
+import net.minecraft.server.packs.PackType
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatMap
 import xyz.xenondevs.commons.provider.flattenIterables
 import xyz.xenondevs.commons.provider.map
-import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.DATA_FOLDER
@@ -114,6 +116,11 @@ private val SKIP_PACK_TASKS: Set<String> by MAIN_CONFIG.entry<HashSet<String>>("
 class ResourcePackBuilder internal constructor() {
     
     companion object {
+        
+        /**
+         * The resource pack format version of the current Minecraft version.
+         */
+        val PACK_VERSION = SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES)
         
         private val JIMFS_PROVIDER: MutableProvider<FileSystem> = mutableProvider { Jimfs.newFileSystem(Configuration.unix()) }
         
@@ -311,10 +318,7 @@ class ResourcePackBuilder internal constructor() {
     private fun writeMetadata(assetPacks: Int, basePacks: Int) {
         val packMcmetaObj = JsonObject()
         val packObj = JsonObject().also { packMcmetaObj.add("pack", it) }
-        packObj.addProperty("pack_format", 15)
-        val supportedFormats = JsonObject().also { packObj.add("supported_formats", it) }
-        supportedFormats.addProperty("min_inclusive", 0)
-        supportedFormats.addProperty("max_inclusive", 999)
+        packObj.addProperty("pack_format", PACK_VERSION)
         packObj.addProperty("description", PACK_DESCRIPTION.format(assetPacks, basePacks))
         
         PACK_MCMETA_FILE.parent.createDirectories()

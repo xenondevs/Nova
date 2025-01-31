@@ -5,9 +5,8 @@ import java.nio.file.Path
 
 internal abstract class FileMerger(protected val basePacks: BasePacks) {
     
-    abstract fun acceptsFile(relPath: Path): Boolean
+    abstract fun acceptsFile(relPath: String): Boolean
     
-    open fun merge(source: Path, destination: Path, baseDir: Path, relPath: Path) = merge(source, destination)
     open fun merge(source: Path, destination: Path) = Unit
     
     companion object {
@@ -24,7 +23,7 @@ internal abstract class FileMerger(protected val basePacks: BasePacks) {
 
 internal abstract class FileInDirectoryMerger(basePacks: BasePacks, val path: String) : FileMerger(basePacks) {
     
-    override fun acceptsFile(relPath: Path): Boolean {
+    override fun acceptsFile(relPath: String): Boolean {
         return relPath.startsWith(path)
     }
     
