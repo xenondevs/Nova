@@ -116,9 +116,6 @@ class ResourcePackBuilder internal constructor() {
     companion object {
         
         private val JIMFS_PROVIDER: MutableProvider<FileSystem> = mutableProvider { Jimfs.newFileSystem(Configuration.unix()) }
-        private val FILE_SYSTEM_PROVIDER: Provider<FileSystem> = combinedProvider(
-            IN_MEMORY_PROVIDER, JIMFS_PROVIDER
-        ) { inMemory, jimfs -> if (inMemory) jimfs else FileSystems.getDefault() }
         
         //<editor-fold desc="never in memory">
         val RESOURCE_PACK_FILE: Path = DATA_FOLDER.resolve("resource_pack/ResourcePack.zip")
@@ -129,7 +126,11 @@ class ResourcePackBuilder internal constructor() {
         //</editor-fold>
         
         //<editor-fold desc="potentially in memory">
-        private val RESOURCE_PACK_BUILD_DIR_PROVIDER: Provider<Path> = FILE_SYSTEM_PROVIDER.mapNonNull { it.rootDirectories.first() }.orElse(RESOURCE_PACK_DIR.resolve(".build"))
+        private val RESOURCE_PACK_BUILD_DIR_PROVIDER: Provider<Path> = IN_MEMORY_PROVIDER.flatMap { inMemory -> 
+            if (inMemory) 
+                JIMFS_PROVIDER.map { it.rootDirectories.first() } 
+            else provider(RESOURCE_PACK_DIR.resolve(".build"))
+        }
         private val TEMP_BASE_PACKS_DIR_PROVIDER: Provider<Path> = RESOURCE_PACK_BUILD_DIR_PROVIDER.map { it.resolve("base_packs") }
         private val PACK_DIR_PROVIDER: Provider<Path> = RESOURCE_PACK_BUILD_DIR_PROVIDER.map { it.resolve("pack") }
         private val ASSETS_DIR_PROVIDER: Provider<Path> = PACK_DIR_PROVIDER.map { it.resolve("assets") }
