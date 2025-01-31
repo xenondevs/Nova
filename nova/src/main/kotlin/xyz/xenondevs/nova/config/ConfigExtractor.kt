@@ -28,6 +28,7 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
+import kotlin.jvm.optionals.getOrNull
 
 internal class ConfigExtractor(extractedConfigs: MutableProvider<Map<Key, String>>) {
     
@@ -35,19 +36,19 @@ internal class ConfigExtractor(extractedConfigs: MutableProvider<Map<Key, String
     
     fun extract(configId: Key, fileInZip: Path, destFile: Path) {
         val internalCfg = loadYaml(fileInZip)
+            ?: throw IllegalArgumentException("In-zip config cannot be empty")
         val extractedCfg = extractedConfigs[configId]?.let(::loadYaml)
         
-        val severCfg: Node
-        if (!destFile.exists() || extractedCfg == null) {
-            severCfg = internalCfg
-            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configId, writeYaml(severCfg, false)) }
+        var serverCfg = destFile.takeIf(Path::exists)?.let(::loadYaml)
+        if (serverCfg == null || extractedCfg == null) {
+            serverCfg = internalCfg
+            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configId, writeYaml(serverCfg, false)) }
         } else {
-            severCfg = loadYaml(destFile)
-            updateExistingConfig(severCfg, extractedCfg, internalCfg)
+            updateExistingConfig(serverCfg, extractedCfg, internalCfg)
             extractedConfigs = extractedConfigs.toMutableMap().apply { put(configId, writeYaml(extractedCfg, false)) }
         }
         
-        writeYaml(severCfg, destFile)
+        writeYaml(serverCfg, destFile)
     }
     
     private fun updateExistingConfig(serverCfg: Node, extractedCfg: Node, internalCfg: Node) {
@@ -103,22 +104,22 @@ internal class ConfigExtractor(extractedConfigs: MutableProvider<Map<Key, String
         }
     }
     
-    private fun loadYaml(s: String): Node {
+    private fun loadYaml(s: String): Node? {
         return loadYaml(s.byteInputStream())
     }
     
-    private fun loadYaml(file: Path): Node {
+    private fun loadYaml(file: Path): Node? {
         return file.inputStream().use { inp -> loadYaml(inp) }
     }
     
-    private fun loadYaml(inp: InputStream): Node {
+    private fun loadYaml(inp: InputStream): Node? {
         val settings = LoadSettings.builder()
             .setParseComments(true)
             .build()
         val reader = StreamReader(settings, inp.reader())
         val parser = ParserImpl(settings, reader)
         val composer = Composer(settings, parser)
-        return composer.singleNode.get()
+        return composer.singleNode.getOrNull()
     }
     
     private fun writeYaml(node: Node, comments: Boolean = true): String {

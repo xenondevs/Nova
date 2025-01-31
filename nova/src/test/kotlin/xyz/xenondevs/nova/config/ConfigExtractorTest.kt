@@ -7,6 +7,7 @@ import xyz.xenondevs.commons.provider.mutableProvider
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.readText
+import kotlin.io.path.writeText
 import kotlin.test.assertEquals
 
 class ConfigExtractorTest {
@@ -75,6 +76,19 @@ class ConfigExtractorTest {
         extractor.extract(CONFIG_ID, sourceChanged, dest)
         
         assertConfigEquals(source("server-config-updated-expected.yml"), dest)
+    }
+    
+    @Test
+    fun `test empty server config`() {
+        val sourceOriginal = source("internal-config-original.yml")
+        val dest = dest()
+        
+        val extractor = ConfigExtractor(mutableProvider(HashMap()))
+        extractor.extract(CONFIG_ID, sourceOriginal, dest)
+        dest.writeText("") // user deleted all entries
+        extractor.extract(CONFIG_ID, sourceOriginal, dest)
+        
+        assertConfigEquals(sourceOriginal, dest)
     }
     
     private fun source(path: String): Path =
