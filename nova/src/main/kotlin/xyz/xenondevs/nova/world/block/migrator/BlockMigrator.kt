@@ -29,6 +29,7 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.bukkitMaterial
 import xyz.xenondevs.nova.util.levelChunk
 import xyz.xenondevs.nova.util.registerEvents
@@ -188,6 +189,10 @@ internal object BlockMigrator : Listener {
     
     @JvmStatic
     fun migrateBlockState(pos: BlockPos, blockState: BlockState): BlockState {
+        // disable migrations for all block states used by base packs
+        if (blockState in ResourceLookups.OCCUPIED_BLOCK_STATES)
+            return blockState
+        
         try {
             val migration = migrationsByVanillaBlock[blockState.block]
                 ?: return blockState
@@ -249,10 +254,12 @@ internal object BlockMigrator : Listener {
         }
         
         // Migrations for block types that are also used as backing states
-        val migration = migrationsByVanillaBlock[newState.block]
-        if (migration is ComplexBlockMigration) {
-            val novaState = migration.vanillaToNova(newState)
-            WorldDataManager.setBlockState(pos, novaState)
+        if (newState !in ResourceLookups.OCCUPIED_BLOCK_STATES) {
+            val migration = migrationsByVanillaBlock[newState.block]
+            if (migration is ComplexBlockMigration) {
+                val novaState = migration.vanillaToNova(newState)
+                WorldDataManager.setBlockState(pos, novaState)
+            }
         }
     }
     

@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.resources.lookup
 
+import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.resources.builder.task.font.FontChar
@@ -10,7 +11,6 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
 import xyz.xenondevs.nova.world.item.Equipment
-import java.util.*
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -83,6 +83,17 @@ internal object ResourceLookups {
      */
     val TEXTURE_ICON_LOOKUP: IdResourceLookup<FontChar> =
         idResourceLookup<FontChar>("texture_icon_lookup")
+    
+    /**
+     * Lookup containing all block states that are in use by base packs.
+     */
+    val OCCUPIED_BLOCK_STATES_LOOKUP: ResourceLookup<Set<BlockState>> =
+        resourceLookup("occupied_block_states", emptySet(), typeOf<HashSet<BlockState>>())
+    
+    /**
+     * Set of all block states that are in use by base packs.
+     */
+    var OCCUPIED_BLOCK_STATES: Set<BlockState> by OCCUPIED_BLOCK_STATES_LOOKUP
     
     private inline fun <reified T : Any> resourceLookup(key: String, empty: T): ResourceLookup<T> {
         val lookup = ResourceLookup(key, typeOf<T>(), empty)

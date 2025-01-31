@@ -9,6 +9,7 @@ import xyz.xenondevs.commons.gson.registerTypeHierarchyAdapter
 import xyz.xenondevs.commons.gson.toJsonTreeTyped
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.serialization.json.serializer.BackingStateConfigSerialization
+import xyz.xenondevs.nova.serialization.json.serializer.BackingStateConfigTypeSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.BlockDataTypeAdapter
 import xyz.xenondevs.nova.serialization.json.serializer.BlockStateSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.BlockStateVariantDataSerialization
@@ -47,6 +48,7 @@ private val GSON_BUILDER = GsonBuilder()
     .registerTypeHierarchyAdapter(BlockStateSerialization.nullSafe())
     .registerTypeHierarchyAdapter(NovaBlockStateSerialization)
     .registerTypeHierarchyAdapter(BlockStateVariantDataSerialization)
+    .registerTypeHierarchyAdapter(BackingStateConfigTypeSerialization)
     .registerTypeHierarchyAdapter(BackingStateConfigSerialization)
     .registerTypeHierarchyAdapter(LinkedBlockModelProviderSerialization)
     .registerTypeHierarchyAdapter(Matrix4fcTypeAdapter.nullSafe())

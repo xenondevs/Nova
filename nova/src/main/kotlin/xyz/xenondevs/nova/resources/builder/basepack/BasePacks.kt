@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.resources.builder.basepack
 
+import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Material
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.nova.LOGGER
@@ -11,6 +12,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.basepack.merger.FileMerger
 import xyz.xenondevs.nova.resources.builder.data.PackMcMeta
 import xyz.xenondevs.nova.resources.builder.task.font.MovedFontContent
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.data.useZip
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
@@ -55,6 +57,22 @@ class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
                 mergeBasePack(pack.toPath())
             }
         }
+        
+        val occupiedBlockStates: Set<BlockState> = occupiedSolidIds.entries.map { (type, ids) ->
+            buildSet { 
+                for (id in ids) {
+                    add(type.of(id, false).vanillaBlockState)
+                    if (type.isWaterloggable) {
+                        add(type.of(id, true).vanillaBlockState)
+                    }
+                }
+            }
+        }.flatten().toHashSet()
+        
+        if (occupiedBlockStates.isNotEmpty())
+            LOGGER.warn("Base packs occupy ${occupiedBlockStates.size} block states that cannot be used by Nova")
+        
+        ResourceLookups.OCCUPIED_BLOCK_STATES = occupiedBlockStates
     }
     
     private fun mergeBasePack(packDir: Path) {
