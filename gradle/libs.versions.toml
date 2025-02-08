@@ -5,7 +5,7 @@ format.version = "1.1"
 bytebase = "0.4.8"
 cbf = "0.18"
 jgrapht = "1.5.2"
-kotlin = "2.1.0"
+kotlin = "2.1.10"
 kotlinx-coroutines = "1.10.1"
 ktor = "3.0.3"
 paper = "1.21.4-R0.1-SNAPSHOT"
@@ -13,7 +13,7 @@ paperweight = "2.0.0-beta.14"
 xenondevs-commons = "1.26"
 
 [libraries]
-awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.30.2" }
+awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.30.11" }
 bstats = { group = "xyz.xenondevs.bstats", name = "bstats-bukkit", version = "3.0.1" }
 bytebase = { group = "xyz.xenondevs.bytebase", name = "ByteBase", version.ref = "bytebase" }
 bytebase-runtime = { group = "xyz.xenondevs.bytebase", name = "ByteBase-Runtime", version.ref = "bytebase" }
