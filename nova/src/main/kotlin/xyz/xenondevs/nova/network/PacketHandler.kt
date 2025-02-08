@@ -10,7 +10,6 @@ import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.PacketListener
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundBundlePacket
-import net.minecraft.network.protocol.login.ServerboundHelloPacket
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.network.event.PacketEventManager
@@ -34,13 +33,9 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
     private val outgoingDropQueue = CopyOnWriteArrayList<PacketDropRequest>()
     
     var player: Player? = null
+        internal set
     var loggedIn = false
-    
-    constructor(channel: Channel, player: Player) : this(channel) {
-        this.player = player
-        this.loggedIn = true
-        PacketManager.playerHandlers[player.name] = this
-    }
+        internal set
     
     override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
         try {
@@ -67,19 +62,14 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
     
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
         try {
-            if (msg is ServerboundHelloPacket) {
-                PacketManager.playerHandlers[msg.name] = this
-                super.channelRead(ctx, msg)
+            if (shouldDrop(msg, incomingDropQueue))
+                return
+            
+            if (msg is Packet<*>) {
+                val packet = callEvent(msg) ?: return
+                super.channelRead(ctx, packet)
             } else {
-                if (shouldDrop(msg, incomingDropQueue))
-                    return
-                
-                if (msg is Packet<*>) {
-                    val packet = callEvent(msg) ?: return
-                    super.channelRead(ctx, packet)
-                } else {
-                    super.channelRead(ctx, msg)
-                }
+                super.channelRead(ctx, msg)
             }
         } catch (t: Throwable) {
             LOGGER.error("An exception occurred while handling a serverbound packet.", t)
