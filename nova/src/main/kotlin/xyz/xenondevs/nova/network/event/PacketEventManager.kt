@@ -6,6 +6,7 @@ import net.minecraft.network.protocol.Packet
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
 import xyz.xenondevs.commons.collections.removeIf
+import xyz.xenondevs.commons.reflection.toMethodHandle
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundActionBarPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockDestructionPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundBlockEventPacketEvent
@@ -37,13 +38,13 @@ import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacke
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSelectBundleItemPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundUseItemPacketEvent
-import java.lang.reflect.Method
+import java.lang.invoke.MethodHandle
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.reflect.KClass
 import net.minecraft.network.PacketListener as MojangPacketListener
 
-private data class Listener(val instance: Any, val method: Method, val priority: EventPriority, val ignoreIfCancelled: Boolean)
+private data class Listener(val handle: MethodHandle, val priority: EventPriority, val ignoreIfCancelled: Boolean)
 
 object PacketEventManager {
     
@@ -121,10 +122,10 @@ object PacketEventManager {
     }
     
     private fun callEvent(event: PacketEvent<*>) {
-        listeners[event::class]?.forEach { (instance, method, _, ignoreIfCancelled) ->
+        listeners[event::class]?.forEach { (handle, _, ignoreIfCancelled) ->
             if (!ignoreIfCancelled || !event.isCancelled) {
                 try {
-                    method.invoke(instance, event)
+                    handle.invoke(event)
                 } catch (t: Throwable) {
                     t.printStackTrace()
                 }
@@ -145,7 +146,7 @@ object PacketEventManager {
                     val priority = method.getAnnotation(PacketHandler::class.java).priority
                     val ignoreIfCancelled = method.getAnnotation(PacketHandler::class.java).ignoreIfCancelled
                     
-                    val listener = Listener(listener, method, priority, ignoreIfCancelled)
+                    val listener = Listener(method.toMethodHandle(listener), priority, ignoreIfCancelled)
                     instanceListeners += listener
                     
                     val list = listeners[param]?.let(::ArrayList) ?: ArrayList()
