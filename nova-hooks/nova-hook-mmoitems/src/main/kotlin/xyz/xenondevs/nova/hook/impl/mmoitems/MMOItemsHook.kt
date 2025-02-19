@@ -95,10 +95,6 @@ internal object MMOItemsHook : CustomItemService {
         return item.displayName()
     }
     
-    override fun hasRecipe(key: NamespacedKey): Boolean {
-        return key.namespace == "mmoitems"
-    }
-    
     override fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {
         return null
     }

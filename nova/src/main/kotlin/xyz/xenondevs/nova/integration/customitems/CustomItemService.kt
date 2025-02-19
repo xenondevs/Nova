@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.integration.customitems
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
-import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.resources.ResourcePath
@@ -76,11 +75,6 @@ interface CustomItemService {
      * Gets a localized name from a placed [Block]
      */
     fun getName(block: Block, locale: String): Component?
-    
-    /**
-     * Checks if this [CustomItemService] registered a recipe with that [key]
-     */
-    fun hasRecipe(key: NamespacedKey): Boolean
     
     /**
      * Checks if the specified [tool] is good enough for the [block] to drop items.

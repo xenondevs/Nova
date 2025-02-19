@@ -409,7 +409,7 @@ object BlockUtils {
         
         if (CustomItemServiceManager.getId(bukkitBlock) != null) {
             val itemDrops = if (drops)
-                CustomItemServiceManager.getDrops(bukkitBlock, ctx[DefaultContextParamTypes.TOOL_ITEM_STACK])!!
+                CustomItemServiceManager.getDrops(bukkitBlock, ctx[DefaultContextParamTypes.TOOL_ITEM_STACK]) ?: emptyList()
             else emptyList()
             CustomItemServiceManager.removeBlock(bukkitBlock, breakEffects)
             return itemDrops

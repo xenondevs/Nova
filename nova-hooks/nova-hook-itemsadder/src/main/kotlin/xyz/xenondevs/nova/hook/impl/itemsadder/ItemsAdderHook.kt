@@ -9,7 +9,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.integration.Hook
@@ -94,10 +93,6 @@ internal object ItemsAdderHook : CustomItemService {
     
     override fun getItemTest(id: String): SingleItemTest? {
         return getItemById(id)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
-    }
-    
-    override fun hasRecipe(key: NamespacedKey): Boolean {
-        return ItemsAdder.isCustomRecipe(key)
     }
     
     override fun getId(item: ItemStack): String? {

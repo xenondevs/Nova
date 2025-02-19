@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.integration.customitems
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
-import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.resources.ResourcePath
@@ -56,10 +55,6 @@ object CustomItemServiceManager {
     
     fun getName(block: Block, locale: String): Component? {
         return services.firstNotNullOfOrNull { it.getName(block, locale) }
-    }
-    
-    fun hasRecipe(key: NamespacedKey): Boolean {
-        return services.any { it.hasRecipe(key) }
     }
     
     fun canBreakBlock(block: Block, tool: ItemStack?): Boolean? {

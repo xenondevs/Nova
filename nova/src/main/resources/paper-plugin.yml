@@ -28,7 +28,7 @@ dependencies:
       required: false
     ItemsAdder:
       required: false
-    Oraxen:
+    Nexo:
       required: false
     MMOItems:
       required: false

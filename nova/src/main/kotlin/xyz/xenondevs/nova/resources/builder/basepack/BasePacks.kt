@@ -83,13 +83,12 @@ class BasePacks internal constructor(private val builder: ResourcePackBuilder) {
                 return
             }
             
-            val packMcMeta = packMcMetaFile.readJson<PackMcMeta>()
+            val packMcMeta = packMcMetaFile.readJson<PackMcMeta>(true)
             LOGGER.info("Merging base pack \"${packMcMeta.pack.description}\"")
             
             val assetDirs: List<Path> = buildList {
                 add(packDir.resolve("assets"))
                 
-                val packMcMeta = packMcMetaFile.readJson<PackMcMeta>()
                 packMcMeta.overlays?.entries
                     ?.filter { entry -> ResourcePackBuilder.PACK_VERSION in entry.formats }
                     ?.forEach { entry -> add(packDir.resolve("${entry.directory}/assets")) }

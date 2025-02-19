@@ -65,12 +65,20 @@ internal inline fun <T> Path.useZip(create: Boolean = false, run: (Path) -> T): 
 }
 
 /**
- * Decodes [value] from JSON via [json] as [T] from the file.
+ * Decodes the contents of [this] JSON file via [json] as [T] from the file.
  */
 @PublishedApi
 @OptIn(ExperimentalSerializationApi::class)
 internal inline fun <reified T> Path.readJson(json: Json = Json): T {
     return inputStream().use { json.decodeFromStream(it) }
+}
+
+/**
+ * Decodes the contents of [this] JSON file as [T] via a custom [Json] instance only configured by [ignoreUnknownKeys].
+ */
+@PublishedApi
+internal inline fun <reified T> Path.readJson(ignoreUnknownKeys: Boolean): T {
+    return readJson(Json { this.ignoreUnknownKeys = ignoreUnknownKeys })
 }
 
 /**
