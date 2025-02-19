@@ -60,17 +60,20 @@ import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.novaBlock
 import xyz.xenondevs.nova.util.runAsyncTask
+import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.block.behavior.LeavesBehavior
 import xyz.xenondevs.nova.world.block.hitbox.HitboxManager
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkDebugger
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
@@ -163,7 +166,11 @@ internal object NovaCommand : Command() {
                 .requiresPlayer()
                 .then(argument("block", NovaBlockArgumentType)
                     .then(argument("range", IntegerArgumentType.integer(0, 10))
-                        .executes0(::searchNovaBlock)))))
+                        .executes0(::searchNovaBlock))))
+            .then(literal("recalculateLeaveProperties")
+                .requiresPlayer()
+                .then(argument("range", IntegerArgumentType.integer(0, 20))
+                    .executes0(::recalculateLeaveProperties))))
         .then(literal("items")
             .requiresPlayer()
             .requiresPermission("nova.command.items")
@@ -872,6 +879,51 @@ internal object NovaCommand : Command() {
             blockName,
             Component.text("x=$x, y=$y, z=$z", NamedTextColor.AQUA).clickEvent(ClickEvent.suggestCommand("/tp $x $y $z"))
         ))
+    }
+    
+    private fun recalculateLeaveProperties(ctx: CommandContext<CommandSourceStack>) = runBlocking {
+        val player = ctx.player
+        val range: Int = ctx["range"]
+        
+        // let all leaves tick, which triggers a chain reaction of scheduled ticks that updates all distances
+        val leaves = HashSet<BlockPos>()
+        val center = player.location.chunkPos
+        for (xOff in -range..range) {
+            for (zOff in -range..range) {
+                val chunkPos = ChunkPos(center.worldUUID, center.x + xOff, center.z + zOff)
+                WorldDataManager.getOrLoadChunk(chunkPos).forEachNonEmpty { pos, blockState ->
+                    if (blockState.block.hasBehavior<LeavesBehavior>()
+                        && blockState[DefaultBlockStateProperties.LEAVES_PERSISTENT] == true
+                        && blockState[DefaultBlockStateProperties.LEAVES_DISTANCE] == 7
+                    ) {
+                        LeavesBehavior.handleScheduledTick(pos, blockState)
+                        leaves += pos
+                    }
+                }
+            }
+        }
+        
+        // assume that all leaves who now have a distance < 7 are part of a tree and not supposed to be persistent
+        runTaskLater(20) {
+            var count = 0
+            for (pos in leaves) {
+                val blockState = WorldDataManager.getBlockState(pos)
+                if (blockState != null
+                    && blockState.block.hasBehavior<LeavesBehavior>()
+                    && blockState.getOrThrow(DefaultBlockStateProperties.LEAVES_DISTANCE) < 7
+                ) {
+                    count++
+                    WorldDataManager.setBlockState(pos, blockState.with(DefaultBlockStateProperties.LEAVES_PERSISTENT, false))
+                }
+            }
+            
+            ctx.source.sender.sendMessage(Component.translatable(
+                "command.nova.recalculate_leave_properties.done",
+                NamedTextColor.GRAY,
+                Component.text(leaves.size, NamedTextColor.AQUA),
+                Component.text(count, NamedTextColor.AQUA)
+            ))
+        }
     }
     
     private fun openItemInventory(ctx: CommandContext<CommandSourceStack>) {

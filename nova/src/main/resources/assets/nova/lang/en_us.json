@@ -120,6 +120,7 @@
   "command.nova.copy_clientside_stack.success": "Added a client-side copy of %s to your inventory.",
   "command.nova.search_block.result": "Found %s at %s.",
   "command.nova.search_block.done": "Search completed.",
+  "command.nova.recalculate_leave_properties.done": "Processed %s leaves and made %s leaves non-persistent.",
   "command.nova.recipe.no-recipe": "This item does not have a recipe.",
   "command.nova.usage.no-usage": "This item has no usages.",
   "command.nova.network_reload.success": "All active networks have been reloaded.",
