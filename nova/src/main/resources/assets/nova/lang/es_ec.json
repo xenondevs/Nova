@@ -161,5 +161,6 @@
   "item.nova.unknown_item_filter": "Filtro de artículos desconocidos",
   "command.nova.fill.success": "Rellenado con éxito el área desde x: %s, y: %s, z: %s hasta x: %s, y: %s, z: %s con %s.",
   "command.nova.show_item_behaviors.success": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
-  "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s"
+  "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
+  "command.nova.recalculate_leave_properties.done": "Procesadas %s hojas y hechas %s hojas no persistentes."
 }

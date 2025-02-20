@@ -161,5 +161,6 @@
   "command.nova.network_debug.nova.energy.on": "Увімкнено перегляд налагодження для Energy-Networks.",
   "command.nova.show_network_node_info.initialized": "Ініціалізовано мережею: %s",
   "command.nova.show_item_behaviors.success": "Цей %s має поведінку %s елементів:\n%s",
-  "command.nova.show_item_behaviors.no_item": "Будь ласка, візьміть предмет в основну руку і спробуйте ще раз."
+  "command.nova.show_item_behaviors.no_item": "Будь ласка, візьміть предмет в основну руку і спробуйте ще раз.",
+  "command.nova.recalculate_leave_properties.done": "Обробив листя %s і зробив листя %s нестійким."
 }

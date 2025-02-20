@@ -161,5 +161,6 @@
   "command.nova.network_debug.nova.energy.on": "Ενεργοποιήθηκε η προβολή εντοπισμού σφαλμάτων για το Energy-Networks.",
   "command.nova.show_network_node_info.bridge.networks.entry": "Τύπος: %s, ID: %s",
   "command.nova.show_item_behaviors.success": "Αυτό το %s έχει %s συμπεριφορά(ες) στοιχείου:\n%s",
-  "command.nova.show_item_behaviors.no_item": "Κρατήστε ένα αντικείμενο στο κύριο χέρι σας και προσπαθήστε ξανά."
+  "command.nova.show_item_behaviors.no_item": "Κρατήστε ένα αντικείμενο στο κύριο χέρι σας και προσπαθήστε ξανά.",
+  "command.nova.recalculate_leave_properties.done": "Επεξεργάστηκε %s φύλλα και κατέστησε %s φύλλα μη μόνιμα."
 }

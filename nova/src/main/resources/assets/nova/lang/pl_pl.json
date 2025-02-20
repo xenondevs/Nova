@@ -161,5 +161,6 @@
   "command.nova.reload_recipes.failure": "Nie udało się przeładować receptur, sprawdź konsolę, aby uzyskać więcej informacji.",
   "item.nova.unknown_item_filter": "Filtr nieznanych przedmiotów",
   "command.nova.show_item_behaviors.success": "Ten %s ma %s zachowań elementów:\n%s",
-  "command.nova.show_item_behaviors.no_item": "Przytrzymaj przedmiot w głównej ręce i spróbuj ponownie."
+  "command.nova.show_item_behaviors.no_item": "Przytrzymaj przedmiot w głównej ręce i spróbuj ponownie.",
+  "command.nova.recalculate_leave_properties.done": "Przetworzono %s liści i uczyniono %s liści nietrwałymi."
 }

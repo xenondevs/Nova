@@ -161,5 +161,6 @@
   "command.nova.reload_recipes.failure": "Nepavyko iš naujo įkelti receptų, daugiau informacijos ieškokite konsolėje.",
   "command.nova.show_network_node_info.end_point.networks.entry": "Tipas: %s, kryptis: %s, ID: %s",
   "command.nova.show_item_behaviors.success": "Šis %s turi %s elemento elgseną (-as):\n%s",
-  "command.nova.show_item_behaviors.no_item": "Laikykite daiktą pagrindinėje rankoje ir bandykite dar kartą."
+  "command.nova.show_item_behaviors.no_item": "Laikykite daiktą pagrindinėje rankoje ir bandykite dar kartą.",
+  "command.nova.recalculate_leave_properties.done": "Apdorota %s lapų ir %s lapų tapo nepastovūs."
 }

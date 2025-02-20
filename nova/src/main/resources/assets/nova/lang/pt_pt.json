@@ -161,5 +161,6 @@
   "command.nova.reload_recipes.failure": "Falha ao recarregar receitas, verifique a consola para mais informações.",
   "command.nova.show_item_model_data.no_item": "Segure um item Nova na sua mão principal e tente novamente.",
   "command.nova.show_item_behaviors.success": "Este %s tem %s comportamento(s) de item:\n%s",
-  "command.nova.show_item_behaviors.no_item": "Segure um objeto na sua mão principal e tente novamente."
+  "command.nova.show_item_behaviors.no_item": "Segure um objeto na sua mão principal e tente novamente.",
+  "command.nova.recalculate_leave_properties.done": "Processou %s folhas e tornou %s folhas não persistentes."
 }

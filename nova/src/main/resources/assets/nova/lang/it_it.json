@@ -161,5 +161,6 @@
   "block.nova.unknown": "Blocco sconosciuto",
   "command.nova.search_block.done": "Ricerca completata.",
   "command.nova.show_item_behaviors.no_item": "Tenere un oggetto nella mano principale e riprovare.",
-  "command.nova.show_item_behaviors.success": "Questo %s ha uno o più comportamenti dell'articolo %s:\n%s"
+  "command.nova.show_item_behaviors.success": "Questo %s ha uno o più comportamenti dell'articolo %s:\n%s",
+  "command.nova.recalculate_leave_properties.done": "Elaborato %s foglie e reso %s foglie non persistenti."
 }

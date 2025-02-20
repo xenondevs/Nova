@@ -161,5 +161,6 @@
   "command.nova.network_debug.nova.energy.on": "Activada la vista de depuración para redes de energía.",
   "command.nova.show_network_node_info.connected_nodes.header": "Conexiones (%s):",
   "command.nova.show_item_behaviors.success": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
-  "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s"
+  "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
+  "command.nova.recalculate_leave_properties.done": "Procesadas %s hojas y hechas %s hojas no persistentes."
 }

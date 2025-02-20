@@ -161,5 +161,6 @@
   "command.nova.reload_recipes.failure": "Nepodarilo sa načítať recepty, ďalšie informácie nájdete v konzole.",
   "command.nova.network_debug.nova.energy.on": "Povolené ladiace zobrazenie pre Energy-Networks.",
   "command.nova.show_item_behaviors.success": "Tento %s má %s správanie(-a) položky:\n%s",
-  "command.nova.show_item_behaviors.no_item": "Podržte predmet v hlavnej ruke a skúste to znova."
+  "command.nova.show_item_behaviors.no_item": "Podržte predmet v hlavnej ruke a skúste to znova.",
+  "command.nova.recalculate_leave_properties.done": "Spracovaných %s listov a %s listov sa stalo nepersistentnými."
 }

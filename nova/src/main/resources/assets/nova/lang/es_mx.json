@@ -161,5 +161,6 @@
   "command.nova.give_clientside_stack.success": "Añadida una versión cliente de %s a tu inventario.",
   "command.nova.copy_clientside_stack.success": "Añadida una copia del lado del cliente de %s a tu inventario.",
   "command.nova.show_item_behaviors.success": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
-  "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s"
+  "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
+  "command.nova.recalculate_leave_properties.done": "Procesadas %s hojas y hechas %s hojas no persistentes."
 }

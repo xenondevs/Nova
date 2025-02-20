@@ -161,5 +161,6 @@
   "item.nova.unknown_item_filter": "Unbekannter Itemfilter",
   "item.nova.unknown_item_filter.description": "Das Addon, das diese Itemfilterart verwaltet, ist entweder nicht vorhanden oder hat ihn nicht registriert.",
   "command.nova.show_item_behaviors.success": "Dieser %s hat %s Gegenstand Verhalten(e):\n%s",
-  "command.nova.show_item_behaviors.no_item": "Dieser %s hat %s Gegenstand Verhalten(e):\n%s"
+  "command.nova.show_item_behaviors.no_item": "Dieser %s hat %s Gegenstand Verhalten(e):\n%s",
+  "command.nova.recalculate_leave_properties.done": "Verarbeitete %s Blätter und machte %s Blätter nicht-persistent."
 }

@@ -161,5 +161,6 @@
   "command.nova.reload_recipes.failure": "Het opnieuw laden van recepten is mislukt, controleer de console voor meer informatie.",
   "command.nova.show_network_node_info.bridge.networks.entry": "Type: %s, ID: %s",
   "command.nova.show_item_behaviors.success": "Deze %s heeft %s item gedrag(en):\n%s",
-  "command.nova.show_item_behaviors.no_item": "Houd een voorwerp in je hoofdhand en probeer het opnieuw."
+  "command.nova.show_item_behaviors.no_item": "Houd een voorwerp in je hoofdhand en probeer het opnieuw.",
+  "command.nova.recalculate_leave_properties.done": "Verwerkte %s bladeren en maakte %s bladeren niet-persistent."
 }
