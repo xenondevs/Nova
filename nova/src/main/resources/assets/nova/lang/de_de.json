@@ -1,7 +1,7 @@
 {
   "menu.nova.items.search": "Item suchen",
   "menu.nova.items.search.back": "Zurück zum Hauptinventar",
-  "menu.nova.items.search.clear": "Suchfeld leeren",
+  "menu.nova.items.search.clear": "Suche leeren",
   "menu.nova.items.search-item": "Suchen...",
   "menu.nova.items.category.misc": "Sonstiges",
   "menu.nova.recipe": "Handwerksbuch",
@@ -43,7 +43,7 @@
   "command.nova.no-item-in-hand": "Halte ein Item in deiner Hand und versuche es erneut.",
   "command.nova.give.success": "%s %s an %s gegeben",
   "command.nova.list_nearby.success": "Von den %s Rüstungsständern in deinem Chunk sind %s Teil einer TileEntity.",
-  "command.nova.get_nearest_data.failed": "Es konnte keine TileEntity in deiner Nähe gefunden werden.",
+  "command.nova.get_nearest_data.failed": "Es konnte keine Tile-Entität in deiner Nähe gefunden werden.",
   "command.nova.remove_obsolete_models.success": "%s Rüstungsständer wurden entfernt.",
   "command.nova.remove_tile_entities.success": "%s TileEntites wurden entfernt.",
   "command.nova.render_distance": "Deine Renderdistanz wurde auf %s gesetzt.",
@@ -68,7 +68,7 @@
   "command.nova.resource_pack.create.start": "Ressourcenpaket wird erstellt... bitte warten",
   "menu.nova.items": "Items",
   "command.nova.resource_pack.reupload.success": "Ressourcenpaket auf %s hochgeladen.",
-  "command.nova.resource_pack.create.success": "Ressourcenpaket erstellt. Ein Server Neustart ist empfohlen.",
+  "command.nova.resource_pack.create.success": "Ressourcenpaket erstellt. Ein Neustart des Servers ist empfohlen.",
   "command.nova.resource_pack.reupload.start": "Ressourcenpaket wird hochgeladen... Bitte warten",
   "command.nova.resource_pack.reupload.fail": "Das Ressourcenpaket konnte nicht hochgeladen werden.",
   "menu.nova.side_config.north": "Norden",
@@ -161,6 +161,6 @@
   "item.nova.unknown_item_filter": "Unbekannter Itemfilter",
   "item.nova.unknown_item_filter.description": "Das Addon, das diese Itemfilterart verwaltet, ist entweder nicht vorhanden oder hat ihn nicht registriert.",
   "command.nova.show_item_behaviors.success": "Dieser %s hat %s Gegenstand Verhalten(e):\n%s",
-  "command.nova.show_item_behaviors.no_item": "Dieser %s hat %s Gegenstand Verhalten(e):\n%s",
-  "command.nova.recalculate_leave_properties.done": "Verarbeitete %s Blätter und machte %s Blätter nicht-persistent."
+  "command.nova.show_item_behaviors.no_item": "Bitte halte ein Item in deiner Hand und versuche es erneut.",
+  "command.nova.recalculate_leave_properties.done": "Es wurden %s Laubblöcke verarbeitet, wovon %s Laubblöcke non-persistent gemacht wurden."
 }
