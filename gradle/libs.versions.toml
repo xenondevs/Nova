@@ -23,7 +23,7 @@ commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version
 commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "xenondevs-commons" }
 commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version.ref = "xenondevs-commons" }
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "xenondevs-commons" }
-configurate-yaml = { group = "org.spongepowered", name = "configurate-yaml", version = "4.1.2" }
+configurate-yaml = { group = "org.spongepowered", name = "configurate-yaml", version = "4.2.0" }
 cosmic-binary-format = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format", version.ref = "cbf" }
 fuzzywuzzy = { group = "me.xdrop", name = "fuzzywuzzy", version = "1.4.0" }
 invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version = "2.0.0-alpha.7" }
