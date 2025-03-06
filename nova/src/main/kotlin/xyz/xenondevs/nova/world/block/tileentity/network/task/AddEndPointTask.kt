@@ -97,4 +97,8 @@ internal class AddEndPointTask(
         return false
     }
     
+    override fun toString(): String {
+        return "AddEndPointTask(endPoint=$node)"
+    }
+    
 }

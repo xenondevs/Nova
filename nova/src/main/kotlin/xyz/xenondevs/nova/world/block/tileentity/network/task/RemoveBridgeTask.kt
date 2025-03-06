@@ -17,9 +17,6 @@ import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
 import java.util.*
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.filterTo
 
 internal class RemoveBridgeTask(
     state: NetworkState,
@@ -213,6 +210,10 @@ internal class RemoveBridgeTask(
         }
         
         return potentialNetworks
+    }
+    
+    override fun toString(): String {
+        return "RemoveBridgeTask(bridge=$node)"
     }
     
 }

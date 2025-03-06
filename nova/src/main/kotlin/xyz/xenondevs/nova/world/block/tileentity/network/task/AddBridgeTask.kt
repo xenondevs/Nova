@@ -18,9 +18,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.format.NetworkState
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
 import java.util.*
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 
 internal class AddBridgeTask(
     state: NetworkState,
@@ -128,7 +125,7 @@ internal class AddBridgeTask(
         // depending on how many networks there are, perform the required action
         val network = when {
             // Merge network
-            previousNetworks.size > 1 -> mergeNetworks(self, networkType, previousNetworks)
+            previousNetworks.size > 1 -> mergeNetworks(networkType, previousNetworks)
             // Connect to existing network
             previousNetworks.size == 1 -> previousNetworks.first()
             // Make a new network
@@ -146,7 +143,6 @@ internal class AddBridgeTask(
      * Merges the given [networks] into a single network of [type].
      */
     private suspend fun <T : Network<T>> mergeNetworks(
-        self: NetworkBridge,
         type: NetworkType<T>,
         networks: Set<ProtoNetwork<T>>
     ): ProtoNetwork<T> {
@@ -195,6 +191,10 @@ internal class AddBridgeTask(
                 }
             }
         }
+    }
+    
+    override fun toString(): String {
+        return "AddBridgeTask(bridge=$node, supportedNetworkTypes=$supportedNetworkTypes, bridgeFaces=$bridgeFaces)"
     }
     
 }

@@ -79,4 +79,8 @@ internal class UnloadChunkTask(
         return true
     }
     
+    override fun toString(): String {
+        return "UnloadChunkTask(pos=$chunkPos)"
+    }
+    
 }

@@ -85,4 +85,8 @@ internal class LoadChunkTask(
         return updatedNetworks.isNotEmpty()
     }
     
+    override fun toString(): String {
+        return "LoadChunkTask(pos=$chunkPos)"
+    }
+    
 }

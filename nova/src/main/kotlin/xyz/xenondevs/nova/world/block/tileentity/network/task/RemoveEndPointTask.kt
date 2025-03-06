@@ -57,4 +57,8 @@ internal class RemoveEndPointTask(
         }
     }
     
+    override fun toString(): String {
+        return "RemoveEndPointTask(node=$node)"
+    }
+    
 }
