@@ -8,6 +8,7 @@ import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
@@ -42,14 +43,18 @@ internal class LoadChunkTask(
         val updatedNetworks = HashMap<ProtoNetwork<*>, MutableSet<NetworkNode>>()
         
         val chunkNodes = NetworkManager.getNodes(chunkPos).associateByTo(HashMap(), NetworkNode::pos)
-        val networkNodes = state.storage.getOrLoadNetworkRegion(chunkPos).getChunk(chunkPos).getData()
+        val networkChunk = state.storage.getOrLoadNetworkRegion(chunkPos).getChunk(chunkPos)
+        val networkNodes = networkChunk.getData()
         
         for ((pos, data) in networkNodes) {
             val node = chunkNodes[pos]
-            if (node == null || node in state)
-                continue
             
             when {
+                node != null && node in state -> {
+                    LOGGER.error("Node at pos $pos is already loaded", Exception())
+                    continue
+                }
+                
                 node is NetworkBridge && data is NetworkBridgeData -> {
                     val networks = data.networks
                     for ((type, id) in networks) {
@@ -68,7 +73,12 @@ internal class LoadChunkTask(
                     }
                 }
                 
-                else -> throw IllegalStateException("Node type and data type do not match")
+                else -> {
+                    // node is null or node and data type do not match
+                    LOGGER.error("Node type and data type mismatch: $node does not match $data. (Removing from network data storage)", Exception())
+                    networkChunk.setData(pos, null)
+                    continue
+                }
             }
             
             state += node
