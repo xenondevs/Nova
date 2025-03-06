@@ -205,6 +205,14 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     
     private suspend fun buildClusters(): List<NetworkCluster> = coroutineScope {
         state.mutex.withLock {
+            // init clusters TODO: clusters are only uninitialized here if an exception was thrown in the task, but it may make sense to always init here
+            for (network in state.networks) {
+                if (network.cluster == null) {
+                    LOGGER.error("Cluster of $network is uninitialized")
+                    network.initCluster()
+                }
+            }
+            
             // collect proto clusters
             val protoClusters = state.networks
                 .mapTo(HashSet()) { it.cluster ?: throw IllegalStateException("Cluster for $it is uninitialized") }
