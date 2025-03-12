@@ -184,7 +184,7 @@
     },
     {
       "file": "nova:font/waila/10/end.png",
-      "chars": ["\uf019"],
+      "chars": ["\uf01a"],
       "height": 128,
       "ascent": 0,
       "type": "bitmap"
