@@ -5,9 +5,6 @@ import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteReader
-import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.world.BlockPos
@@ -81,14 +78,9 @@ internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChun
         val compound = CBF.read<Compound>(reader)!!
         val blockFacing = compound.get<BlockFace>("facing") // facing was the only built-in block property
         
-        // place context is used to determine correct block state
-        val placeCtx = Context.intention(DefaultContextIntentions.BlockPlace)
-            .param(DefaultContextParamTypes.BLOCK_POS, pos)
-            .param(DefaultContextParamTypes.BLOCK_TYPE_NOVA, type)
-            .param(DefaultContextParamTypes.SOURCE_DIRECTION, (blockFacing ?: BlockFace.NORTH).oppositeFace.direction)
-            .build()
-        
-        val blockState = type.chooseBlockState(placeCtx)
+        val blockState = blockFacing
+            ?.let { runCatching { type.defaultBlockState.with(DefaultBlockStateProperties.FACING, blockFacing) }.getOrNull() }
+            ?: type.defaultBlockState
         chunk.setBlockState(pos, blockState)
         
         if (type is NovaTileEntityBlock) {
