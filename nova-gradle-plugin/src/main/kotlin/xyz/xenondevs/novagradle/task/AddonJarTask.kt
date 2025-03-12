@@ -207,6 +207,35 @@ abstract class AddonJarTask : DefaultTask() {
     
     private fun generateBootstrapper(path: Path) {
         val bootstrapper = ClassNode(Opcodes.ASM9)
+        
+        // default bootstrap (empty)
+        val defaultBootstrap = MethodNode(
+            Opcodes.ACC_PUBLIC,
+            "bootstrap",
+            "(Lio/papermc/paper/plugin/bootstrap/BootstrapContext;)V"
+        ) {
+            addLabel()
+            _return()
+        }
+        
+        // default createPlugin (calls interface default)
+        val defaultCreatePlugin = MethodNode(
+            Opcodes.ACC_PUBLIC,
+            "createPlugin",
+            "(Lio/papermc/paper/plugin/bootstrap/PluginProviderContext;)Lorg/bukkit/plugin/java/JavaPlugin;"
+        ) {
+            addLabel()
+            aLoad(0)
+            aLoad(1)
+            invokeSpecial(
+                "io/papermc/paper/plugin/bootstrap/PluginBootstrap",
+                "createPlugin",
+                "(Lio/papermc/paper/plugin/bootstrap/PluginProviderContext;)Lorg/bukkit/plugin/java/JavaPlugin;",
+                isInterface = true
+            )
+            areturn()
+        }
+        
         if (path.notExists()) {
             bootstrapper.apply {
                 version = Opcodes.V21
@@ -215,7 +244,6 @@ abstract class AddonJarTask : DefaultTask() {
                 superName = "java/lang/Object"
                 interfaces = listOf("io/papermc/paper/plugin/bootstrap/PluginBootstrap")
                 methods = mutableListOf(
-                    // <init>
                     MethodNode(
                         Opcodes.ACC_PUBLIC,
                         "<init>",
@@ -225,34 +253,6 @@ abstract class AddonJarTask : DefaultTask() {
                         aLoad(0)
                         invokeSpecial("java/lang/Object", "<init>", "()V")
                         _return()
-                    },
-                    
-                    // bootstrap (empty)
-                    MethodNode(
-                        Opcodes.ACC_PUBLIC,
-                        "bootstrap",
-                        "(Lio/papermc/paper/plugin/bootstrap/BootstrapContext;)V"
-                    ) {
-                        addLabel()
-                        _return()
-                    },
-                    
-                    // createPlugin (calls interface default)
-                    MethodNode(
-                        Opcodes.ACC_PUBLIC,
-                        "createPlugin",
-                        "(Lio/papermc/paper/plugin/bootstrap/PluginProviderContext;)Lorg/bukkit/plugin/java/JavaPlugin;"
-                    ) {
-                        addLabel()
-                        aLoad(0)
-                        aLoad(1)
-                        invokeSpecial(
-                            "io/papermc/paper/plugin/bootstrap/PluginBootstrap",
-                            "createPlugin",
-                            "(Lio/papermc/paper/plugin/bootstrap/PluginProviderContext;)Lorg/bukkit/plugin/java/JavaPlugin;",
-                            isInterface = true
-                        )
-                        areturn()
                     }
                 )
             }
@@ -264,7 +264,9 @@ abstract class AddonJarTask : DefaultTask() {
         }
         
         // inserts AddonBootstrapper.bootstrap(context, getClass().getClassLoader()) at beginning
-        bootstrapper.methods.first { it.name == "bootstrap" }.instructions.insert(buildInsnList {
+        val bootstrap = bootstrapper.methods.firstOrNull { it.name == "bootstrap" }
+            ?: defaultBootstrap.also { bootstrapper.methods.add(it) }
+        bootstrap.instructions.insert(buildInsnList {
             addLabel()
             aLoad(1)
             aLoad(0)
@@ -278,7 +280,9 @@ abstract class AddonJarTask : DefaultTask() {
         })
         
         // inserts AddonBootstrapper.handleJavaPluginCreated(JavaPlugin, PluginProviderContext, ClassLoader) before return
-        bootstrapper.methods.first { it.name == "createPlugin" }.insertBeforeEvery(buildInsnList {
+        val createPlugin = bootstrapper.methods.firstOrNull { it.name == "createPlugin" }
+            ?: defaultCreatePlugin.also { bootstrapper.methods.add(it) }
+        createPlugin.insertBeforeEvery(buildInsnList {
             dup()
             aLoad(1) // PluginProviderContext
             aLoad(0)
