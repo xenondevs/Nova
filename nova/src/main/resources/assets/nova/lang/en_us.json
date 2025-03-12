@@ -88,6 +88,8 @@
   "command.nova.show_block_data.vanilla_block": "You're looking at the vanilla block %s.",
   "command.nova.show_block_data.vanilla_tile_entity": "You're looking at the vanilla tile-entity %s. It has the following Nova data:\n%s",
   "command.nova.show_block_data.failure": "Please look at a block and try again.",
+  "command.nova.show_vanilla_block_state.success": "You're looking at the block state %s.",
+  "command.nova.show_vanilla_block_state.failure": "Please look at a block and try again.",
   "command.nova.show_block_model_data.model_less": "This %s uses the following vanilla block: %s.",
   "command.nova.show_block_model_data.backing_state": "This %s uses the following backing state configuration:\nBlock: %s\nVariant: %s",
   "command.nova.show_block_model_data.display_entity": "This %s uses the following display entity configuration:\nHitbox type: %s\nModels (%s):\n%s",

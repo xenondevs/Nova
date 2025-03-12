@@ -19,8 +19,8 @@ import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Bukkit
-import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import org.joml.Matrix4f
 import org.joml.Vector3f
@@ -120,6 +120,9 @@ internal object NovaCommand : Command() {
             .then(literal("getBlockData")
                 .requiresPlayer()
                 .executes0(::showBlockData))
+            .then(literal("getVanillaBlockData")
+                .requiresPlayer()
+                .executes0(::showVanillaBlockData))
             .then(literal("getBlockModelData")
                 .requiresPlayer()
                 .executes0(::showBlockModelData))
@@ -420,6 +423,20 @@ internal object NovaCommand : Command() {
         }
     }
     
+    private fun showVanillaBlockData(ctx: CommandContext<CommandSourceStack>) {
+        val pos = ctx.player.getTargetBlockExact(8)?.location?.pos
+        if (pos != null) {
+            val blockState = pos.nmsBlockState
+            ctx.source.sender.sendMessage(Component.translatable(
+                "command.nova.show_vanilla_block_state.success",
+                NamedTextColor.GRAY,
+                Component.text(blockState.toString(), NamedTextColor.AQUA)
+            ))
+        } else {
+            ctx.source.sender.sendMessage(Component.translatable("command.nova.show_vanilla_block_state.failure", NamedTextColor.RED))
+        }
+    }
+    
     private fun showBlockModelData(ctx: CommandContext<CommandSourceStack>) {
         val pos = ctx.player.getTargetBlockExact(8)?.location?.pos
         if (pos != null) {
@@ -429,12 +446,12 @@ internal object NovaCommand : Command() {
                 
                 val message = when (modelProvider.provider) {
                     is ModelLessBlockModelProvider -> {
-                        val info = modelProvider.info as BlockData
+                        val info = modelProvider.info as BlockState
                         Component.translatable(
                             "command.nova.show_block_model_data.model_less",
                             NamedTextColor.GRAY,
                             Component.text(novaBlockState.toString(), NamedTextColor.AQUA),
-                            Component.text(info.asString, NamedTextColor.AQUA)
+                            Component.text(info.toString(), NamedTextColor.AQUA)
                         )
                     }
                     
