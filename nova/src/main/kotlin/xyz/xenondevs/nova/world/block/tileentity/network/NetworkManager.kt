@@ -215,6 +215,14 @@ object NetworkManager : Listener {
         return null
     }
     
+    /**
+     * Checks whether it is [unknown][NetworkNodeProvider.isUnknown] if the block at [pos] is a [NetworkNode]
+     * using the registered [NetworkNodeProviders][NetworkNodeProvider].
+     */
+    suspend fun isUnknown(pos: BlockPos): Boolean {
+        return nodeProviders.any { it.isUnknown(pos) }
+    }
+    
     @EventHandler
     private fun handleWorldUnload(event: WorldUnloadEvent) {
         removeConfigurator(event.world)

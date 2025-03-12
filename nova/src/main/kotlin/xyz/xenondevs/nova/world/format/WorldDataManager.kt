@@ -99,6 +99,9 @@ object WorldDataManager : Listener {
     fun getBlockState(pos: BlockPos): NovaBlockState? =
         getChunkOrThrow(pos.chunkPos).getBlockState(pos)
     
+    internal suspend fun getOrLoadBlockState(pos: BlockPos): NovaBlockState? =
+        getOrLoadChunk(pos.chunkPos).getBlockState(pos)
+    
     fun setBlockState(pos: BlockPos, state: NovaBlockState?): NovaBlockState? {
         check(!disabled) { "WorldDataManager is already disabled" }
         return getChunkOrThrow(pos.chunkPos).setBlockState(pos, state)

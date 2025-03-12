@@ -49,6 +49,10 @@ internal class LoadChunkTask(
         for ((pos, data) in networkNodes) {
             val node = chunkNodes[pos]
             
+            // the network data of unknown nodes should not be removed in order to prevent data loss of addons that weren't loaded
+            if (node == null && NetworkManager.isUnknown(pos))
+                continue
+            
             when {
                 node != null && node in state -> {
                     LOGGER.error("Node at pos $pos is already loaded", Exception())

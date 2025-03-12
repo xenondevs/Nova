@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.world.block.tileentity.network
 
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
+import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
@@ -22,6 +23,14 @@ interface NetworkNodeProvider {
      */
     suspend fun getNodes(pos: ChunkPos): Sequence<NetworkNode>
     
+    /**
+     * Checks whether the block at the specified [pos] is unknown.
+     * For example, blocks of addons that weren't loaded but may be a [NetworkNode] should be considered unknown.
+     *
+     * This information may be used by the network system to determine whether to delete network data or not.
+     */
+    suspend fun isUnknown(pos: BlockPos): Boolean = false
+    
 }
 
 /**
@@ -31,6 +40,10 @@ internal object NovaNetworkNodeProvider : NetworkNodeProvider {
     
     override suspend fun getNode(pos: BlockPos): NetworkNode? {
         return WorldDataManager.getOrLoadTileEntity(pos) as? NetworkNode
+    }
+    
+    override suspend fun isUnknown(pos: BlockPos): Boolean {
+        return WorldDataManager.getOrLoadBlockState(pos)?.block == DefaultBlocks.UNKNOWN
     }
     
     override suspend fun getNodes(pos: ChunkPos): Sequence<NetworkNode> {
