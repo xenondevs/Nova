@@ -1,19 +1,10 @@
 package xyz.xenondevs.nova.util.advancement
 
 import net.kyori.adventure.text.Component
-import net.minecraft.advancements.Advancement
-import net.minecraft.advancements.AdvancementHolder
-import net.minecraft.advancements.AdvancementRequirements
-import net.minecraft.advancements.AdvancementType
-import net.minecraft.advancements.Criterion
-import net.minecraft.advancements.DisplayInfo
-import net.minecraft.advancements.critereon.InventoryChangeTrigger
-import net.minecraft.advancements.critereon.ItemPredicate
-import net.minecraft.core.component.DataComponentPredicate
-import net.minecraft.core.component.DataComponents
+import net.minecraft.advancements.*
+import net.minecraft.advancements.critereon.*
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.item.component.CustomData
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -94,16 +85,17 @@ fun obtainNovaItemsAdvancement(
 }
 
 private fun createObtainNovaItemCriterion(item: NovaItem): Criterion<InventoryChangeTrigger.TriggerInstance> {
-    val expectedCustomData = CustomData.of(CompoundTag().apply {
+    val expectedCustomData = CompoundTag().apply {
         put("nova", CompoundTag().apply {
             putString("id", item.id.toString())
         })
-    })
+    }
     return InventoryChangeTrigger.TriggerInstance.hasItems(
-        ItemPredicate.Builder.item().hasComponents(
-            DataComponentPredicate.builder()
-                .expect(DataComponents.CUSTOM_DATA, expectedCustomData)
-                .build()
+        ItemPredicate.Builder.item().withSubPredicate(
+            ItemSubPredicates.CUSTOM_DATA,
+            ItemCustomDataPredicate.customData(
+                NbtPredicate(expectedCustomData)
+            )
         )
     )
 }
