@@ -162,5 +162,7 @@
   "command.nova.give_clientside_stack.success": "Lade till en klientversion av %s i din inventering.",
   "command.nova.show_item_behaviors.success": "Denna %s har %s objektbeteende(n):\n%s",
   "command.nova.show_item_behaviors.no_item": "Håll ett föremål i din huvudhand och försök igen.",
-  "command.nova.recalculate_leave_properties.done": "Bearbetade %s löv och gjorde %s löv icke-beständiga."
+  "command.nova.recalculate_leave_properties.done": "Bearbetade %s löv och gjorde %s löv icke-beständiga.",
+  "command.nova.show_vanilla_block_state.success": "Du tittar på blocktillståndet %s.",
+  "command.nova.show_vanilla_block_state.failure": "Titta på ett block och försök igen."
 }

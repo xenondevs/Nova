@@ -162,5 +162,7 @@
   "item.nova.unknown_item_filter": "Filtr nieznanych przedmiotów",
   "command.nova.show_item_behaviors.success": "Ten %s ma %s zachowań elementów:\n%s",
   "command.nova.show_item_behaviors.no_item": "Przytrzymaj przedmiot w głównej ręce i spróbuj ponownie.",
-  "command.nova.recalculate_leave_properties.done": "Przetworzono %s liści i uczyniono %s liści nietrwałymi."
+  "command.nova.recalculate_leave_properties.done": "Przetworzono %s liści i uczyniono %s liści nietrwałymi.",
+  "command.nova.show_vanilla_block_state.success": "Patrzysz na stan bloku %s.",
+  "command.nova.show_vanilla_block_state.failure": "Spójrz na blok i spróbuj ponownie."
 }

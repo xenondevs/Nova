@@ -162,5 +162,7 @@
   "command.nova.reload_configs.none": "Aucune configuration n'a été modifiée.",
   "command.nova.show_item_behaviors.success": "Ce %s a le(s) comportement(s) de l'élément %s :\n%s",
   "command.nova.show_item_behaviors.no_item": "Tenez un objet dans votre main principale et réessayez.",
-  "command.nova.recalculate_leave_properties.done": "A traité %s feuilles et a rendu %s feuilles non persistantes."
+  "command.nova.recalculate_leave_properties.done": "A traité %s feuilles et a rendu %s feuilles non persistantes.",
+  "command.nova.show_vanilla_block_state.success": "Vous regardez l'état du bloc %s.",
+  "command.nova.show_vanilla_block_state.failure": "Veuillez regarder un bloc et réessayer."
 }

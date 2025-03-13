@@ -162,5 +162,7 @@
   "command.nova.show_network_node_info.bridge.networks.entry": "Type: %s, ID: %s",
   "command.nova.show_item_behaviors.success": "Deze %s heeft %s item gedrag(en):\n%s",
   "command.nova.show_item_behaviors.no_item": "Houd een voorwerp in je hoofdhand en probeer het opnieuw.",
-  "command.nova.recalculate_leave_properties.done": "Verwerkte %s bladeren en maakte %s bladeren niet-persistent."
+  "command.nova.recalculate_leave_properties.done": "Verwerkte %s bladeren en maakte %s bladeren niet-persistent.",
+  "command.nova.show_vanilla_block_state.success": "Je kijkt naar de blokstatus %s.",
+  "command.nova.show_vanilla_block_state.failure": "Kijk naar een blok en probeer het opnieuw."
 }

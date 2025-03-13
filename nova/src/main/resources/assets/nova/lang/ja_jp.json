@@ -162,5 +162,7 @@
   "command.nova.reload_configs.none": "コンフィグは変更されていない。",
   "command.nova.show_item_behaviors.success": "この %s は %s 項目の動作を持っています：\n%s",
   "command.nova.show_item_behaviors.no_item": "本手にアイテムを持って、もう一度試してください。",
-  "command.nova.recalculate_leave_properties.done": "s 個の葉を処理し、%s 個の葉を非永続にしました。"
+  "command.nova.recalculate_leave_properties.done": "s 個の葉を処理し、%s 個の葉を非永続にしました。",
+  "command.nova.show_vanilla_block_state.success": "ブロックの状態 %s を見ています。",
+  "command.nova.show_vanilla_block_state.failure": "ブロックを見て、もう一度試してください。"
 }

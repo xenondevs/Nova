@@ -162,5 +162,7 @@
   "command.nova.show_item_model_data.success": "Este %s utiliza el tipo de artículo %s con el modelo %s.",
   "command.nova.show_item_behaviors.success": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
   "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
-  "command.nova.recalculate_leave_properties.done": "Procesadas %s hojas y hechas %s hojas no persistentes."
+  "command.nova.recalculate_leave_properties.done": "Procesadas %s hojas y hechas %s hojas no persistentes.",
+  "command.nova.show_vanilla_block_state.success": "Estás viendo el estado del bloque %s.",
+  "command.nova.show_vanilla_block_state.failure": "Por favor, mira un bloque e inténtalo de nuevo."
 }
