@@ -13,7 +13,6 @@ import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.data.getByteArrayOrNull
-import xyz.xenondevs.nova.util.data.getIntOrNull
 import xyz.xenondevs.nova.util.data.getOrNull
 import xyz.xenondevs.nova.util.getOrThrow
 import kotlin.jvm.optionals.getOrNull
@@ -76,20 +75,6 @@ internal class ItemStackPersistentDataConverter(
             ?: NamespacedCompound()
         novaCompound.set(type, newKey, CBF.read(type, serializedValue))
         tag.putByteArray("nova_cbf", CBF.write(novaCompound))
-    }
-    
-}
-
-internal data object ItemStackSubIdToModelIdConverter : ItemStackTagLegacyConverter() {
-    
-    override fun convert(tag: CompoundTag) {
-        val novaTag = tag.getOrNull<CompoundTag>("nova")
-            ?: return
-        val subId = novaTag.getIntOrNull("subId")
-        if (subId == null || subId == 0) {
-            novaTag.remove("subId")
-            novaTag.putString("modelId", "default")
-        }
     }
     
 }

@@ -86,8 +86,7 @@ import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
-import java.util.Optional
-import kotlin.collections.map
+import java.util.*
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
 
@@ -404,13 +403,11 @@ internal object PacketItems : Listener, PacketListener {
         return type == DataComponents.CUSTOM_DATA
     }
     
-    private fun getUnknownItem(itemStack: MojangStack, id: String?, modelId: String = "default"): MojangStack {
+    private fun getUnknownItem(itemStack: MojangStack, id: String?): MojangStack {
         return MojangStack(Items.BARRIER).apply {
             set(
                 DataComponents.ITEM_NAME,
-                Component.literal(
-                    "Unknown item: $id" + if (modelId != "default") ":$modelId" else ""
-                ).withStyle(ChatFormatting.RED)
+                Component.literal("Unknown item: $id").withStyle(ChatFormatting.RED)
             )
             storeServerSideTag(this, itemStack)
         }

@@ -51,7 +51,6 @@ internal object ItemStackLegacyConversion {
             NamespacedKey("nova", "damage"),
         ))
         
-        registerConverter(ItemStackSubIdToModelIdConverter)
         registerConverter(ItemStackNovaDamageConverter)
         registerConverter(ItemStackEnchantmentsConverter)
     }
