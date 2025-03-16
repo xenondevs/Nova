@@ -6,7 +6,6 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.level.block.entity.SkullBlockEntity
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
-import org.bukkit.GameMode
 import org.bukkit.Instrument
 import org.bukkit.Material
 import org.bukkit.Note
@@ -127,7 +126,7 @@ internal object NoteBlockBehavior : BlockBehavior {
     }
     
     override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
-        if (ctx[DefaultContextParamTypes.SOURCE_PLAYER]?.gameMode == GameMode.CREATIVE)
+        if (!ctx[DefaultContextParamTypes.BLOCK_DROPS])
             return emptyList()
         
         return listOf(ItemStack(Material.NOTE_BLOCK))

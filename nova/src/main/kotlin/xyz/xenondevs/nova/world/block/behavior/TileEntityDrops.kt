@@ -1,8 +1,5 @@
 package xyz.xenondevs.nova.world.block.behavior
 
-import org.bukkit.GameMode
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
@@ -21,13 +18,18 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 object TileEntityDrops : BlockBehavior {
     
     override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
-        val sourceEntity: Entity? = ctx[DefaultContextParamTypes.SOURCE_ENTITY]
+        if (!ctx[DefaultContextParamTypes.BLOCK_DROPS] && !ctx[DefaultContextParamTypes.BLOCK_STORAGE_DROPS])
+            return emptyList()
+        
         return WorldDataManager.getTileEntity(pos)
-            ?.getDrops(sourceEntity !is Player || sourceEntity.gameMode != GameMode.CREATIVE)
+            ?.getDrops(ctx[DefaultContextParamTypes.BLOCK_DROPS])
             ?: emptyList()
     }
     
     override fun getExp(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): Int {
+        if (!ctx[DefaultContextParamTypes.BLOCK_EXP_DROPS])
+            return 0
+        
         return WorldDataManager.getTileEntity(pos)?.getExp() ?: 0
     }
     

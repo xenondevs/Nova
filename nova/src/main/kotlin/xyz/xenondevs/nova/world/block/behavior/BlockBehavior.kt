@@ -86,11 +86,13 @@ interface BlockBehavior : BlockBehaviorHolder {
     
     /**
      * Retrieves the amount of experience that would be dropped when breaking a block of [state] at [pos] with the given [ctx].
+     * Handlers should check [DefaultContextParamTypes.BLOCK_EXP_DROPS].
      */
     fun getExp(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): Int = 0
     
     /**
      * Retrieves the items that would be dropped when breaking a block of [state] at [pos] with the given [ctx].
+     * Handlers should check [DefaultContextParamTypes.BLOCK_DROPS] and [DefaultContextParamTypes.BLOCK_STORAGE_DROPS].
      */
     fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> = emptyList()
     

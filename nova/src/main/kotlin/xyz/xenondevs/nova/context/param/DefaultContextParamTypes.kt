@@ -20,6 +20,29 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.BLOCK_DROPS
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.BLOCK_EXP_DROPS
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.BLOCK_ITEM_STACK
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.BLOCK_POS
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.BLOCK_STATE_NOVA
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.BLOCK_STORAGE_DROPS
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.BLOCK_TYPE
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.BLOCK_TYPE_NOVA
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.BLOCK_TYPE_VANILLA
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.BLOCK_WORLD
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.CLICKED_BLOCK_FACE
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.INTERACTION_HAND
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.INTERACTION_ITEM_STACK
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.SOURCE_DIRECTION
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.SOURCE_ENTITY
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.SOURCE_LOCATION
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.SOURCE_PLAYER
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.SOURCE_TILE_ENTITY
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.SOURCE_UUID
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.SOURCE_WORLD
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.TILE_ENTITY_DATA_NOVA
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.TILE_ENTITY_NOVA
+import xyz.xenondevs.nova.context.param.DefaultContextParamTypes.TOOL_ITEM_STACK
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.Location
@@ -454,6 +477,11 @@ object DefaultContextParamTypes {
      *
      * Autofilled by:
      * - [SOURCE_ENTITY] if player
+     *
+     * Autofills:
+     * - [SOURCE_ENTITY]
+     * - [CLICKED_BLOCK_FACE]
+     * - [BLOCK_DROPS] with [BLOCK_POS] with and without [TOOL_ITEM_STACK]
      */
     val SOURCE_PLAYER: ContextParamType<Player> =
         ContextParamType.builder<Player>("source_player")
@@ -542,15 +570,19 @@ object DefaultContextParamTypes {
      * - [BlockBreak]
      *
      * Autofilled by:
-     * - [BLOCK_POS] with and without [TOOL_ITEM_STACK]
+     * - [BLOCK_POS] with and without [TOOL_ITEM_STACK] with and without [SOURCE_PLAYER]
      *
      * Autofills: none
+     *
+     * @see BLOCK_STORAGE_DROPS
+     * @see BLOCK_EXP_DROPS
      */
     val BLOCK_DROPS: DefaultingContextParamType<Boolean> =
         ContextParamType.builder<Boolean>("block_drops")
             .optionalIn(BlockBreak)
-            .autofilledBy(::BLOCK_POS, ::TOOL_ITEM_STACK) { pos, tool -> ToolUtils.isCorrectToolForDrops(pos.block, tool) }
-            .autofilledBy(::BLOCK_POS) { ToolUtils.isCorrectToolForDrops(it.block, null) }
+            .autofilledBy(::BLOCK_POS, ::TOOL_ITEM_STACK, ::SOURCE_PLAYER) { pos, tool, player -> player.gameMode != GameMode.CREATIVE && ToolUtils.isCorrectToolForDrops(pos.block, tool) }
+            .autofilledBy(::BLOCK_POS, ::SOURCE_PLAYER) { pos, player -> player.gameMode != GameMode.CREATIVE && ToolUtils.isCorrectToolForDrops(pos.block, null) }
+            .autofilledBy(::BLOCK_POS) { pos -> ToolUtils.isCorrectToolForDrops(pos.block, null) }
             .build(false)
     
     /**
@@ -562,15 +594,37 @@ object DefaultContextParamTypes {
      * Optional in intentions:
      * - [BlockBreak]
      *
-     * Autofilled by:
-     * - [SOURCE_PLAYER]
+     * Autofilled by: none
      *
      * Autofills: none
+     *
+     * @see BLOCK_DROPS
+     * @see BLOCK_EXP_DROPS
      */
     val BLOCK_STORAGE_DROPS: DefaultingContextParamType<Boolean> =
         ContextParamType.builder<Boolean>("block_storage_drops")
             .optionalIn(BlockBreak)
-            .autofilledBy(::SOURCE_PLAYER) { it.gameMode != GameMode.CREATIVE }
+            .build(true)
+    
+    /**
+     * Whether block exp orbs should be spawned.
+     * Defaults to `true`
+     *
+     * Required in intentions: none
+     *
+     * Optional in intentions:
+     * - [BlockBreak]
+     *
+     * Autofilled by: none
+     *
+     * Autofills: none
+     *
+     * @see BLOCK_DROPS
+     * @see BLOCK_STORAGE_DROPS
+     */
+    val BLOCK_EXP_DROPS: DefaultingContextParamType<Boolean> =
+        ContextParamType.builder<Boolean>("block_exp_drops")
+            .optionalIn(BlockBreak)
             .build(true)
     
     /**
@@ -630,14 +684,14 @@ object DefaultContextParamTypes {
     
     /**
      * Whether the data of the block should be included for creative-pick block interactions.
-     * 
+     *
      * Required in intentions: none
-     * 
+     *
      * Optional in intentions:
      * - [BlockInteract]
-     * 
+     *
      * Autofilled by: none
-     * 
+     *
      * Autofills: none
      */
     val INCLUDE_DATA: DefaultingContextParamType<Boolean> =

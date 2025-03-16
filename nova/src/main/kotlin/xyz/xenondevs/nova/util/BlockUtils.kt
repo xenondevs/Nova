@@ -417,9 +417,7 @@ object BlockUtils {
         
         val novaBlockState = WorldDataManager.getBlockState(pos)
         if (novaBlockState != null) {
-            val itemDrops = if (drops)
-                novaBlockState.block.getDrops(pos, novaBlockState, ctx)
-            else emptyList()
+            val itemDrops = novaBlockState.block.getDrops(pos, novaBlockState, ctx)
             breakNovaBlockInternal(ctx, sendEffectsToBreaker)
             return itemDrops
         }

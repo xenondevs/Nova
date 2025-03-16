@@ -99,20 +99,18 @@ internal class VanillaBlockBreaker(
 @Suppress("MemberVisibilityCanBePrivate")
 internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val startSequence: Int, val blockedUntil: Int) {
     
-    protected val breakMethod: BreakMethod by lazy { createBreakMethod() }
+    private val breakMethod: BreakMethod by lazy { createBreakMethod() }
     
-    val block = pos.block
-    protected val soundGroup: SoundGroup? = if (SoundEngine.overridesSound(block.blockSoundGroup.hitSound)) block.novaSoundGroup else null
-    protected val hardness: Double = block.hardness
-    protected val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
-    protected val itemToolCategories: Set<ToolCategory> = ToolCategory.ofItem(tool)
-    protected val drops: Boolean = player.gameMode == GameMode.CREATIVE || ToolUtils.isCorrectToolForDrops(block, tool)
+    protected val block = pos.block
+    private val soundGroup: SoundGroup? = if (SoundEngine.overridesSound(block.blockSoundGroup.hitSound)) block.novaSoundGroup else null
+    private val hardness: Double = block.hardness
+    private val tool: ItemStack? = player.inventory.itemInMainHand.takeUnlessEmpty()
+    private val itemToolCategories: Set<ToolCategory> = ToolCategory.ofItem(tool)
     
-    var destroyTicks = 0
-        private set
+    private var destroyTicks = 0
     var progress = 0.0
         private set
-    val isDone: Boolean
+    private val isDone: Boolean
         get() = progress >= 1
     
     var isStopped: Boolean = false
@@ -180,29 +178,32 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
     
     fun breakBlock(brokenClientside: Boolean, sequence: Int) {
         // create a block breaking context
-        val ctx = Context.intention(BlockBreak)
+        val ctxBuilder = Context.intention(BlockBreak)
             .param(DefaultContextParamTypes.BLOCK_POS, pos)
             .param(DefaultContextParamTypes.SOURCE_ENTITY, player)
             .param(DefaultContextParamTypes.TOOL_ITEM_STACK, tool)
-            .param(DefaultContextParamTypes.BLOCK_DROPS, drops)
+        val ctx = ctxBuilder.build()
         
         val level = block.world.serverLevel
         val blockPos = pos.nmsPos
         
         //<editor-fold desc="break event", defaultstate="collapsed">
         val event = BlockBreakEvent(block, player)
-        if (drops) {
-            event.expToDrop = when (this) {
-                is NovaBlockBreaker -> blockType.getExp(pos, blockState, ctx.build())
-                is VanillaBlockBreaker -> BlockUtils.getVanillaBlockExp(level, blockPos, tool.unwrap().copy())
+        event.expToDrop = when (this) {
+            is NovaBlockBreaker -> blockType.getExp(pos, blockState, ctxBuilder.build())
+            is VanillaBlockBreaker -> {
+                if (ctx[DefaultContextParamTypes.BLOCK_EXP_DROPS])
+                    BlockUtils.getVanillaBlockExp(level, blockPos, tool.unwrap().copy())
+                else 0
             }
         }
+        
         callEvent(event)
-        ctx.param(DefaultContextParamTypes.BLOCK_DROPS, drops && event.isDropItems)
+        ctxBuilder.param(DefaultContextParamTypes.BLOCK_DROPS, ctx[DefaultContextParamTypes.BLOCK_DROPS] && event.isDropItems)
+        ctxBuilder.param(DefaultContextParamTypes.BLOCK_STORAGE_DROPS, ctx[DefaultContextParamTypes.BLOCK_STORAGE_DROPS] && event.isDropItems)
         //</editor-fold>
         
         if (!event.isCancelled && !ProtectionManager.isVanillaProtected(player, block.location)) {
-            //<editor-fold desc="item drops", defaultstate="collapsed">
             //<editor-fold desc="exp drops", defaultstate="collapsed">
             if (level.gameRules.getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
                 val exp = event.expToDrop
@@ -233,7 +234,7 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
             val state = block.state
             
             // remove block
-            val items = BlockUtils.breakBlockInternal(ctx.build(), !brokenClientside)
+            val items = BlockUtils.breakBlockInternal(ctxBuilder.build(), !brokenClientside)
             val itemEntities = EntityUtils.createBlockDropItemEntities(pos, items)
             
             // drop items

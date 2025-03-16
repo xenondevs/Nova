@@ -5,7 +5,6 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.TripWireBlock
 import net.minecraft.world.level.block.TripWireHookBlock
 import net.minecraft.world.level.block.state.BlockState
-import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.event.CraftEventFactory
@@ -72,7 +71,7 @@ internal object TripwireBehavior : BlockBehavior {
     }
     
     override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<DefaultContextIntentions.BlockBreak>): List<ItemStack> {
-        if (ctx[DefaultContextParamTypes.SOURCE_PLAYER]?.gameMode == GameMode.CREATIVE)
+        if (!ctx[DefaultContextParamTypes.BLOCK_DROPS])
             return emptyList()
         
         return listOf(ItemStack.of(Material.STRING))
