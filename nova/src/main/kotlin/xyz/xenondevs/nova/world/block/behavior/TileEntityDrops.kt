@@ -27,9 +27,6 @@ object TileEntityDrops : BlockBehavior {
     }
     
     override fun getExp(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): Int {
-        if (!ctx[DefaultContextParamTypes.BLOCK_EXP_DROPS])
-            return 0
-        
         return WorldDataManager.getTileEntity(pos)?.getExp() ?: 0
     }
     
