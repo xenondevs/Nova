@@ -608,7 +608,7 @@ object DefaultContextParamTypes {
     
     /**
      * Whether block exp orbs should be spawned.
-     * Defaults to `true`
+     * Defaults to `false`
      *
      * Required in intentions: none
      *
@@ -627,7 +627,7 @@ object DefaultContextParamTypes {
         ContextParamType.builder<Boolean>("block_exp_drops")
             .optionalIn(BlockBreak)
             .autofilledBy(::BLOCK_DROPS) { it }
-            .build(true)
+            .build(false)
     
     /**
      * Whether block place effects should be played.
