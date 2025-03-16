@@ -615,7 +615,8 @@ object DefaultContextParamTypes {
      * Optional in intentions:
      * - [BlockBreak]
      *
-     * Autofilled by: none
+     * Autofilled by:
+     * - [BLOCK_DROPS]
      *
      * Autofills: none
      *
@@ -625,6 +626,7 @@ object DefaultContextParamTypes {
     val BLOCK_EXP_DROPS: DefaultingContextParamType<Boolean> =
         ContextParamType.builder<Boolean>("block_exp_drops")
             .optionalIn(BlockBreak)
+            .autofilledBy(::BLOCK_DROPS) { it }
             .build(true)
     
     /**
