@@ -1,6 +1,5 @@
 name: Binary Adapter Request
 description: Request a new binary adapter.
-title: "[Request - BinaryAdapter] "
 labels: [ "type: enhancement" ]
 body:
   - type: input
