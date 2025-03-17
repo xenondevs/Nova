@@ -31,7 +31,9 @@ jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jg
 jgrapht-io = { group = "org.jgrapht", name = "jgrapht-io", version.ref = "jgrapht" }
 jimfs = { group = "com.google.jimfs", name = "jimfs", version = "1.3.0" }
 joml-primitives = { group = "org.joml", name = "joml-primitives", version = "1.10.0" }
-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.11.4" }
+junit-bom = { module = "org.junit:junit-bom", version = "5.12.1" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
@@ -57,7 +59,6 @@ jgrapht = ["jgrapht-core", "jgrapht-io"]
 kotlin = ["kotlin-stdlib", "kotlin-reflect", "kotlinx-coroutines-core-jvm", "kotlinx-coroutines-debug"]
 ktor = ["ktor-server-core-jvm", "ktor-server-cio-jvm", "ktor-client-core-jvm", "ktor-client-cio-jvm", "ktor-client-content-negotiation", "ktor-serialization-gson-jvm"]
 minecraft-assets = ["minecraft-asset-downloader", "minecraft-model-renderer"]
-test = ["kotlin-test-junit", "junit-jupiter"]
 xenondevs-commons = ["commons-collections", "commons-gson", "commons-guava", "commons-provider", "commons-reflection"]
 
 [plugins]
