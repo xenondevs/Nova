@@ -36,10 +36,6 @@ import xyz.xenondevs.nova.util.toResourceLocation
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.iterator
-import kotlin.collections.map
 import net.minecraft.network.chat.Component as MojangComponent
 import net.minecraft.util.Unit as MojangUnit
 
@@ -112,7 +108,7 @@ internal class DefaultBehavior(
                 provider(item.lore),
                 provider(item.tooltipStyle),
                 provider(item.maxStackSize),
-                item.config.node("attribute_modifiers").map(::loadConfiguredAttributeModifiers),
+                item.config.node("attribute_modifiers").map { loadConfiguredAttributeModifiers(item, it) },
                 combinedProvider(
                     behaviors.map(ItemBehavior::defaultCompound)
                 ) { defaultCompounds ->
@@ -125,7 +121,7 @@ internal class DefaultBehavior(
                 }
             )
         
-        private fun loadConfiguredAttributeModifiers(node: ConfigurationNode): ItemAttributeModifiers {
+        private fun loadConfiguredAttributeModifiers(item: NovaItem, node: ConfigurationNode): ItemAttributeModifiers {
             if (node.virtual())
                 return ItemAttributeModifiers.EMPTY
             
@@ -137,6 +133,8 @@ internal class DefaultBehavior(
                     
                     for ((idx, attributeNode) in attributesNode.childrenList().withIndex()) {
                         try {
+                            val id = attributeNode.node("id").get<String>()
+                                ?: "${item.id.namespace()}:${item.id.value()}_${slotGroup.name.lowercase()}_$idx"
                             val attribute = attributeNode.node("attribute").get<Attribute>()
                                 ?: throw NoSuchElementException("Missing value 'attribute'")
                             val operation = attributeNode.node("operation").get<AttributeModifier.Operation>()
@@ -147,21 +145,18 @@ internal class DefaultBehavior(
                             builder.add(
                                 BuiltInRegistries.ATTRIBUTE.wrapAsHolder(attribute),
                                 AttributeModifier(
-                                    ResourceLocation.fromNamespaceAndPath(
-                                        "nova",
-                                        "configured_attribute_modifier_${slotGroup.name.lowercase()}_$idx"
-                                    ),
+                                    ResourceLocation.parse(id),
                                     value,
                                     operation
                                 ),
                                 slotGroup
                             )
                         } catch (e: Exception) {
-                            LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $this, $slotGroup with index $idx", e)
+                            LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $item, $slotGroup with index $idx", e)
                         }
                     }
                 } catch (e: Exception) {
-                    LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $this", e)
+                    LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $item", e)
                 }
             }
             
