@@ -17,7 +17,6 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.upload.service.CustomMultiPart
 import xyz.xenondevs.nova.resources.upload.service.S3
 import xyz.xenondevs.nova.resources.upload.service.SelfHost
-import xyz.xenondevs.nova.resources.upload.service.Xenondevs
 import xyz.xenondevs.nova.util.data.http.ConnectionUtils
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -29,7 +28,7 @@ import kotlin.io.path.exists
 )
 internal object AutoUploadManager {
     
-    internal val services = arrayListOf(Xenondevs, SelfHost, CustomMultiPart, S3)
+    internal val services = arrayListOf(SelfHost, CustomMultiPart, S3)
     
     var enabled = false
         private set
