@@ -291,7 +291,7 @@ object DefaultContextParamTypes {
      */
     val INTERACTION_HAND: ContextParamType<EquipmentSlot> =
         ContextParamType.builder<EquipmentSlot>("interaction_hand")
-            .optionalIn(BlockInteract)
+            .optionalIn(BlockPlace, BlockBreak, BlockInteract)
             .build()
     
     /**
