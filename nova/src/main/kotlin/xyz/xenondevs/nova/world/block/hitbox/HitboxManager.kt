@@ -2,9 +2,11 @@ package xyz.xenondevs.nova.world.block.hitbox
 
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.ClipContext
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -172,57 +174,61 @@ internal object HitboxManager : Listener, PacketListener {
             val level = world.serverLevel
             val ctx = ClipContext(origin, dest, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, CollisionContext.empty())
             BlockGetter.traverseBlocks(origin, dest, ctx, { _, pos ->
+                val novaPos = pos.toNovaPos(world)
+                
                 // check for collision with vanilla hitboxes
-                val blockState = level.getBlockState(pos)
-                val blockShape = ctx.getBlockShape(blockState, level, pos)
-                val blockHitLoc = level.clipWithInteractionOverride(origin, dest, pos, blockShape, blockState)?.let {
+                val blockState: BlockState = level.getBlockState(pos)
+                val blockShape: VoxelShape = ctx.getBlockShape(blockState, level, pos)
+                val blockHitLoc: Vector3f? = level.clipWithInteractionOverride(origin, dest, pos, blockShape, blockState)?.let {
                     if (it.type != HitResult.Type.MISS) it.location.toVector3f() else null
                 }
                 
+                var hitbox: VirtualHitbox? = null // the hitbox that was actually hit
+                var done: Boolean = blockHitLoc != null // whether something was hit (virtual hitbox or block)
+                var distance: Float = blockHitLoc?.distance(originF) ?: Float.MAX_VALUE // the distance to the hit location
+                
                 // check for collision with virtual hitboxes 
-                val novaPos = pos.toNovaPos(world)
-                val hitboxes = virtualHitboxesByBlock[novaPos]
-                if (hitboxes != null) {
+                virtualHitboxesByBlock[novaPos]?.forEach { candidate ->
+                    if (candidate.qualifier?.invoke(event) == false)
+                        return@forEach // skip hitbox as qualifier has failed
+                    
+                    val handlers = if (action.isLeftClick) candidate.leftClickHandlers else candidate.rightClickHandlers
+                    if (handlers.isEmpty())
+                        return@forEach // skip hitbox as it has no handlers for the current action
+                    
                     val boxHitResult = Vector2f()
-                    for (hitbox in hitboxes) {
-                        if (hitbox.qualifier?.invoke(event) == false)
-                            continue // skip hitbox as qualifier has failed
-                        
-                        val handlers = if (action.isLeftClick) hitbox.leftClickHandlers else hitbox.rightClickHandlers
-                        if (handlers.isEmpty())
-                            continue // skip hitbox as it has no handlers for the current action
-                        
-                        if (Intersectionf.intersectRayAab(originF, directionF, hitbox.from, hitbox.to, boxHitResult)) {
-                            // get absolute hit location
-                            val t = boxHitResult.x
-                            val hitLoc = Vector3f(originF.x + directionF.x * t, originF.y + directionF.y * t, originF.z + directionF.z * t)
-                            
-                            // check if block hit is closer
-                            if (blockHitLoc != null && blockHitLoc.distanceSquared(originF) < hitLoc.distanceSquared(originF))
-                                return@traverseBlocks Unit
-                            
-                            // cancel vanilla interactions
-                            event.isCancelled = true
-                            // mark performed custom action
-                            wrappedEvent.actionPerformed = true
-                            
-                            // get hit location relative to hitbox.center
-                            val center = hitbox.center
-                            val relHitLoc = Vector3f(hitLoc.x - center.x, hitLoc.y - center.y, hitLoc.z - center.z)
-                            
-                            // check protection integrations
-                            if (ProtectionManager.canUseBlock(player, event.item, novaPos)) {
-                                handlers.forEach { it.invoke(player, event.hand!!, relHitLoc) }
-                            }
-                            
-                            return@traverseBlocks Unit // hitbox hit, don't continue ray
+                    if (Intersectionf.intersectRayAab(originF, directionF, candidate.from, candidate.to, boxHitResult)) {
+                        val t = boxHitResult.x
+                        if (t < distance) {
+                            hitbox = candidate
+                            distance = t
+                            done = true
                         }
                     }
                 }
                 
-                return@traverseBlocks if (blockHitLoc == null) {
-                    null // no hit, continue ray
-                } else Unit // block hit, don't continue ray
+                // if a hitbox was hit, execute the handlers
+                if (hitbox != null) {
+                    val hitLoc = Vector3f(originF.x + directionF.x * distance, originF.y + directionF.y * distance, originF.z + directionF.z * distance)
+                    
+                    // cancel vanilla interactions
+                    event.isCancelled = true
+                    // mark performed custom action
+                    wrappedEvent.actionPerformed = true
+                    
+                    // get hit location relative to hitbox.center
+                    val center = hitbox.center
+                    val relHitLoc = Vector3f(hitLoc.x - center.x, hitLoc.y - center.y, hitLoc.z - center.z)
+                    
+                    // check protection integrations & invoke handler
+                    val handlers = if (action.isLeftClick) hitbox.leftClickHandlers else hitbox.rightClickHandlers
+                    if (ProtectionManager.canUseBlock(player, event.item, novaPos)) {
+                        handlers.forEach { it.invoke(player, event.hand!!, relHitLoc) }
+                    }
+                }
+                
+                // returning Unit stops traversal
+                return@traverseBlocks if (done) Unit else null
             }, {})
         }
     }
