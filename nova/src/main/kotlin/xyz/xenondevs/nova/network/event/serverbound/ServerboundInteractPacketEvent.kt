@@ -69,7 +69,7 @@ class ServerboundInteractPacketEvent(
         companion object {
             
             internal fun of(nmsAction: Any): Action = when (nmsAction.javaClass) {
-                ACTION -> Interact(
+                INTERACTION_ACTION -> Interact(
                     INTERACTION_ACTION_HAND_GETTER.invoke(nmsAction) as InteractionHand
                 )
                 
