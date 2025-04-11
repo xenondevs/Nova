@@ -103,8 +103,8 @@ class NovaItemBuilder internal constructor(
      * Sets the maximum stack size of the item. Cannot exceed the maximum client-side stack size.
      */
     fun maxStackSize(maxStackSize: Int) {
-        if (maxStackSize > 64)
-            throw IllegalArgumentException("Max stack size cannot exceed 64")
+        if (maxStackSize > 99)
+            throw IllegalArgumentException("Max stack size cannot exceed 99")
         
         this.maxStackSize = maxStackSize
     }
