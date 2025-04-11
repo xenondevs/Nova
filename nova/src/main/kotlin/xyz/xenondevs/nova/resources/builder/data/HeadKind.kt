@@ -2,29 +2,31 @@ package xyz.xenondevs.nova.resources.builder.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
 
 @Serializable
-enum class HeadKind {
+enum class HeadKind(val defaultTexture: ResourcePath<ResourceType.EntityTexture>?) {
     
     @SerialName("skeleton")
-    SKELETON,
+    SKELETON(ResourcePath.of(ResourceType.EntityTexture, "skeleton/skeleton")),
     
     @SerialName("wither_skeleton")
-    WITHER_SKELETON,
+    WITHER_SKELETON(ResourcePath.of(ResourceType.EntityTexture, "skeleton/wither_skeleton")),
     
     @SerialName("player")
-    PLAYER,
+    PLAYER(null),
     
     @SerialName("zombie")
-    ZOMBIE,
+    ZOMBIE(ResourcePath.of(ResourceType.EntityTexture, "zombie/zombie")),
     
     @SerialName("creeper")
-    CREEPER,
+    CREEPER(ResourcePath.of(ResourceType.EntityTexture, "creeper/creeper")),
     
     @SerialName("piglin")
-    PIGLIN,
+    PIGLIN(ResourcePath.of(ResourceType.EntityTexture, "piglin/piglin")),
     
     @SerialName("dragon")
-    DRAGON
+    DRAGON(ResourcePath.of(ResourceType.EntityTexture, "enderdragon/dragon"))
     
 }

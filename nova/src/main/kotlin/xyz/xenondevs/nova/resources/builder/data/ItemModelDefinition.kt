@@ -277,14 +277,14 @@ internal data class SpecialItemModel(
         @SerialName("minecraft:head")
         data class Head(
             val kind: HeadKind,
-            val texture: ResourcePath<ResourceType.EntityTexture>,
+            val texture: ResourcePath<ResourceType.EntityTexture>? = kind.defaultTexture,
             val animation: Double = 0.0
         ) : SpecialModel
         
         @Serializable
         @SerialName("minecraft:shulker_box")
         data class ShulkerBox(
-            val name: ResourcePath<ResourceType.ShulkerTexture>,
+            val texture: ResourcePath<ResourceType.ShulkerTexture>,
             val openness: Double = 0.0,
             val orientation: Orientation = Orientation.UP
         ) : SpecialModel
