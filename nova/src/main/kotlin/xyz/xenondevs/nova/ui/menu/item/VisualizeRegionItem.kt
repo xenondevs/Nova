@@ -14,25 +14,26 @@ import java.util.*
 /**
  * An ui item for visualizing regions via [VisualRegion].
  *
- * @param player the player to visualize the region for
- * @param regionUUID the [UUID] of the region to visualize
+ * @param regionUuid the [UUID] of the region to visualize
  * @param getRegion a function to receive the [Region]
  */
 class VisualizeRegionItem(
-    private val player: Player,
-    private val regionUUID: UUID,
+    private val regionUuid: UUID,
     private val getRegion: () -> Region,
 ) : AbstractItem() {
     
+    @Deprecated(message = "Player is redundant", replaceWith = ReplaceWith("VisualizeRegionItem(regionUUID, getRegion)"))
+    constructor(player: Player, regionUUID: UUID, getRegion: () -> Region) : this(regionUUID, getRegion)
+    
     override fun getItemProvider(player: Player): ItemProvider {
-        val visible = VisualRegion.isVisible(player, regionUUID)
+        val visible = VisualRegion.isVisible(player, regionUuid)
         return if (visible) DefaultGuiItems.AREA_BTN_ON.clientsideProvider
         else DefaultGuiItems.AREA_BTN_OFF.clientsideProvider
     }
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) {
         player.playClickSound()
-        VisualRegion.toggleView(player, regionUUID, getRegion())
+        VisualRegion.toggleView(player, regionUuid, getRegion())
         notifyWindows()
     }
     

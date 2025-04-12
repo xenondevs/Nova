@@ -7,6 +7,7 @@ import org.bukkit.entity.Player
 import org.bukkit.util.BoundingBox
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.nova.ui.menu.item.AddNumberItem
 import xyz.xenondevs.nova.ui.menu.item.DisplayNumberItem
 import xyz.xenondevs.nova.ui.menu.item.RemoveNumberItem
@@ -25,9 +26,10 @@ class DynamicRegion internal constructor(
     private val _increaseSizeItem = lazy { AddNumberItem({ this.minSize..this.maxSize }, { this.size }, { this.size = it }, "menu.nova.region.increase") }
     private val _decreaseSizeItem = lazy { RemoveNumberItem({ this.minSize..this.maxSize }, { this.size }, { this.size = it }, "menu.nova.region.decrease") }
     
-    val displaySizeItem by _displaySizeItem
-    val increaseSizeItem by _increaseSizeItem
-    val decreaseSizeItem by _decreaseSizeItem
+    val displaySizeItem: Item by _displaySizeItem
+    val increaseSizeItem: Item by _increaseSizeItem
+    val decreaseSizeItem: Item by _decreaseSizeItem
+    val visualizeRegionItem: Item by lazy { VisualizeRegionItem(uuid, ::region) }
     
     val minSize by minSize
     val maxSize by maxSize
@@ -61,8 +63,9 @@ class DynamicRegion internal constructor(
         }
     }
     
+    @Deprecated(message= "Player is redundant", ReplaceWith("visualizeRegionItem"))
     fun createVisualizeRegionItem(player: Player): VisualizeRegionItem {
-        return VisualizeRegionItem(player, uuid, ::region)
+        return VisualizeRegionItem(uuid, ::region)
     }
     
     fun showRegionOutline(player: Player) {
