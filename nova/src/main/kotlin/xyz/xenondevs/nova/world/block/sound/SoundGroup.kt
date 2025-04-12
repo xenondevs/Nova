@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.world.block.sound
 
 import net.minecraft.world.level.block.SoundType
 import org.bukkit.Location
+import org.bukkit.SoundCategory
 import org.bukkit.block.Block
 import xyz.xenondevs.nova.util.center
 import org.bukkit.SoundGroup as BukkitSoundGroup
@@ -44,7 +45,7 @@ data class SoundGroup(
     }
     
     fun playBreakSound(location: Location) {
-        location.world!!.playSound(location, breakSound, breakVolume, breakPitch)
+        location.world!!.playSound(location, breakSound, SoundCategory.BLOCKS, breakVolume, breakPitch)
     }
     
     fun playStepSound(block: Block) {
@@ -52,7 +53,7 @@ data class SoundGroup(
     }
     
     fun playStepSound(location: Location) {
-        location.world!!.playSound(location, stepSound, stepVolume, stepPitch)
+        location.world!!.playSound(location, stepSound, SoundCategory.BLOCKS, stepVolume, stepPitch)
     }
     
     fun playPlaceSound(block: Block) {
@@ -60,7 +61,7 @@ data class SoundGroup(
     }
     
     fun playPlaceSound(location: Location) {
-        location.world!!.playSound(location, placeSound, placeVolume, placePitch)
+        location.world!!.playSound(location, placeSound, SoundCategory.BLOCKS, placeVolume, placePitch)
     }
     
     fun playHitSound(block: Block) {
@@ -68,7 +69,7 @@ data class SoundGroup(
     }
     
     fun playHitSound(location: Location) {
-        location.world!!.playSound(location, hitSound, hitVolume, hitPitch)
+        location.world!!.playSound(location, hitSound, SoundCategory.BLOCKS, hitVolume, hitPitch)
     }
     
     fun playFallSound(block: Block) {
@@ -76,7 +77,7 @@ data class SoundGroup(
     }
     
     fun playFallSound(location: Location) {
-        location.world!!.playSound(location, fallSound, fallVolume, fallPitch)
+        location.world!!.playSound(location, fallSound, SoundCategory.BLOCKS, fallVolume, fallPitch)
     }
     
     companion object {
