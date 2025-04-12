@@ -260,8 +260,8 @@ sealed class ItemModelCreationScope<S : ModelSelectorScope>(
                         model = {
                             ModelBuilder(Model(
                                 parent = parentModelId,
-                                display = mapOf(
-                                    Model.Display.Position.GUI to Model.Display(
+                                display = Model.Display(
+                                    gui = Model.Display.Entry(
                                         scale = Vector3d(4.0, 4.0, 4.0),
                                         translation = Vector3d(
                                             (width / -2.0) + offsetX + x * scale,

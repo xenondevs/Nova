@@ -44,7 +44,10 @@ internal data class ScaleTransform(
         var display = model.display
         if (keepDisplaySize) {
             val inverseScale = Vector3d(1.0, 1.0, 1.0).div(scale, Vector3d())
-            display = display.mapValues { (_, dp) -> dp.copy(scale = dp.scale.mul(inverseScale, Vector3d())) }
+            display = display
+                ?.toMap()
+                ?.mapValues { (_, dp) -> dp.copy(scale = dp.scale.mul(inverseScale, Vector3d())) }
+                ?.let { Model.Display.of(it) }
         }
         
         return model.copy(elements = elements, display = display)

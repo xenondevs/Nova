@@ -10,6 +10,7 @@ import org.joml.Vector3dc
 import org.joml.Vector4d
 import org.joml.Vector4dc
 import org.joml.primitives.AABBd
+import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
@@ -25,7 +26,7 @@ import java.util.*
  * @param elements A list of voxels that make up the model.
  * @param ambientOcclusion (Only relevant for block models) Whether ambient occlusion is enabled for the model.
  * @param guiLight (Only relevant for item models) The direction of the light for the item model in the GUI.
- * @param display (Only relevant for item models) A map of display positions to display settings.
+ * @param display (Only relevant for item models) Context-dependant display settings.
  */
 @Serializable
 data class Model(
@@ -40,7 +41,7 @@ data class Model(
     // item-specific
     @SerialName("gui_light")
     val guiLight: GuiLight? = null,
-    val display: Map<Display.Position, Display> = emptyMap()
+    val display: Display? = null
 ) {
     
     /**
@@ -172,21 +173,83 @@ data class Model(
     }
     
     /**
-     * The display settings for an item model.
-     *
-     * @param rotation The rotation of the model.
-     * @param translation The translation of the model.
-     * @param scale The scale of the model.
+     * The display settings for an item model, depending on the context.
+     * 
+     * @param thirdPersonRightHand The display settings for right hand in third person.
+     * @param thirdPersonLeftHand The display settings for left hand in third person. Defaults to [thirdPersonRightHand] if unspecified.
+     * @param firstPersonRightHand The display settings for right hand in first person.
+     * @param firstPersonLeftHand The display settings for left hand in first person. Defaults to [firstPersonRightHand] if unspecified.
+     * @param head The display settings for the head.
+     * @param gui The display settings for the GUI.
+     * @param ground The display settings for the ground.
+     * @param fixed The display settings for fixed position.
      */
     @Serializable
     data class Display(
-        val rotation: Vector3dc = Vector3d(0.0, 0.0, 0.0),
-        val translation: Vector3dc = Vector3d(0.0, 0.0, 0.0),
-        val scale: Vector3dc = Vector3d(1.0, 1.0, 1.0)
+        @SerialName("thirdperson_righthand")
+        val thirdPersonRightHand: Entry = Entry(),
+        @SerialName("thirdperson_lefthand")
+        val thirdPersonLeftHand: Entry = thirdPersonRightHand,
+        @SerialName("firstperson_righthand")
+        val firstPersonRightHand: Entry = Entry(),
+        @SerialName("firstperson_lefthand")
+        val firstPersonLeftHand: Entry = firstPersonRightHand,
+        val head: Entry = Entry(),
+        val gui: Entry = Entry(),
+        val ground: Entry = Entry(),
+        val fixed: Entry = Entry()
     ) {
         
+        companion object {
+            
+            /**
+             * Creates a [Display] based on a map of [Position] to [Entry].
+             */
+            fun of(map: Map<Position, Entry>): Display {
+                return Display(
+                    thirdPersonRightHand = map[Position.THIRDPERSON_RIGHTHAND] ?: Entry(),
+                    thirdPersonLeftHand = map[Position.THIRDPERSON_LEFTHAND] ?: map[Position.THIRDPERSON_RIGHTHAND] ?: Entry(),
+                    firstPersonRightHand = map[Position.FIRSTPERSON_RIGHTHAND] ?: Entry(),
+                    firstPersonLeftHand = map[Position.FIRSTPERSON_LEFTHAND] ?: map[Position.FIRSTPERSON_RIGHTHAND] ?: Entry(),
+                    head = map[Position.HEAD] ?: Entry(),
+                    gui = map[Position.GUI] ?: Entry(),
+                    ground = map[Position.GROUND] ?: Entry(),
+                    fixed = map[Position.FIXED] ?: Entry()
+                )
+            }
+            
+        }
+        
         /**
-         * The different places where an item model can be displayed.
+         * Converts this [Display] to a map of [Position] to [Entry].
+         */
+        fun toMap(): Map<Position, Entry> = enumMapOf(
+            Position.THIRDPERSON_RIGHTHAND to thirdPersonRightHand,
+            Position.THIRDPERSON_LEFTHAND to thirdPersonLeftHand,
+            Position.FIRSTPERSON_RIGHTHAND to firstPersonRightHand,
+            Position.FIRSTPERSON_LEFTHAND to firstPersonLeftHand,
+            Position.HEAD to head,
+            Position.GUI to gui,
+            Position.GROUND to ground,
+            Position.FIXED to fixed
+        )
+        
+        /**
+         * The display settings for an item model.
+         *
+         * @param rotation The rotation of the model.
+         * @param translation The translation of the model.
+         * @param scale The scale of the model.
+         */
+        @Serializable
+        data class Entry(
+            val rotation: Vector3dc = Vector3d(0.0, 0.0, 0.0),
+            val translation: Vector3dc = Vector3d(0.0, 0.0, 0.0),
+            val scale: Vector3dc = Vector3d(1.0, 1.0, 1.0)
+        )
+        
+        /**
+         * The different contexts in a [Display].
          */
         @Serializable
         enum class Position {
@@ -231,7 +294,7 @@ data class Model(
         var elements: List<Element>? = null
         var ambientOcclusion = true
         var guiLight = GuiLight.SIDE
-        val display = HashMap<Display.Position, Display>()
+        var display: Display? = null
         
         val hierarchy = LinkedList<Model>()
         var parent: Model? = this
@@ -247,7 +310,7 @@ data class Model(
             if (model.elements != null) elements = model.elements
             if (model.ambientOcclusion != null) ambientOcclusion = model.ambientOcclusion
             if (model.guiLight != null) guiLight = model.guiLight
-            display.putAll(model.display)
+            if (model.display != null) display = model.display
         }
         
         return Model(
