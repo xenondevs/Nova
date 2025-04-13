@@ -1,3 +1,5 @@
+@file:OptIn(InternalResourcePackDTO::class)
+
 package xyz.xenondevs.nova.resources.builder.layout.item
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
@@ -5,7 +7,8 @@ import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.data.DefaultItemModel
+import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
+import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.data.TintSource
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
@@ -27,13 +30,13 @@ class ItemModelBuilder<S : ModelSelectorScope> internal constructor(
      */
     var tintSource: MutableMap<Int, TintSource> = Int2ObjectOpenHashMap()
     
-    internal fun build(): DefaultItemModel {
+    internal fun build(): ItemModel.Default {
         val highestTintSourceId = tintSource.keys.maxOrNull()
         if (highestTintSourceId != null) {
             val tintSourcesList = Array(highestTintSourceId + 1) { tintSource[it] ?: TintSource.Constant(Color.WHITE) }.asList()
-            return DefaultItemModel(selectAndBuild(model), tintSourcesList)
+            return ItemModel.Default(selectAndBuild(model), tintSourcesList)
         } else {
-            return DefaultItemModel(selectAndBuild(model))
+            return ItemModel.Default(selectAndBuild(model))
         }
     }
     

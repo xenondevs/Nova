@@ -1,3 +1,5 @@
+@file:OptIn(InternalResourcePackDTO::class)
+
 package xyz.xenondevs.nova.resources.builder.task.model
 
 import com.google.gson.JsonObject
@@ -14,7 +16,8 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.data.DefaultItemModel
+import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
+import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
 import xyz.xenondevs.nova.resources.builder.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
@@ -240,7 +243,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
             val modelId = modelContent.getOrPutGenerated(model)
             modelContent.rememberUsage(modelId)
             
-            val itemDef = ItemModelDefinition(DefaultItemModel(modelId))
+            val itemDef = ItemModelDefinition(ItemModel.Default(modelId))
             val itemId = itemModelContent.getOrPutGenerated(itemDef)
             
             DisplayEntityBlockModelData.Model(itemId, Matrix4f(transform))

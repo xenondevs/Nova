@@ -1,3 +1,5 @@
+@file:OptIn(InternalResourcePackDTO::class)
+
 package xyz.xenondevs.nova.resources.builder.layout.item
 
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
@@ -5,9 +7,8 @@ import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.data.CompassTarget
-import xyz.xenondevs.nova.resources.builder.data.DefaultItemModel
+import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
 import xyz.xenondevs.nova.resources.builder.data.ItemModel
-import xyz.xenondevs.nova.resources.builder.data.RangeDispatchItemModel
 import xyz.xenondevs.nova.resources.builder.data.TimeSource
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
@@ -19,14 +20,14 @@ class RangeDispatchEntries<S : ModelSelectorScope> internal constructor(
     private val selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
 ) {
     
-    internal val entries = ArrayList<RangeDispatchItemModel.Entry>()
+    internal val entries = ArrayList<ItemModel.RangeDispatch.Entry>()
     
     /**
      * Adds an entry that displays the model created by [selectModel] when the property value
      * is equal or greater than [threshold] and there is no closer entry.
      */
     operator fun set(threshold: Number, selectModel: S.() -> ModelBuilder) {
-        set(threshold, DefaultItemModel(selectAndBuild(selectModel)))
+        set(threshold, ItemModel.Default(selectAndBuild(selectModel)))
     }
     
     /**
@@ -34,7 +35,7 @@ class RangeDispatchEntries<S : ModelSelectorScope> internal constructor(
      * and there is no closer entry.
      */
     operator fun set(threshold: Number, model: ItemModel) {
-        entries += RangeDispatchItemModel.Entry(threshold.toDouble(), model)
+        entries += ItemModel.RangeDispatch.Entry(threshold.toDouble(), model)
     }
     
 }
@@ -62,20 +63,20 @@ class RangeDispatchItemModelBuilder<S : ModelSelectorScope> internal constructor
      */
     var fallback: ItemModel? = null
     
-    internal fun build(): RangeDispatchItemModel =
+    internal fun build(): ItemModel.RangeDispatch =
         property.buildModel(scale, entry.entries, fallback)
     
 }
 
-sealed class RangeDispatchItemModelProperty(internal val property: RangeDispatchItemModel.Property) {
+sealed class RangeDispatchItemModelProperty(internal val property: ItemModel.RangeDispatch.Property) {
     
-    internal open fun buildModel(scale: Double, entries: List<RangeDispatchItemModel.Entry>, fallback: ItemModel?) =
-        RangeDispatchItemModel(property, scale, entries, fallback)
+    internal open fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
+        ItemModel.RangeDispatch(property, scale, entries, fallback)
     
     /**
      * Returns the weight of the `minecraft:bundle_contents` component, or `0` if not present.
      */
-    object BundleFullness : RangeDispatchItemModelProperty(RangeDispatchItemModel.Property.BUNDLE_FULLNESS)
+    object BundleFullness : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.BUNDLE_FULLNESS)
     
     /**
      * Returns the value of the `minecraft:damage` component, or `0` if not present.
@@ -84,10 +85,10 @@ sealed class RangeDispatchItemModelProperty(internal val property: RangeDispatch
      */
     open class Damage(
         private val normalize: Boolean
-    ) : RangeDispatchItemModelProperty(RangeDispatchItemModel.Property.DAMAGE) {
+    ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.DAMAGE) {
         
-        override fun buildModel(scale: Double, entries: List<RangeDispatchItemModel.Entry>, fallback: ItemModel?) =
-            RangeDispatchItemModel(property, scale, entries, fallback, normalize = normalize)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, normalize = normalize)
         
         companion object : Damage(true)
         
@@ -100,10 +101,10 @@ sealed class RangeDispatchItemModelProperty(internal val property: RangeDispatch
      */
     open class Count(
         private val normalize: Boolean
-    ) : RangeDispatchItemModelProperty(RangeDispatchItemModel.Property.COUNT) {
+    ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.COUNT) {
         
-        override fun buildModel(scale: Double, entries: List<RangeDispatchItemModel.Entry>, fallback: ItemModel?) =
-            RangeDispatchItemModel(property, scale, entries, fallback, normalize = normalize)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, normalize = normalize)
         
         companion object : Count(true)
         
@@ -112,7 +113,7 @@ sealed class RangeDispatchItemModelProperty(internal val property: RangeDispatch
     /**
      * Returns the remaining cooldown for the item, scaled between 0 and 1.
      */
-    object Cooldown : RangeDispatchItemModelProperty(RangeDispatchItemModel.Property.COOLDOWN)
+    object Cooldown : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.COOLDOWN)
     
     /**
      * Returns the in-game time of [source], scaled between 0 and 1.
@@ -121,10 +122,10 @@ sealed class RangeDispatchItemModelProperty(internal val property: RangeDispatch
     class Time(
         private val source: TimeSource,
         private val wobble: Boolean = true
-    ) : RangeDispatchItemModelProperty(RangeDispatchItemModel.Property.TIME) {
+    ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.TIME) {
         
-        override fun buildModel(scale: Double, entries: List<RangeDispatchItemModel.Entry>, fallback: ItemModel?) =
-            RangeDispatchItemModel(property, scale, entries, fallback, source = source, wobble = wobble)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, source = source, wobble = wobble)
         
     }
     
@@ -136,17 +137,17 @@ sealed class RangeDispatchItemModelProperty(internal val property: RangeDispatch
     class Compass(
         private val target: CompassTarget,
         private val wobble: Boolean = true
-    ) : RangeDispatchItemModelProperty(RangeDispatchItemModel.Property.COMPASS) {
+    ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.COMPASS) {
         
-        override fun buildModel(scale: Double, entries: List<RangeDispatchItemModel.Entry>, fallback: ItemModel?) =
-            RangeDispatchItemModel(property, scale, entries, fallback, target = target, wobble = wobble)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, target = target, wobble = wobble)
         
     }
     
     /**
      * Returns the crossbow pull progress, scaled between 0 and 1.
      */
-    object CrossbowPull : RangeDispatchItemModelProperty(RangeDispatchItemModel.Property.CROSSBOW_PULL)
+    object CrossbowPull : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.CROSSBOW_PULL)
     
     /**
      * Returns item use ticks.
@@ -155,10 +156,10 @@ sealed class RangeDispatchItemModelProperty(internal val property: RangeDispatch
      */
     open class UseDuration(
         private val remaining: Boolean
-    ) : RangeDispatchItemModelProperty(RangeDispatchItemModel.Property.USE_DURATION) {
+    ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.USE_DURATION) {
         
-        override fun buildModel(scale: Double, entries: List<RangeDispatchItemModel.Entry>, fallback: ItemModel?) =
-            RangeDispatchItemModel(property, scale, entries, fallback, remaining = remaining)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, remaining = remaining)
         
         companion object : UseDuration(false)
         
@@ -169,10 +170,10 @@ sealed class RangeDispatchItemModelProperty(internal val property: RangeDispatch
      */
     open class UseCycle(
         private val period: Double
-    ) : RangeDispatchItemModelProperty(RangeDispatchItemModel.Property.USE_CYCLE) {
+    ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.USE_CYCLE) {
         
-        override fun buildModel(scale: Double, entries: List<RangeDispatchItemModel.Entry>, fallback: ItemModel?) =
-            RangeDispatchItemModel(property, scale, entries, fallback, period = period)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, period = period)
         
         companion object : UseCycle(0.0)
         
@@ -183,10 +184,10 @@ sealed class RangeDispatchItemModelProperty(internal val property: RangeDispatch
      */
     open class CustomModelData(
         private val index: Int
-    ) : RangeDispatchItemModelProperty(RangeDispatchItemModel.Property.CUSTOM_MODEL_DATA) {
+    ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.CUSTOM_MODEL_DATA) {
         
-        override fun buildModel(scale: Double, entries: List<RangeDispatchItemModel.Entry>, fallback: ItemModel?) =
-            RangeDispatchItemModel(property, scale, entries, fallback, index = index)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, index = index)
         
         companion object : CustomModelData(0)
         

@@ -1,11 +1,12 @@
+@file:OptIn(InternalResourcePackDTO::class)
+
 package xyz.xenondevs.nova.resources.builder.layout.item
 
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.data.CompositeItemModel
-import xyz.xenondevs.nova.resources.builder.data.DefaultItemModel
+import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
 import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
@@ -25,7 +26,7 @@ class ItemModelsCollection<S : ModelSelectorScope> internal constructor(
      * Adds the model created by [selectModel] to the collection.
      */
     operator fun plusAssign(selectModel: S.() -> ModelBuilder) {
-        models += DefaultItemModel(selectAndBuild(selectModel))
+        models += ItemModel.Default(selectAndBuild(selectModel))
     }
     
     /**
@@ -48,6 +49,6 @@ class CompositeItemModelBuilder<S : ModelSelectorScope> internal constructor(
      */
     var models: ItemModelsCollection<S> = ItemModelsCollection(selectAndBuild)
     
-    internal fun build() = CompositeItemModel(models.models)
+    internal fun build() = ItemModel.Composite(models.models)
     
 }

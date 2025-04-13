@@ -1,3 +1,5 @@
+@file:OptIn(InternalResourcePackDTO::class)
+
 package xyz.xenondevs.nova.resources.builder.layout.item
 
 import org.bukkit.DyeColor
@@ -6,9 +8,10 @@ import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.data.HeadKind
+import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
+import xyz.xenondevs.nova.resources.builder.data.ItemModel
+import xyz.xenondevs.nova.resources.builder.data.ItemModel.Special.SpecialModel
 import xyz.xenondevs.nova.resources.builder.data.Orientation
-import xyz.xenondevs.nova.resources.builder.data.SpecialItemModel
-import xyz.xenondevs.nova.resources.builder.data.SpecialItemModel.SpecialModel
 import xyz.xenondevs.nova.resources.builder.data.WoodType
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
@@ -24,7 +27,7 @@ abstract class SpecialItemModelBuilder<S : ModelSelectorScope> internal construc
      */
     var base: S.() -> ModelBuilder = { getModel("minecraft:block/block") }
     
-    internal abstract fun build(): SpecialItemModel
+    internal abstract fun build(): ItemModel.Special
     
 }
 
@@ -39,7 +42,7 @@ class BedSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
      */
     var texture: ResourcePath<ResourceType.BedTexture> by RequiredProperty("Bed texture is undefined")
     
-    override fun build() = SpecialItemModel(
+    override fun build() = ItemModel.Special(
         SpecialModel.Bed(texture),
         selectAndBuild(base)
     )
@@ -57,7 +60,7 @@ class BannerSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor
      */
     var color: DyeColor = DyeColor.WHITE
     
-    override fun build() = SpecialItemModel(
+    override fun build() = ItemModel.Special(
         SpecialModel.Banner(color),
         selectAndBuild(base)
     )
@@ -80,7 +83,7 @@ class ChestSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
      */
     var openness: Double = 0.0
     
-    override fun build() = SpecialItemModel(
+    override fun build() = ItemModel.Special(
         SpecialModel.Chest(texture, openness),
         selectAndBuild(base)
     )
@@ -108,7 +111,7 @@ class HeadSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
      */
     var animation: Double = 0.0
     
-    override fun build() = SpecialItemModel(
+    override fun build() = ItemModel.Special(
         SpecialModel.Head(kind, texture, animation),
         selectAndBuild(base)
     )
@@ -136,7 +139,7 @@ class ShulkerBoxSpecialItemModelBuilder<S : ModelSelectorScope> internal constru
      */
     var orientation: Orientation = Orientation.UP
     
-    override fun build() = SpecialItemModel(
+    override fun build() = ItemModel.Special(
         SpecialModel.ShulkerBox(texture, openness, orientation),
         selectAndBuild(base)
     )
@@ -160,10 +163,10 @@ class SignSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
      */
     var texture: ResourcePath<ResourceType.SignTexture>? = null
     
-    override fun build(): SpecialItemModel {
+    override fun build(): ItemModel.Special {
         require(woodType != null || texture != null) { "Either wood type or texture needs to be defined in sign special model" }
         
-        return SpecialItemModel(
+        return ItemModel.Special(
             make(woodType ?: WoodType.OAK, texture),
             selectAndBuild(base)
         )
@@ -178,6 +181,6 @@ class GenericSpecialItemModelBuilder<S : ModelSelectorScope> internal constructo
     private val selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
 ) : SpecialItemModelBuilder<S>(resourcePackBuilder) {
     
-    override fun build() = SpecialItemModel(model, selectAndBuild(base))
+    override fun build() = ItemModel.Special(model, selectAndBuild(base))
     
 }

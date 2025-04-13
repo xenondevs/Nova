@@ -1,3 +1,5 @@
+@file:OptIn(InternalResourcePackDTO::class)
+
 package xyz.xenondevs.nova.resources.builder.layout.item
 
 import net.kyori.adventure.key.Key
@@ -5,8 +7,7 @@ import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.data.ConditionItemModel
-import xyz.xenondevs.nova.resources.builder.data.EmptyItemModel
+import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
 import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.data.Keybind
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
@@ -22,37 +23,37 @@ class ConditionItemModelBuilder<S : ModelSelectorScope> internal constructor(
     /**
      * The model to display when the condition is `true`.
      */
-    var onTrue: ItemModel = EmptyItemModel
+    var onTrue: ItemModel = ItemModel.Empty
     
     /**
      * The model to display when the condition is `false`.
      */
-    var onFalse: ItemModel = EmptyItemModel
+    var onFalse: ItemModel = ItemModel.Empty
     
-    internal fun build(): ConditionItemModel =
+    internal fun build(): ItemModel.Condition =
         property.buildModel(onTrue, onFalse)
     
 }
 
-sealed class ConditionItemModelProperty(internal val property: ConditionItemModel.Property) {
+sealed class ConditionItemModelProperty(internal val property: ItemModel.Condition.Property) {
     
     internal open fun buildModel(onTrue: ItemModel, onFalse: ItemModel) =
-        ConditionItemModel(property, onTrue, onFalse)
+        ItemModel.Condition(property, onTrue, onFalse)
     
     /**
      * Returns `true` if the player is currently using this item.
      */
-    object UsingItem : ConditionItemModelProperty(ConditionItemModel.Property.USING_ITEM)
+    object UsingItem : ConditionItemModelProperty(ItemModel.Condition.Property.USING_ITEM)
     
     /**
      * Returns `true` if the item is damageable and has only one use remaining before breaking.
      */
-    object Broken : ConditionItemModelProperty(ConditionItemModel.Property.BROKEN)
+    object Broken : ConditionItemModelProperty(ItemModel.Condition.Property.BROKEN)
     
     /**
      * Returns `true` if the item is damageable and has any amount of damage.
      */
-    object Damaged : ConditionItemModelProperty(ConditionItemModel.Property.DAMAGED)
+    object Damaged : ConditionItemModelProperty(ItemModel.Condition.Property.DAMAGED)
     
     /**
      * Returns `true` if a dataComponent identified by [component] is present on the item.
@@ -61,49 +62,49 @@ sealed class ConditionItemModelProperty(internal val property: ConditionItemMode
     class HasComponent(
         private val component: Key,
         private val ignoreDefault: Boolean = false
-    ) : ConditionItemModelProperty(ConditionItemModel.Property.HAS_COMPONENT) {
+    ) : ConditionItemModelProperty(ItemModel.Condition.Property.HAS_COMPONENT) {
         
         override fun buildModel(onTrue: ItemModel, onFalse: ItemModel) =
-            ConditionItemModel(property, onTrue, onFalse, component = component, ignoreDefault = ignoreDefault)
+            ItemModel.Condition(property, onTrue, onFalse, component = component, ignoreDefault = ignoreDefault)
         
     }
     
     /**
      * Returns `true` if the item is a fishing rod that is currently cast.
      */
-    object FishingRodCast : ConditionItemModelProperty(ConditionItemModel.Property.FISHING_ROD_CAST)
+    object FishingRodCast : ConditionItemModelProperty(ItemModel.Condition.Property.FISHING_ROD_CAST)
     
     /**
      * Returns `true` if the bundle is "open", i.e. it has a selected item visible in the GUI.
      */
-    object BundleHasSelectedItem : ConditionItemModelProperty(ConditionItemModel.Property.BUNDLE_HAS_SELECTED_ITEM)
+    object BundleHasSelectedItem : ConditionItemModelProperty(ItemModel.Condition.Property.BUNDLE_HAS_SELECTED_ITEM)
     
     /**
      * Returns `true` if the item is selected in the hotbar.
      */
-    object Selected : ConditionItemModelProperty(ConditionItemModel.Property.SELECTED)
+    object Selected : ConditionItemModelProperty(ItemModel.Condition.Property.SELECTED)
     
     /**
      * Returns `true` if the item is currently on the mouse cursor.
      */
-    object Carried : ConditionItemModelProperty(ConditionItemModel.Property.CARRIED)
+    object Carried : ConditionItemModelProperty(ItemModel.Condition.Property.CARRIED)
     
     /**
      * Returns `true` if the player has requested extended details by holding the shift key down.
      * Only works for items displayed in the GUI.
      * Not a keybind, can't be rebound.
      */
-    object ExtendedView : ConditionItemModelProperty(ConditionItemModel.Property.EXTENDED_VIEW)
+    object ExtendedView : ConditionItemModelProperty(ItemModel.Condition.Property.EXTENDED_VIEW)
     
     /**
      * Returns `true` if the player is currently holding the keybind [keybind].
      */
     class KeybindDown(
         private val keybind: Keybind
-    ) : ConditionItemModelProperty(ConditionItemModel.Property.KEYBIND_DOWN) {
+    ) : ConditionItemModelProperty(ItemModel.Condition.Property.KEYBIND_DOWN) {
         
         override fun buildModel(onTrue: ItemModel, onFalse: ItemModel) =
-            ConditionItemModel(property, onTrue, onFalse, keybind = keybind)
+            ItemModel.Condition(property, onTrue, onFalse, keybind = keybind)
         
     }
     
@@ -112,17 +113,17 @@ sealed class ConditionItemModelProperty(internal val property: ConditionItemMode
      * - If spectating, returns `true` when the context entity is the entity being spectated.
      * - If there is no context entity present, returns `false`.
      */
-    object ViewEntity : ConditionItemModelProperty(ConditionItemModel.Property.VIEW_ENTITY)
+    object ViewEntity : ConditionItemModelProperty(ItemModel.Condition.Property.VIEW_ENTITY)
     
     /**
      * Returns the value from [index] in `flags` of the `minecraft:custom_model_data` component.
      */
     open class CustomModelData(
         private val index: Int = 0
-    ) : ConditionItemModelProperty(ConditionItemModel.Property.CUSTOM_MODEL_DATA) {
+    ) : ConditionItemModelProperty(ItemModel.Condition.Property.CUSTOM_MODEL_DATA) {
         
         override fun buildModel(onTrue: ItemModel, onFalse: ItemModel) =
-            ConditionItemModel(property, onTrue, onFalse, index = index)
+            ItemModel.Condition(property, onTrue, onFalse, index = index)
         
         companion object : CustomModelData(0)
         

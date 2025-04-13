@@ -1,3 +1,5 @@
+@file:OptIn(InternalResourcePackDTO::class)
+
 package xyz.xenondevs.nova.resources.builder.layout.item
 
 import org.joml.Vector3d
@@ -6,11 +8,10 @@ import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.data.BundleSelectedItemItemModel
-import xyz.xenondevs.nova.resources.builder.data.EmptyItemModel
+import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
 import xyz.xenondevs.nova.resources.builder.data.ItemModel
+import xyz.xenondevs.nova.resources.builder.data.ItemModel.Special.SpecialModel
 import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
-import xyz.xenondevs.nova.resources.builder.data.SpecialItemModel.SpecialModel
 import xyz.xenondevs.nova.resources.builder.data.TintSource
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
@@ -96,12 +97,12 @@ sealed class ItemModelCreationScope<S : ModelSelectorScope>(
     /**
      * Renders the selected item stack of the `minecraft:bundle_contents` component if present, otherwise does nothing.
      */
-    fun bundleSelectedItem(): ItemModel = BundleSelectedItemItemModel
+    fun bundleSelectedItem(): ItemModel = ItemModel.BundleSelectedItem
     
     /**
      * Renders nothing.
      */
-    fun empty(): ItemModel = EmptyItemModel
+    fun empty(): ItemModel = ItemModel.Empty
     
     // --- Special Models ---
     

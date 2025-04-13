@@ -454,6 +454,24 @@ class ResourcePackBuilder internal constructor() {
     }
     
     /**
+     * Deserializes the JSON content of the file under [path] in the vanilla minecraft assets.
+     * to [V] using [json], or returns `null` if the file does not exist.
+     * If an exception occurs during deserialization, it is logged and `null` is returned.
+     */
+    internal inline fun <reified V> readJsonVanillaCatching(path: ResourcePath<ResourceType.JsonFile>, json: Json = Json): V? {
+        val file = resolveVanilla(path)
+        if (file.exists()) {
+            try {
+                return file.readJson<V>(json)
+            } catch(e: Exception) {
+                LOGGER.error("An exception occurred trying to parse $file", e)
+            }
+        }
+        
+        return null
+    }
+    
+    /**
      * Serializes [value] to JSON using [json] and writes it to the file
      * under [path], creating parent directories if necessary.
      */
