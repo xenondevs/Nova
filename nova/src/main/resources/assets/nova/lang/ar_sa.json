@@ -162,5 +162,7 @@
   "command.nova.show_network_node_info.network": "اكتب: %s\nالمعرف: %s\nالعقد: %s (جسر (جسور) %s، نقطة (نقاط) نهاية %s)",
   "command.nova.show_network_node_info.node": "الاسم: %s\nالعالم: %s، x: %s، y: %s، z: %s",
   "command.nova.show_network_node_info.failure": "الكتلة في العالم: %s، x: %s، y: %s، z: %s ليست عقدة شبكة.",
-  "command.nova.show_item_model_data.success": "يستخدم هذا %s نوع العنصر %s مع الطراز %s."
+  "command.nova.show_item_model_data.success": "يستخدم هذا %s نوع العنصر %s مع الطراز %s.",
+  "command.nova.show_vanilla_block_state.success": "أنت تنظر إلى حالة الكتلة %s.",
+  "command.nova.show_vanilla_block_state.failure": "يرجى إلقاء نظرة على كتلة والمحاولة مرة أخرى."
 }
