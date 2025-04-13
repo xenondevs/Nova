@@ -18,6 +18,7 @@ dependencies {
     novaLoaderApi(libs.bundles.xenondevs.commons)
     novaLoaderApi(libs.invui.kotlin)
     novaLoaderApi(libs.joml.primitives)
+    novaLoaderApi(libs.kotlinx.serialization.json)
     
     // internal dependencies
     compileOnly(project(":nova-api"))
@@ -33,7 +34,6 @@ dependencies {
     novaLoader(libs.zstd)
     novaLoader(libs.bundles.jgrapht)
     novaLoader(libs.snakeyaml.engine)
-    novaLoader(libs.kotlinx.serialization.json)
     
     // test dependencies
     testImplementation(platform(libs.junit.bom))

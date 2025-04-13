@@ -11,6 +11,7 @@ catalog {
         version("nova", project.version.toString())
         
         plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
+        plugin("kotlinx.serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef("kotlin")
         plugin("paperweight", "io.papermc.paperweight.userdev").versionRef("paperweight")
         plugin("nova", "xyz.xenondevs.nova.nova-gradle-plugin").versionRef("nova")
         
