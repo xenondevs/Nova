@@ -1,36 +1,41 @@
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
-import org.gradle.api.tasks.Input
+import org.gradle.api.file.FileCollection
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
+@DisableCachingByDefault
 abstract class BuildBundlerJarTask : DefaultTask() {
     
-    @get:Input
-    abstract var nova: Project
+    @get:InputFiles
+    abstract var input: FileCollection
     
-    @get:Input
-    abstract var novaApi: Project
+    @get:OutputFile
+    abstract val output: RegularFileProperty
     
-    @get:Input
-    abstract var hooks: List<Project>
-    
-    private val buildDir = project.layout.buildDirectory.asFile.get()
+    private val nova: Project
+        get() = project.project(":nova")
+    private val buildDir: File
+        get() = project.layout.buildDirectory.asFile.get()
     
     @TaskAction
     fun run() {
         val novaFile = createLoaderJar()
         
-        // copy to custom output directory
-        val customOutDir = (project.findProperty("outDir") as? String)?.let(::File)
-            ?: System.getProperty("outDir")?.let(::File)
-            ?: return
-        customOutDir.mkdirs()
-        val copyTo = File(customOutDir, novaFile.name)
+        // copy to specified destination
+        val copyTo = output.get().asFile
+        if (copyTo == novaFile)
+            return
+        copyTo.parentFile.mkdirs()
         novaFile.inputStream().use { ins -> copyTo.outputStream().use { out -> ins.copyTo(out) } }
     }
     
@@ -39,7 +44,7 @@ abstract class BuildBundlerJarTask : DefaultTask() {
         
         val jar = buildDir.resolve("Nova-${project.version}.jar")
         ZipOutputStream(jar.outputStream()).use { out ->
-            include(out, hooks + nova + novaApi)
+            include(out, input.files)
             
             // include dependencies
             val runtimeArtifacts = nova.configurations.getByName("mojangMappedServerRuntime").incoming.artifacts.artifacts
@@ -59,42 +64,18 @@ abstract class BuildBundlerJarTask : DefaultTask() {
         return jar
     }
     
-    private fun include(out: ZipOutputStream, projects: List<Project>) {
-        projects.forEach { project ->
-            iterateClasses(project) { file, path ->
-                out.putNextEntry(ZipEntry(path))
-                file.inputStream().use { inp -> inp.transferTo(out) }
-            }
-            iterateResources(project) { file, path ->
-                out.putNextEntry(ZipEntry(path))
-                file.inputStream().use { inp -> inp.transferTo(out) }
+    private fun include(out: ZipOutputStream, jars: Iterable<File>) {
+        jars.forEach { jar ->
+            ZipInputStream(jar.inputStream()).use { inp ->
+                generateSequence { inp.nextEntry }
+                    .filter { !it.name.startsWith("META-INF") }
+                    .filter { !it.isDirectory }
+                    .forEach { entry ->
+                        out.putNextEntry(entry)
+                        inp.transferTo(out)
+                    }
             }
         }
-    }
-    
-    private fun iterateClasses(project: Project, run: (File, String) -> Unit) {
-        val kotlinClasses = project.layout.buildDirectory.asFile.get().resolve("classes/kotlin/main")
-        val javaClasses = project.layout.buildDirectory.asFile.get().resolve("classes/java/main")
-        iterateClasses(kotlinClasses, run)
-        iterateClasses(javaClasses, run)
-    }
-    
-    private fun iterateClasses(dir: File, run: (File, String) -> Unit) {
-        dir.walkTopDown()
-            .filter { it.isFile }
-            .map { it to it.relativeTo(dir).invariantSeparatorsPath }
-            .filter { (_, path) -> !path.startsWith("META-INF") }
-            .forEach { (file, path) -> run(file, path) }
-    }
-    
-    private fun iterateResources(project: Project, run: (File, String) -> Unit) {
-        val resources = project.layout.buildDirectory.asFile.get().resolve("resources/main")
-        resources.walkTopDown()
-            .filter { it.isFile }
-            .forEach {
-                val path = it.relativeTo(resources).invariantSeparatorsPath
-                run(it, path)
-            }
     }
     
 }
