@@ -9,6 +9,7 @@ catalog {
         version("paper", libs.versions.paper.get())
         version("paperweight", libs.versions.paperweight.get())
         version("nova", project.version.toString())
+        version("minecraft", libs.versions.paper.get().substringBefore('-'))
         
         plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
         plugin("paperweight", "io.papermc.paperweight.userdev").versionRef("paperweight")
