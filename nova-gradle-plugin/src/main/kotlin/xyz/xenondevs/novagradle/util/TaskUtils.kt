@@ -3,26 +3,11 @@ package xyz.xenondevs.novagradle.util
 import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.result.ResolvedArtifactResult
-import org.gradle.jvm.tasks.Jar
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
-import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.Path
 
 object TaskUtils {
-    
-    fun getOutputFile(jar: Jar): File {
-        val dir = jar.destinationDirectory.get().asFile
-        var name = listOf(
-            jar.archiveBaseName.orNull ?: "",
-            jar.archiveAppendix.orNull ?: "",
-            jar.archiveVersion.orNull ?: "",
-            jar.archiveClassifier.orNull ?: ""
-        ).filterNot(String::isBlank).joinToString("-")
-        jar.archiveExtension.orNull?.let { name += ".$it" }
-        
-        return File(dir, name)
-    }
     
     fun findCompileTimeArtifact(project: Project, group: String, name: String): ResolvedArtifactResult {
         for (artifact in project.configurations.getByName("compileClasspath").incoming.artifacts.artifacts) {
