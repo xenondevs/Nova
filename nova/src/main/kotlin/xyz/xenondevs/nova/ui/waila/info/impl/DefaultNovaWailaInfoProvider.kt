@@ -21,7 +21,7 @@ private val DELEGATES = setOf(
     DefaultBlocks.NOTE_BLOCK, DefaultBlocks.OAK_LEAVES, DefaultBlocks.SPRUCE_LEAVES,
     DefaultBlocks.BIRCH_LEAVES, DefaultBlocks.JUNGLE_LEAVES, DefaultBlocks.ACACIA_LEAVES,
     DefaultBlocks.DARK_OAK_LEAVES, DefaultBlocks.MANGROVE_LEAVES, DefaultBlocks.CHERRY_LEAVES,
-    DefaultBlocks.AZALEA_LEAVES, DefaultBlocks.FLOWERING_AZALEA_LEAVES
+    DefaultBlocks.AZALEA_LEAVES, DefaultBlocks.FLOWERING_AZALEA_LEAVES, DefaultBlocks.TRIPWIRE
 )
 
 object DefaultNovaWailaInfoProvider : NovaWailaInfoProvider(null) {
