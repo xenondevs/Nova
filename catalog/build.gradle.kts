@@ -15,6 +15,11 @@ catalog {
         plugin("nova", "xyz.xenondevs.nova.nova-gradle-plugin").versionRef("nova")
         
         library("nova", "xyz.xenondevs.nova", "nova").versionRef("nova")
+        
+        // plugin artifacts for cases like: https://github.com/gradle/gradle/issues/15383#issuecomment-779893192
+        library("kotlin-plugin", "org.jetbrains.kotlin", "kotlin-gradle-plugin").versionRef("kotlin")
+        library("nova-plugin", "xyz.xenondevs.nova", "nova-gradle-plugin").versionRef("nova")
+        library("paperweight-userdev-plugin", "io.papermc.paperweight", "paperweight-userdev").versionRef("paperweight")
     }
 }
 
