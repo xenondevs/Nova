@@ -55,3 +55,17 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_xenondevsUsername: ${{ secrets.XENONDEVS_RELEASES_USERNAME }}
           ORG_GRADLE_PROJECT_xenondevsPassword: ${{ secrets.XENONDEVS_RELEASES_PASSWORD }}
+
+      - name: Deploy to plugin repositories
+        if: ${{ github.event_name == 'release' }}
+        uses: gradle/gradle-build-action@v3
+        with:
+          arguments: |
+            pluginPublish
+            --githubReleaseId ${{ github.event.release.id }}
+        env:
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_WEBHOOK_ID: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          DISCORD_WEBHOOK_TOKEN: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          HANGAR_API_KEY: ${{ secrets.HANGAR_API_KEY }}

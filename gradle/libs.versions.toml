@@ -66,3 +66,4 @@ dokka = { id = "org.jetbrains.dokka", version = "2.0.0" }
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+pluginPublish = { id = "xyz.xenondevs.publish.plugin-publish", version = "1.0.0" }
