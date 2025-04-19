@@ -65,22 +65,17 @@ internal object PacketManager : Listener {
     
     @EventHandler
     private fun handleLogin(event: PlayerLoginEvent) {
-        var deny = true
-        
         // find corresponding packet handler and set player instance
         val player = event.player
-        for (connection in MINECRAFT_SERVER.connection.connections) {
-            val listener = connection.packetListener
-            if (listener is ServerLoginPacketListenerImpl && listener.authenticatedProfile?.name == player.name) {
-                val handler = connection.channel.pipeline().get(PACKET_HANDLER_NAME) as PacketHandler
-                handler.player = player
-                handlers[player] = handler
-                
-                deny = false
-            }
-        }
-        
-        if (deny) {
+        val handler = MINECRAFT_SERVER.connection.connections
+            .firstOrNull { (it.packetListener as? ServerLoginPacketListenerImpl)?.authenticatedProfile?.name == player.name }
+            ?.channel
+            ?.takeIf { it.isOpen }
+            ?.let { it.pipeline().get(PACKET_HANDLER_NAME) as PacketHandler }
+        if (handler != null) {
+            handler.player = player
+            handlers[player] = handler
+        } else {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("[Nova] Something went wrong"))
         }
     }

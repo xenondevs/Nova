@@ -33,7 +33,7 @@ import xyz.xenondevs.nova.util.getOrThrow
 import xyz.xenondevs.nova.util.nmsEquipmentSlot
 import xyz.xenondevs.nova.util.toResourceLocation
 import xyz.xenondevs.nova.world.item.Equipment
-import java.util.Optional
+import java.util.*
 import net.minecraft.world.item.equipment.Equippable as EquippableComponent
 import org.bukkit.entity.EntityType as BukkitEntityType
 import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
@@ -246,11 +246,11 @@ class Equippable(
      * Provider for a 2d array of [EquippableComponent] components, where the first index is the texture frame and the second index is the overlay frame.
      */
     private val equippableComponentFrames: Provider<Array<Array<EquippableComponent>>> = combinedProvider(
-        equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt
-    ) { equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt ->
+        equipment, equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt
+    ) { equipment, equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt ->
         val equipmentSlot = slot.nmsEquipmentSlot
         
-        val textureFrames = equipmentData?.textureFrames
+        val textureFrames = equipmentData?.textureFrames ?: equipment?.id?.let(::listOf)
         val overlayFrames = equipmentData?.cameraOverlayFrames
             ?.takeUnless { slot != BukkitEquipmentSlot.HEAD }
         

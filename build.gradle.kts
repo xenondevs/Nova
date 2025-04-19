@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.paperweight) apply false
     id("xyz.xenondevs.bundler-jar-plugin")
+    alias(libs.plugins.pluginPublish)
 }
 
 fun RepositoryHandler.configureRepos() {
@@ -54,5 +55,19 @@ subprojects {
                 }
             }
         }
+    }
+}
+
+pluginPublish { 
+    file = tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output }
+    githubRepository = "xenondevs/Nova"
+    discord()
+    val gameVersion = libs.versions.paper.get().substringBefore('-')
+    hangar("Nova") {
+        gameVersions(gameVersion)
+    }
+    modrinth("yCVqpwUy") {
+        gameVersions(gameVersion)
+        incompatibleDependency("z4HZZnLr") // FastAsyncWorldEdit
     }
 }

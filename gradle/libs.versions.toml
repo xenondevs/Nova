@@ -6,14 +6,14 @@ bytebase = "0.4.8"
 cbf = "0.18"
 jgrapht = "1.5.2"
 kotlin = "2.1.20"
-kotlinx-coroutines = "1.10.1"
-ktor = "3.1.1"
+kotlinx-coroutines = "1.10.2"
+ktor = "3.1.2"
 paper = "1.21.4-R0.1-SNAPSHOT"
 paperweight = "2.0.0-beta.16"
 xenondevs-commons = "1.26"
 
 [libraries]
-awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.31.6" }
+awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.31.21" }
 bstats = { group = "xyz.xenondevs.bstats", name = "bstats-bukkit", version = "3.0.1" }
 bytebase = { group = "xyz.xenondevs.bytebase", name = "ByteBase", version.ref = "bytebase" }
 bytebase-runtime = { group = "xyz.xenondevs.bytebase", name = "ByteBase-Runtime", version.ref = "bytebase" }
@@ -31,7 +31,7 @@ jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jg
 jgrapht-io = { group = "org.jgrapht", name = "jgrapht-io", version.ref = "jgrapht" }
 jimfs = { group = "com.google.jimfs", name = "jimfs", version = "1.3.0" }
 joml-primitives = { group = "org.joml", name = "joml-primitives", version = "1.10.0" }
-junit-bom = { module = "org.junit:junit-bom", version = "5.12.1" }
+junit-bom = { module = "org.junit:junit-bom", version = "5.12.2" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platformLauncher = { module = "org.junit.platform:junit-platform-launcher" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
@@ -39,7 +39,7 @@ kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", versio
 kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 kotlinx-coroutines-core-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core-jvm", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.8.0" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.8.1" }
 ktor-client-cio-jvm = { group = "io.ktor", name = "ktor-client-cio-jvm", version.ref = "ktor" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-core-jvm = { group = "io.ktor", name = "ktor-client-core-jvm", version.ref = "ktor" }
@@ -66,3 +66,4 @@ dokka = { id = "org.jetbrains.dokka", version = "2.0.0" }
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 paperweight = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }
+pluginPublish = { id = "xyz.xenondevs.publish.plugin-publish", version = "1.0.0" }
