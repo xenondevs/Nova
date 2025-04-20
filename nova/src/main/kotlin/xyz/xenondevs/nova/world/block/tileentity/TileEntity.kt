@@ -430,8 +430,8 @@ abstract class TileEntity(
         
         abstract val gui: Gui
         open val windowBuilder: Window.Builder<*, *> by lazy {
-            Window.single()
-                .setGui(gui)
+            Window.builder()
+                .setUpperGui(gui)
                 .setTitle(getTitle())
         }
         
@@ -456,8 +456,8 @@ abstract class TileEntity(
         
         abstract val gui: Gui
         open val windowBuilder: Window.Builder<*, *> by lazy {
-            Window.single()
-                .setGui(gui)
+            Window.builder()
+                .setUpperGui(gui)
                 .setTitle(getTitle())
         }
         

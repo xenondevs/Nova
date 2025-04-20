@@ -6,6 +6,7 @@ import org.bukkit.NamespacedKey
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.util.data.geantyrefTypeTokenOf
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.util.function.Predicate

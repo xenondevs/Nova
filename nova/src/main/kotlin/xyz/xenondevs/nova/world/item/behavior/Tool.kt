@@ -1,22 +1,25 @@
 package xyz.xenondevs.nova.world.item.behavior
 
-import net.minecraft.core.component.DataComponentMap
-import net.minecraft.core.component.DataComponents
-import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.entity.EquipmentSlotGroup
-import net.minecraft.world.entity.ai.attributes.AttributeModifier
-import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
-import net.minecraft.world.entity.ai.attributes.Attributes
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.ItemAttributeModifiers.itemAttributes
+import io.papermc.paper.datacomponent.item.Tool.tool
+import io.papermc.paper.datacomponent.item.Weapon.weapon
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.component.ItemAttributeModifiers
+import org.bukkit.NamespacedKey
+import org.bukkit.attribute.Attribute
+import org.bukkit.attribute.AttributeModifier
+import org.bukkit.attribute.AttributeModifier.Operation
+import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.nova.config.entryOrElse
+import xyz.xenondevs.nova.util.toNamespacedKey
+import xyz.xenondevs.nova.world.item.DataComponentMap
+import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
-import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
 
 private const val PLAYER_ATTACK_SPEED = 4.0
 private const val PLAYER_ATTACK_DAMAGE = 1.0
@@ -40,13 +43,16 @@ private const val PLAYER_ATTACK_DAMAGE = 1.0
  * Used when `attack_speed` is not specified in the config, or null to require the presence of a config entry.
  *
  * @param knockbackBonus The knockback bonus of the tool when attacking.
- * Used when `knockback_bonus` is not specified in the config.
+ * Defaults to `0`. Used when `knockback_bonus` is not specified in the config.
  *
  * @param canSweepAttack Whether the tool can perform a sweep attack.
- * Used when `can_sweep_attack` is not specified in the config.
+ * Defaults to `false`. Used when `can_sweep_attack` is not specified in the config.
  *
  * @param canBreakBlocksInCreative Whether the tool can break blocks in creative mode.
- * Used when `can_break_blocks_in_creative` is not specified in the config.
+ * Defaults to `true`. Used when `can_break_blocks_in_creative` is not specified in the config.
+ *
+ * @param disableBlocking The amount of ticks to disable an attacked shield's blocking status for when attacking with this tool.
+ * Defaults to `0`. Used when `disable_blocking` is not specified in the config.
  */
 @Suppress("FunctionName")
 fun Tool(
@@ -57,7 +63,8 @@ fun Tool(
     attackSpeed: Double? = null,
     knockbackBonus: Int = 0,
     canSweepAttack: Boolean = false,
-    canBreakBlocksInCreative: Boolean = true
+    canBreakBlocksInCreative: Boolean = true,
+    disableBlocking: Int = 0
 ) = ItemBehaviorFactory<Tool> {
     val cfg = it.config
     Tool(
@@ -68,12 +75,23 @@ fun Tool(
         cfg.entryOrElse(attackSpeed, "attack_speed"),
         cfg.entryOrElse(knockbackBonus, "knockback_bonus"),
         cfg.entryOrElse(canSweepAttack, "can_sweep_attack"),
-        cfg.entryOrElse(canBreakBlocksInCreative, "can_break_blocks_in_creative")
+        cfg.entryOrElse(canBreakBlocksInCreative, "can_break_blocks_in_creative"),
+        cfg.entryOrElse(disableBlocking, "disable_blocking")
     )
 }
 
 /**
  * Allows items to be used as tools, by specifying break and attack properties.
+ *
+ * @param tier The [ToolTier] of the tool.
+ * @param categories The [ToolCategory ToolCategories] of the tool.
+ * @param breakSpeed The break speed of the tool.
+ * @param attackDamage The attack damage of the tool.
+ * @param attackSpeed The attack speed of the tool.
+ * @param knockbackBonus The knockback bonus of the tool when attacking.
+ * @param canSweepAttack Whether the tool can perform a sweep attack.
+ * @param canBreakBlocksInCreative Whether the tool can break blocks in creative mode.
+ * @param disableBlocking The amount of ticks to disable an attacked shield's blocking status for when attacking with this tool.
  */
 class Tool(
     tier: Provider<ToolTier>,
@@ -83,99 +101,106 @@ class Tool(
     attackSpeed: Provider<Double?>,
     knockbackBonus: Provider<Int>,
     canSweepAttack: Provider<Boolean>,
-    canBreakBlocksInCreative: Provider<Boolean>
+    canBreakBlocksInCreative: Provider<Boolean>,
+    disableBlocking: Provider<Int>
 ) : ItemBehavior {
     
     /**
      * The [ToolTier] of this tool.
      */
-    val tier by tier
+    val tier: ToolTier by tier
     
     /**
-     * The [ToolCategory] of this tool.
+     * The [ToolCategory ToolCategories] of this tool.
      */
-    val categories by categories
+    val categories: Set<ToolCategory> by categories
     
     /**
      * The break speed of this tool.
      */
-    val breakSpeed by breakSpeed
+    val breakSpeed: Double by breakSpeed
     
     /**
      * The attack damage of this tool.
      */
-    val attackDamage by attackDamage
+    val attackDamage: Double? by attackDamage
     
     /**
      * The attack speed of this tool.
      */
-    val attackSpeed by attackSpeed
+    val attackSpeed: Double? by attackSpeed
     
     /**
      * The knockback bonus of this tool when attacking.
      */
-    val knockbackBonus by knockbackBonus
+    val knockbackBonus: Int by knockbackBonus
     
     /**
      * Whether this tool can perform a sweep attack.
      */
-    val canSweepAttack by canSweepAttack
+    val canSweepAttack: Boolean by canSweepAttack
     
     /**
      * Whether this tool can break blocks in creative mode.
      */
-    val canBreakBlocksInCreative by canBreakBlocksInCreative
+    val canBreakBlocksInCreative: Boolean by canBreakBlocksInCreative
     
-    override val vanillaMaterialProperties = canBreakBlocksInCreative.map { canBreakBlocksInCreative ->
-        buildList {
-            if (!canBreakBlocksInCreative)
-                add(VanillaMaterialProperty.CREATIVE_NON_BLOCK_BREAKING)
-        }
-    }
+    /**
+     * The amount of ticks to disable blocking for when using this tool.
+     */
+    val disableBlocking: Int by disableBlocking
     
-    override val baseDataComponents = combinedProvider(
-        attackDamage, attackSpeed, knockbackBonus
-    ) { attackDamage, attackSpeed, knockbackBonus ->
-        val modifiers = ItemAttributeModifiers.builder()
-        if (attackDamage != null) {
-            modifiers.add(
-                Attributes.ATTACK_DAMAGE,
-                AttributeModifier(
-                    Item.BASE_ATTACK_DAMAGE_ID,
-                    attackDamage - PLAYER_ATTACK_DAMAGE,
-                    Operation.ADD_VALUE
-                ),
-                EquipmentSlotGroup.MAINHAND
-            )
+    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider {
+        // The actual breaking logic is server-side and disregards this component. Only canBreakBlocksInCreative is relevant.
+        this[DataComponentTypes.TOOL] = canBreakBlocksInCreative.map { tool().canDestroyBlocksInCreative(it).build() }
+        this[DataComponentTypes.WEAPON] = disableBlocking.map { 
+            weapon()
+                .itemDamagePerAttack(0) // // use the lowest value for merging with weapon component of Damageable
+                .disableBlockingForSeconds(it / 20f)
+                .build() }
+        this[DataComponentTypes.ATTRIBUTE_MODIFIERS] = combinedProvider(
+            attackDamage, attackSpeed, knockbackBonus
+        ) { attackDamage, attackSpeed, knockbackBonus ->
+            val modifiers = itemAttributes()
+            
+            if (attackDamage != null) {
+                modifiers.addModifier(
+                    Attribute.ATTACK_DAMAGE,
+                    AttributeModifier(
+                        Item.BASE_ATTACK_DAMAGE_ID.toNamespacedKey(),
+                        attackDamage - PLAYER_ATTACK_DAMAGE,
+                        Operation.ADD_NUMBER
+                    ),
+                    EquipmentSlotGroup.MAINHAND
+                )
+            }
+            
+            if (attackSpeed != null) {
+                modifiers.addModifier(
+                    Attribute.ATTACK_SPEED,
+                    AttributeModifier(
+                        Item.BASE_ATTACK_SPEED_ID.toNamespacedKey(),
+                        attackSpeed - PLAYER_ATTACK_SPEED,
+                        Operation.ADD_NUMBER
+                    ),
+                    EquipmentSlotGroup.MAINHAND
+                )
+            }
+            
+            if (knockbackBonus != 0) {
+                modifiers.addModifier(
+                    Attribute.ATTACK_KNOCKBACK,
+                    AttributeModifier(
+                        NamespacedKey("nova", "knockback_bonus"),
+                        knockbackBonus.toDouble(),
+                        Operation.ADD_NUMBER
+                    ),
+                    EquipmentSlotGroup.MAINHAND
+                )
+            }
+            
+            return@combinedProvider modifiers.build()
         }
-        
-        if (attackSpeed != null) {
-            modifiers.add(
-                Attributes.ATTACK_SPEED,
-                AttributeModifier(
-                    Item.BASE_ATTACK_SPEED_ID,
-                    attackSpeed - PLAYER_ATTACK_SPEED,
-                    Operation.ADD_VALUE
-                ),
-                EquipmentSlotGroup.MAINHAND
-            )
-        }
-        
-        if (knockbackBonus != 0) {
-            modifiers.add(
-                Attributes.ATTACK_KNOCKBACK,
-                AttributeModifier(
-                    ResourceLocation.fromNamespaceAndPath("nova", "knockback_bonus"),
-                    knockbackBonus.toDouble(),
-                    Operation.ADD_VALUE
-                ),
-                EquipmentSlotGroup.MAINHAND
-            )
-        }
-        
-        return@combinedProvider DataComponentMap.builder()
-            .set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers.build())
-            .build()
     }
     
     override fun toString(itemStack: ItemStack): String {
@@ -187,7 +212,8 @@ class Tool(
             "attackSpeed=$attackSpeed, " +
             "knockbackBonus=$knockbackBonus, " +
             "canSweepAttack=$canSweepAttack, " +
-            "canBreakBlocksInCreative=$canBreakBlocksInCreative" +
+            "canBreakBlocksInCreative=$canBreakBlocksInCreative, " +
+            "disableBlocking=$disableBlocking"
             ")"
     }
     

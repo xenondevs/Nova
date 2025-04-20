@@ -15,6 +15,7 @@ import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mapEach
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.ScrollGui
@@ -24,7 +25,6 @@ import xyz.xenondevs.invui.gui.setTab
 import xyz.xenondevs.invui.gui.setTabs
 import xyz.xenondevs.invui.item.AbstractPagedGuiBoundItem
 import xyz.xenondevs.invui.item.AbstractTabGuiBoundItem
-import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.setItemProvider
@@ -106,9 +106,9 @@ internal class ItemsMenu(val player: Player) : ItemMenu {
             }
         }.build()
     
-    private val mainWindow = Window.single()
-        .setTitle(activeTab) { tab -> TAB_BUTTON_TEXTURES[tab % 5].component }
-        .setGui(TabGui.normal()
+    private val mainWindow = Window.builder()
+        .setTitle(activeTab.map { tab -> TAB_BUTTON_TEXTURES[tab % 5].component })
+        .setUpperGui(TabGui.builder()
             .setStructure(
                 "p p p p p p p p p",
                 "p p p p p p p p p",
@@ -117,7 +117,7 @@ internal class ItemsMenu(val player: Player) : ItemMenu {
                 "x x x x x x x x x",
                 "x x x x x x x x x"
             )
-            .addIngredient('p', PagedGui.items()
+            .addIngredient('p', PagedGui.itemsBuilder()
                 .setStructure(
                     "x . x . x . x . x",
                     "< . . . . . . . >"
@@ -130,7 +130,7 @@ internal class ItemsMenu(val player: Player) : ItemMenu {
             )
             .setTab(activeTab)
             .setTabs(ItemCategories.categories.mapEach { category ->
-                ScrollGui.items()
+                ScrollGui.itemsBuilder()
                     .setStructure(
                         "x x x x x x x x s",
                         "x x x x x x x x c",
@@ -155,13 +155,13 @@ internal class ItemsMenu(val player: Player) : ItemMenu {
         )
         .build(player)
     
-    private val searchWindow = AnvilWindow.split()
+    private val searchWindow = AnvilWindow.builder()
         .setTitle(DefaultGuiTextures.SEARCH.getTitle("menu.nova.items.search"))
-        .setUpperGui(Gui.normal()
+        .setUpperGui(Gui.builder()
             .setStructure("a . .")
             .addIngredient('a', AnvilTextItem(DefaultGuiItems.INVISIBLE_ITEM.createClientsideItemBuilder(), ""))
         )
-        .setLowerGui(PagedGui.items()
+        .setLowerGui(PagedGui.itemsBuilder()
             .setStructure(
                 "x x x x x x x x x",
                 "x x x x x x x x x",
@@ -186,17 +186,17 @@ internal class ItemsMenu(val player: Player) : ItemMenu {
         .addRenameHandler(filter)
         .build(player)
     
-    private val searchResultsWindow = Window.single()
-        .setTitle(filter) { filter ->
-            val title = Component.text()
-                .append(Component.translatable("menu.nova.items"))
-                .append(Component.text(" (", NamedTextColor.DARK_GRAY))
-                .append(Component.text(filter, NamedTextColor.GRAY))
-                .append(Component.text(")", NamedTextColor.DARK_GRAY))
-                .build()
-            DefaultGuiTextures.EMPTY_GUI.getTitle(title)
-        }
-        .setGui(PagedGui.items()
+    private val searchResultsWindow = Window.builder()
+        .setTitle(filter.map { filter ->
+                val title = Component.text()
+                    .append(Component.translatable("menu.nova.items"))
+                    .append(Component.text(" (", NamedTextColor.DARK_GRAY))
+                    .append(Component.text(filter, NamedTextColor.GRAY))
+                    .append(Component.text(")", NamedTextColor.DARK_GRAY))
+                    .build()
+                DefaultGuiTextures.EMPTY_GUI.getTitle(title)
+            })
+        .setUpperGui(PagedGui.itemsBuilder()
             .setStructure(
                 ". . . < s > . . .",
                 "x x x x x x x x x",
@@ -233,9 +233,9 @@ internal class ItemsMenu(val player: Player) : ItemMenu {
     private class TabPageBackItem : AbstractPagedGuiBoundItem() {
         
         override fun getItemProvider(player: Player): ItemProvider {
-            return if (gui.pageAmount <= 1)
+            return if (gui.pageCount <= 1)
                 ItemProvider.EMPTY
-            else if (gui.hasPreviousPage())
+            else if (gui.page > 0)
                 DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.clientsideProvider
             else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF.clientsideProvider
         }
@@ -252,9 +252,9 @@ internal class ItemsMenu(val player: Player) : ItemMenu {
     private class TabPageForwardItem : AbstractPagedGuiBoundItem() {
         
         override fun getItemProvider(player: Player): ItemProvider {
-            return if (gui.pageAmount <= 1)
+            return if (gui.pageCount <= 1)
                 ItemProvider.EMPTY
-            else if (gui.hasNextPage())
+            else if (gui.page + 1 < gui.pageCount)
                 DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON.clientsideProvider
             else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF.clientsideProvider
         }

@@ -36,11 +36,7 @@ class ItemModelSelectorScope internal constructor(
         val path = ResourcePath(ResourceType.Model, id.namespace(), "item/${id.value()}")
         modelContent[path]
             ?.let(::ModelBuilder)
-            ?: createLayeredModel(
-                // empty layer 0 for the case that this used for leather armor (layer 0 is colored)
-                ResourcePath(ResourceType.Model, "nova", "item/empty"),
-                path
-            )
+            ?: createLayeredModel(path)
     }
     
     /**

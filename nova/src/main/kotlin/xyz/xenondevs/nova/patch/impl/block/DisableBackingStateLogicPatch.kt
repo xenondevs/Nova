@@ -7,6 +7,7 @@ import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.InsideBlockEffectApplier
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -83,7 +84,7 @@ private val HUGE_MUSHROOM_BLOCK_MIRROR = ReflectionUtils.getMethod(
 private val TRIP_WIRE_BLOCK_ENTITY_INSIDE = ReflectionUtils.getMethod(
     TripWireBlock::class,
     "entityInside",
-    BlockState::class, Level::class, BlockPos::class, Entity::class
+    BlockState::class, Level::class, BlockPos::class, Entity::class, InsideBlockEffectApplier::class
 )
 
 private val TRIP_WIRE_BLOCK_TICK = ReflectionUtils.getMethod(

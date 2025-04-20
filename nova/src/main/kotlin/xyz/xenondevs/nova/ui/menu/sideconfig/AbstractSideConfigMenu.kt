@@ -10,7 +10,7 @@ import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.commons.collections.after
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.item.Click
+import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.item.notifyWindows
 import xyz.xenondevs.nova.ui.menu.item.AsyncItem
 import xyz.xenondevs.nova.util.BlockSide

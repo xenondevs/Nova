@@ -10,6 +10,7 @@ import org.snakeyaml.engine.v2.nodes.ScalarNode
 import org.snakeyaml.engine.v2.nodes.SequenceNode
 import org.snakeyaml.engine.v2.nodes.Tag
 import org.spongepowered.configurate.ConfigurationNode
+import xyz.xenondevs.commons.reflection.javaTypeOf
 import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.reflect.jvm.javaType
@@ -32,10 +33,18 @@ inline fun <reified T> ConfigurationNode.get(): T? {
     return get(typeOf<T>().javaType) as? T
 }
 
-@Suppress("UNCHECKED_CAST")
 inline fun <reified T> ConfigurationNode.getList(): List<T>? {
-    return getList(TypeToken.get(typeOf<T>().javaType)) as List<T>?
+    return getList(geantyrefTypeTokenOf<T>())
 }
+
+inline fun <reified T> ConfigurationNode.setList(value: List<T>?): ConfigurationNode {
+    return setList(geantyrefTypeTokenOf<T>(), value)
+}
+
+@PublishedApi
+@Suppress("UNCHECKED_CAST")
+internal inline fun <reified T> geantyrefTypeTokenOf(): TypeToken<T> =
+    TypeToken.get(javaTypeOf<T>()) as TypeToken<T>
 
 /**
  * Performs a depth-first traversal of all mapping nodes in the tree and calls the [consume] function for each node.

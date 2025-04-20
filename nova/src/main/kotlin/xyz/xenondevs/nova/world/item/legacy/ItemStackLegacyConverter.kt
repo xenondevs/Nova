@@ -14,6 +14,7 @@ import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.data.getByteArrayOrNull
 import xyz.xenondevs.nova.util.data.getOrNull
+import xyz.xenondevs.nova.util.data.getStringOrNull
 import xyz.xenondevs.nova.util.getOrThrow
 import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.KType
@@ -52,7 +53,8 @@ internal class ItemStackNamespaceConverter(
     
     override fun convert(tag: CompoundTag) {
         val novaTag = tag.getOrNull<CompoundTag>("nova") ?: return
-        novaTag.putString("id", newNamespace + ":" + novaTag.getString("id").split(':')[1])
+        val oldId = novaTag.getStringOrNull("id") ?: return
+        novaTag.putString("id", newNamespace + ":" + oldId.split(':')[1])
     }
     
 }

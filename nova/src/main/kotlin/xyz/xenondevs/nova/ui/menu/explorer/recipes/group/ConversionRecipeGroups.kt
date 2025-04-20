@@ -36,7 +36,7 @@ abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
         createConversionRecipeGui(createRecipeChoiceItem(input), result, time)
     
     private fun createConversionRecipeGui(inputUIItem: Item, outputItem: ItemStack, time: Int): Gui {
-        val builder = Gui.normal()
+        val builder = Gui.builder()
             .setStructure(
                 ". . t . . . . . .",
                 ". . i . . . r . .",

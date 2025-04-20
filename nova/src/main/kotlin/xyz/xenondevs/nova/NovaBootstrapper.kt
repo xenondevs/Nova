@@ -25,7 +25,7 @@ import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 
-private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.4")..Version("1.21.4")
+private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.5")..Version("1.21.5")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 internal val PREVIOUS_NOVA_VERSION: Version? = PermanentStorage.retrieveOrNull<Version>("last_version")
 internal val DATA_FOLDER = Path("plugins", "Nova")

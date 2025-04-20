@@ -2,42 +2,36 @@
 
 package xyz.xenondevs.nova.world.item.behavior
 
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.Equippable.equippable
+import io.papermc.paper.datacomponent.item.ItemAttributeModifiers.itemAttributes
+import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.set.RegistryKeySet
+import io.papermc.paper.registry.set.RegistrySet
 import net.kyori.adventure.key.Key
-import net.minecraft.core.Holder
-import net.minecraft.core.HolderSet
-import net.minecraft.core.component.DataComponentMap
-import net.minecraft.core.component.DataComponents
-import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
-import net.minecraft.sounds.SoundEvent
-import net.minecraft.sounds.SoundEvents
-import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.EquipmentSlotGroup
-import net.minecraft.world.entity.ai.attributes.AttributeModifier
-import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation
-import net.minecraft.world.entity.ai.attributes.Attributes
-import net.minecraft.world.item.component.ItemAttributeModifiers
-import net.minecraft.world.item.equipment.EquipmentAssets
+import org.bukkit.NamespacedKey
+import org.bukkit.Registry
+import org.bukkit.Sound
+import org.bukkit.attribute.Attribute
+import org.bukkit.attribute.AttributeModifier
+import org.bukkit.attribute.AttributeModifier.Operation
+import org.bukkit.entity.EntityType
+import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.EquipmentSlotGroup
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.getMod
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.config.optionalEntry
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.util.getOrThrow
-import xyz.xenondevs.nova.util.nmsEquipmentSlot
-import xyz.xenondevs.nova.util.toResourceLocation
+import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.Equipment
-import java.util.*
-import net.minecraft.world.item.equipment.Equippable as EquippableComponent
-import org.bukkit.entity.EntityType as BukkitEntityType
-import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
-import org.bukkit.inventory.ItemStack as BukkitStack
+import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 
 /**
  * Creates a factory for [Equippable] behaviors using the given values, if not specified in the item's configuration.
@@ -46,52 +40,57 @@ import org.bukkit.inventory.ItemStack as BukkitStack
  *
  * @param slot The slot in which the item can be worn.
  *
- * @param armor The amount of armor this item provides.
+ * @param armor The amount of armor this item provides. Defaults to `0`.
  * Used when `armor` is not specified in the config.
  *
- * @param armorToughness The amount of armor toughness this item provides.
+ * @param armorToughness The amount of armor toughness this item provides. Defaults to `0`.
  * Used when `armor_toughness` is not specified in the config.
  *
- * @param knockbackResistance The amount of knockback resistance this item provides.
+ * @param knockbackResistance The amount of knockback resistance this item provides. Defaults to `0`.
  * Used when `knockback_resistance` is not specified in the config.
  *
- * @param equipSound The sound that is played when the item is equipped.
+ * @param equipSound The sound that is played when the item is equipped. Defaults to `item.armor.equip_generic`.
  * Used when `equip_sound` is not specified in the config.
  *
  * @param allowedEntities The entity types that are allowed to wear this item, or null for all entities.
  * Used when `allowed_entities` is not specified in the config.
  *
- * @param dispensable Whether this item can be dispensed from a dispenser.
+ * @param dispensable Whether this item can be dispensed from a dispenser. Defaults to `true`.
  * Used when `dispensable` is not specified in the config.
  *
- * @param swappable Whether this item can be swapped with other items in the same slot.
+ * @param swappable Whether this item can be swapped with other items in the same slot. Defaults to `true`.
  * Used when `swappable` is not specified in the config.
  *
- * @param damageOnHurt Whether this item will be damaged when the wearing entity is damaged.
+ * @param damageOnHurt Whether this item will be damaged when the wearing entity is damaged. Defaults to `true`
  * Used when `damage_on_hurt` is not specified in the config.
+ *
+ * @param equipOnInteract Whether this item should be equipped when right-clicking. Defaults to `true`.
+ * Used when `equip_on_interact` is not specified in the config.
  */
 fun Equippable(
-    equipment: Equipment,
-    slot: BukkitEquipmentSlot,
+    equipment: Equipment?,
+    slot: EquipmentSlot,
     armor: Double = 0.0,
     armorToughness: Double = 0.0,
     knockbackResistance: Double = 0.0,
-    equipSound: Key,
-    allowedEntities: Set<BukkitEntityType>? = null,
+    equipSound: Key = Key.key("minecraft", "item.armor.equip_generic"),
+    allowedEntities: Set<EntityType>?,
     dispensable: Boolean = true,
     swappable: Boolean = true,
-    damageOnHurt: Boolean = true
-) = Equippable(
+    damageOnHurt: Boolean = true,
+    equipOnInteract: Boolean = true
+): ItemBehaviorFactory<Equippable> = Equippable(
     equipment,
     slot,
     armor,
     armorToughness,
     knockbackResistance,
-    Holder.direct(SoundEvent(equipSound.toResourceLocation(), Optional.empty())),
-    allowedEntities,
+    equipSound,
+    allowedEntities?.let { RegistrySet.keySetFromValues(RegistryKey.ENTITY_TYPE, it) },
     dispensable,
     swappable,
-    damageOnHurt
+    damageOnHurt,
+    equipOnInteract
 )
 
 /**
@@ -101,41 +100,45 @@ fun Equippable(
  *
  * @param slot The slot in which the item can be worn.
  *
- * @param armor The amount of armor this item provides.
+ * @param armor The amount of armor this item provides. Defaults to `0`.
  * Used when `armor` is not specified in the config.
  *
- * @param armorToughness The amount of armor toughness this item provides.
+ * @param armorToughness The amount of armor toughness this item provides. Defaults to `0`.
  * Used when `armor_toughness` is not specified in the config.
  *
- * @param knockbackResistance The amount of knockback resistance this item provides.
+ * @param knockbackResistance The amount of knockback resistance this item provides. Defaults to `0`.
  * Used when `knockback_resistance` is not specified in the config.
  *
- * @param equipSound The sound that is played when the item is equipped.
+ * @param equipSound The sound that is played when the item is equipped. Defaults to `item.armor.equip_generic`.
  * Used when `equip_sound` is not specified in the config.
  *
  * @param allowedEntities The entity types that are allowed to wear this item, or null for all entities.
  * Used when `allowed_entities` is not specified in the config.
  *
- * @param dispensable Whether this item can be dispensed from a dispenser.
+ * @param dispensable Whether this item can be dispensed from a dispenser. Defaults to `true`.
  * Used when `dispensable` is not specified in the config.
  *
- * @param swappable Whether this item can be swapped with other items in the same slot.
+ * @param swappable Whether this item can be swapped with other items in the same slot. Defaults to `true`.
  * Used when `swappable` is not specified in the config.
  *
- * @param damageOnHurt Whether this item will be damaged when the wearing entity is damaged.
+ * @param damageOnHurt Whether this item will be damaged when the wearing entity is damaged. Defaults to `true`
  * Used when `damage_on_hurt` is not specified in the config.
+ *
+ * @param equipOnInteract Whether this item should be equipped when right-clicking. Defaults to `true`.
+ * Used when `equip_on_interact` is not specified in the config.
  */
 fun Equippable(
     equipment: Equipment?,
-    slot: BukkitEquipmentSlot,
+    slot: EquipmentSlot,
     armor: Double = 0.0,
     armorToughness: Double = 0.0,
     knockbackResistance: Double = 0.0,
-    equipSound: Holder<SoundEvent> = SoundEvents.ARMOR_EQUIP_GENERIC,
-    allowedEntities: Set<BukkitEntityType>? = null,
+    equipSound: Key = Key.key("minecraft", "item.armor.equip_generic"),
+    allowedEntities: RegistryKeySet<EntityType>? = null,
     dispensable: Boolean = true,
     swappable: Boolean = true,
-    damageOnHurt: Boolean = true
+    damageOnHurt: Boolean = true,
+    equipOnInteract: Boolean = true
 ) = ItemBehaviorFactory<Equippable> {
     val cfg = it.config
     Equippable(
@@ -144,13 +147,12 @@ fun Equippable(
         cfg.entryOrElse(armor, "armor"),
         cfg.entryOrElse(armorToughness, "armor_toughness"),
         cfg.entryOrElse(knockbackResistance, "knockback_resistance"),
-        cfg.optionalEntry<Key>("equip_sound")
-            .mapNonNull { BuiltInRegistries.SOUND_EVENT.getOrThrow(it) }
-            .orElse(equipSound),
-        cfg.optionalEntry<Set<BukkitEntityType>>("allowed_entities").orElse(allowedEntities),
+        cfg.entryOrElse(equipSound, "equip_sound"),
+        cfg.optionalEntry<RegistryKeySet<EntityType>>("allowed_entities").orElse(allowedEntities),
         cfg.entryOrElse(dispensable, "dispensable"),
         cfg.entryOrElse(swappable, "swappable"),
-        cfg.entryOrElse(damageOnHurt, "damage_on_hurt")
+        cfg.entryOrElse(damageOnHurt, "damage_on_hurt"),
+        cfg.entryOrElse(equipOnInteract, "equip_on_interact"),
     )
 }
 
@@ -167,18 +169,20 @@ fun Equippable(
  * @param dispensable Whether this item can be dispensed from a dispenser.
  * @param swappable Whether this item can be swapped with other items in the same slot.
  * @param damageOnHurt Whether this item will be damaged when the wearing entity is damaged.
+ * @param equipOnInteract Whether this item should be equipped when right-clicking.
  */
 class Equippable(
     equipment: Provider<Equipment?>,
-    slot: Provider<BukkitEquipmentSlot>,
+    slot: Provider<EquipmentSlot>,
     armor: Provider<Double>,
     armorToughness: Provider<Double>,
     knockbackResistance: Provider<Double>,
-    equipSound: Provider<Holder<SoundEvent>>,
-    allowedEntities: Provider<Set<BukkitEntityType>?>,
+    equipSound: Provider<Key>,
+    allowedEntities: Provider<RegistryKeySet<EntityType>?>,
     dispensable: Provider<Boolean>,
     swappable: Provider<Boolean>,
     damageOnHurt: Provider<Boolean>,
+    equipOnInteract: Provider<Boolean>
 ) : ItemBehavior {
     
     /**
@@ -189,7 +193,7 @@ class Equippable(
     /**
      * The slot in which the item can be worn.
      */
-    val slot: BukkitEquipmentSlot by slot
+    val slot: EquipmentSlot by slot
     
     /**
      * The amount of armor this item provides.
@@ -207,14 +211,26 @@ class Equippable(
     val knockbackResistance: Double by knockbackResistance
     
     /**
-     * The sound that is played when the item is equipped.
+     * The key of the sound that is played when the item is equipped.
      */
-    val equipSound: Holder<SoundEvent> by equipSound
+    val equipSoundKey: Key by equipSound
     
     /**
-     * The [entity types][BukkitEntityType] that are allowed to wear this item.
+     * The sound that is played when the item is equipped.
      */
-    val allowedEntities: Set<BukkitEntityType>? by allowedEntities
+    val equipSound: Sound?
+        get() = Registry.SOUND_EVENT.get(equipSoundKey)
+    
+    /**
+     * The ids of the entities that are allowed to wear this item.
+     */
+    val allowedEntityKeys: RegistryKeySet<EntityType>? by allowedEntities
+    
+    /**
+     * The entity types that are allowed to wear this item.
+     */
+    val allowedEntities: Set<EntityType?>?
+        get() = allowedEntityKeys?.mapTo(HashSet(), Registry.ENTITY_TYPE::get)
     
     /**
      * Whether this item can be dispensed from a dispenser.
@@ -231,7 +247,12 @@ class Equippable(
      */
     val damageOnHurt: Boolean by damageOnHurt
     
-    internal val equipmentData: Provider<RuntimeEquipmentData?> = ResourceLookups.EQUIPMENT_LOOKUP.getProvider(equipment)
+    /**
+     * Whether this item should be equipped when right-clicking.
+     */
+    val equipOnInteract: Boolean by equipOnInteract
+    
+    private val equipmentData: Provider<RuntimeEquipmentData?> = ResourceLookups.EQUIPMENT_LOOKUP.getProvider(equipment)
     
     init {
         equipmentData.subscribe { equipmentData ->
@@ -242,99 +263,96 @@ class Equippable(
         }
     }
     
-    /**
-     * Provider for a 2d array of [EquippableComponent] components, where the first index is the texture frame and the second index is the overlay frame.
-     */
-    private val equippableComponentFrames: Provider<Array<Array<EquippableComponent>>> = combinedProvider(
-        equipment, equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt
-    ) { equipment, equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt ->
-        val equipmentSlot = slot.nmsEquipmentSlot
-        
-        val textureFrames = equipmentData?.textureFrames ?: equipment?.id?.let(::listOf)
-        val overlayFrames = equipmentData?.cameraOverlayFrames
-            ?.takeUnless { slot != BukkitEquipmentSlot.HEAD }
-        
-        val allowedNmsEntities = allowedEntities
-            ?.map { BuiltInRegistries.ENTITY_TYPE.getOrThrow(it.key()) }
-            ?.let { HolderSet.direct(it) as HolderSet<EntityType<*>> }
-        
-        Array(textureFrames?.size ?: 1) { textureFrame ->
-            Array(overlayFrames?.size ?: 1) { overlayFrame ->
-                EquippableComponent(
-                    equipmentSlot,
-                    equipSound,
-                    Optional.ofNullable(textureFrames?.getOrNull(textureFrame)?.let { ResourceKey.create(EquipmentAssets.ROOT_ID, it.toResourceLocation()) }),
-                    Optional.ofNullable(overlayFrames?.getOrNull(overlayFrame)?.toResourceLocation()),
-                    Optional.ofNullable(allowedNmsEntities),
-                    dispensable, swappable, damageOnHurt
+    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider {
+        this[DataComponentTypes.ATTRIBUTE_MODIFIERS] = combinedProvider(
+            slot, armor, armorToughness, knockbackResistance
+        ) { slot, armor, armorToughness, knockbackResistance ->
+            val slotGroup = when(slot) {
+                EquipmentSlot.HAND -> EquipmentSlotGroup.MAINHAND
+                EquipmentSlot.OFF_HAND -> EquipmentSlotGroup.OFFHAND
+                EquipmentSlot.FEET -> EquipmentSlotGroup.FEET
+                EquipmentSlot.LEGS -> EquipmentSlotGroup.LEGS
+                EquipmentSlot.CHEST -> EquipmentSlotGroup.CHEST
+                EquipmentSlot.HEAD -> EquipmentSlotGroup.HEAD
+                EquipmentSlot.BODY -> EquipmentSlotGroup.BODY
+                EquipmentSlot.SADDLE -> EquipmentSlotGroup.SADDLE
+            }
+            
+            val builder = itemAttributes()
+            if (armor != 0.0) {
+                builder.addModifier(
+                    Attribute.ARMOR,
+                    AttributeModifier(
+                        NamespacedKey("nova", "armor_${slot.name.lowercase()}"),
+                        armor,
+                        Operation.ADD_NUMBER
+                    ),
+                    slotGroup
                 )
             }
+            
+            if (armorToughness != 0.0) {
+                builder.addModifier(
+                    Attribute.ARMOR_TOUGHNESS,
+                    AttributeModifier(
+                        NamespacedKey("nova", "armor_toughness_${slot.name.lowercase()}"),
+                        armorToughness,
+                        Operation.ADD_NUMBER
+                    ),
+                    slotGroup
+                )
+            }
+            
+            if (knockbackResistance != 0.0) {
+                builder.addModifier(
+                    Attribute.KNOCKBACK_RESISTANCE,
+                    AttributeModifier(
+                        NamespacedKey("nova", "knockback_resistance_${slot.name.lowercase()}"),
+                        knockbackResistance,
+                        Operation.ADD_NUMBER
+                    ),
+                    slotGroup
+                )
+            }
+            
+            builder.build()
+        }
+        
+        this[DataComponentTypes.EQUIPPABLE] = combinedProvider(
+            equipment, equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt, equipOnInteract, EquipmentAnimator.tick
+        ) { equipment, equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt, equipOnInteract, tick ->
+            val textureFrames = equipmentData?.textureFrames
+                ?.takeUnlessEmpty()
+                ?: equipment?.id?.let(::listOf)
+            val overlayFrames = equipmentData?.cameraOverlayFrames
+                ?.takeUnlessEmpty()
+                ?.takeUnless { slot != EquipmentSlot.HEAD }
+            
+            equippable(slot)
+                .equipSound(equipSound)
+                .assetId(textureFrames?.getMod(tick))
+                .cameraOverlay(overlayFrames?.getMod(tick))
+                .allowedEntities(allowedEntities)
+                .dispensable(dispensable)
+                .swappable(swappable)
+                .damageOnHurt(damageOnHurt)
+                .equipOnInteract(equipOnInteract)
+                .build()
         }
     }
     
-    /**
-     * Provider for the attribute modifiers.
-     */
-    private val attributeModifiersComponent: Provider<ItemAttributeModifiers> = combinedProvider(
-        slot, armor, armorToughness, knockbackResistance
-    ) { slot, armor, armorToughness, knockbackResistance ->
-        val equipmentSlot = slot.nmsEquipmentSlot
-        val builder = ItemAttributeModifiers.builder()
-        if (armor != 0.0) {
-            builder.add(
-                Attributes.ARMOR,
-                AttributeModifier(
-                    ResourceLocation.fromNamespaceAndPath("nova", "armor_${slot.name.lowercase()}"),
-                    armor,
-                    Operation.ADD_VALUE
-                ),
-                EquipmentSlotGroup.bySlot(equipmentSlot)
-            )
-        }
-        
-        if (armorToughness != 0.0) {
-            builder.add(
-                Attributes.ARMOR_TOUGHNESS,
-                AttributeModifier(
-                    ResourceLocation.fromNamespaceAndPath("nova", "armor_toughness_${slot.name.lowercase()}"),
-                    armorToughness,
-                    Operation.ADD_VALUE
-                ),
-                EquipmentSlotGroup.bySlot(equipmentSlot)
-            )
-        }
-        
-        if (knockbackResistance != 0.0) {
-            builder.add(
-                Attributes.KNOCKBACK_RESISTANCE,
-                AttributeModifier(
-                    ResourceLocation.fromNamespaceAndPath("nova", "knockback_resistance_${slot.name.lowercase()}"),
-                    knockbackResistance,
-                    Operation.ADD_VALUE
-                ),
-                EquipmentSlotGroup.bySlot(equipmentSlot)
-            )
-        }
-        
-        return@combinedProvider builder.build()
-    }
-    
-    override val baseDataComponents = combinedProvider(
-        equippableComponentFrames, EquipmentAnimator.tick, attributeModifiersComponent
-    ) { equippableFrames, tick, attributeModifiers ->
-        val equippable = equippableFrames.getMod(tick).getMod(tick)
-        DataComponentMap.builder()
-            .set(DataComponents.EQUIPPABLE, equippable)
-            .set(DataComponents.ATTRIBUTE_MODIFIERS, attributeModifiers)
-            .build()
-    }
-    
-    override fun toString(itemStack: BukkitStack): String {
-        return "Wearable(" +
+    override fun toString(itemStack: ItemStack): String {
+        return "Equippable(" +
             "slot=$slot, " +
             "armor=$armor, " +
             "armorToughness=$armorToughness, " +
             "knockbackResistance=$knockbackResistance" +
+            "equipSound=$equipSound, " +
+            "allowedEntities=$allowedEntities, " +
+            "dispensable=$dispensable, " +
+            "swappable=$swappable, " +
+            "damageOnHurt=$damageOnHurt, " +
+            "equipOnInteract=$equipOnInteract" +
             ")"
     }
     

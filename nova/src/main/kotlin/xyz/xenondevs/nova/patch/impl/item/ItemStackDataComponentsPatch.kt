@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.patch.MultiTransformer
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
+import xyz.xenondevs.nova.util.data.getStringOrNull
 import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.item.NovaItem
@@ -44,7 +45,7 @@ internal object ItemStackDataComponentsPatch : MultiTransformer(ItemStack::class
         
         val novaItem = patch.get(DataComponents.CUSTOM_DATA)?.getOrNull()?.unsafe
             ?.getCompoundOrNull("nova")
-            ?.getString("id")
+            ?.getStringOrNull("id")
             ?.let(NovaRegistries.ITEM::getValue)
         
         return PatchedDataComponentMap.fromPatch(
@@ -60,7 +61,7 @@ internal class NovaDataComponentMap(private val novaItem: NovaItem) : DataCompon
     
     override fun <T : Any?> get(type: DataComponentType<out T>): T? {
         try {
-            return novaItem.baseDataComponents.get(type)
+            return novaItem.baseDataComponents.handle.get(type)
         } catch (e: Exception) {
             LOGGER.error("Failed to retrieve base data components for $novaItem", e)
         }
@@ -70,7 +71,7 @@ internal class NovaDataComponentMap(private val novaItem: NovaItem) : DataCompon
     
     override fun keySet(): Set<DataComponentType<*>> {
         try {
-            return novaItem.baseDataComponents.keySet()
+            return novaItem.baseDataComponents.handle.keySet()
         } catch (e: Exception) {
             LOGGER.error("Failed to retrieve base data components for $novaItem", e)
         }

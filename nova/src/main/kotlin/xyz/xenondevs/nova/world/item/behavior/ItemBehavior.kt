@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.item.behavior
 
-import net.minecraft.core.component.DataComponentMap
-import net.minecraft.core.component.DataComponentPatch
+import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -13,19 +12,26 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
+import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.world.player.equipment.ArmorEquipEvent
 
+/**
+ * Either [ItemBehavior] or [ItemBehaviorFactory]
+ */
 sealed interface ItemBehaviorHolder
 
+/**
+ * Adds functionality to an item type.
+ */
 interface ItemBehavior : ItemBehaviorHolder {
     
     /**
@@ -33,12 +39,6 @@ interface ItemBehavior : ItemBehaviorHolder {
      */
     val baseDataComponents: Provider<DataComponentMap>
         get() = provider(DataComponentMap.EMPTY)
-    
-    /**
-     * The data component patch that every new [ItemStack] of an item with this [ItemBehavior] has by default.
-     */
-    val defaultPatch: Provider<DataComponentPatch>
-        get() = provider(DataComponentPatch.EMPTY)
     
     /**
      * The [NamespacedCompound] that every new [ItemStack] of an item with this [ItemBehavior] has by default.
@@ -58,7 +58,7 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) = Unit
     fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) = Unit
     fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) = Unit
-    fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) = Unit
+    fun handleEquip(player: Player, itemStack: ItemStack, slot: EquipmentSlot, equipped: Boolean, event: EntityEquipmentChangedEvent) = Unit
     fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
@@ -85,6 +85,14 @@ interface ItemBehavior : ItemBehaviorHolder {
     
 }
 
+/**
+ * Creates [ItemBehavior] instances for [NovaItem NovaItems].
+ */
 fun interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
+    
+    /**
+     * Creates a new [ItemBehavior] instance for the given [item].
+     */
     fun create(item: NovaItem): T
+    
 }

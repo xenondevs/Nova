@@ -26,6 +26,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.server.players.PlayerList
+import net.minecraft.tags.TagKey
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.item.ItemEntity
@@ -67,7 +68,7 @@ import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
-import java.util.Optional
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
@@ -143,6 +144,9 @@ fun Key.toResourceLocation(): ResourceLocation =
 fun ResourceLocation.toKey(): Key =
     Key.key(namespace, path)
 
+fun ResourceLocation.toNamespacedKey(): NamespacedKey =
+    NamespacedKey(namespace, path)
+
 val EquipmentSlot.nmsInteractionHand: InteractionHand
     get() = when (this) {
         EquipmentSlot.HAND -> InteractionHand.MAIN_HAND
@@ -159,6 +163,7 @@ val EquipmentSlot.nmsEquipmentSlot: MojangEquipmentSlot
         EquipmentSlot.CHEST -> MojangEquipmentSlot.CHEST
         EquipmentSlot.HEAD -> MojangEquipmentSlot.HEAD
         EquipmentSlot.BODY -> MojangEquipmentSlot.BODY
+        EquipmentSlot.SADDLE -> MojangEquipmentSlot.SADDLE
     }
 
 val MojangEquipmentSlot.bukkitEquipmentSlot: EquipmentSlot
@@ -170,6 +175,7 @@ val MojangEquipmentSlot.bukkitEquipmentSlot: EquipmentSlot
         MojangEquipmentSlot.CHEST -> EquipmentSlot.CHEST
         MojangEquipmentSlot.HEAD -> EquipmentSlot.HEAD
         MojangEquipmentSlot.BODY -> EquipmentSlot.BODY
+        MojangEquipmentSlot.SADDLE -> EquipmentSlot.SADDLE
     }
 
 val MojangEquipmentSlot.nmsInteractionHand: InteractionHand
@@ -630,6 +636,9 @@ fun ResourceLocation.toString(separator: String): String {
 fun ResourceLocation(addon: Addon, name: String): ResourceLocation {
     return ResourceLocation.fromNamespaceAndPath(addon.id, name)
 }
+
+fun <T> io.papermc.paper.registry.tag.TagKey<*>.toNmsTagKey(registry: ResourceKey<out Registry<T>>): TagKey<T> =
+    TagKey.create(registry, key().toResourceLocation())
 
 fun preventPacketBroadcast(run: () -> Unit) {
     BroadcastPacketPatch.dropAll = true

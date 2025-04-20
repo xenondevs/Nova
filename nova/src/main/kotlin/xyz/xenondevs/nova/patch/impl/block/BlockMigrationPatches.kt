@@ -20,7 +20,7 @@ import xyz.xenondevs.nova.world.block.migrator.BlockMigrator
 private val LEVEL_CHUNK_SET_BLOCK_STATE = ReflectionUtils.getMethod(
     LevelChunk::class,
     "setBlockState",
-    BlockPos::class, BlockState::class, Boolean::class, Boolean::class
+    BlockPos::class, BlockState::class, Int::class
 )
 
 internal object BlockMigrationPatches : MultiTransformer(Level::class, LevelChunk::class) {

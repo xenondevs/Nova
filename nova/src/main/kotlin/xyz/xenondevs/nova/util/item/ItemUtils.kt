@@ -19,6 +19,8 @@ import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.ItemAttributeModifiers
 import net.minecraft.world.item.component.ItemLore
+import net.minecraft.world.item.component.TooltipDisplay
+import net.minecraft.world.item.component.Weapon
 import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -40,6 +42,7 @@ import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
 import xyz.xenondevs.nova.util.contains
 import xyz.xenondevs.nova.util.data.getByteArrayOrNull
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
+import xyz.xenondevs.nova.util.data.getStringOrNull
 import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
@@ -51,7 +54,7 @@ import xyz.xenondevs.nova.world.item.recipe.ModelDataTest
 import xyz.xenondevs.nova.world.item.recipe.NovaIdTest
 import xyz.xenondevs.nova.world.item.recipe.NovaNameTest
 import xyz.xenondevs.nova.world.item.recipe.TagTest
-import java.util.Optional
+import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.max
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -61,7 +64,7 @@ val ItemStack.novaItem: NovaItem?
 
 val MojangStack.novaItem: NovaItem?
     get() = unsafeNovaTag
-        ?.getString("id")
+        ?.getStringOrNull("id")
         ?.let(NovaRegistries.ITEM::getValue)
 
 @Suppress("DEPRECATION")
@@ -362,7 +365,7 @@ object ItemUtils {
         return builder.build()
     }
     
-    @Suppress("UNCHECKED_CAST") // not sure why Kotlin cannot infer the types here
+    @Suppress("UNCHECKED_CAST")
     internal fun <T> mergeDataComponents(type: DataComponentType<T>, values: List<T>): T {
         require(values.isNotEmpty())
         if (values.size == 1)
@@ -380,6 +383,8 @@ object ItemUtils {
             DataComponents.POTION_CONTENTS -> mergePotionContents(values as List<PotionContents>)
             DataComponents.RECIPES -> mergeResourceLocations(values as List<List<ResourceLocation>>)
             DataComponents.STORED_ENCHANTMENTS -> mergeEnchantments(values as List<ItemEnchantments>)
+            DataComponents.TOOLTIP_DISPLAY -> mergeTooltipDisplay(values as List<TooltipDisplay>)
+            DataComponents.WEAPON -> mergeWeapon(values as List<Weapon>)
             else -> values.last()
         } as T
     }
@@ -395,7 +400,7 @@ object ItemUtils {
     }
     
     internal fun mergeAdventureModePredicate(values: List<AdventureModePredicate>): AdventureModePredicate {
-        return AdventureModePredicate(values.flatMap { it.predicates }, values.any { it.showInTooltip() })
+        return AdventureModePredicate(values.flatMap { it.predicates })
     }
     
     @Suppress("DEPRECATION")
@@ -427,6 +432,22 @@ object ItemUtils {
             Optional.empty(),
             values.flatMap { it.allEffects },
             values.asSequence().map { it.customName }.lastOrNull { it.isPresent } ?: Optional.empty()
+        )
+    }
+    
+    internal fun mergeTooltipDisplay(values: List<TooltipDisplay>): TooltipDisplay {
+        return TooltipDisplay(
+            values.any { it.hideTooltip },
+            values.flatMapTo(LinkedHashSet()) { it.hiddenComponents }
+        )
+    }
+    
+    internal fun mergeWeapon(values: List<Weapon>): Weapon {
+        // This is not ideal, but currently required to prevent conflict between Damageable and Tool behavior's
+        // usage of the Weapon component.
+        return Weapon(
+            values.maxOf { it.itemDamagePerAttack },
+            values.maxOf { it.disableBlockingForSeconds }
         )
     }
     

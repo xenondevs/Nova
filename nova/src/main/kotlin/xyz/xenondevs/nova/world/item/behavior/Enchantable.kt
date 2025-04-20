@@ -1,8 +1,8 @@
 package xyz.xenondevs.nova.world.item.behavior
 
-import net.minecraft.core.component.DataComponentMap
-import net.minecraft.core.component.DataComponents
-import net.minecraft.world.item.enchantment.ItemEnchantments
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.Enchantable.enchantable
+import io.papermc.paper.datacomponent.item.ItemEnchantments.itemEnchantments
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
@@ -10,7 +10,8 @@ import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.config.optionalEntry
-import net.minecraft.world.item.enchantment.Enchantable as EnchantableComponent
+import xyz.xenondevs.nova.world.item.DataComponentMap
+import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 
 /**
  * Creates a factory for [Enchantable] behaviors using the given values, if not specified otherwise in the item's config.
@@ -76,11 +77,9 @@ class Enchantable(
      */
     val supportedEnchantments by supportedEnchantments
     
-    override val baseDataComponents = enchantmentValue.map { enchantmentValue ->
-        DataComponentMap.builder()
-            .set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY)
-            .set(DataComponents.ENCHANTABLE, EnchantableComponent(enchantmentValue))
-            .build()
+    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider { 
+        this[DataComponentTypes.ENCHANTMENTS] = itemEnchantments().build()
+        this[DataComponentTypes.ENCHANTABLE] = enchantmentValue.map(::enchantable)
     }
     
     override fun toString(itemStack: ItemStack): String {

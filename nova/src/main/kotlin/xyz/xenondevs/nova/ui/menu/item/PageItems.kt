@@ -4,9 +4,9 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
+import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.item.AbstractPagedGuiBoundItem
-import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound
@@ -21,28 +21,23 @@ class PageBackItem(
 ) : AbstractPagedGuiBoundItem() {
     
     override fun getItemProvider(player: Player): ItemProvider {
-        val itemBuilder = ItemBuilder((if (gui.hasPreviousPage()) on else off).get())
+        val itemBuilder = ItemBuilder((if (gui.page > 0) on else off).get())
         itemBuilder.setName(Component.translatable("menu.nova.paged.back", NamedTextColor.GRAY))
         itemBuilder.addLoreLines(
-            if (gui.hasInfinitePages()) {
-                if (gui.page == 0) Component.translatable("menu.nova.paged.limit_min", NamedTextColor.DARK_GRAY)
-                else Component.translatable("menu.nova.paged.go_infinite", NamedTextColor.DARK_GRAY, Component.text(gui.page))
-            } else {
-                if (gui.hasPreviousPage())
-                    Component.translatable(
-                        "menu.nova.paged.go", NamedTextColor.DARK_GRAY,
-                        Component.text(gui.page), Component.text(gui.pageAmount)
-                    )
-                else Component.translatable("menu.nova.paged.limit_min", NamedTextColor.DARK_GRAY)
-            }
+            if (gui.page > 0)
+                Component.translatable(
+                    "menu.nova.paged.go", NamedTextColor.DARK_GRAY,
+                    Component.text(gui.page), Component.text(gui.pageCount)
+                )
+            else Component.translatable("menu.nova.paged.limit_min", NamedTextColor.DARK_GRAY)
         )
         return itemBuilder
     }
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) {
-        if (clickType == ClickType.LEFT && gui.hasPreviousPage()) {
+        if (clickType == ClickType.LEFT && gui.page > 0) {
             player.playClickSound()
-            gui.goBack()
+            gui.page--
         }
     }
     
@@ -57,30 +52,23 @@ class PageForwardItem(
 ) : AbstractPagedGuiBoundItem() {
     
     override fun getItemProvider(player: Player): ItemProvider {
-        val itemBuilder = ItemBuilder((if (gui.hasNextPage()) on else off).get())
+        val itemBuilder = ItemBuilder((if (gui.page + 1 < gui.pageCount) on else off).get())
         itemBuilder.setName(Component.translatable("menu.nova.paged.forward", NamedTextColor.GRAY))
         itemBuilder.addLoreLines(
-            if (gui.hasInfinitePages()) {
+            if (gui.page + 1 < gui.pageCount)
                 Component.translatable(
-                    "menu.nova.paged.go_infinite", NamedTextColor.DARK_GRAY,
-                    Component.text(gui.page + 2)
+                    "menu.nova.paged.go", NamedTextColor.DARK_GRAY,
+                    Component.text(gui.page + 2), Component.text(gui.pageCount)
                 )
-            } else {
-                if (gui.hasNextPage())
-                    Component.translatable(
-                        "menu.nova.paged.go", NamedTextColor.DARK_GRAY,
-                        Component.text(gui.page + 2), Component.text(gui.pageAmount)
-                    )
-                else Component.translatable("menu.nova.paged.limit_max", NamedTextColor.DARK_GRAY)
-            }
+            else Component.translatable("menu.nova.paged.limit_max", NamedTextColor.DARK_GRAY)
         )
         return itemBuilder
     }
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) {
-        if (clickType == ClickType.LEFT && gui.hasNextPage()) {
+        if (clickType == ClickType.LEFT && gui.page + 1 < gui.pageCount) {
             player.playClickSound()
-            gui.goForward()
+            gui.page++
         }
     }
     

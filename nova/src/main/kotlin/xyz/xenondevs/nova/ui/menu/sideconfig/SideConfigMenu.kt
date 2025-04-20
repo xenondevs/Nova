@@ -4,10 +4,10 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
+import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.TabGui
 import xyz.xenondevs.invui.item.AbstractItem
-import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.ui.menu.item.BackItem
@@ -129,7 +129,7 @@ class SideConfigMenu(
         
         require(energyConfigMenu != null || itemConfigMenu != null || fluidConfigMenu != null)
         
-        mainGui = TabGui.normal()
+        mainGui = TabGui.builder()
             .setStructure(
                 "< # # e i f # # #",
                 "- - - - - - - - -",
@@ -169,12 +169,12 @@ class SideConfigMenu(
      * Opens a [Window] of this [SideConfigMenu] for the given [player].
      */
     fun openWindow(player: Player) {
-        val window = Window.single {
-            it.setViewer(player)
-            it.setTitle(Component.translatable("menu.nova.side_config"))
-            it.setGui(mainGui)
-            it.addOpenHandler(::updateNetworkData)
-        }
+        val window = Window.builder()
+            .setViewer(player)
+            .setTitle(Component.translatable("menu.nova.side_config"))
+            .setUpperGui(mainGui)
+            .addOpenHandler(::updateNetworkData)
+            .build()
         
         if (endPoint is TileEntity) {
             endPoint.menuContainer.registerWindow(window)

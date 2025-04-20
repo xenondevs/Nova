@@ -1,22 +1,19 @@
 package xyz.xenondevs.nova.world.item.behavior
 
-import net.minecraft.core.component.DataComponentMap
-import net.minecraft.core.component.DataComponents
-import net.minecraft.tags.DamageTypeTags
-import net.minecraft.world.item.component.DamageResistant
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.DamageResistant.damageResistant
+import io.papermc.paper.registry.keys.tags.DamageTypeTagKeys
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.nova.world.item.DataComponentMap
+import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 
 /**
  * Makes items fire-resistant.
  */
 object FireResistant : ItemBehavior {
     
-    override val baseDataComponents: Provider<DataComponentMap>
-        get() = provider(
-            DataComponentMap.builder()
-                .set(DataComponents.DAMAGE_RESISTANT, DamageResistant(DamageTypeTags.IS_FIRE))
-                .build()
-        )
+    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider {
+        this[DataComponentTypes.DAMAGE_RESISTANT] = damageResistant(DamageTypeTagKeys.IS_FIRE)
+    }
     
 }

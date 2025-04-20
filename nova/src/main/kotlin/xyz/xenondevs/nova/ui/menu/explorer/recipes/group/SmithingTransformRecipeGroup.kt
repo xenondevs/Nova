@@ -15,7 +15,7 @@ internal object SmithingTransformRecipeGroup : RecipeGroup<SmithingTransformReci
     override val icon = ItemWrapper(ItemStack(Material.SMITHING_TABLE))
     
     override fun createGui(recipe: SmithingTransformRecipe): Gui {
-        return Gui.normal()
+        return Gui.builder()
             .setStructure(
                 ". . . . . . . . .",
                 ". . 1 2 3 . . r .",

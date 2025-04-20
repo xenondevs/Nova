@@ -7,6 +7,7 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
+import xyz.xenondevs.nova.util.data.getStringOrNull
 import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.typeOf
 
@@ -78,7 +79,7 @@ internal object ItemStackLegacyConversion {
         
         val novaId = unsafeCustomTag
             .getCompoundOrNull("nova")
-            ?.getString("id")
+            ?.getStringOrNull("id")
             ?: return patch // not a nova item
         
         val converters = (specializedConverters[novaId] ?: emptyList()) + genericConverters

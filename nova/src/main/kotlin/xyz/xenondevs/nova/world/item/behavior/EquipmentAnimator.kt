@@ -27,7 +27,6 @@ import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
-import kotlin.sequences.forEach
 import org.bukkit.inventory.EquipmentSlot as BukkitEquipmentSlot
 
 @InternalInit(stage = InternalInitStage.POST_WORLD)
@@ -71,11 +70,11 @@ internal object EquipmentAnimator {
     
     private fun updatePlayerArmor(player: Player) {
         val serverPlayer = player.serverPlayer
-        for ((armorSlot, armorStack) in serverPlayer.inventory.armor.withIndex()) {
+        for ((armorSlot, armorStack) in player.equipment.armorContents.withIndex()) {
             var equipment = HashMap<EquipmentSlot, ItemStack>()
             if (armorStack?.novaItem?.behaviors?.any { it in animatedBehaviors } == true) {
                 serverPlayer.inventoryMenu.setRemoteSlot(8 - armorSlot, ItemStack.EMPTY) // mark as dirty, force update
-                equipment[EquipmentSlot.entries[armorSlot + 2]] = armorStack
+                equipment[EquipmentSlot.entries[armorSlot + 2]] = armorStack.unwrap()
             }
             
             // update for other players

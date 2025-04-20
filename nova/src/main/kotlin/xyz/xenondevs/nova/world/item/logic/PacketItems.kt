@@ -3,11 +3,10 @@
 package xyz.xenondevs.nova.world.item.logic
 
 import com.mojang.serialization.Dynamic
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
 import net.minecraft.ChatFormatting
+import net.minecraft.core.component.DataComponentExactPredicate
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch
-import net.minecraft.core.component.DataComponentPredicate
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.component.TypedDataComponent
@@ -15,12 +14,13 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
+import net.minecraft.network.HashedPatchMap
+import net.minecraft.network.HashedStack
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.resources.RegistryOps
-import net.minecraft.util.Unit
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -29,6 +29,7 @@ import net.minecraft.world.item.component.BundleContents
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.DyedItemColor
 import net.minecraft.world.item.component.ItemLore
+import net.minecraft.world.item.component.TooltipDisplay
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.display.FurnaceRecipeDisplay
 import net.minecraft.world.item.crafting.display.RecipeDisplay
@@ -71,7 +72,6 @@ import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.component.adventure.isEmpty
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
-import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
 import xyz.xenondevs.nova.util.data.getStringOrNull
@@ -115,12 +115,7 @@ internal object PacketItems : Listener, PacketListener {
     @PacketHandler
     private fun handleSetContentPacket(event: ClientboundContainerSetContentPacketEvent) {
         val player = event.player
-        val items = event.items
-        
-        items.forEachIndexed { i, item ->
-            items[i] = getClientSideStack(player, item)
-        }
-        
+        event.items = event.items.map { getClientSideStack(player, it) }
         event.carriedItem = getClientSideStack(player, event.carriedItem)
     }
     
@@ -168,8 +163,11 @@ internal object PacketItems : Listener, PacketListener {
     
     @PacketHandler
     private fun handleClick(event: ServerboundContainerClickPacketEvent) {
-        event.carriedItem = getServerSideStack(event.carriedItem)
-        event.changedSlots = event.changedSlots.mapValuesTo(Int2ObjectArrayMap()) { (_, item) -> getServerSideStack(item) }
+        // fixme: HashedStack breaks the approach of saving server-side data in the client-side stack via custom data
+        //        This could be solved by caching a mapping from client-side stack to server-side stack during getClientSideStack
+        
+        // carried item needs to always be set to an item that triggers an update to prevent desync on single-item drag
+        event.carriedItem = HashedStack.ActualItem(Items.DIRT.builtInRegistryHolder(), -1, HashedPatchMap(emptyMap(), emptySet()))
     }
     
     @PacketHandler
@@ -206,10 +204,10 @@ internal object PacketItems : Listener, PacketListener {
         
         event.offers.forEach { offer ->
             val stackA = getClientSideStack(event.player, offer.baseCostA.itemStack)
-            val costA = ItemCost(stackA.itemHolder, stackA.count, DataComponentPredicate.EMPTY, stackA)
+            val costA = ItemCost(stackA.itemHolder, stackA.count, DataComponentExactPredicate.EMPTY, stackA)
             val costB = offer.costB.map {
                 val stackB = getClientSideStack(event.player, it.itemStack)
-                ItemCost(stackB.itemHolder, stackB.count, DataComponentPredicate.EMPTY, stackB)
+                ItemCost(stackB.itemHolder, stackB.count, DataComponentExactPredicate.EMPTY, stackB)
             }
             newOffers += MerchantOffer(
                 costA, costB, getClientSideStack(event.player, offer.result),
@@ -287,7 +285,7 @@ internal object PacketItems : Listener, PacketListener {
         is SlotDisplay.SmithingTrimDemoSlotDisplay -> SlotDisplay.SmithingTrimDemoSlotDisplay(
             getClientSideSlotDisplay(display.base),
             getClientSideSlotDisplay(display.material),
-            getClientSideSlotDisplay(display.pattern)
+            display.pattern
         )
         
         is SlotDisplay.WithRemainder -> SlotDisplay.WithRemainder(
@@ -339,7 +337,7 @@ internal object PacketItems : Listener, PacketListener {
         newItemStack = novaItem.modifyClientSideStack(player, newItemStack.asBukkitMirror(), novaCompound).unwrap()
         
         if (shouldHideEntireTooltip(itemStack)) {
-            newItemStack.set(DataComponents.HIDE_TOOLTIP, Unit.INSTANCE)
+            newItemStack.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(true, linkedSetOf()))
         } else { // generate tooltip server-side and apply as lore
             // we do not want data component modifications done by item behaviors in modifyClientSideStack
             // to be reflected in the tooltip, except for the item lore itself
@@ -361,17 +359,12 @@ internal object PacketItems : Listener, PacketListener {
         
         // remove vanilla default base components
         for (vanillaBase in vanilla.components()) {
-            if (vanillaBase.type == DataComponents.ITEM_MODEL) // removing item_model breaks custom model data
-                continue
-            
             builder.remove(vanillaBase.type)
         }
         
         // add nova default base components
-        mergeIntoClientSidePatch(builder, nova.baseDataComponents)
-        // add nova default patch components
-        mergeIntoClientSidePatch(builder, nova.defaultPatch)
-        // add actual item stack patch components
+        mergeIntoClientSidePatch(builder, nova.baseDataComponents.handle)
+        // add item stack patch components
         mergeIntoClientSidePatch(builder, patch)
         
         return builder.build()
@@ -451,7 +444,7 @@ internal object PacketItems : Listener, PacketListener {
             modified = true
         
         if (shouldHideEntireTooltip(itemStack)) {
-            newItemStack.set(DataComponents.HIDE_TOOLTIP, Unit.INSTANCE)
+            newItemStack.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(true, linkedSetOf()))
             modified = true
         } else if (itemStack.unsafeCustomData?.contains(SKIP_SERVER_SIDE_TOOLTIP) != true) {
             val isAdvanced = player?.let(AdvancedTooltips::hasVanillaTooltips) == true
@@ -487,7 +480,7 @@ internal object PacketItems : Listener, PacketListener {
         if (CustomItemServiceManager.getId(itemStack.asBukkitMirror()) != null)
             return false
         
-        itemStack.set(DataComponents.DYED_COLOR, DyedItemColor(rgb - 1, color.showInTooltip))
+        itemStack.set(DataComponents.DYED_COLOR, DyedItemColor(rgb - 1))
         
         return true
     }
@@ -538,20 +531,10 @@ internal object PacketItems : Listener, PacketListener {
     }
     
     private fun disableClientSideTooltip(itemStack: MojangStack) {
-        itemStack.update(DataComponents.ATTRIBUTE_MODIFIERS) { it.withTooltip(false) }
-        itemStack.update(DataComponents.CAN_BREAK) { it.withTooltip(false) }
-        itemStack.update(DataComponents.CAN_PLACE_ON) { it.withTooltip(false) }
-        itemStack.update(DataComponents.DYED_COLOR) { it.withTooltip(false) }
-        itemStack.update(DataComponents.ENCHANTMENTS) { it.withTooltip(false) }
-        itemStack.update(DataComponents.JUKEBOX_PLAYABLE) { it.withTooltip(false) }
-        itemStack.update(DataComponents.STORED_ENCHANTMENTS) { it.withTooltip(false) }
-        itemStack.update(DataComponents.TRIM) { it.withTooltip(false) }
-        itemStack.update(DataComponents.UNBREAKABLE) { it.withTooltip(false) }
-        
-        // this disables all other tooltips that cannot be disabled through a specific component, for example firework effects
-        // since the bundle preview cannot be rendered server-side, HIDE_ADDITIONAL_TOOLTIP cannot be applied to bundles
-        if (!itemStack.has(DataComponents.BUNDLE_CONTENTS))
-            itemStack.set(DataComponents.HIDE_ADDITIONAL_TOOLTIP, Unit.INSTANCE)
+        itemStack.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(
+            itemStack.get(DataComponents.TOOLTIP_DISPLAY)?.hideTooltip == true,
+            BuiltInRegistries.DATA_COMPONENT_TYPE.filterTo(LinkedHashSet()) { it != DataComponents.BUNDLE_CONTENTS  && it != DataComponents.LORE}
+        ))
     }
     
     private fun shouldHideEntireTooltip(itemStack: MojangStack): Boolean {
@@ -571,7 +554,7 @@ internal object PacketItems : Listener, PacketListener {
         
         // use server-side item for all Nova items, otherwise keep current item
         val serversideCustomData = serversideComponents.get(DataComponents.CUSTOM_DATA)?.orElse(null)
-        val item = if (serversideCustomData?.unsafe?.contains("nova", NBTUtils.TAG_COMPOUND) == true)
+        val item = if (serversideCustomData?.unsafe?.getCompoundOrNull("nova") != null)
             SERVER_SIDE_ITEM_HOLDER
         else itemStack.itemHolder
         

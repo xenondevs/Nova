@@ -19,7 +19,7 @@ internal object TableRecipeGroup : RecipeGroup<Recipe>() {
     override val icon = ItemWrapper(ItemStack(Material.CRAFTING_TABLE))
     
     override fun createGui(recipe: Recipe): Gui {
-        val gui = Gui.normal()
+        val gui = Gui.builder()
             .setStructure(
                 ". . . . . . . . .",
                 ". . . . . . . r .",

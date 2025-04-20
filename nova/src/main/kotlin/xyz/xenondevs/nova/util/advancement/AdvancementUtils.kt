@@ -1,8 +1,18 @@
 package xyz.xenondevs.nova.util.advancement
 
 import net.kyori.adventure.text.Component
-import net.minecraft.advancements.*
-import net.minecraft.advancements.critereon.*
+import net.minecraft.advancements.Advancement
+import net.minecraft.advancements.AdvancementHolder
+import net.minecraft.advancements.AdvancementRequirements
+import net.minecraft.advancements.AdvancementType
+import net.minecraft.advancements.Criterion
+import net.minecraft.advancements.DisplayInfo
+import net.minecraft.advancements.critereon.DataComponentMatchers
+import net.minecraft.advancements.critereon.InventoryChangeTrigger
+import net.minecraft.advancements.critereon.ItemPredicate
+import net.minecraft.advancements.critereon.NbtPredicate
+import net.minecraft.core.component.predicates.CustomDataPredicate
+import net.minecraft.core.component.predicates.DataComponentPredicates
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.Bukkit
@@ -91,11 +101,10 @@ private fun createObtainNovaItemCriterion(item: NovaItem): Criterion<InventoryCh
         })
     }
     return InventoryChangeTrigger.TriggerInstance.hasItems(
-        ItemPredicate.Builder.item().withSubPredicate(
-            ItemSubPredicates.CUSTOM_DATA,
-            ItemCustomDataPredicate.customData(
-                NbtPredicate(expectedCustomData)
-            )
+        ItemPredicate.Builder.item().withComponents(
+            DataComponentMatchers.Builder.components()
+                .partial(DataComponentPredicates.CUSTOM_DATA, CustomDataPredicate(NbtPredicate(expectedCustomData)))
+                .build()
         )
     )
 }

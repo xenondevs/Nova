@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.invui.item.AbstractItem
-import xyz.xenondevs.invui.item.Click
+import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound

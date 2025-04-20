@@ -20,7 +20,6 @@ import xyz.xenondevs.nova.patch.impl.block.FluidFlowPatch
 import xyz.xenondevs.nova.patch.impl.block.TripwireLogicPatch
 import xyz.xenondevs.nova.patch.impl.bossbar.BossBarOriginPatch
 import xyz.xenondevs.nova.patch.impl.chunk.ChunkSchedulingPatch
-import xyz.xenondevs.nova.patch.impl.item.ArmorEquipEventPatch
 import xyz.xenondevs.nova.patch.impl.item.DyeablePatches
 import xyz.xenondevs.nova.patch.impl.item.EnchantmentPatches
 import xyz.xenondevs.nova.patch.impl.item.FuelPatches
@@ -33,6 +32,7 @@ import xyz.xenondevs.nova.patch.impl.misc.EventPreventionPatch
 import xyz.xenondevs.nova.patch.impl.misc.FakePlayerLastHurtPatch
 import xyz.xenondevs.nova.patch.impl.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.patch.impl.registry.RegistryEventsPatch
+import xyz.xenondevs.nova.patch.impl.registry.RegistryInstantBindPatch
 import xyz.xenondevs.nova.patch.impl.sound.SoundPatches
 import xyz.xenondevs.nova.patch.impl.worldgen.NovaRuleTestPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.WrapperBlockPatch
@@ -55,11 +55,11 @@ internal object Patcher {
             FieldFilterPatch, ToolPatches,
             LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
             WrapperBlockPatch, NovaRuleTestPatch, FuelPatches, RemainingItemPatches, SoundPatches,
-            BroadcastPacketPatch, EventPreventionPatch, ArmorEquipEventPatch, BossBarOriginPatch,
+            BroadcastPacketPatch, EventPreventionPatch, BossBarOriginPatch,
             FakePlayerLastHurtPatch, BlockBehaviorPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
             ItemStackDataComponentsPatch, EnchantmentPatches, RepairPatches, BlockMigrationPatches,
             TripwireLogicPatch, FluidFlowPatch, RegistryEventsPatch, DyeablePatches, EarlyBlockPlaceEventPatch,
-            DontCloseAddonClassLoadersPatch
+            DontCloseAddonClassLoadersPatch, RegistryInstantBindPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     

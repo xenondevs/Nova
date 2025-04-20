@@ -4,9 +4,9 @@ import io.leangen.geantyref.GenericTypeReflector
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.util.EnumLookup
+import xyz.xenondevs.nova.util.data.geantyrefTypeTokenOf
 import java.lang.reflect.Type
 import java.util.function.Predicate
-import kotlin.Enum
 
 /**
  * An alternative enum serializer that lists available entries on failure.

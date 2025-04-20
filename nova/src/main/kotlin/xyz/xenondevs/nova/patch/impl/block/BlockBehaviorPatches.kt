@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.InsideBlockEffectApplier
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -86,7 +87,8 @@ private val BLOCK_BEHAVIOR_ENTITY_INSIDE = BLOCK_BEHAVIOR_LOOKUP.findVirtual(
         BlockState::class.java,
         Level::class.java,
         BlockPos::class.java,
-        Entity::class.java
+        Entity::class.java,
+        InsideBlockEffectApplier::class.java
     )
 )
 
@@ -171,7 +173,7 @@ internal object BlockBehaviorPatches : MultiTransformer(BlockStateBase::class, S
     }
     
     @JvmStatic
-    fun entityInside(thisRef: BlockStateBase, level: Level, pos: BlockPos, entity: Entity) {
+    fun entityInside(thisRef: BlockStateBase, level: Level, pos: BlockPos, entity: Entity, effectApplier: InsideBlockEffectApplier) {
         val novaPos = pos.toNovaPos(level.world)
         val novaState = WorldDataManager.getBlockState(novaPos)
         if (novaState != null) {
@@ -181,7 +183,7 @@ internal object BlockBehaviorPatches : MultiTransformer(BlockStateBase::class, S
                 LOGGER.error("Failed to handle entity inside for $novaState at $novaPos", e)
             }
         } else {
-            BLOCK_BEHAVIOR_ENTITY_INSIDE.invoke(thisRef.block, thisRef, level, pos, entity)
+            BLOCK_BEHAVIOR_ENTITY_INSIDE.invoke(thisRef.block, thisRef, level, pos, entity, effectApplier)
         }
     }
     

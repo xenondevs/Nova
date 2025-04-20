@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.resources.builder.layout.item
 
+import io.papermc.paper.datacomponent.DataComponentType
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
@@ -63,6 +64,11 @@ sealed class ConditionItemModelProperty(internal val property: ItemModel.Conditi
         private val component: Key,
         private val ignoreDefault: Boolean = false
     ) : ConditionItemModelProperty(ItemModel.Condition.Property.HAS_COMPONENT) {
+        
+        constructor(
+            component: DataComponentType,
+            ignoreDefault: Boolean = false
+        ) : this(component.key(), ignoreDefault)
         
         override fun buildModel(onTrue: ItemModel, onFalse: ItemModel) =
             ItemModel.Condition(property, onTrue, onFalse, component = component, ignoreDefault = ignoreDefault)

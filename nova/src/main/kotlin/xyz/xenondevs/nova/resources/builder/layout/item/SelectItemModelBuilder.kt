@@ -2,7 +2,13 @@
 
 package xyz.xenondevs.nova.resources.builder.layout.item
 
+import com.mojang.serialization.JsonOps
+import io.papermc.paper.datacomponent.DataComponentType
+import io.papermc.paper.datacomponent.PaperDataComponentType
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import net.kyori.adventure.key.Key
+import net.minecraft.resources.RegistryOps
 import org.bukkit.entity.EntityType
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
@@ -12,6 +18,8 @@ import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
 import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
+import xyz.xenondevs.nova.serialization.kotlinx.googleToKotlinxJson
+import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.resources.builder.layout.item.ChargedType as ChargedTypeEnum
 import xyz.xenondevs.nova.resources.builder.layout.item.DisplayContext as DisplayContextEnum
 
@@ -46,7 +54,7 @@ class SelectCases<T, S : ModelSelectorScope> internal constructor(
      */
     operator fun set(values: List<T>, model: ItemModel) {
         cases += ItemModel.Select.Case(
-            values.map(property::toString),
+            values.map(property::toJson),
             model
         )
     }
@@ -56,7 +64,7 @@ class SelectCases<T, S : ModelSelectorScope> internal constructor(
      */
     operator fun set(values: List<T>, selectModel: S.() -> ModelBuilder) {
         cases += ItemModel.Select.Case(
-            values.map(property::toString),
+            values.map(property::toJson),
             ItemModel.Default(selectAndBuild(selectModel))
         )
     }
@@ -89,7 +97,7 @@ class SelectItemModelBuilder<T, S : ModelSelectorScope> internal constructor(
 
 sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.Property) {
     
-    internal abstract fun toString(value: T): String
+    internal abstract fun toJson(value: T): JsonElement
     
     internal open fun buildModel(
         cases: List<ItemModel.Select.Case>,
@@ -102,21 +110,52 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
      * Returns the main hand of the holding player.
      */
     object MainHand : SelectItemModelProperty<MainHandPosition>(ItemModel.Select.Property.MAIN_HAND) {
-        override fun toString(value: MainHandPosition) = value.name.lowercase()
+        override fun toJson(value: MainHandPosition) = JsonPrimitive(value.name.lowercase())
     }
     
     /**
      * Returns the [charge type][ChargedTypeEnum] stored in the `minecraft:charged_projectiles` component.
      */
     object ChargedType : SelectItemModelProperty<ChargedTypeEnum>(ItemModel.Select.Property.CHARGE_TYPE) {
-        override fun toString(value: ChargedTypeEnum) = value.name.lowercase()
+        override fun toJson(value: ChargedTypeEnum) = JsonPrimitive(value.name.lowercase())
+    }
+    
+    /**
+     * Returns the value of a component.
+     */
+    class Component<T : Any>(
+        private val type: DataComponentType.Valued<T>
+    ) : SelectItemModelProperty<T>(ItemModel.Select.Property.COMPONENT) {
+        
+        override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?): ItemModel.Select {
+            return ItemModel.Select(property, cases, fallback, component = type.key())
+        }
+        
+        override fun toJson(value: T): JsonElement {
+            return toJson<Any>(value)
+        }
+        
+        @Suppress("UNCHECKED_CAST")
+        private fun <NMS : Any> toJson(value: T): JsonElement {
+            type as PaperDataComponentType.ValuedImpl<T, NMS>
+            return googleToKotlinxJson(
+                PaperDataComponentType.bukkitToMinecraft<NMS>(type)
+                    .codecOrThrow()
+                    .encodeStart(
+                        RegistryOps.create(JsonOps.INSTANCE, REGISTRY_ACCESS),
+                        type.adapter.toVanilla(value)
+                    )
+                    .orThrow
+            )
+        }
+        
     }
     
     /**
      * Returns the value of `material` from the `minecraft:trim` component, if present.
      */
     object TrimMaterial : SelectItemModelProperty<Key>(ItemModel.Select.Property.TRIM_MATERIAL) {
-        override fun toString(value: Key) = value.asString()
+        override fun toJson(value: Key) = JsonPrimitive(value.asString())
     }
     
     /**
@@ -126,7 +165,7 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
         private val propertyName: String
     ) : SelectItemModelProperty<String>(ItemModel.Select.Property.BLOCK_STATE) {
         
-        override fun toString(value: String) = value
+        override fun toJson(value: String) = JsonPrimitive(value)
         
         override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?) =
             ItemModel.Select(
@@ -142,7 +181,7 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
      * Returns the [context][DisplayContextEnum] the item is rendered in.
      */
     object DisplayContext : SelectItemModelProperty<DisplayContextEnum>(ItemModel.Select.Property.DISPLAY_CONTEXT) {
-        override fun toString(value: DisplayContextEnum) = value.name.lowercase()
+        override fun toJson(value: DisplayContextEnum) = JsonPrimitive(value.name.lowercase())
     }
     
     /**
@@ -167,7 +206,7 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
         private val locale: String = ""
     ) : SelectItemModelProperty<String>(ItemModel.Select.Property.LOCAL_TIME) {
         
-        override fun toString(value: String) = value
+        override fun toJson(value: String) = JsonPrimitive(value)
         
         override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?) =
             ItemModel.Select(
@@ -185,14 +224,14 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
      * Returns the id of the dimension in context, if any.
      */
     object ContextDimension : SelectItemModelProperty<Key>(ItemModel.Select.Property.CONTEXT_DIMENSION) {
-        override fun toString(value: Key) = value.asString()
+        override fun toJson(value: Key) = JsonPrimitive(value.asString())
     }
     
     /**
      * Returns the holding entity type, if present.
      */
     object ContextEntityType : SelectItemModelProperty<EntityType>(ItemModel.Select.Property.CONTEXT_ENTITY_TYPE) {
-        override fun toString(value: EntityType) = value.key().asString()
+        override fun toJson(value: EntityType) = JsonPrimitive(value.key().asString())
     }
     
     /**
@@ -200,7 +239,7 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
      */
     open class CustomModelData(private val index: Int) : SelectItemModelProperty<String>(ItemModel.Select.Property.CUSTOM_MODEL_DATA) {
         
-        override fun toString(value: String) = value.toString()
+        override fun toJson(value: String) = JsonPrimitive(value.toString())
         
         override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?) =
             ItemModel.Select(

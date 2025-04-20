@@ -1,10 +1,7 @@
 package xyz.xenondevs.nova.patch.impl.item
 
-import net.minecraft.stats.Stats
 import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagKey
-import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.state.BlockState
@@ -22,7 +19,6 @@ import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
-import xyz.xenondevs.nova.world.item.behavior.Damageable
 import xyz.xenondevs.nova.world.item.behavior.Tool
 
 private val ITEM_STACK_IS_TAG = ReflectionUtils.getMethod(ItemStack::class, "is", TagKey::class)
@@ -33,7 +29,6 @@ internal object ToolPatches : MultiTransformer(CraftBlock::class, Player::class,
     override fun transform() {
         transformCraftBlockIsPreferredTool()
         transformPlayerAttack()
-        transformItemStackHurtEnemy()
     }
     
     /**
@@ -76,47 +71,6 @@ internal object ToolPatches : MultiTransformer(CraftBlock::class, Player::class,
             return novaItem.getBehaviorOrNull<Tool>()?.canSweepAttack == true
         } else {
             return itemStack.`is`(ItemTags.SWORDS)
-        }
-    }
-    
-    /**
-     * Transforms ItemStack#hurtEnemy and ItemStack#postHurtEnemy to implement item damage on entity attack.
-     */
-    private fun transformItemStackHurtEnemy() {
-        // hurtEnemy needs to return true, otherwise postHurtEnemy is not called
-        VirtualClassPath[ItemStack::hurtEnemy].delegateStatic(::hurtEnemy)
-        VirtualClassPath[ItemStack::postHurtEnemy].delegateStatic(::postHurtEnemy)
-    }
-    
-    @JvmStatic
-    fun hurtEnemy(itemStack: ItemStack, enemy: LivingEntity, attacker: LivingEntity): Boolean {
-        val novaItem = itemStack.novaItem
-        val isWeapon = if (novaItem != null) {
-            val damageable = novaItem.getBehaviorOrNull<Damageable>()
-                ?: return false
-            damageable.itemDamageOnAttackEntity > 0
-        } else {
-            itemStack.item.hurtEnemy(itemStack, enemy, attacker)
-        }
-        
-        if (isWeapon && attacker is Player) {
-            attacker.awardStat(Stats.ITEM_USED.get(itemStack.item))
-        }
-        
-        return isWeapon
-    }
-    
-    @JvmStatic 
-    fun postHurtEnemy(itemStack: ItemStack, enemy: LivingEntity, attacker: LivingEntity) {
-        val novaItem = itemStack.novaItem
-        
-        val damage: Int
-        if (novaItem != null) {
-            val damageable = novaItem.getBehaviorOrNull<Damageable>() ?: return
-            damage = damageable.itemDamageOnAttackEntity
-            itemStack.hurtAndBreak(damage, attacker, EquipmentSlot.MAINHAND)
-        } else {
-            itemStack.item.postHurtEnemy(itemStack, enemy, attacker)
         }
     }
     

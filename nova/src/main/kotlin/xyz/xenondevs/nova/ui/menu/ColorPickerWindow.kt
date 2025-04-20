@@ -3,9 +3,9 @@ package xyz.xenondevs.nova.ui.menu
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
+import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.AbstractItem
-import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.ui.menu.item.AioNumberItem
@@ -42,7 +42,7 @@ class ColorPickerWindow(
             updateColorPreview()
         }
     
-    private val gui = Gui.normal()
+    private val gui = Gui.builder()
         .setStructure(
             "< . . . p . . . .",
             ". . . . . . . . .",
@@ -64,11 +64,10 @@ class ColorPickerWindow(
     }
     
     fun openWindow(player: Player) {
-        Window.single {
-            it.setViewer(player)
-            it.setTitle(DefaultGuiTextures.COLOR_PICKER.getTitle("menu.nova.color_picker"))
-            it.setGui(gui)
-        }.open()
+        Window.builder()
+            .setTitle(DefaultGuiTextures.COLOR_PICKER.getTitle("menu.nova.color_picker"))
+            .setUpperGui(gui)
+            .open(player)
     }
     
 }

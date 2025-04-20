@@ -14,6 +14,7 @@ import net.minecraft.world.item.crafting.SmithingRecipeInput
 import net.minecraft.world.item.crafting.SmithingTransformRecipe
 import net.minecraft.world.item.crafting.SmokingRecipe
 import net.minecraft.world.item.crafting.StonecutterRecipe
+import net.minecraft.world.item.crafting.TransmuteResult
 import net.minecraft.world.level.Level
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.RecipeChoice
@@ -227,9 +228,9 @@ internal class NovaStonecutterRecipe(private val bukkitRecipe: BukkitStonecuttin
 
 internal class NovaSmithingTransformRecipe(private val bukkitRecipe: BukkitSmithingTransformRecipe) : SmithingTransformRecipe(
     Optional.of(bukkitRecipe.template.toNmsIngredient()),
-    Optional.of(bukkitRecipe.base.toNmsIngredient()),
+    bukkitRecipe.base.toNmsIngredient(),
     Optional.of(bukkitRecipe.addition.toNmsIngredient()),
-    bukkitRecipe.result.unwrap().copy()
+    TransmuteResult(bukkitRecipe.result.unwrap().itemHolder, bukkitRecipe.result.amount, bukkitRecipe.result.unwrap().componentsPatch)
 ) {
     
     private val templateChoice = bukkitRecipe.template

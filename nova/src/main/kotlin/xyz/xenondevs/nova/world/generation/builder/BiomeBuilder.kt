@@ -43,7 +43,6 @@ import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.MOB_SPAWN_SETTINGS_
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.FeatureType
 import java.awt.Color
-import java.util.*
 
 /**
  * Builder for [Biomes][Biome].
@@ -552,17 +551,10 @@ class MobSpawnSettingsBuilder internal constructor() {
     
     /**
      * Adds a [SpawnerData] to the `spawners` setting of the biome's mob spawn settings by creating a new [SpawnerData]
-     * instance out of the given [entityType], [weight], [minGroupSize] and [maxGroupSize].
+     * instance out of the given [entityType], [minCount] and [maxCount].
      */
-    fun addSpawn(mobCategory: MobCategory, entityType: EntityType<*>, weight: Int, minGroupSize: Int, maxGroupSize: Int) =
-        addSpawn(mobCategory, SpawnerData(entityType, weight, minGroupSize, maxGroupSize))
-    
-    /**
-     * Adds a [SpawnerData] to the `spawners` setting of the biome's mob spawn settings by creating a new [SpawnerData]
-     * instance out of the given [entityType], [minGroupSize] and [maxGroupSize]. The `weight` is set to `1`.
-     */
-    fun addSpawn(mobCategory: MobCategory, entityType: EntityType<*>, minGroupSize: Int = 2, maxGroupSize: Int = 4) =
-        addSpawn(mobCategory, SpawnerData(entityType, 1, minGroupSize, maxGroupSize))
+    fun addSpawn(mobCategory: MobCategory, entityType: EntityType<*>, minCount: Int = 2, maxCount: Int = 4) =
+        addSpawn(mobCategory, SpawnerData(entityType, minCount, maxCount))
     
     /**
      * Sets the spawn cost for [entityType] to the given [spawnCost].

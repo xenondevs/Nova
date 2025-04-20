@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.util.item
 
+import io.papermc.paper.datacomponent.DataComponentTypes
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
 import net.minecraft.tags.BlockTags
@@ -16,7 +17,6 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffectType
-import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.nova.util.eyeInWater
 import xyz.xenondevs.nova.util.hardness
 import xyz.xenondevs.nova.util.nmsState
@@ -30,7 +30,6 @@ import xyz.xenondevs.nova.world.item.behavior.Tool
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
-import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import xyz.xenondevs.nova.world.pos
 import net.minecraft.world.item.component.Tool as MojangTool
 import net.minecraft.world.level.block.Block as MojangBlock
@@ -60,7 +59,7 @@ object ToolUtils {
     }
     
     //<editor-fold desc="tool damage", defaultstate="collapsed">
-    @Suppress("DEPRECATION")
+    @Suppress("DEPRECATION", "UnstableApiUsage", "NullableBooleanElvis")
     internal fun calculateDamage(
         player: Player,
         block: Block,
@@ -69,11 +68,8 @@ object ToolUtils {
         when (player.gameMode) {
             GameMode.CREATIVE -> {
                 val canBreakBlocks = tool?.novaItem?.getBehaviorOrNull<Tool>()?.canBreakBlocksInCreative
-                    ?: ToolCategory.ofItem(tool)
-                        .filterIsInstance<VanillaToolCategory>()
-                        .takeUnlessEmpty()
-                        ?.any { it.canBreakBlocksInCreative }
-                    ?: (tool?.type != Material.DEBUG_STICK && tool?.type != Material.TRIDENT)
+                    ?: tool?.getData(DataComponentTypes.TOOL)?.canDestroyBlocksInCreative()
+                    ?: true 
                 
                 return if (canBreakBlocks) 1.0 else 0.0
             }

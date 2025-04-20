@@ -10,7 +10,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.flatMapCollection
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.invui.item.AbstractItem
-import xyz.xenondevs.invui.item.Click
+import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.addon.AddonBootstrapper

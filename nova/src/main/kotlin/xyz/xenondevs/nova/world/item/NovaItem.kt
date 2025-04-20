@@ -2,10 +2,10 @@
 
 package xyz.xenondevs.nova.world.item
 
+import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
-import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
@@ -22,8 +22,10 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.CommentedConfigurationNode
+import xyz.xenondevs.cbf.CBF
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.invui.gui.Gui
@@ -47,8 +49,6 @@ import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorFactory
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.world.item.logic.PacketItems
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.world.player.equipment.ArmorEquipEvent
-import kotlin.Unit
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -88,14 +88,13 @@ class NovaItem internal constructor(
      * The [ItemBehaviors][ItemBehavior] of this [NovaItem].
      */
     val behaviors: List<ItemBehavior> = buildList {
-        val behaviors = behaviorHolders.map { holder ->
+        add(DefaultBehavior.create(this@NovaItem))
+        for (holder in behaviorHolders) {
             when (holder) {
-                is ItemBehavior -> holder
-                is ItemBehaviorFactory<*> -> holder.create(this@NovaItem)
+                is ItemBehavior -> add(holder)
+                is ItemBehaviorFactory<*> -> add(holder.create(this@NovaItem))
             }
         }
-        add(DefaultBehavior.create(this@NovaItem, behaviors))
-        addAll(behaviors)
     }
     
     /**
@@ -127,18 +126,32 @@ class NovaItem internal constructor(
     /**
      * The base data components of this [NovaItem].
      */
-    internal val baseDataComponents: DataComponentMap by combinedProvider(
-        behaviors.map(ItemBehavior::baseDataComponents),
-        ItemUtils::mergeDataComponentMaps
-    )
+    val baseDataComponents: DataComponentMap by combinedProvider(
+        behaviors.map(ItemBehavior::baseDataComponents)
+    ) { maps -> DataComponentMap(ItemUtils.mergeDataComponentMaps(maps.map(DataComponentMap::handle))) }
     
     /**
      * The default components patch applied to all [ItemStacks][ItemStack] of this [NovaItem].
      */
     internal val defaultPatch: DataComponentPatch by combinedProvider(
-        behaviors.map(ItemBehavior::defaultPatch),
-        ItemUtils::mergeDataComponentPatches
-    )
+        behaviors.map(ItemBehavior::defaultCompound)
+    ) { defaultCompounds ->
+        val defaultCompound = NamespacedCompound()
+        for (defaultCompound in defaultCompounds) {
+            defaultCompound.putAll(defaultCompound)
+        }
+        
+        DataComponentPatch.builder()
+            .set(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag().also { compoundTag ->
+                compoundTag.put("nova", CompoundTag().also {
+                    it.putString("id", id.toString())
+                })
+                if (defaultCompound.isNotEmpty()) {
+                    compoundTag.putByteArray("nova_cbf", CBF.write(defaultCompound))
+                }
+            }))
+            .build()
+    }
     
     /**
      * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in server-side format.
@@ -240,8 +253,8 @@ class NovaItem internal constructor(
         behaviors.forEach { it.handleBreak(player, itemStack, event) }
     }
     
-    internal fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorEquipEvent) {
-        behaviors.forEach { it.handleEquip(player, itemStack, equipped, event) }
+    internal fun handleEquip(player: Player, itemStack: ItemStack, slot: EquipmentSlot, equipped: Boolean, event: EntityEquipmentChangedEvent) {
+        behaviors.forEach { it.handleEquip(player, itemStack, slot, equipped, event) }
     }
     
     internal fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {

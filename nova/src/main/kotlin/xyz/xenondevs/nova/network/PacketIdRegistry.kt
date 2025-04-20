@@ -3,11 +3,8 @@
 package xyz.xenondevs.nova.network
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap
-import net.minecraft.network.PacketListener
-import net.minecraft.network.ProtocolInfo
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.IdDispatchCodec
-import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.PacketType
 import net.minecraft.network.protocol.common.CommonPacketTypes
 import net.minecraft.network.protocol.cookie.CookiePacketTypes
@@ -23,8 +20,8 @@ private val ID_DISPATCH_CODEC_TO_ID = MethodHandles
 
 internal object PacketIdRegistry {
     
-    private val CLIENTBOUND_PACKET_IDS = getPacketIdMap(GameProtocols.CLIENTBOUND_TEMPLATE)
-    private val SERVERBOUND_PACKET_IDS = getPacketIdMap(GameProtocols.SERVERBOUND_TEMPLATE)
+    private val CLIENTBOUND_PACKET_IDS: Object2IntMap<PacketType<*>> = getClientboundPacketIdMap()
+    private val SERVERBOUND_PACKET_IDS: Object2IntMap<PacketType<*>> = getServerboundPacketIdMap()
     
     val PLAY_SERVERBOUND_ACCEPT_TELEPORTATION = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_ACCEPT_TELEPORTATION)
     val PLAY_SERVERBOUND_BLOCK_ENTITY_TAG_QUERY = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_BLOCK_ENTITY_TAG_QUERY)
@@ -83,14 +80,15 @@ internal object PacketIdRegistry {
     val PLAY_SERVERBOUND_SET_CREATIVE_MODE_SLOT = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_SET_CREATIVE_MODE_SLOT)
     val PLAY_SERVERBOUND_SET_JIGSAW_BLOCK = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_SET_JIGSAW_BLOCK)
     val PLAY_SERVERBOUND_SET_STRUCTURE_BLOCK = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_SET_STRUCTURE_BLOCK)
+    val PLAY_SERVERBOUND_SET_TEST_BLOCK = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_SET_TEST_BLOCK)
     val PLAY_SERVERBOUND_SIGN_UPDATE = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_SIGN_UPDATE)
     val PLAY_SERVERBOUND_SWING = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_SWING)
     val PLAY_SERVERBOUND_TELEPORT_TO_ENTITY = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_TELEPORT_TO_ENTITY)
+    val PLAY_SERVERBOUND_TEST_INSTANCE_BLOCK_ACTION = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_TEST_INSTANCE_BLOCK_ACTION)
     val PLAY_SERVERBOUND_USE_ITEM_ON = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_USE_ITEM_ON)
     val PLAY_SERVERBOUND_USE_ITEM = SERVERBOUND_PACKET_IDS.getInt(GamePacketTypes.SERVERBOUND_USE_ITEM)
     val PLAY_CLIENTBOUND_BUNDLE = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_BUNDLE)
     val PLAY_CLIENTBOUND_ADD_ENTITY = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_ADD_ENTITY)
-    val PLAY_CLIENTBOUND_ADD_EXPERIENCE_ORB = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_ADD_EXPERIENCE_ORB)
     val PLAY_CLIENTBOUND_ANIMATE = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_ANIMATE)
     val PLAY_CLIENTBOUND_AWARD_STATS = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_AWARD_STATS)
     val PLAY_CLIENTBOUND_BLOCK_CHANGED_ACK = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_BLOCK_CHANGED_ACK)
@@ -208,6 +206,7 @@ internal object PacketIdRegistry {
     val PLAY_CLIENTBOUND_TAG_QUERY = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_TAG_QUERY)
     val PLAY_CLIENTBOUND_TAKE_ITEM_ENTITY = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_TAKE_ITEM_ENTITY)
     val PLAY_CLIENTBOUND_TELEPORT_ENTITY = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_TELEPORT_ENTITY)
+    val PLAY_CLIENTBOUND_TEST_INSTANCE_BLOCK_STATUS = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_TEST_INSTANCE_BLOCK_STATUS)
     val PLAY_CLIENTBOUND_TICKING_STATE = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_TICKING_STATE)
     val PLAY_CLIENTBOUND_TICKING_STEP = CLIENTBOUND_PACKET_IDS.getInt(GamePacketTypes.CLIENTBOUND_TICKING_STEP)
     val PLAY_CLIENTBOUND_TRANSFER = CLIENTBOUND_PACKET_IDS.getInt(CommonPacketTypes.CLIENTBOUND_TRANSFER)
@@ -221,11 +220,19 @@ internal object PacketIdRegistry {
     val PLAY_CLIENTBOUND_SERVER_LINKS = CLIENTBOUND_PACKET_IDS.getInt(CommonPacketTypes.CLIENTBOUND_SERVER_LINKS)
     
     @Suppress("UNCHECKED_CAST")
-    private fun <L : PacketListener, P : Packet<in L>> getPacketIdMap(
-        template: ProtocolInfo.Unbound<L, RegistryFriendlyByteBuf>
-    ): Object2IntMap<PacketType<P>> {
-        val codec = template.bind(RegistryFriendlyByteBuf.decorator(REGISTRY_ACCESS)).codec()
-        return ID_DISPATCH_CODEC_TO_ID.invoke(codec) as Object2IntMap<PacketType<P>>
+    private fun getServerboundPacketIdMap(): Object2IntMap<PacketType<*>> {
+        val ctx = object: GameProtocols.Context {
+            override fun hasInfiniteMaterials() = false
+        }
+        
+        val codec = GameProtocols.SERVERBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(REGISTRY_ACCESS), ctx).codec()
+        return ID_DISPATCH_CODEC_TO_ID.invoke(codec) as Object2IntMap<PacketType<*>>
+    }
+    
+    @Suppress("UNCHECKED_CAST")
+    private fun getClientboundPacketIdMap(): Object2IntMap<PacketType<*>> {
+        val codec = GameProtocols.CLIENTBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(REGISTRY_ACCESS)).codec()
+        return ID_DISPATCH_CODEC_TO_ID.invoke(codec) as Object2IntMap<PacketType<*>>
     }
     
 }

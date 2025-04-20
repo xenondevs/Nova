@@ -1,13 +1,17 @@
 @file:Suppress("unused", "CanBeParameter")
+@file:UseSerializers(KeySerializer::class)
 
 package xyz.xenondevs.nova.resources.builder.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.json.JsonElement
 import net.kyori.adventure.key.Key
 import org.bukkit.DyeColor
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.LowercaseDyeColorSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ValueOrListSerializer
 
@@ -127,27 +131,23 @@ sealed interface ItemModel {
         val pattern: String? = null,
         
         // custom_model_data
-        val index: Int = 0
-    
+        val index: Int = 0,
+        
+        // component
+        val component: Key? = null
     ) : ItemModel {
         
         @Serializable
         enum class Property {
             
-            @SerialName("minecraft:main_hand")
-            MAIN_HAND,
+            @SerialName("minecraft:block_state")
+            BLOCK_STATE,
             
             @SerialName("minecraft:charge_type")
             CHARGE_TYPE,
             
-            @SerialName("minecraft:trim_material")
-            TRIM_MATERIAL,
-            
-            @SerialName("minecraft:block_state")
-            BLOCK_STATE,
-            
-            @SerialName("minecraft:display_context")
-            DISPLAY_CONTEXT,
+            @SerialName("minecraft:component")
+            COMPONENT,
             
             @SerialName("minecraft:context_dimension")
             CONTEXT_DIMENSION,
@@ -155,18 +155,27 @@ sealed interface ItemModel {
             @SerialName("minecraft:context_entity_type")
             CONTEXT_ENTITY_TYPE,
             
+            @SerialName("minecraft:custom_model_data")
+            CUSTOM_MODEL_DATA,
+            
+            @SerialName("minecraft:display_context")
+            DISPLAY_CONTEXT,
+            
             @SerialName("minecraft:local_time")
             LOCAL_TIME,
             
-            @SerialName("minecraft:custom_model_data")
-            CUSTOM_MODEL_DATA
+            @SerialName("minecraft:main_hand")
+            MAIN_HAND,
+            
+            @SerialName("minecraft:trim_material")
+            TRIM_MATERIAL
             
         }
         
         @Serializable
         data class Case(
             @Serializable(with = ValueOrListSerializer::class)
-            val `when`: List<String>,
+            val `when`: List<JsonElement>,
             val model: ItemModel
         )
         

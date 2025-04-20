@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
+import xyz.xenondevs.nova.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 
@@ -77,6 +78,7 @@ class ItemModelContent internal constructor(val builder: ResourcePackBuilder) : 
     }
     
     @PackTask(
+        stage = BuildStage.POST_WORLD, // SelectItemModelProperty.Component requires registry access for serialization
         runBefore = [
             "ModelContent#write",
             "ItemModelContent#write"

@@ -6,6 +6,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.Structure
@@ -13,7 +14,6 @@ import xyz.xenondevs.invui.gui.TabGui
 import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.AbstractPagedGuiBoundItem
 import xyz.xenondevs.invui.item.AbstractTabGuiBoundItem
-import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
@@ -97,7 +97,7 @@ private class RecipesWindow(
             .map { it.key to it.value }
             .sortedBy { it.first }
         
-        mainGui = TabGui.normal()
+        mainGui = TabGui.builder()
             .setStructure(
                 "b . . . . . . . .",
                 "x x x x x x x x x",
@@ -124,16 +124,18 @@ private class RecipesWindow(
     
     override fun show() {
         ItemMenu.addToHistory(viewerUUID, this)
-        window = Window.single {
-            it.setViewer(player)
-            it.setTitle(getCurrentTitle())
-            it.setGui(mainGui)
-        }.apply { open() }
+        val window = Window.builder()
+            .setViewer(player)
+            .setTitle(getCurrentTitle())
+            .setUpperGui(mainGui)
+            .build()
+        window.open()
+        this.window = window
     }
     
     private fun getCurrentTitle(): Component {
         val currentTab = mainGui.tabs[mainGui.tab] as PagedGui<*>
-        val pageNumberString = "${currentTab.page + 1} / ${currentTab.pageAmount}"
+        val pageNumberString = "${currentTab.page + 1} / ${currentTab.pageCount}"
         val pageNumberComponent = Component.text(pageNumberString, NamedTextColor.WHITE).font("nova:recipes_numbers")
         return Component.text()
             .append(currentType.texture.component)
@@ -188,13 +190,13 @@ private class RecipesWindow(
     private inner class PageBackItem : AbstractPagedGuiBoundItem() {
         
         override fun getItemProvider(player: Player) =
-            (if (gui.hasPreviousPage()) DefaultGuiItems.TP_ARROW_LEFT_BTN_ON else DefaultGuiItems.TP_ARROW_LEFT_BTN_OFF)
+            (if (gui.page > 0) DefaultGuiItems.TP_ARROW_LEFT_BTN_ON else DefaultGuiItems.TP_ARROW_LEFT_BTN_OFF)
                 .clientsideProvider
         
         override fun handleClick(clickType: ClickType, player: Player, click: Click) {
-            if (clickType == ClickType.LEFT && gui.hasPreviousPage()) {
+            if (clickType == ClickType.LEFT && gui.page > 0) {
                 player.playClickSound()
-                gui.goBack()
+                gui.page--
                 updateTitle()
             }
         }
@@ -204,13 +206,13 @@ private class RecipesWindow(
     private inner class PageForwardItem : AbstractPagedGuiBoundItem() {
         
         override fun getItemProvider(player: Player) =
-            (if (gui.hasNextPage()) DefaultGuiItems.TP_ARROW_RIGHT_BTN_ON else DefaultGuiItems.TP_ARROW_RIGHT_BTN_OFF)
+            (if (gui.page + 1 < gui.pageCount) DefaultGuiItems.TP_ARROW_RIGHT_BTN_ON else DefaultGuiItems.TP_ARROW_RIGHT_BTN_OFF)
                 .clientsideProvider
         
         override fun handleClick(clickType: ClickType, player: Player, click: Click) {
-            if (clickType == ClickType.LEFT && gui.hasNextPage()) {
+            if (clickType == ClickType.LEFT && gui.page + 1 < gui.pageCount) {
                 player.playClickSound()
-                gui.goForward()
+                gui.page++
                 updateTitle()
             }
         }
@@ -218,7 +220,7 @@ private class RecipesWindow(
     }
     
     private fun createPagedRecipesGui(recipes: List<Gui>): Gui =
-        PagedGui.guis()
+        PagedGui.guisBuilder()
             .setStructure(recipesGuiStructure)
             .setContent(recipes)
             .build()

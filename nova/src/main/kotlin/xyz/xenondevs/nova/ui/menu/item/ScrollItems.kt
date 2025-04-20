@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.ui.menu.item
 
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
+import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.item.AbstractScrollGuiBoundItem
-import xyz.xenondevs.invui.item.Click
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
@@ -18,12 +18,12 @@ class ScrollUpItem(
 ) : AbstractScrollGuiBoundItem() {
     
     override fun getItemProvider(player: Player): ItemProvider =
-        if (gui.canScroll(-1)) on else off
+        if (gui.line > 0) on else off
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) {
-        if (clickType == ClickType.LEFT && gui.canScroll(-1)) {
+        if (clickType == ClickType.LEFT && gui.line > 0) {
             player.playClickSound()
-            gui.scroll(-1)
+            gui.line--
         }
     }
     
@@ -38,12 +38,12 @@ class ScrollDownItem(
 ) : AbstractScrollGuiBoundItem() {
     
     override fun getItemProvider(player: Player): ItemProvider =
-        if (gui.canScroll(1)) on else off
+        if (gui.line < gui.maxLine) on else off
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) {
-        if (clickType == ClickType.LEFT && gui.canScroll(1)) {
+        if (clickType == ClickType.LEFT && gui.line < gui.maxLine) {
             player.playClickSound()
-            gui.scroll(1)
+            gui.line++
         }
     }
     
@@ -58,12 +58,12 @@ class ScrollLeftItem(
 ) : AbstractScrollGuiBoundItem() {
     
     override fun getItemProvider(player: Player): ItemProvider =
-        if (gui.canScroll(-1)) on else off
+        if (gui.line > 0) on else off
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) {
-        if (clickType == ClickType.LEFT && gui.canScroll(-1)) {
+        if (clickType == ClickType.LEFT && gui.line > 0) {
             player.playClickSound()
-            gui.scroll(-1)
+            gui.line--
         }
     }
     
@@ -78,12 +78,12 @@ class ScrollRightItem(
 ) : AbstractScrollGuiBoundItem() {
     
     override fun getItemProvider(player: Player): ItemProvider =
-        if (gui.canScroll(1)) on else off
+        if (gui.line < gui.maxLine) on else off
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) {
-        if (clickType == ClickType.LEFT && gui.canScroll(1)) {
+        if (clickType == ClickType.LEFT && gui.line < gui.maxLine) {
             player.playClickSound()
-            gui.scroll(1)
+            gui.line++
         }
     }
     

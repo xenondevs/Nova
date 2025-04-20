@@ -133,7 +133,7 @@ internal object BlockBreaking : Listener, PacketListener {
             Action.LEFT_CLICK_BLOCK,
             pos.nmsPos,
             direction,
-            serverPlayer.inventory.getSelected(),
+            serverPlayer.inventory.selectedItem,
             InteractionHand.MAIN_HAND
         )
         if (event.useInteractedBlock() == Event.Result.DENY) {

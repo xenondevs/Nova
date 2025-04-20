@@ -1,14 +1,14 @@
 package xyz.xenondevs.nova.world.item.behavior
 
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.UseCooldown.useCooldown
 import net.kyori.adventure.key.Key
-import net.minecraft.core.component.DataComponentMap
-import net.minecraft.core.component.DataComponents
-import net.minecraft.world.item.component.UseCooldown
+import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.nova.config.entryOrElse
-import xyz.xenondevs.nova.util.toResourceLocation
-import java.util.Optional
+import xyz.xenondevs.nova.world.item.DataComponentMap
+import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 
 /**
  * Creates a factory for [Cooldown] behaviors using the given values, if not specified otherwise in the item's config.
@@ -38,16 +38,28 @@ fun Cooldown(
  * @param group The cooldown group.
  */
 class Cooldown(
-    val cooldown: Provider<Int>,
-    val group: Provider<Key>
+    cooldown: Provider<Int>,
+    group: Provider<Key>
 ) : ItemBehavior {
     
-    override val baseDataComponents = combinedProvider(
-        cooldown, group
-    ) { cooldown, group ->
-        DataComponentMap.builder()
-            .set(DataComponents.USE_COOLDOWN, UseCooldown(cooldown / 20f, Optional.of(group.toResourceLocation())))
-            .build()
+    /**
+     * The cooldown in ticks.
+     */
+    val cooldown: Int by cooldown
+    
+    /**
+     * The cooldown group.
+     */
+    val group: Key by group
+    
+    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider { 
+        this[DataComponentTypes.USE_COOLDOWN] = combinedProvider(cooldown, group) { cooldown, group ->
+            useCooldown(cooldown / 20f).cooldownGroup(group).build()
+        }
+    }
+    
+    override fun toString(itemStack: ItemStack): String {
+        return "Cooldown(cooldown=$cooldown, group=$group)"
     }
     
 }

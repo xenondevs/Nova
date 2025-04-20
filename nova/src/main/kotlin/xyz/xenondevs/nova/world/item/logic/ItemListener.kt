@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.item.logic
 
+import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -33,7 +34,6 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.world.player.equipment.ArmorEquipEvent
 import java.util.*
 
 @InternalInit(
@@ -106,13 +106,19 @@ internal object ItemListener : Listener, PacketListener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private fun handleEquip(event: ArmorEquipEvent) {
-        val player = event.player
-        val unequippedItem = event.previous
-        val equippedItem = event.now
+    private fun handleEquip(event: EntityEquipmentChangedEvent) {
+        val player = event.entity as? Player
+            ?: return
         
-        unequippedItem?.novaItem?.handleEquip(player, unequippedItem, false, event)
-        equippedItem?.novaItem?.handleEquip(player, equippedItem, true, event)
+        for ((slot, change) in event.equipmentChanges) {
+            val oldNovaItem  = change.oldItem().novaItem
+            val newNovaItem = change.newItem().novaItem
+            if (oldNovaItem == newNovaItem)
+                continue
+            
+            change.oldItem().novaItem?.handleEquip(player, change.oldItem(), slot, false, event)
+            change.newItem().novaItem?.handleEquip(player, change.newItem(), slot, true, event)
+        }
     }
     
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
