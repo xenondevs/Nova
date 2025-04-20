@@ -4,6 +4,8 @@ import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.data.EquipmentDefinition
 
+const val EMISSIVITY_MAP_DEPRECATION = "Emissivity maps do no longer work due to changes to core shaders and will likely be removed in a future version."
+
 internal sealed interface EquipmentLayout
 
 internal data class StaticEquipmentLayout(
