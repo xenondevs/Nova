@@ -10,7 +10,7 @@ kotlinx-coroutines = "1.10.2"
 ktor = "3.1.2"
 paper = "1.21.5-R0.1-SNAPSHOT"
 paperweight = "2.0.0-beta.16"
-xenondevs-commons = "1.29"
+xenondevs-commons = "1.30"
 
 [libraries]
 awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.31.21" }

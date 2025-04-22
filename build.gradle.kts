@@ -58,6 +58,10 @@ subprojects {
     }
 }
 
+loaderJar {
+    gameVersion = libs.versions.paper.get().substringBefore('-')
+}
+
 pluginPublish { 
     file = tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output }
     githubRepository = "xenondevs/Nova"
