@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.ui.waila.info.impl.RedstoneLampWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RepeaterWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RespawnAnchorWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.SeaPickleWailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.info.impl.TestBlockWailaInfoProvider
 import xyz.xenondevs.nova.util.set
 
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
@@ -48,6 +49,7 @@ private object DefaultWailaProviders {
         register("redstone_lamp", RedstoneLampWailaInfoProvider)
         register("brushable", BrushableWailaInfoProvider)
         register("hatchable", HatchableWailaInfoProvider)
+        register("test_block", TestBlockWailaInfoProvider)
         
         register("vanilla", VanillaWailaToolIconProvider)
     }
