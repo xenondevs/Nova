@@ -4,7 +4,16 @@ import io.papermc.paper.ServerBuildInfo
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.CraftServer
+import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.nova.util.ServerSoftware.*
+
+/**
+ * The game version of the server.
+ */
+val SERVER_VERSION: Version = run {
+    val versionPattern = Regex("""(1\.\d{1,2}(\.\d{1,2})?)""")
+    Version(versionPattern.find(ServerBuildInfo.buildInfo().minecraftVersionId())!!.groupValues[1])
+}
 
 object ServerUtils {
     

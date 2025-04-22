@@ -13,19 +13,20 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.plugin.java.JavaPlugin
+import xyz.xenondevs.commons.version.ClosedVersionRange
+import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.patch.Patcher
 import xyz.xenondevs.nova.serialization.cbf.CBFAdapters
-import xyz.xenondevs.nova.util.data.Version
-import xyz.xenondevs.nova.util.data.VersionRange
+import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 
-private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.5")..Version("1.21.5")
+private val REQUIRED_SERVER_VERSION: ClosedVersionRange = Version("1.21.5")..Version("1.21.5")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 internal val PREVIOUS_NOVA_VERSION: Version? = PermanentStorage.retrieveOrNull<Version>("last_version")
 internal val DATA_FOLDER = Path("plugins", "Nova")
@@ -58,7 +59,7 @@ internal class NovaBootstrapper : PluginBootstrap {
             LOGGER.warn("Running in dev mode! Never use this on a production server!")
         
         // prevent execution on unsupported minecraft versions
-        if (Version.SERVER_VERSION !in REQUIRED_SERVER_VERSION) {
+        if (SERVER_VERSION !in REQUIRED_SERVER_VERSION) {
             throw Exception("Nova is not compatible with this version of Minecraft.\n" +
                 "Nova v$NOVA_VERSION only runs on $REQUIRED_SERVER_VERSION.")
         }

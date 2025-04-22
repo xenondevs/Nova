@@ -8,8 +8,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import xyz.xenondevs.commons.gson.getArray
 import xyz.xenondevs.commons.gson.getString
+import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.nova.HTTP_CLIENT
-import xyz.xenondevs.nova.util.data.Version
 
 interface ProjectDistributor {
     

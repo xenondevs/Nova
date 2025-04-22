@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.spongepowered.configurate.ConfigurationNode
+import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_VERSION
 import xyz.xenondevs.nova.addon.Addon
@@ -24,7 +25,6 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.AsyncExecutor
-import xyz.xenondevs.nova.util.data.Version
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.unregisterEvents
 

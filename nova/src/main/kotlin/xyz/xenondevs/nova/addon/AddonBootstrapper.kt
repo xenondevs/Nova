@@ -8,8 +8,9 @@ import io.papermc.paper.plugin.entrypoint.LaunchEntryPointHandler
 import org.bukkit.plugin.java.JavaPlugin
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
+import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.nova.BOOTSTRAPPER
-import xyz.xenondevs.nova.util.data.Version
+import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.useZip
 import kotlin.io.path.Path
 import kotlin.io.path.notExists
@@ -87,9 +88,9 @@ internal object AddonBootstrapper {
         val apiVersion = context.configuration.apiVersion?.let(::Version)
             ?: throw IllegalArgumentException("Missing api version")
         
-        if (Version.SERVER_VERSION.compareTo(apiVersion, 2) != 0)
+        if (SERVER_VERSION.compareTo(apiVersion, 2) != 0)
             throw IllegalArgumentException("Cannot load Nova addon ${context.configuration.displayName} as it requires Minecraft version " +
-                "$apiVersion, but the server is running Minecraft version ${Version.SERVER_VERSION}!")
+                "$apiVersion, but the server is running Minecraft version $SERVER_VERSION!")
     }
     
 }

@@ -16,6 +16,7 @@ import xyz.xenondevs.commons.provider.flattenIterables
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.DATA_FOLDER
@@ -51,7 +52,7 @@ import xyz.xenondevs.nova.resources.builder.task.model.BlockModelContent
 import xyz.xenondevs.nova.resources.builder.task.model.ItemModelContent
 import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
 import xyz.xenondevs.nova.serialization.json.GSON
-import xyz.xenondevs.nova.util.data.Version
+import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.util.data.writeJson
@@ -224,11 +225,11 @@ class ResourcePackBuilder internal constructor() {
         try {
             totalTime += measureTime {
                 // download minecraft assets if not present / outdated
-                if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("minecraftAssetsVersion") != Version.SERVER_VERSION) {
+                if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("minecraftAssetsVersion") != SERVER_VERSION) {
                     MCASSETS_DIR.toFile().deleteRecursively()
                     runBlocking {
                         val downloader = MinecraftAssetsDownloader(
-                            version = Version.SERVER_VERSION.toString(omitZeros = true),
+                            version = SERVER_VERSION.toString(omitZeros = true),
                             outputDirectory = MCASSETS_DIR.toFile(),
                             mode = EXTRACTION_MODE,
                             logger = LOGGER
@@ -242,7 +243,7 @@ class ResourcePackBuilder internal constructor() {
                                     append(" If your server can't access github.com in general, you can change \"minecraft_assets_source\" in the config to \"mojang\".")
                             }, ex)
                         }
-                        PermanentStorage.store("minecraftAssetsVersion", Version.SERVER_VERSION)
+                        PermanentStorage.store("minecraftAssetsVersion", SERVER_VERSION)
                     }
                 }
                 
