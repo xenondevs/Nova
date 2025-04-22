@@ -115,7 +115,6 @@ xyz.xenondevs.nova.world.model
 xyz.xenondevs.nova.world.player
 xyz.xenondevs.nova.world.player.ability
 xyz.xenondevs.nova.world.player.attachment
-xyz.xenondevs.nova.world.player.equipment
 xyz.xenondevs.nova.world.region
 module:nova-api
 xyz.xenondevs.nova.api
