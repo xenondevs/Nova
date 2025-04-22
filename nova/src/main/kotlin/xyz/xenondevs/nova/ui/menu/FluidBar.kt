@@ -34,7 +34,7 @@ private fun ItemBuilder.setFluidDisplayName(amount: Long, capacity: Long): ItemB
 /**
  * A multi-item gui component for displaying fluid levels.
  */
-class FluidBar @JvmOverloads constructor( // TODO: Remove @JvmOverloads in 0.19
+class FluidBar(
     height: Int,
     fluidHolder: FluidHolder,
     private val fluidContainer: NetworkedFluidContainer,

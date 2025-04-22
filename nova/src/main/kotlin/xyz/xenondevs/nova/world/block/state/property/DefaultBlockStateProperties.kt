@@ -107,7 +107,7 @@ object DefaultScopedBlockStateProperties {
         ) { ctx ->
             ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
                 ?.calculateYaw()
-                ?.let { BlockFaceUtils.toRotation(it) }
+                ?.let { BlockFaceUtils.toFace(it) }
                 ?.oppositeFace
                 ?: BlockFace.NORTH
         }

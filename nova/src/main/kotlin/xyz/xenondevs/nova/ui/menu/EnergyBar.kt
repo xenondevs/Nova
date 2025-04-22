@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.world.item.NovaItem
 /**
  * A multi-item gui component for displaying energy levels.
  */
-class EnergyBar @JvmOverloads constructor( // TODO: Remove @JvmOverloads in 0.19
+class EnergyBar(
     height: Int,
     private val energy: Provider<Long>,
     private val maxEnergy: Provider<Long>,

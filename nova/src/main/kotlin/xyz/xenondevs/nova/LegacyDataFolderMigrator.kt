@@ -5,9 +5,6 @@ import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.config.PermanentStorage
 import java.nio.file.FileVisitResult
 import java.nio.file.Path
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.mapKeys
 import kotlin.io.path.CopyActionResult
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.copyTo
@@ -26,7 +23,7 @@ import kotlin.io.path.relativeTo
 import kotlin.io.path.visitFileTree
 import kotlin.io.path.walk
 
-// TODO: Remove in 0.19
+// TODO: Remove in future version
 internal object LegacyDataFolderMigrator {
     
     private val PLUGINS_DIR = DATA_FOLDER.parent

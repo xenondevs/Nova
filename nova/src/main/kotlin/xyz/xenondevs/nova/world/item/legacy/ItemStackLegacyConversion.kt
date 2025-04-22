@@ -18,6 +18,7 @@ internal object ItemStackLegacyConversion {
     private val specializedConverters = HashMap<String, ArrayList<ItemStackLegacyConverter>>()
     private val genericConverters = ArrayList<ItemStackLegacyConverter>()
     
+    // TODO: remove legacy conversions in future version
     init {
         registerConverter(ItemStackNamespaceConverter(
             hashSetOf(
