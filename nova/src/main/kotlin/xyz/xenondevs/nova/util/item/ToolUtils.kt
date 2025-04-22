@@ -49,7 +49,7 @@ object ToolUtils {
         } else if (!(block as CraftBlock).nms.requiresCorrectToolForDrops()) return true
         
         val toolComponent = tool?.unwrap()?.get(DataComponents.TOOL)
-        if (toolComponent != null && novaBlock == null) {
+        if (tool?.novaItem?.hasBehavior<Tool>() != true && toolComponent != null && novaBlock == null) {
             // vanilla tool, vanilla block
             return toolComponent.isCorrectForDrops(block.nmsState)
         } else {
@@ -143,7 +143,13 @@ object ToolUtils {
         
         val toolComponent = tool.unwrap().get(DataComponents.TOOL)
         val toolBehavior = tool.novaItem?.getBehaviorOrNull<Tool>()
-        if (toolComponent != null) {
+        if (toolBehavior != null) {
+            // Nova tool, Nova/Vanilla block 
+            val itemCategories = toolBehavior.categories
+            val blockCategories = ToolCategory.ofBlock(block)
+            if (itemCategories.any { it in blockCategories })
+                return toolBehavior.breakSpeed
+        } else if (toolComponent != null) {
             val novaBlock = block.novaBlock
             if (novaBlock != null) {
                 // Vanilla tool, Nova block
@@ -156,12 +162,6 @@ object ToolUtils {
                 // Vanilla tool, Vanilla block
                 return toolComponent.getMiningSpeed(block.nmsState).toDouble()
             }
-        } else if (toolBehavior != null) {
-            // Nova tool, Nova/Vanilla block 
-            val itemCategories = toolBehavior.categories
-            val blockCategories = ToolCategory.ofBlock(block)
-            if (itemCategories.any { it in blockCategories })
-                return toolBehavior.breakSpeed
         }
         
         return 1.0
