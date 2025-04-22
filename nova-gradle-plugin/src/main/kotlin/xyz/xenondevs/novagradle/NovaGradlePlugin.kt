@@ -9,6 +9,7 @@ import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.novagradle.task.AddonExtension
 import xyz.xenondevs.novagradle.task.AddonJarTask
 import xyz.xenondevs.novagradle.task.GenerateLanguageFilesTask
@@ -17,6 +18,7 @@ import xyz.xenondevs.novagradle.task.GenerateWailaTexturesTask
 import xyz.xenondevs.novagradle.task.PluginDependency
 import xyz.xenondevs.novagradle.task.PluginDependency.Load
 import xyz.xenondevs.novagradle.task.PluginDependency.Stage
+import xyz.xenondevs.novagradle.util.TaskUtils
 
 class NovaGradlePlugin : Plugin<Project> {
     
@@ -44,18 +46,16 @@ class NovaGradlePlugin : Plugin<Project> {
             website.set(addonExt.website)
             prefix.set(addonExt.prefix)
             
-            val archiveFileProvider: Provider<RegularFile> = project.tasks.named<Jar>("jar").flatMap { it.archiveFile }
-            input.set(archiveFileProvider)
+            input.set(project.tasks.named<Jar>("jar").flatMap { it.archiveFile })
             output.set(
                 addonExt.destination
                     .orElse(project.layout.buildDirectory.dir("libs/"))
-                    .zip(archiveFileProvider) { dir, archiveFile ->
+                    .map { dir ->
                         val name = addonExt.name.getOrElse(project.name)
                         val version = addonExt.version.getOrElse(project.version.toString())
+                        val novaVersion = Version(TaskUtils.readNovaAndApiVersion(project).first)
                         
-                        dir.file("$name-$version.jar")
-                            .takeUnless { it == archiveFile }
-                            ?: dir.file("$name-$version-addon.jar")
+                        dir.file(addonExt.fileName.orNull ?: "$name-$version+Nova-${novaVersion.toString(omitIdx = 2, omitMetadata = true)}.jar")
                     }
             )
         }

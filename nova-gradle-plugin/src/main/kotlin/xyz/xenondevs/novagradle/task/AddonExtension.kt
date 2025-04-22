@@ -22,6 +22,7 @@ abstract class AddonExtension {
     abstract val website: Property<String>
     abstract val prefix: Property<String>
     abstract val destination: DirectoryProperty
+    abstract val fileName: Property<String>
     
     /**
      * Creates a dependency on a plugin named [name] in both the [Stage.BOOTSTRAP] and [Stage.SERVER] stages.
