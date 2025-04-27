@@ -14,7 +14,9 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import org.joml.Vector3d
+import org.joml.Vector3dc
 import org.joml.Vector3f
+import org.joml.Vector3fc
 import xyz.xenondevs.commons.collections.enumSetOf
 import xyz.xenondevs.nova.util.item.isTraversable
 import xyz.xenondevs.nova.util.particle.ParticleBuilder
@@ -172,17 +174,17 @@ fun Location.toVector3f(): Vector3f =
 fun Location.toVec3(): Vec3 =
     Vec3(x, y, z)
 
-fun Vector3d.toLocation(world: World? = null): Location =
-    Location(world, x, y, z)
+fun Vector3dc.toLocation(world: World? = null): Location =
+    Location(world, x(), y(), z())
 
-fun Vector3d.toVec3(): Vec3 =
-    Vec3(x, y, z)
+fun Vector3dc.toVec3(): Vec3 =
+    Vec3(x(), y(), z())
 
-fun Vector3f.toLocation(world: World? = null): Location =
-    Location(world, x.toDouble(), y.toDouble(), z.toDouble())
+fun Vector3fc.toLocation(world: World? = null): Location =
+    Location(world, x().toDouble(), y().toDouble(), z().toDouble())
 
-fun Vector3f.toVec3(): Vec3 =
-    Vec3(x.toDouble(), y.toDouble(), z.toDouble())
+fun Vector3fc.toVec3(): Vec3 =
+    Vec3(x().toDouble(), y().toDouble(), z().toDouble())
 
 fun Vector.toVec3(): Vec3 =
     Vec3(x, y, z)
