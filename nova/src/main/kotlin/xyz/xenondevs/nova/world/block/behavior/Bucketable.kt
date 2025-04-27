@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.player.swingHandEventless
 
 /**
  * Allows filling and emptying fluid containers of [TileEntities][TileEntity]
@@ -72,7 +73,7 @@ object Bucketable : BlockBehavior {
             pos.playSound(sound, 1f, 1f)
         }
         
-        player.swingHand(hand)
+        player.swingHandEventless(hand)
         return true
     }
     

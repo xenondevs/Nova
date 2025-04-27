@@ -41,6 +41,7 @@ import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
+import xyz.xenondevs.nova.world.player.swingHandEventless
 import xyz.xenondevs.nova.world.pos
 
 /**
@@ -167,7 +168,7 @@ internal object BlockPlacing : Listener {
                 handItem.amount--
             
             BlockUtils.placeNovaBlock(pos, newState, ctx)
-            player.swingHand(event.hand!!)
+            player.swingHandEventless(event.hand!!)
         }
     }
     

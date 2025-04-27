@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.WATERLOGGED
+import xyz.xenondevs.nova.world.player.swingHandEventless
 
 /**
  * Allows water-logging blocks via right-clicking with buckets. Requires the [WATERLOGGED] property.
@@ -31,7 +32,7 @@ object Waterloggable : BlockBehavior {
                 Bucketable.emptyBucketInHand(player, hand)
             }
             pos.playSound(Sound.ITEM_BUCKET_EMPTY, 1f, 1f)
-            player.swingHand(hand)
+            player.swingHandEventless(hand)
             return true
         } else if (isWaterlogged && itemStack.type == Material.BUCKET) {
             BlockUtils.updateBlockState(pos, state.with(WATERLOGGED, false))
@@ -39,7 +40,7 @@ object Waterloggable : BlockBehavior {
                 Bucketable.emptyBucketInHand(player, hand)
             }
             pos.playSound(Sound.ITEM_BUCKET_EMPTY, 1f, 1f)
-            player.swingHand(hand)
+            player.swingHandEventless(hand)
             return true
         }
         

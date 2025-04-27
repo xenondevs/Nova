@@ -37,6 +37,7 @@ import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlaceRecipePacket
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSelectBundleItemPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundSwingPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundUseItemPacketEvent
 import java.lang.invoke.MethodHandle
 import java.util.concurrent.locks.ReentrantLock
@@ -92,6 +93,7 @@ object PacketEventManager {
         registerPlayerEventType(::ServerboundContainerClickPacketEvent)
         registerPlayerEventType(::ServerboundSelectBundleItemPacketEvent)
         registerPlayerEventType(::ServerboundPickItemFromBlockPacketEvent)
+        registerPlayerEventType(::ServerboundSwingPacketEvent)
     }
     
     private inline fun <reified P : Packet<*>, reified E : PlayerPacketEvent<P>> registerEventType(noinline constructor: (P) -> E) {

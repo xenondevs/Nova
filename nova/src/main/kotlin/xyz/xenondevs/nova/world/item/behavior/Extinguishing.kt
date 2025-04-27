@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.util.sendTo
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
+import xyz.xenondevs.nova.world.player.swingHandEventless
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 
@@ -56,7 +57,7 @@ object Extinguishing : ItemBehavior {
                 
                 val hand = event.hand!!
                 player.damageItemInHand(hand)
-                runTaskLater(1) { player.swingHand(hand) }
+                runTaskLater(1) { player.swingHandEventless(hand) }
             }
         }
     }

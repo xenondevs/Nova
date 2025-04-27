@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.util
 
 import org.joml.Vector3d
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.round
@@ -54,6 +55,16 @@ internal fun Vector3d.round(decimalPlaces: Int): Vector3d {
 
 internal fun max(a: Vector3d, b: Vector3d): Vector3d {
     return Vector3d(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z))
+}
+
+internal fun AtomicInteger.decrementIfGreaterThanZero(): Boolean {
+    while (true) {
+        val current = get()
+        if (current <= 0)
+            return false
+        if (compareAndSet(current, current - 1))
+            return true
+    }
 }
 
 internal object MathUtils {
