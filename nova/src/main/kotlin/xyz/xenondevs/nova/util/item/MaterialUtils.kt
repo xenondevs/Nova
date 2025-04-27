@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util.item
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.SoundGroup
+import org.bukkit.Tag
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
@@ -66,15 +67,9 @@ fun Material.isActuallyInteractable(): Boolean {
     }
 }
 
+@Deprecated("Corresponding tag exists", ReplaceWith("Tag.REPLACEABLE.isTagged(this)", "org.bukkit.Tag"))
 fun Material.isReplaceable(): Boolean =
-    when (this) {
-        Material.AIR, Material.CAVE_AIR, Material.VOID_AIR, Material.WATER, Material.LAVA,
-        Material.SHORT_GRASS, Material.TALL_GRASS, Material.FERN, Material.DEAD_BUSH, Material.VINE,
-        Material.CRIMSON_ROOTS, Material.WARPED_ROOTS, Material.NETHER_SPROUTS, Material.SEAGRASS, Material.FIRE,
-        Material.SOUL_FIRE, Material.SNOW, Material.STRUCTURE_VOID, Material.LIGHT -> true
-        
-        else -> false
-    }
+    Tag.REPLACEABLE.isTagged(this)
 
 fun Material.playPlaceSoundEffect(location: Location) {
     location.world!!.playSound(location, soundGroup.placeSound, 1f, Random.nextDouble(0.8, 0.95).toFloat())
