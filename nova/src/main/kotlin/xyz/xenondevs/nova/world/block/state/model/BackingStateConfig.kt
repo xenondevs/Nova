@@ -40,6 +40,8 @@ internal abstract class BackingStateConfigType<T : BackingStateConfig> internal 
     abstract fun of(properties: Map<String, String>): T
     internal open fun handleMerged(occupiedIds: Set<Int>) = Unit
     
+    override fun toString() = fileName
+    
 }
 
 internal abstract class DefaultingBackingStateConfigType<T : BackingStateConfig>(

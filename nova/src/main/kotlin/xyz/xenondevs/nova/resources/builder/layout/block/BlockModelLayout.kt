@@ -19,7 +19,12 @@ internal sealed interface BlockModelLayout {
         val priority: Int,
         val configTypes: List<BackingStateConfigType<*>>,
         val modelSelector: BlockModelSelector
-    ) : BlockModelLayout
+    ) : BlockModelLayout {
+        
+        override fun toString(): String =
+            "StateBacked(priority=$priority, configTypes=$configTypes)"
+        
+    }
     
     sealed class EntityBacked(
         val stateSelector: BlockStateSelector
