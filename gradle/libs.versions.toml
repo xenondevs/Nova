@@ -13,7 +13,7 @@ paperweight = "2.0.0-beta.16"
 xenondevs-commons = "1.30"
 
 [libraries]
-awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.31.21" }
+awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.31.30" }
 bstats = { group = "xyz.xenondevs.bstats", name = "bstats-bukkit", version = "3.0.1" }
 bytebase = { group = "xyz.xenondevs.bytebase", name = "ByteBase", version.ref = "bytebase" }
 bytebase-runtime = { group = "xyz.xenondevs.bytebase", name = "ByteBase-Runtime", version.ref = "bytebase" }
