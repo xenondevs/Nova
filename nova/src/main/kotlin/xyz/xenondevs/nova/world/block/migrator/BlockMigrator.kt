@@ -121,6 +121,7 @@ internal object BlockMigrator : Listener {
         migrations += leavesMigration(Blocks.CHERRY_LEAVES, DefaultBlocks.CHERRY_LEAVES)
         migrations += leavesMigration(Blocks.AZALEA_LEAVES, DefaultBlocks.AZALEA_LEAVES)
         migrations += leavesMigration(Blocks.FLOWERING_AZALEA_LEAVES, DefaultBlocks.FLOWERING_AZALEA_LEAVES)
+        migrations += leavesMigration(Blocks.PALE_OAK_LEAVES, DefaultBlocks.PALE_OAK_LEAVES)
         
         queries += migrations.map { migration -> { state -> state.block == migration.vanillaBlock } }
         queries += { state -> VanillaTileEntity.Type.of(state.block.bukkitMaterial) != null }

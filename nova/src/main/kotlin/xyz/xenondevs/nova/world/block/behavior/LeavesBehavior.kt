@@ -117,6 +117,7 @@ internal object LeavesBehavior : BlockBehavior {
             DefaultBlocks.CHERRY_LEAVES -> Material.CHERRY_LEAVES
             DefaultBlocks.AZALEA_LEAVES -> Material.AZALEA_LEAVES
             DefaultBlocks.FLOWERING_AZALEA_LEAVES -> Material.FLOWERING_AZALEA_LEAVES
+            DefaultBlocks.PALE_OAK_LEAVES -> Material.PALE_OAK_LEAVES
             else -> throw UnsupportedOperationException("Unknown leaves block type: ${state.block}")
         }
         

@@ -142,3 +142,15 @@ internal class FloweringAzaleaLeavesBackingStateConfig(
     
     companion object : LeavesBackingStateConfigType<FloweringAzaleaLeavesBackingStateConfig>(::FloweringAzaleaLeavesBackingStateConfig, "flowering_azalea_leaves")
 }
+
+internal class PaleOakLeavesBackingStateConfig(
+    distance: Int,
+    persistent: Boolean,
+    waterlogged: Boolean
+) : LeavesBackingStateConfig(Blocks.CHERRY_LEAVES, distance, persistent, waterlogged) {
+    override val type = PaleOakLeavesBackingStateConfig
+    
+    companion object : LeavesBackingStateConfigType<PaleOakLeavesBackingStateConfig>(::PaleOakLeavesBackingStateConfig, "pale_oak_leaves") {
+        override val particleType = "pale_oak_leaves"
+    }
+}
