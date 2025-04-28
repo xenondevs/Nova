@@ -49,6 +49,10 @@ resource_pack:
     # Whether Nova should assume japanese glyph variants for char size calculation.
     # If the players on your server are expected to have "Japanese Glyph Variants" in Minecraft's font settings enabled, you should set this to true.
     japanese_glyph_variants: false
+    # A list of backing state categories that should not be used for custom blocks.
+    # Custom blocks may fall back to an entity-backed model, which can worsen performance.
+    # Possible values: "note_block", "mushroom_block", "leaves", "tripwire_unattached", "tripwire_attached"
+    disabled_backing_state_categories: [ ]
 
 # The render distance for fake (packet-based) entities from Nova, in chunks.
 # Note that the render distance is also limited by the entity render distance of the client.

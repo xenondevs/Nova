@@ -12,6 +12,8 @@ import xyz.xenondevs.commons.gson.getOrPut
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -45,6 +47,8 @@ import java.nio.file.Path
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.exists
 
+private val DISABLED_BACKING_STATE_CATEGORIES: Set<BackingStateCategory> by MAIN_CONFIG.entry("resource_pack", "generation", "disabled_backing_state_categories")
+
 /**
  * A [PackTaskHolder] that deals with generating and assigning custom block models to block states
  * (i.e. creating block state variant entries) or items.
@@ -65,6 +69,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
     @PackTask(runAfter = ["ExtractTask#extractAll"])
     private fun readBlockStateFiles() {
         BackingStateCategory.entries.asSequence()
+            .filter { it !in DISABLED_BACKING_STATE_CATEGORIES }
             .flatMap { it.backingStateConfigTypes }
             .forEach { type ->
                 val file = getBlockStateFile(type)
@@ -176,6 +181,9 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         
         var cfg: BackingStateConfig? = null
         for (configType in layout.configTypes) {
+            if (DISABLED_BACKING_STATE_CATEGORIES.any { configType in it.backingStateConfigTypes })
+                continue
+            
             val match = configsByVariant[variant]?.firstOrNull { it.type == configType }
             if (match != null) {
                 cfg = if (match.waterlogged != waterlogged) configType.of(match.id, waterlogged) else match
