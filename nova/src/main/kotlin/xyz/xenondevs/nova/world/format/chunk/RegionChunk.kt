@@ -344,8 +344,17 @@ internal class RegionChunk(
             }
             
             // load models
-            for ((pos, tileEntity) in tileEntities)
-                tileEntity.blockState.modelProvider.load(pos)
+            for ((i, section) in sections.withIndex()) {
+                val sectionY = minHeight + (i shl 4)
+                section.forEachNonEmpty { x, y, z, blockState ->
+                    val pos = pos.blockPos(x, sectionY + y, z)
+                    try {
+                        blockState.modelProvider.load(pos)
+                    } catch (t: Throwable) {
+                        LOGGER.error("Failed to load model provider for $blockState at $pos", t)
+                    }
+                }
+            }
             
             // It is assumed that (vanilla-) tile-entities will not update this RegionChunk's tile-entity map
             // during handleEnable, as that would cause the new tile-entity to not be enabled properly.
@@ -386,9 +395,21 @@ internal class RegionChunk(
             if (isTicking)
                 stopTicking()
             
-            for ((pos, tileEntity) in tileEntities) {
+            // unload models
+            for ((i, section) in sections.withIndex()) {
+                val sectionY = minHeight + (i shl 4)
+                section.forEachNonEmpty { x, y, z, blockState ->
+                    val pos = pos.blockPos(x, sectionY + y, z)
+                    try {
+                        blockState.modelProvider.unload(pos)
+                    } catch (t: Throwable) {
+                        LOGGER.error("Failed to unload model provider for $blockState at $pos", t)
+                    }
+                }
+            }
+            
+            for ((_, tileEntity) in tileEntities) {
                 tileEntity.isEnabled = false
-                tileEntity.blockState.modelProvider.unload(pos)
                 try {
                     tileEntity.handleDisable()
                 } catch (t: Throwable) {

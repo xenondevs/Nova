@@ -40,6 +40,13 @@ internal class RegionChunkSection<T>(
     }
     
     /**
+     * Iterates over all non-empty values in the section and calls the specified [action] for each of them.
+     */
+    fun forEachNonEmpty(action: (x: Int, y: Int, z: Int, value: T) -> Unit) {
+        container.forEachNonEmpty(action)
+    }
+    
+    /**
      * Retrieves the value at the given [x], [y] and [z] section coordinates.
      */
     operator fun get(x: Int, y: Int, z: Int): T? =

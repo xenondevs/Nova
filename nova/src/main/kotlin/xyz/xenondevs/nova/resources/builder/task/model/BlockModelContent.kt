@@ -30,7 +30,6 @@ import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.serialization.json.GSON
-import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
@@ -133,24 +132,21 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                                 val cfg = assignModelToVanillaBlockState(layout, modelBuilder, blockState[WATERLOGGED] == true)
                                 if (cfg != null) {
                                     lookup[blockState] = LinkedBlockModelProvider(BackingStateBlockModelProvider, cfg)
-                                } else if (block is NovaTileEntityBlock) {
+                                } else {
                                     LOGGER.warn("No more block states for $blockState with layout, falling back to display entity.")
-                                    val data = DisplayEntityBlockModelData(assignModelToItem(modelBuilder), DEFAULT_BLOCK_STATE_SELECTOR(modelScope))
+                                    val data = DisplayEntityBlockModelData(blockState, assignModelToItem(modelBuilder), DEFAULT_BLOCK_STATE_SELECTOR(modelScope))
                                     lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
-                                } else throw IllegalStateException("Ran out of backing states trying to assign a model to $blockState")
+                                }
                             }
                             
                             is BlockModelLayout.EntityBacked -> {
-                                if (block !is NovaTileEntityBlock)
-                                    throw IllegalArgumentException("$block cannot use entity-backed block models, as it is not a tile-entity")
-                                
                                 val scope = BlockModelSelectorScope(blockState, builder, modelContent)
                                 val models = when (layout) {
                                     is BlockModelLayout.SimpleEntityBacked -> assignModelToItem(layout.modelSelector(scope))
                                     is BlockModelLayout.ItemEntityBacked -> listOf(assignModelToItem(scope, layout.definitionConfigurator))
                                 }
                                 
-                                val data = DisplayEntityBlockModelData(models, layout.stateSelector(modelScope))
+                                val data = DisplayEntityBlockModelData(blockState, models, layout.stateSelector(modelScope))
                                 lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
                             }
                             
