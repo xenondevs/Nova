@@ -13,8 +13,8 @@ import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.resources.builder.task.font.FontContent
 
 private val SETTINGS: Set<String> by combinedProvider(
-    MAIN_CONFIG.entry<Boolean>("resource_pack", "force_uniform_font"),
-    MAIN_CONFIG.entry<Boolean>("resource_pack", "japanese_glyph_variants")
+    MAIN_CONFIG.entry<Boolean>(arrayOf("resource_pack", "generation", "force_uniform_font"), arrayOf("resource_pack", "force_uniform_font")),
+    MAIN_CONFIG.entry<Boolean>(arrayOf("resource_pack", "generation", "japanese_glyph_variants"), arrayOf("resource_pack", "japanese_glyph_variants"))
 ) { uniform, jp -> 
     buildSet { 
         if (uniform) add("uniform")

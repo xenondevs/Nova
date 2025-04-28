@@ -43,12 +43,12 @@ resource_pack:
     # Whether Minecraft assets should be downloaded from GitHub or Mojang's API.
     # GitHub is faster since it's a single zip file. If you're unable to access GitHub, change this to "mojang".
     minecraft_assets_source: github
-  # Whether Nova should assume the uniform font for char size calculation.
-  # If players on your server are expected to "Force Unicode Font" in Minecraft's font settings enabled, you should set this to true.
-  force_uniform_font: false
-  # Whether Nova should assume japanese glyph variants for char size calculation.
-  # If the players on your server are expected to have "Japanese Glyph Variants" in Minecraft's font settings enabled, you should set this to true.
-  japanese_glyph_variants: false
+    # Whether Nova should assume the uniform font for char size calculation.
+    # If players on your server are expected to "Force Unicode Font" in Minecraft's font settings enabled, you should set this to true.
+    force_uniform_font: false
+    # Whether Nova should assume japanese glyph variants for char size calculation.
+    # If the players on your server are expected to have "Japanese Glyph Variants" in Minecraft's font settings enabled, you should set this to true.
+    japanese_glyph_variants: false
 
 # The render distance for fake (packet-based) entities from Nova, in chunks.
 # Note that the render distance is also limited by the entity render distance of the client.
