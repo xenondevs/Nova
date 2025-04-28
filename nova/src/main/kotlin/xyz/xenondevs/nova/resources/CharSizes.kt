@@ -34,7 +34,6 @@ import kotlin.io.path.walk
 import kotlin.io.path.writeBytes
 
 private val LOAD_CHAR_SIZES_ON_STARTUP by MAIN_CONFIG.entry<Boolean>("performance", "load_char_sizes_on_startup")
-private val FORCE_UNIFORM_FONT by MAIN_CONFIG.entry<Boolean>("resource_pack", "force_uniform_font")
 
 private val EMPTY_FLOAT_RANGE: ClosedRange<Float> = 0f..0f
 
@@ -195,10 +194,6 @@ object CharSizes {
     }
     
     internal fun getTable(font: Key): CharSizeTable? {
-        var font = font
-        if (FORCE_UNIFORM_FONT && font == Key.key("minecraft", "default"))
-            font = Key.key("minecraft", "uniform")
-        
         return loadedTables[font] ?: loadTable(font)
     }
     
