@@ -279,6 +279,15 @@ sealed interface ResourceType {
     }
     
     /**
+     * Particle textures
+     * path: `textures/particle/`, extension: `png`
+     */
+    @Serializable
+    data object ParticleTexture : Texture {
+        override val prefix = "textures/particle/"
+    }
+    
+    /**
      * Equipment textures
      */
     interface EquipmentTexture : Texture
@@ -409,6 +418,16 @@ sealed interface ResourceType {
     data object UnihexZip : ResourceType {
         override val prefix = ""
         override val suffix = ""
+    }
+    
+    /**
+     * Particle definitions
+     * 
+     * path: `particles/`, extension: `json`
+     */
+    @Serializable
+    data object ParticleDefinition : JsonFile {
+        override val prefix = "particles"
     }
     
 }

@@ -19,6 +19,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
 import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
+import xyz.xenondevs.nova.resources.builder.data.ParticleDefinition
 import xyz.xenondevs.nova.resources.builder.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
@@ -36,6 +37,7 @@ import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.LeavesBackingStateConfigType
 import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.WATERLOGGED
@@ -133,7 +135,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                                 if (cfg != null) {
                                     lookup[blockState] = LinkedBlockModelProvider(BackingStateBlockModelProvider, cfg)
                                 } else {
-                                    LOGGER.warn("No more block states for $blockState with layout, falling back to display entity.")
+                                    LOGGER.warn("No more block states for $blockState with layout $layout, falling back to display entity")
                                     val data = DisplayEntityBlockModelData(blockState, assignModelToItem(modelBuilder), DEFAULT_BLOCK_STATE_SELECTOR(modelScope))
                                     lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
                                 }
@@ -269,6 +271,16 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         for ((path, obj) in fileContents) {
             path.createParentDirectories()
             obj.writeToFile(path)
+        }
+        
+        // disable leaf particles if leaves backing state configs are used
+        val particles = variantByConfig.keys.mapNotNullTo(HashSet()) { (it.type as? LeavesBackingStateConfigType<*>)?.particleType }
+        for (particle in particles) {
+            LOGGER.info("Disabling $particle particles because their leaves are used as backing states")
+            builder.writeJson(
+                ResourcePath.of(ResourceType.ParticleDefinition, particle), 
+                ParticleDefinition(listOf(ResourcePath(ResourceType.ParticleTexture, "nova", "empty")))
+            )
         }
     }
     

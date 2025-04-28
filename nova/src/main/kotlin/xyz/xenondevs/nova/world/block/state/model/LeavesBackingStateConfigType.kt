@@ -25,6 +25,7 @@ internal abstract class LeavesBackingStateConfigType<T : LeavesBackingStateConfi
     override val blockedIds = hashSetOf(13)
     override val properties = hashSetOf("distance", "persistent", "waterlogged")
     override val isWaterloggable = true
+    open val particleType = "tinted_leaves"
     
     override fun of(id: Int, waterlogged: Boolean): T {
         return ctor((id shr 1) + 1, (id and 1) == 1, waterlogged)
@@ -117,7 +118,9 @@ internal class CherryLeavesBackingStateConfig(
 ) : LeavesBackingStateConfig(Blocks.CHERRY_LEAVES, distance, persistent, waterlogged) {
     override val type = CherryLeavesBackingStateConfig
     
-    companion object : LeavesBackingStateConfigType<CherryLeavesBackingStateConfig>(::CherryLeavesBackingStateConfig, "cherry_leaves")
+    companion object : LeavesBackingStateConfigType<CherryLeavesBackingStateConfig>(::CherryLeavesBackingStateConfig, "cherry_leaves") {
+        override val particleType = "cherry_leaves"
+    }
 }
 
 internal class AzaleaLeavesBackingStateConfig(
