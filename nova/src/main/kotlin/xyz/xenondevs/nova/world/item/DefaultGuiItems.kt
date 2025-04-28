@@ -4,10 +4,13 @@ import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.builder.data.TintSource
+import xyz.xenondevs.nova.resources.builder.layout.item.ConditionItemModelProperty
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelCreationScope
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
 import xyz.xenondevs.nova.util.data.writeImage
+import xyz.xenondevs.nova.world.block.behavior.Waterloggable
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -88,6 +91,7 @@ object DefaultGuiItems {
     val BAR_ORANGE = barGuiItem("gui/opaque/bar/orange", Color(232, 76, 0), true)
     val CHEATING_ON = guiItem("cheating_on", "menu.nova.items.cheat_mode.on")
     val CHEATING_OFF = guiItem("cheating_off", "menu.nova.items.cheat_mode.off")
+    
     @Deprecated("Color picker will be removed in a future version")
     val COLOR_PICKER = guiItem("color_picker", "menu.nova.color_picker")
     val NUMBER = hiddenItem("gui/opaque/number") {
@@ -105,7 +109,7 @@ object DefaultGuiItems {
     val CANVAS = item("gui/canvas") {
         hidden(true)
         name(null)
-        modelDefinition { 
+        modelDefinition {
             model = canvasModel(18, 18)
         }
     }
@@ -181,6 +185,7 @@ object DefaultGuiItems {
     val TP_BAR_ORANGE = barGuiItem("gui/transparent/bar/orange", Color(232, 76, 0), false)
     val TP_CHEATING_ON = tpGuiItem("cheating_on", "menu.nova.items.cheat_mode.on")
     val TP_CHEATING_OFF = tpGuiItem("cheating_off", "menu.nova.items.cheat_mode.off")
+    
     @Deprecated("Color picker will be removed in a future version")
     val TP_COLOR_PICKER = tpGuiItem("color_picker", "menu.nova.color_picker")
     val TP_NUMBER = hiddenItem("gui/transparent/number") {
@@ -197,14 +202,40 @@ object DefaultGuiItems {
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
 object DefaultBlockOverlays {
     
+    /**
+     * An overlay that displays the vanilla break stage textures.
+     * Individual break stages can be selected via `customModelData.floats[0]` in range `[0, 9]`.
+     */
     val BREAK_STAGE_OVERLAY = hiddenItem("break_stage_overlay") {
         model = numberedModels(0..9) {
             getModel("nova:block/break_stage/$it")
         }
     }
     
+    /**
+     * A 1x1x1 block that has an alpha value of `1/255`, so is almost completely transparent.
+     * Can be used to render glow cubical glow outlines around nothing.
+     */
     val TRANSPARENT_BLOCK = hiddenItem("transparent_block") {
         model = buildModel { getModel("nova:block/transparent") }
+    }
+    
+    /**
+     * The overlay used for the [Waterloggable] behavior in case the block is entity-backed.
+     * * `customModelData.flags[0]`: true=fully submerged, false=partially submerged
+     * * `customModelData.colors[0]`: biome water tint
+     */
+    val WATERLOGGED = hiddenItem("waterlogged") {
+        model = condition(ConditionItemModelProperty.CustomModelData(0)) {
+            onTrue = model {
+                model = { getModel("block/waterlogged/full") }
+                tintSource[0] = TintSource.CustomModelData(Color.WHITE, 0)
+            }
+            onFalse = model {
+                model = { getModel("block/waterlogged/half") }
+                tintSource[0] = TintSource.CustomModelData(Color.WHITE, 0)
+            }
+        }
     }
     
 }
