@@ -461,7 +461,7 @@ internal object NovaCommand : Command() {
                             "command.nova.show_block_model_data.backing_state",
                             NamedTextColor.GRAY,
                             Component.text(novaBlockState.toString(), NamedTextColor.AQUA),
-                            Component.text(info.vanillaBlockState.block.descriptionId, NamedTextColor.AQUA),
+                            Component.translatable(info.vanillaBlockState.block.descriptionId, NamedTextColor.AQUA),
                             Component.text(info.variantString, NamedTextColor.AQUA)
                         )
                     }
