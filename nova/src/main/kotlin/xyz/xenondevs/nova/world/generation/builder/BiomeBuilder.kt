@@ -31,7 +31,6 @@ import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.nova.addon.registry.worldgen.BiomeRegistry
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.util.lookupGetterOrThrow
@@ -48,7 +47,6 @@ import java.awt.Color
  * Builder for [Biomes][Biome].
  * Check out the [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/biome/) on biomes for more information.
  *
- * @see [BiomeRegistry]
  * @see [BiomeClimateSettingsBuilder]
  * @see [BiomeSpecialEffectsBuilder]
  * @see [MobSpawnSettingsBuilder]

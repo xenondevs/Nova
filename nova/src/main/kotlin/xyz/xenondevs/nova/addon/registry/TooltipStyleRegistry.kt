@@ -1,11 +1,10 @@
 package xyz.xenondevs.nova.addon.registry
 
-import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.resources.builder.layout.gui.TooltipStyleBuilder
-import xyz.xenondevs.nova.util.Key
-import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.item.TooltipStyle
 
+@Deprecated(REGISTRIES_DEPRECATION)
 interface TooltipStyleRegistry : AddonGetter {
     
     /**
@@ -14,13 +13,8 @@ interface TooltipStyleRegistry : AddonGetter {
      * The tooltip textures are expected to be located under `textures/gui/sprites/tooltip/<name>_background.png` and
      * `textures/gui/sprites/tooltip/<name>_frame.png`. Their mcmeta can be configured via [meta].
      */
-    fun tooltipStyle(name: String, meta: TooltipStyleBuilder.() -> Unit): TooltipStyle {
-        val id = Key(addon, name)
-        val style = TooltipStyle(id) { TooltipStyleBuilder(id, it).apply(meta).build() }
-        NovaRegistries.TOOLTIP_STYLE[id] = style
-        return style
-    }
-    
-    // TODO: animatedTooltipStyle
+    @Deprecated(REGISTRIES_DEPRECATION)
+    fun tooltipStyle(name: String, meta: TooltipStyleBuilder.() -> Unit): TooltipStyle =
+        addon.tooltipStyle(name, meta)
     
 }

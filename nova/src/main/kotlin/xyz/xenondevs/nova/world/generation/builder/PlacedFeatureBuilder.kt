@@ -33,7 +33,6 @@ import net.minecraft.world.level.levelgen.placement.RarityFilter
 import net.minecraft.world.level.levelgen.placement.SurfaceRelativeThresholdFilter
 import net.minecraft.world.level.levelgen.placement.SurfaceWaterDepthFilter
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.addon.registry.worldgen.FeatureRegistry
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.util.lookupGetterOrThrow
@@ -45,7 +44,6 @@ import xyz.xenondevs.nova.world.generation.FeatureType
  * Check out the [docs page](https://xenondevs.xyz/docs-world-gen/nova/addon/worldgen/features/placed-feature/) on
  * [PlacedFeatures][PlacedFeature] for more information.
  *
- * @see [FeatureRegistry]
  * @see [PlacedFeature]
  * @see [ConfiguredFeature]
  * @see [FeatureType]

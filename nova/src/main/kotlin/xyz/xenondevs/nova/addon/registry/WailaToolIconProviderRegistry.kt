@@ -1,16 +1,13 @@
 package xyz.xenondevs.nova.addon.registry
 
-import xyz.xenondevs.nova.addon.id
-import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
-import xyz.xenondevs.nova.util.set
 
+@Deprecated(REGISTRIES_DEPRECATION)
 interface WailaToolIconProviderRegistry : AddonGetter {
     
-    fun registerWailaToolIconProvider(name: String, provider: WailaToolIconProvider): WailaToolIconProvider {
-        val id = addon.id + ":" + name
-        NovaRegistries.WAILA_TOOL_ICON_PROVIDER[id] = provider
-        return provider
-    }
+    @Deprecated(REGISTRIES_DEPRECATION)
+    fun registerWailaToolIconProvider(name: String, provider: WailaToolIconProvider): WailaToolIconProvider =
+        addon.registerWailaToolIconProvider(name, provider)
     
 }
