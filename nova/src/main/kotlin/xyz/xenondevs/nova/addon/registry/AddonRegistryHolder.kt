@@ -14,4 +14,4 @@ class AddonRegistryHolder internal constructor(
     ItemRegistry, NetworkTypeRegistry, RecipeTypeRegistry, ToolCategoryRegistry, ToolTierRegistry,
     WailaInfoProviderRegistry, WailaToolIconProviderRegistry, MinecraftUtilTypeRegistry, BiomeRegistry,
     CarverRegistry, DimensionRegistry, FeatureRegistry, NoiseRegistry, StructureRegistry, EquipmentRegistry,
-    GuiTextureRegistry, ItemFilterTypeRegistry, TooltipStyleRegistry
+    GuiTextureRegistry, ItemFilterTypeRegistry, TooltipStyleRegistry, EntityVariantRegistry

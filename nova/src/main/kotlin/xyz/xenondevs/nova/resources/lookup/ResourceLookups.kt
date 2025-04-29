@@ -2,8 +2,10 @@
 
 package xyz.xenondevs.nova.resources.lookup
 
+import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.resources.builder.task.font.GuiTextureData
@@ -94,6 +96,17 @@ internal object ResourceLookups {
      * Set of all block states that are in use by base packs.
      */
     var OCCUPIED_BLOCK_STATES: Set<BlockState> by OCCUPIED_BLOCK_STATES_LOOKUP
+    
+    /**
+     * Lookup for entity variant layouts.
+     */
+    val ENTITY_VARIANT_ASSETS_LOOKUP: ResourceLookup<Map<ResourceKey<*>, EntityVariantLayout>> =
+        resourceLookup("entity_variant_lookup", emptyMap(), typeOf<HashMap<ResourceKey<*>, EntityVariantLayout>>())
+    
+    /**
+     * Entity variant layouts.
+     */
+    val ENTITY_VARIANT_ASSETS: Map<ResourceKey<*>, EntityVariantLayout> by ENTITY_VARIANT_ASSETS_LOOKUP
     
     private inline fun <reified T : Any> resourceLookup(key: String, empty: T): ResourceLookup<T> {
         val lookup = ResourceLookup(key, typeOf<T>(), empty)

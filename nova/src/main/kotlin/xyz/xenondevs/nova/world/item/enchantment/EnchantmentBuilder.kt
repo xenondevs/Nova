@@ -6,15 +6,14 @@ import net.kyori.adventure.text.Component
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.registries.Registries
+import net.minecraft.resources.RegistryOps
 import net.minecraft.tags.EnchantmentTags
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.patch.impl.item.EnchantmentPatches
 import xyz.xenondevs.nova.patch.impl.registry.plusAssign
 import xyz.xenondevs.nova.registry.LazyRegistryElementBuilder
-import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.world.item.behavior.Enchantable
 import java.util.*
@@ -47,7 +46,11 @@ internal class CustomEnchantmentLogic(
 
 class EnchantmentBuilder internal constructor(
     id: Key,
-) : LazyRegistryElementBuilder<MojangEnchantment>(Registries.ENCHANTMENT, id) {
+) : LazyRegistryElementBuilder<BukkitEnchantment, MojangEnchantment>(
+    Registries.ENCHANTMENT,
+    CraftEnchantment::minecraftHolderToBukkit,
+    id
+) {
     
     // enchantment definition
     private var name: Component = Component.translatable("enchantment.${id.namespace()}.${id.value()}")
@@ -66,8 +69,6 @@ class EnchantmentBuilder internal constructor(
     private var isTreasure: Boolean = false
     private var isTradeable: Boolean = false
     private var isCurse: Boolean = false
-    
-    internal constructor(addon: Addon, name: String) : this(Key(addon, name))
     
     /**
      * Sets the name of the enchantment.
@@ -215,7 +216,7 @@ class EnchantmentBuilder internal constructor(
     /**
      * Builds the enchantment and adds it to the specified categories.
      */
-    override fun build(): MojangEnchantment {
+    override fun build(lookup: RegistryOps.RegistryInfoLookup): MojangEnchantment {
         if (isCurse && maxLevel > 1)
             throw IllegalArgumentException("Curse enchantments cannot have multiple levels")
         
@@ -235,18 +236,14 @@ class EnchantmentBuilder internal constructor(
             DataComponentMap.EMPTY
         )
         
+        EnchantmentPatches.customEnchantments[enchantment] = CustomEnchantmentLogic(
+            primaryItem, supportedItem, tableLeveRequirement, compatibility
+        )
+        
         return enchantment
     }
     
-    override fun register(): Provider<MojangEnchantment> {
-        val provider = super.register()
-        
-        provider.subscribe { enchantment ->
-            EnchantmentPatches.customEnchantments[enchantment] = CustomEnchantmentLogic(
-                primaryItem, supportedItem, tableLeveRequirement, compatibility
-            )
-        }
-        
+    override fun register(): Provider<BukkitEnchantment> {
         if (isTableDiscoverable)
             EnchantmentTags.IN_ENCHANTING_TABLE += id
         if (isCurse)
@@ -258,7 +255,7 @@ class EnchantmentBuilder internal constructor(
         
         UnknownEnchantments.rememberEnchantmentId(id)
         
-        return provider
+        return super.register()
     }
     
 }

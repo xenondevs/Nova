@@ -15,6 +15,7 @@ import xyz.xenondevs.bytebase.util.representedClass
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import java.lang.reflect.ParameterizedType
+import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.isSubclassOf
 
 internal object NamespacedTypeAdapters : TypeAdapterFactory {
@@ -24,7 +25,8 @@ internal object NamespacedTypeAdapters : TypeAdapterFactory {
         return when (val representedClass = typeToken?.type?.representedClass?.kotlin) {
             ResourcePath::class -> when (val type = typeToken.type) {
                 is ParameterizedType -> {
-                    val rType = (type.actualTypeArguments[0] as Class<*>).kotlin.objectInstance as ResourceType
+                    val rType = (type.actualTypeArguments[0] as Class<*>).kotlin
+                        .let { it.objectInstance ?: it.companionObjectInstance } as ResourceType
                     ResourcePathTypeAdapter(rType).nullSafe()
                 }
                 
