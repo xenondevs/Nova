@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.entity
+package xyz.xenondevs.nova.world.entity.variant
 
 import net.kyori.adventure.key.Key
 import net.minecraft.core.registries.Registries

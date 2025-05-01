@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.world.entity
+package xyz.xenondevs.nova.world.entity.variant
 
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
