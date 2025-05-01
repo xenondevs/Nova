@@ -14,7 +14,7 @@ internal inline fun <reified T : Any> RegistryEntrySerializer(registry: Registry
 internal class RegistryEntrySerializer<T : Any>(private val registry: Registry<T>, type: TypeToken<T>) : ScalarSerializer<T>(type) {
     
     override fun deserialize(type: Type, obj: Any): T {
-        return registry.getValueOrThrow(obj.toString())
+        return registry.getValueOrThrow(obj.toString().lowercase())
     }
     
     override fun serialize(item: T, typeSupported: Predicate<Class<*>>): Any {
