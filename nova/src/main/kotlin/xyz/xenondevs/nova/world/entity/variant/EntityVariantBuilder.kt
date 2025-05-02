@@ -6,6 +6,7 @@ import net.minecraft.core.Registry
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.entity.variant.SpawnPrioritySelectors
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.registry.LazyRegistryElementBuilder
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
@@ -64,8 +65,13 @@ internal constructor(
             ?: throw IllegalStateException("Missing variant assets for $id in lookup")
         val spawnConditions = SpawnConditionsBuilder(lookup).apply(configureSpawnConditions).build()
         val variant = build(modelType, layout as L, spawnConditions)
-        UnknownEntityVariants.rememberEntityVariantKey(key)
         return variant
+    }
+    
+    override fun register(): Provider<T> {
+        val key = ResourceKey.create(registryKey, id.toResourceLocation())
+        UnknownEntityVariants.rememberEntityVariantKey(key)
+        return super.register()
     }
     
     internal abstract fun build(modelType: M, layout: L, spawnConditions: SpawnPrioritySelectors): NMS
