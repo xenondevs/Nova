@@ -5,16 +5,13 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.commons.reflection.createType
-import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.resources.ResourcePath
 import kotlin.reflect.KProperty
-import kotlin.reflect.KType
-import kotlin.reflect.typeOf
 
 internal open class ResourceLookup<T : Any>(
     val key: String,
-    private val type: KType,
+    private val loadFn: (String) -> T?,
+    private val storeFn: (String, T) -> Unit,
     empty: T,
 ) {
     
@@ -22,14 +19,15 @@ internal open class ResourceLookup<T : Any>(
     val value by provider
     
     internal open fun set(value: T) {
-        PermanentStorage.store(key, value)
+        storeFn(key, value)
         provider.set(value)
     }
     
     internal fun load() {
-        val loaded = PermanentStorage.retrieveOrNull<T>(type, key)
+        println("Loading lookup $key")
+        val loaded = loadFn(key)
         if (loaded != null)
-            set(loaded)
+            provider.set(loaded)
     }
     
     operator fun getValue(thisRef: Any, property: KProperty<*>): T = value
@@ -42,9 +40,9 @@ internal open class ResourceLookup<T : Any>(
 
 internal class MapResourceLookup<K : Any, V : Any>(
     key: String,
-    typeK: KType,
-    typeV: KType
-) : ResourceLookup<Map<K, V>>(key, HashMap::class.createType(typeK, typeV), emptyMap()) {
+    loadFn: (String) -> Map<K, V>?,
+    storeFn: (String, Map<K, V>) -> Unit,
+) : ResourceLookup<Map<K, V>>(key, loadFn, storeFn, emptyMap()) {
     
     operator fun get(key: K): V? =
         value[key]
@@ -62,8 +60,9 @@ internal class MapResourceLookup<K : Any, V : Any>(
 
 internal class IdResourceLookup<T : Any>(
     key: String,
-    type: KType
-) : ResourceLookup<Map<String, T>>(key, HashMap::class.createType(typeOf<String>(), type), emptyMap()) {
+    loadFn: (String) -> Map<String, T>?,
+    storeFn: (String, Map<String, T>) -> Unit,
+) : ResourceLookup<Map<String, T>>(key, loadFn, storeFn, emptyMap()) {
     
     operator fun get(id: String): T? =
         value[id]

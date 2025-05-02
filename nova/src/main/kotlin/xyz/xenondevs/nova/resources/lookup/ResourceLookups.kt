@@ -1,7 +1,12 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
+@file:UseSerializers(BlockStateSerializer::class)
 
 package xyz.xenondevs.nova.resources.lookup
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.SetSerializer
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.config.PermanentStorage
@@ -9,12 +14,12 @@ import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
 import xyz.xenondevs.nova.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.resources.builder.task.font.GuiTextureData
+import xyz.xenondevs.nova.serialization.kotlinx.BlockStateSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.ResourceKeySerializer
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.item.Equipment
-import kotlin.reflect.KType
-import kotlin.reflect.typeOf
 
 /**
  * Resource lookups store data that is generated during resource pack build, but relevant for the game.
@@ -24,15 +29,15 @@ internal object ResourceLookups {
     private val lookups = ArrayList<ResourceLookup<*>>()
     
     /**
-     * Lookup for getting the relevant [LinkedBlockModelProvider] for every [NovaBlockState].
+     * Lookup for getting the relevant [BlockModelProvider] for every [NovaBlockState].
      */
-    val BLOCK_MODEL_LOOKUP: ResourceLookup<Map<NovaBlockState, LinkedBlockModelProvider<*>>> =
-        resourceLookup("block_models", emptyMap(), typeOf<HashMap<NovaBlockState, LinkedBlockModelProvider<*>>>())
+    val BLOCK_MODEL_LOOKUP: ResourceLookup<Map<NovaBlockState, BlockModelProvider>> =
+        resourceLookup("block_models", emptyMap())
     
     /**
-     * Map of [NovaBlockState] to the relevant [LinkedBlockModelProvider].
+     * Map of [NovaBlockState] to the relevant [BlockModelProvider].
      */
-    var BLOCK_MODEL: Map<NovaBlockState, LinkedBlockModelProvider<*>> by BLOCK_MODEL_LOOKUP
+    var BLOCK_MODEL: Map<NovaBlockState, BlockModelProvider> by BLOCK_MODEL_LOOKUP
     
     /**
      * Lookup containing texture and camera overlay locations for every [Equipment].
@@ -50,7 +55,7 @@ internal object ResourceLookups {
      * Format: ``Map<Language, Map<TranslationKey, Translation>>``
      */
     val LANGUAGE_LOOKUP: ResourceLookup<Map<String, Map<String, String>>> =
-        resourceLookup("language_lookup", emptyMap(), typeOf<HashMap<String, HashMap<String, String>>>())
+        resourceLookup("language_lookup", emptyMap())
     
     /**
      * Map of translations.
@@ -90,7 +95,7 @@ internal object ResourceLookups {
      * Lookup containing all block states that are in use by base packs.
      */
     val OCCUPIED_BLOCK_STATES_LOOKUP: ResourceLookup<Set<BlockState>> =
-        resourceLookup("occupied_block_states", emptySet(), typeOf<HashSet<BlockState>>())
+        resourceLookup("occupied_block_states", emptySet(), SetSerializer(BlockStateSerializer))
     
     /**
      * Set of all block states that are in use by base packs.
@@ -101,7 +106,7 @@ internal object ResourceLookups {
      * Lookup for entity variant layouts.
      */
     val ENTITY_VARIANT_ASSETS_LOOKUP: ResourceLookup<Map<ResourceKey<*>, EntityVariantLayout>> =
-        resourceLookup("entity_variant_lookup", emptyMap(), typeOf<HashMap<ResourceKey<*>, EntityVariantLayout>>())
+        resourceLookup("entity_variant_lookup", emptyMap(), MapSerializer(ResourceKeySerializer, EntityVariantLayout.serializer()))
     
     /**
      * Entity variant layouts.
@@ -109,25 +114,30 @@ internal object ResourceLookups {
     val ENTITY_VARIANT_ASSETS: Map<ResourceKey<*>, EntityVariantLayout> by ENTITY_VARIANT_ASSETS_LOOKUP
     
     private inline fun <reified T : Any> resourceLookup(key: String, empty: T): ResourceLookup<T> {
-        val lookup = ResourceLookup(key, typeOf<T>(), empty)
+        val lookup = ResourceLookup(key, PermanentStorage::retrieve, PermanentStorage::store, empty)
         lookups += lookup
         return lookup
     }
     
-    private fun <T : Any> resourceLookup(key: String, empty: T, type: KType): ResourceLookup<T> {
-        val lookup = ResourceLookup(key, type, empty)
+    private fun <T : Any> resourceLookup(key: String, empty: T, serializer: KSerializer<T>): ResourceLookup<T> {
+        val lookup = ResourceLookup(
+            key,
+            { PermanentStorage.retrieve(it, serializer) },
+            { k, v -> PermanentStorage.store(k, serializer, v) },
+            empty
+        )
         lookups += lookup
         return lookup
     }
     
     private inline fun <reified K : Any, reified V : Any> mapResourceLookup(key: String): MapResourceLookup<K, V> {
-        val lookup = MapResourceLookup<K, V>(key, typeOf<K>(), typeOf<V>())
+        val lookup = MapResourceLookup<K, V>(key, PermanentStorage::retrieve, PermanentStorage::store)
         lookups += lookup
         return lookup
     }
     
     private inline fun <reified T : Any> idResourceLookup(key: String): IdResourceLookup<T> {
-        val lookup = IdResourceLookup<T>(key, typeOf<T>())
+        val lookup = IdResourceLookup<T>(key, PermanentStorage::retrieve, PermanentStorage::store)
         lookups += lookup
         return lookup
     }

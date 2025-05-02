@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.world.block.limits
 
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.config.PermanentStorageMigrations
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
@@ -18,15 +19,18 @@ import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import java.lang.Integer.max
 import java.util.*
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dependsOn = [PermanentStorageMigrations::class]
+)
 internal object TileEntityTracker {
     
     private val BLOCK_COUNTER: HashMap<UUID, HashMap<Key, Int>> =
-        PermanentStorage.retrieve("block_counter", ::HashMap)
+        PermanentStorage.retrieve("block_counter") ?: HashMap()
     private val BLOCK_WORLD_COUNTER: HashMap<UUID, HashMap<UUID, HashMap<Key, Int>>> =
-        PermanentStorage.retrieve("block_world_counter", ::HashMap)
+        PermanentStorage.retrieve("block_world_counter") ?: HashMap()
     private val BLOCK_CHUNK_COUNTER: HashMap<UUID, HashMap<ChunkPos, HashMap<Key, Int>>> =
-        PermanentStorage.retrieve("block_chunk_counter", ::HashMap)
+        PermanentStorage.retrieve("block_chunk_counter") ?: HashMap()
     
     @InitFun
     private fun init() {

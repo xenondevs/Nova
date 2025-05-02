@@ -1,8 +1,11 @@
 package xyz.xenondevs.nova.world.block.state.model
 
+import kotlinx.serialization.Serializable
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.config.PermanentStorage.storedValue
+import xyz.xenondevs.nova.serialization.kotlinx.BackingStateConfigSerializer
 
+@Serializable(with = BackingStateConfigSerializer::class)
 internal abstract class BackingStateConfig internal constructor() {
     
     abstract val type: BackingStateConfigType<*>

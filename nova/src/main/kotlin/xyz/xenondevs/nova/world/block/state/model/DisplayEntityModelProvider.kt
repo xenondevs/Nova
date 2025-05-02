@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.world.block.state.model
 
 import io.papermc.paper.datacomponent.DataComponentTypes
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Fluid
@@ -9,6 +11,9 @@ import org.bukkit.entity.Display.Brightness
 import org.bukkit.inventory.ItemStack
 import org.joml.Matrix4f
 import org.joml.Matrix4fc
+import xyz.xenondevs.nova.serialization.kotlinx.BlockStateSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.Matrix4fcAsArraySerializer
 import xyz.xenondevs.nova.util.item.requiresLight
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.setBlockState
@@ -26,13 +31,21 @@ import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
 
+@Serializable
 internal data class DisplayEntityBlockModelData(
     val blockState: NovaBlockState,
     val models: List<Model>,
+    @Serializable(with = BlockStateSerializer::class)
     val hitboxType: BlockState
 ) {
     
-    internal data class Model(val model: Key, val transform: Matrix4fc) {
+    @Serializable
+    internal data class Model(
+        @Serializable(with = KeySerializer::class)
+        val model: Key,
+        @Serializable(with = Matrix4fcAsArraySerializer::class)
+        val transform: Matrix4fc
+    ) {
         
         val itemStack: ItemStack
             get() = ItemStack(Material.PAPER).apply {
@@ -47,16 +60,20 @@ internal data class DisplayEntityBlockModelData(
 /**
  * A block model provider that uses display entities to display the block model.
  */
-internal data object DisplayEntityBlockModelProvider : BlockModelProvider<DisplayEntityBlockModelData> {
+@Serializable
+@SerialName("entity_backed")
+internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModelData) : BlockModelProvider {
     
-    val entities = ConcurrentHashMap<BlockPos, List<FakeItemDisplay>>()
-    
-    override fun set(pos: BlockPos, info: DisplayEntityBlockModelData, method: BlockUpdateMethod) {
-        placeHitbox(pos, info, method)
-        load(pos, info)
+    companion object {
+        val entities = ConcurrentHashMap<BlockPos, List<FakeItemDisplay>>()
     }
     
-    private fun placeHitbox(pos: BlockPos, info: DisplayEntityBlockModelData, method: BlockUpdateMethod) {
+    override fun set(pos: BlockPos, method: BlockUpdateMethod) {
+        placeHitbox(pos, method)
+        load(pos)
+    }
+    
+    private fun placeHitbox(pos: BlockPos, method: BlockUpdateMethod) {
         withoutBlockMigration(pos) {
             when (method) {
                 BlockUpdateMethod.DEFAULT -> pos.setBlockState(info.hitboxType)
@@ -66,8 +83,18 @@ internal data object DisplayEntityBlockModelProvider : BlockModelProvider<Displa
         }
     }
     
-    override fun load(pos: BlockPos, info: DisplayEntityBlockModelData) {
-        createItemDisplays(pos, info)
+    override fun load(pos: BlockPos) {
+        if (pos in entities.keys)
+            throw IllegalStateException("ItemDisplay already exists at $pos")
+        
+        val models = info.models.mapTo(ArrayList()) { model ->
+            FakeItemDisplay(pos.location.toCenterLocation()) { _, data -> setMetadata(data, model) }
+        }
+        if (hasWaterlogEntity()) {
+            models += FakeItemDisplay(pos.location.toCenterLocation()) { _, data -> setWaterlogMetadata(data, pos) }
+        }
+        
+        entities[pos] = models
     }
     
     override fun remove(pos: BlockPos, method: BlockUpdateMethod) {
@@ -79,8 +106,8 @@ internal data object DisplayEntityBlockModelProvider : BlockModelProvider<Displa
         entities.remove(pos)?.forEach(FakeEntity<*>::remove)
     }
     
-    override fun replace(pos: BlockPos, info: DisplayEntityBlockModelData, method: BlockUpdateMethod) {
-        placeHitbox(pos, info, method)
+    override fun replace(pos: BlockPos, method: BlockUpdateMethod) {
+        placeHitbox(pos, method)
         
         // re-use as many existing entities as possible
         val prevEntities = entities[pos] ?: emptyList()
@@ -89,10 +116,10 @@ internal data object DisplayEntityBlockModelProvider : BlockModelProvider<Displa
         var i = 0
         for (model in info.models) {
             newEntities += prevEntities.getOrNull(i++)
-                ?.also { prevEntity -> prevEntity.updateEntityData(true) { setMetadata(this, info, model) } }
-                ?: FakeItemDisplay(pos.location.toCenterLocation()) { _, data -> setMetadata(data, info, model) }
+                ?.also { prevEntity -> prevEntity.updateEntityData(true) { setMetadata(this, model) } }
+                ?: FakeItemDisplay(pos.location.toCenterLocation()) { _, data -> setMetadata(data, model) }
         }
-        if (hasWaterlogEntity(info)) {
+        if (hasWaterlogEntity()) {
             newEntities += prevEntities.getOrNull(i)
                 ?.also { prevEntity -> prevEntity.updateEntityData(true) { setWaterlogMetadata(this, pos) } }
                 ?: FakeItemDisplay(pos.location.toCenterLocation()) { _, data -> setWaterlogMetadata(data, pos) }
@@ -105,21 +132,7 @@ internal data object DisplayEntityBlockModelProvider : BlockModelProvider<Displa
         entities[pos]?.lastOrNull()?.updateEntityData(true) { setWaterlogMetadata(this, pos) }
     }
     
-    private fun createItemDisplays(pos: BlockPos, info: DisplayEntityBlockModelData) {
-        if (pos in entities.keys)
-            throw IllegalStateException("ItemDisplay already exists at $pos")
-        
-        val models = info.models.mapTo(ArrayList()) { model ->
-            FakeItemDisplay(pos.location.toCenterLocation()) { _, data -> setMetadata(data, info, model) }
-        }
-        if (hasWaterlogEntity(info)) {
-            models += FakeItemDisplay(pos.location.toCenterLocation()) { _, data -> setWaterlogMetadata(data, pos) }
-        }
-        
-        entities[pos] = models
-    }
-    
-    private fun hasWaterlogEntity(info: DisplayEntityBlockModelData): Boolean =
+    private fun hasWaterlogEntity(): Boolean =
         info.blockState.block.hasBehavior<Waterloggable>() && info.blockState.getOrThrow(DefaultBlockStateProperties.WATERLOGGED)
     
     private fun setWaterlogMetadata(data: ItemDisplayMetadata, pos: BlockPos) {
@@ -131,7 +144,7 @@ internal data object DisplayEntityBlockModelProvider : BlockModelProvider<Displa
         data.transform = Matrix4f()
     }
     
-    private fun setMetadata(data: ItemDisplayMetadata, info: DisplayEntityBlockModelData, model: DisplayEntityBlockModelData.Model) {
+    private fun setMetadata(data: ItemDisplayMetadata, model: DisplayEntityBlockModelData.Model) {
         // TODO: proper light level
         if (info.hitboxType.bukkitMaterial.requiresLight) {
             data.brightness = Brightness(15, 15)

@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.resources.builder.task.font
 
+import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import xyz.xenondevs.nova.resources.CharSizes
@@ -9,6 +10,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.Font
 import xyz.xenondevs.nova.resources.builder.font.provider.bitmap.BitmapProvider
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.data.readImageDimensions
 
 private const val START_CODE_POINT: Int = 0xE000
@@ -57,7 +59,12 @@ abstract class CustomFontContent internal constructor(
     
 }
 
-class FontChar internal constructor(val font: Key, val codePoint: Int) {
+@Serializable
+class FontChar internal constructor(
+    @Serializable(with = KeySerializer::class)
+    val font: Key,
+    val codePoint: Int
+) {
     
     val width by lazy { CharSizes.getCharWidth(font, codePoint) }
     val yRange by lazy { CharSizes.getCharYRange(font, codePoint) }

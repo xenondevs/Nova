@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.resources.ResourceGeneration
 )
 internal object UnknownEnchantments {
     
-    private var customEnchantmentIds: Set<Key> by PermanentStorage.storedValue<Set<Key>>("custom_enchantment_ids", ::HashSet)
+    private var customEnchantmentIds: Set<Key> by PermanentStorage.storedValue("custom_enchantment_ids", ::emptySet)
     private val registeredIds = HashSet<Key>()
     
     @InitFun

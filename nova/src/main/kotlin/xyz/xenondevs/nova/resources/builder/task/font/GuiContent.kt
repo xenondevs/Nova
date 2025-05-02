@@ -1,15 +1,19 @@
 package xyz.xenondevs.nova.resources.builder.task.font
 
+import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.util.data.readImageDimensions
 
+@Serializable
 internal class GuiTextureData(
+    @Serializable(with = KeySerializer::class)
     val font: Key,
     val codePoint: Int,
     val offset: Int

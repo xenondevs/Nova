@@ -271,7 +271,7 @@ class WailaContent internal constructor(
     }
     
     private fun writeHardcodedTextures() {
-        fun copyMCTexture(from: ResourcePath<ResourceType.Texture>): ResourcePath<ResourceType.FontTexture> {
+        fun copyMCTexture(from: ResourcePath<ResourceType.PngFile>): ResourcePath<ResourceType.FontTexture> {
             val name = from.path.substringAfterLast('/')
             val to = ResourcePath(ResourceType.FontTexture, "nova", "waila_generated/$name.png")
             

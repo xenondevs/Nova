@@ -28,7 +28,7 @@ class WolfEntityVariantLayoutBuilder internal constructor(
      * `namespace` and `texture` are defined by [wild].
      */
     fun wild(wild: String) {
-        this.wild = ResourcePath.of(ResourceType.EntityTexture, wild, namespace)
+        this.wild = ResourcePath.of(ResourceType.Texture, wild, namespace)
     }
     
     /**

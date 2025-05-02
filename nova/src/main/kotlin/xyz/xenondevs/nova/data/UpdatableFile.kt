@@ -27,7 +27,7 @@ private val PLUGINS_DIR = DATA_FOLDER.parent
 
 object UpdatableFile {
     
-    private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve(STORAGE_KEY) { HashMap() }
+    private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve(STORAGE_KEY) ?: HashMap()
     
     internal fun extractIdNamedFromAllAddons(dirName: String) {
         for (addon in AddonBootstrapper.addons) {

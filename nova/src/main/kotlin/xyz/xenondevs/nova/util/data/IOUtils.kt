@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.util.data
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
@@ -82,10 +84,26 @@ internal inline fun <reified T> Path.readJson(ignoreUnknownKeys: Boolean): T {
 }
 
 /**
+ * Decodes the contents of [this] JSON file via [deserializer] and [json].
+ */
+@OptIn(ExperimentalSerializationApi::class)
+internal fun <T> Path.readJson(deserializer: DeserializationStrategy<T>, json: Json = Json): T {
+    return inputStream().use { json.decodeFromStream(deserializer, it) }
+}
+
+/**
  * Encodes [value] to JSON via [json] as [T] and writes it to the file.
  */
 @PublishedApi
 @OptIn(ExperimentalSerializationApi::class)
 internal inline fun <reified T> Path.writeJson(value: T, json: Json = Json) {
     outputStream().use { json.encodeToStream(value, it) }
+}
+
+/**
+ * Encodes [value] to JSON via [serializer] and [json] and writes it to the file.
+ */
+@OptIn(ExperimentalSerializationApi::class)
+internal fun <T> Path.writeJson(serializer: SerializationStrategy<T>, value: T, json: Json = Json) {
+    outputStream().use { json.encodeToStream(serializer, value, it) }
 }

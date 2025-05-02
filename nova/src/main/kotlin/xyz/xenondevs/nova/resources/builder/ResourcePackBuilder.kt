@@ -226,7 +226,7 @@ class ResourcePackBuilder internal constructor() {
         try {
             totalTime += measureTime {
                 // download minecraft assets if not present / outdated
-                if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("minecraftAssetsVersion") != SERVER_VERSION) {
+                if (!MCASSETS_DIR.exists() || PermanentStorage.retrieve<Version>("minecraftAssetsVersion") != SERVER_VERSION) {
                     MCASSETS_DIR.toFile().deleteRecursively()
                     runBlocking {
                         val downloader = MinecraftAssetsDownloader(

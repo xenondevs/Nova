@@ -37,10 +37,10 @@ import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
+import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.LeavesBackingStateConfigType
-import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.WATERLOGGED
 import java.nio.file.Path
@@ -124,7 +124,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         ]
     )
     private fun assignBlockModels() {
-        val lookup = HashMap<NovaBlockState, LinkedBlockModelProvider<*>>()
+        val lookup = HashMap<NovaBlockState, BlockModelProvider>()
         
         NovaRegistries.BLOCK
             .sortedByDescending { (it.layout as? BlockModelLayout.StateBacked)?.priority ?: 0 }
@@ -138,11 +138,11 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                                 val modelBuilder = layout.modelSelector(modelScope)
                                 val cfg = assignModelToVanillaBlockState(layout, modelBuilder, blockState[WATERLOGGED] == true)
                                 if (cfg != null) {
-                                    lookup[blockState] = LinkedBlockModelProvider(BackingStateBlockModelProvider, cfg)
+                                    lookup[blockState] = BackingStateBlockModelProvider(cfg)
                                 } else {
                                     LOGGER.warn("No more block states for $blockState with layout $layout, falling back to display entity")
                                     val data = DisplayEntityBlockModelData(blockState, assignModelToItem(modelBuilder), DEFAULT_BLOCK_STATE_SELECTOR(modelScope))
-                                    lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
+                                    lookup[blockState] = DisplayEntityBlockModelProvider(data)
                                 }
                             }
                             
@@ -154,11 +154,11 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                                 }
                                 
                                 val data = DisplayEntityBlockModelData(blockState, models, layout.stateSelector(modelScope))
-                                lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
+                                lookup[blockState] = DisplayEntityBlockModelProvider(data)
                             }
                             
                             is BlockModelLayout.ModelLess -> {
-                                lookup[blockState] = LinkedBlockModelProvider(ModelLessBlockModelProvider, layout.stateSelector(modelScope))
+                                lookup[blockState] = ModelLessBlockModelProvider(layout.stateSelector(modelScope))
                             }
                         }
                     } catch (e: Exception) {

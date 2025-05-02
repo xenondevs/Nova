@@ -474,8 +474,8 @@ object BlockUtils {
         }
         
         val soundGroup = state.block.getBehaviorOrNull<BlockSounds>()?.soundGroup
-        val modelProvider = state.modelProvider.provider
-        if (modelProvider == BackingStateBlockModelProvider || modelProvider == ModelLessBlockModelProvider) {
+        val modelProvider = state.modelProvider
+        if (modelProvider is BackingStateBlockModelProvider || modelProvider is ModelLessBlockModelProvider) {
             // use the level event packet for blocks that use block states
             val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, pos.nmsBlockState.id, false)
             broadcast(levelEventPacket, sendEffectsToBreaker)

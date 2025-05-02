@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.block.state.model
 
+import kotlinx.serialization.Serializable
 import net.minecraft.world.level.block.Blocks
 import xyz.xenondevs.nova.util.setBlockState
 import xyz.xenondevs.nova.util.setBlockStateNoUpdate
@@ -34,17 +35,18 @@ internal enum class BlockUpdateMethod {
  *
  * There should be one instance of this interface per provider type.
  */
-internal sealed interface BlockModelProvider<I> {
+@Serializable
+internal sealed interface BlockModelProvider {
     
     /**
-     * Places the model [info] at [pos].
+     * Places the model at [pos].
      */
-    fun set(pos: BlockPos, info: I, method: BlockUpdateMethod)
+    fun set(pos: BlockPos, method: BlockUpdateMethod= BlockUpdateMethod.DEFAULT)
     
     /**
      * Removes the model at [pos].
      */
-    fun remove(pos: BlockPos, method: BlockUpdateMethod) {
+    fun remove(pos: BlockPos, method: BlockUpdateMethod= BlockUpdateMethod.DEFAULT) {
         val air = Blocks.AIR.defaultBlockState()
         withoutBlockMigration(pos) {
             when (method) {
@@ -56,10 +58,9 @@ internal sealed interface BlockModelProvider<I> {
     }
     
     /**
-     * Reactivates the model [info] at [pos], assuming the model
-     * was already [set] previously.
+     * Reactivates the model at [pos], assuming the model was already [set] previously.
      */
-    fun load(pos: BlockPos, info: I)
+    fun load(pos: BlockPos)
     
     /**
      * Deactivates the model at [pos].
@@ -67,36 +68,19 @@ internal sealed interface BlockModelProvider<I> {
     fun unload(pos: BlockPos)
     
     /**
-     * Replaces the model at [pos] with [info].
+     * Replaces the model at [pos].
      */
-    fun replace(pos: BlockPos, info: I, method: BlockUpdateMethod)
+    fun replace(pos: BlockPos, method: BlockUpdateMethod = BlockUpdateMethod.DEFAULT)
     
-}
-
-/**
- * A combination of [BlockModelProvider][provider] and the [information][info] required to display a certain block model with it.
- */
-internal data class LinkedBlockModelProvider<I>(
-    val provider: BlockModelProvider<I>,
-    val info: I
-) {
-    
-    fun set(pos: BlockPos, method: BlockUpdateMethod = BlockUpdateMethod.DEFAULT) = provider.set(pos, info, method)
-    
-    fun remove(pos: BlockPos, method: BlockUpdateMethod = BlockUpdateMethod.DEFAULT) = provider.remove(pos, method)
-    
-    fun load(pos: BlockPos) = provider.load(pos, info)
-    
-    fun unload(pos: BlockPos) = provider.unload(pos)
-    
-    fun replace(pos: BlockPos, method: BlockUpdateMethod = BlockUpdateMethod.DEFAULT) = provider.replace(pos, info, method)
-    
-    fun replace(pos: BlockPos, prevProvider: LinkedBlockModelProvider<*>) {
-        if (prevProvider.provider == provider) {
-            provider.replace(pos, info, BlockUpdateMethod.DEFAULT)
+    /**
+     * Replaces the model at [pos], assuming that the previous model was displayed using [prevProvider].
+     */
+    fun replace(pos: BlockPos, prevProvider: BlockModelProvider, method: BlockUpdateMethod = BlockUpdateMethod.DEFAULT) {
+        if (prevProvider::class == this::class) {
+            replace(pos, method)
         } else {
-            prevProvider.remove(pos)
-            set(pos)
+            prevProvider.remove(pos, method)
+            set(pos, method)
         }
     }
     

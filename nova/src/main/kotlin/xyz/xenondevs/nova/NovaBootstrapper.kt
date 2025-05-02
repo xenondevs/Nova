@@ -28,7 +28,7 @@ import kotlin.io.path.exists
 
 private val REQUIRED_SERVER_VERSION: ClosedVersionRange = Version("1.21.5")..Version("1.21.5")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
-internal val PREVIOUS_NOVA_VERSION: Version? = PermanentStorage.retrieveOrNull<Version>("last_version")
+internal val PREVIOUS_NOVA_VERSION: Version? = PermanentStorage.retrieve<Version>("last_version")
 internal val DATA_FOLDER = Path("plugins", "Nova")
 
 internal lateinit var BOOTSTRAPPER: NovaBootstrapper private set

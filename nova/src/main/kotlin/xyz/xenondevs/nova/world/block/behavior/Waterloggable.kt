@@ -49,7 +49,7 @@ object Waterloggable : BlockBehavior {
     }
     
     override fun handleNeighborChanged(pos: BlockPos, state: NovaBlockState) {
-        DisplayEntityBlockModelProvider.updateWaterlogEntity(pos)
+        (state.modelProvider as? DisplayEntityBlockModelProvider)?.updateWaterlogEntity(pos)
     }
     
 }

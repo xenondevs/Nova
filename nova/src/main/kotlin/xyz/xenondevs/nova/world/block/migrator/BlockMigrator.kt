@@ -247,9 +247,7 @@ internal object BlockMigrator : Listener {
                 // call behavior break handlers directly to bypass any tile-entity or model provider related logic
                 previousNovaState.block.behaviors.forEach { it.handleBreak(pos, previousNovaState, ctx) }
                 // for entity-backed models, the display entity needs to be despawned
-                if (previousNovaState.modelProvider.provider == DisplayEntityBlockModelProvider) {
-                    DisplayEntityBlockModelProvider.unload(pos)
-                }
+                (previousNovaState.modelProvider as? DisplayEntityBlockModelProvider)?.unload(pos)
             }
             previousTileEntity?.handleBreak(ctx)
         }

@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.world.block.logic.place
 
 import kotlinx.coroutines.runBlocking
 import net.minecraft.core.component.DataComponents
-import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
 import org.bukkit.entity.FallingBlock
@@ -37,8 +36,9 @@ import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
+import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.pos
@@ -150,11 +150,10 @@ internal object BlockPlacing : Listener {
         
         val ctx = ctxBuilder.build()
         
-        val vanillaState = when (val info = newState.modelProvider.info) {
-            is BackingStateConfig -> info.vanillaBlockState.bukkitBlockData
-            is DisplayEntityBlockModelData -> info.hitboxType.bukkitBlockData
-            is BlockState -> info.bukkitBlockData
-            else -> throw UnsupportedOperationException()
+        val vanillaState = when (val modelProvider = newState.modelProvider) {
+            is BackingStateBlockModelProvider -> modelProvider.info.vanillaBlockState.bukkitBlockData
+            is DisplayEntityBlockModelProvider -> modelProvider.info.hitboxType.bukkitBlockData
+            is ModelLessBlockModelProvider -> modelProvider.info.bukkitBlockData
         }
         
         if (pos.location.isInsideWorldRestrictions()

@@ -26,7 +26,7 @@ private const val FORCE_BYPASS_PERMISSION = "nova.misc.resourcePack.bypass.force
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object ForceResourcePack : Listener {
     
-    private val packId: UUID = PermanentStorage.retrieveOrStore("force_resource_pack_uuid") { UUID.randomUUID() }
+    private val packId: UUID by PermanentStorage.storedValue("force_resource_pack_uuid") { UUID.randomUUID() }
     
     private var hash: ByteArray? = null
     private var url: String? = null

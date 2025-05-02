@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 )
 internal object SoundEngine : Listener, PacketListener {
     
-    private val SOUND_OVERRIDES: HashSet<String> = PermanentStorage.retrieve("soundOverrides", ::HashSet)
+    private val SOUND_OVERRIDES: HashSet<String> = PermanentStorage.retrieve("soundOverrides") ?: HashSet()
     
     @InitFun
     private fun init() {

@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
@@ -21,6 +22,7 @@ import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockIntera
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
+import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockSerializer
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
@@ -36,6 +38,7 @@ import kotlin.reflect.full.isSuperclassOf
 /**
  * Represents a block type in Nova.
  */
+@Serializable(with = NovaBlockSerializer::class)
 open class NovaBlock internal constructor(
     val id: Key,
     val name: Component,

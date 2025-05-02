@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.config
 
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -17,11 +19,10 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.serialization.configurate.NOVA_CONFIGURATE_SERIALIZERS
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
@@ -39,7 +40,13 @@ object Configs {
     
     private val customSerializers = HashMap<String, ArrayList<TypeSerializerCollection>>()
     
-    private val extractor = ConfigExtractor(PermanentStorage.storedValue("stored_configs", ::HashMap))
+    private val extractor = ConfigExtractor(
+        PermanentStorage.storedValue(
+            "stored_configs", 
+            MapSerializer(KeySerializer, String.serializer()),
+            ::HashMap
+        )
+    )
     private val configProviders = HashMap<Key, RootConfigProvider>()
     
     private var lastReload = -1L

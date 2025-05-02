@@ -19,7 +19,6 @@ import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.joml.Matrix4f
@@ -69,8 +68,6 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.LeavesBehavior
 import xyz.xenondevs.nova.world.block.hitbox.HitboxManager
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
-import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
@@ -444,9 +441,9 @@ internal object NovaCommand : Command() {
             if (novaBlockState != null) {
                 val modelProvider = novaBlockState.modelProvider
                 
-                val message = when (modelProvider.provider) {
+                val message = when (modelProvider) {
                     is ModelLessBlockModelProvider -> {
-                        val info = modelProvider.info as BlockState
+                        val info = modelProvider.info
                         Component.translatable(
                             "command.nova.show_block_model_data.model_less",
                             NamedTextColor.GRAY,
@@ -456,7 +453,7 @@ internal object NovaCommand : Command() {
                     }
                     
                     is BackingStateBlockModelProvider -> {
-                        val info = modelProvider.info as BackingStateConfig
+                        val info = modelProvider.info
                         Component.translatable(
                             "command.nova.show_block_model_data.backing_state",
                             NamedTextColor.GRAY,
@@ -467,7 +464,7 @@ internal object NovaCommand : Command() {
                     }
                     
                     is DisplayEntityBlockModelProvider -> {
-                        val info = modelProvider.info as DisplayEntityBlockModelData
+                        val info = modelProvider.info
                         val format = DecimalFormat("#.##")
                         
                         val modelComponents = info.models.map { model ->

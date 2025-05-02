@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.entity.variant
 
+import kotlinx.serialization.builtins.SetSerializer
 import net.minecraft.core.ClientAsset
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
@@ -17,6 +18,7 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.patch.impl.registry.preFreeze
 import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.serialization.kotlinx.ResourceKeySerializer
 import xyz.xenondevs.nova.util.set
 
 @InternalInit(
@@ -25,7 +27,11 @@ import xyz.xenondevs.nova.util.set
 )
 internal object UnknownEntityVariants {
     
-    private var customVariantKeys: Set<ResourceKey<*>> by PermanentStorage.storedValue("custom_entity_variant_keys") { emptySet() }
+    private var customVariantKeys: Set<ResourceKey<*>> by PermanentStorage.storedValue(
+        "custom_entity_variant_keys", 
+        SetSerializer(ResourceKeySerializer),
+        ::emptySet
+    )
     private val registeredIds = HashSet<ResourceKey<*>>()
     
     @InitFun

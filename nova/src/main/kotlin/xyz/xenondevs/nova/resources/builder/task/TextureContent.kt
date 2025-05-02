@@ -8,13 +8,13 @@ import java.awt.image.BufferedImage
 
 class TextureContent(private val builder: ResourcePackBuilder) : PackTaskHolder {
     
-    private val textureCache = HashMap<ResourcePath<ResourceType.Texture>, BufferedImage>()
+    private val textureCache = HashMap<ResourcePath<ResourceType.PngFile>, BufferedImage>()
     
-    fun getImage(path: ResourcePath<ResourceType.Texture>): BufferedImage {
+    fun getImage(path: ResourcePath<ResourceType.PngFile>): BufferedImage {
         return textureCache.getOrPut(path) { builder.findOrThrow(path).readImage() }
     }
     
-    fun getImageLazily(path: ResourcePath<ResourceType.Texture>): Lazy<BufferedImage> {
+    fun getImageLazily(path: ResourcePath<ResourceType.PngFile>): Lazy<BufferedImage> {
         return lazy { getImage(path) }
     }
     

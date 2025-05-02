@@ -1,12 +1,15 @@
 package xyz.xenondevs.nova.world.item
 
+import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.layout.equipment.EquipmentLayout
+import xyz.xenondevs.nova.serialization.kotlinx.EquipmentSerializer
 
 /**
  * Represents a custom armor texture.
  */
+@Serializable(with = EquipmentSerializer::class)
 class Equipment internal constructor(
     val id: Key,
     internal val makeLayout: (ResourcePackBuilder) -> EquipmentLayout
@@ -14,6 +17,7 @@ class Equipment internal constructor(
     
     companion object {
         
+        // TODO: these should be in the registry, otherwise the serializer won't work for them
         val LEATHER = of(Key.key("minecraft", "leather"))
         val CHAINMAIL = of(Key.key("minecraft", "chainmail"))
         val IRON = of(Key.key("minecraft", "iron"))
