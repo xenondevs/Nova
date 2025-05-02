@@ -21,21 +21,24 @@ import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.serialization.kotlinx.ResourceKeySerializer
 import xyz.xenondevs.nova.util.set
 
+private const val STORAGE_ID = "custom_entity_variant_keys"
+
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
     dependsOn = [ResourceGeneration.PreWorld::class]
 )
 internal object UnknownEntityVariants {
     
-    private var customVariantKeys: Set<ResourceKey<*>> by PermanentStorage.storedValue(
-        "custom_entity_variant_keys", 
+    private val customVariantKeys: HashSet<ResourceKey<*>> = PermanentStorage.retrieve(
+        STORAGE_ID,
         SetSerializer(ResourceKeySerializer),
-        ::emptySet
-    )
+    )?.toHashSet() ?: HashSet()
     private val registeredIds = HashSet<ResourceKey<*>>()
     
     @InitFun
     private fun addUnknownEntityVariants() {
+        PermanentStorage.store(STORAGE_ID, SetSerializer(ResourceKeySerializer), customVariantKeys)
+        
         val unregisteredIds = customVariantKeys - registeredIds
         for (key in unregisteredIds) {
             val registryKey = key.registryKey()
@@ -86,7 +89,7 @@ internal object UnknownEntityVariants {
     }
     
     fun rememberEntityVariantKey(id: ResourceKey<*>) {
-        customVariantKeys = customVariantKeys + id
+        customVariantKeys += id
         registeredIds += id
     }
     

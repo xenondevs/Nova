@@ -9,17 +9,21 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.resources.ResourceGeneration
 
+private const val STORAGE_ID = "custom_enchantment_ids"
+
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
     dependsOn = [ResourceGeneration.PreWorld::class]
 )
 internal object UnknownEnchantments {
     
-    private var customEnchantmentIds: Set<Key> by PermanentStorage.storedValue("custom_enchantment_ids", ::emptySet)
+    private val customEnchantmentIds: HashSet<Key> = PermanentStorage.retrieve(STORAGE_ID) ?: HashSet()
     private val registeredIds = HashSet<Key>()
     
     @InitFun
     private fun addUnknownEnchantments() {
+        PermanentStorage.store(STORAGE_ID, customEnchantmentIds)
+        
         val unregisteredIds = customEnchantmentIds - registeredIds
         for (id in unregisteredIds) {
             val builder = EnchantmentBuilder(id)
@@ -35,7 +39,7 @@ internal object UnknownEnchantments {
     }
     
     fun rememberEnchantmentId(id: Key) {
-        customEnchantmentIds = customEnchantmentIds + id
+        customEnchantmentIds += id
         registeredIds += id
     }
     
