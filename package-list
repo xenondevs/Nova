@@ -34,6 +34,7 @@ xyz.xenondevs.nova.resources.builder.font.provider.bitmap
 xyz.xenondevs.nova.resources.builder.font.provider.unihex
 xyz.xenondevs.nova.resources.builder.layout
 xyz.xenondevs.nova.resources.builder.layout.block
+xyz.xenondevs.nova.resources.builder.layout.entity
 xyz.xenondevs.nova.resources.builder.layout.equipment
 xyz.xenondevs.nova.resources.builder.layout.gui
 xyz.xenondevs.nova.resources.builder.layout.item
@@ -93,6 +94,7 @@ xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder
 xyz.xenondevs.nova.world.block.tileentity.network.type.item
 xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder
 xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory
+xyz.xenondevs.nova.world.entity.variant
 xyz.xenondevs.nova.world.fakeentity
 xyz.xenondevs.nova.world.fakeentity.impl
 xyz.xenondevs.nova.world.fakeentity.metadata
