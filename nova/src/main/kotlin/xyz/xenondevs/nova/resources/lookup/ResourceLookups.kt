@@ -142,9 +142,6 @@ internal object ResourceLookups {
         return lookup
     }
     
-    internal fun hasAllLookups(): Boolean =
-        lookups.all { PermanentStorage.has(it.key) }
-    
     internal fun tryLoadAll(): Boolean =
         runCatching { loadAll() }.isSuccess
     

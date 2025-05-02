@@ -57,7 +57,6 @@ internal object ResourceGeneration {
             if (System.getProperty(FORCE_REBUILD_FLAG) != null
                 || ResourcePackBuilder.RESOURCE_PACK_FILE.notExists()
                 || PermanentStorage.retrieve<String>(VERSION_HASH) != versionHash
-                || !ResourceLookups.hasAllLookups()
                 || !ResourceLookups.tryLoadAll()
                 || !hasAllBlockModels()
             ) {

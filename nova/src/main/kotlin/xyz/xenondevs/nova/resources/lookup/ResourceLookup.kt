@@ -24,7 +24,6 @@ internal open class ResourceLookup<T : Any>(
     }
     
     internal fun load() {
-        println("Loading lookup $key")
         val loaded = loadFn(key)
         if (loaded != null)
             provider.set(loaded)
