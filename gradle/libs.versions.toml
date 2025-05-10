@@ -27,7 +27,7 @@ commons-version = { group = "xyz.xenondevs.commons", name = "commons-version", v
 configurate-yaml = { group = "org.spongepowered", name = "configurate-yaml", version = "4.2.0" }
 cosmic-binary-format = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format", version.ref = "cbf" }
 fuzzywuzzy = { group = "me.xdrop", name = "fuzzywuzzy", version = "1.4.0" }
-invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version = "2.0.0-alpha.11" }
+invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version = "2.0.0-alpha.12" }
 jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jgrapht" }
 jgrapht-io = { group = "org.jgrapht", name = "jgrapht-io", version.ref = "jgrapht" }
 jimfs = { group = "com.google.jimfs", name = "jimfs", version = "1.3.0" }
