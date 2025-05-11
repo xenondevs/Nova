@@ -147,7 +147,7 @@ internal class PaleOakLeavesBackingStateConfig(
     distance: Int,
     persistent: Boolean,
     waterlogged: Boolean
-) : LeavesBackingStateConfig(Blocks.CHERRY_LEAVES, distance, persistent, waterlogged) {
+) : LeavesBackingStateConfig(Blocks.PALE_OAK_LEAVES, distance, persistent, waterlogged) {
     override val type = PaleOakLeavesBackingStateConfig
     
     companion object : LeavesBackingStateConfigType<PaleOakLeavesBackingStateConfig>(::PaleOakLeavesBackingStateConfig, "pale_oak_leaves") {
