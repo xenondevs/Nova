@@ -24,6 +24,7 @@ import xyz.xenondevs.nova.world.ChunkPos
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.Path
+import kotlin.io.path.createParentDirectories
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 
@@ -72,13 +73,13 @@ internal object PermanentStorage {
         getPath(key).deleteIfExists()
     
     fun <T> store(key: String, serializer: SerializationStrategy<T>, data: T): Unit =
-        getPath(key).writeJson(serializer, data, JSON)
+        getPath(key).also { it.createParentDirectories() }.writeJson(serializer, data, JSON)
     
     fun <T> retrieve(key: String, deserializer: DeserializationStrategy<T>): T? =
         getPath(key).takeIf { it.exists() }?.readJson(deserializer, JSON)
     
     inline fun <reified T> store(key: String, data: T): Unit =
-        getPath(key).writeJson(data, JSON)
+        getPath(key).also { it.createParentDirectories() }.writeJson(data, JSON)
     
     inline fun <reified T> retrieve(key: String): T? =
         getPath(key).takeIf { it.exists() }?.readJson(JSON)
