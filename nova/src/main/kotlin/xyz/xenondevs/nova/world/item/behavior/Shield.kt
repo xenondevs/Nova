@@ -4,6 +4,8 @@ package xyz.xenondevs.nova.world.item.behavior
 
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.BlocksAttacks
+import io.papermc.paper.datacomponent.item.blocksattacks.DamageReduction
+import io.papermc.paper.datacomponent.item.blocksattacks.ItemDamageFunction
 import io.papermc.paper.registry.tag.TagKey
 import net.kyori.adventure.key.Key
 import org.bukkit.Registry
@@ -27,6 +29,15 @@ import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
  * @param disableCooldownScale A multiplier that is applied to the number of ticks that the item will be on cooldown for when attacked by a disabling attack.
  * Defaults to `1.0`. Used when `disable_cooldown_scale` is not specified in the config.
  *
+ * @param damageReductions A list of [DamageReductions][DamageReduction] of how much damage should be blocked on attack.
+ * Defaults to none. Used when `damage_reductions` is not specified in the config. 
+ * In configuration `damage_reductions` is a list of maps with  keys `base` (float), `factor` (float), `horizontal_blocking_angle` (float),
+ * `type` (damage type tag/key/list of keys).
+ * 
+ * @param itemDamage Specifies how much damage is applied to the item when it blocks an attack.
+ * Used when `item_damage` is not specified in the config.
+ * In configuration `item_damage` is a map with keys `threshold` (float), `base` (float), `factor` (float).
+ * 
  * @param bypassedBy A damage type tag containing the damage types that bypass the shield. Can be `null` if no damage types bypass the shield.
  * Defaults to `null`. Used when `bypassed_by` is not specified in the config.
  *
@@ -39,46 +50,18 @@ import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 fun Shield(
     blockDelay: Int = 0,
     disableCooldownScale: Double = 1.0,
-    bypassedBy: TagKey<DamageType>?,
-    blockSound: Sound?,
-    disableSound: Sound?
-) = Shield(
-    blockDelay,
-    disableCooldownScale,
-    bypassedBy,
-    blockSound?.let(Registry.SOUND_EVENT::getKey),
-    disableSound?.let(Registry.SOUND_EVENT::getKey)
-)
-
-/**
- * Creates a factory for [Shield] behaviors using the given values, if not specified otherwise in the item's config.
- * 
- * @param blockDelay The number of ticks that right-click must be held before successfully blocking attacks.
- * Defaults to `0`. Used when `block_delay` is not specified in the config.
- * 
- * @param disableCooldownScale A multiplier that is applied to the number of ticks that the item will be on cooldown for when attacked by a disabling attack.
- * Defaults to `1.0`. Used when `disable_cooldown_scale` is not specified in the config.
- * 
- * @param bypassedBy A damage type tag containing the damage types that bypass the shield. Can be `null` if no damage types bypass the shield.
- * Defaults to `null`. Used when `bypassed_by` is not specified in the config.
- * 
- * @param blockSound The sound that is played when the shield successfully blocks an attack. Can be `null` if no sound should be played.
- * Defaults to `null`. Used when `block_sound` is not specified in the config.
- * 
- * @param disableSound The sound that is played when the shield is disabled by a disabling attack. Can be `null` if no sound should be played.
- * Defaults to `null`. Used when `disable_sound` is not specified in the config.
- */
-fun Shield(
-    blockDelay: Int = 0,
-    disableCooldownScale: Double = 1.0,
+    damageReductions: List<DamageReduction> = emptyList(),
+    itemDamage: ItemDamageFunction = ItemDamageFunction.itemDamageFunction().build(),
     bypassedBy: TagKey<DamageType>? = null,
     blockSound: Key? = null,
     disableSound: Key? = null
-) = ItemBehaviorFactory<Shield> {
+) = ItemBehaviorFactory {
     val cfg = it.config
     Shield(
         cfg.entryOrElse(blockDelay, "block_delay"),
         cfg.entryOrElse(disableCooldownScale, "disable_cooldown_scale"),
+        cfg.optionalEntry<List<DamageReduction>>("damage_reductions").orElse(damageReductions),
+        cfg.optionalEntry<ItemDamageFunction>("item_damage").orElse(itemDamage),
         cfg.optionalEntry<TagKey<DamageType>>("bypassed_by").orElse(bypassedBy),
         cfg.optionalEntry<Key>("block_sound").orElse(blockSound),
         cfg.optionalEntry<Key>("disable_sound").orElse(disableSound)
@@ -86,8 +69,12 @@ fun Shield(
 }
 
 /**
+ * Makes items act like shields.
+ * 
  * @param blockDelay The number of ticks that right-click must be held before successfully blocking attacks.
  * @param disableCooldownScale A multiplier that is applied to the number of ticks that the item will be on cooldown for when attacked by a disabling attack.
+ * @param damageReductions A list of [DamageReductions][DamageReduction] of how much damage should be blocked on attack.
+ * @param itemDamage Specifies how much damage is applied to the item when it blocks an attack.
  * @param bypassedBy A damage type tag containing the damage types that bypass the shield. Can be `null` if no damage types bypass the shield.
  * @param blockSound The sound that is played when the shield successfully blocks an attack. Can be `null` if no sound should be played.
  * @param disableSound The sound that is played when the shield is disabled by a disabling attack. Can be `null` if no sound should be played.
@@ -95,7 +82,8 @@ fun Shield(
 class Shield(
     blockDelay: Provider<Int>,
     disableCooldownScale: Provider<Double>,
-    // TODO: damage reductions, item damage (not yet in paper api)
+    damageReductions: Provider<List<DamageReduction>>,
+    itemDamage: Provider<ItemDamageFunction>,
     bypassedBy: Provider<TagKey<DamageType>?>,
     blockSound: Provider<Key?>,
     disableSound: Provider<Key?>
@@ -110,6 +98,16 @@ class Shield(
      * A multiplier that is applied to the number of ticks that the item will be on cooldown for when attacked by a disabling attack.
      */
     val disableCooldownScale: Double by disableCooldownScale
+    
+    /**
+     * A list of [DamageReductions][DamageReduction] of how much damage should be blocked on attack.
+     */
+    val damageReductions: List<DamageReduction> by damageReductions
+    
+    /**
+     * Specifies how much damage is applied to the item when it blocks an attack.
+     */
+    val itemDamage: ItemDamageFunction by itemDamage
     
     /**
      * A damage type tag containing the damage types that bypass the shield.
@@ -140,11 +138,13 @@ class Shield(
     
     override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider {
         this[DataComponentTypes.BLOCKS_ATTACKS] = combinedProvider(
-            blockDelay, disableCooldownScale, bypassedBy, blockSound, disableSound
-        ) { blockDelay, disableCooldownScale, bypassedBy, blockSound, disableSound ->
+            blockDelay, disableCooldownScale, damageReductions, itemDamage, bypassedBy, blockSound, disableSound
+        ) { blockDelay, disableCooldownScale, damageReductions, itemDamage, bypassedBy, blockSound, disableSound ->
             BlocksAttacks.blocksAttacks()
                 .blockDelaySeconds(blockDelay / 20f)
                 .disableCooldownScale(disableCooldownScale.toFloat())
+                .damageReductions(damageReductions)
+                .itemDamage(itemDamage)
                 .bypassedBy(bypassedBy)
                 .blockSound(blockSound)
                 .disableSound(disableSound)
@@ -156,6 +156,8 @@ class Shield(
         return "Shield(" +
             "blockDelay=$blockDelay, " +
             "disableCooldownScale=$disableCooldownScale, " +
+            "damageReductions=$damageReductions, " +
+            "itemDamage=$itemDamage, " +
             "bypassedBy=$bypassedBy, " +
             "blockSound=$blockSound, " +
             "disableSound=$disableSound" +
