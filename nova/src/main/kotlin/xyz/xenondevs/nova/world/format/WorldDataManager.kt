@@ -99,6 +99,9 @@ object WorldDataManager : Listener {
     fun getBlockState(pos: BlockPos): NovaBlockState? =
         getChunkOrThrow(pos.chunkPos).getBlockState(pos)
     
+    internal fun getBlockStateOrNullIfUnloaded(pos: BlockPos): NovaBlockState? =
+        getChunkOrNull(pos.chunkPos)?.getBlockState(pos)
+    
     internal suspend fun getOrLoadBlockState(pos: BlockPos): NovaBlockState? =
         getOrLoadChunk(pos.chunkPos).getBlockState(pos)
     

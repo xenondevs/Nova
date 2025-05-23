@@ -4,12 +4,14 @@ import kotlinx.coroutines.runBlocking
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
+import org.bukkit.block.data.type.Dispenser
 import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockDispenseEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
@@ -28,6 +30,7 @@ import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.dropItem
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
+import xyz.xenondevs.nova.util.item.isBucket
 import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.registerEvents
@@ -90,6 +93,16 @@ internal object BlockPlacing : Listener {
             if (blockState != null) {
                 event.isCancelled = true
                 event.block.location.dropItem(ItemStack(entity.blockData.material))
+            }
+        }
+    }
+    
+    @EventHandler(ignoreCancelled = true)
+    private fun handleBlockDispense(event: BlockDispenseEvent) {
+        if (event.item.type.isBucket()) {
+            val targetPos = event.block.pos.advance((event.block.blockData as Dispenser).facing)
+            if (WorldDataManager.getBlockStateOrNullIfUnloaded(targetPos) != null) {
+                event.isCancelled = true
             }
         }
     }
