@@ -87,7 +87,11 @@ internal object BlockInteracting : Listener, PacketListener {
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private fun handleEntityExplosion(event: EntityExplodeEvent) = handleExplosion(event.blockList())
+    private fun handleEntityExplosion(event: EntityExplodeEvent) {
+        if (event.entityType == EntityType.WIND_CHARGE)
+            return // wind charges don't destroy blocks
+        handleExplosion(event.blockList())
+    }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun handleBlockExplosion(event: BlockExplodeEvent) = handleExplosion(event.blockList())
