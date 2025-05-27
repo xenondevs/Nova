@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvide
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.WATERLOGGED
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.player.swingHandEventless
-import xyz.xenondevs.nova.world.player.swingHandEventless
+
 /**
  * Allows water-logging blocks via right-clicking with buckets. Requires the [WATERLOGGED] property.
  */

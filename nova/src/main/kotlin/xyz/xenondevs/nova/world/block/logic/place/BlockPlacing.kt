@@ -4,8 +4,8 @@ import kotlinx.coroutines.runBlocking
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
-import org.bukkit.block.data.type.Dispenser
 import org.bukkit.Tag
+import org.bukkit.block.data.type.Dispenser
 import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -32,7 +32,6 @@ import xyz.xenondevs.nova.util.dropItem
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isBucket
-import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverLevel
@@ -45,7 +44,6 @@ import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvide
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.world.player.swingHandEventless
 import xyz.xenondevs.nova.world.player.swingHandEventless
 import xyz.xenondevs.nova.world.pos
 
