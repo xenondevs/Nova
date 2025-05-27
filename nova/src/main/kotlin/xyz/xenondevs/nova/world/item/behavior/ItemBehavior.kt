@@ -86,7 +86,7 @@ interface ItemBehavior : ItemBehaviorHolder {
 }
 
 /**
- * Creates [ItemBehavior] instances for [NovaItem NovaItems].
+ * Creates [ItemBehavior] instances for [NovaItems][NovaItem].
  */
 fun interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
     

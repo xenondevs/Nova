@@ -1,41 +1,38 @@
 package xyz.xenondevs.nova.addon.registry.worldgen
 
-import it.unimi.dsi.fastutil.doubles.DoubleArrayList
 import it.unimi.dsi.fastutil.doubles.DoubleList
-import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings
 import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
+import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.addon.registry.AddonGetter
-import xyz.xenondevs.nova.patch.impl.registry.set
-import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
+@Deprecated(REGISTRIES_DEPRECATION)
 interface NoiseRegistry : AddonGetter {
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun registerNoiseParameters(name: String, noiseParams: NoiseParameters): NoiseParameters {
-        val id = ResourceLocation(addon, name)
-        Registries.NOISE[id] = noiseParams
-        return noiseParams
-    }
+    fun registerNoiseParameters(name: String, noiseParams: NoiseParameters): NoiseParameters =
+        addon.registerNoiseParameters(name, noiseParams)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
     fun registerNoiseParameters(name: String, firstOctave: Int, amplitudes: DoubleList) =
-        registerNoiseParameters(name, NoiseParameters(firstOctave, amplitudes))
+        addon.registerNoiseParameters(name, firstOctave, amplitudes)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
     fun registerNoiseParameters(name: String, firstOctave: Int, amplitudes: List<Double>) =
-        registerNoiseParameters(name, NoiseParameters(firstOctave, DoubleArrayList(amplitudes)))
+        addon.registerNoiseParameters(name, firstOctave, amplitudes)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
     fun registerNoiseParameters(name: String, firstOctave: Int, vararg amplitudes: Double) =
-        registerNoiseParameters(name, NoiseParameters(firstOctave, DoubleArrayList(amplitudes)))
+        addon.registerNoiseParameters(name, firstOctave, *amplitudes)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun registerNoiseGenerationSettings(name: String, settings: NoiseGeneratorSettings): NoiseGeneratorSettings {
-        val id = ResourceLocation(addon, name)
-        Registries.NOISE_SETTINGS[id] = settings
-        return settings
-    }
+    fun registerNoiseGenerationSettings(name: String, settings: NoiseGeneratorSettings): NoiseGeneratorSettings =
+        addon.registerNoiseGenerationSettings(name, settings)
     
 }

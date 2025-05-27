@@ -12,7 +12,7 @@ internal object CocoaWailaInfoProvider : VanillaWailaInfoProvider<Cocoa>(setOf(M
     
     override fun getInfo(player: Player, pos: BlockPos, blockState: Cocoa): WailaInfo {
         val info = DefaultVanillaWailaInfoProvider.getInfo(player, pos, blockState)
-        info.icon = Key.key("cocoa_stage$${blockState.age}")
+        info.icon = Key.key("cocoa_stage${blockState.age}")
         return info
     }
     

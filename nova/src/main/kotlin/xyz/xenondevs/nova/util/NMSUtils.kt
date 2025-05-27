@@ -4,11 +4,15 @@ package xyz.xenondevs.nova.util
 
 import com.mojang.datafixers.util.Either
 import io.netty.buffer.Unpooled
+import io.papermc.paper.registry.TypedKey
+import io.papermc.paper.registry.set.RegistryKeySet
+import io.papermc.paper.registry.tag.Tag
 import net.kyori.adventure.key.Key
 import net.minecraft.core.DefaultedRegistry
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderGetter
+import net.minecraft.core.HolderSet
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.NonNullList
 import net.minecraft.core.RegistrationInfo
@@ -443,11 +447,6 @@ operator fun <T> Registry<T>.get(key: String): Optional<Holder.Reference<T>> {
     return get(id)
 }
 
-fun <T> Registry<T>.get(id: ResourceLocation): Holder<T>? {
-    val key = ResourceKey.create(key(), id)
-    return get(key).getOrNull()
-}
-
 fun <T> Registry<T>.getOrNull(key: String): Holder.Reference<T>? {
     return get(key).getOrNull()
 }
@@ -639,6 +638,28 @@ fun ResourceLocation(addon: Addon, name: String): ResourceLocation {
 
 fun <T> io.papermc.paper.registry.tag.TagKey<*>.toNmsTagKey(registry: ResourceKey<out Registry<T>>): TagKey<T> =
     TagKey.create(registry, key().toResourceLocation())
+
+fun <T> TypedKey<*>.toResourceKey(registry: ResourceKey<out Registry<T>>): ResourceKey<T> =
+    ResourceKey.create(registry, key().toResourceLocation())
+
+fun <T> Iterable<TypedKey<*>>.toHolderSet(
+    registryKey: ResourceKey<out Registry<T>>,
+    registry: HolderGetter<T>
+): HolderSet<T> {
+    return map { it.toResourceKey(registryKey) }
+        .map { registry.getOrThrow(it) }
+        .let { HolderSet.direct(it) }
+}
+
+fun <T> RegistryKeySet<*>.toNmsHolderSet(
+    registryKey: ResourceKey<out Registry<T>>, 
+    registry: HolderGetter<T>
+): HolderSet<T> {
+    return when (this) {
+        is Tag -> registry.getOrThrow(tagKey().toNmsTagKey(registryKey))
+        else -> values().toHolderSet(registryKey, registry)
+    }
+}
 
 fun preventPacketBroadcast(run: () -> Unit) {
     BroadcastPacketPatch.dropAll = true

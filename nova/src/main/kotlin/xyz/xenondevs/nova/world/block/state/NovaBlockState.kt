@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.world.block.state
 
+import kotlinx.serialization.Serializable
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockStateSerializer
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.block.state.property.PropertiesTree
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
@@ -10,10 +12,11 @@ import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 /**
  * A block state of a custom Nova block. Every block state is a unique configuration of a block's properties.
  */
+@Serializable(with = NovaBlockStateSerializer::class)
 open class NovaBlockState internal constructor(
     val block: NovaBlock,
     private val path: IntArray,
-    private val scopedValues: Map<ScopedBlockStateProperty<*>, Any>
+    internal val scopedValues: Map<ScopedBlockStateProperty<*>, Any>
 ) {
     
     /**
@@ -30,7 +33,7 @@ open class NovaBlockState internal constructor(
     internal var tree: PropertiesTree<NovaBlockState>? = null
         private set
     
-    internal open val modelProvider: LinkedBlockModelProvider<*> by lazy { ResourceLookups.BLOCK_MODEL[this]!! }
+    internal open val modelProvider: BlockModelProvider by lazy { ResourceLookups.BLOCK_MODEL[this]!! }
     
     internal val ticksRandomly = block.behaviors.fold(false) { acc, behavior -> acc || behavior.ticksRandomly(this) }
     

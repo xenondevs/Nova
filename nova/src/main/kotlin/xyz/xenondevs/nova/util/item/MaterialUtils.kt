@@ -41,6 +41,8 @@ fun Material.hasNoBreakParticles() = this == Material.BARRIER || this == Materia
 
 fun Material.toItemStack(amount: Int = 1): ItemStack = ItemStack.of(this).also { it.amount = amount }
 
+internal fun Material.isBucket() = name.contains("BUCKET")
+
 /**
  * More reliable function compared to the Spigot API function [Material.isInteractable].
  * From https://www.spigotmc.org/threads/check-if-a-block-is-interactable.535861/

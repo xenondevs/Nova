@@ -98,7 +98,7 @@ internal class VanillaChestTileEntity internal constructor(
             else -> throw IllegalArgumentException("Invalid chest type $chestType and facing $facing")
         }
         
-        return WorldDataManager.getVanillaTileEntity(linkedPos) as? VanillaChestTileEntity
+        return WorldDataManager.getVanillaTileEntityOrNullIfUnloaded(linkedPos) as? VanillaChestTileEntity
     }
     
     private fun createNetworkedInventory(): NetworkedInventory {

@@ -25,6 +25,7 @@ import xyz.xenondevs.nova.world.block.state.model.LeavesBackingStateConfigType
 import xyz.xenondevs.nova.world.block.state.model.MangroveLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.OakLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.PaleOakLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.SpruceLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.state.property.DefaultScopedBlockStateProperties
@@ -97,6 +98,7 @@ internal object DefaultBlocks {
     val CHERRY_LEAVES = leaves(CherryLeavesBackingStateConfig)
     val AZALEA_LEAVES = leaves(AzaleaLeavesBackingStateConfig)
     val FLOWERING_AZALEA_LEAVES = leaves(FloweringAzaleaLeavesBackingStateConfig)
+    val PALE_OAK_LEAVES = leaves(PaleOakLeavesBackingStateConfig)
     
     private fun leaves(cfg: LeavesBackingStateConfigType<*>): NovaBlock = block(cfg.fileName) {
         behaviors(

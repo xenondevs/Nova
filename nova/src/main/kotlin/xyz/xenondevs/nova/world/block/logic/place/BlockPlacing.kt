@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.world.block.logic.place
 
 import kotlinx.coroutines.runBlocking
 import net.minecraft.core.component.DataComponents
-import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
+import org.bukkit.block.data.type.Dispenser
 import org.bukkit.Tag
 import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.Player
@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockDispenseEvent
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
@@ -30,6 +31,8 @@ import xyz.xenondevs.nova.util.bukkitBlockData
 import xyz.xenondevs.nova.util.dropItem
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
+import xyz.xenondevs.nova.util.item.isBucket
+import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverLevel
@@ -37,10 +40,12 @@ import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
+import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
+import xyz.xenondevs.nova.world.player.swingHandEventless
 import xyz.xenondevs.nova.world.player.swingHandEventless
 import xyz.xenondevs.nova.world.pos
 
@@ -91,6 +96,16 @@ internal object BlockPlacing : Listener {
             if (blockState != null) {
                 event.isCancelled = true
                 event.block.location.dropItem(ItemStack(entity.blockData.material))
+            }
+        }
+    }
+    
+    @EventHandler(ignoreCancelled = true)
+    private fun handleBlockDispense(event: BlockDispenseEvent) {
+        if (event.item.type.isBucket()) {
+            val targetPos = event.block.pos.advance((event.block.blockData as Dispenser).facing)
+            if (WorldDataManager.getBlockStateOrNullIfUnloaded(targetPos) != null) {
+                event.isCancelled = true
             }
         }
     }
@@ -151,11 +166,10 @@ internal object BlockPlacing : Listener {
         
         val ctx = ctxBuilder.build()
         
-        val vanillaState = when (val info = newState.modelProvider.info) {
-            is BackingStateConfig -> info.vanillaBlockState.bukkitBlockData
-            is DisplayEntityBlockModelData -> info.hitboxType.bukkitBlockData
-            is BlockState -> info.bukkitBlockData
-            else -> throw UnsupportedOperationException()
+        val vanillaState = when (val modelProvider = newState.modelProvider) {
+            is BackingStateBlockModelProvider -> modelProvider.info.vanillaBlockState.bukkitBlockData
+            is DisplayEntityBlockModelProvider -> modelProvider.info.hitboxType.bukkitBlockData
+            is ModelLessBlockModelProvider -> modelProvider.info.bukkitBlockData
         }
         
         if (pos.location.isInsideWorldRestrictions()

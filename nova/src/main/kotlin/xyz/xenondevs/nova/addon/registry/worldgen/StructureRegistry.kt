@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.addon.registry.worldgen
 
-import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.level.levelgen.structure.StructureSet
 import net.minecraft.world.level.levelgen.structure.StructureType
@@ -11,60 +10,46 @@ import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType
+import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.addon.registry.AddonGetter
-import xyz.xenondevs.nova.patch.impl.registry.set
-import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
+@Deprecated(REGISTRIES_DEPRECATION)
 interface StructureRegistry : AddonGetter {
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun registerStructure(name: String, structure: Structure): Structure {
-        val id = ResourceLocation(addon, name)
-        Registries.STRUCTURE[id] = structure
-        return structure
-    }
+    fun registerStructure(name: String, structure: Structure): Structure =
+        addon.registerStructure(name, structure)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun <P : StructurePoolElement> registerStructurePoolElementType(name: String, structurePoolElementType: StructurePoolElementType<P>): StructurePoolElementType<P> {
-        val id = ResourceLocation(addon, name)
-        Registries.STRUCTURE_POOL_ELEMENT[id] = structurePoolElementType
-        return structurePoolElementType
-    }
+    fun <P : StructurePoolElement> registerStructurePoolElementType(name: String, structurePoolElementType: StructurePoolElementType<P>): StructurePoolElementType<P> =
+        addon.registerStructurePoolElementType(name, structurePoolElementType)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun registerStructurePieceType(name: String, structurePieceType: StructurePieceType): StructurePieceType {
-        val id = ResourceLocation(addon, name)
-        Registries.STRUCTURE_PIECE[id] = structurePieceType
-        return structurePieceType
-    }
+    fun registerStructurePieceType(name: String, structurePieceType: StructurePieceType): StructurePieceType =
+        addon.registerStructurePieceType(name, structurePieceType)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun <SP : StructurePlacement> registerStructurePlacementType(name: String, structurePlacementType: StructurePlacementType<SP>): StructurePlacementType<SP> {
-        val id = ResourceLocation(addon, name)
-        Registries.STRUCTURE_PLACEMENT[id] = structurePlacementType
-        return structurePlacementType
-    }
+    fun <SP : StructurePlacement> registerStructurePlacementType(name: String, structurePlacementType: StructurePlacementType<SP>): StructurePlacementType<SP> =
+        addon.registerStructurePlacementType(name, structurePlacementType)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun <P : StructureProcessor> registerStructureProcessorType(name: String, structureProcessorType: StructureProcessorType<P>): StructureProcessorType<P> {
-        val id = ResourceLocation(addon, name)
-        Registries.STRUCTURE_PROCESSOR[id] = structureProcessorType
-        return structureProcessorType
-    }
+    fun <P : StructureProcessor> registerStructureProcessorType(name: String, structureProcessorType: StructureProcessorType<P>): StructureProcessorType<P> =
+        addon.registerStructureProcessorType(name, structureProcessorType)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun registerStructureSet(name: String, structureSet: StructureSet): StructureSet {
-        val id = ResourceLocation(addon, name)
-        Registries.STRUCTURE_SET[id] = structureSet
-        return structureSet
-    }
+    fun registerStructureSet(name: String, structureSet: StructureSet): StructureSet =
+        addon.registerStructureSet(name, structureSet)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun <S : Structure> registerStructureType(name: String, structureType: StructureType<S>): StructureType<S> {
-        val id = ResourceLocation(addon, name)
-        Registries.STRUCTURE_TYPE[id] = structureType
-        return structureType
-    }
+    fun <S : Structure> registerStructureType(name: String, structureType: StructureType<S>): StructureType<S> =
+        addon.registerStructureType(name, structureType)
     
 }

@@ -35,6 +35,7 @@ import xyz.xenondevs.nova.resources.builder.basepack.BasePacks
 import xyz.xenondevs.nova.resources.builder.task.AtlasContent
 import xyz.xenondevs.nova.resources.builder.task.BarOverlayTask
 import xyz.xenondevs.nova.resources.builder.task.BuildStage
+import xyz.xenondevs.nova.resources.builder.task.EntityVariantContent
 import xyz.xenondevs.nova.resources.builder.task.EquipmentContent
 import xyz.xenondevs.nova.resources.builder.task.ExtractTask
 import xyz.xenondevs.nova.resources.builder.task.LanguageContent
@@ -169,7 +170,7 @@ class ResourcePackBuilder internal constructor() {
             ::ExtractTask, ::EquipmentContent, ::GuiContent, ::LanguageContent, ::TextureIconContent,
             ::AtlasContent, ::WailaContent, ::MovedFontContent, ::CharSizeCalculator, ::SoundOverrides, ::FontContent,
             ::BarOverlayTask, ::MoveCharactersContent, ::ModelContent, ::BlockModelContent,
-            ::ItemModelContent, ::TextureContent, ::TooltipStyleContent
+            ::ItemModelContent, ::TextureContent, ::TooltipStyleContent, ::EntityVariantContent
         )
         
         /**
@@ -225,7 +226,7 @@ class ResourcePackBuilder internal constructor() {
         try {
             totalTime += measureTime {
                 // download minecraft assets if not present / outdated
-                if (!MCASSETS_DIR.exists() || PermanentStorage.retrieveOrNull<Version>("minecraftAssetsVersion") != SERVER_VERSION) {
+                if (!MCASSETS_DIR.exists() || PermanentStorage.retrieve<Version>("minecraftAssetsVersion") != SERVER_VERSION) {
                     MCASSETS_DIR.toFile().deleteRecursively()
                     runBlocking {
                         val downloader = MinecraftAssetsDownloader(

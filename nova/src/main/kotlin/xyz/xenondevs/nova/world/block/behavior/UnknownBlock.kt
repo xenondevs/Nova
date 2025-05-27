@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block.behavior
 
-import com.google.gson.JsonObject
+import kotlinx.serialization.json.JsonObject
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.nova.context.Context
@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
-import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.format.BlockStateIdResolver
 import xyz.xenondevs.nova.world.format.WorldDataManager
 
@@ -18,7 +18,7 @@ internal class UnknownNovaBlockState(serializedBlockState: JsonObject) : NovaBlo
     
     val serializedBlockState = serializedBlockState.toString()
     
-    override val modelProvider: LinkedBlockModelProvider<*>
+    override val modelProvider: BlockModelProvider
         get() = block.defaultBlockState.modelProvider
     
 }

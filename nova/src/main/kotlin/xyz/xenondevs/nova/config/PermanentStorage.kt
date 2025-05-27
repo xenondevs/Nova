@@ -1,107 +1,102 @@
 package xyz.xenondevs.nova.config
 
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.commons.gson.fromJson
-import xyz.xenondevs.commons.gson.parseJson
-import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.mutableProvider
+import xyz.xenondevs.commons.version.Version
+import xyz.xenondevs.nova.PREVIOUS_NOVA_VERSION
+import xyz.xenondevs.nova.initialize.InitFun
+import xyz.xenondevs.nova.initialize.InternalInit
+import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.serialization.json.GSON
-import java.io.File
-import java.lang.reflect.Type
-import kotlin.reflect.KType
-import kotlin.reflect.jvm.javaType
-import kotlin.reflect.typeOf
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.UUIDSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.VersionSerializer
+import xyz.xenondevs.nova.util.data.readJson
+import xyz.xenondevs.nova.util.data.writeJson
+import xyz.xenondevs.nova.world.ChunkPos
+import java.nio.file.Path
+import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.createParentDirectories
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.exists
+
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
+internal object PermanentStorageMigrations {
+    
+    @InitFun
+    private fun migrate() {
+        if (PREVIOUS_NOVA_VERSION == null || PREVIOUS_NOVA_VERSION >= Version("0.19-alpha.3"))
+            return
+        
+        // migrations for structured map keys from [[key, value], [key, value]] to [key, value, key, value]
+        
+        val blockChunkCounter = PermanentStorage.getPath("block_chunk_counter")
+        if (blockChunkCounter.exists()) {
+            val map = GSON.fromJson<HashMap<UUID, HashMap<ChunkPos, HashMap<Key, Int>>>>(blockChunkCounter)
+            blockChunkCounter.writeJson(map, PermanentStorage.JSON)
+        }
+        
+        val forceLoadedChunks = PermanentStorage.getPath("forceLoadedChunks")
+        if (forceLoadedChunks.exists()) {
+            val map = GSON.fromJson<HashMap<ChunkPos, HashSet<UUID>>>(forceLoadedChunks)
+            forceLoadedChunks.writeJson(map, PermanentStorage.JSON)
+        }
+    }
+    
+}
 
 internal object PermanentStorage {
     
-    private val dir = File("plugins/Nova/.internal_data/storage/")
-    private val storage = HashMap<String, JsonElement>()
-    
-    init {
-        // legacy conversion
-        val legacyFile = File("plugins/Nova/storage.do-not-edit")
-        if (legacyFile.exists()) {
-            val legacyObj = legacyFile.parseJson() as JsonObject
-            for ((key, element) in legacyObj.entrySet()) {
-                val f = File(dir, "$key.json")
-                f.parentFile.mkdirs()
-                element.writeToFile(f)
-            }
-            legacyFile.delete()
-        }
-        
-        // load storage map
-        dir.walk()
-            .filter(File::isFile)
-            .forEach {
-                val key = it.relativeTo(dir).invariantSeparatorsPath.removeSuffix(".json")
-                storage[key] = it.parseJson()
-            }
-    }
-    
-    fun retrieveRaw(key: String): JsonElement? = storage[key]
-    
-    fun storeRaw(key: String, data: JsonElement?) {
-        val f = getFile(key)
-        if (data != null) {
-            storage[key] = data
-            f.parentFile.mkdirs()
-            data.writeToFile(f)
-        } else {
-            f.delete()
+    val JSON = Json {
+        allowStructuredMapKeys = true
+        serializersModule = SerializersModule {
+            contextual(UUID::class, UUIDSerializer)
+            contextual(Key::class, KeySerializer)
+            contextual(Version::class, VersionSerializer)
         }
     }
     
-    fun store(key: String, data: Any?) =
-        storeRaw(key, data?.let { GSON.toJsonTree(it) })
+    private val dir = Path("plugins/Nova/.internal_data/storage/")
     
     fun has(key: String): Boolean =
-        key in storage
+        getPath(key).exists()
     
     fun remove(key: String) =
-        store(key, null)
+        getPath(key).deleteIfExists()
     
-    inline fun <reified T> retrieve(key: String, alternativeProvider: () -> T): T =
-        retrieveOrNull(key) ?: alternativeProvider()
+    fun <T> store(key: String, serializer: SerializationStrategy<T>, data: T): Unit =
+        getPath(key).also { it.createParentDirectories() }.writeJson(serializer, data, JSON)
     
-    fun <T> retrieve(type: Type, key: String, alternativeProvider: () -> T): T =
-        retrieveOrNull<T>(type, key) ?: alternativeProvider()
+    fun <T> retrieve(key: String, deserializer: DeserializationStrategy<T>): T? =
+        getPath(key).takeIf { it.exists() }?.readJson(deserializer, JSON)
     
-    fun <T> retrieve(type: KType, key: String, alternativeProvider: () -> T): T =
-        retrieve(type.javaType, key, alternativeProvider)
+    inline fun <reified T> store(key: String, data: T): Unit =
+        getPath(key).also { it.createParentDirectories() }.writeJson(data, JSON)
     
-    inline fun <reified T> retrieveOrNull(key: String): T? =
-        GSON.fromJson<T>(retrieveRaw(key))
-    
-    fun <T> retrieveOrNull(type: Type, key: String): T? =
-        GSON.fromJson(retrieveRaw(key), type) as? T
-    
-    fun <T> retrieveOrNull(type: KType, key: String): T? =
-        retrieveOrNull(type.javaType, key)
-    
-    inline fun <reified T> retrieveOrStore(key: String, noinline alternativeProvider: () -> T): T =
-        retrieveOrStore(typeOf<T>(), key, alternativeProvider)
-    
-    fun <T> retrieveOrStore(type: KType, key: String, alternativeProvider: () -> T): T =
-        retrieveOrStore(type.javaType, key, alternativeProvider)
-    
-    fun <T> retrieveOrStore(type: Type, key: String, alternativeProvider: () -> T): T =
-        retrieveOrNull(type, key) ?: alternativeProvider().also { store(key, it) }
+    inline fun <reified T> retrieve(key: String): T? =
+        getPath(key).takeIf { it.exists() }?.readJson(JSON)
     
     inline fun <reified T> storedValue(key: String, noinline alternativeProvider: () -> T): MutableProvider<T> =
-        storedValue(typeOf<T>(), key, alternativeProvider)
-    
-    fun <T> storedValue(type: KType, key: String, alternativeProvider: () -> T): MutableProvider<T> =
-        storedValue(type.javaType, key, alternativeProvider)
-    
-    fun <T> storedValue(type: Type, key: String, alternativeProvider: () -> T): MutableProvider<T> =
         mutableProvider(
-            { retrieveOrStore(type, key, alternativeProvider) },
-            { store(key, it) }
+            { retrieve<T>(key) ?: alternativeProvider().also { store(key, it) } },
+            { store<T>(key, it) }
         )
     
-    private fun getFile(key: String) = File(dir, "$key.json")
+    fun <T> storedValue(key: String, serializer: KSerializer<T>, alternativeProvider: () -> T): MutableProvider<T> =
+        mutableProvider(
+            { retrieve(key, serializer) ?: alternativeProvider().also { store(key, serializer, it) } },
+            { store(key, serializer, it) }
+        )
+    
+    fun getPath(key: String): Path =
+        dir.resolve("$key.json")
     
 }

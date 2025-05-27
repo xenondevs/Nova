@@ -212,20 +212,13 @@ sealed interface ResourceType {
     }
     
     /**
-     * Resources that represent texture files.
+     * Generic textures. 
+     * 
+     * path: `textures/`, extension: `png`
      */
-    sealed interface Texture : PngFile {
-        
-        /**
-         * Textures
-         *
-         * path: `textures/`, extension: `png`
-         */
-        @Serializable
-        companion object : Texture {
-            override val prefix = "textures"
-        }
-        
+    @Serializable
+    data object Texture : PngFile {
+        override val prefix = "textures"
     }
     
     /**
@@ -234,7 +227,7 @@ sealed interface ResourceType {
      * path: `textures/entity/`, extension: `png`
      */
     @Serializable
-    data object EntityTexture : Texture {
+    data object EntityTexture : PngFile {
         override val prefix = "textures/entity/"
     }
     
@@ -244,7 +237,7 @@ sealed interface ResourceType {
      * path: `textures/entity/bed/`, extension: `png`
      */
     @Serializable
-    data object BedTexture : Texture {
+    data object BedTexture : PngFile {
         override val prefix = "textures/entity/bed"
     }
     
@@ -254,7 +247,7 @@ sealed interface ResourceType {
      * path: `textures/entity/chest/`, extension: `png`
      */
     @Serializable
-    data object ChestTexture : Texture {
+    data object ChestTexture : PngFile {
         override val prefix = "textures/entity/chest/"
     }
     
@@ -264,7 +257,7 @@ sealed interface ResourceType {
      * path: `textures/entity/shulker/`, extension: `png`
      */
     @Serializable
-    data object ShulkerTexture : Texture {
+    data object ShulkerTexture : PngFile {
         override val prefix = "textures/entity/shulker/"
     }
     
@@ -274,14 +267,23 @@ sealed interface ResourceType {
      * path: `textures/entity/signs/`, extension: `png`
      */
     @Serializable
-    data object SignTexture : Texture {
+    data object SignTexture : PngFile {
         override val prefix = "textures/entity/signs/"
     }
     
     /**
-     * Equipment textures
+     * Particle textures
+     * path: `textures/particle/`, extension: `png`
      */
-    interface EquipmentTexture : Texture
+    @Serializable
+    data object ParticleTexture : PngFile {
+        override val prefix = "textures/particle/"
+    }
+    
+    /**
+     * Resources that represent entity textures.
+     */
+    interface EquipmentTexture : PngFile
     
     /**
      * Humanoid equipment textures
@@ -345,27 +347,13 @@ sealed interface ResourceType {
     }
     
     /**
-     * Tooltip textures
-     *
-     * path: `textures/gui/sprites/tooltip/`, extension: `png`
-     */
-    interface TooltipTexture : Texture, HasMcMeta {
-        
-        override val prefix
-            get() = "textures/gui/sprites/tooltip/"
-        
-        @Serializable
-        companion object : TooltipTexture
-        
-    }
-    
-    /**
      * Tooltip background textures
      *
      * path: `textures/gui/sprites/tooltip/`, suffix: `_background`, extension: `png`
      */
     @Serializable
-    data object TooltipBackgroundTexture : TooltipTexture {
+    data object TooltipBackgroundTexture : PngFile, HasMcMeta {
+        override val prefix = "textures/gui/sprites/tooltip/"
         override val suffix = "_background.png"
     }
     
@@ -375,7 +363,8 @@ sealed interface ResourceType {
      * path: `textures/gui/sprites/tooltip/`, suffix: `_frame`, extension: `png`
      */
     @Serializable
-    data object TooltipFrameTexture : TooltipTexture {
+    data object TooltipFrameTexture : PngFile, HasMcMeta {
+        override val prefix = "textures/gui/sprites/tooltip/"
         override val suffix = "_frame.png"
     }
     
@@ -395,7 +384,7 @@ sealed interface ResourceType {
      * path: `textures/`, extension: none
      */
     @Serializable
-    data object FontTexture : Texture {
+    data object FontTexture : PngFile {
         override val prefix = "textures"
         override val suffix = ""
     }
@@ -409,6 +398,16 @@ sealed interface ResourceType {
     data object UnihexZip : ResourceType {
         override val prefix = ""
         override val suffix = ""
+    }
+    
+    /**
+     * Particle definitions
+     * 
+     * path: `particles/`, extension: `json`
+     */
+    @Serializable
+    data object ParticleDefinition : JsonFile {
+        override val prefix = "particles"
     }
     
 }

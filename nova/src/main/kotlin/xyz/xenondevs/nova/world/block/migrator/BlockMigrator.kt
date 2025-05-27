@@ -121,6 +121,7 @@ internal object BlockMigrator : Listener {
         migrations += leavesMigration(Blocks.CHERRY_LEAVES, DefaultBlocks.CHERRY_LEAVES)
         migrations += leavesMigration(Blocks.AZALEA_LEAVES, DefaultBlocks.AZALEA_LEAVES)
         migrations += leavesMigration(Blocks.FLOWERING_AZALEA_LEAVES, DefaultBlocks.FLOWERING_AZALEA_LEAVES)
+        migrations += leavesMigration(Blocks.PALE_OAK_LEAVES, DefaultBlocks.PALE_OAK_LEAVES)
         
         queries += migrations.map { migration -> { state -> state.block == migration.vanillaBlock } }
         queries += { state -> VanillaTileEntity.Type.of(state.block.bukkitMaterial) != null }
@@ -246,9 +247,7 @@ internal object BlockMigrator : Listener {
                 // call behavior break handlers directly to bypass any tile-entity or model provider related logic
                 previousNovaState.block.behaviors.forEach { it.handleBreak(pos, previousNovaState, ctx) }
                 // for entity-backed models, the display entity needs to be despawned
-                if (previousNovaState.modelProvider.provider == DisplayEntityBlockModelProvider) {
-                    DisplayEntityBlockModelProvider.unload(pos)
-                }
+                (previousNovaState.modelProvider as? DisplayEntityBlockModelProvider)?.unload(pos)
             }
             previousTileEntity?.handleBreak(ctx)
         }

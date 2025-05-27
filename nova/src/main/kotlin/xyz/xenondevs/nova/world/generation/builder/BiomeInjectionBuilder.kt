@@ -11,7 +11,6 @@ import net.minecraft.tags.TagKey
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
-import xyz.xenondevs.nova.addon.registry.worldgen.BiomeRegistry
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.util.data.ResourceLocationOrTagKey
@@ -22,8 +21,6 @@ import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 /**
  * Builder for [BiomeInjections][BiomeInjection].
  * Check out the [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/inject/biome/) on biome injections for more information.
- *
- * @see [BiomeRegistry]
  */
 @ExperimentalWorldGen
 class BiomeInjectionBuilder internal constructor(

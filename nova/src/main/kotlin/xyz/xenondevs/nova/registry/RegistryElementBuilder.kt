@@ -1,11 +1,13 @@
 package xyz.xenondevs.nova.registry
 
 import net.kyori.adventure.key.Key
+import net.minecraft.core.Holder
 import net.minecraft.core.Registry
 import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.patch.impl.registry.preFreeze
@@ -14,14 +16,13 @@ import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.contains
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HOLDER_REFERENCE_BIND_VALUE_METHOD
 import xyz.xenondevs.nova.util.register
-import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.util.toKey
 
 @DslMarker
 internal annotation class RegistryElementBuilderDsl
 
 @RegistryElementBuilderDsl
-abstract class RegistryElementBuilder<T : Any>(
+abstract class RegistryElementBuilder<T : Any> internal constructor(
     protected val registry: WritableRegistry<in T>,
     val id: Key
 ) {
@@ -40,29 +41,28 @@ abstract class RegistryElementBuilder<T : Any>(
     
 }
 
-abstract class LazyRegistryElementBuilder<T : Any>(
-    protected val registryKey: ResourceKey<Registry<T>>,
+@RegistryElementBuilderDsl
+abstract class LazyRegistryElementBuilder<T : Any, NMS : Any> internal constructor(
+    protected val registryKey: ResourceKey<Registry<NMS>>,
+    private val nmsToBukkit: (Holder<NMS>) -> T,
     protected val id: Key
 ) {
     
-    protected abstract fun build(): T
+    protected abstract fun build(lookup: RegistryOps.RegistryInfoLookup): NMS
     
     @Suppress("UNCHECKED_CAST")
     internal open fun register(): Provider<T> {
-        val provider = mutableProvider<T> {
+        val provider = mutableProvider<Holder<NMS>> {
             throw UninitializedRegistryElementException(registryKey, id)
         }
         
-        registryKey.preFreeze { registry, _ ->
-            if (registry.contains(id))
-                throw IllegalStateException("Tried to register duplicate element $id in $registryKey")
-            
-            val element = build()
-            registry[id] = element
-            provider.set(element)
+        registryKey.preFreeze { registry, lookup ->
+            val element = build(lookup)
+            val holder = registry.register(id, element)
+            provider.set(holder)
         }
         
-        return provider
+        return provider.map(nmsToBukkit)
     }
     
 }

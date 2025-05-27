@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.block.tileentity
 import org.bukkit.Bukkit
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.PermanentStorage
+import xyz.xenondevs.nova.config.PermanentStorageMigrations
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -10,10 +11,13 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.world.ChunkPos
 import java.util.*
 
-@InternalInit(stage = InternalInitStage.POST_WORLD)
+@InternalInit(
+    stage = InternalInitStage.POST_WORLD,
+    dependsOn = [PermanentStorageMigrations::class]
+)
 object ChunkLoadManager {
     
-    private val forceLoadedChunks = PermanentStorage.retrieve("forceLoadedChunks") { HashMap<ChunkPos, HashSet<UUID>>() }
+    private val forceLoadedChunks: HashMap<ChunkPos, HashSet<UUID>> = PermanentStorage.retrieve("forceLoadedChunks") ?: HashMap()
     
     @InitFun
     private fun init() {

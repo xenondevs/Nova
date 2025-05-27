@@ -43,7 +43,7 @@ internal data class AnimatedEquipmentLayout(
         val dyeable: EquipmentDefinition.Layer.Dyeable?
     )
     
-    internal data class Animation<out T : ResourceType.Texture>(
+    internal data class Animation<out T : ResourceType.PngFile>(
         val frames: List<ResourcePath<T>>,
         val ticksPerFrame: Int,
         val interpolationMode: InterpolationMode

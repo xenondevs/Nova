@@ -99,6 +99,9 @@ object WorldDataManager : Listener {
     fun getBlockState(pos: BlockPos): NovaBlockState? =
         getChunkOrThrow(pos.chunkPos).getBlockState(pos)
     
+    internal fun getBlockStateOrNullIfUnloaded(pos: BlockPos): NovaBlockState? =
+        getChunkOrNull(pos.chunkPos)?.getBlockState(pos)
+    
     internal suspend fun getOrLoadBlockState(pos: BlockPos): NovaBlockState? =
         getOrLoadChunk(pos.chunkPos).getBlockState(pos)
     
@@ -133,6 +136,9 @@ object WorldDataManager : Listener {
     internal fun getVanillaTileEntity(pos: BlockPos): VanillaTileEntity? =
         getChunkOrThrow(pos.chunkPos).getVanillaTileEntity(pos)
     
+    internal fun getVanillaTileEntityOrNullIfUnloaded(pos: BlockPos): VanillaTileEntity? =
+        getChunkOrNull(pos.chunkPos)?.getVanillaTileEntity(pos)
+    
     internal suspend fun getOrLoadVanillaTileEntity(pos: BlockPos): VanillaTileEntity? =
         getOrLoadChunk(pos.chunkPos).getVanillaTileEntity(pos)
     
@@ -158,6 +164,10 @@ object WorldDataManager : Listener {
     
     internal fun getChunkOrThrow(pos: ChunkPos): RegionChunk {
         return getWorldStorage(pos.world!!).getBlockChunkOrThrow(pos)
+    }
+    
+    internal fun getChunkOrNull(pos: ChunkPos): RegionChunk? {
+        return getWorldStorage(pos.world!!).getBlockChunkOrNull(pos)
     }
     
     private suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile {

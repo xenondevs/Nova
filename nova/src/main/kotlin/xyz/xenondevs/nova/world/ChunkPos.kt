@@ -1,10 +1,12 @@
 package xyz.xenondevs.nova.world
 
+import kotlinx.serialization.Serializable
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
+import xyz.xenondevs.nova.serialization.kotlinx.UUIDSerializer
 import java.util.*
 import kotlin.math.floor
 
@@ -33,7 +35,13 @@ val Block.chunkPos: ChunkPos
  * @param x The x coordinate of the chunk.
  * @param z The z coordinate of the chunk.
  */
-data class ChunkPos(val worldUUID: UUID, val x: Int, val z: Int) {
+@Serializable
+data class ChunkPos(
+    @Serializable(with = UUIDSerializer::class)
+    val worldUUID: UUID,
+    val x: Int,
+    val z: Int
+) {
     
     /**
      * The [Chunk] at this [ChunkPos], may be null if [world] is null.

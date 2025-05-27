@@ -29,7 +29,7 @@ internal class BukkitRegistryEntrySerializer<T : Keyed>(
     private val registry by lazy { RegistryAccess.registryAccess().getRegistry(registryKey) }
     
     override fun deserialize(type: Type?, obj: Any?): T {
-        return registry.getOrThrow(Key.key(obj.toString()))
+        return registry.getOrThrow(Key.key(obj.toString().lowercase()))
     }
     
     override fun serialize(item: T, typeSupported: Predicate<Class<*>>?): Any {
@@ -47,7 +47,7 @@ internal class TagKeySerializer<T : Keyed>(
 ) : ScalarSerializer<TagKey<T>>(token) {
     
     override fun deserialize(type: Type, obj: Any): TagKey<T> {
-        return TagKey.create(registryKey, Key.key(obj.toString().removePrefix("#")))
+        return TagKey.create(registryKey, Key.key(obj.toString().removePrefix("#").lowercase()))
     }
     
     override fun serialize(item: TagKey<T>, typeSupported: Predicate<Class<*>>): Any {
@@ -65,10 +65,10 @@ internal class RegistryKeySetSerializer<T : Keyed>(
         if (scalar is String && scalar.startsWith('#')) {
             return RegistryAccess.registryAccess()
                 .getRegistry(registryKey)
-                .getTag(TagKey.create(registryKey, scalar.substring(1)))
+                .getTag(TagKey.create(registryKey, scalar.substring(1).lowercase()))
         } else {
             val entries = node.getList<String>() ?: emptyList()
-            return RegistrySet.keySet(registryKey, entries.map { TypedKey.create(registryKey, it) })
+            return RegistrySet.keySet(registryKey, entries.map { TypedKey.create(registryKey, it.lowercase()) })
         }
     }
     

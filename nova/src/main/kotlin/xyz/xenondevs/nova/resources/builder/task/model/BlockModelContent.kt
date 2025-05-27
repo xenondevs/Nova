@@ -12,6 +12,8 @@ import xyz.xenondevs.commons.gson.getOrPut
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -19,6 +21,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
 import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
+import xyz.xenondevs.nova.resources.builder.data.ParticleDefinition
 import xyz.xenondevs.nova.resources.builder.layout.block.BackingStateCategory
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
@@ -30,19 +33,21 @@ import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.serialization.json.GSON
-import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
+import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
-import xyz.xenondevs.nova.world.block.state.model.LinkedBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.LeavesBackingStateConfigType
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.WATERLOGGED
 import java.nio.file.Path
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.exists
+
+private val DISABLED_BACKING_STATE_CATEGORIES: Set<BackingStateCategory> by MAIN_CONFIG.entry("resource_pack", "generation", "disabled_backing_state_categories")
 
 /**
  * A [PackTaskHolder] that deals with generating and assigning custom block models to block states
@@ -64,6 +69,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
     @PackTask(runAfter = ["ExtractTask#extractAll"])
     private fun readBlockStateFiles() {
         BackingStateCategory.entries.asSequence()
+            .filter { it !in DISABLED_BACKING_STATE_CATEGORIES }
             .flatMap { it.backingStateConfigTypes }
             .forEach { type ->
                 val file = getBlockStateFile(type)
@@ -118,7 +124,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         ]
     )
     private fun assignBlockModels() {
-        val lookup = HashMap<NovaBlockState, LinkedBlockModelProvider<*>>()
+        val lookup = HashMap<NovaBlockState, BlockModelProvider>()
         
         NovaRegistries.BLOCK
             .sortedByDescending { (it.layout as? BlockModelLayout.StateBacked)?.priority ?: 0 }
@@ -132,30 +138,27 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                                 val modelBuilder = layout.modelSelector(modelScope)
                                 val cfg = assignModelToVanillaBlockState(layout, modelBuilder, blockState[WATERLOGGED] == true)
                                 if (cfg != null) {
-                                    lookup[blockState] = LinkedBlockModelProvider(BackingStateBlockModelProvider, cfg)
-                                } else if (block is NovaTileEntityBlock) {
-                                    LOGGER.warn("No more block states for $blockState with layout, falling back to display entity.")
-                                    val data = DisplayEntityBlockModelData(assignModelToItem(modelBuilder), DEFAULT_BLOCK_STATE_SELECTOR(modelScope))
-                                    lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
-                                } else throw IllegalStateException("Ran out of backing states trying to assign a model to $blockState")
+                                    lookup[blockState] = BackingStateBlockModelProvider(cfg)
+                                } else {
+                                    LOGGER.warn("No more block states for $blockState with layout $layout, falling back to display entity")
+                                    val data = DisplayEntityBlockModelData(blockState, assignModelToItem(modelBuilder), DEFAULT_BLOCK_STATE_SELECTOR(modelScope))
+                                    lookup[blockState] = DisplayEntityBlockModelProvider(data)
+                                }
                             }
                             
                             is BlockModelLayout.EntityBacked -> {
-                                if (block !is NovaTileEntityBlock)
-                                    throw IllegalArgumentException("$block cannot use entity-backed block models, as it is not a tile-entity")
-                                
                                 val scope = BlockModelSelectorScope(blockState, builder, modelContent)
                                 val models = when (layout) {
                                     is BlockModelLayout.SimpleEntityBacked -> assignModelToItem(layout.modelSelector(scope))
                                     is BlockModelLayout.ItemEntityBacked -> listOf(assignModelToItem(scope, layout.definitionConfigurator))
                                 }
                                 
-                                val data = DisplayEntityBlockModelData(models, layout.stateSelector(modelScope))
-                                lookup[blockState] = LinkedBlockModelProvider(DisplayEntityBlockModelProvider, data)
+                                val data = DisplayEntityBlockModelData(blockState, models, layout.stateSelector(modelScope))
+                                lookup[blockState] = DisplayEntityBlockModelProvider(data)
                             }
                             
                             is BlockModelLayout.ModelLess -> {
-                                lookup[blockState] = LinkedBlockModelProvider(ModelLessBlockModelProvider, layout.stateSelector(modelScope))
+                                lookup[blockState] = ModelLessBlockModelProvider(layout.stateSelector(modelScope))
                             }
                         }
                     } catch (e: Exception) {
@@ -178,6 +181,9 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         
         var cfg: BackingStateConfig? = null
         for (configType in layout.configTypes) {
+            if (DISABLED_BACKING_STATE_CATEGORIES.any { configType in it.backingStateConfigTypes })
+                continue
+            
             val match = configsByVariant[variant]?.firstOrNull { it.type == configType }
             if (match != null) {
                 cfg = if (match.waterlogged != waterlogged) configType.of(match.id, waterlogged) else match
@@ -273,6 +279,16 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         for ((path, obj) in fileContents) {
             path.createParentDirectories()
             obj.writeToFile(path)
+        }
+        
+        // disable leaf particles if leaves backing state configs are used
+        val particles = variantByConfig.keys.mapNotNullTo(HashSet()) { (it.type as? LeavesBackingStateConfigType<*>)?.particleType }
+        for (particle in particles) {
+            LOGGER.info("Disabling $particle particles because their leaves are used as backing states")
+            builder.writeJson(
+                ResourcePath.of(ResourceType.ParticleDefinition, particle), 
+                ParticleDefinition(listOf(ResourcePath(ResourceType.ParticleTexture, "nova", "empty")))
+            )
         }
     }
     

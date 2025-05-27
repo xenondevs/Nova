@@ -11,7 +11,6 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes
 import net.minecraft.world.level.dimension.DimensionType
 import net.minecraft.world.level.dimension.DimensionType.MonsterSettings
-import xyz.xenondevs.nova.addon.registry.worldgen.DimensionRegistry
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
@@ -21,7 +20,6 @@ import java.util.*
  * Builder for [DimensionTypes][DimensionType].
  * Check out the [docs page](https://xenondevs.xyz/docs/nova/addon/worldgen/dimension/) on dimensions for more information.
  *
- * @see [DimensionRegistry]
  * @see [MobSpawnSettingsBuilder]
  */
 @ExperimentalWorldGen

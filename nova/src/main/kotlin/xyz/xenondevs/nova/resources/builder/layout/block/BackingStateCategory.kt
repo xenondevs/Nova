@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.world.block.state.model.MangroveLeavesBackingStateConf
 import xyz.xenondevs.nova.world.block.state.model.MushroomStemBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.NoteBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.OakLeavesBackingStateConfig
+import xyz.xenondevs.nova.world.block.state.model.PaleOakLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.SpruceLeavesBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.TripwireBackingStateConfigType
@@ -65,7 +66,7 @@ enum class BackingStateCategory(
     /**
      * The block model uses leave block states.
      *
-     * - Limited to 130 different models
+     * - Limited to 143 different models
      * - Models can be transparent, translucent textures are disabled on "fancy" graphics setting
      * - Full block hitbox
      * - Full block collider
@@ -76,8 +77,8 @@ enum class BackingStateCategory(
         fallbackHitbox = Blocks.BARRIER,
         OakLeavesBackingStateConfig, SpruceLeavesBackingStateConfig, BirchLeavesBackingStateConfig,
         JungleLeavesBackingStateConfig, AcaciaLeavesBackingStateConfig, DarkOakLeavesBackingStateConfig,
-        MangroveLeavesBackingStateConfig, CherryLeavesBackingStateConfig, AzaleaLeavesBackingStateConfig,
-        FloweringAzaleaLeavesBackingStateConfig
+        MangroveLeavesBackingStateConfig, AzaleaLeavesBackingStateConfig, FloweringAzaleaLeavesBackingStateConfig,
+        CherryLeavesBackingStateConfig, PaleOakLeavesBackingStateConfig
     ),
     
     /**

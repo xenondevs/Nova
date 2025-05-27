@@ -67,7 +67,7 @@ internal object S3 : UploadService {
         if (!resp.isSuccessful)
             throw IllegalStateException("S3 upload failed with code ${resp.statusCode()} " + resp.statusText().orElse(""))
         
-        val lastUpload: String? = PermanentStorage.retrieveOrNull("lastS3Upload")
+        val lastUpload: String? = PermanentStorage.retrieve("lastS3Upload")
         if (lastUpload != null && lastUpload.startsWith(urlFormat.dropLast(2 + directory.length))) {
             val lastBucket = lastUpload.drop("https://".length).split("/")[1]
             val delReq = DeleteObjectRequest.builder()

@@ -64,6 +64,13 @@ internal class WorldDataStorage(val world: World) {
         blockRegionFiles[getRegionId(pos)]?.getCompleted()?.getChunk(pos)
             ?: throw IllegalStateException("Block chunk at $pos is not loaded")
     
+    fun getBlockChunkOrNull(pos: ChunkPos): RegionChunk? {
+        val deferred = blockRegionFiles[getRegionId(pos)]
+        if (deferred == null || !deferred.isCompleted)
+            return null
+        return deferred.getCompleted().getChunk(pos)
+    }
+    
     fun getNetworkChunkOrThrow(pos: ChunkPos): NetworkChunk =
         networkRegionFiles[getRegionId(pos)]?.getCompleted()?.getChunk(pos)
             ?: throw IllegalStateException("Network chunk at $pos is not loaded")

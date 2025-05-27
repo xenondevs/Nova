@@ -28,8 +28,9 @@ import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.patch.MultiTransformer
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.util.unwrap
-import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
+import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
@@ -134,16 +135,14 @@ internal object BlockBehaviorPatches : MultiTransformer(BlockStateBase::class, S
                     val newState = novaState.block.updateShape(novaPos, novaState, neighborPos.toNovaPos(level.world))
                     if (newState != novaState) {
                         WorldDataManager.setBlockState(novaPos, newState)
-                        return when (val info = newState.modelProvider.info) {
-                            is BackingStateConfig -> info.vanillaBlockState
-                            is BlockState -> info
-                            is DisplayEntityBlockModelData -> {
+                        return when (val modelProvider = newState.modelProvider) {
+                            is BackingStateBlockModelProvider -> modelProvider.info.vanillaBlockState
+                            is ModelLessBlockModelProvider -> modelProvider.info
+                            is DisplayEntityBlockModelProvider -> {
                                 novaState.modelProvider.unload(novaPos)
                                 newState.modelProvider.load(novaPos)
-                                info.hitboxType
+                                modelProvider.info.hitboxType
                             }
-                            
-                            else -> throw UnsupportedOperationException()
                         }
                     }
                     

@@ -36,12 +36,12 @@ internal object AutoUploadManager {
     private var explicitUrl = false
     private var selectedService: UploadService? = null
     
-    private var url: String? = PermanentStorage.retrieveOrNull("resourcePackURL")
+    private var url: String? = PermanentStorage.retrieve("resourcePackURL")
         set(value) {
             field = value
             PermanentStorage.store("resourcePackURL", value)
         }
-    private var lastConfig: Int? = PermanentStorage.retrieveOrNull("lastUploadConfig")
+    private var lastConfig: Int? = PermanentStorage.retrieve("lastUploadConfig")
         set(value) {
             field = value
             PermanentStorage.store("lastUploadConfig", value)

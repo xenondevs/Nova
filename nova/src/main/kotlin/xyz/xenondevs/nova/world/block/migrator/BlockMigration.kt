@@ -4,6 +4,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
+import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 
 internal sealed interface BlockMigration {
     val vanillaBlock: Block
@@ -21,8 +22,7 @@ internal data class ComplexBlockMigration(
 ) : BlockMigration {
     
     fun novaToVanilla(novaBlockState: NovaBlockState): BlockState {
-        // assumes model-less model provider
-        return novaBlockState.modelProvider.info as BlockState
+        return (novaBlockState.modelProvider as ModelLessBlockModelProvider).info
     }
     
 }

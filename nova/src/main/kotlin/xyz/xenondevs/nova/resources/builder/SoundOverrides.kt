@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.resources.builder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.world.level.block.SoundType
-import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Material
 import xyz.xenondevs.commons.gson.getBooleanOrNull
 import xyz.xenondevs.commons.gson.getOrPut
@@ -17,8 +16,6 @@ import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
-import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
-import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelData
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import java.nio.file.Path
@@ -51,21 +48,10 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
     private fun findUsedBlockTypes() {
         for (block in NovaRegistries.BLOCK) {
             for (blockState in block.blockStates) {
-                when (blockState.modelProvider.provider) {
-                    DisplayEntityBlockModelProvider -> {
-                        val info = blockState.modelProvider.info as DisplayEntityBlockModelData
-                        useMaterial(info.hitboxType.bukkitMaterial)
-                    }
-                    
-                    BackingStateBlockModelProvider -> {
-                        val info = blockState.modelProvider.info as BackingStateConfig
-                        useMaterial(info.vanillaBlockState.bukkitMaterial)
-                    }
-                    
-                    ModelLessBlockModelProvider -> {
-                        val info = blockState.modelProvider.info as BlockState
-                        useMaterial(info.bukkitMaterial)
-                    }
+                when (val modelProvider = blockState.modelProvider) {
+                    is DisplayEntityBlockModelProvider -> useMaterial(modelProvider.info.hitboxType.bukkitMaterial)
+                    is BackingStateBlockModelProvider -> useMaterial(modelProvider.info.vanillaBlockState.bukkitMaterial)
+                    is ModelLessBlockModelProvider -> useMaterial(modelProvider.info.bukkitMaterial)
                 }
             }
         }

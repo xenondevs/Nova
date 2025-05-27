@@ -1,7 +1,11 @@
+@file:UseSerializers(KeySerializer::class)
+
 package xyz.xenondevs.nova.resources.builder.task
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.commons.collections.eachRepeated
 import xyz.xenondevs.commons.collections.repeated
@@ -16,10 +20,12 @@ import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLa
 import xyz.xenondevs.nova.resources.builder.layout.equipment.InterpolationMode
 import xyz.xenondevs.nova.resources.builder.layout.equipment.StaticEquipmentLayout
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.MathUtils
 import xyz.xenondevs.nova.util.data.ImageUtils
 import java.awt.image.BufferedImage
 
+@Serializable
 internal class RuntimeEquipmentData(
     val textureFrames: List<Key>?,
     val cameraOverlayFrames: List<Key>?
@@ -46,7 +52,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
      * Caches interpolated textures.
      * Format: Map<Pair<FromFile, ToFile>, Map<Blend 0-255, InterpolatedImage>>
      */
-    private val interpolationCache = HashMap<Pair<ResourcePath<ResourceType.Texture>, ResourcePath<ResourceType.Texture>>, Int2ObjectMap<BufferedImage>>()
+    private val interpolationCache = HashMap<Pair<ResourcePath<ResourceType.PngFile>, ResourcePath<ResourceType.PngFile>>, Int2ObjectMap<BufferedImage>>()
     private var generatedCount = 0
     
     @PackTask(
@@ -178,7 +184,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
     /**
      * Applies the emissivity map from [emissivityMap] to the texture under [texture] in [textureDir].
      */
-    private fun applyEmissivityMap(texture: ResourcePath<ResourceType.Texture>, emissivityMap: ResourcePath<ResourceType.Texture>, textureDir: String) {
+    private fun applyEmissivityMap(texture: ResourcePath<ResourceType.PngFile>, emissivityMap: ResourcePath<ResourceType.PngFile>, textureDir: String) {
         var textureImage = ImageUtils.copyToARGB(textureContent.getImage(texture))
         val emissivityMapImage = textureContent.getImage(emissivityMap)
         
@@ -215,7 +221,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
      * Generates/collects the textures required for [animation], then returns the sequence of [ResourcePaths][ResourcePath]
      * pointing to the (generated) textures.
      */
-    private fun <T : ResourceType.Texture> generateTextureAnimation(animation: Animation<T>, location: T): List<ResourcePath<T>> {
+    private fun <T : ResourceType.PngFile> generateTextureAnimation(animation: Animation<T>, location: T): List<ResourcePath<T>> {
         val (keyFrames, ticksPerFrame, interpolationMode) = animation
         if (interpolationMode == InterpolationMode.NONE) {
             return keyFrames.eachRepeated(ticksPerFrame)
@@ -263,8 +269,8 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
      * Generates [count] interpolated images between [from] and [to].
      */
     private fun generateInterpolatedImages(
-        from: ResourcePath<ResourceType.Texture>,
-        to: ResourcePath<ResourceType.Texture>,
+        from: ResourcePath<ResourceType.PngFile>,
+        to: ResourcePath<ResourceType.PngFile>,
         count: Int
     ): List<BufferedImage> {
         if (count <= 0)
@@ -288,13 +294,13 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
      * Writes the [images] to the texture directory and returns the [ResourcePaths][ResourcePath]
      * pointing to the written images.
      */
-    private fun <T : ResourceType.Texture> writeImages(images: List<BufferedImage>, location: T): List<ResourcePath<T>> =
+    private fun <T : ResourceType.PngFile> writeImages(images: List<BufferedImage>, location: T): List<ResourcePath<T>> =
         images.map { writeImage(it, location) }
     
     /**
      * Writes the [image] to the texture directory and returns the [ResourcePath] pointing to the written image.
      */
-    private fun <T : ResourceType.Texture> writeImage(image: BufferedImage, location: T): ResourcePath<T> {
+    private fun <T : ResourceType.PngFile> writeImage(image: BufferedImage, location: T): ResourcePath<T> {
         val path = ResourcePath(location, "nova", "generated/equipment_${generatedCount++}")
         builder.writeImage(path, image)
         return path

@@ -1,18 +1,13 @@
 package xyz.xenondevs.nova.addon.registry
 
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.Key
-import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 
+@Deprecated(REGISTRIES_DEPRECATION)
 interface ToolCategoryRegistry : AddonGetter {
     
-    fun registerToolCategory(name: String): ToolCategory {
-        val id = Key(addon, name)
-        val category = ToolCategory(id)
-        
-        NovaRegistries.TOOL_CATEGORY[id] = category
-        return category
-    }
+    @Deprecated(REGISTRIES_DEPRECATION)
+    fun registerToolCategory(name: String): ToolCategory =
+        addon.registerToolCategory(name)
     
 }

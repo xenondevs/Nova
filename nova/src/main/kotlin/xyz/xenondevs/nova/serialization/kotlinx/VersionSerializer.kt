@@ -5,18 +5,18 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import net.kyori.adventure.key.Key
+import xyz.xenondevs.commons.version.Version
 
-internal object KeySerializer : KSerializer<Key> {
+internal object VersionSerializer : KSerializer<Version> {
     
-    override val descriptor = PrimitiveSerialDescriptor("xyz.xenondevs.nova.KeySerializer", PrimitiveKind.STRING)
+    override val descriptor = PrimitiveSerialDescriptor("xyz.xenondevs.nova.Version", PrimitiveKind.STRING)
     
-    override fun serialize(encoder: Encoder, value: Key) {
+    override fun serialize(encoder: Encoder, value: Version) {
         encoder.encodeString(value.toString())
     }
     
-    override fun deserialize(decoder: Decoder): Key {
-        return Key.key(decoder.decodeString())
+    override fun deserialize(decoder: Decoder): Version {
+        return Version(decoder.decodeString())
     }
     
 }

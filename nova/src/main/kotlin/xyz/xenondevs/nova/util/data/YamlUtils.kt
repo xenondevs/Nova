@@ -37,6 +37,10 @@ inline fun <reified T> ConfigurationNode.getList(): List<T>? {
     return getList(geantyrefTypeTokenOf<T>())
 }
 
+internal inline fun <reified T> ConfigurationNode.setTyped(value: T) {
+    set(geantyrefTypeTokenOf<T>(), value)
+}
+
 inline fun <reified T> ConfigurationNode.setList(value: List<T>?): ConfigurationNode {
     return setList(geantyrefTypeTokenOf<T>(), value)
 }

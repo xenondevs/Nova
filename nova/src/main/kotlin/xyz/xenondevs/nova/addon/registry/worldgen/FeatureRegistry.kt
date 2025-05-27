@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.addon.registry.worldgen
 
 import com.mojang.serialization.MapCodec
-import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature
 import net.minecraft.world.level.levelgen.feature.Feature
@@ -9,48 +8,44 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import net.minecraft.world.level.levelgen.placement.PlacementModifier
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType
+import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.addon.registry.AddonGetter
-import xyz.xenondevs.nova.patch.impl.registry.set
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
-import xyz.xenondevs.nova.registry.buildRegistryElementLater
-import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.builder.PlacedFeatureBuilder
 
+@Deprecated(REGISTRIES_DEPRECATION)
 @RegistryElementBuilderDsl
 interface FeatureRegistry : AddonGetter {
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
     fun placedFeature(name: String, placedFeature: PlacedFeatureBuilder.() -> Unit): ResourceKey<PlacedFeature> =
-        buildRegistryElementLater(addon, name, Registries.PLACED_FEATURE, ::PlacedFeatureBuilder, placedFeature)
+        addon.placedFeature(name, placedFeature)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
     fun <FC : FeatureConfiguration, F : Feature<FC>> configuredFeature(name: String, feature: F, config: FC): ResourceKey<ConfiguredFeature<*, *>> =
-        configuredFeature(name, ConfiguredFeature(feature, config))
+        addon.configuredFeature(name, feature, config)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun <F : ConfiguredFeature<*, *>> configuredFeature(name: String, configuredFeature: F): ResourceKey<ConfiguredFeature<*, *>> {
-        val key = ResourceKey.create(Registries.CONFIGURED_FEATURE, ResourceLocation(addon, name))
-        Registries.CONFIGURED_FEATURE[key] = configuredFeature
-        return key
-    }
+    fun <F : ConfiguredFeature<*, *>> configuredFeature(name: String, configuredFeature: F): ResourceKey<ConfiguredFeature<*, *>> =
+        addon.configuredFeature(name, configuredFeature)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun feature(name: String, feature: Feature<*>): ResourceKey<Feature<*>> {
-        val key = ResourceKey.create(Registries.FEATURE, ResourceLocation(addon, name))
-        Registries.FEATURE[key] = feature
-        return key
-    }
+    fun feature(name: String, feature: Feature<*>): ResourceKey<Feature<*>> =
+        addon.feature(name, feature)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun <P : PlacementModifier> placementModifierType(name: String, placementModifierType: PlacementModifierType<P>): PlacementModifierType<P> {
-        val id = ResourceLocation(addon, name)
-        Registries.PLACEMENT_MODIFIER_TYPE[id] = placementModifierType
-        return placementModifierType
-    }
+    fun <P : PlacementModifier> placementModifierType(name: String, placementModifierType: PlacementModifierType<P>): PlacementModifierType<P> =
+        addon.placementModifierType(name, placementModifierType)
     
+    @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
     fun <P : PlacementModifier> placementModifierType(name: String, codec: MapCodec<P>): PlacementModifierType<P> =
-        placementModifierType(name) { codec }
+        addon.placementModifierType(name, codec)
     
 }

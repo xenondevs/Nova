@@ -1,14 +1,17 @@
 package xyz.xenondevs.nova.world.format
 
 import com.google.common.collect.HashBiMap
-import com.google.gson.JsonObject
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourceGeneration
-import xyz.xenondevs.nova.serialization.json.serializer.NovaBlockStateSerialization
+import xyz.xenondevs.nova.serialization.kotlinx.nullOnFailure
 import xyz.xenondevs.nova.world.block.behavior.UnknownNovaBlockState
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 
@@ -30,24 +33,20 @@ internal object BlockStateIdResolver : IdResolver<NovaBlockState> {
     @InitFun
     private fun generate() {
         val map = HashBiMap.create<NovaBlockState, Int>()
-        val serializedMap = JsonObject()
+        val serializableMap = HashMap<Int, JsonElement>()
         
         var lastId = 0
         
         // register previous states with same id or replace with unknown state if not present
-        val previousStatesObj = PermanentStorage.retrieveRaw(ID_MAP_KEY) as JsonObject?
-        if (previousStatesObj != null) {
-            for ((previousIdStr, previousStateObj) in previousStatesObj.entrySet()) {
-                previousStateObj as JsonObject
-                val previousId = previousIdStr.toInt()
-                val previousState = NovaBlockStateSerialization.deserialize(previousStateObj)
-                
-                serializedMap.add(previousIdStr, previousStateObj)
-                map[previousState ?: UnknownNovaBlockState(previousStateObj)] = previousId
-                
-                if (previousId > lastId)
-                    lastId = previousId
-            }
+        val previousStatesMap: Map<Int, JsonObject>? = PermanentStorage.retrieve(ID_MAP_KEY)
+        previousStatesMap?.forEach { previousId, previousStateObj ->
+            val previousState = Json.decodeFromJsonElement(NovaBlockState.serializer().nullOnFailure(), previousStateObj)
+            
+            serializableMap[previousId] = previousStateObj
+            map[previousState ?: UnknownNovaBlockState(previousStateObj)] = previousId
+            
+            if (previousId > lastId)
+                lastId = previousId
         }
         
         // register new states
@@ -57,11 +56,11 @@ internal object BlockStateIdResolver : IdResolver<NovaBlockState> {
             .forEach {
                 val id = ++lastId
                 map[it] = id
-                serializedMap.add(id.toString(), NovaBlockStateSerialization.serialize(it))
+                serializableMap[id] = Json.encodeToJsonElement(it)
             }
         
         this.map = map
-        PermanentStorage.storeRaw(ID_MAP_KEY, serializedMap)
+        PermanentStorage.store(ID_MAP_KEY, serializableMap)
     }
     
     override fun fromId(id: Int): NovaBlockState? {

@@ -1,8 +1,11 @@
 package xyz.xenondevs.nova.world.block.state.model
 
+import kotlinx.serialization.Serializable
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.config.PermanentStorage.storedValue
+import xyz.xenondevs.nova.serialization.kotlinx.BackingStateConfigSerializer
 
+@Serializable(with = BackingStateConfigSerializer::class)
 internal abstract class BackingStateConfig internal constructor() {
     
     abstract val type: BackingStateConfigType<*>
@@ -39,6 +42,8 @@ internal abstract class BackingStateConfigType<T : BackingStateConfig> internal 
     abstract fun of(id: Int, waterlogged: Boolean = false): T
     abstract fun of(properties: Map<String, String>): T
     internal open fun handleMerged(occupiedIds: Set<Int>) = Unit
+    
+    override fun toString() = fileName
     
 }
 
