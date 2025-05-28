@@ -6,5 +6,5 @@ plugins {
 dependencies {
     paperweight.paperDevBundle(libs.versions.paper)
     implementation(project(":nova"))
-    compileOnly("net.luckperms:api:5.4") { isTransitive = false }
+    compileOnly("net.luckperms:api:5.5") { isTransitive = false }
 }
