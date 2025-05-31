@@ -11,7 +11,6 @@ import xyz.xenondevs.nova.resources.builder.font.provider.SpaceProvider
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.util.toIntArray
 import kotlin.math.pow
 
 class MoveCharactersContent(private val builder: ResourcePackBuilder) : PackTaskHolder {
@@ -33,13 +32,13 @@ class MoveCharactersContent(private val builder: ResourcePackBuilder) : PackTask
         codePoints.addAll(mergedFonts[Font.DEFAULT]!!.getCodePoints(mergedFonts.values))
         codePoints.addAll(mergedFonts[Font.UNIFORM]!!.getCodePoints(mergedFonts.values))
         
-        val range = Font.findFirstUnoccupiedRange(codePoints, Font.PRIVATE_USE_AREA, SIZE * 2).toIntArray()
+        val offset = Font.PRIVATE_USE_AREA.start
         
         val advances = Int2FloatOpenHashMap()
         // -.25, -.5, ..., -8192
-        for (i in 0..<SIZE) advances[range[i]] = -2.0.pow(i - EXP_SHIFT).toFloat()
+        for (i in 0..<SIZE) advances[offset + i] = -2.0.pow(i - EXP_SHIFT).toFloat()
         // .25, .5, ..., 8192
-        for (i in 0..<SIZE) advances[range[i + SIZE]] = 2.0.pow(i - EXP_SHIFT).toFloat()
+        for (i in 0..<SIZE) advances[offset + SIZE + i] = 2.0.pow(i - EXP_SHIFT).toFloat()
         
         val moveFontId = ResourcePath(ResourceType.Font, "nova", "move")
         val spaceFont = Font(moveFontId, listOf(SpaceProvider(advances)))
@@ -50,7 +49,7 @@ class MoveCharactersContent(private val builder: ResourcePackBuilder) : PackTask
         fontContent.getOrCreate(Font.UNIFORM).addFirst(spaceFontReference)
         
         // update lookup
-        ResourceLookups.MOVE_CHARACTERS_OFFSET = range[0]
+        ResourceLookups.MOVE_CHARACTERS_OFFSET = offset
     }
     
 }
