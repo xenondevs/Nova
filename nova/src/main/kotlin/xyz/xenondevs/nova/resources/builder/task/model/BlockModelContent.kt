@@ -33,6 +33,7 @@ import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.serialization.json.GSON
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfig
@@ -126,48 +127,63 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
     private fun assignBlockModels() {
         val lookup = HashMap<NovaBlockState, BlockModelProvider>()
         
+        // state-backed blocks, sort by:
+        // 1. state backed priority (descending)
+        // 2. amount of available states (ascending)
+        // 3. id
+        assignBlockModels<BlockModelLayout.StateBacked>(
+            compareByDescending<Pair<NovaBlock, BlockModelLayout.StateBacked>> { (_, layout) -> layout.priority }
+                .thenBy { (_, layout) -> layout.configTypes.sumOf { it.maxId - it.blockedIds.size } }
+                .thenBy { (block, _) -> block.id }
+        ) { blockState, layout, scope ->
+            val modelBuilder = layout.modelSelector(scope)
+            val cfg = assignModelToVanillaBlockState(layout, modelBuilder, blockState[WATERLOGGED] == true)
+            if (cfg != null) {
+                lookup[blockState] = BackingStateBlockModelProvider(cfg)
+            } else {
+                LOGGER.warn("No more block states for $blockState with layout $layout, falling back to display entity")
+                val data = DisplayEntityBlockModelData(blockState, assignModelToItem(modelBuilder), DEFAULT_BLOCK_STATE_SELECTOR(scope))
+                lookup[blockState] = DisplayEntityBlockModelProvider(data)
+            }
+        }
+        
+        // entity-backed blocks
+        assignBlockModels<BlockModelLayout.EntityBacked> { blockState, layout, scope ->
+            val scope = BlockModelSelectorScope(blockState, builder, modelContent)
+            val models = when (layout) {
+                is BlockModelLayout.SimpleEntityBacked -> assignModelToItem(layout.modelSelector(scope))
+                is BlockModelLayout.ItemEntityBacked -> listOf(assignModelToItem(scope, layout.definitionConfigurator))
+            }
+            
+            val data = DisplayEntityBlockModelData(blockState, models, layout.stateSelector(scope))
+            lookup[blockState] = DisplayEntityBlockModelProvider(data)
+        }
+        
+        // model-less blocks
+        assignBlockModels<BlockModelLayout.ModelLess> { blockState, layout, scope ->
+            lookup[blockState] = ModelLessBlockModelProvider(layout.stateSelector(scope))
+        }
+        
+        ResourceLookups.BLOCK_MODEL = lookup
+    }
+    
+    private inline fun <reified L : BlockModelLayout> assignBlockModels(
+        comparator: Comparator<Pair<NovaBlock, L>> = compareBy { (block, _) -> block.id },
+        assigner: (blockState: NovaBlockState, layout: L, scope: BlockModelSelectorScope) -> Unit
+    ) {
         NovaRegistries.BLOCK
-            .sortedByDescending { (it.layout as? BlockModelLayout.StateBacked)?.priority ?: 0 }
-            .forEach { block ->
-                val layout = block.layout
+            .mapNotNull { if (it.layout is L) it to it.layout else null }
+            .sortedWith(comparator)
+            .forEach { (block, layout) ->
                 for (blockState in block.blockStates) {
                     try {
-                        val modelScope = BlockModelSelectorScope(blockState, builder, modelContent)
-                        when (layout) {
-                            is BlockModelLayout.StateBacked -> {
-                                val modelBuilder = layout.modelSelector(modelScope)
-                                val cfg = assignModelToVanillaBlockState(layout, modelBuilder, blockState[WATERLOGGED] == true)
-                                if (cfg != null) {
-                                    lookup[blockState] = BackingStateBlockModelProvider(cfg)
-                                } else {
-                                    LOGGER.warn("No more block states for $blockState with layout $layout, falling back to display entity")
-                                    val data = DisplayEntityBlockModelData(blockState, assignModelToItem(modelBuilder), DEFAULT_BLOCK_STATE_SELECTOR(modelScope))
-                                    lookup[blockState] = DisplayEntityBlockModelProvider(data)
-                                }
-                            }
-                            
-                            is BlockModelLayout.EntityBacked -> {
-                                val scope = BlockModelSelectorScope(blockState, builder, modelContent)
-                                val models = when (layout) {
-                                    is BlockModelLayout.SimpleEntityBacked -> assignModelToItem(layout.modelSelector(scope))
-                                    is BlockModelLayout.ItemEntityBacked -> listOf(assignModelToItem(scope, layout.definitionConfigurator))
-                                }
-                                
-                                val data = DisplayEntityBlockModelData(blockState, models, layout.stateSelector(modelScope))
-                                lookup[blockState] = DisplayEntityBlockModelProvider(data)
-                            }
-                            
-                            is BlockModelLayout.ModelLess -> {
-                                lookup[blockState] = ModelLessBlockModelProvider(layout.stateSelector(modelScope))
-                            }
-                        }
+                        val scope = BlockModelSelectorScope(blockState, builder, modelContent)
+                        assigner(blockState, layout, scope)
                     } catch (e: Exception) {
                         throw Exception("Failed to assign model to $blockState", e)
                     }
                 }
             }
-        
-        ResourceLookups.BLOCK_MODEL = lookup
     }
     
     /**
@@ -286,7 +302,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         for (particle in particles) {
             LOGGER.info("Disabling $particle particles because their leaves are used as backing states")
             builder.writeJson(
-                ResourcePath.of(ResourceType.ParticleDefinition, particle), 
+                ResourcePath.of(ResourceType.ParticleDefinition, particle),
                 ParticleDefinition(listOf(ResourcePath(ResourceType.ParticleTexture, "nova", "empty")))
             )
         }
