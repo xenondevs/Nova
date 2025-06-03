@@ -6,6 +6,16 @@ resource_pack:
   auto_upload:
     enabled: false
     
+  # The auto copier automatically copies the resource pack after generation.
+  # For use with BlueMaps and other plugins requiring pack.
+  auto_copy:
+    enabled: false
+    # A list of files where to the resource pack should be copied.
+    destinations:
+#      - plugins/BlueMap/packs/Nova.zip
+    # If destination directories should be created. Does not copy if destination directory doesn't exist.
+    create_directories: false
+
   # Settings affecting the resource pack prompt
   prompt:
     # The resource pack prompt message
