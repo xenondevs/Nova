@@ -10,10 +10,9 @@ resource_pack:
   # For use with BlueMaps and other plugins requiring resource pack.
   auto_copy:
     enabled: false
-    # A list of files where to the resource pack should be copied. Files will be overwritten.
+    # A list of files where to the resource pack should be copied. Destination files will be overwritten!
+    # Destination directories are created automatically. Destination files without zip extension are skipped.
     destinations: [ ]
-    # If destination directories should be created. Does not copy if destination directory doesn't exist.
-    create_directories: false
 
   # Settings affecting the resource pack prompt
   prompt:

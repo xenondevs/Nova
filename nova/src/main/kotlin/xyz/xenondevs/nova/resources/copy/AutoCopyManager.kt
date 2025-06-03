@@ -12,9 +12,9 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.util.data.getList
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.copyTo
-import kotlin.io.path.createParentDirectories
-import kotlin.io.path.exists
+import kotlin.io.path.*
+
+internal val SERVER_FOLDER = Path("")
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -26,7 +26,6 @@ internal object AutoCopyManager {
     var enabled = false
         private set
     var wasRegenerated = false
-    private var shouldCreateDirectories = false
 
     private var destinations: List<File>? = filesFromPaths(PermanentStorage.retrieve("copyToDestinations") as List<String>?)
         set(value) {
@@ -50,13 +49,10 @@ internal object AutoCopyManager {
         val autoCopyCfg = cfg.node("auto_copy")
         enabled = autoCopyCfg.node("enabled").boolean
 
-        if (autoCopyCfg.hasChild("destinations")) {
-            val destinations = autoCopyCfg.node("destinations").getList<File>()
-            if (!destinations.isNullOrEmpty()) {
-                if (this.destinations != destinations) {
-                    this.destinations = destinations
-                }
-                return
+        val destinations = autoCopyCfg.node("destinations").getList<File>()
+        if (!destinations.isNullOrEmpty()) {
+            if (this.destinations != destinations) {
+                this.destinations = destinations
             }
         }
 
@@ -64,8 +60,6 @@ internal object AutoCopyManager {
             this.destinations = emptyList()
             return
         }
-
-        shouldCreateDirectories = autoCopyCfg.node("create_directories").boolean
 
         val configHash = autoCopyCfg.hashCode()
         if (wasRegenerated || lastConfig != configHash) {
@@ -91,9 +85,13 @@ internal object AutoCopyManager {
             require(pack.exists()) { pack + " not found!" }
 
             destinations?.forEach {
-                val destinationPath = if (shouldCreateDirectories) it.toPath().createParentDirectories() else it.toPath()
-                val copiedToPath = pack.copyTo(destinationPath.normalize(), true)
-                resultFiles.add(copiedToPath.toFile().normalize())
+                val destinationPath = SERVER_FOLDER.resolve(it.toPath())
+                if (destinationPath.extension == "zip") {
+                    val copiedToPath = pack.copyToRecursively(destinationPath.createParentDirectories(), followLinks = false, overwrite = true)
+                    resultFiles.add(copiedToPath.toFile().normalize())
+                } else {
+                    LOGGER.warn("Destination $destinationPath does not have zip extension. Skipping.")
+                }
             }
 
             this.destinations = resultFiles

@@ -87,6 +87,7 @@ internal object ResourceGeneration {
                 LOGGER.info("Continuing to build resource pack")
                 builder.buildPackPostWorld()
                 AutoUploadManager.wasRegenerated = true
+                AutoCopyManager.wasRegenerated = true
                 PermanentStorage.store(VERSION_HASH, versionHash)
                 BlockMigrator.updateMigrationId()
             }
