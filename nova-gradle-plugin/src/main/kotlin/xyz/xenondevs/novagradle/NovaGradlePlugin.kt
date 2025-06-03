@@ -2,8 +2,6 @@ package xyz.xenondevs.novagradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.RegularFile
-import org.gradle.api.provider.Provider
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.named
@@ -62,7 +60,7 @@ class NovaGradlePlugin : Plugin<Project> {
         
         val wailaExt = project.extensions.create<GenerateWailaTexturesExtension>("generateWailaTextures")
         project.tasks.register<GenerateWailaTexturesTask>("generateWailaTextures") {
-            resourcesDir.set(wailaExt.resourcesDir.orElse("src/main/resources/"))
+            resourcesDir.set(wailaExt.resourcesDir.orElse(project.layout.projectDirectory.dir("src/main/resources/")))
             addonId.set(addonExt.name.map { it.lowercase() })
             filter.set(wailaExt.filter.orElse { true })
         }
