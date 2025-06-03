@@ -154,7 +154,7 @@ class StaticEquipmentLayerBuilder<T : ResourceType.EquipmentTexture> internal co
      */
     @Deprecated(EMISSIVITY_MAP_DEPRECATION)
     fun emissivityMap(emissivityMap: ResourcePath<T>) {
-        this.emissivityMap = emissivityMap
+//        this.emissivityMap = emissivityMap
     }
     
     /**
@@ -163,7 +163,7 @@ class StaticEquipmentLayerBuilder<T : ResourceType.EquipmentTexture> internal co
      */
     @Deprecated(EMISSIVITY_MAP_DEPRECATION)
     fun emissivityMap(emissivityMap: String) {
-        this.emissivityMap = ResourcePath.of(textureType, emissivityMap, namespace)
+//        this.emissivityMap = ResourcePath.of(textureType, emissivityMap, namespace)
     }
     
     /**
