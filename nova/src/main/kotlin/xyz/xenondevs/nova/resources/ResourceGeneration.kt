@@ -15,7 +15,6 @@ import xyz.xenondevs.nova.integration.HooksLoader
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.copy.AutoCopyManager
-import xyz.xenondevs.nova.resources.copy.AutoCopyManager.copyPack
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
@@ -134,7 +133,7 @@ internal object ResourceGeneration {
 
         if (AutoCopyManager.enabled) {
             runBlocking {
-                val destinations = copyPack(ResourcePackBuilder.RESOURCE_PACK_FILE)
+                val destinations = AutoCopyManager.copyPack(ResourcePackBuilder.RESOURCE_PACK_FILE)
                 if (destinations.isNullOrEmpty())
                     LOGGER.warn("The resource pack was not copied. (Misconfigured auto copier?)")
             }
