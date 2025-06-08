@@ -2,8 +2,10 @@ package xyz.xenondevs.novagradle.task
 
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
@@ -18,8 +20,8 @@ abstract class GenerateWailaTexturesTask : DefaultTask() {
     @get:Input
     abstract val addonId: Property<String>
     
-    @get:Input
-    abstract val resourcesDir: Property<String>
+    @get:InputDirectory
+    abstract val resourcesDir: DirectoryProperty
     
     @get:Input
     abstract val filter: Property<(File) -> Boolean>
@@ -46,11 +48,11 @@ abstract class GenerateWailaTexturesTask : DefaultTask() {
         renderer.loader.resourcePacks += ZipResourcePack(TaskUtils.findNovaArtifact(project).file.toPath())
         
         // add addon resource pack
-        renderer.loader.resourcePacks += AddonResourcePack(project, addonId.get())
+        renderer.loader.resourcePacks += AddonResourcePack(resourcesDir.get().asFile, addonId.get())
         
         // render block models
-        val wailaTexturesDir = File(resourcesDir.get(), "assets/textures/waila/").apply(File::mkdirs)
-        val blockModelsDir = File(resourcesDir.get(), "assets/models/block/")
+        val wailaTexturesDir = resourcesDir.dir("assets/textures/waila/").get().asFile.apply(File::mkdirs)
+        val blockModelsDir = resourcesDir.dir("assets/models/block").get().asFile
         blockModelsDir.walkTopDown()
             .filter { it.isFile && it.extension == "json" }
             .forEach { file ->

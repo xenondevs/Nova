@@ -193,7 +193,7 @@ class AnimatedEquipmentLayerBuilder<T : ResourceType.EquipmentTexture> internal 
     @JvmName("emissivityMapResourcePath")
     @OverloadResolutionByLambdaReturnType
     fun emissivityMap(frames: Int, ticksPerFrame: Int, interpolationMode: InterpolationMode, getEmissivityMap: (frame: Int) -> ResourcePath<T>) {
-        emissivityMap = Animation(List(frames, getEmissivityMap), ticksPerFrame, interpolationMode)
+//        emissivityMap = Animation(List(frames, getEmissivityMap), ticksPerFrame, interpolationMode)
     }
     
     /**
@@ -203,7 +203,7 @@ class AnimatedEquipmentLayerBuilder<T : ResourceType.EquipmentTexture> internal 
     @Deprecated(EMISSIVITY_MAP_DEPRECATION)
     @OverloadResolutionByLambdaReturnType
     fun emissivityMap(frames: Int, ticksPerFrame: Int, interpolationMode: InterpolationMode, getEmissivityMap: (frame: Int) -> String) {
-        emissivityMap = Animation(List(frames) { ResourcePath.of(textureType, getEmissivityMap(it), namespace) }, ticksPerFrame, interpolationMode)
+//        emissivityMap = Animation(List(frames) { ResourcePath.of(textureType, getEmissivityMap(it), namespace) }, ticksPerFrame, interpolationMode)
     }
     
     /**
@@ -212,7 +212,7 @@ class AnimatedEquipmentLayerBuilder<T : ResourceType.EquipmentTexture> internal 
      */
     @Deprecated(EMISSIVITY_MAP_DEPRECATION)
     fun emissivityMap(ticksPerFrame: Int, interpolationMode: InterpolationMode, vararg frames: ResourcePath<T>) {
-        emissivityMap = Animation(frames.toList(), ticksPerFrame, interpolationMode)
+//        emissivityMap = Animation(frames.toList(), ticksPerFrame, interpolationMode)
     }
     
     /**
@@ -221,7 +221,7 @@ class AnimatedEquipmentLayerBuilder<T : ResourceType.EquipmentTexture> internal 
      */
     @Deprecated(EMISSIVITY_MAP_DEPRECATION)
     fun emissivityMap(ticksPerFrame: Int, interpolationMode: InterpolationMode, vararg frames: String) {
-        emissivityMap = Animation(frames.map { ResourcePath.of(textureType, it, namespace) }, ticksPerFrame, interpolationMode)
+//        emissivityMap = Animation(frames.map { ResourcePath.of(textureType, it, namespace) }, ticksPerFrame, interpolationMode)
     }
     
     /**
