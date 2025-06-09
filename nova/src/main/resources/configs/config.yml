@@ -7,7 +7,7 @@ resource_pack:
     enabled: false
     
   # The auto copier automatically copies the resource pack after generation.
-  # For use with BlueMaps and other plugins requiring resource pack.
+  # For use with BlueMap and other plugins requiring resource pack.
   auto_copy:
     enabled: false
     # A list of files where to the resource pack should be copied. Destination files will be overwritten!
