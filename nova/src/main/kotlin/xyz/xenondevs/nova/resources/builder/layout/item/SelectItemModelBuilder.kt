@@ -143,7 +143,7 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
                     .codecOrThrow()
                     .encodeStart(
                         RegistryOps.create(JsonOps.INSTANCE, REGISTRY_ACCESS),
-                        type.adapter.toVanilla(value)
+                        type.adapter.toVanilla(value, type.holder)
                     )
                     .orThrow
             )

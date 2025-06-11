@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.ui.waila
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
@@ -24,6 +25,7 @@ import xyz.xenondevs.nova.util.serverTick
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
+import kotlin.math.roundToInt
 
 private val POS_UPDATE_INTERVAL by MAIN_CONFIG.entry<Int>("waila", "pos_update_interval")
 private val DATA_UPDATE_INTERVAL by MAIN_CONFIG.entry<Int>("waila", "data_update_interval")
@@ -64,7 +66,7 @@ internal class Waila(val player: Player) {
         val serverTick = serverTick
         if (serverTick - lastPosUpdate >= POS_UPDATE_INTERVAL) {
             lastPosUpdate = serverTick
-            val pos = player.getTargetBlockExact(5)?.pos
+            val pos = player.getTargetBlockExact(player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE)!!.value.roundToInt())?.pos
             if (pos != lookingAt) {
                 lastDataUpdate = serverTick
                 update(pos)

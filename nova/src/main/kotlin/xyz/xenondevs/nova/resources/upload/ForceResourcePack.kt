@@ -1,6 +1,10 @@
 package xyz.xenondevs.nova.resources.upload
 
+import net.kyori.adventure.resource.ResourcePackInfo
+import net.kyori.adventure.resource.ResourcePackRequest
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -13,6 +17,7 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.util.data.HashUtils
 import xyz.xenondevs.nova.util.registerEvents
+import java.net.URI
 import java.util.*
 
 private val PROMPT_MESSAGE by MAIN_CONFIG.entry<Component>("resource_pack", "prompt", "message")
@@ -38,28 +43,42 @@ internal object ForceResourcePack : Listener {
     
     @EventHandler
     private fun handleJoin(event: PlayerJoinEvent) {
-        // TODO: replace with net.kyori.adventure.resource api once available
-        
+        trySend(event.player)
+    }
+    
+    private fun trySend(player: Player) {
         val url = url
         val hash = hash
         if (url == null || hash == null)
             return
         
-        val player = event.player
         if (ENABLE_PROMPT_BYPASS_PERMISSION && player.hasPermission(PROMPT_BYPASS_PERMISSION))
             return
         
         val force = PROMPT_FORCE && (!ENABLE_PROMPT_FORCE_BYPASS_PERMISSION || !player.hasPermission(FORCE_BYPASS_PERMISSION))
-        event.player.setResourcePack(packId, url, hash, PROMPT_MESSAGE, force)
+        val hashHex = HexFormat.of().formatHex(hash)
+        
+        player.sendResourcePacks(
+            ResourcePackRequest.resourcePackRequest()
+                .replace(false)
+                .required(force)
+                .prompt(PROMPT_MESSAGE)
+                .packs(ResourcePackInfo.resourcePackInfo(packId, URI(url), hashHex))
+                .build()
+        )
     }
     
     fun setResourcePack(url: String?) {
         if (url != null) {
             this.url = url
             this.hash = HashUtils.getFileHash(ResourcePackBuilder.RESOURCE_PACK_FILE, "SHA1")
+            
+            Bukkit.getOnlinePlayers().forEach(::trySend)
         } else {
             this.url = null
             this.hash = null
+            
+            Bukkit.getOnlinePlayers().forEach { it.removeResourcePack(packId) }
         }
     }
     

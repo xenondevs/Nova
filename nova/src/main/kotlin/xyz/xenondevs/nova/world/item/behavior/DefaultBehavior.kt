@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.item.behavior
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers.itemAttributes
+import io.papermc.paper.datacomponent.item.ItemEnchantments.itemEnchantments
 import io.papermc.paper.datacomponent.item.ItemLore.lore
 import io.papermc.paper.datacomponent.item.TooltipDisplay.tooltipDisplay
 import net.kyori.adventure.key.Key
@@ -14,6 +15,7 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlotGroup
+import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
@@ -67,6 +69,11 @@ internal class DefaultBehavior(
         builder[DataComponentTypes.ATTRIBUTE_MODIFIERS] = attributeModifiers
         builder[DataComponentTypes.MAX_STACK_SIZE] = maxStackSize
         builder[DataComponentTypes.ITEM_MODEL] = id
+        
+        // default empty values
+        builder[DataComponentTypes.ENCHANTMENTS] = itemEnchantments().build()
+        builder[DataComponentTypes.REPAIR_COST] = 0
+        builder[DataComponentTypes.RARITY] = ItemRarity.COMMON
         
         builder.build()
     }
