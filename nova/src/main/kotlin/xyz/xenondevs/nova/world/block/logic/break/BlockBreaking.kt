@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ai.attributes.Attributes
 import org.bukkit.GameMode
+import org.bukkit.Material
 import org.bukkit.craftbukkit.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -119,8 +120,12 @@ internal object BlockBreaking : Listener, PacketListener {
     }
     
     private fun handleDestroyStart(player: Player, packet: ServerboundPlayerActionPacket, pos: BlockPos, direction: Direction, sequence: Int) {
-        // pass packet further down the pipeline if the block is from a custom item service
-        if (CustomItemServiceManager.getBlockType(pos.block) != null) {
+        // pass packet further down the pipeline if:
+        // - the block is from a custom item service
+        // - the player is using a debug stick
+        if (CustomItemServiceManager.getBlockType(pos.block) != null
+            || (player.gameMode == GameMode.CREATIVE && player.inventory.itemInMainHand.type == Material.DEBUG_STICK)
+        ) {
             player.packetHandler?.injectIncoming(packet)
             return
         }
