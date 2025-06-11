@@ -6,6 +6,14 @@ resource_pack:
   auto_upload:
     enabled: false
     
+  # The auto copier automatically copies the resource pack after generation.
+  # For use with BlueMap and other plugins requiring resource pack.
+  auto_copy:
+    enabled: false
+    # A list of files where to the resource pack should be copied. Destination files will be overwritten!
+    # Destination directories are created automatically. Destination files without zip extension are skipped.
+    destinations: [ ]
+
   # Settings affecting the resource pack prompt
   prompt:
     # The resource pack prompt message
