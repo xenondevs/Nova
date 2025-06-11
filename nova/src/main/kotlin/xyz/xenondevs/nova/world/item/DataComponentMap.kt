@@ -69,9 +69,14 @@ class DataComponentMap internal constructor(
          * Sets the value of the given [type] to the given [value].
          */
         operator fun <T : Any> set(type: DataComponentType.Valued<T>, value: T): Builder {
+            type as PaperDataComponentType.ValuedImpl<T, *>
+            return set(type, value)
+        }
+        
+        private fun <T : Any, NMS : Any> set(type: PaperDataComponentType.ValuedImpl<T, NMS>, value: T): Builder {
             builder.set(
                 PaperDataComponentType.bukkitToMinecraft(type),
-                (type as PaperDataComponentType.ValuedImpl<T, *>).adapter.toVanilla(value)
+                type.adapter.toVanilla(value, type.holder)
             )
             return this
         }
@@ -107,14 +112,15 @@ class DataComponentMap internal constructor(
          * Sets the value of the given [type] to the given [value].
          */
         operator fun <T : Any> set(type: DataComponentType.Valued<T>, value: Provider<T?>): ProviderBuilder {
-            components += value.mapNonNull { value ->
-                TypedDataComponent(
-                    PaperDataComponentType.bukkitToMinecraft(type),
-                    (type as PaperDataComponentType.ValuedImpl<T, *>).adapter.toVanilla(value)
-                )
-            }
+            components += value.mapNonNull { createTypedDataComponent(type as PaperDataComponentType.ValuedImpl<T, *>, it) }
             return this
         }
+        
+        private fun <T : Any, NMS : Any> createTypedDataComponent(type: PaperDataComponentType.ValuedImpl<T, NMS>, value: T) =
+            TypedDataComponent<NMS>(
+                PaperDataComponentType.bukkitToMinecraft(type),
+                type.adapter.toVanilla(value, type.holder)
+            )
         
         /**
          * Sets the value of the given [type] to the given [value].
