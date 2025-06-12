@@ -13,7 +13,6 @@ import org.bukkit.potion.PotionEffect
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.nova.config.entryOrElse

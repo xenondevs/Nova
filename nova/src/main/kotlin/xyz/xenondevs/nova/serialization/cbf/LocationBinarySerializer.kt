@@ -1,15 +1,14 @@
-package xyz.xenondevs.nova.serialization.cbf.adapter
+package xyz.xenondevs.nova.serialization.cbf
 
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
-import kotlin.reflect.KType
+import xyz.xenondevs.cbf.serializer.UnversionedBinarySerializer
 
-internal object LocationBinaryAdapter : BinaryAdapter<Location> {
+internal object LocationBinarySerializer : UnversionedBinarySerializer<Location>() {
     
-    override fun read(type: KType, reader: ByteReader): Location {
+    override fun readUnversioned(reader: ByteReader): Location {
         return Location(
             if (reader.readBoolean()) reader.readUUID().let(Bukkit::getWorld) else null,
             reader.readDouble(), reader.readDouble(), reader.readDouble(),
@@ -17,7 +16,7 @@ internal object LocationBinaryAdapter : BinaryAdapter<Location> {
         )
     }
     
-    override fun write(obj: Location, type: KType, writer: ByteWriter) {
+    override fun writeUnversioned(obj: Location, writer: ByteWriter) {
         val world = obj.world
         if (world != null) {
             writer.writeBoolean(true)
@@ -31,7 +30,7 @@ internal object LocationBinaryAdapter : BinaryAdapter<Location> {
         writer.writeFloat(obj.pitch)
     }
     
-    override fun copy(obj: Location, type: KType): Location {
+    override fun copyNonNull(obj: Location): Location {
         return obj.clone()
     }
     

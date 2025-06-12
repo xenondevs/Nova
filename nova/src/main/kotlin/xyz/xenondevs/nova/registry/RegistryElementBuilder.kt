@@ -7,7 +7,6 @@ import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.RegistryOps
 import net.minecraft.resources.ResourceKey
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.patch.impl.registry.preFreeze

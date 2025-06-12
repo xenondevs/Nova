@@ -1,10 +1,10 @@
-package xyz.xenondevs.nova.serialization.cbf.adapter
+package xyz.xenondevs.nova.serialization.cbf
 
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
-import xyz.xenondevs.cbf.adapter.ComplexBinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
+import xyz.xenondevs.cbf.serializer.VersionedBinarySerializer
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.nova.util.DATA_VERSION
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
@@ -13,16 +13,20 @@ import xyz.xenondevs.nova.util.item.isNullOrEmpty
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.unwrap
 import java.util.*
-import kotlin.reflect.KType
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
-internal object VirtualInventoryBinaryAdapter : ComplexBinaryAdapter<VirtualInventory> {
+internal object VirtualInventoryBinarySerializer : VersionedBinarySerializer<VirtualInventory>(2U) {
     
-    override fun read(type: KType, id: UByte, reader: ByteReader): VirtualInventory {
-        if (id == 1.toUByte())
-            return readLegacy(reader)
-        
+    override fun readVersioned(version: UByte, reader: ByteReader): VirtualInventory {
+        return when (version) {
+            1.toUByte() -> readV1(reader)
+            2.toUByte() -> readV2(reader)
+            else -> throw UnsupportedOperationException()
+        }
+    }
+    
+    private fun readV2(reader: ByteReader): VirtualInventory {
         val dataInput = reader.asDataInput()
         
         val dataVersion = reader.readVarInt()
@@ -50,16 +54,14 @@ internal object VirtualInventoryBinaryAdapter : ComplexBinaryAdapter<VirtualInve
         return VirtualInventory(uuid, size, items, maxStackSizes)
     }
     
-    private fun readLegacy(reader: ByteReader): VirtualInventory {
+    private fun readV1(reader: ByteReader): VirtualInventory {
         val data = ByteArray(reader.readVarInt())
         reader.readBytes(data)
         return VirtualInventory.deserialize(data)
     }
     
-    override fun write(obj: VirtualInventory, type: KType, writer: ByteWriter) {
+    override fun writeVersioned(obj: VirtualInventory, writer: ByteWriter) {
         val dataOutput = writer.asDataOutput()
-        
-        writer.writeUnsignedByte(2U) // v2
         
         val uuid = obj.uuid
         val size = obj.size
@@ -75,7 +77,7 @@ internal object VirtualInventoryBinaryAdapter : ComplexBinaryAdapter<VirtualInve
             if (!itemStack.isNullOrEmpty())
                 itemsMask.set(slot)
         }
-        writer.writeBytes(Arrays.copyOf(itemsMask.toByteArray(), size.ceilDiv(8)))
+        writer.writeBytes(itemsMask.toByteArray().copyOf(size.ceilDiv(8)))
         
         for (itemStack in obj.items) {
             if (itemStack.isNullOrEmpty())
@@ -97,7 +99,7 @@ internal object VirtualInventoryBinaryAdapter : ComplexBinaryAdapter<VirtualInve
         }
     }
     
-    override fun copy(obj: VirtualInventory, type: KType): VirtualInventory {
+    override fun copyNonNull(obj: VirtualInventory): VirtualInventory {
         return VirtualInventory(obj)
     }
     

@@ -10,7 +10,8 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.NamespacedKey
-import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.cbf.Cbf
+import xyz.xenondevs.cbf.UncheckedApi
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.data.getByteArrayOrNull
 import xyz.xenondevs.nova.util.data.getOrNull
@@ -65,6 +66,7 @@ internal class ItemStackPersistentDataConverter(
     private val newKey: NamespacedKey = oldKey
 ) : ItemStackTagLegacyConverter() {
     
+    @OptIn(UncheckedApi::class)
     override fun convert(tag: CompoundTag) {
         val serializedValue = tag
             .getOrNull<CompoundTag>("PublicBukkitValues")
@@ -73,10 +75,10 @@ internal class ItemStackPersistentDataConverter(
             ?: return
         val novaCompound = tag
             .getByteArrayOrNull("nova_cbf")
-            ?.let(CBF::read)
+            ?.let(Cbf::read)
             ?: NamespacedCompound()
-        novaCompound.set(type, newKey, CBF.read(type, serializedValue))
-        tag.putByteArray("nova_cbf", CBF.write(novaCompound))
+        novaCompound.set(type, newKey, Cbf.read(type, serializedValue))
+        tag.putByteArray("nova_cbf", Cbf.write(novaCompound))
     }
     
 }
@@ -87,7 +89,7 @@ internal data object ItemStackNovaDamageConverter : ItemStackLegacyConverter {
     override fun convert(patch: DataComponentPatch): DataComponentPatch {
         val unsafeTag = patch.get(DataComponents.CUSTOM_DATA)?.getOrNull()?.unsafe
             ?: return patch
-        val novaCompound: NamespacedCompound = unsafeTag.getByteArrayOrNull("nova_cbf")?.let(CBF::read)
+        val novaCompound: NamespacedCompound = unsafeTag.getByteArrayOrNull("nova_cbf")?.let(Cbf::read)
             ?: return patch
         val damage = novaCompound.get<Int>("nova", "damage")
             ?: return patch
@@ -96,7 +98,7 @@ internal data object ItemStackNovaDamageConverter : ItemStackLegacyConverter {
         
         val tag = unsafeTag.copy()
         if (novaCompound.isNotEmpty()) {
-            tag.putByteArray("nova_cbf", CBF.write(novaCompound))
+            tag.putByteArray("nova_cbf", Cbf.write(novaCompound))
         } else {
             tag.remove("nova_cbf")
         }
@@ -116,7 +118,7 @@ internal data object ItemStackEnchantmentsConverter : ItemStackLegacyConverter {
     override fun convert(patch: DataComponentPatch): DataComponentPatch {
         val unsafeTag = patch.get(DataComponents.CUSTOM_DATA)?.getOrNull()?.unsafe
             ?: return patch
-        val novaCompound: NamespacedCompound = unsafeTag.getByteArrayOrNull("nova_cbf")?.let(CBF::read)
+        val novaCompound: NamespacedCompound = unsafeTag.getByteArrayOrNull("nova_cbf")?.let(Cbf::read)
             ?: return patch
         
         val builder = DataComponentPatch.builder()
@@ -147,7 +149,7 @@ internal data object ItemStackEnchantmentsConverter : ItemStackLegacyConverter {
         novaCompound.remove("nova", "enchantments")
         novaCompound.remove("nova", "stored_enchantments")
         if (novaCompound.isNotEmpty()) {
-            tag.putByteArray("nova_cbf", CBF.write(novaCompound))
+            tag.putByteArray("nova_cbf", Cbf.write(novaCompound))
         } else {
             tag.remove("nova_cbf")
         }

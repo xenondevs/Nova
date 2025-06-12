@@ -99,7 +99,7 @@ abstract class NetworkedTileEntity(
             val holderCompound = retrieveDataOrNull<Compound>("energyHolder")!!
             val energy = holderCompound.get<Long>("energy")
             if (energy != null) {
-                holderCompound.remove("energy")
+                holderCompound["energy"] = null
                 storeData("energy", energy, true)
             }
         }

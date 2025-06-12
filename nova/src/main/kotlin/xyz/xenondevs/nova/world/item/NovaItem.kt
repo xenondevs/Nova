@@ -25,7 +25,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.CommentedConfigurationNode
-import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.cbf.Cbf
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.invui.gui.Gui
@@ -147,7 +147,7 @@ class NovaItem internal constructor(
                     it.putString("id", id.toString())
                 })
                 if (defaultCompound.isNotEmpty()) {
-                    compoundTag.putByteArray("nova_cbf", CBF.write(defaultCompound))
+                    compoundTag.putByteArray("nova_cbf", Cbf.write(defaultCompound))
                 }
             }))
             .build()

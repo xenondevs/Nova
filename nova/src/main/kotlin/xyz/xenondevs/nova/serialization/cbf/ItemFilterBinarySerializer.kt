@@ -1,14 +1,15 @@
-@file:Suppress("UNCHECKED_CAST")
-
-package xyz.xenondevs.nova.serialization.cbf.adapter
+package xyz.xenondevs.nova.serialization.cbf
 
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.cbf.Cbf
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.cbf.adapter.ComplexBinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
+import xyz.xenondevs.cbf.serializer.BinarySerializer
+import xyz.xenondevs.cbf.serializer.BinarySerializerFactory
+import xyz.xenondevs.cbf.serializer.VersionedBinarySerializer
+import xyz.xenondevs.commons.reflection.isSubtypeOf
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
@@ -16,25 +17,30 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterTyp
 import xyz.xenondevs.nova.world.item.behavior.UnknownItemFilter
 import kotlin.reflect.KType
 
-internal object ItemFilterBinaryAdapter : ComplexBinaryAdapter<ItemFilter<*>> {
+private object ItemFilterBinarySerializer : VersionedBinarySerializer<ItemFilter<*>>(2U) {
     
-    override fun read(type: KType, id: UByte, reader: ByteReader): ItemFilter<*> {
-        if (id == 1.toUByte())
-            return readLegacy(reader)
-        
+    override fun readVersioned(version: UByte, reader: ByteReader): ItemFilter<*> {
+        return when (version) {
+            1.toUByte() -> readV1(reader)
+            2.toUByte() -> readV2(reader)
+            else -> throw UnsupportedOperationException()
+        }
+    }
+    
+    private fun readV2(reader: ByteReader): ItemFilter<*> {
         val filterTypeId = Key.key(reader.readString())
         return createFilter(
             filterTypeId,
             NovaRegistries.ITEM_FILTER_TYPE.getValue(filterTypeId),
-            CBF.read<Compound>(reader)!!
+            Cbf.read<Compound>(reader)!!
         )
     }
     
-    private fun readLegacy(reader: ByteReader): ItemFilter<*> {
+    private fun readV1(reader: ByteReader): ItemFilter<*> {
         val whitelist = reader.readBoolean()
         val nbt = reader.readBoolean()
         val size = reader.readVarInt()
-        val items: List<ItemStack> = Array(size) { CBF.read(reader) ?: ItemStack.empty() }.toList()
+        val items: List<ItemStack> = Array(size) { Cbf.read(reader) ?: ItemStack.empty() }.toList()
         
         val id = Key.key("logistics", if (nbt) "nbt_item_filter" else "type_item_filter")
         val compound = Compound()
@@ -50,25 +56,35 @@ internal object ItemFilterBinaryAdapter : ComplexBinaryAdapter<ItemFilter<*>> {
         return filterType.deserialize(compound)
     }
     
-    override fun write(obj: ItemFilter<*>, type: KType, writer: ByteWriter) =
+    override fun writeVersioned(obj: ItemFilter<*>, writer: ByteWriter) =
         write(obj, writer)
     
+    @Suppress("UNCHECKED_CAST")
     private fun <T : ItemFilter<T>> write(filter: ItemFilter<T>, writer: ByteWriter) {
-        writer.writeUnsignedByte(2.toUByte())
-        
         if (filter is UnknownItemFilter) {
             writer.writeString(filter.originalId.toString())
-            CBF.write(filter.originalData, writer)
+            Cbf.write(filter.originalData, writer)
         } else {
             writer.writeString(NovaRegistries.ITEM_FILTER_TYPE.getKey(filter.type).toString())
-            CBF.write(filter.type.serialize(filter as T), writer)
+            Cbf.write(filter.type.serialize(filter as T), writer)
         }
     }
     
-    override fun copy(obj: ItemFilter<*>, type: KType): ItemFilter<*> =
+    override fun copyNonNull(obj: ItemFilter<*>): ItemFilter<*> =
         copy(obj)
     
+    @Suppress("UNCHECKED_CAST")
     private fun <T : ItemFilter<T>> copy(filter: ItemFilter<T>): ItemFilter<T> =
         filter.type.copy(filter as T)
+    
+}
+
+internal object ItemFilterBinarySerializerFactory : BinarySerializerFactory {
+    
+    override fun create(type: KType): BinarySerializer<*>? {
+        if (!type.isSubtypeOf<ItemFilter<*>?>())
+            return null
+        return ItemFilterBinarySerializer
+    }
     
 }

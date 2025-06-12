@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.resources.lookup
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.resources.ResourcePath
 import kotlin.reflect.KProperty

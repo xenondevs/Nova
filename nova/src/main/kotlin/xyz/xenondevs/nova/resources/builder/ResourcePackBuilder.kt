@@ -11,9 +11,7 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.flatMap
 import xyz.xenondevs.commons.provider.flattenIterables
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.commons.version.Version

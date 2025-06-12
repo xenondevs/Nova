@@ -6,10 +6,11 @@ import kotlinx.coroutines.cancel
 import net.minecraft.world.level.GameRules
 import org.bukkit.World
 import org.bukkit.scheduler.BukkitTask
-import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.cbf.Cbf
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
+import xyz.xenondevs.cbf.serializer.BinarySerializer
 import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
@@ -33,6 +34,8 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.random.Random
+
+private val COMPOUND_SERIALIZER: BinarySerializer<Compound> = Cbf.getSerializer<Compound>()
 
 internal class RegionChunk(
     val pos: ChunkPos,
@@ -581,7 +584,7 @@ internal class RegionChunk(
         for ((sectionIdx, section) in sections.withIndex()) {
             sectionBitmask.set(sectionIdx, section.write(sectionsWriter))
         }
-        writer.writeBytes(Arrays.copyOf(sectionBitmask.toByteArray(), sections.size.ceilDiv(8)))
+        writer.writeBytes(sectionBitmask.toByteArray().copyOf(sections.size.ceilDiv(8)))
         writer.writeBytes(sectionsBuffer.toByteArray())
         
         // tile-entities
@@ -590,12 +593,12 @@ internal class RegionChunk(
         writer.writeVarInt(vanillaTileEntityData.size)
         for ((pos, data) in vanillaTileEntityData) {
             writer.writeInt(packBlockPos(pos))
-            writer.writeBytes(CBF.write(data))
+            COMPOUND_SERIALIZER.write(data, writer)
         }
         writer.writeVarInt(tileEntityData.size)
         for ((pos, data) in tileEntityData) {
             writer.writeInt(packBlockPos(pos))
-            writer.writeBytes(CBF.write(data))
+            COMPOUND_SERIALIZER.write(data, writer)
         }
         
         return true
@@ -642,7 +645,7 @@ internal class RegionChunk(
             val map = HashMap<BlockPos, Compound>(size)
             repeat(size) {
                 val pos = unpackBlockPos(chunkPos, reader.readInt())
-                val data = CBF.read<Compound>(reader)!!
+                val data = Cbf.read<Compound>(reader)!!
                 map[pos] = data
             }
             return map

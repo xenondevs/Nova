@@ -358,7 +358,7 @@ abstract class TileEntity(
             val compound = retrieveDataOrNull<Compound>(legacyName)!!
             removeData(legacyName)
             when (compound.get<String>("type")) {
-                "NONE" -> compound.remove("type")
+                "NONE" -> compound["type"] = null
                 "WATER" -> compound["type"] = FluidType.WATER
                 "LAVA" -> compound["type"] = FluidType.LAVA
             }

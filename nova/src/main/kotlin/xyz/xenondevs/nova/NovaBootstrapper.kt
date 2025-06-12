@@ -19,7 +19,7 @@ import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.patch.Patcher
-import xyz.xenondevs.nova.serialization.cbf.CBFAdapters
+import xyz.xenondevs.nova.serialization.cbf.CbfSerializers
 import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
@@ -102,7 +102,7 @@ internal class NovaBootstrapper : PluginBootstrap {
             
             Patcher.run()
             Configs.extractDefaultConfig()
-            CBFAdapters.register()
+            CbfSerializers.register()
             Initializer.start()
         } catch (t: Throwable) {
             LOGGER.error("", t)

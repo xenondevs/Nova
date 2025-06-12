@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.world.format.legacy.v1
 
 import org.bukkit.World
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.cbf.Cbf
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -60,7 +60,7 @@ internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChun
     }
     
     private fun readPopulateVanilla(reader: ByteReader, pos: BlockPos, type: String, chunk: RegionChunk) {
-        val data = CBF.read<Compound>(reader)!!
+        val data = Cbf.read<Compound>(reader)!!
         when (type) {
             "minecraft:note_block" -> {
                 val blockState = DefaultBlocks.NOTE_BLOCK.defaultBlockState
@@ -75,7 +75,7 @@ internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChun
     }
     
     private fun readPopulateNova(reader: ByteReader, pos: BlockPos, type: NovaBlock, chunk: RegionChunk) {
-        val compound = CBF.read<Compound>(reader)!!
+        val compound = Cbf.read<Compound>(reader)!!
         val blockFacing = compound.get<BlockFace>("facing") // facing was the only built-in block property
         
         val blockState = blockFacing
@@ -86,7 +86,7 @@ internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChun
         if (type is NovaTileEntityBlock) {
             val uuid = reader.readUUID()
             val ownerUUID = reader.readUUID().takeUnless { it == UUID(0L, 0L) }
-            val data = CBF.read<Compound>(reader)!!
+            val data = Cbf.read<Compound>(reader)!!
             
             data["uuid"] = uuid
             data["ownerUuid"] = ownerUUID

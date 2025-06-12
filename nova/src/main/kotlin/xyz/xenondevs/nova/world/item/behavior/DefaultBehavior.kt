@@ -21,7 +21,6 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.node

@@ -10,7 +10,6 @@ import org.bukkit.Sound
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.nova.config.entryOrElse

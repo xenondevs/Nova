@@ -1,19 +1,18 @@
-package xyz.xenondevs.nova.serialization.cbf.adapter
+package xyz.xenondevs.nova.serialization.cbf
 
 import org.bukkit.Bukkit
-import xyz.xenondevs.cbf.adapter.BinaryAdapter
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
+import xyz.xenondevs.cbf.serializer.UnversionedBinarySerializer
 import xyz.xenondevs.nova.world.BlockPos
-import kotlin.reflect.KType
 
-internal object BlockPosBinaryAdapter : BinaryAdapter<BlockPos> {
+internal object BlockPosBinarySerializer : UnversionedBinarySerializer<BlockPos>() {
     
-    override fun copy(obj: BlockPos, type: KType): BlockPos {
+    override fun copyNonNull(obj: BlockPos): BlockPos {
         return obj.copy()
     }
     
-    override fun read(type: KType, reader: ByteReader): BlockPos {
+    override fun readUnversioned(reader: ByteReader): BlockPos {
         val worldUuid = reader.readUUID()
         val world = Bukkit.getWorld(worldUuid) ?: throw IllegalStateException("No world with UUID $worldUuid found")
         val x = reader.readVarInt()
@@ -22,7 +21,7 @@ internal object BlockPosBinaryAdapter : BinaryAdapter<BlockPos> {
         return BlockPos(world, x, y, z)
     }
     
-    override fun write(obj: BlockPos, type: KType, writer: ByteWriter) {
+    override fun writeUnversioned(obj: BlockPos, writer: ByteWriter) {
         writer.writeUUID(obj.world.uid)
         writer.writeVarInt(obj.x)
         writer.writeVarInt(obj.y)

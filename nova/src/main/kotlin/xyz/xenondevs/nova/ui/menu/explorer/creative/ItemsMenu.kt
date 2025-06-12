@@ -11,7 +11,6 @@ import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.flatten
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mapEach
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider

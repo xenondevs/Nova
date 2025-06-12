@@ -4,7 +4,6 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.entry
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.defaultsTo
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import java.util.*
 import kotlin.math.min
@@ -42,7 +41,7 @@ class FluidContainer(
         allowedTypes,
         capacityProvider,
         compound.entry("type"),
-        compound.entry<Long>("amount").defaultsTo(0L)
+        compound.entry<Long>("amount") { 0L }
     )
     
     override fun addFluid(type: FluidType, amount: Long): Long {
