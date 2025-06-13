@@ -66,6 +66,10 @@ internal sealed class PalletizedSectionDataContainer<T>(idResolver: IdResolver<T
      * Does not update the [bitsPerEntry] or resize the data.
      */
     private fun remakePalette() {
+        // don't remake LinearPalette to save performance, instead wait for palette to grow into HashPalette and remake then
+        if (palette is LinearPalette)
+            return
+        
         val currentPalette = palette
         var newPalette: Palette<T> = LinearPalette(idResolver)
         
