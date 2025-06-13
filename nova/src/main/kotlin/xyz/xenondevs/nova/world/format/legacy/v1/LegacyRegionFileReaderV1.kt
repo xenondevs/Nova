@@ -17,12 +17,11 @@ import xyz.xenondevs.nova.world.format.RegionizedFileReader
 import xyz.xenondevs.nova.world.format.chunk.RegionChunk
 import xyz.xenondevs.nova.world.format.legacy.LegacyConversionException
 import xyz.xenondevs.nova.world.format.legacy.LegacyRegionizedFileReader
-import java.io.File
 import java.util.*
 
 internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChunk, RegionFile> {
     
-    override fun read(file: File, reader: ByteReader, world: World, regionX: Int, regionZ: Int): RegionFile {
+    override fun read(reader: ByteReader, world: World, regionX: Int, regionZ: Int): RegionFile {
         val chunks = Array(1024) { RegionChunk.createEmpty(RegionizedFileReader.chunkIdxToPos(it, world, regionX, regionZ)) }
         while (reader.readByte() == 1.toByte()) {
             val chunk = chunks[reader.readUnsignedShort().toInt()]
@@ -30,7 +29,7 @@ internal object LegacyRegionFileReaderV1 : LegacyRegionizedFileReader<RegionChun
             populateChunk(ByteReader.fromByteArray(data), chunk)
         }
         
-        return RegionFile(file, world, regionX, regionZ, chunks)
+        return RegionFile(chunks)
     }
     
     private fun populateChunk(reader: ByteReader, chunk: RegionChunk) {

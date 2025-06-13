@@ -43,7 +43,7 @@ internal class LoadChunkTask(
         val updatedNetworks = HashMap<ProtoNetwork<*>, MutableSet<NetworkNode>>()
         
         val chunkNodes = NetworkManager.getNodes(chunkPos).associateByTo(HashMap(), NetworkNode::pos)
-        val networkChunk = state.storage.getOrLoadNetworkRegion(chunkPos).getChunk(chunkPos)
+        val networkChunk = state.storage.getOrLoadRegionizedChunk(chunkPos)
         val networkNodes = networkChunk.getData()
         
         for ((pos, data) in networkNodes) {

@@ -61,8 +61,7 @@ object WorldDataManager : Listener {
     )
     private fun disable() = runBlocking {
         for (world in worlds.values) {
-            world.disableAllChunks()
-            world.save(false)
+            world.shutdownAndWait()
         }
         disabled = true
     }
@@ -123,10 +122,10 @@ object WorldDataManager : Listener {
         getOrLoadChunk(pos).getTileEntities()
     
     fun getTileEntities(world: World): List<TileEntity> =
-        getWorldStorage(world).getTileEntities()
+        getWorldStorage(world).blockStorage.collectFromChunks(RegionChunk::getTileEntities)
     
     fun getTileEntities(): List<TileEntity> =
-        worlds.values.flatMap { it.getTileEntities() }
+        worlds.values.flatMap { it.blockStorage.collectFromChunks(RegionChunk::getTileEntities) }
     
     fun setTileEntity(pos: BlockPos, tileEntity: TileEntity?): TileEntity? {
         check(!disabled) { "WorldDataManager is already disabled" }
@@ -154,25 +153,22 @@ object WorldDataManager : Listener {
     }
     
     internal fun getVanillaTileEntities(world: World): List<VanillaTileEntity> =
-        getWorldStorage(world).getVanillaTileEntities()
+        getWorldStorage(world).blockStorage.collectFromChunks(RegionChunk::getVanillaTileEntities)
     
     internal fun getVanillaTileEntities(): List<VanillaTileEntity> =
-        worlds.values.flatMap { it.getVanillaTileEntities() }
+        worlds.values.flatMap { it.blockStorage.collectFromChunks(RegionChunk::getVanillaTileEntities) }
     
     internal suspend fun getOrLoadChunk(pos: ChunkPos): RegionChunk =
         getOrLoadRegion(pos).getChunk(pos)
     
-    internal fun getChunkOrThrow(pos: ChunkPos): RegionChunk {
-        return getWorldStorage(pos.world!!).getBlockChunkOrThrow(pos)
-    }
+    internal fun getChunkOrThrow(pos: ChunkPos): RegionChunk =
+        getWorldStorage(pos.world!!).blockStorage.getRegionizedChunkOrThrow(pos)
     
-    internal fun getChunkOrNull(pos: ChunkPos): RegionChunk? {
-        return getWorldStorage(pos.world!!).getBlockChunkOrNull(pos)
-    }
+    internal fun getChunkOrNull(pos: ChunkPos): RegionChunk? =
+        getWorldStorage(pos.world!!).blockStorage.getRegionizedChunkOrNull(pos)
     
-    private suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile {
-        return getWorldStorage(pos.world!!).getOrLoadRegion(pos)
-    }
+    private suspend fun getOrLoadRegion(pos: ChunkPos): RegionFile =
+        getWorldStorage(pos.world!!).blockStorage.getOrLoadRegionizedFile(pos)
     
     internal fun getWorldStorage(world: World): WorldDataStorage =
         worlds.computeIfAbsent(world.uid) { WorldDataStorage(world) }
