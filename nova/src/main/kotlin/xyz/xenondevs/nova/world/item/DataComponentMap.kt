@@ -5,6 +5,7 @@ import io.papermc.paper.datacomponent.PaperDataComponentType
 import net.minecraft.core.component.TypedDataComponent
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.lazyFlatten
 import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.provider
 import net.minecraft.core.component.DataComponentMap as MojangDataComponentMap
@@ -24,9 +25,11 @@ fun buildDataComponentMap(builderAction: DataComponentMap.Builder.() -> Unit): D
  * Builds a [DataComponentMap] [Provider] using the given [builderAction].
  */
 fun buildDataComponentMapProvider(builderAction: DataComponentMap.ProviderBuilder.() -> Unit): Provider<DataComponentMap> {
-    val builder = DataComponentMap.providerBuilder()
-    builder.builderAction()
-    return builder.build()
+    return provider {
+        val builder = DataComponentMap.providerBuilder()
+        builder.builderAction()
+        builder.build()
+    }.lazyFlatten()
 }
 
 /**
@@ -60,33 +63,30 @@ class DataComponentMap internal constructor(
         /**
          * Sets the value of the given [type] to the given [value].
          */
-        operator fun <T : Any> set(type: MojangDataComponentType<T>, value: T): Builder {
+        operator fun <T : Any> set(type: MojangDataComponentType<T>, value: T) {
             builder.set(type, value)
-            return this
         }
         
         /**
          * Sets the value of the given [type] to the given [value].
          */
-        operator fun <T : Any> set(type: DataComponentType.Valued<T>, value: T): Builder {
+        operator fun <T : Any> set(type: DataComponentType.Valued<T>, value: T) {
             type as PaperDataComponentType.ValuedImpl<T, *>
-            return set(type, value)
+            set(type, value)
         }
         
-        private fun <T : Any, NMS : Any> set(type: PaperDataComponentType.ValuedImpl<T, NMS>, value: T): Builder {
+        private fun <T : Any, NMS : Any> set(type: PaperDataComponentType.ValuedImpl<T, NMS>, value: T) {
             builder.set(
                 PaperDataComponentType.bukkitToMinecraft(type),
                 type.adapter.toVanilla(value, type.holder)
             )
-            return this
         }
         
         /**
          * Sets the given [type] without a value.
          */
-        fun set(type: DataComponentType.NonValued): Builder {
+        fun set(type: DataComponentType.NonValued) {
             builder.set(PaperDataComponentType.bukkitToMinecraft(type), MojangUnit.INSTANCE)
-            return this
         }
         
         fun build() = DataComponentMap(builder.build())
@@ -103,17 +103,15 @@ class DataComponentMap internal constructor(
         /**
          * Sets the value of the given [type] to the given [value].
          */
-        operator fun <T : Any> set(type: MojangDataComponentType<T>, value: Provider<T?>): ProviderBuilder {
+        operator fun <T : Any> set(type: MojangDataComponentType<T>, value: Provider<T?>) {
             components += value.mapNonNull { TypedDataComponent(type, it) }
-            return this
         }
         
         /**
          * Sets the value of the given [type] to the given [value].
          */
-        operator fun <T : Any> set(type: DataComponentType.Valued<T>, value: Provider<T?>): ProviderBuilder {
+        operator fun <T : Any> set(type: DataComponentType.Valued<T>, value: Provider<T?>) {
             components += value.mapNonNull { createTypedDataComponent(type as PaperDataComponentType.ValuedImpl<T, *>, it) }
-            return this
         }
         
         private fun <T : Any, NMS : Any> createTypedDataComponent(type: PaperDataComponentType.ValuedImpl<T, NMS>, value: T) =
@@ -125,25 +123,22 @@ class DataComponentMap internal constructor(
         /**
          * Sets the value of the given [type] to the given [value].
          */
-        operator fun <T : Any> set(type: MojangDataComponentType<T>, value: T): ProviderBuilder {
+        operator fun <T : Any> set(type: MojangDataComponentType<T>, value: T) {
             components += provider(TypedDataComponent(type, value))
-            return this
         }
         
         /**
          * Sets the value of the given [type] to the given [value].
          */
-        operator fun <T : Any> set(type: DataComponentType.Valued<T>, value: T): ProviderBuilder {
+        operator fun <T : Any> set(type: DataComponentType.Valued<T>, value: T) {
             set(type, provider(value))
-            return this
         }
         
         /**
          * Sets the given [type] without a value.
          */
-        fun set(type: DataComponentType.NonValued): ProviderBuilder {
+        fun set(type: DataComponentType.NonValued) {
             components += provider(TypedDataComponent(PaperDataComponentType.bukkitToMinecraft(type), MojangUnit.INSTANCE))
-            return this
         }
         
         /**
