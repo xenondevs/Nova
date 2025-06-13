@@ -77,8 +77,13 @@ internal class ArraySectionDataContainer<T> : PalletizedSectionDataContainer<T> 
     }
     
     override fun isMonotone(): Boolean {
+        // empty section is monotone of air
         if (nonEmptyBlockCount == 0)
             return true
+        
+        // section with empty parts cannot be monotone
+        if (nonEmptyBlockCount != SECTION_SIZE)
+            return false
         
         var prev = data[0]
         for (i in 1..<SECTION_SIZE) {
