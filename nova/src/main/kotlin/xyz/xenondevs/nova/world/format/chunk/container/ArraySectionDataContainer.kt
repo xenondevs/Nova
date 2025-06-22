@@ -60,6 +60,7 @@ internal class ArraySectionDataContainer<T> : PalletizedSectionDataContainer<T> 
     }
     
     override fun fill(value: T?) {
+        nonEmptyBlockCount = if (value == null) 0 else SECTION_SIZE
         val id = toPalletizedId(value)
         data.fill(id)
     }
