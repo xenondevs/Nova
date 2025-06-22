@@ -15,9 +15,6 @@ import net.minecraft.nbt.ShortTag
 import net.minecraft.nbt.StringTag
 import net.minecraft.nbt.Tag
 import net.minecraft.nbt.TagType
-import net.minecraft.world.item.ItemStack
-import xyz.xenondevs.nova.util.REGISTRY_ACCESS
-import java.util.stream.Stream
 import kotlin.jvm.optionals.getOrNull
 
 object NBTUtils {
@@ -72,10 +69,6 @@ object NBTUtils {
         tag.remove("equipment")
         
         return tag
-    }
-    
-    fun convertListToStream(tag: ListTag): Stream<ItemStack> {
-        return tag.stream().map { ItemStack.parse(REGISTRY_ACCESS, it as CompoundTag).get() }
     }
     
 }

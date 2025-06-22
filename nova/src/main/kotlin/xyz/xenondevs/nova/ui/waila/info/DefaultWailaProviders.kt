@@ -16,6 +16,7 @@ import xyz.xenondevs.nova.ui.waila.info.impl.CropWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.DaylightDetectorWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.DefaultNovaWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.DefaultVanillaWailaInfoProvider
+import xyz.xenondevs.nova.ui.waila.info.impl.DriedGhastWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.HatchableWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.LanternWailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.impl.RailWailaInfoProvider
@@ -50,6 +51,7 @@ private object DefaultWailaProviders {
         register("brushable", BrushableWailaInfoProvider)
         register("hatchable", HatchableWailaInfoProvider)
         register("test_block", TestBlockWailaInfoProvider)
+        register("dried_ghast", DriedGhastWailaInfoProvider)
         
         register("vanilla", VanillaWailaToolIconProvider)
     }

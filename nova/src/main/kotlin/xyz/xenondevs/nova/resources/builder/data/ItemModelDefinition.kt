@@ -26,7 +26,9 @@ import xyz.xenondevs.nova.serialization.kotlinx.ValueOrListSerializer
 data class ItemModelDefinition(
     val model: ItemModel,
     @SerialName("hand_animation_on_swap")
-    val handAnimationOnSwap: Boolean = true
+    val handAnimationOnSwap: Boolean = true,
+    @SerialName("oversized_in_gui")
+    val oversizedInGui: Boolean = false
 )
 
 /**
@@ -305,6 +307,10 @@ sealed interface ItemModel {
                 val texture: ResourcePath<ResourceType.EntityTexture>? = kind.defaultTexture,
                 val animation: Double = 0.0
             ) : SpecialModel
+            
+            @Serializable
+            @SerialName("player_head")
+            data object PlayerHead : SpecialModel
             
             @Serializable
             @SerialName("minecraft:shulker_box")

@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
+import net.minecraft.util.ProblemReporter
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ExperienceOrb
 import net.minecraft.world.item.BlockItem
@@ -23,6 +24,8 @@ import net.minecraft.world.item.crafting.AbstractCookingRecipe
 import net.minecraft.world.level.block.DoorBlock
 import net.minecraft.world.level.block.TallFlowerBlock
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityType
+import net.minecraft.world.level.storage.TagValueInput
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
@@ -359,8 +362,8 @@ object BlockUtils {
         val tileEntityTag = itemStack.unwrap().get(DataComponents.BLOCK_ENTITY_DATA)?.copyTag()
             ?: return
         
-        pos.world.serverLevel.getBlockEntity(pos.nmsPos, true)
-            ?.loadWithComponents(tileEntityTag, REGISTRY_ACCESS)
+        val input = TagValueInput.create(ProblemReporter.DISCARDING, pos.world.serverLevel.registryAccess(), tileEntityTag)
+        pos.world.serverLevel.getBlockEntity(pos.nmsPos)?.loadWithComponents(input)
     }
     
     /**

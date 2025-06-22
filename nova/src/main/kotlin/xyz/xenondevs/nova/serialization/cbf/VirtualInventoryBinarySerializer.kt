@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.serialization.cbf
 
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtIo
+import net.minecraft.nbt.NbtOps
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.cbf.serializer.VersionedBinarySerializer
@@ -40,7 +41,10 @@ internal object VirtualInventoryBinarySerializer : VersionedBinarySerializer<Vir
                     NbtIo.read(dataInput),
                     dataVersion, DATA_VERSION
                 )
-                MojangStack.parse(REGISTRY_ACCESS, tag).get().asBukkitMirror().takeUnlessEmpty()
+                MojangStack.CODEC.parse(
+                    REGISTRY_ACCESS.createSerializationContext(NbtOps.INSTANCE),
+                    tag
+                ).resultOrPartial().get().asBukkitMirror().takeUnlessEmpty()
             } else null
         }
         
@@ -84,7 +88,10 @@ internal object VirtualInventoryBinarySerializer : VersionedBinarySerializer<Vir
                 continue
             
             val nmsStack = itemStack.unwrap()
-            val nbt = nmsStack.save(REGISTRY_ACCESS) as CompoundTag
+            val nbt = MojangStack.CODEC.encodeStart(
+                REGISTRY_ACCESS.createSerializationContext(NbtOps.INSTANCE),
+                nmsStack,
+            ).resultOrPartial().get() as CompoundTag
             NbtIo.write(nbt, dataOutput)
         }
         

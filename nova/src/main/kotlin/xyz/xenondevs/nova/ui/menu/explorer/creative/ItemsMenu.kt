@@ -106,7 +106,7 @@ internal class ItemsMenu(val player: Player) : ItemMenu {
         }.build()
     
     private val mainWindow = Window.builder()
-        .setTitle(activeTab.map { tab -> TAB_BUTTON_TEXTURES[tab % 5].component })
+        .setTitle(activeTab.map { tab -> TAB_BUTTON_TEXTURES[(tab % 5).coerceAtLeast(0)].component })
         .setUpperGui(TabGui.builder()
             .setStructure(
                 "p p p p p p p p p",

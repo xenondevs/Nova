@@ -34,7 +34,7 @@ internal object ItemStackSerializer {
         val data = reader.readBytes(reader.readVarInt())
         var nbt = NbtIo.readCompressed(ByteArrayInputStream(data), NbtAccounter.unlimitedHeap())
         nbt = tryFix(nbt, 3700, DATA_VERSION)
-        return MojangStack.parse(REGISTRY_ACCESS, nbt).get()
+        return MojangStack.CODEC.parse(REGISTRY_ACCESS.createSerializationContext(NbtOps.INSTANCE), nbt).resultOrPartial().get()
     }
     
     private fun readV2(reader: ByteReader): MojangStack? {
@@ -42,7 +42,7 @@ internal object ItemStackSerializer {
         var nbt = NbtIo.read(reader.asDataInput())
         nbt = tryFix(nbt, dataVersion, DATA_VERSION)
         
-        return MojangStack.parse(REGISTRY_ACCESS, nbt).get()
+        return MojangStack.CODEC.parse(REGISTRY_ACCESS.createSerializationContext(NbtOps.INSTANCE), nbt).resultOrPartial().get()
     }
     
     fun write(obj: MojangStack?, writer: ByteWriter) {
@@ -54,7 +54,10 @@ internal object ItemStackSerializer {
             writer.writeUnsignedByte(3U)
             
             writer.writeVarInt(DATA_VERSION)
-            val nbt = obj.save(REGISTRY_ACCESS) as CompoundTag
+            val nbt = MojangStack.CODEC.encodeStart(
+                REGISTRY_ACCESS.createSerializationContext(NbtOps.INSTANCE),
+                obj,
+            ).resultOrPartial().get() as CompoundTag
             NbtIo.write(nbt, writer.asDataOutput())
         }
     }

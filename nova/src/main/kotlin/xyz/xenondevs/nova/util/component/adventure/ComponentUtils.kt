@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.util.component.adventure
 
+import com.mojang.serialization.JsonOps
 import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.BuildableComponent
@@ -14,6 +15,7 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.StringTag
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import org.bukkit.entity.Player
@@ -21,10 +23,9 @@ import xyz.xenondevs.invui.internal.util.ComponentUtils
 import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.resources.builder.task.font.FontChar
 import xyz.xenondevs.nova.ui.overlay.MoveCharacters
-import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.toResourceLocation
 import java.awt.Color
-import java.util.LinkedList
+import java.util.*
 import net.minecraft.network.chat.Component as MojangComponent
 import net.minecraft.network.chat.Style as MojangStyle
 
@@ -53,7 +54,7 @@ fun Array<out BaseComponent>.toAdventureComponent(): Component {
 }
 
 fun MojangComponent.toJson(): String {
-    return MojangComponent.Serializer.toJson(this, REGISTRY_ACCESS)
+    return ComponentSerialization.CODEC.encodeStart(JsonOps.INSTANCE, this).getOrThrow().toString()
 }
 
 fun Component.toNMSComponent(): MojangComponent {

@@ -5,10 +5,12 @@ package xyz.xenondevs.nova.patch.impl.registry
 import io.papermc.paper.tag.TagEventConfig
 import net.kyori.adventure.key.Key
 import net.minecraft.core.Registry
+import net.minecraft.core.RegistryAccess
 import net.minecraft.core.WritableRegistry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.RegistryDataLoader
 import net.minecraft.resources.RegistryOps
+import net.minecraft.resources.RegistryOps.HolderLookupAdapter
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagEntry
@@ -88,7 +90,8 @@ internal object RegistryEventsPatch : MultiTransformer(BuiltInRegistries::class,
     
     @JvmStatic
     fun handlePreFreeze1(registry: WritableRegistry<*>) {
-        handlePreFreeze(registry, BuiltInRegistries.BUILT_IN_CONVERSIONS.lookup())
+        val lookup = HolderLookupAdapter(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY))
+        handlePreFreeze(registry, lookup)
     }
     
     @JvmStatic
@@ -116,7 +119,8 @@ internal object RegistryEventsPatch : MultiTransformer(BuiltInRegistries::class,
     
     @JvmStatic
     fun handlePostFreeze1(registry: WritableRegistry<*>) {
-        handlePostFreeze(registry, BuiltInRegistries.BUILT_IN_CONVERSIONS.lookup())
+        val lookup = HolderLookupAdapter(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY))
+        handlePostFreeze(registry, lookup)
     }
     
     @JvmStatic
