@@ -6,6 +6,7 @@ import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.Equippable.equippable
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers.itemAttributes
 import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.keys.SoundEventKeys
 import io.papermc.paper.registry.set.RegistryKeySet
 import io.papermc.paper.registry.set.RegistrySet
 import net.kyori.adventure.key.Key
@@ -66,6 +67,12 @@ import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
  *
  * @param equipOnInteract Whether this item should be equipped when right-clicking. Defaults to `true`.
  * Used when `equip_on_interact` is not specified in the config.
+ *
+ * @param canBeSheared Whether players can use shears to remove this equippable item from a wearing entity. Defaults to `false`.
+ * Used when `can_be_sheared` is not specified in the config.
+ *
+ * @param shearingSound The sound that is played when the equippable is removed by shears. Defaults to `item.shears.snip`.
+ * Used when `shearing_sound` is not specified in the config.
  */
 fun Equippable(
     equipment: Equipment?,
@@ -73,12 +80,14 @@ fun Equippable(
     armor: Double = 0.0,
     armorToughness: Double = 0.0,
     knockbackResistance: Double = 0.0,
-    equipSound: Key = Key.key("minecraft", "item.armor.equip_generic"),
+    equipSound: Key = SoundEventKeys.ITEM_ARMOR_EQUIP_GENERIC,
     allowedEntities: Set<EntityType>?,
     dispensable: Boolean = true,
     swappable: Boolean = true,
     damageOnHurt: Boolean = true,
-    equipOnInteract: Boolean = true
+    equipOnInteract: Boolean = true,
+    canBeSheared: Boolean = false,
+    shearingSound: Key = SoundEventKeys.ITEM_SHEARS_SNIP
 ): ItemBehaviorFactory<Equippable> = Equippable(
     equipment,
     slot,
@@ -90,7 +99,9 @@ fun Equippable(
     dispensable,
     swappable,
     damageOnHurt,
-    equipOnInteract
+    equipOnInteract,
+    canBeSheared,
+    shearingSound
 )
 
 /**
@@ -126,6 +137,12 @@ fun Equippable(
  *
  * @param equipOnInteract Whether this item should be equipped when right-clicking. Defaults to `true`.
  * Used when `equip_on_interact` is not specified in the config.
+ *
+ * @param canBeSheared Whether players can use shears to remove this equippable item from a wearing entity. Defaults to `false`.
+ * Used when `can_be_sheared` is not specified in the config.
+ *
+ * @param shearingSound The sound that is played when the equippable is removed by shears. Defaults to `item.shears.snip`.
+ * Used when `shearing_sound` is not specified in the config.
  */
 fun Equippable(
     equipment: Equipment?,
@@ -133,12 +150,14 @@ fun Equippable(
     armor: Double = 0.0,
     armorToughness: Double = 0.0,
     knockbackResistance: Double = 0.0,
-    equipSound: Key = Key.key("minecraft", "item.armor.equip_generic"),
+    equipSound: Key = SoundEventKeys.ITEM_ARMOR_EQUIP_GENERIC,
     allowedEntities: RegistryKeySet<EntityType>? = null,
     dispensable: Boolean = true,
     swappable: Boolean = true,
     damageOnHurt: Boolean = true,
-    equipOnInteract: Boolean = true
+    equipOnInteract: Boolean = true,
+    canBeSheared: Boolean = false,
+    shearingSound: Key = SoundEventKeys.ITEM_SHEARS_SNIP
 ) = ItemBehaviorFactory<Equippable> {
     val cfg = it.config
     Equippable(
@@ -153,6 +172,8 @@ fun Equippable(
         cfg.entryOrElse(swappable, "swappable"),
         cfg.entryOrElse(damageOnHurt, "damage_on_hurt"),
         cfg.entryOrElse(equipOnInteract, "equip_on_interact"),
+        cfg.entryOrElse(canBeSheared, "can_be_sheared"),
+        cfg.entryOrElse(shearingSound, "shearing_sound")
     )
 }
 
@@ -170,6 +191,8 @@ fun Equippable(
  * @param swappable Whether this item can be swapped with other items in the same slot.
  * @param damageOnHurt Whether this item will be damaged when the wearing entity is damaged.
  * @param equipOnInteract Whether this item should be equipped when right-clicking.
+ * @param canBeSheared Whether players can use shears to remove this equippable item from a wearing entity.
+ * @param shearingSound The sound that is played when the equippable is removed by shears.
  */
 class Equippable(
     equipment: Provider<Equipment?>,
@@ -182,7 +205,9 @@ class Equippable(
     dispensable: Provider<Boolean>,
     swappable: Provider<Boolean>,
     damageOnHurt: Provider<Boolean>,
-    equipOnInteract: Provider<Boolean>
+    equipOnInteract: Provider<Boolean>,
+    canBeSheared: Provider<Boolean>,
+    shearingSound: Provider<Key>
 ) : ItemBehavior {
     
     /**
@@ -252,6 +277,22 @@ class Equippable(
      */
     val equipOnInteract: Boolean by equipOnInteract
     
+    /**
+     * Whether players can use shears to remove this equippable item from a wearing entity.
+     */
+    val canBeSheared: Boolean by canBeSheared
+    
+    /**
+     * The sound that is played when the equippable is removed by shears.
+     */
+    val shearingSoundKey: Key by shearingSound
+    
+    /**
+     * The sound that is played when the equippable is removed by shears.
+     */
+    val shearingSound: Sound?
+        get() = Registry.SOUND_EVENT.get(shearingSoundKey)
+    
     private val equipmentData: Provider<RuntimeEquipmentData?> = ResourceLookups.EQUIPMENT_LOOKUP.getProvider(equipment)
     
     init {
@@ -267,7 +308,7 @@ class Equippable(
         this[DataComponentTypes.ATTRIBUTE_MODIFIERS] = combinedProvider(
             slot, armor, armorToughness, knockbackResistance
         ) { slot, armor, armorToughness, knockbackResistance ->
-            val slotGroup = when(slot) {
+            val slotGroup = when (slot) {
                 EquipmentSlot.HAND -> EquipmentSlotGroup.MAINHAND
                 EquipmentSlot.OFF_HAND -> EquipmentSlotGroup.OFFHAND
                 EquipmentSlot.FEET -> EquipmentSlotGroup.FEET
@@ -352,7 +393,9 @@ class Equippable(
             "dispensable=$dispensable, " +
             "swappable=$swappable, " +
             "damageOnHurt=$damageOnHurt, " +
-            "equipOnInteract=$equipOnInteract" +
+            "equipOnInteract=$equipOnInteract, " +
+            "canBeSheared=$canBeSheared, " +
+            "shearingSound=$shearingSound" +
             ")"
     }
     
