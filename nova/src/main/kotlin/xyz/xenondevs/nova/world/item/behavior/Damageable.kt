@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.world.item.behavior
 
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.Weapon.weapon
+import io.papermc.paper.registry.keys.SoundEventKeys
 import net.kyori.adventure.key.Key
 import org.bukkit.Registry
 import org.bukkit.Sound
@@ -40,7 +41,7 @@ fun Damageable(
     itemDamageOnAttackEntity: Int = 0,
     itemDamageOnBreakBlock: Int = 0,
     repairIngredient: RecipeChoice? = null,
-    breakSound: Key = Key.key("minecraft", "entity.item.break")
+    breakSound: Key = SoundEventKeys.ENTITY_ITEM_BREAK
 ) = ItemBehaviorFactory<Damageable> {
     val cfg = it.config
     Damageable(
