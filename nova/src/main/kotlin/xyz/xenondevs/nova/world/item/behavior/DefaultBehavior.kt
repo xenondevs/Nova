@@ -34,6 +34,7 @@ import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
+import xyz.xenondevs.nova.world.item.buildDataComponentMap
 import net.minecraft.network.chat.Component as MojangComponent
 
 internal class DefaultBehavior(
@@ -51,31 +52,30 @@ internal class DefaultBehavior(
     override val baseDataComponents: Provider<DataComponentMap> = combinedProvider(
         name, style, lore, tooltipStyle, maxStackSize, attributeModifiers
     ) { name, style, lore, tooltipStyle, maxStackSize, attributeModifiers ->
-        val builder = DataComponentMap.builder()
-        if (name != null) {
-            builder[DataComponentTypes.ITEM_NAME] = name.style(style)
-        } else {
-            builder[DataComponentTypes.TOOLTIP_DISPLAY] = tooltipDisplay().hideTooltip(true).build()
+        buildDataComponentMap {
+            if (name != null) {
+                this[DataComponentTypes.ITEM_NAME] = name.style(style)
+            } else {
+                this[DataComponentTypes.TOOLTIP_DISPLAY] = tooltipDisplay().hideTooltip(true).build()
+            }
+            
+            if (lore.isNotEmpty()) {
+                this[DataComponentTypes.LORE] = lore(lore)
+            }
+            
+            if (tooltipStyle != null) {
+                this[DataComponentTypes.TOOLTIP_STYLE] = tooltipStyle.id
+            }
+            
+            this[DataComponentTypes.ATTRIBUTE_MODIFIERS] = attributeModifiers
+            this[DataComponentTypes.MAX_STACK_SIZE] = maxStackSize
+            this[DataComponentTypes.ITEM_MODEL] = id
+            
+            // default empty values
+            this[DataComponentTypes.ENCHANTMENTS] = itemEnchantments().build()
+            this[DataComponentTypes.REPAIR_COST] = 0
+            this[DataComponentTypes.RARITY] = ItemRarity.COMMON
         }
-        
-        if (lore.isNotEmpty()) {
-            builder[DataComponentTypes.LORE] = lore(lore)
-        }
-        
-        if (tooltipStyle != null) {
-            builder[DataComponentTypes.TOOLTIP_STYLE] = tooltipStyle.id
-        }
-        
-        builder[DataComponentTypes.ATTRIBUTE_MODIFIERS] = attributeModifiers
-        builder[DataComponentTypes.MAX_STACK_SIZE] = maxStackSize
-        builder[DataComponentTypes.ITEM_MODEL] = id
-        
-        // default empty values
-        builder[DataComponentTypes.ENCHANTMENTS] = itemEnchantments().build()
-        builder[DataComponentTypes.REPAIR_COST] = 0
-        builder[DataComponentTypes.RARITY] = ItemRarity.COMMON
-        
-        builder.build()
     }
     
     override fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
