@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.util.damageItemInMainHand
 import xyz.xenondevs.nova.util.playSoundNearby
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
+import xyz.xenondevs.nova.world.player.swingHandEventless
 
 private val FLATTENABLES: Set<Material> = hashSetOf(
     Material.GRASS_BLOCK,
@@ -38,7 +39,7 @@ object Flattening : ItemBehavior {
                 block.type = Material.DIRT_PATH
                 block.location.playSoundNearby(Sound.ITEM_SHOVEL_FLATTEN, SoundCategory.BLOCKS, 1f, 1f)
                 player.damageItemInMainHand()
-                runTaskLater(1) { player.swingHand(event.hand!!) }
+                runTaskLater(1) { player.swingHandEventless(event.hand!!) }
             }
         }
     }

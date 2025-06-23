@@ -2,14 +2,15 @@ package xyz.xenondevs.nova.world.block.hitbox
 
 import org.bukkit.Location
 import org.bukkit.World
-import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.entity.Player
 import org.joml.Vector3f
+import org.joml.Vector3fc
 import xyz.xenondevs.nova.util.toVector3f
 import xyz.xenondevs.nova.world.BlockPos
 import java.util.*
 import kotlin.math.floor
 
-private typealias HitboxQualifier = (PlayerInteractEvent) -> Boolean
+private typealias HitboxQualifier = (player: Player, isLeftClick: Boolean) -> Boolean
 
 @Suppress("DuplicatedCode")
 fun VirtualHitbox(from: Location, to: Location): VirtualHitbox {
@@ -24,10 +25,12 @@ fun VirtualHitbox(from: Location, to: Location): VirtualHitbox {
     val xWidth = toVec.x - fromVec.x
     val zWidth = toVec.z - fromVec.z
     val height = toVec.y - fromVec.y
-    val center = Vector3f(fromVec.x + xWidth / 2f, fromVec.y, fromVec.z + zWidth / 2f)
+    val baseCenter = Vector3f(fromVec.x + xWidth / 2f, fromVec.y, fromVec.z + zWidth / 2f)
+    val center = Vector3f(fromVec.x + xWidth / 2f, fromVec.y + height / 2f, fromVec.z + zWidth / 2f)
     
     return VirtualHitbox(
         from.world!!,
+        baseCenter,
         center,
         fromVec, toVec,
         xWidth, zWidth, height
@@ -36,10 +39,10 @@ fun VirtualHitbox(from: Location, to: Location): VirtualHitbox {
 
 class VirtualHitbox internal constructor(
     world: World,
-    center: Vector3f,
-    from: Vector3f, to: Vector3f,
+    baseCenter: Vector3fc, center: Vector3fc,
+    from: Vector3fc, to: Vector3fc,
     xWidth: Float, zWidth: Float, height: Float
-) : Hitbox<ClickAtLocationHandler, ClickAtLocationHandler>(world, center, from, to, xWidth, zWidth, height) {
+) : Hitbox<ClickAtLocationHandler, ClickAtLocationHandler>(world, baseCenter, center, from, to, xWidth, zWidth, height) {
     
     internal val uuid = UUID.randomUUID() // region id for visualization
     
@@ -49,6 +52,7 @@ class VirtualHitbox internal constructor(
     constructor(center: Location, xWidth: Double, zWidth: Double, height: Double) : this(
         center.world!!,
         center.toVector3f(),
+        center.toVector3f().add(0f, (height / 2).toFloat(), 0f),
         Vector3f((center.x - xWidth / 2).toFloat(), center.y.toFloat(), (center.z - zWidth / 2).toFloat()),
         Vector3f((center.x + xWidth / 2).toFloat(), (center.y + height).toFloat(), (center.z + zWidth / 2).toFloat()),
         xWidth.toFloat(),
@@ -62,15 +66,15 @@ class VirtualHitbox internal constructor(
     
 }
 
-private fun getBlocksBetween(world: World, from: Vector3f, to: Vector3f): Set<BlockPos> {
+private fun getBlocksBetween(world: World, from: Vector3fc, to: Vector3fc): Set<BlockPos> {
     val blocks = HashSet<BlockPos>()
     
-    val minX = floor(from.x).toInt()
-    val minY = floor(from.y).toInt()
-    val minZ = floor(from.z).toInt()
-    val maxX = floor(to.x).toInt()
-    val maxY = floor(to.y).toInt()
-    val maxZ = floor(to.z).toInt()
+    val minX = floor(from.x()).toInt()
+    val minY = floor(from.y()).toInt()
+    val minZ = floor(from.z()).toInt()
+    val maxX = floor(to.x()).toInt()
+    val maxY = floor(to.y()).toInt()
+    val maxZ = floor(to.z()).toInt()
     
     for (x in minX..maxX) {
         for (y in minY..maxY) {

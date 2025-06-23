@@ -2,36 +2,26 @@ package xyz.xenondevs.nova.world.format
 
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.bukkit.World
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
-import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.cbf.io.byteWriter
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.CompressionType
-import xyz.xenondevs.nova.util.data.use
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.chunk.RegionizedChunk
 import xyz.xenondevs.nova.world.format.chunk.RegionizedChunkReader
 import xyz.xenondevs.nova.world.format.legacy.LegacyRegionizedFileReader
 import java.io.ByteArrayOutputStream
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.File
 import java.util.*
 
 private const val NUM_CHUNKS = 1024
-private val CREATE_BACKUPS by MAIN_CONFIG.entry<Boolean>("world", "format", "region_backups")
 private val COMPRESSION_TYPE by MAIN_CONFIG.entry<CompressionType>("world", "format", "compression")
 
 internal abstract class RegionizedFile<T : RegionizedChunk>(
     private val magic: Int,
     private val fileVersion: Byte,
-    protected val file: File,
-    protected val world: World,
-    protected val regionX: Int, protected val regionZ: Int,
     private val _chunks: Array<T>
 ) {
     
@@ -45,7 +35,7 @@ internal abstract class RegionizedFile<T : RegionizedChunk>(
         return _chunks[packedCoords]
     }
     
-    suspend fun save() = withContext(Dispatchers.Default) {
+    fun save(): ByteArray {
         val compressionType = COMPRESSION_TYPE
         
         // serialize chunks
@@ -58,25 +48,16 @@ internal abstract class RegionizedFile<T : RegionizedChunk>(
             }
         }
         
-        withContext(Dispatchers.IO) {
-            // create backup
-            val backupFile = RegionizedFileReader.getBackupFile(file)
-            if (CREATE_BACKUPS && file.exists())
-                RegionizedFileReader.writeBackup(file, backupFile)
-            
-            // write region file
-            file.outputStream().buffered().use { out ->
-                val writer = ByteWriter.fromStream(out)
-                writer.writeInt(magic)
-                writer.writeByte(fileVersion)
-                writer.writeByte(compressionType.ordinal.toByte())
-                writer.writeBytes(Arrays.copyOf(chunkBitmask.toByteArray(), NUM_CHUNKS / 8))
-                writer.writeBytes(chunksBuffer.toByteArray())
-            }
-            
-            if (CREATE_BACKUPS && backupFile.exists())
-                backupFile.delete()
+        // write region file
+        val bin = byteWriter {
+            writeInt(magic)
+            writeByte(fileVersion)
+            writeByte(compressionType.ordinal.toByte())
+            writeBytes(chunkBitmask.toByteArray().copyOf(NUM_CHUNKS / 8))
+            writeBytes(chunksBuffer.toByteArray())
         }
+        
+        return bin
     }
     
 }
@@ -87,7 +68,7 @@ internal abstract class RegionizedFileReader<C : RegionizedChunk, F : Regionized
     private val magic: Int,
     private val version: Byte,
     private val createArray: (Int, (Int) -> C) -> Array<C>,
-    private val createFile: (File, World, Int, Int, Array<C>) -> F,
+    private val createFile: (Array<C>) -> F,
     private val chunkReader: RegionizedChunkReader<C>,
     vararg legacyReaders: Pair<Int, LegacyRegionizedFileReader<C, F>>
 ) {
@@ -95,41 +76,30 @@ internal abstract class RegionizedFileReader<C : RegionizedChunk, F : Regionized
     private val legacyReaders: Byte2ObjectMap<LegacyRegionizedFileReader<C, F>> =
         legacyReaders.associateTo(Byte2ObjectOpenHashMap()) { (version, reader) -> version.toByte() to reader }
     
-    fun read(file: File, world: World, regionX: Int, regionZ: Int): F {
-        val backupFile = getBackupFile(file)
-        try {
-            // restore backup if present
-            if (backupFile.exists())
-                restoreBackup(file, backupFile)
+    fun read(reader: ByteReader?, world: World, regionX: Int, regionZ: Int): F {
+        if (reader != null) {
+            // verify magic and version
+            val fileMagic = reader.readInt()
+            if (fileMagic != magic && fileMagic != LEGACY_MAGIC)
+                throw IllegalStateException("Not a valid region file")
             
-            // read region file
-            if (file.length() != 0L) {
-                file.inputStream().buffered().use { inp ->
-                    val reader = ByteReader.fromStream(inp)
-                    
-                    // verify magic and version
-                    val fileMagic = reader.readInt()
-                    if (fileMagic != magic && fileMagic != LEGACY_MAGIC)
-                        throw IllegalStateException(file.absolutePath + " is not a valid region file")
-                    val fileVersion = reader.readByte()
-                    if (fileVersion == version) {
-                        return read(file, reader, world, regionX, regionZ)
-                    } else {
-                        val legacyReader = legacyReaders.get(fileVersion)
-                            ?: throw IllegalStateException("Unsupported region file version $fileVersion")
-                        return legacyReader.read(file, reader, world, regionX, regionZ)
-                    }
-                }
+            // choose reader (legacy reader / readLatest) based on file version
+            val fileVersion = reader.readByte()
+            if (fileVersion == version) {
+                return readLatest(reader, world, regionX, regionZ)
             } else {
-                val chunks = createArray(NUM_CHUNKS) { chunkReader.createEmpty(chunkIdxToPos(it, world, regionX, regionZ)) }
-                return createFile(file, world, regionX, regionZ, chunks)
+                val legacyReader = legacyReaders.get(fileVersion)
+                    ?: throw IllegalStateException("Unsupported region file version $fileVersion")
+                return legacyReader.read(reader, world, regionX, regionZ)
             }
-        } catch (t: Throwable) {
-            throw Exception("Could not read region file $file", t)
+        } else {
+            // create empty region file
+            val chunks = createArray(NUM_CHUNKS) { chunkReader.createEmpty(chunkIdxToPos(it, world, regionX, regionZ)) }
+            return createFile(chunks)
         }
     }
     
-    private fun read(file: File, reader: ByteReader, world: World, regionX: Int, regionZ: Int): F {
+    private fun readLatest(reader: ByteReader, world: World, regionX: Int, regionZ: Int): F {
         // read chunks
         val compressionType = CompressionType.entries[reader.readByte().toInt()]
         compressionType.wrapInput(reader.asInputStream()).use { decompInp ->
@@ -142,37 +112,11 @@ internal abstract class RegionizedFileReader<C : RegionizedChunk, F : Regionized
                 else chunkReader.createEmpty(pos)
             }
             
-            return createFile(file, world, regionX, regionZ, chunks)
+            return createFile(chunks)
         }
     }
     
     companion object {
-        
-        fun writeBackup(file: File, backupFile: File) {
-            val ins = file.inputStream().buffered()
-            val out = DataOutputStream(backupFile.outputStream().buffered())
-            use(ins, out) {
-                out.writeLong(file.length())
-                ins.copyTo(out)
-            }
-        }
-        
-        fun restoreBackup(file: File, backupFile: File) {
-            LOGGER.warn("Restoring region file $file from backup $backupFile")
-            val ins = DataInputStream(backupFile.inputStream().buffered())
-            val out = file.outputStream().buffered()
-            
-            use(ins, out) {
-                val length = ins.readLong()
-                if (length == backupFile.length() - 8) {
-                    ins.copyTo(out)
-                } else LOGGER.warn("Backup file $backupFile is corrupted")
-            }
-            backupFile.delete()
-        }
-        
-        fun getBackupFile(file: File): File =
-            File(file.parentFile, file.name + ".backup")
         
         fun chunkIdxToPos(idx: Int, world: World, regionX: Int, regionZ: Int): ChunkPos {
             val x = regionX shl 5 or (idx shr 5)

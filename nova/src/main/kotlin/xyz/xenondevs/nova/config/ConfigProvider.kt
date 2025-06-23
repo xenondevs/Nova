@@ -6,19 +6,19 @@ import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ScopedConfigurationNode
-import xyz.xenondevs.commons.provider.AbstractProvider
+import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.UnstableProviderApi
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.map
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.commons.provider.strongCombinedProvider
-import xyz.xenondevs.commons.provider.strongMap
 import xyz.xenondevs.commons.provider.strongOrElse
 import java.lang.ref.WeakReference
 import java.lang.reflect.Type
 import java.nio.file.Path
-import java.util.concurrent.locks.ReentrantLock
+import java.util.Collections
+import java.util.WeakHashMap
+import kotlin.collections.ArrayDeque
 import kotlin.io.path.exists
 import kotlin.reflect.KType
 import kotlin.reflect.jvm.javaType
@@ -414,29 +414,34 @@ private fun Provider<ConfigurationNode>.fullPath(): String {
     return builder.toString()
 }
 
-@OptIn(UnstableProviderApi::class)
 private fun Provider<ConfigurationNode>.findFilePath(): String? {
-    this as AbstractProvider<ConfigurationNode>
-    
-    val queue = ArrayDeque<AbstractProvider<*>>()
+    val queue = ArrayDeque<Provider<*>>()
     queue.add(this)
     
     while (queue.isNotEmpty()) {
         val current = queue.removeFirst()
-        if (current is RootConfigProvider) {
-            return current.configId.toString()
-        }
+        
+        val root = RootConfigProvider.getAssociatedRoot(current)
+        if (root != null)
+            return root.configId.toString()
+        
         queue.addAll(current.parents)
     }
     
     return null
 }
 
-@OptIn(UnstableProviderApi::class)
 internal class RootConfigProvider internal constructor(
     val path: Path,
     val configId: Key
-) : AbstractProvider<CommentedConfigurationNode>(ReentrantLock()) {
+) {
+    
+    private val _provider: MutableProvider<CommentedConfigurationNode> = mutableProvider {
+        // empty placeholder that is replaced by the actual node when the config is loaded
+        Configs.createBuilder(configId.namespace()).build().createNode()
+    }
+    val provider: Provider<CommentedConfigurationNode>
+        get() = _provider
     
     @Volatile
     var loaded = false
@@ -447,19 +452,28 @@ internal class RootConfigProvider internal constructor(
         private set
     
     init {
-        subscribe {
-            loaded = true
-            fileExisted = path.exists()
-        }
+        providers[provider] = this
+    }
+    
+    fun set(value: CommentedConfigurationNode) {
+        loaded = true
+        fileExisted = path.exists()
+        
+        _provider.set(value)
     }
     
     fun reload() {
         set(Configs.createLoader(configId.namespace(), path).load())
     }
     
-    override fun pull(): CommentedConfigurationNode {
-        // empty placeholder that is replaced by the actual node when the config is loaded
-        return Configs.createBuilder(configId.namespace()).build().createNode()
+    companion object {
+        
+        private val providers: MutableMap<Provider<*>, RootConfigProvider> = Collections.synchronizedMap(WeakHashMap())
+        
+        fun getAssociatedRoot(provider: Provider<*>): RootConfigProvider? {
+            return providers[provider]
+        }
+        
     }
     
 }

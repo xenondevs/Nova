@@ -32,7 +32,6 @@ import xyz.xenondevs.nova.patch.impl.misc.EventPreventionPatch
 import xyz.xenondevs.nova.patch.impl.misc.FakePlayerLastHurtPatch
 import xyz.xenondevs.nova.patch.impl.playerlist.BroadcastPacketPatch
 import xyz.xenondevs.nova.patch.impl.registry.RegistryEventsPatch
-import xyz.xenondevs.nova.patch.impl.registry.RegistryInstantBindPatch
 import xyz.xenondevs.nova.patch.impl.sound.SoundPatches
 import xyz.xenondevs.nova.patch.impl.worldgen.NovaRuleTestPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.WrapperBlockPatch
@@ -59,7 +58,7 @@ internal object Patcher {
             FakePlayerLastHurtPatch, BlockBehaviorPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
             ItemStackDataComponentsPatch, EnchantmentPatches, RepairPatches, BlockMigrationPatches,
             TripwireLogicPatch, FluidFlowPatch, RegistryEventsPatch, DyeablePatches, EarlyBlockPlaceEventPatch,
-            DontCloseAddonClassLoadersPatch, RegistryInstantBindPatch
+            DontCloseAddonClassLoadersPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
     

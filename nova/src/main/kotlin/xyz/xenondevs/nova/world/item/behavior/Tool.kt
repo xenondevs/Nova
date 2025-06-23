@@ -13,7 +13,6 @@ import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.util.toNamespacedKey
 import xyz.xenondevs.nova.world.item.DataComponentMap

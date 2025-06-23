@@ -11,9 +11,7 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.flatMap
 import xyz.xenondevs.commons.provider.flattenIterables
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.commons.version.Version
@@ -122,7 +120,7 @@ class ResourcePackBuilder internal constructor() {
         /**
          * The resource pack format version of the current Minecraft version.
          */
-        val PACK_VERSION = SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES)
+        val PACK_VERSION = SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES)
         
         private val JIMFS_PROVIDER: MutableProvider<FileSystem> = mutableProvider { Jimfs.newFileSystem(Configuration.unix()) }
         

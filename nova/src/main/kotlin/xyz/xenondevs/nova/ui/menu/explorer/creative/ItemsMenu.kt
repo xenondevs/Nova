@@ -11,7 +11,6 @@ import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.flatten
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mapEach
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
@@ -107,7 +106,7 @@ internal class ItemsMenu(val player: Player) : ItemMenu {
         }.build()
     
     private val mainWindow = Window.builder()
-        .setTitle(activeTab.map { tab -> TAB_BUTTON_TEXTURES[tab % 5].component })
+        .setTitle(activeTab.map { tab -> TAB_BUTTON_TEXTURES[(tab % 5).coerceAtLeast(0)].component })
         .setUpperGui(TabGui.builder()
             .setStructure(
                 "p p p p p p p p p",

@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.resources.builder.basepack
 
 import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Material
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry

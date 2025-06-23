@@ -9,9 +9,11 @@ import net.minecraft.server.level.ClientInformation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.tags.FluidTags
+import net.minecraft.util.ProblemReporter
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.level.storage.TagValueOutput
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.craftbukkit.entity.CraftEntity
@@ -175,7 +177,9 @@ object EntityUtils {
         val nmsEntity = entity.nmsEntity
         
         // serialize data to compound tag
-        var compoundTag = nmsEntity.saveWithoutId(CompoundTag())
+        val valueOutput = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, nmsEntity.registryAccess());
+        nmsEntity.saveWithoutId(valueOutput)
+        var compoundTag = valueOutput.buildResult()
         
         // add id tag to compound tag to identify entity type
         compoundTag.putString("id", nmsEntity.encodeId!!)

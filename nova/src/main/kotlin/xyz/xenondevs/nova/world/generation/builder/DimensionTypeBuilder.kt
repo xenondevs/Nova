@@ -42,6 +42,7 @@ class DimensionTypeBuilder internal constructor(
     private var infiniBurn: TagKey<Block> = BlockTags.INFINIBURN_OVERWORLD
     private var effects: ResourceLocation = BuiltinDimensionTypes.OVERWORLD_EFFECTS
     private var ambientLight: Float = 0.0f
+    private var cloudHeight: Int? = null
     private var monsterSettings: MonsterSettings? = null
     
     /**
@@ -167,6 +168,13 @@ class DimensionTypeBuilder internal constructor(
     }
     
     /**
+     * Sets the `cloudHeight` property of this [DimensionType], which determines the height at which clouds are rendered.
+     */
+    fun cloudHeight(cloudHeight: Int) {
+        this.cloudHeight = cloudHeight
+    }
+    
+    /**
      * Sets the [MonsterSettings] of this [DimensionType]. For more information check out the [MonsterSettingsBuilder]
      */
     fun monsterSettings(monsterSettings: MonsterSettings) {
@@ -196,6 +204,7 @@ class DimensionTypeBuilder internal constructor(
             infiniBurn,
             effects,
             ambientLight,
+            Optional.ofNullable(cloudHeight),
             monsterSettings ?: MonsterSettingsBuilder().build()
         )
     }

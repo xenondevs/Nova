@@ -122,13 +122,18 @@ object Configs {
         get(Key(addon, path))
     
     operator fun get(id: Key): Provider<CommentedConfigurationNode> =
-        configProviders.getOrPut(id) { RootConfigProvider(resolveConfigPath(id), id).also { if (lastReload > -1) it.reload() } }
+        configProviders.getOrPut(id) {
+            val root = RootConfigProvider(resolveConfigPath(id), id)
+            if (lastReload > -1)
+                root.reload()
+            return@getOrPut root
+        }.provider
     
     fun getOrNull(id: String): CommentedConfigurationNode? =
         getOrNull(Key.key(id))
     
     fun getOrNull(id: Key): CommentedConfigurationNode? =
-        configProviders[id]?.takeIf { it.loaded }?.get()
+        configProviders[id]?.takeIf { it.loaded }?.provider?.get()
     
     fun save(id: String): Unit =
         save(Key.key(id))

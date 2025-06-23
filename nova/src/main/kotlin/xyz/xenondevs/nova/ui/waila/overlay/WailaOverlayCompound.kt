@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.ui.waila.overlay
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.CharSizes

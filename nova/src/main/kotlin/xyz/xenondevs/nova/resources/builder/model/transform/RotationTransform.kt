@@ -40,9 +40,6 @@ internal data class RotationTransform(
     }
     
     override fun apply(model: Model): Model {
-        if (rot % 22.5 != 0.0)
-            throw TransformException("Illegal rotation: $rot (needs to a multiple of 22.5)", this)
-        
         val elements = model.elements ?: throw IllegalArgumentException("Model does not define elements list")
         return model.copy(elements = rotatedElements(elements))
     }

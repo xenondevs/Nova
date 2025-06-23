@@ -77,6 +77,7 @@ internal val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerial
     .register(ItemCategorySerializer)
     .register(DamageReductionSerializer)
     .register(ItemDamageFunctionSerializer)
+    .register(AttributeModifierDisplaySerializer)
     .build()
 
 private inline fun <reified T> TypeSerializerCollection.Builder.register(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder {

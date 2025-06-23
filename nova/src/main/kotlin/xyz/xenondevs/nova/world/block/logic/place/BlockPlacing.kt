@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
+import org.bukkit.Tag
 import org.bukkit.block.data.type.Dispenser
 import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.Player
@@ -31,7 +32,6 @@ import xyz.xenondevs.nova.util.dropItem
 import xyz.xenondevs.nova.util.isInsideWorldRestrictions
 import xyz.xenondevs.nova.util.item.isActuallyInteractable
 import xyz.xenondevs.nova.util.item.isBucket
-import xyz.xenondevs.nova.util.item.isReplaceable
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverLevel
@@ -44,6 +44,7 @@ import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvide
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
+import xyz.xenondevs.nova.world.player.swingHandEventless
 import xyz.xenondevs.nova.world.pos
 
 /**
@@ -130,7 +131,7 @@ internal object BlockPlacing : Listener {
                     placeNovaBlock(event, novaBlock)
                 } else if (
                     novaBlockState != null // the block placed against is from Nova
-                    && block.type.isReplaceable() // and will be replaced without special behavior
+                    && Tag.REPLACEABLE.isTagged(block.type) // and will be replaced without special behavior
                     && novaItem == null
                     && handItem?.type?.isBlock == true // a vanilla block material is used 
                 ) {
@@ -149,7 +150,7 @@ internal object BlockPlacing : Listener {
         
         val clickedBlock = event.clickedBlock!!
         var pos = clickedBlock.location.pos
-        if (!clickedBlock.type.isReplaceable() || WorldDataManager.getBlockState(pos) != null)
+        if (!Tag.REPLACEABLE.isTagged(clickedBlock.type) || WorldDataManager.getBlockState(pos) != null)
             pos = pos.advance(event.blockFace)
         
         val ctxBuilder = Context.intention(DefaultContextIntentions.BlockPlace)
@@ -179,7 +180,7 @@ internal object BlockPlacing : Listener {
                 handItem.amount--
             
             BlockUtils.placeNovaBlock(pos, newState, ctx)
-            player.swingHand(event.hand!!)
+            player.swingHandEventless(event.hand!!)
         }
     }
     
@@ -204,7 +205,7 @@ internal object BlockPlacing : Listener {
         if (
             player.gameMode == GameMode.SPECTATOR
             || !block.location.isInsideWorldRestrictions()
-            || !block.block.type.isReplaceable()
+            || !Tag.REPLACEABLE.isTagged(block.block.type)
             || WorldDataManager.getBlockState(block) != null
         ) return false
         

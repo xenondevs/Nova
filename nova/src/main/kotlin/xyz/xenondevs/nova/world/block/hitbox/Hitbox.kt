@@ -6,27 +6,32 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
-import org.bukkit.inventory.EquipmentSlot
 import org.joml.Vector3f
+import org.joml.Vector3fc
 import kotlin.math.abs
 
 internal typealias ClickHandler = (Player) -> Unit
-internal typealias ClickAtLocationHandler = (Player, EquipmentSlot, Vector3f) -> Unit
+internal typealias ClickAtLocationHandler = (Player, Vector3f) -> Unit
 
 private const val EPSILON = 0.0001f
 
 abstract class Hitbox<L, R> internal constructor(
-    internal val world: World,
-    internal val center: Vector3f,
-    internal val from: Vector3f,
-    internal val to: Vector3f,
+    val world: World,
+    val baseCenter: Vector3fc,
+    val center: Vector3fc,
+    val from: Vector3fc,
+    val to: Vector3fc,
     protected var xWidth: Float,
     protected var zWidth: Float,
     protected var height: Float
 ) {
     
-    internal val leftClickHandlers = ArrayList<L>(1)
-    internal val rightClickHandlers = ArrayList<R>(1)
+    private val _leftClickHandlers = ArrayList<L>(1)
+    val leftClickHandlers: List<L>
+        get() = _leftClickHandlers
+    private val _rightClickHandlers = ArrayList<R>(1)
+    val rightClickHandlers: List<R>
+        get() = _rightClickHandlers
     
     /**
      * Adds the [Hitbox] to the world.
@@ -46,14 +51,14 @@ abstract class Hitbox<L, R> internal constructor(
      * Adds a handler to this [Hitbox] that is called when a player left-clicks the hitbox
      */
     fun addLeftClickHandler(handler: L) {
-        leftClickHandlers += handler
+        _leftClickHandlers += handler
     }
     
     /**
      * Adds a handler to this [Hitbox] that is called when a player right-clicks the hitbox.
      */
     fun addRightClickHandler(handler: R) {
-        rightClickHandlers += handler
+        _rightClickHandlers += handler
     }
     
     /**
@@ -61,9 +66,9 @@ abstract class Hitbox<L, R> internal constructor(
      */
     operator fun contains(location: Location): Boolean {
         return location.world == world
-            && location.x in from.x..to.x
-            && location.y in from.y..to.y
-            && location.z in from.z..to.z
+            && location.x in from.x()..to.x()
+            && location.y in from.y()..to.y()
+            && location.z in from.z()..to.z()
     }
     
     /**

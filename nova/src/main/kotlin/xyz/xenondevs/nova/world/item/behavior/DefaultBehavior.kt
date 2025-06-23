@@ -6,6 +6,7 @@ import io.papermc.paper.datacomponent.item.ItemAttributeModifiers.itemAttributes
 import io.papermc.paper.datacomponent.item.ItemEnchantments.itemEnchantments
 import io.papermc.paper.datacomponent.item.ItemLore.lore
 import io.papermc.paper.datacomponent.item.TooltipDisplay.tooltipDisplay
+import io.papermc.paper.datacomponent.item.attribute.AttributeModifierDisplay
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
@@ -21,11 +22,9 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.node
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.component.adventure.toNmsStyle
 import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.data.logExceptionMessages
@@ -34,6 +33,7 @@ import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
+import xyz.xenondevs.nova.world.item.buildDataComponentMap
 import net.minecraft.network.chat.Component as MojangComponent
 
 internal class DefaultBehavior(
@@ -51,41 +51,40 @@ internal class DefaultBehavior(
     override val baseDataComponents: Provider<DataComponentMap> = combinedProvider(
         name, style, lore, tooltipStyle, maxStackSize, attributeModifiers
     ) { name, style, lore, tooltipStyle, maxStackSize, attributeModifiers ->
-        val builder = DataComponentMap.builder()
-        if (name != null) {
-            builder[DataComponentTypes.ITEM_NAME] = name.style(style)
-        } else {
-            builder[DataComponentTypes.TOOLTIP_DISPLAY] = tooltipDisplay().hideTooltip(true).build()
+        buildDataComponentMap {
+            if (name != null) {
+                this[DataComponentTypes.ITEM_NAME] = name.style(style)
+            } else {
+                this[DataComponentTypes.TOOLTIP_DISPLAY] = tooltipDisplay().hideTooltip(true).build()
+            }
+            
+            if (lore.isNotEmpty()) {
+                this[DataComponentTypes.LORE] = lore(lore)
+            }
+            
+            if (tooltipStyle != null) {
+                this[DataComponentTypes.TOOLTIP_STYLE] = tooltipStyle.id
+            }
+            
+            this[DataComponentTypes.ATTRIBUTE_MODIFIERS] = attributeModifiers
+            this[DataComponentTypes.MAX_STACK_SIZE] = maxStackSize
+            this[DataComponentTypes.ITEM_MODEL] = id
+            
+            // default empty values
+            this[DataComponentTypes.ENCHANTMENTS] = itemEnchantments().build()
+            this[DataComponentTypes.REPAIR_COST] = 0
+            this[DataComponentTypes.RARITY] = ItemRarity.COMMON
         }
-        
-        if (lore.isNotEmpty()) {
-            builder[DataComponentTypes.LORE] = lore(lore)
-        }
-        
-        if (tooltipStyle != null) {
-            builder[DataComponentTypes.TOOLTIP_STYLE] = tooltipStyle.id
-        }
-        
-        builder[DataComponentTypes.ATTRIBUTE_MODIFIERS] = attributeModifiers
-        builder[DataComponentTypes.MAX_STACK_SIZE] = maxStackSize
-        builder[DataComponentTypes.ITEM_MODEL] = id
-        
-        // default empty values
-        builder[DataComponentTypes.ENCHANTMENTS] = itemEnchantments().build()
-        builder[DataComponentTypes.REPAIR_COST] = 0
-        builder[DataComponentTypes.RARITY] = ItemRarity.COMMON
-        
-        builder.build()
     }
     
-    override fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
-        itemStack.unwrap().update(DataComponents.CUSTOM_NAME) {
+    override fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {
+        client.unwrap().update(DataComponents.CUSTOM_NAME) {
             val wrappingComponent = MojangComponent.literal("")
-            wrappingComponent.setStyle(style)
+            wrappingComponent.style = style
             wrappingComponent.append(it)
             return@update wrappingComponent
         }
-        return itemStack
+        return client
     }
     
     companion object : ItemBehaviorFactory<DefaultBehavior> {
@@ -121,15 +120,20 @@ internal class DefaultBehavior(
                                 ?: throw NoSuchElementException("Missing value 'operation'")
                             val value = attributeNode.node("value").get<Double>()
                                 ?: throw NoSuchElementException("Missing value 'value'")
+                            val display = attributeNode.node("display").get<AttributeModifierDisplay>()
+                                ?: AttributeModifierDisplay.reset()
+                            
+                            println(display)
                             
                             builder.addModifier(
                                 attribute,
                                 AttributeModifier(
                                     NamespacedKey.fromString(id) ?: throw IllegalArgumentException("Illegal id: $id"),
                                     value,
-                                    operation
+                                    operation,
+                                    slotGroup
                                 ),
-                                slotGroup
+                                display
                             )
                         } catch (e: Exception) {
                             LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $item, $slotGroup with index $idx", e)

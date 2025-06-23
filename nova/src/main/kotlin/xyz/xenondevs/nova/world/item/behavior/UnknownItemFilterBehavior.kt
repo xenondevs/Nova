@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.item.novaCompound
+import xyz.xenondevs.nova.util.item.retrieveData
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.item.DefaultItems
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
@@ -55,17 +56,17 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
         }
     }
     
-    override fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
+    override fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {
         val lore = ArrayList<Component>()
         lore += Component.translatable("item.nova.unknown_item_filter.description", NamedTextColor.RED)
-        lore += Component.text(data.get<Key>(ID_KEY).toString(), NamedTextColor.GRAY)
-        lore += data.get<Compound>(DATA_KEY).toString()
+        lore += Component.text(server.retrieveData<Key>(ID_KEY).toString(), NamedTextColor.GRAY)
+        lore += server.retrieveData<Compound>(DATA_KEY).toString()
             .lineSequence()
             .flatMap { it.chunkedSequence(100) }
             .map { Component.text(it, NamedTextColor.GRAY) }
             .toList()
-        itemStack.lore((itemStack.lore() ?: emptyList()) + lore.map(Component::withoutPreFormatting))
-        return itemStack
+        client.lore((client.lore() ?: emptyList()) + lore.map(Component::withoutPreFormatting))
+        return client
     }
     
     override fun toString(itemStack: ItemStack): String {

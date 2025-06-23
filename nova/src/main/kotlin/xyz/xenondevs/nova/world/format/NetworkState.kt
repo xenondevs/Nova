@@ -26,6 +26,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.format.chunk.NetworkBridgeData
+import xyz.xenondevs.nova.world.format.chunk.NetworkChunk
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
 import xyz.xenondevs.nova.world.format.chunk.NetworkNodeData
 import java.util.*
@@ -38,8 +39,7 @@ import kotlin.reflect.full.isSuperclassOf
  * called from the network configurator context.
  */
 class NetworkState internal constructor(
-    private val world: World,
-    internal val storage: WorldDataStorage
+    internal val storage: RegionFileStorage<NetworkChunk, NetworkRegionFile>
 ) {
     
     private val networksById = HashMap<UUID, ProtoNetwork<*>>()
@@ -167,7 +167,7 @@ class NetworkState internal constructor(
      * Gets all network node data for the given [pos].
      */
     suspend fun getNodeData(pos: ChunkPos): Map<BlockPos, NetworkNodeData> =
-        storage.getOrLoadNetworkChunk(pos).getData()
+        storage.getOrLoadRegionizedChunk(pos).getData()
     
     /**
      * Gets the [NetworkNodeData] for [pos], potentially loading the corresponding
@@ -176,7 +176,7 @@ class NetworkState internal constructor(
      * @throws IllegalStateException If there is no data for a node at [pos].
      */
     suspend fun getNodeData(pos: BlockPos): NetworkNodeData =
-        storage.getOrLoadNetworkChunk(pos.chunkPos).getData(pos)
+        storage.getOrLoadRegionizedChunk(pos.chunkPos).getData(pos)
             ?: throw IllegalStateException("No data for node at $pos")
     
     /**
@@ -193,14 +193,14 @@ class NetworkState internal constructor(
      * @throws IllegalStateException If there is no data for [bridge].
      */
     suspend fun getBridgeData(bridge: NetworkBridge): NetworkBridgeData =
-        storage.getOrLoadNetworkChunk(bridge.pos.chunkPos).getBridgeData(bridge.pos)
+        storage.getOrLoadRegionizedChunk(bridge.pos.chunkPos).getBridgeData(bridge.pos)
             ?: throw IllegalStateException("No data for bridge at ${bridge.pos}")
     
     /**
      * Sets [data] at [pos].
      */
     suspend fun setBridgeData(pos: BlockPos, data: NetworkBridgeData) {
-        storage.getOrLoadNetworkChunk(pos.chunkPos).setBridgeData(pos, data)
+        storage.getOrLoadRegionizedChunk(pos.chunkPos).setBridgeData(pos, data)
     }
     
     /**
@@ -209,14 +209,14 @@ class NetworkState internal constructor(
      * @throws IllegalStateException If there is no data for [endPoint].
      */
     suspend fun getEndPointData(endPoint: NetworkEndPoint): NetworkEndPointData =
-        storage.getOrLoadNetworkChunk(endPoint.pos.chunkPos).getEndPointData(endPoint.pos)
+        storage.getOrLoadRegionizedChunk(endPoint.pos.chunkPos).getEndPointData(endPoint.pos)
             ?: throw IllegalStateException("No data for endpoint at ${endPoint.pos}")
     
     /**
      * Sets [data] at [pos].
      */
     suspend fun setEndPointData(pos: BlockPos, data: NetworkEndPointData) {
-        storage.getOrLoadNetworkChunk(pos.chunkPos).setEndPointData(pos, data)
+        storage.getOrLoadRegionizedChunk(pos.chunkPos).setEndPointData(pos, data)
     }
     
     /**
@@ -227,7 +227,7 @@ class NetworkState internal constructor(
      * @see getBridgeData
      */
     suspend fun removeNodeData(node: NetworkNode) {
-        storage.getOrLoadNetworkChunk(node.pos.chunkPos).setData(node.pos, null)
+        storage.getOrLoadRegionizedChunk(node.pos.chunkPos).setData(node.pos, null)
     }
     
     /**

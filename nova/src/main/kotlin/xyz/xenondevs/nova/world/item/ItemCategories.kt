@@ -8,7 +8,6 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.flatMapCollection
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.item.ItemProvider

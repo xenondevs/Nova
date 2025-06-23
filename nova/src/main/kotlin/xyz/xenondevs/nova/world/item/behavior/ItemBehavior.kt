@@ -74,9 +74,9 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun modifyBlockDamage(player: Player, itemStack: ItemStack, block: Block, damage: Double): Double = damage
     
     /**
-     * Updates the client-side [itemStack] that is to be viewed by [player] and has server-side [data].
+     * Updates the [client-side item stack][client] that is to be viewed by [player] in place of the [server-side item stack][server].
      */
-    fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound) = itemStack
+    fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack = client
     
     /**
      * Creates a string representation of this [ItemBehavior] and its data in [itemStack].

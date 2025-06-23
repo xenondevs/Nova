@@ -3,10 +3,9 @@ package xyz.xenondevs.nova.serialization
 import net.minecraft.server.commands.data.DataAccessor
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.cbf.UncheckedApi
 import xyz.xenondevs.commons.provider.MutableProvider
-import xyz.xenondevs.commons.provider.defaultsToLazily
 import kotlin.reflect.KType
-import kotlin.reflect.typeOf
 
 abstract class DataHolder internal constructor(includePersistent: Boolean) {
     
@@ -44,6 +43,7 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
      *
      * Prefer using [DataAccessors][DataAccessor] via [storedValue] instead.
      */
+    @UncheckedApi
     inline fun <T> retrieveData(type: KType, key: String, defaultValue: () -> T): T {
         return retrieveDataOrNull(type, key) ?: defaultValue()
     }
@@ -53,6 +53,7 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
      *
      * Prefer using [MutableProviders][MutableProvider] via [storedValue] instead.
      */
+    @UncheckedApi
     fun <T> retrieveDataOrNull(type: KType, key: String): T? {
         return data.get(type, key) ?: persistentData.get(type, key)
     }
@@ -67,10 +68,12 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
     /**
      * Removes the data stored under the given [key],
      * regardless of whether it is persistent or not.
+     * 
+     * @throws IllegalArgumentException If the entry cannot be removed due to a non-null provider being bound to it.
      */
     fun removeData(key: String) {
-        data.remove(key)
-        persistentData.remove(key)
+        data[key] = null
+        persistentData[key] = null
     }
     
     /**
@@ -80,8 +83,14 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
      *
      * @param persistent If the data should also be stored in the [ItemStack].
      */
-    inline fun <reified T> storeData(key: String, value: T?, persistent: Boolean = false) {
-        storeData(typeOf<T>(), key, value, persistent)
+    inline fun <reified T> storeData(key: String, value: T, persistent: Boolean = false) {
+        if (persistent) {
+            require(!data.contains(key)) { "$key is already a non-persistent value" }
+            persistentData[key] = value
+        } else {
+            require(!persistentData.contains(key)) { "$key is already a persistent value" }
+            data[key] = value
+        }
     }
     
     /**
@@ -91,15 +100,14 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
      *
      * @param persistent If the data should also be stored in the [ItemStack].
      */
-    fun <T> storeData(type: KType, key: String, value: T?, persistent: Boolean = false) {
+    @UncheckedApi
+    fun <T> storeData(type: KType, key: String, value: T, persistent: Boolean = false) {
         if (persistent) {
             require(!data.contains(key)) { "$key is already a non-persistent value" }
-            if (value != null) persistentData.set(type, key, value)
-            else persistentData.remove(key)
+            persistentData.set(type, key, value)
         } else {
             require(!persistentData.contains(key)) { "$key is already a persistent value" }
-            if (value != null) data.set(type, key, value)
-            else data.remove(key)
+            data.set(type, key, value)
         }
     }
     
@@ -122,7 +130,7 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
      * @param persistent If the data should also be stored in the [ItemStack].
      */
     inline fun <reified T : Any> storedValue(key: String, persistent: Boolean, noinline defaultValue: () -> T): MutableProvider<T> =
-        storedValue<T>(key, persistent).defaultsToLazily(defaultValue)
+        if (persistent) persistentData.entry(key, defaultValue) else data.entry(key, defaultValue)
     
     /**
      * Creates a [MutableProvider] to which properties can delegate.

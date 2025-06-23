@@ -6,6 +6,7 @@ import io.papermc.paper.datacomponent.item.FoodProperties.food
 import io.papermc.paper.datacomponent.item.UseRemainder.useRemainder
 import io.papermc.paper.datacomponent.item.consumable.ConsumeEffect
 import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation
+import io.papermc.paper.registry.keys.SoundEventKeys
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
@@ -13,7 +14,6 @@ import org.bukkit.potion.PotionEffect
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.nova.config.entryOrElse
@@ -63,7 +63,7 @@ fun Consumable(
     remains: ItemStack? = null,
     possibleEffects: Map<PotionEffect, Float>? = null,
     animation: ItemUseAnimation = ItemUseAnimation.EAT,
-    sound: Key = Key.key("minecraft", "entity.generic.eat"),
+    sound: Key = SoundEventKeys.ENTITY_GENERIC_EAT,
     particles: Boolean = true
 ) = ItemBehaviorFactory<Consumable> {
     val cfg = it.config

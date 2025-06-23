@@ -19,14 +19,14 @@ import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.patch.Patcher
-import xyz.xenondevs.nova.serialization.cbf.CBFAdapters
+import xyz.xenondevs.nova.serialization.cbf.CbfSerializers
 import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 
-private val REQUIRED_SERVER_VERSION: ClosedVersionRange = Version("1.21.5")..Version("1.21.5")
+private val REQUIRED_SERVER_VERSION: ClosedVersionRange = Version("1.21.6")..Version("1.21.6")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 internal val PREVIOUS_NOVA_VERSION: Version? = PermanentStorage.retrieve<Version>("last_version")
 internal val DATA_FOLDER = Path("plugins", "Nova")
@@ -102,7 +102,7 @@ internal class NovaBootstrapper : PluginBootstrap {
             
             Patcher.run()
             Configs.extractDefaultConfig()
-            CBFAdapters.register()
+            CbfSerializers.register()
             Initializer.start()
         } catch (t: Throwable) {
             LOGGER.error("", t)

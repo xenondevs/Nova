@@ -25,7 +25,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.CommentedConfigurationNode
-import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.cbf.Cbf
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.invui.gui.Gui
@@ -147,7 +147,7 @@ class NovaItem internal constructor(
                     it.putString("id", id.toString())
                 })
                 if (defaultCompound.isNotEmpty()) {
-                    compoundTag.putByteArray("nova_cbf", CBF.write(defaultCompound))
+                    compoundTag.putByteArray("nova_cbf", Cbf.write(defaultCompound))
                 }
             }))
             .build()
@@ -224,8 +224,8 @@ class NovaItem internal constructor(
     /**
      * Modifies the client-side stack of this [NovaItem], in the context that it is sent to [player] and has [data].
      */
-    internal fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
-        return behaviors.fold(itemStack) { stack, behavior -> behavior.modifyClientSideStack(player, stack, data) }
+    internal fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {
+        return behaviors.fold(client) { stack, behavior -> behavior.modifyClientSideStack(player, server, client) }
     }
     
     //<editor-fold desc="event methods", defaultstate="collapsed">

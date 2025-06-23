@@ -56,11 +56,9 @@ enum class BlockSide(private val rotation: Int) {
 }
 
 /**
- * The axis of a [BlockFace]
- *
- * @throws IllegalArgumentException if the [BlockFace] is not aligned with any axis.
+ * The axis of a [BlockFace], or null if the [BlockFace] is not aligned with any axis.
  */
-val BlockFace.axis: Axis
+val BlockFace.axis: Axis?
     get() = when (this) {
         NORTH -> Axis.Z
         SOUTH -> Axis.Z
@@ -68,7 +66,113 @@ val BlockFace.axis: Axis
         WEST -> Axis.X
         UP -> Axis.Y
         DOWN -> Axis.Y
-        else -> throw IllegalArgumentException("BlockFace is not aligned with any axis.")
+        else -> null
+    }
+
+/**
+ * The next clockwise [BlockFace]. Includes diagonal faces, e.g. after [NORTH] comes [NORTH_NORTH_EAST].
+ */
+val BlockFace.nextClockwise: BlockFace
+    get() = when (this) {
+        NORTH -> NORTH_NORTH_EAST
+        NORTH_NORTH_EAST -> NORTH_EAST
+        NORTH_EAST -> EAST_NORTH_EAST
+        EAST_NORTH_EAST -> EAST
+        EAST -> EAST_SOUTH_EAST
+        EAST_SOUTH_EAST -> SOUTH_EAST
+        SOUTH_EAST -> SOUTH_SOUTH_EAST
+        SOUTH_SOUTH_EAST -> SOUTH
+        SOUTH -> SOUTH_SOUTH_WEST
+        SOUTH_SOUTH_WEST -> SOUTH_WEST
+        SOUTH_WEST -> WEST_SOUTH_WEST
+        WEST_SOUTH_WEST -> WEST
+        WEST -> WEST_NORTH_WEST
+        WEST_NORTH_WEST -> NORTH_WEST
+        NORTH_WEST -> NORTH_NORTH_WEST
+        NORTH_NORTH_WEST -> NORTH
+        UP -> UP
+        DOWN -> DOWN
+        SELF -> SELF
+    }
+
+/**
+ * The next counterclockwise [BlockFace]. Includes diagonal faces, e.g. after [NORTH] comes [NORTH_NORTH_WEST].
+ */
+val BlockFace.nextCounterclockwise: BlockFace
+    get() = when (this) {
+        NORTH -> NORTH_NORTH_WEST
+        NORTH_NORTH_WEST -> NORTH_WEST
+        NORTH_WEST -> WEST_NORTH_WEST
+        WEST_NORTH_WEST -> WEST
+        WEST -> WEST_SOUTH_WEST
+        WEST_SOUTH_WEST -> SOUTH_WEST
+        SOUTH_WEST -> SOUTH_SOUTH_WEST
+        SOUTH_SOUTH_WEST -> SOUTH
+        SOUTH -> SOUTH_SOUTH_EAST
+        SOUTH_SOUTH_EAST -> SOUTH_EAST
+        SOUTH_EAST -> EAST_SOUTH_EAST
+        EAST_SOUTH_EAST -> EAST
+        EAST -> EAST_NORTH_EAST
+        EAST_NORTH_EAST -> NORTH_EAST
+        NORTH_EAST -> NORTH_NORTH_EAST
+        NORTH_NORTH_EAST -> NORTH
+        UP -> UP
+        DOWN -> DOWN
+        SELF -> SELF
+    }
+
+/**
+ * The next clockwise [BlockFace] that is aligned with one of the three cartesian axes.
+ * Does not include diagonal faces, e.g. after [NORTH] or [NORTH_NORTH_EAST] comes [EAST].
+ */
+val BlockFace.nextCartesianClockwise: BlockFace
+    get() = when (this) {
+        NORTH -> EAST
+        NORTH_NORTH_EAST -> EAST
+        NORTH_EAST -> EAST
+        EAST_NORTH_EAST -> EAST
+        EAST -> SOUTH
+        EAST_SOUTH_EAST -> SOUTH
+        SOUTH_EAST -> SOUTH
+        SOUTH_SOUTH_EAST -> SOUTH
+        SOUTH -> WEST
+        SOUTH_SOUTH_WEST -> WEST
+        SOUTH_WEST -> WEST
+        WEST_SOUTH_WEST -> WEST
+        WEST -> NORTH
+        WEST_NORTH_WEST -> NORTH
+        NORTH_WEST -> NORTH
+        NORTH_NORTH_WEST -> NORTH
+        UP -> UP
+        DOWN -> DOWN
+        SELF -> SELF
+    }
+
+/**
+ * The next clockwise [BlockFace] that is aligned with one of the three cartesian axes.
+ * Does not include diagonal faces, e.g. after [NORTH] or [NORTH_NORTH_WEST] comes [WEST].
+ */
+val BlockFace.nextCartesianCounterclockwise: BlockFace
+    get() = when (this) {
+        NORTH -> WEST
+        NORTH_NORTH_WEST -> WEST
+        NORTH_WEST -> WEST
+        WEST_NORTH_WEST -> WEST
+        WEST -> SOUTH
+        WEST_SOUTH_WEST -> SOUTH
+        SOUTH_WEST -> SOUTH
+        SOUTH_SOUTH_WEST -> SOUTH
+        SOUTH -> EAST
+        SOUTH_SOUTH_EAST -> EAST
+        SOUTH_EAST -> EAST
+        EAST_SOUTH_EAST -> EAST
+        EAST -> NORTH
+        EAST_NORTH_EAST -> NORTH
+        NORTH_EAST -> NORTH
+        NORTH_NORTH_EAST -> NORTH
+        UP -> UP
+        DOWN -> DOWN
+        SELF -> SELF
     }
 
 /**

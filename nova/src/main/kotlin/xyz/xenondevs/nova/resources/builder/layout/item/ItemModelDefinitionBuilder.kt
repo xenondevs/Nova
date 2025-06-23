@@ -38,7 +38,13 @@ class ItemModelDefinitionBuilder<S : ModelSelectorScope> internal constructor(
      */
     var handAnimationOnSwap = true
     
-    internal fun build() = ItemModelDefinition(model, handAnimationOnSwap)
+    /**
+     * Whether the items model is allowed to render bigger than the item slot, or should be clipped to the item slot size.
+     * Contrarily to vanilla defaults, this is `true` by default.
+     */
+    var oversizedInGui = true
+    
+    internal fun build() = ItemModelDefinition(model, handAnimationOnSwap, oversizedInGui)
     
     internal companion object {
         
@@ -141,6 +147,12 @@ sealed class ItemModelCreationScope<S : ModelSelectorScope>(
      */
     fun headSpecialModel(headModel: HeadSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
         HeadSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(headModel).build()
+    
+    /**
+     * Renders a player head model, using the texture from the `minecraft:profile` data component on the item stack.
+     */
+    fun playerHeadSpecialModel(playerHeadModel: GenericSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
+        GenericSpecialItemModelBuilder(SpecialModel.PlayerHead, resourcePackBuilder, selectAndBuild).apply(playerHeadModel).build()
     
     /**
      * Renders a shulker box model.

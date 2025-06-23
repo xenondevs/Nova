@@ -30,7 +30,7 @@ import org.bukkit.World
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.cbf.CBF
+import xyz.xenondevs.cbf.Cbf
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
@@ -142,12 +142,12 @@ var ItemStack.novaCompound: NamespacedCompound?
 var MojangStack.novaCompound: NamespacedCompound?
     get() = unsafeCustomData
         ?.getByteArrayOrNull("nova_cbf")
-        ?.let(CBF::read)
+        ?.let(Cbf::read)
     set(novaCompound) {
         if (novaCompound != null) {
             update(DataComponents.CUSTOM_DATA, CustomData.EMPTY) { customData ->
                 customData.update { compoundTag ->
-                    compoundTag.putByteArray("nova_cbf", CBF.write(novaCompound))
+                    compoundTag.putByteArray("nova_cbf", Cbf.write(novaCompound))
                 }
             }
         } else {
@@ -393,7 +393,7 @@ object ItemUtils {
         val builder = ItemAttributeModifiers.builder()
         for (itemAttributeModifiers in values) {
             for (modifier in itemAttributeModifiers.modifiers) {
-                builder.add(modifier.attribute, modifier.modifier, modifier.slot)
+                builder.add(modifier.attribute, modifier.modifier, modifier.slot, modifier.display)
             }
         }
         return builder.build()

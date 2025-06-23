@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.block.hitbox
 import org.bukkit.Location
 import org.bukkit.World
 import org.joml.Vector3f
+import org.joml.Vector3fc
 import xyz.xenondevs.nova.util.toLocation
 import xyz.xenondevs.nova.util.toVector3f
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeInteraction
@@ -20,11 +21,12 @@ fun PhysicalHitbox(from: Location, to: Location): PhysicalHitbox {
     val width = toVec.x - fromVec.x
     require(width == toVec.z - fromVec.z) { "The hitbox base area must be a square" }
     val height = toVec.y - fromVec.y
-    val center = Vector3f(fromVec.x + width / 2f, fromVec.y, fromVec.z + width / 2f)
+    val baseCenter = Vector3f(fromVec.x + width / 2f, fromVec.y, fromVec.z + width / 2f)
+    val center = Vector3f(fromVec.x + width / 2f, fromVec.y + height / 2f, fromVec.z + width / 2f)
     
     return PhysicalHitbox(
         from.world!!,
-        center,
+        baseCenter, center,
         fromVec, toVec,
         width, width, height
     )
@@ -32,18 +34,19 @@ fun PhysicalHitbox(from: Location, to: Location): PhysicalHitbox {
 
 class PhysicalHitbox internal constructor(
     world: World,
-    center: Vector3f,
-    from: Vector3f, to: Vector3f,
+    baseCenter: Vector3fc, center: Vector3fc,
+    from: Vector3fc, to: Vector3fc,
     xWidth: Float, zWidth: Float, height: Float
-) : Hitbox<ClickHandler, ClickAtLocationHandler>(world, center, from, to, xWidth, zWidth, height) {
+) : Hitbox<ClickHandler, ClickAtLocationHandler>(world, baseCenter, center, from, to, xWidth, zWidth, height) {
     
-    private val centerLocation = center.toLocation(world)
+    private val centerLocation = baseCenter.toLocation(world)
     
-    constructor(center: Location, width: Double, height: Double) : this(
-        center.world!!,
-        Vector3f(center.x.toFloat(), center.y.toFloat(), center.z.toFloat()),
-        Vector3f((center.x - width / 2).toFloat(), center.y.toFloat(), (center.z - width / 2).toFloat()),
-        Vector3f((center.x + width / 2).toFloat(), (center.y + height).toFloat(), (center.z + width / 2).toFloat()),
+    constructor(baseCenter: Location, width: Double, height: Double) : this(
+        baseCenter.world!!,
+        Vector3f(baseCenter.x.toFloat(), baseCenter.y.toFloat(), baseCenter.z.toFloat()),
+        Vector3f(baseCenter.x.toFloat(), (baseCenter.y + height / 2).toFloat(), baseCenter.z.toFloat()),
+        Vector3f((baseCenter.x - width / 2).toFloat(), baseCenter.y.toFloat(), (baseCenter.z - width / 2).toFloat()),
+        Vector3f((baseCenter.x + width / 2).toFloat(), (baseCenter.y + height).toFloat(), (baseCenter.z + width / 2).toFloat()),
         width.toFloat(),
         width.toFloat(),
         height.toFloat()

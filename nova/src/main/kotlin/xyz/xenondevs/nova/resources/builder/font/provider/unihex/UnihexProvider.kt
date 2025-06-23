@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.provider.FontProvider
 import xyz.xenondevs.nova.serialization.json.addSerialized
 import xyz.xenondevs.nova.serialization.json.getDeserialized
+import xyz.xenondevs.nova.serialization.json.getDeserializedOrNull
 import xyz.xenondevs.nova.util.data.useZip
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteIfExists
@@ -264,7 +265,7 @@ abstract class UnihexProvider internal constructor(
          */
         fun fromDisk(builder: ResourcePackBuilder, provider: JsonObject): UnihexProvider {
             val hexFile = provider.getDeserialized<ResourcePath<ResourceType.UnihexZip>>("hex_file")
-            val sizeOverrides = provider.getDeserialized<List<SizeOverride>>("size_overrides")
+            val sizeOverrides = provider.getDeserializedOrNull<List<SizeOverride>>("size_overrides") ?: emptyList()
             return LazyLoaded(builder, hexFile, sizeOverrides)
         }
         

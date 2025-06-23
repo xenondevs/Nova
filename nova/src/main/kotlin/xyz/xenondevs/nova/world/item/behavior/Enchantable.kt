@@ -6,7 +6,6 @@ import io.papermc.paper.datacomponent.item.ItemEnchantments.itemEnchantments
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.config.optionalEntry

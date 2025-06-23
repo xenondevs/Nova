@@ -46,7 +46,7 @@ internal class UnloadChunkTask(
         }
         
         val chunkNodes = NetworkManager.getNodes(chunkPos).associateByTo(HashMap(), NetworkNode::pos)
-        val networkNodes = state.storage.getNetworkChunkOrThrow(chunkPos).getData()
+        val networkNodes = state.storage.getRegionizedChunkOrThrow(chunkPos).getData() // fixme: edge cases where unload & save happen before this task
         if (networkNodes.isEmpty())
             return false
         
