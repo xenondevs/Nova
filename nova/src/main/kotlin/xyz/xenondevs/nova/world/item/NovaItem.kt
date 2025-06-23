@@ -224,8 +224,8 @@ class NovaItem internal constructor(
     /**
      * Modifies the client-side stack of this [NovaItem], in the context that it is sent to [player] and has [data].
      */
-    internal fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
-        return behaviors.fold(itemStack) { stack, behavior -> behavior.modifyClientSideStack(player, stack, data) }
+    internal fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {
+        return behaviors.fold(client) { stack, behavior -> behavior.modifyClientSideStack(player, server, client) }
     }
     
     //<editor-fold desc="event methods", defaultstate="collapsed">

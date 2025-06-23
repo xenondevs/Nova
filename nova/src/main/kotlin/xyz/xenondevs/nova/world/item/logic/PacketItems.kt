@@ -68,7 +68,6 @@ import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClickPac
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourceGeneration
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.component.adventure.isEmpty
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
@@ -333,8 +332,7 @@ internal object PacketItems : Listener, PacketListener {
         )
         
         // customization through item behaviors
-        val novaCompound = itemStack.novaCompound ?: NamespacedCompound.EMPTY
-        newItemStack = novaItem.modifyClientSideStack(player, newItemStack.asBukkitMirror(), novaCompound).unwrap()
+        newItemStack = novaItem.modifyClientSideStack(player, itemStack.asBukkitCopy(),newItemStack.asBukkitMirror()).unwrap()
         
         if (shouldHideEntireTooltip(itemStack)) {
             newItemStack.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(true, linkedSetOf()))
@@ -343,7 +341,7 @@ internal object PacketItems : Listener, PacketListener {
             // to be reflected in the tooltip, except for the item lore itself
             val itemStackToGenerateTooltipOf = itemStack.copy()
             itemStackToGenerateTooltipOf.set(DataComponents.LORE, newItemStack.get(DataComponents.LORE))
-            applyServerSideTooltip(newItemStack, generateNovaTooltipLore(player, novaItem, novaCompound.keys.size, itemStackToGenerateTooltipOf))
+            applyServerSideTooltip(newItemStack, generateNovaTooltipLore(player, novaItem, itemStack.novaCompound?.keys?.size ?: 0, itemStackToGenerateTooltipOf))
         }
         
         // save server-side nbt data (for creative mode)

@@ -25,7 +25,6 @@ import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.node
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.component.adventure.toNmsStyle
 import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.data.logExceptionMessages
@@ -78,14 +77,14 @@ internal class DefaultBehavior(
         }
     }
     
-    override fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
-        itemStack.unwrap().update(DataComponents.CUSTOM_NAME) {
+    override fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {
+        client.unwrap().update(DataComponents.CUSTOM_NAME) {
             val wrappingComponent = MojangComponent.literal("")
-            wrappingComponent.setStyle(style)
+            wrappingComponent.style = style
             wrappingComponent.append(it)
             return@update wrappingComponent
         }
-        return itemStack
+        return client
     }
     
     companion object : ItemBehaviorFactory<DefaultBehavior> {

@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.world.item.behavior
 
+import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.minecraft.core.component.DataComponents
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
@@ -15,7 +15,6 @@ import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.retrieveData
 import xyz.xenondevs.nova.util.item.storeData
-import xyz.xenondevs.nova.util.unwrap
 import org.bukkit.inventory.ItemStack as BukkitStack
 
 private val ENERGY_KEY = Key.key("nova", "energy")
@@ -78,24 +77,24 @@ interface Chargeable : ItemBehavior {
             NamespacedCompound().apply { this[ENERGY_KEY] = 0L }
         }
         
-        override fun modifyClientSideStack(player: Player?, itemStack: ItemStack, data: NamespacedCompound): ItemStack {
-            val energy = data[ENERGY_KEY] ?: 0L
+        override fun modifyClientSideStack(player: Player?, server: BukkitStack, client: BukkitStack): BukkitStack {
+            val energy = server.retrieveData(ENERGY_KEY) ?: 0L
             
-            val lore = itemStack.lore() ?: mutableListOf()
+            val lore = client.lore() ?: mutableListOf()
             lore += Component.text(
                 NumberFormatUtils.getEnergyString(energy, maxEnergy),
                 NamedTextColor.GRAY
             ).withoutPreFormatting()
-            itemStack.lore(lore)
+            client.lore(lore)
             
             if (affectsItemDurability) {
                 val fraction = (maxEnergy - energy) / maxEnergy.toDouble()
                 val damage = (fraction * Int.MAX_VALUE).toInt()
-                itemStack.unwrap().set(DataComponents.MAX_DAMAGE, Int.MAX_VALUE)
-                itemStack.unwrap().set(DataComponents.DAMAGE, damage)
+                client.setData(DataComponentTypes.MAX_DAMAGE, Int.MAX_VALUE)
+                client.setData(DataComponentTypes.DAMAGE, damage)
             }
             
-            return itemStack
+            return client
         }
         
         override fun getEnergy(itemStack: BukkitStack): Long =
