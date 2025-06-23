@@ -393,7 +393,7 @@ object ItemUtils {
         val builder = ItemAttributeModifiers.builder()
         for (itemAttributeModifiers in values) {
             for (modifier in itemAttributeModifiers.modifiers) {
-                builder.add(modifier.attribute, modifier.modifier, modifier.slot)
+                builder.add(modifier.attribute, modifier.modifier, modifier.slot, modifier.display)
             }
         }
         return builder.build()

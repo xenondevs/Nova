@@ -6,6 +6,7 @@ import io.papermc.paper.datacomponent.item.ItemAttributeModifiers.itemAttributes
 import io.papermc.paper.datacomponent.item.ItemEnchantments.itemEnchantments
 import io.papermc.paper.datacomponent.item.ItemLore.lore
 import io.papermc.paper.datacomponent.item.TooltipDisplay.tooltipDisplay
+import io.papermc.paper.datacomponent.item.attribute.AttributeModifierDisplay
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
@@ -120,15 +121,20 @@ internal class DefaultBehavior(
                                 ?: throw NoSuchElementException("Missing value 'operation'")
                             val value = attributeNode.node("value").get<Double>()
                                 ?: throw NoSuchElementException("Missing value 'value'")
+                            val display = attributeNode.node("display").get<AttributeModifierDisplay>()
+                                ?: AttributeModifierDisplay.reset()
+                            
+                            println(display)
                             
                             builder.addModifier(
                                 attribute,
                                 AttributeModifier(
                                     NamespacedKey.fromString(id) ?: throw IllegalArgumentException("Illegal id: $id"),
                                     value,
-                                    operation
+                                    operation,
+                                    slotGroup
                                 ),
-                                slotGroup
+                                display
                             )
                         } catch (e: Exception) {
                             LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $item, $slotGroup with index $idx", e)
