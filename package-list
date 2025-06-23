@@ -45,7 +45,6 @@ xyz.xenondevs.nova.resources.builder.task.model
 xyz.xenondevs.nova.resources.upload
 xyz.xenondevs.nova.serialization
 xyz.xenondevs.nova.serialization.cbf
-xyz.xenondevs.nova.serialization.cbf.adapter
 xyz.xenondevs.nova.serialization.configurate
 xyz.xenondevs.nova.serialization.json.serializer
 xyz.xenondevs.nova.serialization.persistentdata
