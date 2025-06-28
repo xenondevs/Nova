@@ -4,6 +4,7 @@ rootProject.name = "nova-parent"
 include("nova")
 include("nova-api")
 include("nova-gradle-plugin")
+include("nova-dokka-plugin")
 
 // hooks
 include("nova-hooks:nova-hook-griefprevention")

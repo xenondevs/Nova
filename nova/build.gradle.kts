@@ -1,17 +1,13 @@
 plugins {
-    java
-    `maven-publish`
-    alias(libs.plugins.kotlin)
+    id("nova.kotlin-conventions")
+    id("nova.paper-conventions")
+    id("nova.dokka-conventions")
+    id("nova.publish-conventions")
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.dokka)
     id("xyz.xenondevs.bundler-plugin")
-    alias(libs.plugins.paperweight)
 }
 
 dependencies {
-    // server
-    paperweight.paperDevBundle(libs.versions.paper)
-    
     // api dependencies
     novaLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
@@ -53,34 +49,21 @@ tasks {
             expand(properties)
         }
     }
-    
-    test {
-        useJUnitPlatform()
-    }
 }
 
-// remove "dev" classifier set by paperweight-userdev
-afterEvaluate {
-    tasks.getByName<Jar>("jar") {
-        archiveClassifier = ""
+kotlin {
+    compilerOptions {
+        optIn.addAll(
+            "kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "xyz.xenondevs.invui.ExperimentalReactiveApi"
+            )
     }
 }
 
 publishing {
-    repositories {
-        maven {
-            credentials {
-                name = "xenondevs"
-                url = uri { "https://repo.xenondevs.xyz/releases/" }
-                credentials(PasswordCredentials::class)
-            }
-        }
-    }
-    
     publications {
-        create<MavenPublication>("nova") {
-            from(components.getByName("kotlin"))
-            artifact(tasks.getByName("sources"))
+        create<MavenPublication>("maven") {
+            from(components["java"])
         }
     }
 }

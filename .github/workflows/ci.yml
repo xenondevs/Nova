@@ -21,18 +21,12 @@ jobs:
           distribution: adopt
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/gradle-build-action@v4
         with:
           cache-disabled: true
         
       - name: Build Nova
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: |
-            test
-            loaderJar
-            -PoutDir=artifacts
-            -Prelease
+        run: ./gradlew test loaderJar -PoutDir=artifacts -Prelease
 
       - name: Upload Artifacts
         id: upload
@@ -45,13 +39,7 @@ jobs:
         if: github.event_name == 'release'
         uses: gradle/gradle-build-action@v3
         with:
-          arguments: | 
-            publishNovaPublicationToXenondevsRepository
-            publishNovaAPIPublicationToXenondevsRepository
-            publishNovaGradlePluginPublicationToXenondevsRepository
-            publishNova-gradle-pluginPluginMarkerMavenPublicationToXenondevsRepository
-            publishCatalogPublicationToXenondevsRepository
-            -Prelease
+          arguments: publish -Prelease
         env:
           ORG_GRADLE_PROJECT_xenondevsUsername: ${{ secrets.XENONDEVS_RELEASES_USERNAME }}
           ORG_GRADLE_PROJECT_xenondevsPassword: ${{ secrets.XENONDEVS_RELEASES_PASSWORD }}

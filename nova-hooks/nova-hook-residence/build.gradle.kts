@@ -1,6 +1,5 @@
 plugins {
-    alias(libs.plugins.kotlin)
-    alias(libs.plugins.paperweight)
+    id("nova.hook-conventions")
 }
 
 repositories {
@@ -8,8 +7,5 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle(libs.versions.paper)
-    implementation(project(":nova"))
-    implementation(project(":nova-api"))
     compileOnly("com.bekvon:Residence:5.0.1.6") { isTransitive = false }
 }

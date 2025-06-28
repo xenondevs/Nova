@@ -1,9 +1,7 @@
-import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
-
 plugins {
-    java
-    `maven-publish`
-    alias(libs.plugins.dokka)
+    id("nova.java-conventions")
+    id("nova.dokka-conventions")
+    id("nova.publish-conventions")
 }
 
 dependencies {
@@ -11,29 +9,10 @@ dependencies {
     compileOnly(libs.paper.api)
 }
 
-tasks.withType<AbstractDokkaLeafTask> {
-    dokkaSourceSets {
-        register("main") {
-            sourceRoots.from("src/main/java")
-        }
-    }
-}
-
 publishing {
-    repositories {
-        maven {
-            credentials {
-                name = "xenondevs"
-                url = uri { "https://repo.xenondevs.xyz/releases/" }
-                credentials(PasswordCredentials::class)
-            }
-        }
-    }
-    
     publications {
-        create<MavenPublication>("novaAPI") {
-            from(components.getByName("java"))
-            artifact(tasks.getByName("sources"))
+        create<MavenPublication>("maven") {
+            from(components["java"])
         }
     }
 }

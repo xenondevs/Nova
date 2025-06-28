@@ -1,5 +1,5 @@
 plugins {
-    `maven-publish`
+    id("nova.publish-conventions")
     `version-catalog`
 }
 
@@ -26,18 +26,8 @@ catalog {
 }
 
 publishing {
-    repositories {
-        maven {
-            credentials {
-                name = "xenondevs"
-                url = uri { "https://repo.xenondevs.xyz/releases/" }
-                credentials(PasswordCredentials::class)
-            }
-        }
-    }
-    
     publications {
-        create<MavenPublication>("catalog") {
+        create<MavenPublication>("maven") {
             from(components["versionCatalog"])
         }
     }
