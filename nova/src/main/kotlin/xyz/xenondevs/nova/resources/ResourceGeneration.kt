@@ -85,6 +85,7 @@ internal object ResourceGeneration {
                 LOGGER.info("Continuing to build resource pack")
                 builder.buildPackPostWorld()
                 AutoUploadManager.wasRegenerated = true
+                AutoCopier.copyToDestinations(ResourcePackBuilder.RESOURCE_PACK_FILE)
                 PermanentStorage.store(VERSION_HASH, versionHash)
                 BlockMigrator.updateMigrationId()
             }
@@ -128,6 +129,8 @@ internal object ResourceGeneration {
                     LOGGER.warn("The resource pack was not uploaded. (Misconfigured auto uploader?)")
             }
         }
+        
+        AutoCopier.copyToDestinations(ResourcePackBuilder.RESOURCE_PACK_FILE)
     }
     
 }

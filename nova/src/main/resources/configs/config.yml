@@ -5,7 +5,9 @@ resource_pack:
   # READ SETUP GUIDE: https://xenondevs.xyz/docs/nova/admin/setup/#automatic-resource-pack-hosting
   auto_upload:
     enabled: false
-    
+  # A list of destination paths to where the resource pack should be copied after generation.
+  # Each entry can either be a directory (e.g 'plugins/Abc/', needs to exist) or a format string (e.g. 'plugins/Abc/Nova-%s.zip').
+  auto_copy: []
   # Settings affecting the resource pack prompt
   prompt:
     # The resource pack prompt message
