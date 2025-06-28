@@ -309,7 +309,7 @@ sealed interface ItemModel {
             ) : SpecialModel
             
             @Serializable
-            @SerialName("player_head")
+            @SerialName("minecraft:player_head")
             data object PlayerHead : SpecialModel
             
             @Serializable
