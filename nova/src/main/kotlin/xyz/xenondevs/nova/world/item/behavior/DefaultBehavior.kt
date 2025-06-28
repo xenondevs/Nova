@@ -123,8 +123,6 @@ internal class DefaultBehavior(
                             val display = attributeNode.node("display").get<AttributeModifierDisplay>()
                                 ?: AttributeModifierDisplay.reset()
                             
-                            println(display)
-                            
                             builder.addModifier(
                                 attribute,
                                 AttributeModifier(
