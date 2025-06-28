@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger
  * interaction related events.
  */
 fun Player.swingMainHandEventless() {
-    swingMainHand()
     val packet = ClientboundAnimatePacket(serverPlayer, 0)
     EventlessHandSwinging.registerDrop(this, true)
     world.serverLevel.chunkSource.broadcastAndSend(serverPlayer, packet)
