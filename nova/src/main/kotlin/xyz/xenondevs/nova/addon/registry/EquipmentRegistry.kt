@@ -5,6 +5,7 @@ import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLa
 import xyz.xenondevs.nova.resources.builder.layout.equipment.StaticEquipmentLayoutBuilder
 import xyz.xenondevs.nova.world.item.Equipment
 
+@Suppress("DEPRECATION")
 @Deprecated(REGISTRIES_DEPRECATION)
 interface EquipmentRegistry : AddonGetter {
     

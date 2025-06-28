@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.addon.registry.worldgen
 
 import it.unimi.dsi.fastutil.doubles.DoubleList

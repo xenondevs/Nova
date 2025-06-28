@@ -4,6 +4,7 @@ import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureLayoutBuilder
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 
+@Suppress("DEPRECATION")
 @Deprecated(REGISTRIES_DEPRECATION)
 interface GuiTextureRegistry : AddonGetter {
     

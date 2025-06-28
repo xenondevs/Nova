@@ -5,6 +5,7 @@ import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.world.player.ability.Ability
 import xyz.xenondevs.nova.world.player.ability.AbilityType
 
+@Suppress("DEPRECATION")
 @Deprecated(REGISTRIES_DEPRECATION)
 interface AbilityTypeRegistry : AddonGetter {
     

@@ -20,6 +20,8 @@ interface MultiItemTest : ItemTest {
     val examples: List<ItemStack>
 }
 
+@Suppress("DEPRECATION")
+@Deprecated("Custom model data is not a single value anymore")
 class ModelDataTest(private val type: Material, private val data: IntArray, override val example: ItemStack) : SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
@@ -28,10 +30,18 @@ class ModelDataTest(private val type: Material, private val data: IntArray, over
     
 }
 
+class VanillaMaterialTest(private val type: Material, override val example: ItemStack) : SingleItemTest {
+    
+    override fun test(item: ItemStack): Boolean {
+        return item.type == type && item.novaItem == null
+    }
+    
+}
+
 class TagTest(private val tag: Tag<Material>, override val examples: List<ItemStack> = tag.values.map(::ItemStack)) : MultiItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return tag.isTagged(item.type) && item.customModelData == 0
+        return tag.isTagged(item.type) && item.novaItem == null
     }
     
 }

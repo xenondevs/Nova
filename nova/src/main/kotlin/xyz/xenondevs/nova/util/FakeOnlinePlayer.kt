@@ -121,7 +121,7 @@ abstract class FakeOnlinePlayer(
                 }
             }
             
-            return ClassWrapperLoader(this.javaClass.classLoader)
+            return ClassWrapperLoader(this::class.java.classLoader)
                 .loadClass(classWrapper)
                 .getConstructor(OfflinePlayer::class.java, Location::class.java) as Constructor<FakeOnlinePlayer>
         }

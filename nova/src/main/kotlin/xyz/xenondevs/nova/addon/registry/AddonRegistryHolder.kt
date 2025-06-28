@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.addon.registry
 
 import xyz.xenondevs.nova.addon.Addon

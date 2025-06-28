@@ -5,6 +5,7 @@ import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.world.player.attachment.Attachment
 import xyz.xenondevs.nova.world.player.attachment.AttachmentType
 
+@Suppress("DEPRECATION")
 @Deprecated(REGISTRIES_DEPRECATION)
 interface AttachmentTypeRegistry : AddonGetter {
     

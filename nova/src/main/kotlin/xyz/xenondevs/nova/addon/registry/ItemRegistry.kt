@@ -6,6 +6,7 @@ import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.NovaItemBuilder
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 
+@Suppress("DEPRECATION")
 @Deprecated(REGISTRIES_DEPRECATION)
 interface ItemRegistry : AddonGetter {
     

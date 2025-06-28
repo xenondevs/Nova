@@ -45,7 +45,7 @@ internal object NoteBlockBehavior : BlockBehavior {
         val clickedFace = ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]
         val item = ctx[DefaultContextParamTypes.INTERACTION_ITEM_STACK]
         
-        if (item != null && item.novaItem == null && Tag.ITEMS_NOTE_BLOCK_TOP_INSTRUMENTS.isTagged(item.type) && clickedFace == BlockFace.UP)
+        if (item != null && item.novaItem == null && Tag.ITEMS_NOTEBLOCK_TOP_INSTRUMENTS.isTagged(item.type) && clickedFace == BlockFace.UP)
             return false
         
         cycleNote(pos, state)

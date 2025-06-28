@@ -4,6 +4,7 @@ import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.resources.builder.layout.gui.TooltipStyleBuilder
 import xyz.xenondevs.nova.world.item.TooltipStyle
 
+@Suppress("DEPRECATION")
 @Deprecated(REGISTRIES_DEPRECATION)
 interface TooltipStyleRegistry : AddonGetter {
     

@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.addon.registry.worldgen
 
 import net.minecraft.resources.ResourceKey

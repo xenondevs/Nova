@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.world.item.recipe.NovaRecipe
 import xyz.xenondevs.nova.world.item.recipe.RecipeType
 import kotlin.reflect.KClass
 
+@Suppress("DEPRECATION")
 @Deprecated(REGISTRIES_DEPRECATION)
 interface RecipeTypeRegistry : AddonGetter {
     

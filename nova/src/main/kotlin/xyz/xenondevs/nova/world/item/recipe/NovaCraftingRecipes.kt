@@ -36,8 +36,8 @@ import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
 
 internal class NovaShapedRecipe private constructor(
     private val bukkitRecipe: BukkitShapedRecipe,
-    private val pattern: ShapedRecipePattern,
-    val result: ItemStack,
+    pattern: ShapedRecipePattern,
+    result: ItemStack,
     val requiredChoices: List<RecipeChoice>,
     val choiceMatrix: Array<Array<RecipeChoice?>>
 ) : ShapedRecipe(

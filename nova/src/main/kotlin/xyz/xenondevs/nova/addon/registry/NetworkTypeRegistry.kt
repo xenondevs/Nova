@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConstructor
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkGroupConstructor
 import kotlin.reflect.KClass
 
+@Suppress("DEPRECATION")
 @Deprecated(REGISTRIES_DEPRECATION)
 interface NetworkTypeRegistry : AddonGetter {
     

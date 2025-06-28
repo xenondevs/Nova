@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlockBuilder
 import xyz.xenondevs.nova.world.block.TileEntityConstructor
 
+@Suppress("DEPRECATION")
 @Deprecated(REGISTRIES_DEPRECATION)
 interface BlockRegistry : AddonGetter {
     

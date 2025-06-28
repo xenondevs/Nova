@@ -1,4 +1,4 @@
-@file:Suppress("LeakingThis", "UnstableApiUsage")
+@file:Suppress("LeakingThis", "UnstableApiUsage", "DEPRECATION")
 
 package xyz.xenondevs.nova.addon
 

@@ -5,6 +5,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType
 import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 
+@Suppress("DEPRECATION")
 @Deprecated(REGISTRIES_DEPRECATION)
 interface MinecraftUtilTypeRegistry : AddonGetter {
     

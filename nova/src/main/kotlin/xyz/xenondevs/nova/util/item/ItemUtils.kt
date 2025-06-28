@@ -50,10 +50,10 @@ import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.logic.PacketItems
 import xyz.xenondevs.nova.world.item.recipe.ComplexTest
 import xyz.xenondevs.nova.world.item.recipe.CustomRecipeChoice
-import xyz.xenondevs.nova.world.item.recipe.ModelDataTest
 import xyz.xenondevs.nova.world.item.recipe.NovaIdTest
 import xyz.xenondevs.nova.world.item.recipe.NovaNameTest
 import xyz.xenondevs.nova.world.item.recipe.TagTest
+import xyz.xenondevs.nova.world.item.recipe.VanillaMaterialTest
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.max
@@ -74,6 +74,8 @@ internal val MojangStack.unsafeCustomData: CompoundTag?
 internal val MojangStack.unsafeNovaTag: CompoundTag?
     get() = unsafeCustomData?.getCompoundOrNull("nova")
 
+@Suppress("DEPRECATION")
+@Deprecated("Custom model data is not a single value anymore")
 val ItemStack.customModelData: Int
     get() {
         if (hasItemMeta()) {
@@ -215,7 +217,7 @@ object ItemUtils {
                 when (id.substringBefore(':')) {
                     "minecraft" -> {
                         val material = Material.valueOf(id.drop(10).uppercase())
-                        return@map ModelDataTest(material, intArrayOf(0), ItemStack(material))
+                        return@map VanillaMaterialTest(material, ItemStack(material))
                     }
                     
                     "nova" -> {

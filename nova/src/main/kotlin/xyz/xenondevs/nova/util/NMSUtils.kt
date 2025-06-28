@@ -415,7 +415,6 @@ inline fun Level.captureDrops(run: () -> Unit): List<ItemEntity> {
         run.invoke()
         return captureDrops
     } finally {
-        @Suppress("NULL_FOR_NONNULL_TYPE") // improperly annotated
         this.captureDrops = null
     }
 }

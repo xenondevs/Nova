@@ -5,6 +5,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.world.item.enchantment.EnchantmentBuilder
 
+@Suppress("DEPRECATION")
 @Deprecated(REGISTRIES_DEPRECATION)
 interface EnchantmentRegistry : AddonGetter {
     
