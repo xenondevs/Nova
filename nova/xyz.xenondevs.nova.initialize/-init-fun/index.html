@@ -41,11 +41,11 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.20-alpha.1
+        <div class="library-version" id="library-version">0.20-alpha.2
         </div>
         <div class="navigation-controls">
         <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova:dokkaHtmlPartial/main">jvm</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova/main">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
                 <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
@@ -56,7 +56,7 @@
                     </div>
                         <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
                             <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":nova:dokkaHtmlPartial/main" data-filter=":nova:dokkaHtmlPartial/main">
+                                <input type="checkbox" class="checkbox--input" id=":nova/main" data-filter=":nova/main">
                                 <span class="checkbox--icon"></span>
                                 jvm
                             </label>
@@ -90,58 +90,58 @@
                 </div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.initialize/InitFun///PointingToDeclaration//2031297628">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.initialize/InitFun///PointingToDeclaration//-501115348">
   <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.initialize</a><span class="delimiter">/</span><span class="current">InitFun</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Init</span><wbr><span><span>Fun</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-f-u-n-c-t-i-o-n/index.html">AnnotationTarget.FUNCTION</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="index.html">InitFun</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>dispatcher<span class="token operator">: </span><a href="../-dispatcher/index.html">Dispatcher</a><span class="token operator"> = </span>Dispatcher.SYNC<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>runAfter<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator"> = </span>[]<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>runBefore<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator"> = </span>[]</span></span><span class="token punctuation">)</span></div><p class="paragraph">Marks a function to be called during initialization. This requires the class to be annotated with <a href="../-init/index.html">Init</a> or <a href="../../../nova/xyz.xenondevs.nova.initialize/-internal-init/index.html">InternalInit</a>, and automatically has a dependency on the initialization of the class.</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>dispatcher</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Defines how the initialization is dispatched. Falls back to the dispatcher of the class if not specified.</p></div></div></div></div><div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>run</span><wbr><span><span>After</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The classes (and their init functions) which should be initialized after this function is called. (This function is called <strong>before</strong> them.) Those classes must be annotated with <a href="../-init/index.html">Init</a> or <a href="../../../nova/xyz.xenondevs.nova.initialize/-internal-init/index.html">InternalInit</a>.</p></div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-f-u-n-c-t-i-o-n/index.html">AnnotationTarget.FUNCTION</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="index.html">InitFun</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>dispatcher<span class="token operator">: </span><a href="../-dispatcher/index.html">Dispatcher</a><span class="token operator"> = </span>Dispatcher.SYNC<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>runAfter<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator"> = </span>[]<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>runBefore<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token operator"> = </span>[]</span></span><span class="token punctuation">)</span></div><p class="paragraph">Marks a function to be called during initialization. This requires the class to be annotated with <a href="../-init/index.html">Init</a> or <a href="../../../nova/xyz.xenondevs.nova.initialize/-internal-init/index.html">InternalInit</a>, and automatically has a dependency on the initialization of the class.</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>dispatcher</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Defines how the initialization is dispatched. Falls back to the dispatcher of the class if not specified.</p></div></div></div></div><div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>run</span><wbr><span><span>After</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The classes (and their init functions) which should be initialized after this function is called. (This function is called <strong>before</strong> them.) Those classes must be annotated with <a href="../-init/index.html">Init</a> or <a href="../../../nova/xyz.xenondevs.nova.initialize/-internal-init/index.html">InternalInit</a>.</p></div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="PROPERTY">
         <h2 class="">Properties</h2>
-        <div class="table"><a data-name="-694649772%2FProperties%2F2031297628" anchor-label="dispatcher" id="-694649772%2FProperties%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
-          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+        <div class="table"><a data-name="-694649772%2FProperties%2F-501115348" anchor-label="dispatcher" id="-694649772%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="dispatcher.html"><span><span>dispatcher</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-694649772%2FProperties%2F2031297628"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-694649772%2FProperties%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="dispatcher.html">dispatcher</a><span class="token operator">: </span><a href="../-dispatcher/index.html">Dispatcher</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="dispatcher.html">dispatcher</a><span class="token operator">: </span><a href="../-dispatcher/index.html">Dispatcher</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="1964140458%2FProperties%2F2031297628" anchor-label="runAfter" id="1964140458%2FProperties%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
-          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+<a data-name="1964140458%2FProperties%2F-501115348" anchor-label="runAfter" id="1964140458%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="run-after.html"><span>run</span><wbr><span><span>After</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1964140458%2FProperties%2F2031297628"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1964140458%2FProperties%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="run-after.html">runAfter</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="run-after.html">runAfter</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-1430581259%2FProperties%2F2031297628" anchor-label="runBefore" id="-1430581259%2FProperties%2F2031297628" data-filterable-set=":nova:dokkaHtmlPartial/main"></a>
-          <div class="table-row" data-filterable-current=":nova:dokkaHtmlPartial/main" data-filterable-set=":nova:dokkaHtmlPartial/main">
+<a data-name="-1430581259%2FProperties%2F-501115348" anchor-label="runBefore" id="-1430581259%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="run-before.html"><span>run</span><wbr><span><span>Before</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1430581259%2FProperties%2F2031297628"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1430581259%2FProperties%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="run-before.html">runBefore</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="run-before.html">runBefore</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>

@@ -1,1 +1,1 @@
-sourceset_dependencies = '{":nova-api:dokkaHtmlPartial/main":[],":nova:dokkaHtmlPartial/main":[]}'
+sourceset_dependencies = '{":nova-api/javaMain":[],":nova/main":[]}'
