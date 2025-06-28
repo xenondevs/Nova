@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.resources.builder.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import org.joml.Vector3d
@@ -182,6 +181,15 @@ class ModelBuilderTest {
         
         val expected = deserializeModel("oversized/negative_y_resized")
         assertEquals(ScaledModel(expected, 0.6), actual)
+    }
+    
+    @Test
+    fun testCull() {
+        val base = deserializeModel("full_cube/model_with_cullfaces")
+        val actual = ModelBuilder(base).cull(setOf(Model.Direction.NORTH, Model.Direction.UP)).buildScaled(null)
+        
+        val expected = deserializeModel("full_cube/culled/north_up")
+        assertEquals(expected, actual)
     }
     
     private fun assertRotatedEquals(model: String, axis: Model.Axis, rotation: Double) {

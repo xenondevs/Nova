@@ -11,6 +11,7 @@ import org.joml.primitives.AABBdc
 import xyz.xenondevs.nova.resources.builder.model.transform.BuildAction
 import xyz.xenondevs.nova.resources.builder.model.transform.CombinationAction
 import xyz.xenondevs.nova.resources.builder.model.transform.ContextualModelBuildAction
+import xyz.xenondevs.nova.resources.builder.model.transform.CullAction
 import xyz.xenondevs.nova.resources.builder.model.transform.FlatteningAction
 import xyz.xenondevs.nova.resources.builder.model.transform.NonContextualModelBuildAction
 import xyz.xenondevs.nova.resources.builder.model.transform.RotationTransform
@@ -206,6 +207,12 @@ class ModelBuilder(private val base: Model) {
         action(FlatteningAction())
     
     /**
+     * Removes all faces that have the given [directions] configured as their [Model.Element.Face.cullface].
+     */
+    fun cull(directions: Set<Model.Direction>): ModelBuilder =
+        action(CullAction(directions))
+    
+    /**
      * Builds the model according to the configured [actions].
      *
      * The [context] parameter is only required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
@@ -303,6 +310,7 @@ class ModelBuilder(private val base: Model) {
                 is FlatteningAction -> Unit // flattening should not be required for display entity models (?)
                 is CombinationAction -> models += action.other.buildDisplayEntity(context)
                     .map { (model, matrix) -> model to Matrix4d(matrix) }
+                is CullAction -> models.replaceAll { (model, matrix) -> action.apply(model) to matrix }
             }
         }
         

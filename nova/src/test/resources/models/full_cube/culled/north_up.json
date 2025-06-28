@@ -1,0 +1,16 @@
+{
+  "textures": {
+    "1": "block/emerald_block"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "south": {"uv": [0, 0, 16, 16], "texture": "#1", "cullface": "south"},
+        "west": {"uv": [0, 0, 16, 16], "texture": "#1", "cullface": "south"},
+        "down": {"uv": [0, 0, 16, 16], "texture": "#1", "cullface":  "down"}
+      }
+    }
+  ]
+}
