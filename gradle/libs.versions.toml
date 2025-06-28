@@ -4,7 +4,7 @@ format.version = "1.1"
 [versions]
 bytebase = "0.4.8"
 jgrapht = "1.5.2"
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.2.0"
 paper = "1.21.6-R0.1-SNAPSHOT"
