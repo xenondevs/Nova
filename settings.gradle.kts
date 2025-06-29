@@ -32,6 +32,7 @@ dependencyResolutionManagement {
 
 pluginManagement {
     repositories {
+        mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
         mavenCentral()
         gradlePluginPortal()
         maven("https://repo.xenondevs.xyz/releases/")
@@ -39,7 +40,7 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.enterprise") version("3.13")
+    id("com.gradle.enterprise") version "3.13"
 }
 
 gradleEnterprise {
