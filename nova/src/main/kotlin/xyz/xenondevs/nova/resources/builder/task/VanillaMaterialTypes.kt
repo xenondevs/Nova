@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.builder.task.model
+package xyz.xenondevs.nova.resources.builder.task
 
 import org.bukkit.Material
 import xyz.xenondevs.commons.collections.contentEquals

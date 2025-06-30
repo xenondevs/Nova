@@ -1,6 +1,6 @@
 @file:OptIn(InternalResourcePackDTO::class)
 
-package xyz.xenondevs.nova.resources.builder.task.model
+package xyz.xenondevs.nova.resources.builder.task
 
 import com.google.gson.JsonObject
 import org.joml.Matrix4f
@@ -11,7 +11,6 @@ import xyz.xenondevs.commons.gson.getObjectOrNull
 import xyz.xenondevs.commons.gson.getOrPut
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -29,8 +28,7 @@ import xyz.xenondevs.nova.resources.builder.layout.block.DEFAULT_BLOCK_STATE_SEL
 import xyz.xenondevs.nova.resources.builder.layout.block.ItemDefinitionConfigurator
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
-import xyz.xenondevs.nova.resources.builder.task.PackTask
-import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
+import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.serialization.json.GSON
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -51,23 +49,33 @@ import kotlin.io.path.exists
 private val DISABLED_BACKING_STATE_CATEGORIES: Set<BackingStateCategory> by MAIN_CONFIG.entry("resource_pack", "generation", "disabled_backing_state_categories")
 
 /**
- * A [PackTaskHolder] that deals with generating and assigning custom block models to block states
+ * Deals with generating and assigning custom block models to block states
  * (i.e. creating block state variant entries) or items.
  */
-class BlockModelContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
+class BlockModelContent internal constructor(private val builder: ResourcePackBuilder) : PackTask {
+    
+    override val stage = BuildStage.PRE_WORLD
+    override val runAfter = setOf(BasePacks.Include::class, ExtractTask::class, ModelContent.DiscoverAllModels::class)
+    override val runBefore = setOf(ModelContent.Write::class, ItemModelContent.Write::class)
     
     private val variantByConfig = HashMap<BackingStateConfig, BlockStateVariantData>()
     private val configsByVariant = HashMap<BlockStateVariantData, ArrayList<BackingStateConfig>>()
     
     private val blockStatePosition = HashMap<BackingStateConfigType<*>, Int>()
     
-    private val modelContent by builder.getHolderLazily<ModelContent>()
-    private val itemModelContent by builder.getHolderLazily<ItemModelContent>()
+    private val basePacks by builder.getBuildDataLazily<BasePacks>()
+    private val modelContent by builder.getBuildDataLazily<ModelContent>()
+    private val itemModelContent by builder.getBuildDataLazily<ItemModelContent>()
+    
+    override suspend fun run() {
+        readBlockStateFiles()
+        assignBlockModels()
+        writeBlockStateFiles()
+    }
     
     /**
      * Reads all block state files that may be used by backing-state block models.
      */
-    @PackTask(runAfter = ["ExtractTask#extractAll"])
     private fun readBlockStateFiles() {
         BackingStateCategory.entries.asSequence()
             .filter { it !in DISABLED_BACKING_STATE_CATEGORIES }
@@ -78,7 +86,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                     val blockStateJson = file.parseJson() as JsonObject
                     
                     if (blockStateJson.has("multipart")) {
-                        LOGGER.warn("Block state file $file contains multipart block states, which are not supported. " +
+                        builder.logger.warn("Block state file $file contains multipart block states, which are not supported. " +
                             "Block states defined in this file will be ignored and potentially overwritten.")
                         return@forEach
                     }
@@ -93,7 +101,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
                             }
                             
                             if (properties.keys != type.properties) {
-                                LOGGER.warn("Variant '$variantStr' in block state file $file does not specify all properties explicitly " +
+                                builder.logger.warn("Variant '$variantStr' in block state file $file does not specify all properties explicitly " +
                                     "(got ${properties.keys}, expected ${type.properties}). " +
                                     "This variant will be ignored and potentially overwritten.")
                                 return@forEach
@@ -113,17 +121,6 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
     /**
      * Assigns models to all custom block states.
      */
-    @PackTask(
-        runAfter = [
-            "BlockModelContent#readBlockStateFiles",
-            "ModelContent#discoverAllModels",
-        ],
-        runBefore = [
-            "ModelContent#write",
-            "BlockModelContent#writeBlockStateFiles",
-            "ItemModelContent#write"
-        ]
-    )
     private fun assignBlockModels() {
         val lookup = HashMap<NovaBlockState, BlockModelProvider>()
         
@@ -141,7 +138,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
             if (cfg != null) {
                 lookup[blockState] = BackingStateBlockModelProvider(cfg)
             } else {
-                LOGGER.warn("No more block states for $blockState with layout $layout, falling back to display entity")
+                builder.logger.warn("No more block states for $blockState with layout $layout, falling back to display entity")
                 val data = DisplayEntityBlockModelData(blockState, assignModelToItem(modelBuilder), DEFAULT_BLOCK_STATE_SELECTOR(scope))
                 lookup[blockState] = DisplayEntityBlockModelProvider(data)
             }
@@ -229,7 +226,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
     private fun nextBackingStateConfig(type: BackingStateConfigType<*>, waterlogged: Boolean): BackingStateConfig? {
         var pos = blockStatePosition.getOrPut(type) { -1 } + 1
         
-        val occupiedSet = builder.basePacks.occupiedSolidIds[type]
+        val occupiedSet = basePacks.occupiedSolidIds[type]
         val blockedSet = type.blockedIds
         
         while (pos in blockedSet || (occupiedSet != null && pos in occupiedSet))
@@ -275,7 +272,6 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
     /**
      * Writes all block state files to the resource pack.
      */
-    @PackTask(runAfter = ["ModelContent#discoverAllModels"])
     private fun writeBlockStateFiles() {
         // some backing state config types cover the same file
         val fileContents = HashMap<Path, JsonObject>()
@@ -300,7 +296,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
         // disable leaf particles if leaves backing state configs are used
         val particles = variantByConfig.keys.mapNotNullTo(HashSet()) { (it.type as? LeavesBackingStateConfigType<*>)?.particleType }
         for (particle in particles) {
-            LOGGER.info("Disabling $particle particles because their leaves are used as backing states")
+            builder.logger.info("Disabling $particle particles because their leaves are used as backing states")
             builder.writeJson(
                 ResourcePath.of(ResourceType.ParticleDefinition, particle),
                 ParticleDefinition(listOf(ResourcePath(ResourceType.ParticleTexture, "nova", "empty")))
@@ -312,7 +308,7 @@ class BlockModelContent internal constructor(private val builder: ResourcePackBu
      * Gets the block state file for the given [type].
      */
     private fun getBlockStateFile(type: BackingStateConfigType<*>): Path =
-        ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/blockstates/${type.fileName}.json")
+        builder.resolve("assets/minecraft/blockstates/${type.fileName}.json")
     
 }
 

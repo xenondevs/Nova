@@ -1,6 +1,6 @@
-package xyz.xenondevs.nova.resources.builder.basepack.merger
+package xyz.xenondevs.nova.resources.builder.task.basepack.merger
 
-import xyz.xenondevs.nova.resources.builder.basepack.BasePacks
+import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
 import java.nio.file.Path
 
 internal abstract class FileMerger(protected val basePacks: BasePacks) {

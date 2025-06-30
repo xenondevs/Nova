@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.waila.info
 
 import net.kyori.adventure.key.Key
-import xyz.xenondevs.nova.resources.builder.task.font.TextureIconContent
+import xyz.xenondevs.nova.resources.builder.task.TextureIconContent
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories.AXE

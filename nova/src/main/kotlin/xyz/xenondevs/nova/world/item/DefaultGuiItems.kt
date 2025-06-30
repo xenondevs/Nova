@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.world.item
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.data.TintSource
 import xyz.xenondevs.nova.resources.builder.layout.item.ConditionItemModelProperty
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelCreationScope
@@ -312,7 +311,7 @@ private fun barGuiItem(name: String, color: Color, background: Boolean): NovaIte
             graphics.fillRect(2, 18 - level, 14, level)
             graphics.dispose()
             val texPath = "item/gui/bar/color_${color.rgb}_level_$level"
-            ResourcePackBuilder.ASSETS_DIR.resolve("nova/textures/$texPath.png")
+            resourcePackBuilder.resolve("assets/nova/textures/$texPath.png")
                 .writeImage(levelTexture, "PNG")
             
             createGuiModel(background, true, "item/gui/bar/background", texPath, "item/gui/bar/overlay")

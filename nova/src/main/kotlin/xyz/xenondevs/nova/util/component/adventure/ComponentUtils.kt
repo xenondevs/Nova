@@ -21,7 +21,7 @@ import net.minecraft.network.chat.contents.TranslatableContents
 import org.bukkit.entity.Player
 import xyz.xenondevs.invui.internal.util.ComponentUtils
 import xyz.xenondevs.nova.resources.CharSizes
-import xyz.xenondevs.nova.resources.builder.task.font.FontChar
+import xyz.xenondevs.nova.resources.builder.task.FontChar
 import xyz.xenondevs.nova.ui.overlay.MoveCharacters
 import xyz.xenondevs.nova.util.toResourceLocation
 import java.awt.Color

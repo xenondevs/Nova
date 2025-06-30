@@ -1,17 +1,13 @@
-package xyz.xenondevs.nova.resources.builder.task.font
+package xyz.xenondevs.nova.resources.builder.task
 
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import xyz.xenondevs.commons.collections.enumMapOf
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.AssetPack
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder.Companion.ASSETS_DIR
-import xyz.xenondevs.nova.resources.builder.task.BuildStage
-import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.renderer.MinecraftModelRenderer
@@ -223,18 +219,23 @@ private val TEXTURES = setOf(
 private const val SIZE = 32
 private const val ASCENT = -4
 
-class WailaContent internal constructor(
+/**
+ * Writes WAILA assets to the resource pack.
+ */
+class WailaTask internal constructor(
     builder: ResourcePackBuilder
 ) : CustomFontContent(
     builder,
     "nova:waila_textures_%s",
     true
-) {
+), PackTask {
     
-    @PackTask(stage = BuildStage.POST_WORLD, runBefore = ["FontContent#write"])
-    private fun write() {
+    override val stage = BuildStage.POST_WORLD
+    override val runBefore = setOf(FontContent.Write::class)
+    
+    override suspend fun run() {
         if (WailaManager.ENABLED) {
-            builder.getHolder<MovedFontContent>().requestMovedFonts(ResourcePath(ResourceType.Font, "nova", "waila"), 1..19)
+            builder.getBuildData<MovedFontContent>().requestMovedFonts(ResourcePath(ResourceType.Font, "nova", "waila"), 1..19)
             writeHardcodedTextures()
             builder.assetPacks.forEach(::writePackTextures)
             renderCustomItemServiceBlocks()
@@ -248,25 +249,25 @@ class WailaContent internal constructor(
             val renderer = MinecraftModelRenderer(
                 512, 512,
                 128, 128,
-                listOf(ResourcePackBuilder.MCASSETS_DIR, ResourcePackBuilder.PACK_DIR),
+                listOf(builder.resolveVanilla(""), builder.resolve("")),
                 true
             )
             
             CustomItemServiceManager.getBlockItemModelPaths().forEach { (id, path) ->
                 try {
-                    val file = ResourcePackBuilder.PACK_DIR.resolve("assets/nova/textures/waila_generated/${id.namespace()}/${id.value()}.png")
+                    val file = builder.resolve("assets/nova/textures/waila_generated/${id.namespace()}/${id.value()}.png")
                     file.parent.createDirectories()
                     renderer.renderModelToFile(path.toString(), file)
                     addEntry(id, ResourcePath(ResourceType.FontTexture, "nova", "waila_generated/${id.namespace()}/${id.value()}.png"), SIZE, ASCENT)
                     count++
                 } catch (e: Exception) {
-                    LOGGER.warn("Failed to render $id ($path) ", e)
+                    builder.logger.warn("Failed to render $id ($path) ", e)
                 }
             }
         } catch (e: Exception) {
-            LOGGER.error("Failed to render WAILA textures for custom item services. (Misconfigured base packs?)", e)
+            builder.logger.error("Failed to render WAILA textures for custom item services. (Misconfigured base packs?)", e)
         } finally {
-            LOGGER.info("Rendered $count WAILA textures")
+            builder.logger.info("Rendered $count WAILA textures")
         }
     }
     
@@ -298,7 +299,7 @@ class WailaContent internal constructor(
         if (!WailaManager.ENABLED)
             return
         
-        val wailaDir = ASSETS_DIR.resolve("${pack.namespace}/textures/waila/")
+        val wailaDir = builder.resolve("assets/${pack.namespace}/textures/waila/")
         if (!wailaDir.exists())
             return
         

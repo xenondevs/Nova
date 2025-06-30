@@ -44,9 +44,15 @@ internal class RuntimeEquipmentData(
 // TODO: Non-interpolated animations can be optimized to not create one equipment model for each tick
 // TODO: emissivity maps and textures only used for generation can be deleted from final resource pack
 // fixme: duplicate images written to pack for same interpolation transitions
-class EquipmentContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
+/**
+ * Generates equipment assets.
+ */
+class EquipmentTask internal constructor(private val builder: ResourcePackBuilder) : PackTask {
     
-    private val textureContent by builder.getHolderLazily<TextureContent>()
+    override val stage = BuildStage.PRE_WORLD
+    override val runAfter = setOf(ExtractTask::class)
+    
+    private val textureContent by builder.getBuildDataLazily<TextureContent>()
     
     /**
      * Caches interpolated textures.
@@ -55,11 +61,7 @@ class EquipmentContent internal constructor(private val builder: ResourcePackBui
     private val interpolationCache = HashMap<Pair<ResourcePath<ResourceType.PngFile>, ResourcePath<ResourceType.PngFile>>, Int2ObjectMap<BufferedImage>>()
     private var generatedCount = 0
     
-    @PackTask(
-        stage = BuildStage.PRE_WORLD,
-        runAfter = ["ExtractTask#extractAll"]
-    )
-    private fun write() {
+    override suspend fun run() {
         ResourceLookups.EQUIPMENT = NovaRegistries.EQUIPMENT.associateWith { equipment ->
             val path = ResourcePath.of(ResourceType.Equipment, equipment.id)
             when (val layout = equipment.makeLayout(builder)) {

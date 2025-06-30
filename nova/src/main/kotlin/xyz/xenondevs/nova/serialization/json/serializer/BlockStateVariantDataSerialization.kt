@@ -10,7 +10,7 @@ import xyz.xenondevs.commons.gson.getIntOrNull
 import xyz.xenondevs.commons.gson.getString
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
-import xyz.xenondevs.nova.resources.builder.task.model.BlockStateVariantData
+import xyz.xenondevs.nova.resources.builder.task.BlockStateVariantData
 import java.lang.reflect.Type
 
 internal object BlockStateVariantDataSerialization : JsonSerializer<BlockStateVariantData>, JsonDeserializer<BlockStateVariantData> {

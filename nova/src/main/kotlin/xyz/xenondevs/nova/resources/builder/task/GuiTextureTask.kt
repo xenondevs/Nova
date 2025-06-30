@@ -1,11 +1,10 @@
-package xyz.xenondevs.nova.resources.builder.task.font
+package xyz.xenondevs.nova.resources.builder.task
 
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
@@ -19,16 +18,21 @@ internal class GuiTextureData(
     val offset: Int
 )
 
-class GuiContent internal constructor(
+/**
+ * Generates gui texture assets.
+ */
+class GuiTextureTask internal constructor(
     builder: ResourcePackBuilder
 ) : CustomFontContent(
     builder,
     "nova:gui_%s",
     true
-) {
+), PackTask {
     
-    @PackTask(runBefore = ["FontContent#write"])
-    private fun write() {
+    override val stage = BuildStage.PRE_WORLD
+    override val runBefore = setOf(FontContent.Write::class)
+    
+    override suspend fun run() {
         val guiTextures = HashMap<GuiTexture, GuiTextureData>()
         
         for (guiTexture in NovaRegistries.GUI_TEXTURE) {

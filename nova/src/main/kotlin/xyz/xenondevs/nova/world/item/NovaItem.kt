@@ -37,7 +37,7 @@ import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacke
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
-import xyz.xenondevs.nova.resources.builder.task.model.VanillaMaterialTypes
+import xyz.xenondevs.nova.resources.builder.task.VanillaMaterialTypes
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.unwrap

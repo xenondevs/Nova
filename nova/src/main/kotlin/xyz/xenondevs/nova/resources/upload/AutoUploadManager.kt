@@ -1,6 +1,9 @@
 package xyz.xenondevs.nova.resources.upload
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.Serializable
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.resource.ResourcePackInfo
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
@@ -11,148 +14,90 @@ import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.integration.HooksLoader
-import xyz.xenondevs.nova.resources.ResourceGeneration
-import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.upload.service.CustomMultiPart
-import xyz.xenondevs.nova.resources.upload.service.S3
 import xyz.xenondevs.nova.resources.upload.service.SelfHost
-import xyz.xenondevs.nova.util.data.http.ConnectionUtils
-import java.nio.file.Path
-import kotlin.io.path.exists
+import xyz.xenondevs.nova.util.data.HashUtils
+import java.net.URI
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+
+private const val PACK_URLS_KEY = "resource_pack_urls"
+
+@Serializable
+private class UploadedPack(
+    val hashHex: String,
+    val url: String
+) {
+    
+    constructor(bin: ByteArray, url: String) : this(
+        HexFormat.of().formatHex(HashUtils.getHash(bin, "SHA1")),
+        url
+    )
+    
+}
 
 @InternalInit(
-    stage = InternalInitStage.POST_WORLD,
+    stage = InternalInitStage.PRE_WORLD,
     dispatcher = Dispatcher.ASYNC,
-    dependsOn = [HooksLoader::class, ResourceGeneration.PostWorld::class]
 )
 internal object AutoUploadManager {
     
-    internal val services = arrayListOf(SelfHost, CustomMultiPart, S3)
+    private val SERVICES = listOf(SelfHost)//, CustomMultiPart, S3)
     
-    var enabled = false
-        private set
-    var wasRegenerated = false
-    private var explicitUrl = false
+    private var enabled = false
     private var selectedService: UploadService? = null
     
-    private var url: String? = PermanentStorage.retrieve("resourcePackURL")
-        set(value) {
-            field = value
-            PermanentStorage.store("resourcePackURL", value)
-        }
-    private var lastConfig: Int? = PermanentStorage.retrieve("lastUploadConfig")
-        set(value) {
-            field = value
-            PermanentStorage.store("lastUploadConfig", value)
-        }
+    private var uploadedPacks: MutableMap<Key, UploadedPack> =
+        ConcurrentHashMap(PermanentStorage.retrieve<Map<Key, UploadedPack>>(PACK_URLS_KEY) ?: emptyMap())
     
     @InitFun
-    private fun init() {
+    private suspend fun init() {
         val cfg = MAIN_CONFIG.strongNode("resource_pack")
-        cfg.subscribe { disable(); enable(it, fromReload = true) }
-        enable(cfg.get(), fromReload = false)
-        
-        if (url != null)
-            forceResourcePack()
-        
-        if (selectedService == SelfHost)
-            SelfHost.startedLatch.await()
+        cfg.subscribe { runBlocking { disable(); enable(it) } }
+        enable(cfg.get())
     }
     
-    private fun enable(cfg: ConfigurationNode, fromReload: Boolean) {
+    private suspend fun enable(cfg: ConfigurationNode) {
         val autoUploadCfg = cfg.node("auto_upload")
         enabled = autoUploadCfg.node("enabled").boolean
-        
-        if (cfg.hasChild("url")) {
-            val url = cfg.node("url").string
-            if (!url.isNullOrEmpty()) {
-                if (enabled)
-                    LOGGER.warn("The resource pack url is set in the config, but the auto upload is also enabled. Defaulting to the url in the config.")
-                explicitUrl = true
-                if (this.url != url) {
-                    this.url = url
-                    if (fromReload)
-                        forceResourcePack()
-                }
-                return
-            }
-        }
-        
-        if (!enabled) {
-            this.url = null
+        if (!enabled)
             return
-        }
         
         val serviceName = autoUploadCfg.node("service").string?.lowercase()
-        if (serviceName != null) {
-            val service = services.find { serviceName in it.names }
-            checkNotNull(service) { "Service $serviceName not found!" }
-            service.loadConfig(autoUploadCfg)
-            
-            selectedService = service
-        } else {
-            LOGGER.warn("No uploading service specified! Available: " + services.joinToString { it.names[0] })
+        if (serviceName == null) {
+            LOGGER.warn("No uploading service specified. Available: " + SERVICES.joinToString { it.names.first() })
             return
         }
         
-        val configHash = autoUploadCfg.hashCode()
-        if (wasRegenerated || lastConfig != configHash) {
-            wasRegenerated = false
-            runBlocking {
-                val url = uploadPack(ResourcePackBuilder.RESOURCE_PACK_FILE)
-                if (url == null)
-                    LOGGER.warn("The resource pack was not uploaded. (Misconfigured auto uploader?)")
-            }
-            lastConfig = configHash
-            
-            if (fromReload)
-                forceResourcePack()
+        selectedService = SERVICES.firstOrNull { serviceName in it.names }
+        if (selectedService == null) {
+            LOGGER.warn("Upload service with name '$serviceName' does not exist. Available: " + SERVICES.joinToString { it.names.first() })
+            return
         }
+        
+        selectedService?.enable(cfg.node("auto_upload"))
     }
     
     @DisableFun(dispatcher = Dispatcher.ASYNC)
-    private fun disable() {
+    private suspend fun disable() {
+        PermanentStorage.store(PACK_URLS_KEY, uploadedPacks)
         selectedService?.disable()
         selectedService = null
     }
     
-    suspend fun uploadPack(pack: Path): String? {
-        try {
-            if (selectedService == SelfHost)
-                SelfHost.startedLatch.await()
-            
-            require(pack.exists()) { pack + " not found!" }
-            
-            this.url = selectedService?.upload(pack)
-        } catch (e: Exception) {
-            LOGGER.error("Failed to upload the resource pack!", e)
+    suspend fun uploadPack(id: Key, bin: ByteArray): String? {
+        val url = selectedService?.upload(getPackUuid(id), bin)
+        if (url != null) {
+            uploadedPacks[id] = UploadedPack(bin, url)
         }
-        
-        forceResourcePack()
         return url
     }
     
-    private fun forceResourcePack() {
-        if (selectedService == SelfHost)
-            SelfHost.startedLatch.await()
-        
-        val url = url
-        if (url != null && !ConnectionUtils.isURL(url)) {
-            if (selectedService == CustomMultiPart) {
-                LOGGER.error("Invalid resource pack URL: $url. Please check your CustomMultiPart config!")
-                if (CustomMultiPart.urlRegex != null)
-                    LOGGER.error("Your urlRegex might be wrong: ${CustomMultiPart.urlRegex}")
-            } else if (enabled) {
-                LOGGER.error("Server responded with an invalid pack URL: $url")
-            } else {
-                LOGGER.error("Invalid resource pack URL: $url")
-            }
-            this.url = null
-            return
-        }
-        
-        ForceResourcePack.setResourcePack(url)
+    fun getPackUuid(id: Key): UUID =
+        UUID.nameUUIDFromBytes(id.toString().encodeToByteArray())
+    
+    fun getPackInfo(id: Key): ResourcePackInfo? {
+        val pack = uploadedPacks[id] ?: return null
+        return ResourcePackInfo.resourcePackInfo(getPackUuid(id), URI(pack.url), pack.hashHex)
     }
     
 }

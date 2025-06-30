@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.resources.builder.model.transform
 
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
-import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.resources.builder.task.ModelContent
 
 /**
  * A combination of two models.

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.builder.task.font
+package xyz.xenondevs.nova.resources.builder.task
 
 import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
@@ -8,12 +8,13 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.Font
 import xyz.xenondevs.nova.resources.builder.font.provider.ReferenceProvider
 import xyz.xenondevs.nova.resources.builder.font.provider.SpaceProvider
-import xyz.xenondevs.nova.resources.builder.task.PackTask
-import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import kotlin.math.pow
 
-class MoveCharactersContent(private val builder: ResourcePackBuilder) : PackTaskHolder {
+/**
+ * Generates horizontal move characters.
+ */
+class MoveCharactersTask(builder: ResourcePackBuilder) : PackTask {
     
     companion object {
         
@@ -23,9 +24,13 @@ class MoveCharactersContent(private val builder: ResourcePackBuilder) : PackTask
         
     }
     
-    @PackTask(runAfter = ["FontContent#discoverAllFonts"], runBefore = ["MovedFontContent#write", "FontContent#write"])
-    private fun write() {
-        val fontContent = builder.getHolder<FontContent>()
+    override val stage = BuildStage.PRE_WORLD
+    override val runAfter = setOf(FontContent.DiscoverAllFonts::class)
+    override val runBefore = setOf(MovedFontContent.Write::class, FontContent.Write::class)
+    
+    private val fontContent by builder.getBuildDataLazily<FontContent>()
+    
+    override suspend fun run() {
         val mergedFonts = fontContent.mergedFonts
         
         val codePoints = IntOpenHashSet()

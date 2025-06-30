@@ -77,7 +77,7 @@ internal object MathUtils {
         var a = a
         var b = b
         while (b > 0) {
-            var temp = b
+            val temp = b
             b = a % b
             a = temp
         }
@@ -110,10 +110,16 @@ internal object MathUtils {
         return gcd
     }
     
+    /**
+     * Returns the greatest common divisor of all numbers in [numbers].
+     */
     fun gcd(numbers: Iterable<Int>): Int {
         return gcd(numbers.iterator())
     }
     
+    /**
+     * Returns the greatest common divisor of all numbers in [numbers].
+     */
     fun gcd(numbers: Sequence<Int>): Int {
         return gcd(numbers.iterator())
     }
@@ -136,6 +142,10 @@ internal object MathUtils {
         return lcm
     }
     
+    /**
+     * Encodes [array] as an [Int] by treating each element as a bit,
+     * where the first element is the least significant bit.
+     */
     fun convertBooleanArrayToInt(array: BooleanArray): Int {
         var i = 0
         for (element in array) {

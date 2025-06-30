@@ -1,16 +1,16 @@
 package xyz.xenondevs.nova.resources.upload
 
 import org.spongepowered.configurate.ConfigurationNode
-import java.nio.file.Path
+import java.util.*
 
-interface UploadService {
+internal interface UploadService {
     
-    val names: List<String>
+    val names: Set<String>
     
-    fun loadConfig(cfg: ConfigurationNode)
+    suspend fun enable(cfg: ConfigurationNode)
     
-    suspend fun upload(file: Path): String
+    suspend fun disable()
     
-    fun disable()
+    suspend fun upload(id: UUID, bin: ByteArray): String
     
 }

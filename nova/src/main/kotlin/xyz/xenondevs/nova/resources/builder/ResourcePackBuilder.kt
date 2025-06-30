@@ -2,77 +2,78 @@ package xyz.xenondevs.nova.resources.builder
 
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
-import com.google.gson.JsonObject
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import net.minecraft.SharedConstants
 import net.minecraft.server.packs.PackType
+import org.apache.commons.io.output.ByteArrayOutputStream
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.commons.provider.MutableProvider
-import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.flattenIterables
-import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.commons.reflection.simpleNestedName
 import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_JAR
-import xyz.xenondevs.nova.PREVIOUS_NOVA_VERSION
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.resources.AutoCopier
+import xyz.xenondevs.nova.resources.ResourcePackManager
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourceFilter.Type
-import xyz.xenondevs.nova.resources.builder.basepack.BasePacks
-import xyz.xenondevs.nova.resources.builder.task.AtlasContent
-import xyz.xenondevs.nova.resources.builder.task.BarOverlayTask
+import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder.Companion.configure
+import xyz.xenondevs.nova.resources.builder.data.PackMcMeta
+import xyz.xenondevs.nova.resources.builder.task.AtlasTask
+import xyz.xenondevs.nova.resources.builder.task.BlockModelContent
+import xyz.xenondevs.nova.resources.builder.task.BossBarOverlayTask
 import xyz.xenondevs.nova.resources.builder.task.BuildStage
-import xyz.xenondevs.nova.resources.builder.task.EntityVariantContent
-import xyz.xenondevs.nova.resources.builder.task.EquipmentContent
+import xyz.xenondevs.nova.resources.builder.task.CharSizeCalculator
+import xyz.xenondevs.nova.resources.builder.task.EntityVariantTask
+import xyz.xenondevs.nova.resources.builder.task.EquipmentTask
 import xyz.xenondevs.nova.resources.builder.task.ExtractTask
+import xyz.xenondevs.nova.resources.builder.task.FontContent
+import xyz.xenondevs.nova.resources.builder.task.GuiTextureTask
+import xyz.xenondevs.nova.resources.builder.task.ItemModelContent
 import xyz.xenondevs.nova.resources.builder.task.LanguageContent
-import xyz.xenondevs.nova.resources.builder.task.PackFunction
-import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
+import xyz.xenondevs.nova.resources.builder.task.ModelContent
+import xyz.xenondevs.nova.resources.builder.task.MoveCharactersTask
+import xyz.xenondevs.nova.resources.builder.task.MovedFontContent
+import xyz.xenondevs.nova.resources.builder.task.PackBuildData
+import xyz.xenondevs.nova.resources.builder.task.PackTask
+import xyz.xenondevs.nova.resources.builder.task.SoundOverridesTask
 import xyz.xenondevs.nova.resources.builder.task.TextureContent
+import xyz.xenondevs.nova.resources.builder.task.TextureIconContent
 import xyz.xenondevs.nova.resources.builder.task.TooltipStyleContent
-import xyz.xenondevs.nova.resources.builder.task.font.FontContent
-import xyz.xenondevs.nova.resources.builder.task.font.GuiContent
-import xyz.xenondevs.nova.resources.builder.task.font.MoveCharactersContent
-import xyz.xenondevs.nova.resources.builder.task.font.MovedFontContent
-import xyz.xenondevs.nova.resources.builder.task.font.TextureIconContent
-import xyz.xenondevs.nova.resources.builder.task.font.WailaContent
-import xyz.xenondevs.nova.resources.builder.task.model.BlockModelContent
-import xyz.xenondevs.nova.resources.builder.task.model.ItemModelContent
-import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
-import xyz.xenondevs.nova.serialization.json.GSON
+import xyz.xenondevs.nova.resources.builder.task.WailaTask
+import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
+import xyz.xenondevs.nova.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.util.data.writeJson
-import xyz.xenondevs.nova.util.runAsyncTask
 import java.awt.image.BufferedImage
-import java.io.File
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Path
+import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.createDirectories
-import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
-import kotlin.io.path.outputStream
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
-import kotlin.io.path.writeText
 import kotlin.time.Duration
 import kotlin.time.measureTime
 
@@ -108,68 +109,122 @@ private val CORE_RESOURCE_FILTERS by combinedProvider(listOf(
 
 private val COMPRESSION_LEVEL by MAIN_CONFIG.entry<Int>("resource_pack", "generation", "compression_level")
 private val PACK_DESCRIPTION by MAIN_CONFIG.entry<String>("resource_pack", "generation", "description")
-private val IN_MEMORY_PROVIDER = MAIN_CONFIG.entry<Boolean>("resource_pack", "generation", "in_memory")
-private val IN_MEMORY by IN_MEMORY_PROVIDER
 
 private val SKIP_PACK_TASKS: Set<String> by MAIN_CONFIG.entry<HashSet<String>>("debug", "skip_pack_tasks")
 
-class ResourcePackBuilder internal constructor() {
+class ResourcePackBuilder internal constructor(
+    val id: Key,
+    val logger: ComponentLogger
+) {
     
     companion object {
         
         /**
          * The resource pack format version of the current Minecraft version.
          */
-        val PACK_VERSION = SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES)
-        
-        private val JIMFS_PROVIDER: MutableProvider<FileSystem> = mutableProvider { Jimfs.newFileSystem(Configuration.unix()) }
-        
-        //<editor-fold desc="never in memory">
-        val RESOURCE_PACK_FILE: Path = DATA_FOLDER.resolve("resource_pack/ResourcePack.zip")
-        val RESOURCE_PACK_DIR: Path = DATA_FOLDER.resolve("resource_pack")
-        val BASE_PACKS_DIR: Path = RESOURCE_PACK_DIR.resolve("base_packs")
-        val MCASSETS_DIR: Path = RESOURCE_PACK_DIR.resolve(".mcassets")
-        val MCASSETS_ASSETS_DIR: Path = MCASSETS_DIR.resolve("assets")
-        //</editor-fold>
-        
-        //<editor-fold desc="potentially in memory">
-        private val RESOURCE_PACK_BUILD_DIR_PROVIDER: Provider<Path> = IN_MEMORY_PROVIDER.flatMap { inMemory -> 
-            if (inMemory) 
-                JIMFS_PROVIDER.map { it.rootDirectories.first() } 
-            else provider(RESOURCE_PACK_DIR.resolve(".build"))
-        }
-        private val TEMP_BASE_PACKS_DIR_PROVIDER: Provider<Path> = RESOURCE_PACK_BUILD_DIR_PROVIDER.map { it.resolve("base_packs") }
-        private val PACK_DIR_PROVIDER: Provider<Path> = RESOURCE_PACK_BUILD_DIR_PROVIDER.map { it.resolve("pack") }
-        private val ASSETS_DIR_PROVIDER: Provider<Path> = PACK_DIR_PROVIDER.map { it.resolve("assets") }
-        private val MINECRAFT_ASSETS_DIR_PROVIDER: Provider<Path> = ASSETS_DIR_PROVIDER.map { it.resolve("minecraft") }
-        private val LANGUAGE_DIR_PROVIDER: Provider<Path> = MINECRAFT_ASSETS_DIR_PROVIDER.map { it.resolve("lang") }
-        private val FONT_DIR_PROVIDER: Provider<Path> = ASSETS_DIR_PROVIDER.map { it.resolve("nova/font") }
-        private val PACK_MCMETA_FILE_PROVIDER: Provider<Path> = PACK_DIR_PROVIDER.map { it.resolve("pack.mcmeta") }
-        
-        val RESOURCE_PACK_BUILD_DIR: Path by RESOURCE_PACK_BUILD_DIR_PROVIDER
-        val TEMP_BASE_PACKS_DIR: Path by TEMP_BASE_PACKS_DIR_PROVIDER
-        val PACK_DIR: Path by PACK_DIR_PROVIDER
-        val ASSETS_DIR: Path by ASSETS_DIR_PROVIDER
-        val MINECRAFT_ASSETS_DIR: Path by MINECRAFT_ASSETS_DIR_PROVIDER
-        val LANGUAGE_DIR: Path by LANGUAGE_DIR_PROVIDER
-        val FONT_DIR: Path by FONT_DIR_PROVIDER
-        val PACK_MCMETA_FILE: Path by PACK_MCMETA_FILE_PROVIDER
-        //</editor-fold>
+        val PACK_VERSION: Int = SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES)
         
         /**
-         * A list of all [ResourceFilters][ResourceFilter] registered by addons.
+         * The id of the core resource pack (``nova:core``).
          */
+        val CORE_PACK_ID: Key = Key.key("nova", "core")
+        
+        internal val MCASSETS_DIR: Path = DATA_FOLDER.resolve("resource_pack/.mcassets")
+        private val MCASSETS_DOWNLOAD_MUTEX = Mutex()
+        
         private val customResourceFilters = ArrayList<ResourceFilter>()
+        private val _configurations = ConcurrentHashMap<Key, ResourcePackConfiguration>()
         
         /**
-         * A list of constructors for [PackTaskHolders][PackTaskHolder] that should be used to build the resource pack.
+         * The registered [ResourcePackConfigurations][ResourcePackConfiguration] by their [id][Key].
          */
-        private val holderCreators: MutableList<(ResourcePackBuilder) -> PackTaskHolder> = mutableListOf(
-            ::ExtractTask, ::EquipmentContent, ::GuiContent, ::LanguageContent, ::TextureIconContent,
-            ::AtlasContent, ::WailaContent, ::MovedFontContent, ::CharSizeCalculator, ::SoundOverrides, ::FontContent,
-            ::BarOverlayTask, ::MoveCharactersContent, ::ModelContent, ::BlockModelContent,
-            ::ItemModelContent, ::TextureContent, ::TooltipStyleContent, ::EntityVariantContent
-        )
+        val configurations: Map<Key, ResourcePackConfiguration>
+            get() = _configurations
+        
+        init {
+            register(CORE_PACK_ID) {
+                registerBuildData(::BasePacks)
+                registerTask(BasePacks::Include)
+                
+                registerBuildData(::FontContent)
+                registerTask(FontContent::DiscoverAllFonts)
+                registerTask(FontContent::Write)
+                
+                registerBuildData(::MovedFontContent)
+                registerTask(MovedFontContent::Write)
+                
+                registerBuildData(::TextureIconContent)
+                registerTask(TextureIconContent::Write)
+                
+                registerBuildData(::ItemModelContent)
+                registerTask(ItemModelContent::GenerateItemDefinitions)
+                registerTask(ItemModelContent::Write)
+                
+                registerBuildData(::ModelContent)
+                registerTask(ModelContent::DiscoverAllModels)
+                registerTask(ModelContent::Write)
+                
+                registerBuildData(::LanguageContent)
+                registerTask(LanguageContent::Write)
+                
+                registerTask(::AtlasTask)
+                registerTask(::BossBarOverlayTask)
+                registerTask(::GuiTextureTask)
+                registerTask(::MoveCharactersTask)
+                registerTask(::WailaTask)
+                registerTask(::BlockModelContent)
+                registerTask(::EntityVariantTask)
+                registerTask(::EquipmentTask)
+                registerTask(::ExtractTask)
+                registerBuildData(::TextureContent)
+                registerTask(::TooltipStyleContent)
+                registerTask(::CharSizeCalculator)
+                registerTask(::SoundOverridesTask)
+            }
+        }
+        
+        /**
+         * Registers a new [ResourcePackConfiguration] with [id] and [configures][configure] it.
+         * @throws IllegalArgumentException If [id] is already in use.
+         */
+        fun register(id: Key, configure: ResourcePackConfiguration.() -> Unit) {
+            require(id !in configurations) { "Id $id is already in use" }
+            _configurations[id] = ResourcePackConfiguration(id).apply(configure)
+        }
+        
+        /**
+         * [Configures][configure] the existing [ResourcePackConfiguration] under [id].
+         * @throws IllegalArgumentException If there is no [ResourcePackConfiguration] registered for [id].
+         */
+        fun configure(id: Key, configure: ResourcePackConfiguration.() -> Unit) {
+            val configuration = configurations[id]
+            requireNotNull(configuration) { "No ResourcePackBuilderFactory registered for id $id" }
+            configuration.configure()
+        }
+        
+        /**
+         * Creates a new [ResourcePackBuilder] using the configuration under [id].
+         * @throws IllegalArgumentException If there is no [ResourcePackConfiguration] registered for [id].
+         */
+        internal fun createBuilder(id: Key): ResourcePackBuilder {
+            val configuration = configurations[id]
+            requireNotNull(configuration) { "No ResourcePackBuilderFactory registered for id $id" }
+            return configuration.create()
+        }
+        
+        /**
+         * Builds and uploads the resource pack with the specified [id].
+         * If [sendToPlayers] is `true`, the pack will also be sent to all online players that have the pack enabled.
+         * @throws IllegalArgumentException If there is no [ResourcePackConfiguration] registered for [id].
+         */
+        suspend fun build(id: Key, sendToPlayers: Boolean = true) {
+            val bin = createBuilder(id).build()
+            AutoUploadManager.uploadPack(id, bin)
+            AutoCopier.copyToDestinations(id, bin)
+            
+            if (sendToPlayers)
+                ResourcePackManager.handlePackUpdated(id)
+        }
         
         /**
          * Registers the specified [filters].
@@ -178,129 +233,79 @@ class ResourcePackBuilder internal constructor() {
             customResourceFilters += filters
         }
         
-        /**
-         * Registers specified [holderCreators].
-         */
-        fun registerTaskHolders(vararg holderCreators: (ResourcePackBuilder) -> PackTaskHolder) {
-            this.holderCreators += holderCreators
+        private suspend fun downloadMcAssets(): Unit = MCASSETS_DOWNLOAD_MUTEX.withLock {
+            if (!MCASSETS_DIR.exists() || PermanentStorage.retrieve<Version>("minecraft_assets_version") != SERVER_VERSION) {
+                MCASSETS_DIR.toFile().deleteRecursively()
+                val downloader = MinecraftAssetsDownloader(
+                    version = SERVER_VERSION.toString(omitZeros = true),
+                    outputDirectory = MCASSETS_DIR.toFile(),
+                    mode = EXTRACTION_MODE,
+                    logger = LOGGER
+                )
+                try {
+                    downloader.downloadAssets()
+                } catch (ex: Exception) {
+                    throw IllegalStateException(buildString {
+                        append("Failed to download minecraft assets. Check your firewall settings.")
+                        if (EXTRACTION_MODE == ExtractionMode.GITHUB)
+                            append(" If your server can't access github.com in general, you can change \"minecraft_assets_source\" in the config to \"mojang\".")
+                    }, ex)
+                }
+                PermanentStorage.store("minecraft_assets_version", SERVER_VERSION)
+            }
         }
         
     }
     
-    val basePacks = BasePacks(this)
-    lateinit var assetPacks: List<AssetPack> private set
+    private lateinit var fs: FileSystem
+    private val buildDir: Path
+        get() = fs.rootDirectories.first()
     
     @PublishedApi
-    internal lateinit var holders: List<PackTaskHolder>
-    private lateinit var tasksByStage: Map<BuildStage, List<PackFunction>>
-    private val taskTimes = HashMap<PackFunction, Duration>()
-    private var totalTime: Duration = Duration.ZERO
+    internal lateinit var data: List<PackBuildData>
+    internal lateinit var tasks: Map<BuildStage, List<PackTask>>
+    lateinit var assetPacks: List<AssetPack> private set
+    private val resourceFilters: Map<ResourceFilter.Stage, List<ResourceFilter>> =
+        sequenceOf(CONFIG_RESOURCE_FILTERS, CORE_RESOURCE_FILTERS, customResourceFilters)
+            .flatten().groupByTo(enumMap()) { it.stage }
     
-    private val resourceFilters = sequenceOf(CONFIG_RESOURCE_FILTERS, CORE_RESOURCE_FILTERS, customResourceFilters)
-        .flatten().groupByTo(enumMap()) { it.stage }
+    private val taskTimes = HashMap<PackTask, Duration>()
+    private var totalTime: Duration = Duration.ZERO // fixme: total duration ends up being less than task sum durations, why?
     
-    init {
-        // delete legacy resource pack files
-        File(DATA_FOLDER.toFile(), "ResourcePack").deleteRecursively()
-        File(RESOURCE_PACK_DIR.toFile(), "asset_packs").deleteRecursively()
-        File(RESOURCE_PACK_DIR.toFile(), "pack").deleteRecursively()
-        if (!IN_MEMORY) RESOURCE_PACK_BUILD_DIR.toFile().deleteRecursively()
-        
-        if (PREVIOUS_NOVA_VERSION != null && PREVIOUS_NOVA_VERSION < Version("0.10")) {
-            BASE_PACKS_DIR.toFile().delete()
-        }
-        
-        // create base packs folder
-        BASE_PACKS_DIR.createDirectories()
-    }
-    
-    internal fun buildPackCompletely() {
-        LOGGER.info("Building resource pack")
+    internal suspend fun build(): ByteArray {
+        logger.info("Building resource pack $id")
         buildPackPreWorld()
-        buildPackPostWorld()
+        return buildPackPostWorld()
     }
     
-    internal fun buildPackPreWorld() {
+    internal suspend fun buildPackPreWorld() {
+        fs = Jimfs.newFileSystem(Configuration.unix())
         try {
             totalTime += measureTime {
-                // download minecraft assets if not present / outdated
-                if (!MCASSETS_DIR.exists() || PermanentStorage.retrieve<Version>("minecraftAssetsVersion") != SERVER_VERSION) {
-                    MCASSETS_DIR.toFile().deleteRecursively()
-                    runBlocking {
-                        val downloader = MinecraftAssetsDownloader(
-                            version = SERVER_VERSION.toString(omitZeros = true),
-                            outputDirectory = MCASSETS_DIR.toFile(),
-                            mode = EXTRACTION_MODE,
-                            logger = LOGGER
-                        )
-                        try {
-                            downloader.downloadAssets()
-                        } catch (ex: Exception) {
-                            throw IllegalStateException(buildString {
-                                append("Failed to download minecraft assets. Check your firewall settings.")
-                                if (EXTRACTION_MODE == ExtractionMode.GITHUB)
-                                    append(" If your server can't access github.com in general, you can change \"minecraft_assets_source\" in the config to \"mojang\".")
-                            }, ex)
-                        }
-                        PermanentStorage.store("minecraftAssetsVersion", SERVER_VERSION)
-                    }
-                }
-                
-                // sort and instantiate holders
-                holders = holderCreators.map { it(this) }
-                tasksByStage = PackFunction.getAndSortFunctions(holders).groupBy { it.stage }
+                downloadMcAssets()
                 logTaskOrder()
-                
-                // load asset packs
                 assetPacks = loadAssetPacks()
-                LOGGER.info("Asset packs (${assetPacks.size}): ${assetPacks.joinToString(transform = AssetPack::namespace)}")
-                
-                // merge base packs
-                basePacks.include()
-                
-                // run pack tasks
-                LOGGER.info("Running pre-world pack tasks")
-                runBlocking { tasksByStage[BuildStage.PRE_WORLD]?.forEach { runPackFunction(it) } }
+                logger.info("Asset packs (${assetPacks.size}): ${assetPacks.joinToString(transform = AssetPack::namespace)}")
+                writePackMcMeta()
+                tasks[BuildStage.PRE_WORLD]?.forEach { runTaskTimed(it) }
             }
         } catch (t: Throwable) {
-            // Only delete build dir in case of exception as building is continued in buildPostWorld()
-            deleteBuildDir()
+            fs.close()
             throw t
         }
     }
     
-    internal fun buildPackPostWorld() {
+    internal suspend fun buildPackPostWorld(): ByteArray {
+        check(fs.isOpen) { "FileSystem is closed" }
         try {
             totalTime += measureTime {
-                // write post-world content
-                LOGGER.info("Running post-world pack tasks")
-                runBlocking { tasksByStage[BuildStage.POST_WORLD]?.forEach { runPackFunction(it) } }
-                
-                // write metadata
-                writeMetadata(assetPacks.size, basePacks.packAmount)
-                
-                // create zip
-                createZip()
+                tasks[BuildStage.POST_WORLD]?.forEach { runTaskTimed(it) }
+                val bin = createZip()
                 logTaskTimes()
-                
-                // delete build dir asynchronously
-                runAsyncTask { deleteBuildDir() }
+                return bin
             }
-        } catch (t: Throwable) {
-            // delete build dir
-            deleteBuildDir()
-            // re-throw t
-            throw t
-        }
-    }
-    
-    private fun deleteBuildDir() {
-        if (IN_MEMORY) {
-            val jimfs = JIMFS_PROVIDER.get()
-            jimfs.close()
-            JIMFS_PROVIDER.set(Jimfs.newFileSystem(Configuration.unix()))
-        } else {
-            RESOURCE_PACK_BUILD_DIR.toFile().deleteRecursively()
+        } finally {
+            fs.close()
         }
     }
     
@@ -315,59 +320,55 @@ class ResourcePackBuilder internal constructor() {
         }
     }
     
-    private fun writeMetadata(assetPacks: Int, basePacks: Int) {
-        val packMcmetaObj = JsonObject()
-        val packObj = JsonObject().also { packMcmetaObj.add("pack", it) }
-        packObj.addProperty("pack_format", PACK_VERSION)
-        packObj.addProperty("description", PACK_DESCRIPTION.format(assetPacks, basePacks))
-        
-        PACK_MCMETA_FILE.parent.createDirectories()
-        PACK_MCMETA_FILE.writeText(GSON.toJson(packMcmetaObj))
+    private fun writePackMcMeta() {
+        resolve("pack.mcmeta").writeJson(PackMcMeta(
+            pack = PackMcMeta.Pack(
+                description = PACK_DESCRIPTION.format(id),
+                packFormat = PACK_VERSION,
+            )
+        ))
     }
     
-    private fun createZip() {
-        // delete old zip file
-        RESOURCE_PACK_FILE.deleteIfExists()
-        
-        // pack zip
-        LOGGER.info("Packing zip...")
+    private fun createZip(): ByteArray {
+        logger.info("Packing zip...")
         val filters = getResourceFilters(ResourceFilter.Stage.RESOURCE_PACK)
-        ZipOutputStream(RESOURCE_PACK_FILE.outputStream()).use { zip ->
+        
+        val out = ByteArrayOutputStream()
+        ZipOutputStream(out).use { zip ->
             zip.setLevel(COMPRESSION_LEVEL)
-            PACK_DIR.walk()
+            buildDir.walk()
                 .filter { path -> path.isRegularFile() }
-                .filter { path -> filters.all { filter -> filter.allows(path.relativeTo(ASSETS_DIR).invariantSeparatorsPathString) } }
+                .filter { path -> filters.all { filter -> filter.allows(path.relativeTo(resolve("assets/")).invariantSeparatorsPathString) } }
                 .forEach { path ->
-                    zip.putNextEntry(ZipEntry(path.relativeTo(PACK_DIR).invariantSeparatorsPathString))
+                    zip.putNextEntry(ZipEntry(path.relativeTo(buildDir).invariantSeparatorsPathString))
                     path.inputStream().use { it.copyTo(zip) }
                 }
         }
-    }
-    
-    private suspend fun runPackFunction(func: PackFunction) {
-        if (func.toString() in SKIP_PACK_TASKS)
-            return
         
-        taskTimes[func] = measureTime { func.run() }
+        return out.toByteArray()
     }
     
     private fun logTaskOrder() {
-        LOGGER.info("Tasks (${tasksByStage.values.sumOf(List<*>::size)}):")
-        for ((stage, tasks) in tasksByStage) {
-            LOGGER.info("  $stage (${tasks.size}):")
+        logger.info("Tasks (${tasks.values.sumOf(List<*>::size)}):")
+        for ((stage, tasks) in tasks) {
+            logger.info("  $stage (${tasks.size}):")
             for (task in tasks) {
                 val skipped = task.toString() in SKIP_PACK_TASKS
-                LOGGER.info("    $task" + if (skipped) " (skipped)" else "")
+                logger.info("    ${task::class.simpleNestedName}" + if (skipped) " (skipped)" else "")
             }
         }
     }
     
+    private suspend fun runTaskTimed(task: PackTask) {
+        taskTimes[task] = measureTime { task.run() }
+    }
+    
     private fun logTaskTimes() {
-        LOGGER.info("Resource pack built in ${totalTime}:")
+        logger.info("Resource pack built in ${totalTime}:")
         taskTimes.entries.asSequence()
             .sortedByDescending { it.value }
             .take(5)
-            .forEach { (task, time) -> LOGGER.info("  $task: $time") }
+            .forEach { (task, time) -> logger.info("  ${task::class.simpleNestedName}: $time") }
     }
     
     /**
@@ -377,20 +378,20 @@ class ResourcePackBuilder internal constructor() {
         resourceFilters[stage] ?: emptyList()
     
     /**
-     * Retrieves the instantiated [PackTaskHolder] of the specified type.
+     * Retrieves the instantiated [PackBuildData] of the specified type.
      *
      * @throws IllegalArgumentException If no holder of the specified type is registered or hasn't been instantiated yet.
      */
-    inline fun <reified T : PackTaskHolder> getHolder(): T {
-        val holder = holders.firstOrNull { it is T }
+    inline fun <reified T : PackBuildData> getBuildData(): T {
+        val holder = data.firstOrNull { it is T }
             ?: throw IllegalArgumentException("No holder of type ${T::class.simpleName} is present")
         return holder as T
     }
     
     /**
-     * Creates a [Lazy] that retrieves an instantiated [PackTaskHolder] of the specified type.
+     * Creates a [Lazy] that retrieves an instantiated [PackBuildData] of the specified type.
      */
-    inline fun <reified T : PackTaskHolder> getHolderLazily(): Lazy<T> = lazy { getHolder<T>() }
+    inline fun <reified T : PackBuildData> getBuildDataLazily(): Lazy<T> = lazy { getBuildData<T>() }
     
     /**
      * Searches for a file under [path] in both the resource pack and vanilla minecraft assets,
@@ -420,6 +421,8 @@ class ResourcePackBuilder internal constructor() {
     
     /**
      * Resolves the file under [path] in the vanilla minecraft assets.
+     *
+     * Example paths: `pack.json`, `assets/minecraft/textures/block/dirt.png`
      */
     fun resolveVanilla(path: String): Path =
         MCASSETS_DIR.resolve(path)
@@ -428,13 +431,13 @@ class ResourcePackBuilder internal constructor() {
      * Resolves the file under [path] in the resource pack.
      */
     fun resolve(path: ResourcePath<*>): Path =
-        PACK_DIR.resolve(path.filePath)
+        buildDir.resolve(path.filePath)
     
     /**
      * Resolves the corresponding `.mcmeta` file for the specified [path].
      */
     fun resolveMeta(path: ResourcePath<ResourceType.HasMcMeta>): Path =
-        PACK_DIR.resolve("${path.filePath}.mcmeta")
+        buildDir.resolve("${path.filePath}.mcmeta")
     
     /**
      * Resolves the file under [path] in the resource pack.
@@ -442,7 +445,7 @@ class ResourcePackBuilder internal constructor() {
      * Example paths: `pack.json`, `assets/minecraft/textures/block/dirt.png`
      */
     fun resolve(path: String): Path =
-        PACK_DIR.resolve(path)
+        buildDir.resolve(path)
     
     /**
      * Deserializes the JSON content of the file under [path] in the resource pack
@@ -463,8 +466,8 @@ class ResourcePackBuilder internal constructor() {
         if (file.exists()) {
             try {
                 return file.readJson<V>(json)
-            } catch(e: Exception) {
-                LOGGER.error("An exception occurred trying to parse $file", e)
+            } catch (e: Exception) {
+                logger.error("An exception occurred trying to parse $file", e)
             }
         }
         

@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.builder.basepack.merger
+package xyz.xenondevs.nova.resources.builder.task.basepack.merger
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -8,7 +8,7 @@ import xyz.xenondevs.commons.gson.getIntOrNull
 import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.set
-import xyz.xenondevs.nova.resources.builder.basepack.BasePacks
+import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
 import xyz.xenondevs.nova.serialization.json.GSON
 import java.nio.file.Path
 import java.util.*

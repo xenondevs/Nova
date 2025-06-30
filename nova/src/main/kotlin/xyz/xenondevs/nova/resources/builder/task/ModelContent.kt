@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.builder.task.model
+package xyz.xenondevs.nova.resources.builder.task
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -7,13 +7,10 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.model.Model
-import xyz.xenondevs.nova.resources.builder.task.PackTask
-import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 import xyz.xenondevs.nova.util.data.readJson
 import java.nio.file.Path
 import kotlin.io.path.extension
@@ -26,10 +23,10 @@ import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 
 /**
- * A [PackTaskHolder] that deals with item/block model files.
+ * A [PackBuildData] that deals with item/block model files.
  * Everything related to item/block model files should run through this.
  */
-class ModelContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder, Iterable<Map.Entry<ResourcePath<ResourceType.Model>, Model>> {
+class ModelContent internal constructor(private val builder: ResourcePackBuilder) : PackBuildData, Iterable<Map.Entry<ResourcePath<ResourceType.Model>, Model>> {
     
     private val json = Json { ignoreUnknownKeys = true }
     
@@ -131,39 +128,6 @@ class ModelContent internal constructor(private val builder: ResourcePackBuilder
      */
     override fun iterator(): Iterator<Map.Entry<ResourcePath<ResourceType.Model>, Model>> = customModelsByPath.iterator()
     
-    @PackTask(runAfter = ["ExtractTask#extractAll"])
-    private suspend fun discoverAllModels() = coroutineScope {
-        val customModels = ArrayList<List<Deferred<Pair<ResourcePath<ResourceType.Model>, Model>>>>()
-        
-        // discover existing models (base packs)
-        ResourcePackBuilder.ASSETS_DIR.listDirectoryEntries()
-            .filter { it.isDirectory() }
-            .forEach { customModels += discoverModels(it.resolve("models"), it.name) }
-        
-        // discover models from asset packs
-        for (assetPack in builder.assetPacks) {
-            val modelsDir = assetPack.modelsDir ?: continue
-            customModels += discoverModels(modelsDir, assetPack.namespace)
-        }
-        
-        customModels.forEach {
-            it.awaitAll().forEach { (path, model) ->
-                customModelsByPath[path] = model
-                customModelsByModel.getOrPut(model, ::HashSet) += path
-            }
-        }
-    }
-    
-    private fun CoroutineScope.discoverModels(modelsDir: Path, namespace: String): List<Deferred<Pair<ResourcePath<ResourceType.Model>, Model>>> =
-        modelsDir.walk()
-            .filter { it.extension.equals("json", true) }
-            .mapTo(ArrayList()) { file ->
-                async {
-                    val path = ResourcePath(ResourceType.Model, namespace, file.relativeTo(modelsDir).invariantSeparatorsPathString.substringBeforeLast('.'))
-                    return@async path to (loadModel(file) ?: Model())
-                }
-            }
-    
     private fun loadModel(path: Path): Model? {
         if (path.notExists())
             return null
@@ -171,22 +135,61 @@ class ModelContent internal constructor(private val builder: ResourcePackBuilder
         try {
             return path.readJson<Model>(json)
         } catch (e: Exception) {
-            LOGGER.warn("Failed to parse model file $path", e)
+            builder.logger.warn("Failed to parse model file $path", e)
         }
         
         return null
     }
     
-    @PackTask(runAfter = ["ModelContent#discoverAllModels"])
-    private suspend fun write() = coroutineScope {
-        for ((id, model) in customModelsByPath) {
-            if (id !in rememberedUsages)
-                continue
+    inner class DiscoverAllModels(private val builder: ResourcePackBuilder) : PackTask {
+        
+        override suspend fun run() = coroutineScope {
+            val customModels = ArrayList<List<Deferred<Pair<ResourcePath<ResourceType.Model>, Model>>>>()
             
-            launch {
-                builder.writeJson(id, model)
+            // discover existing models (base packs)
+            builder.resolve("assets").listDirectoryEntries()
+                .filter { it.isDirectory() }
+                .forEach { customModels += discoverModels(it.resolve("models"), it.name) }
+            
+            // discover models from asset packs
+            for (assetPack in builder.assetPacks) {
+                val modelsDir = assetPack.modelsDir ?: continue
+                customModels += discoverModels(modelsDir, assetPack.namespace)
+            }
+            
+            customModels.forEach {
+                it.awaitAll().forEach { (path, model) ->
+                    customModelsByPath[path] = model
+                    customModelsByModel.getOrPut(model, ::HashSet) += path
+                }
             }
         }
+        
+        private fun CoroutineScope.discoverModels(modelsDir: Path, namespace: String): List<Deferred<Pair<ResourcePath<ResourceType.Model>, Model>>> =
+            modelsDir.walk()
+                .filter { it.extension.equals("json", true) }
+                .mapTo(ArrayList()) { file ->
+                    async {
+                        val path = ResourcePath(ResourceType.Model, namespace, file.relativeTo(modelsDir).invariantSeparatorsPathString.substringBeforeLast('.'))
+                        return@async path to (loadModel(file) ?: Model())
+                    }
+                }
+        
+    }
+    
+    inner class Write(private val builder: ResourcePackBuilder) : PackTask {
+        
+        override suspend fun run() = coroutineScope {
+            for ((id, model) in customModelsByPath) {
+                if (id !in rememberedUsages)
+                    continue
+                
+                launch {
+                    builder.writeJson(id, model)
+                }
+            }
+        }
+        
     }
     
 }

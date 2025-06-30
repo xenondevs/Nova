@@ -1,16 +1,13 @@
-package xyz.xenondevs.nova.resources.builder
+package xyz.xenondevs.nova.resources.builder.task
 
 import xyz.xenondevs.commons.collections.CollectionUtils
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.CharSizeTable
 import xyz.xenondevs.nova.resources.CharSizes
+import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.provider.ReferenceProvider
-import xyz.xenondevs.nova.resources.builder.task.PackTask
-import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
-import xyz.xenondevs.nova.resources.builder.task.font.FontContent
 
 private val SETTINGS: Set<String> by combinedProvider(
     MAIN_CONFIG.entry<Boolean>(arrayOf("resource_pack", "generation", "force_uniform_font"), arrayOf("resource_pack", "force_uniform_font")),
@@ -22,19 +19,20 @@ private val SETTINGS: Set<String> by combinedProvider(
     }
 }
 
-class CharSizeCalculator internal constructor(builder: ResourcePackBuilder) : PackTaskHolder {
+/**
+ * Calculates char sizes for all fonts.
+ */
+class CharSizeCalculator internal constructor(private val builder: ResourcePackBuilder) : PackTask {
     
-    private val fontContent by builder.getHolderLazily<FontContent>()
+    override val runAfter = setOf(
+        FontContent.DiscoverAllFonts::class, GuiTextureTask::class, MoveCharactersTask::class,
+        MovedFontContent.Write::class, TextureIconContent.Write::class, WailaTask::class
+    )
     
-    /**
-     * Calculates the char sizes for all fonts that need to be recalculated.
-     */
-    @PackTask(runAfter = [
-        "FontContent#discoverAllFonts", "GuiContent#write", "MoveCharactersContent#write", "MovedFontContent#write",
-        "TextureIconContent#write", "WailaContent#write"
-    ])
-    private fun calculateCharSizes() {
-        LOGGER.info("Calculating char sizes...")
+    private val fontContent by builder.getBuildDataLazily<FontContent>()
+    
+    override suspend fun run() {
+        builder.logger.info("Calculating char sizes...")
         
         val fonts = fontContent.mergedFonts
         val references = fonts.values.associateWith { it.mapReferences(fonts.values) }
@@ -59,7 +57,7 @@ class CharSizeCalculator internal constructor(builder: ResourcePackBuilder) : Pa
                 
                 CharSizes.storeTable(id, table)
             } catch (t: Throwable) {
-                LOGGER.error("Failed to calculate char sizes for font ${font.id}", t)
+                builder.logger.error("Failed to calculate char sizes for font ${font.id}", t)
             }
         }
         

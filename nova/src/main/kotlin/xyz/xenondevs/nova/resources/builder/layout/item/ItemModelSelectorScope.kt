@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.resources.builder.model.Model.Direction
 import xyz.xenondevs.nova.resources.builder.model.Model.Element
 import xyz.xenondevs.nova.resources.builder.model.Model.Element.Face
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
-import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.resources.builder.task.ModelContent
 import xyz.xenondevs.nova.world.item.NovaItem
 
 @RegistryElementBuilderDsl

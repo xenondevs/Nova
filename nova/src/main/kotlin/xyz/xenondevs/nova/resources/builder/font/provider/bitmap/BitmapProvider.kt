@@ -191,7 +191,7 @@ abstract class BitmapProvider<T> internal constructor() : FontProvider("bitmap")
         override val glyphImageType = BitmapGlyphImageType.BUFFERED_IMAGE
         
         override val codePointGrid = CodePointGrid.single(codePoint)
-        override val glyphGrid by lazy { GlyphGrid.single(builder.getHolder<TextureContent>().getImage(file)) }
+        override val glyphGrid by lazy { GlyphGrid.single(builder.getBuildData<TextureContent>().getImage(file)) }
         
         // not necessary because the image is loaded from disk and cannot be changed
         override fun write(builder: ResourcePackBuilder) = Unit

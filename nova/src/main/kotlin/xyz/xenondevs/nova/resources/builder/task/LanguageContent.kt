@@ -15,11 +15,18 @@ import kotlin.io.path.notExists
 import kotlin.io.path.walk
 import kotlin.io.path.writeText
 
-class LanguageContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
+/**
+ * Contains all translations of the resource pack.
+ */
+class LanguageContent(private val builder: ResourcePackBuilder) : PackBuildData {
     
     val vanillaLangs: Map<String, Map<String, String>> by lazy(::loadVanillaLangs)
     val customLangs: HashMap<String, HashMap<String, String>> by lazy(::loadCustomLangs)
     
+    /**
+     * Gets the translation key -> translation map for [lang],
+     * or creates and registers a new one if it does not exist.
+     */
     fun getOrCreate(lang: String): HashMap<String, String> {
         return customLangs.getOrPut(lang) { HashMap() }
     }
@@ -50,6 +57,9 @@ class LanguageContent internal constructor(private val builder: ResourcePackBuil
         return key
     }
     
+    /**
+     * Sets the translation of [key] in [lang] to [value].
+     */
     fun setTranslation(lang: String, key: String, value: String) {
         val customLang = customLangs.getOrPut(lang, ::HashMap)
         customLang[key] = value
@@ -57,13 +67,13 @@ class LanguageContent internal constructor(private val builder: ResourcePackBuil
     
     private fun loadVanillaLangs(): Map<String, Map<String, String>> {
         val map = HashMap<String, HashMap<String, String>>()
-        loadLangs(ResourcePackBuilder.MCASSETS_ASSETS_DIR.resolve("minecraft/lang/"), map)
+        loadLangs(builder.resolveVanilla("assets/minecraft/lang/"), map)
         return map
     }
     
     private fun loadCustomLangs(): HashMap<String, HashMap<String, String>> {
         val map = HashMap<String, HashMap<String, String>>()
-        loadLangs(ResourcePackBuilder.LANGUAGE_DIR, map) // lang files from base packs
+        loadLangs(builder.resolve("assets/minecraft/lang/"), map) // lang files from base packs
         for (pack in builder.assetPacks) loadLangs(pack.langDir, map) // lang files from asset packs
         return map
     }
@@ -80,20 +90,28 @@ class LanguageContent internal constructor(private val builder: ResourcePackBuil
             }
     }
     
-    @PackTask
-    private fun write() {
-        extractRomanNumerals(customLangs.getOrPut("en_us", ::HashMap))
-        ResourceLookups.LANGUAGE = customLangs
-        customLangs.forEach { (name, content) ->
-            val file = ResourcePackBuilder.LANGUAGE_DIR.resolve("$name.json")
-            file.parent.createDirectories()
-            file.writeText(GSON.toJson(content))
+    /**
+     * Writes all translations of [LanguageContent] to the resource pack.
+     */
+    inner class Write : PackTask {
+        
+        override val stage = BuildStage.PRE_WORLD
+        
+        private fun extractRomanNumerals(map: HashMap<String, String>) {
+            for (i in 6..254)
+                map["potion.potency.$i"] = NumberFormatUtils.getRomanNumeral(i + 1)
         }
-    }
-    
-    private fun extractRomanNumerals(map: HashMap<String, String>) {
-        for (i in 6..254)
-            map["potion.potency.$i"] = NumberFormatUtils.getRomanNumeral(i + 1)
+        
+        override suspend fun run() {
+            extractRomanNumerals(customLangs.getOrPut("en_us", ::HashMap))
+            ResourceLookups.LANGUAGE = customLangs
+            customLangs.forEach { (name, content) ->
+                val file = builder.resolve("assets/minecraft/lang/").resolve("$name.json")
+                file.parent.createDirectories()
+                file.writeText(GSON.toJson(content))
+            }
+        }
+        
     }
     
 }

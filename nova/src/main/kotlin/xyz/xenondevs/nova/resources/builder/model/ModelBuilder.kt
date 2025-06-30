@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.resources.builder.model.transform.RotationTransform
 import xyz.xenondevs.nova.resources.builder.model.transform.ScaleTransform
 import xyz.xenondevs.nova.resources.builder.model.transform.Transform
 import xyz.xenondevs.nova.resources.builder.model.transform.TranslationTransform
-import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.resources.builder.task.ModelContent
 import kotlin.math.min
 
 /**

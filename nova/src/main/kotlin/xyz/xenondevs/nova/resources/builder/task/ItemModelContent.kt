@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.builder.task.model
+package xyz.xenondevs.nova.resources.builder.task
 
 import kotlinx.serialization.json.Json
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -8,17 +8,14 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
-import xyz.xenondevs.nova.resources.builder.task.BuildStage
-import xyz.xenondevs.nova.resources.builder.task.PackTask
-import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
 
 /**
- * A [PackTaskHolder] that deals with generating item model definitions.
+ * Generates item model definitions.
  */
-class ItemModelContent internal constructor(val builder: ResourcePackBuilder) : PackTaskHolder {
+class ItemModelContent(val builder: ResourcePackBuilder) : PackBuildData {
     
     private val json = Json { ignoreUnknownKeys = true }
-    private val modelContent by builder.getHolderLazily<ModelContent>()
+    private val modelContent by builder.getBuildDataLazily<ModelContent>()
     
     private val vanillaDefsByPath = HashMap<ResourcePath<ResourceType.ItemModelDefinition>, ItemModelDefinition?>()
     private val customDefsByPath = HashMap<ResourcePath<ResourceType.ItemModelDefinition>, ItemModelDefinition>()
@@ -77,35 +74,45 @@ class ItemModelContent internal constructor(val builder: ResourcePackBuilder) : 
         return getOrPut(def) { ResourcePath(ResourceType.ItemModelDefinition, "nova", "gen_item/${generatedDefCount++}") }
     }
     
-    @PackTask(
-        stage = BuildStage.POST_WORLD, // SelectItemModelProperty.Component requires registry access for serialization
-        runBefore = [
-            "ModelContent#write",
-            "ItemModelContent#write"
-        ]
-    )
-    private fun generateItemDefinitions() {
-        for (item in NovaRegistries.ITEM) {
-            val definition = ItemModelDefinitionBuilder(
-                builder
-            ) { modelSelector ->
-                val scope = ItemModelSelectorScope(item, builder, modelContent)
-                val (model, _) = modelSelector(scope).buildScaled(modelContent)
-                val id = modelContent.getOrPutGenerated(model)
-                modelContent.rememberUsage(id)
-                id
-            }.apply(item.configureDefinition).build()
-            
-            val path = ResourcePath.of(ResourceType.ItemModelDefinition, item.id)
-            set(path, definition)
+    /**
+     * Generates item model definition files for registered nova items and writes them to [ItemModelContent].
+     */
+    inner class GenerateItemDefinitions : PackTask {
+        
+        override val stage = BuildStage.POST_WORLD // // SelectItemModelProperty.Component requires registry access for serialization
+        override val runAfter = setOf(ModelContent.DiscoverAllModels::class)
+        override val runBefore = setOf(ModelContent.Write::class, Write::class)
+        
+        override suspend fun run() {
+            for (item in NovaRegistries.ITEM) {
+                val definition = ItemModelDefinitionBuilder(
+                    builder
+                ) { modelSelector ->
+                    val scope = ItemModelSelectorScope(item, builder, modelContent)
+                    val (model, _) = modelSelector(scope).buildScaled(modelContent)
+                    val id = modelContent.getOrPutGenerated(model)
+                    modelContent.rememberUsage(id)
+                    id
+                }.apply(item.configureDefinition).build()
+                
+                val path = ResourcePath.of(ResourceType.ItemModelDefinition, item.id)
+                set(path, definition)
+            }
         }
+        
     }
     
-    @PackTask
-    private fun write() {
-        for ((path, def) in customDefsByPath) {
-            builder.writeJson(path, def)
+    /**
+     * Writes all item model definitions of [ItemModelContent] to the resource pack.
+     */
+    inner class Write : PackTask {
+        
+        override suspend fun run() {
+            for ((path, def) in customDefsByPath) {
+                builder.writeJson(path, def)
+            }
         }
+        
     }
     
 }

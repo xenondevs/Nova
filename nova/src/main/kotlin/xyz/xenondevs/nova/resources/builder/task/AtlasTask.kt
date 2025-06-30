@@ -12,10 +12,14 @@ import kotlin.io.path.exists
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.walk
 
-class AtlasContent internal constructor(private val builder: ResourcePackBuilder) : PackTaskHolder {
+/**
+ * Merges atlas files from asset packs and writes them to the resource pack.
+ */
+class AtlasTask(private val builder: ResourcePackBuilder) : PackTask {
     
-    @PackTask(runAfter = ["ExtractTask#extractAll"])
-    private fun write() {
+    override val runAfter = setOf(ExtractTask::class)
+    
+    override suspend fun run() {
         val sources = HashMap<String, JsonArray>()
         
         builder.assetPacks.forEach { pack ->
@@ -27,7 +31,7 @@ class AtlasContent internal constructor(private val builder: ResourcePackBuilder
         }
         
         sources.forEach {
-            val file = ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/atlases/${it.key}.json")
+            val file = builder.resolve("assets/minecraft/atlases/${it.key}.json")
             file.parent.createDirectories()
             val atlasesObj = file.takeIf(Path::exists)?.parseJson() as? JsonObject ?: JsonObject()
             val sourcesJson = atlasesObj.getOrPut("sources", ::JsonArray)

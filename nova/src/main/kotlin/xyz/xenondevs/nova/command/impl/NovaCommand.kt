@@ -12,7 +12,10 @@ import io.papermc.paper.command.brigadier.Commands.literal
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.event.ClickEvent
@@ -33,6 +36,7 @@ import xyz.xenondevs.nova.command.Command
 import xyz.xenondevs.nova.command.argument.NetworkTypeArgumentType
 import xyz.xenondevs.nova.command.argument.NovaBlockArgumentType
 import xyz.xenondevs.nova.command.argument.NovaItemArgumentType
+import xyz.xenondevs.nova.command.argument.ResourcePackIdArgumentType
 import xyz.xenondevs.nova.command.argument.VanillaBlockArgumentType
 import xyz.xenondevs.nova.command.executes0
 import xyz.xenondevs.nova.command.get
@@ -44,9 +48,7 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
-import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.ui.menu.explorer.creative.ItemsMenu
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.BlockUtils
@@ -58,7 +60,6 @@ import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.novaBlock
-import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
@@ -201,10 +202,10 @@ internal object NovaCommand : Command() {
             .executes0(::sendAddons))
         .then(literal("resourcePack")
             .requiresPermission("nova.command.resourcePack")
-            .then(literal("create")
-                .executes0(::createResourcePack))
-            .then(literal("reupload")
-                .executes0(::reuploadResourcePack)))
+            .then(literal("build")
+                .then(argument("pack", ResourcePackIdArgumentType)
+                    .executes0 { buildResourcePack(it, it["pack"]) })
+                .executes0(::buildResourcePack)))
         .then(literal("reload")
             .requiresPermission("nova.command.reload")
             .then(literal("configs")
@@ -250,11 +251,25 @@ internal object NovaCommand : Command() {
         }
     }
     
-    private fun createResourcePack(ctx: CommandContext<CommandSourceStack>) {
-        runAsyncTask {
-            ctx.source.sender.sendMessage(Component.translatable("command.nova.resource_pack.create.start", NamedTextColor.GRAY))
-            ResourceGeneration.createResourcePack()
-            ctx.source.sender.sendMessage(Component.translatable("command.nova.resource_pack.create.success", NamedTextColor.GRAY))
+    @Suppress("OPT_IN_USAGE")
+    private fun buildResourcePack(ctx: CommandContext<CommandSourceStack>, id: Key? = null) {
+        val ids = if (id == null) ResourcePackBuilder.configurations.keys else setOf(id)
+        for (toBuild in ids) {
+            GlobalScope.launch {
+                ctx.source.sender.sendMessage(Component.translatable(
+                    "command.nova.resource_pack.create.start",
+                    NamedTextColor.GRAY,
+                    Component.text(toBuild.toString(), NamedTextColor.AQUA)
+                ))
+                
+                ResourcePackBuilder.build(toBuild)
+                
+                ctx.source.sender.sendMessage(Component.translatable(
+                    "command.nova.resource_pack.create.success",
+                    NamedTextColor.GRAY,
+                    Component.text(toBuild.toString(), NamedTextColor.AQUA)
+                ))
+            }
         }
     }
     
@@ -280,23 +295,6 @@ internal object NovaCommand : Command() {
             ctx.source.sender.sendMessage(Component.translatable("command.nova.waila.$onOff", NamedTextColor.GRAY))
         } else {
             ctx.source.sender.sendMessage(Component.translatable("command.nova.waila.already_$onOff", NamedTextColor.RED))
-        }
-    }
-    
-    private fun reuploadResourcePack(ctx: CommandContext<CommandSourceStack>) {
-        runAsyncTask {
-            runBlocking {
-                ctx.source.sender.sendMessage(Component.translatable("command.nova.resource_pack.reupload.start", NamedTextColor.GRAY))
-                val url = AutoUploadManager.uploadPack(ResourcePackBuilder.RESOURCE_PACK_FILE)
-                
-                if (url != null)
-                    ctx.source.sender.sendMessage(Component.translatable(
-                        "command.nova.resource_pack.reupload.success",
-                        NamedTextColor.GRAY,
-                        Component.text(url).clickEvent(ClickEvent.openUrl(url))
-                    ))
-                else ctx.source.sender.sendMessage(Component.translatable("command.nova.resource_pack.reupload.fail", NamedTextColor.RED))
-            }
         }
     }
     

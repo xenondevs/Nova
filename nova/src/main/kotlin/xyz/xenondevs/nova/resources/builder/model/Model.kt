@@ -13,7 +13,7 @@ import org.joml.primitives.AABBd
 import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
-import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.resources.builder.task.ModelContent
 import xyz.xenondevs.nova.serialization.kotlinx.Vector3dcAsArraySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.Vector4dcAsArraySerializer
 import java.util.*

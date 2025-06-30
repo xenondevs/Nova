@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.resources.builder
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
-import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.font.Font
@@ -33,14 +32,14 @@ internal class BitmapFontGenerator(
      * converted to [BitmapProviders][BitmapProvider].
      */
     fun generateBitmapFont(): Font {
-        LOGGER.info("Creating a bitmap font for $font")
+        builder.logger.info("Creating a bitmap font for $font")
         
         val providers = ArrayList<FontProvider>()
         for (provider in font.providers) {
             when (provider) {
                 is ReferenceProvider, is SpaceProvider, is BitmapProvider<*> -> providers.add(provider)
                 is UnihexProvider -> providers.addAll(convertUnihexProvider(provider))
-                else -> LOGGER.warn("Skipping unsupported font provider type: ${provider::class.simpleName}")
+                else -> builder.logger.warn("Skipping unsupported font provider type: ${provider::class.simpleName}")
             }
         }
         

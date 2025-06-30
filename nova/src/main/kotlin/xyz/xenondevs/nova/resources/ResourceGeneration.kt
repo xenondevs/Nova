@@ -1,11 +1,13 @@
 package xyz.xenondevs.nova.resources
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_VERSION
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.addon.version
+import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
@@ -17,6 +19,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
+import xyz.xenondevs.nova.util.data.update
 import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.migrator.BlockMigrator
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
@@ -24,10 +27,9 @@ import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.DefaultItems
 import java.security.MessageDigest
 import java.util.*
-import kotlin.io.path.notExists
 
 private const val FORCE_REBUILD_FLAG = "NovaForceRegenerateResourcePack"
-private const val VERSION_HASH = "version_hash"
+private const val RESOURCES_HASH = "resources_hash"
 
 /**
  * Handles resource pack generation on startup.
@@ -35,8 +37,8 @@ private const val VERSION_HASH = "version_hash"
  */
 internal object ResourceGeneration {
     
-    private lateinit var versionHash: String
-    private var builder: ResourcePackBuilder? = null
+    private lateinit var resourcesHash: String
+    private val activeBuilders = ArrayList<ResourcePackBuilder>()
     
     @InternalInit(
         stage = InternalInitStage.PRE_WORLD,
@@ -52,17 +54,22 @@ internal object ResourceGeneration {
     object PreWorld {
         
         @InitFun
-        private fun init() {
-            versionHash = calculateVersionHash()
+        private suspend fun init() {
+            resourcesHash = calculateResourcesHash()
             if (System.getProperty(FORCE_REBUILD_FLAG) != null
-                || ResourcePackBuilder.RESOURCE_PACK_FILE.notExists()
-                || PermanentStorage.retrieve<String>(VERSION_HASH) != versionHash
+                || PermanentStorage.retrieve<String>(RESOURCES_HASH) != resourcesHash
                 || !ResourceLookups.tryLoadAll()
                 || !hasAllBlockModels()
             ) {
                 // Build resource pack
-                LOGGER.info("Building resource pack")
-                builder = ResourcePackBuilder().also(ResourcePackBuilder::buildPackPreWorld)
+                LOGGER.info("Building resource pack(s)")
+                coroutineScope {
+                    for ((_, config) in ResourcePackBuilder.configurations) {
+                        val builder = config.create()
+                        activeBuilders += builder
+                        launch { builder.buildPackPreWorld() }
+                    }
+                }
                 LOGGER.info("Pre-world resource pack building done")
             } else {
                 ResourceLookups.loadAll()
@@ -79,14 +86,21 @@ internal object ResourceGeneration {
     object PostWorld {
         
         @InitFun
-        private fun init() {
-            val builder = builder
-            if (builder != null) {
-                LOGGER.info("Continuing to build resource pack")
-                builder.buildPackPostWorld()
-                AutoUploadManager.wasRegenerated = true
-                AutoCopier.copyToDestinations(ResourcePackBuilder.RESOURCE_PACK_FILE)
-                PermanentStorage.store(VERSION_HASH, versionHash)
+        private suspend fun init() {
+            if (activeBuilders.isNotEmpty()) {
+                LOGGER.info("Continuing to build resource pack(s)")
+                coroutineScope {
+                    for (builder in activeBuilders) {
+                        launch {
+                            val bin = builder.buildPackPostWorld()
+                            AutoUploadManager.uploadPack(builder.id, bin)
+                            AutoCopier.copyToDestinations(builder.id, bin)
+                        }
+                    }
+                }
+                
+                activeBuilders.clear()
+                PermanentStorage.store(RESOURCES_HASH, resourcesHash)
                 BlockMigrator.updateMigrationId()
             }
         }
@@ -94,9 +108,10 @@ internal object ResourceGeneration {
     }
     
     /**
-     * Calculates a hash based on the version and name of Nova and all addons.
+     * Calculates a hash based on the version and name of Nova and all addons
+     * and the resource_pack config section.
      */
-    private fun calculateVersionHash(): String {
+    private fun calculateResourcesHash(): String {
         val digest = MessageDigest.getInstance("MD5")
         
         // Nova version
@@ -108,6 +123,9 @@ internal object ResourceGeneration {
             digest.update(addon.version.toByteArray())
         }
         
+        // resource_pack config section
+        digest.update(MAIN_CONFIG.get().node("resource_pack").hashCode())
+        
         return HexFormat.of().formatHex(digest.digest())
     }
     
@@ -118,19 +136,5 @@ internal object ResourceGeneration {
         NovaRegistries.BLOCK.asSequence()
             .flatMap { it.blockStates }
             .all { it in ResourceLookups.BLOCK_MODEL }
-    
-    internal fun createResourcePack() {
-        ResourcePackBuilder().buildPackCompletely()
-        
-        if (AutoUploadManager.enabled) {
-            runBlocking {
-                val url = AutoUploadManager.uploadPack(ResourcePackBuilder.RESOURCE_PACK_FILE)
-                if (url == null)
-                    LOGGER.warn("The resource pack was not uploaded. (Misconfigured auto uploader?)")
-            }
-        }
-        
-        AutoCopier.copyToDestinations(ResourcePackBuilder.RESOURCE_PACK_FILE)
-    }
     
 }

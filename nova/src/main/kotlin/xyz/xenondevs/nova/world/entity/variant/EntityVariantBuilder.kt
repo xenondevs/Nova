@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.registry.LazyRegistryElementBuilder
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayoutBuilder
-import xyz.xenondevs.nova.resources.builder.task.EntityVariantContent
+import xyz.xenondevs.nova.resources.builder.task.EntityVariantTask
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.toResourceLocation
 
@@ -51,7 +51,7 @@ internal constructor(
     fun texture(modelType: M = defaultModelType, texture: LB.() -> Unit) {
         this.modelType = modelType
         val key = ResourceKey.create(registryKey, id.toResourceLocation())
-        EntityVariantContent.queueVariantAssetGeneration(key) {
+        EntityVariantTask.queueVariantAssetGeneration(key) {
             makeLayoutBuilder(id.namespace(), it)
                 .apply(texture)
                 .build()

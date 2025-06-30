@@ -89,7 +89,7 @@ abstract class MutableBitmapProvider<T> : BitmapProvider<T>() {
         override val glyphGrid: ReferenceGlyphGrid by lazy(::loadGlyphGrid)
         
         private fun loadGlyphGrid(): ReferenceGlyphGrid {
-            val img = builder.getHolder<TextureContent>().getImage(file)
+            val img = builder.getBuildData<TextureContent>().getImage(file)
             val codePoints = codePointGrid
             
             require(img.width % codePoints.width == 0 && img.height % codePoints.height == 0) {

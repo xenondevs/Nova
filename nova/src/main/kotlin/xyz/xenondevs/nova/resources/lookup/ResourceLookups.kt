@@ -7,13 +7,14 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.SetSerializer
+import kotlinx.serialization.builtins.serializer
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
+import xyz.xenondevs.nova.resources.builder.task.FontChar
+import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
-import xyz.xenondevs.nova.resources.builder.task.font.FontChar
-import xyz.xenondevs.nova.resources.builder.task.font.GuiTextureData
 import xyz.xenondevs.nova.serialization.kotlinx.BlockStateSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ResourceKeySerializer
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
@@ -112,6 +113,17 @@ internal object ResourceLookups {
      * Entity variant layouts.
      */
     val ENTITY_VARIANT_ASSETS: Map<ResourceKey<*>, EntityVariantLayout> by ENTITY_VARIANT_ASSETS_LOOKUP
+    
+    /**
+     * Lookup for sound overrides (ids of sound that were moved to the Nova namespace).
+     */
+    val SOUND_OVERRIDES_LOOKUP: ResourceLookup<Set<String>> =
+        resourceLookup("sound_overrides", emptySet(), SetSerializer(String.serializer()))
+    
+    /**
+     * Sound overrides (ids of sound that were moved to the Nova namespace).
+     */
+    var SOUND_OVERRIDES: Set<String> by SOUND_OVERRIDES_LOOKUP
     
     private inline fun <reified T : Any> resourceLookup(key: String, empty: T): ResourceLookup<T> {
         val lookup = ResourceLookup(key, PermanentStorage::retrieve, PermanentStorage::store, empty)

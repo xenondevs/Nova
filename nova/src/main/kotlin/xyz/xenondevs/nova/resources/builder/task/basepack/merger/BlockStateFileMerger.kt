@@ -1,12 +1,11 @@
-package xyz.xenondevs.nova.resources.builder.basepack.merger
+package xyz.xenondevs.nova.resources.builder.task.basepack.merger
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import xyz.xenondevs.commons.gson.addAll
 import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.commons.gson.parseJson
-import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.resources.builder.basepack.BasePacks
+import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
 import xyz.xenondevs.nova.serialization.json.GSON
 import xyz.xenondevs.nova.world.block.state.model.BackingStateConfigType
 import xyz.xenondevs.nova.world.block.state.model.BrownMushroomBackingStateConfig
@@ -71,7 +70,7 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerge
                 variants.add(variantString, JsonObject().apply { addProperty("model", model) })
             }
         } catch (e: Exception) {
-            LOGGER.error("Failed to convert multipart to variants, some block states might be missing", e)
+            basePacks.builder.logger.error("Failed to convert multipart to variants, some block states might be missing", e)
         }
         
         return variants
@@ -95,7 +94,7 @@ internal class BlockStateFileMerger(basePacks: BasePacks) : FileInDirectoryMerge
             
             configType.handleMerged(occupied)
         } catch (e: Exception) {
-            LOGGER.error("Failed to process variants for $configType in $obj", e)
+            basePacks.builder.logger.error("Failed to process variants for $configType in $obj", e)
         }
     }
     

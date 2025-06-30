@@ -5,9 +5,12 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 
-class EntityVariantContent internal constructor(
-    private val builder: ResourcePackBuilder
-) : PackTaskHolder {
+/**
+ * Generates entity variant assets.
+ */
+class EntityVariantTask(private val builder: ResourcePackBuilder) : PackTask {
+    
+    override val stage = BuildStage.PRE_WORLD
     
     companion object {
         
@@ -19,8 +22,7 @@ class EntityVariantContent internal constructor(
         
     }
     
-    @PackTask(runAfter = ["ExtractTask#extractAll"])
-    private fun write() {
+    override suspend fun run() {
         val layouts: Map<ResourceKey<*>, EntityVariantLayout> = layoutGenerators
             .mapValues { (_, makeLayout) -> makeLayout(builder) }
         ResourceLookups.ENTITY_VARIANT_ASSETS_LOOKUP.set(layouts)

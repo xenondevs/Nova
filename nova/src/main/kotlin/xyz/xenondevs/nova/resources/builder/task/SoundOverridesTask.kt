@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.resources.builder
+package xyz.xenondevs.nova.resources.builder.task
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -9,11 +9,9 @@ import xyz.xenondevs.commons.gson.getOrPut
 import xyz.xenondevs.commons.gson.getStringOrNull
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.commons.gson.writeToFile
-import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.resources.builder.task.PackTask
-import xyz.xenondevs.nova.resources.builder.task.PackTaskHolder
+import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
@@ -25,7 +23,10 @@ import kotlin.io.path.exists
  * Removes the break, hit, step and fall sounds for blocks used by Nova to display custom blocks (note block, mushroom blocks,
  * specified armor stand hitbox blocks) and copies them to the Nova namespace, so that they can be completely controlled by the server.
  */
-class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTaskHolder {
+class SoundOverridesTask(private val builder: ResourcePackBuilder) : PackTask {
+    
+    override val stage = BuildStage.PRE_WORLD
+    override val runAfter = setOf(BlockModelContent::class)
     
     private val soundEvents = HashSet<String>()
     
@@ -41,10 +42,11 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
         soundEvents += type.fallSound.location.path
     }
     
-    @PackTask(
-        runAfter = ["BlockModelContent#assignBlockModels"],
-        runBefore = ["SoundOverrides#write"]
-    )
+    override suspend fun run() {
+        findUsedBlockTypes()
+        write()
+    }
+    
     private fun findUsedBlockTypes() {
         for (block in NovaRegistries.BLOCK) {
             for (blockState in block.blockStates) {
@@ -57,18 +59,17 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
         }
     }
     
-    @PackTask
     private fun write() {
         try {
             // an index of all vanilla sounds
             val vanillaIndex = createSoundsIndex(
-                ResourcePackBuilder.MCASSETS_ASSETS_DIR.resolve("minecraft/sounds.json").parseJson() as JsonObject
+                builder.resolveVanilla("assets/minecraft/sounds.json").parseJson() as JsonObject
             )
             
             // merge the sound.json files
             val merged = mergeSoundJsons(
-                ResourcePackBuilder.MCASSETS_ASSETS_DIR.resolve("minecraft/sounds.json"),
-                ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/sounds.json")
+                builder.resolveVanilla("assets/minecraft/sounds.json"),
+                builder.resolve("assets/minecraft/sounds.json"),
             )
             
             // an index of all sounds (vanilla and base packs)
@@ -80,7 +81,7 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
                 val soundEventObj = index[soundEvent]!!
                 novaSoundIndex.add(soundEvent, soundEventObj)
             }
-            novaSoundIndex.writeToFile(ResourcePackBuilder.ASSETS_DIR.resolve("nova/sounds.json"))
+            novaSoundIndex.writeToFile(builder.resolve("assets/nova/sounds.json"))
             
             val mcSoundIndex = JsonObject()
             index.forEach { (soundEvent, soundEventObj) ->
@@ -102,12 +103,12 @@ class SoundOverrides internal constructor(builder: ResourcePackBuilder) : PackTa
                     mcSoundIndex.add(soundEvent, soundEventObj)
                 }
             }
-            mcSoundIndex.writeToFile(ResourcePackBuilder.ASSETS_DIR.resolve("minecraft/sounds.json"))
+            mcSoundIndex.writeToFile(builder.resolve("assets/minecraft/sounds.json"))
             
             // write overridden sound events to permanent storage
-            PermanentStorage.store("soundOverrides", soundEvents)
+            ResourceLookups.SOUND_OVERRIDES = soundEvents
         } catch (e: Exception) {
-            LOGGER.error("Failed to write block sound overrides", e)
+            builder.logger.error("Failed to write block sound overrides", e)
         }
     }
     
