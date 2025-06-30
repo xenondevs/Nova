@@ -38,14 +38,3 @@ pluginManagement {
         maven("https://repo.xenondevs.xyz/releases/")
     }
 }
-
-plugins {
-    id("com.gradle.enterprise") version "3.13"
-}
-
-gradleEnterprise {
-    buildScan {
-        termsOfServiceUrl = "https://gradle.com/terms-of-service"
-        termsOfServiceAgree = "yes"
-    }
-}

@@ -5,21 +5,20 @@ import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
-import net.kyori.adventure.text.Component
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.network.ServerConnectionListener
-import net.minecraft.server.network.ServerLoginPacketListenerImpl
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.registerEvents
+import xyz.xenondevs.nova.util.serverPlayer
 import java.lang.invoke.MethodHandles
 import java.util.*
 import net.minecraft.world.entity.player.Player as MojangPlayer
@@ -63,27 +62,13 @@ internal object PacketManager : Listener {
         pipeline.addFirst("nova_pipeline_adapter", NovaServerChannelBootstrap)
     }
     
-    @EventHandler
-    private fun handleLogin(event: PlayerLoginEvent) {
-        // find corresponding packet handler and set player instance
-        val player = event.player
-        val handler = MINECRAFT_SERVER.connection.connections
-            .firstOrNull { (it.packetListener as? ServerLoginPacketListenerImpl)?.authenticatedProfile?.name == player.name }
-            ?.channel
-            ?.takeIf { it.isOpen }
-            ?.let { it.pipeline().get(PACKET_HANDLER_NAME) as PacketHandler }
-        if (handler != null) {
-            handler.player = player
-            handlers[player] = handler
-        } else {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("[Nova] Something went wrong"))
-        }
-    }
-    
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     private fun handleJoin(event: PlayerJoinEvent) {
-        val handler = handlers[event.player]!!
+        val player = event.player
+        val handler = player.serverPlayer.connection.connection.channel.pipeline().get(PACKET_HANDLER_NAME) as PacketHandler
+        handler.player = player
         handler.loggedIn = true
+        handlers[player] = handler
     }
     
     @EventHandler
