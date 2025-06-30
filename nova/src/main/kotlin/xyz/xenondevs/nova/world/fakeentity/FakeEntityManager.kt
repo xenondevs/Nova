@@ -158,6 +158,7 @@ internal object FakeEntityManager : Listener {
     private fun removeViewer(player: Player) {
         visibleChunks[player]?.forEach {
             chunkViewers[it]?.remove(player)
+            chunkEntities[it]?.forEach { entity -> entity.despawn(player) } // removes player from viewers set of fake entity
         }
         
         visibleChunks.remove(player)
