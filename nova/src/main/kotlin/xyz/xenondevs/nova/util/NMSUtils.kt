@@ -28,7 +28,6 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.server.players.PlayerList
 import net.minecraft.tags.TagKey
 import net.minecraft.world.InteractionHand
@@ -129,9 +128,6 @@ val World.serverLevel: ServerLevel
 
 val Chunk.levelChunk: LevelChunk
     get() = world.serverLevel.getChunk(x, z)
-
-val Player.connection: ServerGamePacketListenerImpl
-    get() = serverPlayer.connection
 
 val NamespacedKey.resourceLocation: ResourceLocation
     get() = ResourceLocation.fromNamespaceAndPath(namespace, key)
@@ -332,12 +328,12 @@ fun MojangBlockPos.toNovaPos(world: World): BlockPos =
     BlockPos(world, x, y, z)
 
 fun Player.send(vararg packets: Packet<*>) {
-    val connection = connection
+    val connection = serverPlayer.connection
     packets.forEach { connection.send(it) }
 }
 
 fun Player.send(packets: Iterable<Packet<*>>) {
-    val connection = connection
+    val connection = serverPlayer.connection
     packets.forEach { connection.send(it) }
 }
 
