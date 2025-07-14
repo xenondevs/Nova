@@ -57,7 +57,7 @@ minecraft-model-renderer = { group = "xyz.xenondevs", name = "minecraft-model-re
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 paperweight-userdev-plugin = { module = "io.papermc.paperweight:paperweight-userdev", version.ref = "paperweight" }
 snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version = "2.9" }
-zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.7-3" }
+zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.7-4" }
 
 [bundles]
 cbf = ["cosmic-binary-format"]
