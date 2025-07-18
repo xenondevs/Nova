@@ -65,7 +65,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
-import xyz.xenondevs.nova.patch.impl.playerlist.BroadcastPacketPatch
+import xyz.xenondevs.nova.patch.impl.misc.BroadcastPacketPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType

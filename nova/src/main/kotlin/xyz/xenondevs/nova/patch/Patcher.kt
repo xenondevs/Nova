@@ -30,7 +30,7 @@ import xyz.xenondevs.nova.patch.impl.item.ToolPatches
 import xyz.xenondevs.nova.patch.impl.misc.DontCloseAddonClassLoadersPatch
 import xyz.xenondevs.nova.patch.impl.misc.EventPreventionPatch
 import xyz.xenondevs.nova.patch.impl.misc.FakePlayerLastHurtPatch
-import xyz.xenondevs.nova.patch.impl.playerlist.BroadcastPacketPatch
+import xyz.xenondevs.nova.patch.impl.misc.BroadcastPacketPatch
 import xyz.xenondevs.nova.patch.impl.registry.RegistryEventsPatch
 import xyz.xenondevs.nova.patch.impl.sound.SoundPatches
 import xyz.xenondevs.nova.patch.impl.worldgen.NovaRuleTestPatch
