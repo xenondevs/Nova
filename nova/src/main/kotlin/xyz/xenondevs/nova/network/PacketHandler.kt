@@ -32,9 +32,8 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
     private val incomingDropQueue = CopyOnWriteArrayList<PacketDropRequest>()
     private val outgoingDropQueue = CopyOnWriteArrayList<PacketDropRequest>()
     
+    @Volatile
     var player: Player? = null
-        internal set
-    var loggedIn = false
         internal set
     
     override fun write(ctx: ChannelHandlerContext?, msg: Any?, promise: ChannelPromise?) {
@@ -98,7 +97,7 @@ class PacketHandler internal constructor(val channel: Channel) : ChannelDuplexHa
     
     override fun flush(ctx: ChannelHandlerContext?) {
         try {
-            if (loggedIn) {
+            if (player != null) {
                 while (queue.isNotEmpty()) {
                     channel.write(queue.poll().duplicate())
                 }
