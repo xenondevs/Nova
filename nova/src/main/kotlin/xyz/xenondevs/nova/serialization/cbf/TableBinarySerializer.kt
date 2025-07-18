@@ -92,13 +92,13 @@ internal class TableBinarySerializer<R : Any, C : Any, V : Any>(
         
         @Suppress("UNCHECKED_CAST")
         private fun getTableCreator(type: KType): TableCreator<Any?, Any?, Any?>? {
-            TreeBasedTable.create<Comparable<*>, Comparable<*>, Any?>()
+            TreeBasedTable.create<Comparable<*>, Comparable<*>, Any>()
             return when(type.classifierClass) {
-                HashBasedTable::class -> { { HashBasedTable.create<Any?, Any?, Any?>() } }
-                TreeBasedTable::class -> { { TreeBasedTable.create<Comparable<*>, Comparable<*>, Any?>() } as TableCreator<Any?, Any?, Any?> }
-                Table::class -> { { HashBasedTable.create<Any?, Any?, Any?>() } }
+                HashBasedTable::class -> { { HashBasedTable.create<Any, Any, Any>() } }
+                TreeBasedTable::class -> { { TreeBasedTable.create<Comparable<*>, Comparable<*>, Any>() } as TableCreator<Any, Any, Any> }
+                Table::class -> { { HashBasedTable.create<Any, Any, Any>() } }
                 else -> null
-            }
+            } as TableCreator<Any?, Any?, Any?>?
         }
         
     }
