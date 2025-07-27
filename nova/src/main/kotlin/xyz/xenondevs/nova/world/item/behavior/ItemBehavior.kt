@@ -9,6 +9,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
@@ -52,19 +53,76 @@ interface ItemBehavior : ItemBehaviorHolder {
     val vanillaMaterialProperties: Provider<List<VanillaMaterialProperty>>
         get() = provider(emptyList())
     
+    /**
+     * Called when a [PlayerInteractEvent] is fired for an [itemStack] with this behavior.
+     */
     fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
+    
+    /**
+     * Called when a [PlayerInteractAtEntityEvent] is fired for an [itemStack] with this behavior.
+     */
     fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
+    
+    /**
+     * Called when an [EntityDamageByEntityEvent] is fired where [player] attacks [attacked] using [itemStack] with this behavior in their main hand.
+     */
     fun handleAttackEntity(player: Player, itemStack: ItemStack, attacked: Entity, event: EntityDamageByEntityEvent) = Unit
+    
+    /**
+     * Called when a [BlockBreakEvent] is fired where [player] uses an [itemStack] with this behavior.
+     */
     fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) = Unit
+    
+    /**
+     * Called when a [PlayerItemDamageEvent] is fired where an [itemStack] with this behavior takes damage.
+     */
     fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) = Unit
+    
+    /**
+     * Called when a a[PlayerItemBreakEvent] is fired where an [itemStack] with this behavior runs out of durability and breaks.
+     */
     fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) = Unit
+    
+    /**
+     * Called when a [EntityEquipmentChangedEvent] is fired where [player] equips or unequips an [itemStack] with this behavior.
+     */
     fun handleEquip(player: Player, itemStack: ItemStack, slot: EquipmentSlot, equipped: Boolean, event: EntityEquipmentChangedEvent) = Unit
+    
+    /**
+     * Called when an [InventoryClickEvent] is fired where [player] clicks on an [itemStack] with this behavior.
+     */
     fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
+    
+    /**
+     * Called when an [InventoryClickEvent] is fired where [player] clicks on an [itemStack] with this behavior in their cursor.
+     */
     fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
+    
+    /**
+     * Called when an [InventoryClickEvent] is fired where [player] swaps an item with a hotbar [itemStack] with this behavior.
+     */
     fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
+    
+    /**
+     * Called when a [BlockBreakActionEvent] is fired where [player] breaks a block with an [itemStack] with this behavior.
+     */
     fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) = Unit
+    
+    /**
+     * Called when a [PlayerItemConsumeEvent] is fired where [player] consumes an [itemStack] with this behavior.
+     */
     fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) = Unit
+    
+    /**
+     * Called when a [ServerboundPlayerActionPacketEvent] is fired where the server receives a player action packet regarding an [itemStack] with this behavior.
+     * Note that this is a packet event, and as such this function is called a netty thread, not the server thread.
+     */
     fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
+    
+    /**
+     * Called every tick for an [itemStack] with this behavior that is in the [player's][player] inventory.
+     * The [slot] is the index inside the [player inventory's][Player.getInventory] [contents][org.bukkit.inventory.Inventory.getContents].
+     */
     fun handleInventoryTick(player: Player, itemStack: ItemStack, slot: Int) = Unit
     
     /**
