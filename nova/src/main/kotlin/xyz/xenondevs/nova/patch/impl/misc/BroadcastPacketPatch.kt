@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.patch.impl.playerlist
+package xyz.xenondevs.nova.patch.impl.misc
 
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.ResourceKey

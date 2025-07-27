@@ -4,6 +4,7 @@ import net.kyori.adventure.key.Key
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.crafting.RecipeHolder
+import net.minecraft.world.item.crafting.RecipeInput
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.event.EventHandler
@@ -104,6 +105,7 @@ object RecipeManager : Listener, PacketListener {
     private fun loadRecipes() {
         RecipesLoader.extractAndLoadRecipes().forEach(RecipeManager::loadRecipe)
         hardcodedRecipes.forEach(RecipeManager::loadRecipe)
+        MINECRAFT_SERVER.recipeManager.finalizeRecipeLoading()
     }
     
     private fun loadRecipe(recipe: Any) {
@@ -123,7 +125,7 @@ object RecipeManager : Listener, PacketListener {
                 
                 val key = ResourceKey.create(Registries.RECIPE, recipe.key.resourceLocation)
                 val holder = RecipeHolder(key, nmsRecipe)
-                MINECRAFT_SERVER.recipeManager.addRecipe(holder)
+                MINECRAFT_SERVER.recipeManager.recipes.addRecipe(holder)
                 
                 registeredVanillaRecipes[key] = holder
                 customVanillaRecipes[key] = nmsRecipe
@@ -137,7 +139,9 @@ object RecipeManager : Listener, PacketListener {
     
     internal fun reload() {
         for (key in customVanillaRecipes.keys) {
-            MINECRAFT_SERVER.recipeManager.removeRecipe(key)
+            @Suppress("UNCHECKED_CAST")
+            key as ResourceKey<MojangRecipe<RecipeInput>>
+            MINECRAFT_SERVER.recipeManager.recipes.removeRecipe(key)
         }
         
         customVanillaRecipes.clear()
