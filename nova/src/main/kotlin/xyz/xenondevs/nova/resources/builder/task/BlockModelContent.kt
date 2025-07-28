@@ -52,7 +52,7 @@ private val DISABLED_BACKING_STATE_CATEGORIES: Set<BackingStateCategory> by MAIN
  * Deals with generating and assigning custom block models to block states
  * (i.e. creating block state variant entries) or items.
  */
-class BlockModelContent internal constructor(private val builder: ResourcePackBuilder) : PackTask {
+class BlockModelContent(private val builder: ResourcePackBuilder) : PackTask {
     
     override val stage = BuildStage.PRE_WORLD
     override val runAfter = setOf(BasePacks.Include::class, ExtractTask::class, ModelContent.DiscoverAllModels::class)

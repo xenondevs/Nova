@@ -47,7 +47,7 @@ internal class RuntimeEquipmentData(
 /**
  * Generates equipment assets.
  */
-class EquipmentTask internal constructor(private val builder: ResourcePackBuilder) : PackTask {
+class EquipmentTask(private val builder: ResourcePackBuilder) : PackTask {
     
     override val stage = BuildStage.PRE_WORLD
     override val runAfter = setOf(ExtractTask::class)

@@ -222,7 +222,7 @@ private const val ASCENT = -4
 /**
  * Writes WAILA assets to the resource pack.
  */
-class WailaTask internal constructor(
+class WailaTask(
     builder: ResourcePackBuilder
 ) : CustomFontContent(
     builder,

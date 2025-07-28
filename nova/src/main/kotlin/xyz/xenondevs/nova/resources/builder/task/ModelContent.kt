@@ -26,7 +26,7 @@ import kotlin.io.path.walk
  * A [PackBuildData] that deals with item/block model files.
  * Everything related to item/block model files should run through this.
  */
-class ModelContent internal constructor(private val builder: ResourcePackBuilder) : PackBuildData, Iterable<Map.Entry<ResourcePath<ResourceType.Model>, Model>> {
+class ModelContent(private val builder: ResourcePackBuilder) : PackBuildData, Iterable<Map.Entry<ResourcePath<ResourceType.Model>, Model>> {
     
     private val json = Json { ignoreUnknownKeys = true }
     

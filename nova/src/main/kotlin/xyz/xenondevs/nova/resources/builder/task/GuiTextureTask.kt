@@ -21,7 +21,7 @@ internal class GuiTextureData(
 /**
  * Generates gui texture assets.
  */
-class GuiTextureTask internal constructor(
+class GuiTextureTask(
     builder: ResourcePackBuilder
 ) : CustomFontContent(
     builder,

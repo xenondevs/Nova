@@ -22,7 +22,7 @@ private val SETTINGS: Set<String> by combinedProvider(
 /**
  * Calculates char sizes for all fonts.
  */
-class CharSizeCalculator internal constructor(private val builder: ResourcePackBuilder) : PackTask {
+class CharSizeCalculator(private val builder: ResourcePackBuilder) : PackTask {
     
     override val runAfter = setOf(
         FontContent.DiscoverAllFonts::class, GuiTextureTask::class, MoveCharactersTask::class,

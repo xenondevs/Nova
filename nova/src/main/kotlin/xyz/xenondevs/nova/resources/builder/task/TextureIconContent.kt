@@ -14,7 +14,7 @@ private const val ASCENT = 12
  * Allows requesting "texture icons", which are font characters that use textures as their glyphs
  * (i.e. tool textures like pickaxes).
  */
-class TextureIconContent internal constructor(
+class TextureIconContent(
     builder: ResourcePackBuilder
 ) : CustomFontContent(
     builder,
