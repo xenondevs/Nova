@@ -34,6 +34,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder.Companion.config
 import xyz.xenondevs.nova.resources.builder.data.PackMcMeta
 import xyz.xenondevs.nova.resources.builder.task.AtlasTask
 import xyz.xenondevs.nova.resources.builder.task.BlockModelContent
+import xyz.xenondevs.nova.resources.builder.task.BlockStateContent
 import xyz.xenondevs.nova.resources.builder.task.BossBarOverlayTask
 import xyz.xenondevs.nova.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.resources.builder.task.CharSizeCalculator
@@ -145,6 +146,10 @@ class ResourcePackBuilder internal constructor(
             register(CORE_PACK_ID) {
                 registerBuildData(::BasePacks)
                 registerTask(BasePacks::Include)
+                
+                registerBuildData(::BlockStateContent)
+                registerTask(BlockStateContent::Load)
+                registerTask(BlockStateContent::Write)
                 
                 registerBuildData(::FontContent)
                 registerTask(FontContent::DiscoverAllFonts)

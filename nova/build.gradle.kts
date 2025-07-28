@@ -49,14 +49,17 @@ tasks {
             expand(properties)
         }
     }
+    test {
+        environment("MINECRAFT_VERSION", libs.versions.paper.get().substringBefore("-R0.1-SNAPSHOT"))
+    }
 }
 
 kotlin {
     compilerOptions {
         optIn.addAll(
             "kotlinx.coroutines.ExperimentalCoroutinesApi",
-                "xyz.xenondevs.invui.ExperimentalReactiveApi"
-            )
+            "xyz.xenondevs.invui.ExperimentalReactiveApi"
+        )
     }
 }
 

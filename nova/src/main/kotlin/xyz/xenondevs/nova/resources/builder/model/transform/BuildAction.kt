@@ -9,6 +9,9 @@ import xyz.xenondevs.nova.resources.builder.task.ModelContent
  */
 internal sealed interface BuildAction
 
+/**
+ * A [BuildAction] that requires a [ModelContent] context.
+ */
 internal sealed interface ContextualModelBuildAction : BuildAction {
     
     /**
@@ -18,6 +21,9 @@ internal sealed interface ContextualModelBuildAction : BuildAction {
     
 }
 
+/**
+ * A [BuildAction] that does not require a [ModelContent] context.
+ */
 internal sealed interface NonContextualModelBuildAction : BuildAction {
     
     /**
