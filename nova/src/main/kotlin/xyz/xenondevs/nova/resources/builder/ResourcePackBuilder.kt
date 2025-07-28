@@ -238,7 +238,7 @@ class ResourcePackBuilder internal constructor(
                 MCASSETS_DIR.toFile().deleteRecursively()
                 val downloader = MinecraftAssetsDownloader(
                     version = SERVER_VERSION.toString(omitZeros = true),
-                    outputDirectory = MCASSETS_DIR.toFile(),
+                    outputDirectory = MCASSETS_DIR,
                     mode = EXTRACTION_MODE,
                     logger = LOGGER
                 )
