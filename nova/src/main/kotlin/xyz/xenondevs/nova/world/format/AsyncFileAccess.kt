@@ -26,7 +26,7 @@ private class SerializedFile(val path: Path, val bin: ByteArray) {
 internal class AsyncFileAccess {
     
     private val channel = Channel<SerializedFile>(capacity = Channel.UNLIMITED)
-    private val pendingWrites = ConcurrentHashMap<Path, ByteArray?>()
+    private val pendingWrites = ConcurrentHashMap<Path, ByteArray>()
     
     private val job = CoroutineScope(Dispatchers.IO).launch(CoroutineName("Nova AFA")) {
         channel.consumeEach { (path, bin) ->
@@ -34,7 +34,7 @@ internal class AsyncFileAccess {
                 val tmpPath = path.resolveSibling(path.name + ".tmp")
                 tmpPath.writeBytes(bin)
                 tmpPath.moveTo(path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
-                pendingWrites.computeIfPresent(path) { _, pendingBin -> if (pendingBin === bin) null else pendingBin }
+                pendingWrites.remove(path, bin)
             } catch (t: Throwable) {
                 LOGGER.error("Failed to save file: $path", t)
             }
