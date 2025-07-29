@@ -71,6 +71,17 @@ class ModelBuilderTest {
     }
     
     @Test
+    fun testTranslatePivot() {
+        val model = deserializeModel("torch_wall/model")
+        
+        val builder = ModelBuilder(model)
+        builder.translate(Vector3d(16.0, -8.0, -16.0))
+        val translated = builder.buildScaled(null)
+        
+        assertEquals(deserializeModel("torch_wall/translated/16_-8_-16"), translated)
+    }
+    
+    @Test
     fun testRotateX() {
         assertRotatedEquals("half_cube", Model.Axis.X, 22.5)
         assertRotatedEquals("half_cube", Model.Axis.X, 45.0)
