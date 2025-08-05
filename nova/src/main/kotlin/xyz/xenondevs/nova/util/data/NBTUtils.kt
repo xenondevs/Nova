@@ -68,6 +68,11 @@ object NBTUtils {
         tag.remove("Inventory")
         tag.remove("equipment")
         
+        // recursively remove item data from passengers as well
+        tag.getListOrNull("Passengers")
+            ?.filterIsInstance<CompoundTag>()
+            ?.forEach(::removeItemData)
+        
         return tag
     }
     
