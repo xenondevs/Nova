@@ -17,6 +17,7 @@ import net.minecraft.world.level.storage.TagValueOutput
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.craftbukkit.entity.CraftEntity
+import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.nova.util.data.NBTUtils
@@ -128,6 +129,10 @@ val BukkitEntity.eyeInWater: Boolean
 object EntityUtils {
     
     internal val DUMMY_PLAYER = createFakePlayer(Location(Bukkit.getWorlds()[0], 0.0, 0.0, 0.0), UUID.randomUUID(), "Nova Dummy Player")
+    private val DEFAULT_DESERIALIZATION_DISALLOWED_ENTITY_TYPES: Set<EntityType> = buildSet { 
+        add(EntityType.COMMAND_BLOCK_MINECART)
+        add(EntityType.FALLING_BLOCK) // command block falling block (for good measure, command doesn't seem to be there after landing)
+    }
     
     /**
      * Gets a list of all passengers of this [BukkitEntity], including passengers of passengers.
@@ -200,17 +205,35 @@ object EntityUtils {
         return data
     }
     
+    
+    // TODO: merge functions in 0.21
     /**
      * Spawns an [BukkitEntity] based on serialized [data] and a [location].
      *
+     * @param nbtModifier Called before the [BukkitEntity] gets spawned into the world to allow nbt modifications.
+     */
+    @Deprecated("Use deserializeAndSpawn with disallowedEntityTypes parameter instead.", ReplaceWith("deserializeAndSpawn(data, location, spawnReason, disallowedEntityTypes, nbtModifier)"))
+    fun deserializeAndSpawn(
+        data: ByteArray,
+        location: Location,
+        spawnReason: EntitySpawnReason = EntitySpawnReason.MOB_SUMMONED,
+        nbtModifier: ((CompoundTag) -> CompoundTag)? = null
+    ): MojangEntity = deserializeAndSpawn(data, location, spawnReason, DEFAULT_DESERIALIZATION_DISALLOWED_ENTITY_TYPES, nbtModifier)!!
+    
+    /**
+     * Spawns an [BukkitEntity] based on serialized [data] and a [location], skipping
+     * all entities whose [EntityType] or their passengers are in the [disallowedEntityTypes] set.
+     * 
+     * @param disallowedEntityTypes A set of [EntityType]s that should not be spawned.
      * @param nbtModifier Called before the [BukkitEntity] gets spawned into the world to allow nbt modifications.
      */
     fun deserializeAndSpawn(
         data: ByteArray,
         location: Location,
         spawnReason: EntitySpawnReason = EntitySpawnReason.MOB_SUMMONED,
+        disallowedEntityTypes: Set<EntityType> = DEFAULT_DESERIALIZATION_DISALLOWED_ENTITY_TYPES,
         nbtModifier: ((CompoundTag) -> CompoundTag)? = null
-    ): MojangEntity {
+    ): MojangEntity? {
         // get world
         val world = location.world!!
         val level = world.serverLevel
@@ -225,17 +248,24 @@ object EntityUtils {
         compoundTag.put("Rotation", NBTUtils.createFloatList(location.yaw, location.pitch))
         
         // modify nbt data
-        if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag)
+        if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag) // TODO: passengers
         
-        // deserialize compound tag to entity
-        return NMSEntityType.loadEntityRecursive(compoundTag, level, spawnReason) { entity ->
+        val entities = ArrayList<MojangEntity>()
+        NMSEntityType.loadEntityRecursive(compoundTag, level, spawnReason) { entity ->
             // assign new uuid
             entity.uuid = UUID.randomUUID()
             
-            // add entity to world
-            level.addWithUUID(entity)
+            // (deferred) add entity to world
+            entities += entity
             entity
-        }!!
+        }
+        
+        if (entities.isNotEmpty() && entities.none { it.bukkitEntity.type in disallowedEntityTypes }) {
+            entities.forEach(level::addWithUUID)
+            return entities[0]
+        } else {
+            return null
+        }
     }
     
     /**
