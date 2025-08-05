@@ -1,8 +1,6 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
-$dokka.location:xyz.xenondevs.nova.patch.impl.worldgen.chunksection////PointingToDeclaration/nova/xyz.xenondevs.nova.patch.impl.worldgen.chunksection.html
-$dokka.location:xyz.xenondevs.nova.world.generation.inject.biome////PointingToDeclaration/nova/xyz.xenondevs.nova.world.generation.inject.biome.html
-$dokka.location:xyz.xenondevs.nova////PointingToDeclaration/nova/xyz.xenondevs.nova.html
+
 module:nova
 xyz.xenondevs.nova
 xyz.xenondevs.nova.addon
@@ -47,6 +45,7 @@ xyz.xenondevs.nova.resources.builder.task.model
 xyz.xenondevs.nova.resources.upload
 xyz.xenondevs.nova.serialization
 xyz.xenondevs.nova.serialization.cbf
+xyz.xenondevs.nova.serialization.cbf.adapter
 xyz.xenondevs.nova.serialization.configurate
 xyz.xenondevs.nova.serialization.json.serializer
 xyz.xenondevs.nova.serialization.persistentdata
