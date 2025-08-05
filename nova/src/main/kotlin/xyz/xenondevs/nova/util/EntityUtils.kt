@@ -248,7 +248,7 @@ object EntityUtils {
         compoundTag.put("Rotation", NBTUtils.createFloatList(location.yaw, location.pitch))
         
         // modify nbt data
-        if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag) // TODO: passengers
+        if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag)
         
         val entities = ArrayList<MojangEntity>()
         NMSEntityType.loadEntityRecursive(compoundTag, level, spawnReason) { entity ->
