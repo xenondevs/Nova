@@ -13,8 +13,8 @@ class BundlerJarPlugin : Plugin<Project> {
         val bundlerJarExtension = project.extensions.create<BuildBundlerJarExtension>("loaderJar")
         project.tasks.register<BuildBundlerJarTask>("loaderJar") {
             this.group = LifecycleBasePlugin.BUILD_GROUP
+            this.novaInput.set(project.project(":nova").tasks.named<Jar>("jar").flatMap { it.archiveFile } )
             this.input = project.files(listOf(
-                project.project(":nova"),
                 project.project(":nova-api"),
                 *project.subprojects.filter { it.name.startsWith("nova-hook-") }.toTypedArray()
             ).map { it.tasks.named<Jar>("jar").flatMap { it.archiveFile } })

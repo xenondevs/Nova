@@ -1,6 +1,6 @@
 plugins {
     id("nova.kotlin-conventions")
-    id("nova.paper-conventions")
+    id("nova.origami-conventions")
     id("nova.dokka-conventions")
     id("nova.publish-conventions")
     alias(libs.plugins.kotlinx.serialization)
@@ -30,6 +30,9 @@ dependencies {
     novaLoader(libs.zstd)
     novaLoader(libs.bundles.jgrapht)
     novaLoader(libs.snakeyaml.engine)
+    
+    compileOnly(origamiLibs.mixin)
+    compileOnly(origamiLibs.mixinextras)
     
     // test dependencies
     testImplementation(platform(libs.junit.bom))

@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "xyz.xenondevs.nova.mixin",
+  "mixins": ["item.ItemStackDataComponentsMixin"],
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  }
+}

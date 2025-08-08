@@ -25,8 +25,15 @@ include("nova-hooks:nova-hook-worldguard")
 include("catalog")
 
 dependencyResolutionManagement {
+    repositories {
+        mavenLocal()
+    }
+    
     versionCatalogs {
         create("libs")
+        create("origamiLibs") {
+            from("xyz.xenondevs.origami:origami-catalog:0.1.0")
+        }
     }
 }
 
