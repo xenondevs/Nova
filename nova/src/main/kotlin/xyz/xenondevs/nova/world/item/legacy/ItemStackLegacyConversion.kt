@@ -69,6 +69,7 @@ internal object ItemStackLegacyConversion {
     }
     
     @Suppress("DEPRECATION")
+    @JvmStatic
     fun convert(patch: DataComponentPatch): DataComponentPatch {
         if (!ENABLED)
             return patch

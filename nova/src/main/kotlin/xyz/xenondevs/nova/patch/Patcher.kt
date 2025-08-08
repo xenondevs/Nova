@@ -21,19 +21,15 @@ import xyz.xenondevs.nova.patch.impl.block.TripwireLogicPatch
 import xyz.xenondevs.nova.patch.impl.bossbar.BossBarOriginPatch
 import xyz.xenondevs.nova.patch.impl.chunk.ChunkSchedulingPatch
 import xyz.xenondevs.nova.patch.impl.item.DyeablePatches
-import xyz.xenondevs.nova.patch.impl.item.EnchantmentPatches
 import xyz.xenondevs.nova.patch.impl.item.FuelPatches
-import xyz.xenondevs.nova.patch.impl.item.ItemStackDataComponentsPatch
 import xyz.xenondevs.nova.patch.impl.item.RemainingItemPatches
 import xyz.xenondevs.nova.patch.impl.item.RepairPatches
-import xyz.xenondevs.nova.patch.impl.item.ToolPatches
 import xyz.xenondevs.nova.patch.impl.misc.BindPlayerToPacketHandlerPatch
 import xyz.xenondevs.nova.patch.impl.misc.BroadcastPacketPatch
 import xyz.xenondevs.nova.patch.impl.misc.DontCloseAddonClassLoadersPatch
 import xyz.xenondevs.nova.patch.impl.misc.EventPreventionPatch
 import xyz.xenondevs.nova.patch.impl.misc.FakePlayerLastHurtPatch
 import xyz.xenondevs.nova.patch.impl.registry.RegistryEventsPatch
-import xyz.xenondevs.nova.patch.impl.sound.SoundPatches
 import xyz.xenondevs.nova.patch.impl.worldgen.NovaRuleTestPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.WrapperBlockPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.ChunkAccessSectionsPatch
@@ -52,16 +48,22 @@ internal object Patcher {
     private val extraOpens = setOf("java.lang", "java.lang.reflect", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
     private val transformers by lazy {
         sequenceOf(
-            FieldFilterPatch, ToolPatches,
+            FieldFilterPatch,
             LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
-            WrapperBlockPatch, NovaRuleTestPatch, FuelPatches, RemainingItemPatches, SoundPatches,
+            WrapperBlockPatch, NovaRuleTestPatch, FuelPatches, RemainingItemPatches,
             BroadcastPacketPatch, EventPreventionPatch, BossBarOriginPatch,
             FakePlayerLastHurtPatch, BlockBehaviorPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
-            ItemStackDataComponentsPatch, EnchantmentPatches, RepairPatches, BlockMigrationPatches,
+            RepairPatches, BlockMigrationPatches,
             TripwireLogicPatch, FluidFlowPatch, RegistryEventsPatch, DyeablePatches, EarlyBlockPlaceEventPatch,
             DontCloseAddonClassLoadersPatch, BindPlayerToPacketHandlerPatch
         ).filter(Transformer::shouldTransform).toSet()
     }
+    
+    // TODO
+    // ToolPatches EnchantmentPatches SoundPatches
+    
+    // Done
+    // ItemStackDataComponentsPatch
     
     // These class names can't be accessed via reflection to prevent class loading
     private val injectedClasses: Map<String, LcsWrapperAdapter?> = mapOf(
