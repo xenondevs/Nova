@@ -3,7 +3,7 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
+    mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
     mavenCentral()
     gradlePluginPortal()
 }
