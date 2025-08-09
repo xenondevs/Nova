@@ -1,12 +1,13 @@
 package xyz.xenondevs.nova.ui.overlay.bossbar.positioning
 
+import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.key.Key
-import xyz.xenondevs.nova.util.bossbar.BossBar
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import java.util.*
 import org.bukkit.plugin.Plugin as BukkitPlugin
 
 data class BarMatchInfo(
+    val uuid: UUID?,
     val bossBar: BossBar?,
     val barIndex: Int?,
     val origin: BarOrigin?
@@ -14,14 +15,8 @@ data class BarMatchInfo(
     
     companion object {
         
-        fun fromBossBar(bossBar: BossBar, barIndex: Int): BarMatchInfo =
-            BarMatchInfo(bossBar, barIndex, BarOrigin.Minecraft)
-        
-        fun fromPlugin(bossBar: BossBar, barIndex: Int, plugin: BukkitPlugin): BarMatchInfo =
-            BarMatchInfo(bossBar, barIndex, BarOrigin.Plugin(plugin))
-        
         fun fromAddon(id: Key): BarMatchInfo =
-            BarMatchInfo(null, null, BarOrigin.Addon(id))
+            BarMatchInfo(null, null, null, BarOrigin.Addon(id))
         
     }
     
@@ -32,7 +27,7 @@ interface BarMatcher {
     fun test(info: BarMatchInfo): Boolean
     
     class Id(private val uuid: UUID) : BarMatcher {
-        override fun test(info: BarMatchInfo) = info.bossBar?.id == uuid
+        override fun test(info: BarMatchInfo) = info.uuid == uuid
     }
     
     class Index(private val index: Int) : BarMatcher {
@@ -40,7 +35,7 @@ interface BarMatcher {
     }
     
     class Text(private val regex: Regex) : BarMatcher {
-        override fun test(info: BarMatchInfo) = info.bossBar?.name?.toPlainText()?.matches(regex) ?: false
+        override fun test(info: BarMatchInfo) = info.bossBar?.name()?.toPlainText()?.matches(regex) ?: false
     }
     
     class Origin(private val origin: BarOrigin) : BarMatcher {

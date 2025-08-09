@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.ui.overlay.bossbar
 
 import io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader
 import net.kyori.adventure.text.Component
+import net.minecraft.network.protocol.game.ClientboundBossEventPacket.*
 import net.minecraft.world.BossEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -32,14 +33,9 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarOrigin
 import xyz.xenondevs.nova.ui.overlay.bossbar.positioning.BarPositioning
 import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlay
 import xyz.xenondevs.nova.ui.overlay.bossbar.vanilla.VanillaBossBarOverlayCompound
-import xyz.xenondevs.nova.util.bossbar.BossBar
-import xyz.xenondevs.nova.util.bossbar.operation.AddBossBarOperation
-import xyz.xenondevs.nova.util.bossbar.operation.RemoveBossBarOperation
-import xyz.xenondevs.nova.util.bossbar.operation.UpdateNameBossBarOperation
-import xyz.xenondevs.nova.util.bossbar.operation.UpdateProgressBossBarOperation
-import xyz.xenondevs.nova.util.bossbar.operation.UpdatePropertiesBossBarOperation
-import xyz.xenondevs.nova.util.bossbar.operation.UpdateStyleBossBarOperation
+import xyz.xenondevs.nova.util.BossBar
 import xyz.xenondevs.nova.util.component.adventure.move
+import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
@@ -298,7 +294,7 @@ object BossBarOverlayManager : Listener, PacketListener {
             
             val player = event.player
             when (val operation = event.operation) {
-                is AddBossBarOperation -> {
+                is AddOperation -> {
                     val bar = BossBar.of(id, operation)
                     // add the bar to the tracked bar map
                     val trackedPlayerBars = trackedBars.getOrPut(player, ::LinkedHashMap)
@@ -306,13 +302,13 @@ object BossBarOverlayManager : Listener, PacketListener {
                     
                     // create a fake bar for rendering
                     val fakeBarOverlay = VanillaBossBarOverlay(player, bar)
-                    val matchInfo = BarMatchInfo(bar, trackedPlayerBars.values.indexOf(bar), trackedOrigins[id] ?: BarOrigin.Minecraft)
+                    val matchInfo = BarMatchInfo(bar.id, bar.toAdventure(), trackedPlayerBars.values.indexOf(bar), trackedOrigins[id] ?: BarOrigin.Minecraft)
                     val compound = VanillaBossBarOverlayCompound(fakeBarOverlay, matchInfo)
                     vanillaBarOverlays[bar] = compound
                     registerOverlay(player, compound)
                 }
                 
-                is RemoveBossBarOperation -> {
+                REMOVE_OPERATION -> {
                     // remove from tracked bars map
                     val bar = trackedBars[player]?.remove(id)
                     
@@ -325,15 +321,15 @@ object BossBarOverlayManager : Listener, PacketListener {
                     // update the values in the boss bar
                     val bar = trackedBars[player]?.get(id) ?: return
                     when (operation) {
-                        is UpdateNameBossBarOperation -> bar.name = operation.name
-                        is UpdateProgressBossBarOperation -> bar.progress = operation.progress
+                        is UpdateNameOperation -> bar.name = operation.name.toAdventureComponent()
+                        is UpdateProgressOperation -> bar.progress = operation.progress
                         
-                        is UpdateStyleBossBarOperation -> {
+                        is UpdateStyleOperation -> {
                             bar.color = operation.color
                             bar.overlay = operation.overlay
                         }
                         
-                        is UpdatePropertiesBossBarOperation -> {
+                        is UpdatePropertiesOperation -> {
                             bar.darkenScreen = operation.darkenScreen
                             bar.playMusic = operation.playMusic
                             bar.createWorldFog = operation.createWorldFog

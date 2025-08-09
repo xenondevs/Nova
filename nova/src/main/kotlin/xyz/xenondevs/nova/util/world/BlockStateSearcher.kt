@@ -6,7 +6,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.minecraft.util.BitStorage
-import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap
 import net.minecraft.util.ZeroBitStorage
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
@@ -14,31 +13,13 @@ import net.minecraft.world.level.chunk.GlobalPalette
 import net.minecraft.world.level.chunk.HashMapPalette
 import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.Palette
-import net.minecraft.world.level.chunk.PalettedContainer
 import net.minecraft.world.level.chunk.SingleValuePalette
 import xyz.xenondevs.commons.collections.getOrSet
 import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
-import java.lang.invoke.MethodHandles
 import kotlin.reflect.jvm.jvmName
-
-private val PALETTED_CONTAINER_DATA_CLASS = Class.forName("net.minecraft.world.level.chunk.PalettedContainer\$Data")
-private val PALETTED_CONTAINER_DATA_LOOKUP = MethodHandles.privateLookupIn(PALETTED_CONTAINER_DATA_CLASS, MethodHandles.lookup())
-private val PALETTED_CONTAINER_GET_DATA = MethodHandles
-    .privateLookupIn(PalettedContainer::class.java, MethodHandles.lookup())
-    .findGetter(PalettedContainer::class.java, "data", PALETTED_CONTAINER_DATA_CLASS)
-private val PALETTED_CONTAINER_DATA_GET_PALETTE = PALETTED_CONTAINER_DATA_LOOKUP
-    .findGetter(PALETTED_CONTAINER_DATA_CLASS, "palette", Palette::class.java)
-private val PALETTED_CONTAINER_DATA_GET_STORAGE = PALETTED_CONTAINER_DATA_LOOKUP
-    .findGetter(PALETTED_CONTAINER_DATA_CLASS, "storage", BitStorage::class.java)
-private val LINEAR_PALETTE_GET_VALUES = MethodHandles
-    .privateLookupIn(LinearPalette::class.java, MethodHandles.lookup())
-    .findGetter(LinearPalette::class.java, "values", Array<Any>::class.java)
-private val HASH_MAP_PALETTE_GET_VALUES = MethodHandles
-    .privateLookupIn(HashMapPalette::class.java, MethodHandles.lookup())
-    .findGetter(HashMapPalette::class.java, "values", CrudeIncrementalIntIdentityHashBiMap::class.java)
 
 private typealias ChunkSearchQuery = (BlockState) -> Boolean
 
@@ -59,8 +40,8 @@ object BlockStateSearcher {
             
             try {
                 val bottomY = section.bottomBlockY
-                val data = PALETTED_CONTAINER_GET_DATA.invoke(container)
-                val palette = PALETTED_CONTAINER_DATA_GET_PALETTE.invoke(data) as Palette<BlockState>
+                val data = container.data
+                val palette = data.palette()
                 var storage: BitStorage? = null
                 
                 for ((queryIdx, query) in queries.withIndex()) {
@@ -69,7 +50,7 @@ object BlockStateSearcher {
                         continue
                     
                     if (storage == null)
-                        storage = PALETTED_CONTAINER_DATA_GET_STORAGE.invoke(data) as BitStorage
+                        storage = data.storage()
                     
                     if (storage is ZeroBitStorage)
                         break
@@ -115,13 +96,14 @@ object BlockStateSearcher {
     
     private fun LinearPalette<BlockState>.findIdsLinear(query: ChunkSearchQuery): Int2ObjectMap<BlockState> {
         val result = Int2ObjectOpenHashMap<BlockState>()
-        val values = LINEAR_PALETTE_GET_VALUES.invoke(this) as Array<Any?>
         
+        // values is an Object[], not a T[] (assigned via uncheck cast)
+        // treating it as BlockState[] will cause ClassCastException
+        val values: Array<out Any> = values
         for ((idx, value) in values.withIndex()) {
-            if (value == null)
+            if (value !is BlockState)
                 continue
             
-            value as BlockState
             if (query(value)) {
                 result.put(idx, value)
             }
@@ -132,7 +114,6 @@ object BlockStateSearcher {
     
     private fun HashMapPalette<BlockState>.findIdsHashMap(query: ChunkSearchQuery): Int2ObjectMap<BlockState> {
         val result = Int2ObjectOpenHashMap<BlockState>()
-        val values = HASH_MAP_PALETTE_GET_VALUES.invoke(this) as CrudeIncrementalIntIdentityHashBiMap<BlockState>
         
         for ((idx, value) in values.withIndex()) {
             if (query(value)) {

@@ -1,8 +1,6 @@
 package xyz.xenondevs.nova.world.item.behavior
 
-import it.unimi.dsi.fastutil.objects.Object2IntSortedMap
 import net.minecraft.world.item.Item
-import net.minecraft.world.level.block.entity.FuelValues
 import org.bukkit.Material
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import xyz.xenondevs.commons.collections.enumMap
@@ -11,12 +9,8 @@ import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.item.novaItem
-import java.lang.invoke.MethodHandles
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
-
-private val FUEL_VALUES_VALUES = MethodHandles.privateLookupIn(FuelValues::class.java, MethodHandles.lookup())
-    .findGetter(FuelValues::class.java, "values", Object2IntSortedMap::class.java)
 
 /**
  * Creates a factory for [Fuel] behaviors using the given values, if not specified otherwise in the item's config.
@@ -57,9 +51,7 @@ class Fuel(burnTime: Provider<Int>) : ItemBehavior {
     companion object {
         
         @Suppress("UNCHECKED_CAST")
-        private val NMS_VANILLA_FUELS: Map<Item, Int> by lazy {
-            FUEL_VALUES_VALUES.invoke(MINECRAFT_SERVER.fuelValues()) as Map<Item, Int>
-        }
+        private val NMS_VANILLA_FUELS: Map<Item, Int> by lazy { MINECRAFT_SERVER.fuelValues().values }
         private val VANILLA_FUELS: Map<Material, Int> by lazy {
             NMS_VANILLA_FUELS.mapKeysTo(enumMap()) { (item, _) -> CraftMagicNumbers.getMaterial(item) }
         }

@@ -18,7 +18,6 @@ import xyz.xenondevs.nova.patch.impl.block.DisableBackingStateLogicPatch
 import xyz.xenondevs.nova.patch.impl.block.EarlyBlockPlaceEventPatch
 import xyz.xenondevs.nova.patch.impl.block.FluidFlowPatch
 import xyz.xenondevs.nova.patch.impl.block.TripwireLogicPatch
-import xyz.xenondevs.nova.patch.impl.bossbar.BossBarOriginPatch
 import xyz.xenondevs.nova.patch.impl.chunk.ChunkSchedulingPatch
 import xyz.xenondevs.nova.patch.impl.item.DyeablePatches
 import xyz.xenondevs.nova.patch.impl.item.FuelPatches
@@ -51,7 +50,7 @@ internal object Patcher {
             FieldFilterPatch,
             LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
             WrapperBlockPatch, NovaRuleTestPatch, FuelPatches, RemainingItemPatches,
-            BroadcastPacketPatch, EventPreventionPatch, BossBarOriginPatch,
+            BroadcastPacketPatch, EventPreventionPatch,
             FakePlayerLastHurtPatch, BlockBehaviorPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
             RepairPatches, BlockMigrationPatches,
             TripwireLogicPatch, FluidFlowPatch, RegistryEventsPatch, DyeablePatches, EarlyBlockPlaceEventPatch,
@@ -60,7 +59,7 @@ internal object Patcher {
     }
     
     // TODO
-    // ToolPatches EnchantmentPatches SoundPatches
+    // ToolPatches EnchantmentPatches SoundPatches BossBarOriginPatch
     
     // Done
     // ItemStackDataComponentsPatch

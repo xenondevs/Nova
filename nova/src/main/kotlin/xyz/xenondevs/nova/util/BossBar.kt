@@ -1,18 +1,16 @@
-package xyz.xenondevs.nova.util.bossbar
+package xyz.xenondevs.nova.util
 
 import net.kyori.adventure.text.Component
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.world.BossEvent
-import xyz.xenondevs.nova.network.ClientboundBossEventPacket
-import xyz.xenondevs.nova.util.bossbar.operation.AddBossBarOperation
-import xyz.xenondevs.nova.util.bossbar.operation.RemoveBossBarOperation
-import xyz.xenondevs.nova.util.bossbar.operation.UpdateNameBossBarOperation
-import xyz.xenondevs.nova.util.bossbar.operation.UpdateProgressBossBarOperation
-import xyz.xenondevs.nova.util.bossbar.operation.UpdatePropertiesBossBarOperation
-import xyz.xenondevs.nova.util.bossbar.operation.UpdateStyleBossBarOperation
+import xyz.xenondevs.commons.collections.enumSetOf
+import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
+import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import java.util.*
+import net.kyori.adventure.bossbar.BossBar as AdventureBossBar
 
-class BossBar(
+internal class BossBar(
     val id: UUID,
     name: Component = Component.text(""),
     progress: Float = 0.0f,
@@ -94,52 +92,67 @@ class BossBar(
             _updatePropertiesPacket = null
         }
     
-    private var _addOperation: AddBossBarOperation? = null
-    val addOperation: AddBossBarOperation
+    private var _addOperation: ClientboundBossEventPacket.AddOperation? = null
+    val addOperation: ClientboundBossEventPacket.AddOperation
         get() {
             if (_addOperation == null) {
-                _addOperation = AddBossBarOperation(this.name, progress, color, overlay, darkenScreen, playMusic, createWorldFog)
+                var properties = 0
+                if (darkenScreen)
+                    properties = properties or 1
+                if (playMusic)
+                    properties = properties or 2
+                if (createWorldFog)
+                    properties = properties or 4
+                
+                val buf = RegistryFriendlyByteBuf()
+                ComponentSerialization.TRUSTED_STREAM_CODEC.encode(buf, name.toNMSComponent())
+                buf.writeFloat(progress)
+                buf.writeEnum(color)
+                buf.writeEnum(overlay)
+                buf.writeByte(properties)
+                
+                _addOperation = ClientboundBossEventPacket.AddOperation(buf)
             }
             return _addOperation!!
         }
     
-    private var _updateNameOperation: UpdateNameBossBarOperation? = null
-    val updateNameOperation: UpdateNameBossBarOperation
+    private var _updateNameOperation: ClientboundBossEventPacket.UpdateNameOperation? = null
+    val updateNameOperation: ClientboundBossEventPacket.UpdateNameOperation
         get() {
             if (_updateNameOperation == null) {
-                _updateNameOperation = UpdateNameBossBarOperation(this.name)
+                _updateNameOperation = ClientboundBossEventPacket.UpdateNameOperation(this.name.toNMSComponent())
             }
             return _updateNameOperation!!
         }
     
-    private var _updateProgressOperation: UpdateProgressBossBarOperation? = null
-    val updateProgressOperation: UpdateProgressBossBarOperation
+    private var _updateProgressOperation: ClientboundBossEventPacket.UpdateProgressOperation? = null
+    val updateProgressOperation: ClientboundBossEventPacket.UpdateProgressOperation
         get() {
             if (_updateProgressOperation == null) {
-                _updateProgressOperation = UpdateProgressBossBarOperation(progress)
+                _updateProgressOperation = ClientboundBossEventPacket.UpdateProgressOperation(progress)
             }
             return _updateProgressOperation!!
         }
     
-    private var _updateStyleOperation: UpdateStyleBossBarOperation? = null
-    val updateStyleOperation: UpdateStyleBossBarOperation
+    private var _updateStyleOperation: ClientboundBossEventPacket.UpdateStyleOperation? = null
+    val updateStyleOperation: ClientboundBossEventPacket.UpdateStyleOperation
         get() {
             if (_updateStyleOperation == null) {
-                _updateStyleOperation = UpdateStyleBossBarOperation(color, overlay)
+                _updateStyleOperation = ClientboundBossEventPacket.UpdateStyleOperation(color, overlay)
             }
             return _updateStyleOperation!!
         }
     
-    private var _updatePropertiesOperation: UpdatePropertiesBossBarOperation? = null
-    val updatePropertiesOperation: UpdatePropertiesBossBarOperation
+    private var _updatePropertiesOperation: ClientboundBossEventPacket.UpdatePropertiesOperation? = null
+    val updatePropertiesOperation: ClientboundBossEventPacket.UpdatePropertiesOperation
         get() {
             if (_updatePropertiesOperation == null) {
-                _updatePropertiesOperation = UpdatePropertiesBossBarOperation(darkenScreen, playMusic, createWorldFog)
+                _updatePropertiesOperation = ClientboundBossEventPacket.UpdatePropertiesOperation(darkenScreen, playMusic, createWorldFog)
             }
             return _updatePropertiesOperation!!
         }
     
-    val removeOperation = RemoveBossBarOperation
+    val removeOperation: ClientboundBossEventPacket.Operation = ClientboundBossEventPacket.REMOVE_OPERATION
     
     private var _addPacket: ClientboundBossEventPacket? = null
     val addPacket: ClientboundBossEventPacket
@@ -188,11 +201,41 @@ class BossBar(
     
     val removePacket = ClientboundBossEventPacket(id, removeOperation)
     
+    fun toAdventure(): AdventureBossBar {
+        val adventureColor = when (color) {
+            BossEvent.BossBarColor.PINK -> AdventureBossBar.Color.PINK
+            BossEvent.BossBarColor.BLUE -> AdventureBossBar.Color.BLUE
+            BossEvent.BossBarColor.RED -> AdventureBossBar.Color.RED
+            BossEvent.BossBarColor.GREEN -> AdventureBossBar.Color.GREEN
+            BossEvent.BossBarColor.YELLOW -> AdventureBossBar.Color.YELLOW
+            BossEvent.BossBarColor.PURPLE -> AdventureBossBar.Color.PURPLE
+            BossEvent.BossBarColor.WHITE -> AdventureBossBar.Color.WHITE
+        }
+        
+        val adventureOverlay = when (overlay) {
+            BossEvent.BossBarOverlay.PROGRESS -> AdventureBossBar.Overlay.PROGRESS
+            BossEvent.BossBarOverlay.NOTCHED_6 -> AdventureBossBar.Overlay.NOTCHED_6
+            BossEvent.BossBarOverlay.NOTCHED_10 -> AdventureBossBar.Overlay.NOTCHED_10
+            BossEvent.BossBarOverlay.NOTCHED_12 -> AdventureBossBar.Overlay.NOTCHED_12
+            BossEvent.BossBarOverlay.NOTCHED_20 -> AdventureBossBar.Overlay.NOTCHED_20
+        }
+        
+        val adventureFlags = enumSetOf<AdventureBossBar.Flag>()
+        if (darkenScreen)
+            adventureFlags.add(AdventureBossBar.Flag.DARKEN_SCREEN)
+        if (playMusic)
+            adventureFlags.add(AdventureBossBar.Flag.PLAY_BOSS_MUSIC)
+        if (createWorldFog)
+            adventureFlags.add(AdventureBossBar.Flag.CREATE_WORLD_FOG)
+        
+        return AdventureBossBar.bossBar(name, progress, adventureColor, adventureOverlay, adventureFlags)
+    }
+    
     companion object {
         
-        fun of(id: UUID, operation: AddBossBarOperation) = BossBar(
+        fun of(id: UUID, operation: ClientboundBossEventPacket.AddOperation) = BossBar(
             id,
-            operation.name,
+            operation.name.toAdventureComponent(),
             operation.progress,
             operation.color,
             operation.overlay,

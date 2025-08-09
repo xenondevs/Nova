@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.world.block.hitbox
 
+import net.minecraft.network.protocol.game.ServerboundInteractPacket.ATTACK_ACTION
+import net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAtLocationAction
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.block.state.BlockState
@@ -34,7 +36,6 @@ import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 import org.bukkit.event.block.Action as BlockAction
-import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent.Action as EntityAction
 
 object HitboxManager : Listener, PacketListener {
     
@@ -133,8 +134,8 @@ object HitboxManager : Listener, PacketListener {
         runTask {
             val player = event.player
             when (val action = event.action) {
-                is EntityAction.Attack -> hitbox.leftClickHandlers.forEach { it.invoke(player) }
-                is EntityAction.InteractAtLocation -> {
+                ATTACK_ACTION -> hitbox.leftClickHandlers.forEach { it.invoke(player) }
+                is InteractionAtLocationAction -> {
                     val location = action.location.toVector3f()
                     hitbox.rightClickHandlers.forEach { it.invoke(player, location) }
                 }
