@@ -1,9 +1,9 @@
 plugins {
     id("nova.kotlin-conventions")
-    id("nova.origami-conventions")
     id("nova.dokka-conventions")
     id("nova.publish-conventions")
     alias(libs.plugins.kotlinx.serialization)
+    alias(origamiLibs.plugins.origami)
     id("xyz.xenondevs.bundler-plugin")
 }
 
@@ -31,6 +31,7 @@ dependencies {
     novaLoader(libs.bundles.jgrapht)
     novaLoader(libs.snakeyaml.engine)
     
+    compileOnly(origami.patchedPaperServer())
     compileOnly(origamiLibs.mixin)
     compileOnly(origamiLibs.mixinextras)
     
@@ -44,6 +45,10 @@ dependencies {
 // configure java sources location
 sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
 
+origami {
+    paperDevBundle(libs.versions.paper.get())
+}
+
 tasks {
     withType<ProcessResources> {
         filesMatching("paper-plugin.yml") {
@@ -51,6 +56,10 @@ tasks {
             properties["apiVersion"] = libs.versions.paper.get().substring(0, 4)
             expand(properties)
         }
+    }
+    
+    named<Jar>("jar") {
+        addOrigamiLoader(librariesFolder = "lib")
     }
 }
 

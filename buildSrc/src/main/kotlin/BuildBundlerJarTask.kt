@@ -50,8 +50,9 @@ abstract class BuildBundlerJarTask : DefaultTask() {
         
         val jar = buildDir.resolve("Nova-${project.version}.jar")
         ZipOutputStream(jar.outputStream()).use { out ->
-            include(out, listOf(novaInput.get().asFile), includeMeta = true)
-            include(out, input.files)
+            val added = HashSet<String>()
+            include(out, listOf(novaInput.get().asFile), added, includeMeta = true)
+            include(out, input.files, added)
             
             // include dependencies
 //            val runtimeArtifacts = nova.configurations.getByName("mojangMappedServerRuntime").incoming.artifacts.artifacts
@@ -63,6 +64,7 @@ abstract class BuildBundlerJarTask : DefaultTask() {
                     val file = artifact.file
                     val id = artifact.id.componentIdentifier as ModuleComponentIdentifier
                     val path = "lib/" + id.group.replace('.', '/') + "/" + id.module + "/" + id.version + "/" + file.name
+                    if (added.contains(path)) return@forEach
                     out.putNextEntry(ZipEntry(path))
                     file.inputStream().use { inp -> inp.transferTo(out) }
                 }
@@ -71,15 +73,16 @@ abstract class BuildBundlerJarTask : DefaultTask() {
         return jar
     }
     
-    private fun include(out: ZipOutputStream, jars: Iterable<File>, includeMeta: Boolean = false) {
+    private fun include(out: ZipOutputStream, jars: Iterable<File>, added: HashSet<String>, includeMeta: Boolean = false) {
         jars.forEach { jar ->
             ZipInputStream(jar.inputStream()).use { inp ->
                 generateSequence { inp.nextEntry }
                     .filter { includeMeta || !it.name.startsWith("META-INF") }
-                    .filter { !it.isDirectory }
+                    .filter { !it.isDirectory && !added.contains(it.name) }
                     .forEach { entry ->
                         out.putNextEntry(entry)
                         inp.transferTo(out)
+                        added.add(entry.name)
                     }
             }
         }
