@@ -31,8 +31,6 @@ import xyz.xenondevs.nova.patch.impl.misc.FakePlayerLastHurtPatch
 import xyz.xenondevs.nova.patch.impl.registry.RegistryEventsPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.NovaRuleTestPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.WrapperBlockPatch
-import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.ChunkAccessSectionsPatch
-import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionPatch
 import xyz.xenondevs.nova.patch.impl.worldgen.registry.RegistryCodecPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_PARENT_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
@@ -48,7 +46,7 @@ internal object Patcher {
     private val transformers by lazy {
         sequenceOf(
             FieldFilterPatch,
-            LevelChunkSectionPatch, ChunkAccessSectionsPatch, RegistryCodecPatch,
+            RegistryCodecPatch,
             WrapperBlockPatch, NovaRuleTestPatch, FuelPatches, RemainingItemPatches,
             BroadcastPacketPatch, EventPreventionPatch,
             FakePlayerLastHurtPatch, BlockBehaviorPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
@@ -61,15 +59,13 @@ internal object Patcher {
     // TODO
     // ToolPatches EnchantmentPatches SoundPatches BossBarOriginPatch
     
-    // Done
-    // ItemStackDataComponentsPatch
-    
     // These class names can't be accessed via reflection to prevent class loading
     private val injectedClasses: Map<String, LcsWrapperAdapter?> = mapOf(
         "xyz/xenondevs/nova/patch/impl/worldgen/chunksection/LevelChunkSectionWrapper" to LcsWrapperAdapter
     )
     
     fun run() {
+        return
         try {
             LOGGER.info("Applying patches...")
             VirtualClassPath.classLoaders += javaClass.classLoader

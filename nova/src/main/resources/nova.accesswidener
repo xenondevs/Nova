@@ -50,3 +50,4 @@ accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdatePropertiesOperation playMusic Z
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdatePropertiesOperation createWorldFog Z
 accessible field net/minecraft/server/network/ServerConnectionListener channels Ljava/util/List;
+accessible field net/minecraft/world/level/chunk/ChunkAccess sections [Lnet/minecraft/world/level/chunk/LevelChunkSection;

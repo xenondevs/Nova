@@ -65,8 +65,8 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
+import xyz.xenondevs.nova.world.isMigrationActive
 import xyz.xenondevs.nova.patch.impl.misc.BroadcastPacketPatch
-import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
@@ -684,7 +684,7 @@ fun forcePacketBroadcast(run: () -> Unit) {
 }
 
 internal inline fun withoutBlockMigration(pos: BlockPos, run: () -> Unit) {
-    val chunkSection = pos.chunkSection as LevelChunkSectionWrapper
+    val chunkSection = pos.chunkSection
     val previous = chunkSection.isMigrationActive
     chunkSection.isMigrationActive = false
     try {

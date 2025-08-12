@@ -15,7 +15,7 @@ import net.minecraft.world.level.chunk.LinearPalette
 import net.minecraft.world.level.chunk.Palette
 import net.minecraft.world.level.chunk.SingleValuePalette
 import xyz.xenondevs.commons.collections.getOrSet
-import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
+import xyz.xenondevs.nova.world.bottomBlockY
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
@@ -33,7 +33,7 @@ object BlockStateSearcher {
         
         val result: Array<ArrayList<Pair<BlockPos, BlockState>>?> = arrayOfNulls(queries.size)
         for (section in world.serverLevel.getChunk(pos.x, pos.z).sections) {
-            section as LevelChunkSectionWrapper
+            section
             
             val container = section.states
             container.acquire()

@@ -11,8 +11,8 @@ import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.bytebase.util.calls
 import xyz.xenondevs.bytebase.util.replaceEvery
+import xyz.xenondevs.nova.world.isMigrationActive
 import xyz.xenondevs.nova.patch.MultiTransformer
-import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.world.block.migrator.BlockMigrator
@@ -52,7 +52,7 @@ internal object BlockMigrationPatches : MultiTransformer(Level::class, LevelChun
     
     @JvmStatic
     fun handleBlockEntityPlaced(chunk: LevelChunk, blockEntity: BlockEntity) {
-        val chunkSection = chunk.getSection(chunk.getSectionIndex(blockEntity.blockPos.y)) as LevelChunkSectionWrapper
+        val chunkSection = chunk.getSection(chunk.getSectionIndex(blockEntity.blockPos.y))
         if (chunkSection.isMigrationActive) {
             val novaPos = blockEntity.blockPos.toNovaPos(chunk.level.world)
             BlockMigrator.handleBlockEntityPlaced(novaPos, blockEntity)
@@ -61,7 +61,7 @@ internal object BlockMigrationPatches : MultiTransformer(Level::class, LevelChun
     
     @JvmStatic
     fun handleBlockEntityRemoved(chunk: LevelChunk, pos: BlockPos) {
-        val chunkSection = chunk.getSection(chunk.getSectionIndex(pos.y)) as LevelChunkSectionWrapper
+        val chunkSection = chunk.getSection(chunk.getSectionIndex(pos.y))
         if (chunkSection.isMigrationActive) {
             val novaPos = pos.toNovaPos(chunk.level.world)
             BlockMigrator.handleBlockEntityPlaced(novaPos, null)

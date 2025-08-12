@@ -10,19 +10,20 @@ import net.minecraft.world.item.component.CustomData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import xyz.xenondevs.nova.world.item.NovaDataComponentMap;
 import xyz.xenondevs.nova.registry.NovaRegistries;
+import xyz.xenondevs.nova.world.item.NovaDataComponentMap;
 import xyz.xenondevs.nova.world.item.legacy.ItemStackLegacyConversion;
 
 @SuppressWarnings({"OptionalAssignedToNull", "deprecation"})
 @Mixin(ItemStack.class)
-public class ItemStackDataComponentsMixin {
+public abstract class ItemStackMixin {
     
     @Redirect(
         method = "<init>(Lnet/minecraft/core/Holder;ILnet/minecraft/core/component/DataComponentPatch;)V",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/core/component/PatchedDataComponentMap;fromPatch(Lnet/minecraft/core/component/DataComponentMap;Lnet/minecraft/core/component/DataComponentPatch;)Lnet/minecraft/core/component/PatchedDataComponentMap;")
+            target = "Lnet/minecraft/core/component/PatchedDataComponentMap;fromPatch(Lnet/minecraft/core/component/DataComponentMap;Lnet/minecraft/core/component/DataComponentPatch;)Lnet/minecraft/core/component/PatchedDataComponentMap;"
+        )
     )
     private static PatchedDataComponentMap fromPatch(DataComponentMap patchedDataComponentMap, DataComponentPatch prototype) {
         var patch = ItemStackLegacyConversion.convert(prototype);
