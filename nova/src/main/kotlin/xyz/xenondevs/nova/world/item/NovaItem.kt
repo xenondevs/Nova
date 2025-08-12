@@ -185,6 +185,12 @@ class NovaItem internal constructor(
         behaviors.any { type.isSuperclassOf(it::class) }
     
     /**
+     * Checks whether this [NovaItem] has an [ItemBehavior] of the specified class [type], or a subclass of it.
+     */
+    fun <T : Any> hasBehavior(type: Class<T>): Boolean =
+        behaviors.any { type.isAssignableFrom(it::class.java) }
+    
+    /**
      * Checks whether this [NovaItem] has the specific [behavior] instance.
      */
     fun hasBehavior(behavior: ItemBehavior): Boolean =

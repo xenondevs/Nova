@@ -11,27 +11,6 @@ import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.patch.adapter.LcsWrapperAdapter
-import xyz.xenondevs.nova.patch.impl.FieldFilterPatch
-import xyz.xenondevs.nova.patch.impl.block.BlockBehaviorPatches
-import xyz.xenondevs.nova.patch.impl.block.BlockMigrationPatches
-import xyz.xenondevs.nova.patch.impl.block.DisableBackingStateLogicPatch
-import xyz.xenondevs.nova.patch.impl.block.EarlyBlockPlaceEventPatch
-import xyz.xenondevs.nova.patch.impl.block.FluidFlowPatch
-import xyz.xenondevs.nova.patch.impl.block.TripwireLogicPatch
-import xyz.xenondevs.nova.patch.impl.chunk.ChunkSchedulingPatch
-import xyz.xenondevs.nova.patch.impl.item.DyeablePatches
-import xyz.xenondevs.nova.patch.impl.item.FuelPatches
-import xyz.xenondevs.nova.patch.impl.item.RemainingItemPatches
-import xyz.xenondevs.nova.patch.impl.item.RepairPatches
-import xyz.xenondevs.nova.patch.impl.misc.BindPlayerToPacketHandlerPatch
-import xyz.xenondevs.nova.patch.impl.misc.BroadcastPacketPatch
-import xyz.xenondevs.nova.patch.impl.misc.DontCloseAddonClassLoadersPatch
-import xyz.xenondevs.nova.patch.impl.misc.EventPreventionPatch
-import xyz.xenondevs.nova.patch.impl.misc.FakePlayerLastHurtPatch
-import xyz.xenondevs.nova.patch.impl.registry.RegistryEventsPatch
-import xyz.xenondevs.nova.patch.impl.worldgen.NovaRuleTestPatch
-import xyz.xenondevs.nova.patch.impl.worldgen.WrapperBlockPatch
-import xyz.xenondevs.nova.patch.impl.worldgen.registry.RegistryCodecPatch
 import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_PARENT_FIELD
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.reflection.defineClass
@@ -43,21 +22,7 @@ import java.lang.reflect.Field
 internal object Patcher {
     
     private val extraOpens = setOf("java.lang", "java.lang.reflect", "java.util", "jdk.internal.misc", "jdk.internal.reflect")
-    private val transformers by lazy {
-        sequenceOf(
-            FieldFilterPatch,
-            RegistryCodecPatch,
-            WrapperBlockPatch, NovaRuleTestPatch, FuelPatches, RemainingItemPatches,
-            BroadcastPacketPatch, EventPreventionPatch,
-            FakePlayerLastHurtPatch, BlockBehaviorPatches, ChunkSchedulingPatch, DisableBackingStateLogicPatch,
-            RepairPatches, BlockMigrationPatches,
-            TripwireLogicPatch, FluidFlowPatch, RegistryEventsPatch, DyeablePatches, EarlyBlockPlaceEventPatch,
-            DontCloseAddonClassLoadersPatch, BindPlayerToPacketHandlerPatch
-        ).filter(Transformer::shouldTransform).toSet()
-    }
-    
-    // TODO
-    // ToolPatches EnchantmentPatches SoundPatches BossBarOriginPatch
+    private val transformers = emptySet<Transformer>()
     
     // These class names can't be accessed via reflection to prevent class loading
     private val injectedClasses: Map<String, LcsWrapperAdapter?> = mapOf(

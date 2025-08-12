@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.item;
+package xyz.xenondevs.nova.mixin.item.data;
 
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.world.item.legacy.ItemStackLegacyConversion;
 
 @SuppressWarnings({"OptionalAssignedToNull", "deprecation"})
 @Mixin(ItemStack.class)
-public abstract class ItemStackMixin {
+abstract class ItemStackMixin {
     
     @Redirect(
         method = "<init>(Lnet/minecraft/core/Holder;ILnet/minecraft/core/component/DataComponentPatch;)V",
@@ -31,7 +31,6 @@ public abstract class ItemStackMixin {
         
         var component = patch.get(DataComponents.CUSTOM_DATA);
         if (component != null) {
-            
             var novaItem = component
                 .map(CustomData::getUnsafe)
                 .flatMap(tag -> tag.getCompound("nova"))
