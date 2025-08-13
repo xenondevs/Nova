@@ -31,9 +31,10 @@ dependencies {
     novaLoader(libs.bundles.jgrapht)
     novaLoader(libs.snakeyaml.engine)
     
-    compileOnly(origami.patchedPaperServer())
-    compileOnly(origamiLibs.mixin)
-    compileOnly(origamiLibs.mixinextras)
+    // origami
+    implementation(origami.patchedPaperServer())
+    implementation(origamiLibs.mixin)
+    implementation(origamiLibs.mixinextras)
     
     // test dependencies
     testImplementation(platform(libs.junit.bom))
