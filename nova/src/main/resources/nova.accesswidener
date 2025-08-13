@@ -52,3 +52,8 @@ accessible field net/minecraft/server/network/ServerConnectionListener channels 
 accessible field net/minecraft/world/level/chunk/ChunkAccess sections [Lnet/minecraft/world/level/chunk/LevelChunkSection;
 accessible class net/minecraft/world/entity/npc/VillagerTrades$DyedArmorForEmeralds
 accessible class io/papermc/paper/plugin/manager/PaperPluginInstanceManager
+accessible class ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/ChunkLoadTask$ChunkDataLoadTask
+accessible class ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/ChunkLoadTask$ReadChunk
+accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask world Lnet/minecraft/server/level/ServerLevel;
+accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask chunkX I
+accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask chunkZ I
