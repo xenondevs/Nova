@@ -27,6 +27,8 @@ include("catalog")
 dependencyResolutionManagement {
     repositories {
         mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
+        mavenCentral()
+        maven("https://repo.xenondevs.xyz/releases/")
     }
     
     versionCatalogs {
