@@ -5,7 +5,6 @@ accessible method net/minecraft/world/item/component/BundleContents <init> (Ljav
 accessible field net/minecraft/world/level/chunk/HashMapPalette values Lnet/minecraft/util/CrudeIncrementalIntIdentityHashBiMap;
 accessible field net/minecraft/world/level/chunk/LinearPalette values [Ljava/lang/Object;
 accessible field net/minecraft/network/codec/IdDispatchCodec toId Lit/unimi/dsi/fastutil/objects/Object2IntMap;
-accessible field net/minecraft/world/level/block/entity/FuelValues values Lit/unimi/dsi/fastutil/objects/Object2IntSortedMap;
 accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation
 accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket <init> (Ljava/util/UUID;Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;)V
 accessible method net/minecraft/network/protocol/game/ClientboundUpdateAttributesPacket <init> (ILjava/util/List;)V

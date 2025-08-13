@@ -209,6 +209,12 @@ class NovaItem internal constructor(
         behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
     
     /**
+     * Gets the first [ItemBehavior] that is an instance of [type] or a subclass, or null if there is none.
+     */
+    fun <T : Any> getBehaviorOrNull(type: Class<T>): T? =
+        behaviors.firstOrNull { type.isAssignableFrom(it::class.java) } as T?
+    
+    /**
      * Gets the first [ItemBehavior] that is an instance of [T], or throws an [IllegalStateException] if there is none.
      */
     inline fun <reified T : Any> getBehavior(): T =
@@ -218,6 +224,12 @@ class NovaItem internal constructor(
      * Gets the first [ItemBehavior] that is an instance of [behavior], or throws an [IllegalStateException] if there is none.
      */
     fun <T : Any> getBehavior(behavior: KClass<T>): T =
+        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
+    
+    /**
+     * Gets the first [ItemBehavior] that is an instance of [behavior], or throws an [IllegalStateException] if there is none.
+     */
+    fun <T : Any> getBehavior(behavior: Class<T>): T =
         getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
     
     /**
