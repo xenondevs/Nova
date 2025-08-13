@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "xyz.xenondevs.nova.mixin",
-  "mixins": ["bossbar.tracking.ClientboundBossEventPacketMixin", "item.data.ItemStackMixin", "item.dyeable.ArmorDyeRecipeMixin", "item.dyeable.CauldronInteractionMixin", "item.dyeable.DyedItemColorMixin", "item.dyeable.VillagerTradesDyedArmorForEmeraldsMixin", "world.ChunkAccessMixin", "world.LevelChunkSectionMixin"],
+  "mixins": ["addon.classloader.PaperPluginInstanceManagerMixin", "block.behavior.BlockBehaviourBlockStateBaseMixin", "block.behavior.ServerGamePacketListenerImplMixin", "bossbar.tracking.ClientboundBossEventPacketMixin", "item.data.ItemStackMixin", "item.dyeable.ArmorDyeRecipeMixin", "item.dyeable.CauldronInteractionMixin", "item.dyeable.DyedItemColorMixin", "item.dyeable.VillagerTradesDyedArmorForEmeraldsMixin", "item.fuel.FuelValuesMixin", "packethandler.PlayerListMixin", "world.ChunkAccessMixin", "world.LevelChunkSectionMixin"],
   "mixinextras": {
     "minVersion": "0.5.0"
   }
