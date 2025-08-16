@@ -104,7 +104,7 @@ internal object BlockBreaking : Listener, PacketListener {
      */
     fun setBreakCooldown(player: Player) {
         // adds +1 because break cooldown is set at the end of a block break and the next break can only start in the next tick
-        // a BRAK_COOLDOWN of 0 would then mean breakCooldowns[player] = serverTick + 1 (i.e. the next tick), which allows instant breaking in next tick
+        // a BREAK_COOLDOWN of 0 would then mean breakCooldowns[player] = serverTick + 1 (i.e. the next tick), which means no delay
         breakCooldowns[player] = serverTick + BREAK_COOLDOWN + 1
     }
     
