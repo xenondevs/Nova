@@ -48,6 +48,7 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.max
 
 private val BREAK_COOLDOWN by MAIN_CONFIG.entry<Int>("world", "block_breaking", "break_cooldown")
 
@@ -98,8 +99,23 @@ internal object BlockBreaking : Listener, PacketListener {
         method.breakStage = stage
     }
     
+    /**
+     * Sets the cooldown for [player]'s block breaking to [BREAK_COOLDOWN].
+     */
     fun setBreakCooldown(player: Player) {
-        breakCooldowns[player] = serverTick + BREAK_COOLDOWN
+        // adds +1 because break cooldown is set at the end of a block break and the next break can only start in the next tick
+        // a BRAK_COOLDOWN of 0 would then mean breakCooldowns[player] = serverTick + 1 (i.e. the next tick), which allows instant breaking in next tick
+        breakCooldowns[player] = serverTick + BREAK_COOLDOWN + 1
+    }
+    
+    /**
+     * Returns the first server tick at which [player] can add damage to blocks.
+     * This value may be ignored for instant-breaking (damage >= 1).
+     */
+    fun getBlockedUntil(player: Player): Int {
+        // in vanilla, the first tick of block destroy does not add any damage, unless the damage is >= 1
+        // Nova emulates this behavior by adding one to the cooldown, even if the cooldown has already passed
+        return max(serverTick + 1, (breakCooldowns[player] ?: 0) + 1)
     }
     
     fun getBreaker(player: Player): BlockBreaker? {
@@ -172,9 +188,10 @@ internal object BlockBreaking : Listener, PacketListener {
                 return
             }
             
-            breaker = NovaBlockBreaker(player, pos, novaBlockState, sequence, breakCooldowns[player] ?: 0)
+            breaker = NovaBlockBreaker(player, pos, novaBlockState, sequence, getBlockedUntil(player))
         } else {
-            breaker = VanillaBlockBreaker(player, pos, sequence, breakCooldowns[player] ?: 0)
+            println("created block breaker for $pos at tick $serverTick")
+            breaker = VanillaBlockBreaker(player, pos, sequence, getBlockedUntil(player))
         }
         
         // creative breakers should not be added to the playerBreakers map because players in creative mode
@@ -184,6 +201,8 @@ internal object BlockBreaking : Listener, PacketListener {
         }
         
         // handle initial tick
+        // this may cause a breaker to be ticked twice in the first tick (depending on when the ticking scheduler runs),
+        // but this is fine since the first tick is always blocked unless damage >= 1, in which case the breaker would already be done
         breaker.handleTick()
     }
     
