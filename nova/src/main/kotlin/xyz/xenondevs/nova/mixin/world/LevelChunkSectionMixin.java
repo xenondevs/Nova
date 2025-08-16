@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.mixin.world;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -60,8 +62,10 @@ abstract class LevelChunkSectionMixin {
         BlockState blockState,
         @Local(ordinal = 0, argsOnly = true) int x,
         @Local(ordinal = 1, argsOnly = true) int y,
-        @Local(ordinal = 2, argsOnly = true) int z
+        @Local(ordinal = 2, argsOnly = true) int z,
+        @Share("unmigrated") LocalRef<BlockState> unmigrated
     ) {
+        unmigrated.set(blockState);
         if (!nova$migrationActive)
             return blockState;
         return BlockMigrator.migrateBlockState(nova$getPos(x, y, z), blockState);
@@ -76,12 +80,12 @@ abstract class LevelChunkSectionMixin {
         BlockState state,
         boolean useLocks,
         CallbackInfoReturnable<BlockState> cir,
+        @Share("unmigrated") LocalRef<BlockState> unmigrated,
         @Local(ordinal = 1) BlockState previous
     ) {
         if (!nova$migrationActive)
             return;
-        
-        BlockMigrator.handleBlockStatePlaced(nova$getPos(x, y, z), previous, state);
+        BlockMigrator.handleBlockStatePlaced(nova$getPos(x, y, z), previous, unmigrated.get());
     }
     
     @Unique
