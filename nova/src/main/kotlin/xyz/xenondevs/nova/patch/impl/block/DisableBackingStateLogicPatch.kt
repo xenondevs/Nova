@@ -15,6 +15,7 @@ import net.minecraft.world.level.LevelReader
 import net.minecraft.world.level.ScheduledTickAccess
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.HugeMushroomBlock
+import net.minecraft.world.level.block.LeavesBlock
 import net.minecraft.world.level.block.Mirror
 import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.Rotation
@@ -93,7 +94,31 @@ private val TRIP_WIRE_BLOCK_TICK = ReflectionUtils.getMethod(
     BlockState::class, ServerLevel::class, BlockPos::class, RandomSource::class
 )
 
-internal object DisableBackingStateLogicPatch : MultiTransformer(NoteBlock::class, HugeMushroomBlock::class) {
+private val LEAVES_BLOCK_RANDOM_TICK = ReflectionUtils.getMethod(
+    LeavesBlock::class,
+    "randomTick",
+    BlockState::class, ServerLevel::class, BlockPos::class, RandomSource::class
+)
+
+private val LEAVES_BLOCK_IS_RANDOMLY_TICKING = ReflectionUtils.getMethod(
+    LeavesBlock::class,
+    "isRandomlyTicking",
+    BlockState::class
+)
+
+private val LEAVES_BLOCK_TICK = ReflectionUtils.getMethod(
+    LeavesBlock::class,
+    "tick",
+    BlockState::class, ServerLevel::class, BlockPos::class, RandomSource::class
+)
+
+private val LEAVES_BLOCK_UPDATE_SHAPE = ReflectionUtils.getMethod(
+    LeavesBlock::class,
+    "updateShape",
+    BlockState::class, LevelReader::class, ScheduledTickAccess::class, BlockPos::class, Direction::class, BlockPos::class, BlockState::class, RandomSource::class
+)
+
+internal object DisableBackingStateLogicPatch : MultiTransformer(NoteBlock::class, HugeMushroomBlock::class, LeavesBlock::class) {
     
     override fun transform() {
         val returnDefaultBlockState = buildInsnList {
@@ -145,6 +170,11 @@ internal object DisableBackingStateLogicPatch : MultiTransformer(NoteBlock::clas
         
         VirtualClassPath[TRIP_WIRE_BLOCK_TICK].replaceInstructions(emptyInsn)
         VirtualClassPath[TRIP_WIRE_BLOCK_ENTITY_INSIDE].replaceInstructions(emptyInsn)
+        
+        VirtualClassPath[LEAVES_BLOCK_RANDOM_TICK].replaceInstructions(emptyInsn)
+        VirtualClassPath[LEAVES_BLOCK_IS_RANDOMLY_TICKING].replaceInstructions(returnFalse)
+        VirtualClassPath[LEAVES_BLOCK_TICK].replaceInstructions(emptyInsn)
+        VirtualClassPath[LEAVES_BLOCK_UPDATE_SHAPE].replaceInstructions(returnFirst)
     }
     
 }
