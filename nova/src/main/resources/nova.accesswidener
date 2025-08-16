@@ -57,3 +57,4 @@ accessible class ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/Ch
 accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask world Lnet/minecraft/server/level/ServerLevel;
 accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask chunkX I
 accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask chunkZ I
+accessible method net/minecraft/world/item/BlockItem placeBlock (Lnet/minecraft/world/item/context/BlockPlaceContext;Lnet/minecraft/world/level/block/state/BlockState;)Z
