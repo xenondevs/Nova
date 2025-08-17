@@ -5,7 +5,7 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.patch.impl.registry.set
+import xyz.xenondevs.nova.registry.set
 import xyz.xenondevs.nova.world.generation.ruletest.NovaBlockMatchTestType
 
 @InternalInit(stage = InternalInitStage.PRE_WORLD)

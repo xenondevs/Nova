@@ -2,7 +2,6 @@
 
 package xyz.xenondevs.nova.util.reflection
 
-import jdk.internal.misc.Unsafe
 import xyz.xenondevs.bytebase.jvm.ClassWrapper
 import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.commons.collections.mapToArray
@@ -182,51 +181,6 @@ internal object ReflectionUtils {
         if (serverSoftware !in ServerUtils.SERVER_SOFTWARE.superSoftwares)
             return null
         return getField(clazz, name)
-    }
-    
-    @JvmStatic
-    internal fun setFinalField(field: Field, obj: Any, value: Any?) {
-        val unsafe = Unsafe.getUnsafe()
-        val offset = unsafe.objectFieldOffset(field)
-        unsafe.putReference(obj, offset, value)
-    }
-    
-    @JvmStatic
-    internal fun setStaticFinalField(field: Field, value: Any?) {
-        val unsafe = Unsafe.getUnsafe()
-        val base = unsafe.staticFieldBase(field)
-        val offset = unsafe.staticFieldOffset(field)
-        unsafe.putReference(base, offset, value)
-    }
-    
-    @JvmStatic
-    internal fun getFieldOffset(field: Field): Long {
-        val unsafe = Unsafe.getUnsafe()
-        return unsafe.objectFieldOffset(field)
-    }
-    
-    @JvmStatic
-    internal fun putInt(obj: Any, offset: Long, value: Int) {
-        val unsafe = Unsafe.getUnsafe()
-        unsafe.putInt(obj, offset, value)
-    }
-    
-    @JvmStatic
-    internal fun getInt(obj: Any, offset: Long): Int {
-        val unsafe = Unsafe.getUnsafe()
-        return unsafe.getInt(obj, offset)
-    }
-    
-    @JvmStatic
-    internal fun putReference(obj: Any, offset: Long, value: Any?) {
-        val unsafe = Unsafe.getUnsafe()
-        unsafe.putReference(obj, offset, value)
-    }
-    
-    @JvmStatic
-    internal fun getReference(obj: Any, offset: Long): Any? {
-        val unsafe = Unsafe.getUnsafe()
-        return unsafe.getReference(obj, offset)
     }
     
 }

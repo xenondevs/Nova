@@ -8,11 +8,11 @@ import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.RegistryOps
 import net.minecraft.tags.EnchantmentTags
+import net.minecraft.world.item.enchantment.Enchantment
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.patch.impl.item.EnchantmentPatches
-import xyz.xenondevs.nova.patch.impl.registry.plusAssign
+import xyz.xenondevs.nova.registry.plusAssign
 import xyz.xenondevs.nova.registry.LazyRegistryElementBuilder
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.world.item.behavior.Enchantable
@@ -41,6 +41,13 @@ internal class CustomEnchantmentLogic(
     
     fun getMaxCost(level: Int): Int =
         tableLevelRequirement(level).last
+    
+    companion object {
+        
+        @JvmField
+        val customEnchantments = IdentityHashMap<Enchantment, CustomEnchantmentLogic>()
+        
+    }
     
 }
 
@@ -236,7 +243,7 @@ class EnchantmentBuilder internal constructor(
             DataComponentMap.EMPTY
         )
         
-        EnchantmentPatches.customEnchantments[enchantment] = CustomEnchantmentLogic(
+        CustomEnchantmentLogic.customEnchantments[enchantment] = CustomEnchantmentLogic(
             primaryItem, supportedItem, tableLeveRequirement, compatibility
         )
         

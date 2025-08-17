@@ -27,7 +27,7 @@ object NovaRegistries {
     val WRAPPER_BLOCK: WritableRegistry<WrapperBlock> = simpleRegistry("wrapper_block")
     
     @JvmField
-    val BLOCK: WritableRegistry<NovaBlock> = simpleRegistry("block") // TODO: wrapper registry
+    val BLOCK: WritableRegistry<NovaBlock> = wrappingRegistry("block", WRAPPER_BLOCK, ::WrapperBlock)
     
     @JvmField
     val ITEM: FuzzyMappedRegistry<NovaItem> = fuzzyRegistry("item")

@@ -11,8 +11,6 @@ import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.patch.adapter.LcsWrapperAdapter
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_PARENT_FIELD
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.util.reflection.defineClass
 import java.lang.System.getProperty
 import java.lang.instrument.ClassDefinition
@@ -131,8 +129,9 @@ internal object Patcher {
         transformers.filter { tf -> tf.classes.any { tfClass -> tfClass.internalName == clazz.internalName } }
     
     private fun insertPatchedLoader() {
+        mutableListOf("").addFirst("")
         val spigotLoader = Bukkit::class.java.classLoader
-        ReflectionUtils.setFinalField(CLASS_LOADER_PARENT_FIELD, spigotLoader, PatchedClassLoader())
+        //ReflectionUtils.setFinalField(CLASS_LOADER_PARENT_FIELD, spigotLoader, PatchedClassLoader())
     }
     
 }

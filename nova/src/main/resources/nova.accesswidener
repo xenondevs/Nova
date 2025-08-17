@@ -58,3 +58,14 @@ accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/Ge
 accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask chunkX I
 accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask chunkZ I
 accessible method net/minecraft/world/item/BlockItem placeBlock (Lnet/minecraft/world/item/context/BlockPlaceContext;Lnet/minecraft/world/level/block/state/BlockState;)Z
+accessible class net/minecraft/resources/RegistryDataLoader$LoadingFunction
+accessible class net/minecraft/resources/RegistryDataLoader$Loader
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/ProcessorRule inputPredicate Lnet/minecraft/world/level/levelgen/structure/templatesystem/RuleTest;
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/ProcessorRule locPredicate Lnet/minecraft/world/level/levelgen/structure/templatesystem/RuleTest;
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/ProcessorRule posPredicate Lnet/minecraft/world/level/levelgen/structure/templatesystem/PosRuleTest;
+accessible method net/minecraft/world/level/biome/BiomeGenerationSettings <init> (Lnet/minecraft/core/HolderSet;Ljava/util/List;)V
+accessible field net/minecraft/world/level/biome/Biome generationSettings Lnet/minecraft/world/level/biome/BiomeGenerationSettings;
+mutable field net/minecraft/world/level/biome/Biome generationSettings Lnet/minecraft/world/level/biome/BiomeGenerationSettings;
+accessible method net/minecraft/world/level/biome/Biome$ClimateSettings <init> (ZFLnet/minecraft/world/level/biome/TemperatureModifier;F)V
+accessible method net/minecraft/world/level/biome/MobSpawnSettings <init> (FLjava/util/Map;Ljava/util/Map;)V
+accessible method net/minecraft/world/level/biome/Biome <init> (Lnet/minecraft/world/level/biome/Biome$ClimateSettings;Lnet/minecraft/world/level/biome/BiomeSpecialEffects;Lnet/minecraft/world/level/biome/BiomeGenerationSettings;Lnet/minecraft/world/level/biome/MobSpawnSettings;)V
