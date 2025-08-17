@@ -2,9 +2,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
@@ -14,7 +12,6 @@ import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
-import javax.inject.Inject
 
 @DisableCachingByDefault
 abstract class BuildBundlerJarTask : DefaultTask() {
@@ -55,11 +52,11 @@ abstract class BuildBundlerJarTask : DefaultTask() {
             include(out, input.files, added)
             
             // include dependencies
-//            val runtimeArtifacts = nova.configurations.getByName("mojangMappedServerRuntime").incoming.artifacts.artifacts
-//                .mapNotNullTo(HashSet()) { (it.id.componentIdentifier as? ModuleComponentIdentifier)?.moduleIdentifier }
+            val runtimeArtifacts = nova.configurations.getByName("paperweightDevelopmentBundleCompileClasspath").incoming.artifacts.artifacts
+                .mapNotNullTo(HashSet()) { (it.id.componentIdentifier as? ModuleComponentIdentifier)?.moduleIdentifier }
             nova.configurations.getByName("novaLoader").incoming.artifacts.artifacts
                 .asSequence()
-//                .filter { (it.id.componentIdentifier as ModuleComponentIdentifier).moduleIdentifier !in runtimeArtifacts }
+                .filter { (it.id.componentIdentifier as ModuleComponentIdentifier).moduleIdentifier !in runtimeArtifacts }
                 .forEach { artifact ->
                     val file = artifact.file
                     val id = artifact.id.componentIdentifier as ModuleComponentIdentifier
