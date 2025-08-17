@@ -190,7 +190,6 @@ internal object BlockBreaking : Listener, PacketListener {
             
             breaker = NovaBlockBreaker(player, pos, novaBlockState, sequence, getBlockedUntil(player))
         } else {
-            println("created block breaker for $pos at tick $serverTick")
             breaker = VanillaBlockBreaker(player, pos, sequence, getBlockedUntil(player))
         }
         
