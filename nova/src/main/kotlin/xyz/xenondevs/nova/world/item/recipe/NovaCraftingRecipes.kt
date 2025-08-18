@@ -42,7 +42,7 @@ internal class NovaShapedRecipe private constructor(
     result: ItemStack,
     val choiceMatrix: Array<Array<RecipeChoice?>>
 ) : ShapedRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     pattern, result
 ) {
@@ -136,7 +136,7 @@ internal class NovaShapedRecipe private constructor(
 }
 
 internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : ShapelessRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.result.unwrap().copy(),
     bukkitRecipe.choiceList.map { it.toNmsIngredient() }
@@ -160,7 +160,7 @@ internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessReci
 }
 
 internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) : SmeltingRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.unwrap().copy(),
@@ -179,7 +179,7 @@ internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) 
 }
 
 internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRecipe) : BlastingRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.unwrap().copy(),
@@ -198,7 +198,7 @@ internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRe
 }
 
 internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) : SmokingRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.unwrap().copy(),
@@ -217,7 +217,7 @@ internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) :
 }
 
 internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe) : CampfireCookingRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.unwrap().copy(),
@@ -236,7 +236,7 @@ internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe
 }
 
 internal class NovaStonecutterRecipe(private val bukkitRecipe: BukkitStonecuttingRecipe) : StonecutterRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.unwrap().copy()
 ) {
