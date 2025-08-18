@@ -9,11 +9,9 @@ import net.minecraft.resources.ResourceKey
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.registry.preFreeze
 import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.contains
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.HOLDER_REFERENCE_BIND_VALUE_METHOD
 import xyz.xenondevs.nova.util.register
 import xyz.xenondevs.nova.util.toKey
 
@@ -34,7 +32,7 @@ abstract class RegistryElementBuilder<T : Any> internal constructor(
         
         val element = build()
         val holder = registry.register(id, element)
-        HOLDER_REFERENCE_BIND_VALUE_METHOD.invoke(holder, element)
+        holder.bindValue(element)
         return element
     }
     

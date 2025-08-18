@@ -1,10 +1,6 @@
-@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
-
-package xyz.xenondevs.nova.util.reflection
+package xyz.xenondevs.nova.util
 
 import xyz.xenondevs.commons.collections.mapToArray
-import xyz.xenondevs.nova.util.ServerSoftware
-import xyz.xenondevs.nova.util.ServerUtils
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
 import java.lang.reflect.Constructor

@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BLOCK_DEFAULT_BLOCK_STATE_FIELD
 import xyz.xenondevs.nova.util.toResourceLocation
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -22,7 +21,7 @@ class WrapperBlock(novaBlock: NovaBlock) : Block(
 ) {
     
     init {
-        BLOCK_DEFAULT_BLOCK_STATE_FIELD[this] = WrapperBlockState(novaBlock.defaultBlockState)
+        this.defaultBlockState = WrapperBlockState(novaBlock.defaultBlockState)
     }
     
 }

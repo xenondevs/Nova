@@ -67,11 +67,9 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.isMigrationActive
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
@@ -696,26 +694,16 @@ internal inline fun withoutBlockMigration(pos: BlockPos, run: () -> Unit) {
 fun RegistryFriendlyByteBuf(): RegistryFriendlyByteBuf =
     RegistryFriendlyByteBuf(Unpooled.buffer(), REGISTRY_ACCESS)
 
-object NMSUtils {
+@PublishedApi
+internal object NMSUtils {
     
-    @PublishedApi
     @JvmField
-    internal val broadcastIgnoreExcludedPlayer: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
+    val broadcastIgnoreExcludedPlayer: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
     
-    @PublishedApi
     @JvmField
-    internal val broadcastExcludedPlayerOverride: ThreadLocal<ServerPlayer?> = ThreadLocal.withInitial { null }
+    val broadcastExcludedPlayerOverride: ThreadLocal<ServerPlayer?> = ThreadLocal.withInitial { null }
     
-    @PublishedApi
     @JvmField
-    internal val broadcastDropAll: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
-    
-    val ENTITY_COUNTER by lazy {
-        ReflectionUtils.getField(
-            MojangEntity::class.java,
-            true,
-            "ENTITY_COUNTER"
-        ).get(null) as AtomicInteger
-    }
+    val broadcastDropAll: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
     
 }
