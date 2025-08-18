@@ -63,7 +63,7 @@ class NovaItem internal constructor(
     val style: Style,
     behaviorHolders: List<ItemBehaviorHolder>,
     val maxStackSize: Int,
-    private val _craftingRemainingItem: ItemStack?,
+    private val _craftingRemainingItem: Key?,
     val isHidden: Boolean,
     val block: NovaBlock?,
     configId: String,
@@ -79,10 +79,10 @@ class NovaItem internal constructor(
     
     /**
      * The [ItemStack] that is left over after this [NovaItem] was
-     * used in a crafting recipe.
+     * used in a crafting recipe, or an empty stack if there is no remainder.
      */
-    val craftingRemainingItem: ItemStack?
-        get() = _craftingRemainingItem?.clone()
+    val craftingRemainingItem: ItemStack
+        get() = _craftingRemainingItem?.let(ItemUtils::getItemStack) ?: ItemStack.empty()
     
     /**
      * The [ItemBehaviors][ItemBehavior] of this [NovaItem].
