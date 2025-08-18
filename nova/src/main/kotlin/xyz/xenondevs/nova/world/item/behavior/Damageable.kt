@@ -122,7 +122,7 @@ class Damageable(
             "itemDamageOnAttackEntity=$itemDamageOnAttackEntity, " +
             "itemDamageOnBreakBlock=$itemDamageOnBreakBlock, " +
             "repairIngredient=$repairIngredient" +
-            "breakSound=$breakSoundKey"
+            "breakSound=$breakSoundKey" +
         ")"
     }
     
