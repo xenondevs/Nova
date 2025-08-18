@@ -2,9 +2,12 @@ package xyz.xenondevs.nova.registry
 
 import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.ResourceLocation
+import org.jetbrains.annotations.ApiStatus
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
+import xyz.xenondevs.nova.util.contains
+import xyz.xenondevs.nova.util.getValueOrThrow
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterType
@@ -19,6 +22,7 @@ import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
 import xyz.xenondevs.nova.world.player.ability.AbilityType
 import xyz.xenondevs.nova.world.player.attachment.AttachmentType
+import java.util.stream.Stream
 
 @OptIn(ExperimentalWorldGen::class)
 object NovaRegistries {
@@ -70,6 +74,18 @@ object NovaRegistries {
     
     @JvmField
     val TOOLTIP_STYLE: WritableRegistry<TooltipStyle> = simpleRegistry("tooltip_style")
+    
+    @ApiStatus.Internal // hack for WorldEditHook to not require nms
+    fun hasBlock(block: String): Boolean =
+        block in BLOCK
+    
+    @ApiStatus.Internal // hack for WorldEditHook to not require nms
+    fun getBlockOrThrow(block: String): NovaBlock =
+        BLOCK.getValueOrThrow(block)
+    
+    @ApiStatus.Internal // hack for WorldEditHook to not require nms
+    fun blockStream(): Stream<NovaBlock> =
+        BLOCK.stream()
     
     private fun <E : Any> simpleRegistry(name: String): WritableRegistry<E> {
         val resourceLocation = ResourceLocation.fromNamespaceAndPath("nova", name)

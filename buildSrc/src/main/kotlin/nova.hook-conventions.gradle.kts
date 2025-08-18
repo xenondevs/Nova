@@ -1,9 +1,13 @@
+import org.gradle.accessors.dm.LibrariesForLibs
+
 plugins {
     id("nova.kotlin-conventions")
-    id("nova.paper-conventions")
 }
+
+val libs = the<LibrariesForLibs>()
 
 dependencies {
     implementation(project(":nova"))
     implementation(project(":nova-api"))
+    compileOnly(libs.paper.api)
 }
