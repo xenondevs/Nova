@@ -2,31 +2,15 @@
 
 package xyz.xenondevs.nova.util.reflection
 
-import xyz.xenondevs.bytebase.jvm.ClassWrapper
-import xyz.xenondevs.bytebase.jvm.VirtualClassPath
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.util.ServerSoftware
 import xyz.xenondevs.nova.util.ServerUtils
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.CLASS_LOADER_DEFINE_CLASS_METHOD
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
-import java.security.ProtectionDomain
 import kotlin.reflect.KClass
-
-internal fun ClassLoader.defineClass(name: String, bytecode: ByteArray, protectionDomain: ProtectionDomain?) =
-    CLASS_LOADER_DEFINE_CLASS_METHOD.invoke(this, name, bytecode, 0, bytecode.size, protectionDomain) as Class<*>
-
-internal fun ClassLoader.defineClass(clazz: Class<*>) =
-    defineClass(clazz.name, VirtualClassPath[clazz].assemble(true), clazz.protectionDomain)
-
-internal fun ClassLoader.defineClass(clazz: KClass<*>) =
-    defineClass(clazz.java)
-
-internal fun ClassLoader.defineClass(classWrapper: ClassWrapper) =
-    defineClass(classWrapper.name.replace('/', '.'), classWrapper.assemble(true), null)
 
 internal object ReflectionUtils {
     
