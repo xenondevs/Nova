@@ -1,4 +1,4 @@
-package xyz.xenondevs.nova.mixin.packethandler;
+package xyz.xenondevs.nova.mixin.packet.handler;
 
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;

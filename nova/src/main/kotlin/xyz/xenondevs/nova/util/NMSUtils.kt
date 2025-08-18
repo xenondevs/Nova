@@ -65,12 +65,11 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
-import xyz.xenondevs.nova.world.isMigrationActive
-import xyz.xenondevs.nova.patch.impl.misc.BroadcastPacketPatch
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.isMigrationActive
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.jvm.optionals.getOrNull
@@ -657,29 +656,29 @@ fun <T> RegistryKeySet<*>.toNmsHolderSet(
 }
 
 fun preventPacketBroadcast(run: () -> Unit) {
-    BroadcastPacketPatch.dropAll = true
+    NMSUtils.broadcastDropAll.set(true)
     try {
         run.invoke()
     } finally {
-        BroadcastPacketPatch.dropAll = false
+        NMSUtils.broadcastDropAll.set(false)
     }
 }
 
 fun replaceBroadcastExclusion(exclude: ServerPlayer, run: () -> Unit) {
-    BroadcastPacketPatch.exclude = exclude
+    NMSUtils.broadcastExcludedPlayerOverride.set(exclude)
     try {
         run.invoke()
     } finally {
-        BroadcastPacketPatch.exclude = null
+        NMSUtils.broadcastExcludedPlayerOverride.set(null)
     }
 }
 
 fun forcePacketBroadcast(run: () -> Unit) {
-    BroadcastPacketPatch.ignoreExcludedPlayer = true
+    NMSUtils.broadcastIgnoreExcludedPlayer.set(true)
     try {
         run.invoke()
     } finally {
-        BroadcastPacketPatch.ignoreExcludedPlayer = false
+        NMSUtils.broadcastIgnoreExcludedPlayer.set(false)
     }
 }
 
@@ -698,6 +697,18 @@ fun RegistryFriendlyByteBuf(): RegistryFriendlyByteBuf =
     RegistryFriendlyByteBuf(Unpooled.buffer(), REGISTRY_ACCESS)
 
 object NMSUtils {
+    
+    @PublishedApi
+    @JvmField
+    internal val broadcastIgnoreExcludedPlayer: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
+    
+    @PublishedApi
+    @JvmField
+    internal val broadcastExcludedPlayerOverride: ThreadLocal<ServerPlayer?> = ThreadLocal.withInitial { null }
+    
+    @PublishedApi
+    @JvmField
+    internal val broadcastDropAll: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
     
     val ENTITY_COUNTER by lazy {
         ReflectionUtils.getField(
