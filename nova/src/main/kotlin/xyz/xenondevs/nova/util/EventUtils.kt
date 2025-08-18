@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.PluginManager
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.PLUGIN_READY
-import xyz.xenondevs.nova.patch.impl.misc.EventPreventionPatch
 
 fun Action.isClickBlock() = this == Action.LEFT_CLICK_BLOCK || this == Action.RIGHT_CLICK_BLOCK
 
@@ -51,14 +50,21 @@ fun Listener.unregisterEvents() {
 }
 
 /**
- * Prevents all [synchronous][Event.async] [events][Event] attempted to be fired during [run]
- * from being fired.
+ * Blocks bukkit event firing during [run].
  */
 inline fun preventEvents(run: () -> Unit) {
-    EventPreventionPatch.dropAll = true
+    EventUtils.dropAllEvents.set(true)
     try {
         run()
     } finally {
-        EventPreventionPatch.dropAll = false
+        EventUtils.dropAllEvents.set(false)
     }
+}
+
+@PublishedApi
+internal object EventUtils {
+    
+    @JvmField
+    val dropAllEvents: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
+    
 }
