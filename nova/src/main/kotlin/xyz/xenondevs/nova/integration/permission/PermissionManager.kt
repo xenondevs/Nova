@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
@@ -36,7 +37,7 @@ private data class PermissionArgs(val world: World, val player: OfflinePlayer, v
 )
 object PermissionManager {
     
-    internal val integrations = ArrayList<PermissionIntegration>()
+    internal val integrations = CopyOnWriteArrayList<PermissionIntegration>()
     
     private lateinit var executor: ExecutorService
     private lateinit var offlinePermissionCache: LoadingCache<PermissionArgs, Boolean>

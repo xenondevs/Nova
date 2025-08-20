@@ -18,9 +18,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemType
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.util.broadcastBreakEvent
-import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
-import xyz.xenondevs.nova.world.item.recipe.ModelDataTest
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 
 @Hook(plugins = ["ItemsAdder"], loadListener = ItemsAdderLoadListener::class)
@@ -92,7 +90,7 @@ internal object ItemsAdderHook : CustomItemService {
     }
     
     override fun getItemTest(id: String): SingleItemTest? {
-        return getItemById(id)?.let { ModelDataTest(it.type, intArrayOf(it.customModelData), it) }
+        return null // nova loads recipes before ItemsAdder is done initializing
     }
     
     override fun getId(item: ItemStack): String? {

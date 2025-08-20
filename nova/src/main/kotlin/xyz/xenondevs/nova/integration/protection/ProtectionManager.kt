@@ -35,6 +35,7 @@ import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
@@ -91,7 +92,7 @@ private data class CanHurtEntityTileArgs(override val tileEntity: TileEntity, va
 )
 object ProtectionManager {
     
-    internal val integrations = ArrayList<ProtectionIntegration>()
+    internal val integrations = CopyOnWriteArrayList<ProtectionIntegration>()
     
     private lateinit var executor: ExecutorService
     private lateinit var cacheCanPlaceUser: LoadingCache<CanPlaceUserArgs, CompletableFuture<Boolean>>
