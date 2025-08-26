@@ -39,13 +39,23 @@ internal object S3 : UploadService {
                 Region.regions().joinToString(", ", transform = Region::id))
         
         val forcePathStyle = cfg.node("force_path_style").getBoolean(false)
+        val disableChunkedEncoding = cfg.node("disable_chunked_encoding").getBoolean(false)
         
         LOGGER.info("Connecting to S3 endpoint $endpoint")
+
+        val s3ConfigBuilder = S3Configuration.builder()
+            .pathStyleAccessEnabled(forcePathStyle)
+
+        if (disableChunkedEncoding) {
+            s3ConfigBuilder.chunkedEncodingEnabled(false)
+            LOGGER.info("Chunked encoding disabled for S3 client")
+        }
+
         this.client = S3Client.builder()
             .endpointOverride(endpointURI)
             .credentialsProvider(StaticCredentialsProvider.create(credentials))
             .region(region)
-            .forcePathStyle(forcePathStyle)
+            .serviceConfiguration(s3ConfigBuilder.build())
             .build()
         this.bucket = cfg.node("bucket").string
             ?: throw IllegalArgumentException("S3 bucket is not specified")
