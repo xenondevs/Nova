@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
+import xyz.xenondevs.nova.util.toString
 
 /**
  * Generates item model definitions.
@@ -71,7 +72,8 @@ class ItemModelContent(val builder: ResourcePackBuilder) : PackBuildData {
      * Finds the [ResourcePath] of the given [def] or registers it in `nova:gen_item/`.
      */
     fun getOrPutGenerated(def: ItemModelDefinition): ResourcePath<ResourceType.ItemModelDefinition> {
-        return getOrPut(def) { ResourcePath(ResourceType.ItemModelDefinition, "nova", "gen_item/${generatedDefCount++}") }
+        val packIdPath = builder.id.toString("/").replace(".", "_.")
+        return getOrPut(def) { ResourcePath(ResourceType.ItemModelDefinition, "nova", "gen_item/$packIdPath/${generatedDefCount++}") }
     }
     
     /**

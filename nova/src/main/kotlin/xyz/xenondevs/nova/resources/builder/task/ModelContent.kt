@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.util.data.readJson
+import xyz.xenondevs.nova.util.toString
 import java.nio.file.Path
 import kotlin.io.path.extension
 import kotlin.io.path.invariantSeparatorsPathString
@@ -108,7 +109,8 @@ class ModelContent(private val builder: ResourcePackBuilder) : PackBuildData, It
      * Finds the [ResourcePath] of the given [model] or registers it in `nova:gen_model/`.
      */
     fun getOrPutGenerated(model: Model): ResourcePath<ResourceType.Model> {
-        return getOrPut(model) { ResourcePath(ResourceType.Model, "nova", "gen_model/${generatedModelCount++}") }
+        val packIdPath = builder.id.toString("/").replace(".", "_.")
+        return getOrPut(model) { ResourcePath(ResourceType.Model, "nova", "gen_model/$packIdPath/${generatedModelCount++}") }
     }
     
     /**
