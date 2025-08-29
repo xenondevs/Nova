@@ -215,7 +215,9 @@ class ModelBuilder(private val base: Model) {
     /**
      * Builds the model according to the configured [actions].
      *
-     * The [context] parameter is only required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
+     * If [context] is not null, the model builder will additionally perform a [flatten] operation before
+     * applying the configured actions.
+     * The [context] parameters is also required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
      */
     fun build(context: ModelContent?): Model {
         if (::result.isInitialized)
@@ -229,10 +231,15 @@ class ModelBuilder(private val base: Model) {
     /**
      * Builds the model according to the given [actions].
      *
-     * The [context] parameter is only required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
+     * If [context] is not null, the model builder will additionally perform a [flatten] operation before
+     * applying the configured actions.
+     * The [context] parameters is also required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
      */
     private fun build(context: ModelContent?, actions: List<BuildAction>): Model {
         var resultModel = base
+        if (actions.isNotEmpty() && context != null) {
+            resultModel = FlatteningAction().apply(resultModel, context)
+        }
         for (action in actions) {
             when (action) {
                 is NonContextualModelBuildAction -> resultModel = action.apply(resultModel)
