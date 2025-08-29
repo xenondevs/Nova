@@ -1,18 +1,34 @@
 package xyz.xenondevs.nova.resources.builder.model.transform
 
+import org.joml.Math
+import org.joml.Matrix2d
 import org.joml.Matrix4d
+import org.joml.Vector2d
 import org.joml.Vector3d
 import org.joml.Vector3dc
+import org.joml.Vector4d
+import org.joml.Vector4dc
+import xyz.xenondevs.commons.collections.after
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.model.Model.*
 import xyz.xenondevs.nova.resources.builder.model.Model.Element.Face
 import xyz.xenondevs.nova.resources.builder.model.Model.Element.Rotation
+import xyz.xenondevs.nova.util.component1
+import xyz.xenondevs.nova.util.component2
+import xyz.xenondevs.nova.util.component3
+import xyz.xenondevs.nova.util.component4
+import xyz.xenondevs.nova.util.firstNonZeroAxis
+import xyz.xenondevs.nova.util.get
+import xyz.xenondevs.nova.util.rotate
 import xyz.xenondevs.nova.util.round
+import xyz.xenondevs.nova.util.set
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
+
+// it may make sense to rewrite the elements transformation to convert into some intermediate representation that is easier to work with
 
 /**
  * A transformation that rotates  a model around [axis] and [pivot] by [rot] degrees
@@ -77,12 +93,129 @@ internal data class RotationTransform(
             to = element.to
         }
         
+        if (rotation != null) {
+            // the rotation was either consumed, not present, or would've thrown before
+            check(angle == 0.0)
+            
+            val direction = Vector3d()
+            direction.set(rotation.axis, rotation.angle)
+            direction.rotate(axis, Math.PI / 2 * fullRots)
+            
+            val newAxis = direction.firstNonZeroAxis()
+            check(newAxis != null)
+            
+            rotation = rotation.copy(
+                origin = rotated(rotation.origin, fullRots),
+                axis = newAxis,
+                angle = direction.get(newAxis)
+            )
+        } else if (angle != 0.0) {
+            rotation = Rotation(angle, axis, pivot, rescale)
+        }
+        
         element.copy(
             from = from,
             to = to,
-            rotation = if (angle != 0.0) Rotation(angle, axis, pivot, rescale) else rotation,
-            faces = if (uvLock) rotatedFacesUvLocked(element.faces, fullRots) else rotatedFaces(element.faces, fullRots)
+            rotation = rotation,
+            faces = if (uvLock) rotatedFacesUvLocked(element, fullRots) else rotatedFaces(element.faces, fullRots)
         )
+    }
+    
+    private fun rotatedFacesUvLocked(element: Element, rots: Int): Map<Direction, Face> {
+        val faces = element.faces
+        if (rots == 0)
+            return faces
+        
+        val result = enumMap<Direction, Face>()
+        
+        for (dir in Direction.entries) {
+            val face = faces[dir] ?: continue
+            
+            if (dir.axis != axis) {
+                // swap face
+                val newDir = rotatedDirection(dir, rots)
+                
+                // rotations related to the fact that the element rotation changes the relative position
+                // of the from and to points in the object space
+                val r = when (axis) {
+                    Axis.X -> when {
+                        dir == Direction.NORTH -> 2
+                        newDir == Direction.NORTH -> -2
+                        else -> 0
+                    }
+                    
+                    Axis.Z -> rots
+                    Axis.Y -> 0
+                }
+                
+                result[newDir] = face.copy(
+                    uv = rotatedUv(element, dir, face, r),
+                    rotation = (face.rotation + r * 90).mod(360),
+                    cullface = face.cullface?.let { rotatedDirection(dir, rots) }
+                )
+            } else {
+                result[dir] = face.copy(uv = rotatedUvReordered(element, dir, face, rots * -dirSign(dir)))
+            }
+            
+        }
+        
+        return result
+    }
+    
+    /**
+     * Rotates the uv of [element's][element] [face] at [dir] by 90*rots degrees around (8, 8) counter-clockwise.
+     *
+     */
+    private fun rotatedUv(element: Element, dir: Direction, face: Face, rots: Int): Vector4dc? {
+        if (rots == 0)
+            return face.uv
+        
+        val uv = face.uv ?: element.generateUV(dir)
+        return rotatedUv(uv, rots)
+    }
+    
+    /**
+     * Rotates the uv of [element's][element] [face] at [dir] by 90*rots degrees around (8, 8) counter-clockwise
+     * without letting the rotation affect the draw direction (uv vertex order).
+     */
+    private fun rotatedUvReordered(element: Element, dir: Direction, face: Face, rots: Int): Vector4dc? {
+        if (rots == 0)
+            return face.uv
+        
+        val uv = face.uv ?: element.generateUV(dir)
+        
+        // remember mirroring to reapply later
+        val mirrorU = uv.x() > uv.z()
+        val mirrorV = uv.y() > uv.w()
+        
+        val (u0, v0, u1, v1) = rotatedUv(uv, rots)
+        
+        // sort uv vertices, then reapply original mirroring
+        val minU = min(u0, u1)
+        val minV = min(v0, v1)
+        val maxU = max(u0, u1)
+        val maxV = max(v0, v1)
+        
+        return Vector4d(
+            if (mirrorU) maxU else minU,
+            if (mirrorV) maxV else minV,
+            if (mirrorU) minU else maxU,
+            if (mirrorV) minV else maxV
+        )
+    }
+    
+    /**
+     * Rotates the [uv] by 90*rots degrees around (8, 8) counter-clockwise
+     */
+    private fun rotatedUv(uv: Vector4dc, rots: Int): Vector4dc {
+        val uv0 = Vector2d(uv.x() - 8, uv.y() - 8)
+        val uv1 = Vector2d(uv.z() - 8, uv.w() - 8)
+        
+        val rot = Matrix2d().rotate(Math.PI / 2 * rots)
+        uv0.mul(rot)
+        uv1.mul(rot)
+        
+        return Vector4d(uv0.x + 8.0, uv0.y + 8.0, uv1.x + 8.0, uv1.y + 8.0)
     }
     
     private fun rotatedFaces(faces: Map<Direction, Face>, rots: Int): Map<Direction, Face> {
@@ -94,8 +227,7 @@ internal data class RotationTransform(
             val face = faces[dir] ?: continue
             if (dir.axis == axis) {
                 // rotate texture
-                val rotation = (face.rotation + rots * 90 * -dirSign(dir)).mod(360)
-                result[dir] = face.copy(rotation = rotation)
+                result[dir] = face.copy(rotation = (face.rotation + rots * 90 * -dirSign(dir)).mod(360))
             } else {
                 // swap face
                 val newDir = rotatedDirection(dir, rots)
@@ -113,32 +245,18 @@ internal data class RotationTransform(
                     Axis.Y -> 0
                 }
                 
-                result[newDir] = face.copy(rotation = (face.rotation + rotation).mod(360))
+                result[newDir] = face.copy(
+                    rotation = (face.rotation + rotation).mod(360),
+                    cullface = face.cullface?.let { rotatedDirection(dir, rots) }
+                )
             }
         }
         
         return result
     }
     
-    private fun rotatedFacesUvLocked(faces: Map<Direction, Face>, rots: Int): Map<Direction, Face> {
-        if (rots == 0)
-            return faces
-        
-        val result = enumMap<Direction, Face>()
-        for (dir in Direction.entries) {
-            if (dir.axis != axis) {
-                val newDir = rotatedDirection(dir, rots)
-                result[newDir] = faces[dir] ?: continue
-            }
-        }
-        
-        return result
-    }
-    
-    private fun rotatedDirection(dir: Direction, rots: Int): Direction {
-        val rotatingFaces = directionsAround(axis)
-        return rotatingFaces[(rotatingFaces.indexOf(dir) + rots).mod(rotatingFaces.size)]
-    }
+    private fun rotatedDirection(dir: Direction, rots: Int): Direction =
+        directionsAround(axis).after(dir, rots)
     
     private fun rotated(v: Vector3dc, fullRots: Int): Vector3dc {
         val result = Vector3d(v)

@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.resources.builder.task.ModelContent
  */
 internal data class CombinationAction(val other: ModelBuilder) : ContextualModelBuildAction {
     
+    // fixme: colliding texture names
     override fun apply(model: Model, context: ModelContent): Model {
         val otherModel = other.build(context).flattened(context)
         

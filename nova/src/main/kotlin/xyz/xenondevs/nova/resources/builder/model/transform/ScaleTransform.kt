@@ -8,6 +8,7 @@ import org.joml.Vector3dc
 import org.joml.Vector4d
 import org.joml.Vector4dc
 import xyz.xenondevs.nova.resources.builder.model.Model
+import xyz.xenondevs.nova.util.rotate
 
 /**
  * A transformation that scales a model by [scale] around [pivot].
@@ -136,16 +137,6 @@ internal data class ScaleTransform(
         
         return Triple(uv0, u, v)
     }
-    
-    /**
-     * Rotates [this][Vector3d] by [angleRad] radians around [axis].
-     */
-    private fun Vector3d.rotate(axis: Model.Axis, angleRad: Double): Vector3d =
-        when (axis) {
-            Model.Axis.X -> rotateX(angleRad)
-            Model.Axis.Y -> rotateY(angleRad)
-            Model.Axis.Z -> rotateZ(angleRad)
-        }
     
     override fun apply(matrix: Matrix4d) {
         if (scaleUV)

@@ -262,7 +262,7 @@ class ModelBuilder(private val base: Model) {
      *
      * The [context] parameter is only required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
      */
-    internal fun buildScaled(context: ModelContent?): ScaledModel {
+    internal fun buildScaled(context: ModelContent?): ScaledModel { // TODO: build item definition model instead to allow combination action
         if (::scaledResult.isInitialized)
             return scaledResult
         
