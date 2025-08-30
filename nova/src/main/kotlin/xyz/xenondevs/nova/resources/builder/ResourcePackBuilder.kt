@@ -5,11 +5,12 @@ import com.google.common.jimfs.Jimfs
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import net.minecraft.SharedConstants
 import net.minecraft.server.packs.PackType
 import org.apache.commons.io.output.ByteArrayOutputStream
+import org.slf4j.Logger
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.flattenIterables
@@ -115,7 +116,7 @@ private val SKIP_PACK_TASKS: Set<String> by MAIN_CONFIG.entry<HashSet<String>>("
 
 class ResourcePackBuilder internal constructor(
     val id: Key,
-    val logger: ComponentLogger
+    val logger: Logger
 ) {
     
     companion object {
@@ -211,10 +212,10 @@ class ResourcePackBuilder internal constructor(
          * Creates a new [ResourcePackBuilder] using the configuration under [id].
          * @throws IllegalArgumentException If there is no [ResourcePackConfiguration] registered for [id].
          */
-        internal fun createBuilder(id: Key): ResourcePackBuilder {
+        internal fun createBuilder(id: Key, extraListener: Audience? = null): ResourcePackBuilder {
             val configuration = configurations[id]
             requireNotNull(configuration) { "No ResourcePackBuilderFactory registered for id $id" }
-            return configuration.create()
+            return configuration.create(extraListener)
         }
         
         /**
@@ -222,8 +223,8 @@ class ResourcePackBuilder internal constructor(
          * If [sendToPlayers] is `true`, the pack will also be sent to all online players that have the pack enabled.
          * @throws IllegalArgumentException If there is no [ResourcePackConfiguration] registered for [id].
          */
-        suspend fun build(id: Key, sendToPlayers: Boolean = true) {
-            val bin = createBuilder(id).build()
+        suspend fun build(id: Key, sendToPlayers: Boolean = true, extraListener: Audience? = null) {
+            val bin = createBuilder(id, extraListener).build()
             AutoUploadManager.uploadPack(id, bin)
             AutoCopier.copyToDestinations(id, bin)
             

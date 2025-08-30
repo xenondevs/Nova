@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.resources.builder
 
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.jgrapht.Graph
@@ -14,6 +15,7 @@ import xyz.xenondevs.nova.resources.ResourcePackManager
 import xyz.xenondevs.nova.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.resources.builder.task.PackBuildData
 import xyz.xenondevs.nova.resources.builder.task.PackTask
+import xyz.xenondevs.nova.util.ForwardingLogger
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
@@ -113,7 +115,8 @@ class ResourcePackConfiguration internal constructor(val id: Key) {
         taskConstructors += PackTaskCreator<PackBuildData>(null) { task() }
     }
     
-    internal fun create(): ResourcePackBuilder {
+    internal fun create(extraListener: Audience? = null): ResourcePackBuilder {
+        val logger = if (extraListener != null) ForwardingLogger(logger, extraListener) else logger
         val builder = ResourcePackBuilder(id, logger)
         
         val data = dataConstructors.map { it(builder) }

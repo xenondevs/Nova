@@ -12,6 +12,7 @@ import io.papermc.paper.command.brigadier.Commands.literal
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -251,24 +252,12 @@ internal object NovaCommand : Command() {
         }
     }
     
-    @Suppress("OPT_IN_USAGE")
+    @OptIn(DelicateCoroutinesApi::class)
     private fun buildResourcePack(ctx: CommandContext<CommandSourceStack>, id: Key? = null) {
         val ids = if (id == null) ResourcePackBuilder.configurations.keys else setOf(id)
         for (toBuild in ids) {
             GlobalScope.launch {
-                ctx.source.sender.sendMessage(Component.translatable(
-                    "command.nova.resource_pack.create.start",
-                    NamedTextColor.GRAY,
-                    Component.text(toBuild.toString(), NamedTextColor.AQUA)
-                ))
-                
-                ResourcePackBuilder.build(toBuild)
-                
-                ctx.source.sender.sendMessage(Component.translatable(
-                    "command.nova.resource_pack.create.success",
-                    NamedTextColor.GRAY,
-                    Component.text(toBuild.toString(), NamedTextColor.AQUA)
-                ))
+                ResourcePackBuilder.build(toBuild, extraListener = ctx.source.sender as? Player)
             }
         }
     }
