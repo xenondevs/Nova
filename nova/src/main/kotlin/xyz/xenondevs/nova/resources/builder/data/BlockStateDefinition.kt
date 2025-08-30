@@ -19,10 +19,6 @@ data class BlockStateDefinition(
     val multipart: List<MultipartCase> = emptyList()
 ) {
     
-    init {
-        require(variants.isEmpty() != multipart.isEmpty()) { "BlockStateDefinition must have either 'variants' or 'multipart'" }
-    }
-    
     @Serializable(with = BlockStateVariantAsStringSerializer::class)
     data class Variant(val properties: Map<String, String>)
     
@@ -81,24 +77,37 @@ data class BlockStateDefinition(
         val model: ResourcePath<ResourceType.Model>,
         val x: Int = 0,
         val y: Int = 0,
-        val uvlock: Boolean = false,
+        @SerialName("uvlock")
+        val uvLock: Boolean = false,
         val weight: Int = 1
     )
     
     /**
      * Gets the [models][Model] to be applied when the given [properties] are present.
+     * If both [variants] and [multipart] are defined, [variants] take precedence.
+     * Only if there is no matching variant, [multipart] is checked.
      */
     fun getModels(properties: Map<String, String>): List<Model> {
-        if (variants.isNotEmpty()) {
-            // TODO: determine if this is the correct behavior
-            return variants.entries
-                .firstOrNull { (variant, _) -> properties.containsAll(variant.properties) }
-                ?.value ?: emptyList()
-        } else if (multipart.isNotEmpty()) {
-            return multipart.flatMap { if (it.matches(properties)) it.apply else emptyList() }
+        val models = ArrayList<Model>()
+        
+        // variants take precedence over multipart
+        for ((variant, variantModels) in variants) {
+            if (properties.containsAll(variant.properties)) {
+                models += variantModels
+            }
         }
         
-        return emptyList()
+        if (models.isNotEmpty())
+            return models
+        
+        // only if no variant matched, check multipart
+        for (case in multipart) {
+            if (case.matches(properties)) {
+                models += case.apply
+            }
+        }
+        
+        return models
     }
     
 }
