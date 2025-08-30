@@ -10,6 +10,7 @@ import org.joml.Vector3dc
 import org.joml.Vector4d
 import org.joml.Vector4dc
 import org.joml.primitives.AABBd
+import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -41,7 +42,7 @@ data class Model(
     // item-specific
     @SerialName("gui_light")
     val guiLight: GuiLight? = null,
-    val display: Display? = null
+    val display: Display = Display()
 ) {
     
     /**
@@ -174,64 +175,156 @@ data class Model(
     
     /**
      * The display settings for an item model, depending on the context.
-     * 
-     * @param thirdPersonRightHand The display settings for right hand in third person.
-     * @param thirdPersonLeftHand The display settings for left hand in third person. Defaults to [thirdPersonRightHand] if unspecified.
-     * @param firstPersonRightHand The display settings for right hand in first person.
-     * @param firstPersonLeftHand The display settings for left hand in first person. Defaults to [firstPersonRightHand] if unspecified.
-     * @param head The display settings for the head.
-     * @param gui The display settings for the GUI.
-     * @param ground The display settings for the ground.
-     * @param fixed The display settings for fixed position.
+     *
+     * @param thirdPersonRightHand The display settings for right hand in third person, or `null` if unspecified.
+     * @param thirdPersonLeftHand The display settings for left hand in third person, or `null` if unspecified.
+     * @param firstPersonRightHand The display settings for right hand in first person, or `null` if unspecified.
+     * @param firstPersonLeftHand The display settings for left hand in first person, or `null` if unspecified.
+     * @param head The display settings for the head, or `null` if unspecified.
+     * @param gui The display settings for the GUI, or `null` if unspecified.
+     * @param ground The display settings for the ground, or `null` if unspecified.
+     * @param fixed The display settings for fixed position, or `null` if unspecified.
      */
     @Serializable
     data class Display(
         @SerialName("thirdperson_righthand")
-        val thirdPersonRightHand: Entry = Entry(),
+        val thirdPersonRightHand: Entry? = null,
         @SerialName("thirdperson_lefthand")
-        val thirdPersonLeftHand: Entry = thirdPersonRightHand,
+        val thirdPersonLeftHand: Entry? = null,
         @SerialName("firstperson_righthand")
-        val firstPersonRightHand: Entry = Entry(),
+        val firstPersonRightHand: Entry? = null,
         @SerialName("firstperson_lefthand")
-        val firstPersonLeftHand: Entry = firstPersonRightHand,
-        val head: Entry = Entry(),
-        val gui: Entry = Entry(),
-        val ground: Entry = Entry(),
-        val fixed: Entry = Entry()
+        val firstPersonLeftHand: Entry? = null,
+        val head: Entry? = null,
+        val gui: Entry? = null,
+        val ground: Entry? = null,
+        val fixed: Entry? = null,
     ) {
+        
+        /**
+         * The effective display settings for the right hand in third person,
+         * defaulting to an identity [Entry] if unspecified.
+         */
+        val effectiveThirdPersonRightHand: Entry
+            get() = thirdPersonRightHand ?: Entry()
+        
+        /**
+         * The effective display settings for the left hand in third person,
+         * defaulting to [effectiveThirdPersonRightHand] if unspecified.
+         */
+        val effectiveThirdPersonLeftHand: Entry
+            get() = thirdPersonLeftHand ?: effectiveThirdPersonRightHand
+        
+        /**
+         * The effective display settings for the right hand in first person,
+         * defaulting to an identity [Entry] if unspecified.
+         */
+        val effectiveFirstPersonRightHand: Entry
+            get() = firstPersonRightHand ?: Entry()
+        
+        /**
+         * The effective display settings for the left hand in first person,
+         * defaulting to [effectiveFirstPersonRightHand] if unspecified.
+         */
+        val effectiveFirstPersonLeftHand: Entry
+            get() = firstPersonLeftHand ?: effectiveFirstPersonRightHand
+        
+        /**
+         * The effective display settings for the head,
+         * defaulting to an identity [Entry] if unspecified.
+         */
+        val effectiveHead: Entry
+            get() = head ?: Entry()
+        
+        /**
+         * The effective display settings for the GUI,
+         * defaulting to an identity [Entry] if unspecified.
+         */
+        val effectiveGui: Entry
+            get() = gui ?: Entry()
+        
+        /**
+         * The effective display settings for the ground,
+         * defaulting to an identity [Entry] if unspecified.
+         */
+        val effectiveGround: Entry
+            get() = ground ?: Entry()
+        
+        /**
+         * The effective display settings for fixed position,
+         * defaulting to an identity [Entry] if unspecified.
+         */
+        val effectiveFixed: Entry
+            get() = fixed ?: Entry()
         
         companion object {
             
             /**
              * Creates a [Display] based on a map of [Position] to [Entry].
              */
-            fun of(map: Map<Position, Entry>): Display {
-                return Display(
-                    thirdPersonRightHand = map[Position.THIRDPERSON_RIGHTHAND] ?: Entry(),
-                    thirdPersonLeftHand = map[Position.THIRDPERSON_LEFTHAND] ?: map[Position.THIRDPERSON_RIGHTHAND] ?: Entry(),
-                    firstPersonRightHand = map[Position.FIRSTPERSON_RIGHTHAND] ?: Entry(),
-                    firstPersonLeftHand = map[Position.FIRSTPERSON_LEFTHAND] ?: map[Position.FIRSTPERSON_RIGHTHAND] ?: Entry(),
-                    head = map[Position.HEAD] ?: Entry(),
-                    gui = map[Position.GUI] ?: Entry(),
-                    ground = map[Position.GROUND] ?: Entry(),
-                    fixed = map[Position.FIXED] ?: Entry()
-                )
-            }
+            fun of(map: Map<Position, Entry>) = Display(
+                thirdPersonRightHand = map[Position.THIRDPERSON_RIGHTHAND],
+                thirdPersonLeftHand = map[Position.THIRDPERSON_LEFTHAND] ?: map[Position.THIRDPERSON_RIGHTHAND],
+                firstPersonRightHand = map[Position.FIRSTPERSON_RIGHTHAND],
+                firstPersonLeftHand = map[Position.FIRSTPERSON_LEFTHAND] ?: map[Position.FIRSTPERSON_RIGHTHAND],
+                head = map[Position.HEAD],
+                gui = map[Position.GUI],
+                ground = map[Position.GROUND],
+                fixed = map[Position.FIXED]
+            )
             
         }
         
         /**
          * Converts this [Display] to a map of [Position] to [Entry].
          */
-        fun toMap(): Map<Position, Entry> = enumMapOf(
-            Position.THIRDPERSON_RIGHTHAND to thirdPersonRightHand,
-            Position.THIRDPERSON_LEFTHAND to thirdPersonLeftHand,
-            Position.FIRSTPERSON_RIGHTHAND to firstPersonRightHand,
-            Position.FIRSTPERSON_LEFTHAND to firstPersonLeftHand,
-            Position.HEAD to head,
-            Position.GUI to gui,
-            Position.GROUND to ground,
-            Position.FIXED to fixed
+        fun toMap(): Map<Position, Entry> {
+            val map: MutableMap<Position, Entry> = enumMap()
+            if (thirdPersonRightHand != null)
+                map[Position.THIRDPERSON_RIGHTHAND] = thirdPersonRightHand
+            if (thirdPersonLeftHand != null)
+                map[Position.THIRDPERSON_LEFTHAND] = thirdPersonLeftHand
+            if (firstPersonRightHand != null)
+                map[Position.FIRSTPERSON_RIGHTHAND] = firstPersonRightHand
+            if (firstPersonLeftHand != null)
+                map[Position.FIRSTPERSON_LEFTHAND] = firstPersonLeftHand
+            if (head != null)
+                map[Position.HEAD] = head
+            if (gui != null)
+                map[Position.GUI] = gui
+            if (ground != null)
+                map[Position.GROUND] = ground
+            if (fixed != null)
+                map[Position.FIXED] = fixed
+            return map
+        }
+        
+        /**
+         * Converts this [Display] to a map of [Position] to effective [Entry].
+         */
+        fun toEffectiveMap(): Map<Position, Entry> = enumMapOf(
+            Position.THIRDPERSON_RIGHTHAND to effectiveThirdPersonRightHand,
+            Position.THIRDPERSON_LEFTHAND to effectiveThirdPersonLeftHand,
+            Position.FIRSTPERSON_RIGHTHAND to effectiveFirstPersonRightHand,
+            Position.FIRSTPERSON_LEFTHAND to effectiveFirstPersonLeftHand,
+            Position.HEAD to effectiveHead,
+            Position.GUI to effectiveGui,
+            Position.GROUND to effectiveGround,
+            Position.FIXED to effectiveFixed
+        )
+        
+        /**
+         * Merges this [Display] with another display, giving precedence to [override's][override] non-null entries.
+         */
+        fun withOverrides(override: Display) = Display(
+            thirdPersonRightHand = override.thirdPersonRightHand ?: thirdPersonRightHand,
+            thirdPersonLeftHand = override.thirdPersonLeftHand ?: thirdPersonLeftHand,
+            firstPersonRightHand = override.firstPersonRightHand ?: firstPersonRightHand,
+            firstPersonLeftHand = override.firstPersonLeftHand ?: firstPersonLeftHand,
+            head = override.head ?: head,
+            gui = override.gui ?: gui,
+            ground = override.ground ?: ground,
+            fixed = override.fixed ?: fixed
         )
         
         /**
@@ -282,7 +375,6 @@ data class Model(
         
     }
     
-    // TODO: verify whether this is the correct overwriting behavior for things like textures, display, guiLight, etc.
     /**
      * Creates a flattened copy of this model using the given [context] to resolve parent models.
      */
@@ -294,7 +386,7 @@ data class Model(
         var elements: List<Element>? = null
         var ambientOcclusion = true
         var guiLight = GuiLight.SIDE
-        var display: Display? = null
+        var display = Display()
         
         val hierarchy = LinkedList<Model>()
         var parent: Model? = this
@@ -307,10 +399,10 @@ data class Model(
             val model = hierarchy.removeFirst()
             
             textures.putAll(model.textures)
+            display = display.withOverrides(model.display)
             if (model.elements != null) elements = model.elements
             if (model.ambientOcclusion != null) ambientOcclusion = model.ambientOcclusion
             if (model.guiLight != null) guiLight = model.guiLight
-            if (model.display != null) display = model.display
         }
         
         return Model(

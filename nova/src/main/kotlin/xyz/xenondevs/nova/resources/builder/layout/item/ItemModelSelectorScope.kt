@@ -127,7 +127,7 @@ class ItemModelSelectorScope internal constructor(
         val parent = Model(
             ResourcePath(ResourceType.Model, "nova", "item/gui_item"),
             elements = elements,
-            display = display?.let { Model.Display(gui = it) }
+            display = Model.Display(gui = display)
         )
         val parentId = modelContent.getOrPutGenerated(parent)
         
