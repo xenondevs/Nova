@@ -457,7 +457,7 @@ internal object NovaCommand : Command() {
                             NamedTextColor.GRAY,
                             Component.text(novaBlockState.toString(), NamedTextColor.AQUA),
                             Component.translatable(info.vanillaBlockState.block.descriptionId, NamedTextColor.AQUA),
-                            Component.text(info.variantString, NamedTextColor.AQUA)
+                            Component.text(info.variantMap.toString(), NamedTextColor.AQUA)
                         )
                     }
                     

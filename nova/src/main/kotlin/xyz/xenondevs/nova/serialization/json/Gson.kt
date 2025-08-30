@@ -8,7 +8,6 @@ import xyz.xenondevs.commons.gson.registerTypeAdapter
 import xyz.xenondevs.commons.gson.registerTypeHierarchyAdapter
 import xyz.xenondevs.commons.gson.toJsonTreeTyped
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.serialization.json.serializer.BlockStateVariantDataSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.EnumMapInstanceCreator
 import xyz.xenondevs.nova.serialization.json.serializer.IntRangeSerialization
 import xyz.xenondevs.nova.serialization.json.serializer.ItemStackSerialization
@@ -35,7 +34,6 @@ private val GSON_BUILDER = GsonBuilder()
     .registerTypeHierarchyAdapter(LootTableSerialization)
     .registerTypeHierarchyAdapter(LootItemSerialization)
     .registerTypeHierarchyAdapter(VersionSerialization)
-    .registerTypeHierarchyAdapter(BlockStateVariantDataSerialization)
     .registerTypeAdapter(RegistryElementSerializer(NovaRegistries.ITEM))
     .registerTypeAdapter(RegistryElementSerializer(NovaRegistries.GUI_TEXTURE))
     .registerTypeAdapter(RegistryElementSerializer(NovaRegistries.EQUIPMENT))

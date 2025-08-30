@@ -20,7 +20,12 @@ internal data class NoteBackingStateConfig(
     override val type = NoteBackingStateConfig
     override val id = getIdOf(instrument, note, powered)
     override val waterlogged = false
-    override val variantString = "instrument=${instrument.name.lowercase()},note=$note,powered=$powered"
+    override val variantMap = mapOf(
+        "instrument" to instrument.name.lowercase(),
+        "note" to "$note",
+        "powered" to "$powered"
+    )
+    
     override val vanillaBlockState: BlockState = Blocks.NOTE_BLOCK.defaultBlockState()
         .setValue(NoteBlock.INSTRUMENT, instrument)
         .setValue(NoteBlock.NOTE, note)

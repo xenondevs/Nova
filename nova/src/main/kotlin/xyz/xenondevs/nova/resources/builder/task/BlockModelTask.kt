@@ -2,21 +2,15 @@
 
 package xyz.xenondevs.nova.resources.builder.task
 
-import com.google.gson.JsonObject
 import org.joml.Matrix4f
-import xyz.xenondevs.commons.collections.associateNotNull
 import xyz.xenondevs.commons.collections.flatMap
-import xyz.xenondevs.commons.gson.fromJson
-import xyz.xenondevs.commons.gson.getObjectOrNull
-import xyz.xenondevs.commons.gson.getOrPut
-import xyz.xenondevs.commons.gson.parseJson
-import xyz.xenondevs.commons.gson.writeToFile
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.builder.data.BlockStateDefinition
 import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
 import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
@@ -30,7 +24,6 @@ import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuild
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.serialization.json.GSON
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
@@ -42,9 +35,6 @@ import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvide
 import xyz.xenondevs.nova.world.block.state.model.LeavesBackingStateConfigType
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.WATERLOGGED
-import java.nio.file.Path
-import kotlin.io.path.createParentDirectories
-import kotlin.io.path.exists
 
 private val DISABLED_BACKING_STATE_CATEGORIES: Set<BackingStateCategory> by MAIN_CONFIG.entry("resource_pack", "generation", "disabled_backing_state_categories")
 
@@ -52,68 +42,65 @@ private val DISABLED_BACKING_STATE_CATEGORIES: Set<BackingStateCategory> by MAIN
  * Deals with generating and assigning custom block models to block states
  * (i.e. creating block state variant entries) or items.
  */
-class BlockModelContent(private val builder: ResourcePackBuilder) : PackTask {
+class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
     
     override val stage = BuildStage.PRE_WORLD
-    override val runAfter = setOf(BasePacks.Include::class, ExtractTask::class, ModelContent.DiscoverAllModels::class)
-    override val runBefore = setOf(ModelContent.Write::class, ItemModelContent.Write::class)
+    override val runAfter = setOf(BasePacks.Include::class, ExtractTask::class, ModelContent.DiscoverAllModels::class, BlockStateContent.PreLoadAll::class)
+    override val runBefore = setOf(ModelContent.Write::class, ItemModelContent.Write::class, BlockStateContent.Write::class)
     
-    private val variantByConfig = HashMap<BackingStateConfig, BlockStateVariantData>()
-    private val configsByVariant = HashMap<BlockStateVariantData, ArrayList<BackingStateConfig>>()
+    private val variantByConfig = HashMap<BackingStateConfig, BlockStateDefinition.Model>()
+    private val configsByVariant = HashMap<BlockStateDefinition.Model, ArrayList<BackingStateConfig>>()
     
     private val blockStatePosition = HashMap<BackingStateConfigType<*>, Int>()
     
     private val basePacks by builder.getBuildDataLazily<BasePacks>()
     private val modelContent by builder.getBuildDataLazily<ModelContent>()
     private val itemModelContent by builder.getBuildDataLazily<ItemModelContent>()
+    private val blockStateContent by builder.getBuildDataLazily<BlockStateContent>()
     
     override suspend fun run() {
-        readBlockStateFiles()
+        loadExistingBlockStateVariants()
         assignBlockModels()
         writeBlockStateFiles()
     }
     
     /**
-     * Reads all block state files that may be used by backing-state block models.
+     * Tries to load existing block state variants into [variantByConfig] and [configsByVariant]
+     * in order to not override them. Ignores variants that do not seem to be intended for custom blocks,
+     * e.g. variants that cover multiple block states.
      */
-    private fun readBlockStateFiles() {
+    private fun loadExistingBlockStateVariants() {
         BackingStateCategory.entries.asSequence()
             .filter { it !in DISABLED_BACKING_STATE_CATEGORIES }
             .flatMap { it.backingStateConfigTypes }
             .forEach { type ->
-                val file = getBlockStateFile(type)
-                if (file.exists()) {
-                    val blockStateJson = file.parseJson() as JsonObject
-                    
-                    if (blockStateJson.has("multipart")) {
-                        builder.logger.warn("Block state file $file contains multipart block states, which are not supported. " +
+                val bsdId = ResourcePath.of(ResourceType.BlockStateDefinition, type.fileName)
+                val bsd = blockStateContent.getCustom(bsdId)
+                    ?: return@forEach
+                
+                if (bsd.multipart.isNotEmpty()) {
+                    builder.logger.warn("Block state file $bsdId contains multipart block states, which are not supported. " +
                             "Block states defined in this file will be ignored and potentially overwritten.")
-                        return@forEach
+                    return@forEach
+                }
+                
+                for ((variant, models) in bsd.variants) {
+                    if (variant.properties.keys != type.properties) {
+                        builder.logger.warn("Variant '$variant' in block state file $bsdId does not specify all properties explicitly " +
+                            "(got ${variant.properties.keys}, expected ${type.properties}). " +
+                            "This variant will be ignored and potentially overwritten.")
+                        continue
                     }
                     
-                    blockStateJson.getObjectOrNull("variants")?.entrySet()
-                        ?.forEach { (variantStr, variantOpts) ->
-                            val properties = variantStr.split(',').associateNotNull {
-                                val parts = it.split('=')
-                                if (parts.size == 2)
-                                    parts[0] to parts[1]
-                                else null
-                            }
-                            
-                            if (properties.keys != type.properties) {
-                                builder.logger.warn("Variant '$variantStr' in block state file $file does not specify all properties explicitly " +
-                                    "(got ${properties.keys}, expected ${type.properties}). " +
-                                    "This variant will be ignored and potentially overwritten.")
-                                return@forEach
-                            }
-                            
-                            val config = type.of(properties)
-                            val variant = GSON.fromJson<BlockStateVariantData>(variantOpts)!!
-                            
-                            variantByConfig[config] = variant
-                            configsByVariant.getOrPut(variant, ::ArrayList) += config
-                        }
+                    if (models.size != 1) {
+                        builder.logger.warn("Variant '$variant' in block state file $bsdId has ${models.size} models, " +
+                            "but only one is supported. This variant will be ignored and potentially overwritten.")
+                        continue
+                    }
                     
+                    val config = type.of(variant.properties)
+                    variantByConfig[config] = models[0]
+                    configsByVariant.getOrPut(models[0], ::ArrayList) += config
                 }
             }
     }
@@ -190,7 +177,7 @@ class BlockModelContent(private val builder: ResourcePackBuilder) : PackTask {
      */
     private fun assignModelToVanillaBlockState(layout: BlockModelLayout.StateBacked, modelBuilder: ModelBuilder, waterlogged: Boolean): BackingStateConfig? {
         val (model, rotations) = modelBuilder.buildBlockStateVariant(modelContent)
-        val variant = BlockStateVariantData(modelContent.getOrPutGenerated(model), rotations.x(), rotations.y())
+        val variant = BlockStateDefinition.Model(modelContent.getOrPutGenerated(model), rotations.x(), rotations.y())
         
         var cfg: BackingStateConfig? = null
         for (configType in layout.configTypes) {
@@ -273,25 +260,16 @@ class BlockModelContent(private val builder: ResourcePackBuilder) : PackTask {
      * Writes all block state files to the resource pack.
      */
     private fun writeBlockStateFiles() {
-        // some backing state config types cover the same file
-        val fileContents = HashMap<Path, JsonObject>()
-        
         variantByConfig.entries
-            .groupBy { (cfg, _) -> cfg.type }
-            .forEach { (type, entries) ->
-                val blockStateFile = getBlockStateFile(type)
-                
-                val obj = fileContents.getOrPut(blockStateFile, ::JsonObject)
-                val variantsObj = obj.getOrPut("variants", ::JsonObject)
-                for ((cfg, variantData) in entries) {
-                    variantsObj.add(cfg.variantString, GSON.toJsonTree(variantData))
-                }
+            // group by file id, because some backing state config types share the same file
+            .groupBy { (cfg, _) -> ResourcePath.of(ResourceType.BlockStateDefinition, cfg.type.fileName) }
+            .forEach { (bsdId, cfgModelEntries) ->
+                blockStateContent[bsdId] = BlockStateDefinition(
+                    variants = cfgModelEntries.associate { (cfg, model) ->
+                        BlockStateDefinition.Variant(cfg.variantMap) to listOf(model) 
+                    }
+                )
             }
-        
-        for ((path, obj) in fileContents) {
-            path.createParentDirectories()
-            obj.writeToFile(path)
-        }
         
         // disable leaf particles if leaves backing state configs are used
         val particles = variantByConfig.keys.mapNotNullTo(HashSet()) { (it.type as? LeavesBackingStateConfigType<*>)?.particleType }
@@ -304,16 +282,4 @@ class BlockModelContent(private val builder: ResourcePackBuilder) : PackTask {
         }
     }
     
-    /**
-     * Gets the block state file for the given [type].
-     */
-    private fun getBlockStateFile(type: BackingStateConfigType<*>): Path =
-        builder.resolve("assets/minecraft/blockstates/${type.fileName}.json")
-    
 }
-
-internal data class BlockStateVariantData(
-    val model: ResourcePath<ResourceType.Model>,
-    val x: Int,
-    val y: Int
-)

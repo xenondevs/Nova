@@ -76,7 +76,7 @@ class BlockStateContent(private val builder: ResourcePackBuilder) : PackBuildDat
     /**
      * Loads all block state definitions, both vanilla and custom.
      */
-    inner class Load : PackTask {
+    inner class PreLoadAll : PackTask {
         
         override suspend fun run() = coroutineScope {
             val vanilla = ArrayList<Deferred<Pair<ResourcePath<ResourceType.BlockStateDefinition>, BlockStateDefinition?>>>()

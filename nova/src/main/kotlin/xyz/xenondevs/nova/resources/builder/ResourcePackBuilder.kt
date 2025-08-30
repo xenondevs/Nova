@@ -33,7 +33,7 @@ import xyz.xenondevs.nova.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder.Companion.configure
 import xyz.xenondevs.nova.resources.builder.data.PackMcMeta
 import xyz.xenondevs.nova.resources.builder.task.AtlasTask
-import xyz.xenondevs.nova.resources.builder.task.BlockModelContent
+import xyz.xenondevs.nova.resources.builder.task.BlockModelTask
 import xyz.xenondevs.nova.resources.builder.task.BlockStateContent
 import xyz.xenondevs.nova.resources.builder.task.BossBarOverlayTask
 import xyz.xenondevs.nova.resources.builder.task.BuildStage
@@ -148,7 +148,7 @@ class ResourcePackBuilder internal constructor(
                 registerTask(BasePacks::Include)
                 
                 registerBuildData(::BlockStateContent)
-                registerTask(BlockStateContent::Load)
+                registerTask(BlockStateContent::PreLoadAll)
                 registerTask(BlockStateContent::Write)
                 
                 registerBuildData(::FontContent)
@@ -177,7 +177,7 @@ class ResourcePackBuilder internal constructor(
                 registerTask(::GuiTextureTask)
                 registerTask(::MoveCharactersTask)
                 registerTask(::WailaTask)
-                registerTask(::BlockModelContent)
+                registerTask(::BlockModelTask)
                 registerTask(::EntityVariantTask)
                 registerTask(::EquipmentTask)
                 registerTask(::ExtractTask)
