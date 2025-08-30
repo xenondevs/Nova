@@ -68,7 +68,7 @@ object PermissionManager {
     /**
      * Checks whether the player under the given [UUID][player] has the given [permission] in the given [world].
      *
-     * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline permission cache,
+     * This method will use [org.bukkit.entity.Player.hasPermission] if the player is online and otherwise use access the offline permission cache,
      * which accesses the registered [PermissionIntegrations][PermissionIntegration] asynchronously.
      */
     fun hasPermission(world: World, player: UUID, permission: String): CompletableFuture<Boolean> =
@@ -77,7 +77,7 @@ object PermissionManager {
     /**
      * Checks whether the given [player] has the given [permission] in the given [world].
      *
-     * This method will use [Player.hasPermission] if the player is online and otherwise use access the offline permission cache,
+     * This method will use [org.bukkit.entity.Player.hasPermission] if the player is online and otherwise use access the offline permission cache,
      * which accesses the registered [PermissionIntegrations][PermissionIntegration] asynchronously.
      */
     fun hasPermission(world: World, player: OfflinePlayer, permission: String): CompletableFuture<Boolean> {
@@ -95,6 +95,8 @@ object PermissionManager {
     
     private fun hasOfflinePermission(world: World, player: OfflinePlayer, permission: String): Boolean {
         require(Thread.currentThread() != MINECRAFT_SERVER.serverThread) { "Offline player permissions should never be checked from the main thread" }
+        if (integrations.isEmpty())
+            return false
         return integrations[0].hasPermission(world, player, permission).get() ?: false
     }
     
