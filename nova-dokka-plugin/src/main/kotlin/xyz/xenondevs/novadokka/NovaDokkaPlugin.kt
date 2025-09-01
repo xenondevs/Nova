@@ -11,6 +11,10 @@ class NovaDokkaPlugin : DokkaPlugin() {
         plugin<DokkaBase>().preMergeDocumentableTransformer providing ::HideInternalApiTransformer
     }
     
+    val hideJvmAnnotationsTransformer by extending {
+        plugin<DokkaBase>().preMergeDocumentableTransformer providing ::HideJvmAnnotationsTransformer
+    }
+    
     @OptIn(DokkaPluginApiPreview::class)
     override fun pluginApiPreviewAcknowledgement() = PluginApiPreviewAcknowledgement
     
