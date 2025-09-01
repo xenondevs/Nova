@@ -9,7 +9,6 @@ import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
 import net.minecraft.SharedConstants
 import net.minecraft.server.packs.PackType
-import org.apache.commons.io.output.ByteArrayOutputStream
 import org.slf4j.Logger
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.combinedProvider
@@ -67,15 +66,8 @@ import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
-import kotlin.io.path.inputStream
-import kotlin.io.path.invariantSeparatorsPathString
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.relativeTo
-import kotlin.io.path.walk
 import kotlin.time.Duration
 import kotlin.time.measureTime
 
@@ -126,7 +118,7 @@ class ResourcePackBuilder internal constructor(
     /**
      * The logger for this resource pack build session.
      */
-    val logger: Logger
+    val logger: Logger,
 ) {
     
     companion object {
@@ -284,6 +276,8 @@ class ResourcePackBuilder internal constructor(
     @PublishedApi
     internal lateinit var data: List<PackBuildData>
     internal lateinit var tasks: Map<BuildStage, List<PackTask>>
+    internal lateinit var zipper: PackZipper
+    internal lateinit var postProcessors: List<PackPostProcessor>
     private val resourceFilters: Map<ResourceFilter.Stage, List<ResourceFilter>> =
         sequenceOf(CONFIG_RESOURCE_FILTERS, CORE_RESOURCE_FILTERS, customResourceFilters)
             .flatten().groupByTo(enumMap()) { it.stage }
@@ -324,7 +318,12 @@ class ResourcePackBuilder internal constructor(
         try {
             totalTime += measureTime {
                 tasks[BuildStage.POST_WORLD]?.forEach { runTaskTimed(it) }
-                val bin = createZip()
+                logger.info("Packing zip...")
+                var bin = zipper.createZip()
+                if (postProcessors.isNotEmpty()) {
+                    logger.info("Running ${postProcessors.size} post-processor(s)...")
+                    bin = postProcessors.fold(bin) { b, p -> p.process(b) }
+                }
                 logTaskTimes()
                 return bin
             }
@@ -351,25 +350,6 @@ class ResourcePackBuilder internal constructor(
                 packFormat = PACK_VERSION,
             )
         ))
-    }
-    
-    private fun createZip(): ByteArray {
-        logger.info("Packing zip...")
-        val filters = getResourceFilters(ResourceFilter.Stage.RESOURCE_PACK)
-        
-        val out = ByteArrayOutputStream()
-        ZipOutputStream(out).use { zip ->
-            zip.setLevel(COMPRESSION_LEVEL)
-            buildDir.walk()
-                .filter { path -> path.isRegularFile() }
-                .filter { path -> filters.all { filter -> filter.allows(path.relativeTo(resolve("assets/")).invariantSeparatorsPathString) } }
-                .forEach { path ->
-                    zip.putNextEntry(ZipEntry(path.relativeTo(buildDir).invariantSeparatorsPathString))
-                    path.inputStream().use { it.copyTo(zip) }
-                }
-        }
-        
-        return out.toByteArray()
     }
     
     private fun logTaskOrder() {

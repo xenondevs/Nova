@@ -57,6 +57,8 @@ class ResourcePackConfiguration internal constructor(
     
     private val dataConstructors = ArrayList<(ResourcePackBuilder) -> PackBuildData>()
     private val taskConstructors = ArrayList<PackTaskCreator<*>>()
+    private var zipperConstructor: (ResourcePackBuilder) -> PackZipper = ::DefaultPackZipper
+    private val postProcessorConstructors = ArrayList<(ResourcePackBuilder) -> PackPostProcessor>()
     
     /**
      * Whether this resource pack is enabled for players by default. Defaults to `true`.
@@ -124,6 +126,34 @@ class ResourcePackConfiguration internal constructor(
         taskConstructors += PackTaskCreator<PackBuildData>(null) { task() }
     }
     
+    /**
+     * Sets the [PackZipper] that is used to create the resource pack zip file.
+     */
+    fun setZipper(zipper: (ResourcePackBuilder) -> PackZipper) {
+        zipperConstructor = zipper
+    }
+    
+    /**
+     * Sets the [PackZipper] that is used to create the resource pack zip file.
+     */
+    fun setZipper(zipper: () -> PackZipper) {
+        zipperConstructor = { zipper() }
+    }
+    
+    /**
+     * Registers a [PackPostProcessor] that is run after the resource pack zip file has been created.
+     */
+    fun registerPostProcessor(postProcessor: (ResourcePackBuilder) -> PackPostProcessor) {
+        postProcessorConstructors += postProcessor
+    }
+    
+    /**
+     * Registers a [PackPostProcessor] that is run after the resource pack zip file has been created.
+     */
+    fun registerPostProcessor(postProcessor: () -> PackPostProcessor) {
+        postProcessorConstructors += { postProcessor() }
+    }
+    
     internal fun create(extraListener: Audience? = null): ResourcePackBuilder {
         val logger = if (extraListener != null) ForwardingLogger(logger, extraListener) else logger
         val builder = ResourcePackBuilder(id, logger)
@@ -134,6 +164,8 @@ class ResourcePackConfiguration internal constructor(
         
         builder.data = data
         builder.tasks = taskGraphs
+        builder.zipper = zipperConstructor(builder)
+        builder.postProcessors = postProcessorConstructors.map { it(builder) }
         
         return builder
     }
