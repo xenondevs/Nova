@@ -10,9 +10,6 @@ import net.kyori.adventure.key.Key
 import net.minecraft.SharedConstants
 import net.minecraft.server.packs.PackType
 import org.slf4j.Logger
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.flattenIterables
 import xyz.xenondevs.commons.reflection.simpleNestedName
 import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.downloader.ExtractionMode
@@ -79,31 +76,6 @@ private val EXTRACTION_MODE by MAIN_CONFIG.entry<String>("resource_pack", "gener
     }
 }
 
-private val CONFIG_RESOURCE_FILTERS by MAIN_CONFIG.entry<List<ResourceFilter>>("resource_pack", "generation", "resource_filters")
-private val CORE_RESOURCE_FILTERS by combinedProvider(listOf(
-    MAIN_CONFIG.entry<Boolean>("overlay", "bossbar", "enabled").map { enabled ->
-        if (!enabled) {
-            listOf(
-                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "minecraft/textures/gui/sprites/boss_bar/*"),
-                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/bossbar*"),
-                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/bars/*")
-            )
-        } else emptyList()
-    },
-    MAIN_CONFIG.entry<Boolean>("waila", "enabled").map { enabled ->
-        if (!enabled) {
-            listOf(
-                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, Regex("^[a-z0-9._-]+/textures/waila/.*$")),
-                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/waila*"),
-                ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/waila/*")
-            )
-        } else emptyList()
-    }
-)).flattenIterables()
-
-private val COMPRESSION_LEVEL by MAIN_CONFIG.entry<Int>("resource_pack", "generation", "compression_level")
-private val PACK_DESCRIPTION by MAIN_CONFIG.entry<String>("resource_pack", "generation", "description")
-
 private val SKIP_PACK_TASKS: Set<String> by MAIN_CONFIG.entry<HashSet<String>>("debug", "skip_pack_tasks")
 
 /**
@@ -136,7 +108,6 @@ class ResourcePackBuilder internal constructor(
         internal val MCASSETS_DIR: Path = DATA_FOLDER.resolve("resource_pack/.mcassets")
         private val MCASSETS_DOWNLOAD_MUTEX = Mutex()
         
-        private val customResourceFilters = ArrayList<ResourceFilter>()
         private val _configurations = ConcurrentHashMap<Key, ResourcePackConfiguration>()
         
         /**
@@ -189,6 +160,26 @@ class ResourcePackBuilder internal constructor(
                 registerTask(::CharSizeCalculator)
                 registerTask(::SoundOverridesTask)
                 registerTask(::PackMcMetaTask)
+                
+                registerResourceFilters(MAIN_CONFIG.entry<List<ResourceFilter>>("resource_pack", "generation", "resource_filters"))
+                registerResourceFilters(MAIN_CONFIG.entry<Boolean>("overlay", "bossbar", "enabled").map { enabled ->
+                    if (!enabled) {
+                        listOf(
+                            ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "minecraft/textures/gui/sprites/boss_bar/*"),
+                            ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/bossbar*"),
+                            ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/bars/*")
+                        )
+                    } else emptyList()
+                })
+                registerResourceFilters(MAIN_CONFIG.entry<Boolean>("waila", "enabled").map { enabled ->
+                    if (!enabled) {
+                        listOf(
+                            ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, Regex("^[a-z0-9._-]+/textures/waila/.*$")),
+                            ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/font/waila*"),
+                            ResourceFilter(ResourceFilter.Stage.ASSET_PACK, Type.BLACKLIST, "nova/textures/font/waila/*")
+                        )
+                    } else emptyList()
+                })
             }
         }
         
@@ -223,11 +214,11 @@ class ResourcePackBuilder internal constructor(
         
         /**
          * Builds and uploads the resource pack with the specified [id].
-         * 
+         *
          * If [sendToPlayers] is `true`, the pack will also be sent to all online players that have the pack enabled.
-         * 
+         *
          * If [extraListener] is not `null`, the log output of the build session will be forwarded to it.
-         * 
+         *
          * @throws IllegalArgumentException If there is no [ResourcePackConfiguration] registered for [id].
          */
         suspend fun build(id: Key, sendToPlayers: Boolean = true, extraListener: Audience? = null) {
@@ -237,13 +228,6 @@ class ResourcePackBuilder internal constructor(
             
             if (sendToPlayers)
                 ResourcePackManager.handlePackUpdated(id)
-        }
-        
-        /**
-         * Registers the specified [filters].
-         */
-        fun registerResourceFilters(vararg filters: ResourceFilter) {
-            customResourceFilters += filters
         }
         
         private suspend fun downloadMcAssets(): Unit = MCASSETS_DOWNLOAD_MUTEX.withLock {
@@ -279,9 +263,7 @@ class ResourcePackBuilder internal constructor(
     internal lateinit var tasks: Map<BuildStage, List<PackTask>>
     internal lateinit var zipper: PackZipper
     internal lateinit var postProcessors: List<PackPostProcessor>
-    private val resourceFilters: Map<ResourceFilter.Stage, List<ResourceFilter>> =
-        sequenceOf(CONFIG_RESOURCE_FILTERS, CORE_RESOURCE_FILTERS, customResourceFilters)
-            .flatten().groupByTo(enumMap()) { it.stage }
+    internal lateinit var resourceFilters: Map<ResourceFilter.Stage, List<ResourceFilter>>
     
     private val taskTimes = HashMap<PackTask, Duration>()
     private var totalTime: Duration = Duration.ZERO // fixme: total duration ends up being less than task sum durations, why?

@@ -9,7 +9,10 @@ import org.jgrapht.graph.DirectedAcyclicGraph
 import org.jgrapht.nio.DefaultAttribute
 import org.jgrapht.nio.dot.DOTExporter
 import org.slf4j.Logger
+import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.collections.enumMapOf
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.commons.reflection.simpleNestedName
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.resources.ResourcePackManager
@@ -59,6 +62,7 @@ class ResourcePackConfiguration internal constructor(
     private val taskConstructors = ArrayList<PackTaskCreator<*>>()
     private var zipperConstructor: (ResourcePackBuilder) -> PackZipper = ::DefaultPackZipper
     private val postProcessorConstructors = ArrayList<(ResourcePackBuilder) -> PackPostProcessor>()
+    private val resourceFilterSources = ArrayList<Provider<List<ResourceFilter>>>()
     
     /**
      * Whether this resource pack is enabled for players by default. Defaults to `true`.
@@ -154,6 +158,20 @@ class ResourcePackConfiguration internal constructor(
         postProcessorConstructors += { postProcessor() }
     }
     
+    /**
+     * Registers [ResourceFilters][ResourceFilter] to be used during the resource pack build process.
+     */
+    fun registerResourceFilters(filters: Provider<List<ResourceFilter>>) {
+        resourceFilterSources += filters
+    }
+    
+    /**
+     * Registers [ResourceFilters][ResourceFilter] to be used during the resource pack build process.
+     */
+    fun registerResourceFilters(vararg filters: ResourceFilter) {
+        resourceFilterSources += provider(filters.asList())
+    }
+    
     internal fun create(extraListener: Audience? = null): ResourcePackBuilder {
         val logger = if (extraListener != null) ForwardingLogger(logger, extraListener) else logger
         val builder = ResourcePackBuilder(id, logger)
@@ -166,6 +184,9 @@ class ResourcePackConfiguration internal constructor(
         builder.tasks = taskGraphs
         builder.zipper = zipperConstructor(builder)
         builder.postProcessors = postProcessorConstructors.map { it(builder) }
+        builder.resourceFilters = resourceFilterSources
+            .flatMap { it.get() }
+            .groupByTo(enumMap()) { it.stage }
         
         return builder
     }
