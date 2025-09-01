@@ -19,7 +19,7 @@ import net.minecraft.world.level.levelgen.structure.StructureSet
 import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.id
-import xyz.xenondevs.nova.data.UpdatableFile
+import xyz.xenondevs.nova.util.data.UpdatableFile
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage

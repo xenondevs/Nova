@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.world.loot
 import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.data.UpdatableFile
+import xyz.xenondevs.nova.util.data.UpdatableFile
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage

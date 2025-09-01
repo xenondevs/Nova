@@ -1,14 +1,10 @@
-package xyz.xenondevs.nova.data
+package xyz.xenondevs.nova.util.data
 
 import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.resources.ResourcePath
-import xyz.xenondevs.nova.util.data.HashUtils
-import xyz.xenondevs.nova.util.data.decodeBase64
-import xyz.xenondevs.nova.util.data.encodeBase64
-import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.createDirectories
@@ -25,7 +21,7 @@ import kotlin.io.path.writeBytes
 private const val STORAGE_KEY = "updatable_file_hashes"
 private val PLUGINS_DIR = DATA_FOLDER.parent
 
-object UpdatableFile {
+internal object UpdatableFile {
     
     private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve(STORAGE_KEY) ?: HashMap()
     
@@ -35,7 +31,7 @@ object UpdatableFile {
                 extractAll(
                     zip.resolve(dirName),
                     addon.dataFolder.resolve(dirName)
-                ) { ResourcePath.isValidPath(it.name) }
+                ) { ResourcePath.Companion.isValidPath(it.name) }
             }
         }
     }
