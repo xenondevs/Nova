@@ -114,8 +114,18 @@ private val PACK_DESCRIPTION by MAIN_CONFIG.entry<String>("resource_pack", "gene
 
 private val SKIP_PACK_TASKS: Set<String> by MAIN_CONFIG.entry<HashSet<String>>("debug", "skip_pack_tasks")
 
+/**
+ * Builds a resource pack based on a [ResourcePackConfiguration].
+ * A [ResourcePackBuilder] is responsible for a single resource pack build session.
+ */
 class ResourcePackBuilder internal constructor(
+    /**
+     * The id of the resource pack.
+     */
     val id: Key,
+    /**
+     * The logger for this resource pack build session.
+     */
     val logger: Logger
 ) {
     
@@ -220,7 +230,11 @@ class ResourcePackBuilder internal constructor(
         
         /**
          * Builds and uploads the resource pack with the specified [id].
+         * 
          * If [sendToPlayers] is `true`, the pack will also be sent to all online players that have the pack enabled.
+         * 
+         * If [extraListener] is not `null`, the log output of the build session will be forwarded to it.
+         * 
          * @throws IllegalArgumentException If there is no [ResourcePackConfiguration] registered for [id].
          */
         suspend fun build(id: Key, sendToPlayers: Boolean = true, extraListener: Audience? = null) {
@@ -270,13 +284,17 @@ class ResourcePackBuilder internal constructor(
     @PublishedApi
     internal lateinit var data: List<PackBuildData>
     internal lateinit var tasks: Map<BuildStage, List<PackTask>>
-    lateinit var assetPacks: List<AssetPack> private set
     private val resourceFilters: Map<ResourceFilter.Stage, List<ResourceFilter>> =
         sequenceOf(CONFIG_RESOURCE_FILTERS, CORE_RESOURCE_FILTERS, customResourceFilters)
             .flatten().groupByTo(enumMap()) { it.stage }
     
     private val taskTimes = HashMap<PackTask, Duration>()
     private var totalTime: Duration = Duration.ZERO // fixme: total duration ends up being less than task sum durations, why?
+    
+    /**
+     * The [AssetPacks][AssetPack] of all addons.
+     */
+    lateinit var assetPacks: List<AssetPack> private set
     
     internal suspend fun build(): ByteArray {
         logger.info("Building resource pack $id")

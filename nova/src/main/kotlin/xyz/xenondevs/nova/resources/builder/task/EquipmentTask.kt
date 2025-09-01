@@ -50,7 +50,7 @@ internal class RuntimeEquipmentData(
 class EquipmentTask(private val builder: ResourcePackBuilder) : PackTask {
     
     override val stage = BuildStage.PRE_WORLD
-    override val runAfter = setOf(ExtractTask::class)
+    override val runsAfter = setOf(ExtractTask::class)
     
     private val textureContent by builder.getBuildDataLazily<TextureContent>()
     

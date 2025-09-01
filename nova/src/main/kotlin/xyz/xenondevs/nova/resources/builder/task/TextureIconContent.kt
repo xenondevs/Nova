@@ -57,7 +57,7 @@ class TextureIconContent(
      */
     inner class Write(builder: ResourcePackBuilder) : PackTask {
         
-        override val runBefore = setOf(FontContent.Write::class)
+        override val runsBefore = setOf(FontContent.Write::class)
         
         override suspend fun run() {
             // default icons

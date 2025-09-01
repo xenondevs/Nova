@@ -8,6 +8,7 @@ import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.graph.DirectedAcyclicGraph
 import org.jgrapht.nio.DefaultAttribute
 import org.jgrapht.nio.dot.DOTExporter
+import org.slf4j.Logger
 import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.commons.reflection.simpleNestedName
 import xyz.xenondevs.nova.IS_DEV_SERVER
@@ -43,8 +44,16 @@ private class PackTaskCreator<D : PackBuildData>(
 
 /**
  * A configuration for a custom resource pack to be generated and served by Nova.
+ * 
+ * @see ResourcePackBuilder.register
+ * @see ResourcePackBuilder.configure
  */
-class ResourcePackConfiguration internal constructor(val id: Key) {
+class ResourcePackConfiguration internal constructor(
+    /**
+     * The [id] of the resource pack.
+     */
+    val id: Key
+) {
     
     private val dataConstructors = ArrayList<(ResourcePackBuilder) -> PackBuildData>()
     private val taskConstructors = ArrayList<PackTaskCreator<*>>()
@@ -59,7 +68,7 @@ class ResourcePackConfiguration internal constructor(val id: Key) {
     /**
      * The logger used for the resource pack build process.
      */
-    var logger = ComponentLogger.logger("Nova >> $id")
+    var logger: Logger = ComponentLogger.logger("Nova >> $id")
     
     /**
      * Registers a [PackBuildData] to be present during the resource pack build process.
@@ -152,10 +161,10 @@ class ResourcePackConfiguration internal constructor(val id: Key) {
         }
         
         for (task in unorderedTasks) {
-            task.runAfter
+            task.runsAfter
                 .mapNotNull { taskByClass[it] }
                 .forEach { runTaskAfterThis -> graph.addEdge(runTaskAfterThis, task) }
-            task.runBefore
+            task.runsBefore
                 .mapNotNull { taskByClass[it] }
                 .forEach { runTaskBeforeThis -> graph.addEdge(task, runTaskBeforeThis) }
         }

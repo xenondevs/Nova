@@ -110,7 +110,7 @@ class FontContent : PackBuildData {
      */
     inner class DiscoverAllFonts(private val builder: ResourcePackBuilder) : PackTask {
         
-        override val runAfter = setOf(ExtractTask::class)
+        override val runsAfter = setOf(ExtractTask::class)
         
         override suspend fun run() {
             discoverFonts(builder.resolveVanilla("assets/"), _vanillaFonts)
@@ -138,7 +138,7 @@ class FontContent : PackBuildData {
      */
     inner class Write(private val builder: ResourcePackBuilder) : PackTask {
         
-        override val runAfter = setOf(DiscoverAllFonts::class)
+        override val runsAfter = setOf(DiscoverAllFonts::class)
         
         override suspend fun run() {
             _customFonts.values.forEach { it.write(builder) }

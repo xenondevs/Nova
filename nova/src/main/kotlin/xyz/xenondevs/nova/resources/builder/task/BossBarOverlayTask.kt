@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlayManager
  */
 class BossBarOverlayTask(private val builder: ResourcePackBuilder) : PackTask {
     
-    override val runBefore = setOf(MovedFontContent.Write::class)
+    override val runsBefore = setOf(MovedFontContent.Write::class)
     
     override suspend fun run() {
         if (BossBarOverlayManager.ENABLED) {

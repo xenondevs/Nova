@@ -82,8 +82,8 @@ class ItemModelContent(val builder: ResourcePackBuilder) : PackBuildData {
     inner class GenerateItemDefinitions : PackTask {
         
         override val stage = BuildStage.POST_WORLD // // SelectItemModelProperty.Component requires registry access for serialization
-        override val runAfter = setOf(ModelContent.DiscoverAllModels::class)
-        override val runBefore = setOf(ModelContent.Write::class, Write::class)
+        override val runsAfter = setOf(ModelContent.DiscoverAllModels::class)
+        override val runsBefore = setOf(ModelContent.Write::class, Write::class)
         
         override suspend fun run() {
             for (item in NovaRegistries.ITEM) {

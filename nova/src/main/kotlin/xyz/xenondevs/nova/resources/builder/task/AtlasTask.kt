@@ -17,7 +17,7 @@ import kotlin.io.path.walk
  */
 class AtlasTask(private val builder: ResourcePackBuilder) : PackTask {
     
-    override val runAfter = setOf(ExtractTask::class)
+    override val runsAfter = setOf(ExtractTask::class)
     
     override suspend fun run() {
         val sources = HashMap<String, JsonArray>()

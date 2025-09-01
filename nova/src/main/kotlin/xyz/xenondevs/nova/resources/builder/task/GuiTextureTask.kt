@@ -30,7 +30,7 @@ class GuiTextureTask(
 ), PackTask {
     
     override val stage = BuildStage.PRE_WORLD
-    override val runBefore = setOf(FontContent.Write::class)
+    override val runsBefore = setOf(FontContent.Write::class)
     
     override suspend fun run() {
         val guiTextures = HashMap<GuiTexture, GuiTextureData>()

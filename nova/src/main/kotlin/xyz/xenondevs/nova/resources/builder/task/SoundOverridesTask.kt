@@ -26,7 +26,7 @@ import kotlin.io.path.exists
 class SoundOverridesTask(private val builder: ResourcePackBuilder) : PackTask {
     
     override val stage = BuildStage.PRE_WORLD
-    override val runAfter = setOf(BlockModelTask::class)
+    override val runsAfter = setOf(BlockModelTask::class)
     
     private val soundEvents = HashSet<String>()
     
