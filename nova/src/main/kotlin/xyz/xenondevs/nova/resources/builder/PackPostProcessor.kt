@@ -5,8 +5,8 @@ package xyz.xenondevs.nova.resources.builder
  */
 interface PackPostProcessor {
     
-    /**
-     * Processes the in-memory zipped resource pack [pack] and returns the modified version.
+    /**  
+     * Processes the in-memory [zipped resource pack][pack] and returns the modified version.
      */
     fun process(pack: ByteArray): ByteArray
     

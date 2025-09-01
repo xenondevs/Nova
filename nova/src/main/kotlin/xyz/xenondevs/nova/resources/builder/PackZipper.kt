@@ -6,7 +6,7 @@ package xyz.xenondevs.nova.resources.builder
 interface PackZipper {
     
     /**
-     * Creates a zip file from the given [root] directory and returns it as a [ByteArray].
+     * Creates a zip of the resource pack and returns it as a [ByteArray].
      */
     fun createZip(): ByteArray
     
