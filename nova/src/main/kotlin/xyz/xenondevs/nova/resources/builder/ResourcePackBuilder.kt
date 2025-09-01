@@ -31,7 +31,6 @@ import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourceFilter.Type
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder.Companion.configure
-import xyz.xenondevs.nova.resources.builder.data.PackMcMeta
 import xyz.xenondevs.nova.resources.builder.task.AtlasTask
 import xyz.xenondevs.nova.resources.builder.task.BlockModelTask
 import xyz.xenondevs.nova.resources.builder.task.BlockStateContent
@@ -49,6 +48,7 @@ import xyz.xenondevs.nova.resources.builder.task.ModelContent
 import xyz.xenondevs.nova.resources.builder.task.MoveCharactersTask
 import xyz.xenondevs.nova.resources.builder.task.MovedFontContent
 import xyz.xenondevs.nova.resources.builder.task.PackBuildData
+import xyz.xenondevs.nova.resources.builder.task.PackMcMetaTask
 import xyz.xenondevs.nova.resources.builder.task.PackTask
 import xyz.xenondevs.nova.resources.builder.task.SoundOverridesTask
 import xyz.xenondevs.nova.resources.builder.task.TextureContent
@@ -188,6 +188,7 @@ class ResourcePackBuilder internal constructor(
                 registerTask(::TooltipStyleContent)
                 registerTask(::CharSizeCalculator)
                 registerTask(::SoundOverridesTask)
+                registerTask(::PackMcMetaTask)
             }
         }
         
@@ -304,7 +305,6 @@ class ResourcePackBuilder internal constructor(
                 logTaskOrder()
                 assetPacks = loadAssetPacks()
                 logger.info("Asset packs (${assetPacks.size}): ${assetPacks.joinToString(transform = AssetPack::namespace)}")
-                writePackMcMeta()
                 tasks[BuildStage.PRE_WORLD]?.forEach { runTaskTimed(it) }
             }
         } catch (t: Throwable) {
@@ -341,15 +341,6 @@ class ResourcePackBuilder internal constructor(
             val zip = FileSystems.newFileSystem(file)
             AssetPack(namespace, zip.getPath(assetsPath))
         }
-    }
-    
-    private fun writePackMcMeta() {
-        resolve("pack.mcmeta").writeJson(PackMcMeta(
-            pack = PackMcMeta.Pack(
-                description = PACK_DESCRIPTION.format(id),
-                packFormat = PACK_VERSION,
-            )
-        ))
     }
     
     private fun logTaskOrder() {
