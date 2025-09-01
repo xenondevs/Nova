@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.resources.upload.service.S3
 import xyz.xenondevs.nova.resources.upload.service.SelfHost
 import xyz.xenondevs.nova.util.data.HashUtils
 import java.net.URI
@@ -41,7 +42,7 @@ private class UploadedPack(
 )
 internal object AutoUploadManager {
     
-    private val SERVICES = listOf(SelfHost)//, CustomMultiPart, S3)
+    private val SERVICES = listOf(SelfHost, S3)//, CustomMultiPart)
     
     private var enabled = false
     private var selectedService: UploadService? = null
@@ -51,30 +52,34 @@ internal object AutoUploadManager {
     
     @InitFun
     private suspend fun init() {
-        val cfg = MAIN_CONFIG.strongNode("resource_pack")
+        val cfg = MAIN_CONFIG.strongNode("resource_pack", "auto_upload")
         cfg.subscribe { runBlocking { disable(); enable(it) } }
         enable(cfg.get())
     }
     
     private suspend fun enable(cfg: ConfigurationNode) {
-        val autoUploadCfg = cfg.node("auto_upload")
-        enabled = autoUploadCfg.node("enabled").boolean
+        enabled = cfg.node("enabled").boolean
         if (!enabled)
             return
         
-        val serviceName = autoUploadCfg.node("service").string?.lowercase()
+        val serviceName = cfg.node("service").string?.lowercase()
         if (serviceName == null) {
             LOGGER.warn("No uploading service specified. Available: " + SERVICES.joinToString { it.names.first() })
             return
         }
         
-        selectedService = SERVICES.firstOrNull { serviceName in it.names }
-        if (selectedService == null) {
+        val service = SERVICES.firstOrNull { serviceName in it.names }
+        if (service == null) {
             LOGGER.warn("Upload service with name '$serviceName' does not exist. Available: " + SERVICES.joinToString { it.names.first() })
             return
         }
         
-        selectedService?.enable(cfg.node("auto_upload"))
+        try {
+            service.enable(cfg)
+            this.selectedService = service
+        } catch(e: IllegalArgumentException) {
+            LOGGER.error("Failed to enable upload service $serviceName: ${e.message}")
+        }
     }
     
     @DisableFun(dispatcher = Dispatcher.ASYNC)
@@ -88,6 +93,7 @@ internal object AutoUploadManager {
         val url = selectedService?.upload(getPackUuid(id), bin)
         if (url != null) {
             uploadedPacks[id] = UploadedPack(bin, url)
+            LOGGER.info("Resource pack $id available at $url")
         }
         return url
     }
