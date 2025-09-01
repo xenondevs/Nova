@@ -15,6 +15,9 @@ import org.jetbrains.dokka.model.DProperty
 import org.jetbrains.dokka.plugability.DokkaContext
 import org.jetbrains.dokka.transformers.documentation.PreMergeDocumentableTransformer
 
+/**
+ * A pre-merge transformer that hides all `@JvmStatic`, `@JvmName` and `@JvmField` annotations from the documentation.
+ */
 class HideJvmAnnotationsTransformer(ctx: DokkaContext) : PreMergeDocumentableTransformer {
     
     override fun invoke(modules: List<DModule>): List<DModule> =
