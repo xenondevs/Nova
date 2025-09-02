@@ -5,6 +5,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.S3Configuration
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import xyz.xenondevs.nova.LOGGER
@@ -43,19 +44,16 @@ internal object S3 : UploadService {
         
         LOGGER.info("Connecting to S3 endpoint $endpoint")
 
-        val s3ConfigBuilder = S3Configuration.builder()
-            .pathStyleAccessEnabled(forcePathStyle)
-
-        if (disableChunkedEncoding) {
-            s3ConfigBuilder.chunkedEncodingEnabled(false)
-            LOGGER.info("Chunked encoding disabled for S3 client")
-        }
-
         this.client = S3Client.builder()
             .endpointOverride(endpointURI)
             .credentialsProvider(StaticCredentialsProvider.create(credentials))
             .region(region)
-            .serviceConfiguration(s3ConfigBuilder.build())
+            .serviceConfiguration(
+                S3Configuration.builder()
+                    .pathStyleAccessEnabled(forcePathStyle)
+                    .chunkedEncodingEnabled(!disableChunkedEncoding)
+                    .build()
+            )
             .build()
         this.bucket = cfg.node("bucket").string
             ?: throw IllegalArgumentException("S3 bucket is not specified")
