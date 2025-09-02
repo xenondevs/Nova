@@ -15,9 +15,7 @@ class BlockStateDefinitionTest {
         val blockState = deserializeBlockState("oak_fence")
         
         assertEquals(
-            listOf(
-                BlockStateDefinition.Model(model = ResourcePath(ResourceType.Model, "minecraft", "block/oak_fence_post"))
-            ),
+            listOf(listOf(BlockStateDefinition.Model(model = ResourcePath(ResourceType.Model, "minecraft", "block/oak_fence_post")))),
             blockState.getModels(mapOf())
         )
         
@@ -33,7 +31,7 @@ class BlockStateDefinitionTest {
                     uvLock = true,
                     y = 270
                 )
-            ),
+            ).map { listOf(it) },
             blockState.getModels(mapOf("north" to "true", "west" to "true"))
         )
     }
@@ -67,7 +65,7 @@ class BlockStateDefinitionTest {
                     model = ResourcePath(ResourceType.Model, "minecraft", "block/mushroom_block_inside"),
                     x = 90,
                 ),
-            ),
+            ).map { listOf(it) },
             blockState.getModels(mapOf(
                 "north" to "false",
                 "east" to "false",
@@ -79,7 +77,7 @@ class BlockStateDefinitionTest {
         )
         
         assertEquals(
-            listOf(BlockStateDefinition.Model(model = ResourcePath(ResourceType.Model, "minecraft", "block/emerald_block"))),
+            listOf(listOf(BlockStateDefinition.Model(model = ResourcePath(ResourceType.Model, "minecraft", "block/emerald_block")))),
             blockState.getModels(mapOf(
                 "north" to "true",
                 "east" to "true",

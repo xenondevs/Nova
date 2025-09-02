@@ -87,8 +87,8 @@ data class BlockStateDefinition(
      * If both [variants] and [multipart] are defined, [variants] take precedence.
      * Only if there is no matching variant, [multipart] is checked.
      */
-    fun getModels(properties: Map<String, String>): List<Model> {
-        val models = ArrayList<Model>()
+    fun getModels(properties: Map<String, String>): List<List<Model>> {
+        val models = ArrayList<List<Model>>()
         
         // variants take precedence over multipart
         for ((variant, variantModels) in variants) {
