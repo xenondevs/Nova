@@ -89,13 +89,15 @@ private class PaperNetworkTicker : NetworkTicker {
         clusters.forEach { it.postTickSync(tick) }
     }
     
-    private suspend fun tickParallel(tick: Int) = coroutineScope {
+    private suspend fun tickParallel(tick: Int) {
         clusters.forEach { it.preTickSync(tick) }
-        clusters.forEach { cluster ->
-            launch(Dispatchers.Default) {
-                cluster.preTick(tick)
-                cluster.tick(tick)
-                cluster.postTick(tick)
+        coroutineScope {
+            clusters.forEach { cluster ->
+                launch(Dispatchers.Default) {
+                    cluster.preTick(tick)
+                    cluster.tick(tick)
+                    cluster.postTick(tick)
+                }
             }
         }
         clusters.forEach { it.postTickSync(tick) }

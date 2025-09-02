@@ -8,6 +8,7 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.S3Configuration
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.resources.upload.UploadService
@@ -36,6 +37,7 @@ internal object S3 : UploadService {
         val keySecret = cfg.node("key_secret").string
             ?: throw IllegalArgumentException("S3 key_secret is not specified")
         val region = cfg.node("region")?.string?.let(Region::of)
+        val disableChunkedEncoding = cfg.node("disable_chunked_encoding").getBoolean(false)
         
         pathStyle = cfg.node("force_path_style").getBoolean(false)
         bucket = cfg.node("bucket").string
@@ -48,7 +50,12 @@ internal object S3 : UploadService {
             .endpointOverride(URI("https://$endpoint"))
             .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(keyId, keySecret)))
             .region(region)
-            .forcePathStyle(pathStyle)
+            .serviceConfiguration(
+                S3Configuration.builder()
+                    .pathStyleAccessEnabled(pathStyle)
+                    .chunkedEncodingEnabled(!disableChunkedEncoding)
+                    .build()
+            )
             .build()
     }
     
@@ -57,7 +64,7 @@ internal object S3 : UploadService {
     }
     
     override suspend fun upload(id: UUID, bin: ByteArray): String = withContext(Dispatchers.IO) {
-        val req = PutObjectRequest.builder().apply { 
+        val req = PutObjectRequest.builder().apply {
             bucket(bucket)
             key("$directory$id.zip")
             if (acl != null)

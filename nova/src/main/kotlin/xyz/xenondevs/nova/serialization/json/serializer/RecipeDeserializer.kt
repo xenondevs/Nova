@@ -124,6 +124,8 @@ internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
             ?: CraftingBookCategory.MISC
         recipe.category = category
         
+        recipe.group = json.getStringOrNull("group") ?: ""
+        
         return recipe
     }
     
@@ -167,6 +169,8 @@ internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe
             ?: CraftingBookCategory.MISC
         recipe.category = category
         
+        recipe.group = json.getStringOrNull("group") ?: ""
+       
         return recipe
     }
     
@@ -227,6 +231,8 @@ internal abstract class CookingRecipeDeserializer<T : CookingRecipe<T>>(
             ?.let { CookingBookCategory.valueOf(it.uppercase()) }
             ?: CookingBookCategory.MISC
         recipe.category = category
+
+        recipe.group = json.getStringOrNull("group") ?: ""
         
         return recipe
     }

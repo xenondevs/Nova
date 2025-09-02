@@ -7,6 +7,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.intellectualsites.plotsquared:plotsquared-core:7.5.4")
-    compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit:7.5.4") { isTransitive = false }
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-core:7.5.6")
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit:7.5.6") { isTransitive = false }
 }

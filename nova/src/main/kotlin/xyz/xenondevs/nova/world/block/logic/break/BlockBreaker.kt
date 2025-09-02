@@ -172,7 +172,7 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
             handleBreakTick()
             
             // set the break stage
-            breakMethod.breakStage = (progress.coerceAtMost(1.0) * 10).toInt()
+            breakMethod.breakStage = if (progress <= 0) -1 else (progress.coerceAtMost(1.0) * 10).toInt()
         }
     }
     

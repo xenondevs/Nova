@@ -14,8 +14,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder
 import com.sk89q.worldedit.world.block.BlockTypes
 import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.contains
-import xyz.xenondevs.nova.util.getValueOrThrow
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.stream.Stream
@@ -45,13 +43,13 @@ class NovaBlock(val novaId: String) : BaseBlock(BLOCK_STATE)
 internal class NovaBlockInputParser(worldEdit: WorldEdit) : InputParser<BaseBlock>(worldEdit) {
     
     override fun getSuggestions(input: String): Stream<String> {
-        return NovaRegistries.BLOCK.stream()
+        return NovaRegistries.blockStream()
             .filter { it.id.toString().startsWith(input) || it.id.value().startsWith(input) }
             .map { it.id.toString() }
     }
     
     override fun parseFromInput(input: String, context: ParserContext): BaseBlock? {
-        if (input !in NovaRegistries.BLOCK)
+        if (!NovaRegistries.hasBlock(input))
             return null
         
         return NovaBlock(input)
@@ -64,7 +62,7 @@ internal class NovaBlockExtent(private val event: EditSessionEvent) : AbstractDe
     override fun <T : BlockStateHolder<T>?> setBlock(vec: BlockVector3, block: T): Boolean {
         if (block is NovaBlock) {
             val pos = BlockPos(BukkitAdapter.adapt(event.world), vec.x, vec.y, vec.z)
-            WorldDataManager.setBlockState(pos, NovaRegistries.BLOCK.getValueOrThrow(block.novaId).defaultBlockState)
+            WorldDataManager.setBlockState(pos, NovaRegistries.getBlockOrThrow(block.novaId).defaultBlockState)
             return true
         }
         

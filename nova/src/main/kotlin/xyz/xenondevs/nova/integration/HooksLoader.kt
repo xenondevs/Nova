@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.integration.permission.PermissionIntegration
 import xyz.xenondevs.nova.integration.permission.PermissionManager
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.data.JarUtils
+import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 
 @InternalInit(
@@ -64,19 +65,23 @@ internal object HooksLoader {
     }
     
     private fun loadHook(className: String, loadListener: Type?) {
+        val loaded: CompletableFuture<Boolean>
         if (loadListener != null) {
             val obj = (Class.forName(loadListener.className).kotlin as KClass<out LoadListener>).objectInstance
                 ?: throw IllegalStateException("LoadListener $loadListener is not an object")
             
-            if (!obj.loaded.get())
-                return
+            loaded = obj.loaded
+        } else {
+            loaded = CompletableFuture.completedFuture(true)
         }
         
-        val hookClass = Class.forName(className).kotlin
-        val hookInstance = hookClass.objectInstance
-            ?: throw IllegalStateException("Hook $hookClass is not an object")
-        
-        useHook(hookInstance)
+        loaded.thenAccept {
+            val hookClass = Class.forName(className).kotlin
+            val hookInstance = hookClass.objectInstance
+                ?: throw IllegalStateException("Hook $hookClass is not an object")
+            
+            useHook(hookInstance)
+        }
     }
     
     private fun useHook(hook: Any) {

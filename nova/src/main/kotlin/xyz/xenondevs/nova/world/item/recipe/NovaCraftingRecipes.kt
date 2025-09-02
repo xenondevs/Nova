@@ -5,6 +5,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.BlastingRecipe
 import net.minecraft.world.item.crafting.CampfireCookingRecipe
 import net.minecraft.world.item.crafting.CraftingInput
+import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapedRecipePattern
 import net.minecraft.world.item.crafting.ShapelessRecipe
@@ -18,6 +19,7 @@ import net.minecraft.world.item.crafting.TransmuteResult
 import net.minecraft.world.level.Level
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.RecipeChoice
+import xyz.xenondevs.commons.collections.filterValuesNotNull
 import xyz.xenondevs.commons.collections.removeFirstWhere
 import xyz.xenondevs.nova.util.data.nmsCategory
 import xyz.xenondevs.nova.util.data.toNmsIngredient
@@ -38,10 +40,9 @@ internal class NovaShapedRecipe private constructor(
     private val bukkitRecipe: BukkitShapedRecipe,
     pattern: ShapedRecipePattern,
     result: ItemStack,
-    val requiredChoices: List<RecipeChoice>,
     val choiceMatrix: Array<Array<RecipeChoice?>>
 ) : ShapedRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     pattern, result
 ) {
@@ -85,25 +86,49 @@ internal class NovaShapedRecipe private constructor(
     companion object {
         
         fun of(recipe: BukkitShapedRecipe): NovaShapedRecipe {
-            val width = recipe.shape[0].length
-            val height = recipe.shape.size
+            val choices: Map<Char, RecipeChoice> = recipe.choiceMap.filterValuesNotNull()
+            val pattern = cutPattern(recipe.shape.asList(), choices)
+            val width = pattern[0].length
+            val height = pattern.size
             
-            val flatShape: String = recipe.shape.joinToString("")
-            val flatChoices: Array<RecipeChoice?> = Array(flatShape.length) { recipe.choiceMap[flatShape[it]] }
-            val requiredChoices: List<RecipeChoice> = recipe.shape.joinToString("").mapNotNull { recipe.choiceMap[it] }
-            val choiceMatrix: Array<Array<RecipeChoice?>> = Array(width) { x -> Array(height) { y -> recipe.choiceMap[recipe.shape[y][x]] } }
+            val flatShape: String = pattern.joinToString("")
+            val ingredients: List<Optional<Ingredient>> = List(flatShape.length) {
+                Optional.ofNullable(choices[flatShape[it]]?.toNmsIngredient())
+            }
+            
+            val choiceMatrix: Array<Array<RecipeChoice?>> = Array(width) { x ->
+                Array(height) { y -> choices[pattern[y][x]] }
+            }
             
             return NovaShapedRecipe(
                 recipe,
                 ShapedRecipePattern(
                     width, height,
-                    flatChoices.map { it.toNmsIngredient() },
+                    ingredients,
                     Optional.empty()
                 ),
                 recipe.result.unwrap().copy(),
-                requiredChoices,
                 choiceMatrix
             )
+        }
+        
+        /**
+         * Removes empty rows and columns on the sides
+         */
+        @Suppress("DuplicatedCode")
+        private fun cutPattern(pattern: List<String>, ingredients: Map<Char, *>): List<String> {
+            require(pattern.all { it.length == pattern[0].length }) { "All rows must have the same length." }
+            
+            val width = pattern[0].length
+            val height = pattern.size
+            
+            val startX = (0..<width).first { x -> pattern.any { it[x] in ingredients } }
+            val endX = (width - 1 downTo startX).first { x -> pattern.any { it[x] in ingredients } }
+            
+            val startY = (0..<height).first { y -> pattern[y].any { it in ingredients } }
+            val endY = (height - 1 downTo startY).first { y -> pattern[y].any { it in ingredients } }
+            
+            return (startY..endY).map { y -> pattern[y].substring(startX..endX) }
         }
         
     }
@@ -111,7 +136,7 @@ internal class NovaShapedRecipe private constructor(
 }
 
 internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : ShapelessRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.result.unwrap().copy(),
     bukkitRecipe.choiceList.map { it.toNmsIngredient() }
@@ -135,7 +160,7 @@ internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessReci
 }
 
 internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) : SmeltingRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.unwrap().copy(),
@@ -154,7 +179,7 @@ internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) 
 }
 
 internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRecipe) : BlastingRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.unwrap().copy(),
@@ -173,7 +198,7 @@ internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRe
 }
 
 internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) : SmokingRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.unwrap().copy(),
@@ -192,7 +217,7 @@ internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) :
 }
 
 internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe) : CampfireCookingRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.category.nmsCategory,
     bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.unwrap().copy(),
@@ -211,7 +236,7 @@ internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe
 }
 
 internal class NovaStonecutterRecipe(private val bukkitRecipe: BukkitStonecuttingRecipe) : StonecutterRecipe(
-    "",
+    bukkitRecipe.group,
     bukkitRecipe.inputChoice.toNmsIngredient(),
     bukkitRecipe.result.unwrap().copy()
 ) {

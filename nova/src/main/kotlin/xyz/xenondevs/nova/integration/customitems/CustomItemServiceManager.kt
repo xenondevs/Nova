@@ -8,10 +8,11 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
+import java.util.concurrent.CopyOnWriteArrayList
 
 object CustomItemServiceManager {
     
-    internal val services = ArrayList<CustomItemService>()
+    internal val services = CopyOnWriteArrayList<CustomItemService>()
     
     fun placeBlock(item: ItemStack, location: Location, playSound: Boolean): Boolean {
         return services.any { it.placeBlock(item, location, playSound) }

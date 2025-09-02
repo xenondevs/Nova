@@ -31,6 +31,7 @@ import net.minecraft.world.item.component.DyedItemColor
 import net.minecraft.world.item.component.ItemLore
 import net.minecraft.world.item.component.TooltipDisplay
 import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.crafting.SelectableRecipe
 import net.minecraft.world.item.crafting.display.FurnaceRecipeDisplay
 import net.minecraft.world.item.crafting.display.RecipeDisplay
 import net.minecraft.world.item.crafting.display.RecipeDisplayEntry
@@ -63,6 +64,7 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundRecipeBookAddPack
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetCursorItemPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEquipmentPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClickPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
@@ -216,18 +218,36 @@ internal object PacketItems : Listener, PacketListener {
         
         event.offers = newOffers
     }
+    
+    @PacketHandler
+    private fun handleRecipes(event: ClientboundUpdateRecipesPacketEvent) {
+        event.stonecutterRecipes = SelectableRecipe.SingleInputSet(
+            event.stonecutterRecipes.entries().map { entry ->
+                SelectableRecipe.SingleInputEntry(
+                    getClientSideIngredient(entry.input()),
+                    SelectableRecipe(
+                        getClientSideSlotDisplay(entry.recipe().optionDisplay()),
+                        entry.recipe().recipe()
+                    )
+                )
+            }
+        )
+    }
+    
     //</editor-fold>
     
     //<editor-fold desc="server-side recipe -> client-side recipe">
     private fun getClientSideIngredientList(optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
-        optList.map { ingredientList ->
-            ingredientList.map { ingredient ->
-                val itemStacks = ingredient.itemStacks()
-                if (itemStacks != null)
-                    Ingredient.ofStacks(itemStacks.map { getClientSideStack(null, it, false) })
-                else ingredient
-            }
+        optList.map { ingredientList -> ingredientList.map(::getClientSideIngredient) }
+    
+    private fun getClientSideIngredient(ingredient: Ingredient): Ingredient {
+        val itemStacks = ingredient.itemStacks()
+        if (itemStacks != null) {
+            return Ingredient.ofStacks(itemStacks.map { getClientSideStack(null, it, false) })
+        } else {
+            return ingredient
         }
+    }
     
     private fun getClientSideRecipeDisplay(display: RecipeDisplay): RecipeDisplay = when (display) {
         is FurnaceRecipeDisplay -> FurnaceRecipeDisplay(
