@@ -9,9 +9,10 @@ import xyz.xenondevs.nova.resources.builder.task.ModelContent
  */
 internal data class CombinationAction(val other: ModelBuilder) : ContextualModelBuildAction {
     
-    // fixme: colliding texture names
     override fun apply(model: Model, context: ModelContent): Model {
-        val otherModel = other.build(context).flattened(context)
+        val prefix = (0..Int.MAX_VALUE).first { i -> model.textures.keys.none { it.startsWith(i.toString()) } }.toString()
+        
+        val otherModel = other.build(context).flattened(context).withPrefixedTextureKeys(prefix)
         
         val textures = HashMap<String, String>()
         textures.putAll(model.textures)
@@ -26,5 +27,21 @@ internal data class CombinationAction(val other: ModelBuilder) : ContextualModel
             elements = elements
         )
     }
+    
+    // assumes flattened model
+    private fun Model.withPrefixedTextureKeys(prefix: String): Model = copy(
+        textures = textures.entries.associate { (key, value) ->
+            if (value.startsWith('#')) {
+                prefix + key to "#" + prefix + value.substring(1)
+            } else {
+                prefix + key to value
+            }
+        },
+        elements = elements?.map { element ->
+            element.copy(faces = element.faces.mapValues { (_, face) ->
+                face.copy(texture = "#" + prefix + face.texture.substring(1))
+            })
+        }
+    )
     
 }
