@@ -142,9 +142,9 @@ internal data class ScaleTransform(
         if (scaleUV)
             throw UnsupportedOperationException("Cannot apply UV adjustments to a matrix")
         
-        matrix.translate(-(8 - pivot.x()) / 16, -(8 - pivot.y()) / 16, -(8 - pivot.z()) / 16)
-        matrix.scale(scale)
-        matrix.translate((8 - pivot.x()) / 16, (8 - pivot.y()) / 16, (8 - pivot.z()) / 16)
+        matrix.translateLocal(-(8 - pivot.x()) / 16, -(8 - pivot.y()) / 16, -(8 - pivot.z()) / 16)
+        matrix.scaleLocal(scale.x(), scale.y(), scale.z())
+        matrix.translateLocal((8 - pivot.x()) / 16, (8 - pivot.y()) / 16, (8 - pivot.z()) / 16)
     }
     
 }

@@ -46,13 +46,13 @@ internal data class RotationTransform(
         if (rescale) // TODO: this can be implemented
             throw UnsupportedOperationException("Rescale is not supported in matrix transformations")
         
-        matrix.translate(-(8 - pivot.x()) / 16, -(8 - pivot.y()) / 16, -(8 - pivot.z()) / 16)
+        matrix.translateLocal(-(8 - pivot.x()) / 16, -(8 - pivot.y()) / 16, -(8 - pivot.z()) / 16)
         when (axis) {
-            Axis.X -> matrix.rotateX(Math.toRadians(rot))
-            Axis.Y -> matrix.rotateY(Math.toRadians(rot))
-            Axis.Z -> matrix.rotateZ(Math.toRadians(rot))
+            Axis.X -> matrix.rotateLocalX(Math.toRadians(rot))
+            Axis.Y -> matrix.rotateLocalY(Math.toRadians(rot))
+            Axis.Z -> matrix.rotateLocalZ(Math.toRadians(rot))
         }
-        matrix.translate((8 - pivot.x()) / 16, (8 - pivot.y()) / 16, (8 - pivot.z()) / 16)
+        matrix.translateLocal((8 - pivot.x()) / 16, (8 - pivot.y()) / 16, (8 - pivot.z()) / 16)
     }
     
     override fun apply(model: Model): Model {
