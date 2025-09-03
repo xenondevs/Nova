@@ -29,7 +29,7 @@ abstract class EnchantmentMixin {
             return;
         
         var bukkitEnch = CraftEnchantment.minecraftToBukkit(ench);
-        var enchantable = novaItem.getBehavior(Enchantable.class);
+        var enchantable = novaItem.getBehaviorOrNull(Enchantable.class);
         cir.setReturnValue(enchantable != null && enchantable.getPrimaryEnchantments().contains(bukkitEnch));
     }
     
@@ -59,7 +59,7 @@ abstract class EnchantmentMixin {
             return null;
         
         var bukkitEnch = CraftEnchantment.minecraftToBukkit(ench);
-        var enchantable = novaItem.getBehavior(Enchantable.class);
+        var enchantable = novaItem.getBehaviorOrNull(Enchantable.class);
         return enchantable != null && enchantable.getSupportedEnchantments().contains(bukkitEnch);
     }
     

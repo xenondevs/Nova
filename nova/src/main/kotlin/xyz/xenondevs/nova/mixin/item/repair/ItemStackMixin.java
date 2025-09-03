@@ -18,7 +18,7 @@ abstract class ItemStackMixin {
         if (novaItem == null)
             return;
         
-        var damageable = novaItem.getBehavior(Damageable.class);
+        var damageable = novaItem.getBehaviorOrNull(Damageable.class);
         if (damageable == null)
             return;
         
