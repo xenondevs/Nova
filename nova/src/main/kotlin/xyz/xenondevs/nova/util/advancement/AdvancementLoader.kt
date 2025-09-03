@@ -3,12 +3,8 @@ package xyz.xenondevs.nova.util.advancement
 import net.minecraft.advancements.AdvancementHolder
 import net.minecraft.advancements.AdvancementTree
 import net.minecraft.advancements.TreeNodePosition
-import net.minecraft.server.ServerAdvancementManager
 import org.spigotmc.SpigotConfig
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
-
-private val SERVER_ADVANCEMENT_MANAGER_TREE_FIELD = ReflectionUtils.getField(ServerAdvancementManager::class, "tree")
 
 object AdvancementLoader {
     
@@ -33,7 +29,7 @@ object AdvancementLoader {
         val advancementManager = MINECRAFT_SERVER.advancements
         val allAdvancements = HashMap(MINECRAFT_SERVER.advancements.advancements)
         filtered.forEach { allAdvancements[it.id] = it }
-        val advancementTree = SERVER_ADVANCEMENT_MANAGER_TREE_FIELD.get(advancementManager) as AdvancementTree? ?: AdvancementTree()
+        val advancementTree = advancementManager.tree ?: AdvancementTree()
         advancementTree.addAll(filtered)
         for (root in advancementTree.roots()) {
             if (root.holder().value().display().isPresent) {
@@ -43,7 +39,7 @@ object AdvancementLoader {
         
         // set new advancements
         advancementManager.advancements = allAdvancements
-        SERVER_ADVANCEMENT_MANAGER_TREE_FIELD.set(advancementManager, advancementTree)
+        advancementManager.tree = advancementTree
     }
     
 }

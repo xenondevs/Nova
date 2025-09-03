@@ -2,7 +2,8 @@ plugins {
     `kotlin-dsl`
 }
 
-repositories { 
+repositories {
+    mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
     mavenCentral()
     gradlePluginPortal()
 }

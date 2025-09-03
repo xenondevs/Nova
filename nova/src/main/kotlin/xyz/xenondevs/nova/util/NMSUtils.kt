@@ -65,14 +65,11 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
-import xyz.xenondevs.nova.patch.impl.misc.BroadcastPacketPatch
-import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.isMigrationActive
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
@@ -657,34 +654,34 @@ fun <T> RegistryKeySet<*>.toNmsHolderSet(
 }
 
 fun preventPacketBroadcast(run: () -> Unit) {
-    BroadcastPacketPatch.dropAll = true
+    NMSUtils.broadcastDropAll.set(true)
     try {
         run.invoke()
     } finally {
-        BroadcastPacketPatch.dropAll = false
+        NMSUtils.broadcastDropAll.set(false)
     }
 }
 
 fun replaceBroadcastExclusion(exclude: ServerPlayer, run: () -> Unit) {
-    BroadcastPacketPatch.exclude = exclude
+    NMSUtils.broadcastExcludedPlayerOverride.set(exclude)
     try {
         run.invoke()
     } finally {
-        BroadcastPacketPatch.exclude = null
+        NMSUtils.broadcastExcludedPlayerOverride.set(null)
     }
 }
 
 fun forcePacketBroadcast(run: () -> Unit) {
-    BroadcastPacketPatch.ignoreExcludedPlayer = true
+    NMSUtils.broadcastIgnoreExcludedPlayer.set(true)
     try {
         run.invoke()
     } finally {
-        BroadcastPacketPatch.ignoreExcludedPlayer = false
+        NMSUtils.broadcastIgnoreExcludedPlayer.set(false)
     }
 }
 
 internal inline fun withoutBlockMigration(pos: BlockPos, run: () -> Unit) {
-    val chunkSection = pos.chunkSection as LevelChunkSectionWrapper
+    val chunkSection = pos.chunkSection
     val previous = chunkSection.isMigrationActive
     chunkSection.isMigrationActive = false
     try {
@@ -697,14 +694,16 @@ internal inline fun withoutBlockMigration(pos: BlockPos, run: () -> Unit) {
 fun RegistryFriendlyByteBuf(): RegistryFriendlyByteBuf =
     RegistryFriendlyByteBuf(Unpooled.buffer(), REGISTRY_ACCESS)
 
-object NMSUtils {
+@PublishedApi
+internal object NMSUtils {
     
-    val ENTITY_COUNTER by lazy {
-        ReflectionUtils.getField(
-            MojangEntity::class.java,
-            true,
-            "ENTITY_COUNTER"
-        ).get(null) as AtomicInteger
-    }
+    @JvmField
+    val broadcastIgnoreExcludedPlayer: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
+    
+    @JvmField
+    val broadcastExcludedPlayerOverride: ThreadLocal<ServerPlayer?> = ThreadLocal.withInitial { null }
+    
+    @JvmField
+    val broadcastDropAll: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
     
 }

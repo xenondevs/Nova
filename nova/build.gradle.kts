@@ -1,9 +1,9 @@
 plugins {
     id("nova.kotlin-conventions")
-    id("nova.paper-conventions")
     id("nova.dokka-conventions")
     id("nova.publish-conventions")
     alias(libs.plugins.kotlinx.serialization)
+    alias(origamiLibs.plugins.origami)
     id("xyz.xenondevs.bundler-plugin")
 }
 
@@ -31,6 +31,11 @@ dependencies {
     novaLoader(libs.bundles.jgrapht)
     novaLoader(libs.snakeyaml.engine)
     
+    // origami
+    implementation(origami.patchedPaperServer())
+    implementation(origamiLibs.mixin)
+    implementation(origamiLibs.mixinextras)
+    
     // test dependencies
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
@@ -40,6 +45,10 @@ dependencies {
 
 // configure java sources location
 sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
+
+origami {
+    paperDevBundle(libs.versions.paper.get())
+}
 
 tasks {
     withType<ProcessResources> {
@@ -51,6 +60,9 @@ tasks {
     }
     test {
         environment("MINECRAFT_VERSION", libs.versions.paper.get().substringBefore("-R0.1-SNAPSHOT"))
+    }
+    named<Jar>("jar") {
+        addOrigamiLoader(librariesFolder = "lib")
     }
 }
 

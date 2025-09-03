@@ -27,7 +27,7 @@ import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.data.key
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.namespacedKey
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry
+import xyz.xenondevs.nova.util.ReflectionUtils
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.resourceLocation
 import net.minecraft.world.item.crafting.Recipe as MojangRecipe
@@ -46,6 +46,8 @@ annotation class HardcodedRecipes
 
 private val ALLOW_RESULT_OVERWRITE by MAIN_CONFIG.entry<Boolean>("debug", "allow_craft_result_overwrite")
 private val ALLOWED_RECIPES = setOf(NamespacedKey("minecraft", "repair_item"), NamespacedKey("minecraft", "armor_dye"))
+
+private val PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD = ReflectionUtils.getField(PrepareItemCraftEvent::class, true, "matrix")
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -174,7 +176,7 @@ object RecipeManager : Listener, PacketListener {
         
         if (requiresContainer) {
             // prevent modification of the recipe result by other plugins
-            ReflectionRegistry.PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD.set(event, NovaCraftingInventory(recipe, event.inventory))
+            PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD.set(event, NovaCraftingInventory(recipe, event.inventory))
         }
     }
     

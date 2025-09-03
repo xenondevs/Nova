@@ -1,0 +1,77 @@
+accessWidener v2 named
+
+accessible class net/minecraft/world/level/chunk/PalettedContainer$Data
+accessible method net/minecraft/world/item/component/BundleContents <init> (Ljava/util/List;Lorg/apache/commons/lang3/math/Fraction;I)V
+accessible field net/minecraft/world/level/chunk/HashMapPalette values Lnet/minecraft/util/CrudeIncrementalIntIdentityHashBiMap;
+accessible field net/minecraft/world/level/chunk/LinearPalette values [Ljava/lang/Object;
+accessible field net/minecraft/network/codec/IdDispatchCodec toId Lit/unimi/dsi/fastutil/objects/Object2IntMap;
+accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation
+accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket <init> (Ljava/util/UUID;Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;)V
+accessible method net/minecraft/network/protocol/game/ClientboundUpdateAttributesPacket <init> (ILjava/util/List;)V
+accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket <init> (IZLnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;)V
+accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket entityId I
+accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket action Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;
+accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket ATTACK_ACTION Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;
+accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$Action
+accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction
+accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction <init> (Lnet/minecraft/world/InteractionHand;)V
+accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction hand Lnet/minecraft/world/InteractionHand;
+accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction
+accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction <init> (Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/Vec3;)V
+accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction hand Lnet/minecraft/world/InteractionHand;
+accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction location Lnet/minecraft/world/phys/Vec3;
+accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket id Ljava/util/UUID;
+accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket operation Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;
+accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket <init> (Ljava/util/UUID;Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;)V
+accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation
+accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation <init> (Lnet/minecraft/network/RegistryFriendlyByteBuf;)V
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation name Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation progress F
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation color Lnet/minecraft/world/BossEvent$BossBarColor;
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation overlay Lnet/minecraft/world/BossEvent$BossBarOverlay;
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation darkenScreen Z
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation playMusic Z
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation createWorldFog Z
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket REMOVE_OPERATION Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;
+accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdateProgressOperation
+accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdateProgressOperation <init> (F)V
+accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdateNameOperation
+accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdateNameOperation <init> (Lnet/minecraft/network/chat/Component;)V
+accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdateStyleOperation
+accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdateStyleOperation <init> (Lnet/minecraft/world/BossEvent$BossBarColor;Lnet/minecraft/world/BossEvent$BossBarOverlay;)V
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdateStyleOperation color Lnet/minecraft/world/BossEvent$BossBarColor;
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdateStyleOperation overlay Lnet/minecraft/world/BossEvent$BossBarOverlay;
+accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdatePropertiesOperation
+accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdatePropertiesOperation <init> (ZZZ)V
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdatePropertiesOperation darkenScreen Z
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdatePropertiesOperation playMusic Z
+accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdatePropertiesOperation createWorldFog Z
+accessible field net/minecraft/server/network/ServerConnectionListener channels Ljava/util/List;
+accessible field net/minecraft/world/level/chunk/ChunkAccess sections [Lnet/minecraft/world/level/chunk/LevelChunkSection;
+accessible class net/minecraft/world/entity/npc/VillagerTrades$DyedArmorForEmeralds
+accessible class io/papermc/paper/plugin/manager/PaperPluginInstanceManager
+accessible class ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/ChunkLoadTask$ChunkDataLoadTask
+accessible class ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/ChunkLoadTask$ReadChunk
+accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask world Lnet/minecraft/server/level/ServerLevel;
+accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask chunkX I
+accessible field ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/GenericDataLoadTask chunkZ I
+accessible method net/minecraft/world/item/BlockItem placeBlock (Lnet/minecraft/world/item/context/BlockPlaceContext;Lnet/minecraft/world/level/block/state/BlockState;)Z
+accessible class net/minecraft/resources/RegistryDataLoader$LoadingFunction
+accessible class net/minecraft/resources/RegistryDataLoader$Loader
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/ProcessorRule inputPredicate Lnet/minecraft/world/level/levelgen/structure/templatesystem/RuleTest;
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/ProcessorRule locPredicate Lnet/minecraft/world/level/levelgen/structure/templatesystem/RuleTest;
+accessible field net/minecraft/world/level/levelgen/structure/templatesystem/ProcessorRule posPredicate Lnet/minecraft/world/level/levelgen/structure/templatesystem/PosRuleTest;
+accessible method net/minecraft/world/level/biome/BiomeGenerationSettings <init> (Lnet/minecraft/core/HolderSet;Ljava/util/List;)V
+accessible field net/minecraft/world/level/biome/Biome generationSettings Lnet/minecraft/world/level/biome/BiomeGenerationSettings;
+mutable field net/minecraft/world/level/biome/Biome generationSettings Lnet/minecraft/world/level/biome/BiomeGenerationSettings;
+accessible method net/minecraft/world/level/biome/Biome$ClimateSettings <init> (ZFLnet/minecraft/world/level/biome/TemperatureModifier;F)V
+accessible method net/minecraft/world/level/biome/MobSpawnSettings <init> (FLjava/util/Map;Ljava/util/Map;)V
+accessible method net/minecraft/world/level/biome/Biome <init> (Lnet/minecraft/world/level/biome/Biome$ClimateSettings;Lnet/minecraft/world/level/biome/BiomeSpecialEffects;Lnet/minecraft/world/level/biome/BiomeGenerationSettings;Lnet/minecraft/world/level/biome/MobSpawnSettings;)V
+accessible method net/minecraft/core/Holder$Reference bindValue (Ljava/lang/Object;)V
+accessible field org/bukkit/event/inventory/PrepareItemCraftEvent matrix Lorg/bukkit/inventory/CraftingInventory;
+mutable field org/bukkit/event/inventory/PrepareItemCraftEvent matrix Lorg/bukkit/inventory/CraftingInventory;
+accessible field net/minecraft/world/level/block/Block defaultBlockState Lnet/minecraft/world/level/block/state/BlockState;
+accessible field net/minecraft/world/entity/Entity ENTITY_COUNTER Ljava/util/concurrent/atomic/AtomicInteger;
+accessible field net/minecraft/server/ServerAdvancementManager tree Lnet/minecraft/advancements/AdvancementTree;

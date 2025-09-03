@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.network.event.clientbound
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket.AttributeSnapshot
 import org.bukkit.entity.Player
-import xyz.xenondevs.nova.network.ClientboundUpdateAttributesPacket
 import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 
 class ClientboundUpdateAttributesPacketEvent(

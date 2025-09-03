@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.patch.impl.registry.preFreeze
+import xyz.xenondevs.nova.registry.preFreeze
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.serialization.kotlinx.ResourceKeySerializer
 import xyz.xenondevs.nova.util.set

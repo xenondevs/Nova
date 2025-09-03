@@ -6,6 +6,7 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.biome.BiomeGenerationSettings
 import net.minecraft.world.level.levelgen.GenerationStep
+import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
@@ -13,20 +14,11 @@ import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.patch.impl.registry.postFreeze
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils.getField
+import xyz.xenondevs.nova.registry.postFreeze
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
-import kotlin.collections.plus
 
 private val LOG_INJECTIONS by MAIN_CONFIG.entry<Boolean>("debug", "logging", "biome_injections")
-
-private val BIOME_GENERATION_SETTINGS_CONSTRUCTOR = ReflectionUtils.getConstructorMethodHandle(
-    BiomeGenerationSettings::class,
-    HolderSet::class, List::class
-)
-private val BIOME_BIOME_GENERATION_SETTINGS_FIELD = getField(Biome::class, "generationSettings")
 private val GENERATION_STEPS = GenerationStep.Decoration.entries.size
 
 @OptIn(ExperimentalWorldGen::class)
@@ -65,9 +57,11 @@ internal object BiomeInjector {
             val newFeatures = injections.getOrNull(featureStep) ?: emptyList()
             HolderSet.direct(prevFeatures + newFeatures)
         }.asList()
-        val newGenSettings = BIOME_GENERATION_SETTINGS_CONSTRUCTOR(prevGenSettings.carvers, newFeatures)
         
-        ReflectionUtils.setFinalField(BIOME_BIOME_GENERATION_SETTINGS_FIELD, biome, newGenSettings)
+        biome.generationSettings = BiomeGenerationSettings(
+            prevGenSettings.carvers as HolderSet<ConfiguredWorldCarver<*>>, 
+            newFeatures
+        )
     }
     
 }

@@ -3,7 +3,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.Property
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -15,6 +15,9 @@ import java.util.zip.ZipOutputStream
 
 @DisableCachingByDefault
 abstract class BuildBundlerJarTask : DefaultTask() {
+    
+    @get:InputFile
+    abstract val novaInput: RegularFileProperty
     
     @get:InputFiles
     abstract var input: FileCollection
@@ -44,10 +47,12 @@ abstract class BuildBundlerJarTask : DefaultTask() {
         
         val jar = buildDir.resolve("Nova-${project.version}.jar")
         ZipOutputStream(jar.outputStream()).use { out ->
-            include(out, input.files)
+            val added = HashSet<String>()
+            include(out, listOf(novaInput.get().asFile), added, includeMeta = true)
+            include(out, input.files, added)
             
             // include dependencies
-            val runtimeArtifacts = nova.configurations.getByName("mojangMappedServerRuntime").incoming.artifacts.artifacts
+            val runtimeArtifacts = nova.configurations.getByName("paperweightDevelopmentBundleCompileClasspath").incoming.artifacts.artifacts
                 .mapNotNullTo(HashSet()) { (it.id.componentIdentifier as? ModuleComponentIdentifier)?.moduleIdentifier }
             nova.configurations.getByName("novaLoader").incoming.artifacts.artifacts
                 .asSequence()
@@ -56,6 +61,7 @@ abstract class BuildBundlerJarTask : DefaultTask() {
                     val file = artifact.file
                     val id = artifact.id.componentIdentifier as ModuleComponentIdentifier
                     val path = "lib/" + id.group.replace('.', '/') + "/" + id.module + "/" + id.version + "/" + file.name
+                    if (added.contains(path)) return@forEach
                     out.putNextEntry(ZipEntry(path))
                     file.inputStream().use { inp -> inp.transferTo(out) }
                 }
@@ -64,15 +70,16 @@ abstract class BuildBundlerJarTask : DefaultTask() {
         return jar
     }
     
-    private fun include(out: ZipOutputStream, jars: Iterable<File>) {
+    private fun include(out: ZipOutputStream, jars: Iterable<File>, added: HashSet<String>, includeMeta: Boolean = false) {
         jars.forEach { jar ->
             ZipInputStream(jar.inputStream()).use { inp ->
                 generateSequence { inp.nextEntry }
-                    .filter { !it.name.startsWith("META-INF") }
-                    .filter { !it.isDirectory }
+                    .filter { includeMeta || !it.name.startsWith("META-INF") }
+                    .filter { !it.isDirectory && !added.contains(it.name) }
                     .forEach { entry ->
                         out.putNextEntry(entry)
                         inp.transferTo(out)
+                        added.add(entry.name)
                     }
             }
         }

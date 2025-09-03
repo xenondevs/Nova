@@ -12,11 +12,6 @@ import net.minecraft.network.protocol.game.GamePacketTypes
 import net.minecraft.network.protocol.game.GameProtocols
 import net.minecraft.network.protocol.ping.PingPacketTypes
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
-import java.lang.invoke.MethodHandles
-
-private val ID_DISPATCH_CODEC_TO_ID = MethodHandles
-    .privateLookupIn(IdDispatchCodec::class.java, MethodHandles.lookup())
-    .findGetter(IdDispatchCodec::class.java, "toId", Object2IntMap::class.java)
 
 internal object PacketIdRegistry {
     
@@ -221,18 +216,19 @@ internal object PacketIdRegistry {
     
     @Suppress("UNCHECKED_CAST")
     private fun getServerboundPacketIdMap(): Object2IntMap<PacketType<*>> {
-        val ctx = object: GameProtocols.Context {
-            override fun hasInfiniteMaterials() = false
-        }
-        
-        val codec = GameProtocols.SERVERBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(REGISTRY_ACCESS), ctx).codec()
-        return ID_DISPATCH_CODEC_TO_ID.invoke(codec) as Object2IntMap<PacketType<*>>
+        val codec = GameProtocols.SERVERBOUND_TEMPLATE.bind(
+            RegistryFriendlyByteBuf.decorator(REGISTRY_ACCESS),
+            GameProtocols.Context { false }
+        ).codec() as IdDispatchCodec<*, *, PacketType<*>>
+        return codec.toId
     }
     
     @Suppress("UNCHECKED_CAST")
     private fun getClientboundPacketIdMap(): Object2IntMap<PacketType<*>> {
-        val codec = GameProtocols.CLIENTBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(REGISTRY_ACCESS)).codec()
-        return ID_DISPATCH_CODEC_TO_ID.invoke(codec) as Object2IntMap<PacketType<*>>
+        val codec = GameProtocols.CLIENTBOUND_TEMPLATE.bind(
+            RegistryFriendlyByteBuf.decorator(REGISTRY_ACCESS)
+        ).codec() as IdDispatchCodec<*, *, PacketType<*>>
+        return codec.toId
     }
     
 }

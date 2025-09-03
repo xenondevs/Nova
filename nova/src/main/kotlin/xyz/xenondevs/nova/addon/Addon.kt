@@ -49,9 +49,9 @@ import xyz.xenondevs.nova.addon.registry.AddonGetter
 import xyz.xenondevs.nova.addon.registry.AddonRegistryHolder
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.patch.impl.registry.set
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.buildRegistryElementLater
+import xyz.xenondevs.nova.registry.set
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayoutBuilder
 import xyz.xenondevs.nova.resources.builder.layout.equipment.EquipmentLayout

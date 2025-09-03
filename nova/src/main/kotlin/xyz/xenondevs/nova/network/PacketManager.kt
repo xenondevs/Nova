@@ -1,14 +1,12 @@
 package xyz.xenondevs.nova.network
 
 import io.netty.channel.Channel
-import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import net.minecraft.network.Connection
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.server.network.ServerConnectionListener
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -18,13 +16,8 @@ import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.registerEvents
-import java.lang.invoke.MethodHandles
 import java.util.*
 import net.minecraft.world.entity.player.Player as MojangPlayer
-
-private val SERVER_CONNECTION_LISTENER_CHANNELS_GETTER = MethodHandles
-    .privateLookupIn(ServerConnectionListener::class.java, MethodHandles.lookup())
-    .findGetter(ServerConnectionListener::class.java, "channels", List::class.java)
 
 val Player.packetHandler: PacketHandler?
     get() = PacketManager.handlers[this]
@@ -55,10 +48,8 @@ internal object PacketManager : Listener {
     private fun init() {
         registerEvents()
         
-        val channels = SERVER_CONNECTION_LISTENER_CHANNELS_GETTER.invoke(MINECRAFT_SERVER.connection) as List<ChannelFuture>
-        val serverChannel = channels.first().channel()
-        val pipeline = serverChannel.pipeline()
-        pipeline.addFirst("nova_pipeline_adapter", NovaServerChannelBootstrap)
+        MINECRAFT_SERVER.connection.channels.first().channel().pipeline()
+            .addFirst("nova_pipeline_adapter", NovaServerChannelBootstrap)
     }
     
     fun handlePlayerCreated(player: ServerPlayer, connection: Connection) {

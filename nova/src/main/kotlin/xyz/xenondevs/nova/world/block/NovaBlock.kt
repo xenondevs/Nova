@@ -95,6 +95,12 @@ open class NovaBlock internal constructor(
         behaviors.any { type.isSuperclassOf(it::class) }
     
     /**
+     * Checks whether this [NovaBlock] has a [BlockBehavior] of the specified class [type], or a subclass of it.
+     */
+    fun <T : Any> hasBehavior(type: Class<T>): Boolean =
+        behaviors.any { type.isAssignableFrom(it::class.java) }
+    
+    /**
      * Gets the first [BlockBehavior] that is an instance of [T], or null if there is none.
      */
     inline fun <reified T : Any> getBehaviorOrNull(): T? =
@@ -108,16 +114,29 @@ open class NovaBlock internal constructor(
         behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
     
     /**
+     * Gets the first [BlockBehavior] that is an instance of [type] or a subclass, or null if there is none.
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Any> getBehaviorOrNull(type: Class<T>): T? =
+        behaviors.firstOrNull { type.isAssignableFrom(it::class.java) } as T?
+    
+    /**
      * Gets the first [BlockBehavior] that is an instance of [T], or throws an [IllegalStateException] if there is none.
      */
     inline fun <reified T : Any> getBehavior(): T =
         getBehavior(T::class)
     
     /**
-     * Gets the first [BlockBehavior] that is an instance of [behavior], or throws an [IllegalStateException] if there is none.
+     * Gets the first [BlockBehavior] that is an instance of [type], or throws an [IllegalStateException] if there is none.
      */
-    fun <T : Any> getBehavior(behavior: KClass<T>): T =
-        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Block $id does not have a behavior of type ${behavior.simpleName}")
+    fun <T : Any> getBehavior(type: KClass<T>): T =
+        getBehaviorOrNull(type) ?: throw IllegalStateException("Block $id does not have a behavior of type ${type.simpleName}")
+    
+    /**
+     * Gets the first [BlockBehavior] that is an instance of [type], or throws an [IllegalStateException] if there is none.
+     */
+    fun <T : Any> getBehavior(type: Class<T>): T =
+        getBehaviorOrNull(type) ?: throw IllegalStateException("Block $id does not have a behavior of type ${type.simpleName}")
     
     //<editor-fold desc="event methods">
     suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean = coroutineScope {

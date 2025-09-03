@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.world.item.behavior
 
 import net.minecraft.core.component.DataComponents
 import net.minecraft.stats.Stats
+import net.minecraft.tags.ItemTags
 import net.minecraft.world.level.block.LayeredCauldronBlock
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -9,6 +10,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.block.CauldronLevelChangeEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.nmsState
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
@@ -45,4 +47,13 @@ object Dyeable : ItemBehavior {
         }
     }
     
+    
+    /**
+     * Checks whether the given [itemStack] is dyeable, regardless of whether it is a Nova item or not.
+     */
+    @JvmStatic
+    internal fun isDyeable(itemStack: net.minecraft.world.item.ItemStack): Boolean {
+        return itemStack.novaItem?.hasBehavior<Dyeable>() ?: itemStack.`is`(ItemTags.DYEABLE)
+    }
+        
 }

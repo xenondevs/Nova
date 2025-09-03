@@ -18,7 +18,6 @@ import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
-import xyz.xenondevs.nova.patch.Patcher
 import xyz.xenondevs.nova.serialization.cbf.CbfSerializers
 import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.useZip
@@ -100,7 +99,6 @@ internal class NovaBootstrapper : PluginBootstrap {
                 DebugProbes.enableCreationStackTraces = true
             }
             
-            Patcher.run()
             Configs.extractDefaultConfig()
             CbfSerializers.register()
             Initializer.start()

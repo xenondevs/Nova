@@ -101,13 +101,13 @@ internal val ItemStack.namelessCopyOrSelf: ItemStack
         return itemStack
     }
 
-val ItemStack.craftingRemainingItem: ItemStack?
+val ItemStack.craftingRemainingItem: ItemStack
     get() {
         val novaItem = novaItem
         if (novaItem != null)
             return novaItem.craftingRemainingItem
         
-        return type.craftingRemainingItem?.let(::ItemStack)
+        return type.craftingRemainingItem?.let(::ItemStack) ?: ItemStack.empty()
     }
 
 fun ItemStack.takeUnlessEmpty(): ItemStack? =

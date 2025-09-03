@@ -85,14 +85,9 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
-import java.lang.invoke.MethodHandles
-import java.lang.invoke.MethodType
 import java.util.*
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
-
-private val BUNDLE_CONSTRUCTOR = MethodHandles.privateLookupIn(BundleContents::class.java, MethodHandles.lookup())
-    .findConstructor(BundleContents::class.java, MethodType.methodType(Void.TYPE, List::class.java, Fraction::class.java, Int::class.java))
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -512,11 +507,11 @@ internal object PacketItems : Listener, PacketListener {
             return false
         
         itemStack.update(DataComponents.BUNDLE_CONTENTS) { bundleContents ->
-            BUNDLE_CONSTRUCTOR.invoke(
+            BundleContents(
                 bundleContents.items().map { getClientSideStack(player, it, false) },
                 Fraction.getFraction(0.0),
                 bundleContents.selectedItem
-            ) as BundleContents
+            )
         }
         
         return true
