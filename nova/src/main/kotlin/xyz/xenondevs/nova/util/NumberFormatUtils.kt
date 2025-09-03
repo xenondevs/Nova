@@ -104,7 +104,7 @@ object NumberFormatUtils {
             .toPlainString()
         
         val prefixedUnit = "${prefix.prefixSymbol}$unit"
-        return "§r$prefixedNumber $prefixedUnit / $prefixedMaxNumber $prefixedUnit"
+        return "$prefixedNumber $prefixedUnit / $prefixedMaxNumber $prefixedUnit"
     }
     
     fun getRomanNumeral(number: Int): String {
