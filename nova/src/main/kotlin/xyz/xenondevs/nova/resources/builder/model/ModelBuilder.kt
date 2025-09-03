@@ -292,7 +292,9 @@ class ModelBuilder(private val base: Model) {
             if (bounds.minZ < MIN_ELEMENT_FROM)
                 scale = min(scale, (pivot.z - MIN_ELEMENT_FROM) / (pivot.z - bounds.minZ))
             
-            resultModel = ScaleTransform(pivot, Vector3d(scale, scale, scale), keepDisplaySize = true).apply(resultModel)
+            if (scale != 1.0) {
+                resultModel = ScaleTransform(pivot, Vector3d(scale, scale, scale), keepDisplaySize = true).apply(resultModel)
+            }
         }
         
         return ScaledModel(resultModel, 1 / scale)
