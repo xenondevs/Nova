@@ -9,7 +9,6 @@ import net.minecraft.tags.BlockTags
 import net.minecraft.tags.TagKey
 import net.minecraft.world.level.block.state.pattern.BlockInWorld
 import org.bukkit.GameMode
-import org.bukkit.Material
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.Block
 import org.bukkit.craftbukkit.block.CraftBlock
@@ -69,7 +68,7 @@ object ToolUtils {
             GameMode.CREATIVE -> {
                 val canBreakBlocks = tool?.novaItem?.getBehaviorOrNull<Tool>()?.canBreakBlocksInCreative
                     ?: tool?.getData(DataComponentTypes.TOOL)?.canDestroyBlocksInCreative()
-                    ?: true 
+                    ?: true
                 
                 return if (canBreakBlocks) 1.0 else 0.0
             }
@@ -82,11 +81,6 @@ object ToolUtils {
             
             else -> Unit
         }
-        
-        // hardcoded in BambooSaplingBlock and BambooStalkBlock, ignores block break speed attribute
-        // https://bugs.mojang.com/browse/MC-275705
-        if ((block.type == Material.BAMBOO || block.type == Material.BAMBOO_SAPLING) && VanillaToolCategories.SWORD in ToolCategory.ofItem(tool))
-            return 1.0
         
         var damage = calculateDamage(
             hardness = block.hardness,
