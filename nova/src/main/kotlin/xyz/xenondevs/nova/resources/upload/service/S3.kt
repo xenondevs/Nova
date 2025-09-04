@@ -41,6 +41,9 @@ internal object S3 : UploadService {
         
         val forcePathStyle = cfg.node("force_path_style").getBoolean(false)
         val disableChunkedEncoding = cfg.node("disable_chunked_encoding").getBoolean(false)
+
+        val urlStyle = cfg.node("url_style").string?.lowercase()
+            .takeIf { it in listOf("path", "vhost") } ?: "path"
         
         LOGGER.info("Connecting to S3 endpoint $endpoint")
 
@@ -61,7 +64,11 @@ internal object S3 : UploadService {
             throw IllegalArgumentException("S3 bucket $bucket not found")
         
         this.directory = (cfg.node("directory").string?.addSuffix("/") ?: "")
-        urlFormat = "https://$endpoint/$bucket/$directory%s"
+        this.urlFormat = when (urlStyle) {
+            "path" -> "https://$endpoint/$bucket/$directory%s"
+            "vhost" -> "https://$bucket.$endpoint/$directory%s"
+            else -> throw IllegalStateException("Unreachable")
+        }
     }
     
     override suspend fun upload(file: Path): String {
