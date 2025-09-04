@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.util
 
 import com.mojang.datafixers.util.Either
 import io.netty.buffer.Unpooled
+import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.set.RegistryKeySet
 import io.papermc.paper.registry.tag.Tag
@@ -54,10 +55,12 @@ import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.CraftWorld
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.entity.CraftEntity
+import org.bukkit.craftbukkit.entity.CraftLivingEntity
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
 import org.bukkit.inventory.EquipmentSlot
@@ -80,7 +83,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier as MojangAttri
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
+import net.minecraft.world.item.ItemUseAnimation as MojangItemUseAnimation
 import net.minecraft.world.level.block.Block as MojangBlock
+import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
+
 
 val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
 val REGISTRY_ACCESS: RegistryAccess by lazy { MINECRAFT_SERVER.registryAccess() }
@@ -88,6 +94,9 @@ val DATA_VERSION: Int by lazy { CraftMagicNumbers.INSTANCE.dataVersion }
 
 val Entity.nmsEntity: MojangEntity
     get() = (this as CraftEntity).handle
+
+val LivingEntity.nmsEntity: MojangLivingEntity
+    get() = (this as CraftLivingEntity).handle
 
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
@@ -301,6 +310,21 @@ val Pose.nmsPose: MojangPose
         Pose.SLIDING -> MojangPose.SLIDING
         Pose.SHOOTING -> MojangPose.SHOOTING
         Pose.INHALING -> MojangPose.INHALING
+    }
+
+val ItemUseAnimation.nmsItemUseAnimation: MojangItemUseAnimation
+    get() = when (this) {
+        ItemUseAnimation.NONE -> MojangItemUseAnimation.NONE
+        ItemUseAnimation.EAT -> MojangItemUseAnimation.EAT
+        ItemUseAnimation.DRINK -> MojangItemUseAnimation.DRINK
+        ItemUseAnimation.BLOCK -> MojangItemUseAnimation.BLOCK
+        ItemUseAnimation.BOW -> MojangItemUseAnimation.BOW
+        ItemUseAnimation.SPEAR -> MojangItemUseAnimation.SPEAR
+        ItemUseAnimation.CROSSBOW -> MojangItemUseAnimation.CROSSBOW
+        ItemUseAnimation.SPYGLASS -> MojangItemUseAnimation.SPYGLASS
+        ItemUseAnimation.TOOT_HORN -> MojangItemUseAnimation.TOOT_HORN
+        ItemUseAnimation.BRUSH -> MojangItemUseAnimation.BRUSH
+        ItemUseAnimation.BUNDLE -> MojangItemUseAnimation.BUNDLE
     }
 
 val Material.nmsBlock: MojangBlock

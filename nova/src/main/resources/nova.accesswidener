@@ -75,3 +75,8 @@ mutable field org/bukkit/event/inventory/PrepareItemCraftEvent matrix Lorg/bukki
 accessible field net/minecraft/world/level/block/Block defaultBlockState Lnet/minecraft/world/level/block/state/BlockState;
 accessible field net/minecraft/world/entity/Entity ENTITY_COUNTER Ljava/util/concurrent/atomic/AtomicInteger;
 accessible field net/minecraft/server/ServerAdvancementManager tree Lnet/minecraft/advancements/AdvancementTree;
+accessible method net/minecraft/world/item/CrossbowItem getChargingSounds (Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/CrossbowItem$ChargingSounds;
+accessible method net/minecraft/world/item/CrossbowItem tryLoadProjectiles (Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Z)Z
+accessible method net/minecraft/world/item/CrossbowItem getShootingPower (Lnet/minecraft/world/item/component/ChargedProjectiles;)F
+accessible method net/minecraft/world/item/ProjectileWeaponItem draw (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;)Ljava/util/List;
+accessible method net/minecraft/world/item/ProjectileWeaponItem shoot (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Ljava/util/List;FFZLnet/minecraft/world/entity/LivingEntity;F)V

@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.world.item.behavior
 
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
+import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
@@ -17,7 +19,6 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.item.DataComponentMap
@@ -37,6 +38,8 @@ interface ItemBehavior : ItemBehaviorHolder {
     
     /**
      * The base data components that every item with this [ItemBehavior] has.
+     *
+     * @see xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
      */
     val baseDataComponents: Provider<DataComponentMap>
         get() = provider(DataComponentMap.EMPTY)
@@ -114,16 +117,44 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) = Unit
     
     /**
-     * Called when a [ServerboundPlayerActionPacketEvent] is fired where the server receives a player action packet regarding an [itemStack] with this behavior.
-     * Note that this is a packet event, and as such this function is called a netty thread, not the server thread.
-     */
-    fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) = Unit
-    
-    /**
      * Called every tick for an [itemStack] with this behavior that is in the [player's][player] inventory.
      * The [slot] is the index inside the [player inventory's][Player.getInventory] [contents][org.bukkit.inventory.Inventory.getContents].
      */
     fun handleInventoryTick(player: Player, itemStack: ItemStack, slot: Int) = Unit
+    
+    /**
+     * Called every tick for an [itemStack] with this behavior that is equipped by [player] in the given [slot].
+     */
+    fun handleEquipmentTick(player: Player, itemStack: ItemStack, slot: EquipmentSlot) = Unit
+    
+    /**
+     * Called every tick while an [itemStack] with this behavior is being used by [entity] in [hand], with [remainingUseTicks] left.
+     */
+    fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) = Unit
+    
+    /**
+     * Called when [entity] stops using an [itemStack] with this behavior in [hand], with [remainingUseTicks] left.
+     */
+    fun handleUseStopped(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) = Unit
+    
+    /**
+     * Called when [entity] finishes using an [itemStack] with this behavior in [hand].
+     */
+    fun handleUseFinished(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot) = Unit
+    
+    /**
+     * Modifies the [remainder] when [entity] finishes using [original] with this behavior in [hand].
+     */
+    fun modifyUseRemainder(entity: LivingEntity, original: ItemStack, hand: EquipmentSlot, remainder: ItemStack): ItemStack = remainder
+    
+    /**
+     * Modifies the server-side use duration of [itemStack] with this behavior for [entity].
+     * The initial value of [duration] may stem from [baseDataComponents].
+     * If the use duration is <= 0, the item cannot be used (no right click and hold action).
+     *
+     * Note that the client may predict a different use duration, which this method does not handle.
+     */
+    fun modifyUseDuration(entity: LivingEntity, itemStack: ItemStack, duration: Int): Int = duration
     
     /**
      * Modifies the [damage] when [player] is breaking a [block] with [itemStack].
@@ -132,7 +163,15 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun modifyBlockDamage(player: Player, itemStack: ItemStack, block: Block, damage: Double): Double = damage
     
     /**
+     * Updates the [client-side item type][client] for client-side item stacks to be viewed by [player] in place of the [server-side item stack][server].
+     * This is called before [modifyClientSideStack] and influences the generation of the client-side [ItemStack]'s patch.
+     * Called off-main thread.
+     */
+    fun modifyClientSideItemType(player: Player?, server: ItemStack, client: Material): Material = client
+    
+    /**
      * Updates the [client-side item stack][client] that is to be viewed by [player] in place of the [server-side item stack][server].
+     * Called off-main thread.
      */
     fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack = client
     

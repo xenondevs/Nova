@@ -32,6 +32,7 @@ import xyz.xenondevs.nova.resources.builder.task.AtlasTask
 import xyz.xenondevs.nova.resources.builder.task.BlockModelTask
 import xyz.xenondevs.nova.resources.builder.task.BlockStateContent
 import xyz.xenondevs.nova.resources.builder.task.BossBarOverlayTask
+import xyz.xenondevs.nova.resources.builder.task.NoHandAnimationTask
 import xyz.xenondevs.nova.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.resources.builder.task.CharSizeCalculator
 import xyz.xenondevs.nova.resources.builder.task.EntityVariantTask
@@ -160,6 +161,7 @@ class ResourcePackBuilder internal constructor(
                 registerTask(::CharSizeCalculator)
                 registerTask(::SoundOverridesTask)
                 registerTask(::PackMcMetaTask)
+                registerTask(::NoHandAnimationTask)
                 
                 registerResourceFilters(MAIN_CONFIG.entry<List<ResourceFilter>>("resource_pack", "generation", "resource_filters"))
                 registerResourceFilters(MAIN_CONFIG.entry<Boolean>("overlay", "bossbar", "enabled").map { enabled ->

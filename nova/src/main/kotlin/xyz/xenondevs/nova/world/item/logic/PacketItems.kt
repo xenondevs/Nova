@@ -339,7 +339,7 @@ internal object PacketItems : Listener, PacketListener {
             ?: return getUnknownItem(itemStack, id)
         
         // client-side item stack copy
-        val newItemType = CraftMagicNumbers.getItem(novaItem.vanillaMaterial)
+        val newItemType = CraftMagicNumbers.getItem(novaItem.modifyClientSideItemType(player, itemStack.asBukkitCopy(), novaItem.vanillaMaterial))
         val newItemHolder = BuiltInRegistries.ITEM.wrapAsHolder(newItemType)
         var newItemStack = MojangStack(
             newItemHolder, itemStack.count,
@@ -347,7 +347,7 @@ internal object PacketItems : Listener, PacketListener {
         )
         
         // customization through item behaviors
-        newItemStack = novaItem.modifyClientSideStack(player, itemStack.asBukkitCopy(),newItemStack.asBukkitMirror()).unwrap()
+        newItemStack = novaItem.modifyClientSideStack(player, itemStack.asBukkitCopy(), newItemStack.asBukkitMirror()).unwrap()
         
         if (shouldHideEntireTooltip(itemStack)) {
             newItemStack.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(true, linkedSetOf()))
@@ -546,7 +546,7 @@ internal object PacketItems : Listener, PacketListener {
     private fun disableClientSideTooltip(itemStack: MojangStack) {
         itemStack.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(
             itemStack.get(DataComponents.TOOLTIP_DISPLAY)?.hideTooltip == true,
-            BuiltInRegistries.DATA_COMPONENT_TYPE.filterTo(LinkedHashSet()) { it != DataComponents.BUNDLE_CONTENTS  && it != DataComponents.LORE}
+            BuiltInRegistries.DATA_COMPONENT_TYPE.filterTo(LinkedHashSet()) { it != DataComponents.BUNDLE_CONTENTS && it != DataComponents.LORE }
         ))
     }
     
