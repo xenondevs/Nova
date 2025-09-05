@@ -87,7 +87,7 @@ internal object S3 : UploadService {
             val lastBucket = lastUpload.drop("https://".length).split("/")[1]
             val delReq = DeleteObjectRequest.builder()
                 .bucket(lastBucket)
-                .key(lastUpload.split('/', limit = 5)[4])
+                .key(lastUpload.split('/', limit = 5).last())
                 .build()
             
             val delResp = client!!.deleteObject(delReq)
