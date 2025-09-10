@@ -61,7 +61,10 @@ internal object S3 : UploadService {
             throw IllegalArgumentException("S3 bucket $bucket not found")
         
         this.directory = (cfg.node("directory").string?.addSuffix("/") ?: "")
-        urlFormat = "https://$endpoint/$bucket/$directory%s"
+        this.urlFormat = if (forcePathStyle)
+            "https://$endpoint/$bucket/$directory%s"
+        else
+            "https://$bucket.$endpoint/$directory%s"
     }
     
     override suspend fun upload(file: Path): String {
@@ -75,12 +78,13 @@ internal object S3 : UploadService {
         if (!resp.isSuccessful)
             throw IllegalStateException("S3 upload failed with code ${resp.statusCode()} " + resp.statusText().orElse(""))
         
-        val lastUpload: String? = PermanentStorage.retrieve("lastS3Upload")
-        if (lastUpload != null && lastUpload.startsWith(urlFormat.dropLast(2 + directory.length))) {
-            val lastBucket = lastUpload.drop("https://".length).split("/")[1]
+        val lastUrl: String? = PermanentStorage.retrieve("lastS3Url")
+        val lastBucket: String? = PermanentStorage.retrieve("lastS3Bucket")
+        val prefix = urlFormat.dropLast(2 + directory.length)
+        if (lastUrl != null && lastBucket != null && lastUrl.startsWith(prefix)) {
             val delReq = DeleteObjectRequest.builder()
                 .bucket(lastBucket)
-                .key(lastUpload.split('/', limit = 5)[4])
+                .key(lastUrl.drop(prefix.length))
                 .build()
             
             val delResp = client!!.deleteObject(delReq)
@@ -90,7 +94,8 @@ internal object S3 : UploadService {
         }
         
         val url = urlFormat.format(name)
-        PermanentStorage.store("lastS3Upload", url)
+        PermanentStorage.store("lastS3Url", url)
+        PermanentStorage.store("lastS3Bucket", bucket)
         return url
     }
     
