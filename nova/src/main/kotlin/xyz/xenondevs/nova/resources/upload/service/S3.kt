@@ -61,7 +61,14 @@ internal object S3 : UploadService {
             throw IllegalArgumentException("S3 bucket $bucket not found")
         
         this.directory = (cfg.node("directory").string?.addSuffix("/") ?: "")
-        urlFormat = "https://$endpoint/$bucket/$directory%s"
+
+        val urlStyle = cfg.node("url_style").string?.lowercase()
+            ?.takeIf { it in listOf("path", "vhost") }
+            ?: throw IllegalArgumentException("S3 url_style is invalid (must be \"path\" or \"vhost\")")
+        this.urlFormat = when (urlStyle) {
+            "vhost" -> "https://$bucket.$endpoint/$directory%s"
+            else -> "https://$endpoint/$bucket/$directory%s"
+        }
     }
     
     override suspend fun upload(file: Path): String {
