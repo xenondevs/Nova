@@ -81,11 +81,12 @@ internal object S3 : UploadService {
             throw IllegalStateException("S3 upload failed with code ${resp.statusCode()} " + resp.statusText().orElse(""))
         
         val lastUrl: String? = PermanentStorage.retrieve("lastS3Url")
-        if (lastUrl != null && lastUrl.startsWith(urlFormat.dropLast(2 + directory.length))) {
-            val lastBucket = lastUrl.drop("https://".length).split("/")[1]
+        val lastBucket: String? = PermanentStorage.retrieve("lastS3Bucket")
+        val prefix = urlFormat.dropLast(2 + directory.length)
+        if (lastUrl != null && lastBucket != null && lastUrl.startsWith(prefix)) {
             val delReq = DeleteObjectRequest.builder()
                 .bucket(lastBucket)
-                .key(lastUrl.split('/', limit = 5)[4])
+                .key(lastUrl.drop(prefix.length))
                 .build()
             
             val delResp = client!!.deleteObject(delReq)
@@ -96,6 +97,7 @@ internal object S3 : UploadService {
         
         val url = urlFormat.format(key)
         PermanentStorage.store("lastS3Url", url)
+        PermanentStorage.store("lastS3Bucket", bucket)
         return url
     }
     
