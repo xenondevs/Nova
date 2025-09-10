@@ -62,7 +62,8 @@ internal object PacketManager : Listener {
     }
     
     fun handlePlayerCreated(player: ServerPlayer, connection: Connection) {
-        val handler = connection.channel.pipeline().get(PACKET_HANDLER_NAME) as PacketHandler
+        val handler = connection.channel.pipeline().get(PACKET_HANDLER_NAME) as? PacketHandler
+            ?: return
         handler.player = player.bukkitEntity
         handlers[player.bukkitEntity] = handler
     }

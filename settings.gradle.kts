@@ -32,6 +32,8 @@ dependencyResolutionManagement {
 
 pluginManagement {
     repositories {
+        maven("https://maven-central.storage-download.googleapis.com/maven2/")
+        maven("https://maven.aliyun.com/repository/public")
         mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
         mavenCentral()
         gradlePluginPortal()
