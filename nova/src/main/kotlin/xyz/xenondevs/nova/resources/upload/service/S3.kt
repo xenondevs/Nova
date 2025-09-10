@@ -72,22 +72,22 @@ internal object S3 : UploadService {
     }
     
     override suspend fun upload(file: Path): String {
-        val name = StringUtils.randomString(5)
+        val key = StringUtils.randomString(5)
         val req = PutObjectRequest.builder()
             .bucket(bucket)
-            .key(directory + name)
+            .key(directory + key)
             .build()
         val resp = client!!.putObject(req, file).sdkHttpResponse()
         
         if (!resp.isSuccessful)
             throw IllegalStateException("S3 upload failed with code ${resp.statusCode()} " + resp.statusText().orElse(""))
         
-        val lastUpload: String? = PermanentStorage.retrieve("lastS3Upload")
-        if (lastUpload != null && lastUpload.startsWith(urlFormat.dropLast(2 + directory.length))) {
-            val lastBucket = lastUpload.drop("https://".length).split("/")[1]
+        val lastUrl: String? = PermanentStorage.retrieve("lastS3Url")
+        if (lastUrl != null && lastUrl.startsWith(urlFormat.dropLast(2 + directory.length))) {
+            val lastBucket = lastUrl.drop("https://".length).split("/")[1]
             val delReq = DeleteObjectRequest.builder()
                 .bucket(lastBucket)
-                .key(lastUpload.split('/', limit = 5)[4])
+                .key(lastUrl.split('/', limit = 5)[4])
                 .build()
             
             val delResp = client!!.deleteObject(delReq)
@@ -96,8 +96,8 @@ internal object S3 : UploadService {
                     + delResp.sdkHttpResponse().statusText().orElse(""))
         }
         
-        val url = urlFormat.format(name)
-        PermanentStorage.store("lastS3Upload", url)
+        val url = urlFormat.format(key)
+        PermanentStorage.store("lastS3Url", url)
         return url
     }
     
