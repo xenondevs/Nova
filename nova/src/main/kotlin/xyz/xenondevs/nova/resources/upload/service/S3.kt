@@ -62,12 +62,10 @@ internal object S3 : UploadService {
         
         this.directory = (cfg.node("directory").string?.addSuffix("/") ?: "")
 
-        val urlStyle = cfg.node("url_style").string?.lowercase()
-            ?.takeIf { it in listOf("path", "vhost") }
-            ?: throw IllegalArgumentException("S3 url_style is invalid (must be \"path\" or \"vhost\")")
-        this.urlFormat = when (urlStyle) {
+        this.urlFormat = when (cfg.node("url_style").string?.lowercase()) {
+            "path" -> "https://$endpoint/$bucket/$directory%s"
             "vhost" -> "https://$bucket.$endpoint/$directory%s"
-            else -> "https://$endpoint/$bucket/$directory%s"
+            else -> throw IllegalArgumentException("S3 url_style is invalid (must be \"path\" or \"vhost\")")
         }
     }
     
