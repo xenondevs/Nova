@@ -1,10 +1,10 @@
 package xyz.xenondevs.nova.ui.menu
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.translation.GlobalTranslator
 import net.minecraft.world.inventory.MenuType
 import org.joml.Vector2i
 import org.joml.Vector2ic
+import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -86,7 +86,7 @@ internal object VanillaGuiTextureInjector : PacketListener {
             return
         
         // translate this server-side to prevent different translations on the client from causing incorrect offsets
-        val oldTitle = GlobalTranslator.renderer().render(event.title.toAdventureComponent(), event.player.locale())
+        val oldTitle = LocaleManager.render(event.title.toAdventureComponent(), event.player.locale())
         val lang = event.player.locale
         
         val newTitle = Component.text()

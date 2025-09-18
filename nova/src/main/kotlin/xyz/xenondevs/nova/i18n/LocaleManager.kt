@@ -4,7 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.translation.GlobalTranslator
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.renderer.TranslatableComponentRenderer
 import net.kyori.adventure.translation.Translator
 import net.minecraft.locale.Language
 import net.minecraft.network.chat.FormattedText
@@ -33,6 +34,8 @@ import kotlin.io.path.walk
 )
 object LocaleManager {
     
+    private val RENDERER = TranslatableComponentRenderer.usingTranslationSource(NovaTranslator)
+    
     private var vanillaTranslations: Map<String, Map<String, String>> = emptyMap()
     
     @InitFun
@@ -45,7 +48,6 @@ object LocaleManager {
             .mapValues { (_, v) -> v.await() }
         
         Language.inject(NovaLanguage)
-        GlobalTranslator.translator().addSource(NovaTranslator)
     }
     
     /**
@@ -94,6 +96,13 @@ object LocaleManager {
         return translation ?: key
     }
     
+    /**
+     * Renders the translatable parts of [component] in the given [locale].
+     */
+    fun render(component: Component, locale: Locale): Component {
+        return RENDERER.render(component, locale)
+    }
+    
     private object NovaLanguage : Language() {
         
         private val delegate = getInstance()
@@ -137,6 +146,7 @@ object LocaleManager {
                 }
             }
             
+            // fixme: format strings are not in MessageFormat-format
             return getFormatStringOrNull(lang, key)?.let(::MessageFormat)
         }
         
