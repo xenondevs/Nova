@@ -11,6 +11,7 @@ import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.gui.set
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.createRecipeChoiceItem
@@ -38,8 +39,8 @@ abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
     private fun createConversionRecipeGui(inputUIItem: Item, outputItem: ItemStack, time: Int): Gui {
         val builder = Gui.builder()
             .setStructure(
-                ". . t . . . . . .",
-                ". . i . . . r . .",
+                ". . . . . . . . .",
+                ". . i . t . r . .",
                 ". . . . . . . . ."
             )
             .addIngredient('i', inputUIItem)
@@ -48,7 +49,7 @@ abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
         if (time != 0) {
             builder.addIngredient(
                 't',
-                DefaultGuiItems.TP_STOPWATCH.createClientsideItemBuilder()
+                DefaultGuiItems.INVISIBLE_ITEM.createClientsideItemBuilder()
                     .setName(Component.translatable("menu.nova.recipe.time", Component.text(time / 20.0)))
             )
         }
@@ -58,28 +59,36 @@ abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
     
 }
 
-internal object SmeltingRecipeGroup : ConversionRecipeGroup<FurnaceRecipe>() {
+internal abstract class LitRecipeGroup<T : Any> : ConversionRecipeGroup<T>() {
+    override fun createGui(recipe: T): Gui {
+        val gui = super.createGui(recipe)
+        gui[2, 2] = Item.simple(DefaultGuiItems.TP_LIT_PROGRESS.clientsideProvider)
+        return gui
+    }
+}
+
+internal object SmeltingRecipeGroup : LitRecipeGroup<FurnaceRecipe>() {
     override val priority = 1
     override val icon = ItemWrapper(ItemStack(Material.FURNACE))
-    override val texture = DefaultGuiTextures.RECIPE_SMELTING
+    override val texture = DefaultGuiTextures.RECIPE_CONVERSION
 }
 
-internal object BlastingRecipeGroup : ConversionRecipeGroup<BlastingRecipe>() {
+internal object BlastingRecipeGroup : LitRecipeGroup<BlastingRecipe>() {
     override val priority = 2
     override val icon = ItemWrapper(ItemStack(Material.BLAST_FURNACE))
-    override val texture = DefaultGuiTextures.RECIPE_SMELTING
+    override val texture = DefaultGuiTextures.RECIPE_CONVERSION
 }
 
-internal object SmokingRecipeGroup : ConversionRecipeGroup<SmokingRecipe>() {
+internal object SmokingRecipeGroup : LitRecipeGroup<SmokingRecipe>() {
     override val priority = 3
     override val icon = ItemWrapper(ItemStack(Material.SMOKER))
-    override val texture = DefaultGuiTextures.RECIPE_SMELTING
+    override val texture = DefaultGuiTextures.RECIPE_CONVERSION
 }
 
-internal object CampfireRecipeGroup : ConversionRecipeGroup<CampfireRecipe>() {
+internal object CampfireRecipeGroup : LitRecipeGroup<CampfireRecipe>() {
     override val priority = 4
     override val icon = ItemWrapper(ItemStack(Material.CAMPFIRE))
-    override val texture = DefaultGuiTextures.RECIPE_SMELTING
+    override val texture = DefaultGuiTextures.RECIPE_CONVERSION
 }
 
 internal object StonecutterRecipeGroup : ConversionRecipeGroup<StonecuttingRecipe>() {

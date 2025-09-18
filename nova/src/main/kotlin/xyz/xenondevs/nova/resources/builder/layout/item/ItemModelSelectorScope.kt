@@ -92,9 +92,6 @@ class ItemModelSelectorScope internal constructor(
      * Using [display], additional transformations can be applied.
      */
     fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: ResourcePath<ResourceType.Model>, display: Model.Display.Entry? = null): ModelBuilder {
-        if (!background && !stretched && display == null)
-            return createLayeredModel(*layers)
-        
         val elements = ArrayList<Element>()
         if (background) {
             elements += Element(

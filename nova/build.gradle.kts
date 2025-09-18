@@ -70,7 +70,8 @@ kotlin {
     compilerOptions {
         optIn.addAll(
             "kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "xyz.xenondevs.invui.ExperimentalReactiveApi"
+            "xyz.xenondevs.invui.ExperimentalReactiveApi",
+            "xyz.xenondevs.invui.dsl.ExperimentalDslApi"
         )
     }
 }

@@ -32,7 +32,6 @@ import xyz.xenondevs.nova.resources.builder.task.AtlasTask
 import xyz.xenondevs.nova.resources.builder.task.BlockModelTask
 import xyz.xenondevs.nova.resources.builder.task.BlockStateContent
 import xyz.xenondevs.nova.resources.builder.task.BossBarOverlayTask
-import xyz.xenondevs.nova.resources.builder.task.NoHandAnimationTask
 import xyz.xenondevs.nova.resources.builder.task.BuildStage
 import xyz.xenondevs.nova.resources.builder.task.CharSizeCalculator
 import xyz.xenondevs.nova.resources.builder.task.EntityVariantTask
@@ -45,6 +44,7 @@ import xyz.xenondevs.nova.resources.builder.task.LanguageContent
 import xyz.xenondevs.nova.resources.builder.task.ModelContent
 import xyz.xenondevs.nova.resources.builder.task.MoveCharactersTask
 import xyz.xenondevs.nova.resources.builder.task.MovedFontContent
+import xyz.xenondevs.nova.resources.builder.task.NoHandAnimationTask
 import xyz.xenondevs.nova.resources.builder.task.PackBuildData
 import xyz.xenondevs.nova.resources.builder.task.PackMcMetaTask
 import xyz.xenondevs.nova.resources.builder.task.PackTask
@@ -145,6 +145,7 @@ class ResourcePackBuilder internal constructor(
                 registerTask(ModelContent::Write)
                 
                 registerBuildData(::LanguageContent)
+                registerTask(LanguageContent::LoadAll)
                 registerTask(LanguageContent::Write)
                 
                 registerTask(::AtlasTask)
@@ -432,6 +433,15 @@ class ResourcePackBuilder internal constructor(
      */
     inline fun <reified V> readJson(path: ResourcePath<ResourceType.JsonFile>, json: Json = Json): V? {
         val file = resolve(path)
+        return if (file.exists()) file.readJson(json) else null
+    }
+    
+    /**
+     * Deserializes the JSON content of the file under [path] in the vanilla minecraft assets
+     * to [V] using [json], or returns `null` if the file does not exist.
+     */
+    inline fun <reified V> readVanillaJson(path: ResourcePath<ResourceType.JsonFile>, json: Json = Json): V? {
+        val file = resolveVanilla(path)
         return if (file.exists()) file.readJson(json) else null
     }
     

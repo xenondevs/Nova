@@ -1,12 +1,14 @@
 package xyz.xenondevs.nova.i18n
 
-import com.google.gson.JsonObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.translation.GlobalTranslator
+import net.kyori.adventure.translation.Translator
 import net.minecraft.locale.Language
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
-import org.bukkit.entity.Player
-import xyz.xenondevs.commons.gson.parseJson
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -14,8 +16,15 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.formatSafely
-import xyz.xenondevs.nova.util.runAsyncTask
+import java.text.MessageFormat
+import java.util.*
+import kotlin.io.path.extension
+import kotlin.io.path.isDirectory
+import kotlin.io.path.name
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.walk
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -24,52 +33,42 @@ import xyz.xenondevs.nova.util.runAsyncTask
 )
 object LocaleManager {
     
-    private val loadedLangs = HashSet<String>()
-    private val loadingLangs = HashSet<String>()
-    
-    private lateinit var translationProviders: MutableMap<String, HashMap<String, String>>
+    private var vanillaTranslations: Map<String, Map<String, String>> = emptyMap()
     
     @InitFun
-    private fun init() {
-        translationProviders = ResourceLookups.LANGUAGE.mapValuesTo(HashMap()) { HashMap(it.value) }
-        loadLang("en_us")
+    private suspend fun init() = withContext(Dispatchers.IO) {
+        vanillaTranslations = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/lang/").walk()
+            .filter { !it.isDirectory() && it.extension.equals("json", true) }
+            .filter { it.name != "deprecated.json" }
+            .associate { file -> file.nameWithoutExtension to async { file.readJson<Map<String, String>>() } }
+            .toMap()
+            .mapValues { (_, v) -> v.await() }
+        
         Language.inject(NovaLanguage)
+        GlobalTranslator.translator().addSource(NovaTranslator)
     }
     
-    private fun loadLang(lang: String) {
-        if (lang in loadingLangs)
-            return
-        
-        loadingLangs += lang
-        
-        if (Nova.isEnabled) runAsyncTask {
-            val file = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/lang/$lang.json")
-            val json = file.parseJson() as JsonObject
-            val translations = json.entrySet().associateTo(HashMap()) { it.key to it.value.asString }
-            
-            synchronized(LocaleManager) {
-                translationProviders.getOrPut(lang, ::HashMap) += translations
-                loadedLangs += lang
-                loadingLangs -= lang
-            }
-        }
-    }
-    
-    @Synchronized
+    /**
+     * Checks whether Nova is aware of a translation for [key] in [lang].
+     */
     fun hasTranslation(lang: String, key: String): Boolean {
-        if (!::translationProviders.isInitialized) return false
-        if (lang !in loadedLangs) loadLang(lang.lowercase())
-        return translationProviders[lang.lowercase()]?.containsKey(key) ?: false
+        if (ResourceLookups.LANGUAGE[lang.lowercase()]?.contains(key) == true)
+            return true
+        return vanillaTranslations[lang.lowercase()]?.contains(key) == true
     }
     
-    @Synchronized
+    /**
+     * Gets the format string for [key] in [lang], or null if none was found.
+     */
     fun getFormatStringOrNull(lang: String, key: String): String? {
-        if (!::translationProviders.isInitialized) return null
-        if (lang !in loadedLangs) loadLang(lang.lowercase())
-        return translationProviders[lang.lowercase()]?.get(key)
+        return ResourceLookups.LANGUAGE[lang.lowercase()]?.get(key) 
+            ?: vanillaTranslations[lang.lowercase()]?.get(key)
     }
     
-    @Synchronized
+    /**
+     * Gets the format string for [key] in [lang], falling back the format string
+     * to `en_us` or the [key] itself if none was found.
+     */
     fun getFormatString(lang: String, key: String): String {
         var formatString = getFormatStringOrNull(lang, key)
         if (formatString == null && lang != "en_us")
@@ -77,35 +76,22 @@ object LocaleManager {
         return formatString ?: key
     }
     
-    @Synchronized
-    fun getAllFormatStrings(key: String): Set<String> {
-        return loadedLangs.mapTo(HashSet()) { getFormatString(it, key) }
-    }
-    
-    @Synchronized
+    /**
+     * Gets the translation for [key] in [lang] using [args], or null if there is no format string.
+     */
     fun getTranslationOrNull(lang: String, key: String, vararg args: Any): String? {
-        if (!::translationProviders.isInitialized) return null
-        if (lang !in loadedLangs) loadLang(lang.lowercase())
-        return translationProviders[lang.lowercase()]?.get(key)?.let { String.formatSafely(it, *args) }
+        return getFormatStringOrNull(lang, key)?.let { String.formatSafely(it, *args) }
     }
     
-    @Synchronized
+    /**
+     * Gets the translation for [key] in [lang] using [args], falling back the translation
+     * to `en_us` or the [key] itself if none was found.
+     */
     fun getTranslation(lang: String, key: String, vararg args: Any): String {
         var translation = getTranslationOrNull(lang, key, *args)
         if (translation == null && lang != "en_us")
             translation = getTranslationOrNull("en_us", key, *args)
         return translation ?: key
-    }
-    
-    @Synchronized
-    fun getAllTranslations(key: String, vararg args: Any): Set<String> {
-        return loadedLangs.mapTo(HashSet()) { getTranslation(it, key, *args) }
-    }
-    
-    @Suppress("DEPRECATION")
-    @Synchronized
-    fun getTranslation(player: Player, key: String, vararg args: Any): String {
-        return getTranslation(player.locale, key, *args)
     }
     
     private object NovaLanguage : Language() {
@@ -130,6 +116,28 @@ object LocaleManager {
         
         override fun getVisualOrder(text: FormattedText): FormattedCharSequence {
             return delegate.getVisualOrder(text)
+        }
+        
+    }
+    
+    private object NovaTranslator : Translator {
+        
+        override fun name(): Key = Key.key("nova", "translator")
+        
+        override fun translate(key: String, locale: Locale): MessageFormat? {
+            val lang = buildString { 
+                append(locale.language.lowercase())
+                if (locale.country.isNotEmpty()) {
+                    append("_")
+                    append(locale.country.lowercase())
+                    if (locale.variant.isNotEmpty()) {
+                        append("_")
+                        append(locale.variant.lowercase())
+                    }
+                }
+            }
+            
+            return getFormatStringOrNull(lang, key)?.let(::MessageFormat)
         }
         
     }

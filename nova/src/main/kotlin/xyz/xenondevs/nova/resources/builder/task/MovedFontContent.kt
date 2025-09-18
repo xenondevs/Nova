@@ -29,17 +29,10 @@ class MovedFontContent : PackBuildData {
     private val queue = LinkedList<Pair<ResourcePath<ResourceType.Font>, Int>>()
     
     /**
-     * Requests a vertically moved font variant of [font] for each offset in [range].
+     * Requests a vertically moved font variant of [font] for each offset in [offsets].
      */
-    fun requestMovedFonts(font: ResourcePath<ResourceType.Font>, range: IntRange) {
-        for (y in range) requestMovedFont(font, y)
-    }
-    
-    /**
-     * Requests a vertically moved font variant of [font] for each offset in [range].
-     */
-    fun requestMovedFonts(font: ResourcePath<ResourceType.Font>, range: IntProgression) {
-        for (y in range) requestMovedFont(font, y)
+    fun requestMovedFonts(font: ResourcePath<ResourceType.Font>, offsets: Iterable<Int>) {
+        for (y in offsets) requestMovedFont(font, y)
     }
     
     private fun requestMovedFont(font: ResourcePath<ResourceType.Font>, y: Int) {

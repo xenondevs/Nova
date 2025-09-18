@@ -76,6 +76,16 @@ internal object ResourceLookups {
     var GUI_TEXTURE: Map<GuiTexture, GuiTextureData> by GUI_TEXTURE_LOOKUP
     
     /**
+     * Lookup for getting the [GuiTexture] by its corresponding [FontChar].
+     */
+    val GUI_TEXTURE_BY_FONT_CHAR_LOOKUP: MapResourceLookup<FontChar, GuiTexture> = mapResourceLookup("gui_texture_by_font_char_lookup")
+    
+    /**
+     * Map of [FontChar] to the corresponding [GuiTexture].
+     */
+    var GUI_TEXTURE_BY_FONT_CHAR: Map<FontChar, GuiTexture> by GUI_TEXTURE_BY_FONT_CHAR_LOOKUP
+    
+    /**
      * The first code-point that is a move character in the minecraft:default font.
      */
     var MOVE_CHARACTERS_OFFSET by resourceLookup<Int>("move_characters_offset", 0)

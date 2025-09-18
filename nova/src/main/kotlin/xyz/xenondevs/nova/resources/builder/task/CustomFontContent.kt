@@ -74,4 +74,14 @@ class FontChar internal constructor(
             .font(font)
             .build()
     
+    override fun equals(other: Any?): Boolean {
+        return other is FontChar && other.font == font && other.codePoint == codePoint
+    }
+    
+    override fun hashCode(): Int {
+        var result = codePoint
+        result = 31 * result + font.hashCode()
+        return result
+    }
+    
 }

@@ -10,8 +10,11 @@ fun Player.playItemPickupSound() {
     playSound(location, Sound.ENTITY_ITEM_PICKUP, 0.5f, Random.nextDouble(0.5, 0.7).toFloat())
 }
 
+/**
+ * Plays the ui button click sound for the player.
+ */
 fun Player.playClickSound() {
-    playSound(location, Sound.UI_BUTTON_CLICK, 0.3f, 1f)
+    playSound(location, Sound.UI_BUTTON_CLICK, 0.25f, 1f)
 }
 
 fun Location.playSoundNearby(sound: Sound, volume: Float, pitch: Float, vararg excluded: Player) =

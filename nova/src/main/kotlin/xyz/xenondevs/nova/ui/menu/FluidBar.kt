@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.ui.menu
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.invui.internal.util.InventoryUtils
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
@@ -64,13 +65,15 @@ class FluidBar(
     
     @Suppress("DEPRECATION")
     override fun createBarItem(section: Int) = Item.builder()
-        .setItemProvider(type, amount, capacity) { type, amount, capacity ->
-            createItemBuilder(
-                items[type]!!,
-                section,
-                amount.toDouble() / capacity.toDouble()
-            ).setFluidDisplayName(amount, capacity)
-        }.addClickHandler { _, click ->
+        .setItemProvider(
+            combinedProvider(type, amount, capacity) { type, amount, capacity ->
+                createItemBuilder(
+                    items[type]!!,
+                    section,
+                    amount.toDouble() / capacity.toDouble()
+                ).setFluidDisplayName(amount, capacity)
+            }
+        ).addClickHandler { _, click ->
             val player = click.player
             val cursor = player.itemOnCursor.takeUnlessEmpty()
             when (cursor?.type) {

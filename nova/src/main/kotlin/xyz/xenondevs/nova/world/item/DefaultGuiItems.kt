@@ -84,15 +84,16 @@ object DefaultGuiItems {
     val SMALL_ARROW_DOWN_ON = guiItem("small_arrow/down_on")
     val SMALL_ARROW_UP_OFF = guiItem("small_arrow/up_off")
     val SMALL_ARROW_UP_ON = guiItem("small_arrow/up_on")
+    val SMALL_ARROW_LEFT_OFF_ALIGNED_RIGHT = guiItem("small_arrow/left_off_aligned_right")
+    val SMALL_ARROW_LEFT_ON_ALIGNED_RIGHT = guiItem("small_arrow/left_on_aligned_right")
+    val SMALL_ARROW_RIGHT_OFF_ALIGNED_LEFT = guiItem("small_arrow/right_off_aligned_left")
+    val SMALL_ARROW_RIGHT_ON_ALIGNED_LEFT = guiItem("small_arrow/right_on_aligned_left")
     val BAR_BLUE = barGuiItem("gui/opaque/bar/blue", Color(75, 75, 255), true)
     val BAR_GREEN = barGuiItem("gui/opaque/bar/green", Color(0, 204, 76), true)
     val BAR_RED = barGuiItem("gui/opaque/bar/red", Color(235, 0, 0), true)
     val BAR_ORANGE = barGuiItem("gui/opaque/bar/orange", Color(232, 76, 0), true)
     val CHEATING_ON = guiItem("cheating_on", "menu.nova.items.cheat_mode.on")
     val CHEATING_OFF = guiItem("cheating_off", "menu.nova.items.cheat_mode.off")
-    
-    @Deprecated("Color picker will be removed in a future version")
-    val COLOR_PICKER = guiItem("color_picker", "menu.nova.color_picker")
     val NUMBER = hiddenItem("gui/opaque/number") {
         model = numberedModels(0..999) {
             createGuiModel(true, false, "item/gui/number/$it")
@@ -100,6 +101,9 @@ object DefaultGuiItems {
     }
     val SEARCH = guiItem("search", "menu.nova.items.search-item")
     val STOPWATCH = guiItem("stopwatch")
+    val SCROLLER_VERTICAL = guiItem("scroller_vertical", stretched = true)
+    val SCROLLER_HORIZONTAL = guiItem("scroller_horizontal", stretched = true)
+    val LIT_PROGRESS = guiItem("lit_progress") // animated texture
     //</editor-fold>
     
     /**
@@ -161,6 +165,13 @@ object DefaultGuiItems {
     val TP_WHITE_BTN = tpGuiItem("btn/white")
     val TP_YELLOW_BTN = tpGuiItem("btn/yellow")
     
+    // placeholder
+    val HEAD_PLACEHOLDER = tpGuiItem("placeholder/head")
+    val CHEST_PLACEHOLDER = tpGuiItem("placeholder/chest")
+    val LEGS_PLACEHOLDER = tpGuiItem("placeholder/legs")
+    val FEET_PLACEHOLDER = tpGuiItem("placeholder/feet")
+    val OFF_HAND_PLACEHOLDER = tpGuiItem("placeholder/off_hand")
+    
     // other
     val TP_ARROW_LEFT_OFF = tpGuiItem("arrow/left_off")
     val TP_ARROW_LEFT_ON = tpGuiItem("arrow/left_on")
@@ -178,15 +189,16 @@ object DefaultGuiItems {
     val TP_SMALL_ARROW_DOWN_ON = tpGuiItem("small_arrow/down_on")
     val TP_SMALL_ARROW_UP_OFF = tpGuiItem("small_arrow/up_off")
     val TP_SMALL_ARROW_UP_ON = tpGuiItem("small_arrow/up_on")
+    val TP_SMALL_ARROW_LEFT_OFF_ALIGNED_RIGHT = tpGuiItem("small_arrow/left_off_aligned_right")
+    val TP_SMALL_ARROW_LEFT_ON_ALIGNED_RIGHT = tpGuiItem("small_arrow/left_on_aligned_right")
+    val TP_SMALL_ARROW_RIGHT_OFF_ALIGNED_LEFT = tpGuiItem("small_arrow/right_off_aligned_left")
+    val TP_SMALL_ARROW_RIGHT_ON_ALIGNED_LEFT = tpGuiItem("small_arrow/right_on_aligned_left")
     val TP_BAR_BLUE = barGuiItem("gui/transparent/bar/blue", Color(75, 75, 255), false)
     val TP_BAR_GREEN = barGuiItem("gui/transparent/bar/green", Color(0, 204, 76), false)
     val TP_BAR_RED = barGuiItem("gui/transparent/bar/red", Color(235, 0, 0), false)
     val TP_BAR_ORANGE = barGuiItem("gui/transparent/bar/orange", Color(232, 76, 0), false)
     val TP_CHEATING_ON = tpGuiItem("cheating_on", "menu.nova.items.cheat_mode.on")
     val TP_CHEATING_OFF = tpGuiItem("cheating_off", "menu.nova.items.cheat_mode.off")
-    
-    @Deprecated("Color picker will be removed in a future version")
-    val TP_COLOR_PICKER = tpGuiItem("color_picker", "menu.nova.color_picker")
     val TP_NUMBER = hiddenItem("gui/transparent/number") {
         model = numberedModels(0..999) {
             createGuiModel(false, false, "item/gui/number/$it")
@@ -194,6 +206,9 @@ object DefaultGuiItems {
     }
     val TP_SEARCH = tpGuiItem("search", "menu.nova.items.search-item")
     val TP_STOPWATCH = tpGuiItem("stopwatch")
+    val TP_SCROLLER_VERTICAL = tpGuiItem("scroller_vertical", stretched = true)
+    val TP_SCROLLER_HORIZONTAL = tpGuiItem("scroller_horizontal", stretched = true)
+    val TP_LIT_PROGRESS = tpGuiItem("lit_progress") // animated texture
     //</editor-fold>
     
 }
@@ -247,7 +262,7 @@ private fun item(name: String, run: NovaItemBuilder.() -> Unit): NovaItem {
 
 private fun hiddenItem(
     name: String,
-    localizedName: String? = "",
+    localizedName: String? = null,
     vararg itemBehaviors: ItemBehaviorHolder
 ): NovaItem = item(name) {
     if (localizedName == null) {
@@ -262,7 +277,7 @@ private fun hiddenItem(
 
 private fun hiddenItem(
     name: String,
-    localizedName: String? = "",
+    localizedName: String? = null,
     itemModelDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit
 ): NovaItem = item(name) {
     if (localizedName == null) {
@@ -274,7 +289,7 @@ private fun hiddenItem(
 
 private fun guiItem(
     name: String,
-    localizedName: String? = "",
+    localizedName: String? = null,
     stretched: Boolean = false
 ): NovaItem = item("gui/opaque/$name") {
     if (localizedName == null) {
@@ -288,7 +303,7 @@ private fun guiItem(
 
 private fun tpGuiItem(
     name: String,
-    localizedName: String? = "",
+    localizedName: String? = null,
     stretched: Boolean = false
 ): NovaItem = item("gui/transparent/$name") {
     if (localizedName == null) {
@@ -301,7 +316,7 @@ private fun tpGuiItem(
 }
 
 private fun barGuiItem(name: String, color: Color, background: Boolean): NovaItem = item(name) {
-    localizedName("")
+    name(null)
     hidden(true)
     modelDefinition {
         model = rangedModels(19) { level ->

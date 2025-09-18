@@ -305,7 +305,7 @@ object ItemUtils {
     /**
      * Gets the id of the given [itemStack].
      */
-    fun getId(itemStack: ItemStack): String {
+    fun getId(itemStack: ItemStack): String { // TODO: should return Key
         val novaItem = itemStack.novaItem
         if (novaItem != null) return novaItem.id.toString()
         

@@ -419,4 +419,14 @@ sealed interface ResourceType {
         override val prefix = "particles"
     }
     
+    /**
+     * Language files
+     * 
+     * path: `lang/`, extension: `json`
+     */
+    @Serializable
+    data object Lang : JsonFile {
+        override val prefix = "lang"
+    }
+    
 }
