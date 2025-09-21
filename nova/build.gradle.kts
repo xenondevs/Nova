@@ -32,15 +32,16 @@ dependencies {
     novaLoader(libs.snakeyaml.engine)
     
     // origami
-    implementation(origami.patchedPaperServer())
     implementation(origamiLibs.mixin)
     implementation(origamiLibs.mixinextras)
+    compileOnly(origami.patchedPaperServer())
     
     // test dependencies
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotlin.test.junit)
     testRuntimeOnly(libs.junit.platformLauncher)
+    testCompileOnly(origami.patchedPaperServer())
 }
 
 // configure java sources location
