@@ -8,19 +8,19 @@ accessible field net/minecraft/network/codec/IdDispatchCodec toId Lit/unimi/dsi/
 accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation
 accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket <init> (Ljava/util/UUID;Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;)V
 accessible method net/minecraft/network/protocol/game/ClientboundUpdateAttributesPacket <init> (ILjava/util/List;)V
-accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket <init> (IZLnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;)V
-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket entityId I
-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket action Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;
-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket ATTACK_ACTION Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;
-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$Action
-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction
-accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction <init> (Lnet/minecraft/world/InteractionHand;)V
-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction hand Lnet/minecraft/world/InteractionHand;
-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction
-accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction <init> (Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/Vec3;)V
-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction hand Lnet/minecraft/world/InteractionHand;
-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction location Lnet/minecraft/world/phys/Vec3;
-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType
+transitive-accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket <init> (IZLnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;)V
+transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket entityId I
+transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket action Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;
+transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket ATTACK_ACTION Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;
+transitive-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$Action
+transitive-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction
+transitive-accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction <init> (Lnet/minecraft/world/InteractionHand;)V
+transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction hand Lnet/minecraft/world/InteractionHand;
+transitive-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction
+transitive-accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction <init> (Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/Vec3;)V
+transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction hand Lnet/minecraft/world/InteractionHand;
+transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction location Lnet/minecraft/world/phys/Vec3;
+transitive-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket id Ljava/util/UUID;
 accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket operation Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;
