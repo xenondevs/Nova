@@ -2,8 +2,10 @@ package xyz.xenondevs.novagradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
@@ -17,14 +19,32 @@ import xyz.xenondevs.novagradle.task.PluginDependency
 import xyz.xenondevs.novagradle.task.PluginDependency.Load
 import xyz.xenondevs.novagradle.task.PluginDependency.Stage
 import xyz.xenondevs.novagradle.util.TaskUtils
+import xyz.xenondevs.origami.extension.OrigamiExtension
+import xyz.xenondevs.origami.task.packaging.PrepareOrigamiMarkerTask
 
 class NovaGradlePlugin : Plugin<Project> {
     
     override fun apply(project: Project) {
+        project.pluginManager.apply("xyz.xenondevs.origami")
+        
         val libraryLoaderCfg = project.configurations.create("libraryLoader")
         project.configurations.getByName("implementation").extendsFrom(libraryLoaderCfg)
         
         val addonExt = project.extensions.create<AddonExtension>("addon")
+        val wailaExt = project.extensions.create<GenerateWailaTexturesExtension>("generateWailaTextures")
+        
+        project.extensions.getByName<OrigamiExtension>("origami").apply {
+            devBundleVersion.set(Versions.PAPER)
+            pluginId.set(addonExt.name)
+            transitiveAccessWidenerSources.from(
+                project.configurations.getByName("compileClasspath").incoming.artifactView {
+                    componentFilter {
+                        it is ModuleComponentIdentifier && it.group == "xyz.xenondevs.nova" && it.module == "nova"
+                    }
+                }.files
+            )
+        }
+        
         project.tasks.register<AddonJarTask>("addonJar") {
             group = LifecycleBasePlugin.BUILD_GROUP
             dependsOn("jar")
@@ -45,6 +65,7 @@ class NovaGradlePlugin : Plugin<Project> {
             prefix.set(addonExt.prefix)
             
             input.set(project.tasks.named<Jar>("jar").flatMap { it.archiveFile })
+            origamiMarker.set(project.tasks.named<PrepareOrigamiMarkerTask>("_oriPrepareMarker").flatMap { it.jsonOutput })
             output.set(
                 addonExt.destination
                     .orElse(project.layout.buildDirectory.dir("libs/"))
@@ -58,7 +79,6 @@ class NovaGradlePlugin : Plugin<Project> {
             )
         }
         
-        val wailaExt = project.extensions.create<GenerateWailaTexturesExtension>("generateWailaTextures")
         project.tasks.register<GenerateWailaTexturesTask>("generateWailaTextures") {
             resourcesDir.set(wailaExt.resourcesDir.orElse(project.layout.projectDirectory.dir("src/main/resources/")))
             addonId.set(addonExt.name.map { it.lowercase() })

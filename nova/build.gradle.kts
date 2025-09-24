@@ -4,7 +4,8 @@ plugins {
     id("nova.publish-conventions")
     alias(libs.plugins.kotlinx.serialization)
     alias(origamiLibs.plugins.origami)
-    id("xyz.xenondevs.bundler-plugin")
+    alias(libs.plugins.pluginPublish)
+    id("xyz.xenondevs.bundler-jar-plugin")
 }
 
 dependencies {
@@ -15,8 +16,11 @@ dependencies {
     novaLoaderApi(libs.invui.kotlin)
     novaLoaderApi(libs.joml.primitives)
     novaLoaderApi(libs.kotlinx.serialization.json)
+    api(origamiLibs.mixin)
+    api(origamiLibs.mixinextras)
     
     // internal dependencies
+    compileOnly(origami.patchedPaperServer())
     compileOnly(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
@@ -31,17 +35,12 @@ dependencies {
     novaLoader(libs.bundles.jgrapht)
     novaLoader(libs.snakeyaml.engine)
     
-    // origami
-    implementation(origamiLibs.mixin)
-    implementation(origamiLibs.mixinextras)
-    compileOnly(origami.patchedPaperServer())
-    
     // test dependencies
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotlin.test.junit)
     testRuntimeOnly(libs.junit.platformLauncher)
-    testCompileOnly(origami.patchedPaperServer())
+    testImplementation(origami.patchedPaperServer())
 }
 
 // configure java sources location
@@ -49,6 +48,20 @@ sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
 
 origami {
     paperDevBundle(libs.versions.paper.get())
+    librariesDirectory = "lib"
+}
+
+loaderJar {
+    gameVersion = libs.versions.paper.get().substringBefore('-')
+    novaInput = tasks.named<Jar>("origamiJar").flatMap { it.archiveFile }
+    input.from(
+        project.provider { project(":nova-api").tasks.named<Jar>("jar").map { it.archiveFile } } ,
+        project.provider {
+            rootProject.subprojects
+                .filter { it.name.startsWith("nova-hook-") }
+                .map { hook -> hook.tasks.named<Jar>("jar").map { it.archiveFile } }
+        }
+    )
 }
 
 tasks {
@@ -62,9 +75,6 @@ tasks {
     test {
         environment("MINECRAFT_VERSION", libs.versions.paper.get().substringBefore("-R0.1-SNAPSHOT"))
     }
-    named<Jar>("jar") {
-        addOrigamiLoader(librariesFolder = "lib")
-    }
 }
 
 kotlin {
@@ -74,6 +84,20 @@ kotlin {
             "xyz.xenondevs.invui.ExperimentalReactiveApi",
             "xyz.xenondevs.invui.dsl.ExperimentalDslApi"
         )
+    }
+}
+
+pluginPublish {
+    file = tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output }
+    githubRepository = "xenondevs/Nova"
+    discord()
+    val gameVersion = libs.versions.paper.get().substringBefore('-')
+    hangar("Nova") {
+        gameVersions(gameVersion)
+    }
+    modrinth("yCVqpwUy") {
+        gameVersions(gameVersion)
+        incompatibleDependency("z4HZZnLr") // FastAsyncWorldEdit
     }
 }
 
