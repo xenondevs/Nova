@@ -20,6 +20,7 @@ class Equipment internal constructor(
         // TODO: these should be in the registry, otherwise the serializer won't work for them
         val LEATHER = of(Key.key("minecraft", "leather"))
         val CHAINMAIL = of(Key.key("minecraft", "chainmail"))
+        val COPPER = of(Key.key("minecraft", "copper"))
         val IRON = of(Key.key("minecraft", "iron"))
         val GOLD = of(Key.key("minecraft", "gold"))
         val DIAMOND = of(Key.key("minecraft", "diamond"))

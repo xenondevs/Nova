@@ -8,6 +8,7 @@ import net.minecraft.world.entity.Entity.ENTITY_COUNTER
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
@@ -241,13 +242,11 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         buf.writeDouble(location.x)
         buf.writeDouble(location.y)
         buf.writeDouble(location.z)
+        buf.writeLpVec3(Vec3.ZERO)
         buf.writeByte(location.pitch.toPackedByte().toInt())
         buf.writeByte(packedYaw)
         buf.writeByte(packedYaw)
         buf.writeVarInt(0)
-        buf.writeShort(0)
-        buf.writeShort(0)
-        buf.writeShort(0)
         
         return buf
     }

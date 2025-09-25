@@ -89,6 +89,7 @@ class ToolTier(
                         BlockTags.INCORRECT_FOR_DIAMOND_TOOL -> VanillaToolTiers.DIAMOND
                         BlockTags.INCORRECT_FOR_GOLD_TOOL -> VanillaToolTiers.GOLD
                         BlockTags.INCORRECT_FOR_IRON_TOOL -> VanillaToolTiers.IRON
+                        BlockTags.INCORRECT_FOR_COPPER_TOOL -> VanillaToolTiers.COPPER
                         BlockTags.INCORRECT_FOR_STONE_TOOL -> VanillaToolTiers.STONE
                         BlockTags.INCORRECT_FOR_WOODEN_TOOL -> VanillaToolTiers.WOOD
                         else -> continue

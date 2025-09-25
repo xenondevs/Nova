@@ -22,6 +22,6 @@ class CatVariantBuilder internal constructor(
 ) {
     
     override fun build(modelType: Unit, layout: EntityVariantLayout.Simple, spawnConditions: SpawnPrioritySelectors) =
-        CatVariant(ClientAsset(layout.texture.toResourceLocation()), spawnConditions)
+        CatVariant(ClientAsset.ResourceTexture(layout.texture.toResourceLocation()), spawnConditions)
     
 }

@@ -22,6 +22,6 @@ class FrogVariantBuilder internal constructor(
 ) {
     
     override fun build(modelType: Unit, layout: EntityVariantLayout.Simple, spawnConditions: SpawnPrioritySelectors) =
-        FrogVariant(ClientAsset(layout.texture.toResourceLocation()), spawnConditions)
+        FrogVariant(ClientAsset.ResourceTexture(layout.texture.toResourceLocation()), spawnConditions)
     
 }

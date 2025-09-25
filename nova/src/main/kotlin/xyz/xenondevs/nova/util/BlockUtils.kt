@@ -359,7 +359,7 @@ object BlockUtils {
      * @param itemStack The [ItemStack] to load the data from
      */
     private fun setBlockEntityDataFromItemStack(pos: BlockPos, itemStack: ItemStack) {
-        val tileEntityTag = itemStack.unwrap().get(DataComponents.BLOCK_ENTITY_DATA)?.copyTag()
+        val tileEntityTag = itemStack.unwrap().get(DataComponents.BLOCK_ENTITY_DATA)?.copyTagWithBlockEntityId()
             ?: return
         
         val input = TagValueInput.create(ProblemReporter.DISCARDING, pos.world.serverLevel.registryAccess(), tileEntityTag)

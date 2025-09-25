@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.mixin.block.sound;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,10 +39,10 @@ abstract class PlayerMixin {
         method = "playStepSound",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/LivingEntity;playStepSound(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V"
+            target = "Lnet/minecraft/world/entity/Avatar;playStepSound(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V"
         )
     )
-    private void playStepSound(LivingEntity instance, BlockPos pos, BlockState state) {
+    private void playStepSound(Avatar entity, BlockPos pos, BlockState state) {
         nova$playStepSound(pos, state);
     }
     

@@ -96,7 +96,7 @@ class BasePacks internal constructor(internal val builder: ResourcePackBuilder) 
                     add(packDir.resolve("assets"))
                     
                     packMcMeta.overlays?.entries
-                        ?.filter { entry -> ResourcePackBuilder.PACK_VERSION in entry.formats }
+                        ?.filter { entry -> entry.contains(ResourcePackBuilder.PACK_MAJOR_VERSION, ResourcePackBuilder.PACK_MINOR_VERSION) }
                         ?.forEach { entry -> add(packDir.resolve("${entry.directory}/assets")) }
                 }.filter { it.exists() }
                 

@@ -55,7 +55,7 @@ class TextureIconContent(
     /**
      * Writes the texture icons requested in [TextureIconContent] to [FontContent].
      */
-    inner class Write(builder: ResourcePackBuilder) : PackTask {
+    inner class Write : PackTask {
         
         override val runsBefore = setOf(FontContent.Write::class)
         
@@ -64,6 +64,7 @@ class TextureIconContent(
             addIcons(
                 "minecraft:item/wooden_sword", "minecraft:item/wooden_shovel", "minecraft:item/wooden_pickaxe", "minecraft:item/wooden_axe", "minecraft:item/wooden_hoe",
                 "minecraft:item/stone_sword", "minecraft:item/stone_shovel", "minecraft:item/stone_pickaxe", "minecraft:item/stone_axe", "minecraft:item/stone_hoe",
+                "minecraft:item/copper_sword", "minecraft:item/copper_shovel", "minecraft:item/copper_pickaxe", "minecraft:item/copper_axe", "minecraft:item/copper_hoe",
                 "minecraft:item/iron_sword", "minecraft:item/iron_shovel", "minecraft:item/iron_pickaxe", "minecraft:item/iron_axe", "minecraft:item/iron_hoe",
                 "minecraft:item/golden_sword", "minecraft:item/golden_shovel", "minecraft:item/golden_pickaxe", "minecraft:item/golden_axe", "minecraft:item/golden_hoe",
                 "minecraft:item/diamond_sword", "minecraft:item/diamond_shovel", "minecraft:item/diamond_pickaxe", "minecraft:item/diamond_axe", "minecraft:item/diamond_hoe",

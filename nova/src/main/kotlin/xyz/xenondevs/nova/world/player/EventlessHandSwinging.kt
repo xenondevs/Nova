@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger
 fun Player.swingMainHandEventless() {
     val packet = ClientboundAnimatePacket(serverPlayer, 0)
     EventlessHandSwinging.registerDrop(this, true)
-    world.serverLevel.chunkSource.broadcastAndSend(serverPlayer, packet)
+    world.serverLevel.chunkSource.sendToTrackingPlayersAndSelf(serverPlayer, packet)
 }
 
 /**
@@ -39,7 +39,7 @@ fun Player.swingMainHandEventless() {
 fun Player.swingOffHandEventless() {
     val packet = ClientboundAnimatePacket(serverPlayer, 3)
     EventlessHandSwinging.registerDrop(this, false)
-    world.serverLevel.chunkSource.broadcastAndSend(serverPlayer, packet)
+    world.serverLevel.chunkSource.sendToTrackingPlayersAndSelf(serverPlayer, packet)
 }
 
 /**

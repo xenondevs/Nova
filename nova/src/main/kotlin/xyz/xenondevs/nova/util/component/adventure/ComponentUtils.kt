@@ -16,6 +16,7 @@ import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.StringTag
 import net.minecraft.network.chat.ComponentSerialization
+import net.minecraft.network.chat.FontDescription
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import org.bukkit.entity.Player
@@ -106,7 +107,7 @@ fun MojangComponent.withoutPreFormatting(): MojangComponent {
 fun Style.toNmsStyle(): MojangStyle {
     var style = MojangStyle.EMPTY
     color()?.let { style = style.withColor(it.value()) }
-    font()?.let { style = style.withFont(it.toResourceLocation()) }
+    font()?.let { style = style.withFont(FontDescription.Resource(it.toResourceLocation())) }
     
     when (decoration(TextDecoration.BOLD)) {
         TextDecoration.State.TRUE -> style = style.withBold(true)

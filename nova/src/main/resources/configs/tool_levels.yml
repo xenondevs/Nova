@@ -1,6 +1,7 @@
 wood: 0
 gold: 0
 stone: 1
+copper: 1
 iron: 2
 diamond: 3
 netherite: 3

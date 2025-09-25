@@ -60,7 +60,7 @@ internal object UnknownEntityVariants {
                 
                 Registries.FROG_VARIANT -> Registries.FROG_VARIANT.preFreeze { registry, _ ->
                     registry[id] = FrogVariant(
-                        ClientAsset(id),
+                        ClientAsset.ResourceTexture(id),
                         SpawnPrioritySelectors.EMPTY
                     )
                 }
@@ -75,9 +75,9 @@ internal object UnknownEntityVariants {
                 Registries.WOLF_VARIANT -> Registries.WOLF_VARIANT.preFreeze { registry, _ ->
                     registry[id] = WolfVariant(
                         WolfVariant.AssetInfo(
-                            ClientAsset(id), 
-                            ClientAsset(id),
-                            ClientAsset(id)
+                            ClientAsset.ResourceTexture(id), 
+                            ClientAsset.ResourceTexture(id),
+                            ClientAsset.ResourceTexture(id)
                         ),
                         SpawnPrioritySelectors.EMPTY
                     )

@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.resources.builder
 
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
+import io.papermc.paper.ServerBuildInfo
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
@@ -11,7 +12,6 @@ import net.minecraft.SharedConstants
 import net.minecraft.server.packs.PackType
 import org.slf4j.Logger
 import xyz.xenondevs.commons.reflection.simpleNestedName
-import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.DATA_FOLDER
@@ -55,7 +55,6 @@ import xyz.xenondevs.nova.resources.builder.task.TooltipStyleContent
 import xyz.xenondevs.nova.resources.builder.task.WailaTask
 import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
 import xyz.xenondevs.nova.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.util.data.writeJson
@@ -97,9 +96,15 @@ class ResourcePackBuilder internal constructor(
     companion object {
         
         /**
-         * The resource pack format version of the current Minecraft version.
+         * The major resource pack format version of the current Minecraft version.
          */
-        val PACK_VERSION: Int = SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES)
+        val PACK_MAJOR_VERSION: Int = SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES).major
+        
+        /**
+         * The minor resource pack format version of the current Minecraft version.
+         */
+        val PACK_MINOR_VERSION: Int = SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES).minor
+        
         
         /**
          * The id of the core resource pack (``nova:core``).
@@ -234,10 +239,11 @@ class ResourcePackBuilder internal constructor(
         }
         
         private suspend fun downloadMcAssets(): Unit = MCASSETS_DOWNLOAD_MUTEX.withLock {
-            if (!MCASSETS_DIR.exists() || PermanentStorage.retrieve<Version>("minecraft_assets_version") != SERVER_VERSION) {
+            val mcVersion = ServerBuildInfo.buildInfo().minecraftVersionId()
+            if (!MCASSETS_DIR.exists() || PermanentStorage.retrieve<String>("minecraft_assets_version") != mcVersion) {
                 MCASSETS_DIR.toFile().deleteRecursively()
                 val downloader = MinecraftAssetsDownloader(
-                    version = SERVER_VERSION.toString(omitZeros = true),
+                    version = mcVersion,
                     outputDirectory = MCASSETS_DIR,
                     mode = EXTRACTION_MODE,
                     logger = LOGGER
@@ -251,7 +257,7 @@ class ResourcePackBuilder internal constructor(
                             append(" If your server can't access github.com in general, you can change \"minecraft_assets_source\" in the config to \"mojang\".")
                     }, ex)
                 }
-                PermanentStorage.store("minecraft_assets_version", SERVER_VERSION)
+                PermanentStorage.store("minecraft_assets_version", mcVersion)
             }
         }
         
