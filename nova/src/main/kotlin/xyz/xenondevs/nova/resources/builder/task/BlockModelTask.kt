@@ -45,7 +45,7 @@ private val DISABLED_BACKING_STATE_CATEGORIES: Set<BackingStateCategory> by MAIN
 class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
     
     override val stage = BuildStage.PRE_WORLD
-    override val runsAfter = setOf(BasePacks.Include::class, ExtractTask::class, ModelContent.DiscoverAllModels::class, BlockStateContent.PreLoadAll::class)
+    override val runsAfter = setOf(BasePacks.Include::class, ExtractTask::class, ModelContent.LoadCustom::class, BlockStateContent.PreLoadAll::class)
     override val runsBefore = setOf(ModelContent.Write::class, ItemModelContent.Write::class, BlockStateContent.Write::class)
     
     private val variantByConfig = HashMap<BackingStateConfig, BlockStateDefinition.Model>()

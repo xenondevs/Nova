@@ -127,7 +127,7 @@ class ResourcePackBuilder internal constructor(
                 registerTask(BlockStateContent::Write)
                 
                 registerBuildData(::FontContent)
-                registerTask(FontContent::DiscoverAllFonts)
+                registerTask(FontContent::LoadAll)
                 registerTask(FontContent::Write)
                 
                 registerBuildData(::MovedFontContent)
@@ -141,7 +141,7 @@ class ResourcePackBuilder internal constructor(
                 registerTask(ItemModelContent::Write)
                 
                 registerBuildData(::ModelContent)
-                registerTask(ModelContent::DiscoverAllModels)
+                registerTask(ModelContent::LoadCustom)
                 registerTask(ModelContent::Write)
                 
                 registerBuildData(::LanguageContent)

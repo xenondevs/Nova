@@ -52,7 +52,7 @@ class MovedFontContent : PackBuildData {
      */
     inner class Write(private val builder: ResourcePackBuilder) : PackTask {
         
-        override val runsAfter = setOf(FontContent.DiscoverAllFonts::class)
+        override val runsAfter = setOf(FontContent.LoadAll::class)
         override val runsBefore = setOf(FontContent.Write::class)
         
         private val fontContent by builder.getBuildDataLazily<FontContent>()

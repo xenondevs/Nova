@@ -25,7 +25,7 @@ private val SETTINGS: Set<String> by combinedProvider(
 class CharSizeCalculator(private val builder: ResourcePackBuilder) : PackTask {
     
     override val runsAfter = setOf(
-        FontContent.DiscoverAllFonts::class, GuiTextureTask::class, MoveCharactersTask::class,
+        FontContent.LoadAll::class, GuiTextureTask::class, MoveCharactersTask::class,
         MovedFontContent.Write::class, TextureIconContent.Write::class, WailaTask::class
     )
     

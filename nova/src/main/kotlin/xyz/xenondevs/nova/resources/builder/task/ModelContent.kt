@@ -143,7 +143,11 @@ class ModelContent(private val builder: ResourcePackBuilder) : PackBuildData, It
         return null
     }
     
-    inner class DiscoverAllModels(private val builder: ResourcePackBuilder) : PackTask {
+    /**
+     * Loads all custom models, from base- and asset packs.
+     * Vanilla models are lazily loaded by [ModelContent] on demand.
+     */
+    inner class LoadCustom(private val builder: ResourcePackBuilder) : PackTask {
         
         override suspend fun run() = coroutineScope {
             val customModels = ArrayList<List<Deferred<Pair<ResourcePath<ResourceType.Model>, Model>>>>()

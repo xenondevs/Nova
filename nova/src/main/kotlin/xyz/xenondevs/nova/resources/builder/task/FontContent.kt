@@ -5,7 +5,6 @@ import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.Font
 import java.nio.file.Path
-import kotlin.collections.iterator
 import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.listDirectoryEntries
@@ -106,9 +105,9 @@ class FontContent : PackBuildData {
     }
     
     /**
-     * Discovers all fonts, loading [vanillaFonts] and [customFonts].
+     * Loads all fonts ([vanillaFonts] and [customFonts]).
      */
-    inner class DiscoverAllFonts(private val builder: ResourcePackBuilder) : PackTask {
+    inner class LoadAll(private val builder: ResourcePackBuilder) : PackTask {
         
         override val runsAfter = setOf(ExtractTask::class)
         
@@ -138,7 +137,7 @@ class FontContent : PackBuildData {
      */
     inner class Write(private val builder: ResourcePackBuilder) : PackTask {
         
-        override val runsAfter = setOf(DiscoverAllFonts::class)
+        override val runsAfter = setOf(LoadAll::class)
         
         override suspend fun run() {
             _customFonts.values.forEach { it.write(builder) }

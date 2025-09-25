@@ -82,7 +82,7 @@ class ItemModelContent(val builder: ResourcePackBuilder) : PackBuildData {
     inner class GenerateItemDefinitions : PackTask {
         
         override val stage = BuildStage.POST_WORLD // // SelectItemModelProperty.Component requires registry access for serialization
-        override val runsAfter = setOf(ModelContent.DiscoverAllModels::class)
+        override val runsAfter = setOf(ModelContent.LoadCustom::class)
         override val runsBefore = setOf(ModelContent.Write::class, Write::class)
         
         override suspend fun run() {

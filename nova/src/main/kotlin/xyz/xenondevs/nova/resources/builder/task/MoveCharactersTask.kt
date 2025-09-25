@@ -25,7 +25,7 @@ class MoveCharactersTask(builder: ResourcePackBuilder) : PackTask {
     }
     
     override val stage = BuildStage.PRE_WORLD
-    override val runsAfter = setOf(FontContent.DiscoverAllFonts::class)
+    override val runsAfter = setOf(FontContent.LoadAll::class)
     override val runsBefore = setOf(MovedFontContent.Write::class, FontContent.Write::class)
     
     private val fontContent by builder.getBuildDataLazily<FontContent>()
