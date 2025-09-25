@@ -35,7 +35,7 @@ class NovaGradlePlugin : Plugin<Project> {
         
         project.extensions.getByName<OrigamiExtension>("origami").apply {
             devBundleVersion.set(Versions.PAPER)
-            pluginId.set(addonExt.name)
+            pluginId.set(addonExt.name.map { it.lowercase() })
             transitiveAccessWidenerSources.from(
                 project.configurations.getByName("compileClasspath").incoming.artifactView {
                     componentFilter {
