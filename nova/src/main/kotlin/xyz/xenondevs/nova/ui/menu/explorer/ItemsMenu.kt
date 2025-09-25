@@ -173,6 +173,7 @@ internal class ItemsMenu private constructor(val player: Player) {
                         }
                 }
                 
+                onClose { player.updateInventory() } // for armor slots
                 onOpen { activeWindow = mainWindow }
             }
         }
