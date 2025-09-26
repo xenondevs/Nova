@@ -46,7 +46,7 @@ internal object BlockInteracting : Listener, PacketListener {
         
         val event = wrappedEvent.event
         val player = event.player
-        if (event.action == Action.RIGHT_CLICK_BLOCK && !player.isSneaking) {
+        if (event.action == Action.RIGHT_CLICK_BLOCK) {
             val pos = event.clickedBlock!!.pos
             
             val blockState = WorldDataManager.getBlockState(pos)

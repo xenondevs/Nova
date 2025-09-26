@@ -27,7 +27,7 @@ internal object UnknownBlockBehavior : BlockBehavior {
     
     override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
         val player = ctx[DefaultContextParamTypes.SOURCE_PLAYER]
-        if (player != null && player.hasPermission("nova.command.debug") && state is UnknownNovaBlockState) {
+        if (player != null && !player.isSneaking && player.hasPermission("nova.command.debug") && state is UnknownNovaBlockState) {
             player.sendMessage(
                 Component.translatable()
                     .key("block.nova.unknown.message")
