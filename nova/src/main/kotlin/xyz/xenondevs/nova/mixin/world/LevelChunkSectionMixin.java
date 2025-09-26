@@ -66,7 +66,7 @@ abstract class LevelChunkSectionMixin {
         @Share("unmigrated") LocalRef<BlockState> unmigrated
     ) {
         unmigrated.set(blockState);
-        if (!nova$migrationActive)
+        if (!nova$migrationActive || BlockMigrator.migrationSuppression.get() > 0)
             return blockState;
         return BlockMigrator.migrateBlockState(nova$getPos(x, y, z), blockState);
     }
@@ -83,7 +83,7 @@ abstract class LevelChunkSectionMixin {
         @Share("unmigrated") LocalRef<BlockState> unmigrated,
         @Local(ordinal = 1) BlockState previous
     ) {
-        if (!nova$migrationActive)
+        if (!nova$migrationActive || BlockMigrator.migrationSuppression.get() > 0)
             return;
         BlockMigrator.handleBlockStatePlaced(nova$getPos(x, y, z), previous, unmigrated.get());
     }

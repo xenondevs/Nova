@@ -71,12 +71,13 @@ import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.isMigrationActive
+import xyz.xenondevs.nova.world.block.migrator.BlockMigrator
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
+import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 import net.minecraft.world.entity.Pose as MojangPose
 import net.minecraft.world.entity.ai.attributes.Attribute as MojangAttribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier as MojangAttributeModifier
@@ -85,7 +86,6 @@ import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
 import net.minecraft.world.item.ItemUseAnimation as MojangItemUseAnimation
 import net.minecraft.world.level.block.Block as MojangBlock
-import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 
 
 val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
@@ -705,13 +705,11 @@ fun forcePacketBroadcast(run: () -> Unit) {
 }
 
 internal inline fun withoutBlockMigration(pos: BlockPos, run: () -> Unit) {
-    val chunkSection = pos.chunkSection
-    val previous = chunkSection.isMigrationActive
-    chunkSection.isMigrationActive = false
+    BlockMigrator.migrationSuppression.set(BlockMigrator.migrationSuppression.get() + 1)
     try {
         run.invoke()
     } finally {
-        chunkSection.isMigrationActive = previous
+        BlockMigrator.migrationSuppression.set(BlockMigrator.migrationSuppression.get() - 1)
     }
 }
 

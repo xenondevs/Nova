@@ -74,8 +74,10 @@ abstract class BlockBehaviourBlockStateBaseMixin {
         try {
             var novaNeighborPos = NMSUtilsKt.toNovaPos(neighborPos, serverLevel.getWorld());
             var newState = novaState.getBlock().updateShape(novaPos, novaState, novaNeighborPos);
-            if (newState != novaState)
+            if (newState == novaState) {
                 cir.setReturnValue((BlockState) (Object) this);
+                return;
+            }
             
             WorldDataManager.INSTANCE.setBlockState(novaPos, newState);
             var ret = switch (newState.getModelProvider$nova()) {
