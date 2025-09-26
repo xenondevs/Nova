@@ -21,8 +21,10 @@ abstract class EnchantmentMixin {
     private void isPrimaryItem(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         var ench = (Enchantment) (Object) this;
         var cel = CustomEnchantmentLogic.customEnchantments.get(ench);
-        if (cel != null && cel.isPrimaryItem(stack.asBukkitMirror()))
+        if (cel != null && cel.isPrimaryItem(stack.asBukkitMirror())) {
             cir.setReturnValue(true);
+            return;
+        }
         
         var novaItem = ItemUtilsKt.getNovaItem(stack);
         if (novaItem == null)
