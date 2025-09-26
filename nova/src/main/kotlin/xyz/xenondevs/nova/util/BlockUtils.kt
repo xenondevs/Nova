@@ -24,12 +24,12 @@ import net.minecraft.world.item.crafting.AbstractCookingRecipe
 import net.minecraft.world.level.block.DoorBlock
 import net.minecraft.world.level.block.TallFlowerBlock
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
-import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.storage.TagValueInput
+import net.minecraft.world.level.storage.loot.LootParams
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
-import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
@@ -53,6 +53,8 @@ import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
 import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
 import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.util.BlockUtils.breakBlock
+import xyz.xenondevs.nova.util.BlockUtils.placeBlock
 import xyz.xenondevs.nova.util.item.hasNoBreakParticles
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.soundGroup
@@ -550,47 +552,46 @@ object BlockUtils {
         val pos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
         val tool = ctx[DefaultContextParamTypes.TOOL_ITEM_STACK]
         
-        val block = pos.block
-        if (CustomItemServiceManager.getBlockType(block) != null)
-            return CustomItemServiceManager.getDrops(block, tool) ?: emptyList()
+        // fixme: custom item services ignore block & storage drops params
+        if (CustomItemServiceManager.getBlockType(pos.block) != null)
+            return CustomItemServiceManager.getDrops(pos.block, tool) ?: emptyList()
         
         val novaBlockState = WorldDataManager.getBlockState(pos)
         if (novaBlockState != null)
             return novaBlockState.block.getDrops(pos, novaBlockState, ctx)
         
-        return getVanillaDrops(pos, tool, ctx[DefaultContextParamTypes.SOURCE_ENTITY])
-    }
-    
-    private fun getVanillaDrops(pos: BlockPos, tool: ItemStack?, sourceEntity: Entity?): List<ItemStack> {
         val drops = ArrayList<ItemStack>()
-        val block = pos.block
-        val state = block.state
-        when {
-            state is Chest ->
-                drops += state.blockInventory.contents.asSequence().filterNotNull().map(ItemStack::clone)
-            
-            state is Container && state !is ShulkerBox ->
-                drops += state.inventory.contents.asSequence().filterNotNull().map(ItemStack::clone)
-            
-            state is Lectern ->
-                drops += state.inventory.contents.asSequence().filterNotNull().map(ItemStack::clone)
-            
-            state is Jukebox ->
-                state.record.takeUnlessEmpty()?.clone()?.also(drops::add)
-            
-            state is Campfire ->
-                repeat(4) { state.getItem(it)?.clone()?.also(drops::add) }
+        if (ctx[DefaultContextParamTypes.BLOCK_STORAGE_DROPS]) {
+            // note: storage drops in nms are implemented via BlockEntity#preRemoveSideEffects
+            when (val state = pos.block.state) {
+                is Chest ->
+                    drops += state.blockInventory.contents.asSequence().filterNotNull().map(ItemStack::clone)
+                
+                is Container if state !is ShulkerBox ->
+                    drops += state.inventory.contents.asSequence().filterNotNull().map(ItemStack::clone)
+                
+                is Lectern ->
+                    drops += state.inventory.contents.asSequence().filterNotNull().map(ItemStack::clone)
+                
+                is Jukebox ->
+                    state.record.takeUnlessEmpty()?.clone()?.also(drops::add)
+                
+                is Campfire ->
+                    repeat(4) { state.getItem(it)?.clone()?.also(drops::add) }
+            }
         }
         
-        // don't include the actual block for creative players
-        if (sourceEntity !is Player || sourceEntity.gameMode != GameMode.CREATIVE) {
-            val mainBlock = block.getMainHalf()
-            drops += if (tool != null && sourceEntity != null)
-                mainBlock.getDrops(tool, sourceEntity)
-            else mainBlock.getDrops(tool)
+        if (ctx[DefaultContextParamTypes.BLOCK_DROPS]) {
+            val mainPos = pos.block.getMainHalf().pos
+            val builder = LootParams.Builder(mainPos.world.serverLevel)
+                .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(mainPos.nmsPos))
+                .withParameter(LootContextParams.TOOL, tool.unwrap())
+                .withOptionalParameter(LootContextParams.THIS_ENTITY, ctx[DefaultContextParamTypes.SOURCE_ENTITY]?.nmsEntity)
+                .withOptionalParameter(LootContextParams.BLOCK_ENTITY, mainPos.nmsBlockEntity);
+            drops += mainPos.nmsBlockState.getDrops(builder).map { it.asBukkitMirror() }
         }
-        
-        return drops.filterNot { it.type.isAir }
+
+        return drops.filterNot { it.isEmpty }
     }
     
     private fun Block.getMainHalf(): Block {
