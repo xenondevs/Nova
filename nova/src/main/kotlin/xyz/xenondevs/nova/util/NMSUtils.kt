@@ -4,6 +4,7 @@ package xyz.xenondevs.nova.util
 
 import com.mojang.datafixers.util.Either
 import io.netty.buffer.Unpooled
+import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.set.RegistryKeySet
 import io.papermc.paper.registry.tag.Tag
@@ -54,10 +55,12 @@ import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.CraftWorld
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.entity.CraftEntity
+import org.bukkit.craftbukkit.entity.CraftLivingEntity
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
 import org.bukkit.inventory.EquipmentSlot
@@ -65,25 +68,25 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
-import xyz.xenondevs.nova.patch.impl.misc.BroadcastPacketPatch
-import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
-import xyz.xenondevs.nova.util.reflection.ReflectionUtils
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.migrator.BlockMigrator
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.jvm.optionals.getOrNull
 import net.minecraft.core.BlockPos as MojangBlockPos
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
+import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 import net.minecraft.world.entity.Pose as MojangPose
 import net.minecraft.world.entity.ai.attributes.Attribute as MojangAttribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier as MojangAttributeModifier
 import net.minecraft.world.entity.player.Player as MojangPlayer
 import net.minecraft.world.item.Item as MojangItem
 import net.minecraft.world.item.ItemStack as MojangStack
+import net.minecraft.world.item.ItemUseAnimation as MojangItemUseAnimation
 import net.minecraft.world.level.block.Block as MojangBlock
+
 
 val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
 val REGISTRY_ACCESS: RegistryAccess by lazy { MINECRAFT_SERVER.registryAccess() }
@@ -91,6 +94,9 @@ val DATA_VERSION: Int by lazy { CraftMagicNumbers.INSTANCE.dataVersion }
 
 val Entity.nmsEntity: MojangEntity
     get() = (this as CraftEntity).handle
+
+val LivingEntity.nmsEntity: MojangLivingEntity
+    get() = (this as CraftLivingEntity).handle
 
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
@@ -304,6 +310,21 @@ val Pose.nmsPose: MojangPose
         Pose.SLIDING -> MojangPose.SLIDING
         Pose.SHOOTING -> MojangPose.SHOOTING
         Pose.INHALING -> MojangPose.INHALING
+    }
+
+val ItemUseAnimation.nmsItemUseAnimation: MojangItemUseAnimation
+    get() = when (this) {
+        ItemUseAnimation.NONE -> MojangItemUseAnimation.NONE
+        ItemUseAnimation.EAT -> MojangItemUseAnimation.EAT
+        ItemUseAnimation.DRINK -> MojangItemUseAnimation.DRINK
+        ItemUseAnimation.BLOCK -> MojangItemUseAnimation.BLOCK
+        ItemUseAnimation.BOW -> MojangItemUseAnimation.BOW
+        ItemUseAnimation.SPEAR -> MojangItemUseAnimation.SPEAR
+        ItemUseAnimation.CROSSBOW -> MojangItemUseAnimation.CROSSBOW
+        ItemUseAnimation.SPYGLASS -> MojangItemUseAnimation.SPYGLASS
+        ItemUseAnimation.TOOT_HORN -> MojangItemUseAnimation.TOOT_HORN
+        ItemUseAnimation.BRUSH -> MojangItemUseAnimation.BRUSH
+        ItemUseAnimation.BUNDLE -> MojangItemUseAnimation.BUNDLE
     }
 
 val Material.nmsBlock: MojangBlock
@@ -657,54 +678,54 @@ fun <T> RegistryKeySet<*>.toNmsHolderSet(
 }
 
 fun preventPacketBroadcast(run: () -> Unit) {
-    BroadcastPacketPatch.dropAll = true
+    NMSUtils.broadcastDropAll.set(true)
     try {
         run.invoke()
     } finally {
-        BroadcastPacketPatch.dropAll = false
+        NMSUtils.broadcastDropAll.set(false)
     }
 }
 
 fun replaceBroadcastExclusion(exclude: ServerPlayer, run: () -> Unit) {
-    BroadcastPacketPatch.exclude = exclude
+    NMSUtils.broadcastExcludedPlayerOverride.set(exclude)
     try {
         run.invoke()
     } finally {
-        BroadcastPacketPatch.exclude = null
+        NMSUtils.broadcastExcludedPlayerOverride.set(null)
     }
 }
 
 fun forcePacketBroadcast(run: () -> Unit) {
-    BroadcastPacketPatch.ignoreExcludedPlayer = true
+    NMSUtils.broadcastIgnoreExcludedPlayer.set(true)
     try {
         run.invoke()
     } finally {
-        BroadcastPacketPatch.ignoreExcludedPlayer = false
+        NMSUtils.broadcastIgnoreExcludedPlayer.set(false)
     }
 }
 
 internal inline fun withoutBlockMigration(pos: BlockPos, run: () -> Unit) {
-    val chunkSection = pos.chunkSection as LevelChunkSectionWrapper
-    val previous = chunkSection.isMigrationActive
-    chunkSection.isMigrationActive = false
+    BlockMigrator.migrationSuppression.set(BlockMigrator.migrationSuppression.get() + 1)
     try {
         run.invoke()
     } finally {
-        chunkSection.isMigrationActive = previous
+        BlockMigrator.migrationSuppression.set(BlockMigrator.migrationSuppression.get() - 1)
     }
 }
 
 fun RegistryFriendlyByteBuf(): RegistryFriendlyByteBuf =
     RegistryFriendlyByteBuf(Unpooled.buffer(), REGISTRY_ACCESS)
 
-object NMSUtils {
+@PublishedApi
+internal object NMSUtils {
     
-    val ENTITY_COUNTER by lazy {
-        ReflectionUtils.getField(
-            MojangEntity::class.java,
-            true,
-            "ENTITY_COUNTER"
-        ).get(null) as AtomicInteger
-    }
+    @JvmField
+    val broadcastIgnoreExcludedPlayer: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
+    
+    @JvmField
+    val broadcastExcludedPlayerOverride: ThreadLocal<ServerPlayer?> = ThreadLocal.withInitial { null }
+    
+    @JvmField
+    val broadcastDropAll: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
     
 }

@@ -19,6 +19,9 @@ object TileEntityInteractive : BlockBehavior {
     
     override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
         val sourcePlayer = ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player
+        if (sourcePlayer?.isSneaking == true)
+            return false
+        
         if (sourcePlayer != null)
             runTask { sourcePlayer.swingMainHandEventless() } // TODO: runTask required?
         

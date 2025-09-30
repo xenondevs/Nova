@@ -18,10 +18,13 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.outputStream
 import kotlin.io.path.relativeTo
 
-class ExtractTask(private val builder: ResourcePackBuilder) : PackTaskHolder {
+/**
+ * Extracts data from asset packs to the resource pack.
+ * Respects resource pack filters registered on the resource pack builder.
+ */
+class ExtractTask(private val builder: ResourcePackBuilder) : PackTask {
     
-    @PackTask
-    private fun extractAll() {
+    override suspend fun run() {
         extractMinecraftAssets()
         extractAssetPacks()
     }
@@ -31,13 +34,13 @@ class ExtractTask(private val builder: ResourcePackBuilder) : PackTaskHolder {
         NOVA_JAR.useZip { zip ->
             zip.resolve("assets/minecraft/")
                 .copyToRecursively(
-                    ResourcePackBuilder.MINECRAFT_ASSETS_DIR,
+                    builder.resolve("assets/minecraft/"),
                     followLinks = false,
                 ) { source, target ->
                     if (source.isDirectory())
                         return@copyToRecursively CopyActionResult.CONTINUE
                     
-                    val relPath = target.relativeTo(ResourcePackBuilder.MINECRAFT_ASSETS_DIR)
+                    val relPath = target.relativeTo(builder.resolve("assets/minecraft/"))
                     
                     if (!filters.all { filter -> filter.allows("minecraft/$relPath") })
                         return@copyToRecursively CopyActionResult.SKIP_SUBTREE
@@ -60,7 +63,7 @@ class ExtractTask(private val builder: ResourcePackBuilder) : PackTaskHolder {
         val filters = builder.getResourceFilters(ResourceFilter.Stage.ASSET_PACK)
         for (pack in builder.assetPacks) {
             val namespace = pack.namespace
-            extractAssetPack(pack, ResourcePackBuilder.ASSETS_DIR.resolve(namespace)) { path -> filters.all { it.allows(path) } }
+            extractAssetPack(pack, builder.resolve("assets/$namespace")) { path -> filters.all { it.allows(path) } }
         }
     }
     

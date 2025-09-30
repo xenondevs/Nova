@@ -98,10 +98,4 @@ class NetworkedVirtualInventory(
         
     }
     
-    init {
-        virtualInventory.addResizeHandler { _, _ ->
-            throw UnsupportedOperationException("Networked inventories cannot be resized")
-        }
-    }
-    
 }

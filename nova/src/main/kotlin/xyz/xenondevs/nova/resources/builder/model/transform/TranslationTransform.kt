@@ -16,13 +16,14 @@ internal data class TranslationTransform(val v: Vector3dc) : NonContextualModelB
             element.copy(
                 from = element.from.add(v, Vector3d()),
                 to = element.to.add(v, Vector3d()),
+                rotation = element.rotation?.copy(origin = element.rotation.origin.add(v, Vector3d())),
                 faces = element.faces.mapValues { (direction, face) -> face.copy(uv = face.uv ?: element.generateUV(direction)) }
             )
         })
     }
     
     override fun apply(matrix: Matrix4d) {
-        matrix.translate(v)
+        matrix.translateLocal(v)
     }
     
 }

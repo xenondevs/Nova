@@ -5,7 +5,7 @@ import io.papermc.paper.datacomponent.PaperDataComponentType
 import net.minecraft.core.component.TypedDataComponent
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.lazyFlatten
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.provider
 import net.minecraft.core.component.DataComponentMap as MojangDataComponentMap
@@ -38,7 +38,7 @@ fun buildDataComponentMapProvider(builderAction: DataComponentMap.ProviderBuilde
         val builder = DataComponentMap.ProviderBuilder()
         builder.builderAction()
         builder.build()
-    }.lazyFlatten()
+    }.flatten()
 }
 
 /**

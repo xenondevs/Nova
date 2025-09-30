@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.waila.info
 
 import net.kyori.adventure.key.Key
-import xyz.xenondevs.nova.resources.builder.task.font.TextureIconContent
+import xyz.xenondevs.nova.resources.builder.task.TextureIconContent
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories.AXE
@@ -10,6 +10,8 @@ import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories.PICKAXE
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories.SHEARS
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories.SHOVEL
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories.SWORD
+import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers
+import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers.COPPER
 import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers.DIAMOND
 import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers.GOLD
 import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers.IRON
@@ -38,7 +40,7 @@ internal object VanillaWailaToolIconProvider : WailaToolIconProvider {
             SHEARS -> "shears"
             SHOVEL, PICKAXE, AXE, HOE, SWORD -> when (tier) {
                 WOOD, GOLD -> "${tier.id.value()}en_${category.id.value()}"
-                STONE, IRON, DIAMOND, NETHERITE -> "${tier.id.value()}_${category.id.value()}"
+                STONE, COPPER, IRON, DIAMOND, NETHERITE -> "${tier.id.value()}_${category.id.value()}"
                 else -> null
             }
             

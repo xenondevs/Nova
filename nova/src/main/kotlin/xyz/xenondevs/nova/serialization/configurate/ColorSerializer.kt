@@ -5,7 +5,7 @@ import java.awt.Color
 import java.lang.reflect.Type
 import java.util.function.Predicate
 
-object ColorSerializer : ScalarSerializer<Color>(Color::class.java) {
+internal object ColorSerializer : ScalarSerializer<Color>(Color::class.java) {
     
     override fun deserialize(type: Type, obj: Any): Color? {
         return Color.decode(obj.toString())

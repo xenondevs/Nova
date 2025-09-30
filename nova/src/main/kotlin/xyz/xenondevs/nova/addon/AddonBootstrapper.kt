@@ -14,12 +14,13 @@ import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.useZip
 import kotlin.io.path.Path
 import kotlin.io.path.notExists
-import kotlin.jvm.JvmStatic
 
 @Suppress("unused") // called by generated bootstrap code
 internal object AddonBootstrapper {
     
     private val _addons = ArrayList<Addon>()
+    
+    @JvmStatic
     val addons: List<Addon>
         get() = _addons
     

@@ -18,7 +18,7 @@ import xyz.xenondevs.nova.resources.builder.model.transform.RotationTransform
 import xyz.xenondevs.nova.resources.builder.model.transform.ScaleTransform
 import xyz.xenondevs.nova.resources.builder.model.transform.Transform
 import xyz.xenondevs.nova.resources.builder.model.transform.TranslationTransform
-import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.resources.builder.task.ModelContent
 import kotlin.math.min
 
 /**
@@ -215,7 +215,9 @@ class ModelBuilder(private val base: Model) {
     /**
      * Builds the model according to the configured [actions].
      *
-     * The [context] parameter is only required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
+     * If [context] is not null, the model builder will additionally perform a [flatten] operation before
+     * applying the configured actions.
+     * The [context] parameters is also required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
      */
     fun build(context: ModelContent?): Model {
         if (::result.isInitialized)
@@ -229,10 +231,15 @@ class ModelBuilder(private val base: Model) {
     /**
      * Builds the model according to the given [actions].
      *
-     * The [context] parameter is only required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
+     * If [context] is not null, the model builder will additionally perform a [flatten] operation before
+     * applying the configured actions.
+     * The [context] parameters is also required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
      */
     private fun build(context: ModelContent?, actions: List<BuildAction>): Model {
         var resultModel = base
+        if (actions.isNotEmpty() && context != null) {
+            resultModel = FlatteningAction().apply(resultModel, context)
+        }
         for (action in actions) {
             when (action) {
                 is NonContextualModelBuildAction -> resultModel = action.apply(resultModel)
@@ -255,7 +262,7 @@ class ModelBuilder(private val base: Model) {
      *
      * The [context] parameter is only required if [ContextualModelBuildActions][ContextualModelBuildAction] are used.
      */
-    internal fun buildScaled(context: ModelContent?): ScaledModel {
+    internal fun buildScaled(context: ModelContent?): ScaledModel { // TODO: build item definition model instead to allow combination action
         if (::scaledResult.isInitialized)
             return scaledResult
         
@@ -285,7 +292,9 @@ class ModelBuilder(private val base: Model) {
             if (bounds.minZ < MIN_ELEMENT_FROM)
                 scale = min(scale, (pivot.z - MIN_ELEMENT_FROM) / (pivot.z - bounds.minZ))
             
-            resultModel = ScaleTransform(pivot, Vector3d(scale, scale, scale), keepDisplaySize = true).apply(resultModel)
+            if (scale != 1.0) {
+                resultModel = ScaleTransform(pivot, Vector3d(scale, scale, scale), keepDisplaySize = true).apply(resultModel)
+            }
         }
         
         return ScaledModel(resultModel, 1 / scale)

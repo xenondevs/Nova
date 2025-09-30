@@ -24,9 +24,9 @@ class WolfVariantBuilder internal constructor(
     override fun build(modelType: Unit, layout: EntityVariantLayout.Wolf, spawnConditions: SpawnPrioritySelectors): WolfVariant {
         return WolfVariant(
             WolfVariant.AssetInfo(
-                ClientAsset(layout.wild.toResourceLocation()),
-                ClientAsset(layout.tame.toResourceLocation()),
-                ClientAsset(layout.angry.toResourceLocation()),
+                ClientAsset.ResourceTexture(layout.wild.toResourceLocation()),
+                ClientAsset.ResourceTexture(layout.tame.toResourceLocation()),
+                ClientAsset.ResourceTexture(layout.angry.toResourceLocation()),
             ),
             spawnConditions,
         )

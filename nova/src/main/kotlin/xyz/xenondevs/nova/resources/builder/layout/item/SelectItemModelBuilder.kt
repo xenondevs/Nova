@@ -263,7 +263,24 @@ enum class MainHandPosition { LEFT, RIGHT }
 /**
  * Charged projectile type.
  */
-enum class ChargedType { NONE, ROCKET, ARROW }
+enum class ChargedType {
+    
+    /**
+     * No projectile is charged.
+     */
+    NONE,
+    
+    /**
+     * A firework rocket is charged.
+     */
+    ROCKET,
+    
+    /**
+     * An arrow, or any other item type that is not a firework rocket, is charged.
+     */
+    ARROW
+    
+}
 
 /**
  * Context in which an item is rendered.

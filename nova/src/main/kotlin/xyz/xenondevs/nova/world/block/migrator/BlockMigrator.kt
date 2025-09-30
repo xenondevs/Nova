@@ -27,7 +27,6 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
-import xyz.xenondevs.nova.patch.impl.worldgen.chunksection.LevelChunkSectionWrapper
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.util.bukkitMaterial
@@ -46,6 +45,7 @@ import xyz.xenondevs.nova.world.block.state.model.RedMushroomBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.isMigrationActive
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
 
@@ -65,6 +65,9 @@ internal object BlockMigrator : Listener {
     private val migrationsByVanillaBlock = HashMap<Block, BlockMigration>()
     private val migrationsByNovaBlock = HashMap<NovaBlock, BlockMigration>()
     private val queries = ArrayList<(BlockState) -> Boolean>()
+    
+    @JvmField
+    val migrationSuppression: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
     
     @InitFun
     private fun init() {
@@ -154,7 +157,7 @@ internal object BlockMigrator : Listener {
     
     private fun migrateChunk(chunk: Chunk) {
         for (section in chunk.levelChunk.sections) {
-            (section as LevelChunkSectionWrapper).isMigrationActive = true
+            section.isMigrationActive = true
         }
         
         val pdc = chunk.persistentDataContainer

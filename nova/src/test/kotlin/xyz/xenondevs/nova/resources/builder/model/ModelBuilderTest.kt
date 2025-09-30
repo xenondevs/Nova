@@ -71,6 +71,17 @@ class ModelBuilderTest {
     }
     
     @Test
+    fun testTranslatePivot() {
+        val model = deserializeModel("torch_wall/model")
+        
+        val builder = ModelBuilder(model)
+        builder.translate(Vector3d(16.0, -8.0, -16.0))
+        val translated = builder.buildScaled(null)
+        
+        assertEquals(deserializeModel("torch_wall/translated/16_-8_-16"), translated)
+    }
+    
+    @Test
     fun testRotateX() {
         assertRotatedEquals("half_cube", Model.Axis.X, 22.5)
         assertRotatedEquals("half_cube", Model.Axis.X, 45.0)
@@ -158,11 +169,38 @@ class ModelBuilderTest {
     fun testRotateMulti() {
         val base = deserializeModel("half_cube/model")
         val builder = ModelBuilder(base)
-        builder.rotateY(22.5)
+        builder.rotateY(-22.5)
         builder.rotateX(180.0)
         builder.rotateY(67.5)
         builder.rotateZ(67.5)
         assertEquals(deserializeModel("half_cube/rotated/y22.5_x180.0_y67.5_z67.5"), builder.buildScaled(null))
+    }
+    
+    @Test
+    fun testRotateCullface() {
+        val base = deserializeModel("stairs/model")
+        val builder = ModelBuilder(base)
+        builder.rotateX(180.0)
+        builder.rotateY(90.0)
+        
+        assertEquals(deserializeModel("stairs/rotated/x180.0_y90.0"), builder.buildScaled(null))
+    }
+    
+    @Test
+    fun testRotatePivot() {
+        assertRotatedEquals("torch_wall", Model.Axis.Y, 90.0)
+        assertRotatedEquals("torch_wall", Model.Axis.Y, 180.0)
+        assertRotatedEquals("torch_wall", Model.Axis.Y, 270.0)
+    }
+    
+    @Test
+    fun testRotateUvLocked() {
+        val base = deserializeModel("stairs/model")
+        val builder = ModelBuilder(base)
+        builder.rotateX(180.0, true)
+        builder.rotateY(90.0, true)
+        
+        assertEquals(deserializeModel("stairs/rotated/x180.0_y90.0_uvlock"), builder.buildScaled(null))
     }
     
     @Test
@@ -191,6 +229,8 @@ class ModelBuilderTest {
         val expected = deserializeModel("full_cube/culled/north_up")
         assertEquals(expected, actual)
     }
+    
+    // TODO: compare models while ignoring floating point imprecision
     
     private fun assertRotatedEquals(model: String, axis: Model.Axis, rotation: Double) {
         val builder = ModelBuilder(deserializeModel("$model/model"))

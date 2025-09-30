@@ -22,7 +22,15 @@ internal class TripwireBackingStateConfig(
         (east.intValue shl 1) or
         north.intValue
     
-    override val variantString = "north=$north,east=$east,south=$south,west=$west,attached=${type.attached},disarmed=$disarmed,powered=$powered"
+    override val variantMap = mapOf(
+        "north" to "$north",
+        "east" to "$east",
+        "south" to "$south",
+        "west" to "$west",
+        "attached" to "${type.attached}",
+        "disarmed" to "$disarmed",
+        "powered" to "$powered"
+    )
     
     override val vanillaBlockState = Blocks.TRIPWIRE.defaultBlockState()
         .setValue(TripWireBlock.NORTH, north)

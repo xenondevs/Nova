@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.item.logic
 
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
-import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -16,25 +15,27 @@ import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
-import xyz.xenondevs.nova.network.event.registerPacketListener
-import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
-import xyz.xenondevs.nova.network.event.serverbound.ServerboundUseItemPacketEvent
-import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
-import java.util.*
+
+private val PLAYER_EQUIPMENT_SLOTS = listOf(
+    EquipmentSlot.HAND, 
+    EquipmentSlot.OFF_HAND, 
+    EquipmentSlot.FEET, 
+    EquipmentSlot.LEGS,
+    EquipmentSlot.CHEST, 
+    EquipmentSlot.HEAD
+)
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -42,12 +43,9 @@ import java.util.*
 )
 internal object ItemListener : Listener, PacketListener {
     
-    private val usedItems = WeakHashMap<Player, ItemStack>()
-    
     @InitFun
     private fun init() {
         registerEvents()
-        registerPacketListener()
         runTaskTimer(0, 1, ::handleTick)
     }
     
@@ -57,6 +55,12 @@ internal object ItemListener : Listener, PacketListener {
                 val novaItem = itemStack?.novaItem
                     ?: continue
                 novaItem.handleInventoryTick(player, itemStack, slot)
+            }
+            for (slot in PLAYER_EQUIPMENT_SLOTS) {
+                val itemStack = player.inventory.getItem(slot)
+                val novaItem = itemStack.novaItem
+                    ?: continue
+                novaItem.handleEquipmentTick(player, itemStack.clone(), slot)
             }
         }
     }
@@ -150,25 +154,6 @@ internal object ItemListener : Listener, PacketListener {
         val item = event.item
         
         item.novaItem?.handleConsume(player, item, event)
-    }
-    
-    // This method stores the last used item for the RELEASE_USE_ITEM action below
-    @PacketHandler(priority = EventPriority.HIGHEST, ignoreIfCancelled = true)
-    private fun handleUseItem(event: ServerboundUseItemPacketEvent) {
-        val player = event.player
-        val item = player.inventory.getItem(event.hand.bukkitEquipmentSlot).takeUnlessEmpty()
-        if (item != null)
-            usedItems[player] = item
-        else usedItems -= player
-    }
-    
-    @PacketHandler(priority = EventPriority.HIGHEST, ignoreIfCancelled = true)
-    private fun handleAction(event: ServerboundPlayerActionPacketEvent) {
-        if (event.action == ServerboundPlayerActionPacket.Action.RELEASE_USE_ITEM) {
-            val player = event.player
-            val item = usedItems[player]
-            item?.novaItem?.handleRelease(player, item, event)
-        }
     }
     
 }

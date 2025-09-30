@@ -45,7 +45,6 @@ import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.apache.commons.lang3.math.Fraction
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
@@ -71,7 +70,6 @@ import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSl
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
-import xyz.xenondevs.nova.util.component.adventure.isEmpty
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
@@ -85,14 +83,9 @@ import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
-import java.lang.invoke.MethodHandles
-import java.lang.invoke.MethodType
 import java.util.*
 import com.mojang.datafixers.util.Pair as MojangPair
 import net.minecraft.world.item.ItemStack as MojangStack
-
-private val BUNDLE_CONSTRUCTOR = MethodHandles.privateLookupIn(BundleContents::class.java, MethodHandles.lookup())
-    .findConstructor(BundleContents::class.java, MethodType.methodType(Void.TYPE, List::class.java, Fraction::class.java, Int::class.java))
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
@@ -104,7 +97,6 @@ internal object PacketItems : Listener, PacketListener {
     val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!
     val SERVER_SIDE_ITEM_HOLDER = BuiltInRegistries.ITEM.wrapAsHolder(SERVER_SIDE_ITEM)
     const val SKIP_SERVER_SIDE_TOOLTIP = "NovaSkipPacketItems"
-    private val INVUI_SLOT_KEY = NamespacedKey("nova", "slot")
     
     @InitFun
     private fun init() {
@@ -344,7 +336,7 @@ internal object PacketItems : Listener, PacketListener {
             ?: return getUnknownItem(itemStack, id)
         
         // client-side item stack copy
-        val newItemType = CraftMagicNumbers.getItem(novaItem.vanillaMaterial)
+        val newItemType = CraftMagicNumbers.getItem(novaItem.modifyClientSideItemType(player, itemStack.asBukkitCopy(), novaItem.vanillaMaterial))
         val newItemHolder = BuiltInRegistries.ITEM.wrapAsHolder(newItemType)
         var newItemStack = MojangStack(
             newItemHolder, itemStack.count,
@@ -352,17 +344,14 @@ internal object PacketItems : Listener, PacketListener {
         )
         
         // customization through item behaviors
-        newItemStack = novaItem.modifyClientSideStack(player, itemStack.asBukkitCopy(),newItemStack.asBukkitMirror()).unwrap()
+        newItemStack = novaItem.modifyClientSideStack(player, itemStack.asBukkitCopy(), newItemStack.asBukkitMirror()).unwrap()
         
-        if (shouldHideEntireTooltip(itemStack)) {
-            newItemStack.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(true, linkedSetOf()))
-        } else { // generate tooltip server-side and apply as lore
-            // we do not want data component modifications done by item behaviors in modifyClientSideStack
-            // to be reflected in the tooltip, except for the item lore itself
-            val itemStackToGenerateTooltipOf = itemStack.copy()
-            itemStackToGenerateTooltipOf.set(DataComponents.LORE, newItemStack.get(DataComponents.LORE))
-            applyServerSideTooltip(newItemStack, generateNovaTooltipLore(player, novaItem, itemStack.novaCompound?.keys?.size ?: 0, itemStackToGenerateTooltipOf))
-        }
+        // generate tooltip server-side and apply as lore
+        // we do not want data component modifications done by item behaviors in modifyClientSideStack
+        // to be reflected in the tooltip, except for the item lore itself
+        val itemStackToGenerateTooltipOf = itemStack.copy()
+        itemStackToGenerateTooltipOf.set(DataComponents.LORE, newItemStack.get(DataComponents.LORE))
+        applyServerSideTooltip(newItemStack, generateNovaTooltipLore(player, novaItem, itemStack.novaCompound?.keys?.size ?: 0, itemStackToGenerateTooltipOf))
         
         // save server-side nbt data (for creative mode)
         // this also drops existing custom data, which is ignored by the client anyway
@@ -461,10 +450,7 @@ internal object PacketItems : Listener, PacketListener {
         if (fixBundleContents(player, newItemStack))
             modified = true
         
-        if (shouldHideEntireTooltip(itemStack)) {
-            newItemStack.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(true, linkedSetOf()))
-            modified = true
-        } else if (itemStack.unsafeCustomData?.contains(SKIP_SERVER_SIDE_TOOLTIP) != true) {
+        if (itemStack.unsafeCustomData?.contains(SKIP_SERVER_SIDE_TOOLTIP) != true) {
             val isAdvanced = player?.let(AdvancedTooltips::hasVanillaTooltips) == true
             if (isAdvanced || modified) { // server-side tooltip is only required if the server-side stack differs from the client-side stack
                 applyServerSideTooltip(newItemStack, generateTooltipLore(player, isAdvanced, itemStack))
@@ -512,11 +498,11 @@ internal object PacketItems : Listener, PacketListener {
             return false
         
         itemStack.update(DataComponents.BUNDLE_CONTENTS) { bundleContents ->
-            BUNDLE_CONSTRUCTOR.invoke(
+            BundleContents(
                 bundleContents.items().map { getClientSideStack(player, it, false) },
                 Fraction.getFraction(0.0),
                 bundleContents.selectedItem
-            ) as BundleContents
+            )
         }
         
         return true
@@ -551,14 +537,8 @@ internal object PacketItems : Listener, PacketListener {
     private fun disableClientSideTooltip(itemStack: MojangStack) {
         itemStack.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay(
             itemStack.get(DataComponents.TOOLTIP_DISPLAY)?.hideTooltip == true,
-            BuiltInRegistries.DATA_COMPONENT_TYPE.filterTo(LinkedHashSet()) { it != DataComponents.BUNDLE_CONTENTS  && it != DataComponents.LORE}
+            BuiltInRegistries.DATA_COMPONENT_TYPE.filterTo(LinkedHashSet()) { it != DataComponents.BUNDLE_CONTENTS && it != DataComponents.LORE }
         ))
-    }
-    
-    private fun shouldHideEntireTooltip(itemStack: MojangStack): Boolean {
-        // all items in InvUI guis have a "slot" tag in the pdc
-        // the goal here is to hide the tooltip of all gui items with no name
-        return itemStack.asBukkitMirror().persistentDataContainer.has(INVUI_SLOT_KEY) && itemStack.hoverName.isEmpty()
     }
     //</editor-fold>
     //</editor-fold>

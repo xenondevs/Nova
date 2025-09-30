@@ -11,7 +11,7 @@ internal abstract class BackingStateConfig internal constructor() {
     abstract val type: BackingStateConfigType<*>
     abstract val id: Int
     abstract val waterlogged: Boolean
-    abstract val variantString: String
+    abstract val variantMap: Map<String, String>
     abstract val vanillaBlockState: BlockState
     
     override fun equals(other: Any?): Boolean {

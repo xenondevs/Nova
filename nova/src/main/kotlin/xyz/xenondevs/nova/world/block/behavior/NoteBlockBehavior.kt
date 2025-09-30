@@ -42,6 +42,9 @@ private val PITCH_TABLE: FloatArray = floatArrayOf(
 internal object NoteBlockBehavior : BlockBehavior {
     
     override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
+        if (ctx[DefaultContextParamTypes.SOURCE_PLAYER]?.isSneaking == true)
+            return false
+        
         val clickedFace = ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]
         val item = ctx[DefaultContextParamTypes.INTERACTION_ITEM_STACK]
         

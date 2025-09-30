@@ -14,7 +14,7 @@ internal abstract class SidedBackingStateConfig(val faces: Set<BlockFace>, block
     
     override val id = getIdOf(faces)
     override val waterlogged = false
-    override val variantString = POSSIBLE_FACES.joinToString(",") { "${it.name.lowercase()}=${it in faces}" }
+    override val variantMap = POSSIBLE_FACES.associate { it.name.lowercase() to (it in faces).toString() }
     override val vanillaBlockState: BlockState = block.defaultBlockState()
         .setValue(BlockStateProperties.NORTH, BlockFace.NORTH in faces)
         .setValue(BlockStateProperties.EAST, BlockFace.EAST in faces)

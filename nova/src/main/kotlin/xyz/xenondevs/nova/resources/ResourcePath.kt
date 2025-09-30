@@ -31,7 +31,7 @@ class ResourcePath<out T : ResourceType>(val type: T, val namespace: String, val
     
     init {
         require(isValidNamespace(namespace)) { "Non [a-z0-9_.-] character in $namespace" }
-        require(isValidPath(path)) { "Non [a-z0-9_.-/] character in $path" }
+        require(isValidPath(path)) { "Non [a-z0-9_./-] character in $path" }
     }
     
     /**
@@ -192,6 +192,15 @@ sealed interface ResourceType {
     }
     
     /**
+     * Block state definitions
+     * 
+     * path: `blockstates/`, extension: `json`
+     */
+    data object BlockStateDefinition : JsonFile {
+        override val prefix = "blockstates"
+    }
+    
+    /**
      * Generic Item- and block models
      *
      * path: `models/`, extension: `json`
@@ -283,7 +292,7 @@ sealed interface ResourceType {
     /**
      * Resources that represent entity textures.
      */
-    interface EquipmentTexture : PngFile
+    sealed interface EquipmentTexture : PngFile
     
     /**
      * Humanoid equipment textures
@@ -408,6 +417,16 @@ sealed interface ResourceType {
     @Serializable
     data object ParticleDefinition : JsonFile {
         override val prefix = "particles"
+    }
+    
+    /**
+     * Language files
+     * 
+     * path: `lang/`, extension: `json`
+     */
+    @Serializable
+    data object Lang : JsonFile {
+        override val prefix = "lang"
     }
     
 }

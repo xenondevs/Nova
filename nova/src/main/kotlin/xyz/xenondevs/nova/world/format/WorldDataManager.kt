@@ -161,6 +161,9 @@ object WorldDataManager : Listener {
     internal suspend fun getOrLoadChunk(pos: ChunkPos): RegionChunk =
         getOrLoadRegion(pos).getChunk(pos)
     
+    internal fun getOrLoadChunkBlocking(pos: ChunkPos): RegionChunk =
+        runBlocking { getOrLoadChunk(pos) }
+    
     internal fun getChunkOrThrow(pos: ChunkPos): RegionChunk =
         getWorldStorage(pos.world!!).blockStorage.getRegionizedChunkOrThrow(pos)
     

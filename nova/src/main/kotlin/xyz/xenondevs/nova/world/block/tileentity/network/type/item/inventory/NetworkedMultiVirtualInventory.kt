@@ -3,6 +3,7 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory
 
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.invui.inventory.OperationCategory
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
@@ -19,7 +20,7 @@ internal class NetworkedMultiVirtualInventory(
     
     val inventories: Map<VirtualInventory, NetworkConnectionType> =
         inventories.entries
-            .sortedBy { (inv, _) -> inv.guiPriority }
+            .sortedBy { (inv, _) -> inv.getGuiPriority(OperationCategory.ADD) }
             .associate { it.toPair() }
     
     private val inventoryBySlot: Array<VirtualInventory>
@@ -31,7 +32,6 @@ internal class NetworkedMultiVirtualInventory(
         
         var slot = 0
         for (inventory in this.inventories.keys) {
-            inventory.addResizeHandler { _, _ -> throw UnsupportedOperationException("Networked inventories cannot be resized") }
             for (invSlot in 0..<inventory.size) {
                 inventoryBySlot[slot] = inventory
                 invSlotBySlot[slot] = invSlot

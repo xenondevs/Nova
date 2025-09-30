@@ -17,7 +17,7 @@ import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
-import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.resources.builder.task.ModelContent
 import xyz.xenondevs.nova.ui.menu.Canvas
 import java.awt.Color
 
@@ -261,7 +261,7 @@ sealed class ItemModelCreationScope<S : ModelSelectorScope>(
                 )
             )
         )
-        val parentModelId = resourcePackBuilder.getHolder<ModelContent>().getOrPutGenerated(parentModel)
+        val parentModelId = resourcePackBuilder.getBuildData<ModelContent>().getOrPutGenerated(parentModel)
         
         fallback = empty()
         case[DisplayContext.GUI] = composite {

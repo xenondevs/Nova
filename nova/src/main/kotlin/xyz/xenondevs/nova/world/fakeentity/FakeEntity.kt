@@ -4,15 +4,16 @@ import io.netty.buffer.Unpooled
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.world.entity.Entity.ENTITY_COUNTER
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.network.PacketIdRegistry
 import xyz.xenondevs.nova.network.send
-import xyz.xenondevs.nova.util.NMSUtils
 import xyz.xenondevs.nova.util.RegistryFriendlyByteBuf
 import xyz.xenondevs.nova.util.fromFixedPoint
 import xyz.xenondevs.nova.util.positionEquals
@@ -38,7 +39,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     val viewers: Set<Player>
         get() = _viewers
     
-    val entityId = NMSUtils.ENTITY_COUNTER.incrementAndGet()
+    val entityId = ENTITY_COUNTER.incrementAndGet()
     private val uuid = UUID.randomUUID()
     
     private var spawnBuf: FriendlyByteBuf? = null
@@ -241,13 +242,11 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
         buf.writeDouble(location.x)
         buf.writeDouble(location.y)
         buf.writeDouble(location.z)
+        buf.writeLpVec3(Vec3.ZERO)
         buf.writeByte(location.pitch.toPackedByte().toInt())
         buf.writeByte(packedYaw)
         buf.writeByte(packedYaw)
         buf.writeVarInt(0)
-        buf.writeShort(0)
-        buf.writeShort(0)
-        buf.writeShort(0)
         
         return buf
     }

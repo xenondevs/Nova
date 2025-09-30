@@ -4,7 +4,7 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.ShadowColor
-import xyz.xenondevs.nova.resources.builder.task.font.FontChar
+import xyz.xenondevs.nova.resources.builder.task.FontChar
 import xyz.xenondevs.nova.ui.overlay.bossbar.BossBarOverlay
 import xyz.xenondevs.nova.util.component.adventure.append
 import xyz.xenondevs.nova.util.component.adventure.font

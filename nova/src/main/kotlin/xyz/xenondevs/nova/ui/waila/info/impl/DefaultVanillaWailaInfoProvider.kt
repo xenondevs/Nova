@@ -86,8 +86,9 @@ object DefaultVanillaWailaInfoProvider : VanillaWailaInfoProvider<BlockData>(nul
             
             // torch
             Material.WALL_TORCH -> Material.TORCH
-            Material.REDSTONE_WALL_TORCH -> Material.TORCH
-            Material.SOUL_WALL_TORCH -> Material.TORCH
+            Material.REDSTONE_WALL_TORCH -> Material.REDSTONE_TORCH
+            Material.SOUL_WALL_TORCH -> Material.SOUL_TORCH
+            Material.COPPER_WALL_TORCH -> Material.COPPER_TORCH
             
             // head / skull
             Material.ZOMBIE_WALL_HEAD -> Material.ZOMBIE_HEAD

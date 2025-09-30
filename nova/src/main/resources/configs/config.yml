@@ -23,15 +23,13 @@ resource_pack:
   # Settings affecting how the resource pack is generated.
   generation:
     # The resource pack description.
-    description: Nova (%s asset pack(s), %s base pack(s))
+    description: "Nova (%s)"
     # Resource packs that should be merged with Nova's resource pack.
     # More information about base packs can be found in our documentation: https://xenondevs.xyz/docs/nova/admin/setup/#optional-resourcepack-merging
     # Files in plugins/Nova/resource_pack/base_packs/ do NOT need to be listed here, they are included automatically.
     base_packs: [ ]
     # The zip compression level, ranging from 0 (no compression) to 9 (best compression) or -1 for default.
     compression_level: -1
-    # If the generation process should take place entirely in memory. This increases memory usage during pack generation but improves generation speed.
-    in_memory: true
     # Settings regarding the generation of font files.
     font:
       # A list of fonts that should not have moved versions generated.
@@ -73,9 +71,6 @@ overlay:
     enabled: true
     # How many invisible boss bar should be sent to the player.
     amount: 20
-    # If the boss bars should be sent after the player confirms that the server resource pack has been loaded.
-    # !!! THIS WILL CAUSE ISSUES IF YOU'RE NOT USING NOVA'S FORCED RESOURCE PACK !!!
-    send_bars_after_resource_pack_loaded: false
     # A list of colors for which the boss bar should not be rendered.
     # Possible colors: pink, blue, red, green, yellow, purple, white
     invisible_colors: [ ]

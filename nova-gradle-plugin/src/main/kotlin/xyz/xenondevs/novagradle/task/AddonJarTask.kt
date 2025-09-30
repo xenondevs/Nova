@@ -21,6 +21,7 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import xyz.xenondevs.bytebase.asm.buildInsnList
 import xyz.xenondevs.bytebase.util.MethodNode
 import xyz.xenondevs.bytebase.util.insertBeforeEvery
+import xyz.xenondevs.novagradle.Versions
 import xyz.xenondevs.novagradle.util.TaskUtils
 import java.nio.file.FileSystems
 import java.nio.file.Path
@@ -36,6 +37,7 @@ import kotlin.io.path.writeBytes
 
 private const val PAPER_PLUGIN_YML = "paper-plugin.yml"
 private const val NOVA_ADDON_YML = "nova-addon.yml"
+private const val ORIGAMI_MARKER = "origami.json"
 private const val JAVA_PLUGIN_NAME = "xyz.xenondevs.addonloader.JavaPlugin"
 private const val BOOTSTRAPPER_NAME = "xyz.xenondevs.addonloader.Bootstrapper"
 private const val PLUGIN_LOADER_NAME = "xyz.xenondevs.addonloader.PluginLoader"
@@ -95,6 +97,9 @@ abstract class AddonJarTask : DefaultTask() {
     @get:InputFile
     abstract val input: RegularFileProperty
     
+    @get:InputFile
+    abstract val origamiMarker: RegularFileProperty
+    
     @get:OutputFile
     abstract val output: RegularFileProperty
     
@@ -113,6 +118,7 @@ abstract class AddonJarTask : DefaultTask() {
             
             writePaperPluginYml(apiVersion, root.resolve(PAPER_PLUGIN_YML))
             writeNovaAddonYml(novaVersion, root.resolve(NOVA_ADDON_YML))
+            writeOrigamiMarker(root.resolve(ORIGAMI_MARKER))
             generateBootstrapper(root.resolve(bootstrapper.getOrElse(BOOTSTRAPPER_NAME).replace('.', '/') + ".class"))
             if (!pluginMain.isPresent)
                 generateJavaPlugin(root.resolve(JAVA_PLUGIN_FILE_PATH))
@@ -173,6 +179,10 @@ abstract class AddonJarTask : DefaultTask() {
         addonYml.node("nova_version").set(novaVersion)
         
         addonYmlLoader.save(addonYml)
+    }
+    
+    private fun writeOrigamiMarker(path: Path) {
+        origamiMarker.asFile.get().toPath().copyTo(path, true)
     }
     
     private fun generateJavaPlugin(path: Path) {

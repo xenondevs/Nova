@@ -8,9 +8,8 @@ jgrapht = "1.5.2"
 kotlin = "2.2.10"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.2.3"
-paper = "1.21.8-R0.1-SNAPSHOT"
-paperweight = "2.0.0-beta.17"
-xenondevs-commons = "1.32"
+paper = "1.21.9-R0.1-SNAPSHOT"
+xenondevs-commons = "1.34"
 
 [libraries]
 awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.33.0" }
@@ -21,7 +20,7 @@ caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version
 commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "xenondevs-commons" }
 commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "xenondevs-commons" }
 commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "xenondevs-commons" }
-commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version = "2.0.0-alpha.4" }
+commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version = "2.0.0-alpha.7" }
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "xenondevs-commons" }
 commons-version = { group = "xyz.xenondevs.commons", name = "commons-version", version.ref = "xenondevs-commons" }
 configurate-yaml = { group = "org.spongepowered", name = "configurate-yaml", version = "4.2.0" }
@@ -30,7 +29,7 @@ dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" 
 dokka-core = { module = "org.jetbrains.dokka:dokka-core", version.ref = "dokka" }
 dokka-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 fuzzywuzzy = { group = "me.xdrop", name = "fuzzywuzzy", version = "1.4.0" }
-invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version = "2.0.0-alpha.15" }
+invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version = "2.0.0-alpha.20" }
 jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jgrapht" }
 jgrapht-io = { group = "org.jgrapht", name = "jgrapht-io", version.ref = "jgrapht" }
 jimfs = { group = "com.google.jimfs", name = "jimfs", version = "1.3.1" }
@@ -52,10 +51,9 @@ ktor-serialization-gson-jvm = { group = "io.ktor", name = "ktor-serialization-gs
 ktor-server-cio-jvm = { group = "io.ktor", name = "ktor-server-cio-jvm", version.ref = "ktor" }
 ktor-server-core-jvm = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor" }
 lz4 = { group = "org.lz4", name = "lz4-java", version = "1.8.0" }
-minecraft-asset-downloader = { group = "xyz.xenondevs", name = "minecraft-asset-downloader", version = "1.4" }
+minecraft-asset-downloader = { group = "xyz.xenondevs", name = "minecraft-asset-downloader", version = "1.5" }
 minecraft-model-renderer = { group = "xyz.xenondevs", name = "minecraft-model-renderer", version = "1.3" }
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
-paperweight-userdev-plugin = { module = "io.papermc.paperweight:paperweight-userdev", version.ref = "paperweight" }
 snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version = "2.10" }
 zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.7-4" }
 

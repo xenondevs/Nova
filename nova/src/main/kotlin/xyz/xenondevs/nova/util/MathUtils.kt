@@ -1,7 +1,11 @@
 package xyz.xenondevs.nova.util
 
 import org.joml.Vector3d
+import org.joml.Vector3dc
+import org.joml.Vector4dc
+import xyz.xenondevs.nova.resources.builder.model.Model
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.round
@@ -67,6 +71,54 @@ internal fun AtomicInteger.decrementIfGreaterThanZero(): Boolean {
     }
 }
 
+/**
+ * Rotates [this][Vector3d] by [angleRad] radians around [axis].
+ */
+internal fun Vector3d.rotate(axis: Model.Axis, angleRad: Double): Vector3d =
+    when (axis) {
+        Model.Axis.X -> rotateX(angleRad)
+        Model.Axis.Y -> rotateY(angleRad)
+        Model.Axis.Z -> rotateZ(angleRad)
+    }
+
+/**
+ * Sets [this][Vector3d] component at [axis] to [value].
+ */
+internal fun Vector3d.set(axis: Model.Axis, value: Double): Vector3d =
+    setComponent(axis.ordinal, value)
+
+/**
+ * Gets the component of [this][Vector3d] at [axis].
+ */
+internal fun Vector3dc.get(axis: Model.Axis): Double =
+    get(axis.ordinal)
+
+/**
+ * Gets the first axis of [this][Vector3d] whose value is larger than 1e-6.
+ */
+internal fun Vector3dc.firstNonZeroAxis(): Model.Axis? =
+    Model.Axis.entries.firstOrNull { axis -> abs(get(axis)) > 1e-6 }
+
+/**
+ * Returns the [Vector4dc.x] component of [this][Vector4dc].
+ */
+internal operator fun Vector4dc.component1(): Double = x()
+
+/**
+ * Returns the [Vector4dc.y] component of [this][Vector4dc].
+ */
+internal operator fun Vector4dc.component2(): Double = y()
+
+/**
+ * Returns the [Vector4dc.z] component of [this][Vector4dc].
+ */
+internal operator fun Vector4dc.component3(): Double = z()
+
+/**
+ * Returns the [Vector4dc.w] component of [this][Vector4dc].
+ */
+internal operator fun Vector4dc.component4(): Double = w()
+
 internal object MathUtils {
     
     /**
@@ -77,7 +129,7 @@ internal object MathUtils {
         var a = a
         var b = b
         while (b > 0) {
-            var temp = b
+            val temp = b
             b = a % b
             a = temp
         }
@@ -110,10 +162,16 @@ internal object MathUtils {
         return gcd
     }
     
+    /**
+     * Returns the greatest common divisor of all numbers in [numbers].
+     */
     fun gcd(numbers: Iterable<Int>): Int {
         return gcd(numbers.iterator())
     }
     
+    /**
+     * Returns the greatest common divisor of all numbers in [numbers].
+     */
     fun gcd(numbers: Sequence<Int>): Int {
         return gcd(numbers.iterator())
     }
@@ -136,6 +194,10 @@ internal object MathUtils {
         return lcm
     }
     
+    /**
+     * Encodes [array] as an [Int] by treating each element as a bit,
+     * where the first element is the least significant bit.
+     */
     fun convertBooleanArrayToInt(array: BooleanArray): Int {
         var i = 0
         for (element in array) {

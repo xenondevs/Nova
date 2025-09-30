@@ -1,16 +1,32 @@
 package xyz.xenondevs.nova.resources.upload
 
 import org.spongepowered.configurate.ConfigurationNode
-import java.nio.file.Path
+import java.util.*
 
-interface UploadService {
+/**
+ * Uploads resource packs to somewhere and returns an HTTP download url.
+ */
+internal interface UploadService {
     
-    val names: List<String>
+    /**
+     * The names this upload service is identified by.
+     */
+    val names: Set<String>
     
-    fun loadConfig(cfg: ConfigurationNode)
+    /**
+     * Enables this upload service based on the provided configuration [cfg].
+     */
+    suspend fun enable(cfg: ConfigurationNode)
     
-    suspend fun upload(file: Path): String
+    /**
+     * Disables this upload service.
+     */
+    suspend fun disable()
     
-    fun disable()
+    /**
+     * Uploads a resource pack with the given [id] and binary data [bin],
+     * then returns an HTTP download url.
+     */
+    suspend fun upload(id: UUID, bin: ByteArray): String
     
 }

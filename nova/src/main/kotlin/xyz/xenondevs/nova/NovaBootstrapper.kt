@@ -18,15 +18,15 @@ import xyz.xenondevs.commons.version.Version
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
-import xyz.xenondevs.nova.patch.Patcher
 import xyz.xenondevs.nova.serialization.cbf.CbfSerializers
 import xyz.xenondevs.nova.util.SERVER_VERSION
 import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.exists
+import kotlin.io.path.invariantSeparatorsPathString
 
-private val REQUIRED_SERVER_VERSION: ClosedVersionRange = Version("1.21.7")..Version("1.21.8")
+private val REQUIRED_SERVER_VERSION: ClosedVersionRange = Version("1.21.9")..Version("1.21.9")
 internal val IS_DEV_SERVER: Boolean = System.getProperty("NovaDev") != null
 internal val PREVIOUS_NOVA_VERSION: Version? = PermanentStorage.retrieve<Version>("last_version")
 internal val DATA_FOLDER = Path("plugins", "Nova")
@@ -58,17 +58,24 @@ internal class NovaBootstrapper : PluginBootstrap {
         if (IS_DEV_SERVER)
             LOGGER.warn("Running in dev mode! Never use this on a production server!")
         
+        // origami agent is required for mixins
+        if (System.getProperty("origami.agent.loaded") != "true")
+            error("Missing required JVM argument: -javaagent:${context.pluginSource.invariantSeparatorsPathString}")
+        
         // prevent execution on unsupported minecraft versions
-        if (SERVER_VERSION !in REQUIRED_SERVER_VERSION) {
-            throw Exception("Nova is not compatible with this version of Minecraft.\n" +
-                "Nova v$NOVA_VERSION only runs on $REQUIRED_SERVER_VERSION.")
-        }
+        if (SERVER_VERSION !in REQUIRED_SERVER_VERSION)
+            error("""
+                Nova is not compatible with this version of Minecraft
+                Nova v$NOVA_VERSION only runs on $REQUIRED_SERVER_VERSION
+            """.trimIndent())
+        
         
         // prevent execution if the previously installed version is not compatible with this version
-        if (PREVIOUS_NOVA_VERSION != null && PREVIOUS_NOVA_VERSION < Version("0.9")) {
-            throw Exception("This version of Nova is not compatible with the version that was previously installed.\n" +
-                "Please erase all data related to Nova and try again.")
-        }
+        if (PREVIOUS_NOVA_VERSION != null && PREVIOUS_NOVA_VERSION < Version("0.9"))
+            error("""
+                This version of Nova is not compatible with the version that was previously installed.
+                Please erase all data related to Nova and try again.
+            """.trimIndent())
         
         // count addons
         remainingAddons = LaunchEntryPointHandler.INSTANCE.storage.asSequence()
@@ -100,17 +107,26 @@ internal class NovaBootstrapper : PluginBootstrap {
                 DebugProbes.enableCreationStackTraces = true
             }
             
-            Patcher.run()
             Configs.extractDefaultConfig()
             CbfSerializers.register()
             Initializer.start()
         } catch (t: Throwable) {
-            LOGGER.error("", t)
-            (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
-            Runtime.getRuntime().halt(-1) // force-quit
+            error("", t)
         }
     }
     
     override fun createPlugin(context: PluginProviderContext): JavaPlugin = Nova
+    
+    private fun error(msg: String, throwable: Throwable? = null): Nothing {
+        if (throwable != null) {
+            LOGGER.error(msg, throwable)
+        } else {
+            LOGGER.error(msg)
+        }
+        (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
+        Runtime.getRuntime().halt(-1) // force-quit without running shutdown hooks
+        
+        throw AssertionError() // unreachable, for Nothing return type
+    }
     
 }

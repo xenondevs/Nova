@@ -1,0 +1,34 @@
+{
+	"textures": {
+		"particle": "#torch"
+	},
+	"elements": [
+		{
+			"from": [7, 3.5, 15],
+			"to": [9, 13.5, 17],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 3.5, 16]},
+			"faces": {
+				"up": {"uv": [7, 6, 9, 8], "rotation": 270, "texture": "#torch"},
+				"down": {"uv": [7, 13, 9, 15], "rotation": 90, "texture": "#torch"}
+			}
+		},
+		{
+			"from": [0, 3.5, 15],
+			"to": [16, 19.5, 17],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 3.5, 16]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#torch"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#torch"}
+			}
+		},
+		{
+			"from": [7, 3.5, 8],
+			"to": [9, 19.5, 24],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 3.5, 16]},
+			"faces": {
+				"east": {"uv": [0, 0, 16, 16], "texture": "#torch"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#torch"}
+			}
+		}
+	]
+}

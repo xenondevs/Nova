@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.resources.builder.model.Model.Direction
 import xyz.xenondevs.nova.resources.builder.model.Model.Element
 import xyz.xenondevs.nova.resources.builder.model.Model.Element.Face
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
-import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.resources.builder.task.ModelContent
 import xyz.xenondevs.nova.world.item.NovaItem
 
 @RegistryElementBuilderDsl
@@ -92,9 +92,6 @@ class ItemModelSelectorScope internal constructor(
      * Using [display], additional transformations can be applied.
      */
     fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: ResourcePath<ResourceType.Model>, display: Model.Display.Entry? = null): ModelBuilder {
-        if (!background && !stretched && display == null)
-            return createLayeredModel(*layers)
-        
         val elements = ArrayList<Element>()
         if (background) {
             elements += Element(
@@ -127,7 +124,7 @@ class ItemModelSelectorScope internal constructor(
         val parent = Model(
             ResourcePath(ResourceType.Model, "nova", "item/gui_item"),
             elements = elements,
-            display = display?.let { Model.Display(gui = it) }
+            display = Model.Display(gui = display)
         )
         val parentId = modelContent.getOrPutGenerated(parent)
         

@@ -14,6 +14,7 @@ object VanillaToolTiers {
     val WOOD = register("wood")
     val GOLD = register("gold")
     val STONE = register("stone")
+    val COPPER = register("copper")
     val IRON = register("iron")
     val DIAMOND = register("diamond")
     val NETHERITE = register("netherite")

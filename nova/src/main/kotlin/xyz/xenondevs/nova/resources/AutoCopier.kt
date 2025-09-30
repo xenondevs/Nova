@@ -1,35 +1,34 @@
 package xyz.xenondevs.nova.resources
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
-import java.nio.file.Path
 import kotlin.io.path.Path
-import kotlin.io.path.copyTo
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.isDirectory
-import kotlin.io.path.name
-import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.writeBytes
 
 internal object AutoCopier {
     
     private val copyDestinations: List<String> by MAIN_CONFIG.entry("resource_pack", "auto_copy")
     
-    fun copyToDestinations(file: Path) {
+    suspend fun copyToDestinations(id: Key, bin: ByteArray) = withContext(Dispatchers.IO) {
+        val sanitizedName = id.toString().replace(Regex("[:/]]"), "_")
         for (destination in copyDestinations) {
             try {
                 if (Path(destination).isDirectory()) {
-                    file.copyTo(
-                        Path(destination, file.name),
-                        overwrite = true
-                    )
+                    val destPath = Path(destination, "$sanitizedName.zip")
+                    destPath.writeBytes(bin)
                 } else {
-                    val destPath = Path(destination.format(file.nameWithoutExtension))
+                    val destPath = Path(destination.format(sanitizedName))
                     destPath.createParentDirectories()
-                    file.copyTo(destPath, overwrite = true)
+                    destPath.writeBytes(bin)
                 }
             } catch(e: Exception) {
-                LOGGER.warn("Failed to copy resource pack file '${file.name}' to destination '$destination'.", e)
+                LOGGER.warn("Failed to copy resource pack file '$id' to destination '$destination'.", e)
             }
         }
     }

@@ -13,6 +13,7 @@ import net.minecraft.world.item.component.CustomData
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
@@ -32,12 +33,12 @@ import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.Configs
-import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
-import xyz.xenondevs.nova.resources.builder.task.model.VanillaMaterialTypes
+import xyz.xenondevs.nova.resources.builder.task.VanillaMaterialTypes
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.unwrap
@@ -63,7 +64,7 @@ class NovaItem internal constructor(
     val style: Style,
     behaviorHolders: List<ItemBehaviorHolder>,
     val maxStackSize: Int,
-    private val _craftingRemainingItem: ItemStack?,
+    private val _craftingRemainingItem: Key?,
     val isHidden: Boolean,
     val block: NovaBlock?,
     configId: String,
@@ -79,10 +80,10 @@ class NovaItem internal constructor(
     
     /**
      * The [ItemStack] that is left over after this [NovaItem] was
-     * used in a crafting recipe.
+     * used in a crafting recipe, or an empty stack if there is no remainder.
      */
-    val craftingRemainingItem: ItemStack?
-        get() = _craftingRemainingItem?.clone()
+    val craftingRemainingItem: ItemStack
+        get() = _craftingRemainingItem?.let(ItemUtils::getItemStack) ?: ItemStack.empty()
     
     /**
      * The [ItemBehaviors][ItemBehavior] of this [NovaItem].
@@ -185,6 +186,12 @@ class NovaItem internal constructor(
         behaviors.any { type.isSuperclassOf(it::class) }
     
     /**
+     * Checks whether this [NovaItem] has an [ItemBehavior] of the specified class [type], or a subclass of it.
+     */
+    fun <T : Any> hasBehavior(type: Class<T>): Boolean =
+        behaviors.any { type.isAssignableFrom(it::class.java) }
+    
+    /**
      * Checks whether this [NovaItem] has the specific [behavior] instance.
      */
     fun hasBehavior(behavior: ItemBehavior): Boolean =
@@ -203,6 +210,12 @@ class NovaItem internal constructor(
         behaviors.firstOrNull { type.isSuperclassOf(it::class) } as T?
     
     /**
+     * Gets the first [ItemBehavior] that is an instance of [type] or a subclass, or null if there is none.
+     */
+    fun <T : Any> getBehaviorOrNull(type: Class<T>): T? =
+        behaviors.firstOrNull { type.isAssignableFrom(it::class.java) } as T?
+    
+    /**
      * Gets the first [ItemBehavior] that is an instance of [T], or throws an [IllegalStateException] if there is none.
      */
     inline fun <reified T : Any> getBehavior(): T =
@@ -215,75 +228,224 @@ class NovaItem internal constructor(
         getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
     
     /**
+     * Gets the first [ItemBehavior] that is an instance of [behavior], or throws an [IllegalStateException] if there is none.
+     */
+    fun <T : Any> getBehavior(behavior: Class<T>): T =
+        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
+    
+    //<editor-fold desc="item behavior functionality", defaultstate="collapsed">
+    /**
      * Modifies the block [damage] of this [NovaItem] when using [itemStack] to break [block].
      */
-    internal fun modifyBlockDamage(player: Player, itemStack: ItemStack, block: Block, damage: Double): Double {
-        return behaviors.fold(damage) { currentDamage, behavior -> behavior.modifyBlockDamage(player, itemStack, block, currentDamage) }
+    internal fun modifyBlockDamage(
+        player: Player,
+        itemStack: ItemStack,
+        block: Block,
+        damage: Double
+    ): Double = runSafely("modify block damage", damage) {
+        behaviors.fold(damage) { currentDamage, behavior ->
+            behavior.modifyBlockDamage(player, itemStack, block, currentDamage)
+        }
+    }
+    
+    /**
+     * Modifies the client-side item type of this [NovaItem], in the context that it is sent to [player] and has [server] data.
+     */
+    internal fun modifyClientSideItemType(
+        player: Player?,
+        server: ItemStack,
+        client: Material
+    ): Material = runSafely("modify client-side item type", client) {
+        behaviors.fold(client) { current, behavior -> behavior.modifyClientSideItemType(player, server, current) }
     }
     
     /**
      * Modifies the client-side stack of this [NovaItem], in the context that it is sent to [player] and has [data].
      */
-    internal fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {
-        return behaviors.fold(client) { stack, behavior -> behavior.modifyClientSideStack(player, server, client) }
+    internal fun modifyClientSideStack(
+        player: Player?,
+        server: ItemStack,
+        client: ItemStack
+    ): ItemStack = runSafely("modify client-side stack", client) {
+        behaviors.fold(client) { stack, behavior -> behavior.modifyClientSideStack(player, server, client) }
     }
     
-    //<editor-fold desc="event methods", defaultstate="collapsed">
-    internal fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+    internal fun handleInteract(
+        player: Player,
+        itemStack: ItemStack,
+        action: Action,
+        wrappedEvent: WrappedPlayerInteractEvent
+    ): Unit = runSafely("handle interact") {
         behaviors.forEach { it.handleInteract(player, itemStack, action, wrappedEvent) }
     }
     
-    internal fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
+    internal fun handleEntityInteract(
+        player: Player,
+        itemStack: ItemStack,
+        clicked: Entity,
+        event: PlayerInteractAtEntityEvent
+    ): Unit = runSafely("handle entity interact") {
         behaviors.forEach { it.handleEntityInteract(player, itemStack, clicked, event) }
     }
     
-    internal fun handleAttackEntity(player: Player, itemStack: ItemStack, attacked: Entity, event: EntityDamageByEntityEvent) {
+    internal fun handleAttackEntity(
+        player: Player,
+        itemStack: ItemStack,
+        attacked: Entity,
+        event: EntityDamageByEntityEvent
+    ): Unit = runSafely("handle attack entity") {
         behaviors.forEach { it.handleAttackEntity(player, itemStack, attacked, event) }
     }
     
-    internal fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) {
+    internal fun handleBreakBlock(
+        player: Player,
+        itemStack: ItemStack,
+        event: BlockBreakEvent
+    ): Unit = runSafely("handle break block") {
         behaviors.forEach { it.handleBreakBlock(player, itemStack, event) }
     }
     
-    internal fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
+    internal fun handleDamage(
+        player: Player,
+        itemStack: ItemStack,
+        event: PlayerItemDamageEvent
+    ): Unit = runSafely("handle damage") {
         behaviors.forEach { it.handleDamage(player, itemStack, event) }
     }
     
-    internal fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) {
+    internal fun handleBreak(
+        player: Player,
+        itemStack: ItemStack,
+        event: PlayerItemBreakEvent
+    ): Unit = runSafely("handle break") {
         behaviors.forEach { it.handleBreak(player, itemStack, event) }
     }
     
-    internal fun handleEquip(player: Player, itemStack: ItemStack, slot: EquipmentSlot, equipped: Boolean, event: EntityEquipmentChangedEvent) {
+    internal fun handleEquip(
+        player: Player,
+        itemStack: ItemStack,
+        slot: EquipmentSlot,
+        equipped: Boolean,
+        event: EntityEquipmentChangedEvent
+    ): Unit = runSafely("handle equip") {
         behaviors.forEach { it.handleEquip(player, itemStack, slot, equipped, event) }
     }
     
-    internal fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
+    internal fun handleInventoryClick(
+        player: Player,
+        itemStack: ItemStack,
+        event: InventoryClickEvent
+    ): Unit = runSafely("handle inventory click") {
         behaviors.forEach { it.handleInventoryClick(player, itemStack, event) }
     }
     
-    internal fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
+    internal fun handleInventoryClickOnCursor(
+        player: Player,
+        itemStack: ItemStack,
+        event: InventoryClickEvent
+    ): Unit = runSafely("handle inventory click on cursor") {
         behaviors.forEach { it.handleInventoryClickOnCursor(player, itemStack, event) }
     }
     
-    internal fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
+    internal fun handleInventoryHotbarSwap(
+        player: Player,
+        itemStack: ItemStack,
+        event: InventoryClickEvent
+    ): Unit = runSafely("handle inventory hotbar swap") {
         behaviors.forEach { it.handleInventoryHotbarSwap(player, itemStack, event) }
     }
     
-    internal fun handleBlockBreakAction(player: Player, itemStack: ItemStack, event: BlockBreakActionEvent) {
+    internal fun handleBlockBreakAction(
+        player: Player,
+        itemStack: ItemStack,
+        event: BlockBreakActionEvent
+    ): Unit = runSafely("handle block break action") {
         behaviors.forEach { it.handleBlockBreakAction(player, itemStack, event) }
     }
     
-    internal fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
+    internal fun handleConsume(
+        player: Player,
+        itemStack: ItemStack,
+        event: PlayerItemConsumeEvent
+    ): Unit = runSafely("handle consume") {
         behaviors.forEach { it.handleConsume(player, itemStack, event) }
     }
     
-    internal fun handleRelease(player: Player, itemStack: ItemStack, event: ServerboundPlayerActionPacketEvent) {
-        behaviors.forEach { it.handleRelease(player, itemStack, event) }
-    }
-    
-    internal fun handleInventoryTick(player: Player, itemStack: ItemStack, slot: Int) {
+    internal fun handleInventoryTick(
+        player: Player,
+        itemStack: ItemStack,
+        slot: Int
+    ): Unit = runSafely("handle inventory tick") {
         behaviors.forEach { it.handleInventoryTick(player, itemStack, slot) }
     }
+    
+    internal fun handleEquipmentTick(
+        player: Player,
+        itemStack: ItemStack,
+        slot: EquipmentSlot
+    ): Unit = runSafely("handle equipment tick") {
+        behaviors.forEach { it.handleEquipmentTick(player, itemStack, slot) }
+    }
+    
+    internal fun handleUseTick(
+        entity: LivingEntity,
+        itemStack: ItemStack,
+        hand: EquipmentSlot,
+        passedUseTicks: Int,
+        remainingUseTicks: Int
+    ): Unit = runSafely("handle use tick") {
+        behaviors.forEach { it.handleUseTick(entity, itemStack, hand, remainingUseTicks) }
+    }
+    
+    internal fun handleUseFinished(
+        entity: LivingEntity,
+        itemStack: ItemStack,
+        hand: EquipmentSlot,
+    ) = runSafely("handle use finished") {
+        behaviors.forEach { it.handleUseFinished(entity, itemStack, hand) }
+    }
+    
+    internal fun handleUseStopped(
+        entity: LivingEntity,
+        itemStack: ItemStack,
+        hand: EquipmentSlot,
+        remainingUseTicks: Int
+    ): Unit = runSafely("handle use stopped") {
+        behaviors.forEach { it.handleUseStopped(entity, itemStack, hand, remainingUseTicks) }
+    }
+    
+    internal fun modifyUseRemainder(
+        entity: LivingEntity,
+        original: ItemStack,
+        hand: EquipmentSlot,
+        remainder: ItemStack
+    ): ItemStack = runSafely("modify use remainder", remainder) {
+        behaviors.fold(remainder) { currentRemainder, behavior -> 
+            behavior.modifyUseRemainder(entity, original, hand, currentRemainder)
+        }.clone()
+    }
+    
+    internal fun modifyUseDuration(
+        entity: LivingEntity,
+        itemStack: ItemStack,
+        duration: Int
+    ): Int = runSafely("modify use duration", duration) {
+        behaviors.fold(duration) { currentDuration, behavior ->
+            behavior.modifyUseDuration(entity, itemStack, currentDuration) 
+        }
+    }
+    
+    internal inline fun runSafely(name: String, run: () -> Unit) = runSafely(name, Unit, run)
+    
+    internal inline fun <T> runSafely(name: String, fallback: T, run: () -> T): T {
+        try {
+            return run()
+        } catch (t: Throwable) {
+            LOGGER.error("Failed to $name for $id", t)
+        }
+        return fallback
+    }
+    
     //</editor-fold>
     
     override fun toString() = id.toString()

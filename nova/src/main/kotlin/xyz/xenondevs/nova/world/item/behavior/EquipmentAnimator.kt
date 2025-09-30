@@ -81,7 +81,7 @@ internal object EquipmentAnimator {
         if (updatedEquipment.isNotEmpty()) {
             // update for other players
             val packet = ClientboundSetEquipmentPacket(player.entityId, updatedEquipment)
-            serverPlayer.level().chunkSource.broadcast(serverPlayer, packet)
+            serverPlayer.level().chunkSource.sendToTrackingPlayers(serverPlayer, packet)
         }
     }
     
@@ -101,7 +101,7 @@ internal object EquipmentAnimator {
         
         if (updatedEquipment.isNotEmpty()) {
             val packet = ClientboundSetEquipmentPacket(entity.entityId, updatedEquipment)
-            entity.world.serverLevel.chunkSource.broadcast(entity.nmsEntity, packet)
+            entity.world.serverLevel.chunkSource.sendToTrackingPlayers(entity.nmsEntity, packet)
         }
     }
     

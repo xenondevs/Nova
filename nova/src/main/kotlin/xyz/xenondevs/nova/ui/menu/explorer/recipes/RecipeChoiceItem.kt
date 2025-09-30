@@ -1,6 +1,8 @@
 package xyz.xenondevs.nova.ui.menu.explorer.recipes
 
 import org.bukkit.GameMode
+import org.bukkit.Sound
+import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
@@ -10,7 +12,7 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.item.ItemUtils
-import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.util.playClickSound
 
 fun createRecipeChoiceItem(recipeChoice: RecipeChoice): Item {
     val itemProviders = if (recipeChoice is RecipeChoice.MaterialChoice) recipeChoice.choices.map { ItemWrapper(ItemStack(it)) }
@@ -33,18 +35,24 @@ fun createRecipeChoiceItem(itemProviders: List<ItemProvider>): Item =
 
 internal fun handleRecipeChoiceItemClick(item: Item, click: Click) {
     val player = click.player
-    val clickType = click.clickType
     val itemProvider = item.getItemProvider(player)
-    
     val id = ItemUtils.getId(itemProvider.get())
+    handleRecipeChoiceClick(id, click)
+}
+
+internal fun handleRecipeChoiceClick(id: String, click: Click) {
+    val player = click.player
+    val clickType = click.clickType
+    
     if (clickType == ClickType.LEFT) {
-        player.showRecipes(id)
+        if (player.showRecipes(id))
+            player.playClickSound()
     } else if (clickType == ClickType.RIGHT) {
-        player.showUsages(id)
+        if (player.showUsages(id)) 
+            player.playClickSound()
     } else if (player.gameMode == GameMode.CREATIVE) {
-        val itemStack = itemProvider.get().clone().apply {
-            amount = novaItem?.maxStackSize ?: type.maxStackSize
-        }
+        val itemStack = ItemUtils.getItemStack(id)
+        itemStack.amount = itemStack.maxStackSize
         
         if (clickType == ClickType.MIDDLE) {
             player.setItemOnCursor(itemStack)

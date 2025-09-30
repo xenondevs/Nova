@@ -9,7 +9,8 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 
 internal class GuiTextureLayout(
     val texture: ResourcePath<ResourceType.Texture>,
-    val alignment: GuiTextureAlignment
+    val alignment: GuiTextureAlignment,
+    val hasInventoryLabel: Boolean
 )
 
 @RegistryElementBuilderDsl
@@ -20,6 +21,15 @@ class GuiTextureLayoutBuilder internal constructor(
     
     private var texture: ResourcePath<ResourceType.Texture>? = null
     private var alignment: GuiTextureAlignment? = null
+    private var hasInventoryLabel: Boolean = true
+    
+    /**
+     * Enables or disables the "Inventory" text that is displayed above the player's inventory slots.
+     * Defaults to `true`, meaning the text is shown.
+     */
+    fun inventoryLabel(hasInventoryText: Boolean) {
+        this.hasInventoryLabel = hasInventoryText
+    }
     
     /**
      * Sets the [path] to the gui texture.
@@ -64,7 +74,8 @@ class GuiTextureLayoutBuilder internal constructor(
     internal fun build(): GuiTextureLayout =
         GuiTextureLayout(
             texture ?: throw IllegalStateException("Gui texture path not set"),
-            alignment ?: GuiTextureAlignment.ChestDefault
+            alignment ?: GuiTextureAlignment.TopLeft(),
+            hasInventoryLabel
         )
     
 }

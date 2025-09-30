@@ -2,13 +2,16 @@ package xyz.xenondevs.nova.resources.builder.model.transform
 
 import org.joml.Matrix4d
 import xyz.xenondevs.nova.resources.builder.model.Model
-import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.resources.builder.task.ModelContent
 
 /**
  * Something that can be applied to a model to modify it.
  */
 internal sealed interface BuildAction
 
+/**
+ * A [BuildAction] that requires a [ModelContent] context.
+ */
 internal sealed interface ContextualModelBuildAction : BuildAction {
     
     /**
@@ -18,6 +21,9 @@ internal sealed interface ContextualModelBuildAction : BuildAction {
     
 }
 
+/**
+ * A [BuildAction] that does not require a [ModelContent] context.
+ */
 internal sealed interface NonContextualModelBuildAction : BuildAction {
     
     /**

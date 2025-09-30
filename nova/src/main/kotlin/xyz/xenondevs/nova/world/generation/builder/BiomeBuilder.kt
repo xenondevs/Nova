@@ -14,6 +14,8 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.Music
 import net.minecraft.sounds.SoundEvent
+import net.minecraft.util.random.Weighted
+import net.minecraft.util.random.WeightedList
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.level.biome.AmbientAdditionsSettings
@@ -22,6 +24,7 @@ import net.minecraft.world.level.biome.AmbientParticleSettings
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.biome.Biome.ClimateSettings
 import net.minecraft.world.level.biome.Biome.TemperatureModifier
+import net.minecraft.world.level.biome.BiomeGenerationSettings
 import net.minecraft.world.level.biome.BiomeSpecialEffects
 import net.minecraft.world.level.biome.BiomeSpecialEffects.GrassColorModifier
 import net.minecraft.world.level.biome.MobSpawnSettings
@@ -35,10 +38,6 @@ import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.util.lookupGetterOrThrow
 import xyz.xenondevs.nova.util.particle.ParticleBuilder
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_CLIMATE_SETTINGS_CONSTRUCTOR
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_CONSTRUCTOR
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.BIOME_GENERATION_SETTINGS_CONSTRUCTOR
-import xyz.xenondevs.nova.util.reflection.ReflectionRegistry.MOB_SPAWN_SETTINGS_CONSTRUCTOR
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.FeatureType
 import java.awt.Color
@@ -151,9 +150,9 @@ class BiomeBuilder internal constructor(
     override fun build(): Biome {
         val climateSettings = this.climateSettings ?: BiomeClimateSettingsBuilder().build()
         val specialEffects = this.specialEffects ?: BiomeSpecialEffectsBuilder(lookup).build()
-        val generationSettings = BIOME_GENERATION_SETTINGS_CONSTRUCTOR.newInstance(HolderSet.direct(carvers), features.map { HolderSet.direct(it) })
+        val generationSettings = BiomeGenerationSettings(HolderSet.direct(carvers), features.map { HolderSet.direct(it) })
         val mobSpawnSettings = this.mobSpawnSettings ?: MobSpawnSettings.EMPTY
-        return BIOME_CONSTRUCTOR.newInstance(climateSettings, specialEffects, generationSettings, mobSpawnSettings)
+        return Biome(climateSettings, specialEffects, generationSettings, mobSpawnSettings)
     }
     
 }
@@ -215,7 +214,7 @@ class BiomeClimateSettingsBuilder internal constructor() {
      * Builds a [ClimateSettings] instance from the current state of this builder.
      */
     fun build(): ClimateSettings {
-        return BIOME_CLIMATE_SETTINGS_CONSTRUCTOR.newInstance(hasPrecipitation, temperature, temperatureModifier, downfall)
+        return ClimateSettings(hasPrecipitation, temperature, temperatureModifier, downfall)
     }
     
 }
@@ -529,7 +528,7 @@ class BiomeSpecialEffectsBuilder internal constructor(private val lookup: Regist
 class MobSpawnSettingsBuilder internal constructor() {
     
     private var creatureGenerationProbability = 0.1f
-    private val spawners = enumMap<MobCategory, MutableList<SpawnerData>>()
+    private val spawners = enumMap<MobCategory, MutableList<Weighted<SpawnerData>>>()
     private val mobSpawnCosts = mutableMapOf<EntityType<*>, MobSpawnCost>()
     
     /**
@@ -543,8 +542,8 @@ class MobSpawnSettingsBuilder internal constructor() {
     /**
      * Adds a [SpawnerData] to the `spawners` setting of the biome's mob spawn settings.
      */
-    fun addSpawn(mobCategory: MobCategory, spawnerData: SpawnerData) {
-        spawners.getOrPut(mobCategory, ::ArrayList).add(spawnerData)
+    fun addSpawn(mobCategory: MobCategory, spawnerData: SpawnerData) { // TODO: weights
+        spawners.getOrPut(mobCategory, ::ArrayList).add(Weighted(spawnerData, 1))
     }
     
     /**
@@ -572,9 +571,9 @@ class MobSpawnSettingsBuilder internal constructor() {
      * Builds a [MobSpawnSettings] instance from the current state of this builder.
      */
     internal fun build(): MobSpawnSettings {
-        return MOB_SPAWN_SETTINGS_CONSTRUCTOR.newInstance(
+        return MobSpawnSettings(
             creatureGenerationProbability,
-            spawners,
+            spawners.mapValues { (_, v) -> WeightedList.of(v) },
             mobSpawnCosts
         )
     }

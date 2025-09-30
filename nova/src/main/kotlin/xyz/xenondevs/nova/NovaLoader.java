@@ -6,39 +6,31 @@ import io.papermc.paper.plugin.loader.library.impl.JarLibrary;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @SuppressWarnings({"UnstableApiUsage", "unused"})
 @ApiStatus.Internal
 public class NovaLoader implements PluginLoader {
     
+    private static final Path LIBRARIES_DIR = Path.of("libraries/");
+    
     @Override
     public void classloader(@NotNull PluginClasspathBuilder classpathBuilder) {
-        try {
-            var pluginJar = new File(NovaLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            try (var in = new ZipInputStream(new FileInputStream(pluginJar))) {
-                ZipEntry entry;
-                while ((entry = in.getNextEntry()) != null) {
-                    var name = entry.getName();
-                    if (entry.isDirectory() || !name.startsWith("lib/"))
-                        continue;
-                    
-                    File lib = new File("libraries/" + name.substring(4));
-                    if (!lib.exists()) {
-                        lib.getParentFile().mkdirs();
-                        try (var out = new FileOutputStream(lib)) {
-                            in.transferTo(out);
-                        }
-                    }
-                    classpathBuilder.addLibrary(new JarLibrary(lib.toPath()));
+        try (var zfs = FileSystems.newFileSystem(Path.of(NovaLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI()))) {
+            var lines = Files.readAllLines(zfs.getPath("nova-libraries"));
+            for (var line : lines) {
+                var src = zfs.getPath(line);
+                var dst = LIBRARIES_DIR.resolve(line.substring("lib/".length()));
+                if (!Files.exists(dst)) {
+                    Files.createDirectories(dst.getParent());
+                    Files.copy(src, dst);
                 }
+                classpathBuilder.addLibrary(new JarLibrary(dst));
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to extract Nova libraries", e);
         }
     }
     

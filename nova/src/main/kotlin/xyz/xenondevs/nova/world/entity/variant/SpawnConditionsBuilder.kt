@@ -17,7 +17,6 @@ import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.util.lookupGetterOrThrow
 import xyz.xenondevs.nova.util.toHolderSet
 import xyz.xenondevs.nova.util.toNmsTagKey
-import java.util.*
 
 /**
  * Builder for [Spawn Conditions](https://minecraft.wiki/w/Mob_variant_definitions#Spawn_condition).
@@ -74,12 +73,7 @@ class SpawnConditionsBuilder internal constructor(lookup: RegistryInfoLookup) {
      */
     fun moonBrightness(priority: Int, range: ClosedRange<Double>) {
         conditions += PriorityProvider.Selector(
-            MoonBrightnessCheck(MinMaxBounds.Doubles(
-                Optional.of(range.start),
-                Optional.of(range.endInclusive),
-                Optional.of(range.start * range.start),
-                Optional.of(range.endInclusive * range.endInclusive)
-            )),
+            MoonBrightnessCheck(MinMaxBounds.Doubles.between(range.start, range.endInclusive)),
             priority
         )
     }

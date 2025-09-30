@@ -17,6 +17,13 @@ internal fun MessageDigest.update(ins: InputStream, bufferSize: Int = 4096) {
     ins.close()
 }
 
+internal fun MessageDigest.update(i: Int) {
+    update(((i ushr 24) and 0xFF).toByte())
+    update(((i ushr 16) and 0xFF).toByte())
+    update(((i ushr 8) and 0xFF).toByte())
+    update((i and 0xFF).toByte())
+}
+
 internal object HashUtils {
     
     fun getFileHash(file: Path, algorithm: String): ByteArray {

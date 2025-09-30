@@ -16,8 +16,6 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.integration.permission.PermissionIntegration
 import xyz.xenondevs.nova.integration.permission.PermissionManager
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.resources.upload.AutoUploadManager
-import xyz.xenondevs.nova.resources.upload.UploadService
 import xyz.xenondevs.nova.util.data.JarUtils
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
@@ -97,10 +95,6 @@ internal object HooksLoader {
         
         if (hook is CustomItemService) {
             CustomItemServiceManager.services += hook
-        }
-        
-        if (hook is UploadService) {
-            AutoUploadManager.services += hook
         }
     }
     

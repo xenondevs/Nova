@@ -8,6 +8,7 @@ import org.joml.Vector3dc
 import org.joml.Vector4d
 import org.joml.Vector4dc
 import xyz.xenondevs.nova.resources.builder.model.Model
+import xyz.xenondevs.nova.util.rotate
 
 /**
  * A transformation that scales a model by [scale] around [pivot].
@@ -45,9 +46,9 @@ internal data class ScaleTransform(
         if (keepDisplaySize) {
             val inverseScale = Vector3d(1.0, 1.0, 1.0).div(scale, Vector3d())
             display = display
-                ?.toMap()
-                ?.mapValues { (_, dp) -> dp.copy(scale = dp.scale.mul(inverseScale, Vector3d())) }
-                ?.let { Model.Display.of(it) }
+                .toEffectiveMap()
+                .mapValues { (_, dp) -> dp.copy(scale = dp.scale.mul(inverseScale, Vector3d())) }
+                .let(Model.Display::of)
         }
         
         return model.copy(elements = elements, display = display)
@@ -137,23 +138,13 @@ internal data class ScaleTransform(
         return Triple(uv0, u, v)
     }
     
-    /**
-     * Rotates [this][Vector3d] by [angleRad] radians around [axis].
-     */
-    private fun Vector3d.rotate(axis: Model.Axis, angleRad: Double): Vector3d =
-        when (axis) {
-            Model.Axis.X -> rotateX(angleRad)
-            Model.Axis.Y -> rotateY(angleRad)
-            Model.Axis.Z -> rotateZ(angleRad)
-        }
-    
     override fun apply(matrix: Matrix4d) {
         if (scaleUV)
             throw UnsupportedOperationException("Cannot apply UV adjustments to a matrix")
         
-        matrix.translate(-(8 - pivot.x()) / 16, -(8 - pivot.y()) / 16, -(8 - pivot.z()) / 16)
-        matrix.scale(scale)
-        matrix.translate((8 - pivot.x()) / 16, (8 - pivot.y()) / 16, (8 - pivot.z()) / 16)
+        matrix.translateLocal(-(8 - pivot.x()) / 16, -(8 - pivot.y()) / 16, -(8 - pivot.z()) / 16)
+        matrix.scaleLocal(scale.x(), scale.y(), scale.z())
+        matrix.translateLocal((8 - pivot.x()) / 16, (8 - pivot.y()) / 16, (8 - pivot.z()) / 16)
     }
     
 }

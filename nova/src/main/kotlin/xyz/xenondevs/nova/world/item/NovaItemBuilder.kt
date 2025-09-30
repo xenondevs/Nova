@@ -6,7 +6,6 @@ import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.config.ConfigurableRegistryElementBuilder
 import xyz.xenondevs.nova.registry.NovaRegistries
@@ -28,7 +27,7 @@ class NovaItemBuilder internal constructor(
     private val lore = ArrayList<Component>()
     private var behaviors: MutableList<ItemBehaviorHolder> = ArrayList()
     private var maxStackSize = 64
-    private var craftingRemainingItem: ItemStack? = null
+    private var craftingRemainingItem: Key? = null
     private var isHidden = false
     private var block: NovaBlock? = null
     private var tooltipStyle: TooltipStyle? = null
@@ -120,14 +119,14 @@ class NovaItemBuilder internal constructor(
      * Sets the crafting remaining item to [item].
      */
     fun craftingRemainingItem(item: NovaItem) {
-        this.craftingRemainingItem = item.createItemStack()
+        this.craftingRemainingItem = item.id
     }
     
     /**
      * Sets the crafting remaining item to [material].
      */
     fun craftingRemainingItem(material: Material) {
-        this.craftingRemainingItem = ItemStack.of(material)
+        this.craftingRemainingItem = material.key()
     }
     
     /**

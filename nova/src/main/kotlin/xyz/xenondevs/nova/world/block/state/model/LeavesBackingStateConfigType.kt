@@ -8,7 +8,11 @@ import xyz.xenondevs.nova.util.intValue
 internal abstract class LeavesBackingStateConfig(block: Block, distance: Int, persistent: Boolean, override val waterlogged: Boolean) : BackingStateConfig() {
     
     override val id = (distance - 1) shl 1 or persistent.intValue
-    override val variantString = "distance=$distance,persistent=$persistent,waterlogged=$waterlogged"
+    override val variantMap = mapOf(
+        "distance" to "$distance",
+        "persistent" to "$persistent",
+        "waterlogged" to "$waterlogged"
+    )
     override val vanillaBlockState = block.defaultBlockState()
         .setValue(LeavesBlock.DISTANCE, distance)
         .setValue(LeavesBlock.PERSISTENT, persistent)

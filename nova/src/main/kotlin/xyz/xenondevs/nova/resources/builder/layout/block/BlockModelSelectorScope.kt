@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.Model
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
-import xyz.xenondevs.nova.resources.builder.task.model.ModelContent
+import xyz.xenondevs.nova.resources.builder.task.ModelContent
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties

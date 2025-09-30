@@ -7,13 +7,14 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.SetSerializer
+import kotlinx.serialization.builtins.serializer
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
+import xyz.xenondevs.nova.resources.builder.task.FontChar
+import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
-import xyz.xenondevs.nova.resources.builder.task.font.FontChar
-import xyz.xenondevs.nova.resources.builder.task.font.GuiTextureData
 import xyz.xenondevs.nova.serialization.kotlinx.BlockStateSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ResourceKeySerializer
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
@@ -75,6 +76,16 @@ internal object ResourceLookups {
     var GUI_TEXTURE: Map<GuiTexture, GuiTextureData> by GUI_TEXTURE_LOOKUP
     
     /**
+     * Lookup for getting the [GuiTexture] by its corresponding [FontChar].
+     */
+    val GUI_TEXTURE_BY_FONT_CHAR_LOOKUP: MapResourceLookup<FontChar, GuiTexture> = mapResourceLookup("gui_texture_by_font_char_lookup")
+    
+    /**
+     * Map of [FontChar] to the corresponding [GuiTexture].
+     */
+    var GUI_TEXTURE_BY_FONT_CHAR: Map<FontChar, GuiTexture> by GUI_TEXTURE_BY_FONT_CHAR_LOOKUP
+    
+    /**
      * The first code-point that is a move character in the minecraft:default font.
      */
     var MOVE_CHARACTERS_OFFSET by resourceLookup<Int>("move_characters_offset", 0)
@@ -112,6 +123,17 @@ internal object ResourceLookups {
      * Entity variant layouts.
      */
     val ENTITY_VARIANT_ASSETS: Map<ResourceKey<*>, EntityVariantLayout> by ENTITY_VARIANT_ASSETS_LOOKUP
+    
+    /**
+     * Lookup for sound overrides (ids of sound that were moved to the Nova namespace).
+     */
+    val SOUND_OVERRIDES_LOOKUP: ResourceLookup<Set<String>> =
+        resourceLookup("sound_overrides", emptySet(), SetSerializer(String.serializer()))
+    
+    /**
+     * Sound overrides (ids of sound that were moved to the Nova namespace).
+     */
+    var SOUND_OVERRIDES: Set<String> by SOUND_OVERRIDES_LOOKUP
     
     private inline fun <reified T : Any> resourceLookup(key: String, empty: T): ResourceLookup<T> {
         val lookup = ResourceLookup(key, PermanentStorage::retrieve, PermanentStorage::store, empty)
