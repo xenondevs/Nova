@@ -157,5 +157,6 @@
   "command.nova.show_item_behaviors.no_item": "Κρατήστε ένα αντικείμενο στο κύριο χέρι σας και προσπαθήστε ξανά.",
   "command.nova.recalculate_leave_properties.done": "Επεξεργάστηκε %s φύλλα και κατέστησε %s φύλλα μη μόνιμα.",
   "command.nova.show_vanilla_block_state.success": "Βλέπετε την κατάσταση του μπλοκ %s.",
-  "command.nova.show_vanilla_block_state.failure": "Παρακαλώ κοιτάξτε ένα μπλοκ και προσπαθήστε ξανά."
+  "command.nova.show_vanilla_block_state.failure": "Παρακαλώ κοιτάξτε ένα μπλοκ και προσπαθήστε ξανά.",
+  "menu.nova.items.player_inventory": "Απογραφή παίκτη"
 }

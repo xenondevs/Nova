@@ -157,5 +157,6 @@
   "command.nova.show_item_behaviors.no_item": "Laikykite daiktą pagrindinėje rankoje ir bandykite dar kartą.",
   "command.nova.recalculate_leave_properties.done": "Apdorota %s lapų ir %s lapų tapo nepastovūs.",
   "command.nova.show_vanilla_block_state.success": "Jūs žiūrite į bloko būseną %s.",
-  "command.nova.show_vanilla_block_state.failure": "Pažvelkite į bloką ir pabandykite dar kartą."
+  "command.nova.show_vanilla_block_state.failure": "Pažvelkite į bloką ir pabandykite dar kartą.",
+  "menu.nova.items.player_inventory": "Žaidėjo inventorius"
 }

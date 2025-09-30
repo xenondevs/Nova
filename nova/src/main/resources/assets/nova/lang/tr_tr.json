@@ -157,5 +157,6 @@
   "command.nova.show_item_behaviors.no_item": "Lütfen ana elinizde bir eşya tutun ve tekrar deneyin.",
   "command.nova.recalculate_leave_properties.done": "s yaprakları işlendi ve %s yaprakları kalıcı olmayan hale getirildi.",
   "command.nova.show_vanilla_block_state.success": "Blok durumu %s'ye bakıyorsunuz.",
-  "command.nova.show_vanilla_block_state.failure": "Lütfen bir bloğa bakın ve tekrar deneyin."
+  "command.nova.show_vanilla_block_state.failure": "Lütfen bir bloğa bakın ve tekrar deneyin.",
+  "menu.nova.items.player_inventory": "Oyuncu Envanteri"
 }

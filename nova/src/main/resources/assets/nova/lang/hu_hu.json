@@ -157,5 +157,6 @@
   "command.nova.show_item_behaviors.no_item": "Kérjük, tartson egy tárgyat a fő kezében, és próbálja meg újra.",
   "command.nova.recalculate_leave_properties.done": "Feldolgozott %s levelet, és %s levelet nem tartósított.",
   "command.nova.show_vanilla_block_state.success": "A blokk állapotát nézed %s.",
-  "command.nova.show_vanilla_block_state.failure": "Kérjük, nézz meg egy blokkot, és próbáld meg újra."
+  "command.nova.show_vanilla_block_state.failure": "Kérjük, nézz meg egy blokkot, és próbáld meg újra.",
+  "menu.nova.items.player_inventory": "Játékos leltár"
 }

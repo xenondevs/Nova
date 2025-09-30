@@ -157,5 +157,6 @@
   "command.nova.show_item_behaviors.no_item": "Držite predmet v glavni roki in poskusite znova.",
   "command.nova.recalculate_leave_properties.done": "Obdelanih je bilo %s listov in %s listov je postalo nepersistentnih.",
   "command.nova.show_vanilla_block_state.success": "Gledate stanje bloka %s.",
-  "command.nova.show_vanilla_block_state.failure": "Oglejte si blok in poskusite znova."
+  "command.nova.show_vanilla_block_state.failure": "Oglejte si blok in poskusite znova.",
+  "menu.nova.items.player_inventory": "Inventar igralca"
 }

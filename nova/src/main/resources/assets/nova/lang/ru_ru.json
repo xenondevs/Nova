@@ -157,5 +157,6 @@
   "command.nova.show_item_behaviors.no_item": "Пожалуйста, возьмите предмет в основную руку и повторите попытку.",
   "command.nova.recalculate_leave_properties.done": "Обработано %s листьев и сделано %s листьев непостоянными.",
   "command.nova.show_vanilla_block_state.success": "Вы смотрите на состояние блока %s.",
-  "command.nova.show_vanilla_block_state.failure": "Пожалуйста, посмотрите на блок и попробуйте еще раз."
+  "command.nova.show_vanilla_block_state.failure": "Пожалуйста, посмотрите на блок и попробуйте еще раз.",
+  "menu.nova.items.player_inventory": "Инвентарь игрока"
 }

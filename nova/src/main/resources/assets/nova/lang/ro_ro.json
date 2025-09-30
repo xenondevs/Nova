@@ -157,5 +157,6 @@
   "command.nova.show_item_behaviors.no_item": "Vă rugăm să țineți un obiect în mâna principală și să încercați din nou.",
   "command.nova.recalculate_leave_properties.done": "Procesat %s frunze și făcut %s frunze nepersistente.",
   "command.nova.show_vanilla_block_state.success": "Vă uitați la starea blocului %s.",
-  "command.nova.show_vanilla_block_state.failure": "Vă rugăm să vă uitați la un bloc și să încercați din nou."
+  "command.nova.show_vanilla_block_state.failure": "Vă rugăm să vă uitați la un bloc și să încercați din nou.",
+  "menu.nova.items.player_inventory": "Inventar jucător"
 }

@@ -157,5 +157,6 @@
   "command.nova.show_item_behaviors.no_item": "Este %s tiene %s comportamiento(s) de elemento(s):\n%s",
   "command.nova.recalculate_leave_properties.done": "Procesadas %s hojas y hechas %s hojas no persistentes.",
   "command.nova.show_vanilla_block_state.success": "Estás viendo el estado del bloque %s.",
-  "command.nova.show_vanilla_block_state.failure": "Por favor, mira un bloque e inténtalo de nuevo."
+  "command.nova.show_vanilla_block_state.failure": "Por favor, mira un bloque e inténtalo de nuevo.",
+  "menu.nova.items.player_inventory": "Inventario del jugador"
 }

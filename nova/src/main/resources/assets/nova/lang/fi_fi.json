@@ -157,5 +157,6 @@
   "command.nova.show_item_behaviors.no_item": "Pidä esinettä pääkädessäsi ja yritä uudelleen.",
   "command.nova.recalculate_leave_properties.done": "Käsitteli %s lehteä ja teki %s lehdestä ei-pysyviä.",
   "command.nova.show_vanilla_block_state.success": "Katsot lohkon tilaa %s.",
-  "command.nova.show_vanilla_block_state.failure": "Katso lohkoa ja yritä uudelleen."
+  "command.nova.show_vanilla_block_state.failure": "Katso lohkoa ja yritä uudelleen.",
+  "menu.nova.items.player_inventory": "Pelaajan inventaario"
 }

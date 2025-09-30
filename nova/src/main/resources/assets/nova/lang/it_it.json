@@ -157,5 +157,6 @@
   "command.nova.show_item_behaviors.success": "Questo %s ha uno o più comportamenti dell'articolo %s:\n%s",
   "command.nova.recalculate_leave_properties.done": "Elaborato %s foglie e reso %s foglie non persistenti.",
   "command.nova.show_vanilla_block_state.success": "Stai guardando lo stato del blocco %s.",
-  "command.nova.show_vanilla_block_state.failure": "Guardare un blocco e riprovare."
+  "command.nova.show_vanilla_block_state.failure": "Guardare un blocco e riprovare.",
+  "menu.nova.items.player_inventory": "Inventario del giocatore"
 }

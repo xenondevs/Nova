@@ -157,5 +157,6 @@
   "command.nova.show_item_behaviors.success": "이 %s에는 %s 항목 동작이 있습니다:\n%s",
   "command.nova.recalculate_leave_properties.done": "잎을 처리하고 %s 잎을 비영구적으로 만들었습니다.",
   "command.nova.show_vanilla_block_state.success": "블록 상태 %s를 보고 있습니다.",
-  "command.nova.show_vanilla_block_state.failure": "블록을 보고 다시 시도하세요."
+  "command.nova.show_vanilla_block_state.failure": "블록을 보고 다시 시도하세요.",
+  "menu.nova.items.player_inventory": "플레이어 인벤토리"
 }
