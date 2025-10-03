@@ -158,5 +158,5 @@
   "command.nova.recalculate_leave_properties.done": "Es wurden %s Laubblöcke verarbeitet, wovon %s Laubblöcke non-persistent gemacht wurden.",
   "command.nova.show_vanilla_block_state.success": "Du schaust gerade auf den Blockzustand %s.",
   "command.nova.show_vanilla_block_state.failure": "Bitte schaue auf einen Block und versuche es erneut.",
-  "menu.nova.items.player_inventory": "Spieler Inventar"
+  "menu.nova.items.player_inventory": "Spielerinventar"
 }
