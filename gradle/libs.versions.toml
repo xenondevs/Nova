@@ -24,7 +24,7 @@ commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider",
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "xenondevs-commons" }
 commons-version = { group = "xyz.xenondevs.commons", name = "commons-version", version.ref = "xenondevs-commons" }
 configurate-yaml = { group = "org.spongepowered", name = "configurate-yaml", version = "4.2.0" }
-cosmic-binary-format = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format", version = "1.0.0-alpha.2" }
+cosmic-binary-format = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format", version = "1.0-SNAPSHOT" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
 dokka-core = { module = "org.jetbrains.dokka:dokka-core", version.ref = "dokka" }
 dokka-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
