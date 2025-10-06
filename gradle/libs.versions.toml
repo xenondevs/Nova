@@ -9,7 +9,7 @@ kotlin = "2.2.20"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.3.0"
 paper = "1.21.9-R0.1-SNAPSHOT"
-xenondevs-commons = "1.34"
+xenondevs-commons = "1.35"
 
 [libraries]
 awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.34.5" }
