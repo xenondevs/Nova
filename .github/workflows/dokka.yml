@@ -22,7 +22,7 @@ jobs:
           distribution: adopt
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           cache-disabled: true
 
