@@ -20,7 +20,6 @@ dependencies {
     api(origamiLibs.mixinextras)
     
     // internal dependencies
-    compileOnly(origami.patchedPaperServer())
     compileOnly(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
     novaLoader(libs.bundles.minecraft.assets)
@@ -40,7 +39,6 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotlin.test.junit)
     testRuntimeOnly(libs.junit.platformLauncher)
-    testImplementation(origami.patchedPaperServer())
 }
 
 // configure java sources location

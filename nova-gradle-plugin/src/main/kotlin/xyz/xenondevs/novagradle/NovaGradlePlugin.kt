@@ -2,7 +2,6 @@ package xyz.xenondevs.novagradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByName
@@ -37,11 +36,9 @@ class NovaGradlePlugin : Plugin<Project> {
             devBundleVersion.set(Versions.PAPER)
             pluginId.set(addonExt.name.map { it.lowercase() })
             transitiveAccessWidenerSources.from(
-                project.configurations.getByName("compileClasspath").incoming.artifactView {
-                    componentFilter {
-                        it is ModuleComponentIdentifier && it.group == "xyz.xenondevs.nova" && it.module == "nova"
-                    }
-                }.files
+                project.configurations.detachedConfiguration(
+                    project.dependencyFactory.create("xyz.xenondevs.nova:nova:${Versions.NOVA}")
+                )
             )
         }
         
