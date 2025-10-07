@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ServerGamePacketListenerImpl.class)
-public class ServerGamePacketListenerImplMixin {
+abstract class ServerGamePacketListenerImplMixin {
     
     /**
      * Effectively removes the line:
