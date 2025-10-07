@@ -56,12 +56,19 @@ import xyz.xenondevs.nova.world.item.recipe.TagTest
 import xyz.xenondevs.nova.world.item.recipe.VanillaMaterialTest
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.contracts.contract
 import kotlin.math.max
 import net.minecraft.world.item.ItemStack as MojangStack
 
+/**
+ * The [NovaItem] of [this][ItemStack], or `null` if it's not one.
+ */
 val ItemStack.novaItem: NovaItem?
     get() = unwrap().novaItem
 
+/**
+ * The [NovaItem] of [this][MojangStack], or `null` if it's not one.
+ */
 val MojangStack.novaItem: NovaItem?
     get() = unsafeNovaTag
         ?.getStringOrNull("id")
@@ -101,6 +108,10 @@ internal val ItemStack.namelessCopyOrSelf: ItemStack
         return itemStack
     }
 
+/**
+ * The [ItemStack] that remains in the crafting slots after using it in a recipe.
+ * Empty if there is no remaining item.
+ */
 val ItemStack.craftingRemainingItem: ItemStack
     get() {
         val novaItem = novaItem
@@ -110,18 +121,41 @@ val ItemStack.craftingRemainingItem: ItemStack
         return type.craftingRemainingItem?.let(::ItemStack) ?: ItemStack.empty()
     }
 
+/**
+ * Returns `null` if [this][ItemStack] [is empty][isEmpty], otherwise returns [this][ItemStack].
+ */
 fun ItemStack.takeUnlessEmpty(): ItemStack? =
     if (type.isAir || amount <= 0) null else this
 
-fun ItemStack?.isNullOrEmpty(): Boolean =
-    this == null || type.isAir || amount <= 0
+/**
+ * Returns `true` if [this][ItemStack] is either null or an empty item stack,
+ * otherwise returns `false`.
+ */
+fun ItemStack?.isNullOrEmpty(): Boolean {
+    contract {
+        returns(false) implies (this@isNullOrEmpty != null)
+    }
+    return this == null || isEmpty
+}
 
-fun ItemStack?.isNotNullOrEmpty(): Boolean =
-    this != null && !type.isAir && amount > 0
+/**
+ * Returns `true` if [this][ItemStack] is neither null, nor an empty item stack,
+ * otherwise returns `false`.
+ */
+fun ItemStack?.isNotNullOrEmpty(): Boolean {
+    contract {
+        returns(true) implies (this@isNotNullOrEmpty != null)
+    }
+    return this != null && !isEmpty
+}
 
 internal fun <T> MojangStack.update(type: DataComponentType<T>, action: (T) -> T): T? =
     get(type)?.let { set(type, action(it)) }
 
+/**
+ * Damages the [this][ItemStack] by [amount] and returns the resulting [ItemStack],
+ * which may be `null` if the item broke.
+ */
 fun ItemStack.damage(amount: Int, world: World): ItemStack? {
     val nms = unwrap()
     val ref = AtomicReference(nms)

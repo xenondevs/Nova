@@ -78,6 +78,7 @@ tasks {
 kotlin {
     compilerOptions {
         optIn.addAll(
+            "kotlin.contracts.ExperimentalContracts",
             "kotlinx.coroutines.ExperimentalCoroutinesApi",
             "xyz.xenondevs.invui.ExperimentalReactiveApi",
             "xyz.xenondevs.invui.dsl.ExperimentalDslApi"
