@@ -1,10 +1,7 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
-$dokka.location:xyz.xenondevs.nova.patch.impl.worldgen.chunksection////PointingToDeclaration/nova/xyz.xenondevs.nova.patch.impl.worldgen.chunksection.html
-$dokka.location:xyz.xenondevs.nova.world.generation.inject.biome////PointingToDeclaration/nova/xyz.xenondevs.nova.world.generation.inject.biome.html
-$dokka.location:xyz.xenondevs.nova////PointingToDeclaration/nova/xyz.xenondevs.nova.html
+
 module:nova
-xyz.xenondevs.nova
 xyz.xenondevs.nova.addon
 xyz.xenondevs.nova.addon.registry
 xyz.xenondevs.nova.addon.registry.worldgen
@@ -13,22 +10,20 @@ xyz.xenondevs.nova.config
 xyz.xenondevs.nova.context
 xyz.xenondevs.nova.context.intention
 xyz.xenondevs.nova.context.param
-xyz.xenondevs.nova.data
 xyz.xenondevs.nova.i18n
 xyz.xenondevs.nova.initialize
 xyz.xenondevs.nova.integration
 xyz.xenondevs.nova.integration.customitems
 xyz.xenondevs.nova.integration.permission
 xyz.xenondevs.nova.integration.protection
+xyz.xenondevs.nova.mixin.item.using
 xyz.xenondevs.nova.network
 xyz.xenondevs.nova.network.event
 xyz.xenondevs.nova.network.event.clientbound
 xyz.xenondevs.nova.network.event.serverbound
-xyz.xenondevs.nova.patch.impl.worldgen.chunksection
 xyz.xenondevs.nova.registry
 xyz.xenondevs.nova.resources
 xyz.xenondevs.nova.resources.builder
-xyz.xenondevs.nova.resources.builder.basepack
 xyz.xenondevs.nova.resources.builder.data
 xyz.xenondevs.nova.resources.builder.font
 xyz.xenondevs.nova.resources.builder.font.provider
@@ -42,12 +37,9 @@ xyz.xenondevs.nova.resources.builder.layout.gui
 xyz.xenondevs.nova.resources.builder.layout.item
 xyz.xenondevs.nova.resources.builder.model
 xyz.xenondevs.nova.resources.builder.task
-xyz.xenondevs.nova.resources.builder.task.font
-xyz.xenondevs.nova.resources.builder.task.model
-xyz.xenondevs.nova.resources.upload
+xyz.xenondevs.nova.resources.builder.task.basepack
 xyz.xenondevs.nova.serialization
 xyz.xenondevs.nova.serialization.cbf
-xyz.xenondevs.nova.serialization.configurate
 xyz.xenondevs.nova.serialization.json.serializer
 xyz.xenondevs.nova.serialization.persistentdata
 xyz.xenondevs.nova.ui.menu
@@ -66,8 +58,6 @@ xyz.xenondevs.nova.ui.waila.info.line
 xyz.xenondevs.nova.update
 xyz.xenondevs.nova.util
 xyz.xenondevs.nova.util.advancement
-xyz.xenondevs.nova.util.bossbar
-xyz.xenondevs.nova.util.bossbar.operation
 xyz.xenondevs.nova.util.component.adventure
 xyz.xenondevs.nova.util.data
 xyz.xenondevs.nova.util.item
@@ -104,7 +94,6 @@ xyz.xenondevs.nova.world.format
 xyz.xenondevs.nova.world.format.chunk
 xyz.xenondevs.nova.world.generation
 xyz.xenondevs.nova.world.generation.builder
-xyz.xenondevs.nova.world.generation.inject.biome
 xyz.xenondevs.nova.world.generation.ruletest
 xyz.xenondevs.nova.world.generation.wrapper
 xyz.xenondevs.nova.world.item

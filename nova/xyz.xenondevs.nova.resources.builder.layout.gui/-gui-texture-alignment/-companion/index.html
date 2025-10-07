@@ -1,0 +1,663 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Companion</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+    <div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+<a class="library-name--link" href="../../../../index.html">
+                    nova-parent
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">0.21.0-alpha.2
+        </div>
+        <div class="navigation-controls">
+        <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova/main">jvm</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                    <div class="dropdown--header"><span>Platform filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":nova/main" data-filter=":nova/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
+                        <div class="dropdown--header">
+                            <span>
+                                    nova-parent
+                            </span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <div class="sidebar--inner" id="sideMenu"></div>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.resources.builder.layout.gui/GuiTextureAlignment.Companion///PointingToDeclaration//-501115348">
+  <div class="breadcrumbs"><a href="../../../index.html">nova</a><span class="delimiter">/</span><a href="../../index.html">xyz.xenondevs.nova.resources.builder.layout.gui</a><span class="delimiter">/</span><a href="../index.html">GuiTextureAlignment</a><span class="delimiter">/</span><span class="current">Companion</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Companion</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Companion</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="303553642%2FProperties%2F-501115348" anchor-label="ANVIL_OFFSET" id="303553642%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-n-v-i-l_-o-f-f-s-e-t.html"><span>ANVIL_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="303553642%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-n-v-i-l_-o-f-f-s-e-t.html">ANVIL_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the anvil gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-432151817%2FProperties%2F-501115348" anchor-label="ANVIL_WIDTH" id="-432151817%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-n-v-i-l_-w-i-d-t-h.html"><span>ANVIL_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-432151817%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-a-n-v-i-l_-w-i-d-t-h.html">ANVIL_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the anvil menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="382742159%2FProperties%2F-501115348" anchor-label="BLAST_FURNACE_OFFSET" id="382742159%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-l-a-s-t_-f-u-r-n-a-c-e_-o-f-f-s-e-t.html"><span>BLAST_</span><wbr><span>FURNACE_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="382742159%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-l-a-s-t_-f-u-r-n-a-c-e_-o-f-f-s-e-t.html">BLAST_FURNACE_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the blast furnace gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1815070670%2FProperties%2F-501115348" anchor-label="BLAST_FURNACE_WIDTH" id="-1815070670%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-l-a-s-t_-f-u-r-n-a-c-e_-w-i-d-t-h.html"><span>BLAST_</span><wbr><span>FURNACE_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1815070670%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-b-l-a-s-t_-f-u-r-n-a-c-e_-w-i-d-t-h.html">BLAST_FURNACE_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the blast furnace menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="217729781%2FProperties%2F-501115348" anchor-label="BREWING_STAND_OFFSET" id="217729781%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-r-e-w-i-n-g_-s-t-a-n-d_-o-f-f-s-e-t.html"><span>BREWING_</span><wbr><span>STAND_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="217729781%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-b-r-e-w-i-n-g_-s-t-a-n-d_-o-f-f-s-e-t.html">BREWING_STAND_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the brewing stand gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="257816332%2FProperties%2F-501115348" anchor-label="BREWING_STAND_WIDTH" id="257816332%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-b-r-e-w-i-n-g_-s-t-a-n-d_-w-i-d-t-h.html"><span>BREWING_</span><wbr><span>STAND_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="257816332%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-b-r-e-w-i-n-g_-s-t-a-n-d_-w-i-d-t-h.html">BREWING_STAND_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the brewing stand menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1719868089%2FProperties%2F-501115348" anchor-label="CARTOGRAPHY_TABLE_OFFSET" id="-1719868089%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-r-t-o-g-r-a-p-h-y_-t-a-b-l-e_-o-f-f-s-e-t.html"><span>CARTOGRAPHY_</span><wbr><span>TABLE_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1719868089%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-a-r-t-o-g-r-a-p-h-y_-t-a-b-l-e_-o-f-f-s-e-t.html">CARTOGRAPHY_TABLE_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the cartography table gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-774518150%2FProperties%2F-501115348" anchor-label="CARTOGRAPHY_TABLE_WIDTH" id="-774518150%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-a-r-t-o-g-r-a-p-h-y_-t-a-b-l-e_-w-i-d-t-h.html"><span>CARTOGRAPHY_</span><wbr><span>TABLE_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-774518150%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-c-a-r-t-o-g-r-a-p-h-y_-t-a-b-l-e_-w-i-d-t-h.html">CARTOGRAPHY_TABLE_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the cartography table menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-41746785%2FProperties%2F-501115348" anchor-label="CHEST_OFFSET" id="-41746785%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-h-e-s-t_-o-f-f-s-e-t.html"><span>CHEST_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-41746785%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-h-e-s-t_-o-f-f-s-e-t.html">CHEST_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the chest (generic) gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2105858526%2FProperties%2F-501115348" anchor-label="CHEST_WIDTH" id="-2105858526%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-h-e-s-t_-w-i-d-t-h.html"><span>CHEST_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2105858526%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-c-h-e-s-t_-w-i-d-t-h.html">CHEST_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the chest menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-493731413%2FProperties%2F-501115348" anchor-label="CRAFTER_OFFSET" id="-493731413%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-r-a-f-t-e-r_-o-f-f-s-e-t.html"><span>CRAFTER_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-493731413%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-r-a-f-t-e-r_-o-f-f-s-e-t.html">CRAFTER_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the crafter gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-734965354%2FProperties%2F-501115348" anchor-label="CRAFTER_WIDTH" id="-734965354%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-r-a-f-t-e-r_-w-i-d-t-h.html"><span>CRAFTER_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-734965354%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-c-r-a-f-t-e-r_-w-i-d-t-h.html">CRAFTER_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the crafter menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="458738985%2FProperties%2F-501115348" anchor-label="CRAFTING_TABLE_OFFSET" id="458738985%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-r-a-f-t-i-n-g_-t-a-b-l-e_-o-f-f-s-e-t.html"><span>CRAFTING_</span><wbr><span>TABLE_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="458738985%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-c-r-a-f-t-i-n-g_-t-a-b-l-e_-o-f-f-s-e-t.html">CRAFTING_TABLE_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the crafting table gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1928158808%2FProperties%2F-501115348" anchor-label="CRAFTING_TABLE_WIDTH" id="1928158808%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-r-a-f-t-i-n-g_-t-a-b-l-e_-w-i-d-t-h.html"><span>CRAFTING_</span><wbr><span>TABLE_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1928158808%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-c-r-a-f-t-i-n-g_-t-a-b-l-e_-w-i-d-t-h.html">CRAFTING_TABLE_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the crafting table menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-342718253%2FProperties%2F-501115348" anchor-label="DISPENSER_OFFSET" id="-342718253%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-i-s-p-e-n-s-e-r_-o-f-f-s-e-t.html"><span>DISPENSER_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-342718253%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-d-i-s-p-e-n-s-e-r_-o-f-f-s-e-t.html">DISPENSER_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the dispenser gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1007188626%2FProperties%2F-501115348" anchor-label="DISPENSER_WIDTH" id="-1007188626%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-i-s-p-e-n-s-e-r_-w-i-d-t-h.html"><span>DISPENSER_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1007188626%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-d-i-s-p-e-n-s-e-r_-w-i-d-t-h.html">DISPENSER_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the dispenser menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1378484564%2FProperties%2F-501115348" anchor-label="DROPPER_OFFSET" id="-1378484564%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-r-o-p-p-e-r_-o-f-f-s-e-t.html"><span>DROPPER_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1378484564%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-d-r-o-p-p-e-r_-o-f-f-s-e-t.html">DROPPER_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the dropper gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1594789771%2FProperties%2F-501115348" anchor-label="DROPPER_WIDTH" id="-1594789771%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-d-r-o-p-p-e-r_-w-i-d-t-h.html"><span>DROPPER_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1594789771%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-d-r-o-p-p-e-r_-w-i-d-t-h.html">DROPPER_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the dropper menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="164757956%2FProperties%2F-501115348" anchor-label="ENCHANTMENT_TABLE_OFFSET" id="164757956%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-e-n-c-h-a-n-t-m-e-n-t_-t-a-b-l-e_-o-f-f-s-e-t.html"><span>ENCHANTMENT_</span><wbr><span>TABLE_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="164757956%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-e-n-c-h-a-n-t-m-e-n-t_-t-a-b-l-e_-o-f-f-s-e-t.html">ENCHANTMENT_TABLE_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the enchantment table gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1918675549%2FProperties%2F-501115348" anchor-label="ENCHANTMENT_TABLE_WIDTH" id="1918675549%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-e-n-c-h-a-n-t-m-e-n-t_-t-a-b-l-e_-w-i-d-t-h.html"><span>ENCHANTMENT_</span><wbr><span>TABLE_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1918675549%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-e-n-c-h-a-n-t-m-e-n-t_-t-a-b-l-e_-w-i-d-t-h.html">ENCHANTMENT_TABLE_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the enchantment table menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-782140362%2FProperties%2F-501115348" anchor-label="FURNACE_OFFSET" id="-782140362%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-u-r-n-a-c-e_-o-f-f-s-e-t.html"><span>FURNACE_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-782140362%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-f-u-r-n-a-c-e_-o-f-f-s-e-t.html">FURNACE_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the furnace gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1298458197%2FProperties%2F-501115348" anchor-label="FURNACE_WIDTH" id="-1298458197%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-f-u-r-n-a-c-e_-w-i-d-t-h.html"><span>FURNACE_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1298458197%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-f-u-r-n-a-c-e_-w-i-d-t-h.html">FURNACE_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the furnace menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1820483209%2FProperties%2F-501115348" anchor-label="GRINDSTONE_OFFSET" id="1820483209%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-g-r-i-n-d-s-t-o-n-e_-o-f-f-s-e-t.html"><span>GRINDSTONE_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1820483209%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-g-r-i-n-d-s-t-o-n-e_-o-f-f-s-e-t.html">GRINDSTONE_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the grindstone gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="863707384%2FProperties%2F-501115348" anchor-label="GRINDSTONE_WIDTH" id="863707384%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-g-r-i-n-d-s-t-o-n-e_-w-i-d-t-h.html"><span>GRINDSTONE_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="863707384%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-g-r-i-n-d-s-t-o-n-e_-w-i-d-t-h.html">GRINDSTONE_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the grindstone menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="239714156%2FProperties%2F-501115348" anchor-label="HOPPER_OFFSET" id="239714156%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-h-o-p-p-e-r_-o-f-f-s-e-t.html"><span>HOPPER_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="239714156%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-h-o-p-p-e-r_-o-f-f-s-e-t.html">HOPPER_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the hopper gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-157116491%2FProperties%2F-501115348" anchor-label="HOPPER_WIDTH" id="-157116491%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-h-o-p-p-e-r_-w-i-d-t-h.html"><span>HOPPER_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-157116491%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-h-o-p-p-e-r_-w-i-d-t-h.html">HOPPER_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the hopper menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1281416935%2FProperties%2F-501115348" anchor-label="LOOM_OFFSET" id="-1281416935%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-l-o-o-m_-o-f-f-s-e-t.html"><span>LOOM_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1281416935%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-l-o-o-m_-o-f-f-s-e-t.html">LOOM_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the loom gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-344732568%2FProperties%2F-501115348" anchor-label="LOOM_WIDTH" id="-344732568%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-l-o-o-m_-w-i-d-t-h.html"><span>LOOM_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-344732568%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-l-o-o-m_-w-i-d-t-h.html">LOOM_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the loom menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="90061686%2FProperties%2F-501115348" anchor-label="SHULKER_BOX_OFFSET" id="90061686%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-h-u-l-k-e-r_-b-o-x_-o-f-f-s-e-t.html"><span>SHULKER_</span><wbr><span>BOX_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="90061686%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-h-u-l-k-e-r_-b-o-x_-o-f-f-s-e-t.html">SHULKER_BOX_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the shulker box gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="946434667%2FProperties%2F-501115348" anchor-label="SHULKER_BOX_WIDTH" id="946434667%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-h-u-l-k-e-r_-b-o-x_-w-i-d-t-h.html"><span>SHULKER_</span><wbr><span>BOX_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="946434667%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-s-h-u-l-k-e-r_-b-o-x_-w-i-d-t-h.html">SHULKER_BOX_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the shulker box menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-169494874%2FProperties%2F-501115348" anchor-label="SMITHING_TABLE_OFFSET" id="-169494874%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-m-i-t-h-i-n-g_-t-a-b-l-e_-o-f-f-s-e-t.html"><span>SMITHING_</span><wbr><span>TABLE_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-169494874%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-m-i-t-h-i-n-g_-t-a-b-l-e_-o-f-f-s-e-t.html">SMITHING_TABLE_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the smithing table gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1215156539%2FProperties%2F-501115348" anchor-label="SMITHING_TABLE_WIDTH" id="1215156539%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-m-i-t-h-i-n-g_-t-a-b-l-e_-w-i-d-t-h.html"><span>SMITHING_</span><wbr><span>TABLE_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1215156539%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-s-m-i-t-h-i-n-g_-t-a-b-l-e_-w-i-d-t-h.html">SMITHING_TABLE_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the smithing table menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1626612709%2FProperties%2F-501115348" anchor-label="SMOKER_OFFSET" id="-1626612709%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-m-o-k-e-r_-o-f-f-s-e-t.html"><span>SMOKER_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1626612709%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-m-o-k-e-r_-o-f-f-s-e-t.html">SMOKER_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the smoker gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1306700070%2FProperties%2F-501115348" anchor-label="SMOKER_WIDTH" id="1306700070%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-m-o-k-e-r_-w-i-d-t-h.html"><span>SMOKER_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1306700070%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-s-m-o-k-e-r_-w-i-d-t-h.html">SMOKER_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the smoker menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1763576994%2FProperties%2F-501115348" anchor-label="STONECUTTER_OFFSET" id="1763576994%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-t-o-n-e-c-u-t-t-e-r_-o-f-f-s-e-t.html"><span>STONECUTTER_</span><wbr><span>OFFSET</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1763576994%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="-s-t-o-n-e-c-u-t-t-e-r_-o-f-f-s-e-t.html">STONECUTTER_OFFSET</a><span class="token operator">: </span><span data-unresolved-link="org.joml/Vector2ic///PointingToDeclaration/">Vector2ic</span></div><div class="brief "><p class="paragraph">The default offset that is required to perfectly overlap the stonecutter gui texture.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="169135039%2FProperties%2F-501115348" anchor-label="STONECUTTER_WIDTH" id="169135039%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-s-t-o-n-e-c-u-t-t-e-r_-w-i-d-t-h.html"><span>STONECUTTER_</span><wbr><span>WIDTH</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="169135039%2FProperties%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-s-t-o-n-e-c-u-t-t-e-r_-w-i-d-t-h.html">STONECUTTER_WIDTH</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">176</span></div><div class="brief "><p class="paragraph">The width of the stonecutter menu.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+        <span>© 2025 Copyright</span>
+        <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+    </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
