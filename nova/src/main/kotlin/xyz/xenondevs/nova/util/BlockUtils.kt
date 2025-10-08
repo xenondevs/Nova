@@ -70,6 +70,7 @@ import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
+import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.pos
@@ -478,29 +479,35 @@ object BlockUtils {
             broadcast(soundPacket, true)
         }
         
+        fun broadcastCustomBreakParticles(sendToBreaker: Boolean) {
+            val breakParticlesMaterial = state.block.getBehaviorOrNull<Breakable>()?.breakParticles
+                ?: return
+            val breakParticles = particle(ParticleTypes.BLOCK, pos.location.add(0.5, 0.5, 0.5)) {
+                block(breakParticlesMaterial)
+                offset(0.3, 0.3, 0.3)
+                amount(70)
+            }
+            broadcast(breakParticles, sendToBreaker)
+        }
+        
         val soundGroup = state.block.getBehaviorOrNull<BlockSounds>()?.soundGroup
         val modelProvider = state.modelProvider
         if (modelProvider is BackingStateBlockModelProvider || modelProvider is ModelLessBlockModelProvider) {
-            // use the level event packet for blocks that use block states
+            // use the level event packet for blocks that use block states (sound & particles)
             val levelEventPacket = ClientboundLevelEventPacket(2001, nmsPos, pos.nmsBlockState.id, false)
             broadcast(levelEventPacket, sendEffectsToBreaker)
             
             if (soundGroup != null && SoundEngine.overridesSound(pos.block.type.soundGroup.breakSound.key.key))
                 broadcastBreakSound(soundGroup)
-        } else {
+            
+            // if no break particles were displayed with the level event packet, send custom ones
+            if (modelProvider is ModelLessBlockModelProvider && modelProvider.info.bukkitMaterial.hasNoBreakParticles())
+                broadcastCustomBreakParticles(true)
+        } else if (modelProvider is DisplayEntityBlockModelProvider) {
             // send sound and break particles manually for display entity blocks
             if (soundGroup != null)
                 broadcastBreakSound(soundGroup)
-            
-            val breakParticlesMaterial = state.block.getBehaviorOrNull<Breakable>()?.breakParticles
-            if (breakParticlesMaterial != null) {
-                val breakParticles = particle(ParticleTypes.BLOCK, pos.location.add(0.5, 0.5, 0.5)) {
-                    block(breakParticlesMaterial)
-                    offset(0.3, 0.3, 0.3)
-                    amount(70)
-                }
-                broadcast(breakParticles, sendEffectsToBreaker || pos.block.type.hasNoBreakParticles())
-            }
+            broadcastCustomBreakParticles(sendEffectsToBreaker || modelProvider.info.hitboxType.bukkitMaterial.hasNoBreakParticles())
         }
     }
     
@@ -590,7 +597,7 @@ object BlockUtils {
                 .withOptionalParameter(LootContextParams.BLOCK_ENTITY, mainPos.nmsBlockEntity);
             drops += mainPos.nmsBlockState.getDrops(builder).map { it.asBukkitMirror() }
         }
-
+        
         return drops.filterNot { it.isEmpty }
     }
     

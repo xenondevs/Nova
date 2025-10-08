@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.world.item.tool.ToolTier
  * @param requiresToolForDrops Whether the block requires a tool to drop its item.
  * Used when `requires_tool_for_drops` is not specified in the config, or `null` to require the presence of a config entry.
  *
- * @param breakParticles The type of break particles to spawn in case the block is entity-backed by barriers. Can be null.
+ * @param breakParticles The type of break particles to spawn in case the block is entity-backed or model-less with no vanilla particles. Can be null.
  * Used when `break_particles` is not specified in the config.
  *
  * @param showBreakAnimation Whether the break animation should be shown.
@@ -57,13 +57,41 @@ fun Breakable(
  */
 interface Breakable : BlockBehavior {
     
+    /**
+     * The hardness of the block. Higher values mean the block takes longer to break.
+     */
     val hardness: Double
+    
+    /**
+     * The [ToolCategories][ToolCategory] required to break the block.
+     * If empty, no specific tool is required.
+     */
     val toolCategories: Set<ToolCategory>
+    
+    /**
+     * The [ToolTier] required to break the block.
+     * Can be null to not require a specific tool tier.
+     */
     val toolTier: ToolTier?
+    
+    /**
+     * Whether the block requires a tool to drop its item.
+     */
     val requiresToolForDrops: Boolean
+    
+    /**
+     * The type of break particles to spawn in case the block is entity-backed or model-less with no vanilla particles.
+     */
     val breakParticles: Material?
+    
+    /**
+     * Whether the break animation should be shown.
+     */
     val showBreakAnimation: Boolean
     
+    /**
+     * Default implementation of [Breakable].
+     */
     class Default(
         hardness: Provider<Double>,
         toolCategories: Provider<Set<ToolCategory>>,
