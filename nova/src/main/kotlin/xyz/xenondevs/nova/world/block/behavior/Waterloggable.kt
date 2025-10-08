@@ -34,7 +34,7 @@ object Waterloggable : BlockBehavior {
         val itemStack = player.inventory.getItem(hand)
         val isWaterlogged = state.getOrThrow(WATERLOGGED)
         
-        if (!isWaterlogged && itemStack.type == Material.WATER_BUCKET) {
+        if (itemStack.type == Material.WATER_BUCKET) {
             BlockUtils.updateBlockState(pos, state.with(WATERLOGGED, true))
             if (player.gameMode != GameMode.CREATIVE) {
                 Bucketable.emptyBucketInHand(player, hand)
