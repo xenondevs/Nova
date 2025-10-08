@@ -144,7 +144,7 @@ val Block.novaSoundGroup: SoundGroup?
             return novaBlock.getBehaviorOrNull<BlockSounds>()?.soundGroup
         }
         
-        return SoundGroup.from(type.soundGroup)
+        return if (!type.isAir) SoundGroup.from(type.soundGroup) else null
     }
 
 /**
