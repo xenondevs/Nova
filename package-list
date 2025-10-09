@@ -16,7 +16,6 @@ xyz.xenondevs.nova.integration
 xyz.xenondevs.nova.integration.customitems
 xyz.xenondevs.nova.integration.permission
 xyz.xenondevs.nova.integration.protection
-xyz.xenondevs.nova.mixin.item.using
 xyz.xenondevs.nova.network
 xyz.xenondevs.nova.network.event
 xyz.xenondevs.nova.network.event.clientbound
