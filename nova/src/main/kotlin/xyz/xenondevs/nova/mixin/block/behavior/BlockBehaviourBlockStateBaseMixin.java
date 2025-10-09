@@ -118,6 +118,7 @@ abstract class BlockBehaviourBlockStateBaseMixin {
         BlockPos pos,
         Entity entity,
         InsideBlockEffectApplier effectApplier,
+        boolean flag,
         CallbackInfo ci
     ) {
         var novaPos = NMSUtilsKt.toNovaPos(pos, level.getWorld());

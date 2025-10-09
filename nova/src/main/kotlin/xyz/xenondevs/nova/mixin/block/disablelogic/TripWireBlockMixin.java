@@ -25,7 +25,8 @@ abstract class TripWireBlockMixin {
         Level level,
         BlockPos pos,
         Entity entity,
-        InsideBlockEffectApplier effectApplier
+        InsideBlockEffectApplier effectApplier,
+        boolean flag
     ) {
     }
 

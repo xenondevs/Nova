@@ -8,7 +8,7 @@ jgrapht = "1.5.2"
 kotlin = "2.2.20"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.3.0"
-paper = "1.21.9-R0.1-SNAPSHOT"
+paper = "1.21.10-R0.1-SNAPSHOT"
 xenondevs-commons = "1.35"
 
 [libraries]
