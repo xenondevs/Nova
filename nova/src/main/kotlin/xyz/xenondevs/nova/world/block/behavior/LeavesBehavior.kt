@@ -10,8 +10,8 @@ import org.bukkit.Tag
 import org.bukkit.event.block.LeavesDecayEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
@@ -40,10 +40,10 @@ internal object LeavesBehavior : BlockBehavior {
             if (event.isCancelled || WorldDataManager.getBlockState(pos) != state)
                 return
             
-            val ctx = Context.intention(DefaultContextIntentions.BlockBreak)
-                .param(DefaultContextParamTypes.BLOCK_POS, pos)
-                .param(DefaultContextParamTypes.BLOCK_STATE_NOVA, state)
-                .param(DefaultContextParamTypes.BLOCK_BREAK_EFFECTS, false)
+            val ctx = Context.intention(BlockBreak)
+                .param(BlockBreak.BLOCK_POS, pos)
+                .param(BlockBreak.BLOCK_STATE_NOVA, state)
+                .param(BlockBreak.BLOCK_BREAK_EFFECTS, false)
                 .build()
             BlockUtils.breakBlockNaturally(ctx)
         }
@@ -58,14 +58,14 @@ internal object LeavesBehavior : BlockBehavior {
         BlockUtils.broadcastBlockUpdate(pos)
     }
     
-    override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<DefaultContextIntentions.BlockBreak>): List<ItemStack> {
-        if (!ctx[DefaultContextParamTypes.BLOCK_DROPS])
+    override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
+        if (!ctx[BlockBreak.BLOCK_DROPS])
             return emptyList()
         
         val nmsState = pos.nmsBlockState
         val params = LootParams.Builder(pos.world.serverLevel)
             .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos.nmsPos))
-            .withParameter(LootContextParams.TOOL, ctx[DefaultContextParamTypes.TOOL_ITEM_STACK].unwrap())
+            .withParameter(LootContextParams.TOOL, ctx[BlockBreak.TOOL_ITEM_STACK].unwrap())
             .withParameter(LootContextParams.BLOCK_STATE, nmsState)
             .create(LootContextParamSets.BLOCK)
         val lootTable = MINECRAFT_SERVER.reloadableRegistries().getLootTable(nmsState.block.lootTable.get())
@@ -105,7 +105,7 @@ internal object LeavesBehavior : BlockBehavior {
         return distance
     }
     
-    override fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<DefaultContextIntentions.BlockInteract>): ItemStack? {
+    override fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack? {
         val type = when (state.block) {
             DefaultBlocks.OAK_LEAVES -> Material.OAK_LEAVES
             DefaultBlocks.SPRUCE_LEAVES -> Material.SPRUCE_LEAVES

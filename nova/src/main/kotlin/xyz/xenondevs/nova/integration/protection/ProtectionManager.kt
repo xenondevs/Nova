@@ -16,10 +16,9 @@ import xyz.xenondevs.nova.api.ApiTileEntityWrapper
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration.ExecutionMode
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.context.intention.BlockInteract
+import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
@@ -148,14 +147,14 @@ object ProtectionManager {
      * Checks whether the given [ctx] passes place permission checks.
      */
     suspend fun canPlace(ctx: Context<BlockPlace>): Boolean {
-        val pos = ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS)
-        val blockItem = ctx[DefaultContextParamTypes.BLOCK_ITEM_STACK] ?: ItemStack(Material.AIR)
+        val pos = ctx[BlockPlace.BLOCK_POS]
+        val blockItem = ctx[BlockPlace.BLOCK_ITEM_STACK] ?: ItemStack(Material.AIR)
         
-        val tileEntity = ctx[DefaultContextParamTypes.SOURCE_TILE_ENTITY]
+        val tileEntity = ctx[BlockPlace.SOURCE_TILE_ENTITY]
         if (tileEntity != null)
             return canPlace(tileEntity, blockItem, pos)
         
-        val responsiblePlayer = ctx[DefaultContextParamTypes.RESPONSIBLE_PLAYER]
+        val responsiblePlayer = ctx[BlockPlace.RESPONSIBLE_PLAYER]
         if (responsiblePlayer != null)
             return canPlace(responsiblePlayer, blockItem, pos)
         
@@ -204,14 +203,14 @@ object ProtectionManager {
      * Checks whether the given [ctx] passes break permission checks.
      */
     suspend fun canBreak(ctx: Context<BlockBreak>): Boolean {
-        val pos = ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS)
-        val tool = ctx[DefaultContextParamTypes.TOOL_ITEM_STACK]
+        val pos = ctx[BlockBreak.BLOCK_POS]
+        val tool = ctx[BlockBreak.TOOL_ITEM_STACK]
         
-        val tileEntity = ctx[DefaultContextParamTypes.SOURCE_TILE_ENTITY]
+        val tileEntity = ctx[BlockBreak.SOURCE_TILE_ENTITY]
         if (tileEntity != null)
             return canBreak(tileEntity, tool, pos)
         
-        val responsiblePlayer = ctx[DefaultContextParamTypes.RESPONSIBLE_PLAYER]
+        val responsiblePlayer = ctx[BlockBreak.RESPONSIBLE_PLAYER]
         if (responsiblePlayer != null)
             return canBreak(responsiblePlayer, tool, pos)
         
@@ -260,14 +259,14 @@ object ProtectionManager {
      * Checks whether the given [ctx] passes block interaction permission checks.
      */
     suspend fun canUseBlock(ctx: Context<BlockInteract>): Boolean {
-        val pos = ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS)
-        val item = ctx[DefaultContextParamTypes.INTERACTION_ITEM_STACK]
+        val pos = ctx[BlockInteract.BLOCK_POS]
+        val item = ctx[BlockInteract.INTERACTION_ITEM_STACK]
         
-        val tileEntity = ctx[DefaultContextParamTypes.SOURCE_TILE_ENTITY]
+        val tileEntity = ctx[BlockInteract.SOURCE_TILE_ENTITY]
         if (tileEntity != null)
             return canUseBlock(tileEntity, item, pos)
         
-        val responsiblePlayer = ctx[DefaultContextParamTypes.RESPONSIBLE_PLAYER]
+        val responsiblePlayer = ctx[BlockInteract.RESPONSIBLE_PLAYER]
         if (responsiblePlayer != null)
             return canUseBlock(responsiblePlayer, item, pos)
         

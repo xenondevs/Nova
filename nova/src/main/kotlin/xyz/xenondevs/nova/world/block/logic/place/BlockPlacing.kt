@@ -19,8 +19,7 @@ import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -153,14 +152,14 @@ internal object BlockPlacing : Listener {
         if (!Tag.REPLACEABLE.isTagged(clickedBlock.type) || WorldDataManager.getBlockState(pos) != null)
             pos = pos.advance(event.blockFace)
         
-        val ctxBuilder = Context.intention(DefaultContextIntentions.BlockPlace)
-            .param(DefaultContextParamTypes.BLOCK_POS, pos)
-            .param(DefaultContextParamTypes.BLOCK_ITEM_STACK, handItem)
-            .param(DefaultContextParamTypes.SOURCE_ENTITY, player)
-            .param(DefaultContextParamTypes.CLICKED_BLOCK_FACE, event.blockFace)
+        val ctxBuilder = Context.intention(BlockPlace)
+            .param(BlockPlace.BLOCK_POS, pos)
+            .param(BlockPlace.BLOCK_ITEM_STACK, handItem)
+            .param(BlockPlace.SOURCE_ENTITY, player)
+            .param(BlockPlace.CLICKED_BLOCK_FACE, event.blockFace)
         
         val newState = novaBlock.chooseBlockState(ctxBuilder.build())
-        ctxBuilder.param(DefaultContextParamTypes.BLOCK_STATE_NOVA, newState)
+        ctxBuilder.param(BlockPlace.BLOCK_STATE_NOVA, newState)
         
         val ctx = ctxBuilder.build()
         

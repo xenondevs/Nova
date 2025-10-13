@@ -46,8 +46,7 @@ import xyz.xenondevs.nova.command.requiresPermission
 import xyz.xenondevs.nova.command.requiresPlayer
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
@@ -321,8 +320,8 @@ internal object NovaCommand : Command() {
             .flatMap { WorldDataManager.getTileEntities(it.pos) }
             .forEach { tileEntity ->
                 BlockUtils.breakBlock(
-                    Context.intention(DefaultContextIntentions.BlockBreak)
-                        .param(DefaultContextParamTypes.BLOCK_POS, tileEntity.pos)
+                    Context.intention(BlockBreak)
+                        .param(BlockBreak.BLOCK_POS, tileEntity.pos)
                         .build()
                 )
                 count++

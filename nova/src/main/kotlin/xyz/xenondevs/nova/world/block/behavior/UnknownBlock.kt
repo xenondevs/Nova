@@ -4,9 +4,8 @@ import kotlinx.serialization.json.JsonObject
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -26,7 +25,7 @@ internal class UnknownNovaBlockState(serializedBlockState: JsonObject) : NovaBlo
 internal object UnknownBlockBehavior : BlockBehavior {
     
     override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
-        val player = ctx[DefaultContextParamTypes.SOURCE_PLAYER]
+        val player = ctx[BlockInteract.SOURCE_PLAYER]
         if (player != null && !player.isSneaking && player.hasPermission("nova.command.debug") && state is UnknownNovaBlockState) {
             player.sendMessage(
                 Component.translatable()

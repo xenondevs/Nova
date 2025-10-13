@@ -3,10 +3,9 @@ package xyz.xenondevs.nova.world.block.behavior
 import org.bukkit.entity.Entity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.context.intention.BlockInteract
+import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -86,19 +85,19 @@ interface BlockBehavior : BlockBehaviorHolder {
     
     /**
      * Retrieves the amount of experience that would be dropped when breaking a block of [state] at [pos] with the given [ctx].
-     * Handlers should check [DefaultContextParamTypes.BLOCK_EXP_DROPS].
+     * Handlers should check [BlockBreak.BLOCK_EXP_DROPS].
      */
     fun getExp(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): Int = 0
     
     /**
      * Retrieves the items that would be dropped when breaking a block of [state] at [pos] with the given [ctx].
-     * Handlers should check [DefaultContextParamTypes.BLOCK_DROPS] and [DefaultContextParamTypes.BLOCK_STORAGE_DROPS].
+     * Handlers should check [BlockBreak.BLOCK_DROPS] and [BlockBreak.BLOCK_STORAGE_DROPS].
      */
     fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> = emptyList()
     
     /**
      * Chooses the [ItemStack] that should be given to the player when mid-clicking a block of [state] at [pos] with the given [ctx] in creative mode.
-     * @see DefaultContextParamTypes.INCLUDE_DATA
+     * @see BlockInteract.INCLUDE_DATA
      */
     fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack? = null
     

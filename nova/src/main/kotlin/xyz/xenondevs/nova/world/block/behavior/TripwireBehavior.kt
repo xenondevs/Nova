@@ -15,8 +15,8 @@ import org.bukkit.event.entity.EntityInteractEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.callEvent
@@ -70,8 +70,8 @@ internal object TripwireBehavior : BlockBehavior {
         }
     }
     
-    override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<DefaultContextIntentions.BlockBreak>): List<ItemStack> {
-        if (!ctx[DefaultContextParamTypes.BLOCK_DROPS])
+    override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
+        if (!ctx[BlockBreak.BLOCK_DROPS])
             return emptyList()
         
         return listOf(ItemStack.of(Material.STRING))
@@ -141,7 +141,7 @@ internal object TripwireBehavior : BlockBehavior {
             .setValue(TripWireBlock.ATTACHED, nova.getOrThrow(TRIPWIRE_ATTACHED))
             .setValue(TripWireBlock.POWERED, nova.getOrThrow(POWERED))
     
-    override fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<DefaultContextIntentions.BlockInteract>): ItemStack? {
+    override fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack {
         return ItemStack.of(Material.STRING)
     }
     

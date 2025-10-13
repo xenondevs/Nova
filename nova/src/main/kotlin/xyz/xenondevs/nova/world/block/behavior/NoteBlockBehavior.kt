@@ -14,9 +14,8 @@ import org.bukkit.block.BlockFace
 import org.bukkit.event.block.NotePlayEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.item.novaItem
@@ -42,11 +41,11 @@ private val PITCH_TABLE: FloatArray = floatArrayOf(
 internal object NoteBlockBehavior : BlockBehavior {
     
     override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
-        if (ctx[DefaultContextParamTypes.SOURCE_PLAYER]?.isSneaking == true)
+        if (ctx[BlockInteract.SOURCE_PLAYER]?.isSneaking == true)
             return false
         
-        val clickedFace = ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]
-        val item = ctx[DefaultContextParamTypes.INTERACTION_ITEM_STACK]
+        val clickedFace = ctx[BlockInteract.CLICKED_BLOCK_FACE]
+        val item = ctx[BlockInteract.INTERACTION_ITEM_STACK]
         
         if (item != null && item.novaItem == null && Tag.ITEMS_NOTEBLOCK_TOP_INSTRUMENTS.isTagged(item.type) && clickedFace == BlockFace.UP)
             return false
@@ -129,7 +128,7 @@ internal object NoteBlockBehavior : BlockBehavior {
     }
     
     override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
-        if (!ctx[DefaultContextParamTypes.BLOCK_DROPS])
+        if (!ctx[BlockBreak.BLOCK_DROPS])
             return emptyList()
         
         return listOf(ItemStack(Material.NOTE_BLOCK))

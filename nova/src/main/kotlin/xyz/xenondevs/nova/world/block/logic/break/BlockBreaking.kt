@@ -24,8 +24,7 @@ import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -167,9 +166,9 @@ internal object BlockBreaking : Listener, PacketListener {
         if (player.gameMode != GameMode.CREATIVE) {
             if (novaBlockState != null) {
                 val ctx = Context.intention(BlockBreak)
-                    .param(DefaultContextParamTypes.BLOCK_POS, pos)
-                    .param(DefaultContextParamTypes.BLOCK_STATE_NOVA, novaBlockState)
-                    .param(DefaultContextParamTypes.SOURCE_PLAYER, player)
+                    .param(BlockBreak.BLOCK_POS, pos)
+                    .param(BlockBreak.BLOCK_STATE_NOVA, novaBlockState)
+                    .param(BlockBreak.SOURCE_PLAYER, player)
                     .build()
                 novaBlockState.block.handleAttack(pos, novaBlockState, ctx)
             } else {
