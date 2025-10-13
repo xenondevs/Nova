@@ -14,8 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import xyz.xenondevs.nova.NovaBootstrapperKt;
 import xyz.xenondevs.nova.context.Context;
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract;
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes;
+import xyz.xenondevs.nova.context.intention.BlockInteract;
 import xyz.xenondevs.nova.util.NMSUtilsKt;
 import xyz.xenondevs.nova.world.format.WorldDataManager;
 
@@ -39,12 +38,12 @@ abstract class ServerGamePacketListenerImplMixin {
             return state.getCloneItemStack(level, pos, includeData);
         
         try {
-            var paramTypes = DefaultContextParamTypes.INSTANCE;
-            var ctx = Context.Companion.intention(BlockInteract.INSTANCE)
-                .param(paramTypes.getBLOCK_POS(), novaPos)
-                .param(paramTypes.getBLOCK_STATE_NOVA(), novaState)
-                .param(paramTypes.getINCLUDE_DATA(), includeData)
-                .param(paramTypes.getSOURCE_ENTITY(), player.getBukkitEntity())
+            var intention = BlockInteract.INSTANCE;
+            var ctx = Context.Companion.intention(intention)
+                .param(intention.getBLOCK_POS(), novaPos)
+                .param(intention.getBLOCK_STATE_NOVA(), novaState)
+                .param(intention.getINCLUDE_DATA(), includeData)
+                .param(intention.getSOURCE_ENTITY(), player.getBukkitEntity())
                 .build();
             return CraftItemStack.unwrap(novaState.getBlock().pickBlockCreative(novaPos, novaState, ctx));
         } catch (Exception e) {

@@ -5,9 +5,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
@@ -32,10 +31,10 @@ class NovaTileEntityBlock internal constructor(
     
     override fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>) {
         val tileEntityBlock = state.block as NovaTileEntityBlock
-        val data = ctx[DefaultContextParamTypes.TILE_ENTITY_DATA_NOVA] ?: Compound()
+        val data = ctx[BlockPlace.TILE_ENTITY_DATA_NOVA] ?: Compound()
         
         // write owner into data so that it is accessible during tile-entity construction
-        val owner = ctx[DefaultContextParamTypes.SOURCE_PLAYER] ?: ctx[DefaultContextParamTypes.SOURCE_TILE_ENTITY]?.owner
+        val owner = ctx[BlockPlace.SOURCE_PLAYER] ?: ctx[BlockPlace.SOURCE_TILE_ENTITY]?.owner
         if (owner != null) data["ownerUuid"] = owner.uniqueId
         
         val tileEntity = tileEntityBlock.tileEntityConstructor(pos, state, data)

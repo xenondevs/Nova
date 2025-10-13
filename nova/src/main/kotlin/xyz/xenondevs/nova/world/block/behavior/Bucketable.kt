@@ -9,8 +9,7 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.util.addToInventoryOrDrop
 import xyz.xenondevs.nova.util.addToInventoryPrioritizedOrDrop
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
@@ -31,11 +30,11 @@ import xyz.xenondevs.nova.world.player.swingHandEventless
 object Bucketable : BlockBehavior {
     
     override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
-        val player = ctx[DefaultContextParamTypes.SOURCE_PLAYER]
+        val player = ctx[BlockInteract.SOURCE_PLAYER]
             ?: return false
         if (player.isSneaking)
             return false
-        val hand = ctx[DefaultContextParamTypes.INTERACTION_HAND]
+        val hand = ctx[BlockInteract.INTERACTION_HAND]
             ?: return false
         val item = player.inventory.getItem(hand).takeUnlessEmpty()
             ?: return false
@@ -43,7 +42,7 @@ object Bucketable : BlockBehavior {
             ?: return false
         val fluidHolder = tileEntity.holders.firstInstanceOfOrNull<FluidHolder>()
             ?: return false
-        val clickedFace = ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]
+        val clickedFace = ctx[BlockInteract.CLICKED_BLOCK_FACE]
         
         if (item.type == Material.BUCKET) {
             // move fluid from tile-entity to bucket

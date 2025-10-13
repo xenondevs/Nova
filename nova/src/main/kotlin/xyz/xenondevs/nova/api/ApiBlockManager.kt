@@ -8,9 +8,9 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.block.NovaBlockState
 import xyz.xenondevs.nova.api.material.NovaMaterial
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.context.intention.BlockPlace
+import xyz.xenondevs.nova.context.intention.HasOptionalSource
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.format.WorldDataManager
@@ -44,9 +44,9 @@ internal object ApiBlockManager : IBlockManager {
         require(block is ApiBlockWrapper) { "block must be ApiBlockWrapper" }
         
         val ctxBuilder = Context.intention(BlockPlace)
-            .param(DefaultContextParamTypes.BLOCK_POS, location.pos)
-            .param(DefaultContextParamTypes.BLOCK_TYPE_NOVA, block.block)
-            .param(DefaultContextParamTypes.BLOCK_PLACE_EFFECTS, playSound)
+            .param(BlockPlace.BLOCK_POS, location.pos)
+            .param(BlockPlace.BLOCK_TYPE_NOVA, block.block)
+            .param(BlockPlace.BLOCK_PLACE_EFFECTS, playSound)
         setSourceParam(ctxBuilder, source)
         BlockUtils.placeBlock(ctxBuilder.build())
     }
@@ -58,31 +58,31 @@ internal object ApiBlockManager : IBlockManager {
     
     override fun getDrops(location: Location, source: Any?, tool: ItemStack?): List<ItemStack>? {
         val ctxBuilder = Context.intention(BlockBreak)
-            .param(DefaultContextParamTypes.BLOCK_POS, location.pos)
-            .param(DefaultContextParamTypes.TOOL_ITEM_STACK, tool)
+            .param(BlockBreak.BLOCK_POS, location.pos)
+            .param(BlockBreak.TOOL_ITEM_STACK, tool)
         setSourceParam(ctxBuilder, source)
         return BlockUtils.getDrops(ctxBuilder.build())
     }
     
     override fun removeBlock(location: Location, source: Any?, breakEffects: Boolean): Boolean {
         val ctxBuilder = Context.intention(BlockBreak)
-            .param(DefaultContextParamTypes.BLOCK_POS, location.pos)
-            .param(DefaultContextParamTypes.BLOCK_BREAK_EFFECTS, breakEffects)
+            .param(BlockBreak.BLOCK_POS, location.pos)
+            .param(BlockBreak.BLOCK_BREAK_EFFECTS, breakEffects)
         setSourceParam(ctxBuilder, source)
         BlockUtils.breakBlock(ctxBuilder.build())
         return true
         
     }
     
-    private fun setSourceParam(builder: Context.Builder<*>, source: Any?) {
+    private fun <I : HasOptionalSource<I>> setSourceParam(builder: Context.Builder<I>, source: Any?) {
         if (source == null)
             return
         
         when (source) {
-            is Entity -> builder.param(DefaultContextParamTypes.SOURCE_ENTITY, source)
-            is ApiTileEntityWrapper -> builder.param(DefaultContextParamTypes.SOURCE_TILE_ENTITY, source.tileEntity)
-            is Location -> builder.param(DefaultContextParamTypes.SOURCE_LOCATION, source)
-            is UUID -> builder.param(DefaultContextParamTypes.SOURCE_UUID, source)
+            is Entity -> builder.param(HasOptionalSource.sourceEntity(), source)
+            is ApiTileEntityWrapper -> builder.param(HasOptionalSource.sourceTileEntity(), source.tileEntity)
+            is Location -> builder.param(HasOptionalSource.sourceLocation(), source)
+            is UUID -> builder.param(HasOptionalSource.sourceUuid(), source)
         }
     }
     

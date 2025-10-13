@@ -21,8 +21,7 @@ import xyz.xenondevs.commons.collections.flatMap
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -241,10 +240,10 @@ internal object BlockMigrator : Listener {
         val previousNovaState = WorldDataManager.setBlockState(pos, null)
         val previousTileEntity = WorldDataManager.setTileEntity(pos, null)
         if ((previousNovaState != null && previousNovaState.block !in migrationsByNovaBlock) || previousTileEntity != null) {
-            val ctx = Context.intention(DefaultContextIntentions.BlockBreak)
-                .param(DefaultContextParamTypes.BLOCK_POS, pos)
-                .param(DefaultContextParamTypes.BLOCK_STATE_NOVA, previousNovaState)
-                .param(DefaultContextParamTypes.TILE_ENTITY_NOVA, previousTileEntity)
+            val ctx = Context.intention(BlockBreak)
+                .param(BlockBreak.BLOCK_POS, pos)
+                .param(BlockBreak.BLOCK_STATE_NOVA, previousNovaState)
+                .param(BlockBreak.TILE_ENTITY_NOVA, previousTileEntity)
                 .build()
             if (previousNovaState != null && previousNovaState.block !in migrationsByNovaBlock) {
                 // call behavior break handlers directly to bypass any tile-entity or model provider related logic

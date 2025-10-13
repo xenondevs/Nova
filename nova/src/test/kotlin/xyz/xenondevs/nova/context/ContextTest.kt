@@ -1,48 +1,24 @@
 package xyz.xenondevs.nova.context
 
+import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import xyz.xenondevs.nova.context.intention.ContextIntention
-import xyz.xenondevs.nova.context.param.ContextParamType
-import xyz.xenondevs.nova.context.param.DefaultingContextParamType
 import kotlin.test.assertEquals
 
-object TestIntentions {
+data object TestIntention : AbstractContextIntention<TestIntention>() {
     
-    data object TestIntention : ContextIntention() {
-        override val required by lazy { setOf(TestParamTypes.STRING) }
+    val STRING_PARENT = ContextParamType<String, TestIntention>(Key.key("nova", "string_parent"))
+    val STRING = RequiredContextParamType<String, TestIntention>(Key.key("nova", "string"))
+    val STRING_LENGTH = ContextParamType<Int, TestIntention>(Key.key("nova", "string_length"))
+    val STRING_LENGTH_AS_STRING = ContextParamType<String, TestIntention>(Key.key("nova", "string_length_as_string"))
+    val BOOLEAN = DefaultingContextParamType<Boolean, TestIntention>(Key.key("nova", "boolean"), false)
+    
+    init {
+        require(STRING)
+        addAutofiller(STRING, Autofiller.from(STRING_PARENT) { it })
+        addAutofiller(STRING_LENGTH, Autofiller.from(STRING) { it.length })
+        addAutofiller(STRING_LENGTH_AS_STRING, Autofiller.from(STRING_LENGTH) { it.toString() })
     }
-    
-}
-
-object TestParamTypes {
-    
-    val STRING_PARENT: ContextParamType<String> =
-        ContextParamType.builder<String>("string_parent")
-            .optionalIn(TestIntentions.TestIntention)
-            .build()
-    
-    val STRING: ContextParamType<String> =
-        ContextParamType.builder<String>("string")
-            .autofilledBy(TestParamTypes::STRING_PARENT) { it }
-            .build()
-    
-    val STRING_LENGTH: ContextParamType<Int> =
-        ContextParamType.builder<Int>("string_length")
-            .optionalIn(TestIntentions.TestIntention)
-            .autofilledBy(TestParamTypes::STRING) { it.length }
-            .build()
-    
-    val STRING_LENGTH_AS_STRING: ContextParamType<String> =
-        ContextParamType.builder<String>("string_length_as_string")
-            .optionalIn(TestIntentions.TestIntention)
-            .autofilledBy(TestParamTypes::STRING_LENGTH) { it.toString() }
-            .build()
-    
-    val BOOLEAN: DefaultingContextParamType<Boolean> =
-        ContextParamType.builder<Boolean>("boolean")
-            .optionalIn(TestIntentions.TestIntention)
-            .build(false)
     
 }
 
@@ -51,58 +27,58 @@ class ContextTest {
     @Test
     fun testFailOnMissingRequiredParams() {
         assertThrows<IllegalStateException> {
-            Context.intention(TestIntentions.TestIntention)
-                .param(TestParamTypes.BOOLEAN, true)
+            Context.intention(TestIntention)
+                .param(TestIntention.BOOLEAN, true)
                 .build()
         }
     }
     
     @Test
     fun testAutofill() {
-        val context = Context.intention(TestIntentions.TestIntention)
-            .param(TestParamTypes.STRING, "Hello")
+        val context = Context.intention(TestIntention)
+            .param(TestIntention.STRING, "Hello")
             .build()
         
-        assertEquals("Hello", context[TestParamTypes.STRING])
-        assertEquals(5, context[TestParamTypes.STRING_LENGTH])
+        assertEquals("Hello", context[TestIntention.STRING])
+        assertEquals(5, context[TestIntention.STRING_LENGTH])
     }
     
     @Test
     fun testAutofillChain() {
-        val context = Context.intention(TestIntentions.TestIntention)
-            .param(TestParamTypes.STRING, "Hello")
+        val context = Context.intention(TestIntention)
+            .param(TestIntention.STRING, "Hello")
             .build()
         
-        assertEquals("Hello", context[TestParamTypes.STRING])
-        assertEquals("5", context[TestParamTypes.STRING_LENGTH_AS_STRING])
+        assertEquals("Hello", context[TestIntention.STRING])
+        assertEquals("5", context[TestIntention.STRING_LENGTH_AS_STRING])
     }
     
     @Test
     fun testDefaultValue() {
-        val context = Context.intention(TestIntentions.TestIntention)
-            .param(TestParamTypes.STRING, "Hello")
+        val context = Context.intention(TestIntention)
+            .param(TestIntention.STRING, "Hello")
             .build()
         
-        assertEquals(false, context[TestParamTypes.BOOLEAN])
+        assertEquals(false, context[TestIntention.BOOLEAN])
     }
     
     @Test
     fun testDefaultValueDoesNotOverrideExplicitValue() {
-        val context = Context.intention(TestIntentions.TestIntention)
-            .param(TestParamTypes.STRING, "Hello")
-            .param(TestParamTypes.BOOLEAN, true)
+        val context = Context.intention(TestIntention)
+            .param(TestIntention.STRING, "Hello")
+            .param(TestIntention.BOOLEAN, true)
             .build()
         
-        assertEquals(true, context[TestParamTypes.BOOLEAN])
+        assertEquals(true, context[TestIntention.BOOLEAN])
     }
     
     @Test
     fun testDoesNotFailWhenRequiredParamsAreResolvable() {
-        val context = Context.intention(TestIntentions.TestIntention)
-            .param(TestParamTypes.STRING_PARENT, "Hello")
+        val context = Context.intention(TestIntention)
+            .param(TestIntention.STRING_PARENT, "Hello")
             .build()
         
-        assertEquals("Hello", context[TestParamTypes.STRING])
+        assertEquals("Hello", context[TestIntention.STRING])
     }
     
 }

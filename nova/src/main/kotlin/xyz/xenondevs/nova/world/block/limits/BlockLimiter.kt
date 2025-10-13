@@ -3,8 +3,7 @@ package xyz.xenondevs.nova.world.block.limits
 import net.kyori.adventure.key.Key
 import org.bukkit.World
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
@@ -46,7 +45,7 @@ internal class TypeBlacklist(private val blacklist: Set<Key>) : SimpleBlockLimit
 internal class WorldBlacklist(private val blacklist: Set<String>) : SimpleBlockLimiter("nova.tile_entity_limits.world_blacklist.deny") {
     
     override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
-        return !blacklist.contains("*") && ctx[DefaultContextParamTypes.BLOCK_WORLD]!!.name !in blacklist
+        return !blacklist.contains("*") && ctx[BlockPlace.BLOCK_WORLD].name !in blacklist
     }
     
 }
@@ -55,7 +54,7 @@ internal class TypeWorldBlacklist(private val blacklist: Map<String, Set<Key>>) 
     
     override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
         val id = material.id
-        val world: World = ctx[DefaultContextParamTypes.BLOCK_WORLD]!!
+        val world: World = ctx[BlockPlace.BLOCK_WORLD]
         return blacklist["*"]?.contains(id) != true && blacklist[world.name]?.contains(id) != true
     }
     
@@ -68,8 +67,8 @@ internal class AmountLimiter(private val type: Type, private val limits: Map<Key
     
     override fun canPlace(material: NovaBlock, ctx: Context<BlockPlace>): PlaceResult {
         val id: Key = material.id
-        val owner: UUID = ctx[DefaultContextParamTypes.SOURCE_UUID] ?: return ALLOWED
-        val pos: BlockPos = ctx[DefaultContextParamTypes.BLOCK_POS]!!
+        val owner: UUID = ctx[BlockPlace.SOURCE_UUID] ?: return ALLOWED
+        val pos: BlockPos = ctx[BlockPlace.BLOCK_POS]
         
         val specificLimit = limits[id]
         val totalLimit = limits[null]

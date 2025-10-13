@@ -5,8 +5,7 @@ import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.Sound
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -23,12 +22,12 @@ import xyz.xenondevs.nova.world.player.swingHandEventless
 object Waterloggable : BlockBehavior {
     
     override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
-        val player = ctx[DefaultContextParamTypes.SOURCE_PLAYER]
+        val player = ctx[BlockInteract.SOURCE_PLAYER]
             ?: return false
         if (player.isSneaking)
             return false
         
-        val hand = ctx[DefaultContextParamTypes.INTERACTION_HAND]
+        val hand = ctx[BlockInteract.INTERACTION_HAND]
             ?: return false
         
         val itemStack = player.inventory.getItem(hand)

@@ -2,8 +2,7 @@ package xyz.xenondevs.nova.world.block.behavior
 
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -18,7 +17,7 @@ import xyz.xenondevs.nova.world.player.swingMainHandEventless
 object TileEntityInteractive : BlockBehavior {
     
     override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
-        val sourcePlayer = ctx[DefaultContextParamTypes.SOURCE_ENTITY] as? Player
+        val sourcePlayer = ctx[BlockInteract.SOURCE_ENTITY] as? Player
         if (sourcePlayer?.isSneaking == true)
             return false
         

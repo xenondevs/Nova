@@ -5,7 +5,7 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
 import org.bukkit.Axis
 import org.bukkit.Fluid
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.axis
 import xyz.xenondevs.nova.util.calculateYaw
@@ -59,7 +59,7 @@ object DefaultScopedBlockStateProperties {
      */
     val FACING_HORIZONTAL: ScopedBlockStateProperty<BlockFace> =
         DefaultBlockStateProperties.FACING.scope(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST) { ctx ->
-            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
+            ctx[BlockPlace.SOURCE_DIRECTION]
                 ?.calculateYaw()
                 ?.let { BlockFaceUtils.toCartesianFace(it) }
                 ?.oppositeFace
@@ -71,7 +71,7 @@ object DefaultScopedBlockStateProperties {
      */
     val FACING_VERTICAL: ScopedBlockStateProperty<BlockFace> =
         DefaultBlockStateProperties.FACING.scope(BlockFace.UP, BlockFace.DOWN) { ctx ->
-            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]?.calculateYawPitch()
+            ctx[BlockPlace.SOURCE_DIRECTION]?.calculateYawPitch()
                 ?.let { (_, pitch) -> if (pitch < 0) BlockFace.UP else BlockFace.DOWN }
                 ?: BlockFace.UP
         }
@@ -84,7 +84,7 @@ object DefaultScopedBlockStateProperties {
         DefaultBlockStateProperties.FACING.scope(
             BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN
         ) { ctx ->
-            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
+            ctx[BlockPlace.SOURCE_DIRECTION]
                 ?.calculateYawPitch()
                 ?.let { (yaw, pitch) -> BlockFaceUtils.toCartesianFace(yaw, pitch) }
                 ?.oppositeFace
@@ -105,7 +105,7 @@ object DefaultScopedBlockStateProperties {
             BlockFace.SOUTH, BlockFace.SOUTH_SOUTH_WEST, BlockFace.SOUTH_WEST, BlockFace.WEST_SOUTH_WEST,
             BlockFace.WEST, BlockFace.WEST_NORTH_WEST, BlockFace.NORTH_WEST, BlockFace.NORTH_NORTH_WEST
         ) { ctx ->
-            ctx[DefaultContextParamTypes.SOURCE_DIRECTION]
+            ctx[BlockPlace.SOURCE_DIRECTION]
                 ?.calculateYaw()
                 ?.let { BlockFaceUtils.toFace(it) }
                 ?.oppositeFace
@@ -117,7 +117,7 @@ object DefaultScopedBlockStateProperties {
      */
     val AXIS: ScopedBlockStateProperty<Axis> =
         DefaultBlockStateProperties.AXIS.scope(Axis.Y, Axis.X, Axis.Z) { ctx ->
-            ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]?.axis ?: Axis.Y
+            ctx[BlockPlace.CLICKED_BLOCK_FACE]?.axis ?: Axis.Y
         }
     
     /**
@@ -125,7 +125,7 @@ object DefaultScopedBlockStateProperties {
      */
     val AXIS_HORIZONTAL: ScopedBlockStateProperty<Axis> =
         DefaultBlockStateProperties.AXIS.scope(Axis.X, Axis.Z) { ctx ->
-            ctx[DefaultContextParamTypes.CLICKED_BLOCK_FACE]?.axis ?: Axis.X
+            ctx[BlockPlace.CLICKED_BLOCK_FACE]?.axis ?: Axis.X
         }
     
     /**
@@ -133,7 +133,7 @@ object DefaultScopedBlockStateProperties {
      */
     val WATERLOGGED: ScopedBlockStateProperty<Boolean> =
         DefaultBlockStateProperties.WATERLOGGED.scope { ctx ->
-            val pos = ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS)
+            val pos = ctx[BlockPlace.BLOCK_POS]
             pos.world.getFluidData(pos.x, pos.y, pos.z).fluidType == Fluid.WATER
         }
     
@@ -142,12 +142,12 @@ object DefaultScopedBlockStateProperties {
      */
     val POWERED: ScopedBlockStateProperty<Boolean> =
         DefaultBlockStateProperties.POWERED.scope { ctx ->
-            ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS).block.isBlockIndirectlyPowered
+            ctx[BlockPlace.BLOCK_POS].block.isBlockIndirectlyPowered
         }
     
     internal val NOTE_BLOCK_INSTRUMENT: ScopedBlockStateProperty<NoteBlockInstrument> =
         DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT.scope { ctx ->
-            NoteBlockBehavior.determineInstrument(ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS))
+            NoteBlockBehavior.determineInstrument(ctx[BlockPlace.BLOCK_POS])
         }
     
     internal val NOTE_BLOCK_NOTE: ScopedBlockStateProperty<Int> =
@@ -155,12 +155,12 @@ object DefaultScopedBlockStateProperties {
     
     internal val LEAVES_DISTANCE: ScopedBlockStateProperty<Int> =
         DefaultBlockStateProperties.LEAVES_DISTANCE.scope(1..7) { ctx ->
-            LeavesBehavior.calculateDistance(ctx.getOrThrow(DefaultContextParamTypes.BLOCK_POS))
+            LeavesBehavior.calculateDistance(ctx[BlockPlace.BLOCK_POS])
         }
     
     internal val LEAVES_PERSISTENT: ScopedBlockStateProperty<Boolean> =
         DefaultBlockStateProperties.LEAVES_PERSISTENT.scope { ctx ->
-            ctx[DefaultContextParamTypes.SOURCE_UUID] != null
+            ctx[BlockPlace.SOURCE_UUID] != null
         }
     
     internal val TRIPWIRE_NORTH: ScopedBlockStateProperty<Boolean> = DefaultBlockStateProperties.TRIPWIRE_NORTH.scope { false }

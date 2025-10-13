@@ -18,8 +18,7 @@ import org.bukkit.event.block.BlockDamageEvent
 import org.bukkit.event.block.BlockExpEvent
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.BlockUtils
@@ -179,9 +178,9 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
     fun breakBlock(brokenClientside: Boolean, sequence: Int) {
         // create a block breaking context
         val ctxBuilder = Context.intention(BlockBreak)
-            .param(DefaultContextParamTypes.BLOCK_POS, pos)
-            .param(DefaultContextParamTypes.SOURCE_ENTITY, player)
-            .param(DefaultContextParamTypes.TOOL_ITEM_STACK, tool)
+            .param(BlockBreak.BLOCK_POS, pos)
+            .param(BlockBreak.SOURCE_ENTITY, player)
+            .param(BlockBreak.TOOL_ITEM_STACK, tool)
         val ctx = ctxBuilder.build()
         
         val level = block.world.serverLevel
@@ -192,15 +191,15 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
         event.expToDrop = when (this) {
             is NovaBlockBreaker -> blockType.getExp(pos, blockState, ctxBuilder.build())
             is VanillaBlockBreaker -> {
-                if (ctx[DefaultContextParamTypes.BLOCK_EXP_DROPS])
+                if (ctx[BlockBreak.BLOCK_EXP_DROPS])
                     BlockUtils.getVanillaBlockExp(level, blockPos, tool.unwrap().copy())
                 else 0
             }
         }
         
         callEvent(event)
-        ctxBuilder.param(DefaultContextParamTypes.BLOCK_DROPS, ctx[DefaultContextParamTypes.BLOCK_DROPS] && event.isDropItems)
-        ctxBuilder.param(DefaultContextParamTypes.BLOCK_STORAGE_DROPS, ctx[DefaultContextParamTypes.BLOCK_STORAGE_DROPS] && event.isDropItems)
+        ctxBuilder.param(BlockBreak.BLOCK_DROPS, ctx[BlockBreak.BLOCK_DROPS] && event.isDropItems)
+        ctxBuilder.param(BlockBreak.BLOCK_STORAGE_DROPS, ctx[BlockBreak.BLOCK_STORAGE_DROPS] && event.isDropItems)
         //</editor-fold>
         
         if (!event.isCancelled && !ProtectionManager.isVanillaProtected(player, block.location)) {

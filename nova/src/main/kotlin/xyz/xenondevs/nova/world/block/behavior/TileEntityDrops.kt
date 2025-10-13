@@ -2,8 +2,7 @@ package xyz.xenondevs.nova.world.block.behavior
 
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
@@ -18,11 +17,11 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 object TileEntityDrops : BlockBehavior {
     
     override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
-        if (!ctx[DefaultContextParamTypes.BLOCK_DROPS] && !ctx[DefaultContextParamTypes.BLOCK_STORAGE_DROPS])
+        if (!ctx[BlockBreak.BLOCK_DROPS] && !ctx[BlockBreak.BLOCK_STORAGE_DROPS])
             return emptyList()
         
         return WorldDataManager.getTileEntity(pos)
-            ?.getDrops(ctx[DefaultContextParamTypes.BLOCK_DROPS])
+            ?.getDrops(ctx[BlockBreak.BLOCK_DROPS])
             ?: emptyList()
     }
     

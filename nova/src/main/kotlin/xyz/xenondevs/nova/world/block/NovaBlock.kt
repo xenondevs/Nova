@@ -17,9 +17,9 @@ import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockInteract
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
+import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.context.intention.BlockInteract
+import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockSerializer

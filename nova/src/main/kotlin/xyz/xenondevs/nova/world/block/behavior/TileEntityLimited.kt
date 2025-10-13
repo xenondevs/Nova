@@ -3,9 +3,8 @@ package xyz.xenondevs.nova.world.block.behavior
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.nova.context.Context
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockBreak
-import xyz.xenondevs.nova.context.intention.DefaultContextIntentions.BlockPlace
-import xyz.xenondevs.nova.context.param.DefaultContextParamTypes
+import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.limits.TileEntityLimits
@@ -20,12 +19,12 @@ import xyz.xenondevs.nova.world.format.WorldDataManager
 object TileEntityLimited : BlockBehavior {
     
     override suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean {
-        if (ctx[DefaultContextParamTypes.BYPASS_TILE_ENTITY_LIMITS])
+        if (ctx[BlockPlace.BYPASS_TILE_ENTITY_LIMITS])
             return true
         
         val result = TileEntityLimits.canPlace(ctx)
         if (!result.allowed) {
-            ctx[DefaultContextParamTypes.SOURCE_PLAYER]?.sendMessage(Component.text(result.message, NamedTextColor.RED))
+            ctx[BlockPlace.SOURCE_PLAYER]?.sendMessage(Component.text(result.message, NamedTextColor.RED))
             return false
         }
         
