@@ -8,7 +8,6 @@ plugins {
 dependencies {
     implementation(libs.bundles.xenondevs.commons)
     implementation(libs.bundles.minecraft.assets)
-    implementation(libs.configurate.yaml)
     implementation(libs.bytebase)
     implementation(origamiLibs.origami.plugin)
 }
@@ -39,7 +38,9 @@ val generateVersionsClass = tasks.register("generateVersionsClass") {
             
             internal object Versions {
                 const val NOVA = "${project.version}"
+                const val NOVA_RELEASE = "${Regex("""^(\d+.\d+).*$""").matchEntire(project.version.toString())!!.groupValues[1]}"
                 const val PAPER = "${libs.versions.paper.get()}"
+                const val PAPER_API_VERSION = "${libs.versions.paper.get().substring(0, 4)}"
             }
             """.trimIndent()
         )

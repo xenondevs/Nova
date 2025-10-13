@@ -16,7 +16,7 @@ private val LANGUAGE_CODES = arrayOf(
     "zh_hk", "zh_tw", "zlm_arab"
 )
 
-abstract class GenerateLanguageFilesTask : DefaultTask() {
+internal abstract class GenerateLanguageFilesTask : DefaultTask() {
     
     @TaskAction
     fun run() {

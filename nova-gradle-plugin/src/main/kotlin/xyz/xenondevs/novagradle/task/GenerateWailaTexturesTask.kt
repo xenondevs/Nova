@@ -15,7 +15,7 @@ import xyz.xenondevs.renderer.MinecraftModelRenderer
 import xyz.xenondevs.renderer.model.resource.ZipResourcePack
 import java.io.File
 
-abstract class GenerateWailaTexturesTask : DefaultTask() {
+internal abstract class GenerateWailaTexturesTask : DefaultTask() {
     
     @get:Input
     abstract val addonId: Property<String>
