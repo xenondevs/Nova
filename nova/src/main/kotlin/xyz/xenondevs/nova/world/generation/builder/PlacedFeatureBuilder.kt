@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.world.generation.builder
 
 import net.kyori.adventure.key.Key
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.WritableRegistry
@@ -21,6 +22,7 @@ import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter
 import net.minecraft.world.level.levelgen.placement.CountOnEveryLayerPlacement
 import net.minecraft.world.level.levelgen.placement.CountPlacement
 import net.minecraft.world.level.levelgen.placement.EnvironmentScanPlacement
+import net.minecraft.world.level.levelgen.placement.FixedPlacement
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement
 import net.minecraft.world.level.levelgen.placement.HeightmapPlacement
 import net.minecraft.world.level.levelgen.placement.InSquarePlacement
@@ -60,7 +62,6 @@ class PlacedFeatureBuilder internal constructor(
     
     private var configuredFeature: Holder<ConfiguredFeature<*, *>>? = null
     private val modifiers = mutableListOf<PlacementModifier>()
-    
     
     /**
      * Sets the [ConfiguredFeature] that should be placed by this [PlacedFeature] to [configuredFeature].
@@ -367,6 +368,22 @@ class PlacedFeatureBuilder internal constructor(
      */
     fun surfaceWaterDepthFilter(maxDepth: Int) {
         modifiers += SurfaceWaterDepthFilter.forMaxDepth(maxDepth)
+    }
+    
+    /**
+     * Adds a [FixedPlacement] [PlacementModifier] with the given [positions] to this [PlacedFeature], which returns
+     * exactly the given positions if they're in the current chunk.
+     */
+    fun fixedPlacement(vararg positions: BlockPos) {
+        modifiers += FixedPlacement(listOf(elements = positions))
+    }
+    
+    /**
+     * Adds a [FixedPlacement] [PlacementModifier] with the given [positions] to this [PlacedFeature], which returns
+     * exactly the given positions if they're in the current chunk.
+     */
+    fun fixedPlacement(positions: List<BlockPos>) {
+        modifiers += FixedPlacement(positions)
     }
     
     /**
