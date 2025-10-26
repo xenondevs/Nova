@@ -12,7 +12,7 @@ paper = "1.21.10-R0.1-SNAPSHOT"
 xenondevs-commons = "1.35"
 
 [libraries]
-awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.35.5" }
+awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.35.10" }
 bstats = { group = "xyz.xenondevs.bstats", name = "bstats-bukkit", version = "3.0.1" }
 bytebase = { group = "xyz.xenondevs.bytebase", name = "ByteBase", version.ref = "bytebase" }
 bytebase-runtime = { group = "xyz.xenondevs.bytebase", name = "ByteBase-Runtime", version.ref = "bytebase" }
