@@ -30,7 +30,7 @@ jobs:
 
       - name: Upload Artifacts
         id: upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Artifacts
           path: ./artifacts/*.jar
