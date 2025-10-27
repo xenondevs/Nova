@@ -159,8 +159,6 @@ abstract class AbstractNovaBlockBuilder<B : NovaBlock> internal constructor(
      *   This allows for very customizable colliders.
      * * The item display entities can be accessed and updated at runtime.
      *
-     * Note that only tile-entity blocks can use entity-backed models.
-     *
      * Exclusive with [stateBacked] and [modelLess].
      */
     fun entityBacked(
