@@ -20,16 +20,15 @@ caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version
 commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "xenondevs-commons" }
 commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "xenondevs-commons" }
 commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "xenondevs-commons" }
-commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version = "2.0.0-alpha.7" }
+commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version = "2.0.0-alpha.8" }
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "xenondevs-commons" }
 commons-version = { group = "xyz.xenondevs.commons", name = "commons-version", version.ref = "xenondevs-commons" }
-configurate-yaml = { group = "org.spongepowered", name = "configurate-yaml", version = "4.2.0" }
 cosmic-binary-format = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format", version = "1.0.0-alpha.3" }
 dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
 dokka-core = { module = "org.jetbrains.dokka:dokka-core", version.ref = "dokka" }
 dokka-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 fuzzywuzzy = { group = "me.xdrop", name = "fuzzywuzzy", version = "1.4.0" }
-invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version = "2.0.0-alpha.20" }
+invui-kotlin = { group = "xyz.xenondevs.invui", name = "invui-kotlin", version = "2.0.0-alpha.21" }
 jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jgrapht" }
 jgrapht-io = { group = "org.jgrapht", name = "jgrapht-io", version.ref = "jgrapht" }
 jimfs = { group = "com.google.jimfs", name = "jimfs", version = "1.3.1" }
