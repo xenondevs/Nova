@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>NovaRegistries</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
                     nova-parent
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.21.0-alpha.5
+        <div class="library-version" id="library-version">0.21.0-RC.1
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova/main">jvm</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova/main">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,32 +62,34 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     nova-parent
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.registry/NovaRegistries///PointingToDeclaration//-501115348">
   <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.registry</a><span class="delimiter">/</span><span class="current">NovaRegistries</span></div>
   <div class="cover ">
@@ -100,9 +100,9 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="609313531%2FProperties%2F-501115348" anchor-label="ABILITY_TYPE" id="609313531%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-a-b-i-l-i-t-y_-t-y-p-e.html"><span>ABILITY_</span><wbr><span>TYPE</span></a></div>
@@ -117,7 +117,7 @@
             </div>
           </div>
 <a data-name="-54632742%2FProperties%2F-501115348" anchor-label="ATTACHMENT_TYPE" id="-54632742%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-a-t-t-a-c-h-m-e-n-t_-t-y-p-e.html"><span>ATTACHMENT_</span><wbr><span>TYPE</span></a></div>
@@ -132,7 +132,7 @@
             </div>
           </div>
 <a data-name="-1323588040%2FProperties%2F-501115348" anchor-label="BIOME_INJECTION" id="-1323588040%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-b-i-o-m-e_-i-n-j-e-c-t-i-o-n.html"><span>BIOME_</span><wbr><span>INJECTION</span></a></div>
@@ -147,7 +147,7 @@
             </div>
           </div>
 <a data-name="1651541731%2FProperties%2F-501115348" anchor-label="BLOCK" id="1651541731%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-b-l-o-c-k.html"><span><span>BLOCK</span></span></a></div>
@@ -162,7 +162,7 @@
             </div>
           </div>
 <a data-name="491462530%2FProperties%2F-501115348" anchor-label="EQUIPMENT" id="491462530%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-e-q-u-i-p-m-e-n-t.html"><span><span>EQUIPMENT</span></span></a></div>
@@ -177,7 +177,7 @@
             </div>
           </div>
 <a data-name="-808433031%2FProperties%2F-501115348" anchor-label="GUI_TEXTURE" id="-808433031%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-g-u-i_-t-e-x-t-u-r-e.html"><span>GUI_</span><wbr><span>TEXTURE</span></a></div>
@@ -192,7 +192,7 @@
             </div>
           </div>
 <a data-name="1032210103%2FProperties%2F-501115348" anchor-label="ITEM" id="1032210103%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-i-t-e-m.html"><span><span>ITEM</span></span></a></div>
@@ -207,7 +207,7 @@
             </div>
           </div>
 <a data-name="782194709%2FProperties%2F-501115348" anchor-label="ITEM_FILTER_TYPE" id="782194709%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-i-t-e-m_-f-i-l-t-e-r_-t-y-p-e.html"><span>ITEM_</span><wbr><span>FILTER_</span><wbr><span>TYPE</span></a></div>
@@ -222,7 +222,7 @@
             </div>
           </div>
 <a data-name="1245014271%2FProperties%2F-501115348" anchor-label="NETWORK_TYPE" id="1245014271%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-n-e-t-w-o-r-k_-t-y-p-e.html"><span>NETWORK_</span><wbr><span>TYPE</span></a></div>
@@ -237,7 +237,7 @@
             </div>
           </div>
 <a data-name="1447864197%2FProperties%2F-501115348" anchor-label="RECIPE_TYPE" id="1447864197%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-r-e-c-i-p-e_-t-y-p-e.html"><span>RECIPE_</span><wbr><span>TYPE</span></a></div>
@@ -252,7 +252,7 @@
             </div>
           </div>
 <a data-name="-961029237%2FProperties%2F-501115348" anchor-label="TOOL_CATEGORY" id="-961029237%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-t-o-o-l_-c-a-t-e-g-o-r-y.html"><span>TOOL_</span><wbr><span>CATEGORY</span></a></div>
@@ -267,7 +267,7 @@
             </div>
           </div>
 <a data-name="-1424610009%2FProperties%2F-501115348" anchor-label="TOOL_TIER" id="-1424610009%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-t-o-o-l_-t-i-e-r.html"><span>TOOL_</span><wbr><span>TIER</span></a></div>
@@ -282,7 +282,7 @@
             </div>
           </div>
 <a data-name="134648603%2FProperties%2F-501115348" anchor-label="TOOLTIP_STYLE" id="134648603%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-t-o-o-l-t-i-p_-s-t-y-l-e.html"><span>TOOLTIP_</span><wbr><span>STYLE</span></a></div>
@@ -297,7 +297,7 @@
             </div>
           </div>
 <a data-name="-731713671%2FProperties%2F-501115348" anchor-label="WAILA_INFO_PROVIDER" id="-731713671%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-w-a-i-l-a_-i-n-f-o_-p-r-o-v-i-d-e-r.html"><span>WAILA_</span><wbr><span>INFO_</span><wbr><span>PROVIDER</span></a></div>
@@ -312,7 +312,7 @@
             </div>
           </div>
 <a data-name="-1486371825%2FProperties%2F-501115348" anchor-label="WAILA_TOOL_ICON_PROVIDER" id="-1486371825%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-w-a-i-l-a_-t-o-o-l_-i-c-o-n_-p-r-o-v-i-d-e-r.html"><span>WAILA_</span><wbr><span>TOOL_</span><wbr><span>ICON_</span><wbr><span>PROVIDER</span></a></div>
@@ -327,7 +327,7 @@
             </div>
           </div>
 <a data-name="344184111%2FProperties%2F-501115348" anchor-label="WRAPPER_BLOCK" id="344184111%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-w-r-a-p-p-e-r_-b-l-o-c-k.html"><span>WRAPPER_</span><wbr><span>BLOCK</span></a></div>
@@ -347,17 +347,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

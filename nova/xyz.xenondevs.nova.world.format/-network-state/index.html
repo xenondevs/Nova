@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>NetworkState</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
                     nova-parent
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.21.0-alpha.5
+        <div class="library-version" id="library-version">0.21.0-RC.1
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova/main">jvm</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova/main">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,32 +62,34 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     nova-parent
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.world.format/NetworkState///PointingToDeclaration//-501115348">
   <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.world.format</a><span class="delimiter">/</span><span class="current">NetworkState</span></div>
   <div class="cover ">
@@ -100,9 +100,9 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="246763531%2FProperties%2F-501115348" anchor-label="networks" id="246763531%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="networks.html"><span><span>networks</span></span></a></div>
@@ -119,9 +119,9 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="-1306405918%2FFunctions%2F-501115348" anchor-label="connectEndPointToBridge" id="-1306405918%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="connect-end-point-to-bridge.html"><span>connect</span><wbr><span>End</span><wbr><span>Point</span><wbr><span>To</span><wbr><span><span>Bridge</span></span></a></div>
@@ -136,7 +136,7 @@
             </div>
           </div>
 <a data-name="1685722967%2FFunctions%2F-501115348" anchor-label="connectEndPointToEndPoint" id="1685722967%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="connect-end-point-to-end-point.html"><span>connect</span><wbr><span>End</span><wbr><span>Point</span><wbr><span>To</span><wbr><span>End</span><wbr><span><span>Point</span></span></a></div>
@@ -151,7 +151,7 @@
             </div>
           </div>
 <a data-name="-535592918%2FFunctions%2F-501115348" anchor-label="contains" id="-535592918%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="contains.html"><span><span>contains</span></span></a></div>
@@ -160,13 +160,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="contains.html"><span class="token function">contains</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">network<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether a network with the same UUID as <a href="contains.html">network</a> is present in the network state.</p></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="contains.html"><span class="token function">contains</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div><div class="brief "><p class="paragraph">Checks whether a node with the same position as <a href="contains.html">node</a> is present in the network state.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="contains.html"><span class="token function">contains</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">network<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network/-proto-network/index.html">ProtoNetwork</a><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether a network with the same UUID as <a href="contains.html">network</a> is present in the network state.</p></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="contains.html"><span class="token function">contains</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">node<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.tileentity.network.node/-network-node/index.html">NetworkNode</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether a node with the same position as <a href="contains.html">node</a> is present in the network state.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-712167038%2FFunctions%2F-501115348" anchor-label="createNetwork" id="-712167038%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="create-network.html"><span>create</span><wbr><span><span>Network</span></span></a></div>
@@ -181,7 +181,7 @@
             </div>
           </div>
 <a data-name="-440939523%2FFunctions%2F-501115348" anchor-label="disconnectEndPointFromBridge" id="-440939523%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="disconnect-end-point-from-bridge.html"><span>disconnect</span><wbr><span>End</span><wbr><span>Point</span><wbr><span>From</span><wbr><span><span>Bridge</span></span></a></div>
@@ -196,7 +196,7 @@
             </div>
           </div>
 <a data-name="-325444163%2FFunctions%2F-501115348" anchor-label="disconnectEndPointFromEndPoint" id="-325444163%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="disconnect-end-point-from-end-point.html"><span>disconnect</span><wbr><span>End</span><wbr><span>Point</span><wbr><span>From</span><wbr><span>End</span><wbr><span><span>Point</span></span></a></div>
@@ -211,7 +211,7 @@
             </div>
           </div>
 <a data-name="40948662%2FFunctions%2F-501115348" anchor-label="forEachConnectedNode" id="40948662%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="for-each-connected-node.html"><span>for</span><wbr><span>Each</span><wbr><span>Connected</span><wbr><span><span>Node</span></span></a></div>
@@ -226,7 +226,7 @@
             </div>
           </div>
 <a data-name="1113619357%2FFunctions%2F-501115348" anchor-label="forEachNetwork" id="1113619357%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="for-each-network.html"><span>for</span><wbr><span>Each</span><wbr><span><span>Network</span></span></a></div>
@@ -241,7 +241,7 @@
             </div>
           </div>
 <a data-name="843758624%2FFunctions%2F-501115348" anchor-label="getAllowedFaces" id="843758624%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-allowed-faces.html"><span>get</span><wbr><span>Allowed</span><wbr><span><span>Faces</span></span></a></div>
@@ -256,7 +256,7 @@
             </div>
           </div>
 <a data-name="-2000400173%2FFunctions%2F-501115348" anchor-label="getBridgeData" id="-2000400173%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-bridge-data.html"><span>get</span><wbr><span>Bridge</span><wbr><span><span>Data</span></span></a></div>
@@ -271,7 +271,7 @@
             </div>
           </div>
 <a data-name="-51034069%2FFunctions%2F-501115348" anchor-label="getBridgeFaces" id="-51034069%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-bridge-faces.html"><span>get</span><wbr><span>Bridge</span><wbr><span><span>Faces</span></span></a></div>
@@ -286,7 +286,7 @@
             </div>
           </div>
 <a data-name="-1475424032%2FFunctions%2F-501115348" anchor-label="getConnectedNode" id="-1475424032%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-connected-node.html"><span>get</span><wbr><span>Connected</span><wbr><span><span>Node</span></span></a></div>
@@ -301,7 +301,7 @@
             </div>
           </div>
 <a data-name="516358661%2FFunctions%2F-501115348" anchor-label="getConnectedNodes" id="516358661%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-connected-nodes.html"><span>get</span><wbr><span>Connected</span><wbr><span><span>Nodes</span></span></a></div>
@@ -316,7 +316,7 @@
             </div>
           </div>
 <a data-name="-1512584325%2FFunctions%2F-501115348" anchor-label="getEndPointData" id="-1512584325%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-end-point-data.html"><span>get</span><wbr><span>End</span><wbr><span>Point</span><wbr><span><span>Data</span></span></a></div>
@@ -331,7 +331,7 @@
             </div>
           </div>
 <a data-name="-1120546922%2FFunctions%2F-501115348" anchor-label="getNearbyNodes" id="-1120546922%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-nearby-nodes.html"><span>get</span><wbr><span>Nearby</span><wbr><span><span>Nodes</span></span></a></div>
@@ -346,7 +346,7 @@
             </div>
           </div>
 <a data-name="-210520124%2FFunctions%2F-501115348" anchor-label="getNetwork" id="-210520124%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-network.html"><span>get</span><wbr><span><span>Network</span></span></a></div>
@@ -361,7 +361,7 @@
             </div>
           </div>
 <a data-name="-914045029%2FFunctions%2F-501115348" anchor-label="getNetworkOrThrow" id="-914045029%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-network-or-throw.html"><span>get</span><wbr><span>Network</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -376,7 +376,7 @@
             </div>
           </div>
 <a data-name="-758296192%2FFunctions%2F-501115348" anchor-label="getNetworks" id="-758296192%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-networks.html"><span>get</span><wbr><span><span>Networks</span></span></a></div>
@@ -391,7 +391,7 @@
             </div>
           </div>
 <a data-name="-273979227%2FFunctions%2F-501115348" anchor-label="getNodeData" id="-273979227%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-node-data.html"><span>get</span><wbr><span>Node</span><wbr><span><span>Data</span></span></a></div>
@@ -406,7 +406,7 @@
             </div>
           </div>
 <a data-name="1151534371%2FFunctions%2F-501115348" anchor-label="getOrCreateNetwork" id="1151534371%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-or-create-network.html"><span>get</span><wbr><span>Or</span><wbr><span>Create</span><wbr><span><span>Network</span></span></a></div>
@@ -421,7 +421,7 @@
             </div>
           </div>
 <a data-name="201737567%2FFunctions%2F-501115348" anchor-label="getSupportedNetworkTypes" id="201737567%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-supported-network-types.html"><span>get</span><wbr><span>Supported</span><wbr><span>Network</span><wbr><span><span>Types</span></span></a></div>
@@ -436,7 +436,7 @@
             </div>
           </div>
 <a data-name="1385309813%2FFunctions%2F-501115348" anchor-label="handleEndPointAllowedFacesChange" id="1385309813%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="handle-end-point-allowed-faces-change.html"><span>handle</span><wbr><span>End</span><wbr><span>Point</span><wbr><span>Allowed</span><wbr><span>Faces</span><wbr><span><span>Change</span></span></a></div>
@@ -451,7 +451,7 @@
             </div>
           </div>
 <a data-name="950514794%2FFunctions%2F-501115348" anchor-label="hasConnection" id="950514794%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="has-connection.html"><span>has</span><wbr><span><span>Connection</span></span></a></div>
@@ -466,7 +466,7 @@
             </div>
           </div>
 <a data-name="384372318%2FFunctions%2F-501115348" anchor-label="minusAssign" id="384372318%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="minus-assign.html"><span>minus</span><wbr><span><span>Assign</span></span></a></div>
@@ -481,7 +481,7 @@
             </div>
           </div>
 <a data-name="1868405930%2FFunctions%2F-501115348" anchor-label="plusAssign" id="1868405930%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="plus-assign.html"><span>plus</span><wbr><span><span>Assign</span></span></a></div>
@@ -496,7 +496,7 @@
             </div>
           </div>
 <a data-name="-1883408471%2FFunctions%2F-501115348" anchor-label="removeConnection" id="-1883408471%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="remove-connection.html"><span>remove</span><wbr><span><span>Connection</span></span></a></div>
@@ -511,7 +511,7 @@
             </div>
           </div>
 <a data-name="1984386602%2FFunctions%2F-501115348" anchor-label="removeNetwork" id="1984386602%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="remove-network.html"><span>remove</span><wbr><span><span>Network</span></span></a></div>
@@ -526,7 +526,7 @@
             </div>
           </div>
 <a data-name="-568464455%2FFunctions%2F-501115348" anchor-label="removeNodeData" id="-568464455%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="remove-node-data.html"><span>remove</span><wbr><span>Node</span><wbr><span><span>Data</span></span></a></div>
@@ -541,7 +541,7 @@
             </div>
           </div>
 <a data-name="423286246%2FFunctions%2F-501115348" anchor-label="resolveNode" id="423286246%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="resolve-node.html"><span>resolve</span><wbr><span><span>Node</span></span></a></div>
@@ -556,7 +556,7 @@
             </div>
           </div>
 <a data-name="1374027822%2FFunctions%2F-501115348" anchor-label="setBridgeData" id="1374027822%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-bridge-data.html"><span>set</span><wbr><span>Bridge</span><wbr><span><span>Data</span></span></a></div>
@@ -565,13 +565,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set-bridge-data.html"><span class="token function">setBridgeData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pos<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a><span class="token punctuation">, </span></span><span class="parameter ">data<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format.chunk/-network-bridge-data/index.html">NetworkBridgeData</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets <a href="set-bridge-data.html">data</a> at <a href="set-bridge-data.html">pos</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set-bridge-data.html"><span class="token function">setBridgeData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pos<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a><span class="token punctuation">, </span></span><span class="parameter ">data<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format.chunk/-network-bridge-data/index.html">NetworkBridgeData</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets <span data-unresolved-link="data////PointingToDeclaration/">data</span> at <a href="set-bridge-data.html">pos</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="1313309005%2FFunctions%2F-501115348" anchor-label="setConnection" id="1313309005%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-connection.html"><span>set</span><wbr><span><span>Connection</span></span></a></div>
@@ -586,7 +586,7 @@
             </div>
           </div>
 <a data-name="-2146194578%2FFunctions%2F-501115348" anchor-label="setEndPointData" id="-2146194578%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-end-point-data.html"><span>set</span><wbr><span>End</span><wbr><span>Point</span><wbr><span><span>Data</span></span></a></div>
@@ -595,13 +595,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set-end-point-data.html"><span class="token function">setEndPointData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pos<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a><span class="token punctuation">, </span></span><span class="parameter ">data<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format.chunk/-network-end-point-data/index.html">NetworkEndPointData</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets <a href="set-end-point-data.html">data</a> at <a href="set-end-point-data.html">pos</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="set-end-point-data.html"><span class="token function">setEndPointData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pos<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-block-pos/index.html">BlockPos</a><span class="token punctuation">, </span></span><span class="parameter ">data<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.format.chunk/-network-end-point-data/index.html">NetworkEndPointData</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets <span data-unresolved-link="data////PointingToDeclaration/">data</span> at <a href="set-end-point-data.html">pos</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="574198048%2FFunctions%2F-501115348" anchor-label="setNetwork" id="574198048%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-network.html"><span>set</span><wbr><span><span>Network</span></span></a></div>
@@ -621,17 +621,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

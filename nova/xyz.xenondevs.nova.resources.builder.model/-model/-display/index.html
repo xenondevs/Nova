@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Display</title>
-<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../../styles/main.css" rel="Stylesheet">
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
                     nova-parent
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.21.0-alpha.5
+        <div class="library-version" id="library-version">0.21.0-RC.1
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova/main">jvm</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova/main">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,45 +62,47 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     nova-parent
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.resources.builder.model/Model.Display///PointingToDeclaration//-501115348">
   <div class="breadcrumbs"><a href="../../../index.html">nova</a><span class="delimiter">/</span><a href="../../index.html">xyz.xenondevs.nova.resources.builder.model</a><span class="delimiter">/</span><a href="../index.html">Model</a><span class="delimiter">/</span><span class="current">Display</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Display</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/Serializable///PointingToDeclaration/"><span class="token annotation builtin">Serializable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">Display</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>thirdPersonRightHand<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>thirdPersonLeftHand<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>firstPersonRightHand<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>firstPersonLeftHand<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>head<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>gui<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>ground<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fixed<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div><p class="paragraph">The display settings for an item model, depending on the context.</p><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>third</span><wbr><span>Person</span><wbr><span>Right</span><wbr><span><span>Hand</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for right hand in third person, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>third</span><wbr><span>Person</span><wbr><span>Left</span><wbr><span><span>Hand</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for left hand in third person, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>first</span><wbr><span>Person</span><wbr><span>Right</span><wbr><span><span>Hand</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for right hand in first person, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>first</span><wbr><span>Person</span><wbr><span>Left</span><wbr><span><span>Hand</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for left hand in first person, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>head</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for the head, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>gui</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for the GUI, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>ground</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for the ground, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>fixed</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for fixed position, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/Serializable///PointingToDeclaration/"><span class="token annotation builtin">Serializable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">Display</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>thirdPersonRightHand<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>thirdPersonLeftHand<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>firstPersonRightHand<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>firstPersonLeftHand<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>head<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>gui<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>ground<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fixed<span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div><p class="paragraph">The display settings for an item model, depending on the context.</p><h4 class="tableheader">Parameters</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>third</span><wbr><span>Person</span><wbr><span>Right</span><wbr><span><span>Hand</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for right hand in third person, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>third</span><wbr><span>Person</span><wbr><span>Left</span><wbr><span><span>Hand</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for left hand in third person, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>first</span><wbr><span>Person</span><wbr><span>Right</span><wbr><span><span>Hand</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for right hand in first person, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>first</span><wbr><span>Person</span><wbr><span>Left</span><wbr><span><span>Hand</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for left hand in first person, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>head</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for the head, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>gui</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for the GUI, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>ground</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for the ground, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>fixed</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The display settings for fixed position, or <code class="lang-kotlin">null</code> if unspecified.</p></div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
-        <h2 class="">Constructors</h2>
+        <h2 class="tableheader">Constructors</h2>
         <div class="table"><a data-name="2060648747%2FConstructors%2F-501115348" anchor-label="Display" id="2060648747%2FConstructors%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-display.html"><span><span>Display</span></span></a></div>
@@ -119,9 +119,9 @@
         </div>
       </div>
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
+        <h2 class="tableheader">Types</h2>
         <div class="table"><a data-name="-1277363115%2FClasslikes%2F-501115348" anchor-label="Companion" id="-1277363115%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
@@ -136,7 +136,7 @@
             </div>
           </div>
 <a data-name="766766511%2FClasslikes%2F-501115348" anchor-label="Entry" id="766766511%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-entry/index.html"><span><span>Entry</span></span></a></div>
@@ -151,7 +151,7 @@
             </div>
           </div>
 <a data-name="1821225848%2FClasslikes%2F-501115348" anchor-label="Position" id="1821225848%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-position/index.html"><span><span>Position</span></span></a></div>
@@ -168,9 +168,9 @@
         </div>
       </div>
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="-1405174248%2FProperties%2F-501115348" anchor-label="effectiveFirstPersonLeftHand" id="-1405174248%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="effective-first-person-left-hand.html"><span>effective</span><wbr><span>First</span><wbr><span>Person</span><wbr><span>Left</span><wbr><span><span>Hand</span></span></a></div>
@@ -185,7 +185,7 @@
             </div>
           </div>
 <a data-name="671754465%2FProperties%2F-501115348" anchor-label="effectiveFirstPersonRightHand" id="671754465%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="effective-first-person-right-hand.html"><span>effective</span><wbr><span>First</span><wbr><span>Person</span><wbr><span>Right</span><wbr><span><span>Hand</span></span></a></div>
@@ -200,7 +200,7 @@
             </div>
           </div>
 <a data-name="1887322527%2FProperties%2F-501115348" anchor-label="effectiveFixed" id="1887322527%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="effective-fixed.html"><span>effective</span><wbr><span><span>Fixed</span></span></a></div>
@@ -215,7 +215,7 @@
             </div>
           </div>
 <a data-name="-766500864%2FProperties%2F-501115348" anchor-label="effectiveGround" id="-766500864%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="effective-ground.html"><span>effective</span><wbr><span><span>Ground</span></span></a></div>
@@ -230,7 +230,7 @@
             </div>
           </div>
 <a data-name="-2128080072%2FProperties%2F-501115348" anchor-label="effectiveGui" id="-2128080072%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="effective-gui.html"><span>effective</span><wbr><span><span>Gui</span></span></a></div>
@@ -245,7 +245,7 @@
             </div>
           </div>
 <a data-name="925926471%2FProperties%2F-501115348" anchor-label="effectiveHead" id="925926471%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="effective-head.html"><span>effective</span><wbr><span><span>Head</span></span></a></div>
@@ -260,7 +260,7 @@
             </div>
           </div>
 <a data-name="786234241%2FProperties%2F-501115348" anchor-label="effectiveThirdPersonLeftHand" id="786234241%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="effective-third-person-left-hand.html"><span>effective</span><wbr><span>Third</span><wbr><span>Person</span><wbr><span>Left</span><wbr><span><span>Hand</span></span></a></div>
@@ -275,7 +275,7 @@
             </div>
           </div>
 <a data-name="-114059112%2FProperties%2F-501115348" anchor-label="effectiveThirdPersonRightHand" id="-114059112%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="effective-third-person-right-hand.html"><span>effective</span><wbr><span>Third</span><wbr><span>Person</span><wbr><span>Right</span><wbr><span><span>Hand</span></span></a></div>
@@ -290,7 +290,7 @@
             </div>
           </div>
 <a data-name="918538195%2FProperties%2F-501115348" anchor-label="firstPersonLeftHand" id="918538195%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="first-person-left-hand.html"><span>first</span><wbr><span>Person</span><wbr><span>Left</span><wbr><span><span>Hand</span></span></a></div>
@@ -299,13 +299,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialName///PointingToDeclaration/"><span class="token annotation builtin">SerialName</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"firstperson_lefthand"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="first-person-left-hand.html">firstPersonLeftHand</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialName///PointingToDeclaration/"><span class="token annotation builtin">SerialName</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"firstperson_lefthand"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="first-person-left-hand.html">firstPersonLeftHand</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-307603834%2FProperties%2F-501115348" anchor-label="firstPersonRightHand" id="-307603834%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="first-person-right-hand.html"><span>first</span><wbr><span>Person</span><wbr><span>Right</span><wbr><span><span>Hand</span></span></a></div>
@@ -314,13 +314,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialName///PointingToDeclaration/"><span class="token annotation builtin">SerialName</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"firstperson_righthand"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="first-person-right-hand.html">firstPersonRightHand</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialName///PointingToDeclaration/"><span class="token annotation builtin">SerialName</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"firstperson_righthand"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="first-person-right-hand.html">firstPersonRightHand</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="1838096026%2FProperties%2F-501115348" anchor-label="fixed" id="1838096026%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="fixed.html"><span><span>fixed</span></span></a></div>
@@ -329,13 +329,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="fixed.html">fixed</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="fixed.html">fixed</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="2002444901%2FProperties%2F-501115348" anchor-label="ground" id="2002444901%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="ground.html"><span><span>ground</span></span></a></div>
@@ -344,13 +344,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ground.html">ground</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="ground.html">ground</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="1496445683%2FProperties%2F-501115348" anchor-label="gui" id="1496445683%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="gui.html"><span><span>gui</span></span></a></div>
@@ -359,13 +359,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="gui.html">gui</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="gui.html">gui</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="1617075180%2FProperties%2F-501115348" anchor-label="head" id="1617075180%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="head.html"><span><span>head</span></span></a></div>
@@ -374,13 +374,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="head.html">head</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">val </span><a href="head.html">head</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1185020612%2FProperties%2F-501115348" anchor-label="thirdPersonLeftHand" id="-1185020612%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="third-person-left-hand.html"><span>third</span><wbr><span>Person</span><wbr><span>Left</span><wbr><span><span>Hand</span></span></a></div>
@@ -389,13 +389,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialName///PointingToDeclaration/"><span class="token annotation builtin">SerialName</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"thirdperson_lefthand"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="third-person-left-hand.html">thirdPersonLeftHand</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialName///PointingToDeclaration/"><span class="token annotation builtin">SerialName</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"thirdperson_lefthand"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="third-person-left-hand.html">thirdPersonLeftHand</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1093417411%2FProperties%2F-501115348" anchor-label="thirdPersonRightHand" id="-1093417411%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="third-person-right-hand.html"><span>third</span><wbr><span>Person</span><wbr><span>Right</span><wbr><span><span>Hand</span></span></a></div>
@@ -404,7 +404,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialName///PointingToDeclaration/"><span class="token annotation builtin">SerialName</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"thirdperson_righthand"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="third-person-right-hand.html">thirdPersonRightHand</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/SerialName///PointingToDeclaration/"><span class="token annotation builtin">SerialName</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"thirdperson_righthand"</span></span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="third-person-right-hand.html">thirdPersonRightHand</a><span class="token operator">: </span><a href="-entry/index.html">Model.Display.Entry</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -412,9 +412,9 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="-1209847620%2FFunctions%2F-501115348" anchor-label="toEffectiveMap" id="-1209847620%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-effective-map.html"><span>to</span><wbr><span>Effective</span><wbr><span><span>Map</span></span></a></div>
@@ -429,7 +429,7 @@
             </div>
           </div>
 <a data-name="749683149%2FFunctions%2F-501115348" anchor-label="toMap" id="749683149%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-map.html"><span>to</span><wbr><span><span>Map</span></span></a></div>
@@ -444,7 +444,7 @@
             </div>
           </div>
 <a data-name="1284399118%2FFunctions%2F-501115348" anchor-label="withOverrides" id="1284399118%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="with-overrides.html"><span>with</span><wbr><span><span>Overrides</span></span></a></div>
@@ -464,17 +464,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Addon</title>
-<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../styles/main.css" rel="Stylesheet">
 <link href="../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
                     nova-parent
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.21.0-alpha.5
+        <div class="library-version" id="library-version">0.21.0-RC.1
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova/main">jvm</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova/main">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,32 +62,34 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     nova-parent
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.addon/Addon///PointingToDeclaration//-501115348">
   <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.addon</a><span class="delimiter">/</span><span class="current">Addon</span></div>
   <div class="cover ">
@@ -100,9 +100,9 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
-        <h2 class="">Constructors</h2>
+        <h2 class="tableheader">Constructors</h2>
         <div class="table"><a data-name="-107330920%2FConstructors%2F-501115348" anchor-label="Addon" id="-107330920%2FConstructors%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-addon.html"><span><span>Addon</span></span></a></div>
@@ -119,9 +119,9 @@
         </div>
       </div>
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="254785144%2FProperties%2F-501115348" anchor-label="addon" id="254785144%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="addon.html"><span><span>addon</span></span></a></div>
@@ -136,7 +136,7 @@
             </div>
           </div>
 <a data-name="527780330%2FProperties%2F-501115348" anchor-label="dataFolder" id="527780330%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="data-folder.html"><span>data</span><wbr><span><span>Folder</span></span></a></div>
@@ -151,7 +151,7 @@
             </div>
           </div>
 <a data-name="-1408001690%2FProperties%2F-501115348" anchor-label="file" id="-1408001690%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="file.html"><span><span>file</span></span></a></div>
@@ -166,7 +166,7 @@
             </div>
           </div>
 <a data-name="289587858%2FProperties%2F-501115348" anchor-label="logger" id="289587858%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="logger.html"><span><span>logger</span></span></a></div>
@@ -181,7 +181,7 @@
             </div>
           </div>
 <a data-name="-2095229361%2FProperties%2F-501115348" anchor-label="plugin" id="-2095229361%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="plugin.html"><span><span>plugin</span></span></a></div>
@@ -196,7 +196,7 @@
             </div>
           </div>
 <a data-name="1217492682%2FProperties%2F-501115348" anchor-label="pluginMeta" id="1217492682%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="plugin-meta.html"><span>plugin</span><wbr><span><span>Meta</span></span></a></div>
@@ -211,7 +211,7 @@
             </div>
           </div>
 <a data-name="-1307674125%2FProperties%2F-501115348" anchor-label="projectDistributors" id="-1307674125%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="project-distributors.html"><span>project</span><wbr><span><span>Distributors</span></span></a></div>
@@ -226,7 +226,7 @@
             </div>
           </div>
 <a data-name="256765765%2FProperties%2F-501115348" anchor-label="registry" id="256765765%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="registry.html"><span><span>registry</span></span></a></div>
@@ -243,9 +243,9 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="-532992144%2FFunctions%2F-501115348" anchor-label="animatedEquipment" id="-532992144%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="animated-equipment.html"><span>animated</span><wbr><span><span>Equipment</span></span></a></div>
@@ -260,7 +260,7 @@
             </div>
           </div>
 <a data-name="-2025665803%2FFunctions%2F-501115348" anchor-label="biome" id="-2025665803%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="biome.html"><span><span>biome</span></span></a></div>
@@ -275,7 +275,7 @@
             </div>
           </div>
 <a data-name="305443017%2FFunctions%2F-501115348" anchor-label="biomeInjection" id="305443017%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="biome-injection.html"><span>biome</span><wbr><span><span>Injection</span></span></a></div>
@@ -290,7 +290,7 @@
             </div>
           </div>
 <a data-name="-1558605527%2FFunctions%2F-501115348" anchor-label="block" id="-1558605527%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="block.html"><span><span>block</span></span></a></div>
@@ -305,7 +305,7 @@
             </div>
           </div>
 <a data-name="-1923960642%2FFunctions%2F-501115348" anchor-label="catVariant" id="-1923960642%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="cat-variant.html"><span>cat</span><wbr><span><span>Variant</span></span></a></div>
@@ -320,7 +320,7 @@
             </div>
           </div>
 <a data-name="-581899298%2FFunctions%2F-501115348" anchor-label="chickenVariant" id="-581899298%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="chicken-variant.html"><span>chicken</span><wbr><span><span>Variant</span></span></a></div>
@@ -335,7 +335,7 @@
             </div>
           </div>
 <a data-name="2133996965%2FFunctions%2F-501115348" anchor-label="configuredFeature" id="2133996965%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="configured-feature.html"><span>configured</span><wbr><span><span>Feature</span></span></a></div>
@@ -350,7 +350,7 @@
             </div>
           </div>
 <a data-name="283153054%2FFunctions%2F-501115348" anchor-label="cowVariant" id="283153054%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="cow-variant.html"><span>cow</span><wbr><span><span>Variant</span></span></a></div>
@@ -365,7 +365,7 @@
             </div>
           </div>
 <a data-name="1549943989%2FFunctions%2F-501115348" anchor-label="dimensionType" id="1549943989%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="dimension-type.html"><span>dimension</span><wbr><span><span>Type</span></span></a></div>
@@ -380,7 +380,7 @@
             </div>
           </div>
 <a data-name="-630129328%2FFunctions%2F-501115348" anchor-label="enchantment" id="-630129328%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="enchantment.html"><span><span>enchantment</span></span></a></div>
@@ -395,7 +395,7 @@
             </div>
           </div>
 <a data-name="-492424712%2FFunctions%2F-501115348" anchor-label="equipment" id="-492424712%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="equipment.html"><span><span>equipment</span></span></a></div>
@@ -410,7 +410,7 @@
             </div>
           </div>
 <a data-name="-1954300437%2FFunctions%2F-501115348" anchor-label="feature" id="-1954300437%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="feature.html"><span><span>feature</span></span></a></div>
@@ -425,7 +425,7 @@
             </div>
           </div>
 <a data-name="-761237602%2FFunctions%2F-501115348" anchor-label="frogVariant" id="-761237602%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="frog-variant.html"><span>frog</span><wbr><span><span>Variant</span></span></a></div>
@@ -440,7 +440,7 @@
             </div>
           </div>
 <a data-name="-1122012271%2FFunctions%2F-501115348" anchor-label="guiTexture" id="-1122012271%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="gui-texture.html"><span>gui</span><wbr><span><span>Texture</span></span></a></div>
@@ -455,7 +455,7 @@
             </div>
           </div>
 <a data-name="-1718108222%2FFunctions%2F-501115348" anchor-label="item" id="-1718108222%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="item.html"><span><span>item</span></span></a></div>
@@ -470,7 +470,7 @@
             </div>
           </div>
 <a data-name="471311806%2FFunctions%2F-501115348" anchor-label="pigVariant" id="471311806%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="pig-variant.html"><span>pig</span><wbr><span><span>Variant</span></span></a></div>
@@ -485,7 +485,7 @@
             </div>
           </div>
 <a data-name="-1478088125%2FFunctions%2F-501115348" anchor-label="placedFeature" id="-1478088125%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="placed-feature.html"><span>placed</span><wbr><span><span>Feature</span></span></a></div>
@@ -500,7 +500,7 @@
             </div>
           </div>
 <a data-name="-1150494232%2FFunctions%2F-501115348" anchor-label="placementModifierType" id="-1150494232%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="placement-modifier-type.html"><span>placement</span><wbr><span>Modifier</span><wbr><span><span>Type</span></span></a></div>
@@ -515,7 +515,7 @@
             </div>
           </div>
 <a data-name="-1732452204%2FFunctions%2F-501115348" anchor-label="registerAbilityType" id="-1732452204%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-ability-type.html"><span>register</span><wbr><span>Ability</span><wbr><span><span>Type</span></span></a></div>
@@ -530,7 +530,7 @@
             </div>
           </div>
 <a data-name="-1239257113%2FFunctions%2F-501115348" anchor-label="registerAttachmentType" id="-1239257113%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-attachment-type.html"><span>register</span><wbr><span>Attachment</span><wbr><span><span>Type</span></span></a></div>
@@ -545,7 +545,7 @@
             </div>
           </div>
 <a data-name="721720725%2FFunctions%2F-501115348" anchor-label="registerCarver" id="721720725%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-carver.html"><span>register</span><wbr><span><span>Carver</span></span></a></div>
@@ -560,7 +560,7 @@
             </div>
           </div>
 <a data-name="-1816832231%2FFunctions%2F-501115348" anchor-label="registerConfiguredCarver" id="-1816832231%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-configured-carver.html"><span>register</span><wbr><span>Configured</span><wbr><span><span>Carver</span></span></a></div>
@@ -574,12 +574,12 @@
               </div>
             </div>
           </div>
-<a data-name="2101806087%2FFunctions%2F-501115348" anchor-label="registerItem" id="2101806087%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+<a data-name="-1200290455%2FFunctions%2F-501115348" anchor-label="registerItem" id="-1200290455%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-item.html"><span>register</span><wbr><span><span>Item</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2101806087%2FFunctions%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1200290455%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
@@ -590,7 +590,7 @@
             </div>
           </div>
 <a data-name="484149326%2FFunctions%2F-501115348" anchor-label="registerItemFilterType" id="484149326%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-item-filter-type.html"><span>register</span><wbr><span>Item</span><wbr><span>Filter</span><wbr><span><span>Type</span></span></a></div>
@@ -604,12 +604,12 @@
               </div>
             </div>
           </div>
-<a data-name="48684121%2FFunctions%2F-501115348" anchor-label="registerNetworkType" id="48684121%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+<a data-name="1377339445%2FFunctions%2F-501115348" anchor-label="registerNetworkType" id="1377339445%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-network-type.html"><span>register</span><wbr><span>Network</span><wbr><span><span>Type</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="48684121%2FFunctions%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1377339445%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
@@ -620,7 +620,7 @@
             </div>
           </div>
 <a data-name="-1349335141%2FFunctions%2F-501115348" anchor-label="registerNoiseGenerationSettings" id="-1349335141%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-noise-generation-settings.html"><span>register</span><wbr><span>Noise</span><wbr><span>Generation</span><wbr><span><span>Settings</span></span></a></div>
@@ -634,12 +634,12 @@
               </div>
             </div>
           </div>
-<a data-name="-1330976801%2FFunctions%2F-501115348" anchor-label="registerNoiseParameters" id="-1330976801%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+<a data-name="-1407966688%2FFunctions%2F-501115348" anchor-label="registerNoiseParameters" id="-1407966688%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-noise-parameters.html"><span>register</span><wbr><span>Noise</span><wbr><span><span>Parameters</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1330976801%2FFunctions%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1407966688%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
@@ -650,7 +650,7 @@
             </div>
           </div>
 <a data-name="1612506572%2FFunctions%2F-501115348" anchor-label="registerRecipeType" id="1612506572%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-recipe-type.html"><span>register</span><wbr><span>Recipe</span><wbr><span><span>Type</span></span></a></div>
@@ -665,7 +665,7 @@
             </div>
           </div>
 <a data-name="-998709273%2FFunctions%2F-501115348" anchor-label="registerRuleTestType" id="-998709273%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-rule-test-type.html"><span>register</span><wbr><span>Rule</span><wbr><span>Test</span><wbr><span><span>Type</span></span></a></div>
@@ -680,7 +680,7 @@
             </div>
           </div>
 <a data-name="-1343447339%2FFunctions%2F-501115348" anchor-label="registerStructure" id="-1343447339%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-structure.html"><span>register</span><wbr><span><span>Structure</span></span></a></div>
@@ -695,7 +695,7 @@
             </div>
           </div>
 <a data-name="-1859556948%2FFunctions%2F-501115348" anchor-label="registerStructurePieceType" id="-1859556948%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-structure-piece-type.html"><span>register</span><wbr><span>Structure</span><wbr><span>Piece</span><wbr><span><span>Type</span></span></a></div>
@@ -710,7 +710,7 @@
             </div>
           </div>
 <a data-name="1864518100%2FFunctions%2F-501115348" anchor-label="registerStructurePlacementType" id="1864518100%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-structure-placement-type.html"><span>register</span><wbr><span>Structure</span><wbr><span>Placement</span><wbr><span><span>Type</span></span></a></div>
@@ -725,7 +725,7 @@
             </div>
           </div>
 <a data-name="1584641323%2FFunctions%2F-501115348" anchor-label="registerStructurePoolElementType" id="1584641323%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-structure-pool-element-type.html"><span>register</span><wbr><span>Structure</span><wbr><span>Pool</span><wbr><span>Element</span><wbr><span><span>Type</span></span></a></div>
@@ -740,7 +740,7 @@
             </div>
           </div>
 <a data-name="-15990887%2FFunctions%2F-501115348" anchor-label="registerStructureProcessorType" id="-15990887%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-structure-processor-type.html"><span>register</span><wbr><span>Structure</span><wbr><span>Processor</span><wbr><span><span>Type</span></span></a></div>
@@ -755,7 +755,7 @@
             </div>
           </div>
 <a data-name="-1768792573%2FFunctions%2F-501115348" anchor-label="registerStructureSet" id="-1768792573%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-structure-set.html"><span>register</span><wbr><span>Structure</span><wbr><span><span>Set</span></span></a></div>
@@ -770,7 +770,7 @@
             </div>
           </div>
 <a data-name="-1777102175%2FFunctions%2F-501115348" anchor-label="registerStructureType" id="-1777102175%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-structure-type.html"><span>register</span><wbr><span>Structure</span><wbr><span><span>Type</span></span></a></div>
@@ -785,7 +785,7 @@
             </div>
           </div>
 <a data-name="1038071067%2FFunctions%2F-501115348" anchor-label="registerToolCategory" id="1038071067%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-tool-category.html"><span>register</span><wbr><span>Tool</span><wbr><span><span>Category</span></span></a></div>
@@ -800,7 +800,7 @@
             </div>
           </div>
 <a data-name="-560789593%2FFunctions%2F-501115348" anchor-label="registerToolTier" id="-560789593%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-tool-tier.html"><span>register</span><wbr><span>Tool</span><wbr><span><span>Tier</span></span></a></div>
@@ -815,7 +815,7 @@
             </div>
           </div>
 <a data-name="-344001035%2FFunctions%2F-501115348" anchor-label="registerWailaInfoProvider" id="-344001035%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-waila-info-provider.html"><span>register</span><wbr><span>Waila</span><wbr><span>Info</span><wbr><span><span>Provider</span></span></a></div>
@@ -830,7 +830,7 @@
             </div>
           </div>
 <a data-name="-1092153037%2FFunctions%2F-501115348" anchor-label="registerWailaToolIconProvider" id="-1092153037%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-waila-tool-icon-provider.html"><span>register</span><wbr><span>Waila</span><wbr><span>Tool</span><wbr><span>Icon</span><wbr><span><span>Provider</span></span></a></div>
@@ -845,7 +845,7 @@
             </div>
           </div>
 <a data-name="1175382597%2FFunctions%2F-501115348" anchor-label="tileEntity" id="1175382597%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="tile-entity.html"><span>tile</span><wbr><span><span>Entity</span></span></a></div>
@@ -860,7 +860,7 @@
             </div>
           </div>
 <a data-name="426191643%2FFunctions%2F-501115348" anchor-label="tooltipStyle" id="426191643%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="tooltip-style.html"><span>tooltip</span><wbr><span><span>Style</span></span></a></div>
@@ -875,7 +875,7 @@
             </div>
           </div>
 <a data-name="-1396877410%2FFunctions%2F-501115348" anchor-label="wolfSoundVariant" id="-1396877410%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="wolf-sound-variant.html"><span>wolf</span><wbr><span>Sound</span><wbr><span><span>Variant</span></span></a></div>
@@ -890,7 +890,7 @@
             </div>
           </div>
 <a data-name="172452602%2FFunctions%2F-501115348" anchor-label="wolfVariant" id="172452602%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="wolf-variant.html"><span>wolf</span><wbr><span><span>Variant</span></span></a></div>
@@ -910,17 +910,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

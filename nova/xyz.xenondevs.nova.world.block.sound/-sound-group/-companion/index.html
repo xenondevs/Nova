@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>Companion</title>
-<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../../../styles/main.css" rel="Stylesheet">
 <link href="../../../../styles/prism.css" rel="Stylesheet">
 <link href="../../../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
                     nova-parent
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.21.0-alpha.5
+        <div class="library-version" id="library-version">0.21.0-RC.1
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova/main">jvm</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova/main">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,32 +62,34 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     nova-parent
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="classlike" id="content" pageids="nova::xyz.xenondevs.nova.world.block.sound/SoundGroup.Companion///PointingToDeclaration//-501115348">
   <div class="breadcrumbs"><a href="../../../index.html">nova</a><span class="delimiter">/</span><a href="../../index.html">xyz.xenondevs.nova.world.block.sound</a><span class="delimiter">/</span><a href="../index.html">SoundGroup</a><span class="delimiter">/</span><span class="current">Companion</span></div>
   <div class="cover ">
@@ -100,9 +100,9 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="148489961%2FProperties%2F-501115348" anchor-label="AMETHYST" id="148489961%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-a-m-e-t-h-y-s-t.html"><span><span>AMETHYST</span></span></a></div>
@@ -117,7 +117,7 @@
             </div>
           </div>
 <a data-name="-136484178%2FProperties%2F-501115348" anchor-label="AMETHYST_CLUSTER" id="-136484178%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-a-m-e-t-h-y-s-t_-c-l-u-s-t-e-r.html"><span>AMETHYST_</span><wbr><span>CLUSTER</span></a></div>
@@ -132,7 +132,7 @@
             </div>
           </div>
 <a data-name="114589780%2FProperties%2F-501115348" anchor-label="ANCIENT_DEBRIS" id="114589780%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-a-n-c-i-e-n-t_-d-e-b-r-i-s.html"><span>ANCIENT_</span><wbr><span>DEBRIS</span></a></div>
@@ -147,7 +147,7 @@
             </div>
           </div>
 <a data-name="-1138178792%2FProperties%2F-501115348" anchor-label="ANVIL" id="-1138178792%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-a-n-v-i-l.html"><span><span>ANVIL</span></span></a></div>
@@ -162,7 +162,7 @@
             </div>
           </div>
 <a data-name="-1348553130%2FProperties%2F-501115348" anchor-label="AZALEA" id="-1348553130%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-a-z-a-l-e-a.html"><span><span>AZALEA</span></span></a></div>
@@ -177,7 +177,7 @@
             </div>
           </div>
 <a data-name="-1639284311%2FProperties%2F-501115348" anchor-label="AZALEA_LEAVES" id="-1639284311%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-a-z-a-l-e-a_-l-e-a-v-e-s.html"><span>AZALEA_</span><wbr><span>LEAVES</span></a></div>
@@ -192,7 +192,7 @@
             </div>
           </div>
 <a data-name="-1840489566%2FProperties%2F-501115348" anchor-label="BAMBOO" id="-1840489566%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-b-a-m-b-o-o.html"><span><span>BAMBOO</span></span></a></div>
@@ -207,7 +207,7 @@
             </div>
           </div>
 <a data-name="-1276333239%2FProperties%2F-501115348" anchor-label="BAMBOO_SAPLING" id="-1276333239%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-b-a-m-b-o-o_-s-a-p-l-i-n-g.html"><span>BAMBOO_</span><wbr><span>SAPLING</span></a></div>
@@ -222,7 +222,7 @@
             </div>
           </div>
 <a data-name="-268635924%2FProperties%2F-501115348" anchor-label="BAMBOO_WOOD" id="-268635924%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-b-a-m-b-o-o_-w-o-o-d.html"><span>BAMBOO_</span><wbr><span>WOOD</span></a></div>
@@ -237,7 +237,7 @@
             </div>
           </div>
 <a data-name="1275243747%2FProperties%2F-501115348" anchor-label="BAMBOO_WOOD_HANGING_SIGN" id="1275243747%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-b-a-m-b-o-o_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html"><span>BAMBOO_</span><wbr><span>WOOD_</span><wbr><span>HANGING_</span><wbr><span>SIGN</span></a></div>
@@ -252,7 +252,7 @@
             </div>
           </div>
 <a data-name="-156885855%2FProperties%2F-501115348" anchor-label="BASALT" id="-156885855%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-b-a-s-a-l-t.html"><span><span>BASALT</span></span></a></div>
@@ -267,7 +267,7 @@
             </div>
           </div>
 <a data-name="248237572%2FProperties%2F-501115348" anchor-label="BIG_DRIPLEAF" id="248237572%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-b-i-g_-d-r-i-p-l-e-a-f.html"><span>BIG_</span><wbr><span>DRIPLEAF</span></a></div>
@@ -282,7 +282,7 @@
             </div>
           </div>
 <a data-name="717012132%2FProperties%2F-501115348" anchor-label="BONE_BLOCK" id="717012132%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-b-o-n-e_-b-l-o-c-k.html"><span>BONE_</span><wbr><span>BLOCK</span></a></div>
@@ -297,7 +297,7 @@
             </div>
           </div>
 <a data-name="-368054241%2FProperties%2F-501115348" anchor-label="CALCITE" id="-368054241%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-a-l-c-i-t-e.html"><span><span>CALCITE</span></span></a></div>
@@ -312,7 +312,7 @@
             </div>
           </div>
 <a data-name="-206133847%2FProperties%2F-501115348" anchor-label="CANDLE" id="-206133847%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-a-n-d-l-e.html"><span><span>CANDLE</span></span></a></div>
@@ -327,7 +327,7 @@
             </div>
           </div>
 <a data-name="1254101183%2FProperties%2F-501115348" anchor-label="CAVE_VINES" id="1254101183%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-a-v-e_-v-i-n-e-s.html"><span>CAVE_</span><wbr><span>VINES</span></a></div>
@@ -342,7 +342,7 @@
             </div>
           </div>
 <a data-name="137350339%2FProperties%2F-501115348" anchor-label="CHAIN" id="137350339%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-h-a-i-n.html"><span><span>CHAIN</span></span></a></div>
@@ -357,7 +357,7 @@
             </div>
           </div>
 <a data-name="537579906%2FProperties%2F-501115348" anchor-label="CHERRY_LEAVES" id="537579906%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-h-e-r-r-y_-l-e-a-v-e-s.html"><span>CHERRY_</span><wbr><span>LEAVES</span></a></div>
@@ -372,7 +372,7 @@
             </div>
           </div>
 <a data-name="1689044292%2FProperties%2F-501115348" anchor-label="CHERRY_SAPLING" id="1689044292%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-h-e-r-r-y_-s-a-p-l-i-n-g.html"><span>CHERRY_</span><wbr><span>SAPLING</span></a></div>
@@ -387,7 +387,7 @@
             </div>
           </div>
 <a data-name="-1840277295%2FProperties%2F-501115348" anchor-label="CHERRY_WOOD" id="-1840277295%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-h-e-r-r-y_-w-o-o-d.html"><span>CHERRY_</span><wbr><span>WOOD</span></a></div>
@@ -402,7 +402,7 @@
             </div>
           </div>
 <a data-name="953991454%2FProperties%2F-501115348" anchor-label="CHERRY_WOOD_HANGING_SIGN" id="953991454%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-h-e-r-r-y_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html"><span>CHERRY_</span><wbr><span>WOOD_</span><wbr><span>HANGING_</span><wbr><span>SIGN</span></a></div>
@@ -417,7 +417,7 @@
             </div>
           </div>
 <a data-name="-1790962401%2FProperties%2F-501115348" anchor-label="CHISELED_BOOKSHELF" id="-1790962401%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-h-i-s-e-l-e-d_-b-o-o-k-s-h-e-l-f.html"><span>CHISELED_</span><wbr><span>BOOKSHELF</span></a></div>
@@ -432,7 +432,7 @@
             </div>
           </div>
 <a data-name="1445556152%2FProperties%2F-501115348" anchor-label="COBWEB" id="1445556152%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-o-b-w-e-b.html"><span><span>COBWEB</span></span></a></div>
@@ -447,7 +447,7 @@
             </div>
           </div>
 <a data-name="543550749%2FProperties%2F-501115348" anchor-label="COPPER" id="543550749%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-o-p-p-e-r.html"><span><span>COPPER</span></span></a></div>
@@ -462,7 +462,7 @@
             </div>
           </div>
 <a data-name="466397557%2FProperties%2F-501115348" anchor-label="COPPER_BULB" id="466397557%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-o-p-p-e-r_-b-u-l-b.html"><span>COPPER_</span><wbr><span>BULB</span></a></div>
@@ -477,7 +477,7 @@
             </div>
           </div>
 <a data-name="-1673640587%2FProperties%2F-501115348" anchor-label="COPPER_GRATE" id="-1673640587%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-o-p-p-e-r_-g-r-a-t-e.html"><span>COPPER_</span><wbr><span>GRATE</span></a></div>
@@ -492,7 +492,7 @@
             </div>
           </div>
 <a data-name="-251675355%2FProperties%2F-501115348" anchor-label="CORAL_BLOCK" id="-251675355%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-o-r-a-l_-b-l-o-c-k.html"><span>CORAL_</span><wbr><span>BLOCK</span></a></div>
@@ -507,7 +507,7 @@
             </div>
           </div>
 <a data-name="-1345960506%2FProperties%2F-501115348" anchor-label="CROP" id="-1345960506%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-r-o-p.html"><span><span>CROP</span></span></a></div>
@@ -522,7 +522,7 @@
             </div>
           </div>
 <a data-name="1635865879%2FProperties%2F-501115348" anchor-label="DECORATED_POT" id="1635865879%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-d-e-c-o-r-a-t-e-d_-p-o-t.html"><span>DECORATED_</span><wbr><span>POT</span></a></div>
@@ -537,7 +537,7 @@
             </div>
           </div>
 <a data-name="-1658839587%2FProperties%2F-501115348" anchor-label="DECORATED_POT_CRACKED" id="-1658839587%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-d-e-c-o-r-a-t-e-d_-p-o-t_-c-r-a-c-k-e-d.html"><span>DECORATED_</span><wbr><span>POT_</span><wbr><span>CRACKED</span></a></div>
@@ -552,7 +552,7 @@
             </div>
           </div>
 <a data-name="-1890199209%2FProperties%2F-501115348" anchor-label="DEEPSLATE" id="-1890199209%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-d-e-e-p-s-l-a-t-e.html"><span><span>DEEPSLATE</span></span></a></div>
@@ -567,7 +567,7 @@
             </div>
           </div>
 <a data-name="507907218%2FProperties%2F-501115348" anchor-label="DEEPSLATE_BRICKS" id="507907218%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-d-e-e-p-s-l-a-t-e_-b-r-i-c-k-s.html"><span>DEEPSLATE_</span><wbr><span>BRICKS</span></a></div>
@@ -582,7 +582,7 @@
             </div>
           </div>
 <a data-name="-1026937295%2FProperties%2F-501115348" anchor-label="DEEPSLATE_TILES" id="-1026937295%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-d-e-e-p-s-l-a-t-e_-t-i-l-e-s.html"><span>DEEPSLATE_</span><wbr><span>TILES</span></a></div>
@@ -597,7 +597,7 @@
             </div>
           </div>
 <a data-name="-647530842%2FProperties%2F-501115348" anchor-label="DRIPSTONE_BLOCK" id="-647530842%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-d-r-i-p-s-t-o-n-e_-b-l-o-c-k.html"><span>DRIPSTONE_</span><wbr><span>BLOCK</span></a></div>
@@ -612,7 +612,7 @@
             </div>
           </div>
 <a data-name="718339678%2FProperties%2F-501115348" anchor-label="FLOWERING_AZALEA" id="718339678%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-f-l-o-w-e-r-i-n-g_-a-z-a-l-e-a.html"><span>FLOWERING_</span><wbr><span>AZALEA</span></a></div>
@@ -627,7 +627,7 @@
             </div>
           </div>
 <a data-name="-1821752014%2FProperties%2F-501115348" anchor-label="FROGLIGHT" id="-1821752014%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-f-r-o-g-l-i-g-h-t.html"><span><span>FROGLIGHT</span></span></a></div>
@@ -642,7 +642,7 @@
             </div>
           </div>
 <a data-name="1695814253%2FProperties%2F-501115348" anchor-label="FROGSPAWN" id="1695814253%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-f-r-o-g-s-p-a-w-n.html"><span><span>FROGSPAWN</span></span></a></div>
@@ -657,7 +657,7 @@
             </div>
           </div>
 <a data-name="807247728%2FProperties%2F-501115348" anchor-label="FUNGUS" id="807247728%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-f-u-n-g-u-s.html"><span><span>FUNGUS</span></span></a></div>
@@ -672,7 +672,7 @@
             </div>
           </div>
 <a data-name="-1311981704%2FProperties%2F-501115348" anchor-label="GILDED_BLACKSTONE" id="-1311981704%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-g-i-l-d-e-d_-b-l-a-c-k-s-t-o-n-e.html"><span>GILDED_</span><wbr><span>BLACKSTONE</span></a></div>
@@ -687,7 +687,7 @@
             </div>
           </div>
 <a data-name="-158641048%2FProperties%2F-501115348" anchor-label="GLASS" id="-158641048%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-g-l-a-s-s.html"><span><span>GLASS</span></span></a></div>
@@ -702,7 +702,7 @@
             </div>
           </div>
 <a data-name="-1471435801%2FProperties%2F-501115348" anchor-label="GLOW_LICHEN" id="-1471435801%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-g-l-o-w_-l-i-c-h-e-n.html"><span>GLOW_</span><wbr><span>LICHEN</span></a></div>
@@ -717,7 +717,7 @@
             </div>
           </div>
 <a data-name="-294998162%2FProperties%2F-501115348" anchor-label="GRASS" id="-294998162%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-g-r-a-s-s.html"><span><span>GRASS</span></span></a></div>
@@ -732,7 +732,7 @@
             </div>
           </div>
 <a data-name="-1540430097%2FProperties%2F-501115348" anchor-label="GRAVEL" id="-1540430097%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-g-r-a-v-e-l.html"><span><span>GRAVEL</span></span></a></div>
@@ -747,7 +747,7 @@
             </div>
           </div>
 <a data-name="1938012866%2FProperties%2F-501115348" anchor-label="HANGING_ROOTS" id="1938012866%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-h-a-n-g-i-n-g_-r-o-o-t-s.html"><span>HANGING_</span><wbr><span>ROOTS</span></a></div>
@@ -762,7 +762,7 @@
             </div>
           </div>
 <a data-name="2006605898%2FProperties%2F-501115348" anchor-label="HANGING_SIGN" id="2006605898%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-h-a-n-g-i-n-g_-s-i-g-n.html"><span>HANGING_</span><wbr><span>SIGN</span></a></div>
@@ -777,7 +777,7 @@
             </div>
           </div>
 <a data-name="65770464%2FProperties%2F-501115348" anchor-label="HARD_CROP" id="65770464%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-h-a-r-d_-c-r-o-p.html"><span>HARD_</span><wbr><span>CROP</span></a></div>
@@ -792,7 +792,7 @@
             </div>
           </div>
 <a data-name="1254556479%2FProperties%2F-501115348" anchor-label="HEAVY_CORE" id="1254556479%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-h-e-a-v-y_-c-o-r-e.html"><span>HEAVY_</span><wbr><span>CORE</span></a></div>
@@ -807,7 +807,7 @@
             </div>
           </div>
 <a data-name="596571355%2FProperties%2F-501115348" anchor-label="HONEY_BLOCK" id="596571355%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-h-o-n-e-y_-b-l-o-c-k.html"><span>HONEY_</span><wbr><span>BLOCK</span></a></div>
@@ -822,7 +822,7 @@
             </div>
           </div>
 <a data-name="-1718057420%2FProperties%2F-501115348" anchor-label="LADDER" id="-1718057420%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-l-a-d-d-e-r.html"><span><span>LADDER</span></span></a></div>
@@ -837,7 +837,7 @@
             </div>
           </div>
 <a data-name="1311203294%2FProperties%2F-501115348" anchor-label="LANTERN" id="1311203294%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-l-a-n-t-e-r-n.html"><span><span>LANTERN</span></span></a></div>
@@ -852,7 +852,7 @@
             </div>
           </div>
 <a data-name="-1798895949%2FProperties%2F-501115348" anchor-label="LARGE_AMETHYST_BUD" id="-1798895949%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-l-a-r-g-e_-a-m-e-t-h-y-s-t_-b-u-d.html"><span>LARGE_</span><wbr><span>AMETHYST_</span><wbr><span>BUD</span></a></div>
@@ -867,7 +867,7 @@
             </div>
           </div>
 <a data-name="-5860072%2FProperties%2F-501115348" anchor-label="LILY_PAD" id="-5860072%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-l-i-l-y_-p-a-d.html"><span>LILY_</span><wbr><span>PAD</span></a></div>
@@ -882,7 +882,7 @@
             </div>
           </div>
 <a data-name="311926371%2FProperties%2F-501115348" anchor-label="LODESTONE" id="311926371%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-l-o-d-e-s-t-o-n-e.html"><span><span>LODESTONE</span></span></a></div>
@@ -897,7 +897,7 @@
             </div>
           </div>
 <a data-name="146364427%2FProperties%2F-501115348" anchor-label="MANGROVE_ROOTS" id="146364427%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-m-a-n-g-r-o-v-e_-r-o-o-t-s.html"><span>MANGROVE_</span><wbr><span>ROOTS</span></a></div>
@@ -912,7 +912,7 @@
             </div>
           </div>
 <a data-name="-1358993157%2FProperties%2F-501115348" anchor-label="MEDIUM_AMETHYST_BUD" id="-1358993157%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-m-e-d-i-u-m_-a-m-e-t-h-y-s-t_-b-u-d.html"><span>MEDIUM_</span><wbr><span>AMETHYST_</span><wbr><span>BUD</span></a></div>
@@ -927,7 +927,7 @@
             </div>
           </div>
 <a data-name="-1538837699%2FProperties%2F-501115348" anchor-label="METAL" id="-1538837699%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-m-e-t-a-l.html"><span><span>METAL</span></span></a></div>
@@ -942,7 +942,7 @@
             </div>
           </div>
 <a data-name="1698846996%2FProperties%2F-501115348" anchor-label="MOSS" id="1698846996%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-m-o-s-s.html"><span><span>MOSS</span></span></a></div>
@@ -957,7 +957,7 @@
             </div>
           </div>
 <a data-name="-819230756%2FProperties%2F-501115348" anchor-label="MOSS_CARPET" id="-819230756%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-m-o-s-s_-c-a-r-p-e-t.html"><span>MOSS_</span><wbr><span>CARPET</span></a></div>
@@ -972,7 +972,7 @@
             </div>
           </div>
 <a data-name="-2002323992%2FProperties%2F-501115348" anchor-label="MUD" id="-2002323992%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-m-u-d.html"><span><span>MUD</span></span></a></div>
@@ -987,7 +987,7 @@
             </div>
           </div>
 <a data-name="-1354245407%2FProperties%2F-501115348" anchor-label="MUD_BRICKS" id="-1354245407%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-m-u-d_-b-r-i-c-k-s.html"><span>MUD_</span><wbr><span>BRICKS</span></a></div>
@@ -1002,7 +1002,7 @@
             </div>
           </div>
 <a data-name="1645415485%2FProperties%2F-501115348" anchor-label="MUDDY_MANGROVE_ROOTS" id="1645415485%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-m-u-d-d-y_-m-a-n-g-r-o-v-e_-r-o-o-t-s.html"><span>MUDDY_</span><wbr><span>MANGROVE_</span><wbr><span>ROOTS</span></a></div>
@@ -1017,7 +1017,7 @@
             </div>
           </div>
 <a data-name="1307093323%2FProperties%2F-501115348" anchor-label="NETHER_BRICKS" id="1307093323%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-n-e-t-h-e-r_-b-r-i-c-k-s.html"><span>NETHER_</span><wbr><span>BRICKS</span></a></div>
@@ -1032,7 +1032,7 @@
             </div>
           </div>
 <a data-name="-61935526%2FProperties%2F-501115348" anchor-label="NETHER_GOLD_ORE" id="-61935526%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-n-e-t-h-e-r_-g-o-l-d_-o-r-e.html"><span>NETHER_</span><wbr><span>GOLD_</span><wbr><span>ORE</span></a></div>
@@ -1047,7 +1047,7 @@
             </div>
           </div>
 <a data-name="1912838555%2FProperties%2F-501115348" anchor-label="NETHER_ORE" id="1912838555%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-n-e-t-h-e-r_-o-r-e.html"><span>NETHER_</span><wbr><span>ORE</span></a></div>
@@ -1062,7 +1062,7 @@
             </div>
           </div>
 <a data-name="168560995%2FProperties%2F-501115348" anchor-label="NETHER_SPROUTS" id="168560995%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-n-e-t-h-e-r_-s-p-r-o-u-t-s.html"><span>NETHER_</span><wbr><span>SPROUTS</span></a></div>
@@ -1077,7 +1077,7 @@
             </div>
           </div>
 <a data-name="674574417%2FProperties%2F-501115348" anchor-label="NETHER_WART" id="674574417%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-n-e-t-h-e-r_-w-a-r-t.html"><span>NETHER_</span><wbr><span>WART</span></a></div>
@@ -1092,7 +1092,7 @@
             </div>
           </div>
 <a data-name="-1977928880%2FProperties%2F-501115348" anchor-label="NETHER_WOOD" id="-1977928880%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-n-e-t-h-e-r_-w-o-o-d.html"><span>NETHER_</span><wbr><span>WOOD</span></a></div>
@@ -1107,7 +1107,7 @@
             </div>
           </div>
 <a data-name="-79532801%2FProperties%2F-501115348" anchor-label="NETHER_WOOD_HANGING_SIGN" id="-79532801%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-n-e-t-h-e-r_-w-o-o-d_-h-a-n-g-i-n-g_-s-i-g-n.html"><span>NETHER_</span><wbr><span>WOOD_</span><wbr><span>HANGING_</span><wbr><span>SIGN</span></a></div>
@@ -1122,7 +1122,7 @@
             </div>
           </div>
 <a data-name="-134370700%2FProperties%2F-501115348" anchor-label="NETHERITE_BLOCK" id="-134370700%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-n-e-t-h-e-r-i-t-e_-b-l-o-c-k.html"><span>NETHERITE_</span><wbr><span>BLOCK</span></a></div>
@@ -1137,7 +1137,7 @@
             </div>
           </div>
 <a data-name="-589394105%2FProperties%2F-501115348" anchor-label="NETHERRACK" id="-589394105%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-n-e-t-h-e-r-r-a-c-k.html"><span><span>NETHERRACK</span></span></a></div>
@@ -1152,7 +1152,7 @@
             </div>
           </div>
 <a data-name="1577116406%2FProperties%2F-501115348" anchor-label="NYLIUM" id="1577116406%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-n-y-l-i-u-m.html"><span><span>NYLIUM</span></span></a></div>
@@ -1167,7 +1167,7 @@
             </div>
           </div>
 <a data-name="1199159777%2FProperties%2F-501115348" anchor-label="PACKED_MUD" id="1199159777%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-p-a-c-k-e-d_-m-u-d.html"><span>PACKED_</span><wbr><span>MUD</span></a></div>
@@ -1182,7 +1182,7 @@
             </div>
           </div>
 <a data-name="2059097138%2FProperties%2F-501115348" anchor-label="PINK_PETALS" id="2059097138%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-p-i-n-k_-p-e-t-a-l-s.html"><span>PINK_</span><wbr><span>PETALS</span></a></div>
@@ -1197,7 +1197,7 @@
             </div>
           </div>
 <a data-name="1278279876%2FProperties%2F-501115348" anchor-label="POINTED_DRIPSTONE" id="1278279876%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-p-o-i-n-t-e-d_-d-r-i-p-s-t-o-n-e.html"><span>POINTED_</span><wbr><span>DRIPSTONE</span></a></div>
@@ -1212,7 +1212,7 @@
             </div>
           </div>
 <a data-name="1979029080%2FProperties%2F-501115348" anchor-label="POLISHED_DEEPSLATE" id="1979029080%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-p-o-l-i-s-h-e-d_-d-e-e-p-s-l-a-t-e.html"><span>POLISHED_</span><wbr><span>DEEPSLATE</span></a></div>
@@ -1227,7 +1227,7 @@
             </div>
           </div>
 <a data-name="-478340908%2FProperties%2F-501115348" anchor-label="POLISHED_TUFF" id="-478340908%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-p-o-l-i-s-h-e-d_-t-u-f-f.html"><span>POLISHED_</span><wbr><span>TUFF</span></a></div>
@@ -1242,7 +1242,7 @@
             </div>
           </div>
 <a data-name="-1004400677%2FProperties%2F-501115348" anchor-label="POWDER_SNOW" id="-1004400677%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-p-o-w-d-e-r_-s-n-o-w.html"><span>POWDER_</span><wbr><span>SNOW</span></a></div>
@@ -1257,7 +1257,7 @@
             </div>
           </div>
 <a data-name="50781343%2FProperties%2F-501115348" anchor-label="ROOTED_DIRT" id="50781343%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-r-o-o-t-e-d_-d-i-r-t.html"><span>ROOTED_</span><wbr><span>DIRT</span></a></div>
@@ -1272,7 +1272,7 @@
             </div>
           </div>
 <a data-name="-559556173%2FProperties%2F-501115348" anchor-label="ROOTS" id="-559556173%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-r-o-o-t-s.html"><span><span>ROOTS</span></span></a></div>
@@ -1287,7 +1287,7 @@
             </div>
           </div>
 <a data-name="-144565678%2FProperties%2F-501115348" anchor-label="SAND" id="-144565678%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-a-n-d.html"><span><span>SAND</span></span></a></div>
@@ -1302,7 +1302,7 @@
             </div>
           </div>
 <a data-name="-811157384%2FProperties%2F-501115348" anchor-label="SCAFFOLDING" id="-811157384%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-c-a-f-f-o-l-d-i-n-g.html"><span><span>SCAFFOLDING</span></span></a></div>
@@ -1317,7 +1317,7 @@
             </div>
           </div>
 <a data-name="-1155081088%2FProperties%2F-501115348" anchor-label="SCULK" id="-1155081088%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-c-u-l-k.html"><span><span>SCULK</span></span></a></div>
@@ -1332,7 +1332,7 @@
             </div>
           </div>
 <a data-name="-1647497854%2FProperties%2F-501115348" anchor-label="SCULK_CATALYST" id="-1647497854%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-c-u-l-k_-c-a-t-a-l-y-s-t.html"><span>SCULK_</span><wbr><span>CATALYST</span></a></div>
@@ -1347,7 +1347,7 @@
             </div>
           </div>
 <a data-name="-1784198431%2FProperties%2F-501115348" anchor-label="SCULK_SENSOR" id="-1784198431%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-c-u-l-k_-s-e-n-s-o-r.html"><span>SCULK_</span><wbr><span>SENSOR</span></a></div>
@@ -1362,7 +1362,7 @@
             </div>
           </div>
 <a data-name="-1653653092%2FProperties%2F-501115348" anchor-label="SCULK_SHRIEKER" id="-1653653092%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-c-u-l-k_-s-h-r-i-e-k-e-r.html"><span>SCULK_</span><wbr><span>SHRIEKER</span></a></div>
@@ -1377,7 +1377,7 @@
             </div>
           </div>
 <a data-name="1336080199%2FProperties%2F-501115348" anchor-label="SCULK_VEIN" id="1336080199%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-c-u-l-k_-v-e-i-n.html"><span>SCULK_</span><wbr><span>VEIN</span></a></div>
@@ -1392,7 +1392,7 @@
             </div>
           </div>
 <a data-name="-1702558850%2FProperties%2F-501115348" anchor-label="SHROOMLIGHT" id="-1702558850%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-h-r-o-o-m-l-i-g-h-t.html"><span><span>SHROOMLIGHT</span></span></a></div>
@@ -1407,7 +1407,7 @@
             </div>
           </div>
 <a data-name="118894510%2FProperties%2F-501115348" anchor-label="SLIME_BLOCK" id="118894510%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-l-i-m-e_-b-l-o-c-k.html"><span>SLIME_</span><wbr><span>BLOCK</span></a></div>
@@ -1422,7 +1422,7 @@
             </div>
           </div>
 <a data-name="239675263%2FProperties%2F-501115348" anchor-label="SMALL_AMETHYST_BUD" id="239675263%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-m-a-l-l_-a-m-e-t-h-y-s-t_-b-u-d.html"><span>SMALL_</span><wbr><span>AMETHYST_</span><wbr><span>BUD</span></a></div>
@@ -1437,7 +1437,7 @@
             </div>
           </div>
 <a data-name="67282443%2FProperties%2F-501115348" anchor-label="SMALL_DRIPLEAF" id="67282443%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-m-a-l-l_-d-r-i-p-l-e-a-f.html"><span>SMALL_</span><wbr><span>DRIPLEAF</span></a></div>
@@ -1452,7 +1452,7 @@
             </div>
           </div>
 <a data-name="-1905150413%2FProperties%2F-501115348" anchor-label="SNOW" id="-1905150413%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-n-o-w.html"><span><span>SNOW</span></span></a></div>
@@ -1467,7 +1467,7 @@
             </div>
           </div>
 <a data-name="227024756%2FProperties%2F-501115348" anchor-label="SOUL_SAND" id="227024756%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-o-u-l_-s-a-n-d.html"><span>SOUL_</span><wbr><span>SAND</span></a></div>
@@ -1482,7 +1482,7 @@
             </div>
           </div>
 <a data-name="690736089%2FProperties%2F-501115348" anchor-label="SOUL_SOIL" id="690736089%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-o-u-l_-s-o-i-l.html"><span>SOUL_</span><wbr><span>SOIL</span></a></div>
@@ -1497,7 +1497,7 @@
             </div>
           </div>
 <a data-name="-1085926788%2FProperties%2F-501115348" anchor-label="SPONGE" id="-1085926788%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-p-o-n-g-e.html"><span><span>SPONGE</span></span></a></div>
@@ -1512,7 +1512,7 @@
             </div>
           </div>
 <a data-name="367134043%2FProperties%2F-501115348" anchor-label="SPORE_BLOSSOM" id="367134043%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-p-o-r-e_-b-l-o-s-s-o-m.html"><span>SPORE_</span><wbr><span>BLOSSOM</span></a></div>
@@ -1527,7 +1527,7 @@
             </div>
           </div>
 <a data-name="-475006035%2FProperties%2F-501115348" anchor-label="STEM" id="-475006035%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-t-e-m.html"><span><span>STEM</span></span></a></div>
@@ -1542,7 +1542,7 @@
             </div>
           </div>
 <a data-name="1008274335%2FProperties%2F-501115348" anchor-label="STONE" id="1008274335%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-t-o-n-e.html"><span><span>STONE</span></span></a></div>
@@ -1557,7 +1557,7 @@
             </div>
           </div>
 <a data-name="994126779%2FProperties%2F-501115348" anchor-label="SUSPICIOUS_GRAVEL" id="994126779%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-u-s-p-i-c-i-o-u-s_-g-r-a-v-e-l.html"><span>SUSPICIOUS_</span><wbr><span>GRAVEL</span></a></div>
@@ -1572,7 +1572,7 @@
             </div>
           </div>
 <a data-name="-946396642%2FProperties%2F-501115348" anchor-label="SUSPICIOUS_SAND" id="-946396642%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-u-s-p-i-c-i-o-u-s_-s-a-n-d.html"><span>SUSPICIOUS_</span><wbr><span>SAND</span></a></div>
@@ -1587,7 +1587,7 @@
             </div>
           </div>
 <a data-name="-1166981514%2FProperties%2F-501115348" anchor-label="SWEET_BERRY_BUSH" id="-1166981514%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-w-e-e-t_-b-e-r-r-y_-b-u-s-h.html"><span>SWEET_</span><wbr><span>BERRY_</span><wbr><span>BUSH</span></a></div>
@@ -1602,7 +1602,7 @@
             </div>
           </div>
 <a data-name="-819529435%2FProperties%2F-501115348" anchor-label="TRIAL_SPAWNER" id="-819529435%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-t-r-i-a-l_-s-p-a-w-n-e-r.html"><span>TRIAL_</span><wbr><span>SPAWNER</span></a></div>
@@ -1617,7 +1617,7 @@
             </div>
           </div>
 <a data-name="707834485%2FProperties%2F-501115348" anchor-label="TUFF" id="707834485%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-t-u-f-f.html"><span><span>TUFF</span></span></a></div>
@@ -1632,7 +1632,7 @@
             </div>
           </div>
 <a data-name="-2053614156%2FProperties%2F-501115348" anchor-label="TUFF_BRICKS" id="-2053614156%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-t-u-f-f_-b-r-i-c-k-s.html"><span>TUFF_</span><wbr><span>BRICKS</span></a></div>
@@ -1647,7 +1647,7 @@
             </div>
           </div>
 <a data-name="878766769%2FProperties%2F-501115348" anchor-label="TWISTING_VINES" id="878766769%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-t-w-i-s-t-i-n-g_-v-i-n-e-s.html"><span>TWISTING_</span><wbr><span>VINES</span></a></div>
@@ -1662,7 +1662,7 @@
             </div>
           </div>
 <a data-name="2066809458%2FProperties%2F-501115348" anchor-label="VAULT" id="2066809458%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-v-a-u-l-t.html"><span><span>VAULT</span></span></a></div>
@@ -1677,7 +1677,7 @@
             </div>
           </div>
 <a data-name="-72133140%2FProperties%2F-501115348" anchor-label="VINE" id="-72133140%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-v-i-n-e.html"><span><span>VINE</span></span></a></div>
@@ -1692,7 +1692,7 @@
             </div>
           </div>
 <a data-name="888826844%2FProperties%2F-501115348" anchor-label="WART_BLOCK" id="888826844%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-w-a-r-t_-b-l-o-c-k.html"><span>WART_</span><wbr><span>BLOCK</span></a></div>
@@ -1707,7 +1707,7 @@
             </div>
           </div>
 <a data-name="-1146992303%2FProperties%2F-501115348" anchor-label="WEEPING_VINES" id="-1146992303%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-w-e-e-p-i-n-g_-v-i-n-e-s.html"><span>WEEPING_</span><wbr><span>VINES</span></a></div>
@@ -1722,7 +1722,7 @@
             </div>
           </div>
 <a data-name="495037447%2FProperties%2F-501115348" anchor-label="WET_GRASS" id="495037447%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-w-e-t_-g-r-a-s-s.html"><span>WET_</span><wbr><span>GRASS</span></a></div>
@@ -1737,7 +1737,7 @@
             </div>
           </div>
 <a data-name="1930340611%2FProperties%2F-501115348" anchor-label="WET_SPONGE" id="1930340611%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-w-e-t_-s-p-o-n-g-e.html"><span>WET_</span><wbr><span>SPONGE</span></a></div>
@@ -1752,7 +1752,7 @@
             </div>
           </div>
 <a data-name="23143497%2FProperties%2F-501115348" anchor-label="WOOD" id="23143497%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-w-o-o-d.html"><span><span>WOOD</span></span></a></div>
@@ -1767,7 +1767,7 @@
             </div>
           </div>
 <a data-name="271301953%2FProperties%2F-501115348" anchor-label="WOOL" id="271301953%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-w-o-o-l.html"><span><span>WOOL</span></span></a></div>
@@ -1784,9 +1784,9 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="-50934150%2FFunctions%2F-501115348" anchor-label="from" id="-50934150%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="from.html"><span><span>from</span></span></a></div>
@@ -1806,17 +1806,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

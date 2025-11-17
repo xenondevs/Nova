@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>xyz.xenondevs.nova.util</title>
-<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../styles/main.css" rel="Stylesheet">
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
                     nova-parent
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.21.0-alpha.5
+        <div class="library-version" id="library-version">0.21.0-RC.1
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova/main">jvm</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova/main">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,32 +62,34 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     nova-parent
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="package" id="content" pageids="nova::xyz.xenondevs.nova.util////PointingToDeclaration//-501115348">
   <div class="breadcrumbs"><a href="../index.html">nova</a><span class="delimiter">/</span><span class="current">xyz.xenondevs.nova.util</span></div>
   <div class="cover ">
@@ -99,9 +99,9 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
+        <h2 class="tableheader">Types</h2>
         <div class="table"><a data-name="-755065318%2FClasslikes%2F-501115348" anchor-label="BlockFaceUtils" id="-755065318%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-block-face-utils/index.html"><span>Block</span><wbr><span>Face</span><wbr><span><span>Utils</span></span></a></div>
@@ -116,7 +116,7 @@
             </div>
           </div>
 <a data-name="-1372473123%2FClasslikes%2F-501115348" anchor-label="BlockSide" id="-1372473123%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-block-side/index.html"><span>Block</span><wbr><span><span>Side</span></span></a></div>
@@ -131,7 +131,7 @@
             </div>
           </div>
 <a data-name="541352669%2FClasslikes%2F-501115348" anchor-label="BlockUtils" id="541352669%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-block-utils/index.html"><span>Block</span><wbr><span><span>Utils</span></span></a></div>
@@ -146,7 +146,7 @@
             </div>
           </div>
 <a data-name="987267347%2FClasslikes%2F-501115348" anchor-label="EntityUtils" id="987267347%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-entity-utils/index.html"><span>Entity</span><wbr><span><span>Utils</span></span></a></div>
@@ -161,7 +161,7 @@
             </div>
           </div>
 <a data-name="513206168%2FClasslikes%2F-501115348" anchor-label="FakeOnlinePlayer" id="513206168%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-fake-online-player/index.html"><span>Fake</span><wbr><span>Online</span><wbr><span><span>Player</span></span></a></div>
@@ -170,13 +170,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-fake-online-player/index.html">FakeOnlinePlayer</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">offlinePlayer<span class="token operator">: </span><span data-unresolved-link="org.bukkit/OfflinePlayer///PointingToDeclaration/">OfflinePlayer</span><span class="token punctuation">, </span></span><span class="parameter ">location<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Location///PointingToDeclaration/">Location</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span>, <span data-unresolved-link="org.bukkit/OfflinePlayer///PointingToDeclaration/">OfflinePlayer</span></div><div class="brief "><p class="paragraph">A <span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span> which will throw an <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/UnsupportedOperationException.html">UnsupportedOperationException</a> when methods which aren't supported by <span data-unresolved-link="org.bukkit/OfflinePlayer///PointingToDeclaration/">OfflinePlayer</span> are called.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-fake-online-player/index.html">FakeOnlinePlayer</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">offlinePlayer<span class="token operator">: </span><span data-unresolved-link="org.bukkit/OfflinePlayer///PointingToDeclaration/">OfflinePlayer</span><span class="token punctuation">, </span></span><span class="parameter ">location<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Location///PointingToDeclaration/">Location</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span>, <span data-unresolved-link="org.bukkit/OfflinePlayer///PointingToDeclaration/">OfflinePlayer</span></div><div class="brief "><p class="paragraph">A <span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span> which will throw an <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unsupported-operation-exception/index.html">UnsupportedOperationException</a> when methods which aren't supported by <span data-unresolved-link="org.bukkit/OfflinePlayer///PointingToDeclaration/">OfflinePlayer</span> are called.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="2018740395%2FClasslikes%2F-501115348" anchor-label="FakePlayer" id="2018740395%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-fake-player/index.html"><span>Fake</span><wbr><span><span>Player</span></span></a></div>
@@ -191,7 +191,7 @@
             </div>
           </div>
 <a data-name="-678718107%2FClasslikes%2F-501115348" anchor-label="LocationUtils" id="-678718107%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-location-utils/index.html"><span>Location</span><wbr><span><span>Utils</span></span></a></div>
@@ -206,7 +206,7 @@
             </div>
           </div>
 <a data-name="-1004286881%2FClasslikes%2F-501115348" anchor-label="MetricPrefix" id="-1004286881%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-metric-prefix/index.html"><span>Metric</span><wbr><span><span>Prefix</span></span></a></div>
@@ -221,7 +221,7 @@
             </div>
           </div>
 <a data-name="942593296%2FClasslikes%2F-501115348" anchor-label="NumberFormatUtils" id="942593296%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-number-format-utils/index.html"><span>Number</span><wbr><span>Format</span><wbr><span><span>Utils</span></span></a></div>
@@ -236,7 +236,7 @@
             </div>
           </div>
 <a data-name="-461190924%2FClasslikes%2F-501115348" anchor-label="PacketTask" id="-461190924%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-packet-task/index.html"><span>Packet</span><wbr><span><span>Task</span></span></a></div>
@@ -245,13 +245,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-packet-task/index.html">PacketTask</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packets<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol/Packet///PointingToDeclaration/">Packet</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">interval<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">getViewers<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">A task that sends the given <a href="../../nova/xyz.xenondevs.nova.util/-packet-task/packets.html">packets</a> to all players from <a href="../../nova/xyz.xenondevs.nova.util/-packet-task/get-viewers.html">getViewers</a> every <a href="../../nova/xyz.xenondevs.nova.util/-packet-task/interval.html">interval</a> ticks.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="-packet-task/index.html">PacketTask</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packets<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol/Packet///PointingToDeclaration/">Packet</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">interval<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">getViewers<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">A task that sends the given <a href="../../nova/xyz.xenondevs.nova.util/-packet-task/--root--.html">packets</a> to all players from <a href="../../nova/xyz.xenondevs.nova.util/-packet-task/--root--.html">getViewers</a> every <a href="../../nova/xyz.xenondevs.nova.util/-packet-task/--root--.html">interval</a> ticks.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="1418343351%2FClasslikes%2F-501115348" anchor-label="ServerSoftware" id="1418343351%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-server-software/index.html"><span>Server</span><wbr><span><span>Software</span></span></a></div>
@@ -266,7 +266,7 @@
             </div>
           </div>
 <a data-name="1429382259%2FClasslikes%2F-501115348" anchor-label="ServerUtils" id="1429382259%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-server-utils/index.html"><span>Server</span><wbr><span><span>Utils</span></span></a></div>
@@ -281,7 +281,7 @@
             </div>
           </div>
 <a data-name="-610076479%2FClasslikes%2F-501115348" anchor-label="StringUtils" id="-610076479%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-string-utils/index.html"><span>String</span><wbr><span><span>Utils</span></span></a></div>
@@ -298,9 +298,9 @@
         </div>
       </div>
       <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="137933029%2FProperties%2F-501115348" anchor-label="above" id="137933029%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="above.html"><span><span>above</span></span></a></div>
@@ -315,7 +315,7 @@
             </div>
           </div>
 <a data-name="781377344%2FProperties%2F-501115348" anchor-label="axis" id="781377344%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="axis.html"><span><span>axis</span></span></a></div>
@@ -330,7 +330,7 @@
             </div>
           </div>
 <a data-name="1060232657%2FProperties%2F-501115348" anchor-label="below" id="1060232657%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="below.html"><span><span>below</span></span></a></div>
@@ -345,7 +345,7 @@
             </div>
           </div>
 <a data-name="-1457276748%2FProperties%2F-501115348" anchor-label="blockFace" id="-1457276748%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="block-face.html"><span>block</span><wbr><span><span>Face</span></span></a></div>
@@ -360,7 +360,7 @@
             </div>
           </div>
 <a data-name="-1568256003%2FProperties%2F-501115348" anchor-label="blockLocation" id="-1568256003%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="block-location.html"><span>block</span><wbr><span><span>Location</span></span></a></div>
@@ -375,7 +375,7 @@
             </div>
           </div>
 <a data-name="-453006720%2FProperties%2F-501115348" anchor-label="blockPos" id="-453006720%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="block-pos.html"><span>block</span><wbr><span><span>Pos</span></span></a></div>
@@ -390,7 +390,7 @@
             </div>
           </div>
 <a data-name="1344882013%2FProperties%2F-501115348" anchor-label="bukkitBlockData" id="1344882013%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="bukkit-block-data.html"><span>bukkit</span><wbr><span>Block</span><wbr><span><span>Data</span></span></a></div>
@@ -405,7 +405,7 @@
             </div>
           </div>
 <a data-name="549668616%2FProperties%2F-501115348" anchor-label="bukkitEquipmentSlot" id="549668616%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="bukkit-equipment-slot.html"><span>bukkit</span><wbr><span>Equipment</span><wbr><span><span>Slot</span></span></a></div>
@@ -420,7 +420,7 @@
             </div>
           </div>
 <a data-name="-1576176160%2FProperties%2F-501115348" anchor-label="bukkitMaterial" id="-1576176160%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="bukkit-material.html"><span>bukkit</span><wbr><span><span>Material</span></span></a></div>
@@ -435,7 +435,7 @@
             </div>
           </div>
 <a data-name="-364834533%2FProperties%2F-501115348" anchor-label="bukkitPose" id="-364834533%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="bukkit-pose.html"><span>bukkit</span><wbr><span><span>Pose</span></span></a></div>
@@ -450,7 +450,7 @@
             </div>
           </div>
 <a data-name="1113967418%2FProperties%2F-501115348" anchor-label="center" id="1113967418%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="center.html"><span><span>center</span></span></a></div>
@@ -465,7 +465,7 @@
             </div>
           </div>
 <a data-name="1113254422%2FProperties%2F-501115348" anchor-label="chunkSection" id="1113254422%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="chunk-section.html"><span>chunk</span><wbr><span><span>Section</span></span></a></div>
@@ -480,7 +480,7 @@
             </div>
           </div>
 <a data-name="2032447282%2FProperties%2F-501115348" anchor-label="CUBE_FACES" id="2032447282%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-u-b-e_-f-a-c-e-s.html"><span>CUBE_</span><wbr><span>FACES</span></a></div>
@@ -495,7 +495,7 @@
             </div>
           </div>
 <a data-name="448421563%2FProperties%2F-501115348" anchor-label="DATA_VERSION" id="448421563%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-d-a-t-a_-v-e-r-s-i-o-n.html"><span>DATA_</span><wbr><span>VERSION</span></a></div>
@@ -510,7 +510,7 @@
             </div>
           </div>
 <a data-name="858735515%2FProperties%2F-501115348" anchor-label="destroyProgress" id="858735515%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="destroy-progress.html"><span>destroy</span><wbr><span><span>Progress</span></span></a></div>
@@ -525,7 +525,7 @@
             </div>
           </div>
 <a data-name="10045957%2FProperties%2F-501115348" anchor-label="eyeInWater" id="10045957%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="eye-in-water.html"><span>eye</span><wbr><span>In</span><wbr><span><span>Water</span></span></a></div>
@@ -540,7 +540,7 @@
             </div>
           </div>
 <a data-name="475528993%2FProperties%2F-501115348" anchor-label="handItems" id="475528993%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="hand-items.html"><span>hand</span><wbr><span><span>Items</span></span></a></div>
@@ -555,7 +555,7 @@
             </div>
           </div>
 <a data-name="-739559564%2FProperties%2F-501115348" anchor-label="hands" id="-739559564%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="hands.html"><span><span>hands</span></span></a></div>
@@ -570,7 +570,7 @@
             </div>
           </div>
 <a data-name="1254333826%2FProperties%2F-501115348" anchor-label="hardness" id="1254333826%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="hardness.html"><span><span>hardness</span></span></a></div>
@@ -585,7 +585,7 @@
             </div>
           </div>
 <a data-name="749423576%2FProperties%2F-501115348" anchor-label="hasInventoryOpen" id="749423576%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="has-inventory-open.html"><span>has</span><wbr><span>Inventory</span><wbr><span><span>Open</span></span></a></div>
@@ -600,7 +600,7 @@
             </div>
           </div>
 <a data-name="-1271517021%2FProperties%2F-501115348" anchor-label="HORIZONTAL_FACES" id="-1271517021%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-h-o-r-i-z-o-n-t-a-l_-f-a-c-e-s.html"><span>HORIZONTAL_</span><wbr><span>FACES</span></a></div>
@@ -615,7 +615,7 @@
             </div>
           </div>
 <a data-name="-1857598022%2FProperties%2F-501115348" anchor-label="id" id="-1857598022%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="id.html"><span><span>id</span></span></a></div>
@@ -630,7 +630,7 @@
             </div>
           </div>
 <a data-name="-843694308%2FProperties%2F-501115348" anchor-label="levelChunk" id="-843694308%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="level-chunk.html"><span>level</span><wbr><span><span>Chunk</span></span></a></div>
@@ -645,7 +645,7 @@
             </div>
           </div>
 <a data-name="-929753122%2FProperties%2F-501115348" anchor-label="localizedName" id="-929753122%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="localized-name.html"><span>localized</span><wbr><span><span>Name</span></span></a></div>
@@ -660,7 +660,7 @@
             </div>
           </div>
 <a data-name="-633713303%2FProperties%2F-501115348" anchor-label="MINECRAFT_SERVER" id="-633713303%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-m-i-n-e-c-r-a-f-t_-s-e-r-v-e-r.html"><span>MINECRAFT_</span><wbr><span>SERVER</span></a></div>
@@ -675,7 +675,7 @@
             </div>
           </div>
 <a data-name="1762802148%2FProperties%2F-501115348" anchor-label="namespacedKey" id="1762802148%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="namespaced-key.html"><span>namespaced</span><wbr><span><span>Key</span></span></a></div>
@@ -690,7 +690,7 @@
             </div>
           </div>
 <a data-name="-1428405244%2FProperties%2F-501115348" anchor-label="nextCartesianClockwise" id="-1428405244%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="next-cartesian-clockwise.html"><span>next</span><wbr><span>Cartesian</span><wbr><span><span>Clockwise</span></span></a></div>
@@ -705,7 +705,7 @@
             </div>
           </div>
 <a data-name="1830295892%2FProperties%2F-501115348" anchor-label="nextCartesianCounterclockwise" id="1830295892%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="next-cartesian-counterclockwise.html"><span>next</span><wbr><span>Cartesian</span><wbr><span><span>Counterclockwise</span></span></a></div>
@@ -720,7 +720,7 @@
             </div>
           </div>
 <a data-name="-598494656%2FProperties%2F-501115348" anchor-label="nextClockwise" id="-598494656%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="next-clockwise.html"><span>next</span><wbr><span><span>Clockwise</span></span></a></div>
@@ -735,7 +735,7 @@
             </div>
           </div>
 <a data-name="298807192%2FProperties%2F-501115348" anchor-label="nextCounterclockwise" id="298807192%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="next-counterclockwise.html"><span>next</span><wbr><span><span>Counterclockwise</span></span></a></div>
@@ -750,7 +750,7 @@
             </div>
           </div>
 <a data-name="551351674%2FProperties%2F-501115348" anchor-label="nmsAttribute" id="551351674%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-attribute.html"><span>nms</span><wbr><span><span>Attribute</span></span></a></div>
@@ -765,7 +765,7 @@
             </div>
           </div>
 <a data-name="567762628%2FProperties%2F-501115348" anchor-label="nmsBlock" id="567762628%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-block.html"><span>nms</span><wbr><span><span>Block</span></span></a></div>
@@ -780,7 +780,7 @@
             </div>
           </div>
 <a data-name="-418424718%2FProperties%2F-501115348" anchor-label="nmsBlockState" id="-418424718%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-block-state.html"><span>nms</span><wbr><span>Block</span><wbr><span><span>State</span></span></a></div>
@@ -795,7 +795,7 @@
             </div>
           </div>
 <a data-name="-1110001589%2FProperties%2F-501115348" anchor-label="nmsCopy" id="-1110001589%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-copy.html"><span>nms</span><wbr><span><span>Copy</span></span></a></div>
@@ -810,7 +810,7 @@
             </div>
           </div>
 <a data-name="1659254358%2FProperties%2F-501115348" anchor-label="nmsDirection" id="1659254358%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-direction.html"><span>nms</span><wbr><span><span>Direction</span></span></a></div>
@@ -825,7 +825,7 @@
             </div>
           </div>
 <a data-name="-1094805259%2FProperties%2F-501115348" anchor-label="nmsEntity" id="-1094805259%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-entity.html"><span>nms</span><wbr><span><span>Entity</span></span></a></div>
@@ -840,7 +840,7 @@
             </div>
           </div>
 <a data-name="-614555561%2FProperties%2F-501115348" anchor-label="nmsEquipmentSlot" id="-614555561%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-equipment-slot.html"><span>nms</span><wbr><span>Equipment</span><wbr><span><span>Slot</span></span></a></div>
@@ -855,7 +855,7 @@
             </div>
           </div>
 <a data-name="-1615233543%2FProperties%2F-501115348" anchor-label="nmsInteractionHand" id="-1615233543%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-interaction-hand.html"><span>nms</span><wbr><span>Interaction</span><wbr><span><span>Hand</span></span></a></div>
@@ -870,7 +870,7 @@
             </div>
           </div>
 <a data-name="-1845762796%2FProperties%2F-501115348" anchor-label="nmsItem" id="-1845762796%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-item.html"><span>nms</span><wbr><span><span>Item</span></span></a></div>
@@ -885,7 +885,7 @@
             </div>
           </div>
 <a data-name="1549803189%2FProperties%2F-501115348" anchor-label="nmsItemUseAnimation" id="1549803189%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-item-use-animation.html"><span>nms</span><wbr><span>Item</span><wbr><span>Use</span><wbr><span><span>Animation</span></span></a></div>
@@ -900,7 +900,7 @@
             </div>
           </div>
 <a data-name="8792863%2FProperties%2F-501115348" anchor-label="nmsOperation" id="8792863%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-operation.html"><span>nms</span><wbr><span><span>Operation</span></span></a></div>
@@ -915,7 +915,7 @@
             </div>
           </div>
 <a data-name="1114789517%2FProperties%2F-501115348" anchor-label="nmsPose" id="1114789517%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-pose.html"><span>nms</span><wbr><span><span>Pose</span></span></a></div>
@@ -930,7 +930,7 @@
             </div>
           </div>
 <a data-name="-1561274489%2FProperties%2F-501115348" anchor-label="nmsState" id="-1561274489%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nms-state.html"><span>nms</span><wbr><span><span>State</span></span></a></div>
@@ -945,7 +945,7 @@
             </div>
           </div>
 <a data-name="-1663561535%2FProperties%2F-501115348" anchor-label="novaBlock" id="-1663561535%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nova-block.html"><span>nova</span><wbr><span><span>Block</span></span></a></div>
@@ -960,7 +960,7 @@
             </div>
           </div>
 <a data-name="1140005748%2FProperties%2F-501115348" anchor-label="novaBlockState" id="1140005748%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nova-block-state.html"><span>nova</span><wbr><span>Block</span><wbr><span><span>State</span></span></a></div>
@@ -975,7 +975,7 @@
             </div>
           </div>
 <a data-name="104886088%2FProperties%2F-501115348" anchor-label="novaSoundGroup" id="104886088%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nova-sound-group.html"><span>nova</span><wbr><span>Sound</span><wbr><span><span>Group</span></span></a></div>
@@ -990,7 +990,7 @@
             </div>
           </div>
 <a data-name="756603999%2FProperties%2F-501115348" anchor-label="pitch" id="756603999%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="pitch.html"><span><span>pitch</span></span></a></div>
@@ -1005,7 +1005,7 @@
             </div>
           </div>
 <a data-name="-1664088970%2FProperties%2F-501115348" anchor-label="REGISTRY_ACCESS" id="-1664088970%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-r-e-g-i-s-t-r-y_-a-c-c-e-s-s.html"><span>REGISTRY_</span><wbr><span>ACCESS</span></a></div>
@@ -1020,7 +1020,7 @@
             </div>
           </div>
 <a data-name="-1398594101%2FProperties%2F-501115348" anchor-label="resourceLocation" id="-1398594101%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="resource-location.html"><span>resource</span><wbr><span><span>Location</span></span></a></div>
@@ -1035,7 +1035,7 @@
             </div>
           </div>
 <a data-name="-1340797438%2FProperties%2F-501115348" anchor-label="SERVER_VERSION" id="-1340797438%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-s-e-r-v-e-r_-v-e-r-s-i-o-n.html"><span>SERVER_</span><wbr><span>VERSION</span></a></div>
@@ -1050,7 +1050,7 @@
             </div>
           </div>
 <a data-name="-208422489%2FProperties%2F-501115348" anchor-label="serverLevel" id="-208422489%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="server-level.html"><span>server</span><wbr><span><span>Level</span></span></a></div>
@@ -1065,7 +1065,7 @@
             </div>
           </div>
 <a data-name="769626272%2FProperties%2F-501115348" anchor-label="serverPlayer" id="769626272%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="server-player.html"><span>server</span><wbr><span><span>Player</span></span></a></div>
@@ -1080,7 +1080,7 @@
             </div>
           </div>
 <a data-name="-1939120322%2FProperties%2F-501115348" anchor-label="serverTick" id="-1939120322%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="server-tick.html"><span>server</span><wbr><span><span>Tick</span></span></a></div>
@@ -1095,7 +1095,7 @@
             </div>
           </div>
 <a data-name="-1282232778%2FProperties%2F-501115348" anchor-label="size" id="-1282232778%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="size.html"><span><span>size</span></span></a></div>
@@ -1110,7 +1110,7 @@
             </div>
           </div>
 <a data-name="-1643481921%2FProperties%2F-501115348" anchor-label="vec3" id="-1643481921%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="vec3.html"><span><span>vec3</span></span></a></div>
@@ -1125,7 +1125,7 @@
             </div>
           </div>
 <a data-name="1863418705%2FProperties%2F-501115348" anchor-label="VERTICAL_FACES" id="1863418705%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-v-e-r-t-i-c-a-l_-f-a-c-e-s.html"><span>VERTICAL_</span><wbr><span>FACES</span></a></div>
@@ -1140,7 +1140,7 @@
             </div>
           </div>
 <a data-name="1506353296%2FProperties%2F-501115348" anchor-label="yaw" id="1506353296%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="yaw.html"><span><span>yaw</span></span></a></div>
@@ -1157,9 +1157,9 @@
         </div>
       </div>
       <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="974322050%2FFunctions%2F-501115348" anchor-label="add" id="974322050%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="add.html"><span><span>add</span></span></a></div>
@@ -1174,7 +1174,7 @@
             </div>
           </div>
 <a data-name="749416175%2FFunctions%2F-501115348" anchor-label="addAll" id="749416175%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="add-all.html"><span>add</span><wbr><span><span>All</span></span></a></div>
@@ -1189,7 +1189,7 @@
             </div>
           </div>
 <a data-name="552304930%2FFunctions%2F-501115348" anchor-label="addItemCorrectly" id="552304930%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="add-item-correctly.html"><span>add</span><wbr><span>Item</span><wbr><span><span>Correctly</span></span></a></div>
@@ -1204,7 +1204,7 @@
             </div>
           </div>
 <a data-name="1471580718%2FFunctions%2F-501115348" anchor-label="addNamespace" id="1471580718%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="add-namespace.html"><span>add</span><wbr><span><span>Namespace</span></span></a></div>
@@ -1219,7 +1219,7 @@
             </div>
           </div>
 <a data-name="1595944275%2FFunctions%2F-501115348" anchor-label="addPrefix" id="1595944275%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="add-prefix.html"><span>add</span><wbr><span><span>Prefix</span></span></a></div>
@@ -1234,7 +1234,7 @@
             </div>
           </div>
 <a data-name="-2061387425%2FFunctions%2F-501115348" anchor-label="addPrioritized" id="-2061387425%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="add-prioritized.html"><span>add</span><wbr><span><span>Prioritized</span></span></a></div>
@@ -1249,7 +1249,7 @@
             </div>
           </div>
 <a data-name="-53242316%2FFunctions%2F-501115348" anchor-label="addSuffix" id="-53242316%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="add-suffix.html"><span>add</span><wbr><span><span>Suffix</span></span></a></div>
@@ -1263,23 +1263,23 @@
               </div>
             </div>
           </div>
-<a data-name="-1248809070%2FFunctions%2F-501115348" anchor-label="addToInventoryOrDrop" id="-1248809070%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+<a data-name="-95071568%2FFunctions%2F-501115348" anchor-label="addToInventoryOrDrop" id="-95071568%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="add-to-inventory-or-drop.html"><span>add</span><wbr><span>To</span><wbr><span>Inventory</span><wbr><span>Or</span><wbr><span><span>Drop</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1248809070%2FFunctions%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-95071568%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">.</span><a href="add-to-inventory-or-drop.html"><span class="token function">addToInventoryOrDrop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>items<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div><div class="brief "><p class="paragraph">Adds <a href="add-to-inventory-or-drop.html">items</a> to the <span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player's</span> inventory or drops them on the ground if there is not enough space</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">.</span><a href="add-to-inventory-or-drop.html"><span class="token function">addToInventoryOrDrop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">items<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds <a href="add-to-inventory-or-drop.html">items</a> to the <span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player's</span> inventory or drops them on the ground if there is not enough space.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">.</span><a href="add-to-inventory-or-drop.html"><span class="token function">addToInventoryOrDrop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">items<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds <a href="add-to-inventory-or-drop.html">items</a> to the <span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player's</span> inventory or drops them on the ground if there is not enough space.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">.</span><a href="add-to-inventory-or-drop.html"><span class="token function">addToInventoryOrDrop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>items<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Adds <a href="add-to-inventory-or-drop.html">items</a> to the <span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player's</span> inventory or drops them on the ground if there is not enough space</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-328622152%2FFunctions%2F-501115348" anchor-label="addToInventoryPrioritizedOrDrop" id="-328622152%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="add-to-inventory-prioritized-or-drop.html"><span>add</span><wbr><span>To</span><wbr><span>Inventory</span><wbr><span>Prioritized</span><wbr><span>Or</span><wbr><span><span>Drop</span></span></a></div>
@@ -1294,7 +1294,7 @@
             </div>
           </div>
 <a data-name="2142898070%2FFunctions%2F-501115348" anchor-label="advance" id="2142898070%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="advance.html"><span><span>advance</span></span></a></div>
@@ -1309,7 +1309,7 @@
             </div>
           </div>
 <a data-name="1918733389%2FFunctions%2F-501115348" anchor-label="broadcast" id="1918733389%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="broadcast.html"><span><span>broadcast</span></span></a></div>
@@ -1324,7 +1324,7 @@
             </div>
           </div>
 <a data-name="345275366%2FFunctions%2F-501115348" anchor-label="broadcastBreakEvent" id="345275366%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="broadcast-break-event.html"><span>broadcast</span><wbr><span>Break</span><wbr><span><span>Event</span></span></a></div>
@@ -1339,7 +1339,7 @@
             </div>
           </div>
 <a data-name="-1374958836%2FFunctions%2F-501115348" anchor-label="broadcastDestructionStage" id="-1374958836%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="broadcast-destruction-stage.html"><span>broadcast</span><wbr><span>Destruction</span><wbr><span><span>Stage</span></span></a></div>
@@ -1354,7 +1354,7 @@
             </div>
           </div>
 <a data-name="131029694%2FFunctions%2F-501115348" anchor-label="calculateYaw" id="131029694%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="calculate-yaw.html"><span>calculate</span><wbr><span><span>Yaw</span></span></a></div>
@@ -1369,7 +1369,7 @@
             </div>
           </div>
 <a data-name="-189358290%2FFunctions%2F-501115348" anchor-label="calculateYawPitch" id="-189358290%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="calculate-yaw-pitch.html"><span>calculate</span><wbr><span>Yaw</span><wbr><span><span>Pitch</span></span></a></div>
@@ -1384,7 +1384,7 @@
             </div>
           </div>
 <a data-name="582745888%2FFunctions%2F-501115348" anchor-label="callEvent" id="582745888%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="call-event.html"><span>call</span><wbr><span><span>Event</span></span></a></div>
@@ -1399,7 +1399,7 @@
             </div>
           </div>
 <a data-name="2097544712%2FFunctions%2F-501115348" anchor-label="capitalize" id="2097544712%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="capitalize.html"><span><span>capitalize</span></span></a></div>
@@ -1408,13 +1408,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">.</span><a href="capitalize.html"><span class="token function">capitalize</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">.</span><a href="capitalize.html"><span class="token function">capitalize</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1143822893%2FFunctions%2F-501115348" anchor-label="capitalizeAll" id="-1143822893%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="capitalize-all.html"><span>capitalize</span><wbr><span><span>All</span></span></a></div>
@@ -1429,7 +1429,7 @@
             </div>
           </div>
 <a data-name="1109858590%2FFunctions%2F-501115348" anchor-label="captureDrops" id="1109858590%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="capture-drops.html"><span>capture</span><wbr><span><span>Drops</span></span></a></div>
@@ -1444,7 +1444,7 @@
             </div>
           </div>
 <a data-name="-1505150950%2FFunctions%2F-501115348" anchor-label="castRay" id="-1505150950%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="cast-ray.html"><span>cast</span><wbr><span><span>Ray</span></span></a></div>
@@ -1459,7 +1459,7 @@
             </div>
           </div>
 <a data-name="-653351154%2FFunctions%2F-501115348" anchor-label="center" id="-653351154%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="center.html"><span><span>center</span></span></a></div>
@@ -1474,7 +1474,7 @@
             </div>
           </div>
 <a data-name="356733837%2FFunctions%2F-501115348" anchor-label="component1" id="356733837%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="component1.html"><span><span>component1</span></span></a></div>
@@ -1483,13 +1483,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit/Location///PointingToDeclaration/">Location</span><span class="token punctuation">.</span><a href="component1.html"><span class="token function">component1</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit/World///PointingToDeclaration/">World</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit/Location///PointingToDeclaration/">Location</span><span class="token punctuation">.</span><a href="component1.html"><span class="token function">component1</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit/World///PointingToDeclaration/">World</span><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1344006642%2FFunctions%2F-501115348" anchor-label="component2" id="-1344006642%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="component2.html"><span><span>component2</span></span></a></div>
@@ -1504,7 +1504,7 @@
             </div>
           </div>
 <a data-name="1250220175%2FFunctions%2F-501115348" anchor-label="component3" id="1250220175%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="component3.html"><span><span>component3</span></span></a></div>
@@ -1519,7 +1519,7 @@
             </div>
           </div>
 <a data-name="-450520304%2FFunctions%2F-501115348" anchor-label="component4" id="-450520304%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="component4.html"><span><span>component4</span></span></a></div>
@@ -1534,7 +1534,7 @@
             </div>
           </div>
 <a data-name="2143706513%2FFunctions%2F-501115348" anchor-label="component5" id="2143706513%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="component5.html"><span><span>component5</span></span></a></div>
@@ -1549,7 +1549,7 @@
             </div>
           </div>
 <a data-name="442966034%2FFunctions%2F-501115348" anchor-label="component6" id="442966034%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="component6.html"><span><span>component6</span></span></a></div>
@@ -1564,7 +1564,7 @@
             </div>
           </div>
 <a data-name="-1565307137%2FFunctions%2F-501115348" anchor-label="contains" id="-1565307137%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="contains.html"><span><span>contains</span></span></a></div>
@@ -1579,7 +1579,7 @@
             </div>
           </div>
 <a data-name="1639769399%2FFunctions%2F-501115348" anchor-label="copy" id="1639769399%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="copy.html"><span><span>copy</span></span></a></div>
@@ -1594,7 +1594,7 @@
             </div>
           </div>
 <a data-name="-898491904%2FFunctions%2F-501115348" anchor-label="createColoredParticle" id="-898491904%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="create-colored-particle.html"><span>create</span><wbr><span>Colored</span><wbr><span><span>Particle</span></span></a></div>
@@ -1609,7 +1609,7 @@
             </div>
           </div>
 <a data-name="-725883464%2FFunctions%2F-501115348" anchor-label="damageItemInHand" id="-725883464%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="damage-item-in-hand.html"><span>damage</span><wbr><span>Item</span><wbr><span>In</span><wbr><span><span>Hand</span></span></a></div>
@@ -1624,7 +1624,7 @@
             </div>
           </div>
 <a data-name="-1062879906%2FFunctions%2F-501115348" anchor-label="damageItemInMainHand" id="-1062879906%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="damage-item-in-main-hand.html"><span>damage</span><wbr><span>Item</span><wbr><span>In</span><wbr><span>Main</span><wbr><span><span>Hand</span></span></a></div>
@@ -1639,7 +1639,7 @@
             </div>
           </div>
 <a data-name="1466102516%2FFunctions%2F-501115348" anchor-label="damageItemInOffHand" id="1466102516%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="damage-item-in-off-hand.html"><span>damage</span><wbr><span>Item</span><wbr><span>In</span><wbr><span>Off</span><wbr><span><span>Hand</span></span></a></div>
@@ -1654,7 +1654,7 @@
             </div>
           </div>
 <a data-name="-1248216227%2FFunctions%2F-501115348" anchor-label="damageToolAttackEntity" id="-1248216227%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="damage-tool-attack-entity.html"><span>damage</span><wbr><span>Tool</span><wbr><span>Attack</span><wbr><span><span>Entity</span></span></a></div>
@@ -1669,7 +1669,7 @@
             </div>
           </div>
 <a data-name="1850763258%2FFunctions%2F-501115348" anchor-label="damageToolBreakBlock" id="1850763258%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="damage-tool-break-block.html"><span>damage</span><wbr><span>Tool</span><wbr><span>Break</span><wbr><span><span>Block</span></span></a></div>
@@ -1684,7 +1684,7 @@
             </div>
           </div>
 <a data-name="-2144679362%2FFunctions%2F-501115348" anchor-label="dropItem" id="-2144679362%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="drop-item.html"><span>drop</span><wbr><span><span>Item</span></span></a></div>
@@ -1699,7 +1699,7 @@
             </div>
           </div>
 <a data-name="107664345%2FFunctions%2F-501115348" anchor-label="dropItems" id="107664345%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="drop-items.html"><span>drop</span><wbr><span><span>Items</span></span></a></div>
@@ -1714,7 +1714,7 @@
             </div>
           </div>
 <a data-name="-1242090392%2FFunctions%2F-501115348" anchor-label="dropItemsNaturally" id="-1242090392%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="drop-items-naturally.html"><span>drop</span><wbr><span>Items</span><wbr><span><span>Naturally</span></span></a></div>
@@ -1728,12 +1728,12 @@
               </div>
             </div>
           </div>
-<a data-name="496807451%2FFunctions%2F-501115348" anchor-label="equalsAny" id="496807451%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+<a data-name="-65396117%2FFunctions%2F-501115348" anchor-label="equalsAny" id="-65396117%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="equals-any.html"><span>equals</span><wbr><span><span>Any</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="496807451%2FFunctions%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-65396117%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
@@ -1744,7 +1744,7 @@
             </div>
           </div>
 <a data-name="786352408%2FFunctions%2F-501115348" anchor-label="filterInRange" id="786352408%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="filter-in-range.html"><span>filter</span><wbr><span>In</span><wbr><span><span>Range</span></span></a></div>
@@ -1759,7 +1759,7 @@
             </div>
           </div>
 <a data-name="1969567542%2FFunctions%2F-501115348" anchor-label="forcePacketBroadcast" id="1969567542%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="force-packet-broadcast.html"><span>force</span><wbr><span>Packet</span><wbr><span><span>Broadcast</span></span></a></div>
@@ -1773,12 +1773,12 @@
               </div>
             </div>
           </div>
-<a data-name="557313936%2FFunctions%2F-501115348" anchor-label="formatSafely" id="557313936%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+<a data-name="128941948%2FFunctions%2F-501115348" anchor-label="formatSafely" id="128941948%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="format-safely.html"><span>format</span><wbr><span><span>Safely</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="557313936%2FFunctions%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="128941948%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
@@ -1789,7 +1789,7 @@
             </div>
           </div>
 <a data-name="-1752200877%2FFunctions%2F-501115348" anchor-label="fullCuboidTo" id="-1752200877%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="full-cuboid-to.html"><span>full</span><wbr><span>Cuboid</span><wbr><span><span>To</span></span></a></div>
@@ -1804,7 +1804,7 @@
             </div>
           </div>
 <a data-name="1427460012%2FFunctions%2F-501115348" anchor-label="get" id="1427460012%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get.html"><span><span>get</span></span></a></div>
@@ -1819,7 +1819,7 @@
             </div>
           </div>
 <a data-name="2052620019%2FFunctions%2F-501115348" anchor-label="getBlockState" id="2052620019%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-block-state.html"><span>get</span><wbr><span>Block</span><wbr><span><span>State</span></span></a></div>
@@ -1834,7 +1834,7 @@
             </div>
           </div>
 <a data-name="980030730%2FFunctions%2F-501115348" anchor-label="getBoxOutline" id="980030730%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-box-outline.html"><span>get</span><wbr><span>Box</span><wbr><span><span>Outline</span></span></a></div>
@@ -1849,7 +1849,7 @@
             </div>
           </div>
 <a data-name="1409494770%2FFunctions%2F-501115348" anchor-label="getCoordinate" id="1409494770%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-coordinate.html"><span>get</span><wbr><span><span>Coordinate</span></span></a></div>
@@ -1864,7 +1864,7 @@
             </div>
           </div>
 <a data-name="1357013421%2FFunctions%2F-501115348" anchor-label="getFullCuboid" id="1357013421%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-full-cuboid.html"><span>get</span><wbr><span>Full</span><wbr><span><span>Cuboid</span></span></a></div>
@@ -1879,7 +1879,7 @@
             </div>
           </div>
 <a data-name="1754081047%2FFunctions%2F-501115348" anchor-label="getNextBlockBelow" id="1754081047%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-next-block-below.html"><span>get</span><wbr><span>Next</span><wbr><span>Block</span><wbr><span><span>Below</span></span></a></div>
@@ -1894,7 +1894,7 @@
             </div>
           </div>
 <a data-name="157124791%2FFunctions%2F-501115348" anchor-label="getOrCreateHolder" id="157124791%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-or-create-holder.html"><span>get</span><wbr><span>Or</span><wbr><span>Create</span><wbr><span><span>Holder</span></span></a></div>
@@ -1909,7 +1909,7 @@
             </div>
           </div>
 <a data-name="378327521%2FFunctions%2F-501115348" anchor-label="getOrNull" id="378327521%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-or-null.html"><span>get</span><wbr><span>Or</span><wbr><span><span>Null</span></span></a></div>
@@ -1924,7 +1924,7 @@
             </div>
           </div>
 <a data-name="833341849%2FFunctions%2F-501115348" anchor-label="getOrThrow" id="833341849%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-or-throw.html"><span>get</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -1938,12 +1938,12 @@
               </div>
             </div>
           </div>
-<a data-name="1301574599%2FFunctions%2F-501115348" anchor-label="getPlayersNearby" id="1301574599%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+<a data-name="-440755095%2FFunctions%2F-501115348" anchor-label="getPlayersNearby" id="-440755095%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-players-nearby.html"><span>get</span><wbr><span>Players</span><wbr><span><span>Nearby</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1301574599%2FFunctions%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-440755095%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
@@ -1954,7 +1954,7 @@
             </div>
           </div>
 <a data-name="-1988804017%2FFunctions%2F-501115348" anchor-label="getRectangle" id="-1988804017%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-rectangle.html"><span>get</span><wbr><span><span>Rectangle</span></span></a></div>
@@ -1969,7 +1969,7 @@
             </div>
           </div>
 <a data-name="-1214900863%2FFunctions%2F-501115348" anchor-label="getStraightLine" id="-1214900863%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-straight-line.html"><span>get</span><wbr><span>Straight</span><wbr><span><span>Line</span></span></a></div>
@@ -1984,7 +1984,7 @@
             </div>
           </div>
 <a data-name="-341695185%2FFunctions%2F-501115348" anchor-label="getSurroundingChunks" id="-341695185%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-surrounding-chunks.html"><span>get</span><wbr><span>Surrounding</span><wbr><span><span>Chunks</span></span></a></div>
@@ -1999,7 +1999,7 @@
             </div>
           </div>
 <a data-name="-579468654%2FFunctions%2F-501115348" anchor-label="getTargetLocation" id="-579468654%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-target-location.html"><span>get</span><wbr><span>Target</span><wbr><span><span>Location</span></span></a></div>
@@ -2014,7 +2014,7 @@
             </div>
           </div>
 <a data-name="2045086500%2FFunctions%2F-501115348" anchor-label="getValue" id="2045086500%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-value.html"><span>get</span><wbr><span><span>Value</span></span></a></div>
@@ -2029,7 +2029,7 @@
             </div>
           </div>
 <a data-name="1932779707%2FFunctions%2F-501115348" anchor-label="getValueOrThrow" id="1932779707%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="get-value-or-throw.html"><span>get</span><wbr><span>Value</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -2044,7 +2044,7 @@
             </div>
           </div>
 <a data-name="-9665614%2FFunctions%2F-501115348" anchor-label="hasProperty" id="-9665614%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="has-property.html"><span>has</span><wbr><span><span>Property</span></span></a></div>
@@ -2059,7 +2059,7 @@
             </div>
           </div>
 <a data-name="1330231474%2FFunctions%2F-501115348" anchor-label="insert" id="1330231474%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="insert.html"><span><span>insert</span></span></a></div>
@@ -2074,7 +2074,7 @@
             </div>
           </div>
 <a data-name="531586119%2FFunctions%2F-501115348" anchor-label="insertAfter" id="531586119%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="insert-after.html"><span>insert</span><wbr><span><span>After</span></span></a></div>
@@ -2089,7 +2089,7 @@
             </div>
           </div>
 <a data-name="-1247655427%2FFunctions%2F-501115348" anchor-label="insertAfterLast" id="-1247655427%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="insert-after-last.html"><span>insert</span><wbr><span>After</span><wbr><span><span>Last</span></span></a></div>
@@ -2104,7 +2104,7 @@
             </div>
           </div>
 <a data-name="852079862%2FFunctions%2F-501115348" anchor-label="isBetween" id="852079862%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-between.html"><span>is</span><wbr><span><span>Between</span></span></a></div>
@@ -2119,7 +2119,7 @@
             </div>
           </div>
 <a data-name="-579202444%2FFunctions%2F-501115348" anchor-label="isBetweenXZ" id="-579202444%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-between-x-z.html"><span>is</span><wbr><span>Between</span><wbr><span><span>XZ</span></span></a></div>
@@ -2134,7 +2134,7 @@
             </div>
           </div>
 <a data-name="-1385659981%2FFunctions%2F-501115348" anchor-label="isBlockLocation" id="-1385659981%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-block-location.html"><span>is</span><wbr><span>Block</span><wbr><span><span>Location</span></span></a></div>
@@ -2149,7 +2149,7 @@
             </div>
           </div>
 <a data-name="980555771%2FFunctions%2F-501115348" anchor-label="isClickAir" id="980555771%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-click-air.html"><span>is</span><wbr><span>Click</span><wbr><span><span>Air</span></span></a></div>
@@ -2164,7 +2164,7 @@
             </div>
           </div>
 <a data-name="1584826046%2FFunctions%2F-501115348" anchor-label="isClickBlock" id="1584826046%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-click-block.html"><span>is</span><wbr><span>Click</span><wbr><span><span>Block</span></span></a></div>
@@ -2179,7 +2179,7 @@
             </div>
           </div>
 <a data-name="885585977%2FFunctions%2F-501115348" anchor-label="isCompletelyDenied" id="885585977%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-completely-denied.html"><span>is</span><wbr><span>Completely</span><wbr><span><span>Denied</span></span></a></div>
@@ -2194,7 +2194,7 @@
             </div>
           </div>
 <a data-name="1089066025%2FFunctions%2F-501115348" anchor-label="isFull" id="1089066025%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-full.html"><span>is</span><wbr><span><span>Full</span></span></a></div>
@@ -2209,7 +2209,7 @@
             </div>
           </div>
 <a data-name="-196598962%2FFunctions%2F-501115348" anchor-label="isInsideWorldRestrictions" id="-196598962%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-inside-world-restrictions.html"><span>is</span><wbr><span>Inside</span><wbr><span>World</span><wbr><span><span>Restrictions</span></span></a></div>
@@ -2224,7 +2224,7 @@
             </div>
           </div>
 <a data-name="-989773769%2FFunctions%2F-501115348" anchor-label="isPlayerView" id="-989773769%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-player-view.html"><span>is</span><wbr><span>Player</span><wbr><span><span>View</span></span></a></div>
@@ -2239,7 +2239,7 @@
             </div>
           </div>
 <a data-name="-1813536577%2FFunctions%2F-501115348" anchor-label="Key" id="-1813536577%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-key.html"><span><span>Key</span></span></a></div>
@@ -2248,13 +2248,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-key.html"><span class="token function">Key</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">plugin<span class="token operator">: </span><span data-unresolved-link="org.bukkit.plugin/Plugin///PointingToDeclaration/">Plugin</span><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span></div><div class="brief "><p class="paragraph">Creates a new <span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span> using the <a href="-key.html">plugin's</a> lowercase <span data-unresolved-link="org.bukkit.plugin/Plugin/getName/#/PointingToDeclaration/">name</span> as the namespace and <a href="-key.html">value</a>.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="-key.html"><span class="token function">Key</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">addon<span class="token operator">: </span><a href="../xyz.xenondevs.nova.addon/-addon/index.html">Addon</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span></div><div class="brief "><p class="paragraph">Creates a new <span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span> using the <a href="-key.html">addon's</a> <a href="../../nova/xyz.xenondevs.nova.addon/index.html">id</a> as the namespace and <a href="-key.html">value</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-key.html"><span class="token function">Key</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">plugin<span class="token operator">: </span><span data-unresolved-link="org.bukkit.plugin/Plugin///PointingToDeclaration/">Plugin</span><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span></div><div class="brief "><p class="paragraph">Creates a new <a href="-key.html">Key</a> using the <a href="-key.html">plugin's</a> lowercase <span data-unresolved-link="org.bukkit.plugin/Plugin/getName/#/PointingToDeclaration/">name</span> as the namespace and <a href="-key.html">value</a>.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="-key.html"><span class="token function">Key</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">addon<span class="token operator">: </span><a href="../xyz.xenondevs.nova.addon/-addon/index.html">Addon</a><span class="token punctuation">, </span></span><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.key/Key///PointingToDeclaration/">Key</span></div><div class="brief "><p class="paragraph">Creates a new <a href="-key.html">Key</a> using the <a href="-key.html">addon's</a> <a href="../../nova/xyz.xenondevs.nova.addon/index.html">id</a> as the namespace and <a href="-key.html">value</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1331141049%2FFunctions%2F-501115348" anchor-label="Location" id="-1331141049%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-location.html"><span><span>Location</span></span></a></div>
@@ -2269,7 +2269,7 @@
             </div>
           </div>
 <a data-name="1119661517%2FFunctions%2F-501115348" anchor-label="lookupGetterOrThrow" id="1119661517%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="lookup-getter-or-throw.html"><span>lookup</span><wbr><span>Getter</span><wbr><span>Or</span><wbr><span><span>Throw</span></span></a></div>
@@ -2284,7 +2284,7 @@
             </div>
           </div>
 <a data-name="-191131722%2FFunctions%2F-501115348" anchor-label="NamespacedKey" id="-191131722%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-namespaced-key.html"><span>Namespaced</span><wbr><span><span>Key</span></span></a></div>
@@ -2293,13 +2293,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-namespaced-key.html"><span class="token function">NamespacedKey</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">addon<span class="token operator">: </span><a href="../xyz.xenondevs.nova.addon/-addon/index.html">Addon</a><span class="token punctuation">, </span></span><span class="parameter ">key<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit/NamespacedKey///PointingToDeclaration/">NamespacedKey</span></div><div class="brief "><p class="paragraph">Creates a new <span data-unresolved-link="org.bukkit/NamespacedKey///PointingToDeclaration/">NamespacedKey</span> using the <a href="-namespaced-key.html">addon's</a> <a href="../../nova/xyz.xenondevs.nova.addon/index.html">id</a> as the namespace and <a href="-namespaced-key.html">key</a>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-namespaced-key.html"><span class="token function">NamespacedKey</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">addon<span class="token operator">: </span><a href="../xyz.xenondevs.nova.addon/-addon/index.html">Addon</a><span class="token punctuation">, </span></span><span class="parameter ">key<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit/NamespacedKey///PointingToDeclaration/">NamespacedKey</span></div><div class="brief "><p class="paragraph">Creates a new <a href="-namespaced-key.html">NamespacedKey</a> using the <a href="-namespaced-key.html">addon's</a> <a href="../../nova/xyz.xenondevs.nova.addon/index.html">id</a> as the namespace and <a href="-namespaced-key.html">key</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1334315780%2FFunctions%2F-501115348" anchor-label="NonNullList" id="-1334315780%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-non-null-list.html"><span>Non</span><wbr><span>Null</span><wbr><span><span>List</span></span></a></div>
@@ -2314,7 +2314,7 @@
             </div>
           </div>
 <a data-name="-446964087%2FFunctions%2F-501115348" anchor-label="playClickSound" id="-446964087%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="play-click-sound.html"><span>play</span><wbr><span>Click</span><wbr><span><span>Sound</span></span></a></div>
@@ -2329,7 +2329,7 @@
             </div>
           </div>
 <a data-name="1673949686%2FFunctions%2F-501115348" anchor-label="playItemPickupSound" id="1673949686%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="play-item-pickup-sound.html"><span>play</span><wbr><span>Item</span><wbr><span>Pickup</span><wbr><span><span>Sound</span></span></a></div>
@@ -2343,23 +2343,23 @@
               </div>
             </div>
           </div>
-<a data-name="-1458456182%2FFunctions%2F-501115348" anchor-label="playSoundNearby" id="-1458456182%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+<a data-name="-781044082%2FFunctions%2F-501115348" anchor-label="playSoundNearby" id="-781044082%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="play-sound-nearby.html"><span>play</span><wbr><span>Sound</span><wbr><span><span>Nearby</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1458456182%2FFunctions%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-781044082%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit/Location///PointingToDeclaration/">Location</span><span class="token punctuation">.</span><a href="play-sound-nearby.html"><span class="token function">playSoundNearby</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sound<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Sound///PointingToDeclaration/">Sound</span><span class="token punctuation">, </span></span><span class="parameter ">volume<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">pitch<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>excluded<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit/Location///PointingToDeclaration/">Location</span><span class="token punctuation">.</span><a href="play-sound-nearby.html"><span class="token function">playSoundNearby</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sound<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Sound///PointingToDeclaration/">Sound</span><span class="token punctuation">, </span></span><span class="parameter ">category<span class="token operator">: </span><span data-unresolved-link="org.bukkit/SoundCategory///PointingToDeclaration/">SoundCategory</span><span class="token punctuation">, </span></span><span class="parameter ">volume<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">pitch<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>excluded<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="/<Error class: unknown class>///PointingToDeclaration/">&lt;Error class: unknown class&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit/Location///PointingToDeclaration/">Location</span><span class="token punctuation">.</span><a href="play-sound-nearby.html"><span class="token function">playSoundNearby</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sound<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Sound///PointingToDeclaration/">Sound</span><span class="token punctuation">, </span></span><span class="parameter ">volume<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">pitch<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>excluded<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit/Location///PointingToDeclaration/">Location</span><span class="token punctuation">.</span><a href="play-sound-nearby.html"><span class="token function">playSoundNearby</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sound<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Sound///PointingToDeclaration/">Sound</span><span class="token punctuation">, </span></span><span class="parameter ">category<span class="token operator">: </span><span data-unresolved-link="org.bukkit/SoundCategory///PointingToDeclaration/">SoundCategory</span><span class="token punctuation">, </span></span><span class="parameter ">volume<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">pitch<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>excluded<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-1035333663%2FFunctions%2F-501115348" anchor-label="plus" id="-1035333663%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="plus.html"><span><span>plus</span></span></a></div>
@@ -2374,7 +2374,7 @@
             </div>
           </div>
 <a data-name="757964518%2FFunctions%2F-501115348" anchor-label="positionEquals" id="757964518%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="position-equals.html"><span>position</span><wbr><span><span>Equals</span></span></a></div>
@@ -2389,7 +2389,7 @@
             </div>
           </div>
 <a data-name="-1824187781%2FFunctions%2F-501115348" anchor-label="preventEvents" id="-1824187781%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="prevent-events.html"><span>prevent</span><wbr><span><span>Events</span></span></a></div>
@@ -2404,7 +2404,7 @@
             </div>
           </div>
 <a data-name="-1326275415%2FFunctions%2F-501115348" anchor-label="preventPacketBroadcast" id="-1326275415%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="prevent-packet-broadcast.html"><span>prevent</span><wbr><span>Packet</span><wbr><span><span>Broadcast</span></span></a></div>
@@ -2419,7 +2419,7 @@
             </div>
           </div>
 <a data-name="1155604371%2FFunctions%2F-501115348" anchor-label="register" id="1155604371%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register.html"><span><span>register</span></span></a></div>
@@ -2434,7 +2434,7 @@
             </div>
           </div>
 <a data-name="-858833368%2FFunctions%2F-501115348" anchor-label="registerEvents" id="-858833368%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="register-events.html"><span>register</span><wbr><span><span>Events</span></span></a></div>
@@ -2449,7 +2449,7 @@
             </div>
           </div>
 <a data-name="901951673%2FFunctions%2F-501115348" anchor-label="RegistryFriendlyByteBuf" id="901951673%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-registry-friendly-byte-buf.html"><span>Registry</span><wbr><span>Friendly</span><wbr><span>Byte</span><wbr><span><span>Buf</span></span></a></div>
@@ -2464,7 +2464,7 @@
             </div>
           </div>
 <a data-name="1608024140%2FFunctions%2F-501115348" anchor-label="removeMinecraftFormatting" id="1608024140%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="remove-minecraft-formatting.html"><span>remove</span><wbr><span>Minecraft</span><wbr><span><span>Formatting</span></span></a></div>
@@ -2479,7 +2479,7 @@
             </div>
           </div>
 <a data-name="2014316783%2FFunctions%2F-501115348" anchor-label="removeNamespace" id="2014316783%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="remove-namespace.html"><span>remove</span><wbr><span><span>Namespace</span></span></a></div>
@@ -2494,7 +2494,7 @@
             </div>
           </div>
 <a data-name="123797447%2FFunctions%2F-501115348" anchor-label="removeOrientation" id="123797447%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="remove-orientation.html"><span>remove</span><wbr><span><span>Orientation</span></span></a></div>
@@ -2509,7 +2509,7 @@
             </div>
           </div>
 <a data-name="1659924167%2FFunctions%2F-501115348" anchor-label="replaceBroadcastExclusion" id="1659924167%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="replace-broadcast-exclusion.html"><span>replace</span><wbr><span>Broadcast</span><wbr><span><span>Exclusion</span></span></a></div>
@@ -2524,7 +2524,7 @@
             </div>
           </div>
 <a data-name="286231243%2FFunctions%2F-501115348" anchor-label="ResourceLocation" id="286231243%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-resource-location.html"><span>Resource</span><wbr><span><span>Location</span></span></a></div>
@@ -2539,7 +2539,7 @@
             </div>
           </div>
 <a data-name="-263435938%2FFunctions%2F-501115348" anchor-label="runAsyncTask" id="-263435938%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="run-async-task.html"><span>run</span><wbr><span>Async</span><wbr><span><span>Task</span></span></a></div>
@@ -2554,7 +2554,7 @@
             </div>
           </div>
 <a data-name="-981464102%2FFunctions%2F-501115348" anchor-label="runAsyncTaskLater" id="-981464102%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="run-async-task-later.html"><span>run</span><wbr><span>Async</span><wbr><span>Task</span><wbr><span><span>Later</span></span></a></div>
@@ -2569,7 +2569,7 @@
             </div>
           </div>
 <a data-name="619934253%2FFunctions%2F-501115348" anchor-label="runAsyncTaskTimer" id="619934253%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="run-async-task-timer.html"><span>run</span><wbr><span>Async</span><wbr><span>Task</span><wbr><span><span>Timer</span></span></a></div>
@@ -2584,7 +2584,7 @@
             </div>
           </div>
 <a data-name="-263051366%2FFunctions%2F-501115348" anchor-label="runTask" id="-263051366%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="run-task.html"><span>run</span><wbr><span><span>Task</span></span></a></div>
@@ -2599,7 +2599,7 @@
             </div>
           </div>
 <a data-name="-1000149730%2FFunctions%2F-501115348" anchor-label="runTaskLater" id="-1000149730%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="run-task-later.html"><span>run</span><wbr><span>Task</span><wbr><span><span>Later</span></span></a></div>
@@ -2614,7 +2614,7 @@
             </div>
           </div>
 <a data-name="1683656049%2FFunctions%2F-501115348" anchor-label="runTaskTimer" id="1683656049%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="run-task-timer.html"><span>run</span><wbr><span>Task</span><wbr><span><span>Timer</span></span></a></div>
@@ -2628,38 +2628,38 @@
               </div>
             </div>
           </div>
-<a data-name="1500596490%2FFunctions%2F-501115348" anchor-label="send" id="1500596490%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+<a data-name="1785595644%2FFunctions%2F-501115348" anchor-label="send" id="1785595644%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="send.html"><span><span>send</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1500596490%2FFunctions%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1785595644%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">.</span><a href="send.html"><span class="token function">send</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>packets<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol/Packet///PointingToDeclaration/">Packet</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">.</span><a href="send.html"><span class="token function">send</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packets<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol/Packet///PointingToDeclaration/">Packet</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">.</span><a href="send.html"><span class="token function">send</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">packets<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><span data-unresolved-link="net.minecraft.network.protocol/Packet///PointingToDeclaration/">Packet</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">.</span><a href="send.html"><span class="token function">send</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>packets<span class="token operator">: </span><span data-unresolved-link="net.minecraft.network.protocol/Packet///PointingToDeclaration/">Packet</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-2030063032%2FFunctions%2F-501115348" anchor-label="sendTo" id="-2030063032%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+<a data-name="1316656604%2FFunctions%2F-501115348" anchor-label="sendTo" id="1316656604%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="send-to.html"><span>send</span><wbr><span><span>To</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2030063032%2FFunctions%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1316656604%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="net.minecraft.network.protocol/Packet///PointingToDeclaration/">Packet</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="send-to.html"><span class="token function">sendTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>players<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="net.minecraft.network.protocol/Packet///PointingToDeclaration/">Packet</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="send-to.html"><span class="token function">sendTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">players<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="net.minecraft.network.protocol/Packet///PointingToDeclaration/">Packet</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="send-to.html"><span class="token function">sendTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">players<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-iterable/index.html">Iterable</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="net.minecraft.network.protocol/Packet///PointingToDeclaration/">Packet</span><span class="token operator">&lt;</span><span class="token operator">*</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="send-to.html"><span class="token function">sendTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>players<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="2118803815%2FFunctions%2F-501115348" anchor-label="set" id="2118803815%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set.html"><span><span>set</span></span></a></div>
@@ -2674,7 +2674,7 @@
             </div>
           </div>
 <a data-name="224895180%2FFunctions%2F-501115348" anchor-label="setBlockState" id="224895180%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-block-state.html"><span>set</span><wbr><span>Block</span><wbr><span><span>State</span></span></a></div>
@@ -2689,7 +2689,7 @@
             </div>
           </div>
 <a data-name="-1910329514%2FFunctions%2F-501115348" anchor-label="setBlockStateNoUpdate" id="-1910329514%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-block-state-no-update.html"><span>set</span><wbr><span>Block</span><wbr><span>State</span><wbr><span>No</span><wbr><span><span>Update</span></span></a></div>
@@ -2704,7 +2704,7 @@
             </div>
           </div>
 <a data-name="-1417203472%2FFunctions%2F-501115348" anchor-label="setBlockStateSilently" id="-1417203472%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-block-state-silently.html"><span>set</span><wbr><span>Block</span><wbr><span>State</span><wbr><span><span>Silently</span></span></a></div>
@@ -2719,7 +2719,7 @@
             </div>
           </div>
 <a data-name="1664292318%2FFunctions%2F-501115348" anchor-label="setBreakStage" id="1664292318%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-break-stage.html"><span>set</span><wbr><span>Break</span><wbr><span><span>Stage</span></span></a></div>
@@ -2734,7 +2734,7 @@
             </div>
           </div>
 <a data-name="1149520907%2FFunctions%2F-501115348" anchor-label="setCoordinate" id="1149520907%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-coordinate.html"><span>set</span><wbr><span><span>Coordinate</span></span></a></div>
@@ -2749,7 +2749,7 @@
             </div>
           </div>
 <a data-name="762736491%2FFunctions%2F-501115348" anchor-label="spawnExpOrb" id="762736491%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="spawn-exp-orb.html"><span>spawn</span><wbr><span>Exp</span><wbr><span><span>Orb</span></span></a></div>
@@ -2763,12 +2763,12 @@
               </div>
             </div>
           </div>
-<a data-name="1342555073%2FFunctions%2F-501115348" anchor-label="startsWithAny" id="1342555073%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+<a data-name="-1778537615%2FFunctions%2F-501115348" anchor-label="startsWithAny" id="-1778537615%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="starts-with-any.html"><span>starts</span><wbr><span>With</span><wbr><span><span>Any</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1342555073%2FFunctions%2F-501115348"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1778537615%2FFunctions%2F-501115348"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
@@ -2779,7 +2779,7 @@
             </div>
           </div>
 <a data-name="1077944820%2FFunctions%2F-501115348" anchor-label="subtract" id="1077944820%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="subtract.html"><span><span>subtract</span></span></a></div>
@@ -2794,7 +2794,7 @@
             </div>
           </div>
 <a data-name="-1482056346%2FFunctions%2F-501115348" anchor-label="take" id="-1482056346%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="take.html"><span><span>take</span></span></a></div>
@@ -2809,7 +2809,7 @@
             </div>
           </div>
 <a data-name="318292475%2FFunctions%2F-501115348" anchor-label="teleport" id="318292475%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="teleport.html"><span><span>teleport</span></span></a></div>
@@ -2824,7 +2824,7 @@
             </div>
           </div>
 <a data-name="860699617%2FFunctions%2F-501115348" anchor-label="toHolderMap" id="860699617%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-holder-map.html"><span>to</span><wbr><span>Holder</span><wbr><span><span>Map</span></span></a></div>
@@ -2839,7 +2839,7 @@
             </div>
           </div>
 <a data-name="1799561278%2FFunctions%2F-501115348" anchor-label="toHolderSet" id="1799561278%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-holder-set.html"><span>to</span><wbr><span>Holder</span><wbr><span><span>Set</span></span></a></div>
@@ -2854,7 +2854,7 @@
             </div>
           </div>
 <a data-name="-447227470%2FFunctions%2F-501115348" anchor-label="toIntArray" id="-447227470%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-int-array.html"><span>to</span><wbr><span>Int</span><wbr><span><span>Array</span></span></a></div>
@@ -2869,7 +2869,7 @@
             </div>
           </div>
 <a data-name="-590948362%2FFunctions%2F-501115348" anchor-label="toKey" id="-590948362%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-key.html"><span>to</span><wbr><span><span>Key</span></span></a></div>
@@ -2884,7 +2884,7 @@
             </div>
           </div>
 <a data-name="-465005618%2FFunctions%2F-501115348" anchor-label="toLocation" id="-465005618%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-location.html"><span>to</span><wbr><span><span>Location</span></span></a></div>
@@ -2899,7 +2899,7 @@
             </div>
           </div>
 <a data-name="1194815893%2FFunctions%2F-501115348" anchor-label="toMap" id="1194815893%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-map.html"><span>to</span><wbr><span><span>Map</span></span></a></div>
@@ -2914,7 +2914,7 @@
             </div>
           </div>
 <a data-name="1581492613%2FFunctions%2F-501115348" anchor-label="toNamespacedKey" id="1581492613%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-namespaced-key.html"><span>to</span><wbr><span>Namespaced</span><wbr><span><span>Key</span></span></a></div>
@@ -2929,7 +2929,7 @@
             </div>
           </div>
 <a data-name="-198413731%2FFunctions%2F-501115348" anchor-label="toNmsHolderSet" id="-198413731%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-nms-holder-set.html"><span>to</span><wbr><span>Nms</span><wbr><span>Holder</span><wbr><span><span>Set</span></span></a></div>
@@ -2944,7 +2944,7 @@
             </div>
           </div>
 <a data-name="-2090542612%2FFunctions%2F-501115348" anchor-label="toNmsTagKey" id="-2090542612%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-nms-tag-key.html"><span>to</span><wbr><span>Nms</span><wbr><span>Tag</span><wbr><span><span>Key</span></span></a></div>
@@ -2959,7 +2959,7 @@
             </div>
           </div>
 <a data-name="1175411685%2FFunctions%2F-501115348" anchor-label="toNovaPos" id="1175411685%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-nova-pos.html"><span>to</span><wbr><span>Nova</span><wbr><span><span>Pos</span></span></a></div>
@@ -2974,7 +2974,7 @@
             </div>
           </div>
 <a data-name="-1542646224%2FFunctions%2F-501115348" anchor-label="toResourceKey" id="-1542646224%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-resource-key.html"><span>to</span><wbr><span>Resource</span><wbr><span><span>Key</span></span></a></div>
@@ -2989,7 +2989,7 @@
             </div>
           </div>
 <a data-name="-1974804953%2FFunctions%2F-501115348" anchor-label="toResourceLocation" id="-1974804953%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-resource-location.html"><span>to</span><wbr><span>Resource</span><wbr><span><span>Location</span></span></a></div>
@@ -3004,7 +3004,7 @@
             </div>
           </div>
 <a data-name="-1189046078%2FFunctions%2F-501115348" anchor-label="toResourcePath" id="-1189046078%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-resource-path.html"><span>to</span><wbr><span>Resource</span><wbr><span><span>Path</span></span></a></div>
@@ -3019,7 +3019,7 @@
             </div>
           </div>
 <a data-name="-71113647%2FFunctions%2F-501115348" anchor-label="toString" id="-71113647%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-string.html"><span>to</span><wbr><span><span>String</span></span></a></div>
@@ -3034,7 +3034,7 @@
             </div>
           </div>
 <a data-name="116192448%2FFunctions%2F-501115348" anchor-label="toVec3" id="116192448%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-vec3.html"><span>to</span><wbr><span><span>Vec3</span></span></a></div>
@@ -3049,7 +3049,7 @@
             </div>
           </div>
 <a data-name="1131093736%2FFunctions%2F-501115348" anchor-label="toVector3d" id="1131093736%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-vector3d.html"><span>to</span><wbr><span><span>Vector3d</span></span></a></div>
@@ -3064,7 +3064,7 @@
             </div>
           </div>
 <a data-name="2024580074%2FFunctions%2F-501115348" anchor-label="toVector3f" id="2024580074%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-vector3f.html"><span>to</span><wbr><span><span>Vector3f</span></span></a></div>
@@ -3079,7 +3079,7 @@
             </div>
           </div>
 <a data-name="1425496321%2FFunctions%2F-501115348" anchor-label="unregisterEvents" id="1425496321%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="unregister-events.html"><span>unregister</span><wbr><span><span>Events</span></span></a></div>
@@ -3094,7 +3094,7 @@
             </div>
           </div>
 <a data-name="781517833%2FFunctions%2F-501115348" anchor-label="untilHeightLimit" id="781517833%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="until-height-limit.html"><span>until</span><wbr><span>Height</span><wbr><span><span>Limit</span></span></a></div>
@@ -3109,7 +3109,7 @@
             </div>
           </div>
 <a data-name="-1507213981%2FFunctions%2F-501115348" anchor-label="unwrap" id="-1507213981%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="unwrap.html"><span><span>unwrap</span></span></a></div>
@@ -3124,7 +3124,7 @@
             </div>
           </div>
 <a data-name="-1303584572%2FFunctions%2F-501115348" anchor-label="Vector" id="-1303584572%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-vector.html"><span><span>Vector</span></span></a></div>
@@ -3144,17 +3144,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

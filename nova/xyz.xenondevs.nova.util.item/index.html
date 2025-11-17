@@ -1,22 +1,22 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <title>xyz.xenondevs.nova.util.item</title>
-<link href="../../images/logo-icon.svg" rel="icon" type="image/svg">    <script>var pathToRoot = "../../";</script>
-    <script>document.documentElement.classList.replace("no-js","js");</script>
+<link href="../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
     <script>const storage = localStorage.getItem("dokka-dark-mode")
-    if (storage == null) {
+      if (storage == null) {
         const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
         if (osDarkSchemePreferred === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    } else {
+      } else {
         const savedDarkMode = JSON.parse(storage)
-        if(savedDarkMode === true) {
-            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
         }
-    }
+      }
     </script>
 <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../scripts/sourceset_dependencies.js" async></script>
@@ -24,33 +24,31 @@
 <link href="../../styles/main.css" rel="Stylesheet">
 <link href="../../styles/prism.css" rel="Stylesheet">
 <link href="../../styles/logo-styles.css" rel="Stylesheet">
-<link href="../../styles/font-jb-sans-auto.css" rel="Stylesheet">
 <link href="../../ui-kit/ui-kit.min.css" rel="Stylesheet">
-<script type="text/javascript" src="../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../scripts/safe-local-storage_blocking.js"></script>
 <script type="text/javascript" src="../../scripts/navigation-loader.js" async></script>
 <script type="text/javascript" src="../../scripts/platform-content-handler.js" async></script>
 <script type="text/javascript" src="../../scripts/main.js" defer></script>
 <script type="text/javascript" src="../../scripts/prism.js" async></script>
-<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script>
-<script type="text/javascript" src="../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<script type="text/javascript" src="../../ui-kit/ui-kit.min.js" defer></script></head>
 <body>
-    <div class="root">
-    <nav class="navigation theme-dark" id="navigation-wrapper">
-<a class="library-name--link" href="../../index.html">
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../index.html" tabindex="1">
                     nova-parent
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.21.0-alpha.5
+        <div class="library-version" id="library-version">0.21.0-RC.1
         </div>
         <div class="navigation-controls">
-        <div class="filter-section filter-section_loading" id="filter-section">
-                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":nova/main">jvm</button>
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":nova/main">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
-                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
-                    <div class="dropdown--header"><span>Platform filter</span>
-                        <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
                         </button>
                     </div>
@@ -64,32 +62,34 @@
                 </ul>
                 <div class="dropdown--overlay"></div>
             </div>
-        </div>
+        </ul>
             <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
             </button>
             <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
                 API
             </div>
         </div>
-    </nav>
-        <div id="container">
-            <div class="sidebar" id="leftColumn">
-                <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
-                    <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox">
-                        <div class="dropdown--header">
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
                             <span>
                                     nova-parent
                             </span>
-                            <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
-                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
-                            </button>
-                        </div>
-                        <div class="sidebar--inner" id="sideMenu"></div>
-                    </ul>
-                    <div class="dropdown--overlay"></div>
-                </div>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
             </div>
-            <div id="main">
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
 <div class="main-content" data-page-type="package" id="content" pageids="nova::xyz.xenondevs.nova.util.item////PointingToDeclaration//-501115348">
   <div class="breadcrumbs"><a href="../index.html">nova</a><span class="delimiter">/</span><span class="current">xyz.xenondevs.nova.util.item</span></div>
   <div class="cover ">
@@ -99,9 +99,9 @@
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
     <div class="tabs-section-body">
       <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
+        <h2 class="tableheader">Types</h2>
         <div class="table"><a data-name="-1765720384%2FClasslikes%2F-501115348" anchor-label="ItemUtils" id="-1765720384%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-item-utils/index.html"><span>Item</span><wbr><span><span>Utils</span></span></a></div>
@@ -116,7 +116,7 @@
             </div>
           </div>
 <a data-name="-18762107%2FClasslikes%2F-501115348" anchor-label="ToolUtils" id="-18762107%2FClasslikes%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-tool-utils/index.html"><span>Tool</span><wbr><span><span>Utils</span></span></a></div>
@@ -133,9 +133,9 @@
         </div>
       </div>
       <div data-togglable="EXTENSION_PROPERTY">
-        <h2 class="">Properties</h2>
+        <h2 class="tableheader">Properties</h2>
         <div class="table"><a data-name="668061269%2FProperties%2F-501115348" anchor-label="craftingRemainingItem" id="668061269%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="crafting-remaining-item.html"><span>crafting</span><wbr><span>Remaining</span><wbr><span><span>Item</span></span></a></div>
@@ -150,7 +150,7 @@
             </div>
           </div>
 <a data-name="1859317498%2FProperties%2F-501115348" anchor-label="customModelData" id="1859317498%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="custom-model-data.html"><span>custom</span><wbr><span>Model</span><wbr><span><span>Data</span></span></a></div>
@@ -165,7 +165,7 @@
             </div>
           </div>
 <a data-name="2084075438%2FProperties%2F-501115348" anchor-label="fluidType" id="2084075438%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="fluid-type.html"><span>fluid</span><wbr><span><span>Type</span></span></a></div>
@@ -180,7 +180,7 @@
             </div>
           </div>
 <a data-name="-947264976%2FProperties%2F-501115348" anchor-label="localizedName" id="-947264976%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="localized-name.html"><span>localized</span><wbr><span><span>Name</span></span></a></div>
@@ -195,7 +195,7 @@
             </div>
           </div>
 <a data-name="1076117345%2FProperties%2F-501115348" anchor-label="novaCompound" id="1076117345%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nova-compound.html"><span>nova</span><wbr><span><span>Compound</span></span></a></div>
@@ -210,7 +210,7 @@
             </div>
           </div>
 <a data-name="-1524328351%2FProperties%2F-501115348" anchor-label="novaItem" id="-1524328351%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="nova-item.html"><span>nova</span><wbr><span><span>Item</span></span></a></div>
@@ -225,7 +225,7 @@
             </div>
           </div>
 <a data-name="1044145225%2FProperties%2F-501115348" anchor-label="requiresLight" id="1044145225%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="requires-light.html"><span>requires</span><wbr><span><span>Light</span></span></a></div>
@@ -240,7 +240,7 @@
             </div>
           </div>
 <a data-name="-678181250%2FProperties%2F-501115348" anchor-label="soundGroup" id="-678181250%2FProperties%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="sound-group.html"><span>sound</span><wbr><span><span>Group</span></span></a></div>
@@ -257,9 +257,9 @@
         </div>
       </div>
       <div data-togglable="EXTENSION_FUNCTION">
-        <h2 class="">Functions</h2>
+        <h2 class="tableheader">Functions</h2>
         <div class="table"><a data-name="-1465383764%2FFunctions%2F-501115348" anchor-label="clearCustomModelDataColor" id="-1465383764%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="clear-custom-model-data-color.html"><span>clear</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Color</span></span></a></div>
@@ -274,7 +274,7 @@
             </div>
           </div>
 <a data-name="-289801652%2FFunctions%2F-501115348" anchor-label="clearCustomModelDataColors" id="-289801652%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="clear-custom-model-data-colors.html"><span>clear</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Colors</span></span></a></div>
@@ -289,7 +289,7 @@
             </div>
           </div>
 <a data-name="-1745990091%2FFunctions%2F-501115348" anchor-label="clearCustomModelDataFlag" id="-1745990091%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="clear-custom-model-data-flag.html"><span>clear</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Flag</span></span></a></div>
@@ -304,7 +304,7 @@
             </div>
           </div>
 <a data-name="637091413%2FFunctions%2F-501115348" anchor-label="clearCustomModelDataFlags" id="637091413%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="clear-custom-model-data-flags.html"><span>clear</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Flags</span></span></a></div>
@@ -319,7 +319,7 @@
             </div>
           </div>
 <a data-name="610842835%2FFunctions%2F-501115348" anchor-label="clearCustomModelDataFloat" id="610842835%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="clear-custom-model-data-float.html"><span>clear</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Float</span></span></a></div>
@@ -334,7 +334,7 @@
             </div>
           </div>
 <a data-name="1090694131%2FFunctions%2F-501115348" anchor-label="clearCustomModelDataFloats" id="1090694131%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="clear-custom-model-data-floats.html"><span>clear</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Floats</span></span></a></div>
@@ -349,7 +349,7 @@
             </div>
           </div>
 <a data-name="1013816304%2FFunctions%2F-501115348" anchor-label="clearCustomModelDataString" id="1013816304%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="clear-custom-model-data-string.html"><span>clear</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>String</span></span></a></div>
@@ -364,7 +364,7 @@
             </div>
           </div>
 <a data-name="-1499280496%2FFunctions%2F-501115348" anchor-label="clearCustomModelDataStrings" id="-1499280496%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="clear-custom-model-data-strings.html"><span>clear</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Strings</span></span></a></div>
@@ -379,7 +379,7 @@
             </div>
           </div>
 <a data-name="-669996756%2FFunctions%2F-501115348" anchor-label="damage" id="-669996756%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="damage.html"><span><span>damage</span></span></a></div>
@@ -394,7 +394,7 @@
             </div>
           </div>
 <a data-name="1528391123%2FFunctions%2F-501115348" anchor-label="hasNoBreakParticles" id="1528391123%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="has-no-break-particles.html"><span>has</span><wbr><span>No</span><wbr><span>Break</span><wbr><span><span>Particles</span></span></a></div>
@@ -409,7 +409,7 @@
             </div>
           </div>
 <a data-name="2055436643%2FFunctions%2F-501115348" anchor-label="isActuallyInteractable" id="2055436643%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-actually-interactable.html"><span>is</span><wbr><span>Actually</span><wbr><span><span>Interactable</span></span></a></div>
@@ -424,7 +424,7 @@
             </div>
           </div>
 <a data-name="1233059066%2FFunctions%2F-501115348" anchor-label="isCauldron" id="1233059066%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-cauldron.html"><span>is</span><wbr><span><span>Cauldron</span></span></a></div>
@@ -439,7 +439,7 @@
             </div>
           </div>
 <a data-name="-1546439734%2FFunctions%2F-501115348" anchor-label="isFluid" id="-1546439734%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-fluid.html"><span>is</span><wbr><span><span>Fluid</span></span></a></div>
@@ -454,7 +454,7 @@
             </div>
           </div>
 <a data-name="-1008157060%2FFunctions%2F-501115348" anchor-label="isGlass" id="-1008157060%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-glass.html"><span>is</span><wbr><span><span>Glass</span></span></a></div>
@@ -469,7 +469,7 @@
             </div>
           </div>
 <a data-name="1514992317%2FFunctions%2F-501115348" anchor-label="isNotNullOrEmpty" id="1514992317%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-not-null-or-empty.html"><span>is</span><wbr><span>Not</span><wbr><span>Null</span><wbr><span>Or</span><wbr><span><span>Empty</span></span></a></div>
@@ -484,7 +484,7 @@
             </div>
           </div>
 <a data-name="685902200%2FFunctions%2F-501115348" anchor-label="isNullOrEmpty" id="685902200%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-null-or-empty.html"><span>is</span><wbr><span>Null</span><wbr><span>Or</span><wbr><span><span>Empty</span></span></a></div>
@@ -499,7 +499,7 @@
             </div>
           </div>
 <a data-name="1302133518%2FFunctions%2F-501115348" anchor-label="isReplaceable" id="1302133518%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-replaceable.html"><span>is</span><wbr><span><span>Replaceable</span></span></a></div>
@@ -514,7 +514,7 @@
             </div>
           </div>
 <a data-name="-1470868563%2FFunctions%2F-501115348" anchor-label="isTraversable" id="-1470868563%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="is-traversable.html"><span>is</span><wbr><span><span>Traversable</span></span></a></div>
@@ -529,7 +529,7 @@
             </div>
           </div>
 <a data-name="1851373836%2FFunctions%2F-501115348" anchor-label="playPlaceSoundEffect" id="1851373836%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="play-place-sound-effect.html"><span>play</span><wbr><span>Place</span><wbr><span>Sound</span><wbr><span><span>Effect</span></span></a></div>
@@ -544,7 +544,7 @@
             </div>
           </div>
 <a data-name="2075118827%2FFunctions%2F-501115348" anchor-label="retrieveData" id="2075118827%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="retrieve-data.html"><span>retrieve</span><wbr><span><span>Data</span></span></a></div>
@@ -559,7 +559,7 @@
             </div>
           </div>
 <a data-name="741579531%2FFunctions%2F-501115348" anchor-label="setCustomModelDataColor" id="741579531%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-custom-model-data-color.html"><span>set</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Color</span></span></a></div>
@@ -574,7 +574,7 @@
             </div>
           </div>
 <a data-name="22774976%2FFunctions%2F-501115348" anchor-label="setCustomModelDataColors" id="22774976%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-custom-model-data-colors.html"><span>set</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Colors</span></span></a></div>
@@ -589,7 +589,7 @@
             </div>
           </div>
 <a data-name="2056695546%2FFunctions%2F-501115348" anchor-label="setCustomModelDataFlag" id="2056695546%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-custom-model-data-flag.html"><span>set</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Flag</span></span></a></div>
@@ -604,7 +604,7 @@
             </div>
           </div>
 <a data-name="-735971989%2FFunctions%2F-501115348" anchor-label="setCustomModelDataFlags" id="-735971989%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-custom-model-data-flags.html"><span>set</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Flags</span></span></a></div>
@@ -619,7 +619,7 @@
             </div>
           </div>
 <a data-name="1443156978%2FFunctions%2F-501115348" anchor-label="setCustomModelDataFloat" id="1443156978%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-custom-model-data-float.html"><span>set</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Float</span></span></a></div>
@@ -634,7 +634,7 @@
             </div>
           </div>
 <a data-name="-377248309%2FFunctions%2F-501115348" anchor-label="setCustomModelDataFloats" id="-377248309%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-custom-model-data-floats.html"><span>set</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Floats</span></span></a></div>
@@ -649,7 +649,7 @@
             </div>
           </div>
 <a data-name="1054304234%2FFunctions%2F-501115348" anchor-label="setCustomModelDataString" id="1054304234%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-custom-model-data-string.html"><span>set</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>String</span></span></a></div>
@@ -664,7 +664,7 @@
             </div>
           </div>
 <a data-name="184892817%2FFunctions%2F-501115348" anchor-label="setCustomModelDataStrings" id="184892817%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="set-custom-model-data-strings.html"><span>set</span><wbr><span>Custom</span><wbr><span>Model</span><wbr><span>Data</span><wbr><span><span>Strings</span></span></a></div>
@@ -679,7 +679,7 @@
             </div>
           </div>
 <a data-name="-501280501%2FFunctions%2F-501115348" anchor-label="storeData" id="-501280501%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="store-data.html"><span>store</span><wbr><span><span>Data</span></span></a></div>
@@ -694,7 +694,7 @@
             </div>
           </div>
 <a data-name="-364825848%2FFunctions%2F-501115348" anchor-label="takeUnlessEmpty" id="-364825848%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="take-unless-empty.html"><span>take</span><wbr><span>Unless</span><wbr><span><span>Empty</span></span></a></div>
@@ -703,13 +703,13 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">.</span><a href="take-unless-empty.html"><span class="token function">takeUnlessEmpty</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Returns <code class="lang-kotlin">null</code> if <span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">this</span> isEmpty, otherwise returns <span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">this</span>.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">.</span><a href="take-unless-empty.html"><span class="token function">takeUnlessEmpty</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Returns <code class="lang-kotlin">null</code> if <span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">this</span> <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/index.html">is empty</a>, otherwise returns <span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">this</span>.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
 <a data-name="-428029278%2FFunctions%2F-501115348" anchor-label="toItemStack" id="-428029278%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
-          <div class="table-row" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="to-item-stack.html"><span>to</span><wbr><span>Item</span><wbr><span><span>Stack</span></span></a></div>
@@ -729,17 +729,21 @@
   </div>
 </div>
     <div class="footer">
-        <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
-        <span class="pull-right">
-            <span>Generated by </span>
-            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
-                <span>dokka</span>
-            </a>
-        </span>
-    </div>
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
