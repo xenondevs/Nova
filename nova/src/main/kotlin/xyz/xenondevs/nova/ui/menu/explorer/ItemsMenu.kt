@@ -17,6 +17,7 @@ import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.mapEach
 import xyz.xenondevs.commons.provider.mapEachIndexed
 import xyz.xenondevs.commons.provider.mutableProvider
+import xyz.xenondevs.commons.provider.plus
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.dsl.anvilWindow
@@ -134,43 +135,39 @@ internal class ItemsMenu private constructor(val player: Player) {
                             if (tab.get() != playerInvTab.get())
                                 tab.set(it * CATEGORY_TAB_COUNT)
                         }
-                        pageCount.subscribe(tabButtonsPageCount::set)
+                        tabButtonsPageCount.consume(pageCount)
                         content by ItemCategories.categories.mapEachIndexed { i, cat -> itemCategoryTabButton(i, cat, tab) }
                     }
                     
                     this.tab by tab
-                    tabs by ItemCategories.categories
-                        .mapEach { category ->
-                            scrollItemsGui(
-                                ". x x x x x x x c",
-                                ". x x x x x x x u",
-                                ". x x x x x x x |",
-                                ". x x x x x x x d"
-                            ) {
-                                'c' by cheatModeButton(cheatMode)
-                                'u' by scrollUpItem(line)
-                                '|' by scrollerItem(serverWindowState, clientWindowState, line, maxLine)
-                                'd' by scrollDownItem(line, maxLine)
-                                content by category.items.map { i -> categorizedItemButton(i, cheatMode) }
-                            }
+                    
+                    tabs by ItemCategories.categories.mapEach { category ->
+                        scrollItemsGui(
+                            ". x x x x x x x c",
+                            ". x x x x x x x u",
+                            ". x x x x x x x |",
+                            ". x x x x x x x d"
+                        ) {
+                            'c' by cheatModeButton(cheatMode)
+                            'u' by scrollUpItem(line)
+                            '|' by scrollerItem(serverWindowState, clientWindowState, line, maxLine)
+                            'd' by scrollDownItem(line, maxLine)
+                            content by category.items.map { i -> categorizedItemButton(i, cheatMode) }
                         }
-                        .map { tabs ->
-                            // player inventory as last tab
-                            tabs + gui(
-                                ". x x x x x x x h",
-                                ". x x x x x x x c",
-                                ". x x x x x x x l",
-                                ". x x x x x x o b"
-                            ) {
-                                val inv = ReferencingInventory.fromContents(player.inventory)
-                                'h' by InventoryLink(inv[39..39].apply { allowOnlyEquippable(EquipmentSlot.HEAD) }, 0, DefaultGuiItems.HEAD_PLACEHOLDER.clientsideProvider)
-                                'c' by InventoryLink(inv[38..38].apply { allowOnlyEquippable(EquipmentSlot.CHEST) }, 0, DefaultGuiItems.CHEST_PLACEHOLDER.clientsideProvider)
-                                'l' by InventoryLink(inv[37..37].apply { allowOnlyEquippable(EquipmentSlot.LEGS) }, 0, DefaultGuiItems.LEGS_PLACEHOLDER.clientsideProvider)
-                                'b' by InventoryLink(inv[36..36].apply { allowOnlyEquippable(EquipmentSlot.FEET) }, 0, DefaultGuiItems.FEET_PLACEHOLDER.clientsideProvider)
-                                'o' by InventoryLink(inv, 40, DefaultGuiItems.OFF_HAND_PLACEHOLDER.clientsideProvider)
-                                'x' by ReferencingInventory.fromPlayerStorageContents(player.inventory)[0..26]
-                            }
-                        }
+                    } + gui(
+                        ". x x x x x x x h",
+                        ". x x x x x x x c",
+                        ". x x x x x x x l",
+                        ". x x x x x x o b"
+                    ) {
+                        val inv = ReferencingInventory.fromContents(player.inventory)
+                        'h' by InventoryLink(inv[39..39].apply { allowOnlyEquippable(EquipmentSlot.HEAD) }, 0, DefaultGuiItems.HEAD_PLACEHOLDER.clientsideProvider)
+                        'c' by InventoryLink(inv[38..38].apply { allowOnlyEquippable(EquipmentSlot.CHEST) }, 0, DefaultGuiItems.CHEST_PLACEHOLDER.clientsideProvider)
+                        'l' by InventoryLink(inv[37..37].apply { allowOnlyEquippable(EquipmentSlot.LEGS) }, 0, DefaultGuiItems.LEGS_PLACEHOLDER.clientsideProvider)
+                        'b' by InventoryLink(inv[36..36].apply { allowOnlyEquippable(EquipmentSlot.FEET) }, 0, DefaultGuiItems.FEET_PLACEHOLDER.clientsideProvider)
+                        'o' by InventoryLink(inv, 40, DefaultGuiItems.OFF_HAND_PLACEHOLDER.clientsideProvider)
+                        'x' by ReferencingInventory.fromPlayerStorageContents(player.inventory)[0..26]
+                    }
                 }
                 
                 onClose { player.updateInventory() } // for armor slots

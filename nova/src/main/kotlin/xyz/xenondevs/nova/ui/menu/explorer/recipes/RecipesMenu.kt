@@ -8,21 +8,21 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.invui.dsl.window
+import xyz.xenondevs.invui.gui.pageCountProvider
+import xyz.xenondevs.invui.gui.pageProvider
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
 import xyz.xenondevs.nova.util.PlayerMapManager
+import xyz.xenondevs.nova.util.component.adventure.appendCentered
 import xyz.xenondevs.nova.util.component.adventure.font
-import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.moveToCenter
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.playClickSound
@@ -56,7 +56,7 @@ fun Player.showUsages(item: ItemStack): Boolean =
  * Tries to open the recipe explorer for the usages for [id],
  * and returns whether the attempt was successful, i.e. if there were any usages for the item.
  */
-fun Player.showUsages(id: String): Boolean=
+fun Player.showUsages(id: String): Boolean =
     showRecipes(id, "usage", RecipeRegistry.USAGE_RECIPES::get, RecipeRegistry.creationInfo::get)
 
 private fun Player.showRecipes(
@@ -92,19 +92,6 @@ internal class RecipesMenu(
     private val window = window(player) {
         val recipes = recipes.toList()
         val tab = mutableProvider(0)
-        val activePage = mutableProvider(provider(0))
-        val activePageCount = mutableProvider(provider(0))
-        
-        title by combinedProvider(tab, activePage.flatten(), activePageCount.flatten()) { tab, activePage, activePageCount ->
-            val pageNumberString = "${activePage + 1} / $activePageCount"
-            val pageNumberComponent = Component.text(pageNumberString, NamedTextColor.WHITE).font("nova:recipes_numbers")
-            Component.text()
-                .append(recipes[tab].first.texture.component)
-                .moveToCenter()
-                .move(CharSizes.calculateComponentWidth(pageNumberComponent) / -2)
-                .append(pageNumberComponent)
-                .build()
-        }
         
         upperGui by tabGui(
             "b p p p p p p p .",
@@ -129,7 +116,7 @@ internal class RecipesMenu(
             
             // tab content
             this.tab by tab
-            tabs by recipes.mapIndexed { i, (group, recipes) ->
+            tabs by recipes.map { (group, recipes) ->
                 pagedGuisGui(
                     "< . . . . . . . >",
                     "x x x x x x x x x",
@@ -143,15 +130,19 @@ internal class RecipesMenu(
                         group as RecipeGroup<Any>
                         group.getGui(container.recipe)
                     }
-                    
-                    // ugly hack
-                    tab.subscribe { tab ->
-                        if (tab == i) {
-                            activePage.set(page)
-                            activePageCount.set(pageCount)
-                        }
-                    }
                 }
+            }
+            
+            val activePage = activeTab.flatMap { it?.pageProvider ?: provider(0) }
+            val activePageCount = activeTab.flatMap { it?.pageCountProvider ?: provider(0) }
+            title by combinedProvider(tab, activePage, activePageCount) { tab, activePage, activePageCount ->
+                val pageNumberString = "${activePage + 1} / $activePageCount"
+                val pageNumberComponent = Component.text(pageNumberString, NamedTextColor.WHITE).font("nova:recipes_numbers")
+                Component.text()
+                    .append(recipes[tab].first.texture.component)
+                    .moveToCenter()
+                    .appendCentered(pageNumberComponent)
+                    .build()
             }
         }
         
