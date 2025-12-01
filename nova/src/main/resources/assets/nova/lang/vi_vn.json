@@ -152,5 +152,11 @@
   "command.nova.show_network_node_info.failure": "Khối tại vị trí: %s, x: %s, y: %s, z: %s không phải là một nút mạng.",
   "command.nova.show_item_model_data.success": "%s này với mô hình %s sử dụng loại vật phẩm %s với dữ liệu %s.",
   "command.nova.show_item_model_data.no_item": "Hãy cầm một vật phẩm Nova trên tay phải của bạn và thử lại.",
-  "command.nova.modeldata.item": "Vật phẩm %s sử dụng %s và có dữ liệu sau: %s."
+  "command.nova.modeldata.item": "Vật phẩm %s sử dụng %s và có dữ liệu sau: %s.",
+  "menu.nova.items.player_inventory": "Kho đồ của người chơi",
+  "command.nova.show_item_behaviors.success": "%s có %s hành vi của vật phẩm:\n%s",
+  "command.nova.show_item_behaviors.no_item": "Vui lòng cầm một vật phẩm trong tay chính và thử lại.",
+  "command.nova.recalculate_leave_properties.done": "Xử lý %s lá và làm cho %s lá không còn tồn tại.",
+  "command.nova.show_vanilla_block_state.success": "Bạn đang xem trạng thái khối %s.",
+  "command.nova.show_vanilla_block_state.failure": "Vui lòng xem lại khối đó và thử lại."
 }
