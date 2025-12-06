@@ -27,7 +27,8 @@ internal object S3 : UploadService {
     private lateinit var bucket: String
     private lateinit var directory: String // includes trailing slash
     private var acl: String? = null
-    
+    private var domain : String? = null
+
     @Suppress("HttpUrlsUsage")
     override suspend fun enable(cfg: ConfigurationNode) {
         endpoint = cfg.node("endpoint").string?.removePrefix("https://")?.removePrefix("http://")
@@ -44,7 +45,8 @@ internal object S3 : UploadService {
             ?: throw IllegalArgumentException("S3 bucket is not specified")
         directory = (cfg.node("directory").string?.addSuffix("/") ?: "")
         acl = cfg.node("acl").string
-        
+        domain = cfg.node("domain").string
+
         LOGGER.info("Connecting to S3 endpoint $endpoint")
         client = S3Client.builder()
             .endpointOverride(URI("https://$endpoint"))
@@ -79,11 +81,15 @@ internal object S3 : UploadService {
     }
     
     private fun getDownloadUrl(id: UUID): String {
-        if (pathStyle) {
-            return "https://$endpoint/$bucket/$directory$id.zip"
+        val domain = if (domain != null) {
+            this.domain
+        } else if (pathStyle) {
+            "https://$endpoint/$bucket"
         } else {
-            return "https://$bucket.$endpoint/$directory$id.zip"
+            "https://$bucket.$endpoint"
         }
+
+        return "$domain/$directory$id.zip"
     }
     
 }
