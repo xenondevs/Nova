@@ -68,7 +68,7 @@ internal val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerial
     .register(EnumSerializer)
     .register(KeySerializer)
     .register(NamespacedKeySerializer)
-    .register(ResourceLocationSerializer)
+    .register(IdentifierSerializer)
     .register(ResourcePathSerializer)
     .register(PotionEffectSerializer)
     .register(PotionEffectTypeSerializer)

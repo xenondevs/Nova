@@ -50,7 +50,7 @@ accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdatePropertiesOperation createWorldFog Z
 accessible field net/minecraft/server/network/ServerConnectionListener channels Ljava/util/List;
 accessible field net/minecraft/world/level/chunk/ChunkAccess sections [Lnet/minecraft/world/level/chunk/LevelChunkSection;
-accessible class net/minecraft/world/entity/npc/VillagerTrades$DyedArmorForEmeralds
+accessible class net/minecraft/world/entity/npc/villager/VillagerTrades$DyedArmorForEmeralds
 accessible class io/papermc/paper/plugin/manager/PaperPluginInstanceManager
 accessible class ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/ChunkLoadTask$ChunkDataLoadTask
 accessible class ca/spottedleaf/moonrise/patches/chunk_system/scheduling/task/ChunkLoadTask$ReadChunk
@@ -68,7 +68,7 @@ accessible field net/minecraft/world/level/biome/Biome generationSettings Lnet/m
 mutable field net/minecraft/world/level/biome/Biome generationSettings Lnet/minecraft/world/level/biome/BiomeGenerationSettings;
 accessible method net/minecraft/world/level/biome/Biome$ClimateSettings <init> (ZFLnet/minecraft/world/level/biome/TemperatureModifier;F)V
 accessible method net/minecraft/world/level/biome/MobSpawnSettings <init> (FLjava/util/Map;Ljava/util/Map;)V
-accessible method net/minecraft/world/level/biome/Biome <init> (Lnet/minecraft/world/level/biome/Biome$ClimateSettings;Lnet/minecraft/world/level/biome/BiomeSpecialEffects;Lnet/minecraft/world/level/biome/BiomeGenerationSettings;Lnet/minecraft/world/level/biome/MobSpawnSettings;)V
+accessible method net/minecraft/world/level/biome/Biome <init> (Lnet/minecraft/world/level/biome/Biome$ClimateSettings;Lnet/minecraft/world/attribute/EnvironmentAttributeMap;Lnet/minecraft/world/level/biome/BiomeSpecialEffects;Lnet/minecraft/world/level/biome/BiomeGenerationSettings;Lnet/minecraft/world/level/biome/MobSpawnSettings;)V
 accessible method net/minecraft/core/Holder$Reference bindValue (Ljava/lang/Object;)V
 accessible field org/bukkit/event/inventory/PrepareItemCraftEvent matrix Lorg/bukkit/inventory/CraftingInventory;
 mutable field org/bukkit/event/inventory/PrepareItemCraftEvent matrix Lorg/bukkit/inventory/CraftingInventory;

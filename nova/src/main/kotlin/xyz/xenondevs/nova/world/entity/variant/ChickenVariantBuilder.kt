@@ -2,14 +2,14 @@ package xyz.xenondevs.nova.world.entity.variant
 
 import net.kyori.adventure.key.Key
 import net.minecraft.core.registries.Registries
-import net.minecraft.world.entity.animal.ChickenVariant
+import net.minecraft.world.entity.animal.chicken.ChickenVariant
 import net.minecraft.world.entity.variant.ModelAndTexture
 import net.minecraft.world.entity.variant.SpawnPrioritySelectors
 import org.bukkit.craftbukkit.entity.CraftChicken
 import org.bukkit.entity.Chicken
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.layout.entity.SimpleEntityVariantLayoutBuilder
-import xyz.xenondevs.nova.util.toResourceLocation
+import xyz.xenondevs.nova.util.toIdentifier
 
 class ChickenVariantBuilder internal constructor(
     id: Key
@@ -22,7 +22,7 @@ class ChickenVariantBuilder internal constructor(
 ) {
     
     override fun build(modelType: ChickenModelType, layout: EntityVariantLayout.Simple, spawnConditions: SpawnPrioritySelectors) =
-        ChickenVariant(ModelAndTexture(modelType.nms, layout.texture.toResourceLocation()), spawnConditions)
+        ChickenVariant(ModelAndTexture(modelType.nms, layout.texture.toIdentifier()), spawnConditions)
     
 }
 

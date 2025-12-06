@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.world.format.chunk
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import net.minecraft.world.level.GameRules
+import net.minecraft.world.level.gamerules.GameRules
 import org.bukkit.World
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.cbf.Cbf
@@ -544,7 +544,7 @@ internal class RegionChunk(
         // random ticks
         if (randomTickBlockCount == 0)
             return
-        val randomTickSpeed = level.gameRules.getInt(GameRules.RULE_RANDOMTICKING)
+        val randomTickSpeed = level.gameRules.get(GameRules.RANDOM_TICK_SPEED)
         if (randomTickSpeed > 0) {
             for ((sectionIdx, section) in sections.withIndex()) {
                 if (randomTickBlockCounts[sectionIdx] > 0) {

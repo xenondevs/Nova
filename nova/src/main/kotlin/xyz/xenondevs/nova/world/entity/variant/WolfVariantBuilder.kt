@@ -9,7 +9,7 @@ import org.bukkit.craftbukkit.entity.CraftWolf
 import org.bukkit.entity.Wolf
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.layout.entity.WolfEntityVariantLayoutBuilder
-import xyz.xenondevs.nova.util.toResourceLocation
+import xyz.xenondevs.nova.util.toIdentifier
 
 class WolfVariantBuilder internal constructor(
     id: Key
@@ -24,9 +24,9 @@ class WolfVariantBuilder internal constructor(
     override fun build(modelType: Unit, layout: EntityVariantLayout.Wolf, spawnConditions: SpawnPrioritySelectors): WolfVariant {
         return WolfVariant(
             WolfVariant.AssetInfo(
-                ClientAsset.ResourceTexture(layout.wild.toResourceLocation()),
-                ClientAsset.ResourceTexture(layout.tame.toResourceLocation()),
-                ClientAsset.ResourceTexture(layout.angry.toResourceLocation()),
+                ClientAsset.ResourceTexture(layout.wild.toIdentifier()),
+                ClientAsset.ResourceTexture(layout.tame.toIdentifier()),
+                ClientAsset.ResourceTexture(layout.angry.toIdentifier()),
             ),
             spawnConditions,
         )

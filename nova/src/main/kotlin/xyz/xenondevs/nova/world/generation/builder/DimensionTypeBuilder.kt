@@ -1,20 +1,19 @@
 package xyz.xenondevs.nova.world.generation.builder
 
 import net.kyori.adventure.key.Key
+import net.minecraft.core.HolderSet
 import net.minecraft.core.WritableRegistry
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.TagKey
 import net.minecraft.util.valueproviders.IntProvider
 import net.minecraft.util.valueproviders.UniformInt
+import net.minecraft.world.attribute.EnvironmentAttributeMap
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.dimension.BuiltinDimensionTypes
 import net.minecraft.world.level.dimension.DimensionType
 import net.minecraft.world.level.dimension.DimensionType.MonsterSettings
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
-import java.util.*
 
 /**
  * Builder for [DimensionTypes][DimensionType].
@@ -40,7 +39,6 @@ class DimensionTypeBuilder internal constructor(
     private var height: Int = 384
     private var logicalHeight: Int = 384
     private var infiniBurn: TagKey<Block> = BlockTags.INFINIBURN_OVERWORLD
-    private var effects: ResourceLocation = BuiltinDimensionTypes.OVERWORLD_EFFECTS
     private var ambientLight: Float = 0.0f
     private var cloudHeight: Int? = null
     private var monsterSettings: MonsterSettings? = null
@@ -147,20 +145,6 @@ class DimensionTypeBuilder internal constructor(
     }
     
     /**
-     * Sets the `effects` property of this [DimensionType], which determines the ambient effects the client will display
-     * in levels of this [DimensionType]. These are hardcoded client-side so only the vanilla values can be used:
-     * * BuiltinDimensionTypes.OVERWORLD_EFFECTS
-     * * BuiltinDimensionTypes.NETHER_EFFECTS
-     * * BuiltinDimensionTypes.END_EFFECTS
-     *
-     * For a deeper understanding of what these values do, check out the [Minecraft Wiki](https://minecraft.wiki/w/Custom_dimension#Syntax)
-     * (effects property).
-     */
-    fun effects(effects: ResourceLocation) {
-        this.effects = effects
-    }
-    
-    /**
      * Sets the `ambientLight` property of this [DimensionType].
      */
     fun ambientLight(ambientLight: Float) {
@@ -190,22 +174,20 @@ class DimensionTypeBuilder internal constructor(
     
     override fun build(): DimensionType {
         return DimensionType(
-            fixedTime?.let(OptionalLong::of) ?: OptionalLong.empty(),
+            fixedTime != null, // fixme: fixedTime is now boolean instead of long
             hasSkyLight,
             hasCeiling,
-            ultraWarm,
-            natural,
-            coordinateScale,
-            bedWorks,
-            respawnAnchorWorks,
+            1.0, // TODO: expose coordinate scale
             minY,
             height,
             logicalHeight,
             infiniBurn,
-            effects,
             ambientLight,
-            Optional.ofNullable(cloudHeight),
-            monsterSettings ?: MonsterSettingsBuilder().build()
+            monsterSettings ?: MonsterSettingsBuilder().build(),
+            DimensionType.Skybox.OVERWORLD, // TODO: expose skybox
+            DimensionType.CardinalLightType.DEFAULT, // TODO: expose cardinal light type
+            EnvironmentAttributeMap.builder().build(), // TODO: expose environment attributes
+            HolderSet.empty() // TODO: expose timelines
         )
     }
     
@@ -223,24 +205,8 @@ class DimensionTypeBuilder internal constructor(
 @RegistryElementBuilderDsl
 class MonsterSettingsBuilder internal constructor() {
     
-    private var piglinSafe: Boolean = false
-    private var hasRaids: Boolean = false
     private var monsterSpawnLightTest: IntProvider = UniformInt.of(0, 7)
     private var monsterSpawnBlockLightLimit: Int = 0
-    
-    /**
-     * Sets the `piglinSafe` property which determines whether piglins transform into zombified entities.
-     */
-    fun piglinSafe(piglinSafe: Boolean) {
-        this.piglinSafe = piglinSafe
-    }
-    
-    /**
-     * Sets the `piglinSafe` property which determines whether players with bad omen can trigger raids.
-     */
-    fun hasRaids(hasRaids: Boolean) {
-        this.hasRaids = hasRaids
-    }
     
     /**
      * Sets the `monsterSpawnLightTest` property which determines the light level test used to determine if a monster can
@@ -260,8 +226,6 @@ class MonsterSettingsBuilder internal constructor() {
     
     internal fun build(): MonsterSettings {
         return MonsterSettings(
-            piglinSafe,
-            hasRaids,
             monsterSpawnLightTest,
             monsterSpawnBlockLightLimit
         )

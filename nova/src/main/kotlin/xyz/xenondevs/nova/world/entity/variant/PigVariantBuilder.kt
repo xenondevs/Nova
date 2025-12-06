@@ -2,14 +2,14 @@ package xyz.xenondevs.nova.world.entity.variant
 
 import net.kyori.adventure.key.Key
 import net.minecraft.core.registries.Registries
-import net.minecraft.world.entity.animal.PigVariant
+import net.minecraft.world.entity.animal.pig.PigVariant
 import net.minecraft.world.entity.variant.ModelAndTexture
 import net.minecraft.world.entity.variant.SpawnPrioritySelectors
 import org.bukkit.craftbukkit.entity.CraftPig
 import org.bukkit.entity.Pig
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.layout.entity.SimpleEntityVariantLayoutBuilder
-import xyz.xenondevs.nova.util.toResourceLocation
+import xyz.xenondevs.nova.util.toIdentifier
 
 class PigVariantBuilder internal constructor(
     id: Key
@@ -22,7 +22,7 @@ class PigVariantBuilder internal constructor(
 ) {
     
     override fun build(modelType: PigModelType, layout: EntityVariantLayout.Simple, spawnConditions: SpawnPrioritySelectors) =
-        PigVariant(ModelAndTexture(modelType.nms, layout.texture.toResourceLocation()), spawnConditions)
+        PigVariant(ModelAndTexture(modelType.nms, layout.texture.toIdentifier()), spawnConditions)
     
 }
 

@@ -9,8 +9,8 @@ import net.minecraft.resources.ResourceKey
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.util.Identifier
 import xyz.xenondevs.nova.util.Key
-import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.contains
 import xyz.xenondevs.nova.util.register
 import xyz.xenondevs.nova.util.toKey
@@ -70,7 +70,7 @@ internal fun <T : Any, B : RegistryElementBuilder<T>> buildRegistryElementLater(
     makeBuilder: (Key, WritableRegistry<T>, RegistryOps.RegistryInfoLookup) -> B,
     configureBuilder: B.() -> Unit
 ): ResourceKey<T> {
-    val id = ResourceLocation(addon, name)
+    val id = Identifier(addon, name)
     val key = ResourceKey.create(registryKey, id)
     registryKey.preFreeze { registry, lookup ->
         makeBuilder(id.toKey(), registry, lookup).apply(configureBuilder).register()
@@ -85,7 +85,7 @@ internal fun <T : Any, B : RegistryElementBuilder<T>> buildRegistryElementLater(
     makeBuilder: (Key, WritableRegistry<T>) -> B,
     configureBuilder: B.() -> Unit
 ): ResourceKey<T> {
-    val id = ResourceLocation(addon, name)
+    val id = Identifier(addon, name)
     val key = ResourceKey.create(registryKey, id)
     registryKey.preFreeze { registry, _ ->
         makeBuilder(id.toKey(), registry).apply(configureBuilder).register()

@@ -5,10 +5,10 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.WritableRegistry
+import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.util.ResourceLocation
+import xyz.xenondevs.nova.util.Identifier
 import java.util.*
 import java.util.stream.Stream
 import kotlin.streams.asStream
@@ -29,21 +29,21 @@ object NovaRegistryAccess : RegistryAccess {
     fun <E : Any> addRegistry(
         addon: Addon,
         registryName: String
-    ): WritableRegistry<E> = addRegistry(ResourceLocation(addon, registryName))
+    ): WritableRegistry<E> = addRegistry(Identifier(addon, registryName))
     
     fun <E : Any> addFuzzyRegistry(
         addon: Addon,
         registryName: String
-    ): FuzzyMappedRegistry<E> = addRegistry(ResourceLocation(addon, registryName), ::FuzzyMappedRegistry)
+    ): FuzzyMappedRegistry<E> = addRegistry(Identifier(addon, registryName), ::FuzzyMappedRegistry)
     
     fun <E : Any, R : Registry<E>> addRegistry(
         addon: Addon,
         registryName: String,
         registryConstructor: (ResourceKey<out R>, Lifecycle) -> R
-    ): R = addRegistry(ResourceLocation(addon, registryName), registryConstructor)
+    ): R = addRegistry(Identifier(addon, registryName), registryConstructor)
     
     internal fun <E : Any, R : Registry<E>> addRegistry(
-        registryName: ResourceLocation,
+        registryName: Identifier,
         registryConstructor: (ResourceKey<out R>, Lifecycle) -> R
     ): R {
         val resourceKey = ResourceKey.createRegistryKey<E>(registryName)
@@ -57,14 +57,14 @@ object NovaRegistryAccess : RegistryAccess {
     internal fun <E : Any> addRegistry(
         namespace: String,
         path: String
-    ): WritableRegistry<E> = addRegistry(ResourceLocation.fromNamespaceAndPath(namespace, path), ::InstantBindMappedRegistry)
+    ): WritableRegistry<E> = addRegistry(Identifier.fromNamespaceAndPath(namespace, path), ::InstantBindMappedRegistry)
     
     internal fun <E : Any> addRegistry(
-        registryName: ResourceLocation
+        registryName: Identifier
     ): WritableRegistry<E> = addRegistry(registryName, ::InstantBindMappedRegistry)
     
     internal fun <E : Any> addFuzzyRegistry(
-        registryName: ResourceLocation
+        registryName: Identifier
     ): FuzzyMappedRegistry<E> = addRegistry(registryName, ::FuzzyMappedRegistry)
     
     

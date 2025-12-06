@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.world.block.logic.`break`
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.protocol.game.ClientboundBlockChangedAckPacket
 import net.minecraft.world.entity.ExperienceOrb
-import net.minecraft.world.level.GameRules
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
+import net.minecraft.world.level.gamerules.GameRules
 import net.minecraft.world.phys.Vec3
 import org.bukkit.Axis
 import org.bukkit.GameMode
@@ -205,7 +205,7 @@ internal sealed class BlockBreaker(val player: Player, val pos: BlockPos, val st
         
         if (!event.isCancelled && !ProtectionManager.isVanillaProtected(player, block.location)) {
             //<editor-fold desc="exp drops", defaultstate="collapsed">
-            if (level.gameRules.getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
+            if (level.gameRules.get(GameRules.BLOCK_DROPS)) {
                 val exp = event.expToDrop
                 if (exp > 0) {
                     ExperienceOrb.award(level, Vec3.atCenterOf(blockPos), event.expToDrop)

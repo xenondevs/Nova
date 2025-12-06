@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.serialization.cbf
 
 import net.minecraft.core.Registry
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.cbf.serializer.BinarySerializer
@@ -15,7 +15,7 @@ fun <T : Any> Registry<T>.byNameBinarySerializer(): BinarySerializer<T> {
 internal class RegistryBinarySerializer<T : Any>(private val registry: Registry<T>) : UnversionedBinarySerializer<T>() {
     
     override fun readUnversioned(reader: ByteReader): T {
-        val id = ResourceLocation.parse(reader.readString())
+        val id = Identifier.parse(reader.readString())
         return registry.getValueOrThrow(id)
     }
     

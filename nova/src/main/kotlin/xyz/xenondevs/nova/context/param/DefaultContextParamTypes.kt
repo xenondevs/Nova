@@ -53,7 +53,7 @@ import xyz.xenondevs.nova.util.item.ToolUtils
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.pitch
-import xyz.xenondevs.nova.util.toResourceLocation
+import xyz.xenondevs.nova.util.toIdentifier
 import xyz.xenondevs.nova.util.yaw
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -218,7 +218,7 @@ object DefaultContextParamTypes {
         ContextParamType.builder<Material>("block_type_vanilla")
             .optionalIn(BlockPlace, BlockBreak, BlockInteract)
             .require({ it.isBlock }, { "$it is not a block" })
-            .autofilledBy(::BLOCK_TYPE) { BuiltInRegistries.BLOCK.getOptional(it.toResourceLocation()).getOrNull()?.bukkitMaterial }
+            .autofilledBy(::BLOCK_TYPE) { BuiltInRegistries.BLOCK.getOptional(it.toIdentifier()).getOrNull()?.bukkitMaterial }
             .build()
     
     // TODO: block state vanilla

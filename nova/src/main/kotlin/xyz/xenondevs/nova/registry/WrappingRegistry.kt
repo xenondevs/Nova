@@ -16,7 +16,7 @@ class WrappingRegistry<T : Any, W : Any>(
 ) : MappedRegistry<T>(key, lifecycle) {
     
     override fun register(key: ResourceKey<T>, value: T, info: RegistrationInfo): Holder.Reference<T> {
-        wrapperRegistry.register(ResourceKey.create(wrapperRegistry.key(), key.location()), toWrapper(value), info)
+        wrapperRegistry.register(ResourceKey.create(wrapperRegistry.key(), key.identifier()), toWrapper(value), info)
         return super.register(key, value, info)
     }
     

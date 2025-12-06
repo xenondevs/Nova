@@ -9,19 +9,19 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import org.jetbrains.annotations.ApiStatus
-import xyz.xenondevs.nova.util.data.ResourceLocationOrTagKey
+import xyz.xenondevs.nova.util.data.IdentifierOrTagKey
 import xyz.xenondevs.nova.util.getValueOrThrow
 
 @ApiStatus.Internal
 @JvmRecord
 data class BiomeInjection(
-    val biomes: Either<List<ResourceLocationOrTagKey<Biome>>, ResourceLocationOrTagKey<Biome>>,
+    val biomes: Either<List<IdentifierOrTagKey<Biome>>, IdentifierOrTagKey<Biome>>,
     val features: List<HolderSet<PlacedFeature>>
 ) {
     
     companion object {
         
-        private val BIOME_CODEC = ResourceLocationOrTagKey.codec(Registries.BIOME);
+        private val BIOME_CODEC = IdentifierOrTagKey.codec(Registries.BIOME);
         val CODEC = RecordCodecBuilder.create { builder ->
             builder.group(
                 Codec.either(BIOME_CODEC.listOf(), BIOME_CODEC).fieldOf("biomes").forGetter(BiomeInjection::biomes),

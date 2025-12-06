@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.registry
 
 import net.minecraft.core.WritableRegistry
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.jetbrains.annotations.ApiStatus
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
@@ -88,8 +88,8 @@ object NovaRegistries {
         BLOCK.stream()
     
     private fun <E : Any> simpleRegistry(name: String): WritableRegistry<E> {
-        val resourceLocation = ResourceLocation.fromNamespaceAndPath("nova", name)
-        return NovaRegistryAccess.addRegistry(resourceLocation)
+        val Identifier = Identifier.fromNamespaceAndPath("nova", name)
+        return NovaRegistryAccess.addRegistry(Identifier)
     }
     
     private fun <E : Any, W : Any> wrappingRegistry(
@@ -97,15 +97,15 @@ object NovaRegistries {
         wrapperRegistry: WritableRegistry<W>,
         toWrapper: (E) -> W
     ): WritableRegistry<E> {
-        val resourceLocation = ResourceLocation.fromNamespaceAndPath("nova", name)
-        return NovaRegistryAccess.addRegistry(resourceLocation) { key, lifecycle ->
+        val Identifier = Identifier.fromNamespaceAndPath("nova", name)
+        return NovaRegistryAccess.addRegistry(Identifier) { key, lifecycle ->
             WrappingRegistry(key, lifecycle, wrapperRegistry, toWrapper)
         }
     }
     
     private fun <E : Any> fuzzyRegistry(name: String): FuzzyMappedRegistry<E> {
-        val resourceLocation = ResourceLocation.fromNamespaceAndPath("nova", name)
-        return NovaRegistryAccess.addFuzzyRegistry(resourceLocation)
+        val Identifier = Identifier.fromNamespaceAndPath("nova", name)
+        return NovaRegistryAccess.addFuzzyRegistry(Identifier)
     }
     
 }

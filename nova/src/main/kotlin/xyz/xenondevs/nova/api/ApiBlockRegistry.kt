@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.api
 
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import xyz.xenondevs.nova.api.block.NovaBlock
 import xyz.xenondevs.nova.api.block.NovaBlockRegistry
 import xyz.xenondevs.nova.api.data.NamespacedId
@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 internal object ApiBlockRegistry : NovaBlockRegistry {
     
     override fun getOrNull(id: String): NovaBlock? {
-        val loc = ResourceLocation.parse(id)
+        val loc = Identifier.parse(id)
         return NovaRegistries.BLOCK.getValue(loc)?.let(::ApiBlockWrapper)
     }
     

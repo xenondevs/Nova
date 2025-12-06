@@ -3,7 +3,7 @@
 package xyz.xenondevs.nova.serialization.cbf
 
 import net.kyori.adventure.key.Key
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.bukkit.NamespacedKey
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
@@ -42,17 +42,17 @@ internal object NamespacedIdBinarySerializer : UnversionedBinarySerializer<Names
     
 }
 
-internal object ResourceLocationBinarySerializer : UnversionedBinarySerializer<ResourceLocation>() {
+internal object IdentifierBinarySerializer : UnversionedBinarySerializer<Identifier>() {
     
-    override fun readUnversioned(reader: ByteReader): ResourceLocation {
-        return ResourceLocation.parse(reader.readString())
+    override fun readUnversioned(reader: ByteReader): Identifier {
+        return Identifier.parse(reader.readString())
     }
     
-    override fun writeUnversioned(obj: ResourceLocation, writer: ByteWriter) {
+    override fun writeUnversioned(obj: Identifier, writer: ByteWriter) {
         writer.writeString(obj.toString())
     }
     
-    override fun copyNonNull(obj: ResourceLocation): ResourceLocation {
+    override fun copyNonNull(obj: Identifier): Identifier {
         return obj
     }
     
