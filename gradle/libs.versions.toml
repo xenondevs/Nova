@@ -7,12 +7,12 @@ dokka = "2.1.0"
 jgrapht = "1.5.2"
 kotlin = "2.2.21"
 kotlinx-coroutines = "1.10.2"
-ktor = "3.3.2"
+ktor = "3.3.3"
 paper = "1.21.11-rc2-R0.1-SNAPSHOT"
 xenondevs-commons = "1.35"
 
 [libraries]
-awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.38.2" }
+awssdk-s3 = { group = "software.amazon.awssdk", name = "s3", version = "2.39.5" }
 bstats = { group = "xyz.xenondevs.bstats", name = "bstats-bukkit", version = "3.0.1" }
 bytebase = { group = "xyz.xenondevs.bytebase", name = "ByteBase", version.ref = "bytebase" }
 bytebase-runtime = { group = "xyz.xenondevs.bytebase", name = "ByteBase-Runtime", version.ref = "bytebase" }
@@ -53,7 +53,7 @@ lz4 = { group = "at.yawk.lz4", name = "lz4-java", version = "1.8.1" }
 minecraft-asset-downloader = { group = "xyz.xenondevs", name = "minecraft-asset-downloader", version = "1.5" }
 minecraft-model-renderer = { group = "xyz.xenondevs", name = "minecraft-model-renderer", version = "1.3" }
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
-snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version = "2.10" }
+snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version = "3.0.1" }
 zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.7-6" }
 
 [bundles]
