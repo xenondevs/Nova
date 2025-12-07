@@ -45,7 +45,7 @@ internal object S3 : UploadService {
             ?: throw IllegalArgumentException("S3 bucket is not specified")
         directory = (cfg.node("directory").string?.addSuffix("/") ?: "")
         acl = cfg.node("acl").string
-        domain = cfg.node("domain").string
+        domain = cfg.node("domain").string?.removePrefix("https://")?.removePrefix("http://")
 
         LOGGER.info("Connecting to S3 endpoint $endpoint")
         client = S3Client.builder()
@@ -81,15 +81,15 @@ internal object S3 : UploadService {
     }
     
     private fun getDownloadUrl(id: UUID): String {
-        val domain = if (domain != null) {
-            this.domain
+        val url = if (domain != null) {
+            domain
         } else if (pathStyle) {
-            "https://$endpoint/$bucket"
+            "$endpoint/$bucket"
         } else {
-            "https://$bucket.$endpoint"
+            "$bucket.$endpoint"
         }
 
-        return "$domain/$directory$id.zip"
+        return "https://$url/$directory$id.zip"
     }
     
 }
