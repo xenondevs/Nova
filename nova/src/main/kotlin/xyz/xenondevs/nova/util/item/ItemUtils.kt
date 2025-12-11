@@ -13,7 +13,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.core.component.TypedDataComponent
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.AdventureModePredicate
 import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.item.component.CustomData
@@ -149,7 +149,7 @@ fun ItemStack?.isNotNullOrEmpty(): Boolean {
     return this != null && !isEmpty
 }
 
-internal fun <T> MojangStack.update(type: DataComponentType<T>, action: (T) -> T): T? =
+internal fun <T : Any> MojangStack.update(type: DataComponentType<T>, action: (T) -> T): T? =
     get(type)?.let { set(type, action(it)) }
 
 /**
@@ -402,7 +402,7 @@ object ItemUtils {
     }
     
     @Suppress("UNCHECKED_CAST")
-    internal fun <T> mergeDataComponents(type: DataComponentType<T>, values: List<T>): T {
+    internal fun <T : Any> mergeDataComponents(type: DataComponentType<T>, values: List<T>): T {
         require(values.isNotEmpty())
         if (values.size == 1)
             return values.first()
@@ -417,7 +417,7 @@ object ItemUtils {
             DataComponents.ENTITY_DATA -> mergeCustomData(values as List<CustomData>)
             DataComponents.LORE -> mergeLore(values as List<ItemLore>)
             DataComponents.POTION_CONTENTS -> mergePotionContents(values as List<PotionContents>)
-            DataComponents.RECIPES -> mergeResourceLocations(values as List<List<ResourceLocation>>)
+            DataComponents.RECIPES -> mergeIdentifiers(values as List<List<Identifier>>)
             DataComponents.STORED_ENCHANTMENTS -> mergeEnchantments(values as List<ItemEnchantments>)
             DataComponents.TOOLTIP_DISPLAY -> mergeTooltipDisplay(values as List<TooltipDisplay>)
             DataComponents.WEAPON -> mergeWeapon(values as List<Weapon>)
@@ -487,8 +487,8 @@ object ItemUtils {
         )
     }
     
-    internal fun mergeResourceLocations(values: List<List<ResourceLocation>>): List<ResourceLocation> {
-        val set = LinkedHashSet<ResourceLocation>()
+    internal fun mergeIdentifiers(values: List<List<Identifier>>): List<Identifier> {
+        val set = LinkedHashSet<Identifier>()
         for (value in values) {
             set.addAll(value)
         }

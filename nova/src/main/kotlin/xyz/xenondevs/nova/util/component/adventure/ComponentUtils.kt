@@ -25,7 +25,7 @@ import xyz.xenondevs.invui.internal.util.ComponentUtils
 import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.resources.builder.task.FontChar
 import xyz.xenondevs.nova.ui.overlay.MoveCharacters
-import xyz.xenondevs.nova.util.toResourceLocation
+import xyz.xenondevs.nova.util.toIdentifier
 import java.awt.Color
 import java.util.*
 import net.minecraft.network.chat.Component as MojangComponent
@@ -108,7 +108,7 @@ fun MojangComponent.withoutPreFormatting(): MojangComponent {
 fun Style.toNmsStyle(): MojangStyle {
     var style = MojangStyle.EMPTY
     color()?.let { style = style.withColor(it.value()) }
-    font()?.let { style = style.withFont(FontDescription.Resource(it.toResourceLocation())) }
+    font()?.let { style = style.withFont(FontDescription.Resource(it.toIdentifier())) }
     
     when (decoration(TextDecoration.BOLD)) {
         TextDecoration.State.TRUE -> style = style.withBold(true)

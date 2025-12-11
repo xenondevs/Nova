@@ -13,7 +13,7 @@ import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
-import xyz.xenondevs.nova.util.data.ResourceLocationOrTagKey
+import xyz.xenondevs.nova.util.data.IdentifierOrTagKey
 import xyz.xenondevs.nova.util.lookupGetterOrThrow
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
@@ -30,7 +30,7 @@ class BiomeInjectionBuilder internal constructor(
     
     private val placedFeatureRegistry = lookup.lookupGetterOrThrow(Registries.PLACED_FEATURE)
     
-    private val biomes = mutableListOf<ResourceLocationOrTagKey<Biome>>()
+    private val biomes = mutableListOf<IdentifierOrTagKey<Biome>>()
     private val features = Array(GenerationStep.Decoration.entries.size) { mutableListOf<Holder<PlacedFeature>>() }
     
     /**
@@ -38,7 +38,7 @@ class BiomeInjectionBuilder internal constructor(
      */
     fun biomes(vararg biomeTags: TagKey<Biome>) {
         for (biomeTag in biomeTags) {
-            biomes += ResourceLocationOrTagKey.ofTag(biomeTag)
+            biomes += IdentifierOrTagKey.ofTag(biomeTag)
         }
     }
     
@@ -47,7 +47,7 @@ class BiomeInjectionBuilder internal constructor(
      */
     fun biomes(vararg biomes: ResourceKey<Biome>) {
         for (biomeKey in biomes) {
-            this@BiomeInjectionBuilder.biomes += ResourceLocationOrTagKey.ofLocation(biomeKey.location())
+            this@BiomeInjectionBuilder.biomes += IdentifierOrTagKey.ofLocation(biomeKey.identifier())
         }
     }
     

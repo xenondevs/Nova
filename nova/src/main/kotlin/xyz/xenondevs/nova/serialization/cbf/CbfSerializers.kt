@@ -25,7 +25,7 @@ internal object CbfSerializers {
         Cbf.registerSerializer(LocationBinarySerializer)
         Cbf.registerSerializer(NamespacedKeyBinarySerializer)
         Cbf.registerSerializer(NamespacedIdBinarySerializer)
-        Cbf.registerSerializer(ResourceLocationBinarySerializer)
+        Cbf.registerSerializer(IdentifierBinarySerializer)
         Cbf.registerSerializer(KeyBinarySerializer)
         Cbf.registerSerializer(VirtualInventoryBinarySerializer)
         Cbf.registerSerializer(BlockPosBinarySerializer)

@@ -4,10 +4,10 @@ import kotlinx.serialization.builtins.SetSerializer
 import net.minecraft.core.ClientAsset
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
-import net.minecraft.world.entity.animal.ChickenVariant
-import net.minecraft.world.entity.animal.CowVariant
-import net.minecraft.world.entity.animal.PigVariant
+import net.minecraft.world.entity.animal.chicken.ChickenVariant
+import net.minecraft.world.entity.animal.cow.CowVariant
 import net.minecraft.world.entity.animal.frog.FrogVariant
+import net.minecraft.world.entity.animal.pig.PigVariant
 import net.minecraft.world.entity.animal.wolf.WolfVariant
 import net.minecraft.world.entity.variant.ModelAndTexture
 import net.minecraft.world.entity.variant.SpawnPrioritySelectors
@@ -42,7 +42,7 @@ internal object UnknownEntityVariants {
         val unregisteredIds = customVariantKeys - registeredIds
         for (key in unregisteredIds) {
             val registryKey = key.registryKey()
-            val id = key.location()
+            val id = key.identifier()
             when (registryKey) {
                 Registries.CHICKEN_VARIANT -> Registries.CHICKEN_VARIANT.preFreeze { registry, _ ->
                     registry[id] = ChickenVariant(

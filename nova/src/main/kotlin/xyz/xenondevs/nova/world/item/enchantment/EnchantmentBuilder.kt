@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.item.enchantment
 import io.papermc.paper.registry.TypedKey
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.registries.Registries
@@ -12,8 +13,8 @@ import net.minecraft.world.item.enchantment.Enchantment
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.registry.plusAssign
 import xyz.xenondevs.nova.registry.LazyRegistryElementBuilder
+import xyz.xenondevs.nova.registry.plusAssign
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.world.item.behavior.Enchantable
 import java.util.*
@@ -24,7 +25,7 @@ internal class CustomEnchantmentLogic(
     private val primaryItem: (ItemStack) -> Boolean,
     private val supportedItem: (ItemStack) -> Boolean,
     private val tableLevelRequirement: (Int) -> IntRange,
-    private val compatibility: (MojangEnchantment) -> Boolean
+    private val compatibility: (Holder<MojangEnchantment>) -> Boolean
 ) {
     
     fun isPrimaryItem(itemStack: ItemStack): Boolean =
@@ -33,7 +34,7 @@ internal class CustomEnchantmentLogic(
     fun isSupportedItem(itemStack: ItemStack): Boolean =
         supportedItem(itemStack)
     
-    fun compatibleWith(other: MojangEnchantment): Boolean =
+    fun compatibleWith(other: Holder<MojangEnchantment>): Boolean =
         compatibility(other)
     
     fun getMinCost(level: Int): Int =
@@ -67,7 +68,7 @@ class EnchantmentBuilder internal constructor(
     
     // custom logic
     private var tableLeveRequirement: (Int) -> IntRange = { val min = 1 + it * 10; min..(min + 5) }
-    private var compatibility: (MojangEnchantment) -> Boolean = { true }
+    private var compatibility: (Holder<MojangEnchantment>) -> Boolean = { true }
     private var primaryItem: (ItemStack) -> Boolean = { false }
     private var supportedItem: (ItemStack) -> Boolean = { false }
     
@@ -195,7 +196,7 @@ class EnchantmentBuilder internal constructor(
      * This option is exclusive with [compatibleWith] and [incompatibleWith].
      */
     fun compatibility(compatibility: (BukkitEnchantment) -> Boolean) {
-        this.compatibility = { compatibility(CraftEnchantment.minecraftToBukkit(it)) }
+        this.compatibility = { compatibility(CraftEnchantment.minecraftHolderToBukkit(it)) }
     }
     
     /**
@@ -206,7 +207,7 @@ class EnchantmentBuilder internal constructor(
     @Suppress("UnstableApiUsage")
     fun compatibleWith(vararg enchantments: TypedKey<BukkitEnchantment>) {
         val keySet = enchantments.mapTo(HashSet()) { it.key() }
-        this.compatibility = { CraftEnchantment.minecraftToBukkit(it).key() in keySet }
+        this.compatibility = { CraftEnchantment.minecraftHolderToBukkit(it).key() in keySet }
     }
     
     /**
@@ -217,7 +218,7 @@ class EnchantmentBuilder internal constructor(
     @Suppress("UnstableApiUsage")
     fun incompatibleWith(vararg enchantments: TypedKey<BukkitEnchantment>) {
         val keySet = enchantments.mapTo(HashSet()) { it.key() }
-        this.compatibility = { CraftEnchantment.minecraftToBukkit(it).key() !in keySet }
+        this.compatibility = { CraftEnchantment.minecraftHolderToBukkit(it).key() !in keySet }
     }
     
     /**

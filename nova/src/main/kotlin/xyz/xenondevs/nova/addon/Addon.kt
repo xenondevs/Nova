@@ -64,8 +64,8 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 import xyz.xenondevs.nova.update.ProjectDistributor
+import xyz.xenondevs.nova.util.Identifier
 import xyz.xenondevs.nova.util.Key
-import xyz.xenondevs.nova.util.ResourceLocation
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.NovaBlockBuilder
@@ -271,7 +271,7 @@ abstract class Addon : AddonGetter {
     
     //<editor-fold desc="item filter types">
     fun registerItemFilterType(name: String, itemFilterType: ItemFilterType<*>) {
-        NovaRegistries.ITEM_FILTER_TYPE[ResourceLocation(addon, name)] = itemFilterType
+        NovaRegistries.ITEM_FILTER_TYPE[Identifier(addon, name)] = itemFilterType
     }
     //</editor-fold>
     
@@ -411,7 +411,7 @@ abstract class Addon : AddonGetter {
     
     //<editor-fold desc="worldgen">
     fun <T : RuleTest> registerRuleTestType(name: String, ruleTestType: RuleTestType<T>): RuleTestType<T> {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.RULE_TEST[id] = ruleTestType
         return ruleTestType
     }
@@ -430,14 +430,14 @@ abstract class Addon : AddonGetter {
     
     @ExperimentalWorldGen
     fun <CC : CarverConfiguration> registerCarver(name: String, carver: WorldCarver<CC>): WorldCarver<CC> {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.CARVER[id] = carver
         return carver
     }
     
     @ExperimentalWorldGen
     fun <CC : CarverConfiguration> registerConfiguredCarver(name: String, configuredCarver: ConfiguredWorldCarver<CC>): ConfiguredWorldCarver<CC> {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.CONFIGURED_CARVER[id] = configuredCarver
         return configuredCarver
     }
@@ -456,21 +456,21 @@ abstract class Addon : AddonGetter {
     
     @ExperimentalWorldGen
     fun <F : ConfiguredFeature<*, *>> configuredFeature(name: String, configuredFeature: F): ResourceKey<ConfiguredFeature<*, *>> {
-        val key = ResourceKey.create(Registries.CONFIGURED_FEATURE, ResourceLocation(addon, name))
+        val key = ResourceKey.create(Registries.CONFIGURED_FEATURE, Identifier(addon, name))
         Registries.CONFIGURED_FEATURE[key] = configuredFeature
         return key
     }
     
     @ExperimentalWorldGen
     fun feature(name: String, feature: Feature<*>): ResourceKey<Feature<*>> {
-        val key = ResourceKey.create(Registries.FEATURE, ResourceLocation(addon, name))
+        val key = ResourceKey.create(Registries.FEATURE, Identifier(addon, name))
         Registries.FEATURE[key] = feature
         return key
     }
     
     @ExperimentalWorldGen
     fun <P : PlacementModifier> placementModifierType(name: String, placementModifierType: PlacementModifierType<P>): PlacementModifierType<P> {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.PLACEMENT_MODIFIER_TYPE[id] = placementModifierType
         return placementModifierType
     }
@@ -481,7 +481,7 @@ abstract class Addon : AddonGetter {
     
     @ExperimentalWorldGen
     fun registerNoiseParameters(name: String, noiseParams: NoiseParameters): NoiseParameters {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.NOISE[id] = noiseParams
         return noiseParams
     }
@@ -500,56 +500,56 @@ abstract class Addon : AddonGetter {
     
     @ExperimentalWorldGen
     fun registerNoiseGenerationSettings(name: String, settings: NoiseGeneratorSettings): NoiseGeneratorSettings {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.NOISE_SETTINGS[id] = settings
         return settings
     }
     
     @ExperimentalWorldGen
     fun registerStructure(name: String, structure: Structure): Structure {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.STRUCTURE[id] = structure
         return structure
     }
     
     @ExperimentalWorldGen
     fun <P : StructurePoolElement> registerStructurePoolElementType(name: String, structurePoolElementType: StructurePoolElementType<P>): StructurePoolElementType<P> {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.STRUCTURE_POOL_ELEMENT[id] = structurePoolElementType
         return structurePoolElementType
     }
     
     @ExperimentalWorldGen
     fun registerStructurePieceType(name: String, structurePieceType: StructurePieceType): StructurePieceType {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.STRUCTURE_PIECE[id] = structurePieceType
         return structurePieceType
     }
     
     @ExperimentalWorldGen
     fun <SP : StructurePlacement> registerStructurePlacementType(name: String, structurePlacementType: StructurePlacementType<SP>): StructurePlacementType<SP> {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.STRUCTURE_PLACEMENT[id] = structurePlacementType
         return structurePlacementType
     }
     
     @ExperimentalWorldGen
     fun <P : StructureProcessor> registerStructureProcessorType(name: String, structureProcessorType: StructureProcessorType<P>): StructureProcessorType<P> {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.STRUCTURE_PROCESSOR[id] = structureProcessorType
         return structureProcessorType
     }
     
     @ExperimentalWorldGen
     fun registerStructureSet(name: String, structureSet: StructureSet): StructureSet {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.STRUCTURE_SET[id] = structureSet
         return structureSet
     }
     
     @ExperimentalWorldGen
     fun <S : Structure> registerStructureType(name: String, structureType: StructureType<S>): StructureType<S> {
-        val id = ResourceLocation(addon, name)
+        val id = Identifier(addon, name)
         Registries.STRUCTURE_TYPE[id] = structureType
         return structureType
     }

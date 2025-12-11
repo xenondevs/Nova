@@ -50,7 +50,7 @@ abstract class RegistryFileCodecMixin {
             var vanilla = getter.get(key);
             if (vanilla.isPresent())
                return vanilla;
-            return (Optional) NovaRegistries.WRAPPER_BLOCK.get(key.location());
+            return (Optional) NovaRegistries.WRAPPER_BLOCK.get(key.identifier());
          }
          
          @Override

@@ -7,14 +7,14 @@ import net.minecraft.advancements.AdvancementRequirements
 import net.minecraft.advancements.AdvancementType
 import net.minecraft.advancements.Criterion
 import net.minecraft.advancements.DisplayInfo
-import net.minecraft.advancements.critereon.DataComponentMatchers
-import net.minecraft.advancements.critereon.InventoryChangeTrigger
-import net.minecraft.advancements.critereon.ItemPredicate
-import net.minecraft.advancements.critereon.NbtPredicate
+import net.minecraft.advancements.criterion.DataComponentMatchers
+import net.minecraft.advancements.criterion.InventoryChangeTrigger
+import net.minecraft.advancements.criterion.ItemPredicate
+import net.minecraft.advancements.criterion.NbtPredicate
 import net.minecraft.core.component.predicates.CustomDataPredicate
 import net.minecraft.core.component.predicates.DataComponentPredicates
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -28,7 +28,7 @@ import java.util.*
 fun advancement(addon: Addon, name: String, init: Advancement.Builder.() -> Unit): AdvancementHolder {
     val builder = Advancement.Builder()
     builder.init()
-    return builder.build(ResourceLocation.fromNamespaceAndPath(addon.id, name))
+    return builder.build(Identifier.fromNamespaceAndPath(addon.id, name))
 }
 
 fun obtainNovaItemAdvancement(

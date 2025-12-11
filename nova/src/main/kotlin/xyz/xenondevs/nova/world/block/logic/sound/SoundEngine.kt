@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.world.block.logic.sound
 
 import net.minecraft.core.Holder
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.Entity
@@ -56,7 +56,7 @@ internal object SoundEngine : Listener, PacketListener {
             16.0, 
             level.dimension(),
             ClientboundSoundPacket(
-                Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation.parse(newSound))),
+                Holder.direct(SoundEvent.createVariableRangeEvent(Identifier.parse(newSound))),
                 entity.soundSource,
                 entity.x, entity.y, entity.z,
                 volume, pitch,
@@ -79,7 +79,7 @@ internal object SoundEngine : Listener, PacketListener {
             radius,
             level.dimension(),
             ClientboundSoundPacket(
-                Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation.parse(newSound))),
+                Holder.direct(SoundEvent.createVariableRangeEvent(Identifier.parse(newSound))),
                 source,
                 x, y, z,
                 volume, pitch,
@@ -90,7 +90,7 @@ internal object SoundEngine : Listener, PacketListener {
     
     @PacketHandler
     private fun handleSoundPacket(event: ClientboundSoundPacketEvent) {
-        val location = event.sound.unwrap().mapBoth({ it.location() }, { it.location }).take()
+        val location = event.sound.unwrap().mapBoth({ it.identifier() }, { it.location }).take()
         if (location.namespace == "minecraft" && location.path in ResourceLookups.SOUND_OVERRIDES) {
             event.sound = getNovaSound(location.path)
         }
@@ -98,13 +98,13 @@ internal object SoundEngine : Listener, PacketListener {
     
     @PacketHandler
     private fun handleSoundPacket(event: ClientboundSoundEntityPacketEvent) {
-        val location = event.sound.unwrap().mapBoth({ it.location() }, { it.location }).take()
+        val location = event.sound.unwrap().mapBoth({ it.identifier() }, { it.location }).take()
         if (location.namespace == "minecraft" && location.path in ResourceLookups.SOUND_OVERRIDES) {
             event.sound = getNovaSound(location.path)
         }
     }
     
     private fun getNovaSound(path: String): Holder<SoundEvent> =
-        Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("nova", path)))
+        Holder.direct(SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath("nova", path)))
     
 }

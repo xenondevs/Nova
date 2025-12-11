@@ -8,8 +8,8 @@ import com.mojang.serialization.DataResult
 import com.mojang.serialization.DynamicOps
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
+import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import java.io.File
 import java.nio.file.Path
@@ -27,11 +27,11 @@ inline fun <reified T : S, S : Any> Codec<S>.subType(): Codec<T> =
 
 fun <R> DataResult<R>.resultOrNull(): R? = result().orElse(null)
 
-fun <R> DataResult<Holder<R>>.resultValueOrNull() = result().orElse(null)?.value()
+fun <R : Any> DataResult<Holder<R>>.resultValueOrNull() = result().orElse(null)?.value()
 
 fun <F, S> DataResult<MojangPair<F, S>>.resultFirstOrNull() = result().orElse(null)?.first
 
-fun <F, S> DataResult<MojangPair<Holder<F>, S>>.resultFirstValueOrNull() = result().orElse(null)?.first?.value()
+fun <F : Any, S> DataResult<MojangPair<Holder<F>, S>>.resultFirstValueOrNull() = result().orElse(null)?.first?.value()
 
 fun <R> DataResult<R>.getOrThrow(message: String): R {
     return if (result().isPresent) result().get()
@@ -43,12 +43,12 @@ fun <R> DataResult<R>.getOrThrow(): R {
     else throw IllegalArgumentException(error().get().toString())
 }
 
-fun <R> DataResult<Holder<R>>.getValueOrThrow(message: String): R {
+fun <R : Any> DataResult<Holder<R>>.getValueOrThrow(message: String): R {
     return if (result().isPresent) result().get().value()
     else throw IllegalStateException(message, IllegalArgumentException(error().get().toString()))
 }
 
-fun <R> DataResult<Holder<R>>.getValueOrThrow(): R {
+fun <R : Any> DataResult<Holder<R>>.getValueOrThrow(): R {
     return if (result().isPresent) result().get().value()
     else throw IllegalArgumentException(error().get().toString())
 }
@@ -81,9 +81,9 @@ fun <R> Result<R>.asDataResult(): DataResult<R> {
 fun <R : Any> R?.asDataResult(error: String): DataResult<R> =
     if (this != null) DataResult.success(this) else DataResult.error { error }
 
-class ResourceLocationOrTagKey<T> internal constructor(internal val either: Either<ResourceLocation, TagKey<T>>) {
+class IdentifierOrTagKey<T : Any> internal constructor(internal val either: Either<Identifier, TagKey<T>>) {
     
-    val location: ResourceLocation
+    val location: Identifier
         get() = either.left().get()
     
     val tag: TagKey<T>
@@ -102,19 +102,19 @@ class ResourceLocationOrTagKey<T> internal constructor(internal val either: Eith
     
     companion object {
         
-        fun <T> ofTag(tag: TagKey<T>): ResourceLocationOrTagKey<T> {
-            return ResourceLocationOrTagKey(Either.right(tag))
+        fun <T : Any> ofTag(tag: TagKey<T>): IdentifierOrTagKey<T> {
+            return IdentifierOrTagKey(Either.right(tag))
         }
         
-        fun <T> ofLocation(location: ResourceLocation): ResourceLocationOrTagKey<T> {
-            return ResourceLocationOrTagKey(Either.left(location))
+        fun <T : Any> ofLocation(location: Identifier): IdentifierOrTagKey<T> {
+            return IdentifierOrTagKey(Either.left(location))
         }
         
         @JvmStatic
-        fun <T, R : Registry<T>> codec(registry: ResourceKey<R>): Codec<ResourceLocationOrTagKey<T>> {
+        fun <T : Any, R : Registry<T>> codec(registry: ResourceKey<R>): Codec<IdentifierOrTagKey<T>> {
             val tagKeyCodec = TagKey.hashedCodec(registry)
-            return Codec.either(ResourceLocation.CODEC, tagKeyCodec).xmap(
-                { either -> ResourceLocationOrTagKey(either) },
+            return Codec.either(Identifier.CODEC, tagKeyCodec).xmap(
+                { either -> IdentifierOrTagKey(either) },
                 { tagKeyOrElementLocation -> tagKeyOrElementLocation.either }
             )
         }

@@ -24,12 +24,12 @@ import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
+import xyz.xenondevs.nova.util.ReflectionUtils
 import xyz.xenondevs.nova.util.data.key
+import xyz.xenondevs.nova.util.identifier
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.namespacedKey
-import xyz.xenondevs.nova.util.ReflectionUtils
 import xyz.xenondevs.nova.util.registerEvents
-import xyz.xenondevs.nova.util.resourceLocation
 import net.minecraft.world.item.crafting.Recipe as MojangRecipe
 import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
 import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
@@ -125,7 +125,7 @@ object RecipeManager : Listener, PacketListener {
                     else -> throw UnsupportedOperationException("Unknown recipe type: ${recipe::class.simpleName}")
                 }
                 
-                val key = ResourceKey.create(Registries.RECIPE, recipe.key.resourceLocation)
+                val key = ResourceKey.create(Registries.RECIPE, recipe.key.identifier)
                 val holder = RecipeHolder(key, nmsRecipe)
                 MINECRAFT_SERVER.recipeManager.recipes.addRecipe(holder)
                 
@@ -157,7 +157,7 @@ object RecipeManager : Listener, PacketListener {
     @EventHandler
     private fun handleJoin(event: PlayerJoinEvent) {
         val player = event.player
-        customVanillaRecipes.keys.forEach { player.discoverRecipe(it.location().namespacedKey) }
+        customVanillaRecipes.keys.forEach { player.discoverRecipe(it.identifier().namespacedKey) }
     }
     
     @EventHandler(priority = EventPriority.LOWEST)
@@ -167,7 +167,7 @@ object RecipeManager : Listener, PacketListener {
         if (recipe.key in ALLOWED_RECIPES)
             return
         
-        var requiresContainer = ResourceKey.create(Registries.RECIPE, recipe.key.resourceLocation) in registeredVanillaRecipes.keys
+        var requiresContainer = ResourceKey.create(Registries.RECIPE, recipe.key.identifier) in registeredVanillaRecipes.keys
         if (!requiresContainer && event.inventory.contents.any { it?.novaItem != null }) {
             // prevent non-Nova recipes from using Nova items
             event.inventory.result = ItemStack(Material.AIR)

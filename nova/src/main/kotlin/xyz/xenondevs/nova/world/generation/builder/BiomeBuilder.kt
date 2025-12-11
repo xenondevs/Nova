@@ -6,21 +6,19 @@ import net.kyori.adventure.key.Key
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
 import net.minecraft.core.WritableRegistry
-import net.minecraft.core.particles.ParticleOptions
-import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.registries.Registries
+import net.minecraft.resources.Identifier
 import net.minecraft.resources.RegistryOps.RegistryInfoLookup
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.Music
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.util.random.Weighted
 import net.minecraft.util.random.WeightedList
+import net.minecraft.world.attribute.AmbientAdditionsSettings
+import net.minecraft.world.attribute.AmbientMoodSettings
+import net.minecraft.world.attribute.EnvironmentAttributeMap
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
-import net.minecraft.world.level.biome.AmbientAdditionsSettings
-import net.minecraft.world.level.biome.AmbientMoodSettings
-import net.minecraft.world.level.biome.AmbientParticleSettings
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.biome.Biome.ClimateSettings
 import net.minecraft.world.level.biome.Biome.TemperatureModifier
@@ -37,7 +35,6 @@ import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.util.lookupGetterOrThrow
-import xyz.xenondevs.nova.util.particle.ParticleBuilder
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import xyz.xenondevs.nova.world.generation.FeatureType
 import java.awt.Color
@@ -152,7 +149,8 @@ class BiomeBuilder internal constructor(
         val specialEffects = this.specialEffects ?: BiomeSpecialEffectsBuilder(lookup).build()
         val generationSettings = BiomeGenerationSettings(HolderSet.direct(carvers), features.map { HolderSet.direct(it) })
         val mobSpawnSettings = this.mobSpawnSettings ?: MobSpawnSettings.EMPTY
-        return Biome(climateSettings, specialEffects, generationSettings, mobSpawnSettings)
+        // TODO: expose environment attributes
+        return Biome(climateSettings, EnvironmentAttributeMap.builder().build(), specialEffects, generationSettings, mobSpawnSettings)
     }
     
 }
@@ -255,7 +253,6 @@ class BiomeSpecialEffectsBuilder internal constructor(private val lookup: Regist
     private var foliageColorOverride: Int? = null
     private var grassColorOverride: Int? = null
     private var grassColorModifier: GrassColorModifier = GrassColorModifier.NONE
-    private var ambientParticleSettings: AmbientParticleSettings? = null
     private var ambientLoopSoundEvent: Holder<SoundEvent>? = null
     private var ambientMoodSettings: AmbientMoodSettings? = null
     private var ambientAdditionsSettings: AmbientAdditionsSettings? = null
@@ -362,28 +359,6 @@ class BiomeSpecialEffectsBuilder internal constructor(private val lookup: Regist
     
     //</editor-fold>
     
-    //<editor-fold desc="Ambient particles" defaultstate="collapsed">
-    
-    /**
-     * Sets the `ambientParticle` setting of the biome's special effects. This setting is used to add ambient particles
-     * to the biome. The particles are spawned randomly in the air, and the probability of spawning each tick is
-     * determined by the [AmbientParticleSettings.probability] setting.
-     */
-    fun ambientParticles(ambientParticleSettings: AmbientParticleSettings) {
-        this.ambientParticleSettings = ambientParticleSettings
-    }
-    
-    /**
-     * Sets the `ambientParticle` setting of the biome's special effects by using a [ParticleBuilder]. This setting is
-     * used to add ambient particles to the biome. The particles are spawned randomly in the air, and the probability
-     * of spawning each tick is determined by the [AmbientParticleSettings.probability] setting.
-     */
-    fun <T : ParticleOptions> ambientParticles(particle: ParticleType<T>, probability: Float, builder: ParticleBuilder<T>.() -> Unit = {}) {
-        this.ambientParticleSettings = AmbientParticleSettings(ParticleBuilder(particle).apply(builder).getOptions(), probability)
-    }
-    
-    //</editor-fold>
-    
     //<editor-fold desc="Ambient sounds" defaultstate="collapsed">
     
     /**
@@ -401,9 +376,9 @@ class BiomeSpecialEffectsBuilder internal constructor(private val lookup: Regist
     }
     
     /**
-     * Sets the `ambientLoopSoundEvent` setting of the biome's special effects via its [ResourceLocation].
+     * Sets the `ambientLoopSoundEvent` setting of the biome's special effects via its [Identifier].
      */
-    fun ambientLoopSoundEvent(soundEventId: ResourceLocation) {
+    fun ambientLoopSoundEvent(soundEventId: Identifier) {
         ambientLoopSoundEvent(ResourceKey.create(Registries.SOUND_EVENT, soundEventId))
     }
     
@@ -456,7 +431,7 @@ class BiomeSpecialEffectsBuilder internal constructor(private val lookup: Regist
     /**
      * Sets the `ambientAdditionsSettings` setting of the biome's special effects to [soundEventId] with [tickProbability].
      */
-    fun ambientAdditionsSound(soundEventId: ResourceLocation, tickProbability: Double) {
+    fun ambientAdditionsSound(soundEventId: Identifier, tickProbability: Double) {
         ambientAdditionsSound(ResourceKey.create(Registries.SOUND_EVENT, soundEventId), tickProbability)
     }
     
@@ -504,7 +479,6 @@ class BiomeSpecialEffectsBuilder internal constructor(private val lookup: Regist
             foliageColorOverride?.let(::foliageColor)
             grassColorOverride?.let(::grassColor)
             grassColorModifier(grassColorModifier)
-            ambientParticleSettings?.let(::ambientParticles)
             ambientLoopSoundEvent?.let(::ambientLoopSoundEvent)
             ambientMoodSettings?.let(::ambientMoodSound)
             ambientAdditionsSettings?.let(::ambientAdditionsSound) // TODO: support weights
@@ -619,7 +593,7 @@ class AmbientMoodSoundBuilder internal constructor(lookup: RegistryInfoLookup) {
     /**
      * Sets the `soundEvent` setting of the biome's ambient mood sound to the given [soundEventId].
      */
-    fun soundEvent(soundEventId: ResourceLocation) {
+    fun soundEvent(soundEventId: Identifier) {
         soundEvent(ResourceKey.create(Registries.SOUND_EVENT, soundEventId))
     }
     
@@ -686,7 +660,7 @@ class MusicBuilder internal constructor(lookup: RegistryInfoLookup) {
     /**
      * Sets the `soundEvent` setting of the music to the given [soundEventId].
      */
-    fun soundEvent(soundEventId: ResourceLocation) {
+    fun soundEvent(soundEventId: Identifier) {
         soundEvent(ResourceKey.create(Registries.SOUND_EVENT, soundEventId))
     }
     

@@ -9,7 +9,7 @@ import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
 import net.minecraft.network.protocol.game.ClientboundLevelEventPacket
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
@@ -466,7 +466,7 @@ object BlockUtils {
         
         fun broadcastBreakSound(soundGroup: SoundGroup) {
             val soundPacket = ClientboundSoundPacket(
-                Holder.direct(SoundEvent.createVariableRangeEvent(ResourceLocation.parse(soundGroup.breakSound))),
+                Holder.direct(SoundEvent.createVariableRangeEvent(Identifier.parse(soundGroup.breakSound))),
                 SoundSource.BLOCKS,
                 nmsPos.x + 0.5,
                 nmsPos.y + 0.5,

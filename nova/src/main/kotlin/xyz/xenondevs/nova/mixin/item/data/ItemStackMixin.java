@@ -4,7 +4,7 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.PatchedDataComponentMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,7 +35,7 @@ abstract class ItemStackMixin {
                 .map(CustomData::getUnsafe)
                 .flatMap(tag -> tag.getCompound("nova"))
                 .flatMap(tag -> tag.getString("id"))
-                .map(id -> NovaRegistries.ITEM.getValue(ResourceLocation.parse(id)));
+                .map(id -> NovaRegistries.ITEM.getValue(Identifier.parse(id)));
             if (novaItem.isPresent()) {
                 newMap = new NovaDataComponentMap(novaItem.get());
             }

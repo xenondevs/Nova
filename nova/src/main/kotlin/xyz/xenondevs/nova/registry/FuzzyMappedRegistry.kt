@@ -39,7 +39,7 @@ class FuzzyMappedRegistry<T : Any>(
     
     override fun register(key: ResourceKey<T>, value: T, info: RegistrationInfo): Holder.Reference<T> {
         val holder = super.register(key, value, info)
-        byName.getOrPut(key.location().path, ::ObjectArrayList).add(value)
+        byName.getOrPut(key.identifier().path, ::ObjectArrayList).add(value)
         return holder
     }
     

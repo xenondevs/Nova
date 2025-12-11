@@ -22,7 +22,7 @@ internal operator fun <T> MutableMap<NamespacedId, T>.get(namespace: String, key
 }
 
 @Suppress("DEPRECATION")
-@Deprecated("Use ResourceLocation instead")
+@Deprecated("Use Identifier instead")
 internal class NamespacedId(@JvmField val namespace: String, @JvmField val name: String) : INamespacedId {
     
     private val id = "$namespace:$name"

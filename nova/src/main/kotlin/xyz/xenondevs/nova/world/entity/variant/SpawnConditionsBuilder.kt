@@ -2,7 +2,7 @@ package xyz.xenondevs.nova.world.entity.variant
 
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
-import net.minecraft.advancements.critereon.MinMaxBounds
+import net.minecraft.advancements.criterion.MinMaxBounds
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.RegistryOps.RegistryInfoLookup
 import net.minecraft.world.entity.variant.BiomeCheck

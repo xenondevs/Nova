@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.LOGGER
 // this delegating structure is necessary to allow config reloading
 internal class NovaDataComponentMap(private val novaItem: NovaItem) : DataComponentMap {
     
-    override fun <T : Any?> get(type: DataComponentType<out T>): T? {
+    override fun <T : Any> get(type: DataComponentType<out T>): T? {
         try {
             return novaItem.baseDataComponents.handle.get(type)
         } catch (e: Exception) {

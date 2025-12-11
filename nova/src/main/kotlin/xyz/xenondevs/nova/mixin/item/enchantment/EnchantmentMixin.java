@@ -1,9 +1,13 @@
 package xyz.xenondevs.nova.mixin.item.enchantment;
 
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import net.kyori.adventure.key.Key;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import org.bukkit.craftbukkit.enchantments.CraftEnchantment;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
@@ -13,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xyz.xenondevs.nova.util.item.ItemUtilsKt;
 import xyz.xenondevs.nova.world.item.behavior.Enchantable;
 import xyz.xenondevs.nova.world.item.enchantment.CustomEnchantmentLogic;
+
+import java.util.Objects;
 
 @Mixin(Enchantment.class)
 abstract class EnchantmentMixin {
@@ -30,7 +36,7 @@ abstract class EnchantmentMixin {
         if (novaItem == null)
             return;
         
-        var bukkitEnch = CraftEnchantment.minecraftToBukkit(ench);
+        var bukkitEnch = nova$minecraftEnchantmentToBukkit(ench);
         var enchantable = novaItem.getBehaviorOrNull(Enchantable.class);
         cir.setReturnValue(enchantable != null && enchantable.getPrimaryEnchantments().contains(bukkitEnch));
     }
@@ -60,7 +66,7 @@ abstract class EnchantmentMixin {
         if (novaItem == null)
             return null;
         
-        var bukkitEnch = CraftEnchantment.minecraftToBukkit(ench);
+        var bukkitEnch = nova$minecraftEnchantmentToBukkit(ench);
         var enchantable = novaItem.getBehaviorOrNull(Enchantable.class);
         return enchantable != null && enchantable.getSupportedEnchantments().contains(bukkitEnch);
     }
@@ -89,13 +95,24 @@ abstract class EnchantmentMixin {
         var celSecond = CustomEnchantmentLogic.customEnchantments.get(second.value());
         
         boolean firstCompatibleWithSecond = celFirst != null 
-            ? celFirst.compatibleWith(second.value()) 
+            ? celFirst.compatibleWith(second) 
             : !first.value().exclusiveSet().contains(second);
         boolean secondCompatibleWithFirst = celSecond != null
-            ? celSecond.compatibleWith(first.value())
+            ? celSecond.compatibleWith(first)
             : !second.value().exclusiveSet().contains(first);
         
         return firstCompatibleWithSecond && secondCompatibleWithFirst;
+    }
+    
+    @Unique
+    private org.bukkit.enchantments.Enchantment nova$minecraftEnchantmentToBukkit(Enchantment enchantment) {
+        var id = MinecraftServer.getServer().registryAccess()
+            .lookupOrThrow(Registries.ENCHANTMENT)
+            .getKey(enchantment);
+        Objects.requireNonNull(id);
+        return RegistryAccess.registryAccess()
+            .getRegistry(RegistryKey.ENCHANTMENT)
+            .get(Key.key(id.getNamespace(), id.getPath()));
     }
     
 }

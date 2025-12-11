@@ -465,9 +465,9 @@ internal object NovaCommand : Command() {
                                 "command.nova.show_block_model_data.display_entity.model",
                                 NamedTextColor.GRAY,
                                 Component.text(model.model.toString(), NamedTextColor.AQUA),
-                                Component.text(transform.translation.toString(format), NamedTextColor.AQUA),
+                                Component.text(Vector3f(transform.translation).toString(format), NamedTextColor.AQUA),
                                 Component.text(leftRotation, NamedTextColor.AQUA),
-                                Component.text(transform.scale.toString(format), NamedTextColor.AQUA),
+                                Component.text(Vector3f(transform.scale).toString(format), NamedTextColor.AQUA),
                                 Component.text(rightRotation, NamedTextColor.AQUA)
                             )
                         }

@@ -47,7 +47,7 @@ internal open class NonNullMetadataEntry<T : Any>(
     
 }
 
-internal class MappedNonNullMetadataEntry<T, R>(
+internal class MappedNonNullMetadataEntry<T, R : Any>(
     private val index: Int,
     private val serializer: EntityDataSerializer<R>,
     private val map: (T) -> R,

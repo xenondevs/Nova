@@ -205,21 +205,6 @@ object EntityUtils {
         return data
     }
     
-    
-    // TODO: merge functions in 0.21
-    /**
-     * Spawns an [BukkitEntity] based on serialized [data] and a [location].
-     *
-     * @param nbtModifier Called before the [BukkitEntity] gets spawned into the world to allow nbt modifications.
-     */
-    @Deprecated("Use deserializeAndSpawn with disallowedEntityTypes parameter instead.", ReplaceWith("deserializeAndSpawn(data, location, spawnReason, disallowedEntityTypes, nbtModifier)"))
-    fun deserializeAndSpawn(
-        data: ByteArray,
-        location: Location,
-        spawnReason: EntitySpawnReason = EntitySpawnReason.MOB_SUMMONED,
-        nbtModifier: ((CompoundTag) -> CompoundTag)? = null
-    ): MojangEntity = deserializeAndSpawn(data, location, spawnReason, DEFAULT_DESERIALIZATION_DISALLOWED_ENTITY_TYPES, nbtModifier)!!
-    
     /**
      * Spawns an [BukkitEntity] based on serialized [data] and a [location], skipping
      * all entities whose [EntityType] or their passengers are in the [disallowedEntityTypes] set.

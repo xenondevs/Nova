@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.api
 
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.data.NamespacedId
 import xyz.xenondevs.nova.api.item.NovaItem
@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.util.item.novaItem
 internal object ApiItemRegistry : NovaItemRegistry {
     
     override fun getOrNull(id: String): NovaItem? {
-        val loc = ResourceLocation.parse(id)
+        val loc = Identifier.parse(id)
         return NovaRegistries.ITEM.getValue(loc)?.let(::ApiItemWrapper)
     }
     

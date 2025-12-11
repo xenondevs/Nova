@@ -9,7 +9,7 @@ import org.bukkit.craftbukkit.entity.CraftFrog
 import org.bukkit.entity.Frog
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.layout.entity.SimpleEntityVariantLayoutBuilder
-import xyz.xenondevs.nova.util.toResourceLocation
+import xyz.xenondevs.nova.util.toIdentifier
 
 class FrogVariantBuilder internal constructor(
     id: Key
@@ -22,6 +22,6 @@ class FrogVariantBuilder internal constructor(
 ) {
     
     override fun build(modelType: Unit, layout: EntityVariantLayout.Simple, spawnConditions: SpawnPrioritySelectors) =
-        FrogVariant(ClientAsset.ResourceTexture(layout.texture.toResourceLocation()), spawnConditions)
+        FrogVariant(ClientAsset.ResourceTexture(layout.texture.toIdentifier()), spawnConditions)
     
 }

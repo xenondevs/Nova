@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.serialization.configurate
 
 import net.kyori.adventure.key.Key
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.bukkit.NamespacedKey
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import xyz.xenondevs.nova.resources.ResourcePath
@@ -35,13 +35,13 @@ internal object NamespacedKeySerializer : ScalarSerializer<NamespacedKey>(Namesp
     
 }
 
-internal object ResourceLocationSerializer : ScalarSerializer<ResourceLocation>(ResourceLocation::class.java) {
+internal object IdentifierSerializer : ScalarSerializer<Identifier>(Identifier::class.java) {
     
-    override fun deserialize(type: Type, obj: Any): ResourceLocation {
-        return ResourceLocation.parse(obj.toString())
+    override fun deserialize(type: Type, obj: Any): Identifier {
+        return Identifier.parse(obj.toString())
     }
     
-    override fun serialize(item: ResourceLocation, typeSupported: Predicate<Class<*>>): Any {
+    override fun serialize(item: Identifier, typeSupported: Predicate<Class<*>>): Any {
         return item.toString()
     }
     

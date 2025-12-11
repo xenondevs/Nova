@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayoutBuilder
 import xyz.xenondevs.nova.resources.builder.task.EntityVariantTask
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
-import xyz.xenondevs.nova.util.toResourceLocation
+import xyz.xenondevs.nova.util.toIdentifier
 
 abstract class EntityVariantBuilder<
     T : Any,
@@ -50,7 +50,7 @@ internal constructor(
      */
     fun texture(modelType: M = defaultModelType, texture: LB.() -> Unit) {
         this.modelType = modelType
-        val key = ResourceKey.create(registryKey, id.toResourceLocation())
+        val key = ResourceKey.create(registryKey, id.toIdentifier())
         EntityVariantTask.queueVariantAssetGeneration(key) {
             makeLayoutBuilder(id.namespace(), it)
                 .apply(texture)
@@ -60,7 +60,7 @@ internal constructor(
     
     @Suppress("UNCHECKED_CAST")
     final override fun build(lookup: RegistryOps.RegistryInfoLookup): NMS {
-        val key = ResourceKey.create(registryKey, id.toResourceLocation())
+        val key = ResourceKey.create(registryKey, id.toIdentifier())
         val layout = ResourceLookups.ENTITY_VARIANT_ASSETS[key]
             ?: throw IllegalStateException("Missing variant assets for $id in lookup")
         val spawnConditions = SpawnConditionsBuilder(lookup).apply(configureSpawnConditions).build()
@@ -69,7 +69,7 @@ internal constructor(
     }
     
     override fun register(): Provider<T> {
-        val key = ResourceKey.create(registryKey, id.toResourceLocation())
+        val key = ResourceKey.create(registryKey, id.toIdentifier())
         UnknownEntityVariants.rememberEntityVariantKey(key)
         return super.register()
     }

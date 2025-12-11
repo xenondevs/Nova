@@ -23,9 +23,9 @@ import net.minecraft.core.Rotations
 import net.minecraft.core.WritableRegistry
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.Packet
+import net.minecraft.resources.Identifier
 import net.minecraft.resources.RegistryOps.RegistryInfoLookup
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -135,22 +135,22 @@ val World.serverLevel: ServerLevel
 val Chunk.levelChunk: LevelChunk
     get() = world.serverLevel.getChunk(x, z)
 
-val NamespacedKey.resourceLocation: ResourceLocation
-    get() = ResourceLocation.fromNamespaceAndPath(namespace, key)
+val NamespacedKey.identifier: Identifier
+    get() = Identifier.fromNamespaceAndPath(namespace, key)
 
-val ResourceLocation.namespacedKey: NamespacedKey
+val Identifier.namespacedKey: NamespacedKey
     get() = NamespacedKey(namespace, path)
 
-fun <C : ResourceType> ResourceLocation.toResourcePath(type: C): ResourcePath<C> =
+fun <C : ResourceType> Identifier.toResourcePath(type: C): ResourcePath<C> =
     ResourcePath(type, namespace, path)
 
-fun Key.toResourceLocation(): ResourceLocation =
-    ResourceLocation.fromNamespaceAndPath(namespace(), value())
+fun Key.toIdentifier(): Identifier =
+    Identifier.fromNamespaceAndPath(namespace(), value())
 
-fun ResourceLocation.toKey(): Key =
+fun Identifier.toKey(): Key =
     Key.key(namespace, path)
 
-fun ResourceLocation.toNamespacedKey(): NamespacedKey =
+fun Identifier.toNamespacedKey(): NamespacedKey =
     NamespacedKey(namespace, path)
 
 val EquipmentSlot.nmsInteractionHand: InteractionHand
@@ -325,6 +325,7 @@ val ItemUseAnimation.nmsItemUseAnimation: MojangItemUseAnimation
         ItemUseAnimation.TOOT_HORN -> MojangItemUseAnimation.TOOT_HORN
         ItemUseAnimation.BRUSH -> MojangItemUseAnimation.BRUSH
         ItemUseAnimation.BUNDLE -> MojangItemUseAnimation.BUNDLE
+        ItemUseAnimation.TRIDENT -> MojangItemUseAnimation.TRIDENT
     }
 
 val Material.nmsBlock: MojangBlock
@@ -458,61 +459,61 @@ fun PlayerList.broadcast(exclude: Player?, location: Location, maxDistance: Doub
 fun PlayerList.broadcast(exclude: Player?, block: Block, maxDistance: Double, packet: Packet<*>) =
     broadcast(exclude?.serverPlayer, block.x.toDouble(), block.y.toDouble(), block.z.toDouble(), maxDistance, block.world.serverLevel.dimension(), packet)
 
-operator fun <T> Registry<T>.get(key: String): Optional<Holder.Reference<T>> {
-    val id = ResourceLocation.tryParse(key) ?: return Optional.empty()
+operator fun <T : Any> Registry<T>.get(key: String): Optional<Holder.Reference<T>> {
+    val id = Identifier.tryParse(key) ?: return Optional.empty()
     return get(id)
 }
 
-fun <T> Registry<T>.getOrNull(key: String): Holder.Reference<T>? {
+fun <T : Any> Registry<T>.getOrNull(key: String): Holder.Reference<T>? {
     return get(key).getOrNull()
 }
 
-fun <T> Registry<T>.getOrNull(id: ResourceLocation): Holder.Reference<T>? {
+fun <T : Any> Registry<T>.getOrNull(id: Identifier): Holder.Reference<T>? {
     return get(id).getOrNull()
 }
 
-fun <T> Registry<T>.getOrNull(key: Key): Holder.Reference<T>? {
-    return getOrNull(ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value()))
+fun <T : Any> Registry<T>.getOrNull(key: Key): Holder.Reference<T>? {
+    return getOrNull(Identifier.fromNamespaceAndPath(key.namespace(), key.value()))
 }
 
-fun <T> Registry<T>.getOrThrow(key: String): Holder<T> {
-    return getOrThrow(ResourceLocation.parse(key))
+fun <T : Any> Registry<T>.getOrThrow(key: String): Holder<T> {
+    return getOrThrow(Identifier.parse(key))
 }
 
-fun <T> Registry<T>.getOrThrow(id: ResourceLocation): Holder<T> {
+fun <T : Any> Registry<T>.getOrThrow(id: Identifier): Holder<T> {
     val key = ResourceKey.create(key(), id)
     return getOrThrow(key)
 }
 
-fun <T> Registry<T>.getOrThrow(key: Key): Holder<T> {
-    return getOrThrow(ResourceLocation.fromNamespaceAndPath(key.namespace(), key.value()))
+fun <T : Any> Registry<T>.getOrThrow(key: Key): Holder<T> {
+    return getOrThrow(Identifier.fromNamespaceAndPath(key.namespace(), key.value()))
 }
 
-fun <T> Registry<T>.getValue(key: String?): T? {
-    return getValue(key?.let(ResourceLocation::parse))
+fun <T : Any> Registry<T>.getValue(key: String?): T? {
+    return getValue(key?.let(Identifier::parse))
 }
 
-fun <T> Registry<T>.getValue(key: Key?): T? {
-    return getValue(key?.toResourceLocation())
+fun <T : Any> Registry<T>.getValue(key: Key?): T? {
+    return getValue(key?.toIdentifier())
 }
 
-fun <T> DefaultedRegistry<T>.getValue(key: String?): T {
-    return getValue(key?.let(ResourceLocation::parse))
+fun <T : Any> DefaultedRegistry<T>.getValue(key: String?): T {
+    return getValue(key?.let(Identifier::parse))
 }
 
-fun <T> DefaultedRegistry<T>.getValue(key: Key?): T {
-    return getValue(key?.toResourceLocation())
+fun <T : Any> DefaultedRegistry<T>.getValue(key: Key?): T {
+    return getValue(key?.toIdentifier())
 }
 
-fun <T> Registry<T>.getValueOrThrow(key: String): T {
-    return getValueOrThrow(ResourceLocation.parse(key))
+fun <T : Any> Registry<T>.getValueOrThrow(key: String): T {
+    return getValueOrThrow(Identifier.parse(key))
 }
 
-fun <T> Registry<T>.getValueOrThrow(id: ResourceLocation): T {
+fun <T : Any> Registry<T>.getValueOrThrow(id: Identifier): T {
     return getOrThrow(ResourceKey.create(key(), id)).value()
 }
 
-fun <T> Registry<T>.getOrCreateHolder(id: ResourceLocation): Holder<T> {
+fun <T : Any> Registry<T>.getOrCreateHolder(id: Identifier): Holder<T> {
     val key = ResourceKey.create(key(), id)
     val holder = get(key)
     
@@ -526,19 +527,19 @@ fun <T> Registry<T>.getOrCreateHolder(id: ResourceLocation): Holder<T> {
 }
 
 operator fun Registry<*>.contains(key: String): Boolean {
-    val id = ResourceLocation.tryParse(key) ?: return false
+    val id = Identifier.tryParse(key) ?: return false
     return containsKey(id)
 }
 
 operator fun Registry<*>.contains(key: Key): Boolean {
-    return containsKey(key.toResourceLocation())
+    return containsKey(key.toIdentifier())
 }
 
 operator fun <T : Any> WritableRegistry<T>.set(name: String, value: T) {
-    register(ResourceKey.create(key(), ResourceLocation.parse(name)), value, RegistrationInfo.BUILT_IN)
+    register(ResourceKey.create(key(), Identifier.parse(name)), value, RegistrationInfo.BUILT_IN)
 }
 
-operator fun <T : Any> WritableRegistry<T>.set(id: ResourceLocation, value: T) {
+operator fun <T : Any> WritableRegistry<T>.set(id: Identifier, value: T) {
     register(ResourceKey.create(key(), id), value, RegistrationInfo.BUILT_IN)
 }
 
@@ -547,36 +548,36 @@ operator fun <T : Any> WritableRegistry<T>.set(key: ResourceKey<T>, value: T) {
 }
 
 operator fun <T : Any> WritableRegistry<T>.set(addon: Addon, key: String, value: T) {
-    register(ResourceKey.create(key(), ResourceLocation(addon, key)), value, RegistrationInfo.BUILT_IN)
+    register(ResourceKey.create(key(), Identifier(addon, key)), value, RegistrationInfo.BUILT_IN)
 }
 
 operator fun <T : Any> WritableRegistry<T>.set(key: Key, value: T) {
-    register(key.toResourceLocation(), value)
+    register(key.toIdentifier(), value)
 }
 
-fun <T : Any> WritableRegistry<T>.register(id: ResourceLocation, value: T): Holder.Reference<T> {
+fun <T : Any> WritableRegistry<T>.register(id: Identifier, value: T): Holder.Reference<T> {
     return register(ResourceKey.create(key(), id), value, RegistrationInfo.BUILT_IN)
 }
 
 fun <T : Any> WritableRegistry<T>.register(id: Key, value: T): Holder.Reference<T> {
-    return register(id.toResourceLocation(), value)
+    return register(id.toIdentifier(), value)
 }
 
-fun <T> Registry<T>.toHolderMap(): Map<ResourceLocation, Holder<T>> {
-    val map = HashMap<ResourceLocation, Holder<T>>()
+fun <T : Any> Registry<T>.toHolderMap(): Map<Identifier, Holder<T>> {
+    val map = HashMap<Identifier, Holder<T>>()
     for (key in registryKeySet()) {
         val holderOptional = get(key)
         if (holderOptional.isEmpty)
             continue
         
-        map[key.location()] = holderOptional.get()
+        map[key.identifier()] = holderOptional.get()
     }
     
     return map
 }
 
-fun <T> Registry<T>.toMap(): Map<ResourceLocation, T> {
-    val map = HashMap<ResourceLocation, T>()
+fun <T : Any> Registry<T>.toMap(): Map<Identifier, T> {
+    val map = HashMap<Identifier, T>()
     for (key in registryKeySet()) {
         val holderOptional = get(key)
         if (holderOptional.isEmpty)
@@ -586,45 +587,45 @@ fun <T> Registry<T>.toMap(): Map<ResourceLocation, T> {
         if (!holder.isBound)
             continue
         
-        map[key.location()] = holder.value()
+        map[key.identifier()] = holder.value()
     }
     
     return map
 }
 
-operator fun <T> ResourceKey<Registry<T>>.get(key: ResourceKey<T>): Holder.Reference<T>? {
+operator fun <T : Any> ResourceKey<Registry<T>>.get(key: ResourceKey<T>): Holder.Reference<T>? {
     return REGISTRY_ACCESS.get(key).getOrNull()
 }
 
-operator fun <T> ResourceKey<Registry<T>>.get(id: ResourceLocation): Holder.Reference<T>? {
-    return get(ResourceKey.create<T>(this, id))
+operator fun <T : Any> ResourceKey<Registry<T>>.get(id: Identifier): Holder.Reference<T>? {
+    return get(ResourceKey.create(this, id))
 }
 
-operator fun <T> ResourceKey<Registry<T>>.get(id: String): Holder.Reference<T>? {
-    return get(ResourceLocation.parse(id))
+operator fun <T : Any> ResourceKey<Registry<T>>.get(id: String): Holder.Reference<T>? {
+    return get(Identifier.parse(id))
 }
 
-fun <T> ResourceKey<Registry<T>>.getOrThrow(key: ResourceKey<T>): Holder.Reference<T> {
+fun <T : Any> ResourceKey<Registry<T>>.getOrThrow(key: ResourceKey<T>): Holder.Reference<T> {
     return REGISTRY_ACCESS.get(key).get()
 }
 
-fun <T> ResourceKey<Registry<T>>.getOrThrow(id: ResourceLocation): Holder.Reference<T> {
+fun <T : Any> ResourceKey<Registry<T>>.getOrThrow(id: Identifier): Holder.Reference<T> {
     return REGISTRY_ACCESS.get(ResourceKey.create<T>(this, id)).get()
 }
 
-fun <T> ResourceKey<Registry<T>>.getOrThrow(id: Key): Holder.Reference<T> {
-    return getOrThrow(id.toResourceLocation())
+fun <T : Any> ResourceKey<Registry<T>>.getOrThrow(id: Key): Holder.Reference<T> {
+    return getOrThrow(id.toIdentifier())
 }
 
-fun <T> ResourceKey<Registry<T>>.getOrThrow(key: String): Holder.Reference<T> {
-    return getOrThrow(ResourceLocation.parse(key))
+fun <T : Any> ResourceKey<Registry<T>>.getOrThrow(key: String): Holder.Reference<T> {
+    return getOrThrow(Identifier.parse(key))
 }
 
-fun <T> ResourceKey<Registry<T>>.getValue(id: ResourceLocation): T? {
+fun <T : Any> ResourceKey<Registry<T>>.getValue(id: Identifier): T? {
     return get(id)?.value()
 }
 
-fun <T> ResourceKey<Registry<T>>.getValue(key: String): T? {
+fun <T : Any> ResourceKey<Registry<T>>.getValue(key: String): T? {
     return get(key)?.value()
 }
 
@@ -640,25 +641,25 @@ fun <T : Any> RegistryAccess.getValueOrThrow(key: ResourceKey<T>): T {
     return REGISTRY_ACCESS.get(key).get().value()
 }
 
-fun <T> RegistryInfoLookup.lookupGetterOrThrow(key: ResourceKey<Registry<T>>): HolderGetter<T> {
+fun <T : Any> RegistryInfoLookup.lookupGetterOrThrow(key: ResourceKey<Registry<T>>): HolderGetter<T> {
     return lookup(key).getOrNull()?.getter ?: throw IllegalArgumentException("Registry not found: $key")
 }
 
-fun ResourceLocation.toString(separator: String): String {
+fun Identifier.toString(separator: String): String {
     return namespace + separator + path
 }
 
-fun ResourceLocation(addon: Addon, name: String): ResourceLocation {
-    return ResourceLocation.fromNamespaceAndPath(addon.id, name)
+fun Identifier(addon: Addon, name: String): Identifier {
+    return Identifier.fromNamespaceAndPath(addon.id, name)
 }
 
-fun <T> io.papermc.paper.registry.tag.TagKey<*>.toNmsTagKey(registry: ResourceKey<out Registry<T>>): TagKey<T> =
-    TagKey.create(registry, key().toResourceLocation())
+fun <T : Any> io.papermc.paper.registry.tag.TagKey<*>.toNmsTagKey(registry: ResourceKey<out Registry<T>>): TagKey<T> =
+    TagKey.create(registry, key().toIdentifier())
 
-fun <T> TypedKey<*>.toResourceKey(registry: ResourceKey<out Registry<T>>): ResourceKey<T> =
-    ResourceKey.create(registry, key().toResourceLocation())
+fun <T : Any> TypedKey<*>.toResourceKey(registry: ResourceKey<out Registry<T>>): ResourceKey<T> =
+    ResourceKey.create(registry, key().toIdentifier())
 
-fun <T> Iterable<TypedKey<*>>.toHolderSet(
+fun <T : Any> Iterable<TypedKey<*>>.toHolderSet(
     registryKey: ResourceKey<out Registry<T>>,
     registry: HolderGetter<T>
 ): HolderSet<T> {
@@ -667,8 +668,8 @@ fun <T> Iterable<TypedKey<*>>.toHolderSet(
         .let { HolderSet.direct(it) }
 }
 
-fun <T> RegistryKeySet<*>.toNmsHolderSet(
-    registryKey: ResourceKey<out Registry<T>>, 
+fun <T : Any> RegistryKeySet<*>.toNmsHolderSet(
+    registryKey: ResourceKey<out Registry<T>>,
     registry: HolderGetter<T>
 ): HolderSet<T> {
     return when (this) {

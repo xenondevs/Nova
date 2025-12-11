@@ -18,7 +18,7 @@ abstract class PlayerMixin {
     @Definition(id = "is", method = "Lnet/minecraft/world/item/ItemStack;is(Lnet/minecraft/tags/TagKey;)Z")
     @Definition(id = "SWORDS", field = "Lnet/minecraft/tags/ItemTags;SWORDS:Lnet/minecraft/tags/TagKey;")
     @Expression("?.is(SWORDS)")
-    @Redirect(method = "attack", at = @At("MIXINEXTRAS:EXPRESSION"))
+    @Redirect(method = "isSweepAttack", at = @At("MIXINEXTRAS:EXPRESSION"))
     private boolean canDoSweepAttack(ItemStack stack, TagKey<Item> swords) {
         var novaItem = ItemUtilsKt.getNovaItem(stack);
         if (novaItem != null) {
