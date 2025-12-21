@@ -63,7 +63,10 @@ class DtoSerializationTest {
         weakRoundTrip<Model>("assets/minecraft/models/")
     }
     
-    // TODO: round trip test item model definitions
+    @Test
+    fun itemModelDefinitionsRoundTrip() {
+        roundTrip<ItemModelDefinition>("assets/minecraft/items/")
+    }
     
     private inline fun <reified T> roundTrip(dir: String) {
         val base = assets.resolve(dir)
