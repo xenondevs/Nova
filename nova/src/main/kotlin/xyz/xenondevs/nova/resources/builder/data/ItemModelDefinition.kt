@@ -297,6 +297,32 @@ sealed interface ItemModel {
             ) : SpecialModel
             
             @Serializable
+            @SerialName("minecraft:copper_golem_statue")
+            data class CopperGolemStatue(
+                val pose: Pose,
+                val texture: ResourcePath<ResourceType.CopperGolemStatueTexture>
+            ) : SpecialModel {
+                
+                @Serializable
+                enum class Pose {
+                    
+                    @SerialName("sitting")
+                    SITTING,
+                    
+                    @SerialName("running")
+                    RUNNING,
+                    
+                    @SerialName("star")
+                    STAR,
+                    
+                    @SerialName("standing")
+                    STANDING
+                    
+                }
+                
+            }
+            
+            @Serializable
             @SerialName("minecraft:decorated_pot")
             data object DecoratedPot : SpecialModel
             

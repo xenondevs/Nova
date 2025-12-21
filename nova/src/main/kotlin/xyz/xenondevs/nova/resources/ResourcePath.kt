@@ -282,11 +282,23 @@ sealed interface ResourceType {
     
     /**
      * Particle textures
+     * 
      * path: `textures/particle/`, extension: `png`
      */
     @Serializable
     data object ParticleTexture : PngFile {
         override val prefix = "textures/particle/"
+    }
+    
+    /**
+     * Copper golem statue textures. Assumed to contain the file extension `.png` inside [ResourcePath.path].
+     * 
+     * path: `textures/`, extension: none
+     */
+    @Serializable
+    data object CopperGolemStatueTexture : PngFile {
+        override val prefix = "textures/"
+        override val suffix = ""
     }
     
     /**
