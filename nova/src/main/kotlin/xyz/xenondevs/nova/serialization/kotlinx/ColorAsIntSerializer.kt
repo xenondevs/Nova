@@ -16,7 +16,7 @@ internal object ColorAsIntSerializer : KSerializer<Color> {
     }
     
     override fun deserialize(decoder: Decoder): Color {
-        return Color(decoder.decodeInt())
+        return Color(decoder.decodeInt(), true)
     }
     
 }
