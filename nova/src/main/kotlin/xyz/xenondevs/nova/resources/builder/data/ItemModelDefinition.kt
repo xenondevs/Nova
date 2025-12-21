@@ -28,7 +28,9 @@ data class ItemModelDefinition(
     @SerialName("hand_animation_on_swap")
     val handAnimationOnSwap: Boolean = true,
     @SerialName("oversized_in_gui")
-    val oversizedInGui: Boolean = false
+    val oversizedInGui: Boolean = false,
+    @SerialName("swap_animation_scale")
+    val swapAnimationScale: Double = 1.0
 )
 
 /**
