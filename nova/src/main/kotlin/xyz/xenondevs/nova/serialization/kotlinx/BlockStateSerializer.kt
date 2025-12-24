@@ -27,14 +27,16 @@ internal object BlockStateSerializer : KSerializer<BlockState> {
         encoder.encodeStructure(descriptor) {
             encodeSerializableElement(descriptor, 0, BlockSerializer, value.block)
             
-            val map = value.values as Map<Property<Any>, Comparable<Any>>
             encodeSerializableElement(
                 descriptor, 1,
                 MapSerializer(String.serializer(), String.serializer()),
-                map.entries.associate { (property, value) -> property.name to property.getName(value as Any) }
+                value.values.entries.associate { (property, value) -> stringifyPropertyValue(property, value) }
             )
         }
     }
+    
+    private fun <T: Comparable<T>> stringifyPropertyValue(prop: Property<T>, value: Any): Pair<String, String> =
+        prop.name to prop.getName(value as T)
     
     override fun deserialize(decoder: Decoder): BlockState {
         return decoder.decodeStructure(descriptor) {
