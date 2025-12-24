@@ -16,6 +16,12 @@ dependencies {
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
 gradlePlugin {
     plugins {
         create("bundler-jar-plugin") {
