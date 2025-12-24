@@ -429,7 +429,7 @@ data class Model(
             return AABBd()
         
         val min = Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE)
-        val max = Vector3d(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE)
+        val max = Vector3d(-Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE)
         for (element in elements) {
             min.min(element.from)
             max.max(element.to)

@@ -19,7 +19,8 @@ import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.ui.overlay.MovedFonts
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
-import xyz.xenondevs.nova.util.component.adventure.charsIterator
+import xyz.xenondevs.nova.util.component.adventure.StyledElement
+import xyz.xenondevs.nova.util.component.adventure.elements
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.moveToStart
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
@@ -128,10 +129,10 @@ internal object VanillaGuiTextureInjector : PacketListener {
     
     private fun findGuiTexture(title: Component): GuiTexture? {
         var guiTexture: FontChar? = null
-        for (char in title.charsIterator()) {
-            val font = char.style.font()
-            if (font?.toString()?.startsWith("nova:gui_") == true) {
-                guiTexture = FontChar(font, char.char.code)
+        for (el in title.elements()) {
+            val font = el.style.font()
+            if (el is StyledElement.CodePoint && font?.toString()?.startsWith("nova:gui_") == true) {
+                guiTexture = FontChar(font, el.codePoint)
                 break
             }
         }

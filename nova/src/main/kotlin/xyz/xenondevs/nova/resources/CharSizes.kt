@@ -16,7 +16,8 @@ import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.util.component.adventure.chars
+import xyz.xenondevs.nova.util.component.adventure.StyledElement
+import xyz.xenondevs.nova.util.component.adventure.elements
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.nio.ByteBuffer
@@ -41,12 +42,6 @@ data class ComponentSize(
     val width: Float,
     // TODO: xRange
     val yRange: ClosedRange<Float>,
-)
-
-data class CharOptions(
-    val char: Char,
-    val font: String,
-    val isBold: Boolean
 )
 
 @InternalInit(
@@ -103,44 +98,39 @@ object CharSizes {
      * Calculates the [ComponentSize] of the given [component] under [lang].
      */
     fun calculateComponentSize(component: Component, lang: String): ComponentSize {
-        return componentCache.get(component to lang) {
-            calculateComponentSize(
-                component.chars(lang)
-                    .map {
-                        CharOptions(
-                            it.char,
-                            it.style.font()?.asString() ?: "minecraft:default",
-                            it.style.hasDecoration(TextDecoration.BOLD)
-                        )
-                    }
-            )
-        }
+        return componentCache.get(component to lang) { calculateComponentSize(component.elements(lang)) }
     }
     
     /**
-     * Calculates the [ComponentSize] from a sequence of [CharOptions].
+     * Calculates the [ComponentSize] from a sequence of [StyledElements][StyledElement].
      */
-    fun calculateComponentSize(chars: Sequence<CharOptions>): ComponentSize {
+    fun calculateComponentSize(elements: Sequence<StyledElement>): ComponentSize {
         var width = 0f
         
         var yRangeMin = Float.MAX_VALUE
-        var yRangeMax = Float.MIN_VALUE
+        var yRangeMax = -Float.MAX_VALUE
         
-        chars.forEach { (char, font, isBold) ->
-            val fontKey = Key.key(font)
-            
-            // x
-            var charWidth = getCharWidth(fontKey, char)
-            if (isBold) charWidth += 1
-            width += charWidth
-            
-            // y
-            val yRange = getCharYRange(fontKey, char)
-            val charMinY = yRange.start
-            val charMaxY = yRange.endInclusive
-            
-            if (charMinY < yRangeMin) yRangeMin = charMinY
-            if (charMaxY > yRangeMax) yRangeMax = charMaxY
+        for (element in elements) {
+            if (element is StyledElement.CodePoint) {
+                val fontKey = element.style.font() ?: Key.key("minecraft", "default")
+                
+                // x
+                var charWidth = getCharWidth(fontKey, element.codePoint)
+                if (element.style.hasDecoration(TextDecoration.BOLD)) charWidth += 1
+                width += charWidth
+                
+                // y
+                val yRange = getCharYRange(fontKey, element.codePoint)
+                val charMinY = yRange.start
+                val charMaxY = yRange.endInclusive
+                
+                if (charMinY < yRangeMin) yRangeMin = charMinY
+                if (charMaxY > yRangeMax) yRangeMax = charMaxY
+            } else if (element is StyledElement.Object) {
+                width += 8
+                if (-8f < yRangeMin) yRangeMin = -8f
+                if (-1f > yRangeMax) yRangeMax = -1f
+            }
         }
         
         return ComponentSize(width, yRangeMin..yRangeMax)
