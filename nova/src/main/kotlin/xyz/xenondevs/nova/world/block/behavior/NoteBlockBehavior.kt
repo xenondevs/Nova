@@ -24,6 +24,7 @@ import xyz.xenondevs.nova.util.particle.particle
 import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.NOTE_BLOCK_NOTE
@@ -40,20 +41,21 @@ private val PITCH_TABLE: FloatArray = floatArrayOf(
 
 internal object NoteBlockBehavior : BlockBehavior {
     
-    override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
-        if (ctx[BlockInteract.SOURCE_PLAYER]?.isSneaking == true)
-            return false
-        
+    override fun useItemOn(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult {
+        // if held item is a top instrument, do item use (block placing) instead
         val clickedFace = ctx[BlockInteract.CLICKED_BLOCK_FACE]
-        val item = ctx[BlockInteract.INTERACTION_ITEM_STACK]
+        val item = ctx[BlockInteract.HELD_ITEM_STACK]
+        if (item.novaItem == null && Tag.ITEMS_NOTEBLOCK_TOP_INSTRUMENTS.isTagged(item.type) && clickedFace == BlockFace.UP)
+            return InteractionResult.Pass
         
-        if (item != null && item.novaItem == null && Tag.ITEMS_NOTEBLOCK_TOP_INSTRUMENTS.isTagged(item.type) && clickedFace == BlockFace.UP)
-            return false
-        
+        return use(pos, state, ctx)
+    }
+    
+    override fun use(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult {
         cycleNote(pos, state)
         playNote(pos, state)
         
-        return true
+        return InteractionResult.Success()
     }
     
     override fun handleAttack(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {

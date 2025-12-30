@@ -21,7 +21,7 @@ import kotlin.math.ceil
  */
 object NoHandAnimationWhileHolding : ItemBehavior {
     
-    private val updateTasks: MutableMap<Player, BukkitTask> = PlayerMapManager.create()
+    private val updateTasks: MutableMap<Player, BukkitTask> = PlayerMapManager.createMap()
     
     override fun handleEquip(player: Player, itemStack: ItemStack, slot: EquipmentSlot, equipped: Boolean, event: EntityEquipmentChangedEvent) {
         if (!slot.isHand)

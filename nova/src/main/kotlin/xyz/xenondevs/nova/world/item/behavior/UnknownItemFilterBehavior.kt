@@ -4,37 +4,34 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
-import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.retrieveData
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.item.DefaultItems
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
+import xyz.xenondevs.nova.world.item.ItemAction
 
 private val ID_KEY = Key.key("nova", "unknown_item_filter_original_id")
 private val DATA_KEY = Key.key("nova", "unknown_item_filter_original_data")
 
 internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<UnknownItemFilter> {
     
-    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        val event = wrappedEvent.event
-        
-        val data = itemStack.novaCompound ?: return
-        val filterType = NovaRegistries.ITEM_FILTER_TYPE.getValue(data.get<Key>(ID_KEY)) ?: return
+    override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {
+        val data = itemStack.novaCompound ?: return InteractionResult.Pass
+        val filterType = NovaRegistries.ITEM_FILTER_TYPE.getValue(data.get<Key>(ID_KEY)) ?: return InteractionResult.Pass
         val filterStack = filterType.deserialize(data.get<Compound>(DATA_KEY)!!)
             .toItemStack()
             .apply { amount = itemStack.amount }
         
-        player.inventory.setItem(event.hand!!, filterStack)
-        
-        event.isCancelled = true
-        wrappedEvent.actionPerformed = true
+        return InteractionResult.Success(swing = true, action = ItemAction.ConvertStack(filterStack))
     }
     
     override fun getFilter(itemStack: ItemStack): UnknownItemFilter {

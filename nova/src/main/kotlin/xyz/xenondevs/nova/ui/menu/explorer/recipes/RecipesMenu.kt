@@ -36,7 +36,7 @@ import java.util.*
  * and returns whether the attempt was successful, i.e. if there were any recipes for the item.
  */
 fun Player.showRecipes(item: ItemStack): Boolean =
-    showRecipes(ItemUtils.getId(item))
+    showRecipes(ItemUtils.getId(item).toString())
 
 /**
  * Tries to open the recipe explorer for the recipes for [id],
@@ -50,7 +50,7 @@ fun Player.showRecipes(id: String): Boolean =
  * and returns whether the attempt was successful, i.e. if there were any usages for the item.
  */
 fun Player.showUsages(item: ItemStack): Boolean =
-    showUsages(ItemUtils.getId(item))
+    showUsages(ItemUtils.getId(item).toString())
 
 /**
  * Tries to open the recipe explorer for the usages for [id],
@@ -164,8 +164,8 @@ internal class RecipesMenu(
     companion object {
         
         private const val HISTORY_SIZE = 10
-        private val history: MutableMap<Player, MutableList<RecipesMenu>> = PlayerMapManager.create()
-        private val active: MutableMap<Player, RecipesMenu> = PlayerMapManager.create()
+        private val history: MutableMap<Player, MutableList<RecipesMenu>> = PlayerMapManager.createMap()
+        private val active: MutableMap<Player, RecipesMenu> = PlayerMapManager.createMap()
         
         /**
          * Adds [menu] to the history of [player].

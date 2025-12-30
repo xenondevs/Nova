@@ -1,8 +1,6 @@
 package xyz.xenondevs.nova.ui.menu.explorer.recipes
 
 import org.bukkit.GameMode
-import org.bukkit.Sound
-import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
@@ -36,7 +34,7 @@ fun createRecipeChoiceItem(itemProviders: List<ItemProvider>): Item =
 internal fun handleRecipeChoiceItemClick(item: Item, click: Click) {
     val player = click.player
     val itemProvider = item.getItemProvider(player)
-    val id = ItemUtils.getId(itemProvider.get())
+    val id = ItemUtils.getId(itemProvider.get()).toString()
     handleRecipeChoiceClick(id, click)
 }
 

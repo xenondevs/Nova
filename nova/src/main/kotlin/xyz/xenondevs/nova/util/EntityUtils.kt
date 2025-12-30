@@ -19,6 +19,11 @@ import org.bukkit.Location
 import org.bukkit.craftbukkit.entity.CraftEntity
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
+import org.joml.Vector2d
+import org.joml.Vector3d
+import org.joml.Vector3dc
+import org.joml.primitives.AABBdc
+import org.joml.primitives.Rayd
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.nova.util.data.NBTUtils
 import xyz.xenondevs.nova.util.item.novaItem
@@ -34,8 +39,6 @@ import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.random.Random
 import net.minecraft.world.entity.Entity as MojangEntity
 import net.minecraft.world.entity.EntityType as NMSEntityType
-import net.minecraft.world.entity.EquipmentSlot as MojangEquipmentSlot
-import net.minecraft.world.entity.LivingEntity as MojangLivingEntity
 import org.bukkit.entity.Entity as BukkitEntity
 import org.bukkit.entity.LivingEntity as BukkitLivingEntity
 import org.bukkit.entity.Player as BukkitPlayer
@@ -49,34 +52,34 @@ val BukkitPlayer.destroyProgress: Double?
     get() = BlockBreaking.getBreaker(this)?.progress?.coerceAtMost(1.0)
 
 /**
- * Damages the item in the [entity's][BukkitLivingEntity] main hand by [damage] amount.
+ * Damages the item in the [entity's][BukkitLivingEntity] main hand by [damage] amount
+ * as if the entity caused it and returns whether the item broke.
  */
-fun BukkitLivingEntity.damageItemInMainHand(damage: Int = 1) {
-    if (damage <= 0)
-        return
-    val nmsEntity = nmsEntity as MojangLivingEntity
-    nmsEntity.mainHandItem.hurtAndBreak(damage, nmsEntity, MojangEquipmentSlot.MAINHAND)
-}
+fun BukkitLivingEntity.damageItemInMainHand(damage: Int = 1): Boolean = damageItemInHand(BukkitEquipmentSlot.HAND, damage)
 
 /**
- * Damages the item in the [entity's][BukkitLivingEntity] offhand by [damage] amount.
+ * Damages the item in the [entity's][BukkitLivingEntity] offhand by [damage] amount
+ * as if the entity caused it and returns whether the item broke.
  */
-fun BukkitLivingEntity.damageItemInOffHand(damage: Int = 1) {
-    if (damage <= 0)
-        return
-    val nmsEntity = nmsEntity as MojangLivingEntity
-    nmsEntity.offhandItem.hurtAndBreak(damage, nmsEntity, MojangEquipmentSlot.OFFHAND)
-}
+fun BukkitLivingEntity.damageItemInOffHand(damage: Int = 1): Boolean =
+    damageItemInHand(BukkitEquipmentSlot.OFF_HAND, damage)
 
 /**
- * Damages the item in the specified [hand] by [damage] amount.
+ * Damages the item in the specified [hand] by [damage] amount
+ * as if the entity caused it and returns whether the item broke.
  */
-fun BukkitLivingEntity.damageItemInHand(hand: BukkitEquipmentSlot, damage: Int = 1) {
-    when (hand) {
-        BukkitEquipmentSlot.HAND -> damageItemInMainHand(damage)
-        BukkitEquipmentSlot.OFF_HAND -> damageItemInOffHand(damage)
-        else -> throw IllegalArgumentException("Not a hand: $hand")
-    }
+fun BukkitLivingEntity.damageItemInHand(hand: BukkitEquipmentSlot, damage: Int = 1): Boolean {
+    if (damage <= 0)
+        return false
+    
+    val itemInHand = nmsEntity.getItemInHand(hand.nmsInteractionHand)
+    var broken = false
+    itemInHand.hurtAndBreak(damage, world.serverLevel, nmsEntity, {
+        nmsEntity.onEquippedItemBroken(it, hand.nmsEquipmentSlot)
+        broken = true
+    }, true)
+    
+    return broken
 }
 
 /**
@@ -90,7 +93,7 @@ fun BukkitLivingEntity.damageToolBreakBlock() = damageToolInMainHand(Damageable:
 fun BukkitLivingEntity.damageToolAttackEntity() = damageToolInMainHand(Damageable::itemDamageOnAttackEntity, VanillaToolCategory::itemDamageOnAttackEntity)
 
 private inline fun BukkitLivingEntity.damageToolInMainHand(getNovaDamage: (Damageable) -> Int, getVanillaDamage: (VanillaToolCategory) -> Int) {
-    val itemStack = (nmsEntity as MojangLivingEntity).mainHandItem
+    val itemStack = nmsEntity.mainHandItem
     val novaItem = itemStack.novaItem
     
     val damage: Int
@@ -129,7 +132,7 @@ val BukkitEntity.eyeInWater: Boolean
 object EntityUtils {
     
     internal val DUMMY_PLAYER = createFakePlayer(Location(Bukkit.getWorlds()[0], 0.0, 0.0, 0.0), UUID.randomUUID(), "Nova Dummy Player")
-    private val DEFAULT_DESERIALIZATION_DISALLOWED_ENTITY_TYPES: Set<EntityType> = buildSet { 
+    private val DEFAULT_DESERIALIZATION_DISALLOWED_ENTITY_TYPES: Set<EntityType> = buildSet {
         add(EntityType.COMMAND_BLOCK_MINECART)
         add(EntityType.FALLING_BLOCK) // command block falling block (for good measure, command doesn't seem to be there after landing)
     }
@@ -265,6 +268,24 @@ object EntityUtils {
         val world = location.world!!.serverLevel
         val gameProfile = GameProfile(uuid, name)
         return FakePlayer(MINECRAFT_SERVER, world, gameProfile, hasEvents)
+    }
+    
+    /**
+     * Assuming an entity at [from] interacted with [target], computes the
+     * interaction location on the [target's][target] [bounding box][BukkitEntity.getBoundingBox],
+     * relative to the [target's][target] [location][BukkitEntity.getLocation].
+     */
+    fun computeInteractionLocation(from: Location, target: BukkitEntity): Vector3d? {
+        val aabb: AABBdc = target.boundingBox.toAabb()
+        val direction: Vector3dc = from.direction.toVector3d()
+        val from: Vector3dc = from.toVector3d()
+        val tValues = Vector2d()
+        if (!aabb.intersectsRay(Rayd(from, direction), tValues))
+            return null
+        val tNear = tValues.x()
+        return from
+            .add(direction.mul(tNear, Vector3d()), Vector3d())
+            .sub(target.location.toVector3d())
     }
     
 }

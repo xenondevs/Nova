@@ -81,3 +81,5 @@ accessible method net/minecraft/world/item/CrossbowItem getShootingPower (Lnet/m
 accessible method net/minecraft/world/item/ProjectileWeaponItem draw (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;)Ljava/util/List;
 accessible method net/minecraft/world/item/ProjectileWeaponItem shoot (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Ljava/util/List;FFZLnet/minecraft/world/entity/LivingEntity;F)V
 accessible method net/minecraft/world/level/levelgen/placement/FixedPlacement <init> (Ljava/util/List;)V
+accessible method net/minecraft/world/item/ItemStack applyAfterUseComponentSideEffects (Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;
+accessible class net/minecraft/server/network/ServerGamePacketListenerImpl$EntityInteraction

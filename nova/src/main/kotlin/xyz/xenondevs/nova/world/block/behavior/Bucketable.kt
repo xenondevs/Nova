@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.util.addToInventoryOrDrop
 import xyz.xenondevs.nova.util.addToInventoryPrioritizedOrDrop
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
@@ -21,7 +22,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.world.format.WorldDataManager
-import xyz.xenondevs.nova.world.player.swingHandEventless
 
 /**
  * Allows filling and emptying fluid containers of [TileEntities][TileEntity]
@@ -29,25 +29,23 @@ import xyz.xenondevs.nova.world.player.swingHandEventless
  */
 object Bucketable : BlockBehavior {
     
-    override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
+    override fun useItemOn(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult {
         val player = ctx[BlockInteract.SOURCE_PLAYER]
-            ?: return false
-        if (player.isSneaking)
-            return false
-        val hand = ctx[BlockInteract.INTERACTION_HAND]
-            ?: return false
+            ?: return InteractionResult.Pass
+        val hand = ctx[BlockInteract.HELD_HAND]
+            ?: return InteractionResult.Pass
         val item = player.inventory.getItem(hand).takeUnlessEmpty()
-            ?: return false
+            ?: return InteractionResult.Pass
         val tileEntity = WorldDataManager.getTileEntity(pos) as? NetworkEndPoint
-            ?: return false
+            ?: return InteractionResult.Pass
         val fluidHolder = tileEntity.holders.firstInstanceOfOrNull<FluidHolder>()
-            ?: return false
+            ?: return InteractionResult.Pass
         val clickedFace = ctx[BlockInteract.CLICKED_BLOCK_FACE]
         
         if (item.type == Material.BUCKET) {
             // move fluid from tile-entity to bucket
             val container = selectContainerExtract(fluidHolder, clickedFace)
-                ?: return false
+                ?: return InteractionResult.Pass
             val fluidType = container.type!!
             container.takeFluid(1000)
             if (player.gameMode != GameMode.CREATIVE)
@@ -59,11 +57,11 @@ object Bucketable : BlockBehavior {
             pos.playSound(sound, 1f, 1f)
         } else {
             val fluidType = FluidType.entries.firstOrNull { it.bucket.type == item.type }
-                ?: return false
+                ?: return InteractionResult.Pass
             
             // move fluid from bucket to tile-entity
             val container = selectContainerInsert(fluidHolder, fluidType, clickedFace)
-                ?: return false
+                ?: return InteractionResult.Pass
             container.addFluid(fluidType, 1000)
             if (player.gameMode != GameMode.CREATIVE)
                 emptyBucketInHand(player, hand)
@@ -74,8 +72,7 @@ object Bucketable : BlockBehavior {
             pos.playSound(sound, 1f, 1f)
         }
         
-        player.swingHandEventless(hand)
-        return true
+        return InteractionResult.Success(swing = true)
     }
     
     private fun selectContainerInsert(fluidHolder: FluidHolder, fluidType: FluidType, clickedFace: BlockFace?): NetworkedFluidContainer? {

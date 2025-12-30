@@ -5,7 +5,6 @@ import org.bukkit.entity.EntityType
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockExplodeEvent
 import org.bukkit.event.block.BlockPistonExtendEvent
 import org.bukkit.event.block.BlockPistonRetractEvent
@@ -13,17 +12,14 @@ import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
-import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.format.WorldDataManager
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.pos
 
 @InternalInit(
@@ -36,36 +32,6 @@ internal object BlockInteracting : Listener, PacketListener {
     private fun init() {
         registerEvents()
         registerPacketListener()
-    }
-    
-    @EventHandler(priority = EventPriority.LOW)
-    fun handleInteract(wrappedEvent: WrappedPlayerInteractEvent) {
-        if (wrappedEvent.actionPerformed)
-            return
-        
-        val event = wrappedEvent.event
-        val player = event.player
-        if (event.action == Action.RIGHT_CLICK_BLOCK) {
-            val pos = event.clickedBlock!!.pos
-            
-            val blockState = WorldDataManager.getBlockState(pos)
-            if (blockState != null && ProtectionManager.canUseBlock(player, event.item, pos)) {
-                val block = blockState.block
-                
-                val ctx = Context.intention(BlockInteract)
-                    .param(BlockInteract.BLOCK_POS, pos)
-                    .param(BlockInteract.BLOCK_TYPE_NOVA, block)
-                    .param(BlockInteract.SOURCE_ENTITY, player)
-                    .param(BlockInteract.CLICKED_BLOCK_FACE, event.blockFace)
-                    .param(BlockInteract.INTERACTION_HAND, event.hand)
-                    .param(BlockInteract.INTERACTION_ITEM_STACK, event.item)
-                    .build()
-                
-                val actionPerformed = block.handleInteract(pos, blockState, ctx)
-                event.isCancelled = actionPerformed
-                wrappedEvent.actionPerformed = actionPerformed
-            }
-        }
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

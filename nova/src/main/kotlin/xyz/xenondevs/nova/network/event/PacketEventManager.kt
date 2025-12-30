@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSystemChatPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAttributesPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundClientEndTickPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClickPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPickItemFromBlockPacketEvent
@@ -38,6 +39,7 @@ import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacke
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSelectBundleItemPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSwingPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundUseItemOnPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundUseItemPacketEvent
 import java.lang.invoke.MethodHandle
 import java.util.concurrent.locks.ReentrantLock
@@ -94,6 +96,8 @@ object PacketEventManager {
         registerPlayerEventType(::ServerboundSelectBundleItemPacketEvent)
         registerPlayerEventType(::ServerboundPickItemFromBlockPacketEvent)
         registerPlayerEventType(::ServerboundSwingPacketEvent)
+        registerPlayerEventType(::ServerboundUseItemOnPacketEvent)
+        registerPlayerEventType(::ServerboundClientEndTickPacketEvent)
     }
     
     private inline fun <reified P : Packet<*>, reified E : PlayerPacketEvent<P>> registerEventType(noinline constructor: (P) -> E) {

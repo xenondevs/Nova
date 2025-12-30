@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.world.player
 
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket
 import net.minecraft.world.InteractionHand
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -26,20 +27,28 @@ import java.util.concurrent.atomic.AtomicInteger
  * Lets the [player][this] swing their main hand without triggering any server-side
  * interaction related events.
  */
-fun Player.swingMainHandEventless() {
-    val packet = ClientboundAnimatePacket(serverPlayer, 0)
-    EventlessHandSwinging.registerDrop(this, true)
-    world.serverLevel.chunkSource.sendToTrackingPlayersAndSelf(serverPlayer, packet)
+fun LivingEntity.swingMainHandEventless() {
+    if (this is Player) {
+        val packet = ClientboundAnimatePacket(serverPlayer, 0)
+        EventlessHandSwinging.registerDrop(this, true)
+        world.serverLevel.chunkSource.sendToTrackingPlayersAndSelf(serverPlayer, packet)
+    } else {
+        swingMainHand()
+    }
 }
 
 /**
  * Lets the [player][this] swing their off-hand without triggering any server-side
  * interaction related events.
  */
-fun Player.swingOffHandEventless() {
-    val packet = ClientboundAnimatePacket(serverPlayer, 3)
-    EventlessHandSwinging.registerDrop(this, false)
-    world.serverLevel.chunkSource.sendToTrackingPlayersAndSelf(serverPlayer, packet)
+fun LivingEntity.swingOffHandEventless() {
+    if (this is Player) {
+        val packet = ClientboundAnimatePacket(serverPlayer, 3)
+        EventlessHandSwinging.registerDrop(this, false)
+        world.serverLevel.chunkSource.sendToTrackingPlayersAndSelf(serverPlayer, packet)
+    } else {
+        swingOffHand()
+    }
 }
 
 /**
@@ -48,7 +57,7 @@ fun Player.swingOffHandEventless() {
  * 
  * @throws IllegalArgumentException if the [hand] is not [EquipmentSlot.HAND] or [EquipmentSlot.OFF_HAND]
  */
-fun Player.swingHandEventless(hand: EquipmentSlot) {
+fun LivingEntity.swingHandEventless(hand: EquipmentSlot) {
     when (hand) {
         EquipmentSlot.HAND -> swingMainHandEventless()
         EquipmentSlot.OFF_HAND -> swingOffHandEventless()

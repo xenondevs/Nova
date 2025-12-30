@@ -7,19 +7,17 @@ import net.minecraft.world.level.block.CampfireBlock
 import net.minecraft.world.level.gameevent.GameEvent
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import org.bukkit.entity.Player
-import org.bukkit.event.block.Action
+import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.util.damageItemInHand
-import xyz.xenondevs.nova.util.nmsState
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.BlockInteract
+import xyz.xenondevs.nova.util.nmsBlockState
+import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.particle.particle
-import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.sendTo
 import xyz.xenondevs.nova.util.serverLevel
-import xyz.xenondevs.nova.util.serverPlayer
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.world.player.swingHandEventless
-import xyz.xenondevs.nova.world.pos
+import xyz.xenondevs.nova.world.InteractionResult
+import xyz.xenondevs.nova.world.item.ItemAction
 import kotlin.random.Random
 
 private const val EXTINGUISH_CAMPFIRE_LEVEL_EVENT = 1009
@@ -29,37 +27,30 @@ private const val EXTINGUISH_CAMPFIRE_LEVEL_EVENT = 1009
  */
 object Extinguishing : ItemBehavior {
     
-    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        if (wrappedEvent.actionPerformed)
-            return
+    override fun useOnBlock(itemStack: ItemStack, block: Block, ctx: Context<BlockInteract>): InteractionResult {
+        val pos = ctx[BlockInteract.BLOCK_POS]
+        val entity = ctx[BlockInteract.SOURCE_LIVING_ENTITY] ?: return InteractionResult.Pass
+        val state = ctx[BlockInteract.BLOCK_STATE_VANILLA]?.nmsBlockState ?: return InteractionResult.Pass
         
-        val event = wrappedEvent.event
-        if (action == Action.RIGHT_CLICK_BLOCK) {
-            val block = event.clickedBlock!!
-            val state = block.nmsState
-            if (state.block == Blocks.CAMPFIRE && state.getValue(CampfireBlock.LIT)) {
-                event.isCancelled = true
-                
-                val serverPlayer = player.serverPlayer
-                val level = block.world.serverLevel
-                val pos = block.pos.nmsPos
-                
-                CampfireBlock.dowse(player.serverPlayer, level, pos, state)
-                displayCampfireExtinguishParticles(
-                    block.location,
-                    if (state.getValue(CampfireBlock.SIGNAL_FIRE)) ParticleTypes.CAMPFIRE_SIGNAL_SMOKE else ParticleTypes.CAMPFIRE_COSY_SMOKE
-                )
-                
-                val newState = state.setValue(CampfireBlock.LIT, false)
-                level.setBlock(pos, newState, 11)
-                level.levelEvent(null, EXTINGUISH_CAMPFIRE_LEVEL_EVENT, pos, 0)
-                level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(serverPlayer, newState))
-                
-                val hand = event.hand!!
-                player.damageItemInHand(hand)
-                runTaskLater(1) { player.swingHandEventless(hand) }
-            }
-        }
+        if (state.block != Blocks.CAMPFIRE || !state.getValue(CampfireBlock.LIT))
+            return InteractionResult.Pass
+        
+        val nmsEntity = entity.nmsEntity
+        val level = pos.world.serverLevel
+        val nmsPos = pos.nmsPos
+        
+        CampfireBlock.dowse(nmsEntity, level, nmsPos, state)
+        displayCampfireExtinguishParticles(
+            pos.location,
+            if (state.getValue(CampfireBlock.SIGNAL_FIRE)) ParticleTypes.CAMPFIRE_SIGNAL_SMOKE else ParticleTypes.CAMPFIRE_COSY_SMOKE
+        )
+        
+        val newState = state.setValue(CampfireBlock.LIT, false)
+        level.setBlock(nmsPos, newState, 11)
+        level.levelEvent(null, EXTINGUISH_CAMPFIRE_LEVEL_EVENT, nmsPos, 0)
+        level.gameEvent(GameEvent.BLOCK_CHANGE, nmsPos, GameEvent.Context.of(nmsEntity, newState))
+        
+        return InteractionResult.Success(swing = true, action = ItemAction.Damage())
     }
     
     private fun displayCampfireExtinguishParticles(loc: Location, type: ParticleType<*>) {

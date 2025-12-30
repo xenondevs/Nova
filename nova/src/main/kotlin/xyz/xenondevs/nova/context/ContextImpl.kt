@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.context
 
+import xyz.xenondevs.commons.collections.removeIf
+
 internal class ContextImpl<I : ContextIntention<I>> private constructor(
     override val intention: I,
     private val explicitParams: Map<ContextParamType<*, I>, Any>,
@@ -15,7 +17,7 @@ internal class ContextImpl<I : ContextIntention<I>> private constructor(
     override operator fun <V : Any> get(paramType: RequiredContextParamType<V, I>): V {
         val result = getParam(paramType)?.let { paramType.copy(it) }
         if (result == null) {
-            require(paramType in intention.required) { "$paramType is not registered as required in $intention"}
+            require(paramType in intention.required) { "$paramType is not registered as required in $intention" }
             throw AssertionError() // otherwise, presence should be verified on .build()
         }
         return result
@@ -49,12 +51,12 @@ internal class ContextImpl<I : ContextIntention<I>> private constructor(
             
             // load params required by autofiller
             val requiredParamValues = Array(requiredParamTypes.size) {
-                getParam(requiredParamTypes[it]) 
+                getParam(requiredParamTypes[it])
                     ?: continue
             }
             
             // run autofiller function
-            value = autofiller.fill(requiredParamValues) 
+            value = autofiller.fill(requiredParamValues)
                 ?: continue
             
             paramType.validate(value)
@@ -66,6 +68,11 @@ internal class ContextImpl<I : ContextIntention<I>> private constructor(
             value = paramType.default
         
         resolvedParams[paramType] = value
+        
+        // remove all remembered resolve failures as they may succeed now that a new value is available
+        if (value != null)
+            resolvedParams.removeIf { it.value == null }
+        
         return value
     }
     

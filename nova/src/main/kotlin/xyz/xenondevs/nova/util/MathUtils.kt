@@ -1,8 +1,11 @@
 package xyz.xenondevs.nova.util
 
+import org.bukkit.util.BoundingBox
 import org.joml.Vector3d
 import org.joml.Vector3dc
 import org.joml.Vector4dc
+import org.joml.primitives.AABBd
+import org.joml.primitives.AABBdc
 import xyz.xenondevs.nova.resources.builder.model.Model
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.abs
@@ -118,6 +121,12 @@ internal operator fun Vector4dc.component3(): Double = z()
  * Returns the [Vector4dc.w] component of [this][Vector4dc].
  */
 internal operator fun Vector4dc.component4(): Double = w()
+
+/**
+ * Converts a Bukkit [BoundingBox] to a JOML [AABBdc].
+ */
+internal fun BoundingBox.toAabb(): AABBdc =
+    AABBd(minX, minY, minZ, maxX, maxY, maxZ)
 
 internal object MathUtils {
     

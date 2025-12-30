@@ -10,21 +10,30 @@ import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.phys.BlockHitResult
 import org.bukkit.Material
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
+import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockSerializer
+import xyz.xenondevs.nova.util.blockFace
+import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorFactory
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
@@ -32,11 +41,15 @@ import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.toNms
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
+import net.minecraft.world.InteractionResult as NmsInteractionResult
+import net.minecraft.world.entity.player.Player as NmsPlayer
+import net.minecraft.world.item.ItemStack as NmsItemStack
 
 /**
- * Represents a block type in Nova.
+ * Represents a custom Nova block type.
  */
 @Serializable(with = NovaBlockSerializer::class)
 open class NovaBlock internal constructor(
@@ -139,7 +152,14 @@ open class NovaBlock internal constructor(
         getBehaviorOrNull(type) ?: throw IllegalStateException("Block $id does not have a behavior of type ${type.simpleName}")
     
     //<editor-fold desc="event methods">
-    suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean = coroutineScope {
+    /**
+     * Checks whether a block of [state] can be placed at [pos] using the given [ctx].
+     */
+    suspend fun canPlace(
+        pos: BlockPos,
+        state: NovaBlockState,
+        ctx: Context<BlockPlace>
+    ): Boolean = coroutineScope {
         if (behaviors.isEmpty())
             return@coroutineScope true
         
@@ -149,75 +169,243 @@ open class NovaBlock internal constructor(
             .all { it }
     }
     
+    /**
+     * Chooses the appropriate [NovaBlockState] for placement given the [ctx].
+     */
     fun chooseBlockState(ctx: Context<BlockPlace>): NovaBlockState {
         return defaultBlockState.tree?.get(ctx) ?: defaultBlockState
     }
     
-    fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
-        checkServerThread()
-        for (behavior in behaviors) {
-            if (behavior.handleInteract(pos, state, ctx))
-                return true
+    internal fun useItemOnNms(
+        pos: BlockPos,
+        state: NovaBlockState,
+        nmsItemStack: NmsItemStack,
+        nmsPlayer: NmsPlayer,
+        nmsHand: InteractionHand,
+        hitResult: BlockHitResult,
+    ): NmsInteractionResult {
+        // check cooldown since Nova applies cooldowns in all item-use cases
+        if (nmsPlayer.cooldowns.isOnCooldown(nmsItemStack))
+            return NmsInteractionResult.PASS
+        
+        val player = nmsPlayer.bukkitEntity
+        val itemStack = nmsItemStack.asBukkitCopy()
+        val hand = nmsHand.bukkitEquipmentSlot
+        val face = hitResult.direction.blockFace
+        
+        if (player is Player && !ProtectionManager.canUseBlock(player, itemStack, pos))
+            return NmsInteractionResult.FAIL
+        
+        val ctx = Context.intention(BlockInteract)
+            .param(BlockInteract.BLOCK_POS, pos)
+            .param(BlockInteract.BLOCK_STATE_NOVA, state)
+            .param(BlockInteract.SOURCE_ENTITY, player)
+            .param(BlockInteract.HELD_ITEM_STACK, itemStack)
+            .param(BlockInteract.HELD_HAND, hand)
+            .param(BlockInteract.CLICKED_BLOCK_FACE, face)
+            .build()
+        
+        val result = useItemOn(pos, state, ctx)
+        if (result is InteractionResult.Success)
+            result.performActions(player, hand)
+        
+        return when (val nms = result.toNms()) {
+            is NmsInteractionResult.Pass -> NmsInteractionResult.TRY_WITH_EMPTY_HAND
+            else -> nms
         }
-        return false
     }
     
-    fun handleAttack(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {
-        checkServerThread()
+    /**
+     * Uses an item on the block of [state] at [pos].
+     */
+    fun useItemOn(
+        pos: BlockPos,
+        state: NovaBlockState,
+        ctx: Context<BlockInteract>
+    ): InteractionResult = runSafely("use item on", InteractionResult.Fail) {
+        for (behavior in behaviors) {
+            val result = behavior.useItemOn(pos, state, ctx)
+            if (result !is InteractionResult.Pass)
+                return result
+        }
+        return InteractionResult.Pass
+    }
+    
+    internal fun useNms(
+        pos: BlockPos,
+        state: NovaBlockState,
+        nmsPlayer: NmsPlayer,
+        hitResult: BlockHitResult,
+    ): NmsInteractionResult {
+        val player = nmsPlayer.bukkitEntity
+        val face = hitResult.direction.blockFace
+        
+        if (player is Player && !ProtectionManager.canUseBlock(player, null, pos))
+            return NmsInteractionResult.FAIL
+        
+        val ctx = Context.intention(BlockInteract)
+            .param(BlockInteract.BLOCK_POS, pos)
+            .param(BlockInteract.BLOCK_STATE_NOVA, state)
+            .param(BlockInteract.SOURCE_ENTITY, player)
+            .param(BlockInteract.CLICKED_BLOCK_FACE, face)
+            .build()
+        
+        val result = use(pos, state, ctx)
+        if (result is InteractionResult.Success) {
+            require(!result.wasItemInteraction) { "useWithoutItem cannot result in an item interaction" }
+            result.performActions(player, EquipmentSlot.HAND)
+        }
+        return result.toNms()
+    }
+    
+    /**
+     * Uses the block of [state] at [pos] by itself, without using an item.
+     */
+    fun use(
+        pos: BlockPos,
+        state: NovaBlockState,
+        ctx: Context<BlockInteract>
+    ): InteractionResult = runSafely("use", InteractionResult.Fail) {
+        for (behavior in behaviors) {
+            val result = behavior.use(pos, state, ctx)
+            if (result !is InteractionResult.Pass)
+                return result
+        }
+        return InteractionResult.Pass
+    }
+    
+    /**
+     * Handles attack (left-click) on a block of [state] at [pos] with the given [ctx].
+     */
+    fun handleAttack(
+        pos: BlockPos,
+        state: NovaBlockState,
+        ctx: Context<BlockBreak>
+    ): Unit = runSafely("handle attack") {
         behaviors.forEach { it.handleAttack(pos, state, ctx) }
     }
     
-    open fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>) {
-        checkServerThread()
+    /**
+     * Handles the placement of a block of [state] at [pos] with the given [ctx].
+     */
+    open fun handlePlace(
+        pos: BlockPos,
+        state: NovaBlockState,
+        ctx: Context<BlockPlace>
+    ): Unit = runSafely("handle place") {
         state.modelProvider.set(pos)
         behaviors.forEach { it.handlePlace(pos, state, ctx) }
     }
     
-    open fun handleBreak(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {
-        checkServerThread()
+    /**
+     * Handles the destruction of a block of [state] at [pos] with the given [ctx].
+     */
+    open fun handleBreak(
+        pos: BlockPos,
+        state: NovaBlockState,
+        ctx: Context<BlockBreak>
+    ): Unit = runSafely("handle break") {
         state.modelProvider.remove(pos)
         if (state[DefaultBlockStateProperties.WATERLOGGED] == true)
             pos.block.type = Material.WATER
         behaviors.forEach { it.handleBreak(pos, state, ctx) }
     }
     
-    fun handleNeighborChanged(pos: BlockPos, state: NovaBlockState) {
-        checkServerThread()
+    /**
+     * Called when a redstone update happened that may affect this [state] at [pos].
+     */
+    fun handleNeighborChanged(
+        pos: BlockPos,
+        state: NovaBlockState
+    ): Unit = runSafely("handle neighbor changed") {
         behaviors.forEach { it.handleNeighborChanged(pos, state) }
     }
     
-    fun updateShape(pos: BlockPos, state: NovaBlockState, neighborPos: BlockPos): NovaBlockState {
-        checkServerThread()
+    /**
+     * Called when a block at [neighborPos] changed to update the [NovaBlockState] of this [state] at [pos].
+     */
+    fun updateShape(
+        pos: BlockPos,
+        state: NovaBlockState,
+        neighborPos: BlockPos
+    ): NovaBlockState = runSafely("update shape", state) {
         return behaviors.fold(state) { acc, behavior -> behavior.updateShape(pos, acc, neighborPos) }
     }
     
-    fun handleRandomTick(pos: BlockPos, state: NovaBlockState) {
-        checkServerThread()
+    /**
+     * Handles a random tick for a block of [state] at [pos].
+     */
+    fun handleRandomTick(
+        pos: BlockPos,
+        state: NovaBlockState
+    ): Unit = runSafely("handle random tick") {
         behaviors.forEach { it.handleRandomTick(pos, state) }
     }
     
-    fun handleScheduledTick(pos: BlockPos, state: NovaBlockState) {
-        checkServerThread()
+    /**
+     * Handles a scheduled tick for a block of [state] at [pos].
+     */
+    fun handleScheduledTick(
+        pos: BlockPos,
+        state: NovaBlockState
+    ): Unit = runSafely("handle scheduled tick") {
         behaviors.forEach { it.handleScheduledTick(pos, state) }
     }
     
-    fun handleEntityInside(pos: BlockPos, state: NovaBlockState, entity: Entity) {
-        checkServerThread()
+    /**
+     * Called when an [entity] is inside a block of [state] at [pos].
+     */
+    fun handleEntityInside(
+        pos: BlockPos,
+        state: NovaBlockState,
+        entity: Entity
+    ): Unit = runSafely("handle entity inside") {
         return behaviors.forEach { it.handleEntityInside(pos, state, entity) }
     }
     
-    fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {
-        checkServerThread()
+    /**
+     * Retrieves the items that would be dropped when breaking a block of [state] at [pos] with the given [ctx].
+     */
+    fun getDrops(
+        pos: BlockPos,
+        state: NovaBlockState,
+        ctx: Context<BlockBreak>
+    ): List<ItemStack> = runSafely("get drops", emptyList()) {
         return behaviors.flatMap { it.getDrops(pos, state, ctx) }
     }
     
-    fun getExp(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): Int {
-        checkServerThread()
+    /**
+     * Retrieves the amount of experience that would be dropped when breaking a block of [state] at [pos] with the given [ctx].
+     */
+    fun getExp(
+        pos: BlockPos,
+        state: NovaBlockState,
+        ctx: Context<BlockBreak>
+    ): Int = runSafely("get exp", 0) {
         return behaviors.sumOf { it.getExp(pos, state, ctx) }
     }
     
-    fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack? {
+    /**
+     * Chooses the [ItemStack] that should be given to the player when mid-clicking a block of [state] at [pos] with the given [ctx] in creative mode.
+     */
+    fun pickBlockCreative(
+        pos: BlockPos,
+        state: NovaBlockState,
+        ctx: Context<BlockInteract>
+    ): ItemStack? = runSafely("pick block creative", item?.createItemStack()) {
         return behaviors.firstNotNullOfOrNull { it.pickBlockCreative(pos, state, ctx) } ?: item?.createItemStack()
+    }
+    
+    private inline fun runSafely(name: String, run: () -> Unit) = runSafely(name, Unit, run)
+    
+    private inline fun <T> runSafely(name: String, fallback: T, run: () -> T): T {
+        checkServerThread()
+        try {
+            return run()
+        } catch (t: Throwable) {
+            LOGGER.error("Failed to $name for $id", t)
+        }
+        return fallback
     }
     //</editor-fold>
     

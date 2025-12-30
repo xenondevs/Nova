@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
@@ -24,9 +25,9 @@ internal class UnknownNovaBlockState(serializedBlockState: JsonObject) : NovaBlo
 
 internal object UnknownBlockBehavior : BlockBehavior {
     
-    override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
+    override fun use(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult {
         val player = ctx[BlockInteract.SOURCE_PLAYER]
-        if (player != null && !player.isSneaking && player.hasPermission("nova.command.debug") && state is UnknownNovaBlockState) {
+        if (player != null && player.hasPermission("nova.command.debug") && state is UnknownNovaBlockState) {
             player.sendMessage(
                 Component.translatable()
                     .key("block.nova.unknown.message")
@@ -36,9 +37,9 @@ internal object UnknownBlockBehavior : BlockBehavior {
                         Component.text(state.serializedBlockState).color(NamedTextColor.AQUA)
                     ).build()
             )
-            return true
+            return InteractionResult.Success()
         }
-        return false
+        return InteractionResult.Pass
     }
     
     override fun handleBreak(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>) {

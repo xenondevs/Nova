@@ -71,7 +71,7 @@ object RecipeRegistry {
         // add all with bukkit registered recipes
         getBukkitRecipeSequence().forEach {
             val group = RecipeType.of(it)?.group ?: return@forEach
-            val itemKey = getId(it.result)
+            val itemKey = getId(it.result).toString()
             map.getOrPut(itemKey) { hashMapOf() }
                 .getOrPut(group) { mutableListOf() }
                 .add(RecipeContainer(it))
@@ -81,7 +81,7 @@ object RecipeRegistry {
         getCreationNovaRecipeSequence().forEach { recipe ->
             val group = RecipeType.of(recipe)?.group ?: return@forEach
             recipe.getAllResults().forEach { resultStack ->
-                val itemKey = getId(resultStack)
+                val itemKey = getId(resultStack).toString()
                 map.getOrPut(itemKey) { hashMapOf() }
                     .getOrPut(group) { mutableListOf() }
                     .add(RecipeContainer(recipe))
@@ -98,7 +98,7 @@ object RecipeRegistry {
         getBukkitRecipeSequence().forEach { recipe ->
             val group = RecipeType.of(recipe)?.group ?: return@forEach
             recipe.getInputStacks().forEach { inputStack ->
-                val itemKey = getId(inputStack)
+                val itemKey = getId(inputStack).toString()
                 map.getOrPut(itemKey) { hashMapOf() }
                     .getOrPut(group) { LinkedHashSet() }
                     .add(RecipeContainer(recipe))
@@ -109,7 +109,7 @@ object RecipeRegistry {
         getUsageNovaRecipeSequence().forEach { recipe ->
             val group = RecipeType.of(recipe)?.group ?: return@forEach
             recipe.getAllInputs().flatMap { it.getInputStacks() }.forEach { inputStack ->
-                val itemKey = getId(inputStack)
+                val itemKey = getId(inputStack).toString()
                 map.getOrPut(itemKey) { hashMapOf() }
                     .getOrPut(group) { LinkedHashSet() }
                     .add(RecipeContainer(recipe))
