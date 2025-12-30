@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
@@ -132,6 +133,19 @@ abstract class BlockBehaviourBlockStateBaseMixin {
             NovaBootstrapperKt.getLOGGER().error("Failed to handle entity inside for {} at {}", novaState, novaPos, e);
         }
         ci.cancel();
+    }
+    
+    @Inject(
+        method = "canBeReplaced(Lnet/minecraft/world/item/context/BlockPlaceContext;)Z",
+        at = @At("HEAD"),
+        cancellable = true
+    )
+    private void canBeReplaced(BlockPlaceContext useContext, CallbackInfoReturnable<Boolean> cir) {
+        var novaPos = NMSUtilsKt.toNovaPos(useContext.getClickedPos(), useContext.getLevel().getWorld());
+        if (WorldDataManager.INSTANCE.getBlockState(novaPos) == null)
+            return;
+        
+        cir.setReturnValue(false); // no Nova blocks are replaceable for now
     }
     
 }

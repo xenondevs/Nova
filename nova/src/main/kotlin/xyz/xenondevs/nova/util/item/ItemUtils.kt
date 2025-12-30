@@ -339,14 +339,14 @@ object ItemUtils {
     /**
      * Gets the id of the given [itemStack].
      */
-    fun getId(itemStack: ItemStack): String { // TODO: should return Key
+    fun getId(itemStack: ItemStack): Key {
         val novaItem = itemStack.novaItem
-        if (novaItem != null) return novaItem.id.toString()
+        if (novaItem != null) return novaItem.id
         
         val customNameKey = CustomItemServiceManager.getId(itemStack)
-        if (customNameKey != null) return customNameKey
+        if (customNameKey != null) return Key.key(customNameKey)
         
-        return "minecraft:${itemStack.type.name.lowercase()}"
+        return itemStack.type.key()
     }
     
     @Suppress("UNCHECKED_CAST")

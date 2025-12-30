@@ -6,12 +6,9 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
@@ -19,12 +16,16 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.BlockInteract
+import xyz.xenondevs.nova.context.intention.EntityInteract
+import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 
 /**
  * Either [ItemBehavior] or [ItemBehaviorFactory]
@@ -57,14 +58,26 @@ interface ItemBehavior : ItemBehaviorHolder {
         get() = provider(emptyList())
     
     /**
-     * Called when a [PlayerInteractEvent] is fired for an [itemStack] with this behavior.
+     * Uses the [itemStack] with this behavior by itself, without targeting a block or entity.
+     * 
+     * - When clicking on a block, this function is only called if all [useOnBlock] calls return [InteractionResult.Pass].
+     * - When clicking on an entity, this function is only called if all [useOnEntity] calls return [InteractionResult.Pass].
      */
-    fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
+    fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult = InteractionResult.Pass
     
     /**
-     * Called when a [PlayerInteractAtEntityEvent] is fired for an [itemStack] with this behavior.
+     * Uses the [itemStack] with this behavior on the given [block].
+     * 
+     * If all behaviors return [InteractionResult.Pass], [use] will be called.
      */
-    fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
+    fun useOnBlock(itemStack: ItemStack, block: Block, ctx: Context<BlockInteract>): InteractionResult = InteractionResult.Pass
+    
+    /**
+     * Uses the [itemStack] with this behavior on the given [entity].
+     * 
+     * If all behaviors return [InteractionResult.Pass], [use] will be called.
+     */
+    fun useOnEntity(itemStack: ItemStack, entity: Entity, ctx: Context<EntityInteract>): InteractionResult = InteractionResult.Pass
     
     /**
      * Called when an [EntityDamageByEntityEvent] is fired where [player] attacks [attacked] using [itemStack] with this behavior in their main hand.

@@ -260,7 +260,7 @@ object ProtectionManager {
      */
     suspend fun canUseBlock(ctx: Context<BlockInteract>): Boolean {
         val pos = ctx[BlockInteract.BLOCK_POS]
-        val item = ctx[BlockInteract.INTERACTION_ITEM_STACK]
+        val item = ctx[BlockInteract.HELD_ITEM_STACK]
         
         val tileEntity = ctx[BlockInteract.SOURCE_TILE_ENTITY]
         if (tileEntity != null)

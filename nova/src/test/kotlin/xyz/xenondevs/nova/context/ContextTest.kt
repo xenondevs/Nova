@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
-data object TestIntention : AbstractContextIntention<TestIntention>() {
+private data object TestIntention : AbstractContextIntention<TestIntention>() {
     
     val STRING_PARENT = ContextParamType<String, TestIntention>(Key.key("nova", "string_parent"))
     val STRING = RequiredContextParamType<String, TestIntention>(Key.key("nova", "string"))
@@ -18,6 +18,20 @@ data object TestIntention : AbstractContextIntention<TestIntention>() {
         addAutofiller(STRING, Autofiller.from(STRING_PARENT) { it })
         addAutofiller(STRING_LENGTH, Autofiller.from(STRING) { it.length })
         addAutofiller(STRING_LENGTH_AS_STRING, Autofiller.from(STRING_LENGTH) { it.toString() })
+    }
+    
+}
+
+private data object TestIntention2 : AbstractContextIntention<TestIntention2>() {
+    
+    val STRING_SOURCE = ContextParamType<String, TestIntention2>(Key.key("nova", "string_source"))
+    val STRING = ContextParamType<String, TestIntention2>(Key.key("nova", "string"))
+    val STRING_MIRROR = ContextParamType<String, TestIntention2>(Key.key("nova", "string_mirror"))
+    
+    init {
+        addAutofiller(STRING, Autofiller.from(STRING_MIRROR) { it })
+        addAutofiller(STRING_MIRROR, Autofiller.from(STRING) { it } )
+        addAutofiller(STRING, Autofiller.from(STRING_SOURCE) { it } )
     }
     
 }
@@ -79,6 +93,23 @@ class ContextTest {
             .build()
         
         assertEquals("Hello", context[TestIntention.STRING])
+    }
+    
+    @Test
+    fun `test that failing autofiller is not remembered after value becomes available`() {
+        val ctx = Context.intention(TestIntention2)
+            .param(TestIntention2.STRING_SOURCE, "ABC")
+            .build()
+        
+        // When querying STRING, the autofiller will first try STRING_MIRROR, which is not set and cannot be 
+        // filled by STRING as well, setting STRING_MIRROR to null.
+        // Then, STRING queries STRING_SOURCE and copies its value
+        // It is expected that STRING_MIRROR can now correctly retrieve the value from STRING
+        // and does not remember the previous failure
+        
+        assertEquals(ctx[TestIntention2.STRING_SOURCE], "ABC")
+        assertEquals(ctx[TestIntention2.STRING], "ABC")
+        assertEquals(ctx[TestIntention2.STRING_MIRROR], "ABC")
     }
     
 }

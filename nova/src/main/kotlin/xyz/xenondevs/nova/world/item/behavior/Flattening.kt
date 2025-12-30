@@ -3,14 +3,14 @@ package xyz.xenondevs.nova.world.item.behavior
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
-import org.bukkit.entity.Player
-import org.bukkit.event.block.Action
+import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.util.damageItemInMainHand
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.BlockInteract
+import xyz.xenondevs.nova.util.above
 import xyz.xenondevs.nova.util.playSoundNearby
-import xyz.xenondevs.nova.util.runTaskLater
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
-import xyz.xenondevs.nova.world.player.swingHandEventless
+import xyz.xenondevs.nova.world.InteractionResult
+import xyz.xenondevs.nova.world.item.ItemAction
 
 private val FLATTENABLES: Set<Material> = hashSetOf(
     Material.GRASS_BLOCK,
@@ -26,22 +26,14 @@ private val FLATTENABLES: Set<Material> = hashSetOf(
  */
 object Flattening : ItemBehavior {
     
-    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        if (wrappedEvent.actionPerformed)
-            return
+    override fun useOnBlock(itemStack: ItemStack, block: Block, ctx: Context<BlockInteract>): InteractionResult {
+        if (block.type !in FLATTENABLES || !block.above.type.isAir)
+            return InteractionResult.Pass
         
-        val event = wrappedEvent.event
-        if (action == Action.RIGHT_CLICK_BLOCK) {
-            val block = event.clickedBlock!!
-            if (block.type in FLATTENABLES) {
-                event.isCancelled = true
-                
-                block.type = Material.DIRT_PATH
-                block.location.playSoundNearby(Sound.ITEM_SHOVEL_FLATTEN, SoundCategory.BLOCKS, 1f, 1f)
-                player.damageItemInMainHand()
-                runTaskLater(1) { player.swingHandEventless(event.hand!!) }
-            }
-        }
+        block.type = Material.DIRT_PATH
+        block.location.playSoundNearby(Sound.ITEM_SHOVEL_FLATTEN, SoundCategory.BLOCKS, 1f, 1f)
+        
+        return InteractionResult.Success(swing = true, action = ItemAction.Damage())
     }
     
 }

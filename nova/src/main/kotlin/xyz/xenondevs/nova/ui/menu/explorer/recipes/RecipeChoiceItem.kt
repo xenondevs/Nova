@@ -33,7 +33,7 @@ fun createRecipeChoiceItem(itemProviders: List<ItemProvider>): Item =
 internal fun handleRecipeChoiceItemClick(item: Item, click: Click) {
     val player = click.player
     val itemProvider = item.getItemProvider(player)
-    val id = ItemUtils.getId(itemProvider.get())
+    val id = ItemUtils.getId(itemProvider.get()).toString()
     handleRecipeChoiceClick(id, click)
 }
 

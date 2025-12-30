@@ -28,7 +28,7 @@ abstract class ItemStackMixin {
     private void redirectUseTickToNovaBehaviors(Item item, Level level, LivingEntity livingEntity, ItemStack stack, int remainingUseDuration) {
         var novaItem = ItemUtilsKt.getNovaItem(stack);
         if (novaItem != null) {
-            novaItem.handleUseTick$nova(
+            novaItem.handleUseTick(
                 livingEntity.getBukkitLivingEntity(),
                 CraftItemStack.asBukkitCopy(stack),
                 NMSUtilsKt.getBukkitEquipmentSlot(livingEntity.getUsedItemHand()),
@@ -47,7 +47,7 @@ abstract class ItemStackMixin {
         if (novaItem == null)
             return original;
         
-        return novaItem.modifyUseDuration$nova(
+        return novaItem.modifyUseDuration(
             entity.getBukkitLivingEntity(),
             CraftItemStack.asBukkitCopy(thisRef),
             original
@@ -61,12 +61,12 @@ abstract class ItemStackMixin {
         if (novaItem == null)
             return remainder;
         
-        novaItem.handleUseFinished$nova(
+        novaItem.handleUseFinished(
             entity.getBukkitLivingEntity(),
             CraftItemStack.asBukkitCopy(thisRef),
             NMSUtilsKt.getBukkitEquipmentSlot(entity.getUsedItemHand())
         );
-        return CraftItemStack.unwrap(novaItem.modifyUseRemainder$nova(
+        return CraftItemStack.unwrap(novaItem.modifyUseRemainder(
             entity.getBukkitLivingEntity(),
             CraftItemStack.asBukkitCopy(thisRef),
             NMSUtilsKt.getBukkitEquipmentSlot(entity.getUsedItemHand()),
@@ -81,7 +81,7 @@ abstract class ItemStackMixin {
         if (novaItem == null)
             return;
         
-        novaItem.handleUseStopped$nova(
+        novaItem.handleUseStopped(
             livingEntity.getBukkitLivingEntity(),
             CraftItemStack.asBukkitCopy(thisRef),
             NMSUtilsKt.getBukkitEquipmentSlot(livingEntity.getUsedItemHand()),

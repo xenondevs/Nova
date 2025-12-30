@@ -243,7 +243,7 @@ internal class ItemsMenu private constructor(val player: Player) {
     
     companion object {
         
-        private val menus: MutableMap<Player, ItemsMenu> = PlayerMapManager.create()
+        private val menus: MutableMap<Player, ItemsMenu> = PlayerMapManager.createMap()
         
         fun open(player: Player) =
             menus.computeIfAbsent(player, ::ItemsMenu).open()

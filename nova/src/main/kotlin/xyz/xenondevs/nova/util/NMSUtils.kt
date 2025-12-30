@@ -66,6 +66,7 @@ import org.bukkit.entity.Pose
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
+import org.joml.Vector3d
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.resources.ResourcePath
@@ -348,6 +349,9 @@ val BlockState.id: Int
 
 fun MojangBlockPos.toNovaPos(world: World): BlockPos =
     BlockPos(world, x, y, z)
+
+fun Vec3.toVector3d(): Vector3d =
+    Vector3d(x, y, z)
 
 fun Player.send(vararg packets: Packet<*>) {
     val connection = serverPlayer.connection

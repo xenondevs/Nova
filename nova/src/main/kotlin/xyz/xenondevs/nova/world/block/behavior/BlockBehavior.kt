@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 
@@ -30,12 +31,21 @@ interface BlockBehavior : BlockBehaviorHolder {
     suspend fun canPlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>): Boolean = true
     
     /**
-     * Handles interaction (right-click) with a block of [state] at [pos] with the given [ctx].
-     *
-     * Returns whether an interaction has taken place. If an interaction has taken place,
-     * subsequent behaviors will not be called.
+     * Uses the block of [state] at [pos] by itself, without using an item.
+     * 
+     * This function is only called if all [useItemOn] calls return [InteractionResult.Pass].
+     * 
+     * Returning a result with [InteractionResult.Success.wasItemInteraction] not allowed.
+     * For that, use [useItemOn] instead.
      */
-    fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean = false
+    fun use(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult = InteractionResult.Pass
+    
+    /**
+     * Uses an item on the block of [state] at [pos].
+     * 
+     * If all behaviors return [InteractionResult.Pass], [use] will be called.
+     */
+    fun useItemOn(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult = InteractionResult.Pass
     
     /**
      * Handles attack (left-click) on a block of [state] at [pos] with the given [ctx].

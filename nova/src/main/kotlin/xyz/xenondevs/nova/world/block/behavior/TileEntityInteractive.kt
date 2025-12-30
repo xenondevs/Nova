@@ -1,30 +1,25 @@
 package xyz.xenondevs.nova.world.block.behavior
 
-import org.bukkit.entity.Player
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
-import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.format.WorldDataManager
-import xyz.xenondevs.nova.world.player.swingMainHandEventless
 
 /**
- * Delegates interactions to [TileEntity.handleRightClick].
- * Should only be used for tile-entity blocks.
+ * Delegates [BlockBehavior.useItemOn] to [TileEntity.useItemOn] and
+ * [BlockBehavior.use] to [TileEntity.use]
  */
 object TileEntityInteractive : BlockBehavior {
     
-    override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
-        val sourcePlayer = ctx[BlockInteract.SOURCE_ENTITY] as? Player
-        if (sourcePlayer?.isSneaking == true)
-            return false
-        
-        if (sourcePlayer != null)
-            runTask { sourcePlayer.swingMainHandEventless() } // TODO: runTask required?
-        
-        return WorldDataManager.getTileEntity(pos)?.handleRightClick(ctx) ?: false
+    override fun useItemOn(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult {
+        return WorldDataManager.getTileEntity(pos)?.useItemOn(ctx) ?: InteractionResult.Pass
+    }
+    
+    override fun use(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult {
+        return WorldDataManager.getTileEntity(pos)?.use(ctx) ?: InteractionResult.Pass
     }
     
 }

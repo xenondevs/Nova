@@ -14,12 +14,13 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.block.Action
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import xyz.xenondevs.nova.Nova
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.resources.builder.layout.item.ChargedType
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.setCustomModelDataStrings
@@ -27,8 +28,9 @@ import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.InteractionResult
+import xyz.xenondevs.nova.world.item.ItemAction
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -111,9 +113,9 @@ interface CrossbowLogic {
                 ?: return crossbow
             
             crossbowItem.performShooting(
-                entity.nmsEntity.level(), 
-                entity.nmsEntity, 
-                hand.nmsInteractionHand, 
+                entity.nmsEntity.level(),
+                entity.nmsEntity,
+                hand.nmsInteractionHand,
                 crossbow.unwrap(),
                 CrossbowItem.getShootingPower(projectile),
                 1f,
@@ -124,7 +126,7 @@ interface CrossbowLogic {
         }
         
         private fun playSoundIfPresent(entity: LivingEntity, optSound: Optional<Holder<SoundEvent>>) {
-            val sound = optSound.getOrNull() 
+            val sound = optSound.getOrNull()
                 ?: return
             entity.world.serverLevel.playSound(
                 null,
@@ -200,24 +202,21 @@ class Crossbow(
     private val customModelDataOffset: Int = 0
 ) : ItemBehavior {
     
-    override val baseDataComponents = buildDataComponentMapProvider { 
+    override val baseDataComponents = buildDataComponentMapProvider {
         this[DataComponentTypes.CHARGED_PROJECTILES] = chargedProjectiles(emptyList())
     }
     
-    override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        if (wrappedEvent.actionPerformed)
-            return
+    override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {
+        val entity = ctx[ItemUse.SOURCE_LIVING_ENTITY] ?: return InteractionResult.Pass
+        val hand = ctx[ItemUse.HELD_HAND] ?: return InteractionResult.Pass
         
         val projectiles = itemStack.getData(DataComponentTypes.CHARGED_PROJECTILES)?.projectiles()
-        if (projectiles.isNotNullOrEmpty() && action.isRightClick) {
-            wrappedEvent.event.isCancelled = true
-            wrappedEvent.actionPerformed = true
-            
-            val hand = wrappedEvent.event.hand!!
-            val result = logic.shoot(player, hand, itemStack.clone())
-            
-            player.inventory.setItem(hand, result)
+        if (projectiles.isNotNullOrEmpty()) {
+            val result = logic.shoot(entity, hand, itemStack.clone())
+            return InteractionResult.Success(action = ItemAction.ConvertStack(result))
         }
+        
+        return InteractionResult.Pass
     }
     
     override fun modifyUseDuration(entity: LivingEntity, itemStack: ItemStack, duration: Int): Int {
@@ -245,7 +244,7 @@ class Crossbow(
     override fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {
         val projectiles = server.getData(DataComponentTypes.CHARGED_PROJECTILES)?.projectiles()
         if (projectiles.isNotNullOrEmpty()) {
-            client.setCustomModelDataStrings(customModelDataOffset, projectiles.map(ItemUtils::getId))
+            client.setCustomModelDataStrings(customModelDataOffset, projectiles.map { ItemUtils.getId(it).toString() })
         }
         
         return client

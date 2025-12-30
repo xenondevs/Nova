@@ -24,11 +24,12 @@ import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.serialization.DataHolder
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
-import xyz.xenondevs.nova.util.hasInventoryOpen
 import xyz.xenondevs.nova.util.item.storeData
 import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
+import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.tileentity.menu.MenuContainer
@@ -192,22 +193,25 @@ abstract class TileEntity(
     open fun handleTick() = Unit
     
     /**
-     * Handles right-clicking this [TileEntity].
-     *
-     * Might be called twice, once per hand.
-     *
-     * @return If any action was performed.
+     * @see BlockBehavior.useItemOn
      */
-    open fun handleRightClick(ctx: Context<BlockInteract>): Boolean {
+    open fun useItemOn(ctx: Context<BlockInteract>): InteractionResult {
+        return InteractionResult.Pass
+    }
+    
+    /**
+     * @see BlockBehavior.use
+     */
+    open fun use(ctx: Context<BlockInteract>): InteractionResult {
         val player = ctx[BlockInteract.SOURCE_ENTITY] as? Player
-            ?: return false
+            ?: return InteractionResult.Pass
         
-        if (::menuContainer.isInitialized && !player.hasInventoryOpen) {
+        if (::menuContainer.isInitialized) {
             menuContainer.openWindow(player)
-            return true
+            return InteractionResult.Success()
         }
         
-        return false
+        return InteractionResult.Pass
     }
     
     /**

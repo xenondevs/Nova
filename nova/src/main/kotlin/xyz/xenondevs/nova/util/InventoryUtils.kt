@@ -1,14 +1,18 @@
 package xyz.xenondevs.nova.util
 
+import org.bukkit.Location
+import org.bukkit.entity.Item
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
+import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
-import xyz.xenondevs.invui.internal.util.InventoryUtils
 import xyz.xenondevs.invui.inventory.ReferencingInventory
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.UpdateReason
@@ -61,7 +65,7 @@ fun Player.addToInventoryOrDrop(items: List<ItemStack>) {
         val leftover = inventory.addItemCorrectly(it)
         if (leftover > 0) {
             val drop = it.clone().apply { amount = leftover }
-            InventoryUtils.dropItemLikePlayer(this, drop)
+            dropItemLikePlayer(this, drop)
         }
     }
 }
@@ -88,6 +92,24 @@ fun Player.addToInventoryPrioritizedOrDrop(prioritizedSlot: Int, itemStack: Item
         inventory.setItem(prioritizedSlot, itemStack)
     } else {
         addToInventoryOrDrop(itemStack)
+    }
+}
+
+/**
+ * Puts an [ItemStack] on the [prioritizedSlot] or adds it to the [Inventory]
+ * if the given slot is occupied or drops it on the ground if there is not enough space.
+ */
+fun LivingEntity.addToInventoryPrioritizedOrDrop(prioritizedSlot: EquipmentSlot, itemStack: ItemStack) {
+    val inventory = (this as? InventoryHolder)?.inventory
+    val equipment = equipment
+    if (equipment != null && equipment.getItem(prioritizedSlot).isNullOrEmpty()) {
+        equipment.setItem(prioritizedSlot, itemStack)
+    } else {
+        val leftover = inventory?.addItemCorrectly(itemStack) ?: itemStack.amount
+        if (leftover > 0) {
+            val drop = itemStack.clone().apply { amount = leftover }
+            dropItemLikePlayer(this, drop)
+        }
     }
 }
 
@@ -128,3 +150,32 @@ val Player.hasInventoryOpen: Boolean
  * Checks if an [InventoryView] is the player inventory
  */
 fun InventoryView.isPlayerView() = topInventory is CraftingInventory && topInventory.size == 5
+
+/**
+ * Spawns an item like [entity] would drop it.
+ * Also respects [PlayerDropItemEvent] and returns the result.
+ */
+private fun dropItemLikePlayer(entity: LivingEntity, itemStack: ItemStack): Boolean {
+    if (itemStack.isEmpty)
+        return true
+    
+    val location: Location
+    if (entity is Player) {
+        location = entity.location
+        location.add(0.0, 1.5, 0.0) // not the eye location
+    } else {
+        location = entity.eyeLocation
+    }
+    
+    val item = location.getWorld().createEntity<Item?>(location, Item::class.java)
+    item.itemStack = itemStack.clone()
+    item.pickupDelay = 40
+    item.velocity = location.getDirection().multiply(0.35)
+    
+    if (entity !is Player || PlayerDropItemEvent(entity, item).callEvent()) {
+        location.getWorld().addEntity<Item?>(item)
+        return true
+    }
+    
+    return false
+}

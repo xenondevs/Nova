@@ -10,7 +10,6 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
@@ -19,14 +18,12 @@ import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
-import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 
 private val PLAYER_EQUIPMENT_SLOTS = listOf(
     EquipmentSlot.HAND, 
@@ -63,25 +60,6 @@ internal object ItemListener : Listener, PacketListener {
                 novaItem.handleEquipmentTick(player, itemStack.clone(), slot)
             }
         }
-    }
-    
-    @EventHandler(priority = EventPriority.NORMAL)
-    private fun handleInteract(wrappedEvent: WrappedPlayerInteractEvent) {
-        val event = wrappedEvent.event
-        val player = event.player
-        val item = event.item
-        
-        val location = event.clickedBlock?.location ?: player.location
-        if (item == null || !ProtectionManager.canUseItem(player, item, location))
-            return
-        
-        item.novaItem?.handleInteract(event.player, item, event.action, wrappedEvent)
-    }
-    
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private fun handleEntityInteract(event: PlayerInteractAtEntityEvent) {
-        val item = event.player.inventory.getItem(event.hand).takeUnlessEmpty()
-        item?.novaItem?.handleEntityInteract(event.player, item, event.rightClicked, event)
     }
     
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

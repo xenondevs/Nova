@@ -22,7 +22,7 @@ open class ContextParamType<V : Any, I : ContextIntention<I>>(
     val copy: (V) -> V = { it }
 ) {
     
-    override fun equals(other: Any?): Boolean = 
+    override fun equals(other: Any?): Boolean =
         this === other || (other is ContextParamType<*, *> && id == other.id)
     
     override fun hashCode(): Int =
@@ -51,7 +51,7 @@ class DefaultingContextParamType<V : Any, I : ContextIntention<I>>(
  * A context parameter type that is required in the intention it belongs to.
  */
 class RequiredContextParamType<V : Any, I : ContextIntention<I>>(
-    id: Key, 
+    id: Key,
     validate: (V) -> Boolean = { true },
     copy: (V) -> V = { it }
 ) : ContextParamType<V, I>(id, validate, copy)

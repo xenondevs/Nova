@@ -8,6 +8,7 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BackingStateBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
@@ -21,14 +22,12 @@ import xyz.xenondevs.nova.world.player.swingHandEventless
  */
 object Waterloggable : BlockBehavior {
     
-    override fun handleInteract(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): Boolean {
+    override fun useItemOn(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult {
         val player = ctx[BlockInteract.SOURCE_PLAYER]
-            ?: return false
-        if (player.isSneaking)
-            return false
+            ?: return InteractionResult.Pass
         
-        val hand = ctx[BlockInteract.INTERACTION_HAND]
-            ?: return false
+        val hand = ctx[BlockInteract.HELD_HAND]
+            ?: return InteractionResult.Pass
         
         val itemStack = player.inventory.getItem(hand)
         val isWaterlogged = state.getOrThrow(WATERLOGGED)
@@ -42,7 +41,7 @@ object Waterloggable : BlockBehavior {
                 pos.playSound(Sound.ITEM_BUCKET_EMPTY, 1f, 1f)
                 player.swingHandEventless(hand)
             }
-            return true
+            return InteractionResult.Success()
         } else if (isWaterlogged && itemStack.type == Material.BUCKET) {
             BlockUtils.updateBlockState(pos, state.with(WATERLOGGED, false))
             if (player.gameMode != GameMode.CREATIVE) {
@@ -52,10 +51,10 @@ object Waterloggable : BlockBehavior {
                 pos.playSound(Sound.ITEM_BUCKET_FILL, 1f, 1f)
                 player.swingHandEventless(hand)
             }
-            return true
+            return InteractionResult.Success()
         }
         
-        return false
+        return InteractionResult.Pass
     }
     
     override fun handleNeighborChanged(pos: BlockPos, state: NovaBlockState) {

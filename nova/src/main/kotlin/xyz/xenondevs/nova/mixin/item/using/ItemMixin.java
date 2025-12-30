@@ -33,7 +33,7 @@ abstract class ItemMixin {
         if (novaItem == null)
             return;
         
-        var novaUseDuration = novaItem.modifyUseDuration$nova(
+        var novaUseDuration = novaItem.modifyUseDuration(
             player.getBukkitEntity(),
             CraftItemStack.asBukkitCopy(itemStack),
             0
