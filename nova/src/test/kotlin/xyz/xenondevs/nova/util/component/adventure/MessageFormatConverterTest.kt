@@ -1,10 +1,11 @@
-package xyz.xenondevs.nova.i18n
+package xyz.xenondevs.nova.util.component.adventure
 
 import org.junit.jupiter.api.Test
 import java.text.MessageFormat
 import kotlin.test.assertEquals
 
 class MessageFormatConverterTest {
+    
     @Test
     fun `test pattern escaping`() {
         val inputs = listOf(
@@ -56,4 +57,5 @@ class MessageFormatConverterTest {
             assertEquals(expected, output, "Failed for: '$input'")
         }
     }
+    
 }
