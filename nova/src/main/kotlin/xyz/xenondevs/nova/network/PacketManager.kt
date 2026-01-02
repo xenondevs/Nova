@@ -47,7 +47,11 @@ internal object PacketManager {
     }
     
     fun handlePlayerCreated(player: ServerPlayer, connection: Connection) {
-        val handler = connection.channel.pipeline().get(PACKET_HANDLER_NAME) as PacketHandler
+        // May be null if the player disconnects during protocol change,
+        // but ServerConfigurationPacketListener#handleConfigurationFinished still continues. (#693)
+        // In that case it is ok to just not bind the packet handler, as the player is already disconnecting anyway.
+        val handler = connection.channel.pipeline().get(PACKET_HANDLER_NAME) as? PacketHandler
+            ?: return
         handler.player = player.bukkitEntity
         handlers[player.bukkitEntity] = handler
     }
