@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util.data
 
+import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.config.PermanentStorage
@@ -24,19 +25,41 @@ private val PLUGINS_DIR = DATA_FOLDER.parent
 internal object UpdatableFile {
     
     private val fileHashes: HashMap<String, String> = PermanentStorage.retrieve(STORAGE_KEY) ?: HashMap()
+    private val extractions = HashSet<String>()
     
-    internal fun extractIdNamedFromAllAddons(dirName: String) {
+    @DisableFun
+    private fun disable() {
+        PermanentStorage.store(STORAGE_KEY, fileHashes)
+    }
+    
+    fun extractIdNamedFromAllAddons(dirName: String) {
+        extractions += dirName
         for (addon in AddonBootstrapper.addons) {
             addon.file.useZip { zip ->
                 extractAll(
                     zip.resolve(dirName),
                     addon.dataFolder.resolve(dirName)
-                ) { ResourcePath.Companion.isValidPath(it.name) }
+                ) { ResourcePath.isValidPath(it.name) }
             }
         }
     }
     
-    fun extractAll(fromDir: Path, toDir: Path, filter: (Path) -> Boolean) {
+    fun reset(wildcard: String): Int {
+        val regex = WildcardUtils.toRegex(wildcard)
+        var count = 0
+        fileHashes.removeIf { (path, _) -> 
+            val matches = path.matches(regex)
+            if (matches)
+                count++
+            matches
+        }
+        extractions.forEach(::extractIdNamedFromAllAddons)
+        return count
+    }
+    
+    fun getTrackedFilePaths(): Set<String> = fileHashes.keys
+    
+    private fun extractAll(fromDir: Path, toDir: Path, filter: (Path) -> Boolean) {
         val existingPaths = HashSet<Path>()
         fromDir.walk()
             .filter { it.isRegularFile() }
@@ -62,7 +85,7 @@ internal object UpdatableFile {
             }
     }
     
-    fun load(from: Path, to: Path) {
+    private fun load(from: Path, to: Path) {
         val storedHash = getStoredHash(to)
         
         if (to.exists() && storedHash != null) {
@@ -87,26 +110,21 @@ internal object UpdatableFile {
         }
     }
     
-    @DisableFun
-    private fun disable() {
-        PermanentStorage.store(STORAGE_KEY, fileHashes)
-    }
-    
-    fun storeHash(file: Path, hash: ByteArray) {
+    private fun storeHash(file: Path, hash: ByteArray) {
         fileHashes[file.invariantSeparatorsPathString] = hash.encodeBase64()
     }
     
-    fun storeHash(file: Path) {
+    private fun storeHash(file: Path) {
         fileHashes[id(file)] = file.generateMD5Hash().encodeBase64()
     }
     
-    fun getStoredHashString(file: Path): String? =
+    private fun getStoredHashString(file: Path): String? =
         fileHashes[id(file)]
     
-    fun getStoredHash(file: Path): ByteArray? =
+    private fun getStoredHash(file: Path): ByteArray? =
         getStoredHashString(file)?.decodeBase64()
     
-    fun removeStoredHash(file: Path) {
+    private fun removeStoredHash(file: Path) {
         fileHashes -= id(file)
     }
     

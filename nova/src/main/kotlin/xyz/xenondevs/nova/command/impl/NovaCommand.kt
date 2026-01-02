@@ -3,6 +3,7 @@
 package xyz.xenondevs.nova.command.impl
 
 import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import com.mojang.math.Transformation
@@ -38,6 +39,7 @@ import xyz.xenondevs.nova.command.argument.NetworkTypeArgumentType
 import xyz.xenondevs.nova.command.argument.NovaBlockArgumentType
 import xyz.xenondevs.nova.command.argument.NovaItemArgumentType
 import xyz.xenondevs.nova.command.argument.ResourcePackIdArgumentType
+import xyz.xenondevs.nova.command.argument.UpdatableFileSuggestionProvider
 import xyz.xenondevs.nova.command.argument.VanillaBlockArgumentType
 import xyz.xenondevs.nova.command.executes0
 import xyz.xenondevs.nova.command.get
@@ -56,6 +58,7 @@ import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.component.adventure.indent
+import xyz.xenondevs.nova.util.data.UpdatableFile
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.novaItem
@@ -213,6 +216,15 @@ internal object NovaCommand : Command() {
                 .executes0(::reloadConfigs))
             .then(literal("recipes")
                 .executes0(::reloadRecipes)))
+        .then(literal("reset")
+            .requiresPermission("command.nova.reset")
+            .then(literal("file")
+                .then(argument("path", StringArgumentType.greedyString())
+                    .suggests(UpdatableFileSuggestionProvider)
+                    .executes0(::resetFiles)
+                )
+            )
+        )
         .build()
     
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {
@@ -961,6 +973,25 @@ internal object NovaCommand : Command() {
         }
         
         ctx.source.sender.sendMessage(builder.build())
+    }
+    
+    private fun resetFiles(ctx: CommandContext<CommandSourceStack>) {
+        val path: String = ctx["path"]
+        val count = UpdatableFile.reset(path)
+        if (count > 0) {
+            ctx.source.sender.sendMessage(Component.translatable(
+                "command.nova.reset.files.success",
+                NamedTextColor.GRAY,
+                Component.text(count).color(NamedTextColor.AQUA),
+                Component.text(path)
+            ))
+        } else {
+            ctx.source.sender.sendMessage(Component.translatable(
+                "command.nova.reset.files.no_files",
+                NamedTextColor.RED,
+                Component.text(path
+            )))
+        }
     }
     
 }

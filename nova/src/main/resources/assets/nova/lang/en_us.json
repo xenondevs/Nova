@@ -146,6 +146,8 @@
   "command.nova.remove_invalid_vtes.failure": "No invalid vanilla tile-entities were found.",
   "command.nova.list_blocks.success": "Total: %s",
   "command.nova.invalidate_char_sizes.success": "Successfully invalidated all char sizes. They will be recalculated during the next resource pack creation.",
+  "command.nova.reset.files.success": "Successfully reset %s file(s). A server restart or Nova reload is required for the changes to take effect.",
+  "command.nova.reset.files.no_files": "Could not find any files matching the given wildcard.",
   "waila.nova.required_tool": "Tool: ",
   "waila.nova.required_tool.none": "No tool required",
   "waila.nova.required_tool.unbreakable": "Unbreakable",
