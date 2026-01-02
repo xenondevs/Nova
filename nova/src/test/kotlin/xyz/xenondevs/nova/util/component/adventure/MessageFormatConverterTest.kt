@@ -1,14 +1,17 @@
 package xyz.xenondevs.nova.util.component.adventure
 
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import java.text.MessageFormat
 import kotlin.test.assertEquals
 
 class MessageFormatConverterTest {
     
-    @Test
-    fun `test pattern escaping`() {
-        val inputs = listOf(
+    companion object {
+        
+        @JvmStatic
+        fun patternEscapingInputs() = listOf(
             "",
             "Hello World",
             "'",
@@ -19,43 +22,46 @@ class MessageFormatConverterTest {
             "'{{'}}'",
             "'{{'Hello'}}' '{{'World'}}'"
         )
-
-        inputs.forEach { input ->
-            val pattern = MessageFormatConverter.escapeMessageFormatPattern(input)
-            val output = MessageFormat(pattern).format(emptyArray<String>())
-            assertEquals(input, output, "Failed for: '$input'")
-        }
-    }
-
-    @Test
-    fun `test format string to message format conversion`() {
-        val conversions = listOf<Triple<String, List<String>, String>>(
-            // Triple(input, args, expected)
-            Triple("", emptyList(), ""),
-            Triple("Hello World", emptyList(), "Hello World"),
+        
+        @JvmStatic
+        fun formatStringConversionInputs() = listOf(
+            // Arguments(input, args, expected)
+            Arguments.of("", emptyList<String>(), ""),
+            Arguments.of("Hello World", emptyList<String>(), "Hello World"),
             // test excess arguments
-            Triple("Hello World", listOf("A", "B", "C"), "Hello World"),
+            Arguments.of("Hello World", listOf("A", "B", "C"), "Hello World"),
             // test escaping
-            Triple("'Hello' {0} '{{'}}'", emptyList(), "'Hello' {0} '{{'}}'"),
+            Arguments.of("'Hello' {0} '{{'}}'", emptyList<String>(), "'Hello' {0} '{{'}}'"),
             // test placeholder
-            Triple("Hello %s", listOf("World"), "Hello World"),
+            Arguments.of("Hello %s", listOf("World"), "Hello World"),
             // test placeholder with explicit index
-            Triple($$"Hello %s, %1$s, %s", listOf("World", "Universe"), "Hello World, World, Universe"),
+            Arguments.of($$"Hello %s, %1$s, %s", listOf("World", "Universe"), "Hello World, World, Universe"),
             // test literal percentage sign
-            Triple("Percentage: %s%%", listOf("50"), "Percentage: 50%"),
+            Arguments.of("Percentage: %s%%", listOf("50"), "Percentage: 50%"),
             // test invalid placeholders 
-            Triple(
+            Arguments.of(
                 $$"Hello %0$s %-1$s %3.14$s %d",
                 listOf("World", "Universe"),
                 $$"Hello %0$s %-1$s %3.14$s %d"
             )
         )
+        
+    }
+    
+    @ParameterizedTest
+    @MethodSource("patternEscapingInputs")
+    fun `test pattern escaping`(input: String) {
+        val pattern = MessageFormatConverter.escapeMessageFormatPattern(input)
+        val output = MessageFormat(pattern).format(emptyArray<String>())
+        assertEquals(input, output)
+    }
 
-        for ((input, args, expected) in conversions) {
-            val output = MessageFormatConverter.formatStringToMessageFormat(input)
-                .format(args.toTypedArray())
-            assertEquals(expected, output, "Failed for: '$input'")
-        }
+    @ParameterizedTest
+    @MethodSource("formatStringConversionInputs")
+    fun `test format string to message format conversion`(input: String, args: List<String>, expected: String) {
+        val output = MessageFormatConverter.formatStringToMessageFormat(input)
+            .format(args.toTypedArray())
+        assertEquals(expected, output)
     }
     
 }
