@@ -8,15 +8,11 @@ import net.minecraft.network.Connection
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.level.ServerPlayer
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerQuitEvent
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
-import xyz.xenondevs.nova.util.registerEvents
-import java.util.*
+import xyz.xenondevs.nova.util.PlayerMapManager
 import net.minecraft.world.entity.player.Player as MojangPlayer
 
 val Player.packetHandler: PacketHandler?
@@ -39,15 +35,13 @@ private const val INIT_HANDLER_NAME = "nova_init"
 private const val PACKET_HANDLER_NAME = "nova_packet_handler"
 
 @InternalInit(stage = InternalInitStage.POST_WORLD)
-internal object PacketManager : Listener {
+internal object PacketManager {
     
-    val handlers = WeakHashMap<Player, PacketHandler>()
+    val handlers: MutableMap<Player, PacketHandler> = PlayerMapManager.create()
     
     @Suppress("UNCHECKED_CAST")
     @InitFun
     private fun init() {
-        registerEvents()
-        
         MINECRAFT_SERVER.connection.channels.first().channel().pipeline()
             .addFirst("nova_pipeline_adapter", NovaServerChannelBootstrap)
     }
@@ -56,11 +50,6 @@ internal object PacketManager : Listener {
         val handler = connection.channel.pipeline().get(PACKET_HANDLER_NAME) as PacketHandler
         handler.player = player.bukkitEntity
         handlers[player.bukkitEntity] = handler
-    }
-    
-    @EventHandler
-    private fun handleQuit(event: PlayerQuitEvent) {
-        handlers -= event.player
     }
     
     private object NovaServerChannelBootstrap : ChannelInboundHandlerAdapter() {
