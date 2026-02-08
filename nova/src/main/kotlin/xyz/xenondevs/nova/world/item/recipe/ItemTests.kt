@@ -71,15 +71,26 @@ class ComplexTest(override val example: ItemStack) : SingleItemTest {
     
 }
 
-class CustomRecipeChoice(private val tests: List<ItemTest>) : RecipeChoice.ExactChoice(
-    tests.flatMap {
+@Suppress("NonExtendableApiUsage")
+class CustomRecipeChoice(internal val tests: List<ItemTest>) : RecipeChoice {
+    
+    private val _itemStacks: List<ItemStack> = tests.flatMap {
         when (it) {
             is SingleItemTest -> listOf(it.example)
             is MultiItemTest -> it.examples
             else -> throw UnsupportedOperationException()
         }
     }
-) {
+    
+    internal val itemStacks: List<ItemStack>
+        get() = _itemStacks.map(ItemStack::clone)
+    
+    @Deprecated("Deprecated in RecipeChoice")
+    override fun getItemStack(): ItemStack {
+        return itemStacks.getOrNull(0) ?: ItemStack.empty()
+    }
+    
+    override fun clone(): RecipeChoice = this
     
     override fun test(item: ItemStack): Boolean {
         return tests.any { it.test(item) }

@@ -1,8 +1,6 @@
 package xyz.xenondevs.nova.ui.menu.explorer.recipes
 
 import org.bukkit.GameMode
-import org.bukkit.Sound
-import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
@@ -11,13 +9,12 @@ import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.util.addItemCorrectly
+import xyz.xenondevs.nova.util.data.getInputStacks
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.playClickSound
 
 fun createRecipeChoiceItem(recipeChoice: RecipeChoice): Item {
-    val itemProviders = if (recipeChoice is RecipeChoice.MaterialChoice) recipeChoice.choices.map { ItemWrapper(ItemStack(it)) }
-    else (recipeChoice as RecipeChoice.ExactChoice).choices.map(::ItemWrapper)
-    return createRecipeChoiceItem(itemProviders)
+    return createRecipeChoiceItem(recipeChoice.getInputStacks().map { ItemWrapper(it) })
 }
 
 @JvmName("createRecipeChoiceItemItemStacks")

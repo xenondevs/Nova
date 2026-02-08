@@ -14,7 +14,8 @@ import org.bukkit.inventory.StonecuttingRecipe
 import org.bukkit.inventory.recipe.CookingBookCategory
 import org.bukkit.inventory.recipe.CraftingBookCategory
 import xyz.xenondevs.nova.util.unwrap
-import java.util.Optional
+import xyz.xenondevs.nova.world.item.recipe.CustomRecipeChoice
+import java.util.*
 import net.minecraft.world.item.crafting.CookingBookCategory as MojangCookingBookCategory
 import net.minecraft.world.item.crafting.CraftingBookCategory as MojangCraftingBookCategory
 
@@ -37,6 +38,7 @@ fun RecipeChoice.getInputStacks(): List<ItemStack> =
     when (this) {
         is RecipeChoice.MaterialChoice -> choices.map(::ItemStack)
         is RecipeChoice.ExactChoice -> choices
+        is CustomRecipeChoice -> itemStacks
         else -> throw UnsupportedOperationException("Unknown RecipeChoice type: ${javaClass.name}")
     }
 
@@ -47,6 +49,7 @@ internal fun RecipeChoice.toNmsIngredient(): Ingredient =
     when (this) {
         is RecipeChoice.MaterialChoice -> Ingredient.ofStacks(choices.map { ItemStack(it).unwrap().copy() })
         is RecipeChoice.ExactChoice -> Ingredient.ofStacks(choices.map { it.unwrap().copy() })
+        is CustomRecipeChoice -> Ingredient.ofStacks(itemStacks.map { it.unwrap().copy() })
         else -> throw UnsupportedOperationException("Unsupported RecipeChoice type")
     }
 
