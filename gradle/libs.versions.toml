@@ -20,7 +20,7 @@ caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version
 commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "xenondevs-commons" }
 commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "xenondevs-commons" }
 commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "xenondevs-commons" }
-commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version = "2.0.0-alpha.8" }
+commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version = "2.0.0-alpha.9" }
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "xenondevs-commons" }
 commons-version = { group = "xyz.xenondevs.commons", name = "commons-version", version.ref = "xenondevs-commons" }
 cosmic-binary-format = { group = "xyz.xenondevs.cbf", name = "cosmic-binary-format", version = "1.0.0-alpha.3" }
