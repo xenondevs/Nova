@@ -158,5 +158,7 @@
   "command.nova.show_network_node_info.initialized": "Netzwierk initialiséiert: %s",
   "command.nova.show_network_node_info.networks.header": "Netzwierker (%s):",
   "command.nova.show_network_node_info.connected_nodes.header": "Verbindungen (%s):",
-  "command.nova.show_network_node_info.connected_nodes.entry": "Typ: %s, Richtung: %s, Knoten: %s"
+  "command.nova.show_network_node_info.connected_nodes.entry": "Typ: %s, Richtung: %s, Knoten: %s",
+  "command.nova.reset.files.success": "%s Datei(en) goufen erfollegräich zréckgesat. Fir datt d'Ännerungen a Kraaft trieden, ass e Server-Neistart oder e Nova-Neilued erfuerderlech.",
+  "command.nova.reset.files.no_files": "Keng Dateien konnten fonnt ginn, déi dem uginnene Wildcard entspriechen."
 }

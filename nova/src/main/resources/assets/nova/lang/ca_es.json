@@ -158,5 +158,7 @@
   "nova.tile_entity_limits.amount_global_total.deny": "No podeu col·locar més entitats de tessella.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "No podeu col·locar més entitats de tessel·la en aquest món.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "No podeu col·locar més entitats de tessella en aquest chunk.",
-  "nova.outdated_version": "Esteu executant una versió obsoleta de %s.\nSi us plau, descarregueu l'última versió a %s."
+  "nova.outdated_version": "Esteu executant una versió obsoleta de %s.\nSi us plau, descarregueu l'última versió a %s.",
+  "command.nova.reset.files.success": "S'ha reiniciat amb èxit %s fitxers. Cal reiniciar el servidor o recarregar Nova perquè els canvis tinguin efecte.",
+  "command.nova.reset.files.no_files": "No s'han trobat cap fitxer que coincideixi amb el comodí especificat."
 }

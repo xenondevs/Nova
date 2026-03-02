@@ -158,5 +158,7 @@
   "command.nova.show_block_model_data.failure": "कृपया नोवा ब्लॉक को देखें और फिर से प्रयास करें।",
   "command.nova.show_network_node_info.bridge.networks.entry": "प्रकार: %s, आईडी: %s",
   "command.nova.give_clientside_stack.success": "आपकी इन्वेंटरी में %s का क्लाइंट-साइड संस्करण जोड़ा गया।",
-  "command.nova.copy_clientside_stack.success": "आपकी इन्वेंटरी में %s की क्लाइंट-साइड प्रतिलिपि जोड़ी गई।"
+  "command.nova.copy_clientside_stack.success": "आपकी इन्वेंटरी में %s की क्लाइंट-साइड प्रतिलिपि जोड़ी गई।",
+  "command.nova.reset.files.success": "%s फ़ाइल(ओं) को सफलतापूर्वक रीसेट किया गया। परिवर्तनों को प्रभावी होने के लिए सर्वर को पुनः आरंभ करना या Nova को पुनः लोड करना आवश्यक है।",
+  "command.nova.reset.files.no_files": "दिए गए वाइल्डकार्ड से मेल खाने वाली कोई फ़ाइल नहीं मिली।"
 }

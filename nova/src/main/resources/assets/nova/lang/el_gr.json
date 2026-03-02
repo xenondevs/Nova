@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Επεξεργάστηκε %s φύλλα και κατέστησε %s φύλλα μη μόνιμα.",
   "command.nova.show_vanilla_block_state.success": "Βλέπετε την κατάσταση του μπλοκ %s.",
   "command.nova.show_vanilla_block_state.failure": "Παρακαλώ κοιτάξτε ένα μπλοκ και προσπαθήστε ξανά.",
-  "menu.nova.items.player_inventory": "Απογραφή παίκτη"
+  "menu.nova.items.player_inventory": "Απογραφή παίκτη",
+  "command.nova.reset.files.success": "Επαναφορά αρχείων %s με επιτυχία. Απαιτείται επανεκκίνηση του διακομιστή ή επαναφόρτωση του Nova για να τεθούν σε ισχύ οι αλλαγές.",
+  "command.nova.reset.files.no_files": "Δεν μπόρεσε να βρει κανένα αρχείο που να ταιριάζει με το δεδομένο μπαλαντέρ."
 }

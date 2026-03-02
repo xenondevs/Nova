@@ -158,5 +158,7 @@
   "command.nova.show_block_model_data.backing_state": "Энэ %s дараах дэмжих төлөвийн тохиргоог ашиглана:\nБлок: %s\nХувилбар: %s",
   "command.nova.show_block_model_data.display_entity": "Энэ %s дараах дэлгэцийн нэгжийн тохиргоог ашиглана:\nХитбоксын төрөл: %s\nМоделууд (%s):\n%s",
   "command.nova.search_block.done": "Хайлт дууслаа.",
-  "command.nova.recalculate_leave_properties.done": "%s навчийг боловсруулж, %s навроо байнгын бус болгосон."
+  "command.nova.recalculate_leave_properties.done": "%s навчийг боловсруулж, %s навроо байнгын бус болгосон.",
+  "command.nova.reset.files.success": "%s файлуудыг амжилттай дахин тохирууллаа. Өөрчлөлтүүдийг хүчин төгөлдөр болгохын тулд серверийг дахин эхлүүлэх эсвэл Nova-г дахин ачаалах шаардлагатай.",
+  "command.nova.reset.files.no_files": "Өгөгдсөн вайлдкардтай таарч буй ямар ч файлыг олж чадсангүй."
 }

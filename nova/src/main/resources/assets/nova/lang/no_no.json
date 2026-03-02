@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Behandlet %s blader og gjort %s blader ikke-vedvarende.",
   "command.nova.show_vanilla_block_state.success": "Du ser på blokktilstanden %s.",
   "command.nova.show_vanilla_block_state.failure": "Vennligst se på en blokk og prøv igjen.",
-  "menu.nova.items.player_inventory": "Spillerinventar"
+  "menu.nova.items.player_inventory": "Spillerinventar",
+  "command.nova.reset.files.success": "Vellykket tilbakestilling av %s fil(er). En omstart av serveren eller en ny innlasting av Nova er nødvendig for at endringene skal tre i kraft.",
+  "command.nova.reset.files.no_files": "Fant ingen filer som samsvarer med det angitte jokertegnet."
 }

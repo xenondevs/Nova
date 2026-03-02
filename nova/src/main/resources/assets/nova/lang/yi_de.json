@@ -158,5 +158,7 @@
   "command.nova.show_block_model_data.model_less": "דער %s ניצט דעם פאלגנדיקן וואַנילאַ־בלאָק: %s.",
   "command.nova.show_block_model_data.backing_state": "דער %s ניצט די פֿאָלגנדיקע באַקינג־סטעיט קאָנפֿיגוראַציע:\nבלאָק: %s\nוואַריאַנט: %s",
   "command.nova.recalculate_leave_properties.done": "פּראַסעסירט %s בלעטער און געמאכט %s בלעטער ניט-פּערזיסטענט.",
-  "command.nova.recipe.no-recipe": "דער זאַך האָט נישט קיין רעצעפּט."
+  "command.nova.recipe.no-recipe": "דער זאַך האָט נישט קיין רעצעפּט.",
+  "command.nova.reset.files.success": "דער %s טעקע(ס) איז(זענען) מצליח ריסעטירט. אַ סערווער־ריסטאַרט אָדער אַ נאָוואַ־רילאָד איז נייטיק, כדי די ענדערונגען זאָלן ווירקן.",
+  "command.nova.reset.files.no_files": "קען נישט געפֿינען קיין טעקעס וואָס פּאַסן צום געגעבן ווילדקאַרד."
 }

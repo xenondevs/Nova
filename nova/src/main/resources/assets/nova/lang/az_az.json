@@ -158,5 +158,7 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Daha çox tile-entitiləri yerləşdirə bilməzsiniz.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Bu dünyada daha çox tile-entity yerləşdirə bilməzsiniz.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Bu chunkda daha çox tile-entiteti yerləşdirə bilməzsiniz.",
-  "nova.outdated_version": "Siz %s-in köhnəlmiş versiyasını işlədirsiniz.\nZəhmət olmasa ən son versiyanı %s-dən yükləyin."
+  "nova.outdated_version": "Siz %s-in köhnəlmiş versiyasını işlədirsiniz.\nZəhmət olmasa ən son versiyanı %s-dən yükləyin.",
+  "command.nova.reset.files.success": "%s fayl(lar) uğurla sıfırlandı. Dəyişikliklərin qüvvəyə minməsi üçün serveri yenidən başladın və ya Nova-nı yenidən yükləyin.",
+  "command.nova.reset.files.no_files": "Verilmiş vəli kartla uyğun gələn heç bir fayl tapılmadı."
 }

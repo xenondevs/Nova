@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Processed %s leaves and made %s leaves non-persistent.",
   "command.nova.show_vanilla_block_state.success": "You're looking at the block state %s.",
   "command.nova.show_vanilla_block_state.failure": "Please look at a block and try again.",
-  "menu.nova.items.player_inventory": "Player Inventory"
+  "menu.nova.items.player_inventory": "Player Inventory",
+  "command.nova.reset.files.success": "Successfully reset %s file(s). A server restart or Nova reload is required for the changes to take effect.",
+  "command.nova.reset.files.no_files": "Could not find any files matching the given wildcard."
 }

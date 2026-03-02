@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Обработано %s листьев и сделано %s листьев непостоянными.",
   "command.nova.show_vanilla_block_state.success": "Вы смотрите на состояние блока %s.",
   "command.nova.show_vanilla_block_state.failure": "Пожалуйста, посмотрите на блок и попробуйте еще раз.",
-  "menu.nova.items.player_inventory": "Инвентарь игрока"
+  "menu.nova.items.player_inventory": "Инвентарь игрока",
+  "command.nova.reset.files.success": "Успешно сброшены %s файла(ов). Чтобы изменения вступили в силу, требуется перезагрузка сервера или перезагрузка Nova.",
+  "command.nova.reset.files.no_files": "Не удалось найти ни одного файла, соответствующего заданному подстановочному символу."
 }

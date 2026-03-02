@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Bearbetade %s löv och gjorde %s löv icke-beständiga.",
   "command.nova.show_vanilla_block_state.success": "Du tittar på blocktillståndet %s.",
   "command.nova.show_vanilla_block_state.failure": "Titta på ett block och försök igen.",
-  "menu.nova.items.player_inventory": "Spelarens inventarier"
+  "menu.nova.items.player_inventory": "Spelarens inventarier",
+  "command.nova.reset.files.success": "Framgångsrik återställning av %s fil(er). En omstart av servern eller en omladdning av Nova krävs för att ändringarna ska träda i kraft.",
+  "command.nova.reset.files.no_files": "Kunde inte hitta några filer som matchade det angivna jokertecknet."
 }

@@ -158,5 +158,7 @@
   "command.nova.show_block_model_data.model_less": "இந்த %s பின்வரும் வேனிலா பிளாக்கைப் பயன்படுத்துகிறது: %s.",
   "command.nova.show_block_model_data.backing_state": "இந்த %s பின்வரும் பேக்கிங் மாநில உள்ளமைவைப் பயன்படுத்துகிறது:\nBlock: %s\nVariant: %s",
   "command.nova.show_block_model_data.display_entity": "இந்த %s பின்வரும் காட்சி என்டிட்டி உள்ளமைவைப் பயன்படுத்துகிறது:\nஹிட்பாக்ஸ் வகை: %s\nமாடல்கள் (%s):\n%s",
-  "command.nova.show_block_model_data.failure": "தயவுசெய்து ஒரு நோவா பிளாக்கைப் பார்த்துவிட்டு மீண்டும் முயற்சிக்கவும்."
+  "command.nova.show_block_model_data.failure": "தயவுசெய்து ஒரு நோவா பிளாக்கைப் பார்த்துவிட்டு மீண்டும் முயற்சிக்கவும்.",
+  "command.nova.reset.files.success": "%s கோப்பு(கள்) வெற்றிகரமாக மீட்டமைக்கப்பட்டன. மாற்றங்கள் நடைமுறைக்கு வர, ஒரு சர்வர் மறுதொடக்கம் அல்லது நோவா மறுஏற்றம் தேவை.",
+  "command.nova.reset.files.no_files": "கொடுக்கப்பட்ட வைல்ட்கார்டுடன் பொருந்தும் கோப்புகள் எதுவும் காணப்படவில்லை."
 }

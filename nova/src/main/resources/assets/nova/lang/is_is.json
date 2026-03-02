@@ -158,5 +158,7 @@
   "command.nova.show_block_model_data.failure": "Vinsamlegast skoðaðu Nova-blokk og reyndu aftur.",
   "command.nova.show_network_node_info.end_point.header": "Þetta %s (endapunktur) hefur eftirfarandi gögn:",
   "command.nova.show_network_node_info.end_point.networks.entry": "Gerð: %s, Stefna: %s, Auðkenni: %s",
-  "command.nova.show_network_node_info.bridge.header": "Þessi %s (brú) hefur eftirfarandi gögn:"
+  "command.nova.show_network_node_info.bridge.header": "Þessi %s (brú) hefur eftirfarandi gögn:",
+  "command.nova.reset.files.success": "Endurstillti %s skrá(r) með góðum árangri. Endurræsing netþjóns eða Nova-endurhleðsla er nauðsynleg til að breytingarnar taki gildi.",
+  "command.nova.reset.files.no_files": "Ekki fannst neinn skrá sem samsvaraði gefinni staðgengilsskrá."
 }

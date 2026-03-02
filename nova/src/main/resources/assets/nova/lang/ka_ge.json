@@ -158,5 +158,7 @@
   "command.nova.show_network_node_info.linked_nodes.header": "ბმულები (%s):",
   "command.nova.show_network_node_info.linked_nodes.entry": "ნოდა: %s",
   "command.nova.show_network_node_info.network": "ტიპი: %s\nID: %s\nვერტექსები: %s (%s ხიდი(ები), %s საბოლოო წერტილი(ები))",
-  "command.nova.show_item_behaviors.success": "ამ %s-ს აქვს %s-ის ობიექტის ქცევა(ები):\n%s"
+  "command.nova.show_item_behaviors.success": "ამ %s-ს აქვს %s-ის ობიექტის ქცევა(ები):\n%s",
+  "command.nova.reset.files.success": "წარმატებით განულდა %s ფაილი(ები). ცვლილებების ძალაში შესასვლელად საჭიროა სერვერის გადატვირთვა ან Nova-ს ხელახალი ჩატვირთვა.",
+  "command.nova.reset.files.no_files": "ვერ მოიძებნა ფაილები მოცემული უნივერსალური მაჩვენებლის შესაბამისად."
 }

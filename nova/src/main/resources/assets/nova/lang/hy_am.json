@@ -158,5 +158,7 @@
   "command.nova.show_network_node_info.network": "Տեսակ: %s\nID: %s\nՀանգույցներ: %s (%s կամուրջ(ներ), %s վերջակետ(ներ))",
   "command.nova.waila.off": "Անջատված WAILA.",
   "command.nova.waila.already_on": "WAILA-ն արդեն միացված է։",
-  "command.nova.remove_invalid_vtes.success": "Հաջողությամբ հեռացվել են %s անվավեր vanilla tile-entities։"
+  "command.nova.remove_invalid_vtes.success": "Հաջողությամբ հեռացվել են %s անվավեր vanilla tile-entities։",
+  "command.nova.reset.files.success": "Հաջողությամբ վերականգնվել են %s ֆայլերը։ Փոփոխությունները ուժի մեջ մտնելու համար անհրաժեշտ է սերվերի վերագործարկում կամ Nova-ի վերաբեռնում։",
+  "command.nova.reset.files.no_files": "Չհաջողվեց գտնել տրված վայլդքարդին համապատասխան որևէ ֆայլ։"
 }

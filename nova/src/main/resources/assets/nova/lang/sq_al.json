@@ -158,5 +158,7 @@
   "command.nova.show_network_node_info.bridge.supported_network_types": "Llojet e rrjeteve të mbështetura: %s",
   "command.nova.show_network_node_info.bridge.allowed_faces": "Direksionet e lejuara: %s",
   "command.nova.show_network_node_info.bridge.networks.entry": "Lloji: %s, ID: %s",
-  "command.nova.search_block.result": "Gjeta %s në %s."
+  "command.nova.search_block.result": "Gjeta %s në %s.",
+  "command.nova.reset.files.success": "Rinisën me sukses %s skedarë. Nevojitet rinisje e serverit ose ri-ngarkim i Nova-s që ndryshimet të hyjnë në fuqi.",
+  "command.nova.reset.files.no_files": "Nuk u gjetën asnjë skedar që përputhet me wildcard-in e dhënë."
 }

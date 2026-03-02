@@ -158,5 +158,7 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Ni allwch osod mwy o endidau-teils.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Ni allwch osod mwy o endidau-teils yn y byd hwn.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Ni allwch osod mwy o endidau teils yn y darn hwn.",
-  "nova.outdated_version": "Rydych chi'n rhedeg fersiwn hen ffasiwn o %s.\nLawrlwythwch y fersiwn ddiweddaraf yn %s."
+  "nova.outdated_version": "Rydych chi'n rhedeg fersiwn hen ffasiwn o %s.\nLawrlwythwch y fersiwn ddiweddaraf yn %s.",
+  "command.nova.reset.files.success": "Ailgychwynnwyd ffeil(iau) %s yn llwyddiannus. Mae angen ailgychwyn y gweinydd neu ail-lwytho Nova i'r newidiadau ddod i rym.",
+  "command.nova.reset.files.no_files": "Ni lwyddwyd i ddod o hyd i unrhyw ffeiliau sy'n cyfateb i'r gwylltcard a roddwyd."
 }

@@ -158,5 +158,7 @@
   "nova.tile_entity_limits.world_blacklist.deny": "Jy mag geen teël-entiteite van Nova in hierdie wêreld plaas nie.",
   "nova.tile_entity_limits.type_world_blacklist.deny": "Jy mag nie hierdie teël-entiteit in hierdie wêreld plaas nie.",
   "nova.tile_entity_limits.amount_global.deny": "Jy kan nie meer teël-entiteite van hierdie tipe plaas nie.",
-  "nova.tile_entity_limits.amount_per_world.deny": "Jy kan nie meer teël-entiteite van hierdie tipe in hierdie wêreld plaas nie."
+  "nova.tile_entity_limits.amount_per_world.deny": "Jy kan nie meer teël-entiteite van hierdie tipe in hierdie wêreld plaas nie.",
+  "command.nova.reset.files.success": "Het suksesvol %s lêer(s) gereset. 'n Serverherlating of Nova-herlaai is nodig om die veranderinge van krag te laat word.",
+  "command.nova.reset.files.no_files": "Kon geen lêers vind wat ooreenstem met die gegewe jokerteken nie."
 }

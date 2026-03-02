@@ -158,5 +158,7 @@
   "command.nova.show_network_node_info.bridge.networks.entry": "Genus: %s, ID: %s",
   "command.nova.show_network_node_info.initialized": "Rete inceptum: %s",
   "command.nova.show_network_node_info.networks.header": "Retea (%s):",
-  "command.nova.search_block.result": "Inventum est %s apud %s."
+  "command.nova.search_block.result": "Inventum est %s apud %s.",
+  "command.nova.reset.files.success": "%s documenta feliciter rescripta sunt. Servitor denuo incohandus est aut Nova denuo oneranda est ut mutationes valere incipiant.",
+  "command.nova.reset.files.no_files": "Nullae documenta repertae sunt quae cum characteribus substitutoriis datis congruerent."
 }

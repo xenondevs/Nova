@@ -158,5 +158,7 @@
   "command.nova.show_block_model_data.backing_state": "Mod a na-eji nhazi steeti nkwado ndị a:\nBlọk: %s\nỤdị: %s",
   "command.nova.show_block_model_data.display_entity": "Mod a na-eji ntọala ngosipụta nke ndị a:\nỤdị igbe mmetụ: %s\nNlereanya (%s):\n%s",
   "command.nova.show_block_model_data.display_entity.model": "- Ihe: %s\n  Ntụgharị: %s\n  Ntụgharị ekpe: %s\n  Ọkpụrụkpụ: %s\n  Ntụgharị nri: %s",
-  "command.nova.search_block.result": "Ahụrụ %s na %s."
+  "command.nova.search_block.result": "Ahụrụ %s na %s.",
+  "command.nova.reset.files.success": "Emegharịrị faịlụ %s nke ọma. A chọrọ imegharị sava ma ọ bụ imegharị Nova ka mgbanwe ndị ahụ rụọ ọrụ.",
+  "command.nova.reset.files.no_files": "Enweghị ike ịchọta faịlụ ọ bụla kwekọrọ na wildcard e nyere."
 }

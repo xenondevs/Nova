@@ -158,5 +158,7 @@
   "nova.tile_entity_limits.amount_per_world.deny": "Vi ne povas meti pli da kahel-entitoj de ĉi tiu tipo en ĉi tiun mondon.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Vi ne povas meti pli da kahel-entitoj en ĉi tiun mondon.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Vi ne povas meti pli da kahel-entitoj en ĉi tiun blokon.",
-  "nova.outdated_version": "Vi uzas malnoviĝintan version de %s.\nBonvolu elŝuti la plej novan version ĉe %s."
+  "nova.outdated_version": "Vi uzas malnoviĝintan version de %s.\nBonvolu elŝuti la plej novan version ĉe %s.",
+  "command.nova.reset.files.success": "Sukcese restarigis %s dosierojn. Por ke la ŝanĝoj ekvalidu, necesas restartigi la servilon aŭ reŝargi Nova.",
+  "command.nova.reset.files.no_files": "Ne eblis trovi iujn ajn dosierojn kongruajn kun la donita ĝokera signo."
 }

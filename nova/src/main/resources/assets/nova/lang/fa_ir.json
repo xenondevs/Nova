@@ -158,5 +158,7 @@
   "nova.tile_entity_limits.amount_global_total.deny": "شما نمی‌توانید موجوده‌های کاشی بیشتری قرار دهید.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "شما نمی‌توانید موجودیت‌های کاشی بیشتری در این جهان قرار دهید.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "شما نمی‌توانید در این چنک موجودات کاشی بیشتری قرار دهید.",
-  "nova.outdated_version": "شما در حال اجرای نسخه‌ای قدیمی از %s هستید.\nلطفاً آخرین نسخه را از %s دانلود کنید."
+  "nova.outdated_version": "شما در حال اجرای نسخه‌ای قدیمی از %s هستید.\nلطفاً آخرین نسخه را از %s دانلود کنید.",
+  "command.nova.reset.files.success": "بازیابی موفقیت‌آمیز فایل(های) %s. برای اعمال تغییرات، نیاز به راه‌اندازی مجدد سرور یا بارگذاری مجدد Nova است.",
+  "command.nova.reset.files.no_files": "هیچ فایلی که با وایلدکارد داده‌شده مطابقت داشته باشد، یافت نشد."
 }

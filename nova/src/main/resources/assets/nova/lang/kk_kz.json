@@ -158,5 +158,7 @@
   "command.nova.show_network_node_info.connected_nodes.header": "Қосылымдар (%s):",
   "command.nova.show_network_node_info.connected_nodes.entry": "Түрі: %s, Бағыты: %s, Түйін: %s",
   "command.nova.show_network_node_info.failure": "Әлемдегі %s, x: %s, y: %s, z: %s блогы желі түйіні емес.",
-  "command.nova.search_block.result": "%s-тен %s-ті тапты."
+  "command.nova.search_block.result": "%s-тен %s-ті тапты.",
+  "command.nova.reset.files.success": "%s файлдары сәтті қайта орнатылды. Өзгерістердің күшіне енуі үшін серверді қайта жүктеу немесе Nova-ны қайта жүктеу қажет.",
+  "command.nova.reset.files.no_files": "Берілген вайлдкардқа сәйкес келетін ешбір файл табылған жоқ."
 }

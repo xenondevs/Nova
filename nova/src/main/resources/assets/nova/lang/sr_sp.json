@@ -158,5 +158,7 @@
   "command.nova.show_network_node_info.networks.header": "Мреже (%s):",
   "command.nova.search_block.result": "Пронађен %s на %s.",
   "command.nova.advanced_tooltips.nova.failure": "Напредни алатипи за Нова предмете су већ омогућени.",
-  "command.nova.advanced_tooltips.all.success": "Омогућене су напредне информативне поруке за све предмете."
+  "command.nova.advanced_tooltips.all.success": "Омогућене су напредне информативне поруке за све предмете.",
+  "command.nova.reset.files.success": "Успешно ресетовано %s фајлова. Потребно је поново покренути сервер или учитати Нову да би промене ступиле на снагу.",
+  "command.nova.reset.files.no_files": "Није могуће пронаћи ниједну датотеку која одговара задатом вајлдкарду."
 }

@@ -158,5 +158,7 @@
   "container.nova.water_tank": "Reservatòri d'aiga",
   "command.nova.addons.header": "Addons (%s): ",
   "command.nova.show_vanilla_block_state.success": "Estàs a mirar l'estat del bloc %s.",
-  "command.nova.resource_pack.reupload.start": "Cargament del paquet de ressorsas... mercés d'esperar"
+  "command.nova.resource_pack.reupload.start": "Cargament del paquet de ressorsas... mercés d'esperar",
+  "command.nova.reset.files.success": "Restaurat amb succès %s fichièrs. Cal tornar demarrar lo servidor o recargar Nova per que los cambiaments prengan efièch.",
+  "command.nova.reset.files.no_files": "Se pòdon pas trobar cap de fichièrs que correspondon al caractèr comodin donat."
 }

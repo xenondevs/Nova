@@ -158,5 +158,7 @@
   "command.nova.show_network_node_info.bridge.networks.entry": "Cineál: %s, ID: %s",
   "command.nova.show_network_node_info.initialized": "Tionscnaithe líonra: %s",
   "command.nova.show_item_model_data.success": "Úsáideann an %s seo an cineál míre %s leis an tsamhail %s.",
-  "command.nova.show_item_model_data.no_item": "Coinnigh mír Nova i do phríomhlámh agus bain triail as arís."
+  "command.nova.show_item_model_data.no_item": "Coinnigh mír Nova i do phríomhlámh agus bain triail as arís.",
+  "command.nova.reset.files.success": "Athshocraíodh %s comhad(anna) go rathúil. Tá atosaigh freastalaí nó athlódáil Nova ag teastáil chun go dtiocfaidh na hathruithe i bhfeidhm.",
+  "command.nova.reset.files.no_files": "Níorbh fhéidir aon chomhaid a aimsiú a mheaitseálann leis an gcárta fiáin tugtha."
 }

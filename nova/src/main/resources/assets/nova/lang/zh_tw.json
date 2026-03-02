@@ -158,5 +158,7 @@
   "command.nova.show_network_node_info.bridge.supported_network_types": "支援的網路類型: %s",
   "command.nova.show_network_node_info.bridge.allowed_faces": "允許的方向: %s",
   "command.nova.show_network_node_info.bridge.networks.entry": "類型：%s, ID: %s",
-  "command.nova.search_block.result": "Found %s at %s."
+  "command.nova.search_block.result": "Found %s at %s.",
+  "command.nova.reset.files.success": "成功重設 %s 檔案。需要重新啟動伺服器或重新載入 Nova 才能使變更生效。",
+  "command.nova.reset.files.no_files": "找不到任何符合指定通配符的檔案。"
 }

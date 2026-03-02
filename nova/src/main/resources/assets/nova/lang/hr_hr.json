@@ -158,5 +158,7 @@
   "command.nova.search_block.result": "Pronađen %s na %s.",
   "command.nova.search_block.done": "Pretraga završena.",
   "nova.tile_entity_limits.amount_global_total.deny": "Ne možete postaviti više entitet-pločica.",
-  "nova.tile_entity_limits.amount_per_world_total.deny": "Ne možete postaviti više tile-entiteta u ovom svijetu."
+  "nova.tile_entity_limits.amount_per_world_total.deny": "Ne možete postaviti više tile-entiteta u ovom svijetu.",
+  "command.nova.reset.files.success": "Uspješno je resetirano %s datoteka. Za primjenu promjena potrebno je ponovno pokrenuti poslužitelj ili ponovno učitati Novu.",
+  "command.nova.reset.files.no_files": "Nije moguće pronaći nijednu datoteku koja odgovara zadanom džokeru."
 }

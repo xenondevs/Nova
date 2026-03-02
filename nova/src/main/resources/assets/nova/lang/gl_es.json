@@ -158,5 +158,7 @@
   "command.nova.show_network_node_info.end_point.header": "Este %s (punto final) ten os seguintes datos:",
   "command.nova.show_network_node_info.bridge.networks.entry": "Tipo: %s, ID: %s",
   "command.nova.fill.success": "Encheu con éxito a área desde x: %s, y: %s, z: %s ata x: %s, y: %s, z: %s con %s.",
-  "command.nova.give_clientside_stack.success": "Engadiuse unha versión do lado do cliente de %s ao teu inventario."
+  "command.nova.give_clientside_stack.success": "Engadiuse unha versión do lado do cliente de %s ao teu inventario.",
+  "command.nova.reset.files.success": "Restableceu con éxito os ficheiros %s. É necesario reiniciar o servidor ou recargar Nova para que os cambios entren en vigor.",
+  "command.nova.reset.files.no_files": "Non se puideron atopar ningún ficheiro que coincida co comodín dado."
 }

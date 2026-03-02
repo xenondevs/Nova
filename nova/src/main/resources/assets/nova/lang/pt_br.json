@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Processou %s folhas e tornou %s folhas não persistentes.",
   "command.nova.show_vanilla_block_state.success": "Você está olhando para o estado do bloco %s.",
   "command.nova.show_vanilla_block_state.failure": "Dê uma olhada em um bloco e tente novamente.",
-  "menu.nova.items.player_inventory": "Inventário do jogador"
+  "menu.nova.items.player_inventory": "Inventário do jogador",
+  "command.nova.reset.files.success": "Redefinição bem-sucedida de %s arquivo(s). É necessário reiniciar o servidor ou recarregar o Nova para que as alterações tenham efeito.",
+  "command.nova.reset.files.no_files": "Não foi possível encontrar nenhum arquivo que corresponda ao curinga fornecido."
 }

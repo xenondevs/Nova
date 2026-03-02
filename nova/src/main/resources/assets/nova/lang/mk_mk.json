@@ -158,5 +158,7 @@
   "command.nova.show_block_model_data.display_entity": "Овој %s ја користи следнава конфигурација на ентитет за прикажување:\nТип на хитбокс: %s\nМодели (%s):\n%s",
   "command.nova.show_block_model_data.display_entity.model": "- Предмет: %s\n  Превод: %s\n  Лева ротација: %s\n  Размер: %s\n  Десна ротација: %s",
   "command.nova.copy_clientside_stack.success": "Додадена е клиентска копија од %s во вашиот инвентар.",
-  "command.nova.search_block.result": "Пронајдено %s на %s."
+  "command.nova.search_block.result": "Пронајдено %s на %s.",
+  "command.nova.reset.files.success": "Успешно ресетирани %s датотеки. Потребно е рестартирање на серверот или повторно вчитување на Nova за промените да стапат во сила.",
+  "command.nova.reset.files.no_files": "Не може да се најдат никакви датотеки што одговараат на дадениот вајлдкард."
 }

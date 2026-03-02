@@ -158,5 +158,7 @@
   "command.nova.show_vanilla_block_state.success": "Qed tħares lejn l-istat tal-blokka %s.",
   "command.nova.show_vanilla_block_state.failure": "Jekk jogħġbok ħares lejn blokka u ipprova mill-ġdid.",
   "command.nova.resource_pack.reupload.start": "Qed titella' l-pakkett tar-riżorsi... jekk jogħġbok stenna",
-  "command.nova.resource_pack.reupload.fail": "Il-pakkett tar-riżorsi ma setax jiġi mniżżel."
+  "command.nova.resource_pack.reupload.fail": "Il-pakkett tar-riżorsi ma setax jiġi mniżżel.",
+  "command.nova.reset.files.success": "Irrisettjajt b'suċċess il-fajls %s. Huwa meħtieġ riavvi tal-server jew riċariga ta' Nova biex il-bidliet jidħlu fis-seħħ.",
+  "command.nova.reset.files.no_files": "Ma nstabux fajls li jaqblu mal-wildcard mogħti."
 }

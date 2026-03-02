@@ -158,5 +158,7 @@
   "nova.tile_entity_limits.amount_global_total.deny": "Ne možete postaviti više tile-entiteta.",
   "nova.tile_entity_limits.amount_per_world_total.deny": "Ne možete postaviti više tile-entiteta u ovom svijetu.",
   "nova.tile_entity_limits.amount_per_chunk_total.deny": "Ne možete postaviti više tile-entiteta u ovom chunk-u.",
-  "nova.outdated_version": "Koristite zastarjelu verziju %s.\nMolimo preuzmite najnoviju verziju na %s."
+  "nova.outdated_version": "Koristite zastarjelu verziju %s.\nMolimo preuzmite najnoviju verziju na %s.",
+  "command.nova.reset.files.success": "Uspješno resetirano %s datoteka. Za primjenu promjena potreban je ponovni pokret servera ili ponovno učitavanje Nova.",
+  "command.nova.reset.files.no_files": "Nije moguće pronaći nijednu datoteku koja odgovara zadanoj džoker maski."
 }
