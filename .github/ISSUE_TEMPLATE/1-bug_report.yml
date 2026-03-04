@@ -20,7 +20,7 @@ body:
     id: plugins
     attributes:
       label: Check for plugin incompatibilites
-      description: Before creating a bug report, please validate that the issue you're encountering is not caused by another plugin. In order to do that, remove all other plugins from your server and check if the issue still persists. If the issue is caused by another plugin, select "_This issue is about a specific plugin incompatibility_" and state the name, version and where to download that plugin in your report.
+      description: Please check whether the issue you're encountering is an incompatibility between Nova and another plugin on your server. In order to do that, remove all other plugins from your server and check if the issue still persists. If the issue is caused by another plugin, select "_This issue is about a specific plugin incompatibility_" and state the name, version and where to download that plugin in your report.
       options:
         - There are no other plugins running on my server.
         - This issue is about a specific plugin incompatibility.
@@ -62,7 +62,7 @@ body:
   - type: textarea
     attributes:
       label: Server log
-      description: Upload the complete server log here. Alternatively, you can also upload your log to sites such as [pastebin](https://pastebin.com) or [mclo.gs](https://mclo.gs) and link to it here. __Please always upload your server log, even if you can't see any errors.__
+      description: Upload the complete server log here. **DO NOT paste the log. Upload it as a file instead!** Alternatively, you can also upload your log to sites such as [pastebin](https://pastebin.com) or [mclo.gs](https://mclo.gs) and link to it here. __Please always upload your server log, even if you can't see any errors.__
       placeholder: Drag & drop latest.log here to upload the file. For readability reasons, DO NOT paste the log, but upload it as a file.
     validations:
       required: true
