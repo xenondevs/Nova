@@ -68,7 +68,7 @@
   "command.nova.remove_invalid_vtes.success": "잘못된 %s 바닐라 타일 엔터티를 제거했습니다.",
   "command.nova.remove_invalid_vtes.failure": "잘못된 바닐라 타일 엔티티가 발견되지 않았습니다.",
   "item.cbf_tags": "CBF: %s 태그",
-  "menu.nova.items": "항목",
+  "menu.nova.items": "아이템",
   "waila.nova.required_tool": "도구: ",
   "menu.nova.side_config.up": "Up",
   "menu.nova.side_config.down": "아래로",
