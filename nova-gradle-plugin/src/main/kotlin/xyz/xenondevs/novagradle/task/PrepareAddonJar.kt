@@ -5,10 +5,13 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
@@ -30,6 +33,7 @@ private val JAVA_PLUGIN_INTERNAL_NAME = JAVA_PLUGIN_NAME.replace('.', '/')
 private val BOOTSTRAPPER_INTERNAL_NAME = BOOTSTRAPPER_NAME.replace('.', '/')
 private val PLUGIN_LOADER_INTERNAL_NAME = PLUGIN_LOADER_NAME.replace('.', '/')
 
+@CacheableTask
 internal abstract class PrepareAddonJar : DefaultTask() {
     
     @get:Input
@@ -49,6 +53,7 @@ internal abstract class PrepareAddonJar : DefaultTask() {
     @get:Optional
     abstract val bootstrapper: Property<String>
     
+    @get:PathSensitive(PathSensitivity.NONE)
     @get:InputFile
     @get:Optional
     abstract val bootstrapperFile: RegularFileProperty
@@ -57,6 +62,7 @@ internal abstract class PrepareAddonJar : DefaultTask() {
     @get:Optional
     abstract val loader: Property<String>
     
+    @get:PathSensitive(PathSensitivity.NONE)
     @get:InputFile
     @get:Optional
     abstract val loaderFile: RegularFileProperty
