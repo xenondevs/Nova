@@ -29,6 +29,7 @@ interface ItemAction {
     /**
      * Applies this action to a copy of [itemStack], in the context of [world], then returns it.
      * Does not modify the original [itemStack].
+     * This function is used in cases where the item interaction was not triggered by an entity.
      */
     fun apply(world: World, itemStack: ItemStack): List<ItemStack>
     
