@@ -37,7 +37,7 @@ private const val PACKET_HANDLER_NAME = "nova_packet_handler"
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object PacketManager {
     
-    val handlers: MutableMap<Player, PacketHandler> = PlayerMapManager.create()
+    val handlers: MutableMap<Player, PacketHandler> = PlayerMapManager.createMap()
     
     @Suppress("UNCHECKED_CAST")
     @InitFun
