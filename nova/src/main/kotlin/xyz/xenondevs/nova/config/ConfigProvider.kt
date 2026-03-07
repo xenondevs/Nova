@@ -11,8 +11,10 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.orElseBy
 import xyz.xenondevs.commons.provider.strongCombinedProvider
 import xyz.xenondevs.commons.provider.strongOrElse
+import xyz.xenondevs.commons.provider.strongOrElseBy
 import java.lang.ref.WeakReference
 import java.lang.reflect.Type
 import java.nio.file.Path
@@ -361,7 +363,7 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: T?
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(default: Provider<T>?, vararg path: String): Provider<T> =
-    if (default != null) strongOptionalEntry<T>(*path).strongOrElse(default) else strongEntry<T>(*path)
+    if (default != null) strongOptionalEntry<T>(*path).strongOrElseBy(default) else strongEntry<T>(*path)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under [path], using [default] as fallback, or requiring config presence if null.
@@ -372,7 +374,7 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(defau
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: Provider<T>?, vararg path: String): Provider<T> =
-    if (default != null) optionalEntry<T>(*path).orElse(default) else entry<T>(*path)
+    if (default != null) optionalEntry<T>(*path).orElseBy(default) else entry<T>(*path)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under the first existing path from [paths],
@@ -382,7 +384,7 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: Pr
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
-    if (default != null) strongOptionalEntry<T>(*paths).strongOrElse(default) else strongEntry<T>(*paths)
+    if (default != null) strongOptionalEntry<T>(*paths).strongOrElseBy(default) else strongEntry<T>(*paths)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under the first existing path from [paths],
@@ -394,7 +396,7 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(defau
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
-    if (default != null) optionalEntry<T>(*paths).orElse(default) else entry<T>(*paths)
+    if (default != null) optionalEntry<T>(*paths).orElseBy(default) else entry<T>(*paths)
 
 private fun Provider<ConfigurationNode>.fullPath(): String {
     val filePath = findFilePath()

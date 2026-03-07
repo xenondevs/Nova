@@ -21,8 +21,11 @@ import xyz.xenondevs.commons.provider.plus
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.dsl.anvilWindow
+import xyz.xenondevs.invui.dsl.gui
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.dsl.mergedWindow
+import xyz.xenondevs.invui.dsl.pagedItemsGui
+import xyz.xenondevs.invui.dsl.property.by
 import xyz.xenondevs.invui.dsl.scrollItemsGui
 import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.invui.dsl.window

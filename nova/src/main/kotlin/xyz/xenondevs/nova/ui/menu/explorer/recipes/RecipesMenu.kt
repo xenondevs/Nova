@@ -11,6 +11,8 @@ import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.item
+import xyz.xenondevs.invui.dsl.pagedGuisGui
+import xyz.xenondevs.invui.dsl.pagedItemsGui
 import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.invui.dsl.window
 import xyz.xenondevs.invui.gui.pageCountProvider
