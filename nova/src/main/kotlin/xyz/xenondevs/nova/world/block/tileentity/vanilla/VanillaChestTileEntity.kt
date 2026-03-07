@@ -122,8 +122,6 @@ internal class VanillaChestTileEntity internal constructor(
                 left = (linkedChest.pos.nmsBlockEntity as ChestBlockEntity).contents
                 right = chest.contents
             }
-            
-            else -> throw UnsupportedOperationException()
         }
         
         return NetworkedNMSInventory(DoubleChestItemStackContainer(left, right))

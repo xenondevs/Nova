@@ -64,7 +64,7 @@ internal class MappedNonNullMetadataEntry<T, R : Any>(
     override fun write(buf: RegistryFriendlyByteBuf) {
         buf.writeByte(index)
         buf.writeVarInt(serializerId)
-        serializer.codec().encode(buf, mappedValue!!)
+        serializer.codec().encode(buf, mappedValue)
     }
     
     override fun isNotDefault(): Boolean =

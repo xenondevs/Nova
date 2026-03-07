@@ -167,7 +167,7 @@ private fun dropItemLikePlayer(entity: LivingEntity, itemStack: ItemStack): Bool
         location = entity.eyeLocation
     }
     
-    val item = location.getWorld().createEntity<Item?>(location, Item::class.java)
+    val item = location.getWorld().createEntity(location, Item::class.java)
     item.itemStack = itemStack.clone()
     item.pickupDelay = 40
     item.velocity = location.getDirection().multiply(0.35)

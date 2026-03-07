@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.util.advancement
 
 import net.minecraft.advancements.AdvancementHolder
-import net.minecraft.advancements.AdvancementTree
 import net.minecraft.advancements.TreeNodePosition
 import org.spigotmc.SpigotConfig
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
@@ -29,7 +28,7 @@ object AdvancementLoader {
         val advancementManager = MINECRAFT_SERVER.advancements
         val allAdvancements = HashMap(MINECRAFT_SERVER.advancements.advancements)
         filtered.forEach { allAdvancements[it.id] = it }
-        val advancementTree = advancementManager.tree ?: AdvancementTree()
+        val advancementTree = advancementManager.tree
         advancementTree.addAll(filtered)
         for (root in advancementTree.roots()) {
             if (root.holder().value().display().isPresent) {

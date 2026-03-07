@@ -161,10 +161,13 @@ class DataComponentMap internal constructor(
             for (component in components) {
                 if (component == null)
                     continue
-                builder.set(component.type as MojangDataComponentType<Any>, component.value as Any)
+                builder.set(component)
             }
             return@combinedProvider DataComponentMap(builder.build())
         }
+        
+        private fun <T : Any> MojangDataComponentMap.Builder.set(component: TypedDataComponent<T>) =
+            set(component.type, component.value)
         
     }
     

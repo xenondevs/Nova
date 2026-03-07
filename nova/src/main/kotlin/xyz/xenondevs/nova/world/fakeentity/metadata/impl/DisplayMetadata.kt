@@ -14,17 +14,16 @@ import org.joml.Quaternionf
 import org.joml.Quaternionfc
 import org.joml.Vector3f
 import org.joml.Vector3fc
-import xyz.xenondevs.nova.world.fakeentity.metadata.NonNullMetadataEntry
 
 abstract class DisplayMetadata : EntityMetadata() {
     
     var transformationInterpolationDelay: Int by entry(8, EntityDataSerializers.INT, 0)
     var transformationInterpolationDuration: Int by entry(9, EntityDataSerializers.INT, 0)
     var posRotInterpolationDuration: Int by entry(10, EntityDataSerializers.INT, 0)
-    var translation: Vector3fc by entry(11, EntityDataSerializers.VECTOR3, Vector3f()) as NonNullMetadataEntry<Vector3fc>
-    var scale: Vector3fc by entry(12, EntityDataSerializers.VECTOR3, Vector3f(1f, 1f, 1f)) as NonNullMetadataEntry<Vector3fc>
-    var rightRotation: Quaternionfc by entry(13, EntityDataSerializers.QUATERNION, Quaternionf()) as NonNullMetadataEntry<Quaternionfc>
-    var leftRotation: Quaternionfc by entry(14, EntityDataSerializers.QUATERNION, Quaternionf()) as NonNullMetadataEntry<Quaternionfc>
+    var translation: Vector3fc by entry(11, EntityDataSerializers.VECTOR3, Vector3f())
+    var scale: Vector3fc by entry(12, EntityDataSerializers.VECTOR3, Vector3f(1f, 1f, 1f))
+    var rightRotation: Quaternionfc by entry(13, EntityDataSerializers.QUATERNION, Quaternionf())
+    var leftRotation: Quaternionfc by entry(14, EntityDataSerializers.QUATERNION, Quaternionf())
     var transform: Matrix4fc
         get() = Matrix4f()
             .translate(translation)
