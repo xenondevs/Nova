@@ -4,7 +4,6 @@ import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.RecipeChoice
-import xyz.xenondevs.nova.util.item.customModelData
 import xyz.xenondevs.nova.util.item.namelessCopyOrSelf
 import xyz.xenondevs.nova.util.item.novaItem
 
@@ -18,16 +17,6 @@ interface SingleItemTest : ItemTest {
 
 interface MultiItemTest : ItemTest {
     val examples: List<ItemStack>
-}
-
-@Suppress("DEPRECATION")
-@Deprecated("Custom model data is not a single value anymore")
-class ModelDataTest(private val type: Material, private val data: IntArray, override val example: ItemStack) : SingleItemTest {
-    
-    override fun test(item: ItemStack): Boolean {
-        return item.type == type && item.customModelData in data
-    }
-    
 }
 
 class VanillaMaterialTest(private val type: Material, override val example: ItemStack) : SingleItemTest {

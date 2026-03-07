@@ -81,19 +81,6 @@ internal val MojangStack.unsafeCustomData: CompoundTag?
 internal val MojangStack.unsafeNovaTag: CompoundTag?
     get() = unsafeCustomData?.getCompoundOrNull("nova")
 
-@Suppress("DEPRECATION")
-@Deprecated("Custom model data is not a single value anymore")
-val ItemStack.customModelData: Int
-    get() {
-        if (hasItemMeta()) {
-            val itemMeta = itemMeta!!
-            if (itemMeta.hasCustomModelData())
-                return itemMeta.customModelData
-        }
-        
-        return 0
-    }
-
 internal val ItemStack.namelessCopyOrSelf: ItemStack
     get() {
         var itemStack = this

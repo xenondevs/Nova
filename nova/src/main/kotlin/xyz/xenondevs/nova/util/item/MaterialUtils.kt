@@ -43,10 +43,6 @@ fun Material.toItemStack(amount: Int = 1): ItemStack = ItemStack.of(this).also {
 
 internal fun Material.isBucket() = name.contains("BUCKET")
 
-@Deprecated("Corresponding tag exists", ReplaceWith("Tag.REPLACEABLE.isTagged(this)", "org.bukkit.Tag"))
-fun Material.isReplaceable(): Boolean =
-    Tag.REPLACEABLE.isTagged(this)
-
 fun Material.playPlaceSoundEffect(location: Location) {
     location.world!!.playSound(location, soundGroup.placeSound, 1f, Random.nextDouble(0.8, 0.95).toFloat())
 }

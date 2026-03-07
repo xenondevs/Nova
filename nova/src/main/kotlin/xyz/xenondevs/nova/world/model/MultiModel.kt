@@ -28,11 +28,6 @@ abstract class MultiModel {
         models.clear()
     }
     
-    @Deprecated("Use clear() instead", ReplaceWith("clear()"))
-    fun close() {
-        clear()
-    }
-    
 }
 
 class MovableMultiModel : MultiModel() {
