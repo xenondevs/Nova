@@ -102,10 +102,6 @@ val LivingEntity.nmsEntity: MojangLivingEntity
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
 
-@Deprecated("All bukkit stacks now wrap an nms stack", ReplaceWith("unwrap().copy()", "xyz.xenondevs.nova.util.unwrap"))
-val ItemStack?.nmsCopy: MojangStack
-    get() = unwrap().copy()
-
 fun ItemStack?.unwrap(): MojangStack =
     this?.let(CraftItemStack::unwrap) ?: MojangStack.EMPTY
 

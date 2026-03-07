@@ -63,11 +63,6 @@ class DynamicRegion internal constructor(
         }
     }
     
-    @Deprecated(message= "Player is redundant", ReplaceWith("visualizeRegionItem"))
-    fun createVisualizeRegionItem(player: Player): VisualizeRegionItem {
-        return VisualizeRegionItem(uuid, ::region)
-    }
-    
     fun showRegionOutline(player: Player) {
         VisualRegion.showRegion(player, uuid, region)
     }
