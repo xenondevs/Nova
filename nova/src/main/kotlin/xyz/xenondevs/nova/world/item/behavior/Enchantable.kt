@@ -6,7 +6,7 @@ import io.papermc.paper.datacomponent.item.ItemEnchantments.itemEnchantments
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.orElseBy
 import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.config.optionalEntry
 import xyz.xenondevs.nova.world.item.DataComponentMap
@@ -31,11 +31,11 @@ fun Enchantable(
     enchantmentValue: Int? = null,
     primaryEnchantments: Provider<Set<Enchantment>>? = null,
     supportedEnchantments: Provider<Set<Enchantment>>? = null
-) = ItemBehaviorFactory<Enchantable> {
+) = ItemBehaviorFactory {
     val cfg = it.config
     
     val supportedEnchantments = cfg.entryOrElse(supportedEnchantments, "supported_enchantments")
-    val primaryEnchantments = cfg.optionalEntry<Set<Enchantment>>("primary_enchantments").orElse(primaryEnchantments).orElse(supportedEnchantments)
+    val primaryEnchantments = cfg.optionalEntry<Set<Enchantment>>("primary_enchantments").orElseBy(primaryEnchantments).orElseBy(supportedEnchantments)
     
     Enchantable(
         cfg.entryOrElse(enchantmentValue, "enchantment_value"),
