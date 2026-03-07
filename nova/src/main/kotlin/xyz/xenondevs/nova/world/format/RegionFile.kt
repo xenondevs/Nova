@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.format
 
 import xyz.xenondevs.nova.world.format.chunk.RegionChunk
-import xyz.xenondevs.nova.world.format.legacy.v1.LegacyRegionFileReaderV1
 
 private const val MAGIC = 0x004E5652 // .NVR
 private const val VERSION = 2.toByte()
@@ -18,7 +17,6 @@ internal class RegionFile(chunks: Array<RegionChunk>) : RegionizedFile<RegionChu
     
     companion object : RegionizedFileReader<RegionChunk, RegionFile>(
         MAGIC, VERSION, ::Array, ::RegionFile, RegionChunk,
-        1 to LegacyRegionFileReaderV1
     )
     
 }

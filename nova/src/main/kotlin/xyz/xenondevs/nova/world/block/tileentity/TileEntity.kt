@@ -298,15 +298,6 @@ abstract class TileEntity(
         preUpdateHandler: ((ItemPreUpdateEvent) -> Unit)? = null,
         postUpdateHandler: ((ItemPostUpdateEvent) -> Unit)? = null,
     ): VirtualInventory {
-        // legacy conversion
-        val legacyName = "inventory.${uuid.salt(name)}"
-        if (hasData(legacyName)) {
-            val inventory = retrieveDataOrNull<VirtualInventory>(legacyName)!!
-            inventory.maxStackSizes = maxStackSizes
-            storeData(name, inventory)
-            removeData(legacyName)
-        }
-        
         val inventory = storedValue(name, persistent) {
             VirtualInventory(UUID.nameUUIDFromBytes(name.toByteArray()), size, null, maxStackSizes)
         }.get()
@@ -355,19 +346,6 @@ abstract class TileEntity(
     ): FluidContainer {
         val uuid = UUID.nameUUIDFromBytes(name.toByteArray())
         
-        // legacy conversion
-        val legacyName = "fluidContainer.$uuid"
-        if (hasData(legacyName)) {
-            val compound = retrieveDataOrNull<Compound>(legacyName)!!
-            removeData(legacyName)
-            when (compound.get<String>("type")) {
-                "NONE" -> compound["type"] = null
-                "WATER" -> compound["type"] = FluidType.WATER
-                "LAVA" -> compound["type"] = FluidType.LAVA
-            }
-            storeData(name, compound, persistent)
-        }
-        
         val container = FluidContainer(
             storedValue(name, persistent, ::Compound),
             uuid,
@@ -392,20 +370,12 @@ abstract class TileEntity(
         defaultSize: Int,
         createRegion: (Int) -> Region
     ): DynamicRegion {
-        // legacy conversion
-        val legacyName = "region.$name"
-        var size = defaultSize
-        if (hasData(legacyName)) {
-            size = retrieveDataOrNull<Int>(legacyName)!!
-            removeData(legacyName)
-        }
-        
         val regionUuid = uuid.salt(name)
         disableHandlers += { VisualRegion.removeRegion(regionUuid) }
         return DynamicRegion(
             regionUuid,
             minSize, maxSize,
-            storedValue(name) { size },
+            storedValue(name) { defaultSize },
             createRegion
         )
     }

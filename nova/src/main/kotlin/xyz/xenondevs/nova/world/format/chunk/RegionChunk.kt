@@ -85,11 +85,12 @@ internal class RegionChunk(
     private fun initVanillaTileEntities() {
         for ((pos, data) in vanillaTileEntityData) {
             try {
-                // temporary legacy conversion measure: nullable type to then be read from vanilla block state in enable()
                 val type: VanillaTileEntity.Type? = data["type"]
-                if (type != null) {
-                    vanillaTileEntities[pos] = type.create(pos, data)
+                if (type == null) {
+                    LOGGER.error("Failed to initialize vanilla tile entity at $pos with unknown type")
+                    continue
                 }
+                vanillaTileEntities[pos] = type.create(pos, data)
             } catch (t: Throwable) {
                 LOGGER.error("Failed to initialize vanilla tile entity pos=$pos, data=$data", t)
             }
@@ -104,7 +105,7 @@ internal class RegionChunk(
             val blockState = getBlockState(pos)
             if (blockState == null) {
                 LOGGER.error("Failed to initialize tile entity at $pos because there is no block state")
-                return
+                continue
             }
             
             val block = blockState.block as? NovaTileEntityBlock
@@ -113,7 +114,7 @@ internal class RegionChunk(
                 continue
             } else if (block == null) {
                 LOGGER.error("Failed to initialize tile entity at $pos because ${blockState.block} is not a tile entity type")
-                return
+                continue
             }
             
             try {
@@ -188,11 +189,6 @@ internal class RegionChunk(
      */
     fun getVanillaTileEntities(): List<VanillaTileEntity> = lock.withLock {
         return ArrayList(vanillaTileEntities.values)
-    }
-    
-    // temporary legacy-conversion related function
-    fun setVanillaTileEntityData(pos: BlockPos, data: Compound): Unit = lock.withLock {
-        vanillaTileEntityData[pos] = data
     }
     
     /**
@@ -325,19 +321,6 @@ internal class RegionChunk(
         lock.withLock {
             if (isEnabled)
                 return
-            
-            // temporary legacy conversion measure: init vanilla tile entities based on block type
-            for ((pos, vteData) in vanillaTileEntityData) {
-                if (pos in vanillaTileEntities)
-                    continue
-                
-                val vteType = VanillaTileEntity.Type.of(pos.block.type)
-                if (vteType != null) {
-                    vanillaTileEntities[pos] = vteType.create(pos, vteData)
-                } else {
-                    vanillaTileEntityData -= pos
-                }
-            }
             
             // remove vanilla tile entities that have de-synced from the block type
             vanillaTileEntities.removeIf { (pos, vte) ->

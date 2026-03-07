@@ -19,14 +19,6 @@ internal abstract class NetworkedVanillaTileEntity internal constructor(
     final override val linkedNodes = HashSet<NetworkNode>()
     
     override fun handleEnable() {
-        // legacy conversion
-        if (hasData("connectedNodes") || hasData("networks")) {
-            removeData("connectedNodes")
-            removeData("networks")
-            
-            NetworkManager.queueAddEndPoint(this)
-        }
-        
         isValid = true
     }
     

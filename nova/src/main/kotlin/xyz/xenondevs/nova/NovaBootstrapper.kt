@@ -98,10 +98,6 @@ internal class NovaBootstrapper : PluginBootstrap {
     
     private fun init() {
         try {
-            // legacy data folder migration if updating from 0.17 or earlier
-            if (PREVIOUS_NOVA_VERSION != null && PREVIOUS_NOVA_VERSION < Version("0.18-SNAPSHOT"))
-                LegacyDataFolderMigrator.migrate()
-            
             if (IS_DEV_SERVER) {
                 DebugProbes.install()
                 DebugProbes.enableCreationStackTraces = true

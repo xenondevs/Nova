@@ -46,13 +46,6 @@ abstract class NetworkedTileEntity(
     final override val holders: MutableSet<EndPointDataHolder> = HashSet()
     override val linkedNodes: Set<NetworkNode> = emptySet()
     
-    init {
-        // legacy conversion
-        DefaultEnergyHolder.tryConvertLegacy(this)?.let { storeData("energyHolder", it) }
-        DefaultItemHolder.tryConvertLegacy(this)?.let { storeData("itemHolder", it) }
-        DefaultFluidHolder.tryConvertLegacy(this)?.let { storeData("fluidHolder", it) }
-    }
-    
     /**
      * Retrieves the [EnergyHolder] previously stored or creates a new one and registers it in the [holders] map.
      *
@@ -95,15 +88,6 @@ abstract class NetworkedTileEntity(
         blockedFaces: Set<BlockFace> = emptySet(),
         defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = { CUBE_FACES.associateWithTo(enumMap()) { allowedConnectionType } }
     ): DefaultEnergyHolder {
-        if (hasData("energyHolder")) {
-            val holderCompound = retrieveDataOrNull<Compound>("energyHolder")!!
-            val energy = holderCompound.get<Long>("energy")
-            if (energy != null) {
-                holderCompound["energy"] = null
-                storeData("energy", energy, true)
-            }
-        }
-        
         val holder = DefaultEnergyHolder(
             storedValue("energyHolder", ::Compound),
             storedValue("energy", true) { 0L },
@@ -341,15 +325,6 @@ abstract class NetworkedTileEntity(
     
     override fun handleEnable() {
         super.handleEnable()
-        
-        // legacy conversion
-        if (hasData("connectedNodes") || hasData("networks")) {
-            removeData("connectedNodes")
-            removeData("networks")
-            
-            NetworkManager.queueAddEndPoint(this)
-        }
-        
         isValid = true
     }
     

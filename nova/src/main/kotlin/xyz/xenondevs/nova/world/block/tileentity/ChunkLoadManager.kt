@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.world.block.tileentity
 
-import org.bukkit.Bukkit
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.PermanentStorageMigrations
@@ -21,8 +20,6 @@ object ChunkLoadManager {
     
     @InitFun
     private fun init() {
-        Bukkit.getWorlds().flatMap { it.forceLoadedChunks }.forEach { it.isForceLoaded = false } // TODO: remove in future version
-        
         for (chunk in forceLoadedChunks.keys) {
             chunk.world?.addPluginChunkTicket(chunk.x, chunk.z, Nova)
         }

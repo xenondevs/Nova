@@ -20,8 +20,6 @@ internal class VanillaHopperTileEntity(type: Type, pos: BlockPos, data: Compound
     override lateinit var itemHolder: ItemHolder
     
     override fun handleEnable() {
-        DefaultItemHolder.tryConvertLegacy(this)?.let { storeData("itemHolder", it) } // legacy conversion
-        
         val facing = pos.nmsBlockState.getValue(HopperBlock.FACING).blockFace
         val inventory = NetworkedNMSInventory(SimpleItemStackContainer((pos.nmsBlockEntity as HopperBlockEntity).contents))
         itemHolder = StaticVanillaItemHolder(

@@ -10,7 +10,6 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.observed
 import xyz.xenondevs.commons.provider.orElseNew
 import xyz.xenondevs.invui.inventory.VirtualInventory
-import xyz.xenondevs.nova.serialization.DataHolder
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.world.block.tileentity.network.node.DefaultContainerEndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
@@ -72,58 +71,6 @@ class DefaultItemHolder(
         val ALL_INVENTORY_UUID = UUID(0, 0xA11)
         val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithTo(enumMap()) { 50 } }
         val DEFAULT_CHANNELS = { CUBE_FACES.associateWithTo(enumMap()) { 0 } }
-        
-        fun tryConvertLegacy(dataHolder: DataHolder): Compound? {
-            val inventoryConfig: MutableMap<BlockFace, UUID>? =
-                dataHolder.retrieveDataOrNull("inventories")
-            val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>? =
-                dataHolder.retrieveDataOrNull("itemConfig")
-            val insertFilters: MutableMap<BlockFace, ItemFilter<*>>? =
-                dataHolder.retrieveDataOrNull("insertFilters")
-            val extractFilters: MutableMap<BlockFace, ItemFilter<*>>? =
-                dataHolder.retrieveDataOrNull("extractFilters")
-            val insertPriorities: MutableMap<BlockFace, Int>? =
-                dataHolder.retrieveDataOrNull("insertPriorities")
-            val extractPriorities: MutableMap<BlockFace, Int>? =
-                dataHolder.retrieveDataOrNull("extractPriorities")
-            val channels: MutableMap<BlockFace, Int>? =
-                dataHolder.retrieveDataOrNull("channels")
-            
-            if (inventoryConfig == null &&
-                connectionConfig == null &&
-                insertFilters == null &&
-                extractFilters == null &&
-                insertPriorities == null &&
-                extractPriorities == null &&
-                channels == null
-            ) return null
-            
-            dataHolder.removeData("inventories")
-            dataHolder.removeData("itemConfig")
-            dataHolder.removeData("insertFilters")
-            dataHolder.removeData("extractFilters")
-            dataHolder.removeData("insertPriorities")
-            dataHolder.removeData("extractPriorities")
-            dataHolder.removeData("channels")
-            
-            val compound = Compound() // new format
-            if (inventoryConfig != null)
-                compound["inventoryConfig"] = inventoryConfig
-            if (connectionConfig != null)
-                compound["connectionConfig"] = connectionConfig
-            if (insertFilters != null)
-                compound["insertFilters"] = insertFilters
-            if (extractFilters != null)
-                compound["extractFilters"] = extractFilters
-            if (insertPriorities != null)
-                compound["insertPriorities"] = insertPriorities
-            if (extractPriorities != null)
-                compound["extractPriorities"] = extractPriorities
-            if (channels != null)
-                compound["channels"] = channels
-            
-            return compound
-        }
         
     }
     

@@ -14,7 +14,6 @@ abstract class DataHolder internal constructor(includePersistent: Boolean) {
     
     @PublishedApi
     internal val persistentData: Compound by lazy {
-        data.rename("global", "persistent") // legacy conversion
         data["persistent"] ?: Compound().also { if (includePersistent) data["persistent"] = it }
     }
     

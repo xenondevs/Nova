@@ -62,8 +62,6 @@ internal abstract class RegionizedFile<T : RegionizedChunk>(
     
 }
 
-private const val LEGACY_MAGIC = 0xB7E21337.toInt()
-
 internal abstract class RegionizedFileReader<C : RegionizedChunk, F : RegionizedFile<C>>(
     private val magic: Int,
     private val version: Byte,
@@ -80,7 +78,7 @@ internal abstract class RegionizedFileReader<C : RegionizedChunk, F : Regionized
         if (reader != null) {
             // verify magic and version
             val fileMagic = reader.readInt()
-            if (fileMagic != magic && fileMagic != LEGACY_MAGIC)
+            if (fileMagic != magic)
                 throw IllegalStateException("Not a valid region file")
             
             // choose reader (legacy reader / readLatest) based on file version

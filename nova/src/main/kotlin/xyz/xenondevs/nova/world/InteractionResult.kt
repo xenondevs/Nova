@@ -75,7 +75,7 @@ internal fun InteractionResult.toNms(): NmsInteractionResult {
     return when (this) {
         is InteractionResult.Success -> NmsInteractionResult.Success(
             NmsInteractionResult.SwingSource.NONE,
-            NmsInteractionResult.ItemContext(wasItemInteraction, null) // TODO: should this expose transformedTo ???
+            NmsInteractionResult.ItemContext(wasItemInteraction, null)
         )
         is InteractionResult.Fail -> NmsInteractionResult.FAIL
         is InteractionResult.Pass -> NmsInteractionResult.PASS

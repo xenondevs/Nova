@@ -9,7 +9,6 @@ import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.observed
 import xyz.xenondevs.commons.provider.orElseNew
-import xyz.xenondevs.nova.serialization.DataHolder
 import xyz.xenondevs.nova.util.TickResettingLong
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import kotlin.math.max
@@ -83,22 +82,5 @@ class DefaultEnergyHolder(
                 _energyProvider.set(capped)
             }
         }
-    
-    internal companion object {
-        
-        fun tryConvertLegacy(dataHolder: DataHolder): Compound? {
-            val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>? = dataHolder.retrieveDataOrNull("energyConfig")
-                ?: return null
-            
-            dataHolder.removeData("energyConfig")
-            
-            val compound = Compound() // new format
-            if (connectionConfig != null)
-                compound["connectionConfig"] = connectionConfig
-            
-            return compound
-        }
-        
-    }
     
 }
