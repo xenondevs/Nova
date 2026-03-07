@@ -23,7 +23,6 @@ internal class VanillaFurnaceTileEntity internal constructor(
     override lateinit var itemHolder: ItemHolder
     
     override fun handleEnable() {
-        DefaultItemHolder.tryConvertLegacy(this)?.let { storeData("itemHolder", it) } // legacy conversion
         itemHolder = StaticVanillaItemHolder(
             storedValue("itemHolder", ::Compound),
             getInventories(pos.nmsBlockEntity as AbstractFurnaceBlockEntity)

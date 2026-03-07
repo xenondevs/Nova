@@ -40,7 +40,6 @@ internal class VanillaChestTileEntity internal constructor(
         linkedChest = getLinkedChest()?.also(linkedNodes::add)
         setInventory(createNetworkedInventory())
         
-        DefaultItemHolder.tryConvertLegacy(this)?.let { storeData("itemHolder", it) } // legacy conversion
         itemHolder = DynamicVanillaItemHolder(
             storedValue("itemHolder", ::Compound),
             { inventories },

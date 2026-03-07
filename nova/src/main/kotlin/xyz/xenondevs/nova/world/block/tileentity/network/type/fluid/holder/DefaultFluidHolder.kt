@@ -34,48 +34,4 @@ class DefaultFluidHolder(
     override val uuidToContainer: Map<UUID, NetworkedFluidContainer> =
         containers.keys.associateByTo(HashMap()) { it.uuid }
     
-    internal companion object {
-        
-        fun tryConvertLegacy(dataHolder: DataHolder): Compound? {
-            val containerConfig: MutableMap<BlockFace, UUID>? =
-                dataHolder.retrieveDataOrNull("fluidContainerConfig")
-            val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>? =
-                dataHolder.retrieveDataOrNull("fluidConnectionConfig")
-            val insertPriorities: MutableMap<BlockFace, Int>? =
-                dataHolder.retrieveDataOrNull("fluidInsertPriorities")
-            val extractPriorities: MutableMap<BlockFace, Int>? =
-                dataHolder.retrieveDataOrNull("fluidExtractPriorities")
-            val channels: MutableMap<BlockFace, Int>? =
-                dataHolder.retrieveDataOrNull("fluidChannels")
-            
-            if (containerConfig == null &&
-                connectionConfig == null &&
-                insertPriorities == null &&
-                extractPriorities == null &&
-                channels == null
-            ) return null
-            
-            dataHolder.removeData("fluidContainerConfig")
-            dataHolder.removeData("fluidConnectionConfig")
-            dataHolder.removeData("fluidInsertPriorities")
-            dataHolder.removeData("fluidExtractPriorities")
-            dataHolder.removeData("fluidChannels")
-            
-            val compound = Compound() // new format
-            if (containerConfig != null)
-                compound["containerConfig"] = containerConfig
-            if (connectionConfig != null)
-                compound["connectionConfig"] = connectionConfig
-            if (insertPriorities != null)
-                compound["insertPriorities"] = insertPriorities
-            if (extractPriorities != null)
-                compound["extractPriorities"] = extractPriorities
-            if (channels != null)
-                compound["channels"] = channels
-            
-            return compound
-        }
-        
-    }
-    
 }

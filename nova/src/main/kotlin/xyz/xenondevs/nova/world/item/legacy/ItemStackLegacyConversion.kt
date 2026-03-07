@@ -2,14 +2,11 @@ package xyz.xenondevs.nova.world.item.legacy
 
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponents
-import org.bukkit.NamespacedKey
-import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import xyz.xenondevs.nova.util.data.getStringOrNull
 import kotlin.jvm.optionals.getOrNull
-import kotlin.reflect.typeOf
 
 internal object ItemStackLegacyConversion {
     
@@ -18,44 +15,7 @@ internal object ItemStackLegacyConversion {
     private val specializedConverters = HashMap<String, ArrayList<ItemStackLegacyConverter>>()
     private val genericConverters = ArrayList<ItemStackLegacyConverter>()
     
-    // TODO: remove legacy conversions in future version
-    init {
-        registerConverter(ItemStackNamespaceConverter(
-            hashSetOf(
-                "nova:speed_upgrade",
-                "nova:efficiency_upgrade",
-                "nova:energy_upgrade",
-                "nova:range_upgrade",
-                "nova:fluid_upgrade"
-            ),
-            "simple_upgrades"
-        ))
-        
-        registerConverter(ItemStackNamespaceConverter(
-            hashSetOf("nova:wrench"),
-            "logistics"
-        ))
-        
-        registerConverter(ItemStackPersistentDataConverter(
-            typeOf<Compound>(),
-            NamespacedKey("nova", "tileentitydata"),
-            NamespacedKey("nova", "tileentity")
-        ))
-        
-        registerConverter(ItemStackPersistentDataConverter(
-            typeOf<Long>(),
-            NamespacedKey("nova", "item_energy"),
-            NamespacedKey("nova", "energy")
-        ))
-        
-        registerConverter(ItemStackPersistentDataConverter(
-            typeOf<Compound>(),
-            NamespacedKey("nova", "damage"),
-        ))
-        
-        registerConverter(ItemStackNovaDamageConverter)
-        registerConverter(ItemStackEnchantmentsConverter)
-    }
+    // there are no legacy converters at the moment
     
     private fun registerConverter(converter: ItemStackLegacyConverter) {
         val affectedItemIds = converter.affectedItemIds
