@@ -31,6 +31,9 @@ sealed interface InteractionResult {
          * The action to perform on the item used for the interaction.
          * - Use `null` if the held item was not involved in the interaction.
          * - Use [ItemAction.None] if the held item was involved but no action should be performed.
+         *   Using this instead of `null` applies additional item-related side effects, like the use cooldown.
+         * - Use any of the pre-made [ItemActions][ItemAction] or a custom one to update the affected item stack after the interaction.
+         *   Of course, this also triggers the application of side effects.
          */
         val action: ItemAction? = null
     ) : InteractionResult {
