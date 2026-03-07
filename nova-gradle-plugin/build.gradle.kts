@@ -25,7 +25,7 @@ gradlePlugin {
 val generateVersionsClass = tasks.register("generateVersionsClass") {
     val generatedSrcDir = layout.buildDirectory.dir("generatedSrc")
     
-    inputs.property("nova", provider { project.version })
+    inputs.property("nova", provider { version })
     inputs.property("paper", libs.versions.paper)
     outputs.dir(generatedSrcDir)
     
@@ -37,8 +37,8 @@ val generateVersionsClass = tasks.register("generateVersionsClass") {
             package xyz.xenondevs.novagradle
             
             internal object Versions {
-                const val NOVA = "${project.version}"
-                const val NOVA_RELEASE = "${Regex("""^(\d+.\d+).*$""").matchEntire(project.version.toString())!!.groupValues[1]}"
+                const val NOVA = "$version"
+                const val NOVA_RELEASE = "${Regex("""^(\d+.\d+).*$""").matchEntire(version.toString())!!.groupValues[1]}"
                 const val PAPER = "${libs.versions.paper.get()}"
                 const val PAPER_API_VERSION = "${libs.versions.paper.get().substring(0, 4)}"
             }
