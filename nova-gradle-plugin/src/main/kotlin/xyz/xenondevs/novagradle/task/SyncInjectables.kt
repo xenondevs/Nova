@@ -10,8 +10,10 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.Sync
 import org.gradle.kotlin.dsl.property
+import org.gradle.work.DisableCachingByDefault
 import javax.inject.Inject
 
+@DisableCachingByDefault
 internal abstract class SyncInjectables @Inject constructor(
     objects: ObjectFactory
 ) : Sync() {

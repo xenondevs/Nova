@@ -6,7 +6,10 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.novagradle.util.AddonResourcePack
@@ -15,11 +18,13 @@ import xyz.xenondevs.renderer.MinecraftModelRenderer
 import xyz.xenondevs.renderer.model.resource.ZipResourcePack
 import java.io.File
 
+@DisableCachingByDefault
 internal abstract class GenerateWailaTexturesTask : DefaultTask() {
     
     @get:Input
     abstract val addonId: Property<String>
     
+    @get:PathSensitive(PathSensitivity.NONE)
     @get:InputDirectory
     abstract val resourcesDir: DirectoryProperty
     

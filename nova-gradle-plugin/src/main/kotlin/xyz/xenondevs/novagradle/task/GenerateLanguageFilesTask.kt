@@ -2,6 +2,7 @@ package xyz.xenondevs.novagradle.task
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 
 private val LANGUAGE_CODES = arrayOf(
     "af_za", "ar_sa", "ast_es", "az_az", "bar", "ba_ru", "be_by", "bg_bg", "brb", "br_fr", "bs_ba", "ca_es", "cs_cz",
@@ -16,6 +17,7 @@ private val LANGUAGE_CODES = arrayOf(
     "zh_hk", "zh_tw", "zlm_arab"
 )
 
+@DisableCachingByDefault
 internal abstract class GenerateLanguageFilesTask : DefaultTask() {
     
     @TaskAction
