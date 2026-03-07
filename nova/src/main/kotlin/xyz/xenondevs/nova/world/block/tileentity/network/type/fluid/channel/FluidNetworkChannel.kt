@@ -226,9 +226,9 @@ internal class FluidNetworkChannel {
                 val bufferContainersForPriority = HashSet<FluidConfiguration>()
                 
                 if (lastConfigs != null) {
-                    consumerContainersForPriority += lastConfigs!!.first
-                    providerContainersForPriority += lastConfigs!!.second
-                    bufferContainersForPriority += lastConfigs!!.third
+                    consumerContainersForPriority += lastConfigs.first
+                    providerContainersForPriority += lastConfigs.second
+                    bufferContainersForPriority += lastConfigs.third
                 }
                 
                 consumers[priority]?.forEach(consumerContainersForPriority::add)

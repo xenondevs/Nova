@@ -239,7 +239,7 @@ sealed class SelectItemModelProperty<T>(internal val property: ItemModel.Select.
      */
     open class CustomModelData(private val index: Int) : SelectItemModelProperty<String>(ItemModel.Select.Property.CUSTOM_MODEL_DATA) {
         
-        override fun toJson(value: String) = JsonPrimitive(value.toString())
+        override fun toJson(value: String) = JsonPrimitive(value)
         
         override fun buildModel(cases: List<ItemModel.Select.Case>, fallback: ItemModel?) =
             ItemModel.Select(
