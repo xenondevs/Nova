@@ -1,4 +1,4 @@
-rootProject.name = "nova-parent"
+rootProject.name = "nova"
 
 // core project
 include("nova")
