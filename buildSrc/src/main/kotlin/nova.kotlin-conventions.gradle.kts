@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("nova.java-conventions")
@@ -8,7 +7,6 @@ plugins {
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_25
         jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
         
         optIn.addAll(
