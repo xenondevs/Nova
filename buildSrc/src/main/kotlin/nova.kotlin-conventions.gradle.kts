@@ -8,7 +8,7 @@ plugins {
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_21
+        jvmTarget = JvmTarget.JVM_25
         jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
         
         optIn.addAll(
