@@ -68,7 +68,7 @@
   "command.nova.remove_invalid_vtes.success": "잘못된 %s 바닐라 타일 엔터티를 제거했습니다.",
   "command.nova.remove_invalid_vtes.failure": "잘못된 바닐라 타일 엔티티가 발견되지 않았습니다.",
   "item.cbf_tags": "CBF: %s 태그",
-  "menu.nova.items": "항목",
+  "menu.nova.items": "아이템",
   "waila.nova.required_tool": "도구: ",
   "menu.nova.side_config.up": "Up",
   "menu.nova.side_config.down": "아래로",
@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "잎을 처리하고 %s 잎을 비영구적으로 만들었습니다.",
   "command.nova.show_vanilla_block_state.success": "블록 상태 %s를 보고 있습니다.",
   "command.nova.show_vanilla_block_state.failure": "블록을 보고 다시 시도하세요.",
-  "menu.nova.items.player_inventory": "플레이어 인벤토리"
+  "menu.nova.items.player_inventory": "플레이어 인벤토리",
+  "command.nova.reset.files.success": "파일 %s을(를) 성공적으로 재설정했습니다. 변경 사항을 적용하려면 서버를 다시 시작하거나 Nova를 다시 로드해야 합니다.",
+  "command.nova.reset.files.no_files": "지정된 와일드카드와 일치하는 파일을 찾을 수 없습니다."
 }

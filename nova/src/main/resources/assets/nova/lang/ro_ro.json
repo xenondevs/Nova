@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Procesat %s frunze și făcut %s frunze nepersistente.",
   "command.nova.show_vanilla_block_state.success": "Vă uitați la starea blocului %s.",
   "command.nova.show_vanilla_block_state.failure": "Vă rugăm să vă uitați la un bloc și să încercați din nou.",
-  "menu.nova.items.player_inventory": "Inventar jucător"
+  "menu.nova.items.player_inventory": "Inventar jucător",
+  "command.nova.reset.files.success": "Ați resetat cu succes %s fișier(e). Este necesară o repornire a serverului sau o reîncărcare Nova pentru ca modificările să intre în vigoare.",
+  "command.nova.reset.files.no_files": "Nu s-a putut găsi niciun fișier care să corespundă wildcard-ului dat."
 }

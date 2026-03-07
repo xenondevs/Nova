@@ -158,5 +158,7 @@
   "command.nova.show_block_model_data.model_less": "%s นี้ใช้บล็อกพื้นฐานดังต่อไปนี้: %s.",
   "command.nova.show_block_model_data.backing_state": "%s นี้ใช้การกำหนดค่าสถานะสำรองดังต่อไปนี้:\nบล็อก: %s\nรูปแบบ: %s",
   "command.nova.show_block_model_data.display_entity": "%s นี้ใช้การกำหนดค่าการแสดงผลของเอนทิตีดังต่อไปนี้:\nประเภท Hitbox: %s\nโมเดล (%s):\n%s",
-  "command.nova.reload_configs.success": "โหลดค่ากำหนด %s สำเร็จ: %s."
+  "command.nova.reload_configs.success": "โหลดค่ากำหนด %s สำเร็จ: %s.",
+  "command.nova.reset.files.success": "รีเซ็ตไฟล์ %s สำเร็จแล้ว จำเป็นต้องรีสตาร์ทเซิร์ฟเวอร์หรือรีโหลด Nova เพื่อให้การเปลี่ยนแปลงมีผล",
+  "command.nova.reset.files.no_files": "ไม่พบไฟล์ใดที่ตรงกับตัวอักขระแทนที่ที่ระบุ"
 }

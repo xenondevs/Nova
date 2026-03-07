@@ -158,5 +158,7 @@
   "command.nova.show_item_model_data.success": "يستخدم هذا %s نوع العنصر %s مع الطراز %s.",
   "command.nova.show_vanilla_block_state.success": "أنت تنظر إلى حالة الكتلة %s.",
   "command.nova.show_vanilla_block_state.failure": "يرجى إلقاء نظرة على كتلة والمحاولة مرة أخرى.",
-  "menu.nova.items.player_inventory": "مخزون اللاعب"
+  "menu.nova.items.player_inventory": "مخزون اللاعب",
+  "command.nova.reset.files.success": "تمت إعادة تعيين ملف (ملفات) %s بنجاح. يلزم إعادة تشغيل الخادم أو إعادة تحميل Nova حتى تدخل التغييرات حيز التنفيذ.",
+  "command.nova.reset.files.no_files": "تعذر العثور على أي ملفات مطابقة لحرف البدل المحدد."
 }

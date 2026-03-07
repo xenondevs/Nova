@@ -194,17 +194,25 @@ internal object PacketItems : Listener, PacketListener {
     @PacketHandler
     private fun handleMerchantOffers(event: ClientboundMerchantOffersPacketEvent) {
         val newOffers = MerchantOffers()
-        
         event.offers.forEach { offer ->
-            val stackA = getClientSideStack(event.player, offer.baseCostA.itemStack)
-            val costA = ItemCost(stackA.itemHolder, stackA.count, DataComponentExactPredicate.EMPTY, stackA)
-            val costB = offer.costB.map {
-                val stackB = getClientSideStack(event.player, it.itemStack)
-                ItemCost(stackB.itemHolder, stackB.count, DataComponentExactPredicate.EMPTY, stackB)
-            }
             newOffers += MerchantOffer(
-                costA, costB, getClientSideStack(event.player, offer.result),
-                offer.uses, offer.maxUses, offer.xp, offer.priceMultiplier, offer.demand
+                offer.baseCostA.itemStack.let {
+                    val stackA = getClientSideStack(event.player, it)
+                    ItemCost(stackA.itemHolder, stackA.count, DataComponentExactPredicate.EMPTY, stackA)
+                },
+                offer.costB.map {
+                    val stackB = getClientSideStack(event.player, it.itemStack)
+                    ItemCost(stackB.itemHolder, stackB.count, DataComponentExactPredicate.EMPTY, stackB)
+                }, 
+                getClientSideStack(event.player, offer.result),
+                offer.uses,
+                offer.maxUses,
+                offer.rewardExp,
+                offer.specialPriceDiff,
+                offer.demand, 
+                offer.priceMultiplier,
+                offer.xp, 
+                offer.ignoreDiscounts
             )
         }
         

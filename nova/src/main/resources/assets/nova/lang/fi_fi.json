@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Käsitteli %s lehteä ja teki %s lehdestä ei-pysyviä.",
   "command.nova.show_vanilla_block_state.success": "Katsot lohkon tilaa %s.",
   "command.nova.show_vanilla_block_state.failure": "Katso lohkoa ja yritä uudelleen.",
-  "menu.nova.items.player_inventory": "Pelaajan inventaario"
+  "menu.nova.items.player_inventory": "Pelaajan inventaario",
+  "command.nova.reset.files.success": "Nollasi onnistuneesti %s-tiedosto(t). Palvelimen uudelleenkäynnistys tai Novan uudelleenlataus vaaditaan, jotta muutokset tulevat voimaan.",
+  "command.nova.reset.files.no_files": "Ei löytynyt yhtään annettua jokerimerkkiä vastaavaa tiedostoa."
 }

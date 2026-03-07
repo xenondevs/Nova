@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "处理了 %s 片树叶，并使 %s 片树叶成为非持久性树叶。",
   "command.nova.show_vanilla_block_state.success": "您正在查看的是块状态 %s。",
   "command.nova.show_vanilla_block_state.failure": "请查看一个区块，然后再试一次。",
-  "menu.nova.items.player_inventory": "玩家库存"
+  "menu.nova.items.player_inventory": "玩家库存",
+  "command.nova.reset.files.success": "成功重置 %s 文件。需要重启服务器或重新加载 Nova 才能使更改生效。",
+  "command.nova.reset.files.no_files": "找不到任何与给定通配符匹配的文件。"
 }

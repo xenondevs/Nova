@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "A traité %s feuilles et a rendu %s feuilles non persistantes.",
   "command.nova.show_vanilla_block_state.success": "Vous regardez l'état du bloc %s.",
   "command.nova.show_vanilla_block_state.failure": "Veuillez regarder un bloc et réessayer.",
-  "menu.nova.items.player_inventory": "Inventaire du joueur"
+  "menu.nova.items.player_inventory": "Inventaire du joueur",
+  "command.nova.reset.files.success": "Réinitialisation réussie de %s file(s). Un redémarrage du serveur ou un rechargement de Nova est nécessaire pour que les changements prennent effet.",
+  "command.nova.reset.files.no_files": "Impossible de trouver des fichiers correspondant au joker donné."
 }

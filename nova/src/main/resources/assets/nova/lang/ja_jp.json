@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "s 個の葉を処理し、%s 個の葉を非永続にしました。",
   "command.nova.show_vanilla_block_state.success": "ブロックの状態 %s を見ています。",
   "command.nova.show_vanilla_block_state.failure": "ブロックを見て、もう一度試してください。",
-  "menu.nova.items.player_inventory": "プレイヤーのインベントリ"
+  "menu.nova.items.player_inventory": "プレイヤーのインベントリ",
+  "command.nova.reset.files.success": "sファイルのリセットに成功しました。変更を有効にするには、サーバーの再起動または Nova の再読み込みが必要です。",
+  "command.nova.reset.files.no_files": "指定されたワイルドカードに一致するファイルが見つかりませんでした。"
 }

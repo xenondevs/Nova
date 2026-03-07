@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Bearbejdede %s blade og gjorde %s blade ikke-vedvarende.",
   "command.nova.show_vanilla_block_state.success": "Du ser på bloktilstanden %s.",
   "command.nova.show_vanilla_block_state.failure": "Se venligst på en blok og prøv igen.",
-  "menu.nova.items.player_inventory": "Spiller-inventar"
+  "menu.nova.items.player_inventory": "Spiller-inventar",
+  "command.nova.reset.files.success": "Nulstillet %s fil(er) med succes. En genstart af serveren eller en genindlæsning af Nova er påkrævet for at ændringerne kan træde i kraft.",
+  "command.nova.reset.files.no_files": "Kunne ikke finde nogen filer, der matcher det givne jokertegn."
 }

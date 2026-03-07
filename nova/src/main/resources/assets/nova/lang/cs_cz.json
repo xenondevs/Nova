@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Zpracováno %s listů a %s listů se stalo nepersistentními.",
   "command.nova.show_vanilla_block_state.success": "Díváte se na stav bloku %s.",
   "command.nova.show_vanilla_block_state.failure": "Podívejte se prosím na blok a zkuste to znovu.",
-  "menu.nova.items.player_inventory": "Inventář hráče"
+  "menu.nova.items.player_inventory": "Inventář hráče",
+  "command.nova.reset.files.success": "Soubor(y) %s byl(y) úspěšně resetován(y). Aby se změny projevily, je třeba restartovat server nebo znovu načíst Novu.",
+  "command.nova.reset.files.no_files": "Nepodařilo se najít žádné soubory odpovídající zadanému zástupnému znaku."
 }

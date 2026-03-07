@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Przetworzono %s liści i uczyniono %s liści nietrwałymi.",
   "command.nova.show_vanilla_block_state.success": "Patrzysz na stan bloku %s.",
   "command.nova.show_vanilla_block_state.failure": "Spójrz na blok i spróbuj ponownie.",
-  "menu.nova.items.player_inventory": "Inwentarz gracza"
+  "menu.nova.items.player_inventory": "Inwentarz gracza",
+  "command.nova.reset.files.success": "Pomyślnie zresetowano %s plik(i). Aby zmiany zaczęły obowiązywać, wymagane jest ponowne uruchomienie serwera lub przeładowanie Nova.",
+  "command.nova.reset.files.no_files": "Nie znaleziono plików pasujących do podanego symbolu wieloznacznego."
 }

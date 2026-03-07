@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Obdelanih je bilo %s listov in %s listov je postalo nepersistentnih.",
   "command.nova.show_vanilla_block_state.success": "Gledate stanje bloka %s.",
   "command.nova.show_vanilla_block_state.failure": "Oglejte si blok in poskusite znova.",
-  "menu.nova.items.player_inventory": "Inventar igralca"
+  "menu.nova.items.player_inventory": "Inventar igralca",
+  "command.nova.reset.files.success": "Uspešno ponastavite %s datoteke. Za uveljavitev sprememb je potreben ponovni zagon strežnika ali ponovno nalaganje Nove.",
+  "command.nova.reset.files.no_files": "Ni bilo mogoče najti nobene datoteke, ki bi ustrezala podanemu nadomestnemu znaku."
 }

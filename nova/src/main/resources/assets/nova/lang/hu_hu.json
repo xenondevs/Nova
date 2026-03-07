@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Feldolgozott %s levelet, és %s levelet nem tartósított.",
   "command.nova.show_vanilla_block_state.success": "A blokk állapotát nézed %s.",
   "command.nova.show_vanilla_block_state.failure": "Kérjük, nézz meg egy blokkot, és próbáld meg újra.",
-  "menu.nova.items.player_inventory": "Játékos leltár"
+  "menu.nova.items.player_inventory": "Játékos leltár",
+  "command.nova.reset.files.success": "Sikeresen visszaállította %s fájl(ok)at. A módosítások érvénybe lépéséhez a szerver újraindítása vagy a Nova újratöltése szükséges.",
+  "command.nova.reset.files.no_files": "Nem talált a megadott helyettesítő jelszóra illeszkedő fájlokat."
 }

@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Mengolah daun %s dan membuat daun %s tidak persisten.",
   "command.nova.show_vanilla_block_state.success": "Anda sedang melihat status blok %s.",
   "command.nova.show_vanilla_block_state.failure": "Silakan lihat blok dan coba lagi.",
-  "menu.nova.items.player_inventory": "Inventaris Pemain"
+  "menu.nova.items.player_inventory": "Inventaris Pemain",
+  "command.nova.reset.files.success": "Berhasil mengatur ulang file%s. Server harus dimulai ulang atau memuat ulang Nova agar perubahan dapat diterapkan.",
+  "command.nova.reset.files.no_files": "Tidak dapat menemukan file yang cocok dengan wildcard yang diberikan."
 }

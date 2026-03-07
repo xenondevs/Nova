@@ -158,5 +158,7 @@
   "command.nova.recalculate_leave_properties.done": "Procesadas %s hojas y hechas %s hojas no persistentes.",
   "command.nova.show_vanilla_block_state.success": "Estás viendo el estado del bloque %s.",
   "command.nova.show_vanilla_block_state.failure": "Por favor, mira un bloque e inténtalo de nuevo.",
-  "menu.nova.items.player_inventory": "Inventario del jugador"
+  "menu.nova.items.player_inventory": "Inventario del jugador",
+  "command.nova.reset.files.success": "Restablecido con éxito %s archivo(s). Es necesario reiniciar el servidor o recargar Nova para que los cambios surtan efecto.",
+  "command.nova.reset.files.no_files": "No se pudo encontrar ningún archivo que coincida con el comodín dado."
 }

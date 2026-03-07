@@ -158,5 +158,7 @@
   "command.nova.show_item_behaviors.no_item": "Vui lòng cầm một vật phẩm trong tay chính và thử lại.",
   "command.nova.recalculate_leave_properties.done": "Xử lý %s lá và làm cho %s lá không còn tồn tại.",
   "command.nova.show_vanilla_block_state.success": "Bạn đang xem trạng thái khối %s.",
-  "command.nova.show_vanilla_block_state.failure": "Vui lòng xem lại khối đó và thử lại."
+  "command.nova.show_vanilla_block_state.failure": "Vui lòng xem lại khối đó và thử lại.",
+  "command.nova.reset.files.success": "Đã thiết lập lại thành công tệp %s. Cần khởi động lại máy chủ hoặc tải lại Nova để các thay đổi có hiệu lực.",
+  "command.nova.reset.files.no_files": "Không tìm thấy bất kỳ tệp nào khớp với ký tự đại diện đã cho."
 }

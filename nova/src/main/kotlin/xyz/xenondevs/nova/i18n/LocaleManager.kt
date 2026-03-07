@@ -17,6 +17,7 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.util.component.adventure.MessageFormatConverter
 import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.formatSafely
 import java.text.MessageFormat
@@ -146,10 +147,9 @@ object LocaleManager {
                 }
             }
             
-            // fixme: format strings are not in MessageFormat-format
-            return getFormatStringOrNull(lang, key)?.let(::MessageFormat)
+            return getFormatStringOrNull(lang, key)?.let(MessageFormatConverter::formatStringToMessageFormat)
         }
         
     }
-    
+        
 }
