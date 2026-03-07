@@ -64,6 +64,8 @@ loaderJar {
 
 tasks {
     withType<ProcessResources> {
+        inputs.property("version", provider { version })
+        inputs.property("apiVersion", libs.versions.paper)
         filesMatching("paper-plugin.yml") {
             expand(buildMap {
                 put("version", version)
