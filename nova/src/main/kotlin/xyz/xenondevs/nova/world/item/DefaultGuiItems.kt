@@ -3,8 +3,8 @@ package xyz.xenondevs.nova.world.item
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistrar.item
-import xyz.xenondevs.nova.registry.NovaRegistryLoader
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.resources.builder.data.TintSource
 import xyz.xenondevs.nova.resources.builder.layout.item.ConditionItemModelProperty
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelCreationScope
@@ -121,6 +121,8 @@ object DefaultGuiItems {
             model = canvasModel(18, 18)
         }
     }
+    
+    val DISABLED_SLOT = tpGuiItem("disabled_slot", stretched = true)
     
     //<editor-fold desc="without background">
     // legacy InvUI gui items
