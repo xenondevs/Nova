@@ -7,15 +7,16 @@ import xyz.xenondevs.invui.Observer
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.util.InventoryUtils
+import xyz.xenondevs.invui.util.ItemUtils
 import xyz.xenondevs.nova.util.item.isNullOrEmpty
 import xyz.xenondevs.nova.world.player.swingMainHandEventless
 
 /**
  * UI item that acts as if there were no slot, letting the player drop items by clicking on it.
  */
-internal object NoSlotItem : Item {
+object NoSlotItem : Item {
     
-    override fun getItemProvider(viewer: Player) = ItemProvider.EMPTY
+    override fun getItemProvider(viewer: Player) = ItemUtils.getPlaceholderProvider()
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) {
         val cursor = player.itemOnCursor
