@@ -321,7 +321,7 @@ private fun <T : Any> Provider<ConfigurationNode>.getOptionalEntry(nodes: List<C
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(default: T?, vararg path: String): Provider<T> =
-    if (default != null) strongOptionalEntry<T>(*path).strongOrElse(default) else strongEntry<T>(*path)
+    strongEntryOrElse(typeOf<T>().javaType, default, *path)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under [path], using [default] as fallback, or requiring config presence if null.
@@ -332,7 +332,47 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(defau
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: T?, vararg path: String): Provider<T> =
-    if (default != null) optionalEntry<T>(*path).orElse(default) else entry<T>(*path)
+    entryOrElse(typeOf<T>().javaType, default, *path)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under [path], using [default] as fallback, or requiring config presence if null.
+ *
+ * @throws NoSuchElementException if the entry does not exist and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.strongEntryOrElse(type: KType, default: T?, vararg path: String): Provider<T> =
+    strongEntryOrElse(type.javaType, default, *path)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under [path], using [default] as fallback, or requiring config presence if null.
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ *
+ * @throws NoSuchElementException if the entry does not exist and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.entryOrElse(type: KType, default: T?, vararg path: String): Provider<T> =
+    entryOrElse(type.javaType, default, *path)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under [path], using [default] as fallback, or requiring config presence if null.
+ *
+ * @throws NoSuchElementException if the entry does not exist and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.strongEntryOrElse(type: Type, default: T?, vararg path: String): Provider<T> =
+    if (default != null) strongOptionalEntry<T>(type, *path).strongOrElse(default) else strongEntry(type, *path)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under [path], using [default] as fallback, or requiring config presence if null.
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ *
+ * @throws NoSuchElementException if the entry does not exist and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.entryOrElse(type: Type, default: T?, vararg path: String): Provider<T> =
+    if (default != null) optionalEntry<T>(type, *path).orElse(default) else entry(type, *path)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under the first existing path from [paths],
@@ -342,7 +382,7 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: T?
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(default: T?, vararg paths: Array<String>): Provider<T> =
-    if (default != null) strongOptionalEntry<T>(*paths).strongOrElse(default) else strongEntry<T>(*paths)
+    strongEntryOrElse(typeOf<T>().javaType, default, *paths)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under the first existing path from [paths],
@@ -354,7 +394,51 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(defau
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: T?, vararg paths: Array<String>): Provider<T> =
-    if (default != null) optionalEntry<T>(*paths).orElse(default) else entry<T>(*paths)
+    entryOrElse(typeOf<T>().javaType, default, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under the first existing path from [paths],
+ * using [default] as fallback, or requiring config presence if null.
+ *
+ * @throws NoSuchElementException if no entry exists and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.strongEntryOrElse(type: KType, default: T?, vararg paths: Array<String>): Provider<T> =
+    strongEntryOrElse(type.javaType, default, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under the first existing path from [paths],
+ * using [default] as fallback, or requiring config presence if null.
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ *
+ * @throws NoSuchElementException if no entry exists and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.entryOrElse(type: KType, default: T?, vararg paths: Array<String>): Provider<T> =
+    entryOrElse(type.javaType, default, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under the first existing path from [paths],
+ * using [default] as fallback, or requiring config presence if null.
+ *
+ * @throws NoSuchElementException if no entry exists and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.strongEntryOrElse(type: Type, default: T?, vararg paths: Array<String>): Provider<T> =
+    if (default != null) strongOptionalEntry<T>(type, *paths).strongOrElse(default) else strongEntry(type, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under the first existing path from [paths],
+ * using [default] as fallback, or requiring config presence if null.
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ *
+ * @throws NoSuchElementException if no entry exists and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.entryOrElse(type: Type, default: T?, vararg paths: Array<String>): Provider<T> =
+    if (default != null) optionalEntry<T>(type, *paths).orElse(default) else entry(type, *paths)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under [path], using [default] as fallback, or requiring config presence if null.
@@ -363,7 +447,7 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: T?
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(default: Provider<T>?, vararg path: String): Provider<T> =
-    if (default != null) strongOptionalEntry<T>(*path).strongOrElseBy(default) else strongEntry<T>(*path)
+    strongEntryOrElse(typeOf<T>().javaType, default, *path)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under [path], using [default] as fallback, or requiring config presence if null.
@@ -374,7 +458,47 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(defau
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: Provider<T>?, vararg path: String): Provider<T> =
-    if (default != null) optionalEntry<T>(*path).orElseBy(default) else entry<T>(*path)
+    entryOrElse(typeOf<T>().javaType, default, *path)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under [path], using [default] as fallback, or requiring config presence if null.
+ *
+ * @throws NoSuchElementException if the entry does not exist and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.strongEntryOrElse(type: KType, default: Provider<T>?, vararg path: String): Provider<T> =
+    strongEntryOrElse(type.javaType, default, *path)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under [path], using [default] as fallback, or requiring config presence if null.
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ *
+ * @throws NoSuchElementException if the entry does not exist and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.entryOrElse(type: KType, default: Provider<T>?, vararg path: String): Provider<T> =
+    entryOrElse(type.javaType, default, *path)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under [path], using [default] as fallback, or requiring config presence if null.
+ *
+ * @throws NoSuchElementException if the entry does not exist and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.strongEntryOrElse(type: Type, default: Provider<T>?, vararg path: String): Provider<T> =
+    if (default != null) strongOptionalEntry<T>(type, *path).strongOrElseBy(default) else strongEntry(type, *path)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under [path], using [default] as fallback, or requiring config presence if null.
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ *
+ * @throws NoSuchElementException if the entry does not exist and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.entryOrElse(type: Type, default: Provider<T>?, vararg path: String): Provider<T> =
+    if (default != null) optionalEntry<T>(type, *path).orElseBy(default) else entry(type, *path)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under the first existing path from [paths],
@@ -384,7 +508,7 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: Pr
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
-    if (default != null) strongOptionalEntry<T>(*paths).strongOrElseBy(default) else strongEntry<T>(*paths)
+    strongEntryOrElse(typeOf<T>().javaType, default, *paths)
 
 /**
  * Gets an entry [Provider] for a value of type [T] under the first existing path from [paths],
@@ -396,7 +520,51 @@ inline fun <reified T : Any> Provider<ConfigurationNode>.strongEntryOrElse(defau
  * @throws IllegalStateException if the entry could not be deserialized to [T]
  */
 inline fun <reified T : Any> Provider<ConfigurationNode>.entryOrElse(default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
-    if (default != null) optionalEntry<T>(*paths).orElseBy(default) else entry<T>(*paths)
+    entryOrElse(typeOf<T>().javaType, default, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under the first existing path from [paths],
+ * using [default] as fallback, or requiring config presence if null.
+ *
+ * @throws NoSuchElementException if no entry exists and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.strongEntryOrElse(type: KType, default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
+    strongEntryOrElse(type.javaType, default, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under the first existing path from [paths],
+ * using [default] as fallback, or requiring config presence if null.
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ *
+ * @throws NoSuchElementException if no entry exists and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.entryOrElse(type: KType, default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
+    entryOrElse(type.javaType, default, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under the first existing path from [paths],
+ * using [default] as fallback, or requiring config presence if null.
+ *
+ * @throws NoSuchElementException if no entry exists and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.strongEntryOrElse(type: Type, default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
+    if (default != null) strongOptionalEntry<T>(type, *paths).strongOrElseBy(default) else strongEntry(type, *paths)
+
+/**
+ * Gets an entry [Provider] for a value of [type] under the first existing path from [paths],
+ * using [default] as fallback, or requiring config presence if null.
+ *
+ * The returned provider will only be stored in a [WeakReference] in the parent provider.
+ *
+ * @throws NoSuchElementException if no entry exists and [default] is null
+ * @throws IllegalStateException if the entry could not be deserialized to [type]
+ */
+fun <T : Any> Provider<ConfigurationNode>.entryOrElse(type: Type, default: Provider<T>?, vararg paths: Array<String>): Provider<T> =
+    if (default != null) optionalEntry<T>(type, *paths).orElseBy(default) else entry(type, *paths)
 
 private fun Provider<ConfigurationNode>.fullPath(): String {
     val filePath = findFilePath()
