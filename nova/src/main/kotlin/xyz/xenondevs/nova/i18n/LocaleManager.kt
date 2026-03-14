@@ -10,6 +10,13 @@ import net.kyori.adventure.translation.Translator
 import net.minecraft.locale.Language
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.util.FormattedCharSequence
+import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerLocaleChangeEvent
+import xyz.xenondevs.commons.provider.MutableProvider
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -17,9 +24,12 @@ import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
+import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.component.adventure.MessageFormatConverter
+import xyz.xenondevs.nova.util.component.adventure.toMinecraftLocaleCode
 import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.formatSafely
+import xyz.xenondevs.nova.util.registerEvents
 import java.text.MessageFormat
 import java.util.*
 import kotlin.io.path.extension
@@ -30,17 +40,21 @@ import kotlin.io.path.walk
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dispatcher = Dispatcher.ASYNC,
     runAfter = [ResourceGeneration.PostWorld::class]
 )
-object LocaleManager {
+object LocaleManager : Listener {
     
     private val RENDERER = TranslatableComponentRenderer.usingTranslationSource(NovaTranslator)
-    
+    private val playerLocales: MutableMap<Player, MutableProvider<Locale>> = PlayerMapManager.createMap()
     private var vanillaTranslations: Map<String, Map<String, String>> = emptyMap()
     
-    @InitFun
-    private suspend fun init() = withContext(Dispatchers.IO) {
+    @InitFun(dispatcher = Dispatcher.SYNC)
+    private fun registerListener() {
+        registerEvents()
+    }
+    
+    @InitFun(dispatcher = Dispatcher.ASYNC)
+    private suspend fun loadLanguages() = withContext(Dispatchers.IO) {
         vanillaTranslations = ResourcePackBuilder.MCASSETS_DIR.resolve("assets/minecraft/lang/").walk()
             .filter { !it.isDirectory() && it.extension.equals("json", true) }
             .filter { it.name != "deprecated.json" }
@@ -104,6 +118,18 @@ object LocaleManager {
         return RENDERER.render(component, locale)
     }
     
+    /**
+     * Gets a provider containing the [player's locale][Player.locale]
+     * that updates when the player changes their language.
+     */
+    fun getLocaleProvider(player: Player): Provider<Locale> =
+        playerLocales.getOrPut(player) { mutableProvider(player.locale()) }
+    
+    @EventHandler
+    private fun handlePlayerLocaleChange(event: PlayerLocaleChangeEvent) {
+        playerLocales[event.player]?.set(event.locale())
+    }
+    
     private object NovaLanguage : Language() {
         
         private val delegate = getInstance()
@@ -135,19 +161,8 @@ object LocaleManager {
         override fun name(): Key = Key.key("nova", "translator")
         
         override fun translate(key: String, locale: Locale): MessageFormat? {
-            val lang = buildString {
-                append(locale.language.lowercase())
-                if (locale.country.isNotEmpty()) {
-                    append("_")
-                    append(locale.country.lowercase())
-                    if (locale.variant.isNotEmpty()) {
-                        append("_")
-                        append(locale.variant.lowercase())
-                    }
-                }
-            }
-            
-            return getFormatStringOrNull(lang, key)?.let(MessageFormatConverter::formatStringToMessageFormat)
+            return getFormatStringOrNull(locale.toMinecraftLocaleCode(), key)
+                ?.let(MessageFormatConverter::formatStringToMessageFormat)
         }
         
     }

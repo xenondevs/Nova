@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.ui.menu
 
+import net.kyori.adventure.text.Component
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.dsl.IngredientsDsl
 import xyz.xenondevs.invui.dsl.ItemProviderDsl
+import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.dsl.property.ProviderDslProperty
 import xyz.xenondevs.invui.gui.IngredientMapper
@@ -16,11 +18,14 @@ import xyz.xenondevs.invui.inventory.Inventory
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.setItemProvider
+import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.ui.menu.item.PageBackItem
 import xyz.xenondevs.nova.ui.menu.item.PageForwardItem
 import xyz.xenondevs.nova.ui.menu.item.ScrollDownItem
 import xyz.xenondevs.nova.ui.menu.item.ScrollUpItem
+import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
+import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.clientsideProvider
@@ -77,6 +82,10 @@ infix fun Char.by(item: Provider<NovaItem>) {
 
 infix fun ProviderDslProperty<in ItemProvider>.by(novaItem: Provider<NovaItem>): Unit =
     by(novaItem.clientsideProvider)
+
+context(dsl: WindowDsl)
+infix fun ProviderDslProperty<Component>.by(guiTexture: RegistryEntry.Nova<GuiTexture>): Unit =
+    by(guiTexture.getTitle(LocaleManager.getLocaleProvider(dsl.viewer)))
 
 internal fun Provider<NovaItem>.asUiItem(): Item =
     Item.builder().setItemProvider(clientsideProvider).build()

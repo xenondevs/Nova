@@ -36,6 +36,7 @@ import xyz.xenondevs.nova.world.item.clientsideProvider
 import xyz.xenondevs.nova.world.item.recipe.RecipeContainer
 import xyz.xenondevs.nova.world.item.recipe.RecipeRegistry
 import java.util.*
+import kotlin.math.round
 
 /**
  * Tries to open the recipe explorer for the recipes of [item],
@@ -147,10 +148,10 @@ internal class RecipesMenu(
                 recipes[tab].first.texture.getTitle(
                     Component.text()
                         .move(
-                            GuiTextureAlignment.CHEST_OFFSET.x() + GuiTextureAlignment.CHEST_WIDTH / 2f
+                            round(GuiTextureAlignment.CHEST_OFFSET.x() + GuiTextureAlignment.CHEST_WIDTH / 2f
                                 // -1 to account for space after last char (counts towards width, but isn't visible)
                                 // -1 to account for shadow which recipe_numbers has as part of the char
-                                - (CharSizes.calculateComponentWidth(pageNumberComponent) - 2) / 2f
+                                - (CharSizes.calculateComponentWidth(pageNumberComponent) - 2) / 2f)
                         )
                         .append(pageNumberComponent)
                         .build()
