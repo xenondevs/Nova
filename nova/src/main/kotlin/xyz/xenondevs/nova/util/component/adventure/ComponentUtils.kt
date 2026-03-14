@@ -5,6 +5,7 @@ package xyz.xenondevs.nova.util.component.adventure
 import com.mojang.serialization.JsonOps
 import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentBuilder
@@ -18,8 +19,6 @@ import net.md_5.bungee.chat.ComponentSerializer
 import net.minecraft.nbt.StringTag
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.chat.FontDescription
-import net.minecraft.network.chat.contents.PlainTextContents
-import net.minecraft.network.chat.contents.TranslatableContents
 import org.bukkit.entity.Player
 import xyz.xenondevs.invui.internal.util.ComponentUtils
 import xyz.xenondevs.nova.resources.CharSizes
@@ -143,38 +142,15 @@ fun Style.toNmsStyle(): MojangStyle {
     return style
 }
 
-internal fun MojangComponent.isEmpty(): Boolean {
-    val queue = LinkedList<MojangComponent>()
-    queue.add(this)
-    
-    while (queue.isNotEmpty()) {
-        val current = queue.poll()
-        
-        when (val contents = current.contents) {
-            is PlainTextContents -> {
-                if (contents.text().isNotEmpty())
-                    return false
-            }
-            
-            is TranslatableContents -> {
-                if (contents.key.isNotEmpty() || !contents.fallback.isNullOrEmpty())
-                    return false
-                
-                for (arg in contents.args) {
-                    if (arg is MojangComponent) {
-                        queue.add(arg)
-                    }
-                }
-            }
-            
-            else -> return false // TODO: support other content types
-        }
-        
-        queue.addAll(current.siblings)
-    }
-    
-    return true
-}
+internal fun MojangComponent.isEmpty(locale: Locale = Locale.US): Boolean =
+    toAdventureComponent().isEmpty(locale)
+
+/**
+ * Checks whether this component is empty, meaning it has no visible characters when rendered.
+ * Subject to the same limitations as [elements].
+ */
+fun Component.isEmpty(locale: Locale = Locale.US): Boolean = 
+    elements(locale).none()
 
 /**
  * Sets the font of this component to [font].
@@ -239,7 +215,7 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
  */
 fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.appendCentered(component: Component, lang: String = "en_us"): B {
     // -1 to account for the one unit of empty space after the last char that still counts towards the width but isn't visible
-    move((CharSizes.calculateComponentWidth(component, lang) -1) / -2f)
+    move((CharSizes.calculateComponentWidth(component, lang) - 1) / -2f)
     return append(component)
 }
 
@@ -248,4 +224,43 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
  */
 internal fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.indent(spaces: Int): B {
     return append(Component.text(" ".repeat(spaces)))
-} 
+}
+
+/**
+ * Recursively discovers all fonts used in this component, its children,
+ * and translatable arguments and returns them as a set of [Keys][Key].
+ */
+fun Component.getFontsRecursively(): Set<Key> {
+    val defaultFont = key("minecraft", "default")
+    val fonts = mutableSetOf<Key>()
+    
+    val queue = LinkedList<Component>()
+    queue.add(this)
+    
+    generateSequence { queue.poll() }.forEach { current ->
+        fonts += current.font() ?: defaultFont
+        
+        queue.addAll(current.children())
+        if (current is TranslatableComponent) {
+            queue.addAll(current.args())
+        }
+    }
+    
+    return fonts
+}
+
+/**
+ * Converts the [Locale] into a Minecraft locale code, which is in the format of
+ * `language[_country[_variant]]` (all lowercase), e.g. `en_us`.
+ */
+fun Locale.toMinecraftLocaleCode(): String = buildString {
+    append(language.lowercase())
+    if (country.isNotEmpty()) {
+        append("_")
+        append(country.lowercase())
+        if (variant.isNotEmpty()) {
+            append("_")
+            append(variant.lowercase())
+        }
+    }
+}

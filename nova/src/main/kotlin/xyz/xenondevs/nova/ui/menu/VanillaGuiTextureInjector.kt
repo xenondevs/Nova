@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.ui.menu
 
 import net.kyori.adventure.text.Component
 import net.minecraft.world.inventory.MenuType
-import org.joml.Vector2i
 import org.joml.Vector2ic
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.initialize.InitFun
@@ -33,40 +32,33 @@ import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object VanillaGuiTextureInjector : PacketListener {
     
-    private val _requiredVerticalOffsets = HashSet<Int>()
+    private val _requiredVerticalOffsets = hashSetOf(
+        GuiTextureAlignment.ANVIL_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.BLAST_FURNACE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.BREWING_STAND_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.CARTOGRAPHY_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.CRAFTER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.CRAFTING_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.ENCHANTMENT_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.FURNACE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.GENERIC_9x1_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.GENERIC_9x2_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.GENERIC_9x3_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.GENERIC_9x4_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.GENERIC_9x5_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.GENERIC_9x6_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.GENERIC_3x3_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.GRINDSTONE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.HOPPER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.LOOM_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.SHULKER_BOX_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.SMITHING_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.SMOKER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+        GuiTextureAlignment.STONECUTTER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y()
+    )
     val requiredVerticalOffsets: Set<Int>
         get() = _requiredVerticalOffsets
-    
-    // offsets from title start to inventory label start
-    private val ANVIL_OFFSET: Vector2ic = offset(GuiTextureAlignment.ANVIL_OFFSET, 8, 79)
-    private val BLAST_FURNACE_OFFSET: Vector2ic = offset(GuiTextureAlignment.BLAST_FURNACE_OFFSET, 8, 79)
-    private val BREWING_STAND_OFFSET: Vector2ic = offset(GuiTextureAlignment.BREWING_STAND_OFFSET, 8, 79)
-    private val CARTOGRAPHY_TABLE_OFFSET: Vector2ic = offset(GuiTextureAlignment.CARTOGRAPHY_TABLE_OFFSET, 8, 79)
-    private val CRAFTER_3x3_OFFSET: Vector2ic = offset(GuiTextureAlignment.CRAFTER_OFFSET, 8, 79)
-    private val CRAFTING_OFFSET: Vector2ic = offset(GuiTextureAlignment.CRAFTING_TABLE_OFFSET, 8, 79)
-    private val ENCHANTMENT_OFFSET: Vector2ic = offset(GuiTextureAlignment.ENCHANTMENT_TABLE_OFFSET, 8, 79)
-    private val FURNACE_OFFSET: Vector2ic = offset(GuiTextureAlignment.FURNACE_OFFSET, 8, 79)
-    private val GENERIC_9x1_OFFSET: Vector2ic = offset(GuiTextureAlignment.CHEST_OFFSET, 8, 45)
-    private val GENERIC_9x2_OFFSET: Vector2ic = offset(GuiTextureAlignment.CHEST_OFFSET, 8, 63)
-    private val GENERIC_9x3_OFFSET: Vector2ic = offset(GuiTextureAlignment.CHEST_OFFSET, 8, 81)
-    private val GENERIC_9x4_OFFSET: Vector2ic = offset(GuiTextureAlignment.CHEST_OFFSET, 8, 99)
-    private val GENERIC_9x5_OFFSET: Vector2ic = offset(GuiTextureAlignment.CHEST_OFFSET, 8, 117)
-    private val GENERIC_9x6_OFFSET: Vector2ic = offset(GuiTextureAlignment.CHEST_OFFSET, 8, 135)
-    private val GENERIC_3x3_OFFSET: Vector2ic = offset(GuiTextureAlignment.DISPENSER_OFFSET, 8, 79)
-    private val GRINDSTONE_OFFSET: Vector2ic = offset(GuiTextureAlignment.GRINDSTONE_OFFSET, 8, 79)
-    private val HOPPER_OFFSET: Vector2ic = offset(GuiTextureAlignment.HOPPER_OFFSET, 8, 46)
-    private val LOOM_OFFSET: Vector2ic = offset(GuiTextureAlignment.LOOM_OFFSET, 8, 79)
-    private val SHULKER_BOX_OFFSET: Vector2ic = offset(GuiTextureAlignment.SHULKER_BOX_OFFSET, 8, 81)
-    private val SMITHING_OFFSET: Vector2ic = offset(GuiTextureAlignment.SMITHING_TABLE_OFFSET, 8, 79)
-    private val SMOKER_OFFSET: Vector2ic = offset(GuiTextureAlignment.SMOKER_OFFSET, 8, 79)
-    private val STONECUTTER_OFFSET: Vector2ic = offset(GuiTextureAlignment.STONECUTTER_OFFSET, 8, 79)
-    
-    private fun offset(base: Vector2ic, x: Int, y: Int): Vector2ic {
-        val new = Vector2i(base).add(x, y)
-        _requiredVerticalOffsets += new.y
-        return new
-    }
-    
+
     @InitFun
     private fun init() {
         registerPacketListener()
@@ -160,28 +152,28 @@ internal object VanillaGuiTextureInjector : PacketListener {
     
     private val MenuType<*>.offsetToInventoryLabel: Vector2ic?
         get() = when (this) {
-            MenuType.ANVIL -> ANVIL_OFFSET
-            MenuType.BLAST_FURNACE -> BLAST_FURNACE_OFFSET
-            MenuType.BREWING_STAND -> BREWING_STAND_OFFSET
-            MenuType.CARTOGRAPHY_TABLE -> CARTOGRAPHY_TABLE_OFFSET
-            MenuType.CRAFTER_3x3 -> CRAFTER_3x3_OFFSET
-            MenuType.CRAFTING -> CRAFTING_OFFSET
-            MenuType.ENCHANTMENT -> ENCHANTMENT_OFFSET
-            MenuType.FURNACE -> FURNACE_OFFSET
-            MenuType.GENERIC_9x1 -> GENERIC_9x1_OFFSET
-            MenuType.GENERIC_9x2 -> GENERIC_9x2_OFFSET
-            MenuType.GENERIC_9x3 -> GENERIC_9x3_OFFSET
-            MenuType.GENERIC_9x4 -> GENERIC_9x4_OFFSET
-            MenuType.GENERIC_9x5 -> GENERIC_9x5_OFFSET
-            MenuType.GENERIC_9x6 -> GENERIC_9x6_OFFSET
-            MenuType.GENERIC_3x3 -> GENERIC_3x3_OFFSET
-            MenuType.GRINDSTONE -> GRINDSTONE_OFFSET
-            MenuType.HOPPER -> HOPPER_OFFSET
-            MenuType.LOOM -> LOOM_OFFSET
-            MenuType.SHULKER_BOX -> SHULKER_BOX_OFFSET
-            MenuType.SMITHING -> SMITHING_OFFSET
-            MenuType.SMOKER -> SMOKER_OFFSET
-            MenuType.STONECUTTER -> STONECUTTER_OFFSET
+            MenuType.ANVIL -> GuiTextureAlignment.ANVIL_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.BLAST_FURNACE -> GuiTextureAlignment.BLAST_FURNACE_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.BREWING_STAND -> GuiTextureAlignment.BREWING_STAND_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.CARTOGRAPHY_TABLE -> GuiTextureAlignment.CARTOGRAPHY_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.CRAFTER_3x3 -> GuiTextureAlignment.CRAFTER_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.CRAFTING -> GuiTextureAlignment.CRAFTING_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.ENCHANTMENT -> GuiTextureAlignment.ENCHANTMENT_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.FURNACE -> GuiTextureAlignment.FURNACE_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.GENERIC_9x1 -> GuiTextureAlignment.GENERIC_9x1_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.GENERIC_9x2 -> GuiTextureAlignment.GENERIC_9x2_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.GENERIC_9x3 -> GuiTextureAlignment.GENERIC_9x3_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.GENERIC_9x4 -> GuiTextureAlignment.GENERIC_9x4_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.GENERIC_9x5 -> GuiTextureAlignment.GENERIC_9x5_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.GENERIC_9x6 -> GuiTextureAlignment.GENERIC_9x6_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.GENERIC_3x3 -> GuiTextureAlignment.GENERIC_3x3_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.GRINDSTONE -> GuiTextureAlignment.GRINDSTONE_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.HOPPER -> GuiTextureAlignment.HOPPER_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.LOOM -> GuiTextureAlignment.LOOM_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.SHULKER_BOX -> GuiTextureAlignment.SHULKER_BOX_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.SMITHING -> GuiTextureAlignment.SMITHING_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.SMOKER -> GuiTextureAlignment.SMOKER_INVENTORY_LABEL_OFFSET_FROM_TITLE
+            MenuType.STONECUTTER -> GuiTextureAlignment.STONECUTTER_INVENTORY_LABEL_OFFSET_FROM_TITLE
             else -> null
         }
     
