@@ -1,11 +1,14 @@
 package xyz.xenondevs.nova.util
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.SupervisorJob
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitScheduler
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.PLUGIN_READY
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Shortcut for [BukkitScheduler.runTask], registered under the Nova plugin.
@@ -62,5 +65,13 @@ private fun checkSchedulerAvailability() {
 internal object AsyncExecutor {
     
     val SUPERVISOR = SupervisorJob()
+    
+}
+
+internal object BukkitDispatcher : CoroutineDispatcher() {
+    
+    override fun dispatch(context: CoroutineContext, block: Runnable) {
+        Bukkit.getScheduler().getMainThreadExecutor(Nova).execute(block)
+    }
     
 }
