@@ -1,5 +1,10 @@
 package xyz.xenondevs.nova.config
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import net.kyori.adventure.key.Key
@@ -11,16 +16,24 @@ import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.DATA_FOLDER
+import xyz.xenondevs.nova.IS_DEV_SERVER
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_JAR
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonBootstrapper
+import xyz.xenondevs.nova.config.Configs.reload
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.serialization.configurate.NOVA_CONFIGURATE_SERIALIZERS
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
+import xyz.xenondevs.nova.util.AsyncExecutor
+import xyz.xenondevs.nova.util.BukkitDispatcher
 import xyz.xenondevs.nova.util.data.useZip
+import java.nio.file.FileSystems
 import java.nio.file.Path
+import java.nio.file.StandardWatchEventKinds
+import java.nio.file.WatchService
 import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
@@ -85,6 +98,7 @@ object Configs {
     
     private fun extractConfig(from: Path, to: Path, configId: Key) {
         extractor.extract(configId, from, to)
+        ConfigWatcher.watchConfig(to)
         val provider = configProviders.getOrPut(configId) { RootConfigProvider(to, configId) }
         provider.reload()
     }
@@ -121,7 +135,9 @@ object Configs {
     
     operator fun get(id: Key): Provider<CommentedConfigurationNode> =
         configProviders.getOrPut(id) {
-            val root = RootConfigProvider(resolveConfigPath(id), id)
+            val path = resolveConfigPath(id)
+            ConfigWatcher.watchConfig(path)
+            val root = RootConfigProvider(path, id)
             if (lastReload > -1)
                 root.reload()
             return@getOrPut root
@@ -163,5 +179,50 @@ object Configs {
     
     internal fun createLoader(namespace: String, path: Path): YamlConfigurationLoader =
         createBuilder(namespace).path(path).build()
+    
+}
+
+@InternalInit(stage = InternalInitStage.POST_WORLD)
+internal object ConfigWatcher {
+    
+    private val watchService: WatchService? =
+        if (IS_DEV_SERVER) FileSystems.getDefault().newWatchService() else null
+    private val dirs = HashSet<Path>()
+    
+    fun watchConfig(config: Path) {
+        if (config.exists())
+            dirs.add(config.parent)
+    }
+    
+    @InitFun
+    private fun startWatching() {
+        if (watchService == null)
+            return
+        
+        for (dir in dirs) {
+            dir.register(
+                watchService,
+                StandardWatchEventKinds.ENTRY_CREATE,
+                StandardWatchEventKinds.ENTRY_DELETE,
+                StandardWatchEventKinds.ENTRY_MODIFY
+            )
+        }
+        
+        CoroutineScope(AsyncExecutor.SUPERVISOR + Dispatchers.IO).launch {
+            while (isActive) {
+                val key = watchService.take()
+                key.pollEvents()
+                
+                withContext(BukkitDispatcher) {
+                    LOGGER.info("Detected config change, reloading configs...")
+                    val reloadedConfigs = reload()
+                    LOGGER.info("Reloaded configs: ${reloadedConfigs.joinToString(", ")}")
+                }
+                
+                key.pollEvents()
+                key.reset()
+            }
+        }
+    }
     
 }
