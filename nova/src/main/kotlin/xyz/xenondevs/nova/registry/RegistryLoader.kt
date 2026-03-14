@@ -7,7 +7,11 @@ import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
 import net.kyori.adventure.key.Key
 import org.bukkit.Keyed
+import org.bukkit.scheduler.BukkitTask
+import xyz.xenondevs.bytebase.INSTRUMENTATION
 import xyz.xenondevs.nova.BOOTSTRAP_LIFECYCLE
+import xyz.xenondevs.nova.IS_DEV_SERVER
+import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -17,8 +21,11 @@ import xyz.xenondevs.nova.registry.RegistryLoader.enqueueVanilla
 import xyz.xenondevs.nova.registry.RegistryLoader.novaBuilderFactories
 import xyz.xenondevs.nova.registry.RegistryLoader.novaBuilders
 import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.util.toResourceKey
+import java.lang.instrument.ClassFileTransformer
+import java.security.ProtectionDomain
 
 /**
  * Accepts and queues registrations for both Nova- and Vanilla registries.
@@ -187,6 +194,44 @@ object RegistryLoader {
     
     private fun checkFrozen() {
         check(!NovaRegistries.isFrozen) { "Nova registries are frozen." }
+    }
+    
+    @InitFun
+    private fun setupReloadAgent() {
+        if (!IS_DEV_SERVER)
+            return
+        
+        var hotSwapTask: BukkitTask? = null
+        INSTRUMENTATION.addTransformer(
+            object : ClassFileTransformer {
+                override fun transform(
+                    module: Module?,
+                    loader: ClassLoader?,
+                    className: String?,
+                    classBeingRedefined: Class<*>?,
+                    protectionDomain: ProtectionDomain?,
+                    classfileBuffer: ByteArray?
+                ): ByteArray? {
+                    if (classBeingRedefined == null) 
+                        return null
+                    
+                    hotSwapTask?.cancel()
+                    hotSwapTask = runTask {
+                        LOGGER.info("Hot swap detected, reloading registries...")
+                        val reloadable = NovaRegistries.registries.values.filter { it.isReloadable }
+                        val registryCount = reloadable.size
+                        reloadable.forEach(::reload)
+                        val elementCount = reloadable.sumOf { it.entrySet.get().size }
+                        LOGGER.info("Reloaded $registryCount registries with a total of $elementCount elements.")
+                        
+                        hotSwapTask = null
+                    }
+                    
+                    return null
+                }
+            },
+            true
+        )
     }
     
 }
