@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap
  * when the player leaves the server.
  */
 @InternalInit(stage = InternalInitStage.POST_WORLD)
-internal object PlayerMapManager : Listener {
+object PlayerMapManager : Listener {
     
     private val activeMaps = Collections.synchronizedSet(weakHashSet<MutableMap<Player, *>>())
     private val activeSets = Collections.synchronizedSet(weakHashSet<MutableSet<Player>>())
