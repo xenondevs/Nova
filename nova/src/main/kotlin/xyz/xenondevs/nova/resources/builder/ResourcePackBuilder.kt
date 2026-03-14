@@ -283,7 +283,7 @@ class ResourcePackBuilder internal constructor(
     internal lateinit var postBuildHooks: List<() -> Unit>
     
     private val taskTimes = HashMap<PackTask, Duration>()
-    private var totalTime: Duration = Duration.ZERO // fixme: total duration ends up being less than task sum durations, why?
+    private var totalTime: Duration = Duration.ZERO
     
     /**
      * The [AssetPacks][AssetPack] of all addons.
@@ -314,20 +314,19 @@ class ResourcePackBuilder internal constructor(
     
     internal suspend fun buildPackPostWorld(): ByteArray {
         check(fs.isOpen) { "FileSystem is closed" }
-        try {
+        fs.use {
+            var bin: ByteArray
             totalTime += measureTime {
                 tasks[BuildStage.POST_WORLD]?.forEach { runTaskTimed(it) }
                 logger.info("Packing zip...")
-                var bin = zipper.createZip()
+                bin = zipper.createZip()
                 if (postProcessors.isNotEmpty()) {
                     logger.info("Running ${postProcessors.size} post-processor(s)...")
                     bin = postProcessors.fold(bin) { b, p -> p.process(b) }
                 }
                 logTaskTimes()
-                return bin
             }
-        } finally {
-            fs.close()
+            return bin
         }
     }
     
