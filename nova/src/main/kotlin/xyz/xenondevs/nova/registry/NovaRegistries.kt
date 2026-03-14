@@ -1,8 +1,7 @@
 package xyz.xenondevs.nova.registry
 
 import net.kyori.adventure.key.Key
-import xyz.xenondevs.nova.config.MAIN_CONFIG
-import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
@@ -24,7 +23,7 @@ import xyz.xenondevs.nova.world.player.attachment.AttachmentType
  */
 object NovaRegistries {
     
-    internal val RELOADABLE: Boolean by MAIN_CONFIG.entry("debug", "reloading", "registry")
+    internal val RELOADABLE: Boolean = IS_DEV_SERVER
     
     internal val registries = HashMap<Key, MutableNovaRegistry<*>>()
     internal var isFrozen: Boolean = false

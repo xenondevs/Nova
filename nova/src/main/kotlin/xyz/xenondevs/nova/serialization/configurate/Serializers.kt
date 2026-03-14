@@ -6,7 +6,6 @@ import io.papermc.paper.registry.set.RegistryKeySet
 import io.papermc.paper.registry.tag.TagKey
 import org.bukkit.Keyed
 import org.bukkit.attribute.AttributeModifier.Operation
-import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import xyz.xenondevs.commons.reflection.javaTypeOf
@@ -15,8 +14,6 @@ import xyz.xenondevs.nova.registry.NovaRegistry
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
-import xyz.xenondevs.nova.util.data.geantyrefTypeTokenOf
-import java.lang.reflect.Type
 
 internal val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
     // -- Registries --
@@ -115,28 +112,11 @@ private inline fun <reified T : Keyed> TypeSerializerCollection.Builder.register
     return this
 }
 
-// requires lazy registration because default NovaRegistries access configs for reloadable option
 private inline fun <reified T : NovaRegistryElement<T>> TypeSerializerCollection.Builder.registerForRegistry(
     crossinline registry: () -> NovaRegistry<T>
 ): TypeSerializerCollection.Builder {
-    registerLazily<T> { NovaRegistryElementConfigurateSerializer(registry()) }
-    registerLazily<RegistryEntry.Nova<T>> { NovaRegistryEntryConfigurateSerializer(registry()) }
-    registerLazily<RegistryEntrySet.Nova<T>> { NovaRegistryEntrySetConfigurateSerializer(registry()) }
+    register<T>(NovaRegistryElementConfigurateSerializer(registry()))
+    register<RegistryEntry.Nova<T>>(NovaRegistryEntryConfigurateSerializer(registry()))
+    register<RegistryEntrySet.Nova<T>>(NovaRegistryEntrySetConfigurateSerializer(registry()))
     return this
-}
-
-private inline fun <reified T> TypeSerializerCollection.Builder.registerLazily(noinline factory: () -> TypeSerializer<T>): TypeSerializerCollection.Builder {
-    return register(geantyrefTypeTokenOf<T>(), object : TypeSerializer<T> {
-        
-        private val delegate: TypeSerializer<T> by lazy(factory)
-        
-        override fun deserialize(type: Type?, node: ConfigurationNode?): T? {
-            return delegate.deserialize(type, node)
-        }
-        
-        override fun serialize(type: Type?, obj: T?, node: ConfigurationNode?) {
-            delegate.serialize(type, obj, node)
-        }
-        
-    })
 }
