@@ -173,7 +173,7 @@ class SideConfigMenu(
             .build()
         
         if (endPoint is TileEntity) {
-            endPoint.menuContainer.registerWindow(window)
+            endPoint.menu.register(window)
         }
         
         window.open()

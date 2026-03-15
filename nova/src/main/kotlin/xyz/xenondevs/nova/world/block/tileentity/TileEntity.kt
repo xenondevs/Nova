@@ -4,7 +4,6 @@ package xyz.xenondevs.nova.world.block.tileentity
 
 import kotlinx.coroutines.Job
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
@@ -12,21 +11,16 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mapNonNull
-import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
 import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.invui.window.setTitle
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.serialization.DataHolder
-import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
-import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.item.storeData
 import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.world.BlockPos
@@ -35,7 +29,6 @@ import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
-import xyz.xenondevs.nova.world.block.tileentity.menu.MenuContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.FluidContainer
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
@@ -45,9 +38,6 @@ import xyz.xenondevs.nova.world.region.DynamicRegion
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
-import kotlin.reflect.KClass
-import kotlin.reflect.full.hasAnnotation
-import xyz.xenondevs.nova.world.block.tileentity.menu.TileEntityMenuClass as TileEntityMenuAnnotation
 
 /**
  * A custom tile entity.
@@ -114,11 +104,10 @@ abstract class TileEntity(
         internal set
     
     /**
-     * The [MenuContainer] for this [TileEntity's][TileEntity] gui.
-     * May stay uninitialized if the [TileEntity] has no gui.
+     * This [TileEntity's][TileEntity] menu.
+     * Also tracks other [Windows][Window] that belong to this [TileEntity].
      */
-    lateinit var menuContainer: MenuContainer
-        private set
+    open val menu: TileEntityMenu = TileEntityMenu.none()
     
     /**
      * The supervisor [Job] for coroutines of this [TileEntity].
@@ -131,22 +120,6 @@ abstract class TileEntity(
     
     private val dropProviders = ArrayList<() -> Collection<ItemStack>>()
     private val disableHandlers = ArrayList<() -> Unit>()
-    
-    init {
-        // look through the nested classes of this::class and all its superclasses for a class annotated with @TileEntityMenuClass
-        var guiClass: KClass<*>? = null
-        var clazz: KClass<*>? = this::class
-        while (clazz != null && guiClass == null) {
-            guiClass = clazz.nestedClasses.firstOrNull { it.hasAnnotation<TileEntityMenuAnnotation>() }
-            clazz = clazz.java.superclass?.kotlin
-        }
-        
-        // if a class was found, create a MenuContainer for it
-        if (guiClass != null) {
-            @Suppress("LeakingThis")
-            menuContainer = MenuContainer.of(this, guiClass)
-        }
-    }
     
     /**
      * Called when this [TileEntity] is placed.
@@ -171,8 +144,7 @@ abstract class TileEntity(
      * May not add or remove any [TileEntities][TileEntity].
      */
     open fun handleDisable() {
-        if (::menuContainer.isInitialized)
-            menuContainer.closeWindows()
+        menu.close()
         disableHandlers.forEach { it() }
     }
     
@@ -208,12 +180,8 @@ abstract class TileEntity(
     open fun use(ctx: Context<BlockInteract>): InteractionResult {
         val player = ctx[BlockInteract.SOURCE_ENTITY] as? Player
             ?: return InteractionResult.Pass
-        
-        if (::menuContainer.isInitialized) {
-            menuContainer.openWindow(player)
-            return InteractionResult.Success()
-        }
-        
+        if (menu.open(player))
+            return InteractionResult.Success(swing = true)
         return InteractionResult.Pass
     }
     
@@ -385,67 +353,6 @@ abstract class TileEntity(
     
     override fun toString(): String {
         return "${javaClass.simpleName}(blockState=$blockState, pos=$pos, data=$data)"
-    }
-    
-    /**
-     * A menu for a [TileEntity].
-     */
-    abstract inner class TileEntityMenu internal constructor(protected val texture: Provider<GuiTexture>? = null) {
-        
-        open fun getTitle(): Provider<Component> =
-            texture?.getTitle(block.name, TODO()) ?: provider(block.name)
-        
-    }
-    
-    /**
-     * A menu for a [TileEntity] that uses the same instance for all players.
-     */
-    abstract inner class GlobalTileEntityMenu(
-        texture: Provider<GuiTexture>? = null
-    ) : TileEntityMenu(texture) {
-        
-        abstract val gui: Gui
-        open val windowBuilder: Window.Builder<*, *> by lazy {
-            Window.builder()
-                .setUpperGui(gui)
-                .setTitle(getTitle())
-        }
-        
-        /**
-         * Opens a [Window] to this menu for the specified [player].
-         */
-        open fun openWindow(player: Player) {
-            val window = windowBuilder.build(player)
-            menuContainer.registerWindow(window)
-            window.open()
-        }
-        
-    }
-    
-    /**
-     * A menu for a [TileEntity] that uses a separate instance for each player.
-     */
-    abstract inner class IndividualTileEntityMenu(
-        protected val player: Player,
-        texture: Provider<GuiTexture>? = null
-    ) : TileEntityMenu(texture) {
-        
-        abstract val gui: Gui
-        open val windowBuilder: Window.Builder<*, *> by lazy {
-            Window.builder()
-                .setUpperGui(gui)
-                .setTitle(getTitle())
-        }
-        
-        /**
-         * Opens a [Window] to this menu for the specified [player].
-         */
-        open fun openWindow() {
-            val window = windowBuilder.build(player)
-            menuContainer.registerWindow(window)
-            window.open()
-        }
-        
     }
     
 }
