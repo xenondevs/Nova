@@ -2,18 +2,12 @@ package xyz.xenondevs.nova.registry
 
 import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
-
-/**
- * The configuration of the [Configurable] contained in this [Provider].
- * 
- * Equivalent to `entry.flatMap { it.config }`.
- */
-val Provider<Configurable>.config: Provider<CommentedConfigurationNode>
-    get() = flatMap(Configurable::config)
+import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 
 /**
  * Something that may have a config.
  */
+@GenerateFlatMapExtensions
 interface Configurable {
     
     /**

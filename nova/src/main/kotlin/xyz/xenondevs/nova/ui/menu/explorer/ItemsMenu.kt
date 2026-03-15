@@ -50,6 +50,7 @@ import xyz.xenondevs.nova.ui.menu.item.scrollRightItem
 import xyz.xenondevs.nova.ui.menu.item.scrollUpItem
 import xyz.xenondevs.nova.ui.menu.item.scrollerItem
 import xyz.xenondevs.nova.ui.menu.itemProvider
+import xyz.xenondevs.nova.ui.menu.locale
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.ui.overlay.guitexture.component
 import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
@@ -218,7 +219,7 @@ internal class ItemsMenu private constructor(val player: Player) {
                         .append(Component.text(filter, NamedTextColor.GRAY))
                         .append(Component.text(")", NamedTextColor.DARK_GRAY))
                         .build()
-                    DefaultGuiTextures.SEARCH_RESULTS.getTitle(title)
+                    DefaultGuiTextures.SEARCH_RESULTS.getTitle(title, locale)
                 }.flatten()
                 
                 upperGui by scrollItemsGui(

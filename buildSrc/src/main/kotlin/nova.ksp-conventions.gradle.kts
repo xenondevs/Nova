@@ -8,4 +8,5 @@ val libs = the<LibrariesForLibs>()
 
 dependencies {
     implementation(libs.ksp.api)
+    implementation(libs.kotlinpoet.ksp)
 }

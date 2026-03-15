@@ -2,8 +2,10 @@ rootProject.name = "nova"
 
 // core project
 include("nova")
+include("nova-ksp:annotations")
+include("nova-ksp:processor:flatmap-extensions")
+include("nova-ksp:processor:registry")
 include("nova-registry")
-include("nova-registry-ksp")
 include("nova-api")
 include("nova-gradle-plugin")
 include("nova-dokka-plugin")

@@ -29,6 +29,7 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.clientsideProvider
+import java.util.*
 
 internal fun setGlobalIngredients() {
     addGlobalIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
@@ -85,7 +86,10 @@ infix fun ProviderDslProperty<in ItemProvider>.by(novaItem: Provider<NovaItem>):
 
 context(dsl: WindowDsl)
 infix fun ProviderDslProperty<Component>.by(guiTexture: RegistryEntry.Nova<GuiTexture>): Unit =
-    by(guiTexture.getTitle(LocaleManager.getLocaleProvider(dsl.viewer)))
+    by(guiTexture.getTitle(dsl.locale))
+
+val WindowDsl.locale: Provider<Locale>
+    get() = LocaleManager.getLocaleProvider(viewer)
 
 internal fun Provider<NovaItem>.asUiItem(): Item =
     Item.builder().setItemProvider(clientsideProvider).build()

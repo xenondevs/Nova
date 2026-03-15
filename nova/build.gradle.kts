@@ -4,12 +4,17 @@ plugins {
     id("nova.publish-conventions-java")
     id("nova.detekt-conventions")
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.ksp)
     alias(origamiLibs.plugins.origami)
     alias(libs.plugins.pluginPublish)
     id("xyz.xenondevs.bundler-jar-plugin")
 }
 
 dependencies {
+    // ksp
+    compileOnly(project(":nova-ksp:annotations"))
+    ksp(project(":nova-ksp:processor:flatmap-extensions"))
+    
     // api dependencies
     novaLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)
@@ -20,7 +25,7 @@ dependencies {
     api(origamiLibs.mixin)
     api(origamiLibs.mixinextras)
     api(project(":nova-registry"))
-    
+
     // internal dependencies
     compileOnly(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
@@ -45,6 +50,10 @@ dependencies {
 
 // configure java sources location
 sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
+
+kotlin.sourceSets.main {
+    kotlin.srcDir(project.layout.buildDirectory.dir("generated/ksp/main/kotlin"))
+}
 
 origami {
     paperDevBundle(libs.versions.paper.get())

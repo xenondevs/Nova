@@ -22,35 +22,7 @@ import xyz.xenondevs.nova.util.component.adventure.toMinecraftLocaleCode
 import java.util.*
 import kotlin.math.roundToInt
 
-/**
- * Shortcut to [flatMap][Provider.flatMap] to [GuiTexture.component].
- */
-val Provider<GuiTexture>.component: Provider<Component>
-    get() = flatMap(GuiTexture::component)
-
-/**
- * Shortcut to [flatMap][Provider.flatMap] to [GuiTexture.getTitle].
- */
-fun Provider<GuiTexture>.getTitle(
-    locale: Provider<Locale> = provider(Locale.US)
-): Provider<Component> = flatMap { it.getTitle(locale) }
-
-/**
- * Shortcut to [flatMap][Provider.flatMap] to [GuiTexture.getTitle].
- */
-fun Provider<GuiTexture>.getTitle(
-    translate: String,
-    locale: Provider<Locale> = provider(Locale.US)
-): Provider<Component> = flatMap { it.getTitle(translate, locale) }
-
-/**
- * Shortcut to [flatMap][Provider.flatMap] to [GuiTexture.getTitle].
- */
-fun Provider<GuiTexture>.getTitle(
-    title: Component = Component.empty(),
-    locale: Provider<Locale> = provider(Locale.US)
-): Provider<Component> = flatMap { it.getTitle(title, locale) }
-
+@GenerateFlatMapExtensions
 @Serializable(with = GuiTextureSerializer::class)
 class GuiTexture internal constructor(
     override val entry: RegistryEntry.Nova<GuiTexture>,
