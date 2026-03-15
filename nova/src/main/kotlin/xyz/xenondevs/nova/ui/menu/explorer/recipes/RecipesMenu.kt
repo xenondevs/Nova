@@ -25,6 +25,7 @@ import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureAlignment
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
+import xyz.xenondevs.nova.ui.menu.locale
 import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.component.adventure.font
@@ -154,7 +155,8 @@ internal class RecipesMenu(
                                 - (CharSizes.calculateComponentWidth(pageNumberComponent) - 2) / 2f)
                         )
                         .append(pageNumberComponent)
-                        .build()
+                        .build(),
+                    locale
                 )
             }.flatten()
         }

@@ -393,7 +393,7 @@ abstract class TileEntity(
     abstract inner class TileEntityMenu internal constructor(protected val texture: Provider<GuiTexture>? = null) {
         
         open fun getTitle(): Provider<Component> =
-            texture?.getTitle(block.name) ?: provider(block.name)
+            texture?.getTitle(block.name, TODO()) ?: provider(block.name)
         
     }
     

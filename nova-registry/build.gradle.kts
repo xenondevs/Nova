@@ -12,7 +12,7 @@ dependencies {
     api(libs.kotlinx.serialization.json)
     api(libs.configurate.yaml)
     api(libs.cosmicBinaryFormat)
-    ksp(project(":nova-registry-ksp"))
+    ksp(project(":nova-ksp:processor:registry"))
     testImplementation(libs.mockbukkit)
 }
 

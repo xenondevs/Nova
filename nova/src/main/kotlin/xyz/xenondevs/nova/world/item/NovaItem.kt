@@ -41,6 +41,7 @@ import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 import xyz.xenondevs.nova.registry.Configurable
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
@@ -66,13 +67,6 @@ import net.minecraft.world.entity.Entity as NmsEntity
 import net.minecraft.world.entity.player.Player as NmsPlayer
 import net.minecraft.world.item.ItemStack as NmsItemStack
 
-// TODO: ksp: generate these shortcuts automatically, cache results in synchronized weak map
-/**
- * Shortcut to [flatMap][Provider.flatMap] to [NovaItem.clientsideProvider].
- */
-val Provider<NovaItem>.clientsideProvider: Provider<ItemProvider>
-    get() = flatMap(NovaItem::clientsideProvider)
-
 /**
  * Creates an [ItemStack] for the [NovaItem] without resolving the [RegistryEntry],
  * meaning that changes due to registry reloading will be reflected in the returned [ItemStack].
@@ -83,6 +77,7 @@ fun RegistryEntry<NovaItem>.createItemStack(amount: Int = 1): ItemStack =
 /**
  * Represents a custom Nova item type.
  */
+@GenerateFlatMapExtensions
 @Serializable(with = NovaItemSerializer::class)
 class NovaItem internal constructor(
     override val entry: RegistryEntry.Nova<NovaItem>,

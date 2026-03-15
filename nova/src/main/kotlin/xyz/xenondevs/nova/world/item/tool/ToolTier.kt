@@ -10,6 +10,7 @@ import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.serialization.kotlinx.ToolTierSerializer
@@ -19,12 +20,7 @@ import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.item.behavior.Tool
 
-/**
- * Shortcut to [flatMap][Provider.flatMap] to [ToolTier.levelValue].
- */
-val Provider<ToolTier>.levelValue: Provider<Double>
-    get() = flatMap { it.levelValue }
-
+@GenerateFlatMapExtensions
 @Serializable(with = ToolTierSerializer::class)
 class ToolTier(
     override val entry: RegistryEntry.Nova<ToolTier>,
