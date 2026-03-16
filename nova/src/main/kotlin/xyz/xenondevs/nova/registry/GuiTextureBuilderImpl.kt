@@ -59,7 +59,7 @@ internal class GuiTextureBuilderImpl(
             }
             
             // create the actual gui texture
-            val builder = GuiTextureLayoutBuilder(entry.key.namespace(), rpb)
+            val builder = GuiTextureLayoutBuilder(entry.key.namespace(), entry.key.value(), rpb)
             builder.configureLayout()
             builder.build()
         }

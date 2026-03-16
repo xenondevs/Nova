@@ -15,6 +15,7 @@ internal class GuiTextureLayout(
 @RegistryElementBuilderDsl
 class GuiTextureLayoutBuilder internal constructor(
     private val namespace: String,
+    private val name: String,
     val resourcePackBuilder: ResourcePackBuilder
 ) {
     
@@ -30,6 +31,7 @@ class GuiTextureLayoutBuilder internal constructor(
     
     /**
      * Sets the path to the gui texture.
+     * Defaults to `gui/<gui texture name>`.
      */
     fun path(name: String) {
         this.texture = ResourcePath.of(ResourceType.Texture, name, namespace)
@@ -37,6 +39,7 @@ class GuiTextureLayoutBuilder internal constructor(
     
     /**
      * Configures how the gui texture should be aligned.
+     * Defaults to [GuiTextureAlignment.TopLeft] (chest, no extra offset).
      */
     fun alignment(alignment: GuiTextureAlignment) {
         this.alignment = alignment
@@ -63,7 +66,7 @@ class GuiTextureLayoutBuilder internal constructor(
     
     internal fun build(): GuiTextureLayout =
         GuiTextureLayout(
-            texture ?: throw IllegalStateException("Gui texture path not set"),
+            texture ?: ResourcePath(ResourceType.Texture, namespace, "gui/$name"),
             alignment ?: GuiTextureAlignment.TopLeft()
         )
     
