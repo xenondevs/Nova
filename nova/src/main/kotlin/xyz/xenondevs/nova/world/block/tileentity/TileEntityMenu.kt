@@ -1,5 +1,9 @@
 package xyz.xenondevs.nova.world.block.tileentity
 
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.Expiry
+import com.github.benmanes.caffeine.cache.LoadingCache
+import com.github.benmanes.caffeine.cache.Scheduler
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.collections.weakHashSet
 import xyz.xenondevs.invui.dsl.NormalSplitWindowDsl
@@ -8,6 +12,8 @@ import xyz.xenondevs.invui.dsl.window
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.tileentity.TileEntityMenu.Companion.from
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * A container for [Windows][Window] that belong to a [TileEntity].
@@ -93,6 +99,32 @@ interface TileEntityMenu {
             } 
         }
         
+        /**
+         * Shortcut for [creating][from] a [TileEntityMenu] using the [standard][xyz.xenondevs.invui.dsl.window] [WindowDsl]
+         * that automatically sets the title to the [TileEntity.block] [NovaBlock.name] and is cached with [expireAfterClose].
+         */
+        context(_: TileEntity)
+        fun cachedWindow(
+            expireAfterClose: Duration = 1.minutes,
+            window: NormalSplitWindowDsl.() -> Unit
+        ): TileEntityMenu = cachedWindow(::window, expireAfterClose, window)
+        
+        /**
+         * Shortcut for [creating][from] a [TileEntityMenu] using [WindowDsl] of a custom type
+         * that automatically sets the title to the [TileEntity.block] [NovaBlock.name] and is cached with [expireAfterClose].
+         */
+        context(tileEntity: TileEntity)
+        fun <T : WindowDsl> cachedWindow(
+            windowDsl: (Player, T.() -> Unit) -> Window,
+            expireAfterClose: Duration = 1.minutes,
+            window: (T.() -> Unit),
+        ): TileEntityMenu = CachedWindowTileEntityMenuImpl(expireAfterClose) {
+            windowDsl(it) {
+                title by tileEntity.block.name
+                window()
+            }
+        }
+        
     }
     
 }
@@ -103,13 +135,14 @@ private open class TileEntityMenuImpl : TileEntityMenu {
     private val openWindows = HashSet<Window>()
     
     override fun register(window: Window) {
-        if (registeredWindows.add(window)) {
-            window.addOpenHandler {
-                openWindows += window
-            }
-            window.addCloseHandler {
-                openWindows -= window
-            }
+        if (!registeredWindows.add(window))
+            return
+        
+        window.addOpenHandler {
+            openWindows += window
+        }
+        window.addCloseHandler {
+            openWindows -= window
         }
     }
     
@@ -131,6 +164,67 @@ private class IndividualTileEntityMenuImpl(
         register(window)
         window.open()
         return true
+    }
+    
+}
+
+private class CachedWindowTileEntityMenuImpl(
+    expireAfterClose: Duration,
+    createWindow: (Player) -> Window
+) : TileEntityMenu {
+    
+    private val registeredWindows = weakHashSet<Window>()
+    private val openWindows = HashSet<Window>()
+    private val activeViewers = HashSet<Player>()
+    
+    private val cache: LoadingCache<Player, Window> = Caffeine.newBuilder()
+        .weakKeys()
+        .expireAfter(AfterCloseExpiry(expireAfterClose.inWholeNanoseconds))
+        .scheduler(Scheduler.systemScheduler())
+        .build(createWindow)
+    
+    override fun open(player: Player): Boolean {
+        val window = cache.get(player)
+        check(window.viewer == player)
+        register(window)
+        window.open()
+        return true
+    }
+    
+    override fun close() {
+        openWindows.toList().forEach(Window::close)
+    }
+    
+    override fun register(window: Window) {
+        if (!registeredWindows.add(window))
+            return
+        val viewer = window.viewer
+        
+        window.addOpenHandler {
+            openWindows += window
+            activeViewers += viewer
+            refreshExpiry(viewer)
+        }
+        
+        window.addCloseHandler {
+            openWindows -= window
+            activeViewers -= window.viewer
+            refreshExpiry(viewer)
+        }
+    }
+    
+    private fun refreshExpiry(player: Player) {
+        cache.asMap().computeIfPresent(player) { _, w -> w }
+    }
+    
+    inner class AfterCloseExpiry(private val nanos: Long) : Expiry<Player, Window> {
+        
+        override fun expireAfterCreate(key: Player, value: Window, currentTime: Long) = Long.MAX_VALUE
+        override fun expireAfterRead(key: Player, value: Window, currentTime: Long, currentDuration: Long) = currentDuration
+        
+        override fun expireAfterUpdate(key: Player, value: Window, currentTime: Long, currentDuration: Long) =
+            if (key in activeViewers) Long.MAX_VALUE else nanos
+        
     }
     
 }
