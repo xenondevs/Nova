@@ -168,19 +168,23 @@ performance:
 # If metric prefixes should be used to display energy and fluids (e.g. kJ, MJ, GJ or B, kB, MB)
 use_metric_prefixes: false
 
+# Responsible for the messages in the console / chat notifying you about Nova- and addon updates.
 update_reminder:
   # If update reminders should be shown.
   enabled: true
   # The amount of ticks passed between update checks.
   interval: 12000
 
+# Debug settings, intended for development with Nova and problem-solving. Use with caution.
 debug:
   # The chunk reload watcher will print stack traces if repeated chunk loads and unloads are detected.
   watch_chunk_reloads: false
   # If other plugins should be allowed to overwrite the results of Nova recipes.
   allow_craft_result_overwrite: false
   # A list of pack tasks that should be skipped during resource pack generation
-  skip_pack_tasks: []
+  skip_pack_tasks: [ ]
+  # A map of addon id to a directory path on the default file system that should be used to override the asset pack (in-jar asset directory).
+  asset_pack_overrides: { }
   # Debug logging options
   logging:
     # Logs initializer runnable calls

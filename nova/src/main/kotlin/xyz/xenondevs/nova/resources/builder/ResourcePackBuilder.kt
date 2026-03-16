@@ -77,6 +77,8 @@ private val EXTRACTION_MODE by MAIN_CONFIG.entry<String>("resource_pack", "gener
 }
 
 private val SKIP_PACK_TASKS: Set<String> by MAIN_CONFIG.entry<HashSet<String>>("debug", "skip_pack_tasks")
+private val ASSET_PACK_OVERRIDES: Map<String, Path> by MAIN_CONFIG.entry<Map<String, String>>("debug", "asset_pack_overrides")
+    .map { it.mapValues { (_, path) -> Path.of(path) } }
 
 /**
  * Builds a resource pack based on a [ResourcePackConfiguration].
@@ -336,8 +338,13 @@ class ResourcePackBuilder internal constructor(
             this += AddonBootstrapper.addons.map { addon -> Triple(addon.namespace(), addon.file, "assets/") }
             this += Triple("nova", NOVA_JAR, "assets/nova/")
         }.map { (namespace, file, assetsPath) ->
-            val zip = FileSystems.newFileSystem(file)
-            AssetPack(namespace, zip.getPath(assetsPath))
+            val override = ASSET_PACK_OVERRIDES[namespace]
+            if (override != null) {
+                AssetPack(namespace, override)
+            } else {
+                val zip = FileSystems.newFileSystem(file)
+                AssetPack(namespace, zip.getPath(assetsPath))
+            }
         }
     }
     
