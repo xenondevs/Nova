@@ -3,10 +3,13 @@ package xyz.xenondevs.nova.ui.menu.sideconfig
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.ui.menu.item.BackItem
 import xyz.xenondevs.nova.ui.menu.item.tabItem
@@ -197,6 +200,34 @@ fun openSideConfigItem(sideConfigMenu: SideConfigMenu): Item = item {
     onClick {
         player.playClickSound()
         sideConfigMenu.openWindow(player)
+    }
+}
+
+/**
+ * A UI item that creates, memorizes, and opens a [SideConfigMenu] for the given [endPoint] and [containers] when clicked.
+ * Uses the [window from the context][windowDsl] as the previous- and fallback window.
+ */
+context(windowDsl: WindowDsl, endPoint: NetworkEndPoint)
+fun openSideConfigItem(
+    containers: Map<NetworkedFluidContainer, String>? = null
+): Item = openSideConfigItem(null, containers)
+
+/**
+ * A UI item that creates, memorizes, and opens a [SideConfigMenu] for the given [endPoint], [inventories], and [containers] when clicked.
+ * Uses the [window from the context][windowDsl] as the previous window.
+ */
+context(windowDsl: WindowDsl, endPoint: NetworkEndPoint)
+fun openSideConfigItem(
+    inventories: Map<NetworkedInventory, String>? = null,
+    containers: Map<NetworkedFluidContainer, String>? = null,
+    itemProvider: Provider<ItemProvider> = DefaultGuiItems.TP_SIDE_CONFIG_BTN.clientsideProvider
+): Item = item {
+    val outerWindow = windowDsl.window
+    val menu by lazy { SideConfigMenu(endPoint, inventories, containers) { _ -> outerWindow.get().open() } }
+    this.itemProvider by itemProvider
+    onClick {
+        player.playClickSound()
+        menu.openWindow(player)
     }
 }
 
