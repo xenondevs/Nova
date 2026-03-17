@@ -52,9 +52,9 @@ fun scrollerItem(
         val progress = (line + 1.0) / (maxLine + 1.0)
         ItemBuilder(ItemUtils.asType(itemProvider.get(), ItemType.BUNDLE))
             .set(DataComponentTypes.BUNDLE_CONTENTS, bundleContents(listOf(
-                ItemType.STONE.createItemStack(((progress * 64).toInt() - 2).coerceIn(1..64)),
-                ItemType.STONE.createItemStack(),
-                ItemType.STONE.createItemStack()
+                ItemUtils.getPlaceholder().apply { amount = ((progress * 64).toInt() - 2).coerceIn(1..64) },
+                ItemUtils.getPlaceholder(),
+                ItemUtils.getPlaceholder()
             )))
             .hideTooltip(true)
             // set random component to make sure the bundle resets every time serverWindowState is updated
