@@ -9,6 +9,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.Click
+import xyz.xenondevs.invui.dsl.PagedGuiDsl
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.item.AbstractPagedGuiBoundItem
@@ -18,6 +19,45 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.clientsideProvider
+
+/**
+ * A UI item for decrementing the [page][PagedGuiDsl.page] of the gui from the context on left-click.
+ * Uses [on] as item provider if it is possible to go back, otherwise uses [off].
+ */
+context(dsl: PagedGuiDsl<*>)
+fun pageBackItem(
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_ON.clientsideProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_OFF.clientsideProvider
+): Item = pageBackItem(dsl.page, on, off)
+
+/**
+ * A UI item for decrementing the [page][PagedGuiDsl.page] of the gui from the context on left-click.
+ * Uses [itemProvider] as item provider.
+ */
+context(dsl: PagedGuiDsl<*>)
+fun pageBackItem(
+    itemProvider: Provider<ItemProvider>
+): Item = pageBackItem(dsl.page, itemProvider)
+
+/**
+ * A UI item for incrementing the [page][PagedGuiDsl.page] of the gui from the context on left-click.
+ * Uses [pageCount][PagedGuiDsl.pageCount] to determine whether it is possible to go forward,
+ * then uses [on] if that is the case, otherwise uses [off].
+ */
+context(dsl: PagedGuiDsl<*>)
+fun pageForwardItem(
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_ON.clientsideProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_OFF.clientsideProvider
+): Item = pageForwardItem(dsl.page, dsl.pageCount, on, off)
+
+/**
+ * A UI item for incrementing the [page][PagedGuiDsl.page] of the gui from the context on left-click.
+ * Uses [itemProvider] as item provider.
+ */
+context(dsl: PagedGuiDsl<*>)
+fun pageForwardItem(
+    itemProvider: Provider<ItemProvider>
+): Item = pageForwardItem(dsl.page, dsl.pageCount, itemProvider)
 
 /**
  * A UI item for paged guis that goes back one page on left-click.

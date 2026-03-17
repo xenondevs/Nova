@@ -7,6 +7,8 @@ import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.invui.dsl.ScrollGuiDsl
+import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
@@ -19,6 +21,21 @@ import kotlin.random.Random
 private const val SLOTS = 3
 private const val FIRST_SLOT = 0
 private const val LAST_SLOT = SLOTS - 1
+
+/**
+ * Creates a scroller UI item for changing the [line][ScrollGuiDsl.line] of the gui from the context
+ * using the mouse wheel.
+ */
+context(windowDsl: WindowDsl, guiDsl: ScrollGuiDsl<*>)
+fun scrollerItem(
+    itemProvider: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLLER_VERTICAL.clientsideProvider
+): Item = scrollerItem(
+    windowDsl.serverWindowState,
+    windowDsl.clientWindowState,
+    guiDsl.line,
+    guiDsl.maxLine,
+    itemProvider
+)
 
 /**
  * Creates a scroller UI item that can be used to scroll through a [xyz.xenondevs.invui.gui.ScrollGui]
