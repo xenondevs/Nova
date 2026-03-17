@@ -10,7 +10,10 @@ import xyz.xenondevs.invui.dsl.NormalSplitWindowDsl
 import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.invui.dsl.window
 import xyz.xenondevs.invui.window.Window
-import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.ui.menu.locale
+import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
+import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.world.block.tileentity.TileEntityMenu.Companion.from
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -58,31 +61,41 @@ interface TileEntityMenu {
         
         /**
          * Shortcut for [creating][from] a [TileEntityMenu] using the [standard][xyz.xenondevs.invui.dsl.window] [WindowDsl]
-         * that automatically sets the title to the [TileEntity.block] [NovaBlock.name].
+         * with an optional [texture] that automatically sets the title text to the tile entity's block name.
          * 
          * Equivalent to:
          * ```kotlin
          * MenuContainer.from { viewer -> 
          *     window(viewer) {
-         *         title by block.name
+         *         if (texture != null) {
+         *             title by texture.getTitle(tileEntity.block.name, locale)
+         *         } else {
+         *             title by tileEntity.block.name
+         *         }
          *         window()
          *     }
          * }
          * ```
          */
         context(_: TileEntity)
-        fun window(window: NormalSplitWindowDsl.() -> Unit): TileEntityMenu =
-            window(::window, window)
+        fun window(
+            texture: RegistryEntry.Nova<GuiTexture>? = null,
+            window: NormalSplitWindowDsl.() -> Unit
+        ): TileEntityMenu = window(::window, texture, window)
         
         /**
-         * Shortcut for [creating][from] a [TileEntityMenu] using [WindowDsl] of a custom type
-         * that automatically sets the title to the [TileEntity.block] [NovaBlock.name].
+         * Shortcut for [creating][from] a [TileEntityMenu] using [WindowDsl] of a custom type with an optional [texture]
+         * that automatically sets the title text to the tile entity's block name.
          * 
          * Equivalent to:
          * ```kotlin
-         * MenuContainer.from { viewer ->
+         * MenuContainer.from { viewer -> 
          *     windowDsl(viewer) {
-         *         title by block.name
+         *         if (texture != null) {
+         *             title by texture.getTitle(tileEntity.block.name, locale)
+         *         } else {
+         *             title by tileEntity.block.name
+         *         }
          *         window()
          *     }
          * }
@@ -91,36 +104,51 @@ interface TileEntityMenu {
         context(tileEntity: TileEntity)
         fun <T : WindowDsl> window(
             windowDsl: (Player, T.() -> Unit) -> Window,
+            texture: RegistryEntry.Nova<GuiTexture>? = null,
             window: T.() -> Unit
         ): TileEntityMenu = from {
-            windowDsl(it) { 
-                title by tileEntity.block.name 
+            windowDsl(it) {
+                if (texture != null) {
+                    title by texture.getTitle(tileEntity.block.name, locale)
+                } else {
+                    title by tileEntity.block.name
+                }
                 window()
             } 
         }
         
         /**
          * Shortcut for [creating][from] a [TileEntityMenu] using the [standard][xyz.xenondevs.invui.dsl.window] [WindowDsl]
-         * that automatically sets the title to the [TileEntity.block] [NovaBlock.name] and is cached with [expireAfterClose].
+         * with an optional [texture] that automatically sets the title text to the tile entity's block name and is cached with [expireAfterClose].
+         * 
+         * @see TileEntityMenu.window
          */
         context(_: TileEntity)
         fun cachedWindow(
+            texture: RegistryEntry.Nova<GuiTexture>? = null,
             expireAfterClose: Duration = 1.minutes,
             window: NormalSplitWindowDsl.() -> Unit
-        ): TileEntityMenu = cachedWindow(::window, expireAfterClose, window)
+        ): TileEntityMenu = cachedWindow(::window, texture, expireAfterClose, window)
         
         /**
-         * Shortcut for [creating][from] a [TileEntityMenu] using [WindowDsl] of a custom type
-         * that automatically sets the title to the [TileEntity.block] [NovaBlock.name] and is cached with [expireAfterClose].
+         * Shortcut for [creating][from] a [TileEntityMenu] using [WindowDsl] of a custom type with an optional [texture]
+         * that automatically sets the title text to the tile entity's block name and is cached with [expireAfterClose].
+         * 
+         * @see TileEntityMenu.window
          */
         context(tileEntity: TileEntity)
         fun <T : WindowDsl> cachedWindow(
             windowDsl: (Player, T.() -> Unit) -> Window,
+            texture: RegistryEntry.Nova<GuiTexture>? = null,
             expireAfterClose: Duration = 1.minutes,
             window: (T.() -> Unit),
         ): TileEntityMenu = CachedWindowTileEntityMenuImpl(expireAfterClose) {
             windowDsl(it) {
-                title by tileEntity.block.name
+                if (texture != null) {
+                    title by texture.getTitle(tileEntity.block.name, locale)
+                } else {
+                    title by tileEntity.block.name
+                }
                 window()
             }
         }
