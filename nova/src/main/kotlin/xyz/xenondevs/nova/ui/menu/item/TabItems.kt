@@ -4,12 +4,29 @@ import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.invui.dsl.TabGuiDsl
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.TabGui
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound
+
+/**
+ * A UI item for switching the [active tab][TabGuiDsl.tab] of the gui from the context.
+ * 
+ * Displays:
+ * - [selected] if the tab at [tab] is the current active tab
+ * - [on] if the tab at [tab] is available but not active
+ * - [off] if the tab at [tab] is not available
+ */
+context(dsl: TabGuiDsl<*>)
+fun tabItem(
+    tab: Int,
+    selected: Provider<ItemProvider>,
+    on: Provider<ItemProvider>,
+    off: Provider<ItemProvider>
+): Item = tabItem(tab, dsl.tab, dsl.tabs, selected, on, off)
 
 /**
  * A UI item for switching [activeTab] to [tab] in a [TabGui].

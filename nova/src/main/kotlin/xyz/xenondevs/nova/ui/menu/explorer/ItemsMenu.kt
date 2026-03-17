@@ -159,9 +159,9 @@ internal class ItemsMenu private constructor(val player: Player) {
                             ". x x x x x x x d"
                         ) {
                             'c' by cheatModeButton(cheatMode)
-                            'u' by scrollUpItem(line)
-                            '|' by scrollerItem(serverWindowState, clientWindowState, line, maxLine)
-                            'd' by scrollDownItem(line, maxLine)
+                            'u' by scrollUpItem()
+                            '|' by scrollerItem()
+                            'd' by scrollDownItem()
                             content by category.items.map { i -> categorizedItemButton(i, cheatMode) }
                         }
                     } + gui(
@@ -196,9 +196,9 @@ internal class ItemsMenu private constructor(val player: Player) {
                 ) {
                     'x' by Markers.CONTENT_LIST_SLOT_VERTICAL
                     'c' by cheatModeButton(cheatMode)
-                    '<' by scrollLeftItem(line)
-                    '-' by scrollerItem(serverWindowState, clientWindowState, line, maxLine, DefaultGuiItems.TP_SCROLLER_HORIZONTAL.clientsideProvider)
-                    '>' by scrollRightItem(line, maxLine)
+                    '<' by scrollLeftItem()
+                    '-' by scrollerItem(DefaultGuiItems.TP_SCROLLER_HORIZONTAL.clientsideProvider)
+                    '>' by scrollRightItem()
                     '^' by closeSearchButton(filter, mainWindow, searchResultsWindow)
                     content by filteredItems
                 }
@@ -232,9 +232,9 @@ internal class ItemsMenu private constructor(val player: Player) {
                 ) {
                     's' by searchButton(searchWindow)
                     'c' by cheatModeButton(cheatMode)
-                    'u' by scrollUpItem(line)
-                    '|' by scrollerItem(serverWindowState, clientWindowState, line, maxLine)
-                    'd' by scrollDownItem(line, maxLine)
+                    'u' by scrollUpItem()
+                    '|' by scrollerItem()
+                    'd' by scrollDownItem()
                     content by filteredItems
                 }
                 

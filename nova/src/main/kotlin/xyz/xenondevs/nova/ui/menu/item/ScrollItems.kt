@@ -7,6 +7,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.Click
+import xyz.xenondevs.invui.dsl.ScrollGuiDsl
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.item.AbstractScrollGuiBoundItem
@@ -15,6 +16,66 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.clientsideProvider
+
+/**
+ * A UI item for decrementing the [line][ScrollGuiDsl.line] of the gui from the context on left-click.
+ * Uses [on] as item provider if it is possible to scroll up, otherwise uses [off].
+ */
+context(dsl: ScrollGuiDsl<*>)
+fun scrollUpItem(
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_UP_ON.clientsideProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_UP_OFF.clientsideProvider
+): Item = scrollUpItem(dsl.line, on, off)
+
+/**
+ * A UI item for decrementing the [line][ScrollGuiDsl.line] of the gui from the context on left-click.
+ * Uses [on] as item provider if it is possible to scroll left, otherwise uses [off].
+ */
+context(dsl: ScrollGuiDsl<*>)
+fun scrollLeftItem(
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_ON.clientsideProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_LEFT_OFF.clientsideProvider
+): Item = scrollLeftItem(dsl.line, on, off)
+
+/**
+ * A UI item for decrementing the [line][ScrollGuiDsl.line] of the gui from the context on left-click.
+ * Uses [itemProvider] as item provider.
+ */
+context(dsl: ScrollGuiDsl<*>)
+fun scrollUpItem(
+    itemProvider: Provider<ItemProvider>
+): Item = scrollUpItem(dsl.line, itemProvider)
+
+/**
+ * A UI item for incrementing the [line][ScrollGuiDsl.line] of the gui from the context on left-click.
+ * Uses [maxLine][ScrollGuiDsl.maxLine] to determine whether it is possible to scroll down,
+ * then uses [on] if that is the case, otherwise uses [off].
+ */
+context(dsl: ScrollGuiDsl<*>)
+fun scrollDownItem(
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_DOWN_ON.clientsideProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_DOWN_OFF.clientsideProvider
+): Item = scrollDownItem(dsl.line, dsl.maxLine, on, off)
+
+/**
+ * A UI item for incrementing the [line][ScrollGuiDsl.line] of the gui from the context on left-click.
+ * Uses [maxLine][ScrollGuiDsl.maxLine] to determine whether it is possible to scroll right,
+ * then uses [on] if that is the case, otherwise uses [off].
+ */
+context(dsl: ScrollGuiDsl<*>)
+fun scrollRightItem(
+    on: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_ON.clientsideProvider,
+    off: Provider<ItemProvider> = DefaultGuiItems.TP_ARROW_RIGHT_OFF.clientsideProvider
+): Item = scrollRightItem(dsl.line, dsl.maxLine, on, off)
+
+/**
+ * A UI item for incrementing the [line][ScrollGuiDsl.line] of the gui from the context on left-click.
+ * Uses [itemProvider] as item provider.
+ */
+context(dsl: ScrollGuiDsl<*>)
+fun scrollDownItem(
+    itemProvider: Provider<ItemProvider>
+): Item = scrollDownItem(dsl.line, dsl.maxLine, itemProvider)
 
 /**
  * A UI item for scroll guis that decrements [line] on left-click.
