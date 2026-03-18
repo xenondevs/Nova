@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.ui.menu.sideconfig
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.invui.gui.Structure
+import xyz.xenondevs.invui.dsl.gui
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.DefaultNetworkTypes
@@ -13,25 +13,23 @@ class EnergySideConfigMenu(
     holder: EnergyHolder
 ) : AbstractSideConfigMenu<EnergyHolder>(endPoint, DefaultNetworkTypes.ENERGY, holder) {
     
-    init {
-        gui.applyStructure(
-            Structure(
-                "# # # # u # # # #",
-                "# # # l f r # # #",
-                "# # # # d b # # #")
-                .addIngredient('u', ConnectionConfigItem(BlockSide.TOP))
-                .addIngredient('l', ConnectionConfigItem(BlockSide.LEFT))
-                .addIngredient('f', ConnectionConfigItem(BlockSide.FRONT))
-                .addIngredient('r', ConnectionConfigItem(BlockSide.RIGHT))
-                .addIngredient('d', ConnectionConfigItem(BlockSide.BOTTOM))
-                .addIngredient('b', ConnectionConfigItem(BlockSide.BACK))
-        )
+    override val gui = gui(
+        ". . . . . . . .",
+        ". . . . u . . .",
+        ". . . l f r . .",
+        ". . . . d b . ."
+    ) {
+        'u' by connectionConfigItem(BlockSide.TOP)
+        'l' by connectionConfigItem(BlockSide.LEFT)
+        'f' by connectionConfigItem(BlockSide.FRONT)
+        'r' by connectionConfigItem(BlockSide.RIGHT)
+        'd' by connectionConfigItem(BlockSide.BOTTOM)
+        'b' by connectionConfigItem(BlockSide.BACK)
     }
     
     override fun getAllowedConnectionType(face: BlockFace): NetworkConnectionType {
         if (face in holder.blockedFaces)
             return NetworkConnectionType.NONE
-        
         return holder.allowedConnectionType
     }
     

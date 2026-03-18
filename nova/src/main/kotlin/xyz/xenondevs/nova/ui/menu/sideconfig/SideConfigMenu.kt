@@ -1,21 +1,23 @@
 package xyz.xenondevs.nova.ui.menu.sideconfig
 
-import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.dsl.tabGui
-import xyz.xenondevs.invui.gui.Gui
+import xyz.xenondevs.invui.dsl.window
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.nova.ui.menu.by
 import xyz.xenondevs.nova.ui.menu.item.BackItem
 import xyz.xenondevs.nova.ui.menu.item.tabItem
+import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
+import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.EnergyHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
@@ -77,7 +79,7 @@ class SideConfigMenu(
     private val endPoint: NetworkEndPoint,
     inventories: Map<NetworkedInventory, String>? = null,
     containers: Map<NetworkedFluidContainer, String>? = null,
-    openPrevious: (Player) -> Unit
+    private val openPrevious: (Player) -> Unit
 ) {
     
     /**
@@ -111,8 +113,6 @@ class SideConfigMenu(
     private val itemConfigMenu: ItemSideConfigMenu?
     private val fluidConfigMenu: FluidSideConfigMenu?
     
-    private val mainGui: Gui
-    
     init {
         val energyHolder = endPoint.holders.firstInstanceOfOrNull<EnergyHolder>()
         energyConfigMenu = if (energyHolder != null)
@@ -131,62 +131,73 @@ class SideConfigMenu(
         
         require(energyConfigMenu != null || itemConfigMenu != null || fluidConfigMenu != null)
         
-        mainGui = tabGui(
-            "< # # e i f # # #",
-            "- - - - - - - - -",
-            "x x x x x x x x x",
-            "x x x x x x x x x",
-            "x x x x x x x x x"
-        ) {
-            tabs by listOf(energyConfigMenu?.gui, itemConfigMenu?.gui, fluidConfigMenu?.gui)
-            
-            '<' by BackItem(openPrevious = openPrevious)
-            'e' by tabItem(
-                0, tab, tabs,
-                DefaultGuiItems.ENERGY_BTN_SELECTED.clientsideProvider,
-                DefaultGuiItems.ENERGY_BTN_ON.clientsideProvider,
-                DefaultGuiItems.ENERGY_BTN_OFF.clientsideProvider
-            )
-            'i' by tabItem(
-                1, tab, tabs,
-                DefaultGuiItems.ITEM_BTN_SELECTED.clientsideProvider,
-                DefaultGuiItems.ITEM_BTN_ON.clientsideProvider,
-                DefaultGuiItems.ITEM_BTN_OFF.clientsideProvider
-            )
-            'f' by tabItem(
-                2, tab, tabs,
-                DefaultGuiItems.FLUID_BTN_SELECTED.clientsideProvider,
-                DefaultGuiItems.FLUID_BTN_ON.clientsideProvider,
-                DefaultGuiItems.FLUID_BTN_OFF.clientsideProvider
-            )
-        }
-        
-        updateNetworkData()
+        initNetworkData()
     }
     
     /**
      * Opens a [Window] of this [SideConfigMenu] for the given [player].
      */
     fun openWindow(player: Player) {
-        val window = Window.builder()
-            .setViewer(player)
-            .setTitle(Component.translatable("menu.nova.side_config"))
-            .setUpperGui(mainGui)
-            .addOpenHandler(::updateNetworkData)
-            .build()
-        
-        if (endPoint is TileEntity) {
-            endPoint.menu.register(window)
-        }
-        
-        window.open()
+        createWindow(player).open()
     }
     
-    private fun updateNetworkData() {
-        NetworkManager.queueRead(endPoint.pos.chunkPos) {
-            energyConfigMenu?.initAsync()
-            itemConfigMenu?.initAsync()
-            fluidConfigMenu?.initAsync()
+    /**
+     * Creates a [Window] for this [SideConfigMenu] for the given [player].
+     * If the [endPoint] is a [TileEntity], the window is also registered to the [TileEntity's menu][TileEntity.menu].
+     */
+    fun createWindow(player: Player): Window {
+        val window = window(player) {
+            title by DefaultGuiTextures.SIDE_CONFIG
+            upperGui by tabGui(
+                "< x x x x x x x x",
+                "e x x x x x x x x",
+                "i x x x x x x x x",
+                "f x x x x x x x x"
+            ) {
+                tabs by listOf(energyConfigMenu?.gui, itemConfigMenu?.gui, fluidConfigMenu?.gui)
+                
+                '<' by BackItem(DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.clientsideProvider, openPrevious)
+                'e' by tabItem(
+                    0, tab, tabs,
+                    DefaultGuiItems.TP_ENERGY_BTN_SELECTED.clientsideProvider,
+                    DefaultGuiItems.TP_ENERGY_BTN_ON.clientsideProvider,
+                    DefaultGuiItems.TP_ENERGY_BTN_OFF.clientsideProvider
+                )
+                'i' by tabItem(
+                    1, tab, tabs,
+                    DefaultGuiItems.TP_ITEM_BTN_SELECTED.clientsideProvider,
+                    DefaultGuiItems.TP_ITEM_BTN_ON.clientsideProvider,
+                    DefaultGuiItems.TP_ITEM_BTN_OFF.clientsideProvider
+                )
+                'f' by tabItem(
+                    2, tab, tabs,
+                    DefaultGuiItems.TP_FLUID_BTN_SELECTED.clientsideProvider,
+                    DefaultGuiItems.TP_FLUID_BTN_ON.clientsideProvider,
+                    DefaultGuiItems.TP_FLUID_BTN_OFF.clientsideProvider
+                )
+            }
+            onOpen { updateNetworkData() }
+        }
+        
+        if (endPoint is TileEntity)
+            endPoint.menu.register(window)
+        
+        return window
+    }
+    
+    private fun initNetworkData() {
+        NetworkManager.queueRead(endPoint.pos.chunkPos) { state ->
+            energyConfigMenu?.init(state)
+            itemConfigMenu?.init(state)
+            fluidConfigMenu?.init(state)
+        }        
+    }
+    
+    internal fun updateNetworkData() {
+        NetworkManager.queueRead(endPoint.pos.chunkPos) { state ->
+            energyConfigMenu?.refresh(state)
+            itemConfigMenu?.refresh(state)
+            fluidConfigMenu?.refresh(state)
         }
     }
     
@@ -205,7 +216,8 @@ fun openSideConfigItem(sideConfigMenu: SideConfigMenu): Item = item {
 
 /**
  * A UI item that creates, memorizes, and opens a [SideConfigMenu] for the given [endPoint] and [containers] when clicked.
- * Uses the [window from the context][windowDsl] as the previous- and fallback window.
+ * 
+ * Uses the [window from the context][windowDsl] as the previous window.
  */
 context(windowDsl: WindowDsl, endPoint: NetworkEndPoint)
 fun openSideConfigItem(
@@ -214,7 +226,10 @@ fun openSideConfigItem(
 
 /**
  * A UI item that creates, memorizes, and opens a [SideConfigMenu] for the given [endPoint], [inventories], and [containers] when clicked.
+ * 
  * Uses the [window from the context][windowDsl] as the previous window.
+ * 
+ * Uses the [end point from the context][endPoint] to retrieve the [EndPointDataHolders][EndPointDataHolder].
  */
 context(windowDsl: WindowDsl, endPoint: NetworkEndPoint)
 fun openSideConfigItem(
@@ -223,12 +238,15 @@ fun openSideConfigItem(
     itemProvider: Provider<ItemProvider> = DefaultGuiItems.TP_SIDE_CONFIG_BTN.clientsideProvider
 ): Item = item {
     val outerWindow = windowDsl.window
-    val menu by lazy { SideConfigMenu(endPoint, inventories, containers) { _ -> outerWindow.get().open() } }
+    // eagerly create the menu as loading network state is async
+    val menu = SideConfigMenu(endPoint, inventories, containers) { _ -> outerWindow.get().open() }
+    val window = menu.createWindow(windowDsl.viewer)
     this.itemProvider by itemProvider
     onClick {
         player.playClickSound()
-        menu.openWindow(player)
+        window.open()
     }
+    windowDsl.onOpen { menu.updateNetworkData() }
 }
 
 @Suppress("FunctionName")
