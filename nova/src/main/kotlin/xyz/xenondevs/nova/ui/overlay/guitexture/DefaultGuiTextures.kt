@@ -1,10 +1,13 @@
 package xyz.xenondevs.nova.ui.overlay.guitexture
 
+import net.kyori.adventure.text.Component
+import org.joml.Vector2i
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistrar.guiTexture
 import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureAlignment
+import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture.TitlePosition.Alignment
 
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
@@ -109,6 +112,10 @@ object DefaultGuiTextures {
     val RECIPE_CRAFTING = guiTexture("recipe_crafting") { texture { path("gui/recipe/crafting") } }
     val RECIPE_SMITHING = guiTexture("recipe_smithing") { texture { path("gui/recipe/smithing") } }
     val RECIPE_CONVERSION = guiTexture("recipe_conversion") { texture { path("gui/recipe/conversion") } }
+    val SIDE_CONFIG = guiTexture("side_config") {
+        title { line(Component.translatable("menu.nova.side_config"), Alignment.LEFT, Vector2i(21, 18)) }
+        texture { path("gui/side_config") }
+    }
     
     
 }
