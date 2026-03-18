@@ -1,8 +1,12 @@
 package xyz.xenondevs.nova.ui.menu
 
 import net.kyori.adventure.text.Component
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.flatten
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.IngredientsDsl
+import xyz.xenondevs.invui.dsl.InventoryWithBackgroundProvider
 import xyz.xenondevs.invui.dsl.ItemProviderDsl
 import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.invui.dsl.itemProvider
@@ -20,6 +24,7 @@ import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.setItemProvider
 import xyz.xenondevs.nova.i18n.LocaleManager
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.map
 import xyz.xenondevs.nova.ui.menu.item.PageBackItem
 import xyz.xenondevs.nova.ui.menu.item.PageForwardItem
 import xyz.xenondevs.nova.ui.menu.item.ScrollDownItem
@@ -30,6 +35,8 @@ import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.clientsideProvider
 import java.util.*
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 internal fun setGlobalIngredients() {
     addGlobalIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
@@ -65,11 +72,54 @@ fun <S : IngredientMapper<S>> IngredientMapper<S>.addIngredient(char: Char, inve
     addIngredient(char, inventory, background.clientsideProvider)
 
 // Breaks server-side localization, but that's ok because Nova doesn't use it.
-fun itemProvider(base: Provider<NovaItem>, itemProvider: ItemProviderDsl.() -> Unit): Provider<ItemProvider> =
-    itemProvider(base.clientsideProvider.map { it.get() }, itemProvider)
+inline fun itemProvider(base: Provider<ItemProvider>, itemProvider: ItemProviderDsl.() -> Unit): Provider<ItemProvider> {
+    contract { callsInPlace(itemProvider, InvocationKind.EXACTLY_ONCE) }
+    return itemProvider(base.map(ItemProvider::get), itemProvider)
+}
 
-fun itemProvider(base: NovaItem, itemProvider: ItemProviderDsl.() -> Unit): Provider<ItemProvider> =
-    itemProvider(base.clientsideProvider.map { it.get() }, itemProvider)
+@JvmName("itemProviderNovaItem")
+inline fun itemProvider(base: Provider<NovaItem>, itemProvider: ItemProviderDsl.() -> Unit): Provider<ItemProvider> {
+    contract { callsInPlace(itemProvider, InvocationKind.EXACTLY_ONCE) }
+    return itemProvider(base.clientsideProvider, itemProvider)
+}
+
+fun itemProvider(base: RegistryEntry.Either<NovaItem, ItemType>, itemProvider: ItemProviderDsl.() -> Unit): Provider<ItemProvider> {
+    contract { callsInPlace(itemProvider, InvocationKind.EXACTLY_ONCE) }
+    return itemProvider(
+        base.map(
+            { it.clientsideProvider.map(ItemProvider::get) },
+            { provider(it.createItemStack()) }
+        ).flatten(),
+        itemProvider
+    )
+}
+
+fun itemProvider(base: NovaItem, itemProvider: ItemProviderDsl.() -> Unit): Provider<ItemProvider> {
+    contract { callsInPlace(itemProvider, InvocationKind.EXACTLY_ONCE) }
+    return itemProvider(base.clientsideProvider, itemProvider)
+}
+
+@JvmName("by1")
+context(dsl: ItemProviderDsl)
+infix fun ProviderDslProperty<ItemType?>.by(type: Provider<Provider<NovaItem>>) {
+    dsl.base by type.flatten().clientsideProvider.map(ItemProvider::get)
+    dsl.type by null
+}
+
+context(dsl: ItemProviderDsl)
+infix fun ProviderDslProperty<ItemType?>.by(type: Provider<NovaItem>) {
+    dsl.base by type.clientsideProvider.map(ItemProvider::get)
+    dsl.type by null
+}
+
+context(dsl: ItemProviderDsl)
+infix fun ProviderDslProperty<ItemType>.by(type: RegistryEntry.Either<NovaItem, ItemType>) {
+    dsl.base by type.map(
+        { it.clientsideProvider.map(ItemProvider::get) },
+        { provider(it.createItemStack()) }
+    ).flatten()
+    dsl.type by null
+}
 
 fun InventoryLink(inventory: Inventory, slot: Int, background: RegistryEntry.Nova<NovaItem>): SlotElement.InventoryLink =
     InventoryLink(inventory, slot, background.clientsideProvider)
@@ -81,8 +131,15 @@ infix fun Char.by(item: Provider<NovaItem>) {
     }
 }
 
+infix fun Inventory.with(item: Provider<NovaItem>) = 
+    InventoryWithBackgroundProvider(this, item.clientsideProvider)
+
 infix fun ProviderDslProperty<in ItemProvider>.by(novaItem: Provider<NovaItem>): Unit =
     by(novaItem.clientsideProvider)
+
+@JvmName("by1")
+infix fun ProviderDslProperty<in ItemProvider>.by(novaItem: Provider<Provider<NovaItem>>): Unit =
+    by(novaItem.flatten().clientsideProvider)
 
 context(dsl: WindowDsl)
 infix fun ProviderDslProperty<Component>.by(guiTexture: RegistryEntry.Nova<GuiTexture>): Unit =
