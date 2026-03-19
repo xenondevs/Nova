@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.world.item.recipe.SingleItemTest
 import java.util.concurrent.CopyOnWriteArrayList
 
+@Deprecated(CUSTOM_ITEM_SERVICE_DEPRECATION)
 object CustomItemServiceManager {
     
     internal val services = CopyOnWriteArrayList<CustomItemService>()
