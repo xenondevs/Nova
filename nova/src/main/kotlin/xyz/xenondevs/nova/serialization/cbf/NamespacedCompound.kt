@@ -15,6 +15,11 @@ import java.util.*
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
+@Deprecated("""
+    Namespaced compounds will be removed in a future version.
+    Use the store/retrieve extension functions on ItemStack instead, or use persistent data containers.
+    The contents of NamespacedCompound will be merged into the persistent data container in the future, so make sure to not create any conflicting keys.
+""")
 class NamespacedCompound internal constructor(
     private val map: MutableMap<String, Compound>
 ) {
