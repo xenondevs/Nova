@@ -7,9 +7,9 @@ import xyz.xenondevs.commons.collections.toEnumMap
 import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.observed
 import xyz.xenondevs.commons.provider.orElseNew
-import xyz.xenondevs.nova.util.TickResettingLong
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import kotlin.math.max
 import kotlin.math.min
@@ -33,8 +33,10 @@ class DefaultEnergyHolder(
 ) : EnergyHolder {
     
     private val _energyProvider: MutableProvider<Long> = energy
-    private val _energyMinus = TickResettingLong()
-    private val _energyPlus = TickResettingLong()
+    private val _energyMinusProvider = mutableProvider(0L)
+    private val _energyPlusProvider = mutableProvider(0L)
+    private var activeEnergyMinus = 0L
+    private var activeEnergyPlus = 0L
     
     override val blockedFaces = blockedFaces.toEnumSet()
     override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
@@ -58,14 +60,30 @@ class DefaultEnergyHolder(
     val energyProvider: Provider<Long> get() = _energyProvider
     
     /**
-     * The amount of energy that was extracted during the last server tick.
+     * A [Provider] containing the amount of energy that was extracted between the second-to-last and last energy network tick.
+     * For visualization, this value should be normalized by dividing it by the number of game ticks between energy network ticks.
      */
-    val energyMinus: Long by _energyMinus
+    val energyMinusProvider: Provider<Long>
+        get() = _energyMinusProvider
     
     /**
-     * The amount of energy that was inserted during the last server tick.
+     * A [Provider] containing the amount of energy that was inserted between the second-to-last and last energy network tick.
+     * For visualization, this value should be normalized by dividing it by the number of game ticks between energy network ticks.
      */
-    val energyPlus: Long by _energyPlus
+    val energyPlusProvider: Provider<Long>
+        get() = _energyPlusProvider
+    
+    /**
+     * The amount of energy that was extracted between the second-to-last and last energy network tick.
+     * For visualization, this value should be normalized by dividing it by the number of game ticks between energy network ticks.
+     */
+    val energyMinus: Long by energyMinusProvider
+    
+    /**
+     * The amount of energy that was inserted between the second-to-last and last energy network tick.
+     * For visualization, this value should be normalized by dividing it by the number of game ticks between energy network ticks.
+     */
+    val energyPlus: Long by energyPlusProvider
     
     override var energy: Long
         get() = _energyProvider.get()
@@ -74,13 +92,24 @@ class DefaultEnergyHolder(
             if (_energyProvider.get() != capped) {
                 val energyDelta = capped - _energyProvider.get()
                 if (energyDelta > 0) {
-                    _energyPlus.add(energyDelta)
+                    activeEnergyPlus += energyDelta
                 } else {
-                    _energyMinus.add(-energyDelta)
+                    activeEnergyMinus -= energyDelta
                 }
                 
                 _energyProvider.set(capped)
             }
         }
+    
+    /**
+     * Called by the network group ticking the energy network of this holder to flush the accumulated
+     * energy plus and minus values to [energyPlus] and [energyMinus].
+     */
+    fun postTick() {
+        _energyMinusProvider.set(activeEnergyMinus)
+        _energyPlusProvider.set(activeEnergyPlus)
+        activeEnergyMinus = 0L
+        activeEnergyPlus = 0L
+    }
     
 }
