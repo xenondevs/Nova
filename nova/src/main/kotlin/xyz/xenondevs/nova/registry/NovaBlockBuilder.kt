@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
  * A builder for [NovaBlock].
  */
 @RegistryElementBuilderDsl
-sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder {
+sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, RegistryEntryBuilder.Nova<NovaBlock> {
     
     /**
      * Sets the behaviors of this block to [behaviors].

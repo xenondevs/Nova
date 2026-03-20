@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.registry
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.keys.tags.EnchantmentTagKeys
 import io.papermc.paper.registry.tag.TagKey
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
@@ -17,10 +16,12 @@ import xyz.xenondevs.nova.world.item.enchantment.CustomEnchantmentLogic
 import java.util.*
 import net.minecraft.world.item.enchantment.Enchantment as MojangEnchantment
 
-internal class EnchantmentBuilderImpl(key: Key) : EnchantmentBuilder, RegistryElementBuilder.Vanilla<MojangEnchantment> {
+internal class EnchantmentBuilderImpl(
+    override val entry: RegistryEntry.Paper<Enchantment>,
+) : EnchantmentBuilder, RegistryElementBuilder.Vanilla<MojangEnchantment> {
     
     // enchantment definition
-    private var name: Component = Component.translatable("enchantment.${key.namespace()}.${key.value()}")
+    private var name: Component = Component.translatable("enchantment.${entry.key.namespace()}.${entry.key.value()}")
     private var maxLevel: Int = 1
     private var rarity: Int = 10
     private var anvilCost: Int = 4

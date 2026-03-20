@@ -11,7 +11,7 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture.TitlePosition.Alignme
  * A builder for [GuiTexture].
  */
 @RegistryElementBuilderDsl
-sealed interface GuiTextureBuilder {
+sealed interface GuiTextureBuilder : RegistryEntryBuilder.Nova<GuiTexture> {
     
     /**
      * Enables or disables the "Inventory" text that is displayed above the player's inventory slots.

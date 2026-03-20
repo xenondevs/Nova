@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.world.BlockPos
  * A builder for [WailaInfoProvider].
  */
 @RegistryElementBuilderDsl
-sealed interface WailaInfoProviderBuilder<B : Keyed, S : Any> {
+sealed interface WailaInfoProviderBuilder<B : Keyed, S : Any> : RegistryEntryBuilder.Nova<WailaInfoProvider<B, S>> {
     
     /**
      * The priority of this waila info provider.

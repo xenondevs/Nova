@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
  * A builder for [NovaItem].
  */
 @RegistryElementBuilderDsl
-sealed interface NovaItemBuilder : ConfigurableBuilder, NameableBuilder {
+sealed interface NovaItemBuilder : ConfigurableBuilder, NameableBuilder, RegistryEntryBuilder.Nova<NovaItem> {
     
     /**
      * Sets the name of the item.

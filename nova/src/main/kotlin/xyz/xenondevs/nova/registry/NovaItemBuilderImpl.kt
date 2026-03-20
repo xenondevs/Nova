@@ -29,7 +29,7 @@ import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.world.item.createItemStack
 
 internal class NovaItemBuilderImpl(
-    private val entry: RegistryEntry.Nova<NovaItem>
+    override val entry: RegistryEntry.Nova<NovaItem>
 ) : NovaItemBuilder, RegistryElementBuilder.Nova<NovaItem> {
     
     private val key: Key = entry.key

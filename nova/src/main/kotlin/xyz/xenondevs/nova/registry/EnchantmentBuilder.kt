@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.world.item.behavior.Enchantable
  * A builder for enchantments.
  */
 @RegistryElementBuilderDsl
-sealed interface EnchantmentBuilder {
+sealed interface EnchantmentBuilder : RegistryEntryBuilder.Paper<Enchantment> {
     
     /**
      * Sets the name of the enchantment.

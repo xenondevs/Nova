@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture.TitlePosition.Alignme
 import xyz.xenondevs.nova.util.component.adventure.getFontsRecursively
 
 internal class GuiTextureBuilderImpl(
-    private val entry: RegistryEntry.Nova<GuiTexture>
+    override val entry: RegistryEntry.Nova<GuiTexture>
 ) : GuiTextureBuilder, RegistryElementBuilder.Nova<GuiTexture> {
     
     private var hasInventoryLabel: Boolean = true

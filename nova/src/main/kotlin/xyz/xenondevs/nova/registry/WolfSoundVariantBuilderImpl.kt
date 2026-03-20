@@ -6,10 +6,13 @@ import net.minecraft.resources.Identifier
 import net.minecraft.resources.RegistryOps
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.animal.wolf.WolfSoundVariant
+import org.bukkit.entity.Wolf
 import xyz.xenondevs.nova.util.toIdentifier
 import java.util.*
 
-internal class WolfSoundVariantBuilderImpl : RegistryElementBuilder.Vanilla<WolfSoundVariant>, WolfSoundVariantBuilder {
+internal class WolfSoundVariantBuilderImpl(
+    override val entry: RegistryEntry.Paper<Wolf.SoundVariant>
+) : RegistryElementBuilder.Vanilla<WolfSoundVariant>, WolfSoundVariantBuilder {
     
     private var configureAdultSounds: (WolfSoundSetBuilder.() -> Unit)? = null
     private var configureBabySounds: (WolfSoundSetBuilder.() -> Unit)? = null
