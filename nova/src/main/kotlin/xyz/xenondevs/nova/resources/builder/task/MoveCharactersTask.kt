@@ -1,12 +1,10 @@
 package xyz.xenondevs.nova.resources.builder.task
 
 import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.font.Font
-import xyz.xenondevs.nova.resources.builder.font.provider.ReferenceProvider
 import xyz.xenondevs.nova.resources.builder.font.provider.SpaceProvider
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import kotlin.math.pow
@@ -31,13 +29,7 @@ class MoveCharactersTask(builder: ResourcePackBuilder) : PackTask {
     private val fontContent by builder.getBuildDataLazily<FontContent>()
     
     override suspend fun run() {
-        val mergedFonts = fontContent.mergedFonts
-        
-        val codePoints = IntOpenHashSet()
-        codePoints.addAll(mergedFonts[Font.DEFAULT]!!.getCodePoints(mergedFonts.values))
-        codePoints.addAll(mergedFonts[Font.UNIFORM]!!.getCodePoints(mergedFonts.values))
-        
-        val offset = Font.PRIVATE_USE_AREA.start
+        val offset = Font.PRIVATE_USE_AREA.first
         
         val advances = Int2FloatOpenHashMap()
         // -.25, -.5, ..., -8192
@@ -48,10 +40,6 @@ class MoveCharactersTask(builder: ResourcePackBuilder) : PackTask {
         val moveFontId = ResourcePath(ResourceType.Font, "nova", "move")
         val spaceFont = Font(moveFontId, listOf(SpaceProvider(advances)))
         fontContent += spaceFont
-        
-        val spaceFontReference = ReferenceProvider(moveFontId)
-        fontContent.getOrCreate(Font.DEFAULT).addFirst(spaceFontReference)
-        fontContent.getOrCreate(Font.UNIFORM).addFirst(spaceFontReference)
         
         // update lookup
         ResourceLookups.moveCharactersOffset = offset
