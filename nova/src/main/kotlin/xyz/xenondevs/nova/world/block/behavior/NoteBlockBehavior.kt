@@ -52,9 +52,7 @@ internal object NoteBlockBehavior : BlockBehavior {
     }
     
     override fun use(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): InteractionResult {
-        cycleNote(pos, state)
-        playNote(pos, state)
-        
+        playNote(pos, cycleNote(pos, state))
         return InteractionResult.Success()
     }
     
@@ -79,8 +77,10 @@ internal object NoteBlockBehavior : BlockBehavior {
         }
     }
     
-    private fun cycleNote(pos: BlockPos, state: NovaBlockState) {
-        WorldDataManager.setBlockState(pos, state.cycle(NOTE_BLOCK_NOTE))
+    private fun cycleNote(pos: BlockPos, state: NovaBlockState): NovaBlockState {
+        val cycled = state.cycle(NOTE_BLOCK_NOTE)
+        WorldDataManager.setBlockState(pos, cycled)
+        return cycled
     }
     
     private fun playNote(pos: BlockPos, state: NovaBlockState) {
