@@ -205,7 +205,7 @@ abstract class Registrar internal constructor() : Namespaced {
      * Registers a new [Wolf.SoundVariant] under [name] after configuring it with [wolfSoundVariant].
      */
     fun wolfSoundVariant(name: String, wolfSoundVariant: WolfSoundVariantBuilder.() -> Unit): RegistryEntry.Paper<Wolf.SoundVariant> =
-        RegistryLoader.enqueueVanilla(RegistryKey.WOLF_SOUND_VARIANT, key(this, name), { WolfSoundVariantBuilderImpl() }, wolfSoundVariant)
+        RegistryLoader.enqueueVanilla(RegistryKey.WOLF_SOUND_VARIANT, key(this, name), ::WolfSoundVariantBuilderImpl, wolfSoundVariant)
     //</editor-fold>
     
     //<editor-fold desc="equipment">

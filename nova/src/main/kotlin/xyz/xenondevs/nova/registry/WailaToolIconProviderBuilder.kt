@@ -2,15 +2,15 @@ package xyz.xenondevs.nova.registry
 
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.resources.builder.task.TextureIconContent
+import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
-import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
 
 /**
  * A builder for [WailaToolIconProvider].
  */
 @RegistryElementBuilderDsl
-sealed interface WailaToolIconProviderBuilder {
+sealed interface WailaToolIconProviderBuilder : RegistryEntryBuilder.Nova<WailaToolIconProvider> {
     
     /**
      * Configures the icon provider logic.

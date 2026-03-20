@@ -7,7 +7,7 @@ import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.world.BlockPos
 
 internal class WailaInfoProviderBuilderImpl<B : Keyed, S : Any>(
-    private val entry: RegistryEntry.Nova<WailaInfoProvider<B, S>>,
+    override val entry: RegistryEntry.Nova<WailaInfoProvider<B, S>>,
 ) : WailaInfoProviderBuilder<B, S>, RegistryElementBuilder.Nova<WailaInfoProvider<B, S>> {
     
     override var blocks = emptyRegistryEntrySet<B>()

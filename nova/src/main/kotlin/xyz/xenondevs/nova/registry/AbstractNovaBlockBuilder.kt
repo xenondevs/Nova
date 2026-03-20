@@ -16,7 +16,7 @@ import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 
 internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
-    protected val entry: RegistryEntry.Nova<NovaBlock>
+    override val entry: RegistryEntry.Nova<NovaBlock>
 ) : NovaBlockBuilder, RegistryElementBuilder.Nova<NovaBlock> {
     
     protected val key: Key = entry.key

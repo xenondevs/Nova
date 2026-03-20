@@ -3,6 +3,13 @@ package xyz.xenondevs.nova.registry
 import net.minecraft.world.entity.animal.chicken.ChickenVariant
 import net.minecraft.world.entity.animal.cow.CowVariant
 import net.minecraft.world.entity.animal.pig.PigVariant
+import org.bukkit.Keyed
+import org.bukkit.entity.Cat
+import org.bukkit.entity.Chicken
+import org.bukkit.entity.Cow
+import org.bukkit.entity.Frog
+import org.bukkit.entity.Pig
+import org.bukkit.entity.Wolf
 import xyz.xenondevs.nova.resources.builder.layout.entity.AgingEntityVariantLayoutBuilder
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayoutBuilder
 import xyz.xenondevs.nova.resources.builder.layout.entity.SimpleEntityVariantLayoutBuilder
@@ -15,7 +22,7 @@ import xyz.xenondevs.nova.resources.builder.layout.entity.WolfEntityVariantLayou
  * @param LB Layout builder type.
  */
 @RegistryElementBuilderDsl
-sealed interface EntityVariantBuilder<M : Any, LB : EntityVariantLayoutBuilder<*>> {
+sealed interface EntityVariantBuilder<T : Keyed, M : Any, LB : EntityVariantLayoutBuilder<*>> : RegistryEntryBuilder.Paper<T> {
     
     /**
      * Configures the [conditions](https://minecraft.wiki/w/Mob_variant_definitions#Spawn_condition) under which this entity variant can spawn.
@@ -42,32 +49,32 @@ sealed interface EntityVariantBuilder<M : Any, LB : EntityVariantLayoutBuilder<*
 /**
  * A builder for a cat variant.
  */
-sealed interface CatVariantBuilder : EntityVariantBuilder<Unit, AgingEntityVariantLayoutBuilder>
+sealed interface CatVariantBuilder : EntityVariantBuilder<Cat.Type, Unit, AgingEntityVariantLayoutBuilder>
 
 /**
  * A builder for a chicken variant.
  */
-sealed interface ChickenVariantBuilder : EntityVariantBuilder<ChickenModelType, AgingEntityVariantLayoutBuilder>
+sealed interface ChickenVariantBuilder : EntityVariantBuilder<Chicken.Variant, ChickenModelType, AgingEntityVariantLayoutBuilder>
 
 /**
  * A builder for a cow variant.
  */
-sealed interface CowVariantBuilder : EntityVariantBuilder<CowModelType, AgingEntityVariantLayoutBuilder>
+sealed interface CowVariantBuilder : EntityVariantBuilder<Cow.Variant, CowModelType, AgingEntityVariantLayoutBuilder>
 
 /**
  * A builder for a frog variant.
  */
-sealed interface FrogVariantBuilder : EntityVariantBuilder<Unit, SimpleEntityVariantLayoutBuilder>
+sealed interface FrogVariantBuilder : EntityVariantBuilder<Frog.Variant, Unit, SimpleEntityVariantLayoutBuilder>
 
 /**
  * A builder for a pig variant.
  */
-sealed interface PigVariantBuilder : EntityVariantBuilder<PigModelType, AgingEntityVariantLayoutBuilder>
+sealed interface PigVariantBuilder : EntityVariantBuilder<Pig.Variant, PigModelType, AgingEntityVariantLayoutBuilder>
 
 /**
  * A builder for a wolf variant.
  */
-sealed interface WolfVariantBuilder : EntityVariantBuilder<Unit, WolfEntityVariantLayoutBuilder>
+sealed interface WolfVariantBuilder : EntityVariantBuilder<Wolf.Variant, Unit, WolfEntityVariantLayoutBuilder>
 
 /**
  * The type of chicken model.

@@ -6,7 +6,7 @@ import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
 
 internal class WailaToolIconProviderBuilderImpl(
-    private val entry: RegistryEntry.Nova<WailaToolIconProvider>
+    override val entry: RegistryEntry.Nova<WailaToolIconProvider>
 ) : WailaToolIconProviderBuilder, RegistryElementBuilder.Nova<WailaToolIconProvider> {
     
     private var iconGetter: (category: RegistryEntry.Nova<ToolCategory>, tier: RegistryEntry.Nova<ToolTier>?) -> Key? = { _, _ -> null }
