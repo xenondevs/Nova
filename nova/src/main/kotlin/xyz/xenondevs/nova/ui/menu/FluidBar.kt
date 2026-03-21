@@ -7,8 +7,9 @@ import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.ClickDsl
+import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.dsl.item
-import xyz.xenondevs.invui.dsl.property.by
+import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.gui.SlotElementSupplier
 import xyz.xenondevs.invui.internal.util.InventoryUtils
 import xyz.xenondevs.invui.item.Item

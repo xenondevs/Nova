@@ -10,7 +10,7 @@ import xyz.xenondevs.invui.dsl.InventoryWithBackgroundProvider
 import xyz.xenondevs.invui.dsl.ItemProviderDsl
 import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.invui.dsl.itemProvider
-import xyz.xenondevs.invui.dsl.property.ProviderDslProperty
+import xyz.xenondevs.invui.dsl.ProviderDslProperty
 import xyz.xenondevs.invui.gui.IngredientMapper
 import xyz.xenondevs.invui.gui.InventoryLink
 import xyz.xenondevs.invui.gui.Markers

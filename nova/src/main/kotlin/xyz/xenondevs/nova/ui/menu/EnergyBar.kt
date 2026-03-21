@@ -5,7 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.invui.dsl.ClickDsl
-import xyz.xenondevs.invui.dsl.property.by
+import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.gui.SlotElementSupplier
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.nova.util.NumberFormatUtils
