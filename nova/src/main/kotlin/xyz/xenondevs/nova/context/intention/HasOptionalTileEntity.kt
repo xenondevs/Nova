@@ -4,14 +4,13 @@ package xyz.xenondevs.nova.context.intention
 
 import org.bukkit.block.TileState
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
 import xyz.xenondevs.nova.context.ContextParamType
 import xyz.xenondevs.nova.context.intention.HasOptionalTileEntity.Companion.TILE_ENTITY_DATA_NOVA
 import xyz.xenondevs.nova.context.intention.HasOptionalTileEntity.Companion.TILE_ENTITY_NOVA
 import xyz.xenondevs.nova.context.intention.HasOptionalTileEntity.Companion.TILE_ENTITY_VANILLA
-import xyz.xenondevs.nova.util.Key
+import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.format.WorldDataManager
 
@@ -48,9 +47,9 @@ interface HasOptionalTileEntity<I : HasOptionalTileEntity<I>> : HasRequiredBlock
     @Suppress("UNCHECKED_CAST")
     companion object {
         
-        private val TILE_ENTITY_NOVA = ContextParamType<TileEntity, Nothing>(Key(Nova, "tile_entity_nova"))
-        private val TILE_ENTITY_DATA_NOVA = ContextParamType<Compound, Nothing>(Key(Nova, "tile_entity_data_nova"), copy = Compound::copy)
-        private val TILE_ENTITY_VANILLA = ContextParamType<TileState, Nothing>(Key(Nova, "tile_entity_vanilla"), copy = { it.copy() as TileState })
+        private val TILE_ENTITY_NOVA = ContextParamType<TileEntity, Nothing>(novaKey("tile_entity_nova"))
+        private val TILE_ENTITY_DATA_NOVA = ContextParamType<Compound, Nothing>(novaKey("tile_entity_data_nova"), copy = Compound::copy)
+        private val TILE_ENTITY_VANILLA = ContextParamType<TileState, Nothing>(novaKey("tile_entity_vanilla"), copy = { it.copy() as TileState })
         
         /**
          * Gets the param type for [TILE_ENTITY_NOVA].

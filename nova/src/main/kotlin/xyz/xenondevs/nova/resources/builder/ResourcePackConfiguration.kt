@@ -63,6 +63,7 @@ class ResourcePackConfiguration internal constructor(
     private var zipperConstructor: (ResourcePackBuilder) -> PackZipper = ::DefaultPackZipper
     private val postProcessorConstructors = ArrayList<(ResourcePackBuilder) -> PackPostProcessor>()
     private val resourceFilterSources = ArrayList<Provider<List<ResourceFilter>>>()
+    private val postBuildHooks = ArrayList<() -> Unit>()
     
     /**
      * Whether this resource pack is enabled for players by default. Defaults to `true`.
@@ -172,6 +173,13 @@ class ResourcePackConfiguration internal constructor(
         resourceFilterSources += provider(filters.asList())
     }
     
+    /**
+     * Registers a hook to be run after the resource pack has been built, uploaded, and applied to players.
+     */
+    fun registerPostBuildHook(hook: () -> Unit) {
+        postBuildHooks += hook
+    }
+    
     internal fun create(extraListener: Audience? = null): ResourcePackBuilder {
         val logger = if (extraListener != null) ForwardingLogger(logger, extraListener) else logger
         val builder = ResourcePackBuilder(id, logger)
@@ -187,6 +195,7 @@ class ResourcePackConfiguration internal constructor(
         builder.resourceFilters = resourceFilterSources
             .flatMap { it.get() }
             .groupByTo(enumMap()) { it.stage }
+        builder.postBuildHooks = postBuildHooks
         
         return builder
     }

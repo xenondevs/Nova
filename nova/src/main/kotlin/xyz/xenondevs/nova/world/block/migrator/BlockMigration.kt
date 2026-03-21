@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.world.block.migrator
 
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
+import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.ModelLessBlockModelProvider
@@ -22,7 +23,7 @@ internal data class ComplexBlockMigration(
 ) : BlockMigration {
     
     fun novaToVanilla(novaBlockState: NovaBlockState): BlockState {
-        return (novaBlockState.modelProvider as ModelLessBlockModelProvider).info
+        return (novaBlockState.modelProvider as ModelLessBlockModelProvider).info.nmsBlockState
     }
     
 }

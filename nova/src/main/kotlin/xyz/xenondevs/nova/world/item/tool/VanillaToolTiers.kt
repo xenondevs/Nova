@@ -1,14 +1,18 @@
 package xyz.xenondevs.nova.world.item.tool
 
-import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Key.key
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.registry.RegistryLoader
+import xyz.xenondevs.nova.registry.RegistryEntry
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
+@InternalInit(
+    stage = InternalInitStage.PRE_WORLD,
+    runBefore = [RegistryLoader::class]
+)
 object VanillaToolTiers {
     
     val WOOD = register("wood")
@@ -19,12 +23,9 @@ object VanillaToolTiers {
     val DIAMOND = register("diamond")
     val NETHERITE = register("netherite")
     
-    private fun register(name: String): ToolTier {
-        val id = Key.key(name)
-        val level = ToolTier(id, Configs["nova:tool_levels"].entry(id.value()))
-        
-        NovaRegistries.TOOL_TIER[id] = level
-        return level
-    }
+    private fun register(name: String): RegistryEntry.Nova<ToolTier> =
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_TIER, key(name)) {
+            ToolTier(it, Configs["nova:tool_levels"].entry(name))
+        }
     
 }

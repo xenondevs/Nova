@@ -5,10 +5,12 @@ package xyz.xenondevs.nova.util
 import com.mojang.datafixers.util.Either
 import io.netty.buffer.Unpooled
 import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation
+import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.set.RegistryKeySet
 import io.papermc.paper.registry.tag.Tag
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Namespaced
 import net.minecraft.core.DefaultedRegistry
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
@@ -51,9 +53,11 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.CraftWorld
+import org.bukkit.craftbukkit.block.CraftBlockType
 import org.bukkit.craftbukkit.block.data.CraftBlockData
 import org.bukkit.craftbukkit.entity.CraftEntity
 import org.bukkit.craftbukkit.entity.CraftLivingEntity
@@ -69,7 +73,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import org.joml.Vector3d
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.world.BlockPos
@@ -328,6 +331,9 @@ val ItemUseAnimation.nmsItemUseAnimation: MojangItemUseAnimation
 
 val Material.nmsBlock: MojangBlock
     get() = CraftMagicNumbers.getBlock(this)
+
+val BlockType.nmsBlock: MojangBlock
+    get() = (this as CraftBlockType<*>).handle
 
 val Material.nmsItem: MojangItem
     get() = CraftMagicNumbers.getItem(this)
@@ -637,15 +643,15 @@ fun <T : Any> ResourceKey<Registry<T>>.getValue(key: String): T? {
 }
 
 fun <T : Any> RegistryAccess.getOrThrow(key: ResourceKey<T>): Holder.Reference<T> {
-    return REGISTRY_ACCESS.get(key).get()
+    return get(key).get()
 }
 
 fun <T : Any> RegistryAccess.getValue(key: ResourceKey<T>): T? {
-    return REGISTRY_ACCESS.get(key).getOrNull()?.value()
+    return get(key).getOrNull()?.value()
 }
 
 fun <T : Any> RegistryAccess.getValueOrThrow(key: ResourceKey<T>): T {
-    return REGISTRY_ACCESS.get(key).get().value()
+    return get(key).get().value()
 }
 
 fun <T : Any> RegistryInfoLookup.lookupGetterOrThrow(key: ResourceKey<Registry<T>>): HolderGetter<T> {
@@ -656,8 +662,8 @@ fun Identifier.toString(separator: String): String {
     return namespace + separator + path
 }
 
-fun Identifier(addon: Addon, name: String): Identifier {
-    return Identifier.fromNamespaceAndPath(addon.id, name)
+fun Identifier(namespaced: Namespaced, name: String): Identifier {
+    return Identifier.fromNamespaceAndPath(namespaced.namespace(), name)
 }
 
 fun <T : Any> io.papermc.paper.registry.tag.TagKey<*>.toNmsTagKey(registry: ResourceKey<out Registry<T>>): TagKey<T> =
@@ -665,6 +671,9 @@ fun <T : Any> io.papermc.paper.registry.tag.TagKey<*>.toNmsTagKey(registry: Reso
 
 fun <T : Any> TypedKey<*>.toResourceKey(registry: ResourceKey<out Registry<T>>): ResourceKey<T> =
     ResourceKey.create(registry, key().toIdentifier())
+
+fun <T : Any> RegistryKey<*>.toResourceKey(): ResourceKey<Registry<T>> =
+    ResourceKey.createRegistryKey<T>(key().toIdentifier())
 
 fun <T : Any> Iterable<TypedKey<*>>.toHolderSet(
     registryKey: ResourceKey<out Registry<T>>,

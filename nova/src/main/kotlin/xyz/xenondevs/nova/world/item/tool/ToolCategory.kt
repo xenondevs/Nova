@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.item.tool
 
+import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
@@ -8,6 +9,9 @@ import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.serialization.kotlinx.ToolCategorySerializer
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
@@ -16,15 +20,14 @@ import xyz.xenondevs.nova.world.item.behavior.Tool
 import xyz.xenondevs.nova.world.pos
 
 /**
- * @param id The [Key] of this [ToolCategory]
+ * @param key The [Key] of this [ToolCategory]
  */
+@Serializable(with = ToolCategorySerializer::class)
 open class ToolCategory internal constructor(
-    val id: Key
-) {
+    override val entry: RegistryEntry.Nova<ToolCategory>,
+) : NovaRegistryElement<ToolCategory> {
     
-    override fun toString(): String {
-        return id.toString()
-    }
+    override fun toString(): String = key.toString()
     
     companion object {
         
@@ -42,7 +45,7 @@ open class ToolCategory internal constructor(
             if (novaCategory != null)
                 return novaCategory
             
-            val categories = HashSet<ToolCategory>()
+            val categories = mutableSetOf<ToolCategory>()
             
             // guess type from tool rules
             val rules = item.unwrap().get(DataComponents.TOOL)?.rules
@@ -60,24 +63,24 @@ open class ToolCategory internal constructor(
                         BlockTags.MINEABLE_WITH_SHOVEL -> VanillaToolCategories.SHOVEL
                         BlockTags.LEAVES, BlockTags.WOOL -> VanillaToolCategories.SHEARS
                         else -> continue
-                    }
+                    }.get()
                 }
             }
             
             // read type from type tags
             val type = item.type
             if (Tag.ITEMS_SHOVELS.isTagged(type))
-                categories += VanillaToolCategories.SHOVEL
+                categories += VanillaToolCategories.SHOVEL.get()
             if (Tag.ITEMS_PICKAXES.isTagged(type))
-                categories += VanillaToolCategories.PICKAXE
+                categories += VanillaToolCategories.PICKAXE.get()
             if (Tag.ITEMS_AXES.isTagged(type))
-                categories += VanillaToolCategories.AXE
+                categories += VanillaToolCategories.AXE.get()
             if (Tag.ITEMS_HOES.isTagged(type))
-                categories += VanillaToolCategories.HOE
+                categories += VanillaToolCategories.HOE.get()
             if (Tag.ITEMS_SWORDS.isTagged(type))
-                categories += VanillaToolCategories.SWORD
+                categories += VanillaToolCategories.SWORD.get()
             if (type == Material.SHEARS)
-                categories += VanillaToolCategories.SHEARS
+                categories += VanillaToolCategories.SHEARS.get()
             
             return categories
         }
@@ -92,17 +95,17 @@ open class ToolCategory internal constructor(
             val type = block.type
             val categories = HashSet<ToolCategory>()
             if (Tag.MINEABLE_SHOVEL.isTagged(type))
-                categories.add(VanillaToolCategories.SHOVEL)
+                categories.add(VanillaToolCategories.SHOVEL.get())
             if (Tag.MINEABLE_PICKAXE.isTagged(type))
-                categories.add(VanillaToolCategories.PICKAXE)
+                categories.add(VanillaToolCategories.PICKAXE.get())
             if (Tag.MINEABLE_AXE.isTagged(type))
-                categories.add(VanillaToolCategories.AXE)
+                categories.add(VanillaToolCategories.AXE.get())
             if (Tag.MINEABLE_HOE.isTagged(type))
-                categories.add(VanillaToolCategories.HOE)
+                categories.add(VanillaToolCategories.HOE.get())
             if (type == Material.COBWEB || type == Material.BAMBOO_SAPLING || type == Material.BAMBOO)
-                categories.add(VanillaToolCategories.SWORD)
+                categories.add(VanillaToolCategories.SWORD.get())
             if (Tag.LEAVES.isTagged(type) || Tag.WOOL.isTagged(type) || type == Material.COBWEB)
-                categories.add(VanillaToolCategories.SHEARS)
+                categories.add(VanillaToolCategories.SHEARS.get())
             
             return categories
         }
@@ -112,9 +115,9 @@ open class ToolCategory internal constructor(
 }
 
 class VanillaToolCategory internal constructor(
-    id: Key,
+    entry: RegistryEntry.Nova<ToolCategory>,
     val canSweepAttack: Boolean,
     val canBreakBlocksInCreative: Boolean,
     val itemDamageOnAttackEntity: Int,
     val itemDamageOnBreakBlock: Int
-) : ToolCategory(id)
+) : ToolCategory(entry)

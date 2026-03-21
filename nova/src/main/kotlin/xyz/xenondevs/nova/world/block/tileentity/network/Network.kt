@@ -7,9 +7,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNodeConnection
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import java.util.*
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.iterator
 
 /**
  * The data of a network, containing all [NetworkNodes][NetworkNode] and their connections,

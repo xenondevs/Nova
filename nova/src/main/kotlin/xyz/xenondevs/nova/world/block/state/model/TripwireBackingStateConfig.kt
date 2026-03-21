@@ -1,10 +1,11 @@
 package xyz.xenondevs.nova.world.block.state.model
 
 import it.unimi.dsi.fastutil.ints.IntArraySet
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.TripWireBlock
-import org.bukkit.block.BlockFace
+import net.minecraft.world.level.block.state.BlockState
+import xyz.xenondevs.nova.registry.entries.BlockTypeEntries
 import xyz.xenondevs.nova.util.intValue
+import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.util.toIntArray
 
 internal class TripwireBackingStateConfig(
@@ -32,26 +33,17 @@ internal class TripwireBackingStateConfig(
         "powered" to "$powered"
     )
     
-    override val vanillaBlockState = Blocks.TRIPWIRE.defaultBlockState()
-        .setValue(TripWireBlock.NORTH, north)
-        .setValue(TripWireBlock.EAST, east)
-        .setValue(TripWireBlock.SOUTH, south)
-        .setValue(TripWireBlock.WEST, west)
-        .setValue(TripWireBlock.ATTACHED, type.attached)
-        .setValue(TripWireBlock.DISARMED, disarmed)
-        .setValue(TripWireBlock.POWERED, powered)
-    
-    constructor(
-        type: TripwireBackingStateConfigType,
-        faces: Set<BlockFace>, disarmed: Boolean, powered: Boolean
-    ) : this(
-        type,
-        BlockFace.NORTH in faces,
-        BlockFace.EAST in faces,
-        BlockFace.SOUTH in faces,
-        BlockFace.WEST in faces,
-        disarmed, powered
-    )
+    override val blockType = BlockTypeEntries.TRIPWIRE
+    override val vanillaBlockState: BlockState by blockType.map {
+        it.nmsBlock.defaultBlockState
+            .setValue(TripWireBlock.NORTH, north)
+            .setValue(TripWireBlock.EAST, east)
+            .setValue(TripWireBlock.SOUTH, south)
+            .setValue(TripWireBlock.WEST, west)
+            .setValue(TripWireBlock.ATTACHED, type.attached)
+            .setValue(TripWireBlock.DISARMED, disarmed)
+            .setValue(TripWireBlock.POWERED, powered)
+    }
     
 }
 

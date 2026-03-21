@@ -14,7 +14,6 @@ import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.commons.guava.set
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.getValueOrThrow
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import java.util.*
 
@@ -117,7 +116,7 @@ private fun ByteReader.readNetworkTypeCubeFaceSetMap(): MutableMap<NetworkType<*
     val size = readVarInt()
     val map = HashMap<NetworkType<*>, MutableSet<BlockFace>>(size)
     repeat(size) {
-        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
+        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(Key.key(readString()))
         val set = readCubeFaceSet()
         
         map[networkType] = set
@@ -129,7 +128,7 @@ private fun ByteReader.readNetworkTypeCubeFaceSetMap(): MutableMap<NetworkType<*
 private fun ByteWriter.writeNetworkTypeCubeFaceSetMap(map: Map<NetworkType<*>, Set<BlockFace>>) {
     writeVarInt(map.size)
     for ((networkType, set) in map) {
-        writeString(networkType.id.toString())
+        writeString(networkType.key.toString())
         writeCubeFaceSet(set)
     }
 }
@@ -138,7 +137,7 @@ private fun ByteReader.readNetworkTypeBlockFaceUUIDTable(): Table<NetworkType<*>
     val size = readVarInt()
     val table = HashBasedTable.create<NetworkType<*>, BlockFace, UUID>()
     repeat(size) {
-        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
+        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(Key.key(readString()))
         val face = BlockFace.entries[readByte().toInt()]
         val uuid = readUUID()
         
@@ -151,7 +150,7 @@ private fun ByteReader.readNetworkTypeBlockFaceUUIDTable(): Table<NetworkType<*>
 private fun ByteWriter.writeNetworkTypeBlockFaceUUIDTable(table: Table<NetworkType<*>, BlockFace, UUID>) {
     writeVarInt(table.size())
     for ((networkType, face, uuid) in table) {
-        writeString(networkType.id.toString())
+        writeString(networkType.key.toString())
         writeByte(face.ordinal.toByte())
         writeUUID(uuid)
     }
@@ -160,7 +159,7 @@ private fun ByteWriter.writeNetworkTypeBlockFaceUUIDTable(table: Table<NetworkTy
 private fun ByteWriter.writeNetworkTypeUUIDMap(map: Map<NetworkType<*>, UUID>) {
     writeVarInt(map.size)
     for ((networkType, uuid) in map) {
-        writeString(networkType.id.toString())
+        writeString(networkType.key.toString())
         writeUUID(uuid)
     }
 }
@@ -169,7 +168,7 @@ private fun ByteReader.readNetworkTypeUUIDMap(): MutableMap<NetworkType<*>, UUID
     val size = readVarInt()
     val map = HashMap<NetworkType<*>, UUID>(size)
     repeat(size) {
-        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
+        val networkType = NovaRegistries.NETWORK_TYPE.getValueOrThrow(Key.key(readString()))
         val uuid = readUUID()
         
         map[networkType] = uuid
@@ -181,7 +180,7 @@ private fun ByteReader.readNetworkTypeUUIDMap(): MutableMap<NetworkType<*>, UUID
 private fun ByteWriter.writeNetworkTypeSet(set: Set<NetworkType<*>>) {
     writeVarInt(set.size)
     for (networkType in set) {
-        writeString(networkType.id.toString())
+        writeString(networkType.key.toString())
     }
 }
 
@@ -189,7 +188,7 @@ private fun ByteReader.readNetworkTypeSet(): MutableSet<NetworkType<*>> {
     val size = readVarInt()
     val set = HashSet<NetworkType<*>>(size)
     repeat(size) {
-        set += NovaRegistries.NETWORK_TYPE.getValueOrThrow(readString())
+        set += NovaRegistries.NETWORK_TYPE.getValueOrThrow(Key.key(readString()))
     }
     
     return set

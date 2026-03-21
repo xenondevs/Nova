@@ -7,6 +7,7 @@ import org.bukkit.Sound
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.util.BlockUtils
+import xyz.xenondevs.nova.util.nmsBlockState
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -63,9 +64,9 @@ object Waterloggable : BlockBehavior {
     
     private fun hasNoWaterloggingPrediction(state: NovaBlockState): Boolean {
         val bs = when (val mp = state.modelProvider) {
-            is DisplayEntityBlockModelProvider -> mp.info.hitboxType
+            is DisplayEntityBlockModelProvider -> mp.info.collider.nmsBlockState
             is BackingStateBlockModelProvider -> mp.info.vanillaBlockState
-            is ModelLessBlockModelProvider -> mp.info
+            is ModelLessBlockModelProvider -> mp.info.nmsBlockState
         }
         return !bs.hasProperty(BlockStateProperties.WATERLOGGED)
     }

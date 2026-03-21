@@ -11,7 +11,6 @@ import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
-import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.retrieveData
 import xyz.xenondevs.nova.world.InteractionResult
@@ -26,8 +25,9 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
     
     override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {
         val data = itemStack.novaCompound ?: return InteractionResult.Pass
-        val filterType = NovaRegistries.ITEM_FILTER_TYPE.getValue(data.get<Key>(ID_KEY)) ?: return InteractionResult.Pass
-        val filterStack = filterType.deserialize(data.get<Compound>(DATA_KEY)!!)
+        val id = data.get<Key>(ID_KEY) ?: return InteractionResult.Pass
+        val filterType = NovaRegistries.ITEM_FILTER_TYPE.getValue(id) ?: return InteractionResult.Pass
+        val filterStack = filterType.serializer.deserialize(data.get<Compound>(DATA_KEY)!!)
             .toItemStack()
             .apply { amount = itemStack.amount }
         
@@ -69,8 +69,8 @@ internal object UnknownItemFilterBehavior : ItemBehavior, ItemFilterContainer<Un
     override fun toString(itemStack: ItemStack): String {
         return "UnknownItemFilterBehavior(" +
             "id=${itemStack.novaCompound?.get<Key>(ID_KEY)}, " +
-            "data=${itemStack.novaCompound?.get<Compound>(DATA_KEY)})"
-        ")"
+            "data=${itemStack.novaCompound?.get<Compound>(DATA_KEY)})" +
+            ")"
     }
     
 }
@@ -86,7 +86,7 @@ internal class UnknownItemFilter(
     override fun allows(itemStack: ItemStack) = false
     
     override fun toItemStack(): ItemStack {
-        val itemStack = DefaultItems.UNKNOWN_ITEM_FILTER.createItemStack()
+        val itemStack = DefaultItems.UNKNOWN_ITEM_FILTER.get().createItemStack()
         UnknownItemFilterBehavior.setFilter(itemStack, this)
         return itemStack
     }

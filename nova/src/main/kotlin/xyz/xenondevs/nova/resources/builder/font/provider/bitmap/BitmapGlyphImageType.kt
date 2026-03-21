@@ -33,7 +33,6 @@ interface BitmapGlyphImageType<T> {
          */
         val ARGB_ARRAY: BitmapGlyphImageType<IntArray> = object : BitmapGlyphImageType<IntArray> {
             
-            // TODO: consider moving these to ImageUtils as well?
             override fun findRightBorder(image: IntArray, width: Int, height: Int): Int? {
                 fun isColumnEmpty(x: Int): Boolean {
                     for (y in 0..<height) {

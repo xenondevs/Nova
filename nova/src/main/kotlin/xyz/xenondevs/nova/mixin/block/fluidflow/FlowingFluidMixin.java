@@ -35,7 +35,7 @@ abstract class FlowingFluidMixin {
             return;
         
         var novaBlock = novaState.getBlock();
-        if (!novaBlock.hasBehavior(Waterloggable.class) && novaBlock != DefaultBlocks.INSTANCE.getTRIPWIRE())
+        if (!novaBlock.hasBehavior(Waterloggable.class) && novaBlock != DefaultBlocks.INSTANCE.getTRIPWIRE().get())
             cir.setReturnValue(false);
     }
     

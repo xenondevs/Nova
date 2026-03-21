@@ -53,7 +53,7 @@ private val BREAK_COOLDOWN by MAIN_CONFIG.entry<Int>("world", "block_breaking", 
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [WorldDataManager::class]
+    runAfter = [WorldDataManager::class]
 )
 internal object BlockBreaking : Listener, PacketListener {
     

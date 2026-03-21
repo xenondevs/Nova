@@ -109,7 +109,7 @@ internal class RegionChunk(
             }
             
             val block = blockState.block as? NovaTileEntityBlock
-            if (blockState.block == DefaultBlocks.UNKNOWN) {
+            if (blockState.blockEntry == DefaultBlocks.UNKNOWN) {
                 // nova:unknown is the only non-tile-entity block that is allowed to have tile-entity data
                 continue
             } else if (block == null) {

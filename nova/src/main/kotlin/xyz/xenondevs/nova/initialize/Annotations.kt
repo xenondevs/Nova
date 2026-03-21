@@ -12,15 +12,20 @@ import kotlin.reflect.KClass
  *
  * @param stage The [InternalInitStage] at which the class should be initialized.
  * @param dispatcher Defines how the initialization is dispatched.
- * @param dependsOn The classes (and init functions) which should be initialized before this class.
- * Those classes must also be annotated with [InternalInit].
+ * @param runAfter The classes (and init functions) which should be initialized before this class.
+ * (This class is initialized **after** them.)
+ * Those classes must be annotated with [Init] or [InternalInit].
+ * @param runBefore The classes (and init functions) which should be initialized after this class.
+ * (This class is initialized **before** them.)
+ * Those classes must be annotated with [Init] or [InternalInit].
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 internal annotation class InternalInit(
     val stage: InternalInitStage,
     val dispatcher: Dispatcher = Dispatcher.SYNC,
-    val dependsOn: Array<KClass<*>> = []
+    val runAfter: Array<KClass<*>> = [],
+    val runBefore: Array<KClass<*>> = []
 )
 
 /**

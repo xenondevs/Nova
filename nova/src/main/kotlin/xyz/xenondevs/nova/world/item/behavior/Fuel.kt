@@ -18,8 +18,8 @@ import org.bukkit.inventory.ItemStack as BukkitStack
 @Suppress("FunctionName")
 fun Fuel(
     burnTime: Int? = null
-) = ItemBehaviorFactory<Fuel> {
-    Fuel(it.config.entryOrElse(burnTime, "burn_time"))
+) = ItemBehaviorFactory { _, cfg ->
+    Fuel(cfg.entryOrElse(burnTime, "burn_time"))
 }
 
 /**
@@ -72,14 +72,14 @@ class Fuel(burnTime: Provider<Int>) : ItemBehavior {
          * regardless of whether it is a Nova item or not, 
          * or 0 if the item is not a fuel item.
          */
-        fun getBurnTime(itemStack: BukkitStack): Int = 
+        fun getBurnTime(itemStack: BukkitStack): Int =
             getBurnTime(itemStack.unwrap())
         
         /**
          * Checks if the given [MojangStack] is a fuel item,
          * regardless of whether it is a Nova item or not.
          */
-        fun isFuel(itemStack: MojangStack): Boolean = 
+        fun isFuel(itemStack: MojangStack): Boolean =
             MINECRAFT_SERVER.fuelValues().isFuel(itemStack)
         
         /**
@@ -87,7 +87,7 @@ class Fuel(burnTime: Provider<Int>) : ItemBehavior {
          * regardless of whether it is a Nova item or not,
          * or 0 if the item is not a fuel item.
          */
-        fun getBurnTime(itemStack: MojangStack): Int = 
+        fun getBurnTime(itemStack: MojangStack): Int =
             MINECRAFT_SERVER.fuelValues().burnDuration(itemStack)
         
     }

@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.context.intention
 
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.context.AbstractContextIntention
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
@@ -12,8 +11,8 @@ import xyz.xenondevs.nova.context.intention.BlockPlace.BLOCK_TYPE
 import xyz.xenondevs.nova.context.intention.BlockPlace.BLOCK_TYPE_NOVA
 import xyz.xenondevs.nova.context.intention.BlockPlace.BLOCK_TYPE_VANILLA
 import xyz.xenondevs.nova.context.intention.BlockPlace.HELD_ITEM_STACK
-import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.item.novaItem
+import xyz.xenondevs.nova.util.novaKey
 
 /**
  * A [ContextIntention] for when a block is placed.
@@ -42,7 +41,7 @@ object BlockPlace :
      * The item stack to be placed as a block.
      */
     val BLOCK_ITEM_STACK = ContextParamType<ItemStack, BlockPlace>(
-        Key(Nova, "block_item_stack"),
+        novaKey("block_item_stack"),
         validate = { it.type.isBlock || it.novaItem?.block != null },
         copy = ItemStack::clone
     )
@@ -52,7 +51,7 @@ object BlockPlace :
      * Defaults to `true`.
      */
     val BLOCK_PLACE_EFFECTS = DefaultingContextParamType<Boolean, BlockPlace>(
-        Key(Nova, "block_place_effects"),
+        novaKey("block_place_effects"),
         default = true
     )
     
@@ -62,7 +61,7 @@ object BlockPlace :
      * Defaults to `false`.
      */
     val BYPASS_TILE_ENTITY_LIMITS = DefaultingContextParamType<Boolean, BlockPlace>(
-        Key(Nova, "bypass_tile_entity_limits"),
+        novaKey("bypass_tile_entity_limits"),
         default = false
     )
     
@@ -78,7 +77,7 @@ object BlockPlace :
         addAutofiller(BLOCK_ITEM_STACK, Autofiller.from(BLOCK_TYPE_VANILLA) { if (it.hasItemType()) it.itemType.createItemStack() else null })
         
         // extra autofillers for inherited properties
-        addAutofiller(BLOCK_TYPE, Autofiller.from(BLOCK_ITEM_STACK) { it.novaItem?.block?.id ?: it.type.key() })
+        addAutofiller(BLOCK_TYPE, Autofiller.from(BLOCK_ITEM_STACK) { it.novaItem?.block?.key ?: it.type.key() })
     }
     
 }

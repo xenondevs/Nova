@@ -62,8 +62,8 @@ abstract class NoteBlockMixin {
     
     @Overwrite
     protected InteractionResult useWithoutItem(
-        BlockState state, 
-        Level level, 
+        BlockState state,
+        Level level,
         BlockPos pos,
         Player player,
         BlockHitResult hitResult
@@ -79,7 +79,7 @@ abstract class NoteBlockMixin {
     protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int id, int param) {
         return false;
     }
-
+    
 }    
     
     

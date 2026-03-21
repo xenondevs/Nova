@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.world.item.recipe
 
+import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.BlastingRecipe
 import org.bukkit.inventory.CampfireRecipe
@@ -14,7 +15,9 @@ import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.serialization.json.serializer.BlastingRecipeDeserializer
 import xyz.xenondevs.nova.serialization.json.serializer.CampfireRecipeDeserializer
 import xyz.xenondevs.nova.serialization.json.serializer.FurnaceRecipeDeserializer
@@ -24,6 +27,7 @@ import xyz.xenondevs.nova.serialization.json.serializer.ShapelessRecipeDeseriali
 import xyz.xenondevs.nova.serialization.json.serializer.SmithingTransformRecipeDeserializer
 import xyz.xenondevs.nova.serialization.json.serializer.SmokingRecipeDeserializer
 import xyz.xenondevs.nova.serialization.json.serializer.StonecutterRecipeDeserializer
+import xyz.xenondevs.nova.serialization.kotlinx.RecipeTypeSerializer
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.BlastingRecipeGroup
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.CampfireRecipeGroup
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
@@ -32,31 +36,37 @@ import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.SmithingTransformRecipe
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.SmokingRecipeGroup
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.StonecutterRecipeGroup
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.TableRecipeGroup
-import xyz.xenondevs.nova.util.set
 import kotlin.reflect.KClass
 import kotlin.reflect.full.superclasses
 
+@Serializable(with = RecipeTypeSerializer::class)
 class RecipeType<T : Any> internal constructor(
-    val id: Key,
+    override val entry: RegistryEntry.Nova<RecipeType<T>>,
     val recipeClass: KClass<T>,
     val group: RecipeGroup<in T>,
     val deserializer: RecipeDeserializer<T>?
-) {
+) : NovaRegistryElement<RecipeType<T>> {
     
-    val dirName get() = id.namespace() + "/" + id.value()
+    val dirName get() = key.namespace() + "/" + key.value()
+    
+    override fun toString(): String = key.toString()
     
     companion object {
         
         fun <T : Any> of(recipe: T): RecipeType<out T>? {
             val clazz = recipe::class
-            return NovaRegistries.RECIPE_TYPE.firstOrNull { clazz == it.recipeClass || clazz.superclasses.contains(it.recipeClass) } as RecipeType<out T>?
+            return NovaRegistries.RECIPE_TYPE.entrySet.get()
+                .firstOrNull { clazz == it.recipeClass || clazz.superclasses.contains(it.recipeClass) } as RecipeType<out T>?
         }
         
     }
     
 }
 
-@InternalInit(stage = InternalInitStage.POST_WORLD, dependsOn = [ResourceGeneration.PreWorld::class])
+@InternalInit(
+    stage = InternalInitStage.PRE_WORLD,
+    runBefore = [RegistryLoader::class]
+)
 object VanillaRecipeTypes {
     
     val SHAPED = register("shaped", ShapedRecipe::class, TableRecipeGroup, ShapedRecipeDeserializer)
@@ -68,11 +78,14 @@ object VanillaRecipeTypes {
     val STONECUTTER = register("stonecutter", StonecuttingRecipe::class, StonecutterRecipeGroup, StonecutterRecipeDeserializer)
     val SMITING_TRANSFORM = register("smithing_transform", SmithingTransformRecipe::class, SmithingTransformRecipeGroup, SmithingTransformRecipeDeserializer)
     
-    private fun <T : Any> register(name: String, recipeClass: KClass<T>, group: RecipeGroup<in T>, deserializer: RecipeDeserializer<T>?): RecipeType<T> {
+    private fun <T : Any> register(
+        name: String,
+        recipeClass: KClass<T>,
+        group: RecipeGroup<in T>,
+        deserializer: RecipeDeserializer<T>?
+    ): RegistryEntry.Nova<RecipeType<T>> {
         val id = Key.key(name)
-        val recipeType = RecipeType(id, recipeClass, group, deserializer)
-        NovaRegistries.RECIPE_TYPE[id] = recipeType
-        return recipeType
+        return RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_RECIPE_TYPE, id) { RecipeType(it, recipeClass, group, deserializer) }
     }
     
 }

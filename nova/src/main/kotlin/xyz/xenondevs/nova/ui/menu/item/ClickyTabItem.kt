@@ -2,9 +2,9 @@ package xyz.xenondevs.nova.ui.menu.item
 
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
+import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.gui.TabGui
 import xyz.xenondevs.invui.item.AbstractTabGuiBoundItem
-import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound
 

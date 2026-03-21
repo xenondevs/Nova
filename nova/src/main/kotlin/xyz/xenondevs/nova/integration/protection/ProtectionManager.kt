@@ -87,7 +87,7 @@ private data class CanHurtEntityTileArgs(override val tileEntity: TileEntity, va
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
     dispatcher = Dispatcher.ASYNC,
-    dependsOn = [HooksLoader::class, PermissionManager::class]
+    runAfter = [HooksLoader::class, PermissionManager::class]
 )
 object ProtectionManager {
     

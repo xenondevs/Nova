@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.resources.ResourceGeneration
+import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.serialization.kotlinx.nullOnFailure
 import xyz.xenondevs.nova.world.block.behavior.UnknownNovaBlockState
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -19,7 +19,7 @@ private const val ID_MAP_KEY = "block_state_id_map"
 
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
-    dependsOn = [ResourceGeneration.PreWorld::class]
+    runAfter = [RegistryLoader::class]
 )
 internal object BlockStateIdResolver : IdResolver<NovaBlockState> {
     
@@ -50,7 +50,7 @@ internal object BlockStateIdResolver : IdResolver<NovaBlockState> {
         }
         
         // register new states
-        NovaRegistries.BLOCK.asSequence()
+        NovaRegistries.BLOCK.entrySet.get().asSequence()
             .flatMap { it.blockStates }
             .filter { it !in map }
             .forEach {

@@ -1,0 +1,7 @@
+# Detekt is currently only used for our custom rules
+
+NovaRuleSet:
+  active: true
+  RegistryEntryComparison:
+    active: true
+    severity: error

@@ -24,11 +24,11 @@ abstract class BrewingStandBlockEntityMixin {
     
     @Inject(method = "doBrew", at = @At("HEAD"))
     private static void rememberBrewingNovaItem(
-        Level level, 
+        Level level,
         BlockPos pos,
-        NonNullList<ItemStack> items, 
+        NonNullList<ItemStack> items,
         BrewingStandBlockEntity brewingStand,
-        CallbackInfo ci, 
+        CallbackInfo ci,
         @Share("brewingNovaItem") LocalRef<NovaItem> brewingNovaItem
     ) {
         brewingNovaItem.set(ItemUtilsKt.getNovaItem(brewingStand.getItem(3)));

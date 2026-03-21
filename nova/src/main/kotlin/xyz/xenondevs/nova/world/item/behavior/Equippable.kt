@@ -22,6 +22,7 @@ import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.getMod
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
+import xyz.xenondevs.commons.provider.NULL_PROVIDER
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.orElse
@@ -29,7 +30,6 @@ import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.config.optionalEntry
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
-import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.Equipment
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
@@ -158,8 +158,7 @@ fun Equippable(
     equipOnInteract: Boolean = true,
     canBeSheared: Boolean = false,
     shearingSound: Key = SoundEventKeys.ITEM_SHEARS_SNIP
-) = ItemBehaviorFactory<Equippable> {
-    val cfg = it.config
+) = ItemBehaviorFactory { _, cfg ->
     Equippable(
         provider(equipment),
         provider(slot),
@@ -293,7 +292,7 @@ class Equippable(
     val shearingSound: Sound?
         get() = Registry.SOUND_EVENT.get(shearingSoundKey)
     
-    private val equipmentData: Provider<RuntimeEquipmentData?> = ResourceLookups.EQUIPMENT_LOOKUP.getProvider(equipment)
+    private val equipmentData: Provider<RuntimeEquipmentData?> = equipment.flatMap { it?.runtimeData ?: NULL_PROVIDER }
     
     init {
         equipmentData.subscribe { equipmentData ->
@@ -364,7 +363,7 @@ class Equippable(
         ) { equipment, equipmentData, slot, equipSound, allowedEntities, dispensable, swappable, damageOnHurt, equipOnInteract, tick ->
             val textureFrames = equipmentData?.textureFrames
                 ?.takeUnlessEmpty()
-                ?: equipment?.id?.let(::listOf)
+                ?: equipment?.key?.let(::listOf)
             val overlayFrames = equipmentData?.cameraOverlayFrames
                 ?.takeUnlessEmpty()
                 ?.takeUnless { slot != EquipmentSlot.HEAD }

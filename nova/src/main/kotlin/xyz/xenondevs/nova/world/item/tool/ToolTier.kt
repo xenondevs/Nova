@@ -2,7 +2,7 @@
 
 package xyz.xenondevs.nova.world.item.tool
 
-import net.kyori.adventure.key.Key
+import kotlinx.serialization.Serializable
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
 import net.minecraft.tags.BlockTags
@@ -10,26 +10,35 @@ import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.serialization.kotlinx.ToolTierSerializer
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.novaBlock
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.item.behavior.Tool
 
+/**
+ * Shortcut to [flatMap][Provider.flatMap] to [ToolTier.levelValue].
+ */
+val Provider<ToolTier>.levelValue: Provider<Double>
+    get() = flatMap { it.levelValue }
+
+@Serializable(with = ToolTierSerializer::class)
 class ToolTier(
-    val id: Key,
-    levelValue: Provider<Double>
-) : Comparable<ToolTier> {
-    
-    val levelValue by levelValue
+    override val entry: RegistryEntry.Nova<ToolTier>,
+    val levelValue: Provider<Double>
+) : Comparable<ToolTier>, NovaRegistryElement<ToolTier> {
     
     override fun compareTo(other: ToolTier): Int {
-        return levelValue.compareTo(other.levelValue)
+        val levelCompare = levelValue.get().compareTo(other.levelValue.get())
+        if (levelCompare != 0)
+            return levelCompare
+        return key.compareTo(other.key)
     }
     
-    override fun toString(): String {
-        return id.toString()
-    }
+    override fun toString(): String = key.toString()
     
     companion object {
         
@@ -40,7 +49,7 @@ class ToolTier(
         fun ofBlock(block: Block): ToolTier {
             val novaBlock = block.novaBlock
             if (novaBlock != null)
-                return novaBlock.getBehaviorOrNull<Breakable>()?.toolTier ?: VanillaToolTiers.WOOD
+                return novaBlock.getBehaviorOrNull<Breakable>()?.toolTier ?: VanillaToolTiers.WOOD.get()
             
             val material = block.type
             return when {
@@ -48,7 +57,7 @@ class ToolTier(
                 Tag.NEEDS_IRON_TOOL.isTagged(material) -> VanillaToolTiers.IRON
                 Tag.NEEDS_DIAMOND_TOOL.isTagged(material) -> VanillaToolTiers.DIAMOND
                 else -> VanillaToolTiers.WOOD
-            }
+            }.get()
         }
         
         /**
@@ -60,7 +69,7 @@ class ToolTier(
             if (item == null)
                 return null
             
-            val novaLevel = item.novaItem?.getBehaviorOrNull(Tool::class)?.tier
+            val novaLevel = item.novaItem?.getBehaviorOrNull<Tool>()?.tier
             if (novaLevel != null)
                 return novaLevel
             
@@ -82,7 +91,7 @@ class ToolTier(
                         BlockTags.NEEDS_IRON_TOOL -> VanillaToolTiers.IRON
                         BlockTags.NEEDS_STONE_TOOL -> VanillaToolTiers.STONE
                         else -> continue
-                    }
+                    }.get()
                 } else {
                     tiers += when (key) {
                         BlockTags.INCORRECT_FOR_NETHERITE_TOOL -> VanillaToolTiers.NETHERITE
@@ -93,11 +102,11 @@ class ToolTier(
                         BlockTags.INCORRECT_FOR_STONE_TOOL -> VanillaToolTiers.STONE
                         BlockTags.INCORRECT_FOR_WOODEN_TOOL -> VanillaToolTiers.WOOD
                         else -> continue
-                    }
+                    }.get()
                 }
             }
             
-            return tiers.maxByOrNull { it.levelValue }
+            return tiers.max()
         }
         
         fun isCorrectLevel(block: Block, tool: ItemStack?): Boolean {
@@ -107,7 +116,7 @@ class ToolTier(
         }
         
         fun isCorrectLevel(blockTier: ToolTier?, toolTier: ToolTier?): Boolean {
-            return isCorrectLevel(blockTier?.levelValue, toolTier?.levelValue)
+            return isCorrectLevel(blockTier?.levelValue?.get(), toolTier?.levelValue?.get())
         }
         
         fun isCorrectLevel(blockLevel: Double?, toolLevel: Double?): Boolean {

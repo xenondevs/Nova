@@ -32,12 +32,14 @@ import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
+import xyz.xenondevs.invui.window.WindowManager
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.command.Command
 import xyz.xenondevs.nova.command.argument.NetworkTypeArgumentType
 import xyz.xenondevs.nova.command.argument.NovaBlockArgumentType
 import xyz.xenondevs.nova.command.argument.NovaItemArgumentType
+import xyz.xenondevs.nova.command.argument.ReloadableNovaRegistryArgumentType
 import xyz.xenondevs.nova.command.argument.ResourcePackIdArgumentType
 import xyz.xenondevs.nova.command.argument.UpdatableFileSuggestionProvider
 import xyz.xenondevs.nova.command.argument.VanillaBlockArgumentType
@@ -49,7 +51,10 @@ import xyz.xenondevs.nova.command.requiresPlayer
 import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.registry.MutableNovaRegistry
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
+import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
 import xyz.xenondevs.nova.ui.waila.WailaManager
@@ -214,7 +219,18 @@ internal object NovaCommand : Command() {
             .then(literal("configs")
                 .executes0(::reloadConfigs))
             .then(literal("recipes")
-                .executes0(::reloadRecipes)))
+                .executes0(::reloadRecipes))
+            .apply { 
+                val reloadableRegistries = NovaRegistries.registries.values.filter(MutableNovaRegistry<*>::isReloadable)
+                if (reloadableRegistries.isNotEmpty()) {
+                    then(literal("registry")
+                        .executes0 { reloadRegistries(it, reloadableRegistries) }
+                        .then(argument("registry", ReloadableNovaRegistryArgumentType)
+                            .executes0 { reloadRegistries(it, listOf(it["registry"])) }
+                        ))
+                }
+            }
+        )
         .then(literal("reset")
             .requiresPermission("command.nova.reset")
             .then(literal("file")
@@ -260,6 +276,26 @@ internal object NovaCommand : Command() {
                 ctx.source.sender.sendMessage(Component.translatable("command.nova.reload_recipes.failure", NamedTextColor.RED))
             
             LOGGER.error("Failed to reload recipes", e)
+        }
+    }
+    
+    private fun reloadRegistries(ctx: CommandContext<CommandSourceStack>, registries: Iterable<MutableNovaRegistry<*>>) {
+        for (registry in registries) {
+            RegistryLoader.reload(registry)
+            ctx.source.sender.sendMessage(Component.translatable(
+                "command.nova.reload_registry.success",
+                NamedTextColor.GRAY,
+                Component.text(registry.key.toString(), NamedTextColor.AQUA),
+                Component.text(registry.entrySet.get().size, NamedTextColor.AQUA)
+            ))
+        }
+        
+        for (player in Bukkit.getOnlinePlayers()) {
+            player.updateInventory()
+        }
+        
+        for (window in WindowManager.getInstance().windows) {
+            window.sendAllDataToViewer()
         }
     }
     
@@ -487,7 +523,7 @@ internal object NovaCommand : Command() {
                             "command.nova.show_block_model_data.display_entity",
                             NamedTextColor.GRAY,
                             Component.text(novaBlockState.toString(), NamedTextColor.AQUA),
-                            Component.translatable(info.hitboxType.bukkitMaterial.blockTranslationKey ?: "", NamedTextColor.AQUA),
+                            Component.translatable(info.collider.material.blockTranslationKey ?: "", NamedTextColor.AQUA),
                             Component.text(info.models.size),
                             Component.join(JoinConfiguration.newlines(), modelComponents)
                         )
@@ -527,7 +563,7 @@ internal object NovaCommand : Command() {
                 NamedTextColor.GRAY,
                 ItemUtils.getName(itemStack).color(NamedTextColor.AQUA),
                 Component.translatable(item.vanillaMaterial.translationKey(), NamedTextColor.AQUA),
-                Component.text(item.id.toString(), NamedTextColor.AQUA)
+                Component.text(item.key.toString(), NamedTextColor.AQUA)
             ))
         } else ctx.source.sender.sendMessage(Component.translatable("command.nova.show_item_model_data.no_item", NamedTextColor.RED))
     }
@@ -538,7 +574,7 @@ internal object NovaCommand : Command() {
         val enabled = NetworkDebugger.toggleDebugger(type, player)
         
         ctx.source.sender.sendMessage(Component.translatable(
-            "command.nova.network_debug.${type.id.namespace()}.${type.id.value()}.${if (enabled) "on" else "off"}",
+            "command.nova.network_debug.${type.key.namespace()}.${type.key.value()}.${if (enabled) "on" else "off"}",
             NamedTextColor.GRAY
         ))
     }
@@ -568,7 +604,7 @@ internal object NovaCommand : Command() {
         
         for (node in nodes) {
             when (node) {
-                is NetworkBridge -> NetworkManager.queueAddBridge(node, NETWORK_TYPE.toSet(), CUBE_FACES, true)
+                is NetworkBridge -> NetworkManager.queueAddBridge(node, NETWORK_TYPE.entrySet.get(), CUBE_FACES, true)
                 is NetworkEndPoint -> NetworkManager.queueAddEndPoint(node, true)
             }
         }
@@ -605,7 +641,7 @@ internal object NovaCommand : Command() {
                     val network = state.getNetworkOrThrow(type, id)
                     return Component.translatable(
                         "command.nova.show_network_node_info.network", NamedTextColor.GRAY,
-                        Component.text(network.type.id.toString(), NamedTextColor.AQUA),
+                        Component.text(network.type.key.toString(), NamedTextColor.AQUA),
                         Component.text(id.toString(), NamedTextColor.AQUA),
                         Component.text(network.nodes.size, NamedTextColor.AQUA),
                         Component.text(network.nodes.values.count { (node, _) -> node is NetworkBridge }, NamedTextColor.AQUA),
@@ -649,7 +685,7 @@ internal object NovaCommand : Command() {
                                 "command.nova.show_network_node_info.bridge.supported_network_types",
                                 Component.join(
                                     JoinConfiguration.commas(true),
-                                    state.getSupportedNetworkTypes(node).map { Component.text(it.id.toString(), NamedTextColor.AQUA) }
+                                    state.getSupportedNetworkTypes(node).map { Component.text(it.key.toString(), NamedTextColor.AQUA) }
                                 )))
                             .appendNewline().indent(2)
                             .append(Component.translatable(
@@ -671,7 +707,7 @@ internal object NovaCommand : Command() {
                                 .indent(4)
                                 .append(Component.translatable(
                                     "command.nova.show_network_node_info.bridge.networks.entry",
-                                    Component.text(type.id.toString(), NamedTextColor.AQUA),
+                                    Component.text(type.key.toString(), NamedTextColor.AQUA),
                                     Component
                                         .text(id.toString().take(8) + "...", NamedTextColor.AQUA)
                                         .hoverEvent(buildNetworkInfoComponent(type, id))
@@ -697,7 +733,7 @@ internal object NovaCommand : Command() {
                                 .indent(4)
                                 .append(Component.translatable(
                                     "command.nova.show_network_node_info.end_point.networks.entry",
-                                    Component.text(type.id.toString(), NamedTextColor.AQUA),
+                                    Component.text(type.key.toString(), NamedTextColor.AQUA),
                                     Component.text(face.name, NamedTextColor.AQUA),
                                     Component
                                         .text(id.toString().take(8) + "...", NamedTextColor.AQUA)
@@ -723,7 +759,7 @@ internal object NovaCommand : Command() {
                         .indent(4)
                         .append(Component.translatable(
                             "command.nova.show_network_node_info.connected_nodes.entry",
-                            Component.text(type.id.toString(), NamedTextColor.AQUA),
+                            Component.text(type.key.toString(), NamedTextColor.AQUA),
                             Component.text(face.name, NamedTextColor.AQUA),
                             buildNodeComponent(connectedNode)
                         ))
@@ -904,11 +940,12 @@ internal object NovaCommand : Command() {
             for (zOff in -range..range) {
                 val chunkPos = ChunkPos(center.worldUUID, center.x + xOff, center.z + zOff)
                 WorldDataManager.getOrLoadChunk(chunkPos).forEachNonEmpty { pos, blockState ->
-                    if (blockState.block.hasBehavior<LeavesBehavior>()
+                    val leavesBehavior = blockState.block.getBehaviorOrNull<LeavesBehavior>()
+                    if (leavesBehavior != null
                         && blockState[DefaultBlockStateProperties.LEAVES_PERSISTENT] == true
                         && blockState[DefaultBlockStateProperties.LEAVES_DISTANCE] == 7
                     ) {
-                        LeavesBehavior.handleScheduledTick(pos, blockState)
+                        leavesBehavior.handleScheduledTick(pos, blockState)
                         leaves += pos
                     }
                 }
@@ -989,7 +1026,7 @@ internal object NovaCommand : Command() {
                 "command.nova.reset.files.no_files",
                 NamedTextColor.RED,
                 Component.text(path
-            )))
+                )))
         }
     }
     

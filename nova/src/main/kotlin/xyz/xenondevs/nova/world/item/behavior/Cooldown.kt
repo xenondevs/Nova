@@ -23,11 +23,10 @@ import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 fun Cooldown(
     cooldown: Int? = null,
     group: Key? = null
-) = ItemBehaviorFactory<Cooldown> {
-    val cfg = it.config
+) = ItemBehaviorFactory { entry, cfg ->
     Cooldown(
         cfg.entryOrElse(cooldown, "cooldown"),
-        cfg.entryOrElse(group ?: it.id, "cooldown_group")
+        cfg.entryOrElse(group ?: entry.key, "cooldown_group")
     )
 }
 
@@ -52,7 +51,7 @@ class Cooldown(
      */
     val group: Key by group
     
-    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider { 
+    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider {
         this[DataComponentTypes.USE_COOLDOWN] = combinedProvider(cooldown, group) { cooldown, group ->
             useCooldown(cooldown / 20f).cooldownGroup(group).build()
         }

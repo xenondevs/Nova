@@ -3,7 +3,12 @@
 package xyz.xenondevs.nova.world.item.logic
 
 import com.mojang.serialization.Dynamic
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Key.key
 import net.minecraft.ChatFormatting
+import net.minecraft.advancements.Advancement
+import net.minecraft.advancements.AdvancementHolder
+import net.minecraft.advancements.DisplayInfo
 import net.minecraft.core.component.DataComponentExactPredicate
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch
@@ -63,6 +68,7 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundRecipeBookAddPack
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetCursorItemPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEquipmentPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAdvancementsPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClickPacketEvent
@@ -74,7 +80,6 @@ import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
 import xyz.xenondevs.nova.util.data.getStringOrNull
-import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.unsafeCustomData
 import xyz.xenondevs.nova.util.item.unsafeNovaTag
@@ -90,7 +95,7 @@ import net.minecraft.world.item.ItemStack as MojangStack
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [ResourceGeneration.PreWorld::class]
+    runAfter = [ResourceGeneration.PreWorld::class]
 )
 internal object PacketItems : Listener, PacketListener {
     
@@ -235,6 +240,35 @@ internal object PacketItems : Listener, PacketListener {
         )
     }
     
+    @PacketHandler
+    private fun handleAdvancements(event: ClientboundUpdateAdvancementsPacketEvent) {
+        event.added = event.added.map {
+            AdvancementHolder(
+                it.id,
+                Advancement(
+                    it.value.parent,
+                    it.value.display.map { display ->
+                        DisplayInfo(
+                            getClientSideStack(event.player, display.icon, false),
+                            display.title,
+                            display.description,
+                            display.background,
+                            display.type,
+                            display.shouldShowToast(),
+                            display.shouldAnnounceChat(),
+                            display.isHidden
+                        ).apply { setLocation(display.x, display.y) }
+                    },
+                    it.value.rewards,
+                    it.value.criteria,
+                    it.value.requirements,
+                    it.value.sendsTelemetryEvent,
+                    it.value.name
+                )
+            )
+        }
+    }
+    
     //</editor-fold>
     
     //<editor-fold desc="server-side recipe -> client-side recipe">
@@ -355,7 +389,7 @@ internal object PacketItems : Listener, PacketListener {
             ?: return itemStack
         val id = novaTag.getStringOrNull("id")
             ?: return getUnknownItem(itemStack, null)
-        val novaItem = NovaRegistries.ITEM.getValue(id)
+        val novaItem = NovaRegistries.ITEM.getValue(key(id))
             ?: return getUnknownItem(itemStack, id)
         
         // client-side item stack copy
@@ -446,7 +480,7 @@ internal object PacketItems : Listener, PacketListener {
         
         if (isAdvanced) {
             // nova item id
-            lore[lore.size - 2] = Component.literal(novaItem.id.toString()).withStyle(ChatFormatting.DARK_GRAY)
+            lore[lore.size - 2] = Component.literal(novaItem.key.toString()).withStyle(ChatFormatting.DARK_GRAY)
             
             // cbf tag count
             if (cbfTagCount > 0) {

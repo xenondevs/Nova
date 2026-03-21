@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.ui.menu.explorer.recipes.group
 
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 
 abstract class RecipeGroup<T : Any> : Comparable<RecipeGroup<*>> {
@@ -9,8 +11,8 @@ abstract class RecipeGroup<T : Any> : Comparable<RecipeGroup<*>> {
     private val guiCache = HashMap<T, Gui>()
     
     abstract val priority: Int
-    abstract val texture: GuiTexture
-    abstract val icon: ItemProvider
+    abstract val texture: RegistryEntry.Nova<GuiTexture>
+    abstract val icon: Provider<ItemProvider>
     
     protected abstract fun createGui(recipe: T): Gui
     

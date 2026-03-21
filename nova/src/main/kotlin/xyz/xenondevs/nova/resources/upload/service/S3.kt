@@ -27,8 +27,8 @@ internal object S3 : UploadService {
     private lateinit var bucket: String
     private lateinit var directory: String // includes trailing slash
     private var acl: String? = null
-    private var domain : String? = null
-
+    private var domain: String? = null
+    
     @Suppress("HttpUrlsUsage")
     override suspend fun enable(cfg: ConfigurationNode) {
         endpoint = cfg.node("endpoint").string?.removePrefix("https://")?.removePrefix("http://")
@@ -46,7 +46,7 @@ internal object S3 : UploadService {
         directory = (cfg.node("directory").string?.addSuffix("/") ?: "")
         acl = cfg.node("acl").string
         domain = cfg.node("domain").string?.removePrefix("https://")?.removePrefix("http://")
-
+        
         LOGGER.info("Connecting to S3 endpoint $endpoint")
         client = S3Client.builder()
             .endpointOverride(URI("https://$endpoint"))
@@ -88,7 +88,7 @@ internal object S3 : UploadService {
         } else {
             "$bucket.$endpoint"
         }
-
+        
         return "https://$url/$directory$id.zip"
     }
     

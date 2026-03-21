@@ -32,7 +32,7 @@ import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.nova.registry.RegistryElementBuilder
+import xyz.xenondevs.nova.registry.LegacyRegistryElementBuilder
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.util.lookupGetterOrThrow
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
@@ -53,7 +53,7 @@ class BiomeBuilder internal constructor(
     id: Key,
     registry: WritableRegistry<Biome>,
     private val lookup: RegistryInfoLookup
-) : RegistryElementBuilder<Biome>(registry, id) {
+) : LegacyRegistryElementBuilder<Biome>(registry, id) {
     
     private val configuredCarverRegistry = lookup.lookupGetterOrThrow(Registries.CONFIGURED_CARVER)
     private val placedFeatureRegistry = lookup.lookupGetterOrThrow(Registries.PLACED_FEATURE)

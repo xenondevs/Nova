@@ -33,9 +33,6 @@ import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.ItemUtils.getItemStack
 import xyz.xenondevs.nova.util.toNamespacedKey
 import java.io.File
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 
 interface RecipeDeserializer<T> {
     
@@ -170,7 +167,7 @@ internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe
         recipe.category = category
         
         recipe.group = json.getStringOrNull("group") ?: ""
-       
+        
         return recipe
     }
     
@@ -231,7 +228,7 @@ internal abstract class CookingRecipeDeserializer<T : CookingRecipe<T>>(
             ?.let { CookingBookCategory.valueOf(it.uppercase()) }
             ?: CookingBookCategory.MISC
         recipe.category = category
-
+        
         recipe.group = json.getStringOrNull("group") ?: ""
         
         return recipe

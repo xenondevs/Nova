@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.internal.util.SlotUtils
 import xyz.xenondevs.invui.item.ItemWrapper
@@ -16,7 +17,7 @@ internal object TableRecipeGroup : RecipeGroup<Recipe>() {
     
     override val priority = 0
     override val texture = DefaultGuiTextures.RECIPE_CRAFTING
-    override val icon = ItemWrapper(ItemStack(Material.CRAFTING_TABLE))
+    override val icon = provider { ItemWrapper(ItemStack(Material.CRAFTING_TABLE)) }
     
     override fun createGui(recipe: Recipe): Gui {
         val gui = Gui.builder()

@@ -11,14 +11,12 @@ import net.minecraft.sounds.SoundSource
 import net.minecraft.world.item.CrossbowItem
 import net.minecraft.world.item.Items
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.resources.builder.layout.item.ChargedType
@@ -26,6 +24,7 @@ import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.item.setCustomModelDataStrings
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
+import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
@@ -148,7 +147,7 @@ interface CrossbowLogic {
     
 }
 
-private val CAN_USE_KEY = NamespacedKey(Nova, "can_use_crossbow")
+private val CAN_USE_KEY = novaKey("can_use_crossbow")
 private const val USE_DURATION = 72000
 
 /**

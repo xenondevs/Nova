@@ -29,5 +29,5 @@ abstract class TripWireBlockMixin {
         boolean flag
     ) {
     }
-
+    
 }

@@ -15,5 +15,5 @@ internal object BlockStateMultipartConditionSerializer : JsonContentPolymorphicS
             else -> Condition.State.serializer()
         }
     }
-
+    
 }

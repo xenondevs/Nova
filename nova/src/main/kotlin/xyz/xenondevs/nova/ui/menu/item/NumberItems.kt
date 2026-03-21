@@ -3,13 +3,17 @@ package xyz.xenondevs.nova.ui.menu.item
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.Click
+import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.clientsideProvider
 
 open class ChangeNumberItem(
     private val sizeModifier: Int,
@@ -17,11 +21,26 @@ open class ChangeNumberItem(
     private val getRange: () -> IntRange,
     private val getNumber: () -> Int,
     private val setNumber: (Int) -> Unit,
-    private val onProvider: ItemProvider,
-    private val offProvider: ItemProvider
+    private val onProvider: Provider<ItemProvider>,
+    private val offProvider: Provider<ItemProvider>
 ) : AbstractItem() {
     
-    override fun getItemProvider(player: Player): ItemProvider = if (canModify()) onProvider else offProvider
+    constructor(
+        sizeModifier: Int,
+        shiftSizeModifier: Int,
+        getRange: () -> IntRange,
+        getNumber: () -> Int,
+        setNumber: (Int) -> Unit,
+        onProvider: ItemProvider,
+        offProvider: ItemProvider
+    ) : this(sizeModifier, shiftSizeModifier, getRange, getNumber, setNumber, provider(onProvider), provider(offProvider))
+    
+    init {
+        onProvider.observeWeak(this) { thisRef -> thisRef.notifyWindows() }
+        offProvider.observeWeak(this) { thisRef -> thisRef.notifyWindows() }
+    }
+    
+    override fun getItemProvider(player: Player): ItemProvider = if (canModify()) onProvider.get() else offProvider.get()
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) {
         if (canModify()) {
@@ -38,9 +57,13 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
     
     constructor(getNumber: () -> Int) : this(getNumber, null)
     
+    init {
+        DefaultGuiItems.NUMBER.observeWeak(this) { thisRef -> thisRef.notifyWindows() }
+    }
+    
     override fun getItemProvider(player: Player): ItemProvider {
         val number = getNumber().coerceIn(0..999)
-        val builder = DefaultGuiItems.NUMBER
+        val builder = DefaultGuiItems.NUMBER.get()
             .createClientsideItemBuilder()
             .addCustomModelData(number)
         if (localizedName != null)
@@ -64,7 +87,7 @@ class AddNumberItem(
     getNumber,
     setNumber,
     localizedName
-        ?.let { DefaultGuiItems.PLUS_BTN_ON.createClientsideItemBuilder().setName(Component.translatable(it)) }
+        ?.let { ln -> itemProvider(DefaultGuiItems.PLUS_BTN_ON) { name by Component.translatable(ln) } }
         ?: DefaultGuiItems.PLUS_BTN_ON.clientsideProvider,
     DefaultGuiItems.PLUS_BTN_OFF.clientsideProvider
 )
@@ -81,7 +104,7 @@ class RemoveNumberItem(
     getNumber,
     setNumber,
     localizedName
-        ?.let { DefaultGuiItems.MINUS_BTN_ON.createClientsideItemBuilder().setName(Component.translatable(it)) }
+        ?.let { ln -> itemProvider(DefaultGuiItems.MINUS_BTN_ON) { name by Component.translatable(ln) } }
         ?: DefaultGuiItems.MINUS_BTN_ON.clientsideProvider,
     DefaultGuiItems.MINUS_BTN_OFF.clientsideProvider
 )
@@ -116,7 +139,6 @@ open class AioNumberItem(
             setNumber(number)
             notifyWindows()
         }
-        
     }
     
 }

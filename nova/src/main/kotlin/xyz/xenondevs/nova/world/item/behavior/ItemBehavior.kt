@@ -14,13 +14,14 @@ import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.item.DataComponentMap
@@ -45,12 +46,6 @@ interface ItemBehavior : ItemBehaviorHolder {
      */
     val baseDataComponents: Provider<DataComponentMap>
         get() = provider(DataComponentMap.EMPTY)
-    
-    /**
-     * The [NamespacedCompound] that every new [ItemStack] of an item with this [ItemBehavior] has by default.
-     */
-    val defaultCompound: Provider<NamespacedCompound>
-        get() = provider(NamespacedCompound())
     
     /**
      * The vanilla material properties that an item with this [ItemBehavior] requires.
@@ -197,8 +192,8 @@ interface ItemBehavior : ItemBehaviorHolder {
 fun interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
     
     /**
-     * Creates a new [ItemBehavior] instance for the given [item].
+     * Creates a new [ItemBehavior] for [entry] configured by [config].
      */
-    fun create(item: NovaItem): T
+    fun create(entry: RegistryEntry.Nova<NovaItem>, config: Provider<ConfigurationNode>): T
     
 }

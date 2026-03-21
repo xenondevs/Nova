@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.util
 
+import io.papermc.paper.registry.RegistryKey
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.core.Holder
@@ -33,6 +34,7 @@ import net.minecraft.world.phys.shapes.CollisionContext
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.block.BlockType
 import org.bukkit.block.Campfire
 import org.bukkit.block.Chest
 import org.bukkit.block.Container
@@ -52,6 +54,9 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.entry
 import xyz.xenondevs.nova.util.BlockUtils.breakBlock
 import xyz.xenondevs.nova.util.BlockUtils.placeBlock
 import xyz.xenondevs.nova.util.item.hasNoBreakParticles
@@ -85,7 +90,7 @@ import net.minecraft.world.level.block.Block as MojangBlock
  * The [Key] of this block, considering blocks from Nova, custom item services and vanilla.
  */
 val Block.id: Key
-    get() = WorldDataManager.getBlockState(pos)?.block?.id
+    get() = WorldDataManager.getBlockState(pos)?.block?.key
         ?: CustomItemServiceManager.getId(this)?.let { Key.key(it) }
         ?: type.key()
 
@@ -119,6 +124,13 @@ var Block.novaBlock: NovaBlock?
     set(block) {
         novaBlockState = block?.defaultBlockState
     }
+
+/**
+ * The [RegistryEntry] of this [Block's][Block] [type][Block.getType].
+ */
+val Block.typeEntry: RegistryEntry.Either<NovaBlock, BlockType>
+    get() = novaBlockState?.let { RegistryEntry.either(it.blockEntry, RegistryKey.BLOCK) }
+        ?: RegistryEntry.either(NovaRegistries.BLOCK, type.asBlockType()!!.entry)
 
 /**
  * The hardness of this block, also considering the custom hardness of Nova blocks.
@@ -500,13 +512,13 @@ object BlockUtils {
                 broadcastBreakSound(soundGroup)
             
             // if no break particles were displayed with the level event packet, send custom ones
-            if (modelProvider is ModelLessBlockModelProvider && modelProvider.info.bukkitMaterial.hasNoBreakParticles())
+            if (modelProvider is ModelLessBlockModelProvider && modelProvider.info.material.hasNoBreakParticles())
                 broadcastCustomBreakParticles(true)
         } else if (modelProvider is DisplayEntityBlockModelProvider) {
             // send sound and break particles manually for display entity blocks
             if (soundGroup != null)
                 broadcastBreakSound(soundGroup)
-            broadcastCustomBreakParticles(sendEffectsToBreaker || modelProvider.info.hitboxType.bukkitMaterial.hasNoBreakParticles())
+            broadcastCustomBreakParticles(sendEffectsToBreaker || modelProvider.info.collider.material.hasNoBreakParticles())
         }
     }
     

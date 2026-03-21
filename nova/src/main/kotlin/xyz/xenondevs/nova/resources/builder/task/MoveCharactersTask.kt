@@ -54,7 +54,7 @@ class MoveCharactersTask(builder: ResourcePackBuilder) : PackTask {
         fontContent.getOrCreate(Font.UNIFORM).addFirst(spaceFontReference)
         
         // update lookup
-        ResourceLookups.MOVE_CHARACTERS_OFFSET = offset
+        ResourceLookups.moveCharactersOffset = offset
     }
     
 }

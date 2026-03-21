@@ -13,7 +13,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.EnergyHolder
-import java.util.BitSet
+import java.util.*
 import kotlin.math.min
 import kotlin.math.roundToLong
 

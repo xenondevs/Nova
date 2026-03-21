@@ -1,6 +1,15 @@
 package xyz.xenondevs.nova.world.player.ability
 
-import net.kyori.adventure.key.Key
+import kotlinx.serialization.Serializable
 import org.bukkit.entity.Player
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.serialization.kotlinx.AbilityTypeSerializer
 
-class AbilityType<T : Ability> internal constructor(val id: Key, val createAbility: (Player) -> T)
+@Serializable(with = AbilityTypeSerializer::class)
+class AbilityType<T : Ability> internal constructor(
+    override val entry: RegistryEntry.Nova<AbilityType<T>>,
+    val createAbility: (Player) -> T
+) : NovaRegistryElement<AbilityType<T>> {
+    override fun toString(): String = key.toString()
+}

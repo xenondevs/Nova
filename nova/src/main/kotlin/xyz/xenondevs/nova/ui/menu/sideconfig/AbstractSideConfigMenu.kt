@@ -9,9 +9,10 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.commons.collections.after
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.Click
+import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.notifyWindows
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.ui.menu.item.AsyncItem
 import xyz.xenondevs.nova.util.BlockSide
 import xyz.xenondevs.nova.util.playClickSound
@@ -27,9 +28,11 @@ import xyz.xenondevs.nova.world.item.DefaultGuiItems
 
 abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal constructor(
     protected val endPoint: NetworkEndPoint,
-    protected val networkType: NetworkType<*>,
+    networkType: RegistryEntry.Nova<NetworkType<*>>,
     protected val holder: H
 ) {
+    
+    protected val networkType by networkType
     
     val gui = Gui.empty(9, 3)
     
@@ -95,19 +98,19 @@ abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal construct
             provider.set(
                 when (connectionType) {
                     NetworkConnectionType.NONE ->
-                        DefaultGuiItems.GRAY_BTN.createClientsideItemBuilder()
+                        DefaultGuiItems.GRAY_BTN.get().createClientsideItemBuilder()
                             .addLoreLines(Component.translatable("menu.nova.side_config.none", NamedTextColor.GRAY))
                     
                     NetworkConnectionType.EXTRACT ->
-                        DefaultGuiItems.ORANGE_BTN.createClientsideItemBuilder()
+                        DefaultGuiItems.ORANGE_BTN.get().createClientsideItemBuilder()
                             .addLoreLines(Component.translatable("menu.nova.side_config.output", NamedTextColor.GOLD))
                     
                     NetworkConnectionType.INSERT ->
-                        DefaultGuiItems.BLUE_BTN.createClientsideItemBuilder()
+                        DefaultGuiItems.BLUE_BTN.get().createClientsideItemBuilder()
                             .addLoreLines(Component.translatable("menu.nova.side_config.input", NamedTextColor.AQUA))
                     
                     NetworkConnectionType.BUFFER ->
-                        DefaultGuiItems.GREEN_BTN.createClientsideItemBuilder()
+                        DefaultGuiItems.GREEN_BTN.get().createClientsideItemBuilder()
                             .addLoreLines(Component.translatable("menu.nova.side_config.input_output", NamedTextColor.GREEN))
                 }.setName(getSideName(blockSide, face))
             )

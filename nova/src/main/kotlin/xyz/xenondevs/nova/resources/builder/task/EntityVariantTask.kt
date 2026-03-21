@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.resources.builder.task
 
-import net.minecraft.resources.ResourceKey
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
@@ -14,18 +14,18 @@ class EntityVariantTask(private val builder: ResourcePackBuilder) : PackTask {
     
     companion object {
         
-        private val layoutGenerators = HashMap<ResourceKey<*>, (ResourcePackBuilder) -> EntityVariantLayout>()
+        private val layoutGenerators = HashMap<Pair<Key, Key>, (ResourcePackBuilder) -> EntityVariantLayout>()
         
-        internal fun queueVariantAssetGeneration(key: ResourceKey<*>, makeLayout: (ResourcePackBuilder) -> EntityVariantLayout) { 
-            layoutGenerators[key] = makeLayout 
+        internal fun queueVariantAssetGeneration(type: Key, key: Key, makeLayout: (ResourcePackBuilder) -> EntityVariantLayout) {
+            layoutGenerators[type to key] = makeLayout
         }
         
     }
     
     override suspend fun run() {
-        val layouts: Map<ResourceKey<*>, EntityVariantLayout> = layoutGenerators
+        val layouts: Map<Pair<Key, Key>, EntityVariantLayout> = layoutGenerators
             .mapValues { (_, makeLayout) -> makeLayout(builder) }
-        ResourceLookups.ENTITY_VARIANT_ASSETS_LOOKUP.set(layouts)
+        ResourceLookups.entityVariantAssetsLookup.set(layouts)
     }
     
 }

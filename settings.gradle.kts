@@ -2,9 +2,12 @@ rootProject.name = "nova"
 
 // core project
 include("nova")
+include("nova-registry")
+include("nova-registry-ksp")
 include("nova-api")
 include("nova-gradle-plugin")
 include("nova-dokka-plugin")
+include("nova-detekt-rules")
 
 // hooks
 include("nova-hooks:nova-hook-griefprevention")

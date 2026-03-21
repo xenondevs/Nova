@@ -3,12 +3,12 @@ package xyz.xenondevs.nova.world.loot
 import xyz.xenondevs.commons.gson.fromJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.util.data.UpdatableFile
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.serialization.json.GSON
+import xyz.xenondevs.nova.util.data.UpdatableFile
 import kotlin.io.path.extension
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.name

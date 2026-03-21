@@ -50,7 +50,7 @@ class BlockModelSelectorScope internal constructor(
     /**
      * The ID of the block.
      */
-    val id = blockState.block.id
+    val id = blockState.blockEntry.key
     
     /**
      * The default model for this block under `namespace:block/name` or a new model

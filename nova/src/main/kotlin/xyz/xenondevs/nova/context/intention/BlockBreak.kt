@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.context.intention
 import io.papermc.paper.datacomponent.DataComponentTypes
 import org.bukkit.GameMode
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.context.AbstractContextIntention
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
@@ -16,9 +15,9 @@ import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_TYPE
 import xyz.xenondevs.nova.context.intention.BlockBreak.HELD_ITEM_STACK
 import xyz.xenondevs.nova.context.intention.BlockBreak.SOURCE_PLAYER
 import xyz.xenondevs.nova.context.intention.BlockBreak.TOOL_ITEM_STACK
-import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.id
 import xyz.xenondevs.nova.util.item.ToolUtils
+import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 
 
@@ -52,7 +51,7 @@ object BlockBreak :
      * Defaults to an empty item stack.
      */
     val TOOL_ITEM_STACK = DefaultingContextParamType<ItemStack, BlockBreak>(
-        Key(Nova, "tool_item_stack"),
+        novaKey("tool_item_stack"),
         default = ItemStack.empty(),
         copy = ItemStack::clone
     )
@@ -65,7 +64,7 @@ object BlockBreak :
      * @see BLOCK_EXP_DROPS
      */
     val BLOCK_DROPS = DefaultingContextParamType<Boolean, BlockBreak>(
-        Key(Nova, "block_drops"),
+        novaKey("block_drops"),
         default = false
     )
     
@@ -77,7 +76,7 @@ object BlockBreak :
      * @see BLOCK_EXP_DROPS
      */
     val BLOCK_STORAGE_DROPS = DefaultingContextParamType<Boolean, BlockBreak>(
-        Key(Nova, "block_storage_drops"),
+        novaKey("block_storage_drops"),
         default = true
     )
     
@@ -89,7 +88,7 @@ object BlockBreak :
      * @see BLOCK_STORAGE_DROPS
      */
     val BLOCK_EXP_DROPS = DefaultingContextParamType<Boolean, BlockBreak>(
-        Key(Nova, "block_exp_drops"),
+        novaKey("block_exp_drops"),
         default = false
     )
     
@@ -98,7 +97,7 @@ object BlockBreak :
      * Defaults to `true`
      */
     val BLOCK_BREAK_EFFECTS = DefaultingContextParamType<Boolean, BlockBreak>(
-        Key(Nova, "block_break_effects"),
+        novaKey("block_break_effects"),
         default = true
     )
     

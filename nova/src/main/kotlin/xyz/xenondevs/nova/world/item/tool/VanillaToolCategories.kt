@@ -3,10 +3,14 @@ package xyz.xenondevs.nova.world.item.tool
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.registry.NovaRegistries.TOOL_CATEGORY
-import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.RegistryLoader
+import xyz.xenondevs.nova.registry.RegistryEntry
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
+@InternalInit(
+    stage = InternalInitStage.PRE_WORLD,
+    runBefore = [RegistryLoader::class]
+)
 object VanillaToolCategories {
     
     val SHOVEL = register(
@@ -49,15 +53,15 @@ object VanillaToolCategories {
         name: String,
         canDoSweepAttack: Boolean, canBreakBlocksInCreative: Boolean,
         itemDamageOnAttackEntity: Int, itemDamageOnBreakBlock: Int
-    ): VanillaToolCategory {
+    ): RegistryEntry.Nova<ToolCategory> {
         val id = Key.key(name)
-        val category = VanillaToolCategory(
-            id,
-            canDoSweepAttack, canBreakBlocksInCreative,
-            itemDamageOnAttackEntity, itemDamageOnBreakBlock
-        )
-        TOOL_CATEGORY[id] = category
-        return category
+        return RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_CATEGORY, id) {
+            VanillaToolCategory(
+                it,
+                canDoSweepAttack, canBreakBlocksInCreative,
+                itemDamageOnAttackEntity, itemDamageOnBreakBlock
+            )
+        }
     }
     
 }

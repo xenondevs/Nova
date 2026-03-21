@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.setItemProvider
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.EnergyNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder.DefaultEnergyHolder
@@ -19,21 +20,20 @@ class EnergyBar(
     private val maxEnergy: Provider<Long>,
     private val getEnergyPlus: () -> Long,
     private val getEnergyMinus: () -> Long,
-    private val item: NovaItem = DefaultGuiItems.BAR_RED
+    private val item: Provider<NovaItem> = DefaultGuiItems.BAR_RED
 ) : VerticalBar(height) {
     
-    @JvmOverloads
-    constructor(height: Int, energyHolder: DefaultEnergyHolder, item: NovaItem = DefaultGuiItems.BAR_RED) : this(
+    constructor(height: Int, energyHolder: DefaultEnergyHolder, item: Provider<NovaItem> = DefaultGuiItems.BAR_RED) : this(
         height,
         energyHolder.energyProvider, energyHolder.maxEnergyProvider,
         { energyHolder.energyPlus }, { energyHolder.energyMinus },
         item
     )
     
-    override fun createBarItem(section: Int) =
+    override fun createBarItem(section: Int): Item =
         Item.builder()
             .updatePeriodically(1)
-            .setItemProvider {
+            .setItemProvider(item) { item ->
                 val energy = energy.get()
                 val maxEnergy = maxEnergy.get()
                 val energyPlus = getEnergyPlus()

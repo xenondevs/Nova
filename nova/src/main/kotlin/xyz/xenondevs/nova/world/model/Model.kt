@@ -36,7 +36,7 @@ data class Model(
         width: Float = 0f,
         height: Float = 0f,
         glowColor: Int = -1
-    ) : this(item.clientsideProvider.get(), location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
+    ) : this(item.clientsideProvider.get().get(), location, constraints, translation, scale, leftRotation, rightRotation, brightness, width, height, glowColor)
     
     fun createFakeItemDisplay(autoRegister: Boolean = true): FakeItemDisplay =
         FakeItemDisplay(location, autoRegister) { _, data -> applyMetadata(data) }

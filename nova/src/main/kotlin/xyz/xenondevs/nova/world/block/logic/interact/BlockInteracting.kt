@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.world.pos
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [WorldDataManager::class]
+    runAfter = [WorldDataManager::class]
 )
 internal object BlockInteracting : Listener, PacketListener {
     

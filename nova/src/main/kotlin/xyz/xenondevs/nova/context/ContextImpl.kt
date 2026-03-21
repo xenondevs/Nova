@@ -5,8 +5,9 @@ import xyz.xenondevs.commons.collections.removeIf
 internal class ContextImpl<I : ContextIntention<I>> private constructor(
     override val intention: I,
     private val explicitParams: Map<ContextParamType<*, I>, Any>,
-    private val resolvedParams: MutableMap<ContextParamType<*, I>, Any?> = HashMap(),
 ) : Context<I> {
+    
+    private val resolvedParams: MutableMap<ContextParamType<*, I>, Any?> = HashMap()
     
     override operator fun <V : Any> get(paramType: ContextParamType<V, I>): V? =
         getParam(paramType)?.let { paramType.copy(it) }
@@ -82,8 +83,7 @@ internal class ContextImpl<I : ContextIntention<I>> private constructor(
     
     class Builder<I : ContextIntention<I>> internal constructor(
         private val intention: I,
-        private val explicitParams: MutableMap<ContextParamType<*, I>, Any> = HashMap(),
-        private val resolvedParams: MutableMap<ContextParamType<*, I>, Any?> = HashMap()
+        private val explicitParams: MutableMap<ContextParamType<*, I>, Any> = HashMap()
     ) : Context.Builder<I> {
         
         override fun <V : Any> param(paramType: ContextParamType<V, I>, value: V?): Builder<I> {
@@ -98,7 +98,7 @@ internal class ContextImpl<I : ContextIntention<I>> private constructor(
         }
         
         override fun build(): Context<I> {
-            val context = ContextImpl(intention, HashMap(explicitParams), HashMap(resolvedParams))
+            val context = ContextImpl(intention, HashMap(explicitParams))
             
             // verify presence of all required params
             for (requiredParam in intention.required) {

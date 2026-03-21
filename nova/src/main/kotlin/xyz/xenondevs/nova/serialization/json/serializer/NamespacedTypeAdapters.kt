@@ -37,7 +37,7 @@ internal object NamespacedTypeAdapters : TypeAdapterFactory {
             NamespacedKey::class -> NamespacedKeyTypeAdapter
             Identifier::class -> IdentifierTypeAdapter
             else -> if (representedClass?.isSubclassOf(Key::class) == true) GenericKeyTypeAdapter else null
-       
+            
         } as TypeAdapter<T?>?
     }
     

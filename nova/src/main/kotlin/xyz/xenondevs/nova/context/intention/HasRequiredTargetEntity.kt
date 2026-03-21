@@ -8,7 +8,6 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
 import xyz.xenondevs.nova.context.ContextParamType
@@ -20,7 +19,7 @@ import xyz.xenondevs.nova.context.intention.HasRequiredTargetEntity.Companion.TA
 import xyz.xenondevs.nova.context.intention.HasRequiredTargetEntity.Companion.TARGET_ENTITY_WORLD
 import xyz.xenondevs.nova.context.intention.HasRequiredTargetEntity.Companion.TARGET_LIVING_ENTITY
 import xyz.xenondevs.nova.context.intention.HasRequiredTargetEntity.Companion.TARGET_PLAYER
-import xyz.xenondevs.nova.util.Key
+import xyz.xenondevs.nova.util.novaKey
 import java.util.*
 
 /**
@@ -84,13 +83,13 @@ interface HasRequiredTargetEntity<I : HasRequiredTargetEntity<I>> : ContextInten
     @Suppress("UNCHECKED_CAST")
     companion object {
         
-        private val TARGET_ENTITY_UUID = RequiredContextParamType<UUID, Nothing>(Key(Nova, "target_entity_uuid"))
-        private val TARGET_ENTITY = RequiredContextParamType<Entity, Nothing>(Key(Nova, "target_entity"))
-        private val TARGET_ENTITY_LOCATION = RequiredContextParamType<Location, Nothing>(Key(Nova, "target_entity_location"), copy = Location::clone)
-        private val TARGET_ENTITY_WORLD = RequiredContextParamType<World, Nothing>(Key(Nova, "target_entity_world"))
-        private val TARGET_ENTITY_DIRECTION = RequiredContextParamType<Vector, Nothing>(Key(Nova, "target_entity_direction"), copy = Vector::clone)
-        private val TARGET_LIVING_ENTITY = ContextParamType<LivingEntity, Nothing>(Key(Nova, "target_living_entity"))
-        private val TARGET_PLAYER = ContextParamType<Player, Nothing>(Key(Nova, "target_player"))
+        private val TARGET_ENTITY_UUID = RequiredContextParamType<UUID, Nothing>(novaKey("target_entity_uuid"))
+        private val TARGET_ENTITY = RequiredContextParamType<Entity, Nothing>(novaKey("target_entity"))
+        private val TARGET_ENTITY_LOCATION = RequiredContextParamType<Location, Nothing>(novaKey("target_entity_location"), copy = Location::clone)
+        private val TARGET_ENTITY_WORLD = RequiredContextParamType<World, Nothing>(novaKey("target_entity_world"))
+        private val TARGET_ENTITY_DIRECTION = RequiredContextParamType<Vector, Nothing>(novaKey("target_entity_direction"), copy = Vector::clone)
+        private val TARGET_LIVING_ENTITY = ContextParamType<LivingEntity, Nothing>(novaKey("target_living_entity"))
+        private val TARGET_PLAYER = ContextParamType<Player, Nothing>(novaKey("target_player"))
         
         /**
          * Gets the param type for [TARGET_ENTITY_UUID].

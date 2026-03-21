@@ -65,9 +65,7 @@ fun Consumable(
     animation: ItemUseAnimation = ItemUseAnimation.EAT,
     sound: Key = SoundEventKeys.ENTITY_GENERIC_EAT,
     particles: Boolean = true
-) = ItemBehaviorFactory<Consumable> {
-    val cfg = it.config
-    
+) = ItemBehaviorFactory { _, cfg ->
     Consumable(
         nutrition = cfg.entryOrElse(nutrition, "nutrition"),
         saturation = cfg.entryOrElse(saturation, "saturation"),

@@ -6,7 +6,6 @@ import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.DefaultItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.StaticVanillaItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory

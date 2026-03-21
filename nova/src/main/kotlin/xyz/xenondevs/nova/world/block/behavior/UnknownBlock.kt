@@ -1,20 +1,25 @@
 package xyz.xenondevs.nova.world.block.behavior
 
 import kotlinx.serialization.json.JsonObject
+import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.InteractionResult
-import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.format.BlockStateIdResolver
 import xyz.xenondevs.nova.world.format.WorldDataManager
 
-internal class UnknownNovaBlockState(serializedBlockState: JsonObject) : NovaBlockState(DefaultBlocks.UNKNOWN, IntArray(0), emptyMap()) {
+internal class UnknownNovaBlockState(serializedBlockState: JsonObject) : NovaBlockState(
+    NovaRegistries.BLOCK[key("nova", "unknown")],
+    IntArray(0),
+    emptyMap()
+) {
     
     val serializedBlockState = serializedBlockState.toString()
     

@@ -51,7 +51,7 @@ private val PREPARE_ITEM_CRAFT_EVENT_MATRIX_FIELD = ReflectionUtils.getField(Pre
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [HooksLoader::class, VanillaRecipeTypes::class]
+    runAfter = [HooksLoader::class, VanillaRecipeTypes::class]
 )
 object RecipeManager : Listener, PacketListener {
     
@@ -151,7 +151,7 @@ object RecipeManager : Listener, PacketListener {
         
         loadRecipes()
         RecipeRegistry.indexRecipes()
-        RECIPE_TYPE.forEach { it.group.invalidateCache() }
+        RECIPE_TYPE.entrySet.get().forEach { it.group.invalidateCache() }
     }
     
     @EventHandler

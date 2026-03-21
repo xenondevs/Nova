@@ -72,7 +72,7 @@ class TextureIconContent(
                 "minecraft:item/shears"
             )
             
-            ResourceLookups.TEXTURE_ICON_LOOKUP.set(fontCharLookup)
+            ResourceLookups.textureIcon = fontCharLookup
         }
         
     }
@@ -84,7 +84,7 @@ class TextureIconContent(
          * where id is the path of texture, i.e. `minecraft:item/stone_sword`.
          */
         fun getIcon(id: Key): FontChar? =
-            ResourceLookups.TEXTURE_ICON_LOOKUP[id]
+            ResourceLookups.textureIcon[id]
         
     }
     

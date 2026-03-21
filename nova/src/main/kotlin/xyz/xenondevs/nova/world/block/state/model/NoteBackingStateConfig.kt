@@ -1,10 +1,11 @@
 package xyz.xenondevs.nova.world.block.state.model
 
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.NoteBlock
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument
+import xyz.xenondevs.nova.registry.entries.BlockTypeEntries
 import xyz.xenondevs.nova.util.intValue
+import xyz.xenondevs.nova.util.nmsBlock
 
 // The base of the number system - i.e. how many values each property can have
 private const val NOTE_BASE = 25
@@ -26,10 +27,13 @@ internal data class NoteBackingStateConfig(
         "powered" to "$powered"
     )
     
-    override val vanillaBlockState: BlockState = Blocks.NOTE_BLOCK.defaultBlockState()
-        .setValue(NoteBlock.INSTRUMENT, instrument)
-        .setValue(NoteBlock.NOTE, note)
-        .setValue(NoteBlock.POWERED, powered)
+    override val blockType = BlockTypeEntries.NOTE_BLOCK
+    override val vanillaBlockState: BlockState by blockType.map {
+        it.nmsBlock.defaultBlockState()
+            .setValue(NoteBlock.INSTRUMENT, instrument)
+            .setValue(NoteBlock.NOTE, note)
+            .setValue(NoteBlock.POWERED, powered)
+    }
     
     init {
         require(note in 0..24)

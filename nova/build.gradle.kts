@@ -1,7 +1,8 @@
 plugins {
     id("nova.kotlin-conventions")
     id("nova.dokka-conventions")
-    id("nova.publish-conventions")
+    id("nova.publish-conventions-java")
+    id("nova.detekt-conventions")
     alias(libs.plugins.kotlinx.serialization)
     alias(origamiLibs.plugins.origami)
     alias(libs.plugins.pluginPublish)
@@ -18,6 +19,7 @@ dependencies {
     novaLoaderApi(libs.kotlinx.serialization.json)
     api(origamiLibs.mixin)
     api(origamiLibs.mixinextras)
+    api(project(":nova-registry"))
     
     // internal dependencies
     compileOnly(project(":nova-api"))
@@ -70,6 +72,7 @@ val mcVersion = libs.versions.paper.map {
 }
 
 val novaApiJar = project(":nova-api").tasks.withType<Jar>().matching { it.name == "jar" }
+val novaRegistryJar = project(":nova-registry").tasks.withType<Jar>().matching { it.name == "jar" }
 val hookJars = rootProject.subprojects
     .filter { it.name.startsWith("nova-hook-") }
     .map { hook -> hook.tasks.withType<Jar>().matching { it.name == "jar" } }
@@ -77,7 +80,7 @@ val hookJars = rootProject.subprojects
 loaderJar {
     gameVersion = mcVersion
     novaInput = tasks.named<Jar>("origamiJar").flatMap { it.archiveFile }
-    input.from(novaApiJar, hookJars)
+    input.from(novaApiJar, novaRegistryJar, hookJars)
 }
 
 val resourceProperties = mapOf(
@@ -98,7 +101,6 @@ tasks {
 kotlin {
     compilerOptions {
         optIn.addAll(
-            "kotlin.contracts.ExperimentalContracts",
             "kotlinx.coroutines.ExperimentalCoroutinesApi",
             "xyz.xenondevs.invui.ExperimentalReactiveApi",
             "xyz.xenondevs.invui.dsl.ExperimentalDslApi",

@@ -19,8 +19,10 @@ import xyz.xenondevs.nova.api.ApiItemRegistry
 import xyz.xenondevs.nova.api.ApiTileEntityManager
 import xyz.xenondevs.nova.api.NovaMaterialRegistry
 import xyz.xenondevs.nova.api.protection.ProtectionIntegration
+import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.registry.NovaRegistryBootstrapContext
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.ServerUtils
 import xyz.xenondevs.nova.util.registerEvents
@@ -64,13 +66,16 @@ internal object Nova : JavaPlugin(), INova {
                 throw Exception("Nova is not compatible with the following plugin(s): ${incompatibilities.joinToString()}")
             
             PLUGIN_READY = true
-            LIFECYCLE_MANAGER = lifecycleManager
             
+            NovaRegistryBootstrapContext.exitBootstrapPhase()
             InvUI.getInstance().setPlugin(this)
             Languages.getInstance().enableServerSideTranslations(false)
             Initializer.registerEvents()
         } catch (t: Throwable) {
-            LOGGER.error("", t)
+            if (t is InitializationException)
+                LOGGER.error(t.message)
+            else LOGGER.error("", t)
+            
             (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
             Runtime.getRuntime().halt(-1) // force-quit
         }

@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceKey
  * [MappedRegistry] implementation that binds the value to the [Holder.Reference] immediately after registering it instead
  * of waiting for [freeze] to be called.
  */
-open class InstantBindMappedRegistry<T : Any>(
+internal class InstantBindMappedRegistry<T : Any>(
     resourceKey: ResourceKey<out Registry<T>>,
     lifecycle: Lifecycle
 ) : MappedRegistry<T>(resourceKey, lifecycle) {

@@ -14,6 +14,7 @@ import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mapEach
 import xyz.xenondevs.commons.provider.mapEachIndexed
 import xyz.xenondevs.commons.provider.mutableProvider
@@ -30,7 +31,6 @@ import xyz.xenondevs.invui.dsl.scrollItemsGui
 import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.invui.dsl.window
 import xyz.xenondevs.invui.gui.Markers
-import xyz.xenondevs.invui.gui.SlotElement.InventoryLink
 import xyz.xenondevs.invui.inventory.Inventory
 import xyz.xenondevs.invui.inventory.ReferencingInventory
 import xyz.xenondevs.invui.inventory.event.PlayerUpdateReason
@@ -39,6 +39,8 @@ import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.nova.ui.menu.InventoryLink
+import xyz.xenondevs.nova.ui.menu.by
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.RecipesMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.handleRecipeChoiceClick
 import xyz.xenondevs.nova.ui.menu.item.NoSlotItem
@@ -47,7 +49,10 @@ import xyz.xenondevs.nova.ui.menu.item.scrollLeftItem
 import xyz.xenondevs.nova.ui.menu.item.scrollRightItem
 import xyz.xenondevs.nova.ui.menu.item.scrollUpItem
 import xyz.xenondevs.nova.ui.menu.item.scrollerItem
+import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
+import xyz.xenondevs.nova.ui.overlay.guitexture.component
+import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
@@ -57,6 +62,7 @@ import xyz.xenondevs.nova.world.item.CategorizedItem
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.ItemCategories
 import xyz.xenondevs.nova.world.item.ItemCategory
+import xyz.xenondevs.nova.world.item.clientsideProvider
 
 private const val CATEGORY_TAB_COUNT = 8
 private val TAB_BUTTON_TEXTURES = arrayOf(
@@ -98,7 +104,7 @@ internal class ItemsMenu private constructor(val player: Player) {
                     if (tab < playerInvTab)
                         TAB_BUTTON_TEXTURES[(tab % CATEGORY_TAB_COUNT).coerceAtLeast(0)].component
                     else DefaultGuiTextures.ITEMS_9.component
-                }
+                }.flatten()
                 gui by tabGui(
                     "p * p * p * p * s",
                     "< . . . . . . . >",
@@ -164,11 +170,11 @@ internal class ItemsMenu private constructor(val player: Player) {
                         ". x x x x x x o b"
                     ) {
                         val inv = ReferencingInventory.fromContents(player.inventory)
-                        'h' by InventoryLink(inv[39..39].apply { allowOnlyEquippable(EquipmentSlot.HEAD) }, 0, DefaultGuiItems.HEAD_PLACEHOLDER.clientsideProvider)
-                        'c' by InventoryLink(inv[38..38].apply { allowOnlyEquippable(EquipmentSlot.CHEST) }, 0, DefaultGuiItems.CHEST_PLACEHOLDER.clientsideProvider)
-                        'l' by InventoryLink(inv[37..37].apply { allowOnlyEquippable(EquipmentSlot.LEGS) }, 0, DefaultGuiItems.LEGS_PLACEHOLDER.clientsideProvider)
-                        'b' by InventoryLink(inv[36..36].apply { allowOnlyEquippable(EquipmentSlot.FEET) }, 0, DefaultGuiItems.FEET_PLACEHOLDER.clientsideProvider)
-                        'o' by InventoryLink(inv, 40, DefaultGuiItems.OFF_HAND_PLACEHOLDER.clientsideProvider)
+                        'h' by InventoryLink(inv[39..39].apply { allowOnlyEquippable(EquipmentSlot.HEAD) }, 0, DefaultGuiItems.HEAD_PLACEHOLDER)
+                        'c' by InventoryLink(inv[38..38].apply { allowOnlyEquippable(EquipmentSlot.CHEST) }, 0, DefaultGuiItems.CHEST_PLACEHOLDER)
+                        'l' by InventoryLink(inv[37..37].apply { allowOnlyEquippable(EquipmentSlot.LEGS) }, 0, DefaultGuiItems.LEGS_PLACEHOLDER)
+                        'b' by InventoryLink(inv[36..36].apply { allowOnlyEquippable(EquipmentSlot.FEET) }, 0, DefaultGuiItems.FEET_PLACEHOLDER)
+                        'o' by InventoryLink(inv, 40, DefaultGuiItems.OFF_HAND_PLACEHOLDER)
                         'x' by ReferencingInventory.fromPlayerStorageContents(player.inventory)[0..26]
                     }
                 }
@@ -190,7 +196,7 @@ internal class ItemsMenu private constructor(val player: Player) {
                     'x' by Markers.CONTENT_LIST_SLOT_VERTICAL
                     'c' by cheatModeButton(cheatMode)
                     '<' by scrollLeftItem(line)
-                    '-' by scrollerItem(serverWindowState, clientWindowState, line, maxLine, provider(DefaultGuiItems.TP_SCROLLER_HORIZONTAL.clientsideProvider))
+                    '-' by scrollerItem(serverWindowState, clientWindowState, line, maxLine, DefaultGuiItems.TP_SCROLLER_HORIZONTAL.clientsideProvider)
                     '>' by scrollRightItem(line, maxLine)
                     '^' by closeSearchButton(filter, mainWindow, searchResultsWindow)
                     content by filteredItems
@@ -213,7 +219,7 @@ internal class ItemsMenu private constructor(val player: Player) {
                         .append(Component.text(")", NamedTextColor.DARK_GRAY))
                         .build()
                     DefaultGuiTextures.SEARCH_RESULTS.getTitle(title)
-                }
+                }.flatten()
                 
                 upperGui by scrollItemsGui(
                     "x x x x x x x x c",
@@ -300,8 +306,9 @@ private fun categorizedItemButton(item: CategorizedItem, cheatMode: Provider<Boo
 }
 
 private fun closeSearchButton(filter: Provider<String>, main: Provider<Window>, results: Provider<Window>) = item {
-    itemProvider by DefaultGuiItems.TP_ARROW_UP_ON.createClientsideItemBuilder()
-        .setName(Component.translatable("menu.nova.items.search.back", NamedTextColor.GRAY))
+    itemProvider by itemProvider(DefaultGuiItems.TP_ARROW_UP_ON) {
+        name by Component.translatable("menu.nova.items.search.back", NamedTextColor.GRAY)
+    }
     onClick {
         if (clickType.isLeftClick) {
             if (filter.get().isBlank())
@@ -313,7 +320,7 @@ private fun closeSearchButton(filter: Provider<String>, main: Provider<Window>, 
 }
 
 private fun searchButton(search: Provider<Window>) = item {
-    itemProvider by DefaultGuiItems.TP_SEARCH.clientsideProvider
+    itemProvider by DefaultGuiItems.TP_SEARCH
     onClick {
         if (clickType.isLeftClick) {
             search.get().open()
@@ -323,7 +330,7 @@ private fun searchButton(search: Provider<Window>) = item {
 }
 
 private fun cheatModeButton(cheatMode: MutableProvider<Boolean>) = item {
-    itemProvider by cheatMode.map { cheatMode ->
+    itemProvider by cheatMode.flatMap { cheatMode ->
         if (cheatMode)
             DefaultGuiItems.TP_CHEATING_ON.clientsideProvider
         else DefaultGuiItems.TP_CHEATING_OFF.clientsideProvider
@@ -359,11 +366,11 @@ private fun playerInventoryTabButton(tab: Provider<Int>, activeTab: MutableProvi
 private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            ItemProvider.EMPTY
+            provider(ItemProvider.EMPTY)
         else if (page > 0)
             DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.clientsideProvider
         else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF.clientsideProvider
-    }
+    }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() > 0) {
             page.set(page.get() - 1)
@@ -375,11 +382,11 @@ private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>
 private fun tabPageForwardItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            ItemProvider.EMPTY
+            provider(ItemProvider.EMPTY)
         else if (page + 1 < pageCount)
             DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON.clientsideProvider
         else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF.clientsideProvider
-    }
+    }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() < pageCount.get() - 1) {
             page.set(page.get() + 1)

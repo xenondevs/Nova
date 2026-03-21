@@ -33,7 +33,7 @@ internal class BlockItemBehavior(blockType: Provider<NovaBlock>) : ItemBehavior 
     private val novaBlock by blockType
     
     override fun useOnBlock(itemStack: ItemStack, block: Block, ctx: Context<BlockInteract>): InteractionResult {
-        val player = ctx[BlockInteract.SOURCE_PLAYER] 
+        val player = ctx[BlockInteract.SOURCE_PLAYER]
             ?: return InteractionResult.Fail
         val handItem = ctx[BlockInteract.HELD_ITEM_STACK]
         var pos = ctx[BlockInteract.BLOCK_POS]
@@ -54,8 +54,8 @@ internal class BlockItemBehavior(blockType: Provider<NovaBlock>) : ItemBehavior 
         
         val vanillaState = when (val modelProvider = newState.modelProvider) {
             is BackingStateBlockModelProvider -> modelProvider.info.vanillaBlockState.bukkitBlockData
-            is DisplayEntityBlockModelProvider -> modelProvider.info.hitboxType.bukkitBlockData
-            is ModelLessBlockModelProvider -> modelProvider.info.bukkitBlockData
+            is DisplayEntityBlockModelProvider -> modelProvider.info.collider
+            is ModelLessBlockModelProvider -> modelProvider.info
         }
         
         if (pos.location.isInsideWorldRestrictions()

@@ -26,7 +26,7 @@ jobs:
           cache-disabled: true
         
       - name: Build Nova
-        run: ./gradlew test loaderJar -PoutDir=artifacts -Prelease
+        run: ./gradlew detektMain detektTest test loaderJar -PoutDir=artifacts -Prelease
 
       - name: Upload Artifacts
         id: upload

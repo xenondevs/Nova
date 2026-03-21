@@ -12,6 +12,7 @@ import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundOpenScreenPacketEvent
 import xyz.xenondevs.nova.network.event.registerPacketListener
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureAlignment
 import xyz.xenondevs.nova.resources.builder.task.FontChar
@@ -93,11 +94,11 @@ internal object VanillaGuiTextureInjector : PacketListener {
         val newTitle = Component.text()
         
         // add vanilla gui texture if there is no custom gui texture
-        val vanillaGuiTexture = menuType.guiTexture
+        val vanillaGuiTexture = menuType.guiTexture?.get()?.component?.get()
         val guiTexture = findGuiTexture(oldTitle)
         if (guiTexture == null && vanillaGuiTexture != null) {
             newTitle
-                .append(vanillaGuiTexture.component)
+                .append(vanillaGuiTexture)
                 .moveToStart(lang)
         }
         
@@ -117,7 +118,7 @@ internal object VanillaGuiTextureInjector : PacketListener {
         // add inventory label if required
         // (menu type has inventory label and there is no custom gui texture that doesn't want it)
         val offset = menuType.offsetToInventoryLabel
-        if (offset != null && (guiTexture == null || ResourceLookups.GUI_TEXTURE[guiTexture]?.hasInventoryLabel != false)) {
+        if (offset != null && (guiTexture == null || guiTexture.hasInventoryLabel)) {
             newTitle
                 .move(offset.x())
                 .append(MovedFonts.moveVertically(Component.translatable("container.nova.inventory"), offset.y()))
@@ -137,10 +138,10 @@ internal object VanillaGuiTextureInjector : PacketListener {
             }
         }
         
-        return ResourceLookups.GUI_TEXTURE_BY_FONT_CHAR[guiTexture]
+        return ResourceLookups.guiTextureByFontChar[guiTexture]?.get()
     }
     
-    private val MenuType<*>.guiTexture: GuiTexture?
+    private val MenuType<*>.guiTexture: RegistryEntry.Nova<GuiTexture>?
         get() = when (this) {
             MenuType.ANVIL -> DefaultGuiTextures.ANVIL
             MenuType.CARTOGRAPHY_TABLE -> DefaultGuiTextures.CARTOGRAPHY_TABLE
@@ -192,6 +193,7 @@ internal object VanillaGuiTextureInjector : PacketListener {
             MenuType.FURNACE,
             MenuType.BLAST_FURNACE,
             MenuType.SMOKER -> true
+            
             else -> false
         }
     

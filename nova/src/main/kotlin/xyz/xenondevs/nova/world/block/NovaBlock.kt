@@ -2,12 +2,10 @@
 
 package xyz.xenondevs.nova.world.block
 
-import com.mojang.serialization.Codec
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.Serializable
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.world.InteractionHand
@@ -19,15 +17,16 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
+import xyz.xenondevs.nova.registry.Configurable
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockSerializer
 import xyz.xenondevs.nova.util.blockFace
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
@@ -53,26 +52,36 @@ import net.minecraft.world.item.ItemStack as NmsItemStack
  */
 @Serializable(with = NovaBlockSerializer::class)
 open class NovaBlock internal constructor(
-    val id: Key,
+    override val entry: RegistryEntry.Nova<NovaBlock>,
+    /**
+     * The name of this [NovaBlock].
+     */
     val name: Component,
+    /**
+     * The style of the [name] of this [NovaBlock]. (Already applied to [name])
+     */
     val style: Style,
     behaviors: List<BlockBehaviorHolder>,
+    /**
+     * A list of all the [ScopedBlockStateProperties][ScopedBlockStateProperty] of this [NovaBlock],
+     * responsible for defining the various [blockStates].
+     */
     val stateProperties: List<ScopedBlockStateProperty<*>>,
-    configId: String,
-    internal val layout: BlockModelLayout
-) {
+    item: Provider<RegistryEntry<NovaItem>?>,
+    override val config: Provider<CommentedConfigurationNode>,
+    /**
+     * A list of all possible [NovaBlockStates][NovaBlockState] of this [NovaBlock]
+     */
+    val blockStates: List<NovaBlockState>
+) : NovaRegistryElement<NovaBlock>, Configurable {
     
     /**
      * The [NovaItem] associated with this [NovaBlock].
+     * May be `null` if this block does not have an associated item.
+     * 
+     * Reloaded when the item registry is reloaded or when the associated item changes.
      */
-    var item: NovaItem? = null
-        internal set
-    
-    /**
-     * The configuration for this [NovaBlock].
-     * May be an empty node if the config file does not exist.
-     */
-    val config: Provider<CommentedConfigurationNode> = Configs[configId]
+    val item: NovaItem? by item.flatten()
     
     /**
      * A list of all [BlockBehaviors][BlockBehavior] of this [NovaBlock].
@@ -83,12 +92,6 @@ open class NovaBlock internal constructor(
             is BlockBehaviorFactory<*> -> holder.create(this)
         }
     }
-    
-    /**
-     * A list of all possible [NovaBLockStates][NovaBlockState] of this [NovaBlock]
-     */
-    @Suppress("LeakingThis")
-    val blockStates = NovaBlockState.createBlockStates(this, stateProperties)
     
     /**
      * The default block state of this [NovaBlock].
@@ -143,13 +146,13 @@ open class NovaBlock internal constructor(
      * Gets the first [BlockBehavior] that is an instance of [type], or throws an [IllegalStateException] if there is none.
      */
     fun <T : Any> getBehavior(type: KClass<T>): T =
-        getBehaviorOrNull(type) ?: throw IllegalStateException("Block $id does not have a behavior of type ${type.simpleName}")
+        getBehaviorOrNull(type) ?: throw IllegalStateException("Block $key does not have a behavior of type ${type.simpleName}")
     
     /**
      * Gets the first [BlockBehavior] that is an instance of [type], or throws an [IllegalStateException] if there is none.
      */
     fun <T : Any> getBehavior(type: Class<T>): T =
-        getBehaviorOrNull(type) ?: throw IllegalStateException("Block $id does not have a behavior of type ${type.simpleName}")
+        getBehaviorOrNull(type) ?: throw IllegalStateException("Block $key does not have a behavior of type ${type.simpleName}")
     
     //<editor-fold desc="event methods">
     /**
@@ -403,18 +406,12 @@ open class NovaBlock internal constructor(
         try {
             return run()
         } catch (t: Throwable) {
-            LOGGER.error("Failed to $name for $id", t)
+            LOGGER.error("Failed to $name for $key", t)
         }
         return fallback
     }
     //</editor-fold>
     
-    override fun toString() = id.toString()
-    
-    companion object {
-        
-        val CODEC: Codec<NovaBlock> = NovaRegistries.BLOCK.byNameCodec()
-        
-    }
+    override fun toString(): String = key.toString()
     
 }

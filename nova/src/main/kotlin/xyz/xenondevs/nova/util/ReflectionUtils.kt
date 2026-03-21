@@ -119,6 +119,13 @@ internal object ReflectionUtils {
     }
     
     @JvmStatic
+    fun getConstructorMethodHandle(className: String, vararg args: KClass<*>): MethodHandle {
+        val clazz = Class.forName(className)
+        val constructor = getConstructor(clazz, *args)
+        return MethodHandles.privateLookupIn(clazz, MethodHandles.lookup()).unreflectConstructor(constructor)
+    }
+    
+    @JvmStatic
     fun getField(clazz: KClass<*>, declared: Boolean, name: String): Field =
         getField(clazz.java, declared, name)
     

@@ -28,11 +28,13 @@ internal object NoSlotItem : Item {
                 player.swingMainHandEventless()
                 player.setItemOnCursor(null)
             }
+            
             ClickType.RIGHT -> {
                 InventoryUtils.dropItemLikePlayer(player, cursor.clone().apply { amount = 1 })
                 player.swingMainHandEventless()
                 player.setItemOnCursor(player.itemOnCursor.apply { amount-- })
             }
+            
             else -> Unit
         }
     }

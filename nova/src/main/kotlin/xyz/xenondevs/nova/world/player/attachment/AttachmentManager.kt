@@ -25,11 +25,9 @@ import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.registry.NovaRegistries.ATTACHMENT_TYPE
 import xyz.xenondevs.nova.serialization.persistentdata.get
 import xyz.xenondevs.nova.serialization.persistentdata.set
-import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTaskLater
 import xyz.xenondevs.nova.util.runTaskTimer
-import kotlin.collections.set
 
 private val ATTACHMENTS_KEY = NamespacedKey("nova", "attachments1")
 
@@ -66,11 +64,11 @@ object AttachmentManager : Listener, PacketListener {
     }
     
     fun hasAttachment(player: Player, type: AttachmentType<*>): Boolean =
-        activeAttachments[player]?.contains(type) ?: false || inactiveAttachments[player]?.contains(type.id) ?: false
+        activeAttachments[player]?.contains(type) ?: false || inactiveAttachments[player]?.contains(type.key) ?: false
     
     fun removeAttachment(player: Player, type: AttachmentType<*>) {
         val inactiveAttachmentsMap = inactiveAttachments[player]
-        inactiveAttachmentsMap?.remove(type.id)
+        inactiveAttachmentsMap?.remove(type.key)
         
         if (inactiveAttachmentsMap != null && inactiveAttachmentsMap.isEmpty())
             inactiveAttachments -= player
@@ -123,7 +121,7 @@ object AttachmentManager : Listener, PacketListener {
         val attachmentsMap = activeAttachments[player] ?: return
         val inactive = inactiveAttachments.getOrPut(player, ::HashSet)
         attachmentsMap.forEach { (type, attachment) ->
-            inactive += type.id
+            inactive += type.key
             attachment.despawn()
         }
         
@@ -160,7 +158,7 @@ object AttachmentManager : Listener, PacketListener {
     private fun saveAttachments(player: Player) {
         val dataContainer = player.persistentDataContainer
         val attachmentIds = HashSet<Key>()
-        activeAttachments[player]?.forEach { attachmentIds += it.key.id }
+        activeAttachments[player]?.forEach { attachmentIds += it.key.key }
         inactiveAttachments[player]?.let { attachmentIds += it }
         if (attachmentIds.isNotEmpty()) {
             dataContainer.set(ATTACHMENTS_KEY, attachmentIds)

@@ -11,8 +11,8 @@ import net.minecraft.tags.TagKey
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.placement.PlacedFeature
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.registry.RegistryElementBuilder
+import xyz.xenondevs.nova.registry.LegacyNovaRegistries
+import xyz.xenondevs.nova.registry.LegacyRegistryElementBuilder
 import xyz.xenondevs.nova.util.data.IdentifierOrTagKey
 import xyz.xenondevs.nova.util.lookupGetterOrThrow
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
@@ -26,7 +26,7 @@ import xyz.xenondevs.nova.world.generation.inject.biome.BiomeInjection
 class BiomeInjectionBuilder internal constructor(
     id: Key,
     lookup: RegistryInfoLookup
-) : RegistryElementBuilder<BiomeInjection>(NovaRegistries.BIOME_INJECTION, id) {
+) : LegacyRegistryElementBuilder<BiomeInjection>(LegacyNovaRegistries.BIOME_INJECTION, id) {
     
     private val placedFeatureRegistry = lookup.lookupGetterOrThrow(Registries.PLACED_FEATURE)
     

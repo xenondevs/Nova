@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.api
 
-import net.minecraft.resources.Identifier
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.api.block.NovaBlock
 import xyz.xenondevs.nova.api.block.NovaBlockRegistry
 import xyz.xenondevs.nova.api.data.NamespacedId
@@ -9,8 +9,7 @@ import xyz.xenondevs.nova.registry.NovaRegistries
 internal object ApiBlockRegistry : NovaBlockRegistry {
     
     override fun getOrNull(id: String): NovaBlock? {
-        val loc = Identifier.parse(id)
-        return NovaRegistries.BLOCK.getValue(loc)?.let(::ApiBlockWrapper)
+        return NovaRegistries.BLOCK.getValue(Key.key(id))?.let(::ApiBlockWrapper)
     }
     
     override fun getOrNull(id: NamespacedId) = getOrNull(id.toString())

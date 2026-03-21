@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.context.intention
 
 import org.joml.Vector3d
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.context.AbstractContextIntention
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
@@ -10,7 +9,7 @@ import xyz.xenondevs.nova.context.intention.EntityInteract.INTERACT_LOCATION
 import xyz.xenondevs.nova.context.intention.EntityInteract.SOURCE_EYE_LOCATION
 import xyz.xenondevs.nova.context.intention.EntityInteract.TARGET_ENTITY
 import xyz.xenondevs.nova.util.EntityUtils
-import xyz.xenondevs.nova.util.Key
+import xyz.xenondevs.nova.util.novaKey
 
 /**
  * A [ContextIntention] for interacting with an entity.
@@ -33,7 +32,7 @@ object EntityInteract :
      * The location that was interacted with, relative to the position of the target entity.
      */
     val INTERACT_LOCATION = ContextParamType<Vector3d, EntityInteract>(
-        Key(Nova, "interact_location")
+        novaKey("interact_location")
     )
     
     init {

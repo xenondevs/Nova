@@ -13,7 +13,6 @@ import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
-import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.DefaultItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.DynamicVanillaItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory

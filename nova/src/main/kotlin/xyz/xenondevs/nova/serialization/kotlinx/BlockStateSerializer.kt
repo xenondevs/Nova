@@ -35,7 +35,7 @@ internal object BlockStateSerializer : KSerializer<BlockState> {
         }
     }
     
-    private fun <T: Comparable<T>> stringifyPropertyValue(prop: Property<T>, value: Any): Pair<String, String> =
+    private fun <T : Comparable<T>> stringifyPropertyValue(prop: Property<T>, value: Any): Pair<String, String> =
         prop.name to prop.getName(value as T)
     
     override fun deserialize(decoder: Decoder): BlockState {
@@ -50,6 +50,7 @@ internal object BlockStateSerializer : KSerializer<BlockState> {
                         descriptor, index,
                         MapSerializer(String.serializer(), String.serializer())
                     )
+                    
                     else -> break
                 }
             }

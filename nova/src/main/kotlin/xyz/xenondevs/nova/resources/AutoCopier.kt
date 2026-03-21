@@ -27,7 +27,7 @@ internal object AutoCopier {
                     destPath.createParentDirectories()
                     destPath.writeBytes(bin)
                 }
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 LOGGER.warn("Failed to copy resource pack file '$id' to destination '$destination'.", e)
             }
         }

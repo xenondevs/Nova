@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [RecipeManager::class] // tile-entities may need recipes
+    runAfter = [RecipeManager::class] // tile-entities may need recipes
 )
 object WorldDataManager : Listener {
     

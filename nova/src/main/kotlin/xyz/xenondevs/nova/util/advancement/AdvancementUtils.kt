@@ -15,6 +15,7 @@ import net.minecraft.core.component.predicates.CustomDataPredicate
 import net.minecraft.core.component.predicates.DataComponentPredicates
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.Identifier
+import net.minecraft.world.item.ItemStackTemplate
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -22,6 +23,7 @@ import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.toNmsTemplate
+import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
 import java.util.*
 

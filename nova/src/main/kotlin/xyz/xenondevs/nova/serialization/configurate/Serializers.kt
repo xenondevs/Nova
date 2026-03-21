@@ -1,12 +1,22 @@
 package xyz.xenondevs.nova.serialization.configurate
 
 import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.TypedKey
+import io.papermc.paper.registry.set.RegistryKeySet
+import io.papermc.paper.registry.tag.TagKey
 import org.bukkit.Keyed
 import org.bukkit.attribute.AttributeModifier.Operation
+import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import xyz.xenondevs.commons.reflection.javaTypeOf
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.NovaRegistry
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.util.data.geantyrefTypeTokenOf
+import java.lang.reflect.Type
 
 internal val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
     // -- Registries --
@@ -19,11 +29,13 @@ internal val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerial
     .registerForRegistry(RegistryKey.COW_VARIANT)
     .registerForRegistry(RegistryKey.DAMAGE_TYPE)
     .registerForRegistry(RegistryKey.DATA_COMPONENT_TYPE)
+    .registerForRegistry(RegistryKey.DIALOG)
     .registerForRegistry(RegistryKey.ENCHANTMENT)
     .registerForRegistry(RegistryKey.ENTITY_TYPE)
     .registerForRegistry(RegistryKey.FLUID)
     .registerForRegistry(RegistryKey.FROG_VARIANT)
     .registerForRegistry(RegistryKey.GAME_EVENT)
+    .registerForRegistry(RegistryKey.GAME_RULE)
     .registerForRegistry(RegistryKey.INSTRUMENT)
     .registerForRegistry(RegistryKey.ITEM)
     .registerForRegistry(RegistryKey.JUKEBOX_SONG)
@@ -44,15 +56,22 @@ internal val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerial
     .registerForRegistry(RegistryKey.VILLAGER_TYPE)
     .registerForRegistry(RegistryKey.WOLF_SOUND_VARIANT)
     .registerForRegistry(RegistryKey.WOLF_VARIANT)
+    .registerForRegistry(RegistryKey.ZOMBIE_NAUTILUS_VARIANT)
     // -- Nova Registries --
-    .register(RegistryEntrySerializer(NovaRegistries.NETWORK_TYPE))
-    .register(RegistryEntrySerializer(NovaRegistries.ABILITY_TYPE))
-    .register(RegistryEntrySerializer(NovaRegistries.ATTACHMENT_TYPE))
-    .register(RegistryEntrySerializer(NovaRegistries.RECIPE_TYPE))
-    .register(RegistryEntrySerializer(NovaRegistries.BLOCK))
-    .register(RegistryEntrySerializer(NovaRegistries.ITEM))
-    .register(RegistryEntrySerializer(NovaRegistries.TOOL_CATEGORY))
-    .register(RegistryEntrySerializer(NovaRegistries.TOOL_TIER))
+    .registerForRegistry { NovaRegistries.BLOCK }
+    .registerForRegistry { NovaRegistries.ITEM }
+    .registerForRegistry { NovaRegistries.EQUIPMENT }
+    .registerForRegistry { NovaRegistries.TOOL_TIER }
+    .registerForRegistry { NovaRegistries.TOOL_CATEGORY }
+    .registerForRegistry { NovaRegistries.NETWORK_TYPE }
+    .registerForRegistry { NovaRegistries.ABILITY_TYPE }
+    .registerForRegistry { NovaRegistries.ATTACHMENT_TYPE }
+    .registerForRegistry { NovaRegistries.RECIPE_TYPE }
+    .registerForRegistry { NovaRegistries.GUI_TEXTURE }
+    .registerForRegistry { NovaRegistries.WAILA_INFO_PROVIDER }
+    .registerForRegistry { NovaRegistries.WAILA_TOOL_ICON_PROVIDER }
+    .registerForRegistry { NovaRegistries.ITEM_FILTER_TYPE }
+    .registerForRegistry { NovaRegistries.TOOLTIP_STYLE }
     // -- Misc --
     .register(ExtraMappingEnumSerializer(
         "add_value" to Operation.ADD_NUMBER,
@@ -66,8 +85,8 @@ internal val NOVA_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerial
     .register(BlockLimiterSerializer)
     .register(ComponentSerializer)
     .register(EnumSerializer)
-    .register(KeySerializer)
-    .register(NamespacedKeySerializer)
+    .register(KeyConfigurateSerializer)
+    .register(NamespacedKeyConfigurateSerializer)
     .register(IdentifierSerializer)
     .register(ResourcePathSerializer)
     .register(PotionEffectSerializer)
@@ -86,9 +105,38 @@ private inline fun <reified T> TypeSerializerCollection.Builder.register(seriali
     return this
 }
 
-private inline fun <reified T: Keyed> TypeSerializerCollection.Builder.registerForRegistry(key: RegistryKey<T>): TypeSerializerCollection.Builder {
-    register(BukkitRegistryEntrySerializer(key))
-    register(TagKeySerializer(key))
-    register(RegistryKeySetSerializer(key))
+private inline fun <reified T : Keyed> TypeSerializerCollection.Builder.registerForRegistry(register: RegistryKey<T>): TypeSerializerCollection.Builder {
+    register<T>(PaperRegistryElementConfigurateSerializer(register))
+    register<RegistryEntry.Paper<T>>(PaperRegistryEntryConfigurateSerializer(register))
+    register<RegistryEntrySet.Paper<T>>(PaperRegistryEntrySetConfigurateSerializer(register))
+    register<TypedKey<T>>(TypedKeyConfigurateSerializer(register))
+    register<TagKey<T>>(TagKeyConfigurateSerializer(register))
+    register<RegistryKeySet<T>>(RegistryKeySetConfigurateSerializer(register))
     return this
+}
+
+// requires lazy registration because default NovaRegistries access configs for reloadable option
+private inline fun <reified T : NovaRegistryElement<T>> TypeSerializerCollection.Builder.registerForRegistry(
+    crossinline registry: () -> NovaRegistry<T>
+): TypeSerializerCollection.Builder {
+    registerLazily<T> { NovaRegistryElementConfigurateSerializer(registry()) }
+    registerLazily<RegistryEntry.Nova<T>> { NovaRegistryEntryConfigurateSerializer(registry()) }
+    registerLazily<RegistryEntrySet.Nova<T>> { NovaRegistryEntrySetConfigurateSerializer(registry()) }
+    return this
+}
+
+private inline fun <reified T> TypeSerializerCollection.Builder.registerLazily(noinline factory: () -> TypeSerializer<T>): TypeSerializerCollection.Builder {
+    return register(geantyrefTypeTokenOf<T>(), object : TypeSerializer<T> {
+        
+        private val delegate: TypeSerializer<T> by lazy(factory)
+        
+        override fun deserialize(type: Type?, node: ConfigurationNode?): T? {
+            return delegate.deserialize(type, node)
+        }
+        
+        override fun serialize(type: Type?, obj: T?, node: ConfigurationNode?) {
+            delegate.serialize(type, obj, node)
+        }
+        
+    })
 }

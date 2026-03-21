@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.item.AbstractPagedGuiBoundItem
@@ -11,17 +13,25 @@ import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.clientsideProvider
 
 /**
  * A UI item for [PagedGuis][PagedGui] that goes back one page on left-click.
  */
 class PageBackItem(
-    private val on: ItemProvider = DefaultGuiItems.ARROW_LEFT_ON.clientsideProvider,
-    private val off: ItemProvider = DefaultGuiItems.ARROW_LEFT_OFF.clientsideProvider
+    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_ON.clientsideProvider,
+    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_OFF.clientsideProvider
 ) : AbstractPagedGuiBoundItem() {
     
+    constructor(on: ItemProvider, off: ItemProvider) : this(provider(on), provider(off))
+    
+    init {
+        on.observeWeak(this) { thisRef -> thisRef.notifyWindows() }
+        off.observeWeak(this) { thisRef -> thisRef.notifyWindows() }
+    }
+    
     override fun getItemProvider(player: Player): ItemProvider {
-        val itemBuilder = ItemBuilder((if (gui.page > 0) on else off).get())
+        val itemBuilder = ItemBuilder((if (gui.page > 0) on.get() else off.get()).get())
         itemBuilder.setName(Component.translatable("menu.nova.paged.back", NamedTextColor.GRAY))
         itemBuilder.addLoreLines(
             if (gui.page > 0)
@@ -47,12 +57,19 @@ class PageBackItem(
  * A UI item for [PagedGuis][PagedGui] that goes forward one page on left-click.
  */
 class PageForwardItem(
-    private val on: ItemProvider = DefaultGuiItems.ARROW_RIGHT_ON.clientsideProvider,
-    private val off: ItemProvider = DefaultGuiItems.ARROW_RIGHT_OFF.clientsideProvider
+    private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_ON.clientsideProvider,
+    private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_OFF.clientsideProvider
 ) : AbstractPagedGuiBoundItem() {
     
+    constructor(on: ItemProvider, off: ItemProvider) : this(provider(on), provider(off))
+    
+    init {
+        on.observeWeak(this) { thisRef -> thisRef.notifyWindows() }
+        off.observeWeak(this) { thisRef -> thisRef.notifyWindows() }
+    }
+    
     override fun getItemProvider(player: Player): ItemProvider {
-        val itemBuilder = ItemBuilder((if (gui.page + 1 < gui.pageCount) on else off).get())
+        val itemBuilder = ItemBuilder((if (gui.page + 1 < gui.pageCount) on.get() else off.get()).get())
         itemBuilder.setName(Component.translatable("menu.nova.paged.forward", NamedTextColor.GRAY))
         itemBuilder.addLoreLines(
             if (gui.page + 1 < gui.pageCount)

@@ -43,7 +43,7 @@ internal object NovaNetworkNodeProvider : NetworkNodeProvider {
     }
     
     override suspend fun isUnknown(pos: BlockPos): Boolean {
-        return WorldDataManager.getOrLoadBlockState(pos)?.block == DefaultBlocks.UNKNOWN
+        return WorldDataManager.getOrLoadBlockState(pos)?.blockEntry == DefaultBlocks.UNKNOWN
     }
     
     override suspend fun getNodes(pos: ChunkPos): Sequence<NetworkNode> {

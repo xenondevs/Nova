@@ -15,7 +15,7 @@ class PackMcMetaTask(private val builder: ResourcePackBuilder) : PackTask {
     
     override suspend fun run() {
         val format = PackMcMeta.PackFormatConstraint(
-            ResourcePackBuilder.PACK_MAJOR_VERSION, 
+            ResourcePackBuilder.PACK_MAJOR_VERSION,
             ResourcePackBuilder.PACK_MINOR_VERSION
         )
         builder.resolve("pack.mcmeta").writeJson(PackMcMeta(

@@ -14,13 +14,11 @@ import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.NOVA_JAR
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.serialization.configurate.NOVA_CONFIGURATE_SERIALIZERS
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
-import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.data.useZip
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -42,7 +40,7 @@ object Configs {
     
     private val extractor = ConfigExtractor(
         PermanentStorage.storedValue(
-            "stored_configs", 
+            "stored_configs",
             MapSerializer(KeySerializer, String.serializer()),
             ::HashMap
         )
@@ -63,7 +61,7 @@ object Configs {
     private fun extractAllConfigs() {
         extractConfigs("nova", NOVA_JAR, DATA_FOLDER)
         for (addon in AddonBootstrapper.addons) {
-            extractConfigs(addon.id, addon.file, addon.dataFolder)
+            extractConfigs(addon.namespace(), addon.file, addon.dataFolder)
         }
         
         lastReload = System.currentTimeMillis()
@@ -94,7 +92,7 @@ object Configs {
     private fun resolveConfigPath(configId: Key): Path {
         val dataFolder = when (configId.namespace()) {
             "nova" -> DATA_FOLDER
-            else -> AddonBootstrapper.addons.firstOrNull { it.id == configId.namespace() }?.dataFolder
+            else -> AddonBootstrapper.addons.firstOrNull { it.namespace() == configId.namespace() }?.dataFolder
                 ?: throw IllegalArgumentException("No addon with id ${configId.namespace()} found")
         }
         return dataFolder.resolve("configs").resolve(configId.value() + ".yml")
@@ -119,7 +117,7 @@ object Configs {
         get(Key.key(id))
     
     operator fun get(addon: Addon, path: String): Provider<CommentedConfigurationNode> =
-        get(Key(addon, path))
+        get(Key.key(addon, path))
     
     operator fun get(id: Key): Provider<CommentedConfigurationNode> =
         configProviders.getOrPut(id) {
@@ -149,7 +147,7 @@ object Configs {
      * Registers custom [serializers] for configs of [addon].
      */
     fun registerSerializers(addon: Addon, serializers: TypeSerializerCollection) {
-        customSerializers.getOrPut(addon.id, ::ArrayList) += serializers
+        customSerializers.getOrPut(addon.namespace(), ::ArrayList) += serializers
     }
     
     internal fun createBuilder(namespace: String): YamlConfigurationLoader.Builder =

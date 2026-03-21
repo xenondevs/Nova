@@ -22,8 +22,8 @@ abstract class ServerGamePacketListenerImplMixin {
     @Redirect(
         method = "handleUseItemOn",
         at = @At(
-            value = "INVOKE", 
-            target="Lnet/minecraft/server/level/ServerPlayer;stopUsingItem()V"
+            value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;stopUsingItem()V"
         ),
         require = 1,
         allow = 1

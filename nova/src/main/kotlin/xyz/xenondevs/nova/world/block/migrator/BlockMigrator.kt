@@ -50,7 +50,7 @@ import kotlin.random.Random
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [
+    runAfter = [
         ResourceGeneration.PreWorld::class,
         WorldDataManager::class
     ]
@@ -92,18 +92,18 @@ internal object BlockMigrator : Listener {
         )
         
         migrations += ComplexBlockMigration(
-            Blocks.NOTE_BLOCK, DefaultBlocks.NOTE_BLOCK
+            Blocks.NOTE_BLOCK, DefaultBlocks.NOTE_BLOCK.get()
         ) { vanilla ->
-            DefaultBlocks.NOTE_BLOCK.defaultBlockState
+            DefaultBlocks.NOTE_BLOCK.get().defaultBlockState
                 .with(DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT, vanilla.getValue(NoteBlock.INSTRUMENT))
                 .with(DefaultBlockStateProperties.NOTE_BLOCK_NOTE, vanilla.getValue(NoteBlock.NOTE))
                 .with(DefaultBlockStateProperties.POWERED, vanilla.getValue(NoteBlock.POWERED))
         }
         
         migrations += ComplexBlockMigration(
-            Blocks.TRIPWIRE, DefaultBlocks.TRIPWIRE
+            Blocks.TRIPWIRE, DefaultBlocks.TRIPWIRE.get()
         ) { vanilla ->
-            DefaultBlocks.TRIPWIRE.defaultBlockState
+            DefaultBlocks.TRIPWIRE.get().defaultBlockState
                 .with(DefaultBlockStateProperties.TRIPWIRE_NORTH, vanilla.getValue(TripWireBlock.NORTH))
                 .with(DefaultBlockStateProperties.TRIPWIRE_EAST, vanilla.getValue(TripWireBlock.EAST))
                 .with(DefaultBlockStateProperties.TRIPWIRE_SOUTH, vanilla.getValue(TripWireBlock.SOUTH))
@@ -113,17 +113,17 @@ internal object BlockMigrator : Listener {
                 .with(DefaultBlockStateProperties.POWERED, vanilla.getValue(TripWireBlock.POWERED))
         }
         
-        migrations += leavesMigration(Blocks.OAK_LEAVES, DefaultBlocks.OAK_LEAVES)
-        migrations += leavesMigration(Blocks.SPRUCE_LEAVES, DefaultBlocks.SPRUCE_LEAVES)
-        migrations += leavesMigration(Blocks.BIRCH_LEAVES, DefaultBlocks.BIRCH_LEAVES)
-        migrations += leavesMigration(Blocks.JUNGLE_LEAVES, DefaultBlocks.JUNGLE_LEAVES)
-        migrations += leavesMigration(Blocks.ACACIA_LEAVES, DefaultBlocks.ACACIA_LEAVES)
-        migrations += leavesMigration(Blocks.DARK_OAK_LEAVES, DefaultBlocks.DARK_OAK_LEAVES)
-        migrations += leavesMigration(Blocks.MANGROVE_LEAVES, DefaultBlocks.MANGROVE_LEAVES)
-        migrations += leavesMigration(Blocks.CHERRY_LEAVES, DefaultBlocks.CHERRY_LEAVES)
-        migrations += leavesMigration(Blocks.AZALEA_LEAVES, DefaultBlocks.AZALEA_LEAVES)
-        migrations += leavesMigration(Blocks.FLOWERING_AZALEA_LEAVES, DefaultBlocks.FLOWERING_AZALEA_LEAVES)
-        migrations += leavesMigration(Blocks.PALE_OAK_LEAVES, DefaultBlocks.PALE_OAK_LEAVES)
+        migrations += leavesMigration(Blocks.OAK_LEAVES, DefaultBlocks.OAK_LEAVES.get())
+        migrations += leavesMigration(Blocks.SPRUCE_LEAVES, DefaultBlocks.SPRUCE_LEAVES.get())
+        migrations += leavesMigration(Blocks.BIRCH_LEAVES, DefaultBlocks.BIRCH_LEAVES.get())
+        migrations += leavesMigration(Blocks.JUNGLE_LEAVES, DefaultBlocks.JUNGLE_LEAVES.get())
+        migrations += leavesMigration(Blocks.ACACIA_LEAVES, DefaultBlocks.ACACIA_LEAVES.get())
+        migrations += leavesMigration(Blocks.DARK_OAK_LEAVES, DefaultBlocks.DARK_OAK_LEAVES.get())
+        migrations += leavesMigration(Blocks.MANGROVE_LEAVES, DefaultBlocks.MANGROVE_LEAVES.get())
+        migrations += leavesMigration(Blocks.CHERRY_LEAVES, DefaultBlocks.CHERRY_LEAVES.get())
+        migrations += leavesMigration(Blocks.AZALEA_LEAVES, DefaultBlocks.AZALEA_LEAVES.get())
+        migrations += leavesMigration(Blocks.FLOWERING_AZALEA_LEAVES, DefaultBlocks.FLOWERING_AZALEA_LEAVES.get())
+        migrations += leavesMigration(Blocks.PALE_OAK_LEAVES, DefaultBlocks.PALE_OAK_LEAVES.get())
         
         queries += migrations.map { migration -> { state -> state.block == migration.vanillaBlock } }
         queries += { state -> VanillaTileEntity.Type.of(state.block.bukkitMaterial) != null }
@@ -193,7 +193,7 @@ internal object BlockMigrator : Listener {
     @JvmStatic
     fun migrateBlockState(pos: BlockPos, blockState: BlockState): BlockState {
         // disable migrations for all block states used by base packs
-        if (blockState in ResourceLookups.OCCUPIED_BLOCK_STATES)
+        if (blockState in ResourceLookups.occupiedBlockStates)
             return blockState
         
         try {
@@ -255,7 +255,7 @@ internal object BlockMigrator : Listener {
         }
         
         // Migrations for block types that are also used as backing states
-        if (newState !in ResourceLookups.OCCUPIED_BLOCK_STATES) {
+        if (newState !in ResourceLookups.occupiedBlockStates) {
             val migration = migrationsByVanillaBlock[newState.block]
             if (migration is ComplexBlockMigration) {
                 val novaState = migration.vanillaToNova(newState)

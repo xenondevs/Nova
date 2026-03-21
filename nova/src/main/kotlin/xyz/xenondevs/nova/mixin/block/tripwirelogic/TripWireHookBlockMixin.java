@@ -19,13 +19,13 @@ abstract class TripWireHookBlockMixin {
         method = "calculateState",
         at = @At(
             value = "INVOKE",
-            target ="Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;"
+            target = "Lnet/minecraft/world/level/Level;getBlockState(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;"
         )
     )
     private static BlockState inject(Level level, BlockPos pos) {
         var novaPos = NMSUtilsKt.toNovaPos(pos, level.getWorld());
         var novaState = WorldDataManager.INSTANCE.getBlockState(novaPos);
-        if (novaState != null && novaState.getBlock() == DefaultBlocks.INSTANCE.getTRIPWIRE()) {
+        if (novaState != null && novaState.getBlock() == DefaultBlocks.INSTANCE.getTRIPWIRE().get()) {
             return TripwireBehavior.INSTANCE.vanillaBlockStateOf(novaState);
         }
         

@@ -1,6 +1,7 @@
 plugins {
     id("nova.kotlin-conventions")
     id("nova.publish-conventions")
+    id("nova.dokka-conventions")
     `java-gradle-plugin`
     `kotlin-dsl`
 }

@@ -10,19 +10,23 @@ import net.kyori.adventure.key.Key
 import xyz.xenondevs.commons.collections.eachRepeated
 import xyz.xenondevs.commons.collections.repeated
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
-import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.getOrThrow
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.data.EquipmentDefinition
 import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayout
 import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayout.Animation
+import xyz.xenondevs.nova.resources.builder.layout.equipment.EquipmentLayout
 import xyz.xenondevs.nova.resources.builder.layout.equipment.InterpolationMode
 import xyz.xenondevs.nova.resources.builder.layout.equipment.StaticEquipmentLayout
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.util.MathUtils
 import xyz.xenondevs.nova.util.data.ImageUtils
+import xyz.xenondevs.nova.world.item.Equipment
 import java.awt.image.BufferedImage
 
 @Serializable
@@ -62,9 +66,9 @@ class EquipmentTask(private val builder: ResourcePackBuilder) : PackTask {
     private var generatedCount = 0
     
     override suspend fun run() {
-        ResourceLookups.EQUIPMENT = NovaRegistries.EQUIPMENT.associateWith { equipment ->
-            val path = ResourcePath.of(ResourceType.Equipment, equipment.id)
-            when (val layout = equipment.makeLayout(builder)) {
+        ResourceLookups.equipment = requests.mapValues { (entry, makeLayout) ->
+            val path = ResourcePath.of(ResourceType.Equipment, entry.key)
+            when (val layout = makeLayout(builder)) {
                 is StaticEquipmentLayout -> generatedStaticEquipmentModel(path, layout)
                 is AnimatedEquipmentLayout -> generateAnimatedEquipmentModel(path, layout)
             }
@@ -317,6 +321,24 @@ class EquipmentTask(private val builder: ResourcePackBuilder) : PackTask {
                 builder.findOrThrow(layer.texture)
             }
         }
+    }
+    
+    internal companion object {
+        
+        private val requests = HashMap<RegistryEntry.Nova<Equipment>, (ResourcePackBuilder) -> EquipmentLayout>()
+        
+        /**
+         * Requests the generation of equipment assets for the given [entry] using the provided [makeLayout] function.
+         * The result will be written to [ResourceLookups.equipmentLookup] and is also available as the returned [Provider].
+         */
+        fun request(
+            entry: RegistryEntry.Nova<Equipment>,
+            makeLayout: (ResourcePackBuilder) -> EquipmentLayout
+        ): Provider<RuntimeEquipmentData> {
+            requests[entry] = makeLayout
+            return ResourceLookups.equipmentLookup.getOrThrow(entry)
+        }
+        
     }
     
 }

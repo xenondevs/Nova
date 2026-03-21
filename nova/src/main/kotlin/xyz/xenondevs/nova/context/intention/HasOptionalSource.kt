@@ -9,7 +9,6 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
 import xyz.xenondevs.nova.context.ContextParamType
@@ -23,7 +22,7 @@ import xyz.xenondevs.nova.context.intention.HasOptionalSource.Companion.SOURCE_P
 import xyz.xenondevs.nova.context.intention.HasOptionalSource.Companion.SOURCE_TILE_ENTITY
 import xyz.xenondevs.nova.context.intention.HasOptionalSource.Companion.SOURCE_UUID
 import xyz.xenondevs.nova.context.intention.HasOptionalSource.Companion.SOURCE_WORLD
-import xyz.xenondevs.nova.util.Key
+import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import java.util.*
 
@@ -114,16 +113,16 @@ interface HasOptionalSource<I : HasOptionalSource<I>> : ContextIntention<I> {
     @Suppress("UNCHECKED_CAST")
     companion object {
         
-        private val SOURCE_UUID = ContextParamType<UUID, Nothing>(Key(Nova, "source_uuid"))
-        private val SOURCE_LOCATION = ContextParamType<Location, Nothing>(Key(Nova, "source_location"), copy = Location::clone)
-        private val SOURCE_EYE_LOCATION = ContextParamType<Location, Nothing>(Key(Nova, "source_eye_location"), copy = Location::clone)
-        private val SOURCE_WORLD = ContextParamType<World, Nothing>(Key(Nova, "source_world"))
-        private val SOURCE_DIRECTION = ContextParamType<Vector, Nothing>(Key(Nova, "source_direction"), copy = Vector::clone)
-        private val SOURCE_ENTITY = ContextParamType<Entity, Nothing>(Key(Nova, "source_entity"))
-        private val SOURCE_LIVING_ENTITY = ContextParamType<LivingEntity, Nothing>(Key(Nova, "source_living_entity"))
-        private val SOURCE_PLAYER = ContextParamType<Player, Nothing>(Key(Nova, "source_player"))
-        private val SOURCE_TILE_ENTITY = ContextParamType<TileEntity, Nothing>(Key(Nova, "source_tile_entity"))
-        private val RESPONSIBLE_PLAYER = ContextParamType<OfflinePlayer, Nothing>(Key(Nova, "responsible_player"))
+        private val SOURCE_UUID = ContextParamType<UUID, Nothing>(novaKey("source_uuid"))
+        private val SOURCE_LOCATION = ContextParamType<Location, Nothing>(novaKey("source_location"), copy = Location::clone)
+        private val SOURCE_EYE_LOCATION = ContextParamType<Location, Nothing>(novaKey("source_eye_location"), copy = Location::clone)
+        private val SOURCE_WORLD = ContextParamType<World, Nothing>(novaKey("source_world"))
+        private val SOURCE_DIRECTION = ContextParamType<Vector, Nothing>(novaKey("source_direction"), copy = Vector::clone)
+        private val SOURCE_ENTITY = ContextParamType<Entity, Nothing>(novaKey("source_entity"))
+        private val SOURCE_LIVING_ENTITY = ContextParamType<LivingEntity, Nothing>(novaKey("source_living_entity"))
+        private val SOURCE_PLAYER = ContextParamType<Player, Nothing>(novaKey("source_player"))
+        private val SOURCE_TILE_ENTITY = ContextParamType<TileEntity, Nothing>(novaKey("source_tile_entity"))
+        private val RESPONSIBLE_PLAYER = ContextParamType<OfflinePlayer, Nothing>(novaKey("responsible_player"))
         
         /**
          * Gets the param type for [SOURCE_UUID].
