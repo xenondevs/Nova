@@ -7,7 +7,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.getMod
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.entryOrElse
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.data.ImageUtils
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
@@ -17,20 +17,22 @@ import java.awt.Color
 /**
  * Creates a factory for [AnimatedDye] behaviors using the given values, if not specified otherwise in the config.
  *
- * @param defaultTicksPerColor The default value for the amount of ticks between each color.
- * Used when `ticks_per_color` is not specified in the config, or null to require the presence of a config entry.
+ * @param defaultTicksPerColor The default value for the number of ticks between each color.
+ * Defaults to `1`.
+ * Used when `ticks_per_color` is not specified in the config.
  *
- * @param defaultColors The default value for the list of colors to cycle through,
- * to be used when `colors` is not specified in the config, or null to require the presence of a config entry.
+ * @param defaultColors The default value for the list of colors to cycle through.
+ * Defaults to an empty list.
+ * Used when `colors` is not specified in the config.
  */
 @Suppress("FunctionName")
 fun AnimatedDye(
-    defaultTicksPerColor: Int? = null,
-    defaultColors: List<Color>? = null
+    defaultTicksPerColor: Int = 1,
+    defaultColors: List<Color> = emptyList()
 ) = ItemBehaviorFactory { _, cfg ->
     AnimatedDye(
-        cfg.entryOrElse(defaultTicksPerColor, "ticks_per_color"),
-        cfg.entryOrElse(defaultColors, "colors")
+        cfg.entry(defaultTicksPerColor, "ticks_per_color"),
+        cfg.entry(defaultColors, "colors")
     )
 }
 

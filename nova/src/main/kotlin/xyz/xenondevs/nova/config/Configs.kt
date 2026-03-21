@@ -5,28 +5,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
-import org.spongepowered.configurate.CommentedConfigurationNode
-import org.spongepowered.configurate.serialize.TypeSerializerCollection
-import org.spongepowered.configurate.yaml.NodeStyle
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader
-import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.invui.window.WindowManager
 import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_JAR
-import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.config.Configs.reload
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.serialization.configurate.NOVA_CONFIGURATE_SERIALIZERS
-import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.NOVA_SERIALIZERS_MODULE
 import xyz.xenondevs.nova.util.AsyncExecutor
 import xyz.xenondevs.nova.util.BukkitDispatcher
 import xyz.xenondevs.nova.util.data.useZip
@@ -34,6 +27,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.StandardWatchEventKinds
 import java.nio.file.WatchService
+import kotlin.io.path.bufferedReader
 import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
@@ -42,48 +36,40 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 
-private val DEFAULT_CONFIG_ID = Key.key("nova", "config")
-private const val DEFAULT_CONFIG_PATH = "configs/config.yml"
-val MAIN_CONFIG = Configs[DEFAULT_CONFIG_ID]
+/**
+ * The [ConfigStorage] used for Nova and its addons.
+ * Use [ConfigStorage.get] to get a [ConfigProvider] for a specific config.
+ * 
+ * Usage:
+ * ```
+ * // plugins/example_addon/configs/config.yml with e.g. `some_value: 123`
+ * val myReloadableValue by CONFIGS["example_addon:config"].entry<Int>("some_value")
+ * ```
+ */
+val CONFIGS: ConfigStorage = ConfigStorage(NOVA_SERIALIZERS_MODULE, NovaConfigBackend)
+
+/**
+ * Nova's main config (`plugins/Nova/config.yml`). Equivalent to `CONFIGS["nova:config"]`.
+ */
+val MAIN_CONFIG: ConfigProvider by lazy { CONFIGS["nova:config"] }
+
+@Deprecated("Use CONFIGS instead", ReplaceWith("CONFIGS"))
+val Configs get() = CONFIGS
 
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
-object Configs {
+internal object NovaConfigBackend : ConfigBackend {
     
-    private val customSerializers = HashMap<String, ArrayList<TypeSerializerCollection>>()
-    
-    private val extractor = ConfigExtractor(
-        PermanentStorage.storedValue(
-            "stored_configs",
-            MapSerializer(KeySerializer, String.serializer()),
-            ::HashMap
-        )
-    )
-    private val configProviders = HashMap<Key, RootConfigProvider>()
-    
-    private var lastReload = -1L
-    
-    internal fun extractDefaultConfig() {
-        NOVA_JAR.useZip { zip ->
-            val from = zip.resolve(DEFAULT_CONFIG_PATH)
-            val to = DATA_FOLDER.resolve(DEFAULT_CONFIG_PATH)
-            extractConfig(from, to, DEFAULT_CONFIG_ID)
-        }
-    }
-    
-    @InitFun
-    private fun extractAllConfigs() {
-        extractConfigs("nova", NOVA_JAR, DATA_FOLDER)
+    internal fun extractAllConfigs() {
+        val extractedConfigs = PermanentStorage.retrieve<MutableMap<Key, String>>("stored_configs") ?: HashMap()
+        val extractor = ConfigExtractor(extractedConfigs)
+        extractConfigs(extractor, "nova", NOVA_JAR, DATA_FOLDER)
         for (addon in AddonBootstrapper.addons) {
-            extractConfigs(addon.namespace(), addon.file, addon.dataFolder)
+            extractConfigs(extractor, addon.namespace(), addon.file, addon.dataFolder)
         }
-        
-        lastReload = System.currentTimeMillis()
-        configProviders.values.asSequence()
-            .filter { it.path.exists() }
-            .forEach { it.set(createLoader(it.configId.namespace(), it.path).load()) }
+        PermanentStorage.store("stored_configs", extractedConfigs)
     }
     
-    private fun extractConfigs(namespace: String, zipFile: Path, dataFolder: Path) {
+    private fun extractConfigs(extractor: ConfigExtractor, namespace: String, zipFile: Path, dataFolder: Path) {
         zipFile.useZip { zip ->
             val configsDir = zip.resolve("configs/")
             configsDir.walk()
@@ -91,94 +77,71 @@ object Configs {
                 .forEach { config ->
                     val relPath = config.relativeTo(configsDir).invariantSeparatorsPathString
                     val configId = Key.key(namespace, relPath.substringBeforeLast('.'))
-                    extractConfig(config, dataFolder.resolve("configs").resolve(relPath), configId)
+                    extractConfig(extractor, config, dataFolder.resolve("configs").resolve(relPath), configId)
                 }
         }
     }
     
-    private fun extractConfig(from: Path, to: Path, configId: Key) {
-        extractor.extract(configId, from, to)
-        ConfigWatcher.watchConfig(to)
-        val provider = configProviders.getOrPut(configId) { RootConfigProvider(to, configId) }
-        provider.reload()
+    private fun extractConfig(extractor: ConfigExtractor, from: Path, to: Path, id: Key) {
+        extractor.extract(id, from, to)
+        
+        CONFIGS[id] // get config now to load it into memory
     }
     
-    private fun resolveConfigPath(configId: Key): Path {
-        val dataFolder = when (configId.namespace()) {
+    private fun resolveConfigPath(id: Key): Path {
+        val dataFolder = when (id.namespace()) {
             "nova" -> DATA_FOLDER
-            else -> AddonBootstrapper.addons.firstOrNull { it.namespace() == configId.namespace() }?.dataFolder
-                ?: throw IllegalArgumentException("No addon with id ${configId.namespace()} found")
+            else -> AddonBootstrapper.addons.firstOrNull { it.namespace() == id.namespace() }?.dataFolder
+                ?: throw IllegalArgumentException("No addon with id ${id.namespace()} found")
         }
-        return dataFolder.resolve("configs").resolve(configId.value() + ".yml")
+        return dataFolder.resolve("configs").resolve(id.value() + ".yml")
     }
     
-    internal fun reload(): List<Key> {
-        val reloadedConfigs = configProviders.asSequence()
-            .filter { (_, provider) ->
-                !provider.path.exists() && provider.fileExisted
-                    || provider.path.exists() && provider.path.getLastModifiedTime().toMillis() > lastReload
-            } // only reload updated configs
-            .onEach { (_, provider) -> provider.reload() }
-            .mapTo(ArrayList()) { (id, _) -> id }
-        lastReload = System.currentTimeMillis()
-        
-        Bukkit.getOnlinePlayers().forEach(Player::updateInventory)
-        
-        return reloadedConfigs
-    }
-    
-    operator fun get(id: String): Provider<CommentedConfigurationNode> =
-        get(Key.key(id))
-    
-    operator fun get(addon: Addon, path: String): Provider<CommentedConfigurationNode> =
-        get(Key.key(addon, path))
-    
-    operator fun get(id: Key): Provider<CommentedConfigurationNode> =
-        configProviders.getOrPut(id) {
+    override fun load(id: Key): JsonElement? {
+        try {
             val path = resolveConfigPath(id)
-            ConfigWatcher.watchConfig(path)
-            val root = RootConfigProvider(path, id)
-            if (lastReload > -1)
-                root.reload()
-            return@getOrPut root
-        }.provider
-    
-    fun getOrNull(id: String): CommentedConfigurationNode? =
-        getOrNull(Key.key(id))
-    
-    fun getOrNull(id: Key): CommentedConfigurationNode? =
-        configProviders[id]?.takeIf { it.loaded }?.provider?.get()
-    
-    fun save(id: String): Unit =
-        save(Key.key(id))
-    
-    fun save(id: Key) {
-        val config = getOrNull(id)
-            ?: return
-        
-        createLoader(id.namespace(), resolveConfigPath(id)).save(config)
-    }
-    
-    /**
-     * Registers custom [serializers] for configs of [addon].
-     */
-    fun registerSerializers(addon: Addon, serializers: TypeSerializerCollection) {
-        customSerializers.getOrPut(addon.namespace(), ::ArrayList) += serializers
-    }
-    
-    internal fun createBuilder(namespace: String): YamlConfigurationLoader.Builder =
-        YamlConfigurationLoader.builder()
-            .nodeStyle(NodeStyle.BLOCK)
-            .indent(2)
-            .defaultOptions { opts ->
-                opts.serializers { builder ->
-                    builder.registerAll(NOVA_CONFIGURATE_SERIALIZERS)
-                    customSerializers[namespace]?.forEach(builder::registerAll)
-                }
+            if (path.exists()) {
+                ConfigWatcher.watchConfig(path)
+                return path.bufferedReader().use(::readYamlAsJson)
+            } else {
+                return JsonObject(emptyMap())
             }
+        } catch (e: Exception) {
+            LOGGER.error("Failed to load config '$id': ${e.message}")
+            return null
+        }
+    }
     
-    internal fun createLoader(namespace: String, path: Path): YamlConfigurationLoader =
-        createBuilder(namespace).path(path).build()
+    override fun getLastModified(id: Key): Long {
+        val path = resolveConfigPath(id)
+        if (!path.exists())
+            return 0L
+        return path.getLastModifiedTime().toMillis()
+    }
+    
+    override fun onError(id: Key, path: List<String>, exception: SerializationException) {
+        LOGGER.error("Failed to read '${path.joinToString(" > ")}' in config '$id': ${exception.message}")
+    }
+    
+    override fun postReload() {
+        for (player in Bukkit.getOnlinePlayers()) {
+            player.updateInventory()
+        }
+        
+        for (window in WindowManager.getInstance().windows) {
+            window.sendAllDataToViewer()
+        }
+    }
+    
+}
+
+@InternalInit(stage = InternalInitStage.POST_WORLD)
+internal object ConfigValidator {
+    
+    @InitFun
+    private fun validate() {
+        CONFIGS.resolveEntries()
+    }
     
 }
 
@@ -215,7 +178,7 @@ internal object ConfigWatcher {
                 
                 withContext(BukkitDispatcher) {
                     LOGGER.info("Detected config change, reloading configs...")
-                    val reloadedConfigs = reload()
+                    val reloadedConfigs = CONFIGS.reload()
                     LOGGER.info("Reloaded configs: ${reloadedConfigs.joinToString(", ")}")
                 }
                 

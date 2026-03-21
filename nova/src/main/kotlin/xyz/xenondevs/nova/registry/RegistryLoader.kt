@@ -13,6 +13,7 @@ import xyz.xenondevs.nova.BOOTSTRAP_LIFECYCLE
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.Addon
+import xyz.xenondevs.nova.config.NovaConfigBackend
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -316,6 +317,7 @@ object RegistryLoader {
                         val reloadable = NovaRegistries.registries.values.filter { it.isReloadable }
                         val registryCount = reloadable.size
                         reloadable.forEach(::reload)
+                        NovaConfigBackend.postReload()
                         val elementCount = reloadable.sumOf { it.entrySet.get().size }
                         LOGGER.info("Reloaded $registryCount registries with a total of $elementCount elements.")
                         

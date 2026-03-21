@@ -74,6 +74,10 @@ fun Component.toPlainText(player: Player): String {
     return PlainTextComponentConverter.toPlainText(this, player.locale)
 }
 
+fun Component.toPlainText(locale: Locale): String {
+    return PlainTextComponentConverter.toPlainText(this, locale.toMinecraftLocaleCode())
+}
+
 fun Component.toPlainText(locale: String = "en_us"): String {
     return PlainTextComponentConverter.toPlainText(this, locale)
 }

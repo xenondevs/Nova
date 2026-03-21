@@ -29,7 +29,6 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
-import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.provider.NULL_PROVIDER
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
@@ -39,6 +38,7 @@ import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.EntityInteract
@@ -49,6 +49,8 @@ import xyz.xenondevs.nova.registry.Configurable
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.registry.asMixed
 import xyz.xenondevs.nova.registry.flatMap
 import xyz.xenondevs.nova.registry.map
 import xyz.xenondevs.nova.resources.builder.task.VanillaMaterialTypes
@@ -86,21 +88,54 @@ fun RegistryEntry.Paper<ItemType>.asEither(): RegistryEntry.Either<NovaItem, Ite
     RegistryEntry.either(NovaRegistries.ITEM, this)
 
 /**
+ * Converts [this] to a [RegistryEntrySet.Mixed.Direct] of [NovaItem] and [ItemType] with no Paper entries.
+ */
+fun RegistryEntrySet.Nova.Direct<NovaItem>.asMixed(): RegistryEntrySet.Mixed.Direct<NovaItem, ItemType> =
+    asMixed(RegistryKey.ITEM)
+
+/**
+ * Converts [this] to a [RegistryEntrySet.Mixed.Direct] of [NovaItem] and [ItemType] with no Nova entries.
+ */
+fun RegistryEntrySet.Paper.Direct<ItemType>.asMixed(): RegistryEntrySet.Mixed.Direct<NovaItem, ItemType> =
+    asMixed(NovaRegistries.ITEM)
+
+/**
  * Creates an [ItemStack] for the [NovaItem] without resolving the [RegistryEntry],
  * meaning that changes due to registry reloading will be reflected in the returned [ItemStack].
+ * 
+ * Cannot be called during bootstrap (pre-registry-freeze).
  */
 fun RegistryEntry.Nova<NovaItem>.createItemStack(amount: Int = 1): ItemStack =
-    createNovaItemStack(key, amount)
+    createNovaItemStack(key, amount) // TODO: it may make sense to resolve NovaItem for performance, cannot be called during bootstrap anyways
 
 /**
  * Creates an [ItemStack] for the [ItemType] of the [RegistryEntry].
+ * 
+ * Cannot be called during bootstrap (pre-registry-freeze).
  */
 fun RegistryEntry.Paper<ItemType>.createItemStack(amount: Int = 1): ItemStack =
     get().createItemStack(amount)
 
 /**
+ * Creates an [ItemStack] for the value of this [RegistryEntry.Either], using [NovaItem.createItemStack] if it is a [NovaItem],
+ * or using [ItemType.createItemStack] if it is an [ItemType].
+ * 
+ * If it is a [NovaItem], the returned [ItemStack] will reflect registry reloading.
+ * 
+ * Cannot be called during bootstrap (pre-registry-freeze).
+ */
+fun RegistryEntry.Either<NovaItem, ItemType>.createItemStack(amount: Int = 1): ItemStack =
+    when(val value = get()) {
+        is NovaItem -> value.createItemStack(amount)
+        is ItemType -> value.createItemStack(amount)
+        else -> throw AssertionError()
+    }
+
+/**
  * Maps [this][RegistryEntry.Either] to a [Provider] of an [ItemStack] using [NovaItem.createItemStack]
  * if it is a [NovaItem], or using [ItemType.createItemStack] if it is an [ItemType].
+ * 
+ * Can be called during bootstrap (pre-registry-freeze).
  */
 fun RegistryEntry.Either<NovaItem, ItemType>.mapToItemStack(amount: Int = 1): Provider<ItemStack> =
     map({ it.createItemStack() }, { it.createItemStack() })
@@ -109,6 +144,8 @@ fun RegistryEntry.Either<NovaItem, ItemType>.mapToItemStack(amount: Int = 1): Pr
  * Maps [this][RegistryEntry.Either] to a [Provider] of an [ItemProvider] that is either the
  * [NovaItem.clientsideProvider] if it is a [NovaItem], or an [ItemWrapper] of the [ItemType's][ItemType]
  * [ItemStack] if it is an [ItemType].
+ * 
+ * Can be called during bootstrap (pre-registry-freeze).
  */
 val RegistryEntry.Either<NovaItem, ItemType>.clientsideProvider: Provider<ItemProvider>
     get() = flatMap({ it.clientsideProvider }, { provider(ItemWrapper(it.createItemStack())) })
@@ -147,7 +184,7 @@ class NovaItem internal constructor(
      */
     val isHidden: Boolean,
     block: RegistryEntry.Nova<NovaBlock>?,
-    override val config: Provider<CommentedConfigurationNode>,
+    override val config: ConfigProvider,
     /**
      * The visual style of the tooltip of this [NovaItem].
      * May be `null` if no custom style is set.

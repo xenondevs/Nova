@@ -31,7 +31,10 @@ import xyz.xenondevs.nova.registry.registryEntrySetOf
  * so it can only be used for JSON.
  */
 open class NovaRegistryEntrySetSerializer<T : NovaRegistryElement<T>>(
-    registry: NovaRegistry<T>
+    /**
+     * The registry this serializer is for.
+     */
+    val registry: NovaRegistry<T>
 ) : JsonTransformingSerializer<RegistryEntrySet.Nova<T>>(
     BackingNovaRegistryElementSerializer(registry)
 ) {
@@ -98,10 +101,16 @@ private class BackingNovaRegistryElementSerializer<T : NovaRegistryElement<T>>(
  * so it can only be used for JSON.
  */
 open class PaperRegistryEntrySetSerializer<T : Keyed>(
-    registry: RegistryKey<T>,
-    registryAccess: RegistryAccess = RegistryAccess.registryAccess()
+    /**
+     * The registry this serializer is for.
+     */
+    val registryKey: RegistryKey<T>,
+    /**
+     * The registry access to retrieve the registry from.
+     */
+    val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
 ) : JsonTransformingSerializer<RegistryEntrySet.Paper<T>>(
-    BackingPaperRegistryElementSerializer(registry, registryAccess)
+    BackingPaperRegistryElementSerializer(registryKey, registryAccess)
 ) {
     
     final override fun transformDeserialize(element: JsonElement): JsonElement {
@@ -137,12 +146,16 @@ private class BackingPaperRegistryElementSerializer<T : Keyed>(
     
     override fun deserialize(decoder: Decoder): RegistryEntrySet.Paper<T> {
         val elements = delegate.deserialize(decoder)
-        if (elements.size == 1 && elements[0].startsWith("#")) {
-            return registryEntrySetOf(TagKey.create(registry, KeySerializer.parseKey(elements[0].substring(1))), registryAccess)
-        } else {
-            if (elements.any { it.startsWith("#") })
-                throw SerializationException("Cannot have multiple tags or values mixed with tags (got $elements)")
-            return registryEntrySetOf(elements.map { TypedKey.create(registry, KeySerializer.parseKey(it)) }, registryAccess)
+        try {
+            if (elements.size == 1 && elements[0].startsWith("#")) {
+                return registryEntrySetOf(TagKey.create(registry, KeySerializer.parseKey(elements[0].substring(1))), registryAccess)
+            } else {
+                if (elements.any { it.startsWith("#") })
+                    throw SerializationException("Cannot have multiple tags or values mixed with tags (got $elements)")
+                return registryEntrySetOf(elements.map { TypedKey.create(registry, KeySerializer.parseKey(it)) }, registryAccess)
+            }
+        } catch (e: NoSuchElementException) {
+            throw SerializationException(e.message, e)
         }
     }
     
@@ -160,11 +173,20 @@ private class BackingPaperRegistryElementSerializer<T : Keyed>(
  * so it can only be used for JSON.
  */
 open class MixedRegistryEntrySetSerializer<N : NovaRegistryElement<N>, P : Keyed>(
-    novaRegistry: NovaRegistry<N>,
-    paperRegistry: RegistryKey<P>,
-    registryAccess: RegistryAccess = RegistryAccess.registryAccess()
+    /**
+     * The Nova registry this serializer is for.
+     */
+    val novaRegistry: NovaRegistry<N>,
+    /**
+     * The Paper registry this serializer is for.
+     */
+    val paperRegistryKey: RegistryKey<P>,
+    /**
+     * The registry access to retrieve the Paper registry from.
+     */
+    val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
 ) : JsonTransformingSerializer<RegistryEntrySet.Mixed<N, P>>(
-    BackingMixedRegistryEntrySetSerializer(novaRegistry, paperRegistry, registryAccess)
+    BackingMixedRegistryEntrySetSerializer(novaRegistry, paperRegistryKey, registryAccess)
 ) {
     
     final override fun transformDeserialize(element: JsonElement): JsonElement {
@@ -201,14 +223,18 @@ private class BackingMixedRegistryEntrySetSerializer<N : NovaRegistryElement<N>,
     
     override fun deserialize(decoder: Decoder): RegistryEntrySet.Mixed<N, P> {
         val elements = delegate.deserialize(decoder)
-        if (elements.size == 1 && elements[0].startsWith("#")) {
-            val tagKey = KeySerializer.parseKey(elements[0].substring(1))
-            return registryEntrySetOf(tagKey, novaRegistry, paperRegistry, registryAccess)
-        } else {
-            if (elements.any { it.startsWith("#") })
-                throw SerializationException("Cannot have multiple tags or values mixed with tags (got $elements)")
-            val entries = elements.map { RegistryEntry.either(KeySerializer.parseKey(it), novaRegistry, paperRegistry, registryAccess) }
-            return registryEntrySetOf(entries, novaRegistry, paperRegistry)
+        try {
+            if (elements.size == 1 && elements[0].startsWith("#")) {
+                val tagKey = KeySerializer.parseKey(elements[0].substring(1))
+                return registryEntrySetOf(tagKey, novaRegistry, paperRegistry, registryAccess)
+            } else {
+                if (elements.any { it.startsWith("#") })
+                    throw SerializationException("Cannot have multiple tags or values mixed with tags (got $elements)")
+                val entries = elements.map { RegistryEntry.either(KeySerializer.parseKey(it), novaRegistry, paperRegistry, registryAccess) }
+                return registryEntrySetOf(entries, novaRegistry, paperRegistry)
+            }
+        } catch (e: NoSuchElementException) {
+            throw SerializationException(e.message, e)
         }
     }
     

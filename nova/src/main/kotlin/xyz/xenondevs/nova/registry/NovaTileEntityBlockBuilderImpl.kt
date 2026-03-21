@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.registry
 
-import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.config.CONFIGS
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.TileEntityConstructor
@@ -26,7 +26,7 @@ internal class NovaTileEntityBlockBuilderImpl(
         tickrate,
         stateProperties,
         NovaItemBuilderImpl.blockItems[entry],
-        Configs[configId],
+        CONFIGS[configId],
         blockStates
     )
     

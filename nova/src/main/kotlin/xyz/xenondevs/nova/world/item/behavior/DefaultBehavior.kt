@@ -7,11 +7,11 @@ import io.papermc.paper.datacomponent.item.ItemEnchantments.itemEnchantments
 import io.papermc.paper.datacomponent.item.ItemLore.lore
 import io.papermc.paper.datacomponent.item.TooltipDisplay.tooltipDisplay
 import io.papermc.paper.datacomponent.item.attribute.AttributeModifierDisplay
+import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.core.component.DataComponents
-import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Entity
@@ -21,23 +21,19 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
-import org.slf4j.Logger
-import org.spongepowered.configurate.CommentedConfigurationNode
-import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.config.node
+import xyz.xenondevs.nova.config.ConfigProvider
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.util.component.adventure.toNmsStyle
-import xyz.xenondevs.nova.util.data.get
-import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.item.update
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.util.toNamespacedKey
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.DataComponentMap
@@ -54,7 +50,7 @@ internal class DefaultBehavior(
     lore: Provider<List<Component>>,
     tooltipStyle: Provider<TooltipStyle?>,
     maxStackSize: Provider<Int>,
-    config: Provider<CommentedConfigurationNode>,
+    config: ConfigProvider,
 ) : ItemBehavior {
     
     private val style by style.map { it.toNmsStyle() }
@@ -152,48 +148,32 @@ internal class DefaultBehavior(
     
 }
 
-private fun loadConfiguredAttributeModifiers(key: Key, config: Provider<ConfigurationNode>): Provider<ItemAttributeModifiers> =
-    config.node("attribute_modifiers").map { node ->
-        if (node.virtual())
-            return@map itemAttributes().build()
-        
+@Serializable
+private class AttributesSurrogate(
+    val id: Key? = null,
+    val attribute: Attribute,
+    val operation: AttributeModifier.Operation,
+    val value: Double,
+    val display: AttributeModifierDisplay = AttributeModifierDisplay.reset()
+)
+
+private fun loadConfiguredAttributeModifiers(key: Key, config: ConfigProvider): Provider<ItemAttributeModifiers> =
+    config.entry<Map<EquipmentSlotGroup, AttributesSurrogate>>(emptyMap(), "attribute_modifiers").map {
         val builder = itemAttributes()
-        for ((slotName, attributesNode) in node.childrenMap()) {
-            try {
-                val slotGroup = EquipmentSlotGroup.getByName(slotName as String)
-                    ?: throw IllegalArgumentException("Unknown equipment slot group: $slotName")
-                
-                for ((idx, attributeNode) in attributesNode.childrenList().withIndex()) {
-                    try {
-                        val id = attributeNode.node("id").get<String>()
-                            ?: "${key.namespace()}:${key.value()}_${slotGroup.toString().lowercase()}_$idx"
-                        val attribute = attributeNode.node("attribute").get<Attribute>()
-                            ?: throw NoSuchElementException("Missing value 'attribute'")
-                        val operation = attributeNode.node("operation").get<AttributeModifier.Operation>()
-                            ?: throw NoSuchElementException("Missing value 'operation'")
-                        val value = attributeNode.node("value").get<Double>()
-                            ?: throw NoSuchElementException("Missing value 'value'")
-                        val display = attributeNode.node("display").get<AttributeModifierDisplay>()
-                            ?: AttributeModifierDisplay.reset()
-                        
-                        builder.addModifier(
-                            attribute,
-                            AttributeModifier(
-                                NamespacedKey.fromString(id) ?: throw IllegalArgumentException("Illegal id: $id"),
-                                value,
-                                operation,
-                                slotGroup
-                            ),
-                            display
-                        )
-                    } catch (e: Exception) {
-                        LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $key, $slotGroup with index $idx", e)
-                    }
-                }
-            } catch (e: Exception) {
-                LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $key", e)
-            }
+        for ((slotGroup, attributes) in it) {
+            val id = attributes.id
+                ?: Key.key(key.namespace(), "${key.value()}_${slotGroup.toString().lowercase()}")
+            
+            builder.addModifier(
+                attributes.attribute,
+                AttributeModifier(
+                    id.toNamespacedKey(),
+                    attributes.value,
+                    attributes.operation,
+                    slotGroup
+                ),
+                attributes.display
+            )
         }
-        
         return@map builder.build()
     }

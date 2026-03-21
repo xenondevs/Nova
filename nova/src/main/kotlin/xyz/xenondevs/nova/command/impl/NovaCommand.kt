@@ -32,7 +32,6 @@ import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
-import xyz.xenondevs.invui.window.WindowManager
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.command.Command
@@ -48,7 +47,8 @@ import xyz.xenondevs.nova.command.get
 import xyz.xenondevs.nova.command.player
 import xyz.xenondevs.nova.command.requiresPermission
 import xyz.xenondevs.nova.command.requiresPlayer
-import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.config.CONFIGS
+import xyz.xenondevs.nova.config.NovaConfigBackend
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.registry.MutableNovaRegistry
@@ -245,7 +245,7 @@ internal object NovaCommand : Command() {
     private fun reloadConfigs(ctx: CommandContext<CommandSourceStack>) {
         try {
             ctx.source.sender.sendMessage(Component.translatable("command.nova.reload_configs.start", NamedTextColor.GRAY))
-            val reloadedConfigs = Configs.reload()
+            val reloadedConfigs = CONFIGS.reload()
             if (reloadedConfigs.isNotEmpty()) {
                 ctx.source.sender.sendMessage(Component.translatable(
                     "command.nova.reload_configs.success", NamedTextColor.GRAY,
@@ -290,13 +290,7 @@ internal object NovaCommand : Command() {
             ))
         }
         
-        for (player in Bukkit.getOnlinePlayers()) {
-            player.updateInventory()
-        }
-        
-        for (window in WindowManager.getInstance().windows) {
-            window.sendAllDataToViewer()
-        }
+        NovaConfigBackend.postReload()
     }
     
     @OptIn(DelicateCoroutinesApi::class)

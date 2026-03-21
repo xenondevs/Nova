@@ -6,7 +6,7 @@ import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
-import xyz.xenondevs.nova.serialization.kotlinx.UUIDSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.UUIDAsStringSerializer
 import java.util.*
 import kotlin.math.floor
 
@@ -37,7 +37,7 @@ val Block.chunkPos: ChunkPos
  */
 @Serializable
 data class ChunkPos(
-    @Serializable(with = UUIDSerializer::class)
+    @Serializable(with = UUIDAsStringSerializer::class)
     val worldUUID: UUID,
     val x: Int,
     val z: Int

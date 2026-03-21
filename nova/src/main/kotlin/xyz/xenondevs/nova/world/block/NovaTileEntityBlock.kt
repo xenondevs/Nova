@@ -1,10 +1,12 @@
 package xyz.xenondevs.nova.world.block
 
+import kotlinx.serialization.json.JsonObject
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
@@ -28,7 +30,7 @@ class NovaTileEntityBlock internal constructor(
     val tickrate: Int,
     properties: List<ScopedBlockStateProperty<*>>,
     item: Provider<RegistryEntry.Nova<NovaItem>?>,
-    config: Provider<CommentedConfigurationNode>,
+    config: ConfigProvider,
     blockStates: List<NovaBlockState>
 ) : NovaBlock(entry, name, style, behaviors, properties, item, config, blockStates) {
     

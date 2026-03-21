@@ -47,7 +47,7 @@ import org.bukkit.entity.Wolf
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.BOOTSTRAP_LIFECYCLE
-import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.config.CONFIGS
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.resources.builder.layout.equipment.AnimatedEquipmentLayoutBuilder
@@ -337,7 +337,7 @@ abstract class Registrar internal constructor() : Namespaced {
         RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_CATEGORY, key(this, name), ::ToolCategory)
     
     fun registerToolTier(name: String): RegistryEntry.Nova<ToolTier> =
-        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_TIER, key(this, name)) { ToolTier(it, Configs["${it.key.namespace()}:tool_levels"].entry(it.key.value())) }
+        RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_TIER, key(this, name)) { ToolTier(it, CONFIGS["${it.key.namespace()}:tool_levels"].entry(0.0, it.key.value())) }
     
     fun registerToolTier(name: String, level: Double): RegistryEntry.Nova<ToolTier> =
         RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_TIER, key(this, name)) { ToolTier(it, provider(level)) }

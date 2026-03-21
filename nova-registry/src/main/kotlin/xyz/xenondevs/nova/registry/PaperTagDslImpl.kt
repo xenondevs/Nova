@@ -7,6 +7,7 @@ import io.papermc.paper.registry.tag.TagKey
 import io.papermc.paper.tag.PreFlattenTagRegistrar
 import io.papermc.paper.tag.TagEntry
 import org.bukkit.Keyed
+import xyz.xenondevs.commons.collections.mapToSet
 
 /**
  * Registers a pre-flatten [LifecycleEvents.TAGS] that applies [modify] to [tag].
@@ -16,7 +17,7 @@ fun <T : Keyed> LifecycleEventManager<BootstrapContext>.modifyTag(
     priority: Int = 0,
     modify: TagBuilder.Paper<T>.() -> Unit
 ) {
-     registerEventHandler(LifecycleEvents.TAGS.preFlatten(tag.registryKey()).newHandler { event ->
+    registerEventHandler(LifecycleEvents.TAGS.preFlatten(tag.registryKey()).newHandler { event ->
         PaperTagsBuilderImpl(tag).apply(modify).apply(event.registrar())
     }.priority(priority))
 }
@@ -28,11 +29,11 @@ private class PaperTagsBuilderImpl<T : Keyed>(
     private val ops = mutableListOf<TagOperation<T>>()
     
     override fun add(entries: Iterable<RegistryEntry.Paper<T>>) {
-        ops += TagOperation.Add(entries.mapTo(LinkedHashSet()) { TagEntry.valueEntry(it.key, true) })
+        ops += TagOperation.Add(entries.mapToSet { TagEntry.valueEntry(it.key, true) })
     }
     
     override fun remove(entries: Iterable<RegistryEntry.Paper<T>>) {
-        ops += TagOperation.Remove(entries.mapTo(LinkedHashSet()) { TagEntry.valueEntry(it.key, true) })
+        ops += TagOperation.Remove(entries.mapToSet { TagEntry.valueEntry(it.key, true) })
     }
     
     override fun add(tag: RegistryEntrySet.Paper.Tag<T>) {

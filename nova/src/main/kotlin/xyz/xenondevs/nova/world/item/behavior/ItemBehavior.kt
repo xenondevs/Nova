@@ -14,9 +14,9 @@ import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.EntityInteract
@@ -194,6 +194,6 @@ fun interface ItemBehaviorFactory<T : ItemBehavior> : ItemBehaviorHolder {
     /**
      * Creates a new [ItemBehavior] for [entry] configured by [config].
      */
-    fun create(entry: RegistryEntry.Nova<NovaItem>, config: Provider<ConfigurationNode>): T
+    fun create(entry: RegistryEntry.Nova<NovaItem>, config: ConfigProvider): T
     
 }

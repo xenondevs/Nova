@@ -29,8 +29,14 @@ import org.bukkit.Keyed
  * so it can only be used for JSON.
  */
 open class RegistryKeySetSerializer<T : Keyed>(
-    registryKey: RegistryKey<T>,
-    registryAccess: RegistryAccess = RegistryAccess.registryAccess()
+    /**
+     * The registry this serializer is for.
+     */
+    val registryKey: RegistryKey<T>,
+    /**
+     * The registry access to retrieve the registry from.
+     */
+    val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
 ) : JsonTransformingSerializer<RegistryKeySet<T>>(
     BackingRegistryKeySetSerializer(registryKey, registryAccess)
 ) {

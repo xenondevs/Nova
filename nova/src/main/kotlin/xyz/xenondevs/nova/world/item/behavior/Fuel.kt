@@ -2,8 +2,7 @@ package xyz.xenondevs.nova.world.item.behavior
 
 import org.bukkit.Material
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.entryOrElse
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
 import xyz.xenondevs.nova.util.unwrap
 import net.minecraft.world.item.ItemStack as MojangStack
@@ -13,13 +12,14 @@ import org.bukkit.inventory.ItemStack as BukkitStack
  * Creates a factory for [Fuel] behaviors using the given values, if not specified otherwise in the item's config.
  *
  * @param burnTime The burn time of the fuel, in ticks.
- * Used when `burn_time` is not specified in the item's config, or `null` to require the presence of a config entry.
+ * Defaults to `20` (1 second).
+ * Used when `burn_time` is not specified in the item's config.
  */
 @Suppress("FunctionName")
 fun Fuel(
-    burnTime: Int? = null
+    burnTime: Int = 20
 ) = ItemBehaviorFactory { _, cfg ->
-    Fuel(cfg.entryOrElse(burnTime, "burn_time"))
+    Fuel(cfg.entry(burnTime, "burn_time"))
 }
 
 /**
@@ -33,13 +33,6 @@ class Fuel(burnTime: Provider<Int>) : ItemBehavior {
      * The burn time of this fuel, in ticks.
      */
     val burnTime: Int by burnTime
-    
-    /**
-     * Allows items to be used as fuel in furnaces.
-     *
-     * @param burnTime The burn time of this fuel, in ticks.
-     */
-    constructor(burnTime: Int) : this(provider(burnTime))
     
     override fun toString(itemStack: BukkitStack): String {
         return "Fuel(burnTime=$burnTime)"

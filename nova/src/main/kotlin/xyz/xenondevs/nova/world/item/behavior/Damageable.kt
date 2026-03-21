@@ -13,7 +13,7 @@ import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.orElse
-import xyz.xenondevs.nova.config.entryOrElse
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.config.optionalEntry
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
@@ -22,33 +22,38 @@ import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
  * Creates a factory for [Damageable] behaviors using the given values, if not specified otherwise in the item's config.
  *
  * @param maxDurability The maximum durability of the item.
- * Used when `max_durability` is not specified in the item's config, or `null` to require the presence of a config entry.
+ * Defaults to `1`.
+ * Used when `max_durability` is not specified in the item's config.
  *
  * @param itemDamageOnAttackEntity The amount of damage the item receives when attacking an entity.
+ * Defaults to `1`.
  * Used when `item_damage_on_attack_entity` is not specified in the item's config.
  *
  * @param itemDamageOnBreakBlock The amount of damage the item receives when breaking a block.
+ * Defaults to `1`.
  * Used when `item_damage_on_break_block` is not specified in the item's config.
  *
  * @param repairIngredient The ingredient required to repair the item. Can be null for items that cannot be repaired.
+ * Defaults to `null`.
  * Used when `repair_ingredient` is not specified in the item's config.
- * 
- * @param breakSound The break sound that is played when the item breaks. Defaults to `minecraft:entity.item.break`.
+ *
+ * @param breakSound The break sound that is played when the item breaks.
+ * Defaults to `minecraft:entity.item.break`.
  * Used when `break_sound` is not specified in the item's config.
  */
 fun Damageable(
-    maxDurability: Int? = null,
-    itemDamageOnAttackEntity: Int = 0,
-    itemDamageOnBreakBlock: Int = 0,
+    maxDurability: Int = 1,
+    itemDamageOnAttackEntity: Int = 1,
+    itemDamageOnBreakBlock: Int = 1,
     repairIngredient: RecipeChoice? = null,
     breakSound: Key = SoundEventKeys.ENTITY_ITEM_BREAK
 ) = ItemBehaviorFactory { _, cfg ->
     Damageable(
-        cfg.entryOrElse(maxDurability, arrayOf("max_durability"), arrayOf("durability")),
-        cfg.entryOrElse(itemDamageOnAttackEntity, "item_damage_on_attack_entity"),
-        cfg.entryOrElse(itemDamageOnBreakBlock, "item_damage_on_break_block"),
+        cfg.entry(maxDurability, listOf("max_durability"), listOf("durability")),
+        cfg.entry(itemDamageOnAttackEntity, "item_damage_on_attack_entity"),
+        cfg.entry(itemDamageOnBreakBlock, "item_damage_on_break_block"),
         cfg.optionalEntry<RecipeChoice>("repair_ingredient").orElse(repairIngredient),
-        cfg.entryOrElse(breakSound, "break_sound")
+        cfg.entry(breakSound, "break_sound")
     )
 }
 

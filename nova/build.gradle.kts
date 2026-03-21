@@ -25,6 +25,7 @@ dependencies {
     api(origamiLibs.mixin)
     api(origamiLibs.mixinextras)
     api(project(":nova-registry"))
+    api(project(":nova-config"))
 
     // internal dependencies
     compileOnly(project(":nova-api"))
@@ -70,6 +71,7 @@ loaderJar {
     novaInput = tasks.named<Jar>("origamiJar").flatMap { it.archiveFile }
     input.from(
         project.provider { project(":nova-api").tasks.named<Jar>("jar").map { it.archiveFile } },
+        project.provider { project(":nova-config").tasks.named<Jar>("jar").map { it.archiveFile } },
         project.provider { project(":nova-registry").tasks.named<Jar>("jar").map { it.archiveFile } },
         project.provider {
             rootProject.subprojects

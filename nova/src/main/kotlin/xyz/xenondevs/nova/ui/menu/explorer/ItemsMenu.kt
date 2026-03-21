@@ -56,7 +56,6 @@ import xyz.xenondevs.nova.ui.overlay.guitexture.component
 import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.addItemCorrectly
-import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.CategorizedItem
@@ -162,7 +161,7 @@ internal class ItemsMenu private constructor(val player: Player) {
                             'u' by scrollUpItem()
                             '|' by scrollerItem()
                             'd' by scrollDownItem()
-                            content by category.items.map { i -> categorizedItemButton(i, cheatMode) }
+                            content by category.categorizedItems.map { items -> items.map { i -> categorizedItemButton(i, cheatMode) } }
                         }
                     } + gui(
                         ". x x x x x x x h",
@@ -267,7 +266,7 @@ private fun filterItems(player: Player, filter: String, obtainableItems: List<Ca
     
     val names = obtainableItems
         .asSequence()
-        .map { it to it.name.toPlainText(player) }
+        .map { it to it.getPlainTextName(player.locale()) }
         .filter { (_, name) -> name.contains(filter, true) }
         .toMap(HashMap())
     val scores = FuzzySearch.extractAll(filter, names.values).associateTo(HashMap()) { it.string to it.score }
@@ -301,7 +300,7 @@ private fun categorizedItemButton(item: CategorizedItem, cheatMode: Provider<Boo
                 }
             }
         } else {
-            handleRecipeChoiceClick(item.id, Click(player, clickType, hotbarButton))
+            handleRecipeChoiceClick(item.key.asString(), Click(player, clickType, hotbarButton))
         }
     }
 }
@@ -345,7 +344,7 @@ private fun cheatModeButton(cheatMode: MutableProvider<Boolean>) = item {
 }
 
 private fun itemCategoryTabButton(tab: Int, category: ItemCategory, activeTab: MutableProvider<Int>) = item {
-    itemProvider by category.icon
+    itemProvider by category.iconProvider
     onClick {
         if (clickType.isLeftClick && activeTab.get() != tab) {
             player.playClickSound()

@@ -7,6 +7,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.world.InteractionHand
@@ -17,10 +18,10 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.nova.LOGGER
+import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
@@ -85,7 +86,7 @@ open class NovaBlock internal constructor(
      */
     val stateProperties: List<ScopedBlockStateProperty<*>>,
     item: Provider<RegistryEntry.Nova<NovaItem>?>,
-    override val config: Provider<CommentedConfigurationNode>,
+    override val config: ConfigProvider,
     /**
      * A list of all possible [NovaBlockStates][NovaBlockState] of this [NovaBlock]
      */

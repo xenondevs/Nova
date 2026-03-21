@@ -18,7 +18,10 @@ import xyz.xenondevs.nova.registry.RegistryEntry
  * Open base class for specialized [RegistryEntry.Nova] serializers.
  */
 open class NovaRegistryEntrySerializer<T : NovaRegistryElement<T>>(
-    private val registry: NovaRegistry<T>
+    /**
+     * The registry this serializer is for.
+     */
+    val registry: NovaRegistry<T>
 ) : KSerializer<RegistryEntry.Nova<T>> {
     
     final override val descriptor = PrimitiveSerialDescriptor(
@@ -45,12 +48,18 @@ open class NovaRegistryEntrySerializer<T : NovaRegistryElement<T>>(
  * Open base class for specialized [RegistryEntry.Paper] serializers.
  */
 open class PaperRegistryEntrySerializer<T : Keyed>(
-    private val registry: RegistryKey<T>,
-    private val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
+    /**
+     * The registry this serializer is for.
+     */
+    val registryKey: RegistryKey<T>,
+    /**
+     * The registry access to retrieve the registry from.
+     */
+    val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
 ) : KSerializer<RegistryEntry.Paper<T>> {
     
     final override val descriptor = PrimitiveSerialDescriptor(
-        "xyz.xenondevs.nova.PaperRegistryEntrySerializer.${registry.key().asString()}",
+        "xyz.xenondevs.nova.PaperRegistryEntrySerializer.${registryKey.key().asString()}",
         PrimitiveKind.STRING
     )
     
@@ -60,20 +69,33 @@ open class PaperRegistryEntrySerializer<T : Keyed>(
     
     final override fun deserialize(decoder: Decoder): RegistryEntry.Paper<T> {
         val key = KeySerializer.deserialize(decoder)
-        return RegistryEntry.paper(TypedKey.create(registry, key), registryAccess)
+        try {
+            return RegistryEntry.paper(TypedKey.create(registryKey, key), registryAccess)
+        } catch (e: NoSuchElementException) {
+            throw SerializationException(e.message, e)
+        }
     }
     
 }
 
 /**
  * Open base class for specialized [RegistryEntry.Either] serializers.
- * 
+ *
  * In case an entry exists in both the Nova and Paper registry, the Nova registry takes precedence.
  */
 open class EitherRegistryEntrySerializer<N : NovaRegistryElement<N>, P : Keyed>(
-    private val novaRegistry: NovaRegistry<N>,
-    private val paperRegistry: RegistryKey<P>,
-    private val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
+    /**
+     * The Nova registry this serializer is for.
+     */
+    val novaRegistry: NovaRegistry<N>,
+    /**
+     * The Paper registry this serializer is for.
+     */
+    val paperRegistryKey: RegistryKey<P>,
+    /**
+     * The registry access to retrieve the Paper registry from.
+     */
+    val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
 ) : KSerializer<RegistryEntry.Either<N, P>> {
     
     final override val descriptor = PrimitiveSerialDescriptor(
@@ -87,7 +109,11 @@ open class EitherRegistryEntrySerializer<N : NovaRegistryElement<N>, P : Keyed>(
     
     final override fun deserialize(decoder: Decoder): RegistryEntry.Either<N, P> {
         val key = KeySerializer.deserialize(decoder)
-        return RegistryEntry.either(key, novaRegistry, paperRegistry, registryAccess)
+        try {
+            return RegistryEntry.either(key, novaRegistry, paperRegistryKey, registryAccess)
+        } catch (e: NoSuchElementException) {
+            throw SerializationException(e.message, e)
+        }
     }
     
 }

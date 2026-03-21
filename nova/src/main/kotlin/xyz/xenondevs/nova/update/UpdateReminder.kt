@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
@@ -19,6 +20,8 @@ import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.addon.name
 import xyz.xenondevs.nova.addon.version
 import xyz.xenondevs.nova.config.MAIN_CONFIG
+import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.config.strongEntry
 import xyz.xenondevs.nova.config.strongNode
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
@@ -34,6 +37,12 @@ private val NOVA_DISTRIBUTORS = listOf(
     ProjectDistributor.modrinth("nova-framework")
 )
 
+@Serializable
+private data class UpdateReminderSettings(
+    val enabled: Boolean,
+    val interval: Long
+)
+
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
     dispatcher = Dispatcher.ASYNC
@@ -46,23 +55,19 @@ internal object UpdateReminder : Listener {
     
     @InitFun
     private fun init() {
-        val cfg = MAIN_CONFIG.strongNode("update_reminder")
-        cfg.subscribe(::reload)
-        reload(cfg.get())
+        MAIN_CONFIG.strongEntry<UpdateReminderSettings>("update_reminder")
+            .subscribe(::reload)
     }
     
-    private fun reload(cfg: ConfigurationNode) {
-        val enabled = cfg.node("enabled").boolean
-        val interval = cfg.node("interval").long
-        
-        if (job == null && enabled) {
+    private fun reload(cfg: UpdateReminderSettings) {
+        if (job == null && cfg.enabled) {
             // Enable reminder
             registerEvents()
             job = CoroutineScope(AsyncExecutor.SUPERVISOR).launch {
                 checkForUpdates()
-                delay(interval)
+                delay(cfg.interval)
             }
-        } else if (job != null && !enabled) {
+        } else if (job != null && !cfg.enabled) {
             // Disable reminder
             unregisterEvents()
             job?.cancel()

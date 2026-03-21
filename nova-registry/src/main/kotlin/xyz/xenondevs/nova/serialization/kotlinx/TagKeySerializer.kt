@@ -15,7 +15,10 @@ import org.bukkit.Keyed
  * Serializes the key as a string of `#namespace:value`.
  */
 open class TagKeySerializer<T : Keyed>(
-    private val registryKey: RegistryKey<T>
+    /**
+     * The registry this serializer is for.
+     */
+    val registryKey: RegistryKey<T>
 ) : KSerializer<TagKey<T>> {
     
     final override val descriptor = PrimitiveSerialDescriptor(

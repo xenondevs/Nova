@@ -7,7 +7,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.config.entryOrElse
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
@@ -22,19 +22,22 @@ private val ENERGY_KEY = Key.key("nova", "energy")
  * Creates a factory for [Chargeable] behaviors using the given values, if not specified otherwise in the item's config.
  *
  * @param maxEnergy The maximum amount of energy the item can store.
- * Used when `max_energy` is not specified in the config, or `null` to require the presence of a config entry.
+ * Defaults to `1`.
+ * Used when `max_energy` is not specified in the config.
  *
  * @param affectsItemDurability Whether the item's durability bar should be used to visualize the amount
- * of energy stored in the item. Used when `charge_affects_item_durability` is not specified in the config.
+ * of energy stored in the item. 
+ * Defaults to `true`.
+ * Used when `charge_affects_item_durability` is not specified in the config.
  */
 @Suppress("FunctionName")
 fun Chargeable(
-    maxEnergy: Long? = null,
+    maxEnergy: Long = 1L,
     affectsItemDurability: Boolean = true
 ) = ItemBehaviorFactory<Chargeable> { _, cfg ->
     Chargeable.Default(
-        cfg.entryOrElse(maxEnergy, "max_energy"),
-        cfg.entryOrElse<Boolean>(affectsItemDurability, "charge_affects_item_durability")
+        cfg.entry(maxEnergy, "max_energy"),
+        cfg.entry(affectsItemDurability, "charge_affects_item_durability")
     )
 }
 
