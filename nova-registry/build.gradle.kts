@@ -10,9 +10,9 @@ dependencies {
     api(libs.paper.api)
     api(libs.commons.provider)
     api(libs.kotlinx.serialization.json)
-    api(libs.configurate.yaml)
     api(libs.cosmicBinaryFormat)
     ksp(project(":nova-ksp:processor:registry"))
+    implementation(libs.commons.collections)
     testImplementation(libs.mockbukkit)
 }
 

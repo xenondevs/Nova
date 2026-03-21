@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.NULL_PROVIDER
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.config.CONFIGS
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
 import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
@@ -104,7 +104,7 @@ internal class NovaItemBuilderImpl(
     }
     
     override fun build(): NovaItem {
-        val config = Configs[configId]
+        val config = CONFIGS[configId]
         
         val behaviors = buildList {
             this += DefaultBehavior(
@@ -136,7 +136,7 @@ internal class NovaItemBuilderImpl(
             craftingRemainingItem,
             isHidden,
             block,
-            Configs[configId],
+            CONFIGS[configId],
             tooltipStyle
         )
     }

@@ -1,5 +1,7 @@
 package xyz.xenondevs.nova.registry
 
+import xyz.xenondevs.commons.collections.mapToSet
+
 /**
  * Builds a set of [NovaTagEntry] using the given [build] function.
  */
@@ -12,7 +14,7 @@ private class NovaTagBuilderImpl<T : NovaRegistryElement<T>> : TagBuilder.Nova<T
     val entries = mutableSetOf<NovaTagEntry<T>>()
     
     override fun add(entries: Iterable<RegistryEntry.Nova<T>>) {
-        this.entries += entries.mapTo(LinkedHashSet()) { NovaTagEntry.Direct(it) }
+        this.entries += entries.mapToSet { NovaTagEntry.Direct(it) }
     }
     
     override fun add(tag: RegistryEntrySet.Nova.Tag<T>) {
@@ -20,7 +22,7 @@ private class NovaTagBuilderImpl<T : NovaRegistryElement<T>> : TagBuilder.Nova<T
     }
     
     override fun remove(entries: Iterable<RegistryEntry.Nova<T>>) {
-        this.entries -= entries.mapTo(LinkedHashSet()) { NovaTagEntry.Direct(it) }
+        this.entries -= entries.mapToSet { NovaTagEntry.Direct(it) }
     }
     
     override fun remove(tag: RegistryEntrySet.Nova.Tag<T>) {

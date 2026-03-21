@@ -25,6 +25,7 @@ dependencies {
     api(origamiLibs.mixin)
     api(origamiLibs.mixinextras)
     api(project(":nova-registry"))
+    api(project(":nova-config"))
 
     // internal dependencies
     compileOnly(project(":nova-api"))
@@ -81,6 +82,7 @@ val mcVersion = libs.versions.paper.map {
 }
 
 val novaApiJar = project(":nova-api").tasks.withType<Jar>().matching { it.name == "jar" }
+val novaConfigJar = project(":nova-config").tasks.withType<Jar>().matching { it.name == "jar" }
 val novaRegistryJar = project(":nova-registry").tasks.withType<Jar>().matching { it.name == "jar" }
 val hookJars = rootProject.subprojects
     .filter { it.name.startsWith("nova-hook-") }
@@ -89,7 +91,7 @@ val hookJars = rootProject.subprojects
 loaderJar {
     gameVersion = mcVersion
     novaInput = tasks.named<Jar>("origamiJar").flatMap { it.archiveFile }
-    input.from(novaApiJar, novaRegistryJar, hookJars)
+    input.from(novaApiJar, novaConfigJar, novaRegistryJar, hookJars)
 }
 
 val resourceProperties = mapOf(

@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.initialize
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.config.NovaConfigBackend
 import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import kotlin.reflect.KClass
@@ -39,12 +40,12 @@ enum class InitStage(
     
     /**
      * Before configs are initialized.
-     * Can be used to register custom config serializers via [Configs.registerSerializers].
+     * Can be used to register custom config serializers via [xyz.xenondevs.nova.config.Configs.registerSerializers].
      */
     PRE_CONFIG(
         internalStage = InternalInitStage.PRE_WORLD,
         runBefore = setOf(
-            Configs::class
+            NovaConfigBackend::class
         )
     ),
     
@@ -53,7 +54,7 @@ enum class InitStage(
      */
     PRE_WORLD(
         internalStage = InternalInitStage.PRE_WORLD,
-        runAfter = setOf(Configs::class)
+        runAfter = setOf(NovaConfigBackend::class)
     ),
     
     /**
@@ -62,7 +63,7 @@ enum class InitStage(
     PRE_PACK(
         internalStage = InternalInitStage.PRE_WORLD,
         runAfter = setOf(
-            Configs::class
+            NovaConfigBackend::class
         ),
         runBefore = setOf(
             RegistryLoader::class,
@@ -76,7 +77,7 @@ enum class InitStage(
     POST_PACK_PRE_WORLD(
         internalStage = InternalInitStage.PRE_WORLD,
         runAfter = setOf(
-            Configs::class,
+            NovaConfigBackend::class,
             RegistryLoader::class,
             ResourceGeneration.PreWorld::class
         )

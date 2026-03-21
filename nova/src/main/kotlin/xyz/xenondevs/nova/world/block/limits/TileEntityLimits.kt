@@ -9,7 +9,8 @@ import xyz.xenondevs.nova.world.block.limits.BlockLimiter.Companion.ALLOWED
 
 internal object TileEntityLimits {
     
-    private val limiters: List<BlockLimiter>? by MAIN_CONFIG.optionalEntry<List<BlockLimiter>>("performance", "tile_entity_limits")
+    private val limiters: List<BlockLimiter>? by MAIN_CONFIG.optionalEntry<BlockLimiters>("performance", "tile_entity_limits")
+        .map { it?.toList() }
     
     fun canPlace(ctx: Context<BlockPlace>): PlaceResult {
         val block: NovaTileEntityBlock = ctx[BlockPlace.BLOCK_TYPE_NOVA] as? NovaTileEntityBlock

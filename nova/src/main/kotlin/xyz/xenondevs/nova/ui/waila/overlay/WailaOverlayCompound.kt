@@ -18,8 +18,8 @@ private val BAR_MATCH_INFO = BarMatchInfo.fromAddon(Key.key("nova", "waila"))
 
 private val MARGIN_TOP = MAIN_CONFIG.entry<Int>("waila", "positioning", "margin_top")
 private val MARGIN_BOTTOM = MAIN_CONFIG.entry<Int>("waila", "positioning", "margin_bottom")
-private val MATCH_BELOW = MAIN_CONFIG.entry<BarMatcher.CombinedAny>("waila", "positioning", "above") // bars WAILA should be above: matchers for bar below
-private val MATCH_ABOVE = MAIN_CONFIG.entry<BarMatcher.CombinedAny>("waila", "positioning", "below")  // bars WAILA should be below: matchers for bar above
+private val MATCH_BELOW = MAIN_CONFIG.entry<List<BarMatcher>>("waila", "positioning", "above").map(BarMatcher::CombinedAny) // bars WAILA should be above: matchers for bar below
+private val MATCH_ABOVE = MAIN_CONFIG.entry<List<BarMatcher>>("waila", "positioning", "below").map(BarMatcher::CombinedAny)  // bars WAILA should be below: matchers for bar above
 
 internal class WailaOverlayCompound(private val player: Player) : BossBarOverlayCompound {
     

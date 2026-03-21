@@ -4,50 +4,13 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
-import net.kyori.adventure.key.Key
-import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.commons.version.Version
-import xyz.xenondevs.nova.registry.RegistryEntry
-import xyz.xenondevs.nova.serialization.kotlinx.AbilityTypeEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.AbilityTypeSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.AttachmentTypeEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.AttachmentTypeSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.BlockStateSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.EquipmentEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.EquipmentSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.GuiTextureEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.GuiTextureSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.ItemFilterTypeEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.ItemFilterTypeSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.NetworkTypeEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.NetworkTypeSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.NovaItemEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.NovaItemSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.RecipeTypeEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.RecipeTypeSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.ToolCategoryEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.ToolCategorySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.ToolTierEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.ToolTierSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.TooltipStyleEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.TooltipStyleSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.UUIDSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.VersionSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.WailaInfoProviderEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.WailaInfoProviderSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.WailaToolIconProviderEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.WailaToolIconProviderSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.NOVA_SERIALIZERS_MODULE
 import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.data.writeJson
 import java.nio.file.Path
-import java.util.*
 import kotlin.io.path.Path
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.deleteIfExists
@@ -58,31 +21,7 @@ internal object PermanentStorage {
     
     val JSON = Json {
         allowStructuredMapKeys = true
-        serializersModule = SerializersModule {
-            contextual(UUID::class, UUIDSerializer)
-            contextual(Key::class, KeySerializer)
-            contextual(Version::class, VersionSerializer)
-            contextual(BlockState::class, BlockStateSerializer)
-            contextual(RegistryEntry.Nova::class) { typeArgs ->
-                when (typeArgs.single()) {
-                    NovaBlockSerializer -> NovaBlockEntrySerializer
-                    NovaItemSerializer -> NovaItemEntrySerializer
-                    EquipmentSerializer -> EquipmentEntrySerializer
-                    ToolTierSerializer -> ToolTierEntrySerializer
-                    ToolCategorySerializer -> ToolCategoryEntrySerializer
-                    NetworkTypeSerializer -> NetworkTypeEntrySerializer
-                    AbilityTypeSerializer -> AbilityTypeEntrySerializer
-                    AttachmentTypeSerializer -> AttachmentTypeEntrySerializer
-                    RecipeTypeSerializer -> RecipeTypeEntrySerializer
-                    GuiTextureSerializer -> GuiTextureEntrySerializer
-                    WailaInfoProviderSerializer -> WailaInfoProviderEntrySerializer
-                    WailaToolIconProviderSerializer -> WailaToolIconProviderEntrySerializer
-                    ItemFilterTypeSerializer -> ItemFilterTypeEntrySerializer
-                    TooltipStyleSerializer -> TooltipStyleEntrySerializer
-                    else -> error("No RegistryEntry.Nova serializer for element serializer: ${typeArgs.single().descriptor.serialName}")
-                }
-            }
-        }
+        serializersModule = NOVA_SERIALIZERS_MODULE
     }
     
     private val dir = Path("plugins/Nova/.internal_data/storage/")

@@ -1,5 +1,9 @@
 package xyz.xenondevs.nova.resources.builder
 
+import kotlinx.serialization.KeepGeneratedSerializer
+import kotlinx.serialization.Serializable
+import xyz.xenondevs.nova.serialization.kotlinx.RegexSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.ResourceFilterSerializer
 import xyz.xenondevs.nova.util.data.WildcardUtils
 
 /**
@@ -10,9 +14,12 @@ import xyz.xenondevs.nova.util.data.WildcardUtils
  * @param filter The regex pattern to match file paths against.
  * @param directory An optional directory to which the filter is scoped, or `null` for global application.
  */
-class ResourceFilter(
+@KeepGeneratedSerializer
+@Serializable(with = ResourceFilterSerializer::class)
+data class ResourceFilter(
     val stage: Stage,
     val type: Type,
+    @Serializable(with = RegexSerializer::class)
     val filter: Regex,
     val directory: String? = null
 ) {
@@ -40,6 +47,7 @@ class ResourceFilter(
     /**
      * The stage at which the filter is applied.
      */
+    @Serializable
     enum class Stage {
         
         /**
@@ -57,6 +65,7 @@ class ResourceFilter(
     /**
      * The type of filter.
      */
+    @Serializable
     enum class Type {
         
         /**
@@ -74,6 +83,7 @@ class ResourceFilter(
     /**
      * The type of pattern used for filtering.
      */
+    @Serializable
     enum class PatternType {
         
         /**

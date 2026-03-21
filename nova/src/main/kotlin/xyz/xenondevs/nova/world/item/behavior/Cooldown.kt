@@ -6,7 +6,7 @@ import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.nova.config.entryOrElse
+import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 
@@ -14,19 +14,21 @@ import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
  * Creates a factory for [Cooldown] behaviors using the given values, if not specified otherwise in the item's config.
  *
  * @param cooldown The cooldown, in ticks.
- * Used when `cooldown` is not specified in the item's config, or `null` to require the presence of a config entry.
+ * Defaults to `20` (1 second).
+ * Used when `cooldown` is not specified in the item's config
  *
- * @param group The cooldown group. Falls back to the item's id if not specified.
+ * @param group The cooldown group. 
+ * Falls back to the item's id if not specified.
  * Used when `cooldown_group is not specified in the item's config.
  */
 @Suppress("FunctionName")
 fun Cooldown(
-    cooldown: Int? = null,
+    cooldown: Int = 20,
     group: Key? = null
 ) = ItemBehaviorFactory { entry, cfg ->
     Cooldown(
-        cfg.entryOrElse(cooldown, "cooldown"),
-        cfg.entryOrElse(group ?: entry.key, "cooldown_group")
+        cfg.entry(cooldown, "cooldown"),
+        cfg.entry(group ?: entry.key, "cooldown_group")
     )
 }
 

@@ -18,7 +18,10 @@ import xyz.xenondevs.nova.registry.NovaRegistryElement
  * Serializes the element's [NovaRegistryElement.key] as a string of `namespace:value`.
  */
 open class NovaRegistryElementSerializer<T : NovaRegistryElement<T>>(
-    private val registry: NovaRegistry<T>
+    /**
+     * The registry this serializer is for.
+     */
+    val registry: NovaRegistry<T>
 ) : KSerializer<T> {
     
     final override val descriptor = PrimitiveSerialDescriptor(
@@ -33,7 +36,7 @@ open class NovaRegistryElementSerializer<T : NovaRegistryElement<T>>(
     final override fun deserialize(decoder: Decoder): T {
         val key = KeySerializer.deserialize(decoder)
         return registry.getValue(key)
-            ?: throw SerializationException("No element under $key in $registry")
+            ?: throw SerializationException("No element under $key in registry ${registry.key.asString()}")
     }
     
 }
@@ -43,14 +46,20 @@ open class NovaRegistryElementSerializer<T : NovaRegistryElement<T>>(
  * Serializes the element's [Keyed.key] as a string of `namespace:value`.
  */
 open class PaperRegistryElementSerializer<T : Keyed>(
-    registry: RegistryKey<T>,
-    registryAccess: RegistryAccess = RegistryAccess.registryAccess()
+    /**
+     * The registry this serializer is for.
+     */
+    val registryKey: RegistryKey<T>,
+    /**
+     * The registry access to retrieve the registry from.
+     */
+    val registryAccess: RegistryAccess = RegistryAccess.registryAccess()
 ) : KSerializer<T> {
     
-    private val registry: Registry<T> by lazy { registryAccess.getRegistry(registry) }
+    private val registry: Registry<T> by lazy { registryAccess.getRegistry(registryKey) }
     
     final override val descriptor = PrimitiveSerialDescriptor(
-        "xyz.xenondevs.nova.PaperRegistryElementSerializer.${registry.key().asString()}",
+        "xyz.xenondevs.nova.PaperRegistryElementSerializer.${registryKey.key().asString()}",
         PrimitiveKind.STRING
     )
     
@@ -61,7 +70,7 @@ open class PaperRegistryElementSerializer<T : Keyed>(
     final override fun deserialize(decoder: Decoder): T {
         val key = KeySerializer.deserialize(decoder)
         return registry.get(key)
-            ?: throw SerializationException("No element under $key in $registry")
+            ?: throw SerializationException("No element under $key in registry ${registryKey.key().asString()}")
     }
     
 }

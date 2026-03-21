@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.resources
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.jsonObject
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_VERSION
 import xyz.xenondevs.nova.addon.AddonBootstrapper
@@ -122,7 +123,7 @@ internal object ResourceGeneration {
         }
         
         // resource_pack config section
-        digest.update(MAIN_CONFIG.get().node("resource_pack").hashCode())
+        digest.update(MAIN_CONFIG.get().jsonObject["resource_pack"].hashCode())
         
         return HexFormat.of().formatHex(digest.digest())
     }

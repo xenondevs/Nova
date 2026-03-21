@@ -1,7 +1,7 @@
 package xyz.xenondevs.nova.world.item.tool
 
 import net.kyori.adventure.key.Key.key
-import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.config.CONFIGS
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
@@ -25,7 +25,7 @@ object VanillaToolTiers {
     
     private fun register(name: String): RegistryEntry.Nova<ToolTier> =
         RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_TOOL_TIER, key(name)) {
-            ToolTier(it, Configs["nova:tool_levels"].entry(name))
+            ToolTier(it, CONFIGS["nova:tool_levels"].entry(name))
         }
     
 }

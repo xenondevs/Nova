@@ -13,12 +13,18 @@ import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.nova.config.entryOrElse
+import xyz.xenondevs.commons.provider.flatten
+import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.registry.registryEntrySetOf
 import xyz.xenondevs.nova.util.toNamespacedKey
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
+import xyz.xenondevs.nova.world.item.tool.VanillaToolCategories
+import xyz.xenondevs.nova.world.item.tool.VanillaToolTiers
 
 private const val PLAYER_ATTACK_SPEED = 4.0
 private const val PLAYER_ATTACK_DAMAGE = 1.0
@@ -27,54 +33,63 @@ private const val PLAYER_ATTACK_DAMAGE = 1.0
  * Creates a factory for [Tool] behaviors using the given values, if not specified otherwise in the config.
  *
  * @param tier The [ToolTier] of the tool.
- * Used when `tool_tier` is not specified in the config, or null to require the presence of a config entry.
+ * Defaults to `VanillaToolTiers.WOOD`.
+ * Used when `tool_tier` is not specified in the config.
  *
  * @param categories The [ToolCategory] of the tool.
- * Used when `tool_category` is not specified in the config, or null to require the presence of a config entry.
+ * Defaults to `VanillaToolCategories.PICKAXE`.
+ * Used when `tool_category` is not specified in the config.
  *
  * @param breakSpeed The break speed of the tool.
- * Used when `break_speed` is not specified in the config, or null to require the presence of a config entry.
+ * Defaults to `1.0`.
+ * Used when `break_speed` is not specified in the config.
  *
  * @param attackDamage The attack damage of the tool.
- * Used when `attack_damage` is not specified in the config, or null to require the presence of a config entry.
+ * Defaults to `1.0`.
+ * Used when `attack_damage` is not specified in the config.
  *
  * @param attackSpeed The attack speed of the tool.
- * Used when `attack_speed` is not specified in the config, or null to require the presence of a config entry.
+ * Defaults to `1.0`.
+ * Used when `attack_speed` is not specified in the config.
  *
  * @param knockbackBonus The knockback bonus of the tool when attacking.
- * Defaults to `0`. Used when `knockback_bonus` is not specified in the config.
+ * Defaults to `0`.
+ * Used when `knockback_bonus` is not specified in the config.
  *
  * @param canSweepAttack Whether the tool can perform a sweep attack.
- * Defaults to `false`. Used when `can_sweep_attack` is not specified in the config.
+ * Defaults to `false`.
+ * Used when `can_sweep_attack` is not specified in the config.
  *
  * @param canBreakBlocksInCreative Whether the tool can break blocks in creative mode.
- * Defaults to `true`. Used when `can_break_blocks_in_creative` is not specified in the config.
+ * Defaults to `true`.
+ * Used when `can_break_blocks_in_creative` is not specified in the config.
  *
- * @param disableBlocking The amount of ticks to disable an attacked shield's blocking status for when attacking with this tool.
- * Defaults to `0`. Used when `disable_blocking` is not specified in the config.
+ * @param disableBlocking The number of ticks to disable an attacked shield's blocking status for when attacking with this tool.
+ * Defaults to `0`.
+ * Used when `disable_blocking` is not specified in the config.
  */
 @Suppress("FunctionName")
 fun Tool(
-    tier: ToolTier? = null,
-    categories: Set<ToolCategory>? = null,
-    breakSpeed: Double? = null,
-    attackDamage: Double? = null,
-    attackSpeed: Double? = null,
+    tier: RegistryEntry.Nova<ToolTier> = VanillaToolTiers.WOOD,
+    categories: RegistryEntrySet.Nova<ToolCategory> = registryEntrySetOf(VanillaToolCategories.PICKAXE),
+    breakSpeed: Double = 1.0,
+    attackDamage: Double = 1.0,
+    attackSpeed: Double = 1.0,
     knockbackBonus: Int = 0,
     canSweepAttack: Boolean = false,
     canBreakBlocksInCreative: Boolean = true,
     disableBlocking: Int = 0
 ) = ItemBehaviorFactory { _, cfg ->
     Tool(
-        cfg.entryOrElse(tier, arrayOf("tool_tier"), arrayOf("tool_level")),
-        cfg.entryOrElse(categories, "tool_category"),
-        cfg.entryOrElse(breakSpeed, "break_speed"),
-        cfg.entryOrElse(attackDamage, "attack_damage"),
-        cfg.entryOrElse(attackSpeed, "attack_speed"),
-        cfg.entryOrElse(knockbackBonus, "knockback_bonus"),
-        cfg.entryOrElse(canSweepAttack, "can_sweep_attack"),
-        cfg.entryOrElse(canBreakBlocksInCreative, "can_break_blocks_in_creative"),
-        cfg.entryOrElse(disableBlocking, "disable_blocking")
+        cfg.entry<RegistryEntry.Nova<ToolTier>>(tier, listOf("tool_tier"), listOf("tool_level")).flatten(),
+        cfg.entry<RegistryEntrySet.Nova<ToolCategory>>(categories, "tool_category").flatten(),
+        cfg.entry(breakSpeed, "break_speed"),
+        cfg.entry(attackDamage, "attack_damage"),
+        cfg.entry(attackSpeed, "attack_speed"),
+        cfg.entry(knockbackBonus, "knockback_bonus"),
+        cfg.entry(canSweepAttack, "can_sweep_attack"),
+        cfg.entry(canBreakBlocksInCreative, "can_break_blocks_in_creative"),
+        cfg.entry(disableBlocking, "disable_blocking")
     )
 }
 

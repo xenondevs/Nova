@@ -18,7 +18,7 @@ import kotlin.test.assertSame
 class RegistryElementBinarySerializerTest {
     
     private class TestElement(override val entry: RegistryEntry.Nova<TestElement>) : NovaRegistryElement<TestElement>
-
+    
     companion object {
         
         private lateinit var registry: MutableNovaRegistry<TestElement>

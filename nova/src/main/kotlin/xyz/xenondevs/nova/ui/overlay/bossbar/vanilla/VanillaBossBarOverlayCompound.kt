@@ -25,7 +25,7 @@ internal class VanillaBossBarOverlayCompound(
     override var hasChanged = false
     override val positioning by combinedProvider(MARGIN_TOP, MARGIN_BOTTOM, _matchInfo)
         .map { (marginTop, marginBottom, matchInfo) ->
-            BarPositioning.Dynamic(marginTop, marginBottom, matchInfo, BarMatcher.FALSE, BarMatcher.FALSE)
+            BarPositioning.Dynamic(marginTop, marginBottom, matchInfo, BarMatcher.False, BarMatcher.False)
         }
     
     override fun getVerticalRange(locale: String): IntRange {

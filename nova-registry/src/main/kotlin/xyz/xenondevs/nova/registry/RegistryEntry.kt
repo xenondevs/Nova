@@ -95,26 +95,28 @@ sealed interface RegistryEntry<out T : Keyed> : Provider<T>, Comparable<Registry
             paperRegistry: RegistryKey<P>,
             registryAccess: RegistryAccess = RegistryAccess.registryAccess()
         ): Either<N, P> {
-            if (RegistryBootstrapContext.isInBootstrapPhase) {
+            if (RegistryContext.isInBootstrapPhase) {
+                val typedKey = TypedKey.create(paperRegistry, key)
                 val entry = EitherRegistryEntry(
                     key,
                     novaRegistry,
                     paperRegistry,
                     combinedProvider(
                         novaRegistry.getOptional(key),
-                        optionalPaper(TypedKey.create(paperRegistry, key), registryAccess)
+                        optionalPaper(typedKey, registryAccess)
                     ) { nova, paper -> nova ?: paper }.flatMap {
-                        it ?: throw NoSuchElementException("Key $key not found in either ${novaRegistry.key} or ${paperRegistry.key()}")
+                        it ?: throw NoSuchElementException("Key $key not found in either ${novaRegistry.key.asString()} or ${paperRegistry.key().asString()}")
                     }
                 )
-                RegistryBootstrapContext.trackUnresolvedEntry(entry)
+                RegistryContext.trackUnresolved(typedKey, entry)
                 return entry
             } else {
                 if (key in novaRegistry) {
                     val novaEntry = novaRegistry[key]
                     return EitherRegistryEntry(key, novaRegistry, paperRegistry, novaEntry)
                 } else {
-                    val paperValue = registryAccess.getRegistry(paperRegistry).getOrThrow(key)
+                    val paperValue = registryAccess.getRegistry(paperRegistry).get(key)
+                        ?: throw NoSuchElementException("No element under ${key.asString()} in registry ${novaRegistry.key.asString()} or ${paperRegistry.key().asString()}")
                     return EitherRegistryEntry(key, novaRegistry, paperRegistry, provider(paperValue))
                 }
             }
@@ -145,16 +147,17 @@ sealed interface RegistryEntry<out T : Keyed> : Provider<T>, Comparable<Registry
             key: TypedKey<T>,
             registryAccess: RegistryAccess = RegistryAccess.registryAccess()
         ): Paper<T> {
-            if (RegistryBootstrapContext.isInBootstrapPhase) {
-                val entry = PaperRegistryEntry(
-                    key,
-                    provider { registryAccess.getRegistry(key.registryKey()).getOrThrow(key) }
-                )
-                RegistryBootstrapContext.trackUnresolvedEntry(entry)
+            fun resolve(): T {
+                return registryAccess.getRegistry(key.registryKey()).get(key)
+                    ?: throw NoSuchElementException("No element under ${key.asString()} in registry ${key.registryKey().key().asString()}")
+            }
+            
+            if (RegistryContext.isInBootstrapPhase) {
+                val entry = PaperRegistryEntry(key, provider(::resolve))
+                RegistryContext.trackUnresolved(key, entry)
                 return entry
             } else {
-                val value = registryAccess.getRegistry(key.registryKey()).getOrThrow(key)
-                return PaperRegistryEntry(key, provider(value))
+                return PaperRegistryEntry(key, provider(resolve()))
             }
         }
         

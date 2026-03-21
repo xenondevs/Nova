@@ -10,15 +10,18 @@ import io.papermc.paper.registry.set.RegistrySet
 import io.papermc.paper.registry.tag.TagKey
 import net.kyori.adventure.key.Key
 import org.bukkit.Keyed
+import xyz.xenondevs.commons.collections.mapToSet
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.UnstableProviderApi
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.flatten
+import xyz.xenondevs.commons.provider.mapEach
+import xyz.xenondevs.commons.provider.mapNonNull
 import xyz.xenondevs.commons.provider.plus
 import xyz.xenondevs.commons.provider.provider
-import kotlin.streams.asSequence
 import io.papermc.paper.registry.tag.Tag as RegistryTagSet
 
+//<editor-fold desc="emptyRegistryEntrySet">
 /**
  * Returns an empty [RegistryEntrySet].
  */
@@ -45,7 +48,9 @@ fun <N : NovaRegistryElement<N>, P : Keyed> emptyRegistryEntrySet(
     novaRegistry: NovaRegistry<N>,
     paperRegistry: RegistryKey<P>
 ): RegistryEntrySet.Mixed.Direct<N, P> = registryEntrySetOf(emptyRegistryEntrySet(novaRegistry), emptyRegistryEntrySet(paperRegistry))
+//</editor-fold>
 
+//<editor-fold desc="registryEntrySetOf Nova direct">
 /**
  * Returns a [RegistryEntrySet.Nova] containing [elements].
  */
@@ -87,7 +92,9 @@ fun <T : Keyed> registryEntrySetOf(
     
     return PaperDirectRegistryEntrySet(registry, elementSet)
 }
+//</editor-fold>
 
+//<editor-fold desc="registryEntrySetOf Paper direct">
 /**
  * Returns a [RegistryEntrySet.Paper] containing ([element], [elements]).
  */
@@ -102,6 +109,12 @@ fun <T : Keyed> registryEntrySetOf(
 
 /**
  * Returns a [RegistryEntrySet.Paper] from the given ([key], [keys]), resolving from [registryAccess].
+ *
+ * * If this function is called during bootstrap and a key is not present in the registry,
+ *   an erroneous entry is created that throws [NoSuchElementException] when trying to resolve it.
+ *   Additionally, server startup will fail.
+ * * If this function is called after bootstrap and a key is not present in the registry,
+ *   a [NoSuchElementException] is thrown immediately.
  */
 fun <T : Keyed> registryEntrySetOf(
     key: TypedKey<T>,
@@ -111,6 +124,12 @@ fun <T : Keyed> registryEntrySetOf(
 
 /**
  * Returns a [RegistryEntrySet.Paper] for the given [keys], resolving from [registryAccess].
+ *
+ * * If this function is called during bootstrap and a key is not present in the registry,
+ *   an erroneous entry is created that throws [NoSuchElementException] when trying to resolve it.
+ *   Additionally, server startup will fail.
+ * * If this function is called after bootstrap and a key is not present in the registry,
+ *   a [NoSuchElementException] is thrown immediately.
  */
 fun <T : Keyed> registryEntrySetOf(
     keys: Iterable<TypedKey<T>>,
@@ -124,34 +143,28 @@ fun <T : Keyed> registryEntrySetOf(
     
     return PaperDirectRegistryEntrySet(
         registryKey,
-        keyList.mapTo(LinkedHashSet()) { RegistryEntry.paper(it, registryAccess) }
+        keyList.mapToSet { RegistryEntry.paper(it, registryAccess) }
     )
 }
+//</editor-fold>
 
-
+//<editor-fold desc="registryEntrySetOf Paper tag">
 /**
  * Returns a [RegistryEntrySet.Paper.Tag] for the given [tagKey], resolving from [registryAccess].
- * If the tag doesn't exist in the registry, trying to resolve the value of the returned entry set will throw an exception.
+ *
+ * * If this function is called during bootstrap and the tag doesn't exist in the registry,
+ *   an erroneous [RegistryEntrySet.Paper.Tag] is returned that throws [NoSuchElementException] when trying to resolve it.
+ *   Additionally, server startup will fail.
+ * * If this function is called after bootstrap and the tag doesn't exist in the registry,
+ *   a [NoSuchElementException] is thrown immediately.
  */
 fun <T : Keyed> registryEntrySetOf(
     tagKey: TagKey<T>,
     registryAccess: RegistryAccess = RegistryAccess.registryAccess()
-): RegistryEntrySet.Paper.Tag<T> {
-    val entries = provider {
-        val registry = registryAccess.getRegistry(tagKey.registryKey())
-        val keysInTag = registry.getTag(tagKey).values()
-        keysInTag.mapTo(LinkedHashSet(keysInTag.size)) { typedKey ->
-            RegistryEntry.paper(typedKey, registryAccess)
-        }
-    }
-    val values = entries.flatMap { combinedProvider(it.toList(), List<T>::toSet) }
-    return PaperTagRegistryEntrySet(
-        tagKey.registryKey(),
-        tagKey,
-        entries,
-        values
-    )
-}
+): RegistryEntrySet.Paper.Tag<T> = PaperTagRegistryEntrySet(
+    tagKey,
+    PaperTagManager.getTagEntries(tagKey, registryAccess)
+)
 
 /**
  * Returns a provider of an [RegistryEntrySet.Paper.Tag] for the given [tagKey], resolving from [registryAccess],
@@ -160,22 +173,8 @@ fun <T : Keyed> registryEntrySetOf(
 fun <T : Keyed> optionalRegistryEntrySetOf(
     tagKey: TagKey<T>,
     registryAccess: RegistryAccess = RegistryAccess.registryAccess()
-): Provider<RegistryEntrySet.Paper.Tag<T>?> {
-    return provider {
-        val registry = registryAccess.getRegistry(tagKey.registryKey())
-        if (registry.hasTag(tagKey)) {
-            val keysInTag = registry.getTag(tagKey).values()
-            val entries: Set<RegistryEntry.Paper<T>> = keysInTag.mapTo(LinkedHashSet(keysInTag.size)) { typedKey ->
-                RegistryEntry.paper(typedKey, registryAccess)
-            }
-            PaperTagRegistryEntrySet(
-                tagKey.registryKey(),
-                tagKey,
-                provider(entries)
-            )
-        } else null
-    }
-}
+): Provider<RegistryEntrySet.Paper.Tag<T>?> =
+    PaperTagManager.getOptionalTagEntries(tagKey, registryAccess).mapNonNull { PaperTagRegistryEntrySet(tagKey, it) }
 
 /**
  * Returns a [RegistryEntrySet.Paper.Tag] for all entries in the given [registryKey], resolving from [registryAccess].
@@ -184,19 +183,13 @@ fun <T : Keyed> optionalRegistryEntrySetOf(
 fun <T : Keyed> registryEntrySetOf(
     registryKey: RegistryKey<T>,
     registryAccess: RegistryAccess = RegistryAccess.registryAccess()
-): RegistryEntrySet.Paper.Tag<T> {
-    val entries = provider {
-        registryAccess.getRegistry(registryKey).keyStream().asSequence()
-            .map { RegistryEntry.paper(TypedKey.create(registryKey, it), registryAccess) }
-            .toSet()
-    }
-    return PaperTagRegistryEntrySet(
-        registryKey,
-        TagKey.create(registryKey, registryKey.key()),
-        entries
-    )
-}
+): RegistryEntrySet.Paper.Tag<T> = PaperTagRegistryEntrySet(
+    TagKey.create(registryKey, registryKey.key()),
+    PaperTagManager.getAllEntries(registryKey, registryAccess)
+)
+//</editor-fold>
 
+//<editor-fold desc="registryEntrySetOf mixed direct">
 /**
  * Returns a [RegistryEntrySet.Mixed.Direct] that contains all entries of both the [nova] and [paper] sets.
  */
@@ -262,6 +255,22 @@ fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
 }
 
 /**
+ * Returns a [RegistryEntrySet.Mixed.Direct] by wrapping this [RegistryEntrySet.Nova.Direct] with an empty [paperRegistry] part.
+ */
+fun <N : NovaRegistryElement<N>, P : Keyed> RegistryEntrySet.Nova.Direct<N>.asMixed(
+    paperRegistry: RegistryKey<P>
+): RegistryEntrySet.Mixed.Direct<N, P> = registryEntrySetOf(this, emptyRegistryEntrySet(paperRegistry))
+
+/**
+ * Returns a [RegistryEntrySet.Mixed.Direct] by wrapping this [RegistryEntrySet.Paper.Direct] with an empty [novaRegistry] part.
+ */
+fun <N : NovaRegistryElement<N>, P : Keyed> RegistryEntrySet.Paper.Direct<P>.asMixed(
+    novaRegistry: NovaRegistry<N>,
+): RegistryEntrySet.Mixed.Direct<N, P> = registryEntrySetOf(emptyRegistryEntrySet(novaRegistry), this)
+//</editor-fold>
+
+//<editor-fold desc="registryEntrySetOf mixed tag">
+/**
  * Returns a [RegistryEntrySet.Mixed.Tag] that contains all entries of both the [nova] and [paper] sets.
  * 
  * @throws IllegalArgumentException If the sets don't use the same tag key.
@@ -275,36 +284,85 @@ fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
 }
 
 /**
- * Returns a [RegistryEntrySet.Mixed.Tag] of [nova] and [paperRegistry] that contains only the entries of [nova].
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
-    nova: RegistryEntrySet.Nova.Tag<N>,
-    paperRegistry: RegistryKey<P>
-): RegistryEntrySet.Mixed.Tag<N, P> {
-    return MixedTagRegistryEntrySet(nova.tagKey, nova, emptyRegistryEntrySet(paperRegistry))
-}
-
-/**
- * Returns a [RegistryEntrySet.Mixed.Tag] of [novaRegistry] and [paper] that contains only the entries of [paper].
- */
-fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
-    novaRegistry: NovaRegistry<N>,
-    paper: RegistryEntrySet.Paper.Tag<P>
-): RegistryEntrySet.Mixed.Tag<N, P> {
-    return MixedTagRegistryEntrySet(paper.tagKey.key(), emptyRegistryEntrySet(novaRegistry), paper)
-}
-
-/**
  * Returns a [RegistryEntrySet.Mixed.Tag] for [tagKey], resolved and merged together from both
  * [novaRegistry] and [paperRegistry] (using [registryAccess]).
- * If no matching tag is found in either registry, trying to resolve the value of the returned entry set will throw an exception.
+ *
+ * * If this function is called during bootstrap and no matching tag is found in either registry,
+ *   an erroneous [RegistryEntrySet.Mixed.Tag] is returned that throws [NoSuchElementException] when trying to resolve it.
+ *   Additionally, server startup will fail.
+ * * If this function is called after bootstrap and no matching tag is found in either registry,
+ *   a [NoSuchElementException] is thrown immediately.
  */
 fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
     tagKey: Key,
     novaRegistry: NovaRegistry<N>,
     paperRegistry: RegistryKey<P>,
     registryAccess: RegistryAccess = RegistryAccess.registryAccess()
-): RegistryEntrySet.Mixed.Tag<N, P> = MixedTagRegistryEntrySet(tagKey, novaRegistry, paperRegistry, registryAccess)
+): RegistryEntrySet.Mixed.Tag<N, P> {
+    val paperTagKey = TagKey.create(paperRegistry, tagKey)
+    if (RegistryContext.isInBootstrapPhase) {
+        val entrySet = MixedTagRegistryEntrySet(tagKey, novaRegistry, paperRegistry, registryAccess)
+        RegistryContext.trackUnresolved(paperTagKey, entrySet)
+        return entrySet
+    } else {
+        val hasNovaTag = novaRegistry.getOptionalTag(tagKey).get() != null
+        val hasPaperTag = registryAccess.getRegistry(paperRegistry).hasTag(paperTagKey)
+        
+        if (!hasNovaTag && !hasPaperTag)
+            throw NoSuchElementException("Tag $tagKey not found in either ${novaRegistry.key.asString()} or ${paperRegistry.key().asString()}")
+        
+        return MixedTagRegistryEntrySet(tagKey, novaRegistry, paperRegistry, registryAccess)
+    }
+}
+
+/**
+ * Returns a [RegistryEntrySet.Mixed.Tag] by wrapping this [RegistryEntrySet.Nova.Tag] with an empty [paperRegistry] part.
+ */
+fun <N : NovaRegistryElement<N>, P : Keyed> RegistryEntrySet.Nova.Tag<N>.asMixed(
+    paperRegistry: RegistryKey<P>
+): RegistryEntrySet.Mixed.Tag<N, P> = MixedTagRegistryEntrySet(
+    tagKey.key(),
+    this,
+    emptyRegistryEntrySet(paperRegistry)
+)
+
+/**
+ * Returns a [RegistryEntrySet.Mixed.Tag] by wrapping this [RegistryEntrySet.Paper.Tag] with an empty [novaRegistry] part.
+ */
+fun <N : NovaRegistryElement<N>, P : Keyed> RegistryEntrySet.Paper.Tag<P>.asMixed(
+    novaRegistry: NovaRegistry<N>,
+): RegistryEntrySet.Mixed.Tag<N, P> = MixedTagRegistryEntrySet(
+    tagKey.key(),
+    emptyRegistryEntrySet(novaRegistry),
+    this
+)
+//</editor-fold>
+
+//<editor-fold desc="reactive transformations">
+/**
+ * Maps each element of this [RegistryEntrySet.Mixed] using [transformNova] for Nova entries
+ * and [transformPaper] for Paper entries.
+ */
+inline fun <reified N : NovaRegistryElement<N>, reified P : Keyed, R> RegistryEntrySet.Mixed<N, P>.mapEach(
+    crossinline transformNova: (N) -> R,
+    crossinline transformPaper: (P) -> R
+): Provider<List<R>> = mapEach {
+    when (it) {
+        is N -> transformNova(it)
+        is P -> transformPaper(it)
+        else -> throw AssertionError("Value $value is neither ${N::class.java} nor ${P::class.java}")
+    }
+}
+
+/**
+ * Maps each element of this [RegistryEntrySet.Mixed] using [transformNova] for Nova entries
+ * and [transformPaper] for Paper entries, then flattens the resulting [Providers][Provider] into a single [Provider].
+ */
+inline fun <reified N : NovaRegistryElement<N>, reified P : Keyed, R> RegistryEntrySet.Mixed<N, P>.flatMapEach(
+    crossinline transformNova: (N) -> Provider<R>,
+    crossinline transformPaper: (P) -> Provider<R>
+): Provider<List<R>> = mapEach(transformNova, transformPaper).map(::combinedProvider).flatten()
+//</editor-fold>
 
 /**
  * A set of [RegistryEntries][RegistryEntry].
@@ -648,11 +706,13 @@ private class PaperDirectRegistryEntrySet<T : Keyed>(
 }
 
 private class PaperTagRegistryEntrySet<T : Keyed>(
-    override val registry: RegistryKey<T>,
     override val tagKey: TagKey<T>,
     override val entries: Provider<Set<RegistryEntry.Paper<T>>>,
     values: Provider<Set<T>> = entries.flatMap { combinedProvider(it.toList(), List<T>::toSet) }
 ) : RegistryEntrySet.Paper.Tag<T>, Provider<Set<T>> by values {
+    
+    override val registry: RegistryKey<T>
+        get() = tagKey.registryKey()
     
     override fun toRegistryKeySet(registryAccess: RegistryAccess): RegistryTagSet<T> =
         registryAccess.getRegistry(registry).getTag(tagKey)
@@ -737,6 +797,7 @@ internal class NovaTagRegistryEntrySet<T : NovaRegistryElement<T>>(
         result = 31 * result + tagKey.hashCode()
         return result
     }
+    
     override fun toString() = "${registry.key}: #$tagKey"
     
 }
@@ -797,7 +858,7 @@ private class MixedTagRegistryEntrySet<N : NovaRegistryElement<N>, P : Keyed>(
             optionalRegistryEntrySetOf(TagKey.create(paperRegistry, tagKey), registryAccess)
         ) { n, p ->
             if (n == null && p == null)
-                throw NoSuchElementException("Tag $tagKey not found in either ${novaRegistry.key} or ${paperRegistry.key()}")
+                throw NoSuchElementException("Tag $tagKey not found in either ${novaRegistry.key.asString()} or ${paperRegistry.key().asString()}")
             combinedProvider(
                 p?.entries?.map { it.toEither(novaRegistry) } ?: provider(emptySet()),
                 n?.entries?.map { it.toEither(paperRegistry) } ?: provider(emptySet())
@@ -830,6 +891,7 @@ private class MixedTagRegistryEntrySet<N : NovaRegistryElement<N>, P : Keyed>(
         result = 31 * result + tagKey.hashCode()
         return result
     }
+    
     override fun toString() = "${novaRegistry.key}, ${paperRegistry.key()}: #$tagKey"
     
 }

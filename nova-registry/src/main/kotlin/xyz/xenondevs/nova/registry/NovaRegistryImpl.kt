@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.registry
 
 import net.kyori.adventure.key.Key
+import xyz.xenondevs.commons.collections.mapToSet
 import xyz.xenondevs.commons.provider.DeferredValue
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
@@ -117,7 +118,7 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
         checkNotFrozen()
         
         // populate entries map & register "all entries" tag
-        unflattenedTagEntriesByKey[key] = entryByKey.keys.mapTo(LinkedHashSet()) { NovaTagEntry.Direct(get(it)) }
+        unflattenedTagEntriesByKey[key] = entryByKey.keys.mapToSet { NovaTagEntry.Direct(get(it)) }
         // populate tags map
         unflattenedTagEntriesByKey.keys.forEach { getTag(it) }
         
@@ -180,8 +181,8 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
      * this registry's lock. Acquires the lock on value resolution. Used for optional providers.
      */
     private fun <K, V> MutableMap<K, Provider<V>>.getOrPutLazyProvider(key: K, lazyValue: () -> V): Provider<V> =
-        getOrPut(key) { 
-            createProvider { 
+        getOrPut(key) {
+            createProvider {
                 check(!lock.isHeldByCurrentThread)
                 lock.withLock {
                     // cannot resolve values pre-freeze
@@ -242,7 +243,7 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
                     provider as MutableProvider<RegistryEntrySet.Nova.Tag<T>?>
                     provider to DeferredValue.Direct(tags[key])
                 }
-            } catch(e: NoSuchElementException) {
+            } catch (e: NoSuchElementException) {
                 isFrozen = false // freezing failed
                 throw IllegalStateException("Referenced entries need to be registered before freezing", e)
             } finally {

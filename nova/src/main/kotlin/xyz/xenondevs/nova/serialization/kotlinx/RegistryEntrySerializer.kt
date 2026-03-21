@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.serialization.kotlinx
 
+import io.papermc.paper.registry.RegistryKey
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -9,8 +10,11 @@ import kotlinx.serialization.encoding.Encoder
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.level.block.Block
+import org.bukkit.block.BlockType
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.waila.info.WailaInfoProvider
 import xyz.xenondevs.nova.ui.waila.info.WailaToolIconProvider
@@ -47,6 +51,7 @@ internal abstract class NmsRegistryEntrySerializer<T : Any>(val registry: Regist
     
 }
 
+//<editor-fold desc="nova element serializers">
 /**
  * Serializer for [NovaBlock], serializes by [NovaBlock.key] in the format of `namespace:value`.
  */
@@ -116,7 +121,9 @@ object ItemFilterTypeSerializer : NovaRegistryElementSerializer<ItemFilterType<*
  * Serializer for [TooltipStyle], serializes by [TooltipStyle.key] in the format of `namespace:value`.
  */
 object TooltipStyleSerializer : NovaRegistryElementSerializer<TooltipStyle>(NovaRegistries.TOOLTIP_STYLE)
+//</editor-fold>
 
+//<editor-fold desc="nova entry serializers">
 /**
  * Serializer for [RegistryEntry.Nova] of [NovaBlock], serialized by [RegistryEntry.key] in the format of `namespace:value`.
  */
@@ -186,3 +193,98 @@ object ItemFilterTypeEntrySerializer : NovaRegistryEntrySerializer<ItemFilterTyp
  * Serializer for [RegistryEntry.Nova] of [TooltipStyle], serialized by [RegistryEntry.key] in the format of `namespace:value`.
  */
 object TooltipStyleEntrySerializer : NovaRegistryEntrySerializer<TooltipStyle>(NovaRegistries.TOOLTIP_STYLE)
+//</editor-fold>
+
+//<editor-fold desc="nova entry set serializers">
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [NovaBlock].
+ */
+object NovaBlockEntrySetSerializer : NovaRegistryEntrySetSerializer<NovaBlock>(NovaRegistries.BLOCK)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [NovaItem].
+ */
+object NovaItemEntrySetSerializer : NovaRegistryEntrySetSerializer<NovaItem>(NovaRegistries.ITEM)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [Equipment].
+ */
+object EquipmentEntrySetSerializer : NovaRegistryEntrySetSerializer<Equipment>(NovaRegistries.EQUIPMENT)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [ToolTier].
+ */
+object ToolTierEntrySetSerializer : NovaRegistryEntrySetSerializer<ToolTier>(NovaRegistries.TOOL_TIER)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [ToolCategory].
+ */
+object ToolCategoryEntrySetSerializer : NovaRegistryEntrySetSerializer<ToolCategory>(NovaRegistries.TOOL_CATEGORY)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [NetworkType].
+ */
+object NetworkTypeEntrySetSerializer : NovaRegistryEntrySetSerializer<NetworkType<*>>(NovaRegistries.NETWORK_TYPE)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [AbilityType].
+ */
+object AbilityTypeEntrySetSerializer : NovaRegistryEntrySetSerializer<AbilityType<*>>(NovaRegistries.ABILITY_TYPE)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [AttachmentType].
+ */
+object AttachmentTypeEntrySetSerializer : NovaRegistryEntrySetSerializer<AttachmentType<*>>(NovaRegistries.ATTACHMENT_TYPE)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [RecipeType].
+ */
+object RecipeTypeEntrySetSerializer : NovaRegistryEntrySetSerializer<RecipeType<*>>(NovaRegistries.RECIPE_TYPE)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [GuiTexture].
+ */
+object GuiTextureEntrySetSerializer : NovaRegistryEntrySetSerializer<GuiTexture>(NovaRegistries.GUI_TEXTURE)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [WailaInfoProvider].
+ */
+object WailaInfoProviderEntrySetSerializer : NovaRegistryEntrySetSerializer<WailaInfoProvider<*, *>>(NovaRegistries.WAILA_INFO_PROVIDER)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [WailaToolIconProvider].
+ */
+object WailaToolIconProviderEntrySetSerializer : NovaRegistryEntrySetSerializer<WailaToolIconProvider>(NovaRegistries.WAILA_TOOL_ICON_PROVIDER)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [ItemFilterType].
+ */
+object ItemFilterTypeEntrySetSerializer : NovaRegistryEntrySetSerializer<ItemFilterType<*>>(NovaRegistries.ITEM_FILTER_TYPE)
+
+/**
+ * Serializer for [RegistryEntrySet.Nova] of [TooltipStyle].
+ */
+object TooltipStyleEntrySetSerializer : NovaRegistryEntrySetSerializer<TooltipStyle>(NovaRegistries.TOOLTIP_STYLE)
+//</editor-fold>
+
+//<editor-fold desc="either / mixed serializers">
+/**
+ * Serializer for [RegistryEntry.Either] of [NovaItem] and [ItemType].
+ */
+object ItemTypeEitherEntrySerializer : EitherRegistryEntrySerializer<NovaItem, ItemType>(NovaRegistries.ITEM, RegistryKey.ITEM)
+
+/**
+ * Serializer for [RegistryEntry.Either] of [NovaBlock] and [BlockType].
+ */
+object BlockTypeEitherEntrySerializer : EitherRegistryEntrySerializer<NovaBlock, BlockType>(NovaRegistries.BLOCK, RegistryKey.BLOCK)
+
+/**
+ * Serializer for [RegistryEntrySet.Mixed] of [NovaItem] and [ItemType].
+ */
+object ItemTypeMixedEntrySetSerializer : MixedRegistryEntrySetSerializer<NovaItem, ItemType>(NovaRegistries.ITEM, RegistryKey.ITEM)
+
+/**
+ * Serializer for [RegistryEntrySet.Mixed] of [NovaBlock] and [BlockType].
+ */
+object BlockTypeMixedEntrySetSerializer : MixedRegistryEntrySetSerializer<NovaBlock, BlockType>(NovaRegistries.BLOCK, RegistryKey.BLOCK)
+//</editor-fold>

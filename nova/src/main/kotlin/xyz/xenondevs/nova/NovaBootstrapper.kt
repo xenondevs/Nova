@@ -15,7 +15,7 @@ import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.plugin.java.JavaPlugin
 import xyz.xenondevs.commons.version.ClosedVersionRange
 import xyz.xenondevs.commons.version.Version
-import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.config.NovaConfigBackend
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.serialization.cbf.CbfSerializers
@@ -103,7 +103,7 @@ internal class NovaBootstrapper : PluginBootstrap {
                 DebugProbes.enableCreationStackTraces = true
             }
             
-            Configs.extractDefaultConfig()
+            NovaConfigBackend.extractAllConfigs()
             CbfSerializers.register()
             Initializer.start()
         } catch (t: Throwable) {
