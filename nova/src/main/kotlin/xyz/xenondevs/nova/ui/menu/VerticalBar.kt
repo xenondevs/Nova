@@ -6,7 +6,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.dsl.ClickDsl
 import xyz.xenondevs.invui.dsl.ItemProviderDsl
 import xyz.xenondevs.invui.dsl.item
-import xyz.xenondevs.invui.dsl.property.by
+import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.gui.SlotElement
 import xyz.xenondevs.invui.gui.SlotElementSupplier
 import xyz.xenondevs.invui.item.Item
