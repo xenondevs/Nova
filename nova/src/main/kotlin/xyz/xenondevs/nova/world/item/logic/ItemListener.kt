@@ -26,11 +26,11 @@ import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 
 private val PLAYER_EQUIPMENT_SLOTS = listOf(
-    EquipmentSlot.HAND, 
-    EquipmentSlot.OFF_HAND, 
-    EquipmentSlot.FEET, 
+    EquipmentSlot.HAND,
+    EquipmentSlot.OFF_HAND,
+    EquipmentSlot.FEET,
     EquipmentSlot.LEGS,
-    EquipmentSlot.CHEST, 
+    EquipmentSlot.CHEST,
     EquipmentSlot.HEAD
 )
 
@@ -93,7 +93,7 @@ internal object ItemListener : Listener, PacketListener {
             ?: return
         
         for ((slot, change) in event.equipmentChanges) {
-            val oldNovaItem  = change.oldItem().novaItem
+            val oldNovaItem = change.oldItem().novaItem
             val newNovaItem = change.newItem().novaItem
             if (oldNovaItem == newNovaItem)
                 continue

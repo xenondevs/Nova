@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.api.event.NovaLoadDataEvent
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.entry
+import xyz.xenondevs.nova.initialize.Initializer.start
 import xyz.xenondevs.nova.ui.menu.setGlobalIngredients
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.data.JarUtils

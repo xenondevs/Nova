@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.serialization.configurate
 
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializer
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.util.data.get
@@ -23,7 +24,7 @@ internal object ItemCategorySerializer : TypeSerializer<ItemCategory> {
         icon.clearLore()
         icon.setLore(emptyList())
         
-        return ItemCategory(ItemWrapper(icon.get().clientsideCopy()), items.map { CategorizedItem(it) })
+        return ItemCategory(provider(ItemWrapper(icon.get().clientsideCopy())), items.map { CategorizedItem(it) })
     }
     
     override fun serialize(type: Type, obj: ItemCategory?, node: ConfigurationNode) {

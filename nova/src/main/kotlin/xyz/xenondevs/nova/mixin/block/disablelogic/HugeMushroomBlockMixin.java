@@ -33,12 +33,12 @@ abstract class HugeMushroomBlockMixin {
     
     @Overwrite
     protected BlockState rotate(BlockState state, Rotation rot) {
-        return ((Block)(Object)this).defaultBlockState();
+        return ((Block) (Object) this).defaultBlockState();
     }
     
     @Overwrite
     protected BlockState mirror(BlockState state, Mirror mirror) {
-        return ((Block)(Object)this).defaultBlockState();
+        return ((Block) (Object) this).defaultBlockState();
     }
     
 }

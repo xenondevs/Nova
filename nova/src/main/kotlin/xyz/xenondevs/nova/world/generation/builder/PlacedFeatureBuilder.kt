@@ -35,7 +35,7 @@ import net.minecraft.world.level.levelgen.placement.RarityFilter
 import net.minecraft.world.level.levelgen.placement.SurfaceRelativeThresholdFilter
 import net.minecraft.world.level.levelgen.placement.SurfaceWaterDepthFilter
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.registry.RegistryElementBuilder
+import xyz.xenondevs.nova.registry.LegacyRegistryElementBuilder
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.util.lookupGetterOrThrow
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
@@ -56,7 +56,7 @@ class PlacedFeatureBuilder internal constructor(
     id: Key,
     registry: WritableRegistry<PlacedFeature>,
     lookup: RegistryInfoLookup
-) : RegistryElementBuilder<PlacedFeature>(registry, id) {
+) : LegacyRegistryElementBuilder<PlacedFeature>(registry, id) {
     
     private val configuredFeatureRegistry = lookup.lookupGetterOrThrow(Registries.CONFIGURED_FEATURE)
     

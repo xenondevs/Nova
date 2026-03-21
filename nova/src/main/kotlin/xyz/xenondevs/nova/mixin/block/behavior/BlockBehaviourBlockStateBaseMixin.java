@@ -83,11 +83,11 @@ abstract class BlockBehaviourBlockStateBaseMixin {
             WorldDataManager.INSTANCE.setBlockState(novaPos, newState);
             var ret = switch (newState.getModelProvider$nova()) {
                 case BackingStateBlockModelProvider modelProvider -> modelProvider.getInfo().getVanillaBlockState();
-                case ModelLessBlockModelProvider modelProvider -> modelProvider.getInfo();
+                case ModelLessBlockModelProvider modelProvider -> NMSUtilsKt.getNmsBlockState(modelProvider.getInfo());
                 case DisplayEntityBlockModelProvider modelProvider -> {
                     novaState.getModelProvider$nova().unload(novaPos);
                     newState.getModelProvider$nova().load(novaPos);
-                    yield modelProvider.getInfo().getHitboxType();
+                    yield NMSUtilsKt.getNmsBlockState(modelProvider.getInfo().getCollider());
                 }
                 default -> throw new UnsupportedOperationException();
             };

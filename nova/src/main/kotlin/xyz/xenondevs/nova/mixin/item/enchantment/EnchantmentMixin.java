@@ -94,8 +94,8 @@ abstract class EnchantmentMixin {
         var celFirst = CustomEnchantmentLogic.customEnchantments.get(first.value());
         var celSecond = CustomEnchantmentLogic.customEnchantments.get(second.value());
         
-        boolean firstCompatibleWithSecond = celFirst != null 
-            ? celFirst.compatibleWith(second) 
+        boolean firstCompatibleWithSecond = celFirst != null
+            ? celFirst.compatibleWith(second)
             : !first.value().exclusiveSet().contains(second);
         boolean secondCompatibleWithFirst = celSecond != null
             ? celSecond.compatibleWith(first)

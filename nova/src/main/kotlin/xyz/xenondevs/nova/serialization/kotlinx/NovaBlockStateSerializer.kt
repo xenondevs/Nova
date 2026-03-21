@@ -47,6 +47,7 @@ internal object NovaBlockStateSerializer : KSerializer<NovaBlockState> {
                         descriptor, index,
                         MapSerializer(String.serializer(), String.serializer())
                     )
+                    
                     else -> break
                 }
             }

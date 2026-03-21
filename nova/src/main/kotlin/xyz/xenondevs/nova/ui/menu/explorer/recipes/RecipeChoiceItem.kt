@@ -45,7 +45,7 @@ internal fun handleRecipeChoiceClick(id: String, click: Click) {
         if (player.showRecipes(id))
             player.playClickSound()
     } else if (clickType == ClickType.RIGHT) {
-        if (player.showUsages(id)) 
+        if (player.showUsages(id))
             player.playClickSound()
     } else if (player.gameMode == GameMode.CREATIVE) {
         val itemStack = ItemUtils.getItemStack(id)

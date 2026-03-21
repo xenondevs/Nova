@@ -41,12 +41,12 @@ internal sealed interface BlockModelProvider {
     /**
      * Places the model at [pos].
      */
-    fun set(pos: BlockPos, method: BlockUpdateMethod= BlockUpdateMethod.DEFAULT)
+    fun set(pos: BlockPos, method: BlockUpdateMethod = BlockUpdateMethod.DEFAULT)
     
     /**
      * Removes the model at [pos].
      */
-    fun remove(pos: BlockPos, method: BlockUpdateMethod= BlockUpdateMethod.DEFAULT) {
+    fun remove(pos: BlockPos, method: BlockUpdateMethod = BlockUpdateMethod.DEFAULT) {
         val air = Blocks.AIR.defaultBlockState()
         withoutBlockMigration(pos) {
             when (method) {

@@ -1,7 +1,8 @@
 plugins {
     id("nova.kotlin-conventions")
     id("nova.dokka-conventions")
-    id("nova.publish-conventions")
+    id("nova.publish-conventions-java")
+    id("nova.detekt-conventions")
     alias(libs.plugins.kotlinx.serialization)
     alias(origamiLibs.plugins.origami)
     alias(libs.plugins.pluginPublish)
@@ -18,6 +19,7 @@ dependencies {
     novaLoaderApi(libs.kotlinx.serialization.json)
     api(origamiLibs.mixin)
     api(origamiLibs.mixinextras)
+    api(project(":nova-registry"))
     
     // internal dependencies
     compileOnly(project(":nova-api"))
@@ -58,7 +60,8 @@ loaderJar {
     gameVersion = mcVersion
     novaInput = tasks.named<Jar>("origamiJar").flatMap { it.archiveFile }
     input.from(
-        project.provider { project(":nova-api").tasks.named<Jar>("jar").map { it.archiveFile } } ,
+        project.provider { project(":nova-api").tasks.named<Jar>("jar").map { it.archiveFile } },
+        project.provider { project(":nova-registry").tasks.named<Jar>("jar").map { it.archiveFile } },
         project.provider {
             rootProject.subprojects
                 .filter { it.name.startsWith("nova-hook-") }
@@ -86,7 +89,6 @@ tasks {
 kotlin {
     compilerOptions {
         optIn.addAll(
-            "kotlin.contracts.ExperimentalContracts",
             "kotlinx.coroutines.ExperimentalCoroutinesApi",
             "xyz.xenondevs.invui.ExperimentalReactiveApi",
             "xyz.xenondevs.invui.dsl.ExperimentalDslApi",
@@ -105,13 +107,5 @@ pluginPublish {
     modrinth("yCVqpwUy") {
         gameVersions(mcVersion.get())
         incompatibleDependency("z4HZZnLr") // FastAsyncWorldEdit
-    }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
     }
 }

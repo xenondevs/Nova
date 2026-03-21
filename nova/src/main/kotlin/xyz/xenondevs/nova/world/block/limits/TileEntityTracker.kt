@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.world.block.limits
 
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.config.PermanentStorage
-import xyz.xenondevs.nova.config.PermanentStorageMigrations
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
@@ -18,10 +17,7 @@ import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import java.lang.Integer.max
 import java.util.*
 
-@InternalInit(
-    stage = InternalInitStage.POST_WORLD,
-    dependsOn = [PermanentStorageMigrations::class]
-)
+@InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object TileEntityTracker {
     
     private val BLOCK_COUNTER: HashMap<UUID, HashMap<Key, Int>> =
@@ -45,13 +41,13 @@ internal object TileEntityTracker {
     
     internal fun handlePlace(block: NovaTileEntityBlock, ctx: Context<BlockPlace>) {
         val sourceUuid = ctx[BlockPlace.SOURCE_UUID] ?: return
-        modifyCounters(sourceUuid, ctx[BlockPlace.BLOCK_POS], block.id, 1)
+        modifyCounters(sourceUuid, ctx[BlockPlace.BLOCK_POS], block.key, 1)
     }
     
     internal fun handleBreak(tileEntity: TileEntity, ctx: Context<BlockBreak>) {
         val ownerUuid = tileEntity.ownerUuid
         if (ownerUuid != null)
-            modifyCounters(ownerUuid, ctx[BlockBreak.BLOCK_POS], tileEntity.block.id, -1)
+            modifyCounters(ownerUuid, ctx[BlockBreak.BLOCK_POS], tileEntity.block.key, -1)
     }
     
     private fun modifyCounters(player: UUID, pos: BlockPos, id: Key, add: Int) {

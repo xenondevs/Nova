@@ -33,8 +33,8 @@ internal class ForwardingLogger(private val delegate: Logger, private val audien
         when (level) {
             Level.TRACE -> delegate.trace(format, *args)
             Level.DEBUG -> delegate.debug(format, *args)
-            Level.INFO  -> delegate.info(format, *args)
-            Level.WARN  -> delegate.warn(format, *args)
+            Level.INFO -> delegate.info(format, *args)
+            Level.WARN -> delegate.warn(format, *args)
             Level.ERROR -> delegate.error(format, *args)
         }
         val ft = MessageFormatter.arrayFormat(format, args)
@@ -45,8 +45,8 @@ internal class ForwardingLogger(private val delegate: Logger, private val audien
         when (level) {
             Level.TRACE -> delegate.trace(msg)
             Level.DEBUG -> delegate.debug(msg)
-            Level.INFO  -> delegate.info(msg)
-            Level.WARN  -> delegate.warn(msg)
+            Level.INFO -> delegate.info(msg)
+            Level.WARN -> delegate.warn(msg)
             Level.ERROR -> delegate.error(msg)
         }
         sendToAudience(level, msg, null)
@@ -56,8 +56,8 @@ internal class ForwardingLogger(private val delegate: Logger, private val audien
         when (level) {
             Level.TRACE -> delegate.trace(msg, t)
             Level.DEBUG -> delegate.debug(msg, t)
-            Level.INFO  -> delegate.info(msg, t)
-            Level.WARN  -> delegate.warn(msg, t)
+            Level.INFO -> delegate.info(msg, t)
+            Level.WARN -> delegate.warn(msg, t)
             Level.ERROR -> delegate.error(msg, t)
         }
         sendToAudience(level, msg, t)
@@ -67,8 +67,8 @@ internal class ForwardingLogger(private val delegate: Logger, private val audien
         when (level) {
             Level.TRACE -> delegate.trace(marker, format, *args)
             Level.DEBUG -> delegate.debug(marker, format, *args)
-            Level.INFO  -> delegate.info(marker, format, *args)
-            Level.WARN  -> delegate.warn(marker, format, *args)
+            Level.INFO -> delegate.info(marker, format, *args)
+            Level.WARN -> delegate.warn(marker, format, *args)
             Level.ERROR -> delegate.error(marker, format, *args)
         }
         val ft = MessageFormatter.arrayFormat(format, args)
@@ -79,8 +79,8 @@ internal class ForwardingLogger(private val delegate: Logger, private val audien
         when (level) {
             Level.TRACE -> delegate.trace(marker, msg)
             Level.DEBUG -> delegate.debug(marker, msg)
-            Level.INFO  -> delegate.info(marker, msg)
-            Level.WARN  -> delegate.warn(marker, msg)
+            Level.INFO -> delegate.info(marker, msg)
+            Level.WARN -> delegate.warn(marker, msg)
             Level.ERROR -> delegate.error(marker, msg)
         }
         sendToAudience(level, msg, null)
@@ -90,8 +90,8 @@ internal class ForwardingLogger(private val delegate: Logger, private val audien
         when (level) {
             Level.TRACE -> delegate.trace(marker, msg, t)
             Level.DEBUG -> delegate.debug(marker, msg, t)
-            Level.INFO  -> delegate.info(marker, msg, t)
-            Level.WARN  -> delegate.warn(marker, msg, t)
+            Level.INFO -> delegate.info(marker, msg, t)
+            Level.WARN -> delegate.warn(marker, msg, t)
             Level.ERROR -> delegate.error(marker, msg, t)
         }
         sendToAudience(level, msg, t)

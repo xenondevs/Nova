@@ -132,6 +132,7 @@
   "command.nova.reload_recipes.start": "Reloading recipes...",
   "command.nova.reload_recipes.success": "Reloaded recipes.",
   "command.nova.reload_recipes.failure": "Failed to reload recipes, check the console for more information.",
+  "command.nova.reload_registry.success": "Successfully reloaded registry %s with %s elements.",
   "command.nova.advanced_tooltips.off.success": "Disabled advanced tooltips.",
   "command.nova.advanced_tooltips.off.failure": "Advanced tooltips are already disabled.",
   "command.nova.advanced_tooltips.nova.success": "Enabled advanced tooltips for Nova items.",

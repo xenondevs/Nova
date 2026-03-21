@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [DefaultNetworkTypes::class, ProtectionManager::class]
+    runAfter = [DefaultNetworkTypes::class, ProtectionManager::class]
 )
 object NetworkManager : Listener {
     

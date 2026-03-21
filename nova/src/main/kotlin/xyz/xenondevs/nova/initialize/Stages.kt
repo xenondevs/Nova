@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.initialize
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.config.Configs
+import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import kotlin.reflect.KClass
 
@@ -40,32 +41,63 @@ enum class InitStage(
      * Before configs are initialized.
      * Can be used to register custom config serializers via [Configs.registerSerializers].
      */
-    PRE_CONFIG(InternalInitStage.PRE_WORLD, runBefore = setOf(Configs::class)),
+    PRE_CONFIG(
+        internalStage = InternalInitStage.PRE_WORLD,
+        runBefore = setOf(
+            Configs::class
+        )
+    ),
     
     /**
      * Before the world is loaded.
      */
-    PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class)),
+    PRE_WORLD(
+        internalStage = InternalInitStage.PRE_WORLD,
+        runAfter = setOf(Configs::class)
+    ),
     
     /**
      * Before the resource pack generation starts.
      */
-    PRE_PACK(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class), runBefore = setOf(ResourceGeneration.PreWorld::class)),
+    PRE_PACK(
+        internalStage = InternalInitStage.PRE_WORLD,
+        runAfter = setOf(
+            Configs::class
+        ),
+        runBefore = setOf(
+            RegistryLoader::class,
+            ResourceGeneration.PreWorld::class
+        )
+    ),
     
     /**
      * After the first stage of resource pack generation ("pre-world") has finished. Lookup registries are now loaded.
      */
-    POST_PACK_PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class, ResourceGeneration.PreWorld::class)),
+    POST_PACK_PRE_WORLD(
+        internalStage = InternalInitStage.PRE_WORLD,
+        runAfter = setOf(
+            Configs::class,
+            RegistryLoader::class,
+            ResourceGeneration.PreWorld::class
+        )
+    ),
     
     /**
      * After the world has been loaded.
      */
-    POST_WORLD(InternalInitStage.POST_WORLD),
+    POST_WORLD(
+        internalStage = InternalInitStage.POST_WORLD
+    ),
     
     /**
      * After the second (and last) stage of resource pack generation ("post-world") has finished.
      */
-    POST_PACK(InternalInitStage.POST_WORLD, runAfter = setOf(ResourceGeneration.PostWorld::class));
+    POST_PACK(
+        internalStage = InternalInitStage.POST_WORLD,
+        runAfter = setOf(
+            ResourceGeneration.PostWorld::class
+        )
+    );
     
     internal val runAfter: Array<String> = runAfter.mapToArray { it.internalName }
     internal val runBefore: Array<String> = runBefore.mapToArray { it.internalName }

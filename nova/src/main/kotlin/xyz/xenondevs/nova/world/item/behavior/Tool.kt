@@ -64,8 +64,7 @@ fun Tool(
     canSweepAttack: Boolean = false,
     canBreakBlocksInCreative: Boolean = true,
     disableBlocking: Int = 0
-) = ItemBehaviorFactory<Tool> {
-    val cfg = it.config
+) = ItemBehaviorFactory { _, cfg ->
     Tool(
         cfg.entryOrElse(tier, arrayOf("tool_tier"), arrayOf("tool_level")),
         cfg.entryOrElse(categories, "tool_category"),
@@ -152,11 +151,12 @@ class Tool(
     override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider {
         // The actual breaking logic is server-side and disregards this component. Only canBreakBlocksInCreative is relevant.
         this[DataComponentTypes.TOOL] = canBreakBlocksInCreative.map { tool().canDestroyBlocksInCreative(it).build() }
-        this[DataComponentTypes.WEAPON] = disableBlocking.map { 
+        this[DataComponentTypes.WEAPON] = disableBlocking.map {
             weapon()
                 .itemDamagePerAttack(0) // // use the lowest value for merging with weapon component of Damageable
                 .disableBlockingForSeconds(it / 20f)
-                .build() }
+                .build()
+        }
         this[DataComponentTypes.ATTRIBUTE_MODIFIERS] = combinedProvider(
             attackDamage, attackSpeed, knockbackBonus
         ) { attackDamage, attackSpeed, knockbackBonus ->
@@ -212,7 +212,7 @@ class Tool(
             "knockbackBonus=$knockbackBonus, " +
             "canSweepAttack=$canSweepAttack, " +
             "canBreakBlocksInCreative=$canBreakBlocksInCreative, " +
-            "disableBlocking=$disableBlocking"
+            "disableBlocking=$disableBlocking" +
             ")"
     }
     

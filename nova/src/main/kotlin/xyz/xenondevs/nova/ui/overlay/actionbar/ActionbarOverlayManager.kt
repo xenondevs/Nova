@@ -14,6 +14,8 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundSystemChatPacketE
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.unregisterPacketListener
 import xyz.xenondevs.nova.resources.CharSizes
+import xyz.xenondevs.nova.ui.overlay.actionbar.ActionbarOverlayManager.handleChatPacket
+import xyz.xenondevs.nova.ui.overlay.actionbar.ActionbarOverlayManager.overlays
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send

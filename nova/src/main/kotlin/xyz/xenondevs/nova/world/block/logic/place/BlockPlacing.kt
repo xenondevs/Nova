@@ -24,7 +24,7 @@ import xyz.xenondevs.nova.world.pos
  */
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [WorldDataManager::class]
+    runAfter = [WorldDataManager::class]
 )
 internal object BlockPlacing : Listener {
     
@@ -42,19 +42,19 @@ internal object BlockPlacing : Listener {
     // requires earlier block place event because BlockMigrator has already removed WorldDataManager entry already otherwise
     fun handleBlockPlace(pos: BlockPos): Boolean {
         val blockState = WorldDataManager.getBlockState(pos)
-        return blockState == null || blockState.block.id.namespace() == "nova"
+        return blockState == null || blockState.block.key.namespace() == "nova"
     }
     
     @EventHandler(ignoreCancelled = true)
     private fun handleFluidPlace(event: PlayerBucketEmptyEvent) {
         val blockState = WorldDataManager.getBlockState(event.block.pos)
-        event.isCancelled = blockState != null && blockState.block.id.namespace() != "nova"
+        event.isCancelled = blockState != null && blockState.block.key.namespace() != "nova"
     }
     
     @EventHandler(ignoreCancelled = true)
     private fun handleFluidRemove(event: PlayerBucketFillEvent) {
         val blockState = WorldDataManager.getBlockState(event.block.pos)
-        event.isCancelled = blockState != null && blockState.block.id.namespace() != "nova"
+        event.isCancelled = blockState != null && blockState.block.key.namespace() != "nova"
     }
     
     @EventHandler(ignoreCancelled = true)

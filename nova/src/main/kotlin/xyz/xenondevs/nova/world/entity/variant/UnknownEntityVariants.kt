@@ -25,7 +25,7 @@ private const val STORAGE_ID = "custom_entity_variant_keys"
 
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
-    dependsOn = [ResourceGeneration.PreWorld::class]
+    runAfter = [ResourceGeneration.PreWorld::class]
 )
 internal object UnknownEntityVariants {
     

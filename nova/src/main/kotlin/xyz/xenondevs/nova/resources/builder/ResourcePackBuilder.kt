@@ -18,7 +18,6 @@ import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.NOVA_JAR
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.PermanentStorage
 import xyz.xenondevs.nova.config.entry
@@ -48,12 +47,13 @@ import xyz.xenondevs.nova.resources.builder.task.NoHandAnimationTask
 import xyz.xenondevs.nova.resources.builder.task.PackBuildData
 import xyz.xenondevs.nova.resources.builder.task.PackMcMetaTask
 import xyz.xenondevs.nova.resources.builder.task.PackTask
-import xyz.xenondevs.nova.resources.builder.task.SoundOverridesTask
+import xyz.xenondevs.nova.resources.builder.task.SoundOverridesContent
 import xyz.xenondevs.nova.resources.builder.task.TextureContent
 import xyz.xenondevs.nova.resources.builder.task.TextureIconContent
-import xyz.xenondevs.nova.resources.builder.task.TooltipStyleContent
+import xyz.xenondevs.nova.resources.builder.task.TooltipStyleTask
 import xyz.xenondevs.nova.resources.builder.task.WailaTask
 import xyz.xenondevs.nova.resources.builder.task.basepack.BasePacks
+import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.resources.upload.AutoUploadManager
 import xyz.xenondevs.nova.util.data.readJson
 import xyz.xenondevs.nova.util.data.writeImage
@@ -153,6 +153,9 @@ class ResourcePackBuilder internal constructor(
                 registerTask(LanguageContent::LoadAll)
                 registerTask(LanguageContent::Write)
                 
+                registerBuildData(::SoundOverridesContent)
+                registerTask(SoundOverridesContent::Write)
+                
                 registerTask(::AtlasTask)
                 registerTask(::BossBarOverlayTask)
                 registerTask(::GuiTextureTask)
@@ -163,9 +166,8 @@ class ResourcePackBuilder internal constructor(
                 registerTask(::EquipmentTask)
                 registerTask(::ExtractTask)
                 registerBuildData(::TextureContent)
-                registerTask(::TooltipStyleContent)
+                registerTask(::TooltipStyleTask)
                 registerTask(::CharSizeCalculator)
-                registerTask(::SoundOverridesTask)
                 registerTask(::PackMcMetaTask)
                 registerTask(::NoHandAnimationTask)
                 
@@ -188,6 +190,8 @@ class ResourcePackBuilder internal constructor(
                         )
                     } else emptyList()
                 })
+                
+                registerPostBuildHook { ResourceLookups.storeAll() }
             }
         }
         
@@ -230,12 +234,15 @@ class ResourcePackBuilder internal constructor(
          * @throws IllegalArgumentException If there is no [ResourcePackConfiguration] registered for [id].
          */
         suspend fun build(id: Key, sendToPlayers: Boolean = true, extraListener: Audience? = null) {
-            val bin = createBuilder(id, extraListener).build()
+            val builder = createBuilder(id, extraListener)
+            val bin = builder.build()
             AutoUploadManager.uploadPack(id, bin)
             AutoCopier.copyToDestinations(id, bin)
             
             if (sendToPlayers)
                 ResourcePackManager.handlePackUpdated(id)
+            
+            builder.postBuildHooks.forEach { it() }
         }
         
         private suspend fun downloadMcAssets(): Unit = MCASSETS_DOWNLOAD_MUTEX.withLock {
@@ -273,6 +280,7 @@ class ResourcePackBuilder internal constructor(
     internal lateinit var zipper: PackZipper
     internal lateinit var postProcessors: List<PackPostProcessor>
     internal lateinit var resourceFilters: Map<ResourceFilter.Stage, List<ResourceFilter>>
+    internal lateinit var postBuildHooks: List<() -> Unit>
     
     private val taskTimes = HashMap<PackTask, Duration>()
     private var totalTime: Duration = Duration.ZERO // fixme: total duration ends up being less than task sum durations, why?
@@ -326,7 +334,7 @@ class ResourcePackBuilder internal constructor(
     @Suppress("RemoveExplicitTypeArguments")
     private fun loadAssetPacks(): List<AssetPack> {
         return buildList<Triple<String, Path, String>> {
-            this += AddonBootstrapper.addons.map { addon -> Triple(addon.id, addon.file, "assets/") }
+            this += AddonBootstrapper.addons.map { addon -> Triple(addon.namespace(), addon.file, "assets/") }
             this += Triple("nova", NOVA_JAR, "assets/nova/")
         }.map { (namespace, file, assetsPath) ->
             val zip = FileSystems.newFileSystem(file)

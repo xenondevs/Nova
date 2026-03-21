@@ -15,7 +15,7 @@ import xyz.xenondevs.nova.util.registerEvents
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
     dispatcher = Dispatcher.ASYNC,
-    dependsOn = [LootConfigHandler::class]
+    runAfter = [LootConfigHandler::class]
 )
 internal object LootGeneration : Listener {
     

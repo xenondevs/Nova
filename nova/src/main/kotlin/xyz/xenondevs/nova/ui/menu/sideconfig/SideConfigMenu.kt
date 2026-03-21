@@ -2,16 +2,14 @@ package xyz.xenondevs.nova.ui.menu.sideconfig
 
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
-import xyz.xenondevs.invui.Click
+import xyz.xenondevs.invui.dsl.item
+import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.invui.gui.Gui
-import xyz.xenondevs.invui.gui.TabGui
-import xyz.xenondevs.invui.item.AbstractItem
-import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.nova.ui.menu.item.BackItem
-import xyz.xenondevs.nova.ui.menu.item.ClickyTabItem
+import xyz.xenondevs.nova.ui.menu.item.tabItem
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
@@ -22,6 +20,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.Fluid
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.clientsideProvider
 
 /**
  * Creates a new [SideConfigMenu] for [endPoint] using the given
@@ -129,38 +128,35 @@ class SideConfigMenu(
         
         require(energyConfigMenu != null || itemConfigMenu != null || fluidConfigMenu != null)
         
-        mainGui = TabGui.builder()
-            .setStructure(
-                "< # # e i f # # #",
-                "- - - - - - - - -",
-                "x x x x x x x x x",
-                "x x x x x x x x x",
-                "x x x x x x x x x"
+        mainGui = tabGui(
+            "< # # e i f # # #",
+            "- - - - - - - - -",
+            "x x x x x x x x x",
+            "x x x x x x x x x",
+            "x x x x x x x x x"
+        ) {
+            tabs by listOf(energyConfigMenu?.gui, itemConfigMenu?.gui, fluidConfigMenu?.gui)
+            
+            '<' by BackItem(openPrevious = openPrevious)
+            'e' by tabItem(
+                0, tab, tabs,
+                DefaultGuiItems.ENERGY_BTN_SELECTED.clientsideProvider,
+                DefaultGuiItems.ENERGY_BTN_ON.clientsideProvider,
+                DefaultGuiItems.ENERGY_BTN_OFF.clientsideProvider
             )
-            .addIngredient('<', BackItem(openPrevious = openPrevious))
-            .addIngredient('e', ClickyTabItem(0) {
-                (if (energyConfigMenu != null) {
-                    if (it.tab == 0)
-                        DefaultGuiItems.ENERGY_BTN_SELECTED
-                    else DefaultGuiItems.ENERGY_BTN_ON
-                } else DefaultGuiItems.ENERGY_BTN_OFF).clientsideProvider
-            })
-            .addIngredient('i', ClickyTabItem(1) {
-                (if (itemConfigMenu != null) {
-                    if (it.tab == 1)
-                        DefaultGuiItems.ITEM_BTN_SELECTED
-                    else DefaultGuiItems.ITEM_BTN_ON
-                } else DefaultGuiItems.ITEM_BTN_OFF).clientsideProvider
-            })
-            .addIngredient('f', ClickyTabItem(2) {
-                (if (fluidConfigMenu != null) {
-                    if (it.tab == 2)
-                        DefaultGuiItems.FLUID_BTN_SELECTED
-                    else DefaultGuiItems.FLUID_BTN_ON
-                } else DefaultGuiItems.FLUID_BTN_OFF).clientsideProvider
-            })
-            .setTabs(listOf(energyConfigMenu?.gui, itemConfigMenu?.gui, fluidConfigMenu?.gui))
-            .build()
+            'i' by tabItem(
+                1, tab, tabs,
+                DefaultGuiItems.ITEM_BTN_SELECTED.clientsideProvider,
+                DefaultGuiItems.ITEM_BTN_ON.clientsideProvider,
+                DefaultGuiItems.ITEM_BTN_OFF.clientsideProvider
+            )
+            'f' by tabItem(
+                2, tab, tabs,
+                DefaultGuiItems.FLUID_BTN_SELECTED.clientsideProvider,
+                DefaultGuiItems.FLUID_BTN_ON.clientsideProvider,
+                DefaultGuiItems.FLUID_BTN_OFF.clientsideProvider
+            )
+        }
         
         updateNetworkData()
     }
@@ -194,17 +190,16 @@ class SideConfigMenu(
 }
 
 /**
- * An ui item that opens the [sideConfigMenu] when clicked.
+ * A UI item that opens the [sideConfigMenu] when clicked.
  */
-class OpenSideConfigItem(private val sideConfigMenu: SideConfigMenu) : AbstractItem() {
-    
-    override fun getItemProvider(player: Player): ItemProvider {
-        return DefaultGuiItems.SIDE_CONFIG_BTN.clientsideProvider
-    }
-    
-    override fun handleClick(clickType: ClickType, player: Player, click: Click) {
+fun openSideConfigItem(sideConfigMenu: SideConfigMenu): Item = item {
+    itemProvider by DefaultGuiItems.SIDE_CONFIG_BTN.clientsideProvider
+    onClick {
         player.playClickSound()
         sideConfigMenu.openWindow(player)
     }
-    
 }
+
+@Suppress("FunctionName")
+@Deprecated("", ReplaceWith("openSideConfigItem(sideConfigMenu)"))
+fun OpenSideConfigItem(sideConfigMenu: SideConfigMenu) = openSideConfigItem(sideConfigMenu)

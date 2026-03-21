@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.util.component3
 import xyz.xenondevs.nova.util.component4
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
+import xyz.xenondevs.nova.world.item.clientsideProvider
 import java.awt.Color
 import java.util.*
 
@@ -113,7 +114,7 @@ object VisualRegion {
         val center = from.clone().add(to).multiply(0.5)
         
         return FakeItemDisplay(center, false) { _, data ->
-            data.itemStack = DefaultBlockOverlays.TRANSPARENT_BLOCK.clientsideProvider.get()
+            data.itemStack = DefaultBlockOverlays.TRANSPARENT_BLOCK.clientsideProvider.get().get()
             data.scale = Vector3f(
                 (to.x - from.x + lineWidth).toFloat(),
                 (to.y - from.y + lineWidth).toFloat(),

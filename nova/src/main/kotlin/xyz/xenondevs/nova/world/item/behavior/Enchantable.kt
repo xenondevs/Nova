@@ -31,11 +31,11 @@ fun Enchantable(
     enchantmentValue: Int? = null,
     primaryEnchantments: Provider<Set<Enchantment>>? = null,
     supportedEnchantments: Provider<Set<Enchantment>>? = null
-) = ItemBehaviorFactory {
-    val cfg = it.config
-    
+) = ItemBehaviorFactory { _, cfg ->
     val supportedEnchantments = cfg.entryOrElse(supportedEnchantments, "supported_enchantments")
-    val primaryEnchantments = cfg.optionalEntry<Set<Enchantment>>("primary_enchantments").orElseBy(primaryEnchantments).orElseBy(supportedEnchantments)
+    val primaryEnchantments = cfg.optionalEntry<Set<Enchantment>>("primary_enchantments")
+        .orElseBy(primaryEnchantments)
+        .orElseBy(supportedEnchantments)
     
     Enchantable(
         cfg.entryOrElse(enchantmentValue, "enchantment_value"),
@@ -76,7 +76,7 @@ class Enchantable(
      */
     val supportedEnchantments by supportedEnchantments
     
-    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider { 
+    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider {
         this[DataComponentTypes.ENCHANTMENTS] = itemEnchantments().build()
         this[DataComponentTypes.ENCHANTABLE] = enchantmentValue.map(::enchantable)
     }

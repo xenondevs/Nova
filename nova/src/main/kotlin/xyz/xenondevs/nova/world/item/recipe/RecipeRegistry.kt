@@ -15,7 +15,7 @@ import kotlin.reflect.full.isSuperclassOf
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
     dispatcher = Dispatcher.ASYNC,
-    dependsOn = [RecipeManager::class]
+    runAfter = [RecipeManager::class]
 )
 object RecipeRegistry {
     
@@ -130,7 +130,7 @@ object RecipeRegistry {
     
     private fun getBukkitRecipeSequence(): Sequence<Recipe> {
         return BUKKIT_RECIPES.asSequence().filter { recipe ->
-            RECIPE_TYPE.any { type -> type.recipeClass.isSuperclassOf(recipe::class) }
+            RECIPE_TYPE.entrySet.get().any { type -> type.recipeClass.isSuperclassOf(recipe::class) }
         }
     }
     

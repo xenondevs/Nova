@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.item
@@ -20,15 +21,18 @@ import xyz.xenondevs.invui.gui.pageProvider
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.nova.resources.CharSizes
+import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureAlignment
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.group.RecipeGroup
+import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.PlayerMapManager
-import xyz.xenondevs.nova.util.component.adventure.appendCentered
 import xyz.xenondevs.nova.util.component.adventure.font
-import xyz.xenondevs.nova.util.component.adventure.moveToCenter
+import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.item.ItemUtils
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.clientsideProvider
 import xyz.xenondevs.nova.world.item.recipe.RecipeContainer
 import xyz.xenondevs.nova.world.item.recipe.RecipeRegistry
 import java.util.*
@@ -140,12 +144,18 @@ internal class RecipesMenu(
             title by combinedProvider(tab, activePage, activePageCount) { tab, activePage, activePageCount ->
                 val pageNumberString = "${activePage + 1} / $activePageCount"
                 val pageNumberComponent = Component.text(pageNumberString, NamedTextColor.WHITE).font("nova:recipes_numbers")
-                Component.text()
-                    .append(recipes[tab].first.texture.component)
-                    .moveToCenter()
-                    .appendCentered(pageNumberComponent)
-                    .build()
-            }
+                recipes[tab].first.texture.getTitle(
+                    Component.text()
+                        .move(
+                            GuiTextureAlignment.CHEST_OFFSET.x() + GuiTextureAlignment.CHEST_WIDTH / 2f
+                                // -1 to account for space after last char (counts towards width, but isn't visible)
+                                // -1 to account for shadow which recipe_numbers has as part of the char
+                                - (CharSizes.calculateComponentWidth(pageNumberComponent) - 2) / 2f
+                        )
+                        .append(pageNumberComponent)
+                        .build()
+                )
+            }.flatten()
         }
         
         onOpen { active[player] = this@RecipesMenu }
@@ -250,11 +260,11 @@ private fun itemInfoButton(info: String): Item = item {
 private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            ItemProvider.EMPTY
+            provider(ItemProvider.EMPTY)
         else if (page > 0)
             DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON_ALIGNED_RIGHT.clientsideProvider
         else DefaultGuiItems.TP_SMALL_ARROW_LEFT_OFF_ALIGNED_RIGHT.clientsideProvider
-    }
+    }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() > 0) {
             page.set(page.get() - 1)
@@ -266,11 +276,11 @@ private fun tabPageBackItem(page: MutableProvider<Int>, pageCount: Provider<Int>
 private fun tabPageForwardItem(page: MutableProvider<Int>, pageCount: Provider<Int>) = item {
     itemProvider by combinedProvider(page, pageCount) { page, pageCount ->
         if (pageCount <= 1)
-            ItemProvider.EMPTY
+            provider(ItemProvider.EMPTY)
         else if (page + 1 < pageCount)
             DefaultGuiItems.TP_SMALL_ARROW_RIGHT_ON_ALIGNED_LEFT.clientsideProvider
         else DefaultGuiItems.TP_SMALL_ARROW_RIGHT_OFF_ALIGNED_LEFT.clientsideProvider
-    }
+    }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() < pageCount.get() - 1) {
             page.set(page.get() + 1)
@@ -284,7 +294,7 @@ private fun recipePageBackButton(page: MutableProvider<Int>): Item = item {
         if (page > 0)
             DefaultGuiItems.TP_ARROW_LEFT_BTN_ON.clientsideProvider
         else DefaultGuiItems.TP_ARROW_LEFT_BTN_OFF.clientsideProvider
-    }
+    }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() > 0) {
             page.set(page.get() - 1)
@@ -298,7 +308,7 @@ private fun recipePageForwardButton(page: MutableProvider<Int>, pageCount: Provi
         if (page + 1 < pageCount)
             DefaultGuiItems.TP_ARROW_RIGHT_BTN_ON.clientsideProvider
         else DefaultGuiItems.TP_ARROW_RIGHT_BTN_OFF.clientsideProvider
-    }
+    }.flatten()
     onClick {
         if (clickType.isLeftClick && page.get() < pageCount.get() - 1) {
             page.set(page.get() + 1)

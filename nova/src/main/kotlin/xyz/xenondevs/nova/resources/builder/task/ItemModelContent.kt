@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova.resources.builder.task
 
 import kotlinx.serialization.json.Json
-import xyz.xenondevs.nova.registry.NovaRegistries
+import net.kyori.adventure.key.Key
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
@@ -9,6 +10,7 @@ import xyz.xenondevs.nova.resources.builder.data.ItemModelDefinition
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
 import xyz.xenondevs.nova.util.toString
+import xyz.xenondevs.nova.world.item.NovaItem
 
 /**
  * Generates item model definitions.
@@ -81,23 +83,23 @@ class ItemModelContent(val builder: ResourcePackBuilder) : PackBuildData {
      */
     inner class GenerateItemDefinitions : PackTask {
         
-        override val stage = BuildStage.POST_WORLD // // SelectItemModelProperty.Component requires registry access for serialization
+        override val stage = BuildStage.POST_WORLD // SelectItemModelProperty.Component requires registry access for serialization
         override val runsAfter = setOf(ModelContent.LoadCustom::class)
         override val runsBefore = setOf(ModelContent.Write::class, Write::class)
         
         override suspend fun run() {
-            for (item in NovaRegistries.ITEM) {
+            for ((itemId, configureDefinition) in novaItemDefinitions) {
                 val definition = ItemModelDefinitionBuilder(
                     builder
                 ) { modelSelector ->
-                    val scope = ItemModelSelectorScope(item, builder, modelContent)
+                    val scope = ItemModelSelectorScope(itemId, builder, modelContent)
                     val (model, _) = modelSelector(scope).buildScaled(modelContent)
                     val id = modelContent.getOrPutGenerated(model)
                     modelContent.rememberUsage(id)
                     id
-                }.apply(item.configureDefinition).build()
+                }.apply(configureDefinition).build()
                 
-                val path = ResourcePath.of(ResourceType.ItemModelDefinition, item.id)
+                val path = ResourcePath.of(ResourceType.ItemModelDefinition, itemId)
                 set(path, definition)
             }
         }
@@ -113,6 +115,23 @@ class ItemModelContent(val builder: ResourcePackBuilder) : PackBuildData {
             for ((path, def) in customDefsByPath) {
                 builder.writeJson(path, def)
             }
+        }
+        
+    }
+    
+    internal companion object {
+        
+        private val novaItemDefinitions = HashMap<Key, ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit>()
+        
+        /**
+         * Requests the generation and assignment of item model(s) and an item model definition
+         * for [entry] using [configureDefinition].
+         */
+        fun request(
+            entry: RegistryEntry.Nova<NovaItem>,
+            configureDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit
+        ) {
+            novaItemDefinitions[entry.key] = configureDefinition
         }
         
     }

@@ -2,10 +2,13 @@ package xyz.xenondevs.nova.resources.builder.task
 
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
-import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.getOrThrow
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.builder.layout.gui.GuiTextureLayout
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.ui.menu.VanillaGuiTextureInjector
@@ -21,8 +24,7 @@ internal class GuiTextureData(
     @Serializable(with = KeySerializer::class)
     val font: Key,
     val codePoint: Int,
-    val offset: Int,
-    val hasInventoryLabel: Boolean
+    val offset: Int
 )
 
 /**
@@ -105,22 +107,41 @@ class GuiTextureTask(
     }
     
     private fun loadCustomGuiTextures() {
-        val guiTextures = HashMap<GuiTexture, GuiTextureData>()
-        val guiTexturesByFontChar = HashMap<FontChar, GuiTexture>()
+        val guiTextures = HashMap<RegistryEntry.Nova<GuiTexture>, GuiTextureData>()
+        val guiTexturesByFontChar = HashMap<FontChar, RegistryEntry.Nova<GuiTexture>>()
         
-        for (guiTexture in NovaRegistries.GUI_TEXTURE) {
-            val layout = guiTexture.makeLayout(builder)
+        for ((guiTexture, makeLayout) in requests) {
+            val layout = makeLayout(builder)
             val texture = layout.texture.toType(ResourceType.FontTexture)
             val dim = builder.resolve(texture).readImageDimensions()
             val offset = layout.alignment.getOffset(dim.width, dim.height)
             
-            val fontChar = addEntry(guiTexture.id.toString(), texture, dim.height, -offset.y())
-            guiTextures[guiTexture] = GuiTextureData(fontChar.font, fontChar.codePoint, offset.x(), layout.hasInventoryLabel)
+            val fontChar = addEntry(guiTexture.key.toString(), texture, dim.height, -offset.y())
+            guiTextures[guiTexture] = GuiTextureData(fontChar.font, fontChar.codePoint, offset.x())
             guiTexturesByFontChar[fontChar] = guiTexture
         }
         
-        ResourceLookups.GUI_TEXTURE = guiTextures
-        ResourceLookups.GUI_TEXTURE_BY_FONT_CHAR = guiTexturesByFontChar
+        ResourceLookups.guiTexture = guiTextures
+        ResourceLookups.guiTextureByFontChar = guiTexturesByFontChar
+    }
+    
+    internal companion object {
+        
+        private val requests = HashMap<RegistryEntry.Nova<GuiTexture>, (ResourcePackBuilder) -> GuiTextureLayout>()
+        
+        /**
+         * Requests the generation of [entry] using [makeLayout].
+         * Results will be written to [ResourceLookups.guiTextureLookup] and [ResourceLookups.guiTextureByFontChar]
+         * and are also available in the returned provider.
+         */
+        fun request(
+            entry: RegistryEntry.Nova<GuiTexture>,
+            makeLayout: (ResourcePackBuilder) -> GuiTextureLayout
+        ): Provider<GuiTextureData> {
+            requests[entry] = makeLayout
+            return ResourceLookups.guiTextureLookup.getOrThrow(entry)
+        }
+        
     }
     
 }

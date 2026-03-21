@@ -8,7 +8,6 @@ import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
 import xyz.xenondevs.nova.context.ContextParamType
@@ -22,9 +21,8 @@ import xyz.xenondevs.nova.context.intention.HasRequiredBlock.Companion.BLOCK_TYP
 import xyz.xenondevs.nova.context.intention.HasRequiredBlock.Companion.BLOCK_TYPE_VANILLA
 import xyz.xenondevs.nova.context.intention.HasRequiredBlock.Companion.BLOCK_WORLD
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.Key
-import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.util.novaBlock
+import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -72,7 +70,7 @@ interface HasRequiredBlock<I : HasRequiredBlock<I>> : ContextIntention<I> {
     /**
      * The block type as id.
      */
-    val BLOCK_TYPE: RequiredContextParamType<Key, I>
+    val BLOCK_TYPE: RequiredContextParamType<Key, I> // TODO: registry entry
         get() = blockType()
     
     /**
@@ -102,14 +100,14 @@ interface HasRequiredBlock<I : HasRequiredBlock<I>> : ContextIntention<I> {
     @Suppress("UNCHECKED_CAST")
     companion object {
         
-        private val BLOCK = RequiredContextParamType<Block, Nothing>(Key(Nova, "block"))
-        private val BLOCK_POS = RequiredContextParamType<BlockPos, Nothing>(Key(Nova, "block_pos"))
-        private val BLOCK_WORLD = RequiredContextParamType<World, Nothing>(Key(Nova, "block_world"))
-        private val BLOCK_TYPE = RequiredContextParamType<Key, Nothing>(Key(Nova, "block_type"))
-        private val BLOCK_TYPE_VANILLA = ContextParamType<BlockType, Nothing>(Key(Nova, "block_type_vanilla"))
-        private val BLOCK_STATE_VANILLA = ContextParamType<BlockData, Nothing>(Key(Nova, "block_state_vanilla"))
-        private val BLOCK_TYPE_NOVA = ContextParamType<NovaBlock, Nothing>(Key(Nova, "block_type_nova"))
-        private val BLOCK_STATE_NOVA = ContextParamType<NovaBlockState, Nothing>(Key(Nova, "block_state_nova"))
+        private val BLOCK = RequiredContextParamType<Block, Nothing>(novaKey("block"))
+        private val BLOCK_POS = RequiredContextParamType<BlockPos, Nothing>(novaKey("block_pos"))
+        private val BLOCK_WORLD = RequiredContextParamType<World, Nothing>(novaKey("block_world"))
+        private val BLOCK_TYPE = RequiredContextParamType<Key, Nothing>(novaKey("block_type"))
+        private val BLOCK_TYPE_VANILLA = ContextParamType<BlockType, Nothing>(novaKey("block_type_vanilla"))
+        private val BLOCK_STATE_VANILLA = ContextParamType<BlockData, Nothing>(novaKey("block_state_vanilla"))
+        private val BLOCK_TYPE_NOVA = ContextParamType<NovaBlock, Nothing>(novaKey("block_type_nova"))
+        private val BLOCK_STATE_NOVA = ContextParamType<NovaBlockState, Nothing>(novaKey("block_state_nova"))
         
         /**
          * Gets the param type for [BLOCK].
@@ -170,7 +168,7 @@ interface HasRequiredBlock<I : HasRequiredBlock<I>> : ContextIntention<I> {
             addAutofiller(BLOCK, Autofiller.from(BLOCK_POS, BlockPos::block))
             addAutofiller(BLOCK_POS, Autofiller.from(BLOCK, Block::pos))
             addAutofiller(BLOCK_WORLD, Autofiller.from(BLOCK_POS, BlockPos::world))
-            addAutofiller(BLOCK_TYPE, Autofiller.from(BLOCK_TYPE_NOVA, NovaBlock::id))
+            addAutofiller(BLOCK_TYPE, Autofiller.from(BLOCK_TYPE_NOVA, NovaBlock::getKey))
             addAutofiller(BLOCK_TYPE, Autofiller.from(BLOCK_TYPE_VANILLA, BlockType::key))
             addAutofiller(BLOCK_TYPE_VANILLA, Autofiller.from(BLOCK_STATE_VANILLA) { it.material.asBlockType() })
             addAutofiller(BLOCK_TYPE_VANILLA, Autofiller.from(BLOCK_TYPE, Registry.BLOCK::get))

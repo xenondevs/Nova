@@ -24,7 +24,7 @@ internal abstract class GenerateLanguageFilesTask : DefaultTask() {
     fun run() {
         val langDir = project.projectDir.resolve("src/main/resources/assets/lang/")
         langDir.mkdirs()
-        LANGUAGE_CODES.forEach { 
+        LANGUAGE_CODES.forEach {
             val langFile = langDir.resolve("$it.json")
             if (!langFile.exists())
                 langFile.writeText("{}")

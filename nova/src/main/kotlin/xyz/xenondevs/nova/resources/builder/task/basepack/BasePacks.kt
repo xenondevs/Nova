@@ -77,7 +77,7 @@ class BasePacks internal constructor(internal val builder: ResourcePackBuilder) 
             if (occupiedBlockStates.isNotEmpty())
                 builder.logger.warn("Base packs occupy ${occupiedBlockStates.size} block states that cannot be used by Nova")
             
-            ResourceLookups.OCCUPIED_BLOCK_STATES = occupiedBlockStates
+            ResourceLookups.occupiedBlockStates = occupiedBlockStates
         }
         
         

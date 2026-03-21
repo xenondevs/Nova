@@ -31,7 +31,7 @@ import kotlin.io.path.walk
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
     dispatcher = Dispatcher.ASYNC,
-    dependsOn = [ResourceGeneration.PostWorld::class]
+    runAfter = [ResourceGeneration.PostWorld::class]
 )
 object LocaleManager {
     
@@ -55,7 +55,7 @@ object LocaleManager {
      * Checks whether Nova is aware of a translation for [key] in [lang].
      */
     fun hasTranslation(lang: String, key: String): Boolean {
-        if (ResourceLookups.LANGUAGE[lang.lowercase()]?.contains(key) == true)
+        if (ResourceLookups.language[lang.lowercase()]?.contains(key) == true)
             return true
         return vanillaTranslations[lang.lowercase()]?.contains(key) == true
     }
@@ -64,7 +64,7 @@ object LocaleManager {
      * Gets the format string for [key] in [lang], or null if none was found.
      */
     fun getFormatStringOrNull(lang: String, key: String): String? {
-        return ResourceLookups.LANGUAGE[lang.lowercase()]?.get(key) 
+        return ResourceLookups.language[lang.lowercase()]?.get(key)
             ?: vanillaTranslations[lang.lowercase()]?.get(key)
     }
     
@@ -135,7 +135,7 @@ object LocaleManager {
         override fun name(): Key = Key.key("nova", "translator")
         
         override fun translate(key: String, locale: Locale): MessageFormat? {
-            val lang = buildString { 
+            val lang = buildString {
                 append(locale.language.lowercase())
                 if (locale.country.isNotEmpty()) {
                     append("_")
@@ -151,5 +151,5 @@ object LocaleManager {
         }
         
     }
-        
+    
 }

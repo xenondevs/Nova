@@ -47,7 +47,7 @@ data class ComponentSize(
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
     dispatcher = Dispatcher.ASYNC,
-    dependsOn = [ResourceGeneration.PostWorld::class]
+    runAfter = [ResourceGeneration.PostWorld::class]
 )
 object CharSizes {
     

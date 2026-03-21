@@ -32,7 +32,7 @@ internal val PREVIOUS_NOVA_VERSION: Version? = PermanentStorage.retrieve<Version
 internal val DATA_FOLDER = Path("plugins", "Nova")
 
 internal lateinit var BOOTSTRAPPER: NovaBootstrapper private set
-internal lateinit var LIFECYCLE_MANAGER: LifecycleEventManager<*>
+internal lateinit var BOOTSTRAP_LIFECYCLE: LifecycleEventManager<BootstrapContext>
 internal lateinit var LOGGER: ComponentLogger private set
 internal lateinit var NOVA_VERSION: Version private set
 internal lateinit var NOVA_JAR: Path private set
@@ -50,7 +50,7 @@ internal class NovaBootstrapper : PluginBootstrap {
     }
     
     override fun bootstrap(context: BootstrapContext) {
-        LIFECYCLE_MANAGER = context.lifecycleManager
+        BOOTSTRAP_LIFECYCLE = context.lifecycleManager
         LOGGER = context.logger
         NOVA_VERSION = Version(context.pluginMeta.version)
         NOVA_JAR = context.pluginSource
@@ -91,7 +91,7 @@ internal class NovaBootstrapper : PluginBootstrap {
     
     fun handleAddonBootstrap(context: BootstrapContext) {
         if (--remainingAddons == 0) {
-            LIFECYCLE_MANAGER = context.lifecycleManager
+            BOOTSTRAP_LIFECYCLE = context.lifecycleManager
             init()
         }
     }

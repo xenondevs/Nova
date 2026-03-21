@@ -42,8 +42,7 @@ fun Damageable(
     itemDamageOnBreakBlock: Int = 0,
     repairIngredient: RecipeChoice? = null,
     breakSound: Key = SoundEventKeys.ENTITY_ITEM_BREAK
-) = ItemBehaviorFactory<Damageable> {
-    val cfg = it.config
+) = ItemBehaviorFactory { _, cfg ->
     Damageable(
         cfg.entryOrElse(maxDurability, arrayOf("max_durability"), arrayOf("durability")),
         cfg.entryOrElse(itemDamageOnAttackEntity, "item_damage_on_attack_entity"),
@@ -101,7 +100,7 @@ class Damageable(
     val breakSound: Sound?
         get() = Registry.SOUND_EVENT.get(breakSoundKey)
     
-    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider { 
+    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider {
         this[DataComponentTypes.MAX_DAMAGE] = maxDurability
         this[DataComponentTypes.DAMAGE] = 0
         this[DataComponentTypes.BREAK_SOUND] = breakSound
@@ -123,7 +122,7 @@ class Damageable(
             "itemDamageOnBreakBlock=$itemDamageOnBreakBlock, " +
             "repairIngredient=$repairIngredient" +
             "breakSound=$breakSoundKey" +
-        ")"
+            ")"
     }
     
 }

@@ -112,7 +112,7 @@ class BlockStateContent(private val builder: ResourcePackBuilder) : PackBuildDat
                     dest += async {
                         val path = ResourcePath(
                             ResourceType.BlockStateDefinition,
-                            namespace, 
+                            namespace,
                             file.relativeTo(dir).invariantSeparatorsPathString
                         )
                         path to loadDefinition(file)

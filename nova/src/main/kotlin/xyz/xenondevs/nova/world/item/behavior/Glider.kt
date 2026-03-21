@@ -10,8 +10,8 @@ import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
  */
 object Glider : ItemBehavior {
     
-    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider { 
-        set(DataComponentTypes.GLIDER) 
+    override val baseDataComponents: Provider<DataComponentMap> = buildDataComponentMapProvider {
+        set(DataComponentTypes.GLIDER)
     }
     
 }

@@ -127,7 +127,7 @@ abstract class AddonExtension @Inject constructor(
      * Defaults to `<name>-<version>+Nova-<novaRelease>.jar` (e.g. `MyAddon-1.0.0+Nova-0.21.jar`).
      */
     val fileName: Property<String> = objects.property<String>()
-        .convention(name.zip(version) { name, version -> "$name-$version+Nova-${Versions.NOVA_RELEASE}.jar"})
+        .convention(name.zip(version) { name, version -> "$name-$version+Nova-${Versions.NOVA_RELEASE}.jar" })
     
     /**
      * Creates a dependency on a plugin named [name] in both the [Stage.BOOTSTRAP] and [Stage.SERVER] stages.

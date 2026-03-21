@@ -9,7 +9,7 @@ import kotlinx.serialization.json.JsonTransformingSerializer
 internal class ValueOrListSerializer<T>(dataSerializer: KSerializer<T>) : JsonTransformingSerializer<List<T>>(ListSerializer(dataSerializer)) {
     
     override fun transformDeserialize(element: JsonElement): JsonElement =
-        if (element !is JsonArray) JsonArray(listOf(element)) else element
+        element as? JsonArray ?: JsonArray(listOf(element))
     
     override fun transformSerialize(element: JsonElement): JsonElement {
         require(element is JsonArray) // this serializer is used only with lists

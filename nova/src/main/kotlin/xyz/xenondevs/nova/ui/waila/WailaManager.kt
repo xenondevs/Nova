@@ -29,7 +29,7 @@ private val Player.isWailaEnabled: Boolean
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [ResourceGeneration.PostWorld::class]
+    runAfter = [ResourceGeneration.PostWorld::class]
 )
 internal object WailaManager : Listener, IWailaManager {
     

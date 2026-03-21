@@ -78,7 +78,7 @@ internal object AutoUploadManager {
         try {
             service.enable(cfg)
             this.selectedService = service
-        } catch(e: IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
             LOGGER.error("Failed to enable upload service $serviceName: ${e.message}")
         }
     }

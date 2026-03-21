@@ -5,13 +5,14 @@ import net.minecraft.world.level.storage.loot.LootParams
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.phys.Vec3
-import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.event.block.LeavesDecayEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.CUBE_FACES
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
@@ -19,7 +20,6 @@ import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.LEAVES_DISTANCE
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.LEAVES_PERSISTENT
@@ -27,7 +27,11 @@ import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import kotlin.math.min
 
-internal object LeavesBehavior : BlockBehavior {
+internal class LeavesBehavior(
+    itemType: RegistryEntry.Paper<ItemType>
+) : BlockBehavior {
+    
+    private val itemType: ItemType by itemType
     
     override fun ticksRandomly(state: NovaBlockState): Boolean {
         return !state.getOrThrow(LEAVES_PERSISTENT) && state.getOrThrow(LEAVES_DISTANCE) == 7
@@ -87,41 +91,29 @@ internal object LeavesBehavior : BlockBehavior {
         return state
     }
     
-    fun getDistanceAt(pos: BlockPos): Int? {
-        val state = WorldDataManager.getBlockState(pos)
-            ?: return if (Tag.LOGS.isTagged(pos.block.type)) 0 else null
-        return state[LEAVES_DISTANCE]
-    }
+    override fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack =
+        itemType.createItemStack()
     
-    fun calculateDistance(pos: BlockPos): Int {
-        var distance = 7
-        for (face in CUBE_FACES) {
-            val neighborPos = pos.advance(face)
-            val dist = getDistanceAt(neighborPos)
-                ?: continue
-            distance = min(distance, dist + 1)
+    companion object {
+        
+        fun getDistanceAt(pos: BlockPos): Int? {
+            val state = WorldDataManager.getBlockState(pos)
+                ?: return if (Tag.LOGS.isTagged(pos.block.type)) 0 else null
+            return state[LEAVES_DISTANCE]
         }
         
-        return distance
-    }
-    
-    override fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack? {
-        val type = when (state.block) {
-            DefaultBlocks.OAK_LEAVES -> Material.OAK_LEAVES
-            DefaultBlocks.SPRUCE_LEAVES -> Material.SPRUCE_LEAVES
-            DefaultBlocks.BIRCH_LEAVES -> Material.BIRCH_LEAVES
-            DefaultBlocks.JUNGLE_LEAVES -> Material.JUNGLE_LEAVES
-            DefaultBlocks.ACACIA_LEAVES -> Material.ACACIA_LEAVES
-            DefaultBlocks.DARK_OAK_LEAVES -> Material.DARK_OAK_LEAVES
-            DefaultBlocks.MANGROVE_LEAVES -> Material.MANGROVE_LEAVES
-            DefaultBlocks.CHERRY_LEAVES -> Material.CHERRY_LEAVES
-            DefaultBlocks.AZALEA_LEAVES -> Material.AZALEA_LEAVES
-            DefaultBlocks.FLOWERING_AZALEA_LEAVES -> Material.FLOWERING_AZALEA_LEAVES
-            DefaultBlocks.PALE_OAK_LEAVES -> Material.PALE_OAK_LEAVES
-            else -> throw UnsupportedOperationException("Unknown leaves block type: ${state.block}")
+        fun calculateDistance(pos: BlockPos): Int {
+            var distance = 7
+            for (face in CUBE_FACES) {
+                val neighborPos = pos.advance(face)
+                val dist = getDistanceAt(neighborPos)
+                    ?: continue
+                distance = min(distance, dist + 1)
+            }
+            
+            return distance
         }
         
-        return ItemStack.of(type)
     }
     
 }

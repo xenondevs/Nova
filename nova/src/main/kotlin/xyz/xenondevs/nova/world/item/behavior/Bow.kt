@@ -8,7 +8,6 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.ProjectileWeaponItem
 import org.bukkit.GameMode
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.Tag
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -16,9 +15,9 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
+import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.util.unwrap
 
 /**
@@ -74,9 +73,9 @@ interface BowLogic {
             
             (Items.BOW as BowItem).shoot(
                 level,
-                nmsEntity, 
-                hand.nmsInteractionHand, 
-                bow.unwrap(), 
+                nmsEntity,
+                hand.nmsInteractionHand,
+                bow.unwrap(),
                 projectileItems,
                 powerForTime * 3f,
                 1f,
@@ -100,7 +99,7 @@ interface BowLogic {
     
 }
 
-private val CAN_USE_KEY = NamespacedKey(Nova, "can_use_bow")
+private val CAN_USE_KEY = novaKey("can_use_bow")
 private const val USE_DURATION: Int = 72000
 
 /**

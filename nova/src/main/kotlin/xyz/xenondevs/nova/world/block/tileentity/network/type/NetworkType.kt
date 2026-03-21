@@ -1,12 +1,15 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type
 
-import net.kyori.adventure.key.Key
+import kotlinx.serialization.Serializable
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.set
+import xyz.xenondevs.nova.registry.NovaRegistrar.registerNetworkType
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryLoader
+import xyz.xenondevs.nova.serialization.kotlinx.NetworkTypeSerializer
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkGroup
@@ -37,44 +40,40 @@ internal typealias LocalValidator = (NetworkEndPoint, NetworkEndPoint, BlockFace
  * @param holderTypes The types of [EndPointDataHolders][EndPointDataHolder]
  * that are required for end points of this [NetworkType].
  */
+@Serializable(with = NetworkTypeSerializer::class)
 class NetworkType<T : Network<T>> internal constructor(
-    val id: Key,
+    override val entry: RegistryEntry.Nova<NetworkType<T>>,
     val createNetwork: NetworkConstructor<T>,
     val createGroup: NetworkGroupConstructor<T>,
     val validateLocal: LocalValidator,
     tickDelay: Provider<Int>,
     val holderTypes: Set<KClass<out EndPointDataHolder>>
-) {
+) : NovaRegistryElement<NetworkType<T>> {
     
     /**
      * The delay between [network ticks][NetworkGroup.tick].
      */
     val tickDelay: Int by tickDelay
     
-    override fun toString(): String {
-        return id.toString()
-    }
-    
-    override fun equals(other: Any?): Boolean {
-        return other is NetworkType<*> && id == other.id
-    }
-    
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
+    override fun toString(): String = key.toString()
+    override fun hashCode(): Int = key.hashCode()
+    override fun equals(other: Any?): Boolean = other is NetworkType<*> && key == other.key
     
 }
 
 /**
  * The default network types provided by Nova.
  */
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
+@InternalInit(
+    stage = InternalInitStage.PRE_WORLD,
+    runBefore = [RegistryLoader::class]
+)
 object DefaultNetworkTypes {
     
     /**
      * The default network type responsible for distributing energy provided through [EnergyHolders][EnergyHolder].
      */
-    val ENERGY = register(
+    val ENERGY = registerNetworkType(
         "energy",
         ::EnergyNetwork, ::EnergyNetworkGroup, EnergyNetwork::validateLocal,
         EnergyNetwork.TICK_DELAY_PROVIDER,
@@ -84,7 +83,7 @@ object DefaultNetworkTypes {
     /**
      * The default network type responsible for distributing items provided through [ItemHolders][ItemHolder].
      */
-    val ITEM = register(
+    val ITEM = registerNetworkType(
         "item",
         ::ItemNetwork, ::ItemNetworkGroup, ItemNetwork::validateLocal,
         ItemNetwork.TICK_DELAY_PROVIDER,
@@ -94,32 +93,12 @@ object DefaultNetworkTypes {
     /**
      * The default network type responsible for distributing fluids provided through [FluidHolders][FluidHolder].
      */
-    val FLUID = register(
+    val FLUID = registerNetworkType(
         "fluid",
         ::FluidNetwork, ::FluidNetworkGroup, FluidNetwork::validateLocal,
         FluidNetwork.TICK_DELAY_PROVIDER,
         FluidHolder::class
     )
-    
-    private fun <T : Network<T>> register(
-        name: String,
-        createNetwork: NetworkConstructor<T>,
-        createGroup: NetworkGroupConstructor<T>,
-        validateLocal: LocalValidator,
-        tickDelay: Provider<Int>,
-        vararg holderTypes: KClass<out EndPointDataHolder>
-    ): NetworkType<T> {
-        val id = Key.key("nova", name)
-        val type = NetworkType(
-            id,
-            createNetwork, createGroup,
-            validateLocal,
-            tickDelay,
-            holderTypes.toHashSet()
-        )
-        NovaRegistries.NETWORK_TYPE[id] = type
-        return type
-    }
     
 }
 

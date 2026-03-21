@@ -8,10 +8,10 @@ import xyz.xenondevs.commons.gson.hasArray
 import xyz.xenondevs.commons.gson.parseJson
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.util.data.UpdatableFile
 import xyz.xenondevs.nova.registry.NovaRegistries.RECIPE_TYPE
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.serialization.json.serializer.RecipeDeserializer
+import xyz.xenondevs.nova.util.data.UpdatableFile
 import java.io.File
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
@@ -25,7 +25,7 @@ internal object RecipesLoader {
     }
     
     private fun loadRecipes(): List<Any> {
-        return RECIPE_TYPE.flatMap {
+        return RECIPE_TYPE.entrySet.get().flatMap {
             val deserializer = it.deserializer
             if (deserializer != null) {
                 loadRecipes(it.dirName, it.deserializer)

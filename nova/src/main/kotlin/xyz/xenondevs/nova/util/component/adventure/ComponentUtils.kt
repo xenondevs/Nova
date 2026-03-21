@@ -238,7 +238,8 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
  * Moves the cursor by half the width of the [component] to the left, then appends the [component].
  */
 fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.appendCentered(component: Component, lang: String = "en_us"): B {
-    move(CharSizes.calculateComponentWidth(component, lang) / -2f)
+    // -1 to account for the one unit of empty space after the last char that still counts towards the width but isn't visible
+    move((CharSizes.calculateComponentWidth(component, lang) -1) / -2f)
     return append(component)
 }
 

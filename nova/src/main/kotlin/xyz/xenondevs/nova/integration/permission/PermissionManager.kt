@@ -33,7 +33,7 @@ private data class PermissionArgs(val world: World, val player: OfflinePlayer, v
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
     dispatcher = Dispatcher.ASYNC,
-    dependsOn = [HooksLoader::class]
+    runAfter = [HooksLoader::class]
 )
 object PermissionManager {
     

@@ -27,7 +27,7 @@ import kotlin.random.Random
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
-    dependsOn = [WorldDataManager::class]
+    runAfter = [WorldDataManager::class]
 )
 internal object SoundEngine : Listener, PacketListener {
     
@@ -38,7 +38,7 @@ internal object SoundEngine : Listener, PacketListener {
     }
     
     fun overridesSound(sound: String): Boolean {
-        return sound.removePrefix("minecraft:") in ResourceLookups.SOUND_OVERRIDES
+        return sound.removePrefix("minecraft:") in ResourceLookups.soundOverrides
     }
     
     fun overridesSound(sound: Sound): Boolean {
@@ -49,11 +49,11 @@ internal object SoundEngine : Listener, PacketListener {
     fun broadcast(entity: Entity, oldSound: String, newSound: String, volume: Float, pitch: Float) {
         val level = entity.level()
         val player = if (overridesSound(oldSound)) null else entity as? Player
-
+        
         MINECRAFT_SERVER.playerList.broadcast(
             player,
-            entity.x, entity.y, entity.z, 
-            16.0, 
+            entity.x, entity.y, entity.z,
+            16.0,
             level.dimension(),
             ClientboundSoundPacket(
                 Holder.direct(SoundEvent.createVariableRangeEvent(Identifier.parse(newSound))),
@@ -91,7 +91,7 @@ internal object SoundEngine : Listener, PacketListener {
     @PacketHandler
     private fun handleSoundPacket(event: ClientboundSoundPacketEvent) {
         val location = event.sound.unwrap().mapBoth({ it.identifier() }, { it.location }).take()
-        if (location.namespace == "minecraft" && location.path in ResourceLookups.SOUND_OVERRIDES) {
+        if (location.namespace == "minecraft" && location.path in ResourceLookups.soundOverrides) {
             event.sound = getNovaSound(location.path)
         }
     }
@@ -99,7 +99,7 @@ internal object SoundEngine : Listener, PacketListener {
     @PacketHandler
     private fun handleSoundPacket(event: ClientboundSoundEntityPacketEvent) {
         val location = event.sound.unwrap().mapBoth({ it.identifier() }, { it.location }).take()
-        if (location.namespace == "minecraft" && location.path in ResourceLookups.SOUND_OVERRIDES) {
+        if (location.namespace == "minecraft" && location.path in ResourceLookups.soundOverrides) {
             event.sound = getNovaSound(location.path)
         }
     }

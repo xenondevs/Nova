@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.resources.builder.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import xyz.xenondevs.nova.serialization.json.serializer.PackVersionMultiFormatSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.IntRangeMultiFormatSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.PackVersionMultiFormatSerializer
 
 @Serializable
 internal data class PackMcMeta(

@@ -12,18 +12,21 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mapNonNull
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
 import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.setTitle
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.serialization.DataHolder
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
+import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
 import xyz.xenondevs.nova.util.item.storeData
 import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.world.BlockPos
@@ -387,10 +390,10 @@ abstract class TileEntity(
     /**
      * A menu for a [TileEntity].
      */
-    abstract inner class TileEntityMenu internal constructor(protected val texture: GuiTexture? = null) {
+    abstract inner class TileEntityMenu internal constructor(protected val texture: Provider<GuiTexture>? = null) {
         
-        open fun getTitle(): Component =
-            texture?.getTitle(block.name) ?: block.name
+        open fun getTitle(): Provider<Component> =
+            texture?.getTitle(block.name) ?: provider(block.name)
         
     }
     
@@ -398,7 +401,7 @@ abstract class TileEntity(
      * A menu for a [TileEntity] that uses the same instance for all players.
      */
     abstract inner class GlobalTileEntityMenu(
-        texture: GuiTexture? = null
+        texture: Provider<GuiTexture>? = null
     ) : TileEntityMenu(texture) {
         
         abstract val gui: Gui
@@ -424,7 +427,7 @@ abstract class TileEntity(
      */
     abstract inner class IndividualTileEntityMenu(
         protected val player: Player,
-        texture: GuiTexture? = null
+        texture: Provider<GuiTexture>? = null
     ) : TileEntityMenu(texture) {
         
         abstract val gui: Gui

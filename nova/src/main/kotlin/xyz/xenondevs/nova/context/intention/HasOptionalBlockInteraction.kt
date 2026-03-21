@@ -3,13 +3,12 @@
 package xyz.xenondevs.nova.context.intention
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
 import xyz.xenondevs.nova.context.ContextParamType
 import xyz.xenondevs.nova.context.intention.HasOptionalBlockInteraction.Companion.CLICKED_BLOCK_FACE
 import xyz.xenondevs.nova.util.BlockFaceUtils
-import xyz.xenondevs.nova.util.Key
+import xyz.xenondevs.nova.util.novaKey
 
 /**
  * A [ContextIntention] that has optional parameters about an interaction on or with a block.
@@ -31,7 +30,7 @@ interface HasOptionalBlockInteraction<I : HasOptionalBlockInteraction<I>> : HasO
     @Suppress("UNCHECKED_CAST")
     companion object {
         
-        private val CLICKED_BLOCK_FACE = ContextParamType<BlockFace, Nothing>(Key(Nova, "clicked_block_face"))
+        private val CLICKED_BLOCK_FACE = ContextParamType<BlockFace, Nothing>(novaKey("clicked_block_face"))
         
         /**
          * Gets the param type for [CLICKED_BLOCK_FACE]

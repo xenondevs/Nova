@@ -6,6 +6,8 @@ import net.minecraft.util.RandomSource
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTestType
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.util.data.byNameCodec
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
@@ -26,7 +28,7 @@ class NovaBlockMatchTest(val block: NovaBlock) : NovaBlockTest() {
 object NovaBlockMatchTestType : RuleTestType<NovaBlockMatchTest> {
     
     private val CODEC: MapCodec<NovaBlockMatchTest> =
-        NovaBlock.CODEC
+        NovaRegistries.BLOCK.byNameCodec()
             .fieldOf("block")
             .xmap(::NovaBlockMatchTest, NovaBlockMatchTest::block)
     

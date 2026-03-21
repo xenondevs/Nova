@@ -22,10 +22,10 @@ abstract class LevelMixin {
         ordinal = 1
     )
     private BlockState notifyAndUpdatePhysics(
-        BlockState newState, 
+        BlockState newState,
         @Local(ordinal = 2, argsOnly = true) BlockState currentState
     ) {
-       return currentState; 
+        return currentState;
     }
     
 }

@@ -119,13 +119,12 @@ internal class InitializableClass(
             val stage = (annotation["stage"] as Array<String>?)?.get(1)
                 ?.let { enumValueOf<InternalInitStage>(it) }
                 ?: throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")
-            val dispatcher = readDispatcher(annotation)
-            val dependsOn = readStrings("dependsOn", annotation)
+            val (dispatcher, runBefore, runAfter) = readAnnotationCommons(annotation)
             
             return InitializableClass(
                 classLoader, clazz,
                 stage, (dispatcher ?: Dispatcher.SYNC).dispatcher,
-                emptySet(), dependsOn
+                runBefore, runAfter
             )
         }
         

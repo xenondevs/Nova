@@ -4,9 +4,10 @@ package xyz.xenondevs.nova.resources.builder.task
 
 import org.joml.Matrix4f
 import xyz.xenondevs.commons.collections.flatMap
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
-import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
@@ -46,7 +47,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
     
     override val stage = BuildStage.PRE_WORLD
     override val runsAfter = setOf(BasePacks.Include::class, ExtractTask::class, ModelContent.LoadCustom::class, BlockStateContent.PreLoadAll::class)
-    override val runsBefore = setOf(ModelContent.Write::class, ItemModelContent.Write::class, BlockStateContent.Write::class)
+    override val runsBefore = setOf(ModelContent.Write::class, ItemModelContent.Write::class, BlockStateContent.Write::class, SoundOverridesContent.Write::class)
     
     private val variantByConfig = HashMap<BackingStateConfig, BlockStateDefinition.Model>()
     private val configsByVariant = HashMap<BlockStateDefinition.Model, ArrayList<BackingStateConfig>>()
@@ -57,6 +58,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
     private val modelContent by builder.getBuildDataLazily<ModelContent>()
     private val itemModelContent by builder.getBuildDataLazily<ItemModelContent>()
     private val blockStateContent by builder.getBuildDataLazily<BlockStateContent>()
+    private val soundOverridesContent by builder.getBuildDataLazily<SoundOverridesContent>()
     
     override suspend fun run() {
         loadExistingBlockStateVariants()
@@ -80,7 +82,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
                 
                 if (bsd.multipart.isNotEmpty()) {
                     builder.logger.warn("Block state file $bsdId contains multipart block states, which are not supported. " +
-                            "Block states defined in this file will be ignored and potentially overwritten.")
+                        "Block states defined in this file will be ignored and potentially overwritten.")
                     return@forEach
                 }
                 
@@ -116,50 +118,64 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
         // 2. amount of available states (ascending)
         // 3. id
         assignBlockModels<BlockModelLayout.StateBacked>(
-            compareByDescending<Pair<NovaBlock, BlockModelLayout.StateBacked>> { (_, layout) -> layout.priority }
+            compareByDescending<Pair<RegistryEntry.Nova<NovaBlock>, BlockModelLayout.StateBacked>> { (_, layout) -> layout.priority }
                 .thenBy { (_, layout) -> layout.configTypes.sumOf { it.maxId - it.blockedIds.size } }
-                .thenBy { (block, _) -> block.id }
+                .thenBy { (block, _) -> block.key }
         ) { blockState, layout, scope ->
             val modelBuilder = layout.modelSelector(scope)
             val cfg = assignModelToVanillaBlockState(layout, modelBuilder, blockState[WATERLOGGED] == true)
             if (cfg != null) {
                 lookup[blockState] = BackingStateBlockModelProvider(cfg)
+                soundOverridesContent.useBlockData(cfg.blockType.map { it.createBlockData() })
             } else {
                 builder.logger.warn("No more block states for $blockState with layout $layout, falling back to display entity")
-                val data = DisplayEntityBlockModelData(blockState, assignModelToItem(modelBuilder), DEFAULT_BLOCK_STATE_SELECTOR(scope))
+                val data = DisplayEntityBlockModelData(
+                    blockState[WATERLOGGED] == true, 
+                    assignModelToItem(modelBuilder), 
+                    provider { DEFAULT_BLOCK_STATE_SELECTOR(scope) }
+                )
                 lookup[blockState] = DisplayEntityBlockModelProvider(data)
+                soundOverridesContent.useBlockData(data.colliderProvider)
             }
         }
         
         // entity-backed blocks
         assignBlockModels<BlockModelLayout.EntityBacked> { blockState, layout, scope ->
-            val scope = BlockModelSelectorScope(blockState, builder, modelContent)
             val models = when (layout) {
                 is BlockModelLayout.SimpleEntityBacked -> assignModelToItem(layout.modelSelector(scope))
                 is BlockModelLayout.ItemEntityBacked -> listOf(assignModelToItem(scope, layout.definitionConfigurator))
             }
-            
-            val data = DisplayEntityBlockModelData(blockState, models, layout.stateSelector(scope))
+            val data = DisplayEntityBlockModelData(
+                blockState[WATERLOGGED] == true,
+                models,
+                provider { layout.stateSelector(scope) }
+            )
             lookup[blockState] = DisplayEntityBlockModelProvider(data)
+            soundOverridesContent.useBlockData(data.colliderProvider)
         }
         
         // model-less blocks
         assignBlockModels<BlockModelLayout.ModelLess> { blockState, layout, scope ->
-            lookup[blockState] = ModelLessBlockModelProvider(layout.stateSelector(scope))
+            val modelProvider = ModelLessBlockModelProvider(provider { layout.stateSelector(scope) })
+            lookup[blockState] = modelProvider
+            soundOverridesContent.useBlockData(modelProvider.infoProvider)
         }
         
-        ResourceLookups.BLOCK_MODEL = lookup
+        ResourceLookups.blockModel = lookup
     }
     
     private inline fun <reified L : BlockModelLayout> assignBlockModels(
-        comparator: Comparator<Pair<NovaBlock, L>> = compareBy { (block, _) -> block.id },
+        comparator: Comparator<Pair<RegistryEntry.Nova<NovaBlock>, L>> = compareBy { (block, _) -> block.key },
         assigner: (blockState: NovaBlockState, layout: L, scope: BlockModelSelectorScope) -> Unit
     ) {
-        NovaRegistries.BLOCK
-            .mapNotNull { if (it.layout is L) it to it.layout else null }
-            .sortedWith(comparator)
-            .forEach { (block, layout) ->
-                for (blockState in block.blockStates) {
+        requests.entries
+            .mapNotNull { (block, pair) ->
+                val (layout, blockStates) = pair
+                if (layout is L) Triple(block, layout, blockStates) else null
+            }
+            .sortedWith(compareBy(comparator) { (block, layout, _) -> block to layout })
+            .forEach { (_, layout, blockStates) ->
+                for (blockState in blockStates) {
                     try {
                         val scope = BlockModelSelectorScope(blockState, builder, modelContent)
                         assigner(blockState, layout, scope)
@@ -266,7 +282,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
             .forEach { (bsdId, cfgModelEntries) ->
                 blockStateContent[bsdId] = BlockStateDefinition(
                     variants = cfgModelEntries.associate { (cfg, model) ->
-                        BlockStateDefinition.Variant(cfg.variantMap) to listOf(model) 
+                        BlockStateDefinition.Variant(cfg.variantMap) to listOf(model)
                     }
                 )
             }
@@ -280,6 +296,25 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
                 ParticleDefinition(listOf(ResourcePath(ResourceType.ParticleTexture, "nova", "empty")))
             )
         }
+    }
+    
+    internal companion object {
+        
+        private val _requests = HashMap<RegistryEntry.Nova<NovaBlock>, Pair<BlockModelLayout, List<NovaBlockState>>>()
+        val requests: Map<RegistryEntry.Nova<NovaBlock>, Pair<BlockModelLayout, List<NovaBlockState>>> get() = _requests
+        
+        /**
+         * Requests the generation and assignment of models for all [states] of [entry] using [layout].
+         * Results will be written to [ResourceLookups.blockModel].
+         */
+        fun request(
+            entry: RegistryEntry.Nova<NovaBlock>,
+            layout: BlockModelLayout,
+            states: List<NovaBlockState>,
+        ) {
+            _requests[entry] = layout to states
+        }
+        
     }
     
 }

@@ -49,7 +49,7 @@ internal object SelfHost : UploadService {
         this.host = configuredHost ?: ConnectionUtils.SERVER_IP
         
         val port = cfg.node("port").get<Int?>()
-        if (port != null) 
+        if (port != null)
             this.port = port
         
         appendPort = cfg.node("append_port").get<Boolean?>()

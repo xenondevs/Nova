@@ -51,7 +51,6 @@
     "registry.events.BuiltInRegistriesMixin",
     "registry.events.RegistryDataLoaderMixin",
     "registry.events.ResourceManagerRegistryLoadTaskMixin",
-    "registry.events.TagLoaderMixin",
     "registry.injectwrapperblock.DefaultMappedRegistryMixin",
     "registry.injectwrapperblock.RegistryFileCodecMixin",
     "registry.injectwrapperblock.RegistryMixin",

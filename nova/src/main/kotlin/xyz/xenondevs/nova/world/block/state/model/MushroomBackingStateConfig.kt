@@ -1,9 +1,9 @@
 package xyz.xenondevs.nova.world.block.state.model
 
-import net.minecraft.world.level.block.Blocks
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.registry.entries.BlockTypeEntries
 
-internal class RedMushroomBackingStateConfig(faces: Set<BlockFace>) : SidedBackingStateConfig(faces, Blocks.RED_MUSHROOM_BLOCK) {
+internal class RedMushroomBackingStateConfig(faces: Set<BlockFace>) : SidedBackingStateConfig(faces, BlockTypeEntries.RED_MUSHROOM_BLOCK) {
     
     override val type = RedMushroomBackingStateConfig
     
@@ -14,7 +14,7 @@ internal class RedMushroomBackingStateConfig(faces: Set<BlockFace>) : SidedBacki
     
 }
 
-internal class BrownMushroomBackingStateConfig(faces: Set<BlockFace>) : SidedBackingStateConfig(faces, Blocks.BROWN_MUSHROOM_BLOCK) {
+internal class BrownMushroomBackingStateConfig(faces: Set<BlockFace>) : SidedBackingStateConfig(faces, BlockTypeEntries.BROWN_MUSHROOM_BLOCK) {
     
     override val type = BrownMushroomBackingStateConfig
     
@@ -25,7 +25,7 @@ internal class BrownMushroomBackingStateConfig(faces: Set<BlockFace>) : SidedBac
     
 }
 
-internal class MushroomStemBackingStateConfig(faces: Set<BlockFace>) : SidedBackingStateConfig(faces, Blocks.MUSHROOM_STEM) {
+internal class MushroomStemBackingStateConfig(faces: Set<BlockFace>) : SidedBackingStateConfig(faces, BlockTypeEntries.MUSHROOM_STEM) {
     
     override val type = MushroomStemBackingStateConfig
     

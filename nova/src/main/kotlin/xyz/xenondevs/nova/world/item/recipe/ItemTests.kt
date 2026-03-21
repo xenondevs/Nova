@@ -38,7 +38,7 @@ class TagTest(private val tag: Tag<Material>, override val examples: List<ItemSt
 class NovaIdTest(private val id: String, override val example: ItemStack) : SingleItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return item.novaItem?.id.toString() == id
+        return item.novaItem?.key.toString() == id
     }
     
 }
@@ -46,7 +46,7 @@ class NovaIdTest(private val id: String, override val example: ItemStack) : Sing
 class NovaNameTest(private val name: String, override val examples: List<ItemStack>) : MultiItemTest {
     
     override fun test(item: ItemStack): Boolean {
-        return item.novaItem?.id?.value() == name
+        return item.novaItem?.key?.value() == name
     }
     
 }

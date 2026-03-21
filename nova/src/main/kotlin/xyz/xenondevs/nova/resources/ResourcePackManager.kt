@@ -72,10 +72,10 @@ object ResourcePackManager : Listener {
             when (status) {
                 ResourcePackStatus.SUCCESSFULLY_LOADED -> packStatusFuture.complete(true)
                 
-                ResourcePackStatus.DECLINED, 
+                ResourcePackStatus.DECLINED,
                 ResourcePackStatus.INVALID_URL,
                 ResourcePackStatus.FAILED_DOWNLOAD,
-                ResourcePackStatus.FAILED_RELOAD, 
+                ResourcePackStatus.FAILED_RELOAD,
                 ResourcePackStatus.DISCARDED -> packStatusFuture.complete(false)
                 
                 ResourcePackStatus.ACCEPTED, ResourcePackStatus.DOWNLOADED -> Unit

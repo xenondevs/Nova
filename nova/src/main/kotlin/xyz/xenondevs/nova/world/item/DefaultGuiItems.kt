@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.world.item
 
-import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.registry.NovaRegistrar.item
+import xyz.xenondevs.nova.registry.NovaRegistryLoader
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.builder.data.TintSource
 import xyz.xenondevs.nova.resources.builder.layout.item.ConditionItemModelProperty
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelCreationScope
@@ -14,7 +16,10 @@ import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import java.awt.Color
 import java.awt.image.BufferedImage
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
+@InternalInit(
+    stage = InternalInitStage.PRE_WORLD,
+    runBefore = [RegistryLoader::class]
+)
 object DefaultGuiItems {
     
     //<editor-fold desc="with background">
@@ -213,7 +218,10 @@ object DefaultGuiItems {
     
 }
 
-@InternalInit(stage = InternalInitStage.PRE_WORLD)
+@InternalInit(
+    stage = InternalInitStage.PRE_WORLD,
+    runBefore = [RegistryLoader::class]
+)
 object DefaultBlockOverlays {
     
     /**
@@ -254,17 +262,11 @@ object DefaultBlockOverlays {
     
 }
 
-private fun item(name: String, run: NovaItemBuilder.() -> Unit): NovaItem {
-    val builder = NovaItemBuilder(Key.key("nova", name))
-    builder.run()
-    return builder.register()
-}
-
 private fun hiddenItem(
     name: String,
     localizedName: String? = null,
     vararg itemBehaviors: ItemBehaviorHolder
-): NovaItem = item(name) {
+): RegistryEntry.Nova<NovaItem> = item(name) {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -279,7 +281,7 @@ private fun hiddenItem(
     name: String,
     localizedName: String? = null,
     itemModelDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit
-): NovaItem = item(name) {
+): RegistryEntry.Nova<NovaItem> = item(name) {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -291,7 +293,7 @@ private fun guiItem(
     name: String,
     localizedName: String? = null,
     stretched: Boolean = false
-): NovaItem = item("gui/opaque/$name") {
+): RegistryEntry.Nova<NovaItem> = item("gui/opaque/$name") {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -305,7 +307,7 @@ private fun tpGuiItem(
     name: String,
     localizedName: String? = null,
     stretched: Boolean = false
-): NovaItem = item("gui/transparent/$name") {
+): RegistryEntry.Nova<NovaItem> = item("gui/transparent/$name") {
     if (localizedName == null) {
         name(null)
     } else localizedName(localizedName)
@@ -315,7 +317,11 @@ private fun tpGuiItem(
     }
 }
 
-private fun barGuiItem(name: String, color: Color, background: Boolean): NovaItem = item(name) {
+private fun barGuiItem(
+    name: String,
+    color: Color,
+    background: Boolean
+): RegistryEntry.Nova<NovaItem> = item(name) {
     name(null)
     hidden(true)
     modelDefinition {

@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.api
 
-import net.minecraft.resources.Identifier
+import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.api.data.NamespacedId
 import xyz.xenondevs.nova.api.item.NovaItem
@@ -11,8 +11,7 @@ import xyz.xenondevs.nova.util.item.novaItem
 internal object ApiItemRegistry : NovaItemRegistry {
     
     override fun getOrNull(id: String): NovaItem? {
-        val loc = Identifier.parse(id)
-        return NovaRegistries.ITEM.getValue(loc)?.let(::ApiItemWrapper)
+        return NovaRegistries.ITEM.getValue(Key.key(id))?.let(::ApiItemWrapper)
     }
     
     override fun getOrNull(id: NamespacedId): NovaItem? =
@@ -31,6 +30,6 @@ internal object ApiItemRegistry : NovaItemRegistry {
         itemStack.novaItem?.let(::ApiItemWrapper) ?: throw IllegalArgumentException("ItemStack is not a Nova item")
     
     override fun getNonNamespaced(name: String): List<NovaItem> =
-        NovaRegistries.ITEM.getByName(name).map(::ApiItemWrapper)
+        NovaRegistries.ITEM.getValuesByName(name).map(::ApiItemWrapper)
     
 }

@@ -1,14 +1,13 @@
 package xyz.xenondevs.nova.context.intention
 
-import xyz.xenondevs.nova.Nova
 import xyz.xenondevs.nova.context.AbstractContextIntention
 import xyz.xenondevs.nova.context.Autofiller
 import xyz.xenondevs.nova.context.ContextIntention
 import xyz.xenondevs.nova.context.DefaultingContextParamType
 import xyz.xenondevs.nova.context.intention.BlockInteract.BLOCK_POS
 import xyz.xenondevs.nova.context.intention.BlockInteract.BLOCK_TYPE
-import xyz.xenondevs.nova.util.Key
 import xyz.xenondevs.nova.util.id
+import xyz.xenondevs.nova.util.novaKey
 
 
 /**
@@ -36,7 +35,7 @@ object BlockInteract :
      * Defaults to `false`.
      */
     val INCLUDE_DATA = DefaultingContextParamType<Boolean, BlockInteract>(
-        Key(Nova, "include_data"),
+        novaKey("include_data"),
         default = false
     )
     

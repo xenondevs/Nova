@@ -2,7 +2,9 @@ package xyz.xenondevs.nova.world.block.state.model
 
 import kotlinx.serialization.Serializable
 import net.minecraft.world.level.block.state.BlockState
+import org.bukkit.block.BlockType
 import xyz.xenondevs.nova.config.PermanentStorage.storedValue
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.serialization.kotlinx.BackingStateConfigSerializer
 
 @Serializable(with = BackingStateConfigSerializer::class)
@@ -12,6 +14,7 @@ internal abstract class BackingStateConfig internal constructor() {
     abstract val id: Int
     abstract val waterlogged: Boolean
     abstract val variantMap: Map<String, String>
+    abstract val blockType: RegistryEntry.Paper<BlockType>
     abstract val vanillaBlockState: BlockState
     
     override fun equals(other: Any?): Boolean {

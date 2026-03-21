@@ -7,8 +7,8 @@ import xyz.xenondevs.nova.util.toKey
 import xyz.xenondevs.nova.world.block.NovaBlock
 
 internal object NovaBlockArgumentType : KeyedArgumentType<NovaBlock>() {
-    override fun getEntries() = NovaRegistries.BLOCK.asSequence()
-    override fun toId(t: NovaBlock) = t.id
+    override fun getEntries() = NovaRegistries.BLOCK.entrySet.get().asSequence()
+    override fun toId(t: NovaBlock) = t.key
 }
 
 internal object VanillaBlockArgumentType : KeyedArgumentType<Block>() {

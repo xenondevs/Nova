@@ -1,11 +1,15 @@
 package xyz.xenondevs.nova.world.block.behavior
 
 import org.bukkit.Material
-import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.config.optionalEntry
+import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.registry.emptyRegistryEntrySet
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
 
@@ -33,19 +37,17 @@ import xyz.xenondevs.nova.world.item.tool.ToolTier
 @Suppress("FunctionName")
 fun Breakable(
     hardness: Double? = null,
-    toolCategories: Set<ToolCategory> = emptySet(),
-    toolTier: ToolTier? = null,
+    toolCategories: RegistryEntrySet.Nova<ToolCategory> = emptyRegistryEntrySet(NovaRegistries.TOOL_CATEGORY),
+    toolTier: RegistryEntry.Nova<ToolTier>? = null,
     requiresToolForDrops: Boolean? = null,
     breakParticles: Material? = null,
     showBreakAnimation: Boolean = true
 ) = BlockBehaviorFactory<Breakable> {
-    require(toolTier == null || toolCategories.isNotNullOrEmpty()) { "Tool categories cannot be empty if a tool tier is specified!" }
-    
     val cfg = it.config
     Breakable.Default(
         cfg.entryOrElse(hardness, "hardness"),
-        cfg.entryOrElse(toolCategories, "tool_categories"),
-        cfg.optionalEntry<ToolTier>("tool_tier").orElse(toolTier),
+        cfg.entryOrElse<RegistryEntrySet.Nova<ToolCategory>>(toolCategories, "tool_categories").flatten(),
+        cfg.optionalEntry<RegistryEntry.Nova<ToolTier>>("tool_tier").orElse(toolTier).flatten(),
         cfg.entryOrElse(requiresToolForDrops, "requires_tool_for_drops"),
         cfg.optionalEntry<Material>("break_particles").orElse(breakParticles),
         cfg.optionalEntry<Boolean>("show_break_animation").orElse(showBreakAnimation)

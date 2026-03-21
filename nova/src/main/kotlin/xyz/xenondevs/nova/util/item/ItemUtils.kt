@@ -3,6 +3,7 @@
 package xyz.xenondevs.nova.util.item
 
 import com.mojang.brigadier.StringReader
+import io.papermc.paper.registry.RegistryKey
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.commands.arguments.item.ItemParser
@@ -29,17 +30,18 @@ import org.bukkit.Tag
 import org.bukkit.World
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.inventory.RecipeChoice
 import xyz.xenondevs.cbf.Cbf
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.entry
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.bukkitMaterial
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
-import xyz.xenondevs.nova.util.contains
 import xyz.xenondevs.nova.util.data.getByteArrayOrNull
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import xyz.xenondevs.nova.util.data.getStringOrNull
@@ -67,12 +69,27 @@ val ItemStack.novaItem: NovaItem?
     get() = unwrap().novaItem
 
 /**
+ * The [RegistryEntry] of this [ItemStack's][ItemStack] [type][ItemStack.getType].
+ */
+val ItemStack.typeEntry: RegistryEntry.Either<NovaItem, ItemType>
+    get() = novaItem?.let { RegistryEntry.either(it.entry, RegistryKey.ITEM) }
+        ?: RegistryEntry.either(NovaRegistries.ITEM, type.asItemType()!!.entry)
+
+/**
  * The [NovaItem] of [this][MojangStack], or `null` if it's not one.
  */
 val MojangStack.novaItem: NovaItem?
     get() = unsafeNovaTag
         ?.getStringOrNull("id")
+        ?.let(Key::key)
         ?.let(NovaRegistries.ITEM::getValue)
+
+/**
+ * The [RegistryEntry] of this [ItemStack's][MojangStack] [type][MojangStack.item].
+ */
+val MojangStack.typeEntry: RegistryEntry.Either<NovaItem, ItemType>
+    get() = novaItem?.let { RegistryEntry.either(it.entry, RegistryKey.ITEM) }
+        ?: RegistryEntry.either(NovaRegistries.ITEM, item.bukkitMaterial.asItemType()!!.entry)
 
 @Suppress("DEPRECATION")
 internal val MojangStack.unsafeCustomData: CompoundTag?
@@ -181,11 +198,11 @@ var MojangStack.novaCompound: NamespacedCompound?
     }
 
 inline fun <reified T : Any> ItemStack.retrieveData(key: Key): T? = retrieveData(key.namespace(), key.value())
-inline fun <reified T : Any> ItemStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.id, key)
+inline fun <reified T : Any> ItemStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.namespace(), key)
 inline fun <reified T : Any> ItemStack.retrieveData(namespace: String, key: String): T? = novaCompound?.get(namespace, key)
 
 inline fun <reified T : Any> ItemStack.storeData(key: Key, data: T?) = storeData(key.namespace(), key.value(), data)
-inline fun <reified T : Any> ItemStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.id, key, data)
+inline fun <reified T : Any> ItemStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.namespace(), key, data)
 inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String, data: T?) {
     val novaCompound = this.novaCompound ?: NamespacedCompound()
     novaCompound[namespace, key] = data
@@ -193,11 +210,11 @@ inline fun <reified T : Any> ItemStack.storeData(namespace: String, key: String,
 }
 
 inline fun <reified T : Any> MojangStack.retrieveData(key: Key): T? = retrieveData(key.namespace(), key.value())
-inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.id, key)
+inline fun <reified T : Any> MojangStack.retrieveData(addon: Addon, key: String): T? = retrieveData(addon.namespace(), key)
 inline fun <reified T : Any> MojangStack.retrieveData(namespace: String, key: String): T? = novaCompound?.get(namespace, key)
 
 inline fun <reified T : Any> MojangStack.storeData(key: Key, data: T?) = storeData(key.namespace(), key.value(), data)
-inline fun <reified T : Any> MojangStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.id, key, data)
+inline fun <reified T : Any> MojangStack.storeData(addon: Addon, key: String, data: T?) = storeData(addon.namespace(), key, data)
 inline fun <reified T : Any> MojangStack.storeData(namespace: String, key: String, data: T?) {
     val novaCompound = this.novaCompound ?: NamespacedCompound()
     novaCompound[namespace, key] = data
@@ -212,7 +229,7 @@ object ItemUtils {
             val nid = Key.key(id)
             return when (nid.namespace()) {
                 "minecraft" -> runCatching { Material.valueOf(nid.value().uppercase()) }.isSuccess
-                "nova" -> NovaRegistries.ITEM.getByName(nid.value()).isNotEmpty()
+                "nova" -> NovaRegistries.ITEM.getValuesByName(nid.value()).isNotEmpty()
                 else -> nid in NovaRegistries.ITEM || CustomItemServiceManager.getItemByName(id) != null
             }
         } catch (ignored: Exception) {
@@ -243,16 +260,16 @@ object ItemUtils {
                     
                     "nova" -> {
                         val name = id.substringAfter(':')
-                        val novaItems = NovaRegistries.ITEM.getByName(name)
+                        val novaItems = NovaRegistries.ITEM.getValuesByName(name)
                         if (novaItems.isNotEmpty()) {
                             return@map NovaNameTest(name, novaItems.map { it.createItemStack() })
                         } else throw IllegalArgumentException("Not an item name in Nova: $name")
                     }
                     
                     else -> {
-                        val novaItems = NovaRegistries.ITEM.getValue(id)
-                        if (novaItems != null) {
-                            return@map NovaIdTest(id, novaItems.createItemStack())
+                        val novaItem = NovaRegistries.ITEM.getValue(Key.key(id))
+                        if (novaItem != null) {
+                            return@map NovaIdTest(id, novaItem.createItemStack())
                         } else {
                             return@map CustomItemServiceManager.getItemTest(id)!!
                         }
@@ -283,7 +300,7 @@ object ItemUtils {
     fun getItemStack(id: Key): ItemStack {
         return when (id.namespace()) {
             "minecraft" -> ItemStack(BuiltInRegistries.ITEM.getValue(id).bukkitMaterial)
-            "nova" -> NovaRegistries.ITEM.getByName(id.value()).firstOrNull()?.createItemStack()
+            "nova" -> NovaRegistries.ITEM.getValuesByName(id.value()).firstOrNull()?.createItemStack()
             else -> NovaRegistries.ITEM.getValue(id)?.createItemStack()
                 ?: CustomItemServiceManager.getItemByName(id.toString())
         } ?: throw IllegalArgumentException("Could not find item with id $id")
@@ -328,7 +345,7 @@ object ItemUtils {
      */
     fun getId(itemStack: ItemStack): Key {
         val novaItem = itemStack.novaItem
-        if (novaItem != null) return novaItem.id
+        if (novaItem != null) return novaItem.key
         
         val customNameKey = CustomItemServiceManager.getId(itemStack)
         if (customNameKey != null) return Key.key(customNameKey)

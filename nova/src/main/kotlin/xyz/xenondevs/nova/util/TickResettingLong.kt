@@ -29,7 +29,7 @@ internal class TickResettingLong {
                 accumulator = 0
             }
             
-            accumulatorTick = serverTick 
+            accumulatorTick = serverTick
         }
     }
     

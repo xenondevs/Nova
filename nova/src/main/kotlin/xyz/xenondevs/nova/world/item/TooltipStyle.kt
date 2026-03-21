@@ -1,27 +1,16 @@
 package xyz.xenondevs.nova.world.item
 
-import net.kyori.adventure.key.Key
-import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
-import xyz.xenondevs.nova.resources.builder.layout.gui.TooltipStyleLayout
+import kotlinx.serialization.Serializable
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.serialization.kotlinx.TooltipStyleSerializer
 
 /**
  * Represents a custom tooltip texture.
  */
+@Serializable(with = TooltipStyleSerializer::class)
 class TooltipStyle internal constructor(
-    val id: Key,
-    internal val makeLayout: (ResourcePackBuilder) -> TooltipStyleLayout
-) {
-    
-    companion object {
-        
-        /**
-         * Creates a new [TooltipStyle] with the specified [Key],
-         * assuming that a tooltip style under that id already exists.
-         */
-        fun of(key: Key): TooltipStyle {
-            return TooltipStyle(key) { throw UnsupportedOperationException() }
-        }
-        
-    }
-    
+    override val entry: RegistryEntry.Nova<TooltipStyle>,
+) : NovaRegistryElement<TooltipStyle> {
+    override fun toString(): String = key.toString()
 }

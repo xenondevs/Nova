@@ -1,8 +1,15 @@
+import org.gradle.accessors.dm.LibrariesForLibs
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 
 plugins {
     id("nova.java-conventions")
     kotlin("jvm")
+}
+
+val libs = the<LibrariesForLibs>()
+
+dependencies {
+    testImplementation(libs.mockk)
 }
 
 kotlin {
@@ -12,7 +19,12 @@ kotlin {
         optIn.addAll(
             "kotlin.io.path.ExperimentalPathApi",
             "kotlin.time.ExperimentalTime",
-            "kotlin.experimental.ExperimentalTypeInference"
+            "kotlin.experimental.ExperimentalTypeInference",
+            "kotlin.contracts.ExperimentalContracts"
+        )
+        
+        freeCompilerArgs.addAll(
+            "-Xcontext-parameters"
         )
         
         if (!project.hasProperty("release")) {

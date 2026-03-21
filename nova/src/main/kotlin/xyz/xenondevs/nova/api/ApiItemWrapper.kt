@@ -13,19 +13,14 @@ import xyz.xenondevs.nova.api.item.NovaItem as INovaItem
 
 internal class ApiItemWrapper(private val item: NovaItem) : INovaItem {
     
-    override fun getId(): INamespacedId = NamespacedId(item.id.namespace(), item.id.value())
+    override fun getId(): INamespacedId = NamespacedId(item.key.namespace(), item.key.value())
     override fun getBlock(): NovaBlock? = item.block?.let(::ApiBlockWrapper)
     override fun getMaxStackSize(): Int = item.maxStackSize
     
     override fun getName(): Component = item.name ?: Component.empty()
     override fun getPlaintextName(locale: String): String = item.name?.toPlainText(locale) ?: ""
     
-    override fun createItemStack(amount: Int): ItemStack {
-        return item.createItemStack(amount)
-    }
-    
-    override fun createClientsideItemStack(amount: Int): ItemStack {
-        return item.createItemStack(amount).clientsideCopy()
-    }
+    override fun createItemStack(amount: Int): ItemStack = item.createItemStack(amount)
+    override fun createClientsideItemStack(amount: Int): ItemStack = item.createItemStack(amount).clientsideCopy()
     
 }

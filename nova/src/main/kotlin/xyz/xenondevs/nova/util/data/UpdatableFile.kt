@@ -47,7 +47,7 @@ internal object UpdatableFile {
     fun reset(wildcard: String): Int {
         val regex = WildcardUtils.toRegex(wildcard)
         var count = 0
-        fileHashes.removeIf { (path, _) -> 
+        fileHashes.removeIf { (path, _) ->
             val matches = path.matches(regex)
             if (matches)
                 count++

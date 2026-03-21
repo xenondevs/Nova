@@ -22,10 +22,10 @@ import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import org.slf4j.Logger
+import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.node
 import xyz.xenondevs.nova.context.Context
@@ -42,7 +42,6 @@ import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.ItemAction
-import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.buildDataComponentMap
 import xyz.xenondevs.nova.world.toNova
@@ -55,13 +54,13 @@ internal class DefaultBehavior(
     lore: Provider<List<Component>>,
     tooltipStyle: Provider<TooltipStyle?>,
     maxStackSize: Provider<Int>,
-    attributeModifiers: Provider<ItemAttributeModifiers>,
+    config: Provider<CommentedConfigurationNode>,
 ) : ItemBehavior {
     
     private val style by style.map { it.toNmsStyle() }
     
     override val baseDataComponents: Provider<DataComponentMap> = combinedProvider(
-        name, style, lore, tooltipStyle, maxStackSize, attributeModifiers
+        name, style, lore, tooltipStyle, maxStackSize, loadConfiguredAttributeModifiers(id, config)
     ) { name, style, lore, tooltipStyle, maxStackSize, attributeModifiers ->
         buildDataComponentMap {
             if (name != null) {
@@ -75,7 +74,7 @@ internal class DefaultBehavior(
             }
             
             if (tooltipStyle != null) {
-                this[DataComponentTypes.TOOLTIP_STYLE] = tooltipStyle.id
+                this[DataComponentTypes.TOOLTIP_STYLE] = tooltipStyle.key
             }
             
             this[DataComponentTypes.ATTRIBUTE_MODIFIERS] = attributeModifiers
@@ -151,63 +150,50 @@ internal class DefaultBehavior(
         return client
     }
     
-    companion object : ItemBehaviorFactory<DefaultBehavior> {
-        
-        override fun create(item: NovaItem) =
-            DefaultBehavior(
-                item.id,
-                provider(item.name),
-                provider(item.style),
-                provider(item.lore),
-                provider(item.tooltipStyle),
-                provider(item.maxStackSize),
-                item.config.node("attribute_modifiers").map { loadConfiguredAttributeModifiers(item, it) }
-            )
-        
-        private fun loadConfiguredAttributeModifiers(item: NovaItem, node: ConfigurationNode): ItemAttributeModifiers {
-            if (node.virtual())
-                return itemAttributes().build()
-            
-            val builder = itemAttributes()
-            for ((slotName, attributesNode) in node.childrenMap()) {
-                try {
-                    val slotGroup = EquipmentSlotGroup.getByName(slotName as String)
-                        ?: throw IllegalArgumentException("Unknown equipment slot group: $slotName")
-                    
-                    for ((idx, attributeNode) in attributesNode.childrenList().withIndex()) {
-                        try {
-                            val id = attributeNode.node("id").get<String>()
-                                ?: "${item.id.namespace()}:${item.id.value()}_${slotGroup.toString().lowercase()}_$idx"
-                            val attribute = attributeNode.node("attribute").get<Attribute>()
-                                ?: throw NoSuchElementException("Missing value 'attribute'")
-                            val operation = attributeNode.node("operation").get<AttributeModifier.Operation>()
-                                ?: throw NoSuchElementException("Missing value 'operation'")
-                            val value = attributeNode.node("value").get<Double>()
-                                ?: throw NoSuchElementException("Missing value 'value'")
-                            val display = attributeNode.node("display").get<AttributeModifierDisplay>()
-                                ?: AttributeModifierDisplay.reset()
-                            
-                            builder.addModifier(
-                                attribute,
-                                AttributeModifier(
-                                    NamespacedKey.fromString(id) ?: throw IllegalArgumentException("Illegal id: $id"),
-                                    value,
-                                    operation,
-                                    slotGroup
-                                ),
-                                display
-                            )
-                        } catch (e: Exception) {
-                            LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $item, $slotGroup with index $idx", e)
-                        }
-                    }
-                } catch (e: Exception) {
-                    LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $item", e)
-                }
-            }
-            
-            return builder.build()
-        }
-    }
-    
 }
+
+private fun loadConfiguredAttributeModifiers(key: Key, config: Provider<ConfigurationNode>): Provider<ItemAttributeModifiers> =
+    config.node("attribute_modifiers").map { node ->
+        if (node.virtual())
+            return@map itemAttributes().build()
+        
+        val builder = itemAttributes()
+        for ((slotName, attributesNode) in node.childrenMap()) {
+            try {
+                val slotGroup = EquipmentSlotGroup.getByName(slotName as String)
+                    ?: throw IllegalArgumentException("Unknown equipment slot group: $slotName")
+                
+                for ((idx, attributeNode) in attributesNode.childrenList().withIndex()) {
+                    try {
+                        val id = attributeNode.node("id").get<String>()
+                            ?: "${key.namespace()}:${key.value()}_${slotGroup.toString().lowercase()}_$idx"
+                        val attribute = attributeNode.node("attribute").get<Attribute>()
+                            ?: throw NoSuchElementException("Missing value 'attribute'")
+                        val operation = attributeNode.node("operation").get<AttributeModifier.Operation>()
+                            ?: throw NoSuchElementException("Missing value 'operation'")
+                        val value = attributeNode.node("value").get<Double>()
+                            ?: throw NoSuchElementException("Missing value 'value'")
+                        val display = attributeNode.node("display").get<AttributeModifierDisplay>()
+                            ?: AttributeModifierDisplay.reset()
+                        
+                        builder.addModifier(
+                            attribute,
+                            AttributeModifier(
+                                NamespacedKey.fromString(id) ?: throw IllegalArgumentException("Illegal id: $id"),
+                                value,
+                                operation,
+                                slotGroup
+                            ),
+                            display
+                        )
+                    } catch (e: Exception) {
+                        LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $key, $slotGroup with index $idx", e)
+                    }
+                }
+            } catch (e: Exception) {
+                LOGGER.logExceptionMessages(Logger::warn, "Failed to load attribute modifier for $key", e)
+            }
+        }
+        
+        return@map builder.build()
+    }

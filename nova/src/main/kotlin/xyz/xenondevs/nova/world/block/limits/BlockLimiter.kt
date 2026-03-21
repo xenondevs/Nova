@@ -37,7 +37,7 @@ internal abstract class SimpleBlockLimiter(denyMessage: String) : BlockLimiter {
 internal class TypeBlacklist(private val blacklist: Set<Key>) : SimpleBlockLimiter("nova.tile_entity_limits.type_blacklist.deny") {
     
     override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
-        return material.id !in blacklist
+        return material.key !in blacklist
     }
     
 }
@@ -53,7 +53,7 @@ internal class WorldBlacklist(private val blacklist: Set<String>) : SimpleBlockL
 internal class TypeWorldBlacklist(private val blacklist: Map<String, Set<Key>>) : SimpleBlockLimiter("nova.tile_entity_limits.type_world_blacklist.deny") {
     
     override fun testPlace(material: NovaBlock, ctx: Context<BlockPlace>): Boolean {
-        val id = material.id
+        val id = material.key
         val world: World = ctx[BlockPlace.BLOCK_WORLD]
         return blacklist["*"]?.contains(id) != true && blacklist[world.name]?.contains(id) != true
     }
@@ -66,7 +66,7 @@ internal class AmountLimiter(private val type: Type, private val limits: Map<Key
     private val deniedTotal = PlaceResult(false, "nova.tile_entity_limits.amount_${type.name.lowercase()}_total.deny")
     
     override fun canPlace(material: NovaBlock, ctx: Context<BlockPlace>): PlaceResult {
-        val id: Key = material.id
+        val id: Key = material.key
         val owner: UUID = ctx[BlockPlace.SOURCE_UUID] ?: return ALLOWED
         val pos: BlockPos = ctx[BlockPlace.BLOCK_POS]
         

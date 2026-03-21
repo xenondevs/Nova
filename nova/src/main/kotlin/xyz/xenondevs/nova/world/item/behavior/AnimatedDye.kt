@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.world.item.behavior
 
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.DyedItemColor.dyedItemColor
-import io.papermc.paper.datacomponent.item.TooltipDisplay.tooltipDisplay
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
@@ -28,8 +27,7 @@ import java.awt.Color
 fun AnimatedDye(
     defaultTicksPerColor: Int? = null,
     defaultColors: List<Color>? = null
-) = ItemBehaviorFactory<AnimatedDye> {
-    val cfg = it.config
+) = ItemBehaviorFactory { _, cfg ->
     AnimatedDye(
         cfg.entryOrElse(defaultTicksPerColor, "ticks_per_color"),
         cfg.entryOrElse(defaultColors, "colors")
@@ -66,9 +64,8 @@ class AnimatedDye(
                 val to = frames[(i / ticksPerFrame + 1) % frames.size]
                 val color = ImageUtils.lerp(from, to, i % ticksPerFrame / ticksPerFrame.toFloat())
                 
-                this += buildDataComponentMapProvider { 
+                this += buildDataComponentMapProvider {
                     this[DataComponentTypes.DYED_COLOR] = dyedItemColor(org.bukkit.Color.fromARGB(color.rgb))
-                    this[DataComponentTypes.TOOLTIP_DISPLAY] = tooltipDisplay().hideTooltip(true).build()
                 }.get()
             }
         }

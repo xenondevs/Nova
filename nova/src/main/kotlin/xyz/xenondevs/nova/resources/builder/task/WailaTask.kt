@@ -256,7 +256,7 @@ class WailaTask(
             writeHardcodedTextures()
             builder.assetPacks.forEach(::writePackTextures)
             renderCustomItemServiceBlocks()
-            ResourceLookups.WAILA_DATA_LOOKUP.set(fontCharLookup)
+            ResourceLookups.wailaData = fontCharLookup
         }
     }
     

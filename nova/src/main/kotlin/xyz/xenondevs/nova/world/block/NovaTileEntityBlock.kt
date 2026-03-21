@@ -1,33 +1,36 @@
 package xyz.xenondevs.nova.world.block
 
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
+import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.cbf.Compound
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
-import xyz.xenondevs.nova.resources.builder.layout.block.BlockModelLayout
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.item.NovaItem
 
 typealias TileEntityConstructor = ((BlockPos, NovaBlockState, Compound) -> TileEntity)
 
 class NovaTileEntityBlock internal constructor(
-    id: Key,
+    entry: RegistryEntry.Nova<NovaBlock>,
     name: Component,
     style: Style,
     behaviors: List<BlockBehaviorHolder>,
     internal val tileEntityConstructor: TileEntityConstructor,
     val tickrate: Int,
     properties: List<ScopedBlockStateProperty<*>>,
-    configId: String,
-    requestedLayout: BlockModelLayout
-) : NovaBlock(id, name, style, behaviors, properties, configId, requestedLayout) {
+    item: Provider<RegistryEntry.Nova<NovaItem>?>,
+    config: Provider<CommentedConfigurationNode>,
+    blockStates: List<NovaBlockState>
+) : NovaBlock(entry, name, style, behaviors, properties, item, config, blockStates) {
     
     override fun handlePlace(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockPlace>) {
         val tileEntityBlock = state.block as NovaTileEntityBlock

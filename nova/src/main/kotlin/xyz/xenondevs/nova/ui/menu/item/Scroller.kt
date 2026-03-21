@@ -8,13 +8,13 @@ import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.internal.util.ItemUtils2
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.clientsideProvider
 import kotlin.random.Random
 
 private const val SLOTS = 3
@@ -25,13 +25,12 @@ private const val LAST_SLOT = SLOTS - 1
  * Creates a scroller UI item that can be used to scroll through a [xyz.xenondevs.invui.gui.ScrollGui]
  * using the mouse wheel.
  */
-@Suppress("AssignedValueIsNeverRead") // broken inspection
 fun scrollerItem(
     serverWindowState: MutableProvider<Int>,
     clientWindowState: Provider<Int>,
     line: MutableProvider<Int>,
     maxLine: Provider<Int>,
-    itemProvider: Provider<ItemProvider> = provider(DefaultGuiItems.TP_SCROLLER_VERTICAL.clientsideProvider),
+    itemProvider: Provider<ItemProvider> = DefaultGuiItems.TP_SCROLLER_VERTICAL.clientsideProvider,
 ): Item = item {
     this.itemProvider by combinedProvider(line, maxLine, itemProvider) { line, maxLine, itemProvider ->
         val progress = (line + 1.0) / (maxLine + 1.0)

@@ -129,7 +129,7 @@ class LanguageContent(private val builder: ResourcePackBuilder) : PackBuildData 
             extractRomanNumerals()
             
             // create language lookup
-            ResourceLookups.LANGUAGE = customLangs.mapKeys { (path, _) -> path.path }
+            ResourceLookups.language = customLangs.mapKeys { (path, _) -> path.path }
             
             // write custom langs to disk
             for ((path, content) in customLangs) {
@@ -148,7 +148,7 @@ class LanguageContent(private val builder: ResourcePackBuilder) : PackBuildData 
     }
     
     private companion object {
-         val EN_US = ResourcePath.of(ResourceType.Lang, "en_us")
+        val EN_US = ResourcePath.of(ResourceType.Lang, "en_us")
     }
     
 }

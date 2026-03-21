@@ -5,23 +5,8 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import net.kyori.adventure.key.Key
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
-
-internal object KeySerializer : KSerializer<Key> {
-    
-    override val descriptor = PrimitiveSerialDescriptor("xyz.xenondevs.nova.KeySerializer", PrimitiveKind.STRING)
-    
-    override fun serialize(encoder: Encoder, value: Key) {
-        encoder.encodeString(value.toString())
-    }
-    
-    override fun deserialize(decoder: Decoder): Key {
-        return Key.key(decoder.decodeString())
-    }
-    
-}
 
 internal object IdentifierSerializer : KSerializer<Identifier> {
     

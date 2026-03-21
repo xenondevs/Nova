@@ -1,8 +1,14 @@
 package xyz.xenondevs.nova.world.block.state
 
 import kotlinx.serialization.Serializable
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.get
+import xyz.xenondevs.commons.provider.getOrThrow
+import xyz.xenondevs.commons.provider.orElseBy
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.lookup.ResourceLookups
 import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockStateSerializer
+import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.state.model.BlockModelProvider
 import xyz.xenondevs.nova.world.block.state.property.BlockStateProperty
@@ -14,10 +20,15 @@ import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
  */
 @Serializable(with = NovaBlockStateSerializer::class)
 open class NovaBlockState internal constructor(
-    val block: NovaBlock,
+    val blockEntry: RegistryEntry.Nova<NovaBlock>,
     private val path: IntArray,
     internal val scopedValues: Map<ScopedBlockStateProperty<*>, Any>
 ) {
+    
+    /**
+     * The [NovaBlock] of this block state.
+     */
+    val block: NovaBlock by blockEntry
     
     /**
      * The property-value configuration of this block state.
@@ -33,9 +44,17 @@ open class NovaBlockState internal constructor(
     internal var tree: PropertiesTree<NovaBlockState>? = null
         private set
     
-    internal open val modelProvider: BlockModelProvider by lazy { ResourceLookups.BLOCK_MODEL[this]!! }
+    private val _modelProvider: Provider<BlockModelProvider> = run {
+        if (blockEntry == DefaultBlocks.UNKNOWN)
+            return@run ResourceLookups.blockModelLookup.getOrThrow(this)
+        
+        ResourceLookups.blockModelLookup[this]
+            .orElseBy(DefaultBlocks.UNKNOWN.map { it.defaultBlockState.modelProvider })
+    }
     
-    internal val ticksRandomly = block.behaviors.fold(false) { acc, behavior -> acc || behavior.ticksRandomly(this) }
+    internal open val modelProvider: BlockModelProvider by _modelProvider
+    
+    internal val ticksRandomly by blockEntry.map { it.behaviors.fold(false) { acc, behavior -> acc || behavior.ticksRandomly(this) } }
     
     /**
      * Gets the value of the given [property] or `null` if the property is not set.
@@ -49,7 +68,7 @@ open class NovaBlockState internal constructor(
      * Gets the value of the given [property] or throws an [IllegalStateException] if the property is not set.
      */
     fun <T : Any> getOrThrow(property: BlockStateProperty<T>): T {
-        return get(property) ?: throw IllegalStateException("$block does not have property $property")
+        return get(property) ?: throw IllegalStateException("$blockEntry does not have property $property")
     }
     
     /**
@@ -88,7 +107,7 @@ open class NovaBlockState internal constructor(
             "$property=$valStr"
         }
         
-        return "$block[$propertiesStr]"
+        return "$blockEntry[$propertiesStr]"
     }
     
     companion object {
@@ -97,7 +116,7 @@ open class NovaBlockState internal constructor(
          * Creates all possible [BlockStates][NovaBlockState] for the given [NovaBlock].
          */
         internal fun createBlockStates(
-            block: NovaBlock,
+            block: RegistryEntry.Nova<NovaBlock>,
             properties: List<ScopedBlockStateProperty<*>>,
         ): List<NovaBlockState> {
             if (properties.isNotEmpty()) {

@@ -13,8 +13,8 @@ object MoveCharacters {
     
     internal fun getMovingString(distance: Float): String {
         val start = if (distance < 0)
-            ResourceLookups.MOVE_CHARACTERS_OFFSET
-        else ResourceLookups.MOVE_CHARACTERS_OFFSET + MoveCharactersTask.SIZE
+            ResourceLookups.moveCharactersOffset
+        else ResourceLookups.moveCharactersOffset + MoveCharactersTask.SIZE
         
         val num = abs((distance * MoveCharactersTask.PRECISION).roundToInt())
         val buffer = StringBuffer()

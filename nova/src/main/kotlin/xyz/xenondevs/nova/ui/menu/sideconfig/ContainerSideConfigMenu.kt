@@ -7,9 +7,10 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.commons.collections.after
 import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.Click
+import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.notifyWindows
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.ui.menu.item.AsyncItem
 import xyz.xenondevs.nova.ui.menu.item.BUTTON_COLORS
 import xyz.xenondevs.nova.util.BlockSide
@@ -25,7 +26,7 @@ import xyz.xenondevs.nova.world.item.DefaultGuiItems
 
 abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPointDataHolder<C>> internal constructor(
     endPoint: NetworkEndPoint,
-    networkType: NetworkType<*>,
+    networkType: RegistryEntry.Nova<NetworkType<*>>,
     holder: H,
     private val namedContainers: Map<C, String>
 ) : AbstractSideConfigMenu<H>(endPoint, networkType, holder) {
@@ -145,7 +146,7 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
             val container = holder.containerConfig[face] ?: throw IllegalStateException("No container at $face")
             val color = BUTTON_COLORS[containers.indexOf(container)]
             
-            val builder = color.createClientsideItemBuilder()
+            val builder = color.get().createClientsideItemBuilder()
                 .setName(getSideName(blockSide, face))
                 .addLoreLines(Component.translatable(
                     namedContainers[container] ?: throw IllegalArgumentException("Missing name for $container"),
@@ -167,11 +168,11 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
         override fun updateAsync() {
             val builder = if (simple) {
                 if (isSimpleConfiguration()) {
-                    DefaultGuiItems.SIMPLE_MODE_BTN_ON.clientsideProvider
-                } else DefaultGuiItems.SIMPLE_MODE_BTN_OFF.createClientsideItemBuilder()
+                    DefaultGuiItems.SIMPLE_MODE_BTN_ON.get().clientsideProvider.get()
+                } else DefaultGuiItems.SIMPLE_MODE_BTN_OFF.get().createClientsideItemBuilder()
                     .setName(Component.translatable("menu.nova.side_config.simple_mode"))
                     .addLoreLines(Component.translatable("menu.nova.side_config.simple_mode.unavailable", NamedTextColor.GRAY))
-            } else DefaultGuiItems.ADVANCED_MODE_BTN_ON.clientsideProvider
+            } else DefaultGuiItems.ADVANCED_MODE_BTN_ON.get().clientsideProvider.get()
             
             provider.set(builder)
         }

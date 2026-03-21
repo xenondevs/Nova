@@ -1,27 +1,34 @@
 package xyz.xenondevs.nova.world.block.state.model
 
-import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.bukkit.block.BlockFace
+import org.bukkit.block.BlockType
 import xyz.xenondevs.commons.collections.enumSet
 import xyz.xenondevs.commons.collections.mapToBooleanArray
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.util.MathUtils
+import xyz.xenondevs.nova.util.nmsBlock
 
 private val POSSIBLE_FACES = arrayOf(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN)
 
-internal abstract class SidedBackingStateConfig(val faces: Set<BlockFace>, block: Block) : BackingStateConfig() {
+internal abstract class SidedBackingStateConfig(
+    val faces: Set<BlockFace>,
+    override val blockType: RegistryEntry.Paper<BlockType>
+) : BackingStateConfig() {
     
     override val id = getIdOf(faces)
     override val waterlogged = false
     override val variantMap = POSSIBLE_FACES.associate { it.name.lowercase() to (it in faces).toString() }
-    override val vanillaBlockState: BlockState = block.defaultBlockState()
-        .setValue(BlockStateProperties.NORTH, BlockFace.NORTH in faces)
-        .setValue(BlockStateProperties.EAST, BlockFace.EAST in faces)
-        .setValue(BlockStateProperties.SOUTH, BlockFace.SOUTH in faces)
-        .setValue(BlockStateProperties.WEST, BlockFace.WEST in faces)
-        .setValue(BlockStateProperties.UP, BlockFace.UP in faces)
-        .setValue(BlockStateProperties.DOWN, BlockFace.DOWN in faces)
+    override val vanillaBlockState: BlockState by blockType.map {
+        it.nmsBlock.defaultBlockState()
+            .setValue(BlockStateProperties.NORTH, BlockFace.NORTH in faces)
+            .setValue(BlockStateProperties.EAST, BlockFace.EAST in faces)
+            .setValue(BlockStateProperties.SOUTH, BlockFace.SOUTH in faces)
+            .setValue(BlockStateProperties.WEST, BlockFace.WEST in faces)
+            .setValue(BlockStateProperties.UP, BlockFace.UP in faces)
+            .setValue(BlockStateProperties.DOWN, BlockFace.DOWN in faces)
+    }
     
     companion object {
         fun getIdOf(faces: Collection<BlockFace>): Int {

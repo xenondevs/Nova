@@ -5,8 +5,9 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.component.CustomModelData
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
-import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.Click
+import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
@@ -15,6 +16,7 @@ import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelCreationScope
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.clientsideProvider
 import java.awt.image.BufferedImage
 import java.util.function.Supplier
 
@@ -29,11 +31,12 @@ import java.util.function.Supplier
  * @see ItemModelCreationScope.canvasModel
  */
 open class Canvas(
-    private val canvasItem: NovaItem,
+    canvasItem: Provider<NovaItem>,
     private val itemResolution: Int,
     private val image: BufferedImage
 ) : Supplier<Item> {
     
+    private val canvasItem = canvasItem.clientsideProvider
     private val items = ArrayList<Item>()
     private var supplierIndex = 0
     
@@ -81,6 +84,10 @@ open class Canvas(
         
         private val colors = IntArray(itemResolution * itemResolution)
         
+        init {
+            canvasItem.observeWeak(this) { thisRef -> thisRef.notifyWindows() }
+        }
+        
         override fun getItemProvider(viewer: Player): ItemProvider {
             // read colors from image
             image.getRGB(
@@ -92,7 +99,7 @@ open class Canvas(
             )
             
             // write colors to item stack
-            val itemStack = canvasItem.clientsideProvider.get().unwrap().copy()
+            val itemStack = canvasItem.get().get().unwrap().copy()
             itemStack.set(
                 DataComponents.CUSTOM_MODEL_DATA,
                 CustomModelData(

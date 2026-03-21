@@ -19,6 +19,7 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.platformLauncher)
     testImplementation(libs.kotlin.test.junit)
+    testImplementation(libs.slf4j.simple)
 }
 
 java {

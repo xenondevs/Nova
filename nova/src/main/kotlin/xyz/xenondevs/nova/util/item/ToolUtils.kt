@@ -175,7 +175,7 @@ object ToolUtils {
      * Returns a tag that is similar to the given [category] or null if no such tag exists.
      */
     private fun findSimilarTagForToolCategory(category: ToolCategory): TagKey<MojangBlock>? {
-        return when (category) {
+        return when (category.entry) {
             VanillaToolCategories.AXE -> BlockTags.MINEABLE_WITH_AXE
             VanillaToolCategories.HOE -> BlockTags.MINEABLE_WITH_HOE
             VanillaToolCategories.PICKAXE -> BlockTags.MINEABLE_WITH_PICKAXE

@@ -4,10 +4,13 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
+import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.internal.util.InventoryUtils
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
-import xyz.xenondevs.invui.item.setItemProvider
+import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
@@ -42,19 +45,18 @@ class FluidBar(
     private val capacity: Provider<Long>,
     private val type: Provider<FluidType?>,
     private val amount: Provider<Long>,
-    private val items: Map<FluidType?, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
+    private val items: Map<FluidType?, Provider<NovaItem>> = DEFAULT_FLUID_BAR_ITEMS
 ) : VerticalBar(height) {
     
     private val allowedConnectionType = fluidHolder.containers[fluidContainer]!!
     
-    @JvmOverloads
     constructor(
         height: Int,
         fluidHolder: FluidHolder,
         container: FluidContainer,
-        items: Map<FluidType?, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
+        items: Map<FluidType?, Provider<NovaItem>> = DEFAULT_FLUID_BAR_ITEMS
     ) : this(
-        height, 
+        height,
         fluidHolder,
         container,
         container.capacityProvider,
@@ -64,17 +66,15 @@ class FluidBar(
     )
     
     @Suppress("DEPRECATION")
-    override fun createBarItem(section: Int) = Item.builder()
-        .setItemProvider(
-            combinedProvider(type, amount, capacity) { type, amount, capacity ->
-                createItemBuilder(
-                    items[type]!!,
-                    section,
-                    amount.toDouble() / capacity.toDouble()
-                ).setFluidDisplayName(amount, capacity)
-            }
-        ).addClickHandler { _, click ->
-            val player = click.player
+    override fun createBarItem(section: Int): Item = item {
+        itemProvider by combinedProvider(type, amount, capacity) { type, amount, capacity ->
+            items[type]?.map { item ->
+                createItemBuilder(item, section, amount.toDouble() / capacity.toDouble())
+                    .setFluidDisplayName(amount, capacity)
+            } ?: provider(ItemProvider.EMPTY)
+        }.flatten()
+        
+        onClick {
             val cursor = player.itemOnCursor.takeUnlessEmpty()
             when (cursor?.type) {
                 Material.BUCKET -> if (allowedConnectionType.extract && fluidContainer.amount >= 1000) {
@@ -99,7 +99,8 @@ class FluidBar(
                 
                 else -> Unit
             }
-        }.build()
+        }
+    }
     
 }
 
@@ -111,17 +112,15 @@ class StaticFluidBar(
     private val capacity: Long,
     private val type: FluidType,
     private val amount: Long,
-    private val items: Map<FluidType?, NovaItem> = DEFAULT_FLUID_BAR_ITEMS
+    private val items: Map<FluidType?, Provider<NovaItem>> = DEFAULT_FLUID_BAR_ITEMS
 ) : VerticalBar(height) {
     
-    override fun createBarItem(section: Int): Item {
-        return Item.simple(
-            createItemBuilder(
-                items[type]!!,
-                section,
-                amount.toDouble() / capacity.toDouble()
-            ).setFluidDisplayName(amount, capacity)
-        )
+    override fun createBarItem(section: Int): Item = item {
+        val item = items[type] ?: return@item
+        itemProvider by item.map { item ->
+            createItemBuilder(item, section, amount.toDouble() / capacity.toDouble())
+                .setFluidDisplayName(amount, capacity)
+        }
     }
     
 }

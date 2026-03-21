@@ -56,8 +56,7 @@ fun Shield(
     bypassedBy: RegistryKeySet<DamageType>? = null,
     blockSound: Key? = null,
     disableSound: Key? = null
-) = ItemBehaviorFactory {
-    val cfg = it.config
+) = ItemBehaviorFactory { _, cfg ->
     Shield(
         cfg.entryOrElse(blockDelay, "block_delay"),
         cfg.entryOrElse(disableCooldownScale, "disable_cooldown_scale"),

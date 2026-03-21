@@ -17,6 +17,7 @@ import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
+import xyz.xenondevs.nova.registry.entries.BlockTypeEntries
 import xyz.xenondevs.nova.util.BlockFaceUtils
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.callEvent
@@ -24,6 +25,7 @@ import xyz.xenondevs.nova.util.nmsDirection
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.util.typeEntry
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -52,9 +54,8 @@ internal object TripwireBehavior : BlockBehavior {
     override fun updateShape(pos: BlockPos, state: NovaBlockState, neighborPos: BlockPos): NovaBlockState {
         val property = FACE_PROPERTIES[BlockFaceUtils.determineBlockFaceBetween(pos, neighborPos)]
             ?: return state
-        val novaNeighbor = neighborPos.novaBlockState
-        val nmsNeighbor = neighborPos.nmsBlockState
-        return state.with(property, novaNeighbor?.block == DefaultBlocks.TRIPWIRE || nmsNeighbor == Blocks.TRIPWIRE_HOOK)
+        val type = neighborPos.block.typeEntry
+        return state.with(property, type == DefaultBlocks.TRIPWIRE || type == BlockTypeEntries.TRIPWIRE)
     }
     
     @Suppress("UnstableApiUsage")
@@ -114,7 +115,7 @@ internal object TripwireBehavior : BlockBehavior {
                 val posThere = pos.advance(face, length)
                 
                 val novaStateThere = WorldDataManager.getBlockState(posThere)
-                if (novaStateThere?.block == DefaultBlocks.TRIPWIRE)
+                if (novaStateThere?.blockEntry == DefaultBlocks.TRIPWIRE)
                     continue
                 
                 val vanillaStateThere = posThere.nmsBlockState

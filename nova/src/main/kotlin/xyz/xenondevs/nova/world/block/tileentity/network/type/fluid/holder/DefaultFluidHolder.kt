@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.serialization.DataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.DefaultContainerEndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer

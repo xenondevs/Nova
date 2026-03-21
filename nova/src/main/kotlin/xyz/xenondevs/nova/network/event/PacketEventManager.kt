@@ -28,6 +28,7 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetPassengersPack
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundEntityPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSystemChatPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAdvancementsPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAttributesPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
@@ -86,6 +87,7 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundOpenScreenPacketEvent)
         registerPlayerEventType(::ClientboundRecipeBookAddPacketEvent)
         registerPlayerEventType(::ClientboundPlaceGhostRecipePacketEvent)
+        registerPlayerEventType(::ClientboundUpdateAdvancementsPacketEvent)
         
         // serverbound - player
         registerPlayerEventType(::ServerboundPlaceRecipePacketEvent)

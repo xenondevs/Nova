@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.resources.builder.layout.item
 
+import net.kyori.adventure.key.Key
 import org.joml.Vector3d
 import org.joml.Vector4d
 import xyz.xenondevs.commons.collections.mapToArray
@@ -14,19 +15,22 @@ import xyz.xenondevs.nova.resources.builder.model.Model.Element
 import xyz.xenondevs.nova.resources.builder.model.Model.Element.Face
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
 import xyz.xenondevs.nova.resources.builder.task.ModelContent
-import xyz.xenondevs.nova.world.item.NovaItem
 
 @RegistryElementBuilderDsl
 class ItemModelSelectorScope internal constructor(
-    item: NovaItem,
-    val resourcePackBuilder: ResourcePackBuilder,
-    val modelContent: ModelContent
-) : ModelSelectorScope {
-    
     /**
      * The ID of the item.
      */
-    val id = item.id
+    val id: Key,
+    /**
+     * The [ResourcePackBuilder] instance that builds the current resource pack.
+     */
+    val resourcePackBuilder: ResourcePackBuilder,
+    /**
+     * The [ModelContent] instance of the current resource pack build session.
+     */
+    val modelContent: ModelContent
+) : ModelSelectorScope {
     
     /**
      * The default model for this item under `namespace:item/name` or a new

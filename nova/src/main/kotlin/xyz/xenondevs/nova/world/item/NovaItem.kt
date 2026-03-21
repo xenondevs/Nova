@@ -3,6 +3,7 @@
 package xyz.xenondevs.nova.world.item
 
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
+import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
@@ -27,26 +28,24 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.CommentedConfigurationNode
-import xyz.xenondevs.cbf.Cbf
+import xyz.xenondevs.commons.provider.NULL_PROVIDER
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
-import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
+import xyz.xenondevs.nova.registry.Configurable
+import xyz.xenondevs.nova.registry.NovaRegistryElement
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.resources.builder.task.VanillaMaterialTypes
-import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
+import xyz.xenondevs.nova.serialization.kotlinx.NovaItemSerializer
 import xyz.xenondevs.nova.util.blockFace
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
@@ -57,11 +56,7 @@ import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
-import xyz.xenondevs.nova.world.item.behavior.BlockItemBehavior
-import xyz.xenondevs.nova.world.item.behavior.DefaultBehavior
 import xyz.xenondevs.nova.world.item.behavior.ItemBehavior
-import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorFactory
-import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
 import xyz.xenondevs.nova.world.item.logic.PacketItems
 import xyz.xenondevs.nova.world.toNms
 import kotlin.reflect.KClass
@@ -71,57 +66,81 @@ import net.minecraft.world.entity.Entity as NmsEntity
 import net.minecraft.world.entity.player.Player as NmsPlayer
 import net.minecraft.world.item.ItemStack as NmsItemStack
 
+// TODO: ksp: generate these shortcuts automatically, cache results in synchronized weak map
+/**
+ * Shortcut to [flatMap][Provider.flatMap] to [NovaItem.clientsideProvider].
+ */
+val Provider<NovaItem>.clientsideProvider: Provider<ItemProvider>
+    get() = flatMap(NovaItem::clientsideProvider)
+
+/**
+ * Creates an [ItemStack] for the [NovaItem] without resolving the [RegistryEntry],
+ * meaning that changes due to registry reloading will be reflected in the returned [ItemStack].
+ */
+fun RegistryEntry<NovaItem>.createItemStack(amount: Int = 1): ItemStack =
+    createNovaItemStack(key, amount)
+
 /**
  * Represents a custom Nova item type.
  */
+@Serializable(with = NovaItemSerializer::class)
 class NovaItem internal constructor(
-    val id: Key,
+    override val entry: RegistryEntry.Nova<NovaItem>,
+    /**
+     * The name of this [NovaItem].
+     */
     val name: Component?,
+    /**
+     * The lore of this [NovaItem], rendered below the name in the item tooltip.
+     */
     val lore: List<Component>,
+    /**
+     * The style of the [name] of this [NovaItem]. (Already applied to [name])
+     */
     val style: Style,
-    behaviorHolders: List<ItemBehaviorHolder>,
+    /**
+     * The [ItemBehaviors][ItemBehavior] of this [NovaItem].
+     */
+    val behaviors: List<ItemBehavior>,
+    /**
+     * The maximum amount of items of this type that can be in one stack.
+     */
     val maxStackSize: Int,
-    private val _craftingRemainingItem: Key?,
+    private val _craftingRemainingItem: Lazy<ItemStack>,
+    /**
+     * Whether this [NovaItem] should be hidden from user-facing listings such as
+     * the items menu or the give command.
+     */
     val isHidden: Boolean,
-    val block: NovaBlock?,
-    configId: String,
-    val tooltipStyle: TooltipStyle?,
-    internal val configureDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit
-) {
+    block: RegistryEntry.Nova<NovaBlock>?,
+    override val config: Provider<CommentedConfigurationNode>,
+    /**
+     * The visual style of the tooltip of this [NovaItem].
+     * May be `null` if no custom style is set.
+     */
+    val tooltipStyle: RegistryEntry.Nova<TooltipStyle>?
+) : NovaRegistryElement<NovaItem>, Configurable {
     
     /**
-     * The configuration for this [NovaItem].
-     * May be an empty node if the config file does not exist.
+     * The [NovaBlock] associated with this [NovaItem].
+     * May be `null` if this [NovaItem] is not a block item.
      */
-    val config: Provider<CommentedConfigurationNode> = Configs[configId]
+    val block: NovaBlock? by block ?: NULL_PROVIDER
     
     /**
      * The [ItemStack] that is left over after this [NovaItem] was
      * used in a crafting recipe, or an empty stack if there is no remainder.
      */
     val craftingRemainingItem: ItemStack
-        get() = _craftingRemainingItem?.let(ItemUtils::getItemStack) ?: ItemStack.empty()
-    
-    /**
-     * The [ItemBehaviors][ItemBehavior] of this [NovaItem].
-     */
-    val behaviors: List<ItemBehavior> = buildList {
-        add(DefaultBehavior.create(this@NovaItem))
-        if (block != null)
-            add(BlockItemBehavior(provider(block)))
-        for (holder in behaviorHolders) {
-            when (holder) {
-                is ItemBehavior -> add(holder)
-                is ItemBehaviorFactory<*> -> add(holder.create(this@NovaItem))
-            }
-        }
-    }
+        get() = _craftingRemainingItem.value.clone()
     
     /**
      * An [ItemProvider] containing the client-side [ItemStack] of this [NovaItem],
      * intended for use in [Guis][Gui].
      */
-    val clientsideProvider: ItemProvider by lazy {
+    val clientsideProvider: Provider<ItemProvider> = combinedProvider(
+        behaviors.map(ItemBehavior::baseDataComponents) // accessed indirectly through PacketItems
+    ) { _ ->
         val clientStack = PacketItems.getClientSideStack(
             player = null,
             itemStack = createItemStack().unwrap(),
@@ -150,47 +169,33 @@ class NovaItem internal constructor(
         behaviors.map(ItemBehavior::baseDataComponents)
     ) { maps -> DataComponentMap(ItemUtils.mergeDataComponentMaps(maps.map(DataComponentMap::handle))) }
     
-    /**
-     * The default components patch applied to all [ItemStacks][ItemStack] of this [NovaItem].
-     */
-    internal val defaultPatch: DataComponentPatch by combinedProvider(
-        behaviors.map(ItemBehavior::defaultCompound)
-    ) { defaultCompounds ->
-        val defaultCompound = NamespacedCompound()
-        for (defaultCompound in defaultCompounds) {
-            defaultCompound.putAll(defaultCompound)
-        }
-        
-        DataComponentPatch.builder()
-            .set(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag().also { compoundTag ->
-                compoundTag.put("nova", CompoundTag().also {
-                    it.putString("id", id.toString())
-                })
-                if (defaultCompound.isNotEmpty()) {
-                    compoundTag.putByteArray("nova_cbf", Cbf.write(defaultCompound))
-                }
-            }))
-            .build()
-    }
+    private val itemStack by lazy { createNovaItemStack(key) }
     
     /**
      * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in server-side format.
+     * 
+     * The [ItemStack] built by the returned [ItemBuilder] is not tied to this specific [NovaItem] instance and will reflect
+     * changes related to registry- and data component reloading.
      */
     fun createItemBuilder(): ItemBuilder =
-        ItemBuilder(createItemStack(1))
+        ItemBuilder(createItemStack())
     
     /**
      * Creates an [ItemStack] of this [NovaItem] with the given [amount] in server-side format.
+     * 
+     * The returned [ItemStack] is not tied to this specific [NovaItem] instance and will reflect
+     * changes related to registry- and data component reloading.
      */
     fun createItemStack(amount: Int = 1): ItemStack =
-        NmsItemStack(PacketItems.SERVER_SIDE_ITEM_HOLDER, amount, defaultPatch).asBukkitMirror()
+        itemStack.clone().apply { this.amount = amount }
     
     /**
      * Creates an [ItemBuilder] for an [ItemStack] of this [NovaItem], in client-side format,
      * intended for use in [Guis][Gui].
      */
+    @Deprecated("Use itemProvider DSL instead")
     fun createClientsideItemBuilder(): ItemBuilder =
-        ItemBuilder(clientsideProvider.get())
+        ItemBuilder(clientsideProvider.get().get())
     
     /**
      * Checks whether this [NovaItem] has an [ItemBehavior] of the reified type [T], or a subclass of it.
@@ -244,13 +249,13 @@ class NovaItem internal constructor(
      * Gets the first [ItemBehavior] that is an instance of [behavior], or throws an [IllegalStateException] if there is none.
      */
     fun <T : Any> getBehavior(behavior: KClass<T>): T =
-        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
+        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behavior.simpleName}")
     
     /**
      * Gets the first [ItemBehavior] that is an instance of [behavior], or throws an [IllegalStateException] if there is none.
      */
     fun <T : Any> getBehavior(behavior: Class<T>): T =
-        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $id does not have a behavior of type ${behavior.simpleName}")
+        getBehaviorOrNull(behavior) ?: throw IllegalStateException("Item $key does not have a behavior of type ${behavior.simpleName}")
     
     //<editor-fold desc="item behavior functionality", defaultstate="collapsed">
     /**
@@ -627,19 +632,25 @@ class NovaItem internal constructor(
         try {
             return run()
         } catch (t: Throwable) {
-            LOGGER.error("Failed to $name for $id", t)
+            LOGGER.error("Failed to $name for $key", t)
         }
         return fallback
     }
     
     //</editor-fold>
     
-    override fun toString() = id.toString()
+    override fun toString(): String = key.toString()
     
-    companion object {
-        
-        val CODEC = NovaRegistries.ITEM.byNameCodec()
-        
+}
+
+private fun createNovaItemStack(id: Key, amount: Int = 1): ItemStack {
+    val compound = CompoundTag().also { tag ->
+        tag.put("nova", CompoundTag().also { nova ->
+            nova.putString("id", id.toString())
+        })
     }
-    
+    val patch = DataComponentPatch.builder()
+        .set(DataComponents.CUSTOM_DATA, CustomData.of(compound))
+        .build()
+    return NmsItemStack(PacketItems.SERVER_SIDE_ITEM_HOLDER, amount, patch).asBukkitMirror()
 }

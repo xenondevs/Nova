@@ -18,14 +18,13 @@ import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.level.levelgen.structure.StructureSet
 import net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters
 import xyz.xenondevs.nova.addon.AddonBootstrapper
-import xyz.xenondevs.nova.addon.id
-import xyz.xenondevs.nova.util.data.UpdatableFile
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.registry.LegacyNovaRegistries
 import xyz.xenondevs.nova.registry.preFreeze
-import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.util.data.UpdatableFile
 import xyz.xenondevs.nova.util.data.decodeJsonFile
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
 import xyz.xenondevs.nova.util.set
@@ -41,7 +40,7 @@ import kotlin.io.path.walk
 internal object WorldGenFileParser {
     
     private val NOVA_WORLD_GEN_DIRECTORIES = listOf(
-        NovaWorldGenDir("inject/biome", BiomeInjection.CODEC, NovaRegistries.BIOME_INJECTION, Registries.BIOME)
+        NovaWorldGenDir("inject/biome", BiomeInjection.CODEC, LegacyNovaRegistries.BIOME_INJECTION, Registries.BIOME)
     )
     
     private val VANILLA_WORLD_GEN_DIRECTORIES = listOf(
@@ -85,7 +84,7 @@ internal object WorldGenFileParser {
             addon.dataFolder.resolve(dirName).walk()
                 .filter { it.isRegularFile() && it.extension == "json" && ResourcePath.isValidPath(it.name) }
                 .forEach { file ->
-                    val id = Key.key(addon.id, file.nameWithoutExtension)
+                    val id = Key.key(addon.namespace(), file.nameWithoutExtension)
                     registry[id] = codec.decodeJsonFile(
                         RegistryOps.create(JsonOps.INSTANCE, lookup),
                         file

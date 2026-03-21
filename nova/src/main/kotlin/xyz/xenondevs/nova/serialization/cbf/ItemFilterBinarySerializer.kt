@@ -11,7 +11,6 @@ import xyz.xenondevs.cbf.serializer.BinarySerializerFactory
 import xyz.xenondevs.cbf.serializer.VersionedBinarySerializer
 import xyz.xenondevs.commons.reflection.isSubtypeOf
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.getValue
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterType
 import xyz.xenondevs.nova.world.item.behavior.UnknownItemFilter
@@ -53,7 +52,7 @@ private object ItemFilterBinarySerializer : VersionedBinarySerializer<ItemFilter
     private fun createFilter(id: Key, filterType: ItemFilterType<*>?, compound: Compound): ItemFilter<*> {
         if (filterType == null)
             return UnknownItemFilter(id, compound)
-        return filterType.deserialize(compound)
+        return filterType.serializer.deserialize(compound)
     }
     
     override fun writeVersioned(obj: ItemFilter<*>, writer: ByteWriter) =
@@ -65,8 +64,8 @@ private object ItemFilterBinarySerializer : VersionedBinarySerializer<ItemFilter
             writer.writeString(filter.originalId.toString())
             Cbf.write(filter.originalData, writer)
         } else {
-            writer.writeString(NovaRegistries.ITEM_FILTER_TYPE.getKey(filter.type).toString())
-            Cbf.write(filter.type.serialize(filter as T), writer)
+            writer.writeString(filter.type.key.asString())
+            Cbf.write(filter.type.serializer.serialize(filter as T), writer)
         }
     }
     
@@ -75,7 +74,7 @@ private object ItemFilterBinarySerializer : VersionedBinarySerializer<ItemFilter
     
     @Suppress("UNCHECKED_CAST")
     private fun <T : ItemFilter<T>> copy(filter: ItemFilter<T>): ItemFilter<T> =
-        filter.type.copy(filter as T)
+        filter.type.serializer.copy(filter as T)
     
 }
 

@@ -91,7 +91,7 @@ internal class DisplayEntityBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos)
             field = stage
             itemDisplay.updateEntityData(true) {
                 if (stage in 0..9) {
-                    itemStack = DefaultBlockOverlays.BREAK_STAGE_OVERLAY
+                    itemStack = DefaultBlockOverlays.BREAK_STAGE_OVERLAY.get()
                         .createClientsideItemBuilder()
                         .addCustomModelData(stage)
                         .get()

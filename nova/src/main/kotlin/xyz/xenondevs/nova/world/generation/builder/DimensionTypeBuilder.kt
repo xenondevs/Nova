@@ -12,7 +12,7 @@ import net.minecraft.world.level.CardinalLighting
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.dimension.DimensionType
 import net.minecraft.world.level.dimension.DimensionType.MonsterSettings
-import xyz.xenondevs.nova.registry.RegistryElementBuilder
+import xyz.xenondevs.nova.registry.LegacyRegistryElementBuilder
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 import java.util.Optional
@@ -27,7 +27,7 @@ import java.util.Optional
 class DimensionTypeBuilder internal constructor(
     id: Key,
     registry: WritableRegistry<DimensionType>
-) : RegistryElementBuilder<DimensionType>(registry, id) {
+) : LegacyRegistryElementBuilder<DimensionType>(registry, id) {
     
     private var fixedTime: Long? = null
     private var hasSkyLight: Boolean = true

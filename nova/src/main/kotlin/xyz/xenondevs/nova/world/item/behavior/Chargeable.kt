@@ -7,7 +7,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.entryOrElse
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.NumberFormatUtils
@@ -32,8 +31,7 @@ private val ENERGY_KEY = Key.key("nova", "energy")
 fun Chargeable(
     maxEnergy: Long? = null,
     affectsItemDurability: Boolean = true
-) = ItemBehaviorFactory<Chargeable> {
-    val cfg = it.config
+) = ItemBehaviorFactory<Chargeable> { _, cfg ->
     Chargeable.Default(
         cfg.entryOrElse(maxEnergy, "max_energy"),
         cfg.entryOrElse<Boolean>(affectsItemDurability, "charge_affects_item_durability")
@@ -72,10 +70,6 @@ interface Chargeable : ItemBehavior {
         
         override val maxEnergy by maxEnergy
         private val affectsItemDurability by affectsItemDurability
-        
-        override val defaultCompound = provider {
-            NamespacedCompound().apply { this[ENERGY_KEY] = 0L }
-        }
         
         override fun modifyClientSideStack(player: Player?, server: BukkitStack, client: BukkitStack): BukkitStack {
             val energy = server.retrieveData(ENERGY_KEY) ?: 0L

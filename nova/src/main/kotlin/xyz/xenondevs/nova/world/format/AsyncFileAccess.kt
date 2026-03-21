@@ -57,8 +57,8 @@ internal class AsyncFileAccess {
         if (pendingBin != null)
             return pendingBin
         
-        return withContext(Dispatchers.IO) { 
-           if (path.exists() && path.fileSize() > 0L) path.readBytes() else null
+        return withContext(Dispatchers.IO) {
+            if (path.exists() && path.fileSize() > 0L) path.readBytes() else null
         }
     }
     

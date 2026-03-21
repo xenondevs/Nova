@@ -12,11 +12,13 @@ import com.sk89q.worldedit.util.eventbus.Subscribe
 import com.sk89q.worldedit.world.block.BaseBlock
 import com.sk89q.worldedit.world.block.BlockStateHolder
 import com.sk89q.worldedit.world.block.BlockTypes
+import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.integration.Hook
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.stream.Stream
+import kotlin.streams.asStream
 
 private val BLOCK_STATE = BlockTypes.BARRIER!!.defaultState
 
@@ -43,13 +45,14 @@ class NovaBlock(val novaId: String) : BaseBlock(BLOCK_STATE)
 internal class NovaBlockInputParser(worldEdit: WorldEdit) : InputParser<BaseBlock>(worldEdit) {
     
     override fun getSuggestions(input: String): Stream<String> {
-        return NovaRegistries.blockStream()
-            .filter { it.id.toString().startsWith(input) || it.id.value().startsWith(input) }
-            .map { it.id.toString() }
+        return NovaRegistries.BLOCK.entrySet.get().asSequence()
+            .filter { it.key.toString().startsWith(input) || it.key.value().startsWith(input) }
+            .map { it.key.toString() }
+            .asStream()
     }
     
     override fun parseFromInput(input: String, context: ParserContext): BaseBlock? {
-        if (!NovaRegistries.hasBlock(input))
+        if (Key.key(input) !in NovaRegistries.BLOCK)
             return null
         
         return NovaBlock(input)
@@ -62,7 +65,7 @@ internal class NovaBlockExtent(private val event: EditSessionEvent) : AbstractDe
     override fun <T : BlockStateHolder<T>?> setBlock(vec: BlockVector3, block: T): Boolean {
         if (block is NovaBlock) {
             val pos = BlockPos(BukkitAdapter.adapt(event.world), vec.x, vec.y, vec.z)
-            WorldDataManager.setBlockState(pos, NovaRegistries.getBlockOrThrow(block.novaId).defaultBlockState)
+            WorldDataManager.setBlockState(pos, NovaRegistries.BLOCK.getValueOrThrow(Key.key(block.novaId)).defaultBlockState)
             return true
         }
         

@@ -14,7 +14,7 @@ import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.registry.NovaRegistries
+import xyz.xenondevs.nova.registry.LegacyNovaRegistries
 import xyz.xenondevs.nova.registry.postFreeze
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
 
@@ -29,7 +29,7 @@ internal object BiomeInjector {
     fun prepareInjections() {
         Registries.BIOME.postFreeze { biomeRegistry, _ ->
             val toInject = HashMap<Biome, Array<MutableSet<Holder<PlacedFeature>>>>()
-            for (biomeInjection in NovaRegistries.BIOME_INJECTION) {
+            for (biomeInjection in LegacyNovaRegistries.BIOME_INJECTION) {
                 val biomes = biomeInjection.resolveAffectedBiomes(biomeRegistry)
                 for (biome in biomes) {
                     val featuresPerStep = toInject.getOrPut(biome) { Array(GENERATION_STEPS) { HashSet() } }
@@ -59,7 +59,7 @@ internal object BiomeInjector {
         }.asList()
         
         biome.generationSettings = BiomeGenerationSettings(
-            prevGenSettings.carvers as HolderSet<ConfiguredWorldCarver<*>>, 
+            prevGenSettings.carvers as HolderSet<ConfiguredWorldCarver<*>>,
             newFeatures
         )
     }

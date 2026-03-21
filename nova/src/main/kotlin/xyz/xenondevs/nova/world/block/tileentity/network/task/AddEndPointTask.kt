@@ -44,7 +44,7 @@ internal class AddEndPointTask(
         
         val clustersToEnlarge = HashSet<ProtoNetwork<*>>()
         
-        for (networkType in NovaRegistries.NETWORK_TYPE) {
+        for (networkType in NovaRegistries.NETWORK_TYPE.entrySet.get()) {
             var allowedFaces = state.getAllowedFaces(node, networkType)
             if (allowedFaces.isEmpty())
                 continue
