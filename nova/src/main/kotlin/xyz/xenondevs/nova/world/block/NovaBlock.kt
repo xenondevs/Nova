@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.world.block
 
+import io.papermc.paper.registry.RegistryKey
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -11,6 +12,7 @@ import net.kyori.adventure.text.format.Style
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.phys.BlockHitResult
 import org.bukkit.Material
+import org.bukkit.block.BlockType
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -26,6 +28,7 @@ import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 import xyz.xenondevs.nova.registry.Configurable
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockSerializer
@@ -49,6 +52,18 @@ import net.minecraft.world.entity.player.Player as NmsPlayer
 import net.minecraft.world.item.ItemStack as NmsItemStack
 
 /**
+ * Converts [this][RegistryEntry.Nova] to an [RegistryEntry.Either] of [NovaBlock] and [BlockType].
+ */
+fun RegistryEntry.Nova<NovaBlock>.asEither(): RegistryEntry.Either<NovaBlock, BlockType> =
+    RegistryEntry.either(this, RegistryKey.BLOCK)
+
+/**
+ * Converts [this][RegistryEntry.Paper] to an [RegistryEntry.Either] of [NovaBlock] and [BlockType].
+ */
+fun RegistryEntry.Paper<BlockType>.asEither(): RegistryEntry.Either<NovaBlock, BlockType> =
+    RegistryEntry.either(NovaRegistries.BLOCK, this)
+
+/**
  * Represents a custom Nova block type.
  */
 @GenerateFlatMapExtensions
@@ -69,7 +84,7 @@ open class NovaBlock internal constructor(
      * responsible for defining the various [blockStates].
      */
     val stateProperties: List<ScopedBlockStateProperty<*>>,
-    item: Provider<RegistryEntry<NovaItem>?>,
+    item: Provider<RegistryEntry.Nova<NovaItem>?>,
     override val config: Provider<CommentedConfigurationNode>,
     /**
      * A list of all possible [NovaBlockStates][NovaBlockState] of this [NovaBlock]

@@ -3,6 +3,7 @@
 package xyz.xenondevs.nova.world.item
 
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
+import io.papermc.paper.registry.RegistryKey
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -27,10 +28,12 @@ import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.commons.provider.NULL_PROVIDER
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
@@ -43,8 +46,11 @@ import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 import xyz.xenondevs.nova.registry.Configurable
+import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.flatMap
+import xyz.xenondevs.nova.registry.map
 import xyz.xenondevs.nova.resources.builder.task.VanillaMaterialTypes
 import xyz.xenondevs.nova.serialization.kotlinx.NovaItemSerializer
 import xyz.xenondevs.nova.util.blockFace
@@ -68,11 +74,44 @@ import net.minecraft.world.entity.player.Player as NmsPlayer
 import net.minecraft.world.item.ItemStack as NmsItemStack
 
 /**
+ * Converts [this][RegistryEntry.Nova] to an [RegistryEntry.Either] of [NovaItem] and [ItemType].
+ */
+fun RegistryEntry.Nova<NovaItem>.asEither(): RegistryEntry.Either<NovaItem, ItemType> =
+    RegistryEntry.either(this, RegistryKey.ITEM)
+
+/**
+ * Converts [this][RegistryEntry.Paper] to an [RegistryEntry.Either] of [NovaItem] and [ItemType].
+ */
+fun RegistryEntry.Paper<ItemType>.asEither(): RegistryEntry.Either<NovaItem, ItemType> =
+    RegistryEntry.either(NovaRegistries.ITEM, this)
+
+/**
  * Creates an [ItemStack] for the [NovaItem] without resolving the [RegistryEntry],
  * meaning that changes due to registry reloading will be reflected in the returned [ItemStack].
  */
-fun RegistryEntry<NovaItem>.createItemStack(amount: Int = 1): ItemStack =
+fun RegistryEntry.Nova<NovaItem>.createItemStack(amount: Int = 1): ItemStack =
     createNovaItemStack(key, amount)
+
+/**
+ * Creates an [ItemStack] for the [ItemType] of the [RegistryEntry].
+ */
+fun RegistryEntry.Paper<ItemType>.createItemStack(amount: Int = 1): ItemStack =
+    get().createItemStack(amount)
+
+/**
+ * Maps [this][RegistryEntry.Either] to a [Provider] of an [ItemStack] using [NovaItem.createItemStack]
+ * if it is a [NovaItem], or using [ItemType.createItemStack] if it is an [ItemType].
+ */
+fun RegistryEntry.Either<NovaItem, ItemType>.mapToItemStack(amount: Int = 1): Provider<ItemStack> =
+    map({ it.createItemStack() }, { it.createItemStack() })
+
+/**
+ * Maps [this][RegistryEntry.Either] to a [Provider] of an [ItemProvider] that is either the
+ * [NovaItem.clientsideProvider] if it is a [NovaItem], or an [ItemWrapper] of the [ItemType's][ItemType]
+ * [ItemStack] if it is an [ItemType].
+ */
+val RegistryEntry.Either<NovaItem, ItemType>.clientsideProvider: Provider<ItemProvider>
+    get() = flatMap({ it.clientsideProvider }, { provider(ItemWrapper(it.createItemStack())) })
 
 /**
  * Represents a custom Nova item type.
