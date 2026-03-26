@@ -69,3 +69,7 @@ build/
 
 # Kotlin
 .kotlin/
+
+# AI agents
+.claude/*
+.mcp.json
