@@ -118,7 +118,7 @@ class BlockModelSelectorScope internal constructor(
     fun createCubeModel(all: ResourcePath<ResourceType.Model>): ModelBuilder = ModelBuilder(
         Model(
             parent = ResourcePath(ResourceType.Model, "minecraft", "block/cube_all"),
-            textures = mapOf("all" to all.toString())
+            textures = mapOf("all" to Model.Texture(all.toString()))
         )
     )
     

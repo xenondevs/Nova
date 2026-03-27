@@ -84,7 +84,8 @@ kotlin {
             "kotlin.contracts.ExperimentalContracts",
             "kotlinx.coroutines.ExperimentalCoroutinesApi",
             "xyz.xenondevs.invui.ExperimentalReactiveApi",
-            "xyz.xenondevs.invui.dsl.ExperimentalDslApi"
+            "xyz.xenondevs.invui.dsl.ExperimentalDslApi",
+            "kotlinx.serialization.ExperimentalSerializationApi"
         )
     }
 }

@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.resources.builder.model
 
+import kotlinx.serialization.KeepGeneratedSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -15,6 +16,7 @@ import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.task.ModelContent
+import xyz.xenondevs.nova.serialization.kotlinx.ModelTextureMultiFormatSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.Vector3dcAsArraySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.Vector4dcAsArraySerializer
 import java.util.*
@@ -32,7 +34,7 @@ import java.util.*
 @Serializable
 data class Model(
     val parent: ResourcePath<ResourceType.Model>? = null,
-    val textures: Map<String, String> = emptyMap(),
+    val textures: Map<String, Texture> = emptyMap(),
     val elements: List<Element>? = null,
     
     // block-specific
@@ -101,6 +103,14 @@ data class Model(
         DOWN(Axis.Y)
         
     }
+    
+    @KeepGeneratedSerializer
+    @Serializable(with = ModelTextureMultiFormatSerializer::class)
+    data class Texture(
+        val sprite: String,
+        @SerialName("force_translucent")
+        val forceTranslucent: Boolean = false
+    )
     
     /**
      * A voxel of a [Model].
@@ -199,6 +209,8 @@ data class Model(
         val gui: Entry? = null,
         val ground: Entry? = null,
         val fixed: Entry? = null,
+        @SerialName("on_shelf")
+        val onShelf: Entry? = null
     ) {
         
         /**
@@ -257,6 +269,13 @@ data class Model(
         val effectiveFixed: Entry
             get() = fixed ?: Entry()
         
+        /**
+         * The effective display settings for on shelf position,
+         * defaulting to an identity [Entry] if unspecified.
+         */
+        val effectiveOnShelf: Entry
+            get() = onShelf ?: Entry()
+        
         companion object {
             
             /**
@@ -270,7 +289,8 @@ data class Model(
                 head = map[Position.HEAD],
                 gui = map[Position.GUI],
                 ground = map[Position.GROUND],
-                fixed = map[Position.FIXED]
+                fixed = map[Position.FIXED],
+                onShelf = map[Position.ON_SHELF]
             )
             
         }
@@ -296,6 +316,8 @@ data class Model(
                 map[Position.GROUND] = ground
             if (fixed != null)
                 map[Position.FIXED] = fixed
+            if (onShelf != null)
+                map[Position.ON_SHELF] = onShelf
             return map
         }
         
@@ -310,7 +332,8 @@ data class Model(
             Position.HEAD to effectiveHead,
             Position.GUI to effectiveGui,
             Position.GROUND to effectiveGround,
-            Position.FIXED to effectiveFixed
+            Position.FIXED to effectiveFixed,
+            Position.ON_SHELF to effectiveOnShelf
         )
         
         /**
@@ -324,7 +347,8 @@ data class Model(
             head = override.head ?: head,
             gui = override.gui ?: gui,
             ground = override.ground ?: ground,
-            fixed = override.fixed ?: fixed
+            fixed = override.fixed ?: fixed,
+            onShelf = override.onShelf ?: onShelf
         )
         
         /**
@@ -369,7 +393,10 @@ data class Model(
             GROUND,
             
             @SerialName("fixed")
-            FIXED
+            FIXED,
+            
+            @SerialName("on_shelf")
+            ON_SHELF
             
         }
         
@@ -382,7 +409,7 @@ data class Model(
         if (parent == null)
             return this
         
-        val textures = HashMap<String, String>()
+        val textures = HashMap<String, Texture>()
         var elements: List<Element>? = null
         var ambientOcclusion = true
         var guiLight = GuiLight.SIDE

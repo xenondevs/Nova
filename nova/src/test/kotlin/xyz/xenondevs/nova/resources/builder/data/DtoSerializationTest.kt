@@ -3,11 +3,16 @@ package xyz.xenondevs.nova.resources.builder.data
 import com.google.common.jimfs.Configuration
 import com.google.common.jimfs.Jimfs
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -16,6 +21,8 @@ import org.slf4j.LoggerFactory
 import xyz.xenondevs.downloader.ExtractionMode
 import xyz.xenondevs.downloader.MinecraftAssetsDownloader
 import xyz.xenondevs.nova.resources.builder.model.Model
+import xyz.xenondevs.nova.serialization.kotlinx.Matrix4fcAsArraySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.Matrix4fcAsSingularValueDecompositionMultiFormatSerializer
 import java.nio.file.FileSystem
 import java.nio.file.Path
 import kotlin.io.path.invariantSeparatorsPathString
@@ -23,6 +30,7 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
+import kotlin.math.abs
 
 class DtoSerializationTest {
     
@@ -59,51 +67,114 @@ class DtoSerializationTest {
     
     @Test
     fun modelsRoundTrip() {
-        // weak round trip because many vanilla models have "__comment" keys or redundant properties
-        weakRoundTrip<Model>("assets/minecraft/models/")
+        roundTrip<Model>(
+            "assets/minecraft/models/",
+            discardKeys = setOf("__comment", "name", "groups", "texture_size"),
+            conditionalRemovals = mapOf(
+                "translation" to { it is JsonArray && it.size == 3 && it.all { e -> (e as? JsonPrimitive)?.contentOrNull?.toDoubleOrNull() == 0.0 } },
+                "rotation" to { it is JsonArray && it.size == 3 && it.all { e -> (e as? JsonPrimitive)?.contentOrNull?.toDoubleOrNull() == 0.0 } },
+                "scale" to { it is JsonArray && it.size == 3 && it.all { e -> (e as? JsonPrimitive)?.contentOrNull?.toDoubleOrNull() == 1.0 } },
+                "rescale" to { it is JsonPrimitive && it.booleanOrNull == false }
+            )
+        )
     }
     
     @Test
     fun itemModelDefinitionsRoundTrip() {
-        roundTrip<ItemModelDefinition>("assets/minecraft/items/")
+        roundTrip<ItemModelDefinition>("assets/minecraft/items/",
+            reserializations = listOf(
+                Triple(
+                    "transformation",
+                    Matrix4fcAsSingularValueDecompositionMultiFormatSerializer,
+                    Matrix4fcAsArraySerializer
+                )
+            )
+        )
     }
     
-    private inline fun <reified T> roundTrip(dir: String) {
+    @Suppress("UNCHECKED_CAST")
+    private inline fun <reified T> roundTrip(
+        dir: String,
+        
+        // pre-processing content: removes keys from both expected JSON and input for actual round-trip
+        discardKeys: Set<String> = emptySet(),
+        
+        // transforms expected JSON only (does not affect round-trip input data)
+        conditionalRemovals: Map<String, (JsonElement) -> Boolean> = emptyMap(),
+        reserializations: List<Triple<String, DeserializationStrategy<*>, SerializationStrategy<*>>> = emptyList()
+    ) {
         val base = assets.resolve(dir)
         base.walk()
             .filter { it.isRegularFile() }
             .forEach { file ->
+                val content = Json.parseToJsonElement(file.readText()).withoutKeys(discardKeys)
                 try {
-                    val content = file.readText()
+                    var expected = content
+                    expected = expected.removeConditionally(conditionalRemovals)
+                    expected = reserializations.fold(expected) { acc, (n, d, s) ->
+                        d as DeserializationStrategy<Any>
+                        s as SerializationStrategy<Any>
+                        acc.reserializeNamed(n, d, s)
+                    }
+                    
+                    val actual = Json.encodeToJsonElement(Json.decodeFromJsonElement<T>(content))
+                    
                     assertJsonEquals(
-                        Json.parseToJsonElement(content),
-                        Json.encodeToJsonElement(Json.decodeFromString<T>(content)),
+                        expected,
+                        actual,
                         file.relativeTo(base).invariantSeparatorsPathString
                     )
                 } catch (e: Exception) {
-                    throw AssertionError("Failed to de(serialize) file: ${file.relativeTo(base)}", e)
+                    throw AssertionError("Failed to (de)serialize file: ${file.relativeTo(base)}.  Content:\n$content", e)
                 }
             }
     }
     
-    private inline fun <reified T> weakRoundTrip(dir: String) {
-        val json = Json { ignoreUnknownKeys = true }
-        val base = assets.resolve(dir)
-        base.walk()
-            .filter { it.isRegularFile() }
-            .forEach { file ->
-                try {
-                    val content = file.readText()
-                    assertJsonContainsAll(
-                        json.parseToJsonElement(content),
-                        json.encodeToJsonElement(json.decodeFromString<T>(content)),
-                        file.relativeTo(base).invariantSeparatorsPathString
-                    )
-                } catch (e: Exception) {
-                    throw AssertionError("Failed to de(serialize) file: ${file.relativeTo(base)}", e)
-                }
-            }
+    private fun JsonElement.withoutKeys(discardKeys: Set<String>): JsonElement = when (this) {
+        is JsonObject -> JsonObject(
+            entries
+                .filterNot { (key, _) -> key in discardKeys }
+                .associate { (key, value) -> key to value.withoutKeys(discardKeys) }
+        )
+        
+        is JsonArray -> JsonArray(map { it.withoutKeys(discardKeys) })
+        
+        else -> this
     }
+    
+    private fun JsonElement.removeConditionally(conditions: Map<String, (JsonElement) -> Boolean>): JsonElement = when (this) {
+        is JsonObject -> JsonObject(
+            entries
+                .filterNot { (k, v) -> k in conditions && conditions[k]!!.invoke(v) }
+                .associate { (k, v) -> k to v.removeConditionally(conditions) }
+        )
+        
+        is JsonArray -> JsonArray(map { it.removeConditionally(conditions) })
+        
+        else -> this
+    }
+    
+    private fun <T> JsonElement.reserializeNamed(
+        name: String,
+        deserializer: DeserializationStrategy<T>,
+        serializer: SerializationStrategy<T>
+    ): JsonElement = when (this) {
+        is JsonObject -> JsonObject(entries.associate { (key, value) ->
+            val newValue = if (key == name)
+                value.reserialize(deserializer, serializer)
+            else value.reserializeNamed(name, deserializer, serializer)
+            key to newValue
+        })
+        
+        is JsonArray -> JsonArray(map { it.reserializeNamed(name, deserializer, serializer) })
+        
+        else -> this
+    }
+    
+    private fun <T> JsonElement.reserialize(
+        deserializer: DeserializationStrategy<T>,
+        serializer: SerializationStrategy<T>
+    ): JsonElement = Json.encodeToJsonElement(serializer, Json.decodeFromJsonElement(deserializer, this))
     
     private fun JsonPrimitive.sanitizedEquals(other: JsonPrimitive): Boolean {
         // remove "minecraft:" namespace prefix
@@ -112,8 +183,8 @@ class DtoSerializationTest {
         
         val d1 = content.toDoubleOrNull()
         val d2 = other.content.toDoubleOrNull()
-        if (d1 != null)
-            return d1 == d2
+        if (d1 != null && d2 != null)
+            return abs(d1 - d2) < 1e-6
         
         return this == other
     }
@@ -152,23 +223,5 @@ class DtoSerializationTest {
             })
         }
     }
-    
-    private fun assertJsonContainsAll(superset: JsonElement, subset: JsonElement, message: String? = null) {
-        if (!superset.sanitizedContainsAll(subset)) {
-            throw AssertionError(buildString {
-                if (message != null) {
-                    appendLine(message)
-                    appendLine()
-                }
-                appendLine("JSON content does not match (formatting is ignored, 'minecraft:' prefixes were removed):")
-                appendLine("Superset:")
-                append(superset)
-                appendLine()
-                appendLine("Subset:")
-                append(subset)
-            })
-        }
-    }
-    
     
 }

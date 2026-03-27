@@ -9,10 +9,13 @@ import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.json.JsonElement
 import net.kyori.adventure.key.Key
 import org.bukkit.DyeColor
+import org.joml.Matrix4f
+import org.joml.Matrix4fc
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.LowercaseDyeColorSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.Matrix4fcMultiFormatSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ValueOrListSerializer
 
 /**
@@ -44,13 +47,19 @@ sealed interface ItemModel {
     @SerialName("minecraft:model")
     data class Default(
         val model: ResourcePath<ResourceType.Model>,
-        val tints: List<TintSource>? = null
+        val tints: List<TintSource>? = null,
+        @Serializable(with = Matrix4fcMultiFormatSerializer::class)
+        val transformation: Matrix4fc = Matrix4f()
     ) : ItemModel
     
     @InternalResourcePackDTO
     @Serializable
     @SerialName("minecraft:composite")
-    data class Composite(val models: List<ItemModel>) : ItemModel
+    data class Composite(
+        val models: List<ItemModel>,
+        @Serializable(with = Matrix4fcMultiFormatSerializer::class)
+        val transformation: Matrix4fc = Matrix4f()
+    ) : ItemModel
     
     @InternalResourcePackDTO
     @Serializable
@@ -61,6 +70,8 @@ sealed interface ItemModel {
         val onTrue: ItemModel,
         @SerialName("on_false")
         val onFalse: ItemModel,
+        @Serializable(with = Matrix4fcMultiFormatSerializer::class)
+        val transformation: Matrix4fc = Matrix4f(),
         
         // has_component
         val component: Key? = null,
@@ -123,6 +134,8 @@ sealed interface ItemModel {
         val property: Property,
         val cases: List<Case>,
         val fallback: ItemModel? = null,
+        @Serializable(with = Matrix4fcMultiFormatSerializer::class)
+        val transformation: Matrix4fc = Matrix4f(),
         
         // block_state
         @SerialName("block_state_property")
@@ -193,6 +206,8 @@ sealed interface ItemModel {
         val scale: Double = 1.0,
         val entries: List<Entry>,
         val fallback: ItemModel? = null,
+        @Serializable(with = Matrix4fcMultiFormatSerializer::class)
+        val transformation: Matrix4fc = Matrix4f(),
         
         // damage, count
         val normalize: Boolean = true,
@@ -268,23 +283,49 @@ sealed interface ItemModel {
     @SerialName("minecraft:special")
     data class Special(
         val model: SpecialModel,
-        val base: ResourcePath<ResourceType.Model>
+        val base: ResourcePath<ResourceType.Model>,
+        @Serializable(with = Matrix4fcMultiFormatSerializer::class)
+        val transformation: Matrix4fc = Matrix4f()
     ) : ItemModel {
         
         @Serializable
         sealed interface SpecialModel {
             
             @Serializable
-            @SerialName("minecraft:bed")
-            data class Bed(
-                val texture: ResourcePath<ResourceType.BedTexture>
-            ) : SpecialModel
-            
-            @Serializable
             @SerialName("minecraft:banner")
             data class Banner(
                 @Serializable(with = LowercaseDyeColorSerializer::class)
-                val color: DyeColor
+                val color: DyeColor,
+                val attachment: BannerAttachment = BannerAttachment.GROUND
+            ) : SpecialModel
+            
+            @Serializable
+            @SerialName("minecraft:bed")
+            data class Bed(
+                val texture: ResourcePath<ResourceType.BedTexture>,
+                val part: BedPart 
+            ) : SpecialModel
+            
+            @Serializable
+            @SerialName("minecraft:bell")
+            data object Bell : SpecialModel
+            
+            @Serializable
+            @SerialName("minecraft:book")
+            data class Book(
+                @SerialName("open_angle")
+                val openAngle: Int,
+                val page1: Float,
+                val page2: Float
+            ) : SpecialModel
+            
+            @Serializable
+            @SerialName("minecraft:chest")
+            data class Chest(
+                val texture: ResourcePath<ResourceType.ChestTexture>,
+                val openness: Double = 0.0,
+                @SerialName("chest_type")
+                val type: ChestType = ChestType.SINGLE
             ) : SpecialModel
             
             @Serializable
@@ -292,41 +333,29 @@ sealed interface ItemModel {
             data object Conduit : SpecialModel
             
             @Serializable
-            @SerialName("minecraft:chest")
-            data class Chest(
-                val texture: ResourcePath<ResourceType.ChestTexture>,
-                val openness: Double = 0.0
-            ) : SpecialModel
-            
-            @Serializable
             @SerialName("minecraft:copper_golem_statue")
             data class CopperGolemStatue(
-                val pose: Pose,
+                val pose: CopperGolemStatuePose,
                 val texture: ResourcePath<ResourceType.CopperGolemStatueTexture>
-            ) : SpecialModel {
-                
-                @Serializable
-                enum class Pose {
-                    
-                    @SerialName("sitting")
-                    SITTING,
-                    
-                    @SerialName("running")
-                    RUNNING,
-                    
-                    @SerialName("star")
-                    STAR,
-                    
-                    @SerialName("standing")
-                    STANDING
-                    
-                }
-                
-            }
+            ) : SpecialModel
             
             @Serializable
             @SerialName("minecraft:decorated_pot")
             data object DecoratedPot : SpecialModel
+            
+            @Serializable
+            @SerialName("minecraft:end_cube")
+            data class EndCube(
+                val effect: EndCubeEffect
+            ) : SpecialModel
+            
+            @Serializable
+            @SerialName("minecraft:hanging_sign")
+            data class HangingSign(
+                val woodType: WoodType,
+                val texture: ResourcePath<ResourceType.SignTexture>? = null,
+                val attachment: HangingSignAttachment = HangingSignAttachment.CEILING_MIDDLE
+            ) : SpecialModel
             
             @Serializable
             @SerialName("minecraft:head")
@@ -344,8 +373,7 @@ sealed interface ItemModel {
             @SerialName("minecraft:shulker_box")
             data class ShulkerBox(
                 val texture: ResourcePath<ResourceType.ShulkerTexture>,
-                val openness: Double = 0.0,
-                val orientation: Orientation = Orientation.UP
+                val openness: Double = 0.0
             ) : SpecialModel
             
             @Serializable
@@ -356,19 +384,13 @@ sealed interface ItemModel {
             @SerialName("minecraft:standing_sign")
             data class StandingSign(
                 val woodType: WoodType,
-                val texture: ResourcePath<ResourceType.SignTexture>? = null
+                val texture: ResourcePath<ResourceType.SignTexture>? = null,
+                val attachment: StandingSignAttachment = StandingSignAttachment.GROUND
             ) : SpecialModel
             
             @Serializable
             @SerialName("minecraft:trident")
             data object Trident : SpecialModel
-            
-            @Serializable
-            @SerialName("minecraft:hanging_sign")
-            data class HangingSign(
-                val woodType: WoodType,
-                val texture: ResourcePath<ResourceType.SignTexture>? = null
-            ) : SpecialModel
             
         }
         

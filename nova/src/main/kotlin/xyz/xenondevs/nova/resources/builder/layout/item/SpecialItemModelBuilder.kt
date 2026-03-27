@@ -7,11 +7,17 @@ import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
+import xyz.xenondevs.nova.resources.builder.data.BannerAttachment
+import xyz.xenondevs.nova.resources.builder.data.BedPart
+import xyz.xenondevs.nova.resources.builder.data.ChestType
+import xyz.xenondevs.nova.resources.builder.data.CopperGolemStatuePose
+import xyz.xenondevs.nova.resources.builder.data.EndCubeEffect
+import xyz.xenondevs.nova.resources.builder.data.HangingSignAttachment
 import xyz.xenondevs.nova.resources.builder.data.HeadKind
 import xyz.xenondevs.nova.resources.builder.data.InternalResourcePackDTO
 import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.data.ItemModel.Special.SpecialModel
-import xyz.xenondevs.nova.resources.builder.data.Orientation
+import xyz.xenondevs.nova.resources.builder.data.StandingSignAttachment
 import xyz.xenondevs.nova.resources.builder.data.WoodType
 import xyz.xenondevs.nova.resources.builder.layout.ModelSelectorScope
 import xyz.xenondevs.nova.resources.builder.model.ModelBuilder
@@ -32,24 +38,6 @@ abstract class SpecialItemModelBuilder<S : ModelSelectorScope> internal construc
 }
 
 @RegistryElementBuilderDsl
-class BedSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
-    resourcePackBuilder: ResourcePackBuilder,
-    private val selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
-) : SpecialItemModelBuilder<S>(resourcePackBuilder) {
-    
-    /**
-     * The texture of the bed, in `textures/entity/bed/`.
-     */
-    var texture: ResourcePath<ResourceType.BedTexture> by RequiredProperty("Bed texture is undefined")
-    
-    override fun build() = ItemModel.Special(
-        SpecialModel.Bed(texture),
-        selectAndBuild(base)
-    )
-    
-}
-
-@RegistryElementBuilderDsl
 class BannerSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
     resourcePackBuilder: ResourcePackBuilder,
     private val selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
@@ -60,8 +48,66 @@ class BannerSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor
      */
     var color: DyeColor = DyeColor.WHITE
     
+    /**
+     * Where the banner is attached.
+     */
+    var attachment: BannerAttachment = BannerAttachment.GROUND
+    
     override fun build() = ItemModel.Special(
-        SpecialModel.Banner(color),
+        SpecialModel.Banner(color, attachment),
+        selectAndBuild(base)
+    )
+    
+}
+
+@RegistryElementBuilderDsl
+class BedSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
+    resourcePackBuilder: ResourcePackBuilder,
+    private val selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
+) : SpecialItemModelBuilder<S>(resourcePackBuilder) {
+    
+    /**
+     * The texture of the bed, in `textures/entity/bed/`.
+     */
+    var texture: ResourcePath<ResourceType.BedTexture> by RequiredProperty("Bed texture is undefined")
+    
+    /**
+     * Defines which half of the bed that is rendered.
+     */
+    var part: BedPart = BedPart.HEAD
+    
+    override fun build() = ItemModel.Special(
+        SpecialModel.Bed(texture, part),
+        selectAndBuild(base)
+    )
+    
+}
+
+@RegistryElementBuilderDsl
+class BookSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
+    resourcePackBuilder: ResourcePackBuilder,
+    private val selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
+) : SpecialItemModelBuilder<S>(resourcePackBuilder) {
+    
+    /**
+     * Angle (in degrees) between the book cover and the centerline (`0` means closed, `90` means open flat).
+     */
+    var openAngle: Int by RequiredProperty("Book open angle is undefined")
+    
+    /**
+     * The position of the first page inside the book.
+     * `0` means the page is completely on the left side, `1` means it's completely on the right side.
+     */
+    var page1: Float by RequiredProperty("Book page 1 angle is undefined")
+    
+    /**
+     * The position of the second page inside the book.
+     * `0` means the page is completely on the left side, `1` means it's completely on the right side.
+     */
+    var page2: Float by RequiredProperty("Book page 2 angle is undefined")
+    
+    override fun build() = ItemModel.Special(
+        SpecialModel.Book(openAngle, page1, page2),
         selectAndBuild(base)
     )
     
@@ -83,13 +129,91 @@ class ChestSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
      */
     var openness: Double = 0.0
     
+    /**
+     * The type of the chest model.
+     */
+    var type: ChestType = ChestType.SINGLE
+    
     override fun build() = ItemModel.Special(
-        SpecialModel.Chest(texture, openness),
+        SpecialModel.Chest(texture, openness, type),
         selectAndBuild(base)
     )
     
 }
 
+@RegistryElementBuilderDsl
+class CopperGolemStatueSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
+    resourcePackBuilder: ResourcePackBuilder,
+    private val selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
+) : SpecialItemModelBuilder<S>(resourcePackBuilder) {
+    
+    /**
+     * The pose that the statue takes.
+     */
+    var pose: CopperGolemStatuePose = CopperGolemStatuePose.STANDING
+    
+    /**
+     * The texture of the statue, in `textures/`.
+     */
+    var texture by RequiredProperty<ResourcePath<ResourceType.CopperGolemStatueTexture>>("Copper golem statue texture is undefined")
+    
+    override fun build() = ItemModel.Special(
+        SpecialModel.CopperGolemStatue(pose, texture),
+        selectAndBuild(base)
+    )
+    
+}
+
+@RegistryElementBuilderDsl
+class EndCubeSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
+    resourcePackBuilder: ResourcePackBuilder,
+    private val selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
+) : SpecialItemModelBuilder<S>(resourcePackBuilder) {
+    
+    /**
+     * The texture effect of the cube.
+     */
+    var effect: EndCubeEffect = EndCubeEffect.PORTAL
+    
+    override fun build() = ItemModel.Special(
+        SpecialModel.EndCube(effect),
+        selectAndBuild(base)
+    )
+    
+}
+
+
+@RegistryElementBuilderDsl
+class HangingSignSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
+    resourcePackBuilder: ResourcePackBuilder,
+    private val selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
+) : SpecialItemModelBuilder<S>(resourcePackBuilder) {
+    
+    /**
+     * The type of wood the sign is made of. Ignored if [texture] is set.
+     */
+    var woodType: WoodType? = null
+    
+    /**
+     * The texture of the sign, in `textures/entity/signs`. Overrides [woodType].
+     */
+    var texture: ResourcePath<ResourceType.SignTexture>? = null
+    
+    /**
+     * Where the hanging sign is attached.
+     */
+    var attachment: HangingSignAttachment = HangingSignAttachment.CEILING_MIDDLE
+    
+    override fun build(): ItemModel.Special {
+        require(woodType != null || texture != null) { "Either wood type or texture needs to be defined in hanging sign special model" }
+        
+        return ItemModel.Special(
+            SpecialModel.HangingSign(woodType ?: WoodType.OAK, texture, attachment),
+            selectAndBuild(base)
+        )
+    }
+    
+}
 @RegistryElementBuilderDsl
 class HeadSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
     resourcePackBuilder: ResourcePackBuilder,
@@ -134,21 +258,15 @@ class ShulkerBoxSpecialItemModelBuilder<S : ModelSelectorScope> internal constru
      */
     var openness: Double = 0.0
     
-    /**
-     * The orientation of the shulker box model.
-     */
-    var orientation: Orientation = Orientation.UP
-    
     override fun build() = ItemModel.Special(
-        SpecialModel.ShulkerBox(texture, openness, orientation),
+        SpecialModel.ShulkerBox(texture, openness),
         selectAndBuild(base)
     )
     
 }
 
 @RegistryElementBuilderDsl
-class SignSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
-    private val make: (WoodType, ResourcePath<ResourceType.SignTexture>?) -> SpecialModel,
+class StandingSignSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
     resourcePackBuilder: ResourcePackBuilder,
     private val selectAndBuild: (S.() -> ModelBuilder) -> ResourcePath<ResourceType.Model>
 ) : SpecialItemModelBuilder<S>(resourcePackBuilder) {
@@ -163,11 +281,16 @@ class SignSpecialItemModelBuilder<S : ModelSelectorScope> internal constructor(
      */
     var texture: ResourcePath<ResourceType.SignTexture>? = null
     
+    /**
+     * Where the standing sign is attached.
+     */
+    var attachment: StandingSignAttachment = StandingSignAttachment.GROUND
+    
     override fun build(): ItemModel.Special {
-        require(woodType != null || texture != null) { "Either wood type or texture needs to be defined in sign special model" }
+        require(woodType != null || texture != null) { "Either wood type or texture needs to be defined in standing sign special model" }
         
         return ItemModel.Special(
-            make(woodType ?: WoodType.OAK, texture),
+            SpecialModel.StandingSign(woodType ?: WoodType.OAK, texture, attachment),
             selectAndBuild(base)
         )
     }

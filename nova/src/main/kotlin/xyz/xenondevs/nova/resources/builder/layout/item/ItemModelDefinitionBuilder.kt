@@ -113,22 +113,28 @@ sealed class ItemModelCreationScope<S : ModelSelectorScope>(
     // --- Special Models ---
     
     /**
-     * Renders a bed model.
-     */
-    fun bedSpecialModel(bedModel: BedSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
-        BedSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(bedModel).build()
-    
-    /**
      * Renders a banner model.
      */
     fun bannerSpecialModel(bannerModel: BannerSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
         BannerSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(bannerModel).build()
     
     /**
-     * Renders a conduit model.
+     * Renders a bed model.
      */
-    fun conduitSpecialModel(conduitModel: GenericSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
-        GenericSpecialItemModelBuilder(SpecialModel.Conduit, resourcePackBuilder, selectAndBuild).apply(conduitModel).build()
+    fun bedSpecialModel(bedModel: BedSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
+        BedSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(bedModel).build()
+    
+    /**
+     * Renders a bell model.
+     */
+    fun bellSpecialModel(bellModel: GenericSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
+        GenericSpecialItemModelBuilder(SpecialModel.Bell, resourcePackBuilder, selectAndBuild).apply(bellModel).build()
+    
+    /**
+     * Renders a book model.
+     */
+    fun bookSpecialModel(bookModel: BookSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
+        BookSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(bookModel).build()
     
     /**
      * Renders a chest model.
@@ -137,10 +143,28 @@ sealed class ItemModelCreationScope<S : ModelSelectorScope>(
         ChestSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(chestModel).build()
     
     /**
+     * Renders a conduit model.
+     */
+    fun conduitSpecialModel(conduitModel: GenericSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
+        GenericSpecialItemModelBuilder(SpecialModel.Conduit, resourcePackBuilder, selectAndBuild).apply(conduitModel).build()
+    
+    /**
+     * Renders a copper golem statue model.
+     */
+    fun copperGolemStatueSpecialModel(copperGolemStatueModel: CopperGolemStatueSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
+        CopperGolemStatueSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(copperGolemStatueModel).build()
+    
+    /**
      * Renders a decorated pot model.
      */
     fun decoratedPotSpecialModel(decoratedPotModel: GenericSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
         GenericSpecialItemModelBuilder(SpecialModel.DecoratedPot, resourcePackBuilder, selectAndBuild).apply(decoratedPotModel).build()
+    
+    /**
+     * Renders an end cube model.
+     */
+    fun endCubeSpecialModel(endCubeModel: EndCubeSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
+        EndCubeSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(endCubeModel).build()
     
     /**
      * Renders a head model.
@@ -155,34 +179,34 @@ sealed class ItemModelCreationScope<S : ModelSelectorScope>(
         GenericSpecialItemModelBuilder(SpecialModel.PlayerHead, resourcePackBuilder, selectAndBuild).apply(playerHeadModel).build()
     
     /**
-     * Renders a shulker box model.
-     */
-    fun shulkerBoxSpecialModel(shulkerBoxModel: ShulkerBoxSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
-        ShulkerBoxSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(shulkerBoxModel).build()
-    
-    /**
      * Renders a shield model.
      */
     fun shieldSpecialModel(shieldModel: GenericSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
         GenericSpecialItemModelBuilder(SpecialModel.Shield, resourcePackBuilder, selectAndBuild).apply(shieldModel).build()
     
     /**
+     * Renders a shulker box model.
+     */
+    fun shulkerBoxSpecialModel(shulkerBoxModel: ShulkerBoxSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
+        ShulkerBoxSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(shulkerBoxModel).build()
+    
+    /**
      * Renders a standing sign model.
      */
-    fun standingSignSpecialModel(standingSignModel: SignSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
-        SignSpecialItemModelBuilder(SpecialModel::StandingSign, resourcePackBuilder, selectAndBuild).apply(standingSignModel).build()
+    fun standingSignSpecialModel(standingSignModel: StandingSignSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
+        StandingSignSpecialItemModelBuilder(resourcePackBuilder, selectAndBuild).apply(standingSignModel).build()
+    
+    /**
+     * Renders a hanging sign model.
+     */
+    fun hangingSignSpecialModel(hangingSignModel: HangingSignSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
+        HangingSignSpecialItemModelBuilder( resourcePackBuilder, selectAndBuild).apply(hangingSignModel).build()
     
     /**
      * Renders a trident model.
      */
     fun tridentSpecialModel(tridentModel: GenericSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
         GenericSpecialItemModelBuilder(SpecialModel.Trident, resourcePackBuilder, selectAndBuild).apply(tridentModel).build()
-    
-    /**
-     * Renders a hanging sign model.
-     */
-    fun hangingSignSpecialModel(hangingSignModel: SignSpecialItemModelBuilder<S>.() -> Unit): ItemModel =
-        SignSpecialItemModelBuilder(SpecialModel::HangingSign, resourcePackBuilder, selectAndBuild).apply(hangingSignModel).build()
     
     // --- Utility Functions ---
     

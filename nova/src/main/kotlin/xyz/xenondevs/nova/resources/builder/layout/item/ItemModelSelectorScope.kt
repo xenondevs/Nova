@@ -64,7 +64,7 @@ class ItemModelSelectorScope internal constructor(
     fun createLayeredModel(vararg layers: ResourcePath<ResourceType.Model>): ModelBuilder = ModelBuilder(
         Model(
             parent = ResourcePath(ResourceType.Model, "minecraft", "item/generated"),
-            textures = layers.mapIndexed { index, layer -> "layer$index" to layer.toString() }.toMap()
+            textures = layers.mapIndexed { index, layer -> "layer$index" to Model.Texture(layer.toString()) }.toMap()
         )
     )
     
@@ -128,13 +128,13 @@ class ItemModelSelectorScope internal constructor(
         )
         val parentId = modelContent.getOrPutGenerated(parent)
         
-        val textures = HashMap<String, String>()
+        val textures = HashMap<String, Model.Texture>()
         if (background) {
-            textures["background"] = "nova:item/gui/inventory_part"
+            textures["background"] = Model.Texture("nova:item/gui/inventory_part")
         }
         for ((idx, layer) in layers.withIndex()) {
             val name = if (idx == 0) "particle" else idx.toString()
-            textures[name] = layer.toString()
+            textures[name] = Model.Texture(layer.toString())
         }
         val model = Model(parentId, textures)
         

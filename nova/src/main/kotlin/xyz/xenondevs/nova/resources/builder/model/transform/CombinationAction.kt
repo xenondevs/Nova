@@ -14,7 +14,7 @@ internal data class CombinationAction(val other: ModelBuilder) : ContextualModel
         
         val otherModel = other.build(context).flattened(context).withPrefixedTextureKeys(prefix)
         
-        val textures = HashMap<String, String>()
+        val textures = HashMap<String, Model.Texture>()
         textures.putAll(model.textures)
         textures.putAll(otherModel.textures)
         
@@ -31,8 +31,9 @@ internal data class CombinationAction(val other: ModelBuilder) : ContextualModel
     // assumes flattened model
     private fun Model.withPrefixedTextureKeys(prefix: String): Model = copy(
         textures = textures.entries.associate { (key, value) ->
-            if (value.startsWith('#')) {
-                prefix + key to "#" + prefix + value.substring(1)
+            val sprite = value.sprite
+            if (sprite.startsWith('#')) {
+                prefix + key to value.copy(sprite = "#" + prefix + sprite.substring(1))
             } else {
                 prefix + key to value
             }
