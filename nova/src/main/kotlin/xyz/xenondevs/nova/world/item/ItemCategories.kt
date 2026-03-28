@@ -73,7 +73,10 @@ internal sealed interface ItemCategory {
     ) : ItemCategory {
         
         @Transient
-        override val iconProvider = itemProvider(icon) { name by this@Custom.name }
+        override val iconProvider = itemProvider(icon) {
+            name by this@Custom.name
+            lore by emptyList()
+        }
         
         @Transient
         override val categorizedItems = items.mapEach(
@@ -87,7 +90,10 @@ internal sealed interface ItemCategory {
         private val name: Component,
         content: List<NovaItem>
     ) : ItemCategory {
-        override val iconProvider = itemProvider(content[0]) { name by this@Default.name }
+        override val iconProvider = itemProvider(content[0]) { 
+            name by this@Default.name
+            lore by emptyList()
+        }
         override val categorizedItems = provider(content.map { CategorizedItem(it.key, it.createItemStack(), it.name ?: Component.empty()) })
     }
     
