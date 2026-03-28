@@ -54,6 +54,10 @@ import xyz.xenondevs.nova.registry.asMixed
 import xyz.xenondevs.nova.registry.flatMap
 import xyz.xenondevs.nova.registry.map
 import xyz.xenondevs.nova.resources.builder.task.VanillaMaterialTypes
+import xyz.xenondevs.nova.serialization.kotlinx.ItemTypeEitherEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.ItemTypeMixedEntrySetSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.NovaItemEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.NovaItemEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.NovaItemSerializer
 import xyz.xenondevs.nova.util.blockFace
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
@@ -149,6 +153,26 @@ fun RegistryEntry.Either<NovaItem, ItemType>.mapToItemStack(amount: Int = 1): Pr
  */
 val RegistryEntry.Either<NovaItem, ItemType>.clientsideProvider: Provider<ItemProvider>
     get() = flatMap({ it.clientsideProvider }, { provider(ItemWrapper(it.createItemStack())) })
+
+/**
+ * Serializable type alias for `RegistryEntry.Nova<NovaItem>` using [NovaItemEntrySerializer].
+ */
+typealias NovaItemEntry = @Serializable(with = NovaItemEntrySerializer::class) RegistryEntry.Nova<NovaItem>
+
+/**
+ * Serializable type alias for `RegistryEntry.Either<NovaItem, ItemType>` using [ItemTypeEitherEntrySerializer].
+ */
+typealias EitherItemTypeEntry = @Serializable(with = ItemTypeEitherEntrySerializer::class) RegistryEntry.Either<NovaItem, ItemType>
+
+/**
+ * Serializable type alias for `RegistryEntrySet.Nova<NovaItem>` using [NovaItemEntrySetSerializer].
+ */
+typealias NovaItemEntrySet = @Serializable(with = NovaItemEntrySetSerializer::class) RegistryEntrySet.Nova<NovaItem>
+
+/**
+ * Serializable type alias for `RegistryEntrySet.Mixed<NovaItem, ItemType>` using [NovaItemEntrySetSerializer].
+ */
+typealias MixedItemTypeEntrySet = @Serializable(with = ItemTypeMixedEntrySetSerializer::class) RegistryEntrySet.Mixed<NovaItem, ItemType>
 
 /**
  * Represents a custom Nova item type.

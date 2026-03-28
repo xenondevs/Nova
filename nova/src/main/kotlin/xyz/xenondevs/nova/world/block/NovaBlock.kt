@@ -7,7 +7,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.world.InteractionHand
@@ -32,6 +31,11 @@ import xyz.xenondevs.nova.registry.Configurable
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.serialization.kotlinx.BlockTypeEitherEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.BlockTypeMixedEntrySetSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.NovaBlockSerializer
 import xyz.xenondevs.nova.util.blockFace
 import xyz.xenondevs.nova.util.bukkitEquipmentSlot
@@ -63,6 +67,26 @@ fun RegistryEntry.Nova<NovaBlock>.asEither(): RegistryEntry.Either<NovaBlock, Bl
  */
 fun RegistryEntry.Paper<BlockType>.asEither(): RegistryEntry.Either<NovaBlock, BlockType> =
     RegistryEntry.either(NovaRegistries.BLOCK, this)
+
+/**
+ * Serializable type alias for `RegistryEntry.Nova<NovaBlock>` using [NovaBlockEntrySerializer].
+ */
+typealias NovaBlockEntry = @Serializable(with = NovaBlockEntrySerializer::class) RegistryEntry.Nova<NovaBlock>
+
+/**
+ * Serializable type alias for `RegistryEntry.Either<NovaBlock, BlockType>` using [BlockTypeEitherEntrySerializer].
+ */
+typealias EitherBlockTypeEntry = @Serializable(with = BlockTypeEitherEntrySerializer::class) RegistryEntry.Either<NovaBlock, BlockType>
+
+/**
+ * Serializable type alias for `RegistryEntrySet.Nova<NovaBlock>` using [NovaBlockEntrySetSerializer].
+ */
+typealias NovaBlockEntrySet = @Serializable(with = NovaBlockEntrySetSerializer::class) RegistryEntrySet.Nova<NovaBlock>
+
+/**
+ * Serializable type alias for `RegistryEntrySet.Mixed<NovaBlock, BlockType>` using [NovaBlockEntrySetSerializer].
+ */
+typealias MixedBlockTypeEntrySet = @Serializable(with = BlockTypeMixedEntrySetSerializer::class) RegistryEntrySet.Mixed<NovaBlock, BlockType>
 
 /**
  * Represents a custom Nova block type.
