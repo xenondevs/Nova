@@ -48,7 +48,7 @@ internal object ItemCategories {
                     val name = addonNamesById[namespace]
                     val visibleItems = items.filterNot(NovaItem::isHidden)
                     if (name != null && visibleItems.isNotEmpty())
-                        ItemCategory.Default(name, items)
+                        ItemCategory.Default(name, visibleItems)
                     else null
                 }
                 .toSortedMap().values.toList()
