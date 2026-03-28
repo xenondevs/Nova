@@ -11,6 +11,9 @@ import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.serialization.kotlinx.ToolCategoryEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.ToolCategoryEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolCategorySerializer
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.unwrap
@@ -18,6 +21,16 @@ import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.item.behavior.Tool
 import xyz.xenondevs.nova.world.pos
+
+/**
+ * Serializable type alias for `RegistryEntry.Nova<ToolCategory>` using [NovaToolCategoryEntrySerializer].
+ */
+typealias NovaToolCategoryEntry = @Serializable(with = ToolCategoryEntrySerializer::class) RegistryEntry.Nova<ToolCategory>
+
+/**
+ * Serializable type alias for `RegistryEntrySet.Nova<ToolCategory>` using [NovaToolCategoryEntrySetSerializer].
+ */
+typealias NovaToolCategoryEntrySet = @Serializable(with = ToolCategoryEntrySetSerializer::class) RegistryEntrySet.Nova<ToolCategory>
 
 /**
  * @param key The [Key] of this [ToolCategory]

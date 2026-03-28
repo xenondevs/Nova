@@ -4,10 +4,23 @@ import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.resources.builder.task.TextureIconContent
+import xyz.xenondevs.nova.serialization.kotlinx.WailaToolIconProviderEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.WailaToolIconProviderEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.WailaToolIconProviderSerializer
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
+
+/**
+ * Serializable type alias for `RegistryEntry.Nova<WailaToolIconProvider>` using [NovaWailaToolIconProviderEntrySerializer].
+ */
+typealias NovaWailaToolIconProviderEntry = @Serializable(with = WailaToolIconProviderEntrySerializer::class) RegistryEntry.Nova<WailaToolIconProvider>
+
+/**
+ * Serializable type alias for `RegistryEntrySet.Nova<WailaToolIconProvider>` using [NovaWailaToolIconProviderEntrySetSerializer].
+ */
+typealias NovaWailaToolIconProviderEntrySet = @Serializable(with = WailaToolIconProviderEntrySetSerializer::class) RegistryEntrySet.Nova<WailaToolIconProvider>
 
 /**
  * Chooses tool icons for WAILA.

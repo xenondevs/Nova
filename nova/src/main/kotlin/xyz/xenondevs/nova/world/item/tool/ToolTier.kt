@@ -13,12 +13,25 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.serialization.kotlinx.ToolTierEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.ToolTierEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolTierSerializer
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.novaBlock
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.item.behavior.Tool
+
+/**
+ * Serializable type alias for `RegistryEntry.Nova<ToolTier>` using [NovaToolTierEntrySerializer].
+ */
+typealias NovaToolTierEntry = @Serializable(with = ToolTierEntrySerializer::class) RegistryEntry.Nova<ToolTier>
+
+/**
+ * Serializable type alias for `RegistryEntrySet.Nova<ToolTier>` using [NovaToolTierEntrySetSerializer].
+ */
+typealias NovaToolTierEntrySet = @Serializable(with = ToolTierEntrySetSerializer::class) RegistryEntrySet.Nova<ToolTier>
 
 @GenerateFlatMapExtensions
 @Serializable(with = ToolTierSerializer::class)

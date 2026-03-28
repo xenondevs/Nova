@@ -5,8 +5,21 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.resources.builder.task.RuntimeEquipmentData
+import xyz.xenondevs.nova.serialization.kotlinx.EquipmentEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.EquipmentEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.EquipmentSerializer
+
+/**
+ * Serializable type alias for `RegistryEntry.Nova<Equipment>` using [NovaEquipmentEntrySerializer].
+ */
+typealias NovaEquipmentEntry = @Serializable(with = EquipmentEntrySerializer::class) RegistryEntry.Nova<Equipment>
+
+/**
+ * Serializable type alias for `RegistryEntrySet.Nova<Equipment>` using [NovaEquipmentEntrySetSerializer].
+ */
+typealias NovaEquipmentEntrySet = @Serializable(with = EquipmentEntrySetSerializer::class) RegistryEntrySet.Nova<Equipment>
 
 /**
  * Represents a custom armor texture.
