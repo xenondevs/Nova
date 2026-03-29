@@ -701,7 +701,7 @@ private class PaperDirectRegistryEntrySet<T : Keyed>(
         return result
     }
     
-    override fun toString() = "${registry.key()}: $entries"
+    override fun toString() = "${registry.key().asString()}/[${entries.joinToString { it.key.asString() }}]"
     
 }
 
@@ -737,7 +737,7 @@ private class PaperTagRegistryEntrySet<T : Keyed>(
         return result
     }
     
-    override fun toString() = "${registry.key()}: #$tagKey"
+    override fun toString() = "${registry.key().asString()}/#${tagKey.key().asString()}"
     
 }
 
@@ -767,7 +767,7 @@ private class NovaDirectRegistryEntrySet<T : NovaRegistryElement<T>>(
         return result
     }
     
-    override fun toString() = "${registry.key}: $entries"
+    override fun toString() = "${registry.key.asString()}/[${entries.joinToString { it.key.asString() }}]"
     
 }
 
@@ -798,7 +798,7 @@ internal class NovaTagRegistryEntrySet<T : NovaRegistryElement<T>>(
         return result
     }
     
-    override fun toString() = "${registry.key}: #$tagKey"
+    override fun toString() = "${registry.key.asString()}/#${tagKey.asString()}"
     
 }
 
@@ -890,7 +890,7 @@ private class MixedTagRegistryEntrySet<N : NovaRegistryElement<N>, P : Keyed>(
         return result
     }
     
-    override fun toString() = "${novaRegistry.key}, ${paperRegistry.key()}: #$tagKey"
+    override fun toString() = "${novaRegistry.key.asString()}|${paperRegistry.key().asString()}/#${tagKey.asString()}"
     
 }
 
@@ -931,6 +931,6 @@ private class MixedDirectRegistryEntrySet<N : NovaRegistryElement<N>, P : Keyed>
         return result
     }
     
-    override fun toString() = "${novaRegistry.key}, ${paperRegistry.key()}: $entries"
+    override fun toString() = "${novaRegistry.key.asString()}|${paperRegistry.key().asString()}/[${entries.joinToString { it.key.asString() }}]"
     
 }
