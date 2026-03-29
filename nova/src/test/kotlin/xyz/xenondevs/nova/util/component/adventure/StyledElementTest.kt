@@ -53,6 +53,25 @@ class StyledElementTest {
     }
     
     @Test
+    fun `inner style overrides outer style`() {
+        val outerStyle = Style.style(NamedTextColor.AQUA)
+        val innerStyle = Style.style(NamedTextColor.RED)
+        val component = Component.text("A", outerStyle)
+            .append(Component.text("BC", innerStyle))
+            .append(Component.text("D"))
+        
+        assertContentEquals(
+            listOf(
+                StyledElement.CodePoint(Style.style(NamedTextColor.AQUA), 'A'.code),
+                StyledElement.CodePoint(Style.style(NamedTextColor.RED), 'B'.code),
+                StyledElement.CodePoint(Style.style(NamedTextColor.RED), 'C'.code),
+                StyledElement.CodePoint(Style.style(NamedTextColor.AQUA), 'D'.code)
+            ),
+            component.elements({ null }).toList()
+        )
+    }
+    
+    @Test
     fun `nested styled text with objects`() {
         val sprite = ObjectContents.sprite(Key.key("minecraft", "sprite"))
         val head = ObjectContents.playerHead(UUID.randomUUID())

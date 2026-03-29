@@ -58,7 +58,7 @@ fun Component.elements(
     translate: (key: String) -> String?,
     outerStyle: Style = Style.empty()
 ): Sequence<StyledElement> = sequence {
-    val style = style().merge(outerStyle)
+    val style = outerStyle.merge(style())
     when (this@elements) {
         is TextComponent -> yieldAll(content().styledCodePoints(style))
         is ObjectComponent -> yield(StyledElement.Object(style, contents()))
