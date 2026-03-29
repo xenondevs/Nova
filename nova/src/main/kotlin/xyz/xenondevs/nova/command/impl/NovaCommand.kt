@@ -57,6 +57,7 @@ import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
 import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.resources.builder.ResourcePackBuilder
 import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
+import xyz.xenondevs.nova.ui.menu.explorer.itemTagExplorer
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.BlockUtils
 import xyz.xenondevs.nova.util.CUBE_FACES
@@ -155,6 +156,9 @@ internal object NovaCommand : Command() {
             .then(literal("showHitboxes")
                 .requiresPlayer()
                 .executes0(::toggleHitboxDebugging))
+            .then(literal("showItemTags")
+                .requiresPlayer()
+                .executes0(::showItemTagsMenu))
             .then(literal("fill")
                 .requiresPlayer()
                 .then(argument("from", ArgumentTypes.blockPosition())
@@ -808,6 +812,10 @@ internal object NovaCommand : Command() {
             "command.nova.hitbox_debug",
             NamedTextColor.GRAY
         ))
+    }
+    
+    private fun showItemTagsMenu(ctx: CommandContext<CommandSourceStack>) {
+        itemTagExplorer(ctx.player).open()
     }
     
     private fun fillArea(ctx: CommandContext<CommandSourceStack>) {
