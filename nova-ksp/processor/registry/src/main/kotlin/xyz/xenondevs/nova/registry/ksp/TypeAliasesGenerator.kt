@@ -45,7 +45,7 @@ internal class TypeAliasesGenerator(private val codeGenerator: CodeGenerator) {
         val fileSpec = FileSpec.builder(registryPackage, "TypeAliases")
             .addAnnotation(suppressUnusedAnnotation)
         
-        registryKey.nonDeprecatedRegistryKeyProperties()
+        registryKey.registryKeyProperties()
             .forEach { property ->
                 val keyType = property.primaryTypeArgument()
                 val keyTypeName = keyType.toTypeName()
