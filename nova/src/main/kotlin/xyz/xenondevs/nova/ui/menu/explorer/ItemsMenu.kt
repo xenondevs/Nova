@@ -139,9 +139,10 @@ internal class ItemsMenu private constructor(val player: Player) {
                         "x . x . x . x . ."
                     ) {
                         page by tabButtonsPage
+                        var prevPage = page.get()
                         page.subscribe {
                             // adjust tab if not currently looking at player inventory tab
-                            if (tab.get() != playerInvTab.get())
+                            if (it != prevPage && tab.get() != playerInvTab.get())
                                 tab.set(it * CATEGORY_TAB_COUNT)
                         }
                         tabButtonsPageCount.consume(pageCount)
