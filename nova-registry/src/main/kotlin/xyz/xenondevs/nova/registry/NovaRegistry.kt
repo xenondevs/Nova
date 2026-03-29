@@ -29,6 +29,11 @@ interface NovaRegistry<out T : NovaRegistryElement<T>> {
         get() = getTag(key)
     
     /**
+     * A provider containing all tags in this registry.
+     */
+    val tags: Provider<Set<RegistryEntrySet.Nova.Tag<T>>>
+    
+    /**
      * Gets an entry for the given [key].
      * This function may be used before registries are frozen (i.e. during bootstrap)
      * and before the actual value is available.

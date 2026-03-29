@@ -108,7 +108,7 @@ sealed interface RegistryEntry<out T : Keyed> : Provider<T>, Comparable<Registry
                         it ?: throw NoSuchElementException("Key $key not found in either ${novaRegistry.key.asString()} or ${paperRegistry.key().asString()}")
                     }
                 )
-                RegistryContext.trackUnresolved(typedKey, entry)
+                RegistryContext.trackUnresolvedEntry(typedKey, novaRegistry, registryAccess)
                 return entry
             } else {
                 if (key in novaRegistry) {
@@ -154,7 +154,7 @@ sealed interface RegistryEntry<out T : Keyed> : Provider<T>, Comparable<Registry
             
             if (RegistryContext.isInBootstrapPhase) {
                 val entry = PaperRegistryEntry(key, provider(::resolve))
-                RegistryContext.trackUnresolved(key, entry)
+                RegistryContext.trackUnresolvedEntry(key, registryAccess)
                 return entry
             } else {
                 return PaperRegistryEntry(key, provider(resolve()))

@@ -34,7 +34,9 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
     
     // caches: cached objects for types that wrap providers, updated implicitly on reload, maps are greedy
     protected val entries: MutableMap<Key, RegistryEntry.Nova<T>> = HashMap()
-    protected val tags: MutableMap<Key, RegistryEntrySet.Nova.Tag<T>> = HashMap()
+    protected val tagsByKey: MutableMap<Key, RegistryEntrySet.Nova.Tag<T>> = HashMap()
+    
+    override val tags: Provider<Set<RegistryEntrySet.Nova.Tag<T>>> = createProvider { tagsByKey.values.toSet() }
     
     protected var isFrozen = false
     
@@ -97,10 +99,10 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
     
     final override fun getTag(key: Key): RegistryEntrySet.Nova.Tag<T> = lock.withLock {
         if (isFrozen) {
-            require(key in unflattenedTagEntriesByKey) { "Cannot create tag entry set for unregistered tag key $key after freezing" }
-            return tags[key]!!
+            require(key in tagsByKey) { "Cannot create tag entry set for unregistered tag key $key after freezing" }
+            return tagsByKey[key]!!
         } else {
-            return tags.getOrPut(key) {
+            return tagsByKey.getOrPut(key) {
                 val entries = tagProviders.getOrPutEagerProvider(key) {
                     flattenedTagEntriesByKey[key]
                         ?: throw NoSuchElementException("No tag found for key $key")
@@ -111,7 +113,7 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
     }
     
     final override fun getOptionalTag(key: Key): Provider<RegistryEntrySet.Nova.Tag<T>?> = lock.withLock {
-        return optionalTagProviders.getOrPutLazyProvider(key) { tags[key] }
+        return optionalTagProviders.getOrPutLazyProvider(key) { tagsByKey[key] }
     }
     
     final override fun freeze(): Unit = lock.withLock {
@@ -128,7 +130,7 @@ internal abstract class AbstractNovaRegistry<T : NovaRegistryElement<T>>(
         try {
             // bind entry- and tag providers to their initial value
             entries.values.forEach { it.get() }
-            tags.values.forEach { it.get() }
+            tagsByKey.values.forEach { it.get() }
         } catch (e: NoSuchElementException) {
             isFrozen = false // freezing failed
             throw IllegalStateException("Referenced entries need to be registered before freezing", e)
@@ -216,6 +218,7 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
         val optionalEntryValues: Map<MutableProvider<RegistryEntry.Nova<T>?>, DeferredValue.Direct<RegistryEntry.Nova<T>?>>
         val tagValues: Map<MutableProvider<Set<RegistryEntry.Nova<T>>>, DeferredValue.Direct<Set<RegistryEntry.Nova<T>>>>
         val optionalTagValues: Map<MutableProvider<RegistryEntrySet.Nova.Tag<T>?>, DeferredValue.Direct<RegistryEntrySet.Nova.Tag<T>?>>
+        val allTags: DeferredValue.Direct<Set<RegistryEntrySet.Nova.Tag<T>>>
         
         lock.withLock {
             checkFrozen()
@@ -241,8 +244,9 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
                 }
                 optionalTagValues = optionalTagProviders.entries.associate { (key, provider) ->
                     provider as MutableProvider<RegistryEntrySet.Nova.Tag<T>?>
-                    provider to DeferredValue.Direct(tags[key])
+                    provider to DeferredValue.Direct(tagsByKey[key])
                 }
+                allTags = DeferredValue.Direct(tagsByKey.values.toSet())
             } catch (e: NoSuchElementException) {
                 isFrozen = false // freezing failed
                 throw IllegalStateException("Referenced entries need to be registered before freezing", e)
@@ -256,6 +260,7 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
         optionalEntryValues.forEach { (provider, value) -> provider.update(value) }
         tagValues.forEach { (provider, value) -> provider.update(value) }
         optionalTagValues.forEach { (provider, value) -> provider.update(value) }
+        (tags as MutableProvider).update(allTags)
     }
     
     private fun reset() {
