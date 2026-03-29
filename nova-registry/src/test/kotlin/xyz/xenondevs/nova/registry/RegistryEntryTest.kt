@@ -81,7 +81,7 @@ class RegistryEntryTest {
     fun `paper() during bootstrap tracks unresolved entry`() {
         TestRegistryContext.inBootstrapPhase = true
         val entry = RegistryEntry.paper(ItemTypeKeys.DIAMOND)
-        assertTrue(entry in TestRegistryContext.trackedEntries)
+        assertTrue(entry.key in TestRegistryContext.trackedEntries)
     }
     
     @Test

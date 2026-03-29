@@ -549,6 +549,41 @@ class NovaRegistryTest {
     }
     
     @Test
+    fun `tags provider includes new tags after reloading`() {
+        val registry = createRegistry("reloadable", reloadable = true)
+        val key1 = key("nova", "element1")
+        val key2 = key("nova", "element2")
+        val tag1Key = key("nova", "tag1")
+        val tag2Key = key("nova", "tag2")
+        val element1 = mockElement()
+        val element2 = mockElement()
+        val entry1 = registry[key1]
+        val entry2 = registry[key2]
+        
+        registry[key1] = element1
+        registry[key2] = element2
+        registry[tag1Key] = buildNovaTagEntries { add(entry1) }
+        registry.freeze()
+
+        val tags = registry.tags
+        
+        val tagKeys = tags.get().map { it.tagKey }.toSet()
+        assertTrue(tag1Key in tagKeys)
+        assertFalse(tag2Key in tagKeys)
+
+        registry.reload {
+            this[key1] = element1
+            this[key2] = element2
+            this[tag1Key] = buildNovaTagEntries { add(entry1) }
+            this[tag2Key] = buildNovaTagEntries { add(entry2) }
+        }
+
+        val updatedTagKeys = tags.get().map { it.tagKey }.toSet()
+        assertTrue(tag1Key in updatedTagKeys)
+        assertTrue(tag2Key in updatedTagKeys)
+    }
+
+    @Test
     fun `reloading is reflected in tag including another tag`() {
         val registry = createRegistry("reloadable", reloadable = true)
         val key1 = key("nova", "element1")

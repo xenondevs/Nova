@@ -288,7 +288,7 @@ fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
  * [novaRegistry] and [paperRegistry] (using [registryAccess]).
  *
  * * If this function is called during bootstrap and no matching tag is found in either registry,
- *   an erroneous [RegistryEntrySet.Mixed.Tag] is returned that throws [NoSuchElementException] when trying to resolve it.
+ *   an empty [RegistryEntrySet.Mixed.Tag] is returned.
  *   Additionally, server startup will fail.
  * * If this function is called after bootstrap and no matching tag is found in either registry,
  *   a [NoSuchElementException] is thrown immediately.
@@ -302,7 +302,7 @@ fun <N : NovaRegistryElement<N>, P : Keyed> registryEntrySetOf(
     val paperTagKey = TagKey.create(paperRegistry, tagKey)
     if (RegistryContext.isInBootstrapPhase) {
         val entrySet = MixedTagRegistryEntrySet(tagKey, novaRegistry, paperRegistry, registryAccess)
-        RegistryContext.trackUnresolved(paperTagKey, entrySet)
+        RegistryContext.trackUnresolvedTag(paperTagKey, novaRegistry, registryAccess)
         return entrySet
     } else {
         val hasNovaTag = novaRegistry.getOptionalTag(tagKey).get() != null
@@ -857,8 +857,6 @@ private class MixedTagRegistryEntrySet<N : NovaRegistryElement<N>, P : Keyed>(
             novaRegistry.getOptionalTag(tagKey),
             optionalRegistryEntrySetOf(TagKey.create(paperRegistry, tagKey), registryAccess)
         ) { n, p ->
-            if (n == null && p == null)
-                throw NoSuchElementException("Tag $tagKey not found in either ${novaRegistry.key.asString()} or ${paperRegistry.key().asString()}")
             combinedProvider(
                 p?.entries?.map { it.toEither(novaRegistry) } ?: provider(emptySet()),
                 n?.entries?.map { it.toEither(paperRegistry) } ?: provider(emptySet())

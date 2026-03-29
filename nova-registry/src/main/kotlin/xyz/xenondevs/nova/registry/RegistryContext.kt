@@ -1,7 +1,9 @@
 package xyz.xenondevs.nova.registry
 
-import net.kyori.adventure.key.Keyed
-import xyz.xenondevs.commons.provider.Provider
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.TypedKey
+import io.papermc.paper.registry.tag.TagKey
+import org.bukkit.Keyed
 import java.util.*
 
 /**
@@ -16,10 +18,42 @@ interface RegistryContext {
     val isInBootstrapPhase: Boolean
     
     /**
-     * Remembers an unresolved entry that needs to be [resolved][Provider.get] to complete server startup.
-     * Erroneous (unbound) entries will prevent startup.
+     * Remembers that an unresolved registry entry for [key] was created during bootstrap which
+     * needs to be present to complete server startup.
      */
-    fun trackUnresolved(identifier: Keyed, entry: Provider<*>)
+    fun <T : Keyed> trackUnresolvedEntry(
+        key: TypedKey<T>,
+        registryAccess: RegistryAccess
+    )
+    
+    /**
+     * Remembers that an unresolved either registry entry or tag for [key] was created during bootstrap which
+     * needs to be present to complete server startup.
+     */
+    fun <N : NovaRegistryElement<N>, T : Keyed> trackUnresolvedEntry(
+        key: TypedKey<T>,
+        novaRegistry: NovaRegistry<N>,
+        registryAccess: RegistryAccess
+    )
+    
+    /**
+     * Remembers that an unresolved registry entry set for [key] was created during bootstrap which
+     * needs to be present to complete server startup.
+     */
+    fun <T : Keyed> trackUnresolvedTag(
+        key: TagKey<T>,
+        registryAccess: RegistryAccess
+    )
+    
+    /**
+     * Remembers that an unresolved mixed registry entry set for [key] was created during bootstrap which
+     * needs to be present to complete server startup.
+     */
+    fun <N : NovaRegistryElement<N>, T : Keyed> trackUnresolvedTag(
+        key: TagKey<T>,
+        novaRegistry: NovaRegistry<N>,
+        registryAccess: RegistryAccess
+    )
     
     /**
      * Registers a lister that is called after tags of paper registries were reloaded.
