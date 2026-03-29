@@ -19,6 +19,9 @@ internal fun KSClassDeclaration.publicStaticPropertiesOfType(typeName: String): 
 internal fun KSPropertyDeclaration.primaryTypeArgument(): KSType =
     type.element!!.typeArguments.first().type!!.resolve()
 
+internal fun KSClassDeclaration.registryKeyProperties(): Sequence<KSPropertyDeclaration> =
+    publicStaticPropertiesOfType("RegistryKey")
+
 internal fun KSClassDeclaration.nonDeprecatedRegistryKeyProperties(): Sequence<KSPropertyDeclaration> =
     publicStaticPropertiesOfType("RegistryKey")
         .filter { property ->

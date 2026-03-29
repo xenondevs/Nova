@@ -16,6 +16,7 @@ class NovaRegistryProcessor(
     private val extensionsGenerator = ExtensionsGenerator(codeGenerator)
     private val serializersGenerator = SerializersGenerator(codeGenerator)
     private val typeAliasesGenerator = TypeAliasesGenerator(codeGenerator)
+    private val registryKeysGenerator = RegistryKeysGenerator(codeGenerator)
     
     private var invoked = false
     
@@ -40,6 +41,7 @@ class NovaRegistryProcessor(
         extensionsGenerator.generateEntryExtensions(registryKey)
         serializersGenerator.generatePaperRegistrySerializers(registryKey)
         typeAliasesGenerator.generateSerializableTypeAliases(registryKey)
+        registryKeysGenerator.generateAllRegistryKeys(registryKey)
         
         return emptyList()
     }

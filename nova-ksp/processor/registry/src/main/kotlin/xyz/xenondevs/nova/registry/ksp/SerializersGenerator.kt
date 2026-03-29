@@ -52,7 +52,7 @@ internal class SerializersGenerator(private val codeGenerator: CodeGenerator) {
         val fileSpec = FileSpec.builder(serializationPackage, "PaperRegistrySerializers")
             .addAnnotation(suppressUnusedAnnotation)
         
-        val typeInfos = registryKey.nonDeprecatedRegistryKeyProperties()
+        val typeInfos = registryKey.registryKeyProperties()
             .map { property ->
                 val keyType = property.primaryTypeArgument()
                 val keyTypeDeclaration = keyType.declaration as KSClassDeclaration
