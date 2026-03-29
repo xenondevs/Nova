@@ -250,7 +250,7 @@ private class PaperRegistryEntry<T : Keyed>(
         return key.compareTo(other.key)
     }
     
-    override fun toString(): String = key.asString()
+    override fun toString(): String = "${registry.key().asString()}/${key.asString()}"
     
 }
 
@@ -279,7 +279,7 @@ internal class NovaRegistryEntry<T : NovaRegistryElement<T>>(
         return key.compareTo(other.key)
     }
     
-    override fun toString(): String = key.asString()
+    override fun toString(): String = "${registry.key.asString()}/${key.asString()}"
     
 }
 
@@ -313,7 +313,7 @@ private class EitherRegistryEntry<N : NovaRegistryElement<N>, P : Keyed>(
         return key.compareTo(other.key)
     }
     
-    override fun toString(): String = key.asString()
+    override fun toString(): String = "${novaRegistry.key.asString()}|${paperRegistry.key().asString()}/${key.asString()}"
     
 }
 
