@@ -1,13 +1,15 @@
 package xyz.xenondevs.nova.world.item
 
 import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.TooltipDisplay
+import io.papermc.paper.registry.RegistryKey
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.collections.mapValuesNotNull
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
@@ -20,12 +22,11 @@ import xyz.xenondevs.nova.addon.name
 import xyz.xenondevs.nova.config.CONFIGS
 import xyz.xenondevs.nova.config.optionalEntry
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.registry.RegistryEntry
-import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.registry.emptyRegistryEntrySet
+import xyz.xenondevs.nova.registry.entries.ItemTypeEntries
 import xyz.xenondevs.nova.registry.mapEach
-import xyz.xenondevs.nova.serialization.kotlinx.ComponentAsMiniMessageSerializer
-import xyz.xenondevs.nova.serialization.kotlinx.ItemTypeEitherEntrySerializer
-import xyz.xenondevs.nova.serialization.kotlinx.ItemTypeMixedEntrySetSerializer
+import xyz.xenondevs.nova.serialization.kotlinx.ComponentAsMiniMessage
+import xyz.xenondevs.nova.serialization.kotlinx.ValueOrList
 import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import java.util.*
@@ -64,18 +65,19 @@ internal sealed interface ItemCategory {
     
     @Serializable
     class Custom(
-        @Serializable(with = ItemTypeEitherEntrySerializer::class)
-        val icon: RegistryEntry.Either<NovaItem, ItemType>,
-        @Serializable(with = ComponentAsMiniMessageSerializer::class)
-        val name: Component,
-        @Serializable(with = ItemTypeMixedEntrySetSerializer::class)
-        val items: RegistryEntrySet.Mixed<NovaItem, ItemType>
+        val icon: EitherItemTypeEntry = ItemTypeEntries.AIR.asEither(),
+        val name: ComponentAsMiniMessage = Component.empty(),
+        val description: ValueOrList<ComponentAsMiniMessage> = emptyList(),
+        val items: MixedItemTypeEntrySet = emptyRegistryEntrySet(NovaRegistries.ITEM, RegistryKey.ITEM)
     ) : ItemCategory {
         
         @Transient
         override val iconProvider = itemProvider(icon) {
             name by this@Custom.name
-            lore by emptyList()
+            lore by description
+            data[DataComponentTypes.TOOLTIP_DISPLAY] by TooltipDisplay.tooltipDisplay()
+                .hiddenComponents(Registry.DATA_COMPONENT_TYPE.toSet())
+                .build()
         }
         
         @Transient
