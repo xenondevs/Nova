@@ -34,7 +34,7 @@ sealed interface GuiTextureBuilder : RegistryEntryBuilder.Nova<GuiTexture> {
 /**
  * A builder for the title of a [GuiTexture], consisting of one or more lines.
  * A [GuiTexture's][GuiTexture] title can be both:
- * * static: defined via [line], retrieved via [GuiTexture.title], or
+ * * static: defined via [line], retrieved via [GuiTexture.getTitle], or
  * * dynamic: only alignment is defined via [alignment], actual text is set in [GuiTexture.getTitle].
  */
 @RegistryElementBuilderDsl

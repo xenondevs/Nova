@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.initialize
 
 import xyz.xenondevs.bytebase.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
-import xyz.xenondevs.nova.config.Configs
 import xyz.xenondevs.nova.config.NovaConfigBackend
 import xyz.xenondevs.nova.registry.RegistryLoader
 import xyz.xenondevs.nova.resources.ResourceGeneration
@@ -40,7 +39,7 @@ enum class InitStage(
     
     /**
      * Before configs are initialized.
-     * Can be used to register custom config serializers via [xyz.xenondevs.nova.config.Configs.registerSerializers].
+     * Can be used to register custom config serializers via [xyz.xenondevs.nova.config.ConfigStorage.setSerializers].
      */
     PRE_CONFIG(
         internalStage = InternalInitStage.PRE_WORLD,

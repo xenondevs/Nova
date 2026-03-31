@@ -22,6 +22,7 @@ class HideInternalApiTransformer(
                     pkg.properties.isNotEmpty()
                         || pkg.functions.isNotEmpty()
                         || pkg.classlikes.isNotEmpty()
+                        || pkg.typealiases.isNotEmpty()
                 }
             )
         }

@@ -15,8 +15,9 @@ import com.squareup.kotlinpoet.ksp.writeTo
 
 internal class TypeAliasesGenerator(private val codeGenerator: CodeGenerator) {
     
-    private val serializationPackage = "xyz.xenondevs.nova.serialization.kotlinx"
     private val registryPackage = "xyz.xenondevs.nova.registry"
+    private val serializationPackage = "xyz.xenondevs.nova.serialization.kotlinx"
+    private val aliasPackage = "xyz.xenondevs.nova.registry.alias"
     private val serializableClass = ClassName("kotlinx.serialization", "Serializable")
     private val registryEntryPaperClass = ClassName(registryPackage, "RegistryEntry", "Paper")
     private val registryEntrySetPaperClass = ClassName(registryPackage, "RegistryEntrySet", "Paper")
@@ -42,7 +43,7 @@ internal class TypeAliasesGenerator(private val codeGenerator: CodeGenerator) {
     )
     
     fun generateSerializableTypeAliases(registryKey: KSClassDeclaration) {
-        val fileSpec = FileSpec.builder(registryPackage, "TypeAliases")
+        val fileSpec = FileSpec.builder(aliasPackage, "TypeAliases")
             .addAnnotation(suppressUnusedAnnotation)
         
         registryKey.registryKeyProperties()

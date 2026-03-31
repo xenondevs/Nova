@@ -170,7 +170,7 @@ typealias EitherItemTypeEntry = @Serializable(with = ItemTypeEitherEntrySerializ
 typealias NovaItemEntrySet = @Serializable(with = NovaItemEntrySetSerializer::class) RegistryEntrySet.Nova<NovaItem>
 
 /**
- * Serializable type alias for `RegistryEntrySet.Mixed<NovaItem, ItemType>` using [NovaItemEntrySetSerializer].
+ * Serializable type alias for `RegistryEntrySet.Mixed<NovaItem, ItemType>` using [ItemTypeMixedEntrySetSerializer].
  */
 typealias MixedItemTypeEntrySet = @Serializable(with = ItemTypeMixedEntrySetSerializer::class) RegistryEntrySet.Mixed<NovaItem, ItemType>
 

@@ -9,3 +9,7 @@ repositories {
 dependencies {
     dokkaPlugin(project(":nova-dokka-plugin"))
 }
+
+dokka.dokkaSourceSets.configureEach {
+    suppressGeneratedFiles = false
+}
