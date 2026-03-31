@@ -24,12 +24,12 @@ import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.item.behavior.Tool
 
 /**
- * Serializable type alias for `RegistryEntry.Nova<ToolTier>` using [NovaToolTierEntrySerializer].
+ * Serializable type alias for `RegistryEntry.Nova<ToolTier>` using [ToolTierEntrySerializer].
  */
 typealias NovaToolTierEntry = @Serializable(with = ToolTierEntrySerializer::class) RegistryEntry.Nova<ToolTier>
 
 /**
- * Serializable type alias for `RegistryEntrySet.Nova<ToolTier>` using [NovaToolTierEntrySetSerializer].
+ * Serializable type alias for `RegistryEntrySet.Nova<ToolTier>` using [ToolTierEntrySetSerializer].
  */
 typealias NovaToolTierEntrySet = @Serializable(with = ToolTierEntrySetSerializer::class) RegistryEntrySet.Nova<ToolTier>
 

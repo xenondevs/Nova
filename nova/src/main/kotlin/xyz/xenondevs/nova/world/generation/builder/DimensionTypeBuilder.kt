@@ -200,8 +200,6 @@ class DimensionTypeBuilder internal constructor(
 /**
  * A builder for [MonsterSettings]. The following settings are available:
  *
- * * [piglinSafe] - Whether piglins transform into zombified entities.
- * * [hasRaids] - Whether players with bad omen can trigger raids.
  * * [monsterSpawnLightTest] - The light level test used to determine if a monster can spawn. (Value between 0 and 15)
  * * [monsterSpawnBlockLightLimit] - The maximum light level a block can have to allow monsters to spawn. (Value between 0 and 15)
  */

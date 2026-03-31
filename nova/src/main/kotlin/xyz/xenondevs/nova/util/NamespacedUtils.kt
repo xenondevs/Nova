@@ -5,7 +5,7 @@ import org.bukkit.NamespacedKey
 import xyz.xenondevs.nova.addon.Addon
 
 /**
- * Creates a new [NamespacedKey] using the [addon's][addon] [id][Addon.id] as the namespace and [key].
+ * Creates a new [NamespacedKey] using the [addon's][addon] [namespace][Addon.namespace] as the namespace and [key].
  */
 fun NamespacedKey(addon: Addon, key: String): NamespacedKey =
     NamespacedKey(addon.namespace(), key)
@@ -13,7 +13,7 @@ fun NamespacedKey(addon: Addon, key: String): NamespacedKey =
 internal fun novaKey(value: String) = NamespacedKey("nova", value)
 
 /**
- * Creates a new [Key] using the [addon's][addon] [id][Addon.id] as the namespace and [value].
+ * Creates a new [Key] using the [addon's][addon] [namespace][Addon.namespace] as the namespace and [value].
  */
 @Deprecated("Can use built-in Key factory function", ReplaceWith("Key.key(addon, value)", "net.kyori.adventure.key.Key"))
 fun Key(addon: Addon, value: String): Key =

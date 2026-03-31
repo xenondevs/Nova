@@ -12,12 +12,12 @@ import xyz.xenondevs.nova.serialization.kotlinx.EquipmentEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.EquipmentSerializer
 
 /**
- * Serializable type alias for `RegistryEntry.Nova<Equipment>` using [NovaEquipmentEntrySerializer].
+ * Serializable type alias for `RegistryEntry.Nova<Equipment>` using [EquipmentEntrySerializer].
  */
 typealias NovaEquipmentEntry = @Serializable(with = EquipmentEntrySerializer::class) RegistryEntry.Nova<Equipment>
 
 /**
- * Serializable type alias for `RegistryEntrySet.Nova<Equipment>` using [NovaEquipmentEntrySetSerializer].
+ * Serializable type alias for `RegistryEntrySet.Nova<Equipment>` using [EquipmentEntrySetSerializer].
  */
 typealias NovaEquipmentEntrySet = @Serializable(with = EquipmentEntrySetSerializer::class) RegistryEntrySet.Nova<Equipment>
 

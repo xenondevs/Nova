@@ -84,7 +84,7 @@ typealias EitherBlockTypeEntry = @Serializable(with = BlockTypeEitherEntrySerial
 typealias NovaBlockEntrySet = @Serializable(with = NovaBlockEntrySetSerializer::class) RegistryEntrySet.Nova<NovaBlock>
 
 /**
- * Serializable type alias for `RegistryEntrySet.Mixed<NovaBlock, BlockType>` using [NovaBlockEntrySetSerializer].
+ * Serializable type alias for `RegistryEntrySet.Mixed<NovaBlock, BlockType>` using [BlockTypeMixedEntrySetSerializer].
  */
 typealias MixedBlockTypeEntrySet = @Serializable(with = BlockTypeMixedEntrySetSerializer::class) RegistryEntrySet.Mixed<NovaBlock, BlockType>
 

@@ -23,12 +23,12 @@ import xyz.xenondevs.nova.world.item.behavior.Tool
 import xyz.xenondevs.nova.world.pos
 
 /**
- * Serializable type alias for `RegistryEntry.Nova<ToolCategory>` using [NovaToolCategoryEntrySerializer].
+ * Serializable type alias for `RegistryEntry.Nova<ToolCategory>` using [ToolCategoryEntrySerializer].
  */
 typealias NovaToolCategoryEntry = @Serializable(with = ToolCategoryEntrySerializer::class) RegistryEntry.Nova<ToolCategory>
 
 /**
- * Serializable type alias for `RegistryEntrySet.Nova<ToolCategory>` using [NovaToolCategoryEntrySetSerializer].
+ * Serializable type alias for `RegistryEntrySet.Nova<ToolCategory>` using [ToolCategoryEntrySetSerializer].
  */
 typealias NovaToolCategoryEntrySet = @Serializable(with = ToolCategoryEntrySetSerializer::class) RegistryEntrySet.Nova<ToolCategory>
 

@@ -13,12 +13,12 @@ import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.ToolTier
 
 /**
- * Serializable type alias for `RegistryEntry.Nova<WailaToolIconProvider>` using [NovaWailaToolIconProviderEntrySerializer].
+ * Serializable type alias for `RegistryEntry.Nova<WailaToolIconProvider>` using [WailaToolIconProviderEntrySerializer].
  */
 typealias NovaWailaToolIconProviderEntry = @Serializable(with = WailaToolIconProviderEntrySerializer::class) RegistryEntry.Nova<WailaToolIconProvider>
 
 /**
- * Serializable type alias for `RegistryEntrySet.Nova<WailaToolIconProvider>` using [NovaWailaToolIconProviderEntrySetSerializer].
+ * Serializable type alias for `RegistryEntrySet.Nova<WailaToolIconProvider>` using [WailaToolIconProviderEntrySetSerializer].
  */
 typealias NovaWailaToolIconProviderEntrySet = @Serializable(with = WailaToolIconProviderEntrySetSerializer::class) RegistryEntrySet.Nova<WailaToolIconProvider>
 

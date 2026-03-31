@@ -9,12 +9,12 @@ import xyz.xenondevs.nova.serialization.kotlinx.TooltipStyleEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.TooltipStyleSerializer
 
 /**
- * Serializable type alias for `RegistryEntry.Nova<TooltipStyle>` using [NovaTooltipStyleEntrySerializer].
+ * Serializable type alias for `RegistryEntry.Nova<TooltipStyle>` using [TooltipStyleEntrySerializer].
  */
 typealias NovaTooltipStyleEntry = @Serializable(with = TooltipStyleEntrySerializer::class) RegistryEntry.Nova<TooltipStyle>
 
 /**
- * Serializable type alias for `RegistryEntrySet.Nova<TooltipStyle>` using [NovaTooltipStyleEntrySetSerializer].
+ * Serializable type alias for `RegistryEntrySet.Nova<TooltipStyle>` using [TooltipStyleEntrySetSerializer].
  */
 typealias NovaTooltipStyleEntrySet = @Serializable(with = TooltipStyleEntrySetSerializer::class) RegistryEntrySet.Nova<TooltipStyle>
 

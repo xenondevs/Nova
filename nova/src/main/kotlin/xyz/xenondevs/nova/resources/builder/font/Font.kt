@@ -104,9 +104,9 @@ class Font(
     }
     
     /**
-     * Writes this [Font] to its corresponding file in the given [assetsDir].
+     * Writes this [Font] to its corresponding file in the given resource pack.
      *
-     * Depending on the providers, additional files (such as bitmaps or unihex zips) might be written to the [assetsDir].
+     * Depending on the providers, additional files (such as bitmaps or unihex zips) might be written to the resource pack.
      */
     fun write(builder: ResourcePackBuilder) {
         val file = builder.resolve(id)
