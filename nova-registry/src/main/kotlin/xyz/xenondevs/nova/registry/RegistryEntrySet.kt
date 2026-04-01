@@ -380,6 +380,13 @@ inline fun <reified N : NovaRegistryElement<N>, reified P : Keyed, R> RegistryEn
 sealed interface RegistryEntrySet<out T : Keyed> : Provider<Set<T>> {
     
     /**
+     * Checks whether [value] is part of this set.
+     * Requires resolving this set and as such this function may not be called before registry freeze.
+     */
+    operator fun contains(value: @UnsafeVariance T): Boolean = 
+        value in get()
+    
+    /**
      * A [RegistryEntrySet] backed by a Paper registry.
      */
     sealed interface Paper<out T : Keyed> : RegistryEntrySet<T> {
