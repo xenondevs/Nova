@@ -66,8 +66,21 @@ class ResourcePath<out T : ResourceType>(val type: T, val namespace: String, val
     operator fun component1() = namespace
     operator fun component2() = path
     
-    override fun hashCode(): Int = filePath.hashCode()
-    override fun equals(other: Any?): Boolean = other is ResourcePath<*> && filePath == other.filePath
+    override fun hashCode(): Int {
+        var result = namespace.hashCode()
+        result = 31 * result + path.hashCode()
+        return result
+    }
+    
+    override fun equals(other: Any?): Boolean {
+        if (this === other)
+            return true
+        if (other is ResourcePath<*>)
+            return type == other.type && namespace == other.namespace && path == other.path
+        if (other is Key)
+            return namespace == other.namespace() && path == other.value()
+        return false
+    }
     
     companion object {
         
