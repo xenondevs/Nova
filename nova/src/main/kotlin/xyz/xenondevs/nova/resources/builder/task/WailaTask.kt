@@ -248,7 +248,7 @@ class WailaTask(
 ), PackTask {
     
     override val stage = BuildStage.POST_WORLD
-    override val runsBefore = setOf(FontContent.Write::class)
+    override val runsBefore = setOf(MovedFontContent.Write::class, FontContent.Write::class)
     
     override suspend fun run() {
         if (WailaManager.ENABLED) {
