@@ -25,15 +25,21 @@ import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.node
+import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.util.component.adventure.toNmsStyle
 import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.item.update
+import xyz.xenondevs.nova.util.nmsInteractionHand
+import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.buildDataComponentMap
+import xyz.xenondevs.nova.world.toNova
 import net.minecraft.network.chat.Component as MojangComponent
 
 internal class DefaultBehavior(
@@ -75,6 +81,21 @@ internal class DefaultBehavior(
             this[DataComponentTypes.REPAIR_COST] = 0
             this[DataComponentTypes.RARITY] = ItemRarity.COMMON
         }
+    }
+    
+    override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {
+        val player = ctx[ItemUse.SOURCE_PLAYER]
+            ?: return InteractionResult.Pass
+        val hand = ctx[ItemUse.HELD_HAND]
+            ?: return InteractionResult.Pass
+        
+        // run default data component functionality (e.g., of consumable, equippable, etc.)
+        val serverPlayer = player.serverPlayer
+        return itemStack.unwrap().item.use(
+            serverPlayer.level(),
+            serverPlayer,
+            hand.nmsInteractionHand
+        ).toNova()
     }
     
     override fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {

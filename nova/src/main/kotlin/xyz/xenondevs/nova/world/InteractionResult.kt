@@ -74,6 +74,33 @@ sealed interface InteractionResult {
     
 }
 
+internal fun NmsInteractionResult.toNova(): InteractionResult = when (this) {
+    is NmsInteractionResult.Success -> {
+        val swing = when (swingSource) {
+            NmsInteractionResult.SwingSource.NONE,
+            NmsInteractionResult.SwingSource.CLIENT -> false
+            
+            NmsInteractionResult.SwingSource.SERVER -> true
+        }
+        val action: ItemAction?
+        if (itemContext.wasItemInteraction) {
+            val transformedTo = itemContext.heldItemTransformedTo
+            if (transformedTo != null) {
+                action = ItemAction.ConvertStack(transformedTo.asBukkitCopy())
+            } else {
+                action = ItemAction.None
+            }
+        } else {
+            action = null
+        }
+        InteractionResult.Success(swing, action)
+    }
+    
+    is NmsInteractionResult.Fail -> InteractionResult.Fail
+    is NmsInteractionResult.Pass -> InteractionResult.Pass
+    is NmsInteractionResult.TryEmptyHandInteraction -> InteractionResult.Pass
+}
+
 internal fun InteractionResult.toNms(): NmsInteractionResult {
     return when (this) {
         is InteractionResult.Success -> NmsInteractionResult.Success(
