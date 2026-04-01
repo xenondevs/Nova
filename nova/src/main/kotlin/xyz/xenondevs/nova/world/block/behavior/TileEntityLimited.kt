@@ -24,7 +24,7 @@ object TileEntityLimited : BlockBehavior {
         
         val result = TileEntityLimits.canPlace(ctx)
         if (!result.allowed) {
-            ctx[BlockPlace.SOURCE_PLAYER]?.sendMessage(Component.text(result.message, NamedTextColor.RED))
+            ctx[BlockPlace.SOURCE_PLAYER]?.sendMessage(Component.translatable(result.message, NamedTextColor.RED))
             return false
         }
         
