@@ -24,6 +24,7 @@ import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.item.DataComponentMap
+import xyz.xenondevs.nova.world.item.ItemAction
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
 
@@ -146,24 +147,19 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleUseTick(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) = Unit
     
     /**
-     * Called when [entity] stops using an [itemStack] with this behavior in [hand], with [remainingUseTicks] left.
+     * Called when [entity] stops using (multi-tick right-click action) an [itemStack] with this behavior in [hand], with [remainingUseTicks] left.
      */
     fun handleUseStopped(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot, remainingUseTicks: Int) = Unit
     
     /**
-     * Called when [entity] finishes using an [itemStack] with this behavior in [hand].
+     * Called when [entity] finishes using (multi-tick right-click action) an [itemStack] with this behavior in [hand].
      */
-    fun handleUseFinished(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot) = Unit
-    
-    /**
-     * Modifies the [remainder] when [entity] finishes using [original] with this behavior in [hand].
-     */
-    fun modifyUseRemainder(entity: LivingEntity, original: ItemStack, hand: EquipmentSlot, remainder: ItemStack): ItemStack = remainder
+    fun handleUseFinished(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot): ItemAction = ItemAction.None
     
     /**
      * Modifies the server-side use duration of [itemStack] with this behavior for [entity].
      * The initial value of [duration] may stem from [baseDataComponents].
-     * If the use duration is <= 0, the item cannot be used (no right click and hold action).
+     * If the use duration is <= 0, the item has no right click and hold action.
      *
      * Note that the client may predict a different use duration, which this method does not handle.
      */

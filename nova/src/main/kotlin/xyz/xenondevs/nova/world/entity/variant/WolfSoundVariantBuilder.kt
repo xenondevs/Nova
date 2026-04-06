@@ -70,14 +70,16 @@ class WolfSoundVariantBuilder(id: Key) : LazyRegistryElementBuilder<Wolf.SoundVa
     
     override fun build(lookup: RegistryOps.RegistryInfoLookup): WolfSoundVariant {
         val undefinedSound = Holder.direct(SoundEvent(Identifier.parse("nova:undefined"), Optional.empty()))
-        return WolfSoundVariant(
+        val set = WolfSoundVariant.WolfSoundSet(
             ambientSound ?: undefinedSound,
             deathSound ?: undefinedSound,
             growlSound ?: undefinedSound,
             hurtSound ?: undefinedSound,
             pantSound ?: undefinedSound,
-            whineSound ?: undefinedSound
+            whineSound ?: undefinedSound,
+            undefinedSound // TODO: expose step sound
         )
+        return WolfSoundVariant(set, set) // TODO: separate sound sets
     }
     
 }

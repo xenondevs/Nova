@@ -10,10 +10,7 @@ import xyz.xenondevs.nova.util.ServerSoftware.*
 /**
  * The game version of the server.
  */
-val SERVER_VERSION: Version = run {
-    val versionPattern = Regex("""(1\.\d{1,2}(\.\d{1,2})?)""")
-    Version(versionPattern.find(ServerBuildInfo.buildInfo().minecraftVersionId())!!.groupValues[1])
-}
+val SERVER_VERSION: Version = Version(ServerBuildInfo.buildInfo().minecraftVersionId())
 
 object ServerUtils {
     

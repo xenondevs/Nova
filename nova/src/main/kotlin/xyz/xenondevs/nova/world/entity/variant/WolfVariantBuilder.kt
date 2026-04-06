@@ -22,12 +22,13 @@ class WolfVariantBuilder internal constructor(
 ) {
     
     override fun build(modelType: Unit, layout: EntityVariantLayout.Wolf, spawnConditions: SpawnPrioritySelectors): WolfVariant {
+        val assetInfo = WolfVariant.AssetInfo(
+            ClientAsset.ResourceTexture(layout.wild.toIdentifier()),
+            ClientAsset.ResourceTexture(layout.tame.toIdentifier()),
+            ClientAsset.ResourceTexture(layout.angry.toIdentifier()),
+        )
         return WolfVariant(
-            WolfVariant.AssetInfo(
-                ClientAsset.ResourceTexture(layout.wild.toIdentifier()),
-                ClientAsset.ResourceTexture(layout.tame.toIdentifier()),
-                ClientAsset.ResourceTexture(layout.angry.toIdentifier()),
-            ),
+            assetInfo, assetInfo, // TODO: baby textures
             spawnConditions,
         )
     }

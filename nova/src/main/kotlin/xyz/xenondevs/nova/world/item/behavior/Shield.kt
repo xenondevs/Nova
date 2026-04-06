@@ -6,6 +6,7 @@ import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.BlocksAttacks
 import io.papermc.paper.datacomponent.item.blocksattacks.DamageReduction
 import io.papermc.paper.datacomponent.item.blocksattacks.ItemDamageFunction
+import io.papermc.paper.registry.set.RegistryKeySet
 import io.papermc.paper.registry.tag.TagKey
 import net.kyori.adventure.key.Key
 import org.bukkit.Registry
@@ -52,7 +53,7 @@ fun Shield(
     disableCooldownScale: Double = 1.0,
     damageReductions: List<DamageReduction> = emptyList(),
     itemDamage: ItemDamageFunction = ItemDamageFunction.itemDamageFunction().build(),
-    bypassedBy: TagKey<DamageType>? = null,
+    bypassedBy: RegistryKeySet<DamageType>? = null,
     blockSound: Key? = null,
     disableSound: Key? = null
 ) = ItemBehaviorFactory {
@@ -62,7 +63,7 @@ fun Shield(
         cfg.entryOrElse(disableCooldownScale, "disable_cooldown_scale"),
         cfg.optionalEntry<List<DamageReduction>>("damage_reductions").orElse(damageReductions),
         cfg.optionalEntry<ItemDamageFunction>("item_damage").orElse(itemDamage),
-        cfg.optionalEntry<TagKey<DamageType>>("bypassed_by").orElse(bypassedBy),
+        cfg.optionalEntry<RegistryKeySet<DamageType>>("bypassed_by").orElse(bypassedBy),
         cfg.optionalEntry<Key>("block_sound").orElse(blockSound),
         cfg.optionalEntry<Key>("disable_sound").orElse(disableSound)
     )
@@ -84,7 +85,7 @@ class Shield(
     disableCooldownScale: Provider<Double>,
     damageReductions: Provider<List<DamageReduction>>,
     itemDamage: Provider<ItemDamageFunction>,
-    bypassedBy: Provider<TagKey<DamageType>?>,
+    bypassedBy: Provider<RegistryKeySet<DamageType>?>,
     blockSound: Provider<Key?>,
     disableSound: Provider<Key?>
 ) : ItemBehavior {
@@ -112,7 +113,7 @@ class Shield(
     /**
      * A damage type tag containing the damage types that bypass the shield.
      */
-    val bypassedBy: TagKey<DamageType>? by bypassedBy
+    val bypassedBy: RegistryKeySet<DamageType>? by bypassedBy
     
     /**
      * The key of the sound that is played when the shield successfully blocks an attack.

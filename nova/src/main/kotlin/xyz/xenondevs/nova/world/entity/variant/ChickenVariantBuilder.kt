@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.world.entity.variant
 
 import net.kyori.adventure.key.Key
+import net.minecraft.core.ClientAsset
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.entity.animal.chicken.ChickenVariant
 import net.minecraft.world.entity.variant.ModelAndTexture
@@ -21,8 +22,9 @@ class ChickenVariantBuilder internal constructor(
     id
 ) {
     
+    // TODO: expose baby texture
     override fun build(modelType: ChickenModelType, layout: EntityVariantLayout.Simple, spawnConditions: SpawnPrioritySelectors) =
-        ChickenVariant(ModelAndTexture(modelType.nms, layout.texture.toIdentifier()), spawnConditions)
+        ChickenVariant(ModelAndTexture(modelType.nms, layout.texture.toIdentifier()), ClientAsset.ResourceTexture(layout.texture.toIdentifier()), spawnConditions)
     
 }
 

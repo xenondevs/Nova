@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xyz.xenondevs.nova.util.NMSUtilsKt;
 import xyz.xenondevs.nova.util.item.ItemUtilsKt;
 import xyz.xenondevs.nova.world.item.NovaItem;
 
@@ -36,16 +38,16 @@ abstract class BrewingStandBlockEntityMixin {
         method = "doBrew",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/item/Item;getCraftingRemainder()Lnet/minecraft/world/item/ItemStack;"
+            target = "Lnet/minecraft/world/item/Item;getCraftingRemainder()Lnet/minecraft/world/item/ItemStackTemplate;"
         )
     )
-    private static ItemStack getCraftingRemainer(
+    private static ItemStackTemplate getCraftingRemainer(
         Item item,
         @Share("brewingNovaItem") LocalRef<NovaItem> brewingNovaItem
     ) {
         var novaItem = brewingNovaItem.get();
         return novaItem != null
-            ? CraftItemStack.unwrap(novaItem.getCraftingRemainingItem())
+            ? NMSUtilsKt.toNmsTemplate(novaItem.getCraftingRemainingItem())
             : item.getCraftingRemainder();
     }
     

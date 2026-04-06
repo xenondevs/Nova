@@ -171,9 +171,13 @@ internal object NoteBlockBehavior : BlockBehavior {
             NoteBlockInstrument.WITHER_SKELETON -> Instrument.WITHER_SKELETON
             NoteBlockInstrument.PIGLIN -> Instrument.PIGLIN
             NoteBlockInstrument.CUSTOM_HEAD -> Instrument.CUSTOM_HEAD
+            NoteBlockInstrument.TRUMPET -> Instrument.TRUMPET
+            NoteBlockInstrument.TRUMPET_EXPOSED -> Instrument.TRUMPET_EXPOSED
+            NoteBlockInstrument.TRUMPET_OXIDIZED -> Instrument.TRUMPET_OXIDIZED
+            NoteBlockInstrument.TRUMPET_WEATHERED -> Instrument.TRUMPET_WEATHERED
         }
     
-    override fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack? {
+    override fun pickBlockCreative(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockInteract>): ItemStack {
         return ItemStack.of(Material.NOTE_BLOCK)
     }
     

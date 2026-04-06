@@ -136,6 +136,22 @@ interface ItemAction {
     }
     
     /**
+     * Applies [actions] in sequence.
+     */
+    class Composite(val actions: List<ItemAction>) : ItemAction {
+        
+        override fun apply(entity: LivingEntity, slot: EquipmentSlot) {
+            actions.forEach { it.apply(entity, slot) }
+        }
+        
+        override fun apply(world: World, itemStack: ItemStack): List<ItemStack> =
+            actions.fold(listOf(itemStack)) { stacks, action ->
+                stacks.flatMap { action.apply(world, it) }
+            }
+        
+    }
+    
+    /**
      * No action is applied.
      */
     data object None : ItemAction {

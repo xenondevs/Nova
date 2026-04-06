@@ -25,7 +25,7 @@ import xyz.xenondevs.invui.dsl.gui
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.dsl.mergedWindow
 import xyz.xenondevs.invui.dsl.pagedItemsGui
-import xyz.xenondevs.invui.dsl.property.by
+import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.dsl.scrollItemsGui
 import xyz.xenondevs.invui.dsl.tabGui
 import xyz.xenondevs.invui.dsl.window

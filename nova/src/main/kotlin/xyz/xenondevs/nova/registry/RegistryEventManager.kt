@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.registry
 import io.papermc.paper.tag.TagEventConfig
 import net.kyori.adventure.key.Key
 import net.minecraft.core.Registry
+import net.minecraft.core.RegistryAccess
 import net.minecraft.core.WritableRegistry
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.RegistryOps
@@ -10,11 +11,13 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.tags.TagEntry
 import net.minecraft.tags.TagKey
 import net.minecraft.tags.TagLoader
+import xyz.xenondevs.commons.collections.concurrentHashSet
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.set
 import xyz.xenondevs.nova.util.toIdentifier
+import java.util.concurrent.ConcurrentHashMap
 
 private val LOG_REGISTRY_FREEZE by MAIN_CONFIG.entry<Boolean>("debug", "logging", "registry_freeze")
 
@@ -23,17 +26,16 @@ private typealias PostFreezeListener<T> = (registry: Registry<T>, lookup: Regist
 
 internal object RegistryEventManager {
     
-    private val preFreezeListeners = HashMap<ResourceKey<*>, ArrayList<PreFreezeListener<*>>>()
-    private val postFreezeListeners = HashMap<ResourceKey<*>, ArrayList<PostFreezeListener<*>>>()
-    private val frozen = HashSet<ResourceKey<*>>()
-    private val additionalTagEntries = HashMap<ResourceKey<*>, HashMap<TagKey<*>, ArrayList<Identifier>>>()
+    private val preFreezeListeners = ConcurrentHashMap<ResourceKey<*>, ArrayList<PreFreezeListener<*>>>()
+    private val postFreezeListeners = ConcurrentHashMap<ResourceKey<*>, ArrayList<PostFreezeListener<*>>>()
+    private val frozen = concurrentHashSet<ResourceKey<*>>()
+    private val additionalTagEntries = ConcurrentHashMap<ResourceKey<*>, HashMap<TagKey<*>, ArrayList<Identifier>>>()
     
     @JvmStatic
     fun handlePreFreeze(registry: WritableRegistry<*>, lookup: RegistryOps.RegistryInfoLookup) {
         val key = registry.key()
         try {
-            preFreezeListeners[key]?.forEach { it(registry, lookup) }
-            preFreezeListeners.remove(key)
+            preFreezeListeners.remove(key)?.forEach { it(registry, lookup) }
         } catch (t: Throwable) {
             LOGGER.error("An exception occurred while running registry pre-freeze listeners for $key", t)
         }
@@ -47,10 +49,24 @@ internal object RegistryEventManager {
     fun handlePostFreeze(registry: Registry<*>, lookup: RegistryOps.RegistryInfoLookup) {
         val key = registry.key()
         try {
-            postFreezeListeners[key]?.forEach { it(registry, lookup) }
-            postFreezeListeners.remove(key)
+            postFreezeListeners.remove(key)?.forEach { it(registry, lookup) }
         } catch (t: Throwable) {
             LOGGER.error("An exception occurred while running registry post-freeze listeners for $key", t)
+        }
+    }
+    
+    @JvmStatic
+    fun handlePostFreeze(registryAccess: RegistryAccess) {
+        val lookup = RegistryOps.HolderLookupAdapter(registryAccess)
+        for (registryEntry in registryAccess.registries()) {
+            val key = registryEntry.key
+            val registry = registryEntry.value
+            
+            try {
+                postFreezeListeners.remove(key)?.forEach { it(registry, lookup) }
+            } catch (t: Throwable) {
+                LOGGER.error("An exception occurred while running registry post-freeze listeners for $key", t)
+            }
         }
     }
     

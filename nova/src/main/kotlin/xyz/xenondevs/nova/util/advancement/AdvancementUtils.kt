@@ -15,12 +15,14 @@ import net.minecraft.core.component.predicates.CustomDataPredicate
 import net.minecraft.core.component.predicates.DataComponentPredicates
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.Identifier
+import net.minecraft.world.item.ItemStackTemplate
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
 import xyz.xenondevs.nova.addon.id
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
+import xyz.xenondevs.nova.util.toNmsTemplate
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
 import java.util.*
@@ -44,7 +46,7 @@ fun obtainNovaItemAdvancement(
             parent(parent)
         
         display(DisplayInfo(
-            item.clientsideProvider.get().unwrap().copy(),
+            item.clientsideProvider.get().toNmsTemplate(),
             Component.translatable("advancement.${id.namespace()}.${id.value()}.title").toNMSComponent(),
             Component.translatable("advancement.${id.namespace()}.${id.value()}.description").toNMSComponent(),
             Optional.empty(),
@@ -70,7 +72,7 @@ fun obtainNovaItemsAdvancement(
             parent(parent)
         
         display(DisplayInfo(
-            items[0].clientsideProvider.get().unwrap().copy(),
+            items[0].clientsideProvider.get().toNmsTemplate(),
             Component.translatable("advancement.$namespace.$name.title").toNMSComponent(),
             Component.translatable("advancement.$namespace.$name.description").toNMSComponent(),
             Optional.empty(),

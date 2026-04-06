@@ -25,15 +25,14 @@ abstract class ItemStackMixin {
             target = "Lnet/minecraft/core/component/PatchedDataComponentMap;fromPatch(Lnet/minecraft/core/component/DataComponentMap;Lnet/minecraft/core/component/DataComponentPatch;)Lnet/minecraft/core/component/PatchedDataComponentMap;"
         )
     )
-    private static PatchedDataComponentMap fromPatch(DataComponentMap patchedDataComponentMap, DataComponentPatch prototype) {
-        var patch = ItemStackLegacyConversion.convert(prototype);
-        var newMap = patchedDataComponentMap;
+    private static PatchedDataComponentMap fromPatch(DataComponentMap map, DataComponentPatch components) {
+        var patch = ItemStackLegacyConversion.convert(map, components);
+        var newMap = map;
         
-        var component = patch.get(DataComponents.CUSTOM_DATA);
+        var component = patch.get(map, DataComponents.CUSTOM_DATA);
         if (component != null) {
-            var novaItem = component
-                .map(CustomData::getUnsafe)
-                .flatMap(tag -> tag.getCompound("nova"))
+            var novaItem = component.getUnsafe()
+                .getCompound("nova")
                 .flatMap(tag -> tag.getString("id"))
                 .map(id -> NovaRegistries.ITEM.getValue(Identifier.parse(id)));
             if (novaItem.isPresent()) {

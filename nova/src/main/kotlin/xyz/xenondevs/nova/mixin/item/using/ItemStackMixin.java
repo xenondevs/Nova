@@ -12,8 +12,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xyz.xenondevs.nova.util.NMSUtilsKt;
 import xyz.xenondevs.nova.util.item.ItemUtilsKt;
+import xyz.xenondevs.nova.world.InteractionResult;
 
 @Mixin(ItemStack.class)
 abstract class ItemStackMixin {
@@ -54,24 +56,30 @@ abstract class ItemStackMixin {
         );
     }
     
-    @ModifyReturnValue(method = "finishUsingItem", at = @At("RETURN"))
-    private ItemStack handleFinishUseAndModifyRemainder(ItemStack remainder, @Local(argsOnly = true) LivingEntity entity) {
+    @Inject(method = "finishUsingItem", at = @At("HEAD"), cancellable = true)
+    private void handleFinishUseAndModifyRemainder(
+        Level level,
+        LivingEntity livingEntity,
+        CallbackInfoReturnable<ItemStack> cir,
+        @Local(argsOnly = true) LivingEntity entity
+    ) {
         var thisRef = (ItemStack) (Object) this;
         var novaItem = ItemUtilsKt.getNovaItem(thisRef);
         if (novaItem == null)
-            return remainder;
+            return;
         
-        novaItem.handleUseFinished(
+        var action = novaItem.handleUseFinished(
             entity.getBukkitLivingEntity(),
             CraftItemStack.asBukkitCopy(thisRef),
             NMSUtilsKt.getBukkitEquipmentSlot(entity.getUsedItemHand())
         );
-        return CraftItemStack.unwrap(novaItem.modifyUseRemainder(
+        new InteractionResult.Success(false, action).performActions(
             entity.getBukkitLivingEntity(),
-            CraftItemStack.asBukkitCopy(thisRef),
             NMSUtilsKt.getBukkitEquipmentSlot(entity.getUsedItemHand()),
-            CraftItemStack.asBukkitCopy(remainder)
-        )).copy();
+            true
+        );
+        
+        cir.setReturnValue(livingEntity.getItemInHand(entity.getUsedItemHand()));
     }
     
     @Inject(method = "releaseUsing", at = @At("HEAD"))

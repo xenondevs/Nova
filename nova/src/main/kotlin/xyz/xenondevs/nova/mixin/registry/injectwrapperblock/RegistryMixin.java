@@ -21,13 +21,13 @@ interface RegistryMixin {
      * to produce {@link WrapperBlock WrapperBlocks}.
      */
     @Redirect(
-        method = "lambda$referenceHolderWithLifecycle$4",
+        method = "lambda$referenceHolderWithLifecycle$0",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/core/Registry;get(Lnet/minecraft/resources/Identifier;)Ljava/util/Optional;"
         )
     )
-    private Optional<? extends Holder.Reference<?>> xd(Registry<?> registry, Identifier id) {
+    private Optional<? extends Holder.Reference<?>> redirect(Registry<?> registry, Identifier id) {
         Optional<? extends Holder.Reference<?>> holder = registry.get(id);
         if (holder.isEmpty() && registry.key() == Registries.BLOCK) {
             holder = NovaRegistries.WRAPPER_BLOCK.get(id);

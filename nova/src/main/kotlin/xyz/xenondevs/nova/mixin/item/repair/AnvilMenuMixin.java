@@ -14,15 +14,14 @@ import xyz.xenondevs.nova.util.item.ItemUtilsKt;
 @Mixin(AnvilMenu.class)
 abstract class AnvilMenuMixin {
     
-    @Definition(id = "is", method = "Lnet/minecraft/world/item/ItemStack;is(Lnet/minecraft/world/item/Item;)Z")
+    @Definition(id = "is", method = "Lnet/minecraft/world/item/ItemStack;is(Ljava/lang/Object;)Z")
     @Definition(id = "getItem", method = "Lnet/minecraft/world/item/ItemStack;getItem()Lnet/minecraft/world/item/Item;")
-    @Definition(id = "item1", local = @Local(type = ItemStack.class, ordinal = 2))
-    @Expression("?.is(item1.getItem())")
+    @Expression("?.is(?.getItem())")
     @Redirect(method = "createResult", at = @At("MIXINEXTRAS:EXPRESSION"))
     private boolean isSameItemType(
         ItemStack first,
-        Item secondType,
-        @Local(ordinal = 2) ItemStack second
+        Object secondType,
+        @Local(name = "addition") ItemStack second
     ) {
         var firstNovaItem = ItemUtilsKt.getNovaItem(first);
         var secondNovaItem = ItemUtilsKt.getNovaItem(second);
@@ -30,7 +29,7 @@ abstract class AnvilMenuMixin {
         if (firstNovaItem != null || secondNovaItem != null)
             return firstNovaItem == secondNovaItem;
         
-        return first.is(secondType);
+        return first.is((Item) secondType);
     }
     
 }

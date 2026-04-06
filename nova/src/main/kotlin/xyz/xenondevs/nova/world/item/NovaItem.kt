@@ -580,8 +580,8 @@ class NovaItem internal constructor(
         entity: LivingEntity,
         itemStack: ItemStack,
         hand: EquipmentSlot,
-    ): Unit = runSafely("handle use finished") {
-        behaviors.forEach { it.handleUseFinished(entity, itemStack.clone(), hand) }
+    ): ItemAction = runSafely("handle use finished", ItemAction.None) {
+        ItemAction.Composite(behaviors.map { it.handleUseFinished(entity, itemStack.clone(), hand) })
     }
     
     /**
@@ -595,20 +595,6 @@ class NovaItem internal constructor(
         remainingUseTicks: Int
     ): Unit = runSafely("handle use stopped") {
         behaviors.forEach { it.handleUseStopped(entity, itemStack.clone(), hand, remainingUseTicks) }
-    }
-    
-    /**
-     * Modifies the [remainder] item stack of using [original] with this [NovaItem] for [entity] in [hand].
-     */
-    fun modifyUseRemainder(
-        entity: LivingEntity,
-        original: ItemStack,
-        hand: EquipmentSlot,
-        remainder: ItemStack
-    ): ItemStack = runSafely("modify use remainder", remainder) {
-        behaviors.fold(remainder) { currentRemainder, behavior ->
-            behavior.modifyUseRemainder(entity, original.clone(), hand, currentRemainder)
-        }.clone()
     }
     
     /**

@@ -45,7 +45,7 @@ object ToolUtils {
                 ?: return false // block is not breakable, so there is no correct tool for drops
             if (!requiresToolForDrops)
                 return true
-        } else if (!(block as CraftBlock).nms.requiresCorrectToolForDrops()) return true
+        } else if (!(block as CraftBlock).nmsState.requiresCorrectToolForDrops()) return true
         
         val toolComponent = tool?.unwrap()?.get(DataComponents.TOOL)
         if (tool?.novaItem?.hasBehavior<Tool>() != true && toolComponent != null && novaBlock == null) {

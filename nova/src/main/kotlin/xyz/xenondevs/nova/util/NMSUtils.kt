@@ -34,6 +34,7 @@ import net.minecraft.tags.TagKey
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
@@ -109,7 +110,7 @@ val BlockData.nmsBlockState: BlockState
     get() = (this as CraftBlockData).state
 
 val BlockState.bukkitBlockData: BlockData
-    get() = CraftBlockData.fromData(this)
+    get() = CraftBlockData.createData(this)
 
 val Location.blockPos: MojangBlockPos
     get() = MojangBlockPos(blockX, blockY, blockZ)
@@ -349,6 +350,12 @@ fun MojangBlockPos.toNovaPos(world: World): BlockPos =
 fun Vec3.toVector3d(): Vector3d =
     Vector3d(x, y, z)
 
+fun ItemStack.toNmsTemplate(): ItemStackTemplate =
+    unwrap().toTemplate()
+
+fun MojangStack.toTemplate(): ItemStackTemplate =
+    ItemStackTemplate.fromNonEmptyStack(this)
+
 fun Player.send(vararg packets: Packet<*>) {
     val connection = serverPlayer.connection
     packets.forEach { connection.send(it) }
@@ -390,7 +397,7 @@ fun <E : Any> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
 }
 
 fun <T : Comparable<T>> BlockState.hasProperty(property: Property<T>, value: T): Boolean {
-    return hasProperty(property) && values[property] == value
+    return hasProperty(property) && getValue(property) == value
 }
 
 fun BlockPos.setBlockStateNoUpdate(state: BlockState) {

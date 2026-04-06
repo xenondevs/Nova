@@ -14,7 +14,10 @@ import net.minecraft.core.component.DataComponents
 import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
+import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
@@ -26,16 +29,19 @@ import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.node
 import xyz.xenondevs.nova.context.Context
+import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.util.component.adventure.toNmsStyle
 import xyz.xenondevs.nova.util.data.get
 import xyz.xenondevs.nova.util.data.logExceptionMessages
 import xyz.xenondevs.nova.util.item.update
+import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.DataComponentMap
+import xyz.xenondevs.nova.world.item.ItemAction
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.buildDataComponentMap
@@ -83,19 +89,56 @@ internal class DefaultBehavior(
         }
     }
     
+    override fun useOnEntity(itemStack: ItemStack, entity: Entity, ctx: Context<EntityInteract>): InteractionResult {
+        if (entity !is LivingEntity)
+            return InteractionResult.Pass
+        
+        val player = ctx[EntityInteract.SOURCE_PLAYER]
+            ?: return InteractionResult.Pass
+        val hand = ctx[EntityInteract.HELD_HAND]
+            ?: return InteractionResult.Pass
+        
+        // run default data component functionality (of equippable, etc.)
+        val result = itemStack.unwrap().interactLivingEntity(
+            player.serverPlayer,
+            entity.nmsEntity,
+            hand.nmsInteractionHand
+        ).toNova()
+        
+        // reset to previous item so that component-based post-use effects in InteractionResult.Success#performActions work correctly
+        // this asserts that transformations are stored in the interaction result via transformedTo
+        player.equipment.setItem(hand, itemStack)
+        return result
+    }
+    
     override fun use(itemStack: ItemStack, ctx: Context<ItemUse>): InteractionResult {
         val player = ctx[ItemUse.SOURCE_PLAYER]
             ?: return InteractionResult.Pass
         val hand = ctx[ItemUse.HELD_HAND]
             ?: return InteractionResult.Pass
         
-        // run default data component functionality (e.g., of consumable, equippable, etc.)
+        // run default data component functionality (of consumable, equippable, etc.)
         val serverPlayer = player.serverPlayer
-        return itemStack.unwrap().item.use(
+        val result = itemStack.unwrap().item.use(
             serverPlayer.level(),
             serverPlayer,
             hand.nmsInteractionHand
         ).toNova()
+        
+        // reset to previous item so that component-based post-use effects in InteractionResult.Success#performActions work correctly
+        // this asserts that transformations are stored in the interaction result via transformedTo
+        player.equipment.setItem(hand, itemStack)
+        return result
+    }
+    
+    override fun handleUseFinished(entity: LivingEntity, itemStack: ItemStack, hand: EquipmentSlot): ItemAction {
+        // run default data component functionality (of consumable, etc.)
+        val nmsStack = itemStack.unwrap().copy()
+        val nmsEntity = entity.nmsEntity
+        val result = nmsStack.item.finishUsingItem(nmsStack, nmsEntity.level(), nmsEntity).asBukkitMirror()
+        if (result == itemStack)
+            return ItemAction.None
+        return ItemAction.ConvertStack(result)
     }
     
     override fun modifyClientSideStack(player: Player?, server: ItemStack, client: ItemStack): ItemStack {

@@ -47,6 +47,7 @@ internal object UnknownEntityVariants {
                 Registries.CHICKEN_VARIANT -> Registries.CHICKEN_VARIANT.preFreeze { registry, _ ->
                     registry[id] = ChickenVariant(
                         ModelAndTexture(ChickenVariant.ModelType.NORMAL, id),
+                        ClientAsset.ResourceTexture(id),
                         SpawnPrioritySelectors.EMPTY
                     )
                 }
@@ -54,6 +55,7 @@ internal object UnknownEntityVariants {
                 Registries.COW_VARIANT -> Registries.COW_VARIANT.preFreeze { registry, _ ->
                     registry[id] = CowVariant(
                         ModelAndTexture(CowVariant.ModelType.NORMAL, id),
+                        ClientAsset.ResourceTexture(id),
                         SpawnPrioritySelectors.EMPTY
                     )
                 }
@@ -68,17 +70,19 @@ internal object UnknownEntityVariants {
                 Registries.PIG_VARIANT -> Registries.PIG_VARIANT.preFreeze { registry, _ ->
                     registry[id] = PigVariant(
                         ModelAndTexture(PigVariant.ModelType.NORMAL, id),
+                        ClientAsset.ResourceTexture(id),
                         SpawnPrioritySelectors.EMPTY
                     )
                 }
                 
                 Registries.WOLF_VARIANT -> Registries.WOLF_VARIANT.preFreeze { registry, _ ->
+                    val info = WolfVariant.AssetInfo(
+                        ClientAsset.ResourceTexture(id),
+                        ClientAsset.ResourceTexture(id),
+                        ClientAsset.ResourceTexture(id)
+                    )
                     registry[id] = WolfVariant(
-                        WolfVariant.AssetInfo(
-                            ClientAsset.ResourceTexture(id), 
-                            ClientAsset.ResourceTexture(id),
-                            ClientAsset.ResourceTexture(id)
-                        ),
+                        info, info,
                         SpawnPrioritySelectors.EMPTY
                     )
                 }

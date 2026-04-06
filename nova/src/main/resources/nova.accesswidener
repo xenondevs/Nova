@@ -24,7 +24,6 @@ transitive-accessible class net/minecraft/network/protocol/game/ServerboundInter
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket id Ljava/util/UUID;
 accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket operation Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;
-accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket <init> (Ljava/util/UUID;Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;)V
 accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation
 accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation <init> (Lnet/minecraft/network/RegistryFriendlyByteBuf;)V
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation name Lnet/minecraft/network/chat/Component;
@@ -84,3 +83,6 @@ accessible method net/minecraft/world/level/levelgen/placement/FixedPlacement <i
 accessible method net/minecraft/world/item/trading/MerchantOffer <init> (Lnet/minecraft/world/item/trading/ItemCost;Ljava/util/Optional;Lnet/minecraft/world/item/ItemStack;IIZIIFIZ)V
 accessible method net/minecraft/world/item/ItemStack applyAfterUseComponentSideEffects (Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;
 accessible class net/minecraft/server/network/ServerGamePacketListenerImpl$EntityInteraction
+accessible field net/minecraft/resources/RegistryLoadTask registry Lnet/minecraft/core/WritableRegistry;
+accessible class io/papermc/paper/world/migration/WorldMigrationSupport
+accessible field io/papermc/paper/world/migration/WorldMigrationSupport DIMENSION_DIRECTORIES Ljava/util/List;

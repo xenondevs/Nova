@@ -4,6 +4,8 @@ import io.papermc.paper.datacomponent.DataComponentTypes
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.nova.util.addToInventoryPrioritizedOrDrop
 import xyz.xenondevs.nova.world.item.ItemAction
 import xyz.xenondevs.nova.world.player.swingHandEventless
 import net.minecraft.world.InteractionResult as NmsInteractionResult
@@ -46,22 +48,32 @@ sealed interface InteractionResult {
         
         /**
          * Performs the actions associated with this result as if it was [entity] that used [hand].
+         * Conditionally applies post-use side effects based on [applyPostUseSideEffects].
          */
-        fun performActions(entity: LivingEntity, hand: EquipmentSlot) {
+        fun performActions(
+            entity: LivingEntity,
+            hand: EquipmentSlot,
+            applyPostUseSideEffects: Boolean = entity.activeItemRemainingTime == 0
+        ) {
             if (swing)
                 entity.swingHandEventless(hand)
             
             if (action != null) {
-                // possibly apply item cooldown
-                if (entity is Player) {
-                    val handItem = entity.inventory.getItem(hand)
-                    val cooldown = handItem.getData(DataComponentTypes.USE_COOLDOWN)
-                    if (cooldown != null) {
-                        entity.setCooldown(handItem, (cooldown.seconds() * 20).toInt())
-                    }
-                }
+                val previousItem = entity.equipment?.getItem(hand)?.clone()
+                    ?: ItemStack.empty()
                 
                 action.apply(entity, hand)
+                
+                if (applyPostUseSideEffects) {
+                    val remainder = previousItem.getData(DataComponentTypes.USE_REMAINDER)
+                    val cooldown = previousItem.getData(DataComponentTypes.USE_COOLDOWN)
+                    if (remainder != null) {
+                        entity.addToInventoryPrioritizedOrDrop(hand, remainder.transformInto())
+                    }
+                    if (entity is Player && cooldown != null) {
+                        entity.setCooldown(previousItem, (cooldown.seconds() * 20).toInt())
+                    }
+                }
             }
         }
         
@@ -107,6 +119,7 @@ internal fun InteractionResult.toNms(): NmsInteractionResult {
             NmsInteractionResult.SwingSource.NONE,
             NmsInteractionResult.ItemContext(wasItemInteraction, null)
         )
+        
         is InteractionResult.Fail -> NmsInteractionResult.FAIL
         is InteractionResult.Pass -> NmsInteractionResult.PASS
     }

@@ -1,12 +1,14 @@
 package xyz.xenondevs.nova.world.entity.variant
 
 import net.kyori.adventure.key.Key
+import net.minecraft.core.ClientAsset
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.entity.animal.cow.CowVariant
 import net.minecraft.world.entity.variant.ModelAndTexture
 import net.minecraft.world.entity.variant.SpawnPrioritySelectors
 import org.bukkit.craftbukkit.entity.CraftCow
 import org.bukkit.entity.Cow
+import xyz.xenondevs.bytebase.jvm.Resource
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
 import xyz.xenondevs.nova.resources.builder.layout.entity.SimpleEntityVariantLayoutBuilder
 import xyz.xenondevs.nova.util.toIdentifier
@@ -21,8 +23,9 @@ class CowVariantBuilder internal constructor(
     id
 ) {
     
+    // TODO: expose baby texture
     override fun build(modelType: CowModelType, layout: EntityVariantLayout.Simple, spawnConditions: SpawnPrioritySelectors) =
-        CowVariant(ModelAndTexture(modelType.nms, layout.texture.toIdentifier()), spawnConditions)
+        CowVariant(ModelAndTexture(modelType.nms, layout.texture.toIdentifier()), ClientAsset.ResourceTexture(layout.texture.toIdentifier()), spawnConditions)
     
 }
 

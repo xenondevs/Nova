@@ -21,7 +21,8 @@ class CatVariantBuilder internal constructor(
     id
 ) {
     
+    // TODO: expose baby texture
     override fun build(modelType: Unit, layout: EntityVariantLayout.Simple, spawnConditions: SpawnPrioritySelectors) =
-        CatVariant(ClientAsset.ResourceTexture(layout.texture.toIdentifier()), spawnConditions)
+        CatVariant(ClientAsset.ResourceTexture(layout.texture.toIdentifier()), ClientAsset.ResourceTexture(layout.texture.toIdentifier()), spawnConditions)
     
 }

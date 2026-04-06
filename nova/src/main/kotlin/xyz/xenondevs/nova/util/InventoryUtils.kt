@@ -71,18 +71,6 @@ fun Player.addToInventoryOrDrop(items: List<ItemStack>) {
 }
 
 /**
- * Puts an [ItemStack] on the [prioritizedSlot] or adds it to the [Inventory][PlayerInventory]
- * if the given slot is occupied or drops it on the ground if there is not enough space.
- */
-fun Player.addToInventoryPrioritizedOrDrop(prioritizedSlot: EquipmentSlot, itemStack: ItemStack) {
-    val inventory = inventory
-    if (inventory.getItem(prioritizedSlot).isEmpty) {
-        inventory.setItem(prioritizedSlot, itemStack)
-    } else {
-        addToInventoryOrDrop(itemStack)
-    }
-}
-/**
  * Puts an [ItemStack] on the [prioritizedSlot] or adds it to the [Inventory]
  * if the given slot is occupied or drops it on the ground if there is not enough space.
  */

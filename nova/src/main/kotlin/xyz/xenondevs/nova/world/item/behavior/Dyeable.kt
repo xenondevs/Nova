@@ -18,6 +18,7 @@ import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
 
+// fixme: dye recipes (no longer automatic since 26.1)
 /**
  * Makes items dyeable.
  */
@@ -46,14 +47,6 @@ object Dyeable : ItemBehavior {
         }
         
         return InteractionResult.Pass
-    }
-    
-    /**
-     * Checks whether the given [itemStack] is dyeable, regardless of whether it is a Nova item or not.
-     */
-    @JvmStatic
-    internal fun isDyeable(itemStack: net.minecraft.world.item.ItemStack): Boolean {
-        return itemStack.novaItem?.hasBehavior<Dyeable>() ?: itemStack.`is`(ItemTags.DYEABLE)
     }
     
 }

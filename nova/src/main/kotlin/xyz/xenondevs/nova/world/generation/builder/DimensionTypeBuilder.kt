@@ -8,12 +8,14 @@ import net.minecraft.tags.TagKey
 import net.minecraft.util.valueproviders.IntProvider
 import net.minecraft.util.valueproviders.UniformInt
 import net.minecraft.world.attribute.EnvironmentAttributeMap
+import net.minecraft.world.level.CardinalLighting
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.dimension.DimensionType
 import net.minecraft.world.level.dimension.DimensionType.MonsterSettings
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
+import java.util.Optional
 
 /**
  * Builder for [DimensionTypes][DimensionType].
@@ -177,6 +179,7 @@ class DimensionTypeBuilder internal constructor(
             fixedTime != null, // fixme: fixedTime is now boolean instead of long
             hasSkyLight,
             hasCeiling,
+            false, // TODO: expose hasEnderDragonFight
             1.0, // TODO: expose coordinate scale
             minY,
             height,
@@ -185,9 +188,10 @@ class DimensionTypeBuilder internal constructor(
             ambientLight,
             monsterSettings ?: MonsterSettingsBuilder().build(),
             DimensionType.Skybox.OVERWORLD, // TODO: expose skybox
-            DimensionType.CardinalLightType.DEFAULT, // TODO: expose cardinal light type
+            CardinalLighting.Type.DEFAULT, // TODO: expose cardinal light type
             EnvironmentAttributeMap.builder().build(), // TODO: expose environment attributes
-            HolderSet.empty() // TODO: expose timelines
+            HolderSet.empty(), // TODO: expose timelines
+            Optional.empty() // TODO: expose default clock
         )
     }
     

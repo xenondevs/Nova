@@ -30,7 +30,7 @@ internal object BlockStateSerializer : KSerializer<BlockState> {
             encodeSerializableElement(
                 descriptor, 1,
                 MapSerializer(String.serializer(), String.serializer()),
-                value.values.entries.associate { (property, value) -> stringifyPropertyValue(property, value) }
+                value.properties.associate { property -> stringifyPropertyValue(property, value.getValue(property)) }
             )
         }
     }

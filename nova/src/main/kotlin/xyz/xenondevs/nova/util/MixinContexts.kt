@@ -1,13 +1,11 @@
 package xyz.xenondevs.nova.util
 
-import net.minecraft.world.phys.Vec3
-
 /**
- * Contains thread locals for passing contexts from mixins.
+ * Contains scoped values for passing context from mixins.
  */
-internal object MixinContexts {
+internal object MixinContext {
     
     @JvmField
-    val INTERACT_LOCATION: ThreadLocal<Vec3> = ThreadLocal.withInitial { Vec3.ZERO }
+    val IS_USING_SECONDARY_ACTION: ScopedValue<Boolean> = ScopedValue.newInstance()
     
 }

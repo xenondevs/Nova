@@ -30,6 +30,7 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSystemChatPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAttributesPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundClientEndTickPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClickPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
@@ -98,6 +99,7 @@ object PacketEventManager {
         registerPlayerEventType(::ServerboundSwingPacketEvent)
         registerPlayerEventType(::ServerboundUseItemOnPacketEvent)
         registerPlayerEventType(::ServerboundClientEndTickPacketEvent)
+        registerPlayerEventType(::ServerboundAttackPacketEvent)
     }
     
     private inline fun <reified P : Packet<*>, reified E : PlayerPacketEvent<P>> registerEventType(noinline constructor: (P) -> E) {

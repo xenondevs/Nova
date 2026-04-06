@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.world.block.hitbox
 
-import net.minecraft.network.protocol.game.ServerboundInteractPacket.ATTACK_ACTION
-import net.minecraft.network.protocol.game.ServerboundInteractPacket.InteractionAtLocationAction
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.block.state.BlockState
@@ -21,6 +19,7 @@ import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.registerPacketListener
+import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTask
@@ -133,16 +132,17 @@ object HitboxManager : Listener, PacketListener {
         
         runTask {
             val player = event.player
-            when (val action = event.action) {
-                ATTACK_ACTION -> hitbox.leftClickHandlers.forEach { it.invoke(player) }
-                is InteractionAtLocationAction -> {
-                    val location = action.location.toVector3f()
-                    hitbox.rightClickHandlers.forEach { it.invoke(player, location) }
-                }
-                
-                else -> Unit // Action.Interact can be ignored as the client always sends both Interact and InteractAtLocation
-            }
+            val location = event.location.toVector3f()
+            hitbox.rightClickHandlers.forEach { it.invoke(player, location) }
         }
+    }
+    
+    @PacketHandler
+    private fun handleEntityAttackPacket(event: ServerboundAttackPacketEvent) {
+        val hitbox = physicalHitboxesById[event.entityId]
+            ?: return
+        event.isCancelled = true
+        runTask { hitbox.leftClickHandlers.forEach { it(event.player) } }
     }
     
     @EventHandler(priority = EventPriority.LOWEST)

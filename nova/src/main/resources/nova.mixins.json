@@ -25,14 +25,8 @@
     "chunk.scheduling.NewChunkHolderMixin",
     "event.prevention.PaperPluginManagerImplMixin",
     "fakeplayer.LivingEntityMixin",
-    "item.consistentinteractloop.ServerGamePacketListenerHandleInteractAnonymousHandlerMixin",
-    "item.consistentinteractloop.ServerGamePacketListenerImplMixin",
     "item.consistentuseloop.ServerGamePacketListenerImplMixin",
     "item.data.ItemStackMixin",
-    "item.dyeable.ArmorDyeRecipeMixin",
-    "item.dyeable.CauldronInteractionMixin",
-    "item.dyeable.DyedItemColorMixin",
-    "item.dyeable.VillagerTradesDyedArmorForEmeraldsMixin",
     "item.enchantment.EnchantmentMixin",
     "item.fuel.FuelValuesMixin",
     "item.recipe.customrecipechoice.CraftRecipeMixin",
@@ -47,7 +41,6 @@
     "item.repair.RepairItemRecipeMixin",
     "item.tool.CraftBlockMixin",
     "item.tool.PlayerMixin",
-    "item.use.ItemStackMixin",
     "item.use.PlayerMixin",
     "item.use.ServerPlayerGameModeMixin",
     "item.using.ItemMixin",
@@ -57,6 +50,7 @@
     "packet.handler.PlayerListMixin",
     "registry.events.BuiltInRegistriesMixin",
     "registry.events.RegistryDataLoaderMixin",
+    "registry.events.ResourceManagerRegistryLoadTaskMixin",
     "registry.events.TagLoaderMixin",
     "registry.injectwrapperblock.DefaultMappedRegistryMixin",
     "registry.injectwrapperblock.RegistryFileCodecMixin",
@@ -65,7 +59,9 @@
     "world.LevelChunkSectionMixin",
     "world.generation.ruletest.OreFeatureMixin",
     "world.generation.ruletest.ReplaceBlockFeatureMixin",
-    "world.generation.ruletest.RuleProcessorMixin"
+    "world.generation.ruletest.RuleProcessorMixin",
+    "worldmigration.DimensionStorageFileFixMixin",
+    "worldmigration.WorldMigrationSupportMixin"
   ],
   "mixinextras": {
     "minVersion": "0.5.0"

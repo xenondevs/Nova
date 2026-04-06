@@ -49,8 +49,13 @@ origami {
     librariesDirectory = "lib"
 }
 
+val mcVersion = libs.versions.paper.map { 
+    val versionRegex = Regex("""(\d+\.\d+(?:\.\d+)?).*""")
+    versionRegex.matchEntire(it)!!.groupValues[1]
+}
+
 loaderJar {
-    gameVersion = libs.versions.paper.get().substringBefore('-')
+    gameVersion = mcVersion
     novaInput = tasks.named<Jar>("origamiJar").flatMap { it.archiveFile }
     input.from(
         project.provider { project(":nova-api").tasks.named<Jar>("jar").map { it.archiveFile } } ,
@@ -74,7 +79,7 @@ tasks {
         }
     }
     test {
-        environment("MINECRAFT_VERSION", libs.versions.paper.get().substringBefore("-R0.1-SNAPSHOT"))
+        environment("MINECRAFT_VERSION", mcVersion)
     }
 }
 
@@ -94,12 +99,11 @@ pluginPublish {
     file = tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output }
     githubRepository = "xenondevs/Nova"
     discord()
-    val gameVersion = libs.versions.paper.get().substringBefore('-')
     hangar("Nova") {
-        gameVersions(gameVersion)
+        gameVersions(mcVersion.get())
     }
     modrinth("yCVqpwUy") {
-        gameVersions(gameVersion)
+        gameVersions(mcVersion.get())
         incompatibleDependency("z4HZZnLr") // FastAsyncWorldEdit
     }
 }

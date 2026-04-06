@@ -223,19 +223,19 @@ fun ParticleBuilder<SculkChargeParticleOptions>.sculkCharge(roll: Float) = optio
 }
 
 fun ParticleBuilder<ItemParticleOption>.item(itemStack: ItemStack) = options {
-    ItemParticleOption(it, itemStack.unwrap().copy())
+    ItemParticleOption(it, itemStack.unwrap().item)
 }
 
 fun ParticleBuilder<ItemParticleOption>.item(itemStack: MojangStack) = options {
-    ItemParticleOption(it, itemStack)
+    ItemParticleOption(it, itemStack.item)
 }
 
 fun ParticleBuilder<ItemParticleOption>.item(material: Material) = options {
-    ItemParticleOption(it, MojangStack(CraftMagicNumbers.getItem(material)))
+    ItemParticleOption(it, CraftMagicNumbers.getItem(material))
 }
 
 fun ParticleBuilder<ItemParticleOption>.item(item: Item) = options {
-    ItemParticleOption(it, MojangStack(item))
+    ItemParticleOption(it, item)
 }
 
 fun ParticleBuilder<VibrationParticleOption>.vibration(destination: Entity, ticks: Int, yOffset: Float = 0f) = options {

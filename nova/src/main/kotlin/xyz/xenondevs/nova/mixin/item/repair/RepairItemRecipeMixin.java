@@ -18,7 +18,7 @@ abstract class RepairItemRecipeMixin {
         method = "canCombine",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/item/ItemStack;is(Lnet/minecraft/world/item/Item;)Z"
+            target = "Lnet/minecraft/world/item/ItemStack;is(Ljava/lang/Object;)Z"
         )
     )
     private static boolean sameType(
@@ -34,13 +34,16 @@ abstract class RepairItemRecipeMixin {
     }
     
     @Redirect(
-        method = "assemble(Lnet/minecraft/world/item/crafting/CraftingInput;Lnet/minecraft/core/HolderLookup$Provider;)Lnet/minecraft/world/item/ItemStack;",
+        method = "assemble(Lnet/minecraft/world/item/crafting/CraftingInput;)Lnet/minecraft/world/item/ItemStack;",
         at = @At(
             value = "NEW",
             target = "net/minecraft/world/item/ItemStack"
         )
     )
-    private ItemStack newItemStack(ItemLike item, @Local(ordinal = 0) ItemStack template) {
+    private ItemStack newItemStack(
+        ItemLike item,
+        @Local(name = "first") ItemStack template
+    ) {
         var novaItem = ItemUtilsKt.getNovaItem(template);
         if (novaItem != null)
             return CraftItemStack.unwrap(novaItem.createItemStack(1));

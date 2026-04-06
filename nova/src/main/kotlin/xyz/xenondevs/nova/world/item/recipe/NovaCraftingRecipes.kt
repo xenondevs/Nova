@@ -1,11 +1,13 @@
 package xyz.xenondevs.nova.world.item.recipe
 
-import net.minecraft.core.HolderLookup
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.item.crafting.BlastingRecipe
 import net.minecraft.world.item.crafting.CampfireCookingRecipe
 import net.minecraft.world.item.crafting.CraftingInput
+import net.minecraft.world.item.crafting.CraftingRecipe
 import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapedRecipePattern
 import net.minecraft.world.item.crafting.ShapelessRecipe
@@ -15,7 +17,6 @@ import net.minecraft.world.item.crafting.SmithingRecipeInput
 import net.minecraft.world.item.crafting.SmithingTransformRecipe
 import net.minecraft.world.item.crafting.SmokingRecipe
 import net.minecraft.world.item.crafting.StonecutterRecipe
-import net.minecraft.world.item.crafting.TransmuteResult
 import net.minecraft.world.level.Level
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.RecipeChoice
@@ -24,6 +25,7 @@ import xyz.xenondevs.commons.collections.removeFirstWhere
 import xyz.xenondevs.nova.util.data.nmsCategory
 import xyz.xenondevs.nova.util.data.toNmsIngredient
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.toNmsTemplate
 import xyz.xenondevs.nova.util.unwrap
 import java.util.*
 import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
@@ -39,11 +41,11 @@ import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
 internal class NovaShapedRecipe private constructor(
     private val bukkitRecipe: BukkitShapedRecipe,
     pattern: ShapedRecipePattern,
-    result: ItemStack,
+    result: ItemStackTemplate,
     val choiceMatrix: Array<Array<RecipeChoice?>>
 ) : ShapedRecipe(
-    bukkitRecipe.group,
-    bukkitRecipe.category.nmsCategory,
+    Recipe.CommonInfo(true),
+    CraftingRecipe.CraftingBookInfo(bukkitRecipe.category.nmsCategory, bukkitRecipe.group),
     pattern, result
 ) {
     
@@ -107,7 +109,7 @@ internal class NovaShapedRecipe private constructor(
                     ingredients,
                     Optional.empty()
                 ),
-                recipe.result.unwrap().copy(),
+                recipe.result.toNmsTemplate(),
                 choiceMatrix
             )
         }
@@ -136,9 +138,9 @@ internal class NovaShapedRecipe private constructor(
 }
 
 internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : ShapelessRecipe(
-    bukkitRecipe.group,
-    bukkitRecipe.category.nmsCategory,
-    bukkitRecipe.result.unwrap().copy(),
+    Recipe.CommonInfo(true),
+    CraftingRecipe.CraftingBookInfo(bukkitRecipe.category.nmsCategory, bukkitRecipe.group),
+    bukkitRecipe.result.toNmsTemplate(),
     bukkitRecipe.choiceList.map { it.toNmsIngredient() }
 ) {
     
@@ -160,10 +162,10 @@ internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessReci
 }
 
 internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) : SmeltingRecipe(
-    bukkitRecipe.group,
-    bukkitRecipe.category.nmsCategory,
+    Recipe.CommonInfo(true),
+    CookingBookInfo(bukkitRecipe.category.nmsCategory, bukkitRecipe.group),
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.unwrap().copy(),
+    bukkitRecipe.result.toNmsTemplate(),
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {
@@ -179,10 +181,10 @@ internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) 
 }
 
 internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRecipe) : BlastingRecipe(
-    bukkitRecipe.group,
-    bukkitRecipe.category.nmsCategory,
+    Recipe.CommonInfo(true),
+    CookingBookInfo(bukkitRecipe.category.nmsCategory, bukkitRecipe.group),
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.unwrap().copy(),
+    bukkitRecipe.result.toNmsTemplate(),
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {
@@ -198,10 +200,10 @@ internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRe
 }
 
 internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) : SmokingRecipe(
-    bukkitRecipe.group,
-    bukkitRecipe.category.nmsCategory,
+    Recipe.CommonInfo(true),
+    CookingBookInfo(bukkitRecipe.category.nmsCategory, bukkitRecipe.group),
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.unwrap().copy(),
+    bukkitRecipe.result.toNmsTemplate(),
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {
@@ -217,10 +219,10 @@ internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) :
 }
 
 internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe) : CampfireCookingRecipe(
-    bukkitRecipe.group,
-    bukkitRecipe.category.nmsCategory,
+    Recipe.CommonInfo(true),
+    CookingBookInfo(bukkitRecipe.category.nmsCategory, bukkitRecipe.group),
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.unwrap().copy(),
+    bukkitRecipe.result.toNmsTemplate(),
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {
@@ -236,9 +238,9 @@ internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe
 }
 
 internal class NovaStonecutterRecipe(private val bukkitRecipe: BukkitStonecuttingRecipe) : StonecutterRecipe(
-    bukkitRecipe.group,
+    Recipe.CommonInfo(true),
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.unwrap().copy()
+    bukkitRecipe.result.toNmsTemplate()
 ) {
     
     private val choice = bukkitRecipe.inputChoice
@@ -252,10 +254,11 @@ internal class NovaStonecutterRecipe(private val bukkitRecipe: BukkitStonecuttin
 }
 
 internal class NovaSmithingTransformRecipe(private val bukkitRecipe: BukkitSmithingTransformRecipe) : SmithingTransformRecipe(
+    Recipe.CommonInfo(true),
     Optional.of(bukkitRecipe.template.toNmsIngredient()),
     bukkitRecipe.base.toNmsIngredient(),
     Optional.of(bukkitRecipe.addition.toNmsIngredient()),
-    TransmuteResult(bukkitRecipe.result.unwrap().itemHolder, bukkitRecipe.result.amount, bukkitRecipe.result.unwrap().componentsPatch)
+    bukkitRecipe.result.toNmsTemplate()
 ) {
     
     private val templateChoice = bukkitRecipe.template
@@ -268,10 +271,10 @@ internal class NovaSmithingTransformRecipe(private val bukkitRecipe: BukkitSmith
             && additionChoice.test(input.getItem(2).asBukkitMirror())
     }
     
-    override fun assemble(input: SmithingRecipeInput, lookup: HolderLookup.Provider): ItemStack {
+    override fun assemble(input: SmithingRecipeInput): ItemStack {
         val recipeResult = bukkitRecipe.result.unwrap()
         val mergedPatch = ItemUtils.mergeDataComponentPatches(listOf(input.base.componentsPatch, recipeResult.componentsPatch)) // recipeResult overrides input
-        return ItemStack(recipeResult.itemHolder, recipeResult.count, mergedPatch)
+        return ItemStack(recipeResult.typeHolder(), recipeResult.count, mergedPatch)
     }
     
     override fun toBukkitRecipe(id: NamespacedKey): BukkitRecipe = bukkitRecipe

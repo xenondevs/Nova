@@ -8,7 +8,7 @@ import xyz.xenondevs.nova.util.intValue
 
 // The base of the number system - i.e. how many values each property can have
 private const val NOTE_BASE = 25
-private const val INSTRUMENT_BASE = 23
+private const val INSTRUMENT_BASE = 27
 private const val POWERED_BASE = 2
 
 internal data class NoteBackingStateConfig(
@@ -35,7 +35,7 @@ internal data class NoteBackingStateConfig(
         require(note in 0..24)
     }
     
-    companion object : DynamicDefaultingBackingStateConfigType<NoteBackingStateConfig>(1149, "note_block") {
+    companion object : DynamicDefaultingBackingStateConfigType<NoteBackingStateConfig>(2024, "note_block") {
         
         override val properties = hashSetOf("instrument", "note", "powered")
         override val isWaterloggable = false

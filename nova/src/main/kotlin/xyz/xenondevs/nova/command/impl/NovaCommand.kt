@@ -467,18 +467,18 @@ internal object NovaCommand : Command() {
                         
                         val modelComponents = info.models.map { model ->
                             val transform = Transformation(Matrix4f(model.transform))
-                            val leftRotation = transform.leftRotation.getEulerAnglesXYZ(Vector3f())
+                            val leftRotation = transform.leftRotation().getEulerAnglesXYZ(Vector3f())
                                 .mul(1 / Math.PI.toFloat() * 180f).toString(format)
-                            val rightRotation = transform.rightRotation.getEulerAnglesXYZ(Vector3f())
+                            val rightRotation = transform.rightRotation().getEulerAnglesXYZ(Vector3f())
                                 .mul(1 / Math.PI.toFloat() * 180f).toString(format)
                             
                             Component.translatable(
                                 "command.nova.show_block_model_data.display_entity.model",
                                 NamedTextColor.GRAY,
                                 Component.text(model.model.toString(), NamedTextColor.AQUA),
-                                Component.text(Vector3f(transform.translation).toString(format), NamedTextColor.AQUA),
+                                Component.text(Vector3f(transform.translation()).toString(format), NamedTextColor.AQUA),
                                 Component.text(leftRotation, NamedTextColor.AQUA),
-                                Component.text(Vector3f(transform.scale).toString(format), NamedTextColor.AQUA),
+                                Component.text(Vector3f(transform.scale()).toString(format), NamedTextColor.AQUA),
                                 Component.text(rightRotation, NamedTextColor.AQUA)
                             )
                         }

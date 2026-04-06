@@ -1,5 +1,6 @@
 package xyz.xenondevs.nova.world.item.legacy
 
+import net.minecraft.core.component.DataComponentGetter
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponents
 import xyz.xenondevs.nova.config.MAIN_CONFIG
@@ -30,13 +31,11 @@ internal object ItemStackLegacyConversion {
     
     @Suppress("DEPRECATION")
     @JvmStatic
-    fun convert(patch: DataComponentPatch): DataComponentPatch {
+    fun convert(prototype: DataComponentGetter, patch: DataComponentPatch): DataComponentPatch {
         if (!ENABLED)
             return patch
         
-        val unsafeCustomTag = patch.get(DataComponents.CUSTOM_DATA)
-            ?.getOrNull()
-            ?.unsafe
+        val unsafeCustomTag = patch.get(prototype, DataComponents.CUSTOM_DATA)?.unsafe
             ?: return patch // not a nova item
         
         val novaId = unsafeCustomTag

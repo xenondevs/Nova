@@ -3,7 +3,7 @@ package xyz.xenondevs.nova.network.event.serverbound
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import net.minecraft.network.HashedStack
 import net.minecraft.network.protocol.game.ServerboundContainerClickPacket
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.network.event.PlayerPacketEvent
 
@@ -42,14 +42,14 @@ class ServerboundContainerClickPacketEvent(
             field = value
             changed = true
         }
-    var clickType: ClickType = packet.clickType
+    var containerInput: ContainerInput = packet.containerInput
         set(value) {
             field = value
             changed = true
         }
     
     override fun buildChangedPacket(): ServerboundContainerClickPacket {
-        return ServerboundContainerClickPacket(containerId, stateId, slotNum.toShort(), buttonNum.toByte(), clickType, changedSlots, carriedItem)
+        return ServerboundContainerClickPacket(containerId, stateId, slotNum.toShort(), buttonNum.toByte(), containerInput, changedSlots, carriedItem)
     }
     
 }

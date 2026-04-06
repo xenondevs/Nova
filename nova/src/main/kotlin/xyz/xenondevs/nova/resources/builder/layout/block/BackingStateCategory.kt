@@ -37,7 +37,7 @@ enum class BackingStateCategory(
     /**
      * The block model uses note block states.
      *
-     * - Limited to 1149 different models
+     * - Limited to 2024 different models
      * - Models cannot be transparent
      * - Full block hitbox
      * - Full block collider
@@ -66,7 +66,7 @@ enum class BackingStateCategory(
     /**
      * The block model uses leave block states.
      *
-     * - Limited to 143 different models
+     * - Limited to 153 different models
      * - Models can be transparent, translucent textures are disabled on "fancy" graphics setting
      * - Full block hitbox
      * - Full block collider

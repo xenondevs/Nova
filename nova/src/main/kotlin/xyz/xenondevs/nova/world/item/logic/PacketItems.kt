@@ -23,6 +23,7 @@ import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.resources.RegistryOps
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.item.component.BundleContents
@@ -81,6 +82,7 @@ import xyz.xenondevs.nova.util.item.unsafeNovaTag
 import xyz.xenondevs.nova.util.item.update
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverPlayer
+import xyz.xenondevs.nova.util.toTemplate
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
 import java.util.*
@@ -198,11 +200,11 @@ internal object PacketItems : Listener, PacketListener {
             newOffers += MerchantOffer(
                 offer.baseCostA.itemStack.let {
                     val stackA = getClientSideStack(event.player, it)
-                    ItemCost(stackA.itemHolder, stackA.count, DataComponentExactPredicate.EMPTY, stackA)
+                    ItemCost(stackA.typeHolder(), stackA.count, DataComponentExactPredicate.EMPTY, stackA)
                 },
                 offer.costB.map {
                     val stackB = getClientSideStack(event.player, it.itemStack)
-                    ItemCost(stackB.itemHolder, stackB.count, DataComponentExactPredicate.EMPTY, stackB)
+                    ItemCost(stackB.typeHolder(), stackB.count, DataComponentExactPredicate.EMPTY, stackB)
                 }, 
                 getClientSideStack(event.player, offer.result),
                 offer.uses,
@@ -298,7 +300,7 @@ internal object PacketItems : Listener, PacketListener {
         )
         
         is SlotDisplay.ItemStackSlotDisplay -> SlotDisplay.ItemStackSlotDisplay(
-            getClientSideNovaStack(null, display.stack, false)
+            ItemStackTemplate.fromNonEmptyStack(getClientSideNovaStack(null, display.stack.create(), false))
         )
         
         is SlotDisplay.SmithingTrimDemoSlotDisplay -> SlotDisplay.SmithingTrimDemoSlotDisplay(
@@ -506,11 +508,7 @@ internal object PacketItems : Listener, PacketListener {
             return false
         
         itemStack.update(DataComponents.BUNDLE_CONTENTS) { bundleContents ->
-            BundleContents(
-                bundleContents.items().map { getClientSideStack(player, it, false) },
-                Fraction.getFraction(0.0),
-                bundleContents.selectedItem
-            )
+            BundleContents(bundleContents.items().map { getClientSideStack(player, it.create(), false).toTemplate() })
         }
         
         return true
@@ -559,10 +557,10 @@ internal object PacketItems : Listener, PacketListener {
         val serversideComponents = decodeComponents(serversideTag)
         
         // use server-side item for all Nova items, otherwise keep current item
-        val serversideCustomData = serversideComponents.get(DataComponents.CUSTOM_DATA)?.orElse(null)
+        val serversideCustomData = serversideComponents.get(itemStack, DataComponents.CUSTOM_DATA)
         val item = if (serversideCustomData?.unsafe?.getCompoundOrNull("nova") != null)
             SERVER_SIDE_ITEM_HOLDER
-        else itemStack.itemHolder
+        else itemStack.typeHolder()
         
         return MojangStack(item, itemStack.count, serversideComponents)
     }
