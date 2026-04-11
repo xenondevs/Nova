@@ -5,7 +5,7 @@ plugins {
     id("nova.detekt-conventions")
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
-    alias(origamiLibs.plugins.origami)
+    id("nova.origami-conventions")
     alias(libs.plugins.pluginPublish)
     id("xyz.xenondevs.bundler-jar-plugin")
 }
@@ -57,9 +57,6 @@ kotlin.sourceSets.main {
 }
 
 origami {
-    paperDevBundle(libs.versions.paper.get())
-    librariesDirectory = "lib"
-    
     runServer {
         workingDirectory.set(layout.dir(providers.gradleProperty("serverDir").map(::File)))
         plugins.from(tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output })
@@ -135,8 +132,7 @@ pluginPublish {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
+        named<MavenPublication>("maven") {
             artifact(tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output }) {
                 classifier = "loader"
                 extension = "jar"

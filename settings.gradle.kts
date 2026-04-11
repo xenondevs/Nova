@@ -46,6 +46,7 @@ dependencyResolutionManagement {
 }
 
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
         mavenCentral()
