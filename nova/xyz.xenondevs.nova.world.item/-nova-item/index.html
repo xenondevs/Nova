@@ -18,7 +18,6 @@
         }
       }
     </script>
-<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
 <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
 <link href="../../../styles/style.css" rel="Stylesheet">
 <link href="../../../styles/main.css" rel="Stylesheet">
@@ -35,11 +34,11 @@
 <div class="root">
     <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
 <a class="library-name--link" href="../../../index.html" tabindex="1">
-                    nova-parent
+                    nova
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">0.22.3
+        <div class="library-version" id="library-version">0.23.0-alpha.1
         </div>
         <div class="navigation-controls">
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
@@ -77,7 +76,7 @@
                 <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
                     <div class="dropdown--header">
                             <span>
-                                    nova-parent
+                                    nova
                             </span>
                         <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
                             <i class="ui-kit-icon ui-kit-icon_cross"></i>
@@ -94,7 +93,7 @@
   <div class="breadcrumbs"><a href="../../index.html">nova</a><span class="delimiter">/</span><a href="../index.html">xyz.xenondevs.nova.world.item</a><span class="delimiter">/</span><span class="current">NovaItem</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Nova</span><wbr><span><span>Item</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">NovaItem</a></div><p class="paragraph">Represents an item type in Nova.</p></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">NovaItem</a></div><p class="paragraph">Represents a custom Nova item type.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
@@ -374,7 +373,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior.html"><span class="token function">getBehavior</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior.html">T</a></div><div class="brief "><p class="paragraph">Gets the first <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> that is an instance of <a href="get-behavior.html">T</a>, or throws an <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-illegal-state-exception/index.html">IllegalStateException</a> if there is none.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior.html"><span class="token function">getBehavior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">behavior<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Class.html">Class</a><span class="token operator">&lt;</span><a href="get-behavior.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior.html">T</a></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior.html"><span class="token function">getBehavior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">behavior<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><a href="get-behavior.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior.html">T</a></div><div class="brief "><p class="paragraph">Gets the first <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> that is an instance of <a href="get-behavior.html">behavior</a>, or throws an <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-illegal-state-exception/index.html">IllegalStateException</a> if there is none.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior.html"><span class="token function">getBehavior</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior.html">T</a></div><div class="brief "><p class="paragraph">Gets the first <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> that is an instance of <a href="get-behavior.html">T</a>, or throws an <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-illegal-state-exception/index.html">IllegalStateException</a> if there is none.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior.html"><span class="token function">getBehavior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">behavior<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html">Class</a><span class="token operator">&lt;</span><a href="get-behavior.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior.html">T</a></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior.html"><span class="token function">getBehavior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">behavior<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><a href="get-behavior.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior.html">T</a></div><div class="brief "><p class="paragraph">Gets the first <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> that is an instance of <a href="get-behavior.html">behavior</a>, or throws an <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-illegal-state-exception/index.html">IllegalStateException</a> if there is none.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -389,7 +388,232 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior-or-null.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior-or-null.html"><span class="token function">getBehaviorOrNull</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior-or-null.html">T</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets the first <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> that is an instance of <a href="get-behavior-or-null.html">T</a>, or null if there is none.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior-or-null.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior-or-null.html"><span class="token function">getBehaviorOrNull</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Class.html">Class</a><span class="token operator">&lt;</span><a href="get-behavior-or-null.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior-or-null.html">T</a><span class="token operator">?</span></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior-or-null.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior-or-null.html"><span class="token function">getBehaviorOrNull</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><a href="get-behavior-or-null.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior-or-null.html">T</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets the first <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> that is an instance of <a href="get-behavior-or-null.html">type</a> or a subclass, or null if there is none.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior-or-null.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior-or-null.html"><span class="token function">getBehaviorOrNull</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior-or-null.html">T</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets the first <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> that is an instance of <a href="get-behavior-or-null.html">T</a>, or null if there is none.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior-or-null.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior-or-null.html"><span class="token function">getBehaviorOrNull</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html">Class</a><span class="token operator">&lt;</span><a href="get-behavior-or-null.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior-or-null.html">T</a><span class="token operator">?</span></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get-behavior-or-null.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="get-behavior-or-null.html"><span class="token function">getBehaviorOrNull</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><a href="get-behavior-or-null.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get-behavior-or-null.html">T</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Gets the first <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> that is an instance of <a href="get-behavior-or-null.html">type</a> or a subclass, or null if there is none.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-914833326%2FFunctions%2F-501115348" anchor-label="handleAttackEntity" id="-914833326%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-attack-entity.html"><span>handle</span><wbr><span>Attack</span><wbr><span><span>Entity</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-914833326%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-attack-entity.html"><span class="token function">handleAttackEntity</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">attacked<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Entity///PointingToDeclaration/">Entity</span><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="org.bukkit.event.entity/EntityDamageByEntityEvent///PointingToDeclaration/">EntityDamageByEntityEvent</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles <a href="handle-attack-entity.html">event</a> where <a href="handle-attack-entity.html">player</a> attacks <a href="handle-attack-entity.html">attacked</a> using <a href="handle-attack-entity.html">itemStack</a> with this <a href="index.html">NovaItem</a> in their main hand.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1457582989%2FFunctions%2F-501115348" anchor-label="handleBlockBreakAction" id="-1457582989%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-block-break-action.html"><span>handle</span><wbr><span>Block</span><wbr><span>Break</span><wbr><span><span>Action</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1457582989%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-block-break-action.html"><span class="token function">handleBlockBreakAction</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.block.event/-block-break-action-event/index.html">BlockBreakActionEvent</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles <a href="handle-block-break-action.html">event</a> where <a href="handle-block-break-action.html">player</a> performs a block break action using <a href="handle-block-break-action.html">itemStack</a> with this <a href="index.html">NovaItem</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-217502520%2FFunctions%2F-501115348" anchor-label="handleBreak" id="-217502520%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-break.html"><span>handle</span><wbr><span><span>Break</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-217502520%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-break.html"><span class="token function">handleBreak</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="org.bukkit.event.player/PlayerItemBreakEvent///PointingToDeclaration/">PlayerItemBreakEvent</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles <a href="handle-break.html">event</a> where <a href="handle-break.html">player</a> breaks <a href="handle-break.html">itemStack</a> with this <a href="index.html">NovaItem</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-959431164%2FFunctions%2F-501115348" anchor-label="handleBreakBlock" id="-959431164%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-break-block.html"><span>handle</span><wbr><span>Break</span><wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-959431164%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-break-block.html"><span class="token function">handleBreakBlock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="org.bukkit.event.block/BlockBreakEvent///PointingToDeclaration/">BlockBreakEvent</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles <a href="handle-break-block.html">event</a> where <a href="handle-break-block.html">player</a> breaks a block using <a href="handle-break-block.html">itemStack</a> with this <a href="index.html">NovaItem</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="421649896%2FFunctions%2F-501115348" anchor-label="handleConsume" id="421649896%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-consume.html"><span>handle</span><wbr><span><span>Consume</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="421649896%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-consume.html"><span class="token function">handleConsume</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="org.bukkit.event.player/PlayerItemConsumeEvent///PointingToDeclaration/">PlayerItemConsumeEvent</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles <a href="handle-consume.html">event</a> where <a href="handle-consume.html">player</a> consumes <a href="handle-consume.html">itemStack</a> with this <a href="index.html">NovaItem</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1459671922%2FFunctions%2F-501115348" anchor-label="handleDamage" id="-1459671922%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-damage.html"><span>handle</span><wbr><span><span>Damage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1459671922%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-damage.html"><span class="token function">handleDamage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="org.bukkit.event.player/PlayerItemDamageEvent///PointingToDeclaration/">PlayerItemDamageEvent</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles <a href="handle-damage.html">event</a> where <a href="handle-damage.html">player</a> damages <a href="handle-damage.html">itemStack</a> with this <a href="index.html">NovaItem</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-736565998%2FFunctions%2F-501115348" anchor-label="handleEquip" id="-736565998%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-equip.html"><span>handle</span><wbr><span><span>Equip</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-736565998%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-equip.html"><span class="token function">handleEquip</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">slot<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/EquipmentSlot///PointingToDeclaration/">EquipmentSlot</span><span class="token punctuation">, </span></span><span class="parameter ">equipped<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="io.papermc.paper.event.entity/EntityEquipmentChangedEvent///PointingToDeclaration/">EntityEquipmentChangedEvent</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles <a href="handle-equip.html">event</a> where <a href="handle-equip.html">player</a> equips or unequips (<a href="handle-equip.html">equipped</a>) <a href="handle-equip.html">itemStack</a> with this <a href="index.html">NovaItem</a> in <a href="handle-equip.html">slot</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1670019402%2FFunctions%2F-501115348" anchor-label="handleEquipmentTick" id="1670019402%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-equipment-tick.html"><span>handle</span><wbr><span>Equipment</span><wbr><span><span>Tick</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1670019402%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-equipment-tick.html"><span class="token function">handleEquipmentTick</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">slot<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/EquipmentSlot///PointingToDeclaration/">EquipmentSlot</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles an equipment tick for <a href="handle-equipment-tick.html">player</a> with <a href="handle-equipment-tick.html">itemStack</a> with this <a href="index.html">NovaItem</a> in <a href="handle-equipment-tick.html">slot</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="259076465%2FFunctions%2F-501115348" anchor-label="handleInventoryClick" id="259076465%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-inventory-click.html"><span>handle</span><wbr><span>Inventory</span><wbr><span><span>Click</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="259076465%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-inventory-click.html"><span class="token function">handleInventoryClick</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="org.bukkit.event.inventory/InventoryClickEvent///PointingToDeclaration/">InventoryClickEvent</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles <a href="handle-inventory-click.html">event</a> where <a href="handle-inventory-click.html">player</a> clicks on <a href="handle-inventory-click.html">itemStack</a> with this <a href="index.html">NovaItem</a> in an inventory.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-975369828%2FFunctions%2F-501115348" anchor-label="handleInventoryClickOnCursor" id="-975369828%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-inventory-click-on-cursor.html"><span>handle</span><wbr><span>Inventory</span><wbr><span>Click</span><wbr><span>On</span><wbr><span><span>Cursor</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-975369828%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-inventory-click-on-cursor.html"><span class="token function">handleInventoryClickOnCursor</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="org.bukkit.event.inventory/InventoryClickEvent///PointingToDeclaration/">InventoryClickEvent</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles <a href="handle-inventory-click-on-cursor.html">event</a> where <a href="handle-inventory-click-on-cursor.html">player</a> clicks on a slot with <a href="handle-inventory-click-on-cursor.html">itemStack</a> with this <a href="index.html">NovaItem</a> on their cursor.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1175501422%2FFunctions%2F-501115348" anchor-label="handleInventoryHotbarSwap" id="-1175501422%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-inventory-hotbar-swap.html"><span>handle</span><wbr><span>Inventory</span><wbr><span>Hotbar</span><wbr><span><span>Swap</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1175501422%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-inventory-hotbar-swap.html"><span class="token function">handleInventoryHotbarSwap</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">event<span class="token operator">: </span><span data-unresolved-link="org.bukkit.event.inventory/InventoryClickEvent///PointingToDeclaration/">InventoryClickEvent</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles <a href="handle-inventory-hotbar-swap.html">event</a> where <a href="handle-inventory-hotbar-swap.html">player</a> swaps <a href="handle-inventory-hotbar-swap.html">itemStack</a> with this <a href="index.html">NovaItem</a> via hotbar swap.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1267190578%2FFunctions%2F-501115348" anchor-label="handleInventoryTick" id="-1267190578%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-inventory-tick.html"><span>handle</span><wbr><span>Inventory</span><wbr><span><span>Tick</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1267190578%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-inventory-tick.html"><span class="token function">handleInventoryTick</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">slot<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles an inventory tick for <a href="handle-inventory-tick.html">player</a> with <a href="handle-inventory-tick.html">itemStack</a> with this <a href="index.html">NovaItem</a> in <a href="handle-inventory-tick.html">slot</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2058994705%2FFunctions%2F-501115348" anchor-label="handleUseFinished" id="2058994705%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-use-finished.html"><span>handle</span><wbr><span>Use</span><wbr><span><span>Finished</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2058994705%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-use-finished.html"><span class="token function">handleUseFinished</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entity<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/LivingEntity///PointingToDeclaration/">LivingEntity</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">hand<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/EquipmentSlot///PointingToDeclaration/">EquipmentSlot</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-item-action/index.html">ItemAction</a></div><div class="brief "><p class="paragraph">Handles the use of <a href="handle-use-finished.html">itemStack</a> with this <a href="index.html">NovaItem</a> finishing for <a href="handle-use-finished.html">entity</a> in <a href="handle-use-finished.html">hand</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1397693475%2FFunctions%2F-501115348" anchor-label="handleUseStopped" id="1397693475%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-use-stopped.html"><span>handle</span><wbr><span>Use</span><wbr><span><span>Stopped</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1397693475%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-use-stopped.html"><span class="token function">handleUseStopped</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entity<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/LivingEntity///PointingToDeclaration/">LivingEntity</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">hand<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/EquipmentSlot///PointingToDeclaration/">EquipmentSlot</span><span class="token punctuation">, </span></span><span class="parameter ">remainingUseTicks<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles the use of <a href="handle-use-stopped.html">itemStack</a> with this <a href="index.html">NovaItem</a> being stopped for <a href="handle-use-stopped.html">entity</a> in <a href="handle-use-stopped.html">hand</a> and <a href="handle-use-stopped.html">remainingUseTicks</a> left.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="712912806%2FFunctions%2F-501115348" anchor-label="handleUseTick" id="712912806%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="handle-use-tick.html"><span>handle</span><wbr><span>Use</span><wbr><span><span>Tick</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="712912806%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="handle-use-tick.html"><span class="token function">handleUseTick</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entity<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/LivingEntity///PointingToDeclaration/">LivingEntity</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">hand<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/EquipmentSlot///PointingToDeclaration/">EquipmentSlot</span><span class="token punctuation">, </span></span><span class="parameter ">passedUseTicks<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">remainingUseTicks<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Handles a use tick for <a href="handle-use-tick.html">entity</a> with <a href="handle-use-tick.html">itemStack</a> with this <a href="index.html">NovaItem</a> in <a href="handle-use-tick.html">hand</a> with <a href="handle-use-tick.html">passedUseTicks</a> passed and <a href="handle-use-tick.html">remainingUseTicks</a> remaining.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -404,7 +628,67 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="has-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="has-behavior.html"><span class="token function">hasBehavior</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether this <a href="index.html">NovaItem</a> has an <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> of the reified type <a href="has-behavior.html">T</a>, or a subclass of it.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="has-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="has-behavior.html"><span class="token function">hasBehavior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Class.html">Class</a><span class="token operator">&lt;</span><a href="has-behavior.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="has-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="has-behavior.html"><span class="token function">hasBehavior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><a href="has-behavior.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether this <a href="index.html">NovaItem</a> has an <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> of the specified class <a href="has-behavior.html">type</a>, or a subclass of it.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="has-behavior.html"><span class="token function">hasBehavior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">behavior<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether this <a href="index.html">NovaItem</a> has the specific <a href="has-behavior.html">behavior</a> instance.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="has-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="has-behavior.html"><span class="token function">hasBehavior</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether this <a href="index.html">NovaItem</a> has an <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> of the reified type <a href="has-behavior.html">T</a>, or a subclass of it.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="has-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="has-behavior.html"><span class="token function">hasBehavior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Class.html">Class</a><span class="token operator">&lt;</span><a href="has-behavior.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="has-behavior.html">T</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">&gt; </span><a href="has-behavior.html"><span class="token function">hasBehavior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><a href="has-behavior.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether this <a href="index.html">NovaItem</a> has an <a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a> of the specified class <a href="has-behavior.html">type</a>, or a subclass of it.</p></div><div class="symbol monospace"><span class="token keyword">fun </span><a href="has-behavior.html"><span class="token function">hasBehavior</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">behavior<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world.item.behavior/-item-behavior/index.html">ItemBehavior</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks whether this <a href="index.html">NovaItem</a> has the specific <a href="has-behavior.html">behavior</a> instance.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="83881662%2FFunctions%2F-501115348" anchor-label="modifyBlockDamage" id="83881662%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="modify-block-damage.html"><span>modify</span><wbr><span>Block</span><wbr><span><span>Damage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="83881662%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="modify-block-damage.html"><span class="token function">modifyBlockDamage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span><span class="token punctuation">, </span></span><span class="parameter ">damage<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></div><div class="brief "><p class="paragraph">Modifies the block <a href="modify-block-damage.html">damage</a> of this <a href="index.html">NovaItem</a> when using <a href="modify-block-damage.html">itemStack</a> to break <a href="modify-block-damage.html">block</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1823754454%2FFunctions%2F-501115348" anchor-label="modifyClientSideItemType" id="1823754454%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="modify-client-side-item-type.html"><span>modify</span><wbr><span>Client</span><wbr><span>Side</span><wbr><span>Item</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1823754454%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="modify-client-side-item-type.html"><span class="token function">modifyClientSideItemType</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">server<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">client<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Material///PointingToDeclaration/">Material</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit/Material///PointingToDeclaration/">Material</span></div><div class="brief "><p class="paragraph">Modifies the client-side item type of this <a href="index.html">NovaItem</a>, in the context that it is sent to <a href="modify-client-side-item-type.html">player</a> and has <a href="modify-client-side-item-type.html">server</a> data.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1968122325%2FFunctions%2F-501115348" anchor-label="modifyClientSideStack" id="-1968122325%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="modify-client-side-stack.html"><span>modify</span><wbr><span>Client</span><wbr><span>Side</span><wbr><span><span>Stack</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1968122325%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="modify-client-side-stack.html"><span class="token function">modifyClientSideStack</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">player<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">server<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">client<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span></div><div class="brief "><p class="paragraph">Modifies the client-side stack of this <a href="index.html">NovaItem</a>, in the context that it is sent to <a href="modify-client-side-stack.html">player</a> and has <span data-unresolved-link="data////PointingToDeclaration/">data</span>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="370538707%2FFunctions%2F-501115348" anchor-label="modifyUseDuration" id="370538707%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="modify-use-duration.html"><span>modify</span><wbr><span>Use</span><wbr><span><span>Duration</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="370538707%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="modify-use-duration.html"><span class="token function">modifyUseDuration</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">entity<span class="token operator">: </span><span data-unresolved-link="org.bukkit.entity/LivingEntity///PointingToDeclaration/">LivingEntity</span><span class="token punctuation">, </span></span><span class="parameter ">itemStack<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">duration<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Modifies the use <a href="modify-use-duration.html">duration</a> of <a href="modify-use-duration.html">itemStack</a> with this <a href="index.html">NovaItem</a> for <a href="modify-use-duration.html">entity</a>.</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -420,6 +704,51 @@
               <div>
                 <div class="title">
                   <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="59437572%2FFunctions%2F-501115348" anchor-label="use" id="59437572%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="use.html"><span><span>use</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="59437572%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="use.html"><span class="token function">use</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.context/-context/index.html">Context</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.context.intention/-item-use/index.html">ItemUse</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-interaction-result/index.html">InteractionResult</a></div><div class="brief "><p class="paragraph">Handles using this <a href="index.html">NovaItem</a> in the given <a href="use.html">ctx</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1054393447%2FFunctions%2F-501115348" anchor-label="useOnBlock" id="-1054393447%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="use-on-block.html"><span>use</span><wbr><span>On</span><wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1054393447%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="use-on-block.html"><span class="token function">useOnBlock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.context/-context/index.html">Context</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.context.intention/-block-interact/index.html">BlockInteract</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-interaction-result/index.html">InteractionResult</a></div><div class="brief "><p class="paragraph">Handles using this <a href="index.html">NovaItem</a> on a block in the given <a href="use-on-block.html">ctx</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="397867795%2FFunctions%2F-501115348" anchor-label="useOnEntity" id="397867795%2FFunctions%2F-501115348" data-filterable-set=":nova/main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":nova/main" data-filterable-set=":nova/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="use-on-entity.html"><span>use</span><wbr><span>On</span><wbr><span><span>Entity</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="397867795%2FFunctions%2F-501115348"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":nova/main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="use-on-entity.html"><span class="token function">useOnEntity</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ctx<span class="token operator">: </span><a href="../../xyz.xenondevs.nova.context/-context/index.html">Context</a><span class="token operator">&lt;</span><a href="../../xyz.xenondevs.nova.context.intention/-entity-interact/index.html">EntityInteract</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../xyz.xenondevs.nova.world/-interaction-result/index.html">InteractionResult</a></div><div class="brief "><p class="paragraph">Handles using this <a href="index.html">NovaItem</a> on an entity in the given <a href="use-on-entity.html">ctx</a>.</p></div></div></div>
                 </div>
               </div>
             </div>

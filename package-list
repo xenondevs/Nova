@@ -9,7 +9,6 @@ xyz.xenondevs.nova.api
 xyz.xenondevs.nova.config
 xyz.xenondevs.nova.context
 xyz.xenondevs.nova.context.intention
-xyz.xenondevs.nova.context.param
 xyz.xenondevs.nova.i18n
 xyz.xenondevs.nova.initialize
 xyz.xenondevs.nova.integration
