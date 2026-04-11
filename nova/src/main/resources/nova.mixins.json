@@ -47,7 +47,6 @@
     "item.using.ItemStackMixin",
     "item.using.ServerGamePacketListenerImplMixin",
     "packet.broadcast.PlayerListMixin",
-    "packet.handler.PlayerListMixin",
     "registry.events.BuiltInRegistriesMixin",
     "registry.events.RegistryDataLoaderMixin",
     "registry.events.ResourceManagerRegistryLoadTaskMixin",

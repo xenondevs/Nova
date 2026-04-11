@@ -124,7 +124,7 @@ internal object PacketItems : Listener, PacketListener {
     
     @PacketHandler
     private fun handleSetCursorPacket(event: ClientboundSetCursorItemPacketEvent) {
-        event.item = getClientSideStack(event.player, event.item.copy())
+        event.contents = getClientSideStack(event.player, event.contents.copy())
     }
     
     @PacketHandler

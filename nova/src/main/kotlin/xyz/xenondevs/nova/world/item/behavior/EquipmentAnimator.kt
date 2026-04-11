@@ -19,7 +19,7 @@ import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
-import xyz.xenondevs.nova.network.ClientboundSetEquipmentPacket
+import xyz.xenondevs.nova.network.packet.ClientboundSetEquipmentPacket
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsEquipmentSlot

@@ -15,7 +15,3 @@ dependencies {
     implementation(libs.commons.collections)
     testImplementation(libs.mockbukkit)
 }
-
-kotlin.sourceSets.main {
-    kotlin.srcDir(project.layout.buildDirectory.dir("generated/ksp/main/kotlin"))
-}

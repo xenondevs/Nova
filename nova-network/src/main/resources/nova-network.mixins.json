@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "xyz.xenondevs.nova.network.mixin",
+  "mixins": [
+    "PlayerListMixin"
+  ],
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  }
+}

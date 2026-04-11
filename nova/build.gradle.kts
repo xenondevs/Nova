@@ -24,9 +24,10 @@ dependencies {
     novaLoaderApi(libs.kotlinx.serialization.json)
     api(origamiLibs.mixin)
     api(origamiLibs.mixinextras)
-    api(project(":nova-registry"))
     api(project(":nova-config"))
-
+    api(project(":nova-registry"))
+    api(project(":nova-network"))
+    
     // internal dependencies
     compileOnly(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
@@ -49,31 +50,26 @@ dependencies {
     testRuntimeOnly(libs.junit.platformLauncher)
 }
 
-// configure java sources location
-sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
-
-kotlin.sourceSets.main {
-    kotlin.srcDir(project.layout.buildDirectory.dir("generated/ksp/main/kotlin"))
-}
-
-val mcVersion = libs.versions.paper.map { 
+val mcVersion = libs.versions.paper.map {
     val versionRegex = Regex("""(\d+\.\d+(?:\.\d+)?).*""")
     versionRegex.matchEntire(it)!!.groupValues[1]
 }
 
+origami {
+    transitiveAccessWidenerSources.from(configurations.named("runtimeClasspath"))
+}
+
 loaderJar {
     gameVersion = mcVersion
-    novaInput = tasks.named<Jar>("origamiJar").flatMap { it.archiveFile }
-    input.from(
-        project.provider { project(":nova-api").tasks.named<Jar>("jar").map { it.archiveFile } },
-        project.provider { project(":nova-config").tasks.named<Jar>("jar").map { it.archiveFile } },
-        project.provider { project(":nova-registry").tasks.named<Jar>("jar").map { it.archiveFile } },
-        project.provider {
-            rootProject.subprojects
-                .filter { it.name.startsWith("nova-hook-") }
-                .map { hook -> hook.tasks.named<Jar>("jar").map { it.archiveFile } }
-        }
-    )
+    merge.from(tasks.named<Jar>("origamiJar").flatMap { it.archiveFile })
+    listOf(
+        ":nova-api", 
+        ":nova-config", 
+        ":nova-network", 
+        ":nova-registry",
+    ).forEach { projectName ->
+        merge.from(project.provider { project(projectName).tasks.named<Jar>("jar").flatMap { it.archiveFile } })
+    }
 }
 
 tasks {
@@ -104,7 +100,7 @@ kotlin {
 }
 
 pluginPublish {
-    file = tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output }
+    file = tasks.named<Zip>("loaderJar").flatMap { it.archiveFile }
     githubRepository = "xenondevs/Nova"
     discord()
     hangar("Nova") {

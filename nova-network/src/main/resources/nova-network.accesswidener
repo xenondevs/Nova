@@ -1,0 +1,10 @@
+accessWidener v2 named
+
+transitive-accessible field net/minecraft/server/network/ServerConnectionListener channels Ljava/util/List;
+transitive-accessible field net/minecraft/network/codec/IdDispatchCodec toId Lit/unimi/dsi/fastutil/objects/Object2IntMap;
+transitive-accessible method net/minecraft/network/protocol/game/ClientboundUpdateAttributesPacket <init> (ILjava/util/List;)V
+transitive-accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket <init> (Ljava/util/UUID;Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;)V
+transitive-accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket id Ljava/util/UUID;
+transitive-accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket operation Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;
+transitive-accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation
+transitive-accessible class net/minecraft/network/protocol/game/ClientboundTrackedWaypointPacket$Operation

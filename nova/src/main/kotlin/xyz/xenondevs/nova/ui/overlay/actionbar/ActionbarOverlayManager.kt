@@ -9,7 +9,7 @@ import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.strongEntry
 import xyz.xenondevs.nova.network.event.PacketHandler
 import xyz.xenondevs.nova.network.event.PacketListener
-import xyz.xenondevs.nova.network.event.clientbound.ClientboundActionBarPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetActionBarTextPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSystemChatPacketEvent
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.unregisterPacketListener
@@ -17,6 +17,8 @@ import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.ui.overlay.actionbar.ActionbarOverlayManager.handleChatPacket
 import xyz.xenondevs.nova.ui.overlay.actionbar.ActionbarOverlayManager.overlays
 import xyz.xenondevs.nova.util.component.adventure.move
+import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
+import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.send
 import java.util.*
@@ -84,22 +86,22 @@ object ActionbarOverlayManager : PacketListener {
             val player = event.player
             val uuid = player.uniqueId
             if (overlays.containsKey(uuid)) {
-                saveInterceptedComponent(player, event.message)
-                event.message = getCurrentText(player)
+                saveInterceptedComponent(player, event.content.toAdventureComponent())
+                event.content = getCurrentText(player).toNMSComponent()
             }
         }
     }
     
     @PacketHandler
-    private fun handleChatPacket(event: ClientboundActionBarPacketEvent) {
+    private fun handleChatPacket(event: ClientboundSetActionBarTextPacketEvent) {
         val player = event.player
         val uuid = player.uniqueId
         if (overlays.containsKey(uuid)) {
             if (event.packet !== EMPTY_ACTION_BAR_PACKET) {
-                saveInterceptedComponent(player, event.text)
+                saveInterceptedComponent(player, event.text.toAdventureComponent())
             }
             
-            event.text = getCurrentText(player)
+            event.text = getCurrentText(player).toNMSComponent()
         }
     }
     

@@ -730,9 +730,6 @@ internal inline fun withoutBlockMigration(pos: BlockPos, run: () -> Unit) {
     }
 }
 
-fun RegistryFriendlyByteBuf(): RegistryFriendlyByteBuf =
-    RegistryFriendlyByteBuf(Unpooled.buffer(), REGISTRY_ACCESS)
-
 @PublishedApi
 internal object NMSUtils {
     

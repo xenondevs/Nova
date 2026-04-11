@@ -5,6 +5,7 @@ import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket
 import net.minecraft.world.BossEvent
 import xyz.xenondevs.commons.collections.enumSetOf
+import xyz.xenondevs.nova.network.RegistryFriendlyByteBuf
 import xyz.xenondevs.nova.util.component.adventure.toAdventureComponent
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import java.util.*

@@ -22,6 +22,7 @@ import xyz.xenondevs.nova.api.protection.ProtectionIntegration
 import xyz.xenondevs.nova.initialize.InitializationException
 import xyz.xenondevs.nova.initialize.Initializer
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
+import xyz.xenondevs.nova.network.installPacketHandler
 import xyz.xenondevs.nova.registry.NovaRegistryContext
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.ServerUtils
@@ -70,6 +71,7 @@ internal object Nova : JavaPlugin(), INova {
             NovaRegistryContext.exitBootstrapPhase()
             InvUI.getInstance().setPlugin(this)
             Languages.getInstance().enableServerSideTranslations(false)
+            installPacketHandler(this)
             Initializer.registerEvents()
         } catch (t: Throwable) {
             if (t is InitializationException)

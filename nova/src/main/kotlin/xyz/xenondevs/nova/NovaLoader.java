@@ -22,7 +22,7 @@ public class NovaLoader implements PluginLoader {
             var lines = Files.readAllLines(zfs.getPath("nova-libraries"));
             for (var line : lines) {
                 var src = zfs.getPath(line);
-                var dst = LIBRARIES_DIR.resolve(line.substring("lib/".length()));
+                var dst = LIBRARIES_DIR.resolve(line.substring("/lib/".length()));
                 if (!Files.exists(dst)) {
                     Files.createDirectories(dst.getParent());
                     Files.copy(src, dst);
