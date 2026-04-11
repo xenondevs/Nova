@@ -3,9 +3,9 @@ plugins {
 }
 
 repositories {
-    maven("https://jitpack.io")
+    maven("https://maven.devs.beer/") { content { includeGroupAndSubgroups("dev.lone") }}
 }
 
 dependencies {
-    compileOnly("com.github.LoneDev6:API-ItemsAdder:3.2.4") { isTransitive = false }
+    compileOnly("dev.lone:api-itemsadder:4.0.10")
 }
