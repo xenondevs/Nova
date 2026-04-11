@@ -24,9 +24,10 @@ dependencies {
     novaLoaderApi(libs.kotlinx.serialization.json)
     api(origamiLibs.mixin)
     api(origamiLibs.mixinextras)
-    api(project(":nova-registry"))
     api(project(":nova-config"))
-
+    api(project(":nova-registry"))
+    api(project(":nova-network"))
+    
     // internal dependencies
     compileOnly(project(":nova-api"))
     novaLoader(libs.bundles.ktor)
@@ -49,17 +50,10 @@ dependencies {
     testRuntimeOnly(libs.junit.platformLauncher)
 }
 
-// configure java sources location
-sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
-
-kotlin.sourceSets.main {
-    kotlin.srcDir(project.layout.buildDirectory.dir("generated/ksp/main/kotlin"))
-}
-
 origami {
     runServer {
         workingDirectory.set(layout.dir(providers.gradleProperty("serverDir").map(::File)))
-        plugins.from(tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output })
+        plugins.from(tasks.named<Zip>("loaderJar").flatMap { it.archiveFile })
         jvmArgs.addAll(
             "-XX:+EnableDynamicAgentLoading",
             "--enable-native-access=ALL-UNNAMED",
@@ -72,23 +66,28 @@ origami {
         // w/o novaLoader on application classpath: record+build: 103s exec: ~8s
     }
 }
-
 val mcVersion = libs.versions.paper.map {
     val versionRegex = Regex("""(\d+\.\d+(?:\.\d+)?(?:-(?:rc|pre|snapshot)-\d+)?).*""")
     versionRegex.matchEntire(it)!!.groupValues[1]
 }
 
-val novaApiJar = project(":nova-api").tasks.withType<Jar>().matching { it.name == "jar" }
-val novaConfigJar = project(":nova-config").tasks.withType<Jar>().matching { it.name == "jar" }
-val novaRegistryJar = project(":nova-registry").tasks.withType<Jar>().matching { it.name == "jar" }
-val hookJars = rootProject.subprojects
-    .filter { it.name.startsWith("nova-hook-") }
-    .map { hook -> hook.tasks.withType<Jar>().matching { it.name == "jar" } }
+origami {
+    transitiveAccessWidenerSources.from(configurations.named("runtimeClasspath"))
+}
 
 loaderJar {
     gameVersion = mcVersion
-    novaInput = tasks.named<Jar>("origamiJar").flatMap { it.archiveFile }
-    input.from(novaApiJar, novaConfigJar, novaRegistryJar, hookJars)
+    merge.from(tasks.named<Jar>("origamiJar").flatMap { it.archiveFile })
+    val projectJars = listOf(
+        ":nova-api", 
+        ":nova-config", 
+        ":nova-network", 
+        ":nova-registry",
+    ).map { projectName -> project(projectName).tasks.withType<Jar>().matching { it.name == "jar" } }
+    val hookJars = rootProject.subprojects
+        .filter { it.name.startsWith("nova-hook-") }
+        .map { hook -> hook.tasks.withType<Jar>().matching { it.name == "jar" } }
+    merge.from(projectJars, hookJars)
 }
 
 val resourceProperties = mapOf(
@@ -118,7 +117,7 @@ kotlin {
 }
 
 pluginPublish {
-    file = tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output }
+    file = tasks.named<Zip>("loaderJar").flatMap { it.archiveFile }
     githubRepository = "xenondevs/Nova"
     discord()
     hangar("Nova") {
@@ -133,7 +132,7 @@ pluginPublish {
 publishing {
     publications {
         named<MavenPublication>("maven") {
-            artifact(tasks.named<BuildBundlerJarTask>("loaderJar").flatMap { it.output }) {
+            artifact(tasks.named<Zip>("loaderJar").flatMap { it.archiveFile }) {
                 classifier = "loader"
                 extension = "jar"
             }

@@ -4,8 +4,6 @@ accessible class net/minecraft/world/level/chunk/PalettedContainer$Data
 accessible method net/minecraft/world/item/component/BundleContents <init> (Ljava/util/List;Lorg/apache/commons/lang3/math/Fraction;I)V
 accessible field net/minecraft/world/level/chunk/HashMapPalette values Lnet/minecraft/util/CrudeIncrementalIntIdentityHashBiMap;
 accessible field net/minecraft/world/level/chunk/LinearPalette values [Ljava/lang/Object;
-accessible field net/minecraft/network/codec/IdDispatchCodec toId Lit/unimi/dsi/fastutil/objects/Object2IntMap;
-accessible method net/minecraft/network/protocol/game/ClientboundUpdateAttributesPacket <init> (ILjava/util/List;)V
 transitive-accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket <init> (IZLnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;)V
 transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket entityId I
 transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket action Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;
@@ -19,10 +17,7 @@ transitive-accessible method net/minecraft/network/protocol/game/ServerboundInte
 transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction hand Lnet/minecraft/world/InteractionHand;
 transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction location Lnet/minecraft/world/phys/Vec3;
 transitive-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType
-accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket <init> (Ljava/util/UUID;Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;)V
-accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket id Ljava/util/UUID;
 accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation
-accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket operation Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;
 accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation
 accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation <init> (Lnet/minecraft/network/RegistryFriendlyByteBuf;)V
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$AddOperation name Lnet/minecraft/network/chat/Component;
@@ -46,7 +41,6 @@ accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdatePropertiesOperation darkenScreen Z
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdatePropertiesOperation playMusic Z
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket$UpdatePropertiesOperation createWorldFog Z
-accessible field net/minecraft/server/network/ServerConnectionListener channels Ljava/util/List;
 accessible field net/minecraft/world/level/chunk/ChunkAccess sections [Lnet/minecraft/world/level/chunk/LevelChunkSection;
 accessible class net/minecraft/world/entity/npc/villager/VillagerTrades$DyedArmorForEmeralds
 accessible class io/papermc/paper/plugin/manager/PaperPluginInstanceManager

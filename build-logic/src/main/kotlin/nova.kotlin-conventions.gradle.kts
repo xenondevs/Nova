@@ -12,6 +12,8 @@ dependencies {
     testImplementation(libs.mockk)
 }
 
+sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
+
 kotlin {
     compilerOptions {
         jvmDefault = JvmDefaultMode.NO_COMPATIBILITY

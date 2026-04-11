@@ -1,16 +1,11 @@
 rootProject.name = "nova"
 
-// core project
+// core
 include("nova")
-include("nova-ksp:annotations")
-include("nova-ksp:processor:flatmap-extensions")
-include("nova-ksp:processor:registry")
-include("nova-config")
-include("nova-registry")
 include("nova-api")
-include("nova-gradle-plugin")
-include("nova-dokka-plugin")
-include("nova-detekt-rules")
+include("nova-config")
+include("nova-network")
+include("nova-registry")
 
 // hooks
 include("nova-hooks:nova-hook-griefprevention")
@@ -26,6 +21,17 @@ include("nova-hooks:nova-hook-towny")
 include("nova-hooks:nova-hook-vault")
 include("nova-hooks:nova-hook-worldedit")
 include("nova-hooks:nova-hook-worldguard")
+
+// ksp
+include("nova-ksp:annotations")
+include("nova-ksp:processor:flatmap-extensions")
+include("nova-ksp:processor:registry")
+include("nova-ksp:processor:network")
+
+// tooling
+include("nova-detekt-rules")
+include("nova-dokka-plugin")
+include("nova-gradle-plugin")
 
 // misc
 include("catalog")

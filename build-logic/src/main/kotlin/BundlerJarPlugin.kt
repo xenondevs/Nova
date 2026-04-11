@@ -1,6 +1,8 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
@@ -16,7 +18,7 @@ class BundlerJarPlugin : Plugin<Project> {
         project.configurations.getByName("implementation").extendsFrom(novaLoaderCfg)
         
         val runtimeArtifacts = project.configurations
-            .getByName("paperweightDevelopmentBundleCompileClasspath")
+            .getByName("paperweightDevelopmentBundleRuntimeClasspath")
             .incoming.artifacts.resolvedArtifacts
         val libraryPaths = novaLoaderCfg.incoming.artifacts.resolvedArtifacts.zip(runtimeArtifacts) { libraries, runtime ->
             val runtimeModules = runtime.mapNotNullTo(HashSet()) { artifact ->
@@ -33,14 +35,19 @@ class BundlerJarPlugin : Plugin<Project> {
             }.sortedBy { it.second }.toMap()
         }
         
-        val ext = project.extensions.create<BuildBundlerJarExtension>("loaderJar")
-        val projectVersion = project.version.toString()
-        project.tasks.register<BuildBundlerJarTask>("loaderJar") {
-            this.group = LifecycleBasePlugin.BUILD_GROUP
-            this.novaInput.set(ext.novaInput)
-            this.input.from(ext.input)
-            this.libraries.from(libraryPaths.map { paths -> paths.keys.map(::File) })
+        val prepare = project.tasks.register<PrepareNovaLoaderTask>("prepareNovaLoader") {
+            libraries.from(libraryPaths.map { paths -> paths.keys.map(::File) })
             this.libraryPaths.set(libraryPaths)
+            outputDir.set(project.layout.buildDirectory.dir("novaLoader"))
+        }
+        
+        val ext = project.extensions.create<BuildLoaderJarExtension>("loaderJar")
+        project.tasks.register<Zip>("loaderJar") {
+            group = LifecycleBasePlugin.BUILD_GROUP
+            
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            from(prepare.flatMap { it.outputDir })
+            from(ext.merge.elements.map { jars -> jars.map { jar -> project.zipTree(jar) } })
             
             val customOutDir = project.layout.dir(
                 project.providers.gradleProperty("outDir")
@@ -48,12 +55,10 @@ class BundlerJarPlugin : Plugin<Project> {
                     .map(::File)
             )
             val outputDir = customOutDir.orElse(project.layout.buildDirectory)
+            val fileName = ext.gameVersion.map { gameVersion -> "Nova-${project.version}+MC-$gameVersion.jar" }
             
-            this.output.set(
-                outputDir.zip(ext.gameVersion) { outDir, gameVersion ->
-                    outDir.file("Nova-$projectVersion+MC-$gameVersion.jar")
-                }
-            )
+            destinationDirectory.set(outputDir)
+            archiveFileName.set(fileName)
         }
     }
     
