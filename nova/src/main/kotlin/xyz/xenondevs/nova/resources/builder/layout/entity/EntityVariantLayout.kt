@@ -16,12 +16,27 @@ sealed interface EntityVariantLayout {
     class Simple(val texture: ResourcePath<ResourceType.Texture>) : EntityVariantLayout
     
     @Serializable
+    @SerialName("aging")
+    @ApiStatus.Internal
+    class Aging(
+        val adultTexture: ResourcePath<ResourceType.Texture>,
+        val babyTexture: ResourcePath<ResourceType.Texture>,
+    ) : EntityVariantLayout
+    
+    @Serializable
     @SerialName("wolf")
     @ApiStatus.Internal
     class Wolf(
+        val adultTextures: WolfTextureSet,
+        val babyTextures: WolfTextureSet,
+    ) : EntityVariantLayout
+    
+    @Serializable
+    @ApiStatus.Internal
+    class WolfTextureSet(
         val wild: ResourcePath<ResourceType.Texture>,
         val tame: ResourcePath<ResourceType.Texture>,
         val angry: ResourcePath<ResourceType.Texture>,
-    ) : EntityVariantLayout
+    )
     
 }

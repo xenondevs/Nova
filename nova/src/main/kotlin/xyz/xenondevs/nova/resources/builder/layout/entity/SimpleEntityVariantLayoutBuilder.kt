@@ -26,7 +26,7 @@ class SimpleEntityVariantLayoutBuilder internal constructor(
      * `namespace` and `texture` are defined by [texture].
      */
     fun texture(texture: String) {
-        this.texture = ResourcePath.Companion.of(ResourceType.Texture, texture, namespace)
+        this.texture = ResourcePath.of(ResourceType.Texture, texture, namespace)
     }
     
     override fun build() = EntityVariantLayout.Simple(

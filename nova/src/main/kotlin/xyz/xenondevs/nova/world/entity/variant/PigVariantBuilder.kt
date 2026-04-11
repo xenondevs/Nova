@@ -8,23 +8,26 @@ import net.minecraft.world.entity.variant.ModelAndTexture
 import net.minecraft.world.entity.variant.SpawnPrioritySelectors
 import org.bukkit.craftbukkit.entity.CraftPig
 import org.bukkit.entity.Pig
+import xyz.xenondevs.nova.resources.builder.layout.entity.AgingEntityVariantLayoutBuilder
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
-import xyz.xenondevs.nova.resources.builder.layout.entity.SimpleEntityVariantLayoutBuilder
 import xyz.xenondevs.nova.util.toIdentifier
 
 class PigVariantBuilder internal constructor(
     id: Key
-) : EntityVariantBuilder<Pig.Variant, PigModelType, PigVariant, EntityVariantLayout.Simple, SimpleEntityVariantLayoutBuilder>(
+) : EntityVariantBuilder<Pig.Variant, PigModelType, PigVariant, EntityVariantLayout.Aging, AgingEntityVariantLayoutBuilder>(
     Registries.PIG_VARIANT,
     CraftPig.CraftVariant::minecraftHolderToBukkit,
     PigModelType.NORMAL,
-    ::SimpleEntityVariantLayoutBuilder,
+    ::AgingEntityVariantLayoutBuilder,
     id
 ) {
     
-    // TODO: expose baby texture
-    override fun build(modelType: PigModelType, layout: EntityVariantLayout.Simple, spawnConditions: SpawnPrioritySelectors) =
-        PigVariant(ModelAndTexture(modelType.nms, layout.texture.toIdentifier()), ClientAsset.ResourceTexture(layout.texture.toIdentifier()), spawnConditions)
+    override fun build(modelType: PigModelType, layout: EntityVariantLayout.Aging, spawnConditions: SpawnPrioritySelectors) =
+        PigVariant(
+            ModelAndTexture(modelType.nms, layout.adultTexture.toIdentifier()),
+            ClientAsset.ResourceTexture(layout.babyTexture.toIdentifier()),
+            spawnConditions,
+        )
     
 }
 

@@ -8,23 +8,26 @@ import net.minecraft.world.entity.variant.ModelAndTexture
 import net.minecraft.world.entity.variant.SpawnPrioritySelectors
 import org.bukkit.craftbukkit.entity.CraftChicken
 import org.bukkit.entity.Chicken
+import xyz.xenondevs.nova.resources.builder.layout.entity.AgingEntityVariantLayoutBuilder
 import xyz.xenondevs.nova.resources.builder.layout.entity.EntityVariantLayout
-import xyz.xenondevs.nova.resources.builder.layout.entity.SimpleEntityVariantLayoutBuilder
 import xyz.xenondevs.nova.util.toIdentifier
 
 class ChickenVariantBuilder internal constructor(
     id: Key
-) : EntityVariantBuilder<Chicken.Variant, ChickenModelType, ChickenVariant, EntityVariantLayout.Simple, SimpleEntityVariantLayoutBuilder>(
+) : EntityVariantBuilder<Chicken.Variant, ChickenModelType, ChickenVariant, EntityVariantLayout.Aging, AgingEntityVariantLayoutBuilder>(
     Registries.CHICKEN_VARIANT,
     CraftChicken.CraftVariant::minecraftHolderToBukkit,
     ChickenModelType.NORMAL,
-    ::SimpleEntityVariantLayoutBuilder,
+    ::AgingEntityVariantLayoutBuilder,
     id
 ) {
     
-    // TODO: expose baby texture
-    override fun build(modelType: ChickenModelType, layout: EntityVariantLayout.Simple, spawnConditions: SpawnPrioritySelectors) =
-        ChickenVariant(ModelAndTexture(modelType.nms, layout.texture.toIdentifier()), ClientAsset.ResourceTexture(layout.texture.toIdentifier()), spawnConditions)
+    override fun build(modelType: ChickenModelType, layout: EntityVariantLayout.Aging, spawnConditions: SpawnPrioritySelectors) =
+        ChickenVariant(
+            ModelAndTexture(modelType.nms, layout.adultTexture.toIdentifier()),
+            ClientAsset.ResourceTexture(layout.babyTexture.toIdentifier()),
+            spawnConditions,
+        )
     
 }
 
