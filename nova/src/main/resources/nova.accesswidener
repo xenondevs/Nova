@@ -19,6 +19,7 @@ transitive-accessible method net/minecraft/network/protocol/game/ServerboundInte
 transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction hand Lnet/minecraft/world/InteractionHand;
 transitive-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction location Lnet/minecraft/world/phys/Vec3;
 transitive-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType
+accessible method net/minecraft/network/protocol/game/ClientboundBossEventPacket <init> (Ljava/util/UUID;Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;)V
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket id Ljava/util/UUID;
 accessible class net/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation
 accessible field net/minecraft/network/protocol/game/ClientboundBossEventPacket operation Lnet/minecraft/network/protocol/game/ClientboundBossEventPacket$Operation;

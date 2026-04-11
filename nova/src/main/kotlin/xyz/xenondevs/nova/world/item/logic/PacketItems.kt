@@ -3,7 +3,6 @@
 package xyz.xenondevs.nova.world.item.logic
 
 import com.mojang.serialization.Dynamic
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Key.key
 import net.minecraft.ChatFormatting
 import net.minecraft.advancements.Advancement
@@ -249,7 +248,7 @@ internal object PacketItems : Listener, PacketListener {
                     it.value.parent,
                     it.value.display.map { display ->
                         DisplayInfo(
-                            getClientSideStack(event.player, display.icon, false),
+                            getClientSideStack(event.player, display.icon.create(), false).toTemplate(),
                             display.title,
                             display.description,
                             display.background,
