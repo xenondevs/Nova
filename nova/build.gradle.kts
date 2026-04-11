@@ -5,7 +5,7 @@ plugins {
     id("nova.detekt-conventions")
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
-    alias(origamiLibs.plugins.origami)
+    id("nova.origami-conventions")
     alias(libs.plugins.pluginPublish)
     id("xyz.xenondevs.bundler-jar-plugin")
 }
@@ -54,11 +54,6 @@ sourceSets.main { java.setSrcDirs(listOf("src/main/kotlin/")) }
 
 kotlin.sourceSets.main {
     kotlin.srcDir(project.layout.buildDirectory.dir("generated/ksp/main/kotlin"))
-}
-
-origami {
-    paperDevBundle(libs.versions.paper.get())
-    librariesDirectory = "lib"
 }
 
 val mcVersion = libs.versions.paper.map { 

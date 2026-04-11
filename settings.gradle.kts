@@ -40,12 +40,13 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs")
         create("origamiLibs") {
-            from("xyz.xenondevs.origami:origami-catalog:0.4.0")
+            from("xyz.xenondevs.origami:origami-catalog:0.4.0") // !!! also change in build-logic !!!
         }
     }
 }
 
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         mavenLocal { content { includeGroupAndSubgroups("xyz.xenondevs") } }
         mavenCentral()
