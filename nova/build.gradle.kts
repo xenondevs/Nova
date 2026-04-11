@@ -79,7 +79,7 @@ tasks {
         }
     }
     test {
-        environment("MINECRAFT_VERSION", mcVersion)
+        environment("MINECRAFT_VERSION", mcVersion.get())
     }
 }
 
