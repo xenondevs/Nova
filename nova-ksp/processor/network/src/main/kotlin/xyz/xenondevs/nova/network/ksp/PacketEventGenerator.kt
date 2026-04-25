@@ -3,10 +3,12 @@
 package xyz.xenondevs.nova.network.ksp
 
 import com.google.devtools.ksp.KspExperimental
+import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -29,22 +31,23 @@ internal class PacketEventGenerator(private val codeGenerator: CodeGenerator) {
     private val playerPacketEventClass = ClassName(eventPackage, "PlayerPacketEvent")
     private val packetEventManagerClass = ClassName(eventPackage, "PacketEventManager")
     
+    private val protocolPackage = "net.minecraft.network.protocol"
     private val gamePackage = "net.minecraft.network.protocol.game"
-    
     private val packetPackages = listOf(
-        gamePackage,
-        "net.minecraft.network.protocol.common",
-        "net.minecraft.network.protocol.cookie",
-        "net.minecraft.network.protocol.ping",
-    )
+        "common", "configuration", "cookie", "game", "handshake", "login", "ping", "status"
+    ).map { "$protocolPackage.$it" }
+    
+    private lateinit var clientboundPacketListenerType: KSType
     
     fun generate(resolver: Resolver) {
+        clientboundPacketListenerType = resolver.getClassDeclarationByName("net.minecraft.network.ClientboundPacketListener")!!.asStarProjectedType()
+        
         val recordPackets = findRecordPacketClasses(resolver)
         if (recordPackets.isEmpty())
             return
         
-        val clientbound = recordPackets.filter { it.simpleName.asString().startsWith("Clientbound") }
-        val serverbound = recordPackets.filter { it.simpleName.asString().startsWith("Serverbound") }
+        val clientbound = recordPackets.filter { it.isClientboundPacket() }
+        val serverbound = recordPackets.filter { !it.isClientboundPacket() }
         
         if (clientbound.isNotEmpty())
             generateEventFile("GeneratedClientboundPacketEvents", "$eventPackage.clientbound", clientbound)
@@ -55,22 +58,28 @@ internal class PacketEventGenerator(private val codeGenerator: CodeGenerator) {
     }
     
     private fun findRecordPacketClasses(resolver: Resolver): List<KSClassDeclaration> =
-        packetPackages.flatMap { pkg ->
-            resolver.getDeclarationsFromPackage(pkg)
-                .filterIsInstance<KSClassDeclaration>()
-                .filter { it.isJavaRecord() }
-                .filter {
-                    val name = it.simpleName.asString()
-                    name.startsWith("Clientbound") || name.startsWith("Serverbound")
-                }
-                .toList()
-        }.sortedBy { it.simpleName.asString() }
+        packetPackages.flatMap { resolver.getDeclarationsFromPackage(it) }
+            .filter { it.packageName.asString().startsWith("net.minecraft.network.protocol") }
+            .filterIsInstance<KSClassDeclaration>()
+            .filter { it.isJavaRecord() && it.isPacket() }
+            .toList()
     
     private fun KSClassDeclaration.isJavaRecord(): Boolean =
         superTypes.any { it.resolve().declaration.qualifiedName?.asString() == "java.lang.Record" }
     
+    private fun KSClassDeclaration.isPacket(): Boolean =
+        superTypes.any { it.resolve().declaration.qualifiedName?.asString() == "net.minecraft.network.protocol.Packet" }
+    
     private fun KSClassDeclaration.isGamePacket(): Boolean =
-        packageName.asString() == gamePackage
+        isPacket() && packageName.asString() == gamePackage
+    
+    private fun KSClassDeclaration.isClientboundPacket(): Boolean {
+        val packetSupertype = superTypes.firstOrNull { it.resolve().declaration.qualifiedName?.asString() == "net.minecraft.network.protocol.Packet" }?.resolve()
+            ?: return false // not a packet
+        val packetListenerType = packetSupertype.arguments.single().type?.resolve()
+            ?: return false
+        return clientboundPacketListenerType.isAssignableFrom(packetListenerType)
+    }
     
     private fun generateEventFile(
         fileName: String,
@@ -158,7 +167,7 @@ internal class PacketEventGenerator(private val codeGenerator: CodeGenerator) {
         
         for (packetClass in packets) {
             val eventName = packetClass.simpleName.asString() + "Event"
-            val direction = if (packetClass.simpleName.asString().startsWith("Clientbound")) "clientbound" else "serverbound"
+            val direction = if (packetClass.isClientboundPacket()) "clientbound" else "serverbound"
             val eventClassName = ClassName("$eventPackage.$direction", eventName)
             
             if (packetClass.isGamePacket()) {
