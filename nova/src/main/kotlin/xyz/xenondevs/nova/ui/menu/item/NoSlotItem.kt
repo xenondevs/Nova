@@ -5,7 +5,6 @@ import org.bukkit.event.inventory.ClickType
 import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.Observer
 import xyz.xenondevs.invui.item.Item
-import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.util.InventoryUtils
 import xyz.xenondevs.invui.util.ItemUtils
 import xyz.xenondevs.nova.util.item.isNullOrEmpty

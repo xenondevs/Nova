@@ -76,6 +76,12 @@ val ItemStack.typeEntry: RegistryEntry.Either<NovaItem, ItemType>
         ?: RegistryEntry.either(NovaRegistries.ITEM, type.asItemType()!!.entry)
 
 /**
+ * The [ItemType] of this [ItemStack].
+ */
+val ItemStack.itemType: ItemType
+    get() = type.asItemType()!!
+
+/**
  * The [NovaItem] of [this][MojangStack], or `null` if it's not one.
  */
 val MojangStack.novaItem: NovaItem?

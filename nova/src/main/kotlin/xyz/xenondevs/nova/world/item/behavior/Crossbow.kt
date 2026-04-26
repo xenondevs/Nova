@@ -15,6 +15,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import xyz.xenondevs.nova.context.Context
@@ -267,9 +268,9 @@ class Crossbow(
         }
     }
     
-    override fun modifyClientSideItemType(player: Player?, server: ItemStack, client: Material): Material {
+    override fun modifyClientSideItemType(player: Player?, server: ItemStack, client: ItemType): ItemType {
         if (logic == CrossbowLogic.Vanilla || server.persistentDataContainer.has(CAN_USE_KEY))
-            return Material.CROSSBOW
+            return ItemType.CROSSBOW
         return client
     }
     //</editor-fold>

@@ -66,6 +66,7 @@ import xyz.xenondevs.nova.util.component.adventure.indent
 import xyz.xenondevs.nova.util.data.UpdatableFile
 import xyz.xenondevs.nova.util.getSurroundingChunks
 import xyz.xenondevs.nova.util.item.ItemUtils
+import xyz.xenondevs.nova.util.item.itemType
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.novaBlock
@@ -556,11 +557,12 @@ internal object NovaCommand : Command() {
         val item = itemStack.novaItem
         
         if (item != null) {
+            val clientSideType = item.modifyClientSideItemType(player, itemStack, itemStack.itemType)
             ctx.source.sender.sendMessage(Component.translatable(
                 "command.nova.show_item_model_data.success",
                 NamedTextColor.GRAY,
                 ItemUtils.getName(itemStack).color(NamedTextColor.AQUA),
-                Component.translatable(item.vanillaMaterial.translationKey(), NamedTextColor.AQUA),
+                Component.translatable(clientSideType.translationKey(), NamedTextColor.AQUA),
                 Component.text(item.key.toString(), NamedTextColor.AQUA)
             ))
         } else ctx.source.sender.sendMessage(Component.translatable("command.nova.show_item_model_data.no_item", NamedTextColor.RED))

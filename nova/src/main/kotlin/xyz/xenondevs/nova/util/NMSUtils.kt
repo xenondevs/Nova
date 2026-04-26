@@ -3,7 +3,6 @@
 package xyz.xenondevs.nova.util
 
 import com.mojang.datafixers.util.Either
-import io.netty.buffer.Unpooled
 import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.TypedKey
@@ -23,7 +22,6 @@ import net.minecraft.core.Registry
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.Rotations
 import net.minecraft.core.WritableRegistry
-import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.RegistryOps.RegistryInfoLookup
@@ -63,6 +61,7 @@ import org.bukkit.craftbukkit.entity.CraftEntity
 import org.bukkit.craftbukkit.entity.CraftLivingEntity
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.inventory.CraftItemStack
+import org.bukkit.craftbukkit.inventory.CraftItemType
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -70,6 +69,7 @@ import org.bukkit.entity.Player
 import org.bukkit.entity.Pose
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.util.Vector
 import org.joml.Vector3d
 import xyz.xenondevs.nova.addon.Addon
@@ -337,6 +337,12 @@ val BlockType.nmsBlock: MojangBlock
 
 val Material.nmsItem: MojangItem
     get() = CraftMagicNumbers.getItem(this)
+
+val ItemType.nmsItem: MojangItem
+    get() = (this as CraftItemType<*>).handle
+
+val MojangItem.bukkitItemType: ItemType
+    get() = CraftItemType.minecraftToBukkitNew(this)
 
 val MojangBlock.bukkitMaterial: Material
     get() = CraftMagicNumbers.getMaterial(this)

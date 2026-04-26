@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundEntityPacket
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSoundPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAdvancementsPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAttributesPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateTagsPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSwingPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundUseItemOnPacketEvent
@@ -50,6 +51,7 @@ internal object PacketEventManager {
         registerGeneratedPacketEvents()
         
         // handwritten events for non-record packets
+        registerEventType(::ClientboundUpdateTagsPacketEvent)
         registerPlayerEventType(::ClientboundBlockDestructionPacketEvent)
         registerPlayerEventType(::ClientboundBlockEventPacketEvent)
         registerPlayerEventType(::ClientboundBlockUpdatePacketEvent)

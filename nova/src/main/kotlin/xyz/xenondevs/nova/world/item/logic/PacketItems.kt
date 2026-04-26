@@ -3,6 +3,7 @@
 package xyz.xenondevs.nova.world.item.logic
 
 import com.mojang.serialization.Dynamic
+import it.unimi.dsi.fastutil.ints.IntArrayList
 import net.kyori.adventure.key.Key.key
 import net.minecraft.ChatFormatting
 import net.minecraft.advancements.Advancement
@@ -15,6 +16,7 @@ import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.component.TypedDataComponent
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
@@ -25,6 +27,8 @@ import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.resources.RegistryOps
+import net.minecraft.tags.ItemTags
+import net.minecraft.tags.TagNetworkSerialization
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemStackTemplate
@@ -48,10 +52,9 @@ import net.minecraft.world.item.crafting.display.StonecutterRecipeDisplay
 import net.minecraft.world.item.trading.ItemCost
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
-import org.bukkit.Material
-import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
@@ -69,12 +72,14 @@ import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEntityDataPack
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundSetEquipmentPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateAdvancementsPacketEvent
 import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
+import xyz.xenondevs.nova.network.event.clientbound.ClientboundUpdateTagsPacketEvent
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundContainerClickPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.resources.ResourceGeneration
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
+import xyz.xenondevs.nova.util.bukkitItemType
 import xyz.xenondevs.nova.util.component.adventure.withoutPreFormatting
 import xyz.xenondevs.nova.util.data.getCompoundOrNull
 import xyz.xenondevs.nova.util.data.getFirstOrThrow
@@ -83,6 +88,7 @@ import xyz.xenondevs.nova.util.item.novaCompound
 import xyz.xenondevs.nova.util.item.unsafeCustomData
 import xyz.xenondevs.nova.util.item.unsafeNovaTag
 import xyz.xenondevs.nova.util.item.update
+import xyz.xenondevs.nova.util.nmsItem
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.serverPlayer
 import xyz.xenondevs.nova.util.toTemplate
@@ -98,8 +104,10 @@ import net.minecraft.world.item.ItemStack as MojangStack
 )
 internal object PacketItems : Listener, PacketListener {
     
-    val SERVER_SIDE_MATERIAL = Material.SHULKER_SHELL
-    val SERVER_SIDE_ITEM = CraftMagicNumbers.getItem(SERVER_SIDE_MATERIAL)!!
+    val SERVER_SIDE_ITEM_TYPE = ItemType.SHULKER_SHELL
+    val SCROLLABLE_ITEM_TYPE = ItemType.STRUCTURE_VOID
+    val SCROLLABLE_ITEM_HOLDER = BuiltInRegistries.ITEM.wrapAsHolder(SCROLLABLE_ITEM_TYPE.nmsItem)
+    val SERVER_SIDE_ITEM = SERVER_SIDE_ITEM_TYPE.nmsItem
     val SERVER_SIDE_ITEM_HOLDER = BuiltInRegistries.ITEM.wrapAsHolder(SERVER_SIDE_ITEM)
     const val SKIP_SERVER_SIDE_TOOLTIP = "NovaSkipPacketItems"
     
@@ -248,7 +256,7 @@ internal object PacketItems : Listener, PacketListener {
                     it.value.parent,
                     it.value.display.map { display ->
                         DisplayInfo(
-                            getClientSideStack(event.player, display.icon.create(), false).toTemplate(),
+                            getClientSideStack(event.player, display.icon.create(), false).toTemplate()!!,
                             display.title,
                             display.description,
                             display.background,
@@ -268,6 +276,33 @@ internal object PacketItems : Listener, PacketListener {
         }
     }
     
+    @PacketHandler
+    private fun handleRegistryData(event: ClientboundUpdateTagsPacketEvent) {
+        // inject STRUCTURE_VOID into the minecraft:bundles tag for scroll support
+        event.tags = event.tags.mapValues { (key, payloads) ->
+            if (key != Registries.ITEM)
+                return@mapValues payloads
+            
+            val tags = payloads
+                .resolve(REGISTRY_ACCESS.lookupOrThrow(Registries.ITEM))
+                .tags()
+                .toMutableMap()
+            
+            tags.compute(ItemTags.BUNDLES) { _, previousTagValues ->
+                buildList {
+                    addAll(previousTagValues ?: emptyList())
+                    add(SCROLLABLE_ITEM_HOLDER)
+                }
+            }
+            
+            val serialized = tags.entries.associate { (tagKey, tagValues) ->
+                val registry = REGISTRY_ACCESS.lookupOrThrow(tagKey.registry())
+                tagKey.location() to tagValues.mapTo(IntArrayList()) { registry.getId(it.value()) }
+            }
+
+            TagNetworkSerialization.NetworkPayload(serialized)
+        }
+    }
     //</editor-fold>
     
     //<editor-fold desc="server-side recipe -> client-side recipe">
@@ -392,7 +427,7 @@ internal object PacketItems : Listener, PacketListener {
             ?: return getUnknownItem(itemStack, id)
         
         // client-side item stack copy
-        val newItemType = CraftMagicNumbers.getItem(novaItem.modifyClientSideItemType(player, itemStack.asBukkitCopy(), novaItem.vanillaMaterial))
+        val newItemType = novaItem.modifyClientSideItemType(player, itemStack.asBukkitCopy(), itemStack.item.bukkitItemType).nmsItem
         val newItemHolder = BuiltInRegistries.ITEM.wrapAsHolder(newItemType)
         var newItemStack = MojangStack(
             newItemHolder, itemStack.count,

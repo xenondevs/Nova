@@ -14,6 +14,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
@@ -156,9 +157,9 @@ class Bow(private val logic: BowLogic = BowLogic.Vanilla) : ItemBehavior {
         }
     }
     
-    override fun modifyClientSideItemType(player: Player?, server: ItemStack, client: Material): Material {
+    override fun modifyClientSideItemType(player: Player?, server: ItemStack, client: ItemType): ItemType {
         if (logic == BowLogic.Vanilla || server.persistentDataContainer.has(CAN_USE_KEY))
-            return Material.BOW
+            return ItemType.BOW
         return client
     }
     //</editor-fold>

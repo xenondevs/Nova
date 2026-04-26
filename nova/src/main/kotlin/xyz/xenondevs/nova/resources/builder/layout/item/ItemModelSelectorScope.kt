@@ -37,10 +37,9 @@ class ItemModelSelectorScope internal constructor(
      * layered model using the texture under `namespace:item/name`.
      */
     override val defaultModel: ModelBuilder by lazy {
-        val path = ResourcePath(ResourceType.Model, id.namespace(), "item/${id.value()}")
-        modelContent[path]
+        modelContent[ResourcePath(ResourceType.Model, id.namespace(), "item/${id.value()}")]
             ?.let(::ModelBuilder)
-            ?: createLayeredModel(path)
+            ?: createLayeredModel(ResourcePath(ResourceType.Texture, id.namespace(), "item/${id.value()}"))
     }
     
     /**
@@ -60,12 +59,12 @@ class ItemModelSelectorScope internal constructor(
      * Creates a new layered model using the given [layers] as the textures.
      */
     fun createLayeredModel(vararg layers: String): ModelBuilder =
-        createLayeredModel(*layers.map { ResourcePath.of(ResourceType.Model, it, id.namespace()) }.toTypedArray())
+        createLayeredModel(*layers.map { ResourcePath.of(ResourceType.Texture, it, id.namespace()) }.toTypedArray())
     
     /**
      * Creates a new layered model using the given [layers] as raw paths to the textures.
      */
-    fun createLayeredModel(vararg layers: ResourcePath<ResourceType.Model>): ModelBuilder = ModelBuilder(
+    fun createLayeredModel(vararg layers: ResourcePath<ResourceType.Texture>): ModelBuilder = ModelBuilder(
         Model(
             parent = ResourcePath(ResourceType.Model, "minecraft", "item/generated"),
             textures = layers.mapIndexed { index, layer -> "layer$index" to Model.Texture(layer.toString()) }.toMap()
@@ -83,7 +82,7 @@ class ItemModelSelectorScope internal constructor(
      * Using [display], additional transformations can be applied.
      */
     fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: String, display: Model.Display.Entry? = null): ModelBuilder =
-        createGuiModel(background, stretched, *layers.mapToArray { ResourcePath.of(ResourceType.Model, it, id.namespace()) }, display = display)
+        createGuiModel(background, stretched, *layers.mapToArray { ResourcePath.of(ResourceType.Texture, it, id.namespace()) }, display = display)
     
     /**
      * Creates a new GUI model using the given [layers] as texture
@@ -95,7 +94,7 @@ class ItemModelSelectorScope internal constructor(
      * 
      * Using [display], additional transformations can be applied.
      */
-    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: ResourcePath<ResourceType.Model>, display: Model.Display.Entry? = null): ModelBuilder {
+    fun createGuiModel(background: Boolean, stretched: Boolean, vararg layers: ResourcePath<ResourceType.Texture>, display: Model.Display.Entry? = null): ModelBuilder {
         val elements = ArrayList<Element>()
         if (background) {
             elements += Element(

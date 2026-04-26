@@ -21,8 +21,9 @@ import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.plus
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.Click
+import xyz.xenondevs.invui.dsl.ScrollGuiDsl
+import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.invui.dsl.anvilWindow
-import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.dsl.gui
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.dsl.mergedWindow
@@ -35,7 +36,6 @@ import xyz.xenondevs.invui.inventory.Inventory
 import xyz.xenondevs.invui.inventory.ReferencingInventory
 import xyz.xenondevs.invui.inventory.event.PlayerUpdateReason
 import xyz.xenondevs.invui.inventory.get
-import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.window.Window
@@ -44,11 +44,10 @@ import xyz.xenondevs.nova.ui.menu.by
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.RecipesMenu
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.handleRecipeChoiceClick
 import xyz.xenondevs.nova.ui.menu.item.NoSlotItem
-import xyz.xenondevs.nova.ui.menu.item.scrollDownItem
-import xyz.xenondevs.nova.ui.menu.item.scrollLeftItem
-import xyz.xenondevs.nova.ui.menu.item.scrollRightItem
-import xyz.xenondevs.nova.ui.menu.item.scrollUpItem
-import xyz.xenondevs.nova.ui.menu.item.scrollerItem
+import xyz.xenondevs.nova.ui.menu.item.backItem
+import xyz.xenondevs.nova.ui.menu.item.installBackgroundScrollSupport
+import xyz.xenondevs.nova.ui.menu.item.installItemScrollSupport
+import xyz.xenondevs.nova.ui.menu.item.scrollBar
 import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.ui.menu.locale
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
@@ -94,9 +93,8 @@ internal class ItemsMenu private constructor(val player: Player) {
         val cheatMode: MutableProvider<Boolean> = mutableProvider { player.persistentDataContainer.get(CHEAT_MODE_KEY, PersistentDataType.BOOLEAN) == true }
         cheatMode.subscribe { cheatMode -> player.persistentDataContainer.set(CHEAT_MODE_KEY, PersistentDataType.BOOLEAN, cheatMode) }
         
-        val filteredItems: Provider<List<Item>> = combinedProvider(filter, ItemCategories.obtainableItems)
+        val filteredItems: Provider<List<CategorizedItem>> = combinedProvider(filter, ItemCategories.obtainableItems)
             .map { (filter, obtainableItems) -> filterItems(player, filter, obtainableItems) }
-            .mapEach { i -> categorizedItemButton(i, cheatMode) }
         
         mainWindow = provider {
             mergedWindow(player) {
@@ -154,16 +152,16 @@ internal class ItemsMenu private constructor(val player: Player) {
                     
                     tabs by ItemCategories.categories.mapEach { category ->
                         scrollItemsGui(
-                            ". x x x x x x x c",
-                            ". x x x x x x x u",
+                            "c x x x x x x x |",
                             ". x x x x x x x |",
-                            ". x x x x x x x d"
+                            ". x x x x x x x |",
+                            ". x x x x x x x |"
                         ) {
                             'c' by cheatModeButton(cheatMode)
-                            'u' by scrollUpItem()
-                            '|' by scrollerItem()
-                            'd' by scrollDownItem()
-                            content by category.categorizedItems.map { items -> items.map { i -> categorizedItemButton(i, cheatMode) } }
+                            '|' by scrollBar(offset = 1)
+                            content by category.categorizedItems
+                                .mapEach { categorizedItemButton(it, cheatMode) }
+                            installBackgroundScrollSupport()
                         }
                     } + gui(
                         ". x x x x x x x h",
@@ -193,15 +191,14 @@ internal class ItemsMenu private constructor(val player: Player) {
                     "x x x x x x x x x",
                     "x x x x x x x x x",
                     "x x x x x x x x x",
-                    "c . . < - > . . ^"
+                    "c - - - - - - - ^"
                 ) {
                     'x' by Markers.CONTENT_LIST_SLOT_VERTICAL
                     'c' by cheatModeButton(cheatMode)
-                    '<' by scrollLeftItem()
-                    '-' by scrollerItem(DefaultGuiItems.TP_SCROLLER_HORIZONTAL.clientsideProvider)
-                    '>' by scrollRightItem()
+                    '-' by scrollBar(offset = -2)
                     '^' by closeSearchButton(filter, mainWindow, searchResultsWindow)
-                    content by filteredItems
+                    content by filteredItems.mapEach { categorizedItemButton(it, cheatMode) }
+                    installBackgroundScrollSupport()
                 }
                 text.subscribe(filter::set)
                 
@@ -224,19 +221,18 @@ internal class ItemsMenu private constructor(val player: Player) {
                 }.flatten()
                 
                 upperGui by scrollItemsGui(
-                    "x x x x x x x x c",
-                    "x x x x x x x x s",
-                    "x x x x x x x x u",
+                    "< . . . . . . . c",
                     "x x x x x x x x |",
-                    "x x x x x x x x d",
-                    "x x x x x x x x ."
+                    "x x x x x x x x |",
+                    "x x x x x x x x |",
+                    "x x x x x x x x |",
+                    "x x x x x x x x |"
                 ) {
-                    's' by searchButton(searchWindow)
+                    '<' by backItem(searchWindow, DefaultGuiItems.TP_SMALL_ARROW_LEFT_ON.clientsideProvider)
                     'c' by cheatModeButton(cheatMode)
-                    'u' by scrollUpItem()
-                    '|' by scrollerItem()
-                    'd' by scrollDownItem()
-                    content by filteredItems
+                    '|' by scrollBar(offset = 2)
+                    content by filteredItems.mapEach { categorizedItemButton(it, cheatMode) }
+                    installBackgroundScrollSupport()
                 }
                 
                 fallbackWindow by mainWindow
@@ -283,10 +279,10 @@ private fun filterItems(player: Player, filter: String, obtainableItems: List<Ca
     }
 }
 
+context(windowDsl: WindowDsl, scrollGuiDsl: ScrollGuiDsl<*>)
 private fun categorizedItemButton(item: CategorizedItem, cheatMode: Provider<Boolean>) = item {
     val itemStack = item.itemStack
-    
-    itemProvider by itemStack
+    itemProvider by item.scrollableItemProvider
     onClick {
         if (player.hasPermission(GIVE_PERMISSION) && cheatMode.get()) {
             when {
@@ -305,6 +301,8 @@ private fun categorizedItemButton(item: CategorizedItem, cheatMode: Provider<Boo
             handleRecipeChoiceClick(item.key.asString(), Click(player, clickType, hotbarButton))
         }
     }
+    
+    installItemScrollSupport()
 }
 
 private fun closeSearchButton(filter: Provider<String>, main: Provider<Window>, results: Provider<Window>) = item {
