@@ -57,10 +57,9 @@ class BlockModelSelectorScope internal constructor(
      * with parent `minecraft:block/cube_all` and `"all": "namespace:block/name"`.
      */
     override val defaultModel: ModelBuilder by lazy {
-        val path = ResourcePath(ResourceType.Model, id.namespace(), "block/${id.value()}")
-        modelContent[path]
+        modelContent[ResourcePath(ResourceType.Model, id.namespace(), "block/${id.value()}")]
             ?.let(::ModelBuilder)
-            ?: createCubeModel(ResourcePath(ResourceType.Model, id.namespace(), "block/${id.value()}"))
+            ?: createCubeModel(ResourcePath(ResourceType.Texture, id.namespace(), "block/${id.value()}"))
     }
     
     /**
@@ -113,9 +112,9 @@ class BlockModelSelectorScope internal constructor(
     // TODO: utility methods to generate cube models from textures
     
     fun createCubeModel(all: String): ModelBuilder =
-        createCubeModel(ResourcePath.of(ResourceType.Model, all, id.namespace()))
+        createCubeModel(ResourcePath.of(ResourceType.Texture, all, id.namespace()))
     
-    fun createCubeModel(all: ResourcePath<ResourceType.Model>): ModelBuilder = ModelBuilder(
+    fun createCubeModel(all: ResourcePath<ResourceType.Texture>): ModelBuilder = ModelBuilder(
         Model(
             parent = ResourcePath(ResourceType.Model, "minecraft", "block/cube_all"),
             textures = mapOf("all" to Model.Texture(all.toString()))

@@ -6,12 +6,10 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.getMod
-import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.data.ImageUtils
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.buildDataComponentMapProvider
-import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
 import java.awt.Color
 
 /**
@@ -74,7 +72,6 @@ class AnimatedDye(
     }
     
     override val baseDataComponents = componentFrames.getMod(EquipmentAnimator.tick)
-    override val vanillaMaterialProperties = provider(listOf(VanillaMaterialProperty.DYEABLE))
     
     init {
         EquipmentAnimator.animatedBehaviors += this

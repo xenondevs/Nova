@@ -27,6 +27,7 @@ import xyz.xenondevs.nova.registry.entries.ItemTypeEntries
 import xyz.xenondevs.nova.registry.mapEach
 import xyz.xenondevs.nova.serialization.kotlinx.ComponentAsMiniMessage
 import xyz.xenondevs.nova.serialization.kotlinx.ValueOrList
+import xyz.xenondevs.nova.ui.menu.item.scrollableItemProvider
 import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.util.component.adventure.toPlainText
 import java.util.*
@@ -108,6 +109,9 @@ internal class CategorizedItem(
 ) {
     
     private val nameCache = HashMap<Locale, String>()
+    
+    // cached here to avoid expensive recomputation
+    val scrollableItemProvider = scrollableItemProvider(itemStack)
     
     fun getPlainTextName(locale: Locale): String =
         nameCache.getOrPut(locale) { name.toPlainText() }

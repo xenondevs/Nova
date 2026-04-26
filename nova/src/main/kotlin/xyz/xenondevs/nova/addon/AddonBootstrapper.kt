@@ -31,6 +31,7 @@ internal object AddonBootstrapper {
         checkRequiredNovaVersion(context, addonMeta)
         checkRequiredMinecraftVersion(context)
         
+        // TODO: create addon instance later when starting init, this is too early at the moment
         val addon = getAddonInstance(addonMeta, classLoader)
         addon.pluginMeta = context.pluginMeta
         addon.file = context.pluginSource

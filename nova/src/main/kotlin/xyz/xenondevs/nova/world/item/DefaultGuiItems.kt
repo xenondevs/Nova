@@ -1,15 +1,22 @@
 package xyz.xenondevs.nova.world.item
 
+import org.joml.Vector3d
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistrar.item
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryLoader
+import xyz.xenondevs.nova.resources.ResourcePath
+import xyz.xenondevs.nova.resources.ResourceType
+import xyz.xenondevs.nova.resources.builder.data.ItemModel
 import xyz.xenondevs.nova.resources.builder.data.TintSource
 import xyz.xenondevs.nova.resources.builder.layout.item.ConditionItemModelProperty
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelCreationScope
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
+import xyz.xenondevs.nova.resources.builder.layout.item.RangeDispatchItemModelProperty
+import xyz.xenondevs.nova.resources.builder.model.Model
+import xyz.xenondevs.nova.resources.builder.task.TextureContent
 import xyz.xenondevs.nova.util.data.writeImage
 import xyz.xenondevs.nova.world.block.behavior.Waterloggable
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
@@ -224,6 +231,58 @@ object DefaultGuiItems {
     val TP_SCROLLER_VERTICAL = tpGuiItem("scroller_vertical", stretched = true)
     val TP_SCROLLER_HORIZONTAL = tpGuiItem("scroller_horizontal", stretched = true)
     val TP_LIT_PROGRESS = tpGuiItem("lit_progress") // animated texture
+    
+    /**
+     * The default vertical scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
+     * 
+     * - `customModelData.floats[0]` defines the movement of the scroller, in pixels
+     * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
+     * - Height: 15px
+     */
+    val TP_SCROLL_BAR_VERTICAL = scrollBarItem(
+        "scroll_bar_vertical",
+        ResourcePath(ResourceType.Texture, "nova", "item/gui/moving_scroller_vertical"),
+        vertical = true
+    )
+    
+    /**
+     * The default vertical disabled scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
+     * 
+     * - `customModelData.floats[0]` defines whether the scroller is visible (1) or not (any other integer value)
+     * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
+     * - Height: 15px
+     */
+    val TP_SCROLL_BAR_VERTICAL_DISABLED = disabledScrollBarItem(
+        "scroll_bar_vertical_disabled",
+        ResourcePath(ResourceType.Texture, "nova", "item/gui/moving_scroller_vertical_disabled"),
+        vertical = true
+    )
+    
+    /**
+     * The default horizontal scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
+     * 
+     * - `customModelData.floats[0]` defines the movement of the scroller, in pixels
+     * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
+     * - Width: 15px
+     */
+    val TP_SCROLL_BAR_HORIZONTAL = scrollBarItem(
+        "scroll_bar_horizontal",
+        ResourcePath(ResourceType.Texture, "nova", "item/gui/moving_scroller_horizontal"),
+        vertical = false
+    )
+    
+    /**
+     * The default horizontal disabled scroll bar scroller item for [xyz.xenondevs.nova.ui.menu.item.scrollBar].
+     * 
+     * - `customModelData.floats[0]` defines whether the scroller is visible (1) or not (any other integer value)
+     * - `customModelData.floats[1]` defines the offset of the scroller, in pixels (range: `[-8, 8]`)
+     * - Width: 15px
+     */
+    val TP_SCROLL_BAR_HORIZONTAL_DISABLED = disabledScrollBarItem(
+        "scroll_bar_horizontal_disabled",
+        ResourcePath(ResourceType.Texture, "nova", "item/gui/moving_scroller_horizontal_disabled"),
+        vertical = false
+    )
     //</editor-fold>
     
 }
@@ -349,3 +408,74 @@ private fun barGuiItem(
         }
     }
 }
+
+//<editor-fold desc="scroll bar">
+private fun scrollBarItem(
+    name: String,
+    texture: ResourcePath<ResourceType.Texture>,
+    vertical: Boolean = true
+): RegistryEntry.Nova<NovaItem> = item("gui/transparent/$name") {
+    name(null)
+    hidden(true)
+    modelDefinition {
+        val textureContent = resourcePackBuilder.getBuildData<TextureContent>()
+        val base = textureContent.getImage(texture)
+        model = rangeDispatch(RangeDispatchItemModelProperty.CustomModelData) {
+            val empty = buildModel { createLayeredModel("nova:item/empty") }
+            entry[-Float.MAX_VALUE] = empty
+            for (off in -15..16) {
+                val img = BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB)
+                val graphics = img.createGraphics()
+                if (vertical) {
+                    graphics.drawImage(base, 0, off, null)
+                } else {
+                    graphics.drawImage(base, off, 0, null)
+                }
+                graphics.dispose()
+                val generatedImg = ResourcePath(ResourceType.Texture, "nova", "item/gui/${name}_$off")
+                resourcePackBuilder.writeImage(generatedImg, img)
+                entry[off.toFloat()] = secondaryOffsetModel(generatedImg, vertical)
+            }
+            entry[17] = empty
+        }
+    }
+}
+
+private fun disabledScrollBarItem(
+    name: String,
+    texture: ResourcePath<ResourceType.Texture>,
+    vertical: Boolean
+): RegistryEntry.Nova<NovaItem> = item("gui/transparent/$name") {
+    name(null)
+    hidden(true)
+    modelDefinition {
+        model = rangeDispatch(RangeDispatchItemModelProperty.CustomModelData) {
+            val empty = buildModel { createLayeredModel("nova:item/empty") }
+            entry[-Float.MAX_VALUE] = empty
+            entry[0] = secondaryOffsetModel(texture, vertical)
+            entry[1] = empty
+        }
+    }
+}
+
+private fun ItemModelCreationScope<ItemModelSelectorScope>.secondaryOffsetModel(
+    texture: ResourcePath<ResourceType.Texture>,
+    vertical: Boolean
+): ItemModel = rangeDispatch(RangeDispatchItemModelProperty.CustomModelData(1)) {
+    for (secondaryOff in -8..8) {
+        entry[secondaryOff.toFloat()] = buildModel {
+            val translation = if (vertical) {
+                Vector3d(secondaryOff.toDouble(), 0.0, 0.0)
+            } else {
+                Vector3d(0.0, -secondaryOff.toDouble(), 0.0)
+            }
+            createGuiModel(
+                background = false,
+                stretched = true,
+                texture,
+                display = Model.Display.Entry(translation = translation)
+            )
+        }
+    }
+}
+//</editor-fold>

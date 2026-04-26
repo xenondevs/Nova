@@ -31,10 +31,10 @@ internal class GuiTextureBuilderImpl(
     }
     
     override fun title(title: GuiTextureTitleBuilder.() -> Unit) {
-        GuiTextureTitleBilderImpl().apply(title).also { 
-            titlePosition = it.titlePosition
-            extraLines += it.extraLines
-        }
+        val titleBuilder = GuiTextureTitleBilderImpl()
+        titleBuilder.title()
+        titlePosition = titleBuilder.titlePosition
+        extraLines += titleBuilder.extraLines
     }
     
     override fun texture(texture: GuiTextureLayoutBuilder.() -> Unit) {

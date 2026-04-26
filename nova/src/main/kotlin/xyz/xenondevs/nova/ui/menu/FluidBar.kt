@@ -9,12 +9,11 @@ import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.ClickDsl
 import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.dsl.item
-import xyz.xenondevs.invui.dsl.by
 import xyz.xenondevs.invui.gui.SlotElementSupplier
-import xyz.xenondevs.invui.internal.util.InventoryUtils
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.util.InventoryUtils
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
@@ -128,7 +127,7 @@ fun fluidBar(
         }
     },
     onClick = onClick
-) 
+)
 
 private fun ItemBuilder.setFluidDisplayName(amount: Long, capacity: Long): ItemBuilder {
     if (amount == Long.MAX_VALUE) {

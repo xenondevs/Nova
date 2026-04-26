@@ -79,3 +79,4 @@ accessible class net/minecraft/server/network/ServerGamePacketListenerImpl$Entit
 accessible field net/minecraft/resources/RegistryLoadTask registry Lnet/minecraft/core/WritableRegistry;
 accessible class io/papermc/paper/world/migration/WorldMigrationSupport
 accessible field io/papermc/paper/world/migration/WorldMigrationSupport DIMENSION_DIRECTORIES Ljava/util/List;
+accessible method net/minecraft/tags/TagNetworkSerialization$NetworkPayload <init> (Ljava/util/Map;)V

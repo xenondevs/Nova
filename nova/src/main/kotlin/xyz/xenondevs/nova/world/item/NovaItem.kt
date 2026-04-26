@@ -15,7 +15,6 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.phys.Vec3
-import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -53,7 +52,6 @@ import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.asMixed
 import xyz.xenondevs.nova.registry.flatMap
 import xyz.xenondevs.nova.registry.map
-import xyz.xenondevs.nova.resources.builder.task.VanillaMaterialTypes
 import xyz.xenondevs.nova.serialization.kotlinx.ItemTypeEitherEntrySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ItemTypeMixedEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.NovaItemEntrySerializer
@@ -251,13 +249,6 @@ class NovaItem internal constructor(
     }
     
     /**
-     * The underlying vanilla material of this [NovaItem].
-     */
-    internal val vanillaMaterial: Material by combinedProvider(
-        behaviors.map(ItemBehavior::vanillaMaterialProperties)
-    ) { properties -> VanillaMaterialTypes.getMaterial(properties.flatten().toHashSet()) }
-    
-    /**
      * The base data components of this [NovaItem].
      */
     val baseDataComponents: DataComponentMap by combinedProvider(
@@ -373,8 +364,8 @@ class NovaItem internal constructor(
     fun modifyClientSideItemType(
         player: Player?,
         server: ItemStack,
-        client: Material
-    ): Material = runSafely("modify client-side item type", client, allowOffMain = true) {
+        client: ItemType
+    ): ItemType = runSafely("modify client-side item type", client, allowOffMain = true) {
         behaviors.fold(client) { current, behavior -> behavior.modifyClientSideItemType(player, server.clone(), current) }
     }
     

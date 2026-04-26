@@ -15,38 +15,37 @@ import net.minecraft.core.component.predicates.CustomDataPredicate
 import net.minecraft.core.component.predicates.DataComponentPredicates
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.Identifier
-import net.minecraft.world.item.ItemStackTemplate
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.addon.Addon
-import xyz.xenondevs.nova.addon.id
+import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.toNmsTemplate
-import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.createItemStack
 import java.util.*
 
 fun advancement(addon: Addon, name: String, init: Advancement.Builder.() -> Unit): AdvancementHolder {
     val builder = Advancement.Builder()
     builder.init()
-    return builder.build(Identifier.fromNamespaceAndPath(addon.id, name))
+    return builder.build(Identifier.fromNamespaceAndPath(addon.namespace(), name))
 }
 
 fun obtainNovaItemAdvancement(
     addon: Addon,
     parent: AdvancementHolder?,
-    item: NovaItem,
+    item: RegistryEntry.Nova<NovaItem>,
     frameType: AdvancementType = AdvancementType.TASK
 ): AdvancementHolder {
-    require(addon.id == item.id.namespace()) { "The specified item is from a different addon" }
-    val id = item.id
+    require(addon.namespace() == item.key.namespace()) { "The specified item is from a different addon" }
+    val id = item.key
     return advancement(addon, "obtain_${id.value()}") {
         if (parent != null)
             parent(parent)
         
         display(DisplayInfo(
-            item.clientsideProvider.get().toNmsTemplate()!!,
+            item.createItemStack().toNmsTemplate()!!,
             Component.translatable("advancement.${id.namespace()}.${id.value()}.title").toNMSComponent(),
             Component.translatable("advancement.${id.namespace()}.${id.value()}.description").toNMSComponent(),
             Optional.empty(),
@@ -62,17 +61,17 @@ fun obtainNovaItemsAdvancement(
     addon: Addon,
     name: String,
     parent: AdvancementHolder?,
-    items: List<NovaItem>, requireAll: Boolean,
+    items: List<RegistryEntry.Nova<NovaItem>>, requireAll: Boolean,
     frameType: AdvancementType = AdvancementType.TASK
 ): AdvancementHolder {
-    require(items.all { it.id.namespace() == addon.id }) { "At least one of the specified items is from a different addon" }
-    val namespace = addon.id
+    require(items.all { it.key.namespace() == addon.namespace() }) { "At least one of the specified items is from a different addon" }
+    val namespace = addon.namespace()
     return advancement(addon, name) {
         if (parent != null)
             parent(parent)
         
         display(DisplayInfo(
-            items[0].clientsideProvider.get().toNmsTemplate()!!,
+            items[0].createItemStack().toNmsTemplate()!!,
             Component.translatable("advancement.$namespace.$name.title").toNMSComponent(),
             Component.translatable("advancement.$namespace.$name.description").toNMSComponent(),
             Optional.empty(),
@@ -83,7 +82,7 @@ fun obtainNovaItemsAdvancement(
         val criteriaNames = ArrayList<String>()
         
         for (item in items) {
-            val criterionName = "obtain_${item.id.value()}"
+            val criterionName = "obtain_${item.key.value()}"
             addCriterion(criterionName, createObtainNovaItemCriterion(item))
             criteriaNames += criterionName
         }
@@ -96,10 +95,10 @@ fun obtainNovaItemsAdvancement(
     }
 }
 
-private fun createObtainNovaItemCriterion(item: NovaItem): Criterion<InventoryChangeTrigger.TriggerInstance> {
+private fun createObtainNovaItemCriterion(item: RegistryEntry.Nova<NovaItem>): Criterion<InventoryChangeTrigger.TriggerInstance> {
     val expectedCustomData = CompoundTag().apply {
         put("nova", CompoundTag().apply {
-            putString("id", item.id.toString())
+            putString("id", item.key.toString())
         })
     }
     return InventoryChangeTrigger.TriggerInstance.hasItems(

@@ -68,7 +68,10 @@ object DefaultGuiTextures {
         }
         inventoryLabel(false)
     }
-    val SEARCH_RESULTS = guiTexture("search_results") { texture { path("gui/search_results") } }
+    val SEARCH_RESULTS = guiTexture("search_results") { 
+        texture { path("gui/search_results") }
+        title { alignment(Alignment.LEFT, Vector2i(21, 18)) }
+    }
     val ITEMS_0 = guiTexture("items_0") {
         texture { path("gui/items/0") }
         inventoryLabel(false)

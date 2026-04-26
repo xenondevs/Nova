@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.world.item.behavior
 
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
-import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -14,6 +13,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.config.ConfigProvider
@@ -27,7 +27,6 @@ import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
 import xyz.xenondevs.nova.world.item.DataComponentMap
 import xyz.xenondevs.nova.world.item.ItemAction
 import xyz.xenondevs.nova.world.item.NovaItem
-import xyz.xenondevs.nova.world.item.vanilla.VanillaMaterialProperty
 
 /**
  * Either [ItemBehavior] or [ItemBehaviorFactory]
@@ -46,12 +45,6 @@ interface ItemBehavior : ItemBehaviorHolder {
      */
     val baseDataComponents: Provider<DataComponentMap>
         get() = provider(DataComponentMap.EMPTY)
-    
-    /**
-     * The vanilla material properties that an item with this [ItemBehavior] requires.
-     */
-    val vanillaMaterialProperties: Provider<List<VanillaMaterialProperty>>
-        get() = provider(emptyList())
     
     /**
      * Uses the [itemStack] with this behavior by itself, without targeting a block or entity.
@@ -171,7 +164,7 @@ interface ItemBehavior : ItemBehaviorHolder {
      * This is called before [modifyClientSideStack] and influences the generation of the client-side [ItemStack]'s patch.
      * Called off-main thread.
      */
-    fun modifyClientSideItemType(player: Player?, server: ItemStack, client: Material): Material = client
+    fun modifyClientSideItemType(player: Player?, server: ItemStack, client: ItemType): ItemType = client
     
     /**
      * Updates the [client-side item stack][client] that is to be viewed by [player] in place of the [server-side item stack][server].
