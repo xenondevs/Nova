@@ -117,18 +117,8 @@ internal class ItemsMenu private constructor(val player: Player) {
                     "* * * * * * * * *",
                     "h h h h h h h h h"
                 ) {
-                    val tabButtonsPage = mutableProvider(0)
-                    val tabButtonsPageCount = mutableProvider(0)
-                    '<' by tabPageBackItem(tabButtonsPage, tabButtonsPageCount)
-                    '>' by tabPageForwardItem(tabButtonsPage, tabButtonsPageCount)
-                    's' by searchButton(searchWindow)
-                    'i' by playerInventoryTabButton(ItemCategories.categories.map { it.size }, tab) // last tab
-                    'h' by ReferencingInventory.fromPlayerStorageContents(player.inventory)[27..35].apply {
-                        setGuiPriority(Integer.MAX_VALUE)
-                    }
-                    '*' by NoSlotItem
-                    'c' by cheatModeButton(cheatMode)
-                    
+                    val tabButtonsPage: MutableProvider<Int>
+                    val tabButtonsPageCount: Provider<Int>
                     'p' by pagedItemsGui(
                         "x . x . x . x . .",
                         ". . . . . . . . .",
@@ -138,16 +128,27 @@ internal class ItemsMenu private constructor(val player: Player) {
                         ". . . . . . . . .",
                         "x . x . x . x . ."
                     ) {
-                        page by tabButtonsPage
+                        tabButtonsPage = page
+                        tabButtonsPageCount = pageCount
+                        
                         var prevPage = page.get()
                         page.subscribe {
                             // adjust tab if not currently looking at player inventory tab
                             if (it != prevPage && tab.get() != playerInvTab.get())
                                 tab.set(it * CATEGORY_TAB_COUNT)
                         }
-                        tabButtonsPageCount.consume(pageCount)
                         content by ItemCategories.categories.mapEachIndexed { i, cat -> itemCategoryTabButton(i, cat, tab) }
                     }
+                    
+                    '<' by tabPageBackItem(tabButtonsPage, tabButtonsPageCount)
+                    '>' by tabPageForwardItem(tabButtonsPage, tabButtonsPageCount)
+                    's' by searchButton(searchWindow)
+                    'i' by playerInventoryTabButton(ItemCategories.categories.map { it.size }, tab) // last tab
+                    'h' by ReferencingInventory.fromPlayerStorageContents(player.inventory)[27..35].apply {
+                        setGuiPriority(Integer.MAX_VALUE)
+                    }
+                    '*' by NoSlotItem
+                    'c' by cheatModeButton(cheatMode)
                     
                     this.tab by tab
                     
