@@ -4,7 +4,11 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.Expiry
 import com.github.benmanes.caffeine.cache.LoadingCache
 import com.github.benmanes.caffeine.cache.Scheduler
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerMoveEvent
 import xyz.xenondevs.commons.collections.weakHashSet
 import xyz.xenondevs.invui.dsl.NormalSplitWindowDsl
 import xyz.xenondevs.invui.dsl.WindowDsl
@@ -14,6 +18,8 @@ import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.ui.menu.locale
 import xyz.xenondevs.nova.ui.overlay.guitexture.GuiTexture
 import xyz.xenondevs.nova.ui.overlay.guitexture.getTitle
+import xyz.xenondevs.nova.util.PlayerMapManager
+import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.world.block.tileentity.TileEntityMenu.Companion.from
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -49,15 +55,17 @@ interface TileEntityMenu {
          * Creates a new [TileEntityMenu] that has no main window, but can still track other windows.
          * The [open] function of the returned container will never open a window and always return `false`.
          */
-        fun none(): TileEntityMenu = TileEntityMenuImpl()
+        context(tileEntity: TileEntity)
+        fun none(): TileEntityMenu = TileEntityMenuImpl(tileEntity)
         
         /**
          * Create a new [TileEntityMenu] that uses [getWindow] to get the main 
          * window for the given [Player]. [getWindow] may create a new window each time
          * or re-use existing windows.
          */
+        context(tileEntity: TileEntity)
         fun from(getWindow: (Player) -> Window): TileEntityMenu =
-            IndividualTileEntityMenuImpl(getWindow)
+            IndividualTileEntityMenuImpl(tileEntity, getWindow)
         
         /**
          * Shortcut for [creating][from] a [TileEntityMenu] using the [standard][xyz.xenondevs.invui.dsl.window] [WindowDsl]
@@ -114,7 +122,7 @@ interface TileEntityMenu {
                     title by tileEntity.block.name
                 }
                 window()
-            } 
+            }
         }
         
         /**
@@ -142,7 +150,7 @@ interface TileEntityMenu {
             texture: RegistryEntry.Nova<GuiTexture>? = null,
             expireAfterClose: Duration = 1.minutes,
             window: (T.() -> Unit),
-        ): TileEntityMenu = CachedWindowTileEntityMenuImpl(expireAfterClose) {
+        ): TileEntityMenu = CachedWindowTileEntityMenuImpl(tileEntity, expireAfterClose) {
             windowDsl(it) {
                 if (texture != null) {
                     title by texture.getTitle(tileEntity.block.name, locale)
@@ -157,7 +165,9 @@ interface TileEntityMenu {
     
 }
 
-private open class TileEntityMenuImpl : TileEntityMenu {
+private open class TileEntityMenuImpl(
+    private val tileEntity: TileEntity
+) : TileEntityMenu {
     
     private val registeredWindows = weakHashSet<Window>()
     private val openWindows = HashSet<Window>()
@@ -168,9 +178,11 @@ private open class TileEntityMenuImpl : TileEntityMenu {
         
         window.addOpenHandler {
             openWindows += window
+            DistanceBasedMenuCloser.openMenus[window.viewer] = tileEntity
         }
         window.addCloseHandler {
             openWindows -= window
+            DistanceBasedMenuCloser.openMenus -= window.viewer
         }
     }
     
@@ -183,8 +195,9 @@ private open class TileEntityMenuImpl : TileEntityMenu {
 }
 
 private class IndividualTileEntityMenuImpl(
+    tileEntity: TileEntity,
     private val createWindow: (player: Player) -> Window
-) : TileEntityMenuImpl() {
+) : TileEntityMenuImpl(tileEntity) {
     
     override fun open(player: Player): Boolean {
         val window = createWindow(player)
@@ -197,6 +210,7 @@ private class IndividualTileEntityMenuImpl(
 }
 
 private class CachedWindowTileEntityMenuImpl(
+    private val tileEntity: TileEntity,
     expireAfterClose: Duration,
     createWindow: (Player) -> Window
 ) : TileEntityMenu {
@@ -231,12 +245,14 @@ private class CachedWindowTileEntityMenuImpl(
         window.addOpenHandler {
             openWindows += window
             activeViewers += viewer
+            DistanceBasedMenuCloser.openMenus[viewer] = tileEntity
             refreshExpiry(viewer)
         }
         
         window.addCloseHandler {
             openWindows -= window
             activeViewers -= window.viewer
+            DistanceBasedMenuCloser.openMenus -= viewer
             refreshExpiry(viewer)
         }
     }
@@ -253,6 +269,26 @@ private class CachedWindowTileEntityMenuImpl(
         override fun expireAfterUpdate(key: Player, value: Window, currentTime: Long, currentDuration: Long) =
             if (key in activeViewers) Long.MAX_VALUE else nanos
         
+    }
+    
+}
+
+private object DistanceBasedMenuCloser : Listener {
+    
+    val openMenus: MutableMap<Player, TileEntity> = PlayerMapManager.createMap()
+    
+    init {
+        registerEvents()
+    }
+    
+    @EventHandler
+    private fun handleMove(event: PlayerMoveEvent) {
+        val player = event.player
+        val tileEntity = openMenus[player]
+            ?: return
+        val reach = player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE)?.value ?: 10.0
+        if (tileEntity.pos.world != player.world || tileEntity.pos.location.toCenterLocation().distance(event.to) > (reach + 4.0))
+            player.closeInventory()
     }
     
 }
