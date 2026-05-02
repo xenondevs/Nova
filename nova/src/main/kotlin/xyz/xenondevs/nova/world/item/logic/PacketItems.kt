@@ -44,7 +44,6 @@ import net.minecraft.world.item.crafting.display.StonecutterRecipeDisplay
 import net.minecraft.world.item.trading.ItemCost
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
-import org.apache.commons.lang3.math.Fraction
 import org.bukkit.Material
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Player
@@ -205,15 +204,15 @@ internal object PacketItems : Listener, PacketListener {
                 offer.costB.map {
                     val stackB = getClientSideStack(event.player, it.itemStack)
                     ItemCost(stackB.typeHolder(), stackB.count, DataComponentExactPredicate.EMPTY, stackB)
-                }, 
+                },
                 getClientSideStack(event.player, offer.result),
                 offer.uses,
                 offer.maxUses,
                 offer.rewardExp,
                 offer.specialPriceDiff,
-                offer.demand, 
+                offer.demand,
                 offer.priceMultiplier,
-                offer.xp, 
+                offer.xp,
                 offer.ignoreDiscounts
             )
         }
@@ -312,6 +311,20 @@ internal object PacketItems : Listener, PacketListener {
         is SlotDisplay.WithRemainder -> SlotDisplay.WithRemainder(
             getClientSideSlotDisplay(display.input),
             getClientSideSlotDisplay(display.remainder)
+        )
+        
+        is SlotDisplay.WithAnyPotion -> SlotDisplay.WithAnyPotion(
+            getClientSideSlotDisplay(display.display)
+        )
+        
+        is SlotDisplay.OnlyWithComponent -> SlotDisplay.OnlyWithComponent(
+            getClientSideSlotDisplay(display.source),
+            display.component
+        )
+        
+        is SlotDisplay.DyedSlotDemo -> SlotDisplay.DyedSlotDemo(
+            getClientSideSlotDisplay(display.dye),
+            getClientSideSlotDisplay(display.target),
         )
         
         is SlotDisplay.AnyFuel,
