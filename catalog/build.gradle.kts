@@ -6,9 +6,12 @@ plugins {
 catalog {
     versionCatalog {
         version("kotlin", libs.versions.kotlin.get())
-        version("paper", libs.versions.paper.get())
         version("nova", project.version.toString())
-        version("minecraft", libs.versions.paper.get().substringBefore('-'))
+        val versionRegex = Regex("""(\d+\.\d+(?:\.\d+)?).*""")
+        val paperVersion = libs.versions.paper.get()
+        val mcVersion = versionRegex.matchEntire(paperVersion)!!.groupValues[1]
+        version("paper", paperVersion)
+        version("minecraft",  mcVersion)
         
         plugin("kotlin", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
         plugin("kotlinx.serialization", "org.jetbrains.kotlin.plugin.serialization").versionRef("kotlin")
