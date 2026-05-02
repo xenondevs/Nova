@@ -521,7 +521,7 @@ internal object PacketItems : Listener, PacketListener {
             return false
         
         itemStack.update(DataComponents.BUNDLE_CONTENTS) { bundleContents ->
-            BundleContents(bundleContents.items().map { getClientSideStack(player, it.create(), false).toTemplate() })
+            BundleContents(bundleContents.items().mapNotNull { getClientSideStack(player, it.create(), false).toTemplate() })
         }
         
         return true

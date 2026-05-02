@@ -109,7 +109,7 @@ internal class NovaShapedRecipe private constructor(
                     ingredients,
                     Optional.empty()
                 ),
-                recipe.result.toNmsTemplate(),
+                recipe.result.toNmsTemplate()!!,
                 choiceMatrix
             )
         }
@@ -140,7 +140,7 @@ internal class NovaShapedRecipe private constructor(
 internal class NovaShapelessRecipe(private val bukkitRecipe: BukkitShapelessRecipe) : ShapelessRecipe(
     Recipe.CommonInfo(true),
     CraftingRecipe.CraftingBookInfo(bukkitRecipe.category.nmsCategory, bukkitRecipe.group),
-    bukkitRecipe.result.toNmsTemplate(),
+    bukkitRecipe.result.toNmsTemplate()!!,
     bukkitRecipe.choiceList.map { it.toNmsIngredient() }
 ) {
     
@@ -165,7 +165,7 @@ internal class NovaFurnaceRecipe(private val bukkitRecipe: BukkitFurnaceRecipe) 
     Recipe.CommonInfo(true),
     CookingBookInfo(bukkitRecipe.category.nmsCategory, bukkitRecipe.group),
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.toNmsTemplate(),
+    bukkitRecipe.result.toNmsTemplate()!!,
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {
@@ -184,7 +184,7 @@ internal class NovaBlastFurnaceRecipe(private val bukkitRecipe: BukkitBlastingRe
     Recipe.CommonInfo(true),
     CookingBookInfo(bukkitRecipe.category.nmsCategory, bukkitRecipe.group),
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.toNmsTemplate(),
+    bukkitRecipe.result.toNmsTemplate()!!,
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {
@@ -203,7 +203,7 @@ internal class NovaSmokerRecipe(private val bukkitRecipe: BukkitSmokingRecipe) :
     Recipe.CommonInfo(true),
     CookingBookInfo(bukkitRecipe.category.nmsCategory, bukkitRecipe.group),
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.toNmsTemplate(),
+    bukkitRecipe.result.toNmsTemplate()!!,
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {
@@ -222,7 +222,7 @@ internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe
     Recipe.CommonInfo(true),
     CookingBookInfo(bukkitRecipe.category.nmsCategory, bukkitRecipe.group),
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.toNmsTemplate(),
+    bukkitRecipe.result.toNmsTemplate()!!,
     bukkitRecipe.experience,
     bukkitRecipe.cookingTime
 ) {
@@ -240,7 +240,7 @@ internal class NovaCampfireRecipe(private val bukkitRecipe: BukkitCampfireRecipe
 internal class NovaStonecutterRecipe(private val bukkitRecipe: BukkitStonecuttingRecipe) : StonecutterRecipe(
     Recipe.CommonInfo(true),
     bukkitRecipe.inputChoice.toNmsIngredient(),
-    bukkitRecipe.result.toNmsTemplate()
+    bukkitRecipe.result.toNmsTemplate()!!
 ) {
     
     private val choice = bukkitRecipe.inputChoice
@@ -258,7 +258,7 @@ internal class NovaSmithingTransformRecipe(private val bukkitRecipe: BukkitSmith
     Optional.of(bukkitRecipe.template.toNmsIngredient()),
     bukkitRecipe.base.toNmsIngredient(),
     Optional.of(bukkitRecipe.addition.toNmsIngredient()),
-    bukkitRecipe.result.toNmsTemplate()
+    bukkitRecipe.result.toNmsTemplate()!!
 ) {
     
     private val templateChoice = bukkitRecipe.template

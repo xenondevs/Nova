@@ -350,11 +350,11 @@ fun MojangBlockPos.toNovaPos(world: World): BlockPos =
 fun Vec3.toVector3d(): Vector3d =
     Vector3d(x, y, z)
 
-fun ItemStack.toNmsTemplate(): ItemStackTemplate =
+fun ItemStack.toNmsTemplate(): ItemStackTemplate? =
     unwrap().toTemplate()
 
-fun MojangStack.toTemplate(): ItemStackTemplate =
-    ItemStackTemplate.fromNonEmptyStack(this)
+fun MojangStack.toTemplate(): ItemStackTemplate? =
+    if (!isEmpty) ItemStackTemplate.fromNonEmptyStack(this) else null
 
 fun Player.send(vararg packets: Packet<*>) {
     val connection = serverPlayer.connection
