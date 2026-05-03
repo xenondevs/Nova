@@ -19,9 +19,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.bukkit.World
 import xyz.xenondevs.commons.collections.mapToBooleanArray
@@ -38,6 +36,8 @@ import xyz.xenondevs.nova.world.block.tileentity.network.task.ProtectionResult
 import xyz.xenondevs.nova.world.block.tileentity.network.task.UnloadChunkTask
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 internal class NetworkConfigurator(private val world: World, private val ticker: NetworkTicker) {
     
@@ -55,7 +55,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     /**
      * Lock for [loadedChunks] and [taskBacklog].
      */
-    private val queueLock = Mutex()
+    private val queueLock = ReentrantLock()
     
     /**
      * Contains all positions of chunks that will be loaded for a network task queued now.
@@ -131,33 +131,31 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
      * Enqueues the [task] to be processed by the appropriate coroutine.
      * Also queries protection in case of [ProtectedNodeNetworkTask].
      */
-    fun queueTask(task: NetworkTask): Unit = runBlocking {
-        queueLock.withLock {
-            if (task is ProtectedNodeNetworkTask)
-                protectionResults[task] = CoroutineScope(protectionSupervisor).async(Dispatchers.Default) { queryProtection(task.node) }
+    fun queueTask(task: NetworkTask): Unit = queueLock.withLock {
+        if (task is ProtectedNodeNetworkTask)
+            protectionResults[task] = CoroutineScope(protectionSupervisor).async(Dispatchers.Default) { queryProtection(task.node) }
+        
+        // ensure load chunk task is queued before any other task that might need its data
+        val chunkPos = task.chunkPos
+        if (task is LoadChunkTask) {
+            // ignore duplicate chunk load requests
+            if (chunkPos in loadedChunks)
+                return@withLock
             
-            // ensure load chunk task is queued before any other task that might need its data
-            val chunkPos = task.chunkPos
-            if (task is LoadChunkTask) {
-                // ignore duplicate chunk load requests
-                if (chunkPos in loadedChunks)
-                    return@runBlocking
-                
-                taskChannel.send(task)
-                loadedChunks += chunkPos
-                taskBacklog.remove(chunkPos)?.forEach { taskChannel.send(it) }
-            } else if (task is UnloadChunkTask) {
-                // ignore duplicate chunk unload requests
-                if (chunkPos !in loadedChunks)
-                    return@runBlocking
-                
-                taskChannel.send(task)
-                loadedChunks -= chunkPos
-            } else if (chunkPos !in loadedChunks) {
-                taskBacklog.getOrPut(chunkPos, ::ArrayList) += task
-            } else {
-                taskChannel.send(task)
-            }
+            taskChannel.trySend(task).getOrThrow()
+            loadedChunks += chunkPos
+            taskBacklog.remove(chunkPos)?.forEach { taskChannel.trySend(it).getOrThrow() }
+        } else if (task is UnloadChunkTask) {
+            // ignore duplicate chunk unload requests
+            if (chunkPos !in loadedChunks)
+                return@withLock
+            
+            taskChannel.trySend(task).getOrThrow()
+            loadedChunks -= chunkPos
+        } else if (chunkPos !in loadedChunks) {
+            taskBacklog.getOrPut(chunkPos, ::ArrayList) += task
+        } else {
+            taskChannel.trySend(task).getOrThrow()
         }
     }
     
