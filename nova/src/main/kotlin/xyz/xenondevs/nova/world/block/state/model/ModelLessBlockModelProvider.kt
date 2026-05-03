@@ -11,6 +11,7 @@ import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.util.withoutBlockMigration
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.BlockUpdateMethod
 
 /**
  * A block model provider that just places a vanilla block state that is not associated with any custom model.
@@ -26,9 +27,9 @@ internal class ModelLessBlockModelProvider(
     override fun set(pos: BlockPos, method: BlockUpdateMethod) {
         withoutBlockMigration(pos) {
             when (method) {
-                BlockUpdateMethod.DEFAULT -> pos.setBlockState(info.nmsBlockState)
-                BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.nmsBlockState)
-                BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.nmsBlockState)
+                BlockUpdateMethod.WITH_BLOCK_UPDATES -> pos.setBlockState(info.nmsBlockState)
+                BlockUpdateMethod.WITHOUT_BLOCK_UPDATES -> pos.setBlockStateNoUpdate(info.nmsBlockState)
+                BlockUpdateMethod.WITHOUT_BOCK_UPDATES_WITHOUT_PACKETS -> pos.setBlockStateSilently(info.nmsBlockState)
             }
         }
     }

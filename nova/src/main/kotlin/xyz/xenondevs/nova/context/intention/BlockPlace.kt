@@ -32,6 +32,7 @@ import xyz.xenondevs.nova.util.novaKey
 object BlockPlace :
     AbstractContextIntention<BlockPlace>(),
     HasRequiredBlock<BlockPlace>,
+    HasBlockUpdateMethod<BlockPlace>,
     HasOptionalTileEntity<BlockPlace>,
     HasOptionalSource<BlockPlace>,
     HasOptionalBlockInteraction<BlockPlace>,

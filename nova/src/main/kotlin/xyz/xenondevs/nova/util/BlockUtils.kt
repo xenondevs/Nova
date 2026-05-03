@@ -66,6 +66,7 @@ import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.particle.block
 import xyz.xenondevs.nova.util.particle.particle
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.BlockUpdateMethod
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockSounds
 import xyz.xenondevs.nova.world.block.behavior.Breakable
@@ -257,14 +258,14 @@ object BlockUtils {
      * @throws IllegalArgumentException If there is no custom Nova block of the same block type at [pos].
      * For such cases, use [breakBlock] and [placeBlock] instead.
      */
-    fun updateBlockState(pos: BlockPos, blockState: NovaBlockState) {
+    fun updateBlockState(pos: BlockPos, blockState: NovaBlockState, method: BlockUpdateMethod = BlockUpdateMethod.WITH_BLOCK_UPDATES) {
         val prevBlockState = WorldDataManager.getBlockState(pos)
         if (prevBlockState == blockState)
             return
         
         require(prevBlockState != null && prevBlockState.block == blockState.block) { "New block state needs to be of the same block type" }
         
-        blockState.modelProvider.replace(pos, prevBlockState.modelProvider)
+        blockState.modelProvider.replace(pos, prevBlockState.modelProvider, method)
         WorldDataManager.setBlockState(pos, blockState)
     }
     
@@ -279,10 +280,13 @@ object BlockUtils {
     fun placeBlock(ctx: Context<BlockPlace>): Boolean {
         val pos = ctx[BlockPlace.BLOCK_POS]
         
+        // TODO: combined break+place that uses model provider replace
+        
         // break previous block (if present)
         val breakCtx = Context.intention(BlockBreak)
             .param(BlockBreak.BLOCK_POS, pos)
             .param(BlockBreak.BLOCK_BREAK_EFFECTS, false)
+            .param(BlockBreak.BLOCK_UPDATE_METHOD, ctx[BlockPlace.BLOCK_UPDATE_METHOD])
             .build()
         breakBlock(breakCtx)
         
@@ -293,6 +297,7 @@ object BlockUtils {
         }
         
         // TODO: place block by block state / id
+        // TODO: respect block update method
         val itemStack: ItemStack? = ctx[BlockPlace.BLOCK_ITEM_STACK]
         val placeEffects = ctx[BlockPlace.BLOCK_PLACE_EFFECTS]
         if (itemStack != null) {

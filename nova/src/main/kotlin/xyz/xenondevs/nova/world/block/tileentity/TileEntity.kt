@@ -25,6 +25,7 @@ import xyz.xenondevs.nova.util.item.storeData
 import xyz.xenondevs.nova.util.salt
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.InteractionResult
+import xyz.xenondevs.nova.world.block.BlockUpdateMethod
 import xyz.xenondevs.nova.world.block.NovaTileEntityBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehavior
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -231,7 +232,7 @@ abstract class TileEntity(
      *
      * @throws IllegalArgumentException If [blockState] is not of this [TileEntity's][TileEntity] block type.
      */
-    fun updateBlockState(blockState: NovaBlockState) {
+    fun updateBlockState(blockState: NovaBlockState, method: BlockUpdateMethod = BlockUpdateMethod.WITH_BLOCK_UPDATES) {
         require(isEnabled) { "TileEntity needs to be enabled" }
         require(blockState.block == block) { "New block state needs to be of the same block type" }
         
@@ -239,7 +240,7 @@ abstract class TileEntity(
         if (blockState == prevBlockState)
             return
         
-        blockState.modelProvider.replace(pos, prevBlockState.modelProvider)
+        blockState.modelProvider.replace(pos, prevBlockState.modelProvider, method)
         WorldDataManager.setBlockState(pos, blockState)
     }
     

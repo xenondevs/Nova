@@ -7,6 +7,7 @@ import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.util.withoutBlockMigration
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.BlockUpdateMethod
 
 /**
  * A block model provider that uses vanilla block states to display the block model.
@@ -18,9 +19,9 @@ internal class BackingStateBlockModelProvider(val info: BackingStateConfig) : Bl
     override fun set(pos: BlockPos, method: BlockUpdateMethod) {
         withoutBlockMigration(pos) {
             when (method) {
-                BlockUpdateMethod.DEFAULT -> pos.setBlockState(info.vanillaBlockState)
-                BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.vanillaBlockState)
-                BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.vanillaBlockState)
+                BlockUpdateMethod.WITH_BLOCK_UPDATES -> pos.setBlockState(info.vanillaBlockState)
+                BlockUpdateMethod.WITHOUT_BLOCK_UPDATES -> pos.setBlockStateNoUpdate(info.vanillaBlockState)
+                BlockUpdateMethod.WITHOUT_BOCK_UPDATES_WITHOUT_PACKETS -> pos.setBlockStateSilently(info.vanillaBlockState)
             }
         }
     }

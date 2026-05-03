@@ -36,7 +36,7 @@ import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.DefaultBlocks
 import xyz.xenondevs.nova.world.block.NovaBlock
-import xyz.xenondevs.nova.world.block.state.model.BlockUpdateMethod
+import xyz.xenondevs.nova.world.block.BlockUpdateMethod
 import xyz.xenondevs.nova.world.block.state.model.BrownMushroomBackingStateConfig
 import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvider
 import xyz.xenondevs.nova.world.block.state.model.MushroomStemBackingStateConfig
@@ -166,7 +166,7 @@ internal object BlockMigrator : Listener {
         // migrate Nova backing states
         val regionChunk = runBlocking { WorldDataManager.getOrLoadChunk(chunk.pos) } // should already be loaded in most cases
         regionChunk.forEachNonEmpty { pos, blockState ->
-            blockState.modelProvider.replace(pos, BlockUpdateMethod.SILENT)
+            blockState.modelProvider.replace(pos, BlockUpdateMethod.WITHOUT_BOCK_UPDATES_WITHOUT_PACKETS)
         }
         
         // migrate vanilla block states that are used by Nova 
