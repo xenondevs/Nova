@@ -5,8 +5,11 @@ import org.junit.jupiter.api.assertThrows
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.nova.byteWriter
 import xyz.xenondevs.nova.world.format.MockIdResolver
+import xyz.xenondevs.nova.world.format.SectionMatchResult
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class SingleValueSectionDataContainerTest {
     
@@ -59,6 +62,43 @@ class SingleValueSectionDataContainerTest {
                 }
             }
         }
+    }
+    
+    @Test
+    fun testMatchEmptySection() {
+        val container = SingleValueSectionDataContainer<String>(MockIdResolver(), null)
+        assertAllFalse(container.match(setOf("a")))
+        assertAllFalse(container.match(setOf("a", "b")))
+        assertAllFalse(container.match(emptySet()))
+    }
+    
+    @Test
+    fun testMatchEmptySetOnFilledSection() {
+        val container = SingleValueSectionDataContainer(MockIdResolver(), "a")
+        assertAllFalse(container.match(emptySet()))
+    }
+    
+    @Test
+    fun testMatchContainingValue() {
+        val container = SingleValueSectionDataContainer(MockIdResolver(), "a")
+        assertAllTrue(container.match(setOf("a")))
+        assertAllTrue(container.match(setOf("a", "b")))
+        assertAllTrue(container.match(setOf("b", "a")))
+    }
+    
+    @Test
+    fun testMatchNotContainingValue() {
+        val container = SingleValueSectionDataContainer(MockIdResolver(), "a")
+        assertAllFalse(container.match(setOf("b")))
+        assertAllFalse(container.match(setOf("b", "c", "d")))
+    }
+    
+    private fun assertAllTrue(result: SectionMatchResult) {
+        for (i in 0..<4096) assertTrue(result[i], "expected true at $i")
+    }
+    
+    private fun assertAllFalse(result: SectionMatchResult) {
+        for (i in 0..<4096) assertFalse(result[i], "expected false at $i")
     }
     
 }

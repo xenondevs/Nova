@@ -27,6 +27,7 @@ import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.tileentity.TileEntity
 import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.world.format.BlockStateIdResolver
+import xyz.xenondevs.nova.world.format.SectionMatchResult
 import xyz.xenondevs.nova.world.format.chunk.RegionizedChunk.Companion.packBlockPos
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -175,6 +176,15 @@ internal class RegionChunk(
                 action(pos.blockPos(x, bottomY + y, z), blockState)
             }
         }
+    }
+    
+    /**
+     * Checks for the block states in [match] in the section with the index [section]
+     * and returns the result.
+     */
+    fun matchSection(section: Int, match: Set<NovaBlockState>): SectionMatchResult {
+        val section = sections.getOrNull(section) ?: return SectionMatchResult.NONE
+        return section.container.match(match)
     }
     
     /**
