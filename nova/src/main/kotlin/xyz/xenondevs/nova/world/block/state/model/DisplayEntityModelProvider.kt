@@ -23,6 +23,7 @@ import xyz.xenondevs.nova.util.setBlockStateNoUpdate
 import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.util.withoutBlockMigration
 import xyz.xenondevs.nova.world.BlockPos
+import xyz.xenondevs.nova.world.block.BlockUpdateMethod
 import xyz.xenondevs.nova.world.fakeentity.FakeEntity
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemDisplayMetadata
@@ -76,9 +77,9 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
     private fun placeHitbox(pos: BlockPos, method: BlockUpdateMethod) {
         withoutBlockMigration(pos) {
             when (method) {
-                BlockUpdateMethod.DEFAULT -> pos.setBlockState(info.collider.nmsBlockState)
-                BlockUpdateMethod.NO_UPDATE -> pos.setBlockStateNoUpdate(info.collider.nmsBlockState)
-                BlockUpdateMethod.SILENT -> pos.setBlockStateSilently(info.collider.nmsBlockState)
+                BlockUpdateMethod.WITH_BLOCK_UPDATES -> pos.setBlockState(info.collider.nmsBlockState)
+                BlockUpdateMethod.WITHOUT_BLOCK_UPDATES -> pos.setBlockStateNoUpdate(info.collider.nmsBlockState)
+                BlockUpdateMethod.WITHOUT_BOCK_UPDATES_WITHOUT_PACKETS -> pos.setBlockStateSilently(info.collider.nmsBlockState)
             }
         }
     }

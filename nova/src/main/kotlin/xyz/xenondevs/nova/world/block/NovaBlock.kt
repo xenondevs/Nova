@@ -338,7 +338,7 @@ open class NovaBlock internal constructor(
         state: NovaBlockState,
         ctx: Context<BlockPlace>
     ): Unit = runSafely("handle place") {
-        state.modelProvider.set(pos)
+        state.modelProvider.set(pos, ctx[BlockPlace.BLOCK_UPDATE_METHOD])
         behaviors.forEach { it.handlePlace(pos, state, ctx) }
     }
     
@@ -350,7 +350,7 @@ open class NovaBlock internal constructor(
         state: NovaBlockState,
         ctx: Context<BlockBreak>
     ): Unit = runSafely("handle break") {
-        state.modelProvider.remove(pos)
+        state.modelProvider.remove(pos, ctx[BlockBreak.BLOCK_UPDATE_METHOD])
         if (state[DefaultBlockStateProperties.WATERLOGGED] == true)
             pos.block.type = Material.WATER
         behaviors.forEach { it.handleBreak(pos, state, ctx) }

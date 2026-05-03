@@ -43,6 +43,7 @@ import xyz.xenondevs.nova.world.item.tool.ToolCategory
 object BlockBreak :
     AbstractContextIntention<BlockBreak>(),
     HasRequiredBlock<BlockBreak>,
+    HasBlockUpdateMethod<BlockBreak>,
     HasOptionalTileEntity<BlockBreak>,
     HasOptionalSource<BlockBreak>,
     HasOptionalBlockInteraction<BlockBreak>,
