@@ -10,8 +10,9 @@ import xyz.xenondevs.nova.context.DefaultingContextParamType
 import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_DROPS
 import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_EXP_DROPS
 import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_POS
+import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_STATE_NOVA
+import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_STATE_VANILLA
 import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_STORAGE_DROPS
-import xyz.xenondevs.nova.context.intention.BlockBreak.BLOCK_TYPE
 import xyz.xenondevs.nova.context.intention.BlockBreak.HELD_ITEM_STACK
 import xyz.xenondevs.nova.context.intention.BlockBreak.SOURCE_PLAYER
 import xyz.xenondevs.nova.context.intention.BlockBreak.TOOL_ITEM_STACK
@@ -31,12 +32,13 @@ import xyz.xenondevs.nova.world.item.tool.ToolCategory
  *
  * | Target | # | Source(s) | Notes |
  * |--------|---|-----------|-------|
- * | [BLOCK_TYPE] | +1. | [BLOCK_POS] | |
  * | [TOOL_ITEM_STACK] | 1. | [HELD_ITEM_STACK] | Only if tool |
  * | [BLOCK_DROPS] | 1. | [BLOCK_POS], [TOOL_ITEM_STACK], [SOURCE_PLAYER] | |
  * | | 2. | [BLOCK_POS], [SOURCE_PLAYER] | |
  * | | 3. | [BLOCK_POS] | |
  * | [BLOCK_EXP_DROPS] | 1. | [BLOCK_DROPS] | |
+ * | [BLOCK_STATE_NOVA] | +1. | [BLOCK_POS] | Only if Nova block |
+ * | [BLOCK_STATE_VANILLA] | +1. | [BLOCK_POS] | Only if vanilla block |
  */
 object BlockBreak :
     AbstractContextIntention<BlockBreak>(),
@@ -115,7 +117,8 @@ object BlockBreak :
         addAutofiller(BLOCK_EXP_DROPS, Autofiller.from(BLOCK_DROPS) { it })
         
         // extra autofillers for inherited properties
-        addAutofiller(BLOCK_TYPE, Autofiller.from(BLOCK_POS) { it.block.id })
+        addAutofiller(BLOCK_STATE_NOVA, Autofiller.from(BLOCK_POS) { it.novaBlockState })
+        addAutofiller(BLOCK_STATE_VANILLA, Autofiller.from(BLOCK_POS) { if(it.block.id.namespace() == "minecraft") it.block.blockData else null })
     }
     
 }
