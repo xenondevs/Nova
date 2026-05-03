@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.format.chunk.container
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.world.format.IdResolver
+import xyz.xenondevs.nova.world.format.SectionMatchResult
 
 internal class SingleValueSectionDataContainer<T> : SectionDataContainer<T> {
     
@@ -43,6 +44,12 @@ internal class SingleValueSectionDataContainer<T> : SectionDataContainer<T> {
                 }
             }
         }
+    }
+    
+    override fun match(match: Set<T>): SectionMatchResult {
+        if (match.any { it == value })
+            return SectionMatchResult.ALL
+        return SectionMatchResult.NONE
     }
     
     override fun fill(value: T?) {

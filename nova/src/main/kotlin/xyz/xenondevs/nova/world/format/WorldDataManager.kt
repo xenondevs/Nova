@@ -112,6 +112,12 @@ object WorldDataManager : Listener {
     fun getTileEntity(pos: BlockPos): TileEntity? =
         getChunkOrThrow(pos.chunkPos).getTileEntity(pos)
     
+    fun matchSection(world: World, sx: Int, sy: Int, sz: Int, match: Set<NovaBlockState>): SectionMatchResult {
+        val sectionIndex = sy - (world.minHeight shr 4)
+        return getChunkOrNull(ChunkPos(world.uid, sx, sz))?.matchSection(sectionIndex, match) 
+            ?: SectionMatchResult.NONE
+    }
+    
     internal suspend fun getOrLoadTileEntity(pos: BlockPos): TileEntity? =
         getOrLoadChunk(pos.chunkPos).getTileEntity(pos)
     

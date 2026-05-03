@@ -115,4 +115,34 @@ class MapSectionDataContainerTest : AbstractSectionDataContainerTest() {
         testDataMigrateOnPaletteResize(MapSectionDataContainer(MockIdResolver()))
     }
     
+    @Test
+    fun testMatchEmptyContainer() {
+        testMatchEmptyContainer(MapSectionDataContainer(MockIdResolver()))
+    }
+    
+    @Test
+    fun testMatchEmptySet() {
+        testMatchEmptySet(MapSectionDataContainer(MockIdResolver()))
+    }
+    
+    @Test
+    fun testMatchValuesNotInPalette() {
+        testMatchValuesNotInPalette(MapSectionDataContainer(MockIdResolver()))
+    }
+    
+    @Test
+    fun testMatchSingleValue() {
+        testMatchSingleValue(MapSectionDataContainer(MockIdResolver()))
+    }
+    
+    @Test
+    fun testMatchMultipleValues() {
+        testMatchMultipleValues(MapSectionDataContainer(MockIdResolver()))
+    }
+    
+    @Test
+    fun testMatchMultipleValuesPartiallyInPalette() {
+        testMatchMultipleValuesPartiallyInPalette(MapSectionDataContainer(MockIdResolver()))
+    }
+    
 }

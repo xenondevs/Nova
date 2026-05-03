@@ -1,8 +1,10 @@
 package xyz.xenondevs.nova.world.format.chunk.container
 
+import it.unimi.dsi.fastutil.ints.IntArrayList
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.world.format.IdResolver
+import xyz.xenondevs.nova.world.format.SectionMatchResult
 import xyz.xenondevs.nova.world.format.chunk.data.MappedCompactIntStorage
 import xyz.xenondevs.nova.world.format.chunk.data.forEach
 import xyz.xenondevs.nova.world.format.chunk.palette.LinearPalette
@@ -62,6 +64,42 @@ internal class MapSectionDataContainer<T> : PalletizedSectionDataContainer<T> {
         data.forEach { packedPos, value ->
             action(unpackX(packedPos), unpackY(packedPos), unpackZ(packedPos), palette.getValue(value)!!)
         }
+    }
+    
+    override fun match(match: Set<T>): SectionMatchResult {
+        if (nonEmptyBlockCount == 0 || match.isEmpty())
+            return SectionMatchResult.NONE
+        
+        if (match.size > 1) {
+            val ids = IntArrayList()
+            for (value in match) {
+                val id = palette.getId(value)
+                if (id != 0)
+                    ids.add(id)
+            }
+            
+            if (ids.size > 1) {
+                val array = LongArray(SECTION_SIZE)
+                data.forEach { i, otherId -> SectionMatchResult.set(array, i, ids.contains(otherId)) }
+                return SectionMatchResult(array)
+            } else if (ids.size == 1) {
+                val id = ids.getInt(0)
+                return matchSingle(id)
+            } else {
+                return SectionMatchResult.NONE
+            }
+        } else {
+            val id = palette.getId(match.first())
+            if (id == 0)
+                return SectionMatchResult.NONE
+            return matchSingle(id)
+        }
+    }
+    
+    private fun matchSingle(id: Int): SectionMatchResult {
+        val array = LongArray(SECTION_SIZE)
+        data.forEach { i, otherId -> SectionMatchResult.set(array, i, otherId == id) }
+        return SectionMatchResult(array)
     }
     
     override fun isMonotone(): Boolean {

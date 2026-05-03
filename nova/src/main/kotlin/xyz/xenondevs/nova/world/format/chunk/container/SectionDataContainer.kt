@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.format.chunk.container
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
 import xyz.xenondevs.nova.world.format.IdResolver
+import xyz.xenondevs.nova.world.format.SectionMatchResult
 
 /**
  * A container for values of type [T] in a 16x16x16 space.
@@ -40,6 +41,11 @@ internal sealed class SectionDataContainer<T>(protected val idResolver: IdResolv
      * for each of them.
      */
     abstract fun forEachNonEmpty(action: (x: Int, y: Int, z: Int, value: T) -> Unit)
+    
+    /**
+     * Matches the values in the section with the specified [match] set and returns the result.
+     */
+    abstract fun match(match: Set<T>): SectionMatchResult
     
     /**
      * Checks whether all values in the section are the same.
