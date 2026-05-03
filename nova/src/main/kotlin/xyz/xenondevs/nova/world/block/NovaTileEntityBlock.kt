@@ -1,9 +1,7 @@
 package xyz.xenondevs.nova.world.block
 
-import kotlinx.serialization.json.JsonObject
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
-import org.spongepowered.configurate.CommentedConfigurationNode
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.config.ConfigProvider
@@ -39,7 +37,7 @@ class NovaTileEntityBlock internal constructor(
         val data = ctx[BlockPlace.TILE_ENTITY_DATA_NOVA] ?: Compound()
         
         // write owner into data so that it is accessible during tile-entity construction
-        val owner = ctx[BlockPlace.SOURCE_PLAYER] ?: ctx[BlockPlace.SOURCE_TILE_ENTITY]?.owner
+        val owner = ctx[BlockPlace.RESPONSIBLE_PLAYER]
         if (owner != null) data["ownerUuid"] = owner.uniqueId
         
         val tileEntity = tileEntityBlock.tileEntityConstructor(pos, state, data)
