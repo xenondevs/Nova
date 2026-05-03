@@ -2,6 +2,8 @@
 
 package xyz.xenondevs.nova.resources.builder.layout.item
 
+import org.joml.Matrix4f
+import org.joml.Matrix4fc
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -63,15 +65,21 @@ class RangeDispatchItemModelBuilder<S : ModelSelectorScope> internal constructor
      */
     var fallback: ItemModel? = null
     
+    /**
+     * An additional transformationation matrix that is applied to the resulting model on top of the
+     * transformationations defined in the matched entry (or [fallback]).
+     */
+    var transformation: Matrix4fc = Matrix4f()
+    
     internal fun build(): ItemModel.RangeDispatch =
-        property.buildModel(scale, entry.entries, fallback)
+        property.buildModel(scale, entry.entries, fallback, transformation)
     
 }
 
 sealed class RangeDispatchItemModelProperty(internal val property: ItemModel.RangeDispatch.Property) {
     
-    internal open fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
-        ItemModel.RangeDispatch(property, scale, entries, fallback)
+    internal open fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?, transformation: Matrix4fc) =
+        ItemModel.RangeDispatch(property, scale, entries, fallback, transformation)
     
     /**
      * Returns the weight of the `minecraft:bundle_contents` component, or `0` if not present.
@@ -87,8 +95,8 @@ sealed class RangeDispatchItemModelProperty(internal val property: ItemModel.Ran
         private val normalize: Boolean
     ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.DAMAGE) {
         
-        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
-            ItemModel.RangeDispatch(property, scale, entries, fallback, normalize = normalize)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?, transformation: Matrix4fc) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, transformation, normalize = normalize)
         
         companion object : Damage(true)
         
@@ -103,8 +111,8 @@ sealed class RangeDispatchItemModelProperty(internal val property: ItemModel.Ran
         private val normalize: Boolean
     ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.COUNT) {
         
-        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
-            ItemModel.RangeDispatch(property, scale, entries, fallback, normalize = normalize)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?, transformation: Matrix4fc) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, transformation, normalize = normalize)
         
         companion object : Count(true)
         
@@ -124,8 +132,8 @@ sealed class RangeDispatchItemModelProperty(internal val property: ItemModel.Ran
         private val wobble: Boolean = true
     ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.TIME) {
         
-        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
-            ItemModel.RangeDispatch(property, scale, entries, fallback, source = source, wobble = wobble)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?, transformation: Matrix4fc) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, transformation, source = source, wobble = wobble)
         
     }
     
@@ -139,8 +147,8 @@ sealed class RangeDispatchItemModelProperty(internal val property: ItemModel.Ran
         private val wobble: Boolean = true
     ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.COMPASS) {
         
-        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
-            ItemModel.RangeDispatch(property, scale, entries, fallback, target = target, wobble = wobble)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?, transformation: Matrix4fc) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, transformation, target = target, wobble = wobble)
         
     }
     
@@ -158,8 +166,8 @@ sealed class RangeDispatchItemModelProperty(internal val property: ItemModel.Ran
         private val remaining: Boolean
     ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.USE_DURATION) {
         
-        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
-            ItemModel.RangeDispatch(property, scale, entries, fallback, remaining = remaining)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?, transformation: Matrix4fc) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, transformation, remaining = remaining)
         
         companion object : UseDuration(false)
         
@@ -172,8 +180,8 @@ sealed class RangeDispatchItemModelProperty(internal val property: ItemModel.Ran
         private val period: Double
     ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.USE_CYCLE) {
         
-        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
-            ItemModel.RangeDispatch(property, scale, entries, fallback, period = period)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?, transformation: Matrix4fc) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, transformation, period = period)
         
         companion object : UseCycle(0.0)
         
@@ -186,8 +194,8 @@ sealed class RangeDispatchItemModelProperty(internal val property: ItemModel.Ran
         private val index: Int
     ) : RangeDispatchItemModelProperty(ItemModel.RangeDispatch.Property.CUSTOM_MODEL_DATA) {
         
-        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?) =
-            ItemModel.RangeDispatch(property, scale, entries, fallback, index = index)
+        override fun buildModel(scale: Double, entries: List<ItemModel.RangeDispatch.Entry>, fallback: ItemModel?, transformation: Matrix4fc) =
+            ItemModel.RangeDispatch(property, scale, entries, fallback, transformation, index = index)
         
         companion object : CustomModelData(0)
         
