@@ -3,6 +3,8 @@
 package xyz.xenondevs.nova.resources.builder.layout.item
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import org.joml.Matrix4f
+import org.joml.Matrix4fc
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
@@ -30,13 +32,19 @@ class ItemModelBuilder<S : ModelSelectorScope> internal constructor(
      */
     var tintSource: MutableMap<Int, TintSource> = Int2ObjectOpenHashMap()
     
+    /**
+     * An additional transformationation matrix that is applied to the model on top of the
+     * transformationations defined in the [model] itself.
+     */
+    var transformation: Matrix4fc = Matrix4f()
+    
     internal fun build(): ItemModel.Default {
         val highestTintSourceId = tintSource.keys.maxOrNull()
         if (highestTintSourceId != null) {
             val tintSourcesList = Array(highestTintSourceId + 1) { tintSource[it] ?: TintSource.Constant(Color.WHITE) }.asList()
-            return ItemModel.Default(selectAndBuild(model), tintSourcesList)
+            return ItemModel.Default(selectAndBuild(model), tintSourcesList, transformation)
         } else {
-            return ItemModel.Default(selectAndBuild(model))
+            return ItemModel.Default(selectAndBuild(model), null, transformation)
         }
     }
     
