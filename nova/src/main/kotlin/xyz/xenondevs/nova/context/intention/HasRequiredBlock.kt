@@ -21,7 +21,6 @@ import xyz.xenondevs.nova.context.intention.HasRequiredBlock.Companion.BLOCK_TYP
 import xyz.xenondevs.nova.context.intention.HasRequiredBlock.Companion.BLOCK_TYPE_VANILLA
 import xyz.xenondevs.nova.context.intention.HasRequiredBlock.Companion.BLOCK_WORLD
 import xyz.xenondevs.nova.registry.NovaRegistries
-import xyz.xenondevs.nova.util.novaBlock
 import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
@@ -42,10 +41,10 @@ import xyz.xenondevs.nova.world.pos
  * | | 2. | [BLOCK_TYPE_VANILLA] | |
  * | [BLOCK_TYPE_VANILLA] | 1. | [BLOCK_STATE_VANILLA] | |
  * | | 2. | [BLOCK_TYPE] | Only if vanilla block |
- * | [BLOCK_STATE_VANILLA] | 1. | [BLOCK_POS] | Only if not Nova block |
+ * | [BLOCK_STATE_VANILLA] | 1. | [BLOCK_TYPE_VANILLA] | |
  * | [BLOCK_TYPE_NOVA] | 1. | [BLOCK_STATE_NOVA] | |
  * | | 2. | [BLOCK_TYPE] | Only if Nova block |
- * | [BLOCK_STATE_NOVA] | 1. | [BLOCK_POS] | Only if Nova block |
+ * | [BLOCK_STATE_NOVA] | 1. | [BLOCK_TYPE_NOVA] | |
  */
 interface HasRequiredBlock<I : HasRequiredBlock<I>> : ContextIntention<I> {
     
@@ -172,10 +171,10 @@ interface HasRequiredBlock<I : HasRequiredBlock<I>> : ContextIntention<I> {
             addAutofiller(BLOCK_TYPE, Autofiller.from(BLOCK_TYPE_VANILLA, BlockType::key))
             addAutofiller(BLOCK_TYPE_VANILLA, Autofiller.from(BLOCK_STATE_VANILLA) { it.material.asBlockType() })
             addAutofiller(BLOCK_TYPE_VANILLA, Autofiller.from(BLOCK_TYPE, Registry.BLOCK::get))
-            addAutofiller(BLOCK_STATE_VANILLA, Autofiller.from(BLOCK_POS) { if (it.block.novaBlock == null) it.block.blockData else null })
+            addAutofiller(BLOCK_STATE_VANILLA, Autofiller.from(BLOCK_TYPE_VANILLA) { it.createBlockData() })
             addAutofiller(BLOCK_TYPE_NOVA, Autofiller.from(BLOCK_STATE_NOVA, NovaBlockState::block))
             addAutofiller(BLOCK_TYPE_NOVA, Autofiller.from(BLOCK_TYPE, NovaRegistries.BLOCK::getValue))
-            addAutofiller(BLOCK_STATE_NOVA, Autofiller.from(BLOCK_POS) { it.novaBlockState })
+            addAutofiller(BLOCK_STATE_NOVA, Autofiller.from(BLOCK_TYPE_NOVA) { it.defaultBlockState })
         }
         
     }
