@@ -219,11 +219,13 @@ private class CachedWindowTileEntityMenuImpl(
     private val openWindows = HashSet<Window>()
     private val activeViewers = HashSet<Player>()
     
-    private val cache: LoadingCache<Player, Window> = Caffeine.newBuilder()
-        .weakKeys()
-        .expireAfter(AfterCloseExpiry(expireAfterClose.inWholeNanoseconds))
-        .scheduler(Scheduler.systemScheduler())
-        .build(createWindow)
+    private val cache: LoadingCache<Player, Window> by lazy {
+        Caffeine.newBuilder()
+            .weakKeys()
+            .expireAfter(AfterCloseExpiry(expireAfterClose.inWholeNanoseconds))
+            .scheduler(Scheduler.systemScheduler())
+            .build(createWindow)
+    }
     
     override fun open(player: Player): Boolean {
         val window = cache.get(player)
