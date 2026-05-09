@@ -48,20 +48,30 @@ internal class ContextImpl<I : ContextIntention<I>> private constructor(
         val autofillers = intention.getAutofillers(paramType)
         var value: V? = null
         for (autofiller in autofillers) {
-            val requiredParamTypes = autofiller.requiredParamTypes
-            
-            // load params required by autofiller
-            val requiredParamValues = Array(requiredParamTypes.size) {
-                getParam(requiredParamTypes[it])
-                    ?: continue
+            when (autofiller) {
+                is Autofiller.FromParams -> {
+                    val requiredParamTypes = autofiller.requiredParamTypes
+                    
+                    // load params required by autofiller
+                    val requiredParamValues = Array(requiredParamTypes.size) {
+                        getParam(requiredParamTypes[it])
+                            ?: continue
+                    }
+                    
+                    // run autofiller function
+                    value = autofiller.fill(requiredParamValues)
+                        ?: continue
+                    
+                    paramType.validate(value)
+                    break
+                }
+                is Autofiller.FromContext -> {
+                    value = autofiller.fill(this)
+                        ?: continue
+                    paramType.validate(value)
+                    break
+                }
             }
-            
-            // run autofiller function
-            value = autofiller.fill(requiredParamValues)
-                ?: continue
-            
-            paramType.validate(value)
-            break
         }
         
         // otherwise, use default value if present
