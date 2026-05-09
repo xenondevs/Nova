@@ -25,7 +25,7 @@ internal class NovaTileEntityBlockBuilderImpl(
         tileEntity,
         tickrate,
         stateProperties,
-        NovaItemBuilderImpl.blockItems[entry],
+        item ?: NovaItemBuilderImpl.blockItems[entry],
         CONFIGS[configId],
         blockStates
     )

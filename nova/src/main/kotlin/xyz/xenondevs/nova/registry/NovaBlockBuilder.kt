@@ -9,13 +9,23 @@ import xyz.xenondevs.nova.resources.builder.layout.block.ItemDefinitionConfigura
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder.Companion.DEFAULT_CONFIGURE_BLOCK_MODEL_SELECTOR
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
+import xyz.xenondevs.nova.world.block.behavior.BlockDrops
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
+import xyz.xenondevs.nova.world.item.NovaItem
 
 /**
  * A builder for [NovaBlock].
  */
 @RegistryElementBuilderDsl
 sealed interface NovaBlockBuilder : ConfigurableBuilder, NameableBuilder, RegistryEntryBuilder.Nova<NovaBlock> {
+    
+    /**
+     * Sets the item type of this block. Used in, for example, block drops via [BlockDrops].
+     * 
+     * If this is not set, defaults to the [NovaItem] that used this block to create it's [NovaItemBuilder] (in [Registrar.item]).
+     * Note that this only applies if the block is passed directly in the [Registrar.item] function, NOT if the block is defined via [NovaItemBuilder.block].
+     */
+    fun item(item: RegistryEntry.Nova<NovaItem>)
     
     /**
      * Sets the behaviors of this block to [behaviors].

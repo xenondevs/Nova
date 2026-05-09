@@ -108,7 +108,7 @@ fun RegistryEntrySet.Paper.Direct<ItemType>.asMixed(): RegistryEntrySet.Mixed.Di
  * Cannot be called during bootstrap (pre-registry-freeze).
  */
 fun RegistryEntry.Nova<NovaItem>.createItemStack(amount: Int = 1): ItemStack =
-    createNovaItemStack(key, amount) // TODO: it may make sense to resolve NovaItem for performance, cannot be called during bootstrap anyways
+    get().createItemStack(amount)
 
 /**
  * Creates an [ItemStack] for the [ItemType] of the [RegistryEntry].

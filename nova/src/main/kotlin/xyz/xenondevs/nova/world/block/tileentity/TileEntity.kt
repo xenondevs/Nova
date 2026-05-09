@@ -35,6 +35,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.Fl
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.item.createItemStack
 import xyz.xenondevs.nova.world.region.DynamicRegion
 import xyz.xenondevs.nova.world.region.Region
 import xyz.xenondevs.nova.world.region.VisualRegion

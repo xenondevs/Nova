@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.BlockBehaviorHolder
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
+import xyz.xenondevs.nova.world.item.NovaItem
 
 internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     override val entry: RegistryEntry.Nova<NovaBlock>
@@ -23,6 +24,7 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     protected var configId: String = key.toString()
     protected var style: Style = Style.empty()
     protected var name: Component = Component.translatable("block.${key.namespace()}.${key.value()}")
+    protected var item: RegistryEntry.Nova<NovaItem>? = null
     protected var behaviors = ArrayList<BlockBehaviorHolder>()
     protected val stateProperties = ArrayList<ScopedBlockStateProperty<*>>()
     internal var layout: BlockModelLayout = BlockModelLayout.DEFAULT
@@ -43,6 +45,10 @@ internal abstract class AbstractNovaBlockBuilder<T : NovaBlock>(
     
     override fun name(name: Component) {
         this.name = name
+    }
+    
+    override fun item(item: RegistryEntry.Nova<NovaItem>) {
+        this.item = item
     }
     
     override fun behaviors(vararg behaviors: BlockBehaviorHolder) {
