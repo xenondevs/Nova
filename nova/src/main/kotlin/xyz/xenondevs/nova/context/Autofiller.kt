@@ -5,19 +5,29 @@ import xyz.xenondevs.commons.reflection.call
 /**
  * Infers context values from other context values.
  */
-interface Autofiller<out V, I : ContextIntention<I>> {
+sealed interface Autofiller<out V, I : ContextIntention<I>> {
     
-    /**
-     * The context parameters types required by this autofiller to create a value of type [V].
-     */
-    val requiredParamTypes: List<ContextParamType<*, I>>
+    interface FromParams<out V, I : ContextIntention<I>> : Autofiller<V, I> {
+        
+        /**
+         * The context parameters types required by this autofiller to create a value of type [V].
+         */
+        val requiredParamTypes: List<ContextParamType<*, I>>
+        
+        /**
+         * Generates a value of type [V] based on [values], which is expected to be an
+         * array with the same length as [requiredParamTypes], where each entry corresponds to the
+         * value of the parameter type at the same index in [requiredParamTypes].
+         */
+        fun fill(values: Array<Any>): V?
+        
+    }
     
-    /**
-     * Generates a value of type [V] based on [values], which is expected to be an
-     * array with the same length as [requiredParamTypes], where each entry corresponds to the
-     * value of the parameter type at the same index in [requiredParamTypes].
-     */
-    fun fill(values: Array<Any>): V?
+    interface FromContext<out V, I : ContextIntention<I>> : Autofiller<V, I> {
+        
+        fun fill(context: Context<I>): V?
+        
+    }
     
     companion object {
         
@@ -63,11 +73,18 @@ interface Autofiller<out V, I : ContextIntention<I>> {
             fillValue: (A, B, C, D) -> V?
         ): Autofiller<V, I> = from(listOf(paramTypeA, paramTypeB, paramTypeC, paramTypeD), fillValue)
         
+        fun <V : Any, I : ContextIntention<I>> fromContext(
+            fillValue: (Context<I>) -> V?
+        ): Autofiller<V, I> = object : FromContext<V, I> {
+            override fun fill(context: Context<I>) = fillValue.call(context)
+            override fun toString() = "Autofiller(context)"
+        }
+        
         private fun <V : Any, I : ContextIntention<I>> from(
             paramTypes: List<ContextParamType<*, I>>,
             fillValue: Function<V?>,
             vararg lazyParamTypes: () -> ContextParamType<*, I>
-        ) = object : Autofiller<V, I> {
+        ) = object : FromParams<V, I> {
             override val requiredParamTypes = paramTypes
             override fun fill(values: Array<Any>): V? = fillValue.call(*values)
             override fun toString() = "Autofiller(${requiredParamTypes.joinToString()})"

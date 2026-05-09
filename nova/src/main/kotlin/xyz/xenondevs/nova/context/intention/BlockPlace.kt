@@ -7,12 +7,16 @@ import xyz.xenondevs.nova.context.ContextIntention
 import xyz.xenondevs.nova.context.ContextParamType
 import xyz.xenondevs.nova.context.DefaultingContextParamType
 import xyz.xenondevs.nova.context.intention.BlockPlace.BLOCK_ITEM_STACK
+import xyz.xenondevs.nova.context.intention.BlockPlace.BLOCK_STATE_NOVA
+import xyz.xenondevs.nova.context.intention.BlockPlace.BLOCK_STATE_VANILLA
 import xyz.xenondevs.nova.context.intention.BlockPlace.BLOCK_TYPE
 import xyz.xenondevs.nova.context.intention.BlockPlace.BLOCK_TYPE_NOVA
 import xyz.xenondevs.nova.context.intention.BlockPlace.BLOCK_TYPE_VANILLA
 import xyz.xenondevs.nova.context.intention.BlockPlace.HELD_ITEM_STACK
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.novaKey
+import xyz.xenondevs.nova.world.block.NovaBlock
+import xyz.xenondevs.nova.world.item.createItemStack
 
 /**
  * A [ContextIntention] for when a block is placed.
@@ -28,6 +32,8 @@ import xyz.xenondevs.nova.util.novaKey
  * | | 2. | [BLOCK_TYPE_NOVA] | Only if has item type |
  * | | 3. | [BLOCK_TYPE_VANILLA] | Only if has item type |
  * | [BLOCK_TYPE] | +1. | [BLOCK_ITEM_STACK] | |
+ * | [BLOCK_STATE_NOVA] | +1. | Entire context | Determined via [NovaBlock.chooseBlockState] |
+ * | [BLOCK_STATE_VANILLA] | +1. | [BLOCK_TYPE_VANILLA] | Uses default block state. This may be changed to the proper placement block state in the future.
  */
 object BlockPlace :
     AbstractContextIntention<BlockPlace>(),
@@ -79,6 +85,8 @@ object BlockPlace :
         
         // extra autofillers for inherited properties
         addAutofiller(BLOCK_TYPE, Autofiller.from(BLOCK_ITEM_STACK) { it.novaItem?.block?.key ?: it.type.key() })
+        addAutofiller(BLOCK_STATE_NOVA, Autofiller.fromContext { it[BLOCK_TYPE_NOVA]?.chooseBlockState(it) })
+        addAutofiller(BLOCK_STATE_VANILLA, Autofiller.from(BLOCK_TYPE_VANILLA) { it.createBlockData() })
     }
     
 }
