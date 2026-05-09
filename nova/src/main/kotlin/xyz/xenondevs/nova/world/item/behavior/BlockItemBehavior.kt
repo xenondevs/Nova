@@ -41,16 +41,14 @@ internal class BlockItemBehavior(blockType: Provider<NovaBlock>) : ItemBehavior 
         if (!Tag.REPLACEABLE.isTagged(pos.block.type) || WorldDataManager.getBlockState(pos) != null)
             pos = pos.advance(clickedFace)
         
-        val ctxBuilder = Context.intention(BlockPlace)
+        val ctx = Context.intention(BlockPlace)
             .param(BlockPlace.BLOCK_POS, pos)
             .param(BlockPlace.BLOCK_ITEM_STACK, handItem)
             .param(BlockPlace.SOURCE_ENTITY, player)
             .param(BlockPlace.CLICKED_BLOCK_FACE, ctx[BlockInteract.CLICKED_BLOCK_FACE])
+            .build()
         
-        val newState = novaBlock.chooseBlockState(ctxBuilder.build())
-        ctxBuilder.param(BlockPlace.BLOCK_STATE_NOVA, newState)
-        
-        val ctx = ctxBuilder.build()
+        val newState = ctx[BlockPlace.BLOCK_STATE_NOVA]!!
         
         val vanillaState = when (val modelProvider = newState.modelProvider) {
             is BackingStateBlockModelProvider -> modelProvider.info.vanillaBlockState.bukkitBlockData

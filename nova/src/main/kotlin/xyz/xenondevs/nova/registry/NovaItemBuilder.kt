@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelDefinitionBuilder
 import xyz.xenondevs.nova.resources.builder.layout.item.ItemModelSelectorScope
+import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.TooltipStyle
 import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
@@ -16,6 +17,19 @@ import xyz.xenondevs.nova.world.item.behavior.ItemBehaviorHolder
  */
 @RegistryElementBuilderDsl
 sealed interface NovaItemBuilder : ConfigurableBuilder, NameableBuilder, RegistryEntryBuilder.Nova<NovaItem> {
+    
+    /**
+     * Sets the block of this [NovaItem], making it placeable.
+     * 
+     * Also updates this item's [modelDefinition] to use the block's model and changes the [name] to the translation key `block.<block namespace>.<block name>`.
+     * If you want to use a different model / name, call [modelDefinition] / [name] after this function.
+     * 
+     * Note that this function does not need to be called if the [NovaItemBuilder] was already created with a `block` parameter in [Registrar.item].
+     * If an item's block is defined with this function instead of directly in [Registrar.item], the corresponding block will not use this
+     * item as its [NovaBlock.item] automatically. Instead, you will need to set it manually via [NovaBlockBuilder.item].
+     * Unless you want this behavior, prefer using [Registrar.item] with an explicit block argument over this function.
+     */
+    fun block(block: RegistryEntry.Nova<NovaBlock>)
     
     /**
      * Sets the name of the item.

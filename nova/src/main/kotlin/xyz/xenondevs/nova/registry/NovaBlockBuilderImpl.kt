@@ -13,7 +13,7 @@ internal open class NovaBlockBuilderImpl(
         style,
         behaviors,
         stateProperties,
-        NovaItemBuilderImpl.blockItems[entry],
+        item ?: NovaItemBuilderImpl.blockItems[entry],
         CONFIGS[configId],
         blockStates
     )

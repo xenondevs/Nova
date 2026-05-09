@@ -3,7 +3,6 @@ package xyz.xenondevs.nova.world.block
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
@@ -27,7 +26,7 @@ class NovaTileEntityBlock internal constructor(
     internal val tileEntityConstructor: TileEntityConstructor,
     val tickrate: Int,
     properties: List<ScopedBlockStateProperty<*>>,
-    item: Provider<RegistryEntry.Nova<NovaItem>?>,
+    item: RegistryEntry.Nova<NovaItem>?,
     config: ConfigProvider,
     blockStates: List<NovaBlockState>
 ) : NovaBlock(entry, name, style, behaviors, properties, item, config, blockStates) {

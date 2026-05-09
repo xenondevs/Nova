@@ -17,8 +17,6 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.ConfigProvider
 import xyz.xenondevs.nova.context.Context
@@ -49,6 +47,7 @@ import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
 import xyz.xenondevs.nova.world.block.state.property.ScopedBlockStateProperty
 import xyz.xenondevs.nova.world.item.NovaItem
+import xyz.xenondevs.nova.world.item.createItemStack
 import xyz.xenondevs.nova.world.toNms
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
@@ -109,21 +108,17 @@ open class NovaBlock internal constructor(
      * responsible for defining the various [blockStates].
      */
     val stateProperties: List<ScopedBlockStateProperty<*>>,
-    item: Provider<RegistryEntry.Nova<NovaItem>?>,
+    /**
+     * The [NovaItem] associated with this [NovaBlock].
+     * May be `null` if this block does not have an associated item.
+     */
+    val item: RegistryEntry.Nova<NovaItem>?,
     override val config: ConfigProvider,
     /**
      * A list of all possible [NovaBlockStates][NovaBlockState] of this [NovaBlock]
      */
     val blockStates: List<NovaBlockState>
 ) : NovaRegistryElement<NovaBlock>, Configurable {
-    
-    /**
-     * The [NovaItem] associated with this [NovaBlock].
-     * May be `null` if this block does not have an associated item.
-     * 
-     * Reloaded when the item registry is reloaded or when the associated item changes.
-     */
-    val item: NovaItem? by item.flatten()
     
     /**
      * A list of all [BlockBehaviors][BlockBehavior] of this [NovaBlock].
@@ -437,7 +432,7 @@ open class NovaBlock internal constructor(
         pos: BlockPos,
         state: NovaBlockState,
         ctx: Context<BlockInteract>
-    ): ItemStack? = runSafely("pick block creative", item?.createItemStack()) {
+    ): ItemStack? = runSafely("pick block creative", { item?.createItemStack() }) {
         return behaviors.firstNotNullOfOrNull { it.pickBlockCreative(pos, state, ctx) } ?: item?.createItemStack()
     }
     
@@ -451,6 +446,16 @@ open class NovaBlock internal constructor(
             LOGGER.error("Failed to $name for $key", t)
         }
         return fallback
+    }
+    
+    private inline fun <T> runSafely(name: String, lazyFallback: () -> T, run: () -> T): T {
+        checkServerThread()
+        try {
+            return run()
+        } catch (t: Throwable) {
+            LOGGER.error("Failed to $name for $key", t)
+        }
+        return lazyFallback()
     }
     //</editor-fold>
     

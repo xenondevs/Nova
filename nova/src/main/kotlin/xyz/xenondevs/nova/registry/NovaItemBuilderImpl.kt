@@ -45,6 +45,35 @@ internal class NovaItemBuilderImpl(
     private var tooltipStyle: RegistryEntry.Nova<TooltipStyle>? = null
     private var configureDefinition: ItemModelDefinitionBuilder<ItemModelSelectorScope>.() -> Unit = ItemModelDefinitionBuilder.DEFAULT_CONFIGURE_ITEM_MODEL_SELECTOR
     
+    override fun block(block: RegistryEntry.Nova<NovaBlock>) {
+        this.block = block
+        // note that this does not use NovaBlock.name as that would require making the name a Provider
+        name(Component.translatable("block.${block.key.namespace()}.${block.key.value()}"))
+        modelDefinition {
+            val (layout, blockStates) = BlockModelTask.requests[block]!!
+            
+            val modelContent = resourcePackBuilder.getBuildData<ModelContent>()
+            val scope = BlockModelSelectorScope(blockStates[0], resourcePackBuilder, modelContent)
+            
+            model = when (layout) {
+                is BlockModelLayout.StateBacked -> buildModel { layout.modelSelector(scope) }
+                is BlockModelLayout.SimpleEntityBacked -> buildModel { layout.modelSelector(scope) }
+                is BlockModelLayout.ItemEntityBacked -> {
+                    val builder = ItemModelDefinitionBuilder(resourcePackBuilder) { modelSelector ->
+                        val (model, _) = modelSelector(scope).buildScaled(modelContent)
+                        val id = modelContent.getOrPutGenerated(model)
+                        modelContent.rememberUsage(id)
+                        id
+                    }
+                    layout.definitionConfigurator(builder)
+                    builder.build().model
+                }
+                
+                else -> buildModel { defaultModel }
+            }
+        }
+    }
+    
     override fun config(name: String) {
         this.configId = key.namespace() + ":" + name
     }
@@ -143,41 +172,14 @@ internal class NovaItemBuilderImpl(
     
     companion object {
         
-        val blockItems = RegistryEntryMap<RegistryEntry.Nova<NovaBlock>, RegistryEntry.Nova<NovaItem>>()
+        val blockItems = HashMap<RegistryEntry.Nova<NovaBlock>, RegistryEntry.Nova<NovaItem>>()
         
         fun fromBlock(
             item: RegistryEntry.Nova<NovaItem>,
             block: RegistryEntry.Nova<NovaBlock>
         ): NovaItemBuilderImpl {
             blockItems[block] = item
-            return NovaItemBuilderImpl(item).apply {
-                this.block = block
-                // note that this does not use NovaBlock.name as that would require making the name a Provider
-                name(Component.translatable("block.${block.key.namespace()}.${block.key.value()}"))
-                modelDefinition {
-                    val (layout, blockStates) = BlockModelTask.requests[block]!!
-                    
-                    val modelContent = resourcePackBuilder.getBuildData<ModelContent>()
-                    val scope = BlockModelSelectorScope(blockStates[0], resourcePackBuilder, modelContent)
-                    
-                    model = when (layout) {
-                        is BlockModelLayout.StateBacked -> buildModel { layout.modelSelector(scope) }
-                        is BlockModelLayout.SimpleEntityBacked -> buildModel { layout.modelSelector(scope) }
-                        is BlockModelLayout.ItemEntityBacked -> {
-                            val builder = ItemModelDefinitionBuilder(resourcePackBuilder) { modelSelector ->
-                                val (model, _) = modelSelector(scope).buildScaled(modelContent)
-                                val id = modelContent.getOrPutGenerated(model)
-                                modelContent.rememberUsage(id)
-                                id
-                            }
-                            layout.definitionConfigurator(builder)
-                            builder.build().model
-                        }
-                        
-                        else -> buildModel { defaultModel }
-                    }
-                }
-            }
+            return NovaItemBuilderImpl(item).apply { block(block) }
         }
         
     }
