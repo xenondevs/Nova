@@ -70,7 +70,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.NetworkGroup
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkGroupData
 import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
-import xyz.xenondevs.nova.world.block.tileentity.network.type.LocalValidator
+import xyz.xenondevs.nova.world.block.tileentity.network.type.LocalNetworkValidator
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterSerializer
@@ -303,9 +303,9 @@ abstract class Registrar internal constructor() : Namespaced {
         name: String,
         createNetwork: (NetworkData<T>) -> T,
         createGroup: (NetworkGroupData<T>) -> NetworkGroup<T>,
-        validateLocal: LocalValidator,
+        validateLocal: LocalNetworkValidator,
         extractHolders: (NetworkEndPoint) -> List<EndPointDataHolder>?,
-        tickDelay: Provider<Int>
+        tickDelay: Int
     ): RegistryEntry.Nova<NetworkType<T>> = RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_NETWORK_TYPE, key(this, name)) {
         NetworkType(it, createNetwork, createGroup, validateLocal, extractHolders, tickDelay)
     }

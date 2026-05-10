@@ -2,13 +2,15 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type
 
 import kotlinx.serialization.Serializable
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.NovaRegistrar.registerNetworkType
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.RegistryLoader
+import xyz.xenondevs.nova.serialization.kotlinx.NetworkTypeEntrySerializer
+import xyz.xenondevs.nova.serialization.kotlinx.NetworkTypeEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.NetworkTypeSerializer
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
@@ -27,10 +29,20 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemNetworkGr
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
 
 /**
- * Typealias for a local network validator. The lambda is called to check whether a local (a network of just two end points)
+ * Serializable type alias for `RegistryEntry.Nova<NetworkType<T>>` using [NetworkTypeEntrySerializer].
+ */
+typealias NetworkTypeEntry<T> = @Serializable(with = NetworkTypeEntrySerializer::class) RegistryEntry.Nova<NetworkType<T>>
+
+/**
+ * Serializable type alias for `RegistryEntrySet.Nova<NetworkType<T>>` using [NetworkTypeEntrySetSerializer].
+ */
+typealias NetworkTypeEntrySet<T> = @Serializable(with = NetworkTypeEntrySetSerializer::class) RegistryEntrySet.Nova<NetworkType<T>>
+
+/**
+ * Typealias for a local network validator. The lambda is called to check whether a local (a network of only two end points)
  * can be created by connecting `from` to `to` through `face`.
  */
-typealias LocalValidator = (from: NetworkEndPoint, to: NetworkEndPoint, face: BlockFace) -> Boolean
+typealias LocalNetworkValidator = (from: NetworkEndPoint, to: NetworkEndPoint, face: BlockFace) -> Boolean
 
 /**
  * A network type. Specifies how and when to create a [Network] and the associated [NetworkGroup].
@@ -48,8 +60,11 @@ class NetworkType<T : Network<T>> internal constructor(
     val createGroup: (NetworkGroupData<T>) -> NetworkGroup<T>,
     /**
      * A function that checks whether a local network can be created between two end points.
+     * 
+     * A local network will only be created it this validator returns `true` and at least one of the
+     * end points [requests][NetworkEndPoint.requestsLocalNetwork] a local network.
      */
-    val validateLocal: LocalValidator,
+    val validateLocal: LocalNetworkValidator,
     /**
      * A function that gets the required [data holders][EndPointDataHolder] from an [end point's holders][NetworkEndPoint.holders].
      * Only if all returned [data holders][EndPointDataHolder] [allow a connection at a face][EndPointDataHolder.allowedFaces]
@@ -57,15 +72,10 @@ class NetworkType<T : Network<T>> internal constructor(
      */
     val extractHolders: (NetworkEndPoint) -> List<EndPointDataHolder>?,
     /**
-     * The delay between network ticks.
-     */
-    tickDelay: Provider<Int>,
-) : NovaRegistryElement<NetworkType<T>> {
-    
-    /**
      * The delay between [network ticks][NetworkGroup.tick].
      */
-    val tickDelay: Int by tickDelay
+    val tickDelay: Int
+) : NovaRegistryElement<NetworkType<T>> {
     
     override fun toString(): String = key.toString()
     override fun hashCode(): Int = key.hashCode()
@@ -91,7 +101,7 @@ object DefaultNetworkTypes {
         ::EnergyNetworkGroup,
         EnergyNetwork::validateLocal,
         EnergyNetwork::extractHolders,
-        EnergyNetwork.TICK_DELAY_PROVIDER,
+        EnergyNetwork.TICK_DELAY_PROVIDER.get(),
     )
     
     /**
@@ -103,7 +113,7 @@ object DefaultNetworkTypes {
         ::ItemNetworkGroup,
         ItemNetwork::validateLocal,
         ItemNetwork::extractHolders,
-        ItemNetwork.TICK_DELAY_PROVIDER,
+        ItemNetwork.TICK_DELAY_PROVIDER.get(),
     )
     
     /**
@@ -115,7 +125,7 @@ object DefaultNetworkTypes {
         ::FluidNetworkGroup,
         FluidNetwork::validateLocal,
         FluidNetwork::extractHolders,
-        FluidNetwork.TICK_DELAY_PROVIDER,
+        FluidNetwork.TICK_DELAY_PROVIDER.get(),
     )
     
 }

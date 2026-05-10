@@ -48,6 +48,8 @@ sealed interface NetworkNode {
      * Note that a node may never receive an update when it is unloaded at that time,
      * so you shouldn't rely on this method for important updates, it is rather
      * intended to update the visual state and similar non-critical things.
+     * 
+     * Called on the network configurator thread (off-main).
      */
     suspend fun handleNetworkUpdate(state: NetworkState) = Unit
     
@@ -57,6 +59,8 @@ sealed interface NetworkNode {
      * Note that this function is only called when a [NetworkNode] is loaded,
      * not when the node was added using [NetworkManager.queueAddEndPoint] or
      * [NetworkManager.queueAddBridge].
+     * 
+     * Called on the network configurator thread (off-main).
      */
     suspend fun handleNetworkLoaded(state: NetworkState) = Unit
     

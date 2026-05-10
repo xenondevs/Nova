@@ -576,6 +576,8 @@ class NetworkState internal constructor(
         networkType: NetworkType<T>, face: BlockFace,
         clustersToInit: MutableSet<ProtoNetwork<*>>
     ): Boolean {
+        if (!endPoint.requestsLocalNetwork(face) && !other.requestsLocalNetwork(face.oppositeFace))
+            return false
         if (!networkType.validateLocal(endPoint, other, face))
             return false
         
