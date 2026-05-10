@@ -1,26 +1,21 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.node
 
-import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.entry
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.commons.collections.mapValuesNotNullTo
-import xyz.xenondevs.commons.collections.toEnumMap
-import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mapNonNull
-import xyz.xenondevs.commons.provider.observed
-import xyz.xenondevs.commons.provider.orElseNew
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import java.util.*
 
 abstract class DefaultContainerEndPointDataHolder<C : EndPointContainer> internal constructor(
     compound: Provider<Compound>,
     final override val containers: Map<C, NetworkConnectionType>,
-    blockedFaces: Set<BlockFace>,
-    defaultContainerConfig: () -> Map<BlockFace, C>,
-    defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)?
+    final override val blockedFaces: CubeFaceSet,
+    defaultContainerConfig: CubeFaceMap<C?>,
+    defaultConnectionConfig: CubeFaceMap<NetworkConnectionType>?
 ) : ContainerEndPointDataHolder<C> {
     
     init {
@@ -30,46 +25,36 @@ abstract class DefaultContainerEndPointDataHolder<C : EndPointContainer> interna
     
     protected abstract val uuidToContainer: Map<UUID, C>
     
-    final override val blockedFaces = blockedFaces.toEnumSet()
-    
-    final override val containerConfig: MutableMap<BlockFace, C>
-        by compound.entry<Map<BlockFace, UUID>>("containerConfig")
+    final override var containerConfig: CubeFaceMap<C?>
+        by compound.entry<CubeFaceMap<UUID?>>("containerConfig")
             .mapNonNull(
-                { it.mapValuesNotNullTo(enumMap()) { (_, uuid) -> uuidToContainer[uuid] } },
-                { it.mapValuesTo(enumMap()) { (_, container) -> container.uuid } }
-            ).orElseNew { defaultContainerConfig().toEnumMap() }
-            .observed()
+                { it.map { uuid -> uuid?.let(uuidToContainer::get) } },
+                { it.map { container -> container?.uuid } }
+            ).orElse(defaultContainerConfig)
     
-    final override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
-        by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-            .orElseNew {
-                val map: MutableMap<BlockFace, NetworkConnectionType> = defaultConnectionConfig?.invoke()?.toEnumMap()
-                    ?: containerConfig.mapValuesTo(enumMap()) { (_, container) -> containers[container] }
-                for (face in blockedFaces)
-                    map[face] = NetworkConnectionType.NONE
-                map
-            }
-            .observed()
+    final override var connectionConfig: CubeFaceMap<NetworkConnectionType>
+        by compound.entry<CubeFaceMap<NetworkConnectionType>>("connectionConfig")
+            .orElse(
+                (defaultConnectionConfig ?: containerConfig.map { containers[it]!! })
+                    .map { f, t -> if (f !in blockedFaces) t else NetworkConnectionType.NONE }
+            )
     
-    final override val channels: MutableMap<BlockFace, Int>
-        by compound.entry<MutableMap<BlockFace, Int>>("channels")
-            .orElseNew(DEFAULT_CHANNEL_CONFIG)
-            .observed()
+    final override var channels: CubeFaceMap<Int>
+        by compound.entry<CubeFaceMap<Int>>("channels")
+            .orElse(DEFAULT_CHANNEL_CONFIG)
     
-    final override val insertPriorities: MutableMap<BlockFace, Int>
-        by compound.entry<MutableMap<BlockFace, Int>>("insertPriorities")
-            .orElseNew(DEFAULT_PRIORITIES)
-            .observed()
+    final override var insertPriorities: CubeFaceMap<Int>
+        by compound.entry<CubeFaceMap<Int>>("insertPriorities")
+            .orElse(DEFAULT_PRIORITIES)
     
-    final override val extractPriorities: MutableMap<BlockFace, Int>
-        by compound.entry<MutableMap<BlockFace, Int>>("extractPriorities")
-            .orElseNew(DEFAULT_PRIORITIES)
-            .observed()
+    final override var extractPriorities: CubeFaceMap<Int>
+        by compound.entry<CubeFaceMap<Int>>("extractPriorities")
+            .orElse(DEFAULT_PRIORITIES)
     
     internal companion object {
         
-        val DEFAULT_CHANNEL_CONFIG = { CUBE_FACES.associateWithTo(enumMap()) { 0 } }
-        val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithTo(enumMap()) { 50 } }
+        val DEFAULT_CHANNEL_CONFIG = CubeFaceMap(0)
+        val DEFAULT_PRIORITIES = CubeFaceMap(50)
         
     }
     

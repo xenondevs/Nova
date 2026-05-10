@@ -41,7 +41,7 @@ class FluidNetwork internal constructor(
                     val fluidHolder = node.holders.firstInstanceOfOrNull<FluidHolder>()
                         ?: continue
                     
-                    for ((face, channelId) in fluidHolder.channels) {
+                    fluidHolder.channels.forEach { face, channelId ->
                         if (face in faces) {
                             val channel = channels.getOrSet(channelId, ::FluidNetworkChannel)
                             channel.addHolder(fluidHolder, face)
@@ -117,4 +117,3 @@ class FluidNetwork internal constructor(
     }
     
 }
-

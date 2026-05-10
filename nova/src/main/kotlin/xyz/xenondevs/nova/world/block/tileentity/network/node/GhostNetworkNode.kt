@@ -76,7 +76,7 @@ internal class GhostNetworkEndPoint(
 ) : NetworkEndPoint, GhostNetworkNode {
     
     override val isValid = true
-    override val holders: Set<EndPointDataHolder> = emptySet()
+    override val holders: Collection<EndPointDataHolder> = emptyList()
     override val linkedNodes: Set<NetworkNode> = emptySet()
     
     constructor(pos: BlockPos, data: NetworkEndPointData) : this(pos, Bukkit.getOfflinePlayer(data.owner))

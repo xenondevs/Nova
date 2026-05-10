@@ -2,10 +2,8 @@ package xyz.xenondevs.nova.world.block.tileentity.vanilla
 
 import net.minecraft.world.level.block.HopperBlock
 import net.minecraft.world.level.block.entity.HopperBlockEntity
-import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.blockFace
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
@@ -23,13 +21,16 @@ internal class VanillaHopperTileEntity(type: Type, pos: BlockPos, data: Compound
         val inventory = NetworkedNMSInventory(SimpleItemStackContainer((pos.nmsBlockEntity as HopperBlockEntity).contents))
         itemHolder = StaticVanillaItemHolder(
             storedValue("itemHolder", ::Compound),
-            CUBE_FACES.associateWithTo(enumMap()) { inventory }
-        ) {
-            val map = CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.NONE }
-            map[BlockFace.UP] = NetworkConnectionType.INSERT
-            map[facing] = NetworkConnectionType.EXTRACT
-            map
-        }
+            CubeFaceMap(inventory),
+            CubeFaceMap(
+                up = NetworkConnectionType.INSERT,
+                north = NetworkConnectionType.NONE,
+                east = NetworkConnectionType.NONE,
+                south = NetworkConnectionType.NONE,
+                west = NetworkConnectionType.NONE,
+                down = NetworkConnectionType.NONE
+            ).with(facing, NetworkConnectionType.EXTRACT)
+        )
         
         super.handleEnable()
     }

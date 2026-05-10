@@ -447,6 +447,7 @@ object ProtectionManager {
                     // not in main thread, no async calls allowed -> check protection on main thread
                     futures += CompletableFuture<Boolean>().apply { runTask { complete(integration.check()) } }
                 } else {
+                    // TODO: already async may still want to schedule onto different thread
                     // check protection in current thread (online player, already async, or no async calls allowed)
                     futures += CompletableFuture.completedFuture(integration.check())
                 }

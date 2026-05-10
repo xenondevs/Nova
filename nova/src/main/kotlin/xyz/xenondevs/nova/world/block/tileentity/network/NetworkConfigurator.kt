@@ -7,8 +7,6 @@ import jdk.jfr.Name
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -22,11 +20,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.withLock
 import org.bukkit.World
-import xyz.xenondevs.commons.collections.mapToBooleanArray
+import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.nova.IS_DEV_SERVER
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
 import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.task.LoadChunkTask
@@ -35,6 +34,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.task.ProtectedNodeNetwo
 import xyz.xenondevs.nova.world.block.tileentity.network.task.ProtectionResult
 import xyz.xenondevs.nova.world.block.tileentity.network.task.UnloadChunkTask
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -72,7 +72,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
     /**
      * Stores protection query results for [ProtectedNodeNetworkTasks][ProtectedNodeNetworkTask].
      */
-    private val protectionResults = ConcurrentHashMap<ProtectedNodeNetworkTask, Deferred<ProtectionResult>>()
+    private val protectionResults = ConcurrentHashMap<ProtectedNodeNetworkTask, CompletableFuture<CubeFaceSet>>()
     
     /**
      * The current network state, i.e. which nodes are connected to which networks.
@@ -133,7 +133,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
      */
     fun queueTask(task: NetworkTask): Unit = queueLock.withLock {
         if (task is ProtectedNodeNetworkTask)
-            protectionResults[task] = CoroutineScope(protectionSupervisor).async(Dispatchers.Default) { queryProtection(task.node) }
+            protectionResults[task] = queryProtectionAsync(task.node)
         
         // ensure load chunk task is queued before any other task that might need its data
         val chunkPos = task.chunkPos
@@ -174,14 +174,22 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
      * Queries the block use protection in all 6 cartesian directions around [node] asynchronously
      * and returns the [ProtectionResult].
      */
-    private suspend fun queryProtection(node: NetworkNode): ProtectionResult = coroutineScope {
+    private fun queryProtectionAsync(node: NetworkNode): CompletableFuture<CubeFaceSet> {
         val owner = node.owner
-        if (owner != null) {
-            CUBE_FACES
-                .map { face -> ProtectionManager.canUseBlockAsync(owner, null, node.pos.advance(face, 1)) }
-                .mapToBooleanArray { it.await() }
-                .let(::ProtectionResult)
-        } else ProtectionResult.ALL_ALLOWED
+        return if (owner != null) {
+            val results = CUBE_FACES.mapToArray { face ->
+                ProtectionManager.canUseBlockAsync(owner, null, node.pos.advance(face, 1))
+            }
+            
+            CompletableFuture.allOf(*results).thenApply {
+                var data = 0
+                for ((i, result) in results.withIndex()) {
+                    if (result.get())
+                        data = data or (1 shl i)
+                }
+                CubeFaceSet(data.toByte())
+            }
+        } else CompletableFuture.completedFuture(CubeFaceSet.ALL)
     }
     
     /**
@@ -192,7 +200,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
         state.mutex.withLock {
             // await protection results, run task
             if (task is ProtectedNodeNetworkTask) {
-                task.result = protectionResults.remove(task)?.await()
+                task.protectionResult = protectionResults.remove(task)?.await()
                     ?: throw IllegalStateException("Protection was not queried")
             }
             

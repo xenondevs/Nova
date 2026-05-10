@@ -27,6 +27,11 @@ internal object CbfSerializers {
         Cbf.registerSerializerFactory(ItemFilterBinarySerializerFactory)
         Cbf.registerSerializerFactory(TableBinarySerializer)
         
+        Cbf.registerSerializer(CubeFaceSetBinarySerializer)
+        Cbf.registerSerializer(BlockSideSetBinarySerializer)
+        Cbf.registerSerializerFactory(CubeFaceMapBinarySerializer)
+        Cbf.registerSerializerFactory(BlockSideMapBinarySerializer)
+        
         Cbf.registerSerializer(Vector2iBinarySerializer)
         Cbf.registerSerializer(Vector2icBinarySerializer)
         Cbf.registerSerializer(Vector2dBinarySerializer)

@@ -386,7 +386,7 @@ fun Packet<*>.sendTo(players: Iterable<Player>) {
     players.forEach { it.send(this) }
 }
 
-fun Rotations.copy(x: Float? = null, y: Float? = null, z: Float? = null) =
+fun Rotations.with(x: Float? = null, y: Float? = null, z: Float? = null) =
     Rotations(x ?: this.x, y ?: this.y, z ?: this.z)
 
 fun Rotations.add(x: Float, y: Float, z: Float) =

@@ -92,14 +92,21 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
             return
         
         NetworkManager.queueWrite(endPoint.pos.chunkPos) { state ->
+            var containerConfig = holder.containerConfig
+            var connectionConfig = holder.connectionConfig
+            
             // cycle container
-            val currentContainer = holder.containerConfig[face]!!
+            val currentContainer = containerConfig[face]!!
             val newContainer = containers.after(currentContainer, move)
-            holder.containerConfig[face] = newContainer
+            containerConfig = containerConfig.with(face, newContainer)
+            
             // adjust connection type
             val allowedTypes = holder.containers[newContainer]!!.supertypes
-            if (holder.connectionConfig[face] !in allowedTypes)
-                holder.connectionConfig[face] = allowedTypes[0]
+            if (connectionConfig[face] !in allowedTypes)
+                connectionConfig = connectionConfig.with(face, allowedTypes[0])
+            
+            holder.containerConfig = containerConfig    
+            holder.connectionConfig = connectionConfig
             
             state.getNetwork(endPoint, networkType, face)?.markDirty()
             state.handleEndPointAllowedFacesChange(endPoint, networkType, face)
@@ -116,11 +123,11 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
             ?: NetworkConnectionType.NONE
     
     override fun getConnectionType(face: BlockFace): NetworkConnectionType {
-        return holder.connectionConfig[face]!!
+        return holder.connectionConfig[face]
     }
     
     override fun setConnectionType(face: BlockFace, type: NetworkConnectionType) {
-        holder.connectionConfig[face] = type
+        holder.connectionConfig = holder.connectionConfig.with(face, type)
     }
     
     protected abstract fun isSimpleConfiguration(): Boolean

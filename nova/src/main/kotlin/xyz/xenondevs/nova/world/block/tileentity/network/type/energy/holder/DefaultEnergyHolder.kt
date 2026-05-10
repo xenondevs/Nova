@@ -3,13 +3,12 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.entry
-import xyz.xenondevs.commons.collections.toEnumMap
-import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.commons.provider.observed
-import xyz.xenondevs.commons.provider.orElseNew
+import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import kotlin.math.max
 import kotlin.math.min
@@ -28,8 +27,8 @@ class DefaultEnergyHolder(
     energy: MutableProvider<Long>,
     val maxEnergyProvider: Provider<Long>,
     override val allowedConnectionType: NetworkConnectionType,
-    blockedFaces: Set<BlockFace>,
-    defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType>
+    override val blockedFaces: CubeFaceSet,
+    defaultConnectionConfig: CubeFaceMap<NetworkConnectionType>
 ) : EnergyHolder {
     
     private val _energyProvider: MutableProvider<Long> = energy
@@ -38,16 +37,13 @@ class DefaultEnergyHolder(
     private var activeEnergyMinus = 0L
     private var activeEnergyPlus = 0L
     
-    override val blockedFaces = blockedFaces.toEnumSet()
-    override val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
-        by compound.entry<MutableMap<BlockFace, NetworkConnectionType>>("connectionConfig")
-            .orElseNew {
-                val map = defaultConnectionConfig().toEnumMap()
-                for (face in blockedFaces)
-                    map[face] = NetworkConnectionType.NONE
-                map
-            }
-            .observed()
+    override var connectionConfig: CubeFaceMap<NetworkConnectionType>
+        by compound.entry<CubeFaceMap<NetworkConnectionType>>("connectionConfig")
+            .orElse(
+                defaultConnectionConfig.map { face, value ->
+                    if (face !in blockedFaces) value else NetworkConnectionType.NONE
+                }
+            )
     
     /**
      * The maximum amount of energy this [EnergyHolder] can store.

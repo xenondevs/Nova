@@ -7,15 +7,13 @@ import com.google.common.collect.Table
 import kotlinx.coroutines.sync.Mutex
 import org.bukkit.World
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.collections.associateWithNotNullTo
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.commons.collections.enumSet
-import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
 import xyz.xenondevs.commons.guava.set
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
@@ -43,7 +41,8 @@ class NetworkState internal constructor(
 ) {
     
     private val networksById = HashMap<UUID, ProtoNetwork<*>>()
-    private val nodesByPos = HashMap<BlockPos, NetworkNode>()
+    @PublishedApi
+    internal val nodesByPos = HashMap<BlockPos, NetworkNode>()
     
     /**
      * Mutex for all data governed by this [NetworkState].
@@ -158,8 +157,23 @@ class NetworkState internal constructor(
     /**
      * Finds all nearby [NetworkNodes][NetworkNode] of [pos] using the given [faces].
      */
-    fun getNearbyNodes(pos: BlockPos, faces: Set<BlockFace>): Map<BlockFace, NetworkNode> =
-        faces.associateWithNotNullTo(enumMap<BlockFace, NetworkNode>()) { face -> nodesByPos[pos.advance(face, 1)] }
+    fun getNearbyNodes(pos: BlockPos, faces: CubeFaceSet): CubeFaceMap<NetworkNode?> =
+        faces.associateWith { face -> nodesByPos[pos.advance(face, 1)] }
+    
+    /**
+     * Runs [action] for each nearby [NetworkNode] of [pos] using the given [faces].
+     */
+    inline fun forEachNearbyNode(
+        pos: BlockPos,
+        faces: CubeFaceSet,
+        action: (face: BlockFace, neighbor: NetworkNode) -> Unit
+    ) {
+        faces.forEach { face ->
+            val neighbor = nodesByPos[pos.advance(face, 1)]
+            if (neighbor != null)
+                action(face, neighbor)
+        }
+    }
     
     // ---- Data ----
     
@@ -237,7 +251,7 @@ class NetworkState internal constructor(
      */
     suspend fun setConnection(node: NetworkNode, networkType: NetworkType<*>, face: BlockFace) {
         val data = getNodeData(node)
-        data.connections.getOrPut(networkType, ::enumSet) += face
+        data.connections[networkType] = (data.connections[networkType] ?: CubeFaceSet.NONE) + face
     }
     
     /**
@@ -247,7 +261,7 @@ class NetworkState internal constructor(
      */
     suspend fun removeConnection(node: NetworkNode, networkType: NetworkType<*>, face: BlockFace) {
         val data = getNodeData(node)
-        data.connections[networkType]?.remove(face)
+        data.connections[networkType] = (data.connections[networkType] ?: CubeFaceSet.NONE) - face
     }
     
     /**
@@ -327,7 +341,7 @@ class NetworkState internal constructor(
     suspend inline fun forEachConnectedNode(node: NetworkNode, action: (NetworkType<*>, BlockFace, NetworkNode) -> Unit) {
         val connections = getNodeData(node).connections
         for ((networkType, faces) in connections) {
-            for (face in faces) {
+            faces.forEach { face ->
                 val connectedNode = resolveNode(node.pos.advance(face))
                 action(networkType, face, connectedNode)
             }
@@ -342,7 +356,7 @@ class NetworkState internal constructor(
      */
     suspend inline fun forEachConnectedNode(node: NetworkNode, networkType: NetworkType<*>, action: (BlockFace, NetworkNode) -> Unit) {
         val faces = getNodeData(node).connections[networkType] ?: return
-        for (face in faces) {
+        faces.forEach { face ->
             val connectedNode = resolveNode(node.pos.advance(face))
             action(face, connectedNode)
         }
@@ -494,7 +508,7 @@ class NetworkState internal constructor(
      *
      * @throws IllegalStateException If there is no data for [bridge].
      */
-    suspend fun getBridgeFaces(bridge: NetworkBridge): MutableSet<BlockFace> =
+    suspend fun getBridgeFaces(bridge: NetworkBridge): CubeFaceSet =
         getBridgeData(bridge).bridgeFaces
     
     // ---- More complex utility functions ----
@@ -504,15 +518,14 @@ class NetworkState internal constructor(
      * is allowed to connect to [Networks][Network] of the given [type].
      * Will be empty if the [NetworkEndPoint] does not contain all [required holder types][NetworkType.holderTypes].
      */
-    fun getAllowedFaces(endPoint: NetworkEndPoint, type: NetworkType<*>): Set<BlockFace> {
+    fun getAllowedFaces(endPoint: NetworkEndPoint, type: NetworkType<*>): CubeFaceSet {
         val holders = endPoint.holders
         if (!type.holderTypes.all { requiredType -> holders.any { holder -> requiredType.isSuperclassOf(holder::class) } })
-            return emptySet()
+            return CubeFaceSet.NONE
         
         return holders.asSequence()
             .filter { holder -> type.holderTypes.any { requiredType -> requiredType.isSuperclassOf(holder::class) } }
-            .flatMap { it.allowedFaces }
-            .toEnumSet()
+            .fold(CubeFaceSet.NONE) { faces, holder -> faces + holder.allowedFaces }
     }
     
     /**
@@ -522,11 +535,11 @@ class NetworkState internal constructor(
      *
      * @throws IllegalStateException If there is no data for [bridge].
      */
-    suspend fun getAllowedFaces(bridge: NetworkBridge, type: NetworkType<*>): Set<BlockFace> {
+    suspend fun getAllowedFaces(bridge: NetworkBridge, type: NetworkType<*>): CubeFaceSet {
         val data = getBridgeData(bridge)
         if (type in data.supportedNetworkTypes)
             return data.bridgeFaces
-        return emptySet()
+        return CubeFaceSet.NONE
     }
     
     /**

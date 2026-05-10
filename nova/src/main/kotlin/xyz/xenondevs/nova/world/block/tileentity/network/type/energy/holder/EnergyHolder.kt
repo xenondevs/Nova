@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.type.energy.holder
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.collections.enumSet
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 
@@ -15,12 +16,12 @@ interface EnergyHolder : EndPointDataHolder {
     /**
      * The [BlockFaces][BlockFace] that can never have a connection.
      */
-    val blockedFaces: Set<BlockFace>
+    val blockedFaces: CubeFaceSet
     
     /**
      * Stores which [NetworkConnectionType] is used for each [BlockFace].
      */
-    val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
+    var connectionConfig: CubeFaceMap<NetworkConnectionType>
     
     /**
      * The current amount of energy in this [EnergyHolder].
@@ -32,9 +33,7 @@ interface EnergyHolder : EndPointDataHolder {
      */
     val maxEnergy: Long
     
-    override val allowedFaces: Set<BlockFace>
-        get() = connectionConfig.mapNotNullTo(enumSet()) { (face, type) ->
-            if (type != NetworkConnectionType.NONE) face else null
-        }
+    override val allowedFaces: CubeFaceSet
+        get() = connectionConfig.mapToCubeFaceSet { it != NetworkConnectionType.NONE }
     
 }

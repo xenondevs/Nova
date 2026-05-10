@@ -3,6 +3,8 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.node.DefaultContainerEndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
@@ -19,9 +21,9 @@ import java.util.*
 class DefaultFluidHolder(
     compound: Provider<Compound>,
     containers: Map<NetworkedFluidContainer, NetworkConnectionType>,
-    blockedFaces: Set<BlockFace>,
-    defaultContainerConfig: () -> Map<BlockFace, NetworkedFluidContainer>,
-    defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)?
+    blockedFaces: CubeFaceSet,
+    defaultContainerConfig: CubeFaceMap<NetworkedFluidContainer?>,
+    defaultConnectionConfig: CubeFaceMap<NetworkConnectionType>?
 ) : DefaultContainerEndPointDataHolder<NetworkedFluidContainer>(
     compound,
     containers,

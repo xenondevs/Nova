@@ -5,12 +5,11 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
 import xyz.xenondevs.cbf.entry
-import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.observed
-import xyz.xenondevs.commons.provider.orElseNew
+import xyz.xenondevs.commons.provider.orElse
 import xyz.xenondevs.invui.inventory.VirtualInventory
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.node.DefaultContainerEndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
@@ -32,9 +31,9 @@ class DefaultItemHolder(
     compound: Provider<Compound>,
     containers: Map<NetworkedInventory, NetworkConnectionType>,
     override val mergedInventory: NetworkedInventory?,
-    blockedFaces: Set<BlockFace>,
-    defaultInventoryConfig: () -> Map<BlockFace, NetworkedInventory>,
-    defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)?
+    blockedFaces: CubeFaceSet,
+    defaultInventoryConfig: CubeFaceMap<NetworkedInventory?>,
+    defaultConnectionConfig: CubeFaceMap<NetworkConnectionType>?
 ) : DefaultContainerEndPointDataHolder<NetworkedInventory>(
     compound,
     containers,
@@ -50,15 +49,13 @@ class DefaultItemHolder(
     
     override val uuidToContainer: Map<UUID, NetworkedInventory> = containers.keys.associateByTo(HashMap()) { it.uuid }
     
-    override val insertFilters: MutableMap<BlockFace, ItemFilter<*>>
-        by compound.entry<MutableMap<BlockFace, ItemFilter<*>>>("insertFilters")
-            .orElseNew(::enumMap)
-            .observed()
+    override var insertFilters: CubeFaceMap<ItemFilter<*>?>
+        by compound.entry<CubeFaceMap<ItemFilter<*>?>>("insertFilters")
+            .orElse(CubeFaceMap.NULL)
     
-    override val extractFilters: MutableMap<BlockFace, ItemFilter<*>>
-        by compound.entry<MutableMap<BlockFace, ItemFilter<*>>>("extractFilters")
-            .orElseNew(::enumMap)
-            .observed()
+    override var extractFilters: CubeFaceMap<ItemFilter<*>?>
+        by compound.entry<CubeFaceMap<ItemFilter<*>?>>("extractFilters")
+            .orElse(CubeFaceMap.NULL)
     
     fun getNetworkedInventory(inv: VirtualInventory): NetworkedInventory =
         getNetworkedInventory(inv.uuid)
@@ -69,8 +66,6 @@ class DefaultItemHolder(
     internal companion object {
         
         val ALL_INVENTORY_UUID = UUID(0, 0xA11)
-        val DEFAULT_PRIORITIES = { CUBE_FACES.associateWithTo(enumMap()) { 50 } }
-        val DEFAULT_CHANNELS = { CUBE_FACES.associateWithTo(enumMap()) { 0 } }
         
     }
     

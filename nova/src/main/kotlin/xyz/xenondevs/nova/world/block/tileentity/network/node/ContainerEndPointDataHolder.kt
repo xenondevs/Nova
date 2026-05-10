@@ -1,7 +1,8 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.node
 
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.collections.enumSet
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 
 /**
@@ -13,7 +14,7 @@ interface ContainerEndPointDataHolder<C : EndPointContainer> : EndPointDataHolde
     /**
      * The [BlockFaces][BlockFace] that can never have a connection.
      */
-    val blockedFaces: Set<BlockFace>
+    val blockedFaces: CubeFaceSet
     
     /**
      * Stores all available [C] and their allowed [NetworkConnectionTypes][NetworkConnectionType].
@@ -23,31 +24,29 @@ interface ContainerEndPointDataHolder<C : EndPointContainer> : EndPointDataHolde
     /**
      * Stores the currently configured [NetworkConnectionType] per [BlockFace].
      */
-    val connectionConfig: MutableMap<BlockFace, NetworkConnectionType>
+    var connectionConfig: CubeFaceMap<NetworkConnectionType>
     
     /**
      * Stores which [C] is accessible from what [BlockFace].
      */
-    val containerConfig: MutableMap<BlockFace, C>
+    var containerConfig: CubeFaceMap<C?>
     
     /**
      * Stores the selected channels per [BlockFace].
      */
-    val channels: MutableMap<BlockFace, Int>
+    var channels: CubeFaceMap<Int>
     
     /**
      * Stores the insertion priorities per [BlockFace].
      */
-    val insertPriorities: MutableMap<BlockFace, Int>
+    var insertPriorities: CubeFaceMap<Int>
     
     /**
      * Stores the extraction priorities per [BlockFace].
      */
-    val extractPriorities: MutableMap<BlockFace, Int>
+    var extractPriorities: CubeFaceMap<Int>
     
-    override val allowedFaces: Set<BlockFace>
-        get() = connectionConfig.mapNotNullTo(enumSet()) { (face, type) ->
-            if (type != NetworkConnectionType.NONE) face else null
-        }
+    override val allowedFaces: CubeFaceSet
+        get() = connectionConfig.mapToCubeFaceSet { it != NetworkConnectionType.NONE }
     
 }

@@ -5,7 +5,6 @@ import jdk.jfr.Event
 import jdk.jfr.Label
 import jdk.jfr.Name
 import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
@@ -45,15 +44,14 @@ internal class AddEndPointTask(
         val clustersToEnlarge = HashSet<ProtoNetwork<*>>()
         
         for (networkType in NovaRegistries.NETWORK_TYPE.entrySet.get()) {
-            var allowedFaces = state.getAllowedFaces(node, networkType)
+            val allowedFaces = state.getAllowedFaces(node, networkType) and protectionResult
             if (allowedFaces.isEmpty())
                 continue
-            allowedFaces = allowedFaces.toEnumSet().also { result.removeProtected(it) }
             
-            for ((face, neighborNode) in state.getNearbyNodes(node.pos, allowedFaces)) {
+            state.forEachNearbyNode(node.pos, allowedFaces) { face, neighborNode ->
                 // do not allow networks between two vanilla tile entities
                 if (node is VanillaTileEntity && neighborNode is VanillaTileEntity)
-                    continue
+                    return@forEachNearbyNode
                 
                 val success = when (neighborNode) {
                     is NetworkBridge -> tryConnectToBridge(neighborNode, networkType, face, clustersToEnlarge)

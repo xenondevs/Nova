@@ -4,10 +4,10 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.LayeredCauldronBlock
 import net.minecraft.world.level.block.state.BlockState
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.commons.collections.enumMap
 import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.commons.provider.provider
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.util.setBlockState
 import xyz.xenondevs.nova.util.withoutBlockMigration
 import xyz.xenondevs.nova.world.BlockPos
@@ -21,6 +21,7 @@ import java.util.*
 import kotlin.math.roundToInt
 
 private val ALLOWED_FLUID_TYPES = hashSetOf(FluidType.WATER, FluidType.LAVA)
+private val ALL_BUFFER = CubeFaceMap(NetworkConnectionType.BUFFER)
 
 internal class VanillaCauldronTileEntity internal constructor(
     type: Type,
@@ -30,7 +31,7 @@ internal class VanillaCauldronTileEntity internal constructor(
     
     private lateinit var container: FluidContainer
     private lateinit var fluidHolder: FluidHolder
-    override lateinit var holders: Set<EndPointDataHolder>
+    override lateinit var holders: Collection<EndPointDataHolder>
     
     @Volatile
     private lateinit var currentBlockState: BlockState
@@ -54,11 +55,11 @@ internal class VanillaCauldronTileEntity internal constructor(
         fluidHolder = DefaultFluidHolder(
             storedValue("fluidHolder", ::Compound),
             mapOf(container to NetworkConnectionType.BUFFER),
-            emptySet(),
-            { CUBE_FACES.associateWithTo(enumMap()) { container } },
-            { CUBE_FACES.associateWithTo(enumMap()) { NetworkConnectionType.BUFFER } }
+            CubeFaceSet.NONE,
+            CubeFaceMap(container),
+            ALL_BUFFER
         )
-        holders = setOf(fluidHolder)
+        holders = listOf(fluidHolder)
         currentBlockState = pos.nmsBlockState
         
         handleBlockStateChange(currentBlockState)

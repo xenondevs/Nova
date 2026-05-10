@@ -12,6 +12,6 @@ interface NetworkEndPoint : NetworkNode {
     /**
      * The [EndPointDataHolders][EndPointDataHolder] that contain the data of this [NetworkEndPoint].
      */
-    val holders: Set<EndPointDataHolder>
+    val holders: Collection<EndPointDataHolder>
     
 }

@@ -5,15 +5,15 @@ package xyz.xenondevs.nova.world.block.tileentity
 import org.bukkit.block.BlockFace
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.commons.collections.enumSet
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
-import xyz.xenondevs.nova.util.BlockSide
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.BlockSideMap
+import xyz.xenondevs.nova.util.BlockSideSet
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties
@@ -43,7 +43,7 @@ abstract class NetworkedTileEntity(
     @Volatile
     final override var isValid = false
     
-    final override val holders: MutableSet<EndPointDataHolder> = HashSet()
+    final override val holders: MutableCollection<EndPointDataHolder> = ArrayList()
     override val linkedNodes: Set<NetworkNode> = emptySet()
     
     /**
@@ -61,14 +61,17 @@ abstract class NetworkedTileEntity(
     fun storedEnergyHolder(
         maxEnergy: Provider<Long>,
         allowedConnectionType: NetworkConnectionType,
-        blockedSides: Set<BlockSide>,
-        defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = { CUBE_FACES.associateWithTo(enumMap()) { allowedConnectionType } }
-    ) = storedEnergyHolder(
-        maxEnergy,
-        allowedConnectionType,
-        translateSidesToFaces(blockedSides),
-        defaultConnectionConfig
-    )
+        blockedSides: BlockSideSet,
+        defaultConnectionConfig: BlockSideMap<NetworkConnectionType> = BlockSideMap(allowedConnectionType)
+    ): DefaultEnergyHolder {
+        val front = blockState[DefaultBlockStateProperties.FACING] ?: BlockFace.NORTH
+        return storedEnergyHolder(
+            maxEnergy,
+            allowedConnectionType,
+            blockedSides.toCubeFaceSet(front),
+            defaultConnectionConfig.toCubeFaceMap(front)
+        )
+    }
     
     /**
      * Retrieves the [EnergyHolder] previously stored or creates a new one and registers it in the [holders] map.
@@ -85,8 +88,8 @@ abstract class NetworkedTileEntity(
     fun storedEnergyHolder(
         maxEnergy: Provider<Long>,
         allowedConnectionType: NetworkConnectionType,
-        blockedFaces: Set<BlockFace> = emptySet(),
-        defaultConnectionConfig: () -> Map<BlockFace, NetworkConnectionType> = { CUBE_FACES.associateWithTo(enumMap()) { allowedConnectionType } }
+        blockedFaces: CubeFaceSet = CubeFaceSet.NONE,
+        defaultConnectionConfig: CubeFaceMap<NetworkConnectionType> = CubeFaceMap(allowedConnectionType)
     ): DefaultEnergyHolder {
         val holder = DefaultEnergyHolder(
             storedValue("energyHolder", ::Compound),
@@ -118,16 +121,19 @@ abstract class NetworkedTileEntity(
     fun storedItemHolder(
         inventory: Pair<VirtualInventory, NetworkConnectionType>,
         vararg inventories: Pair<VirtualInventory, NetworkConnectionType>,
-        blockedSides: Set<BlockSide>,
-        defaultInventoryConfig: (() -> Map<BlockFace, VirtualInventory>)? = null,
-        defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null,
-    ) = storedItemHolder(
-        inventory,
-        inventories = inventories,
-        translateSidesToFaces(blockedSides),
-        defaultInventoryConfig,
-        defaultConnectionConfig
-    )
+        blockedSides: BlockSideSet,
+        defaultInventoryConfig: BlockSideMap<VirtualInventory?>? = null,
+        defaultConnectionConfig: BlockSideMap<NetworkConnectionType>? = null,
+    ): DefaultItemHolder {
+        val front = blockState[DefaultBlockStateProperties.FACING] ?: BlockFace.NORTH
+        return storedItemHolder(
+            inventory,
+            inventories = inventories,
+            blockedSides.toCubeFaceSet(front),
+            defaultInventoryConfig?.toCubeFaceMap(front),
+            defaultConnectionConfig?.toCubeFaceMap(front)
+        )
+    }
     
     /**
      * Retrieves the [ItemHolder] previously stored or creates a new one, registers it in the [holders] map,
@@ -147,9 +153,9 @@ abstract class NetworkedTileEntity(
     fun storedItemHolder(
         inventory: Pair<VirtualInventory, NetworkConnectionType>,
         vararg inventories: Pair<VirtualInventory, NetworkConnectionType>,
-        blockedFaces: Set<BlockFace> = emptySet(),
-        defaultInventoryConfig: (() -> Map<BlockFace, VirtualInventory>)? = null,
-        defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null,
+        blockedFaces: CubeFaceSet = CubeFaceSet.NONE,
+        defaultInventoryConfig: CubeFaceMap<VirtualInventory?>? = null,
+        defaultConnectionConfig: CubeFaceMap<NetworkConnectionType>? = null,
     ): DefaultItemHolder {
         val allInventories: Map<VirtualInventory, NetworkConnectionType> =
             buildMap { this += inventory; this += inventories }
@@ -169,8 +175,8 @@ abstract class NetworkedTileEntity(
             blockedFaces,
             // map from VirtualInventory to NetworkedInventory or use mergedInventory for all sides
             defaultInventoryConfig
-                ?.let { { it.invoke().mapValues { (_, vi) -> availableInventories[vi.uuid]!! } } }
-                ?: { CUBE_FACES.associateWithTo(enumMap()) { mergedInventory } },
+                ?.map { it?.let { availableInventories[it.uuid] } }
+                ?: CubeFaceMap(mergedInventory),
             defaultConnectionConfig
         )
         registerItemHolder(holder)
@@ -195,17 +201,20 @@ abstract class NetworkedTileEntity(
         inventory: Pair<NetworkedInventory, NetworkConnectionType>,
         vararg inventories: Pair<NetworkedInventory, NetworkConnectionType>,
         mergedInventory: NetworkedInventory? = null,
-        blockedSides: Set<BlockSide>,
-        defaultInventoryConfig: () -> Map<BlockFace, NetworkedInventory> = { CUBE_FACES.associateWithTo(enumMap()) { inventory.first } },
-        defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null
-    ) = storedItemHolder(
-        inventory,
-        inventories = inventories,
-        mergedInventory,
-        translateSidesToFaces(blockedSides),
-        defaultInventoryConfig,
-        defaultConnectionConfig
-    )
+        blockedSides: BlockSideSet,
+        defaultInventoryConfig: BlockSideMap<NetworkedInventory?> = BlockSideMap(inventory.first),
+        defaultConnectionConfig: BlockSideMap<NetworkConnectionType>? = null
+    ): DefaultItemHolder {
+        val front = blockState[DefaultBlockStateProperties.FACING] ?: BlockFace.NORTH
+        return storedItemHolder(
+            inventory,
+            inventories = inventories,
+            mergedInventory,
+            blockedSides.toCubeFaceSet(front),
+            defaultInventoryConfig.toCubeFaceMap(front),
+            defaultConnectionConfig?.toCubeFaceMap(front)
+        )
+    }
     
     /**
      * Retrieves the [ItemHolder] previously stored or creates a new one, registers it in the [holders] map,
@@ -225,9 +234,9 @@ abstract class NetworkedTileEntity(
         inventory: Pair<NetworkedInventory, NetworkConnectionType>,
         vararg inventories: Pair<NetworkedInventory, NetworkConnectionType>,
         mergedInventory: NetworkedInventory? = null,
-        blockedFaces: Set<BlockFace> = emptySet(),
-        defaultInventoryConfig: () -> Map<BlockFace, NetworkedInventory> = { CUBE_FACES.associateWithTo(enumMap()) { inventory.first } },
-        defaultConnectionConfig: (() -> Map<BlockFace, NetworkConnectionType>)? = null
+        blockedFaces: CubeFaceSet = CubeFaceSet.NONE,
+        defaultInventoryConfig: CubeFaceMap<NetworkedInventory?> = CubeFaceMap(inventory.first),
+        defaultConnectionConfig: CubeFaceMap<NetworkConnectionType>? = null,
     ): DefaultItemHolder {
         val allInventories = buildMap { this += inventory; this += inventories }
         
@@ -251,10 +260,8 @@ abstract class NetworkedTileEntity(
         holders += holder
         dropProvider {
             val itemFilters = ArrayList<ItemStack>()
-            for (filter in holder.insertFilters.values)
-                itemFilters += filter.toItemStack()
-            for (filter in holder.extractFilters.values)
-                itemFilters += filter.toItemStack()
+            holder.insertFilters.forEach { if (it != null) itemFilters += it.toItemStack() }
+            holder.extractFilters.forEach { if (it != null) itemFilters += it.toItemStack() }
             itemFilters
         }
     }
@@ -275,16 +282,19 @@ abstract class NetworkedTileEntity(
     fun storedFluidHolder(
         container: Pair<NetworkedFluidContainer, NetworkConnectionType>,
         vararg containers: Pair<NetworkedFluidContainer, NetworkConnectionType>,
-        blockedSides: Set<BlockSide>,
-        defaultContainerConfig: () -> MutableMap<BlockFace, NetworkedFluidContainer> = { CUBE_FACES.associateWithTo(enumMap()) { container.first } },
-        defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
-    ) = storedFluidHolder(
-        container,
-        containers = containers,
-        translateSidesToFaces(blockedSides),
-        defaultContainerConfig,
-        defaultConnectionConfig
-    )
+        blockedSides: BlockSideSet,
+        defaultContainerConfig: BlockSideMap<NetworkedFluidContainer?> = BlockSideMap(container.first),
+        defaultConnectionConfig: BlockSideMap<NetworkConnectionType>? = null
+    ): DefaultFluidHolder {
+        val front = blockState[DefaultBlockStateProperties.FACING] ?: BlockFace.NORTH
+        return storedFluidHolder(
+            container,
+            containers = containers,
+            blockedSides.toCubeFaceSet(front),
+            defaultContainerConfig.toCubeFaceMap(front),
+            defaultConnectionConfig?.toCubeFaceMap(front)
+        )
+    }
     
     
     /**
@@ -303,9 +313,9 @@ abstract class NetworkedTileEntity(
     fun storedFluidHolder(
         container: Pair<NetworkedFluidContainer, NetworkConnectionType>,
         vararg containers: Pair<NetworkedFluidContainer, NetworkConnectionType>,
-        blockedFaces: Set<BlockFace> = emptySet(),
-        defaultContainerConfig: () -> MutableMap<BlockFace, NetworkedFluidContainer> = { CUBE_FACES.associateWithTo(enumMap()) { container.first } },
-        defaultConnectionConfig: (() -> EnumMap<BlockFace, NetworkConnectionType>)? = null
+        blockedFaces: CubeFaceSet = CubeFaceSet.NONE,
+        defaultContainerConfig: CubeFaceMap<NetworkedFluidContainer?> = CubeFaceMap(container.first),
+        defaultConnectionConfig: CubeFaceMap<NetworkConnectionType>? = null
     ): DefaultFluidHolder {
         val fluidHolder = DefaultFluidHolder(
             storedValue("fluidHolder", ::Compound),
@@ -316,11 +326,6 @@ abstract class NetworkedTileEntity(
         )
         holders += fluidHolder
         return fluidHolder
-    }
-    
-    private fun translateSidesToFaces(sides: Set<BlockSide>): Set<BlockFace> {
-        val facing = blockState[DefaultBlockStateProperties.FACING] ?: BlockFace.NORTH
-        return sides.mapTo(enumSet()) { it.getBlockFace(facing) }
     }
     
     override fun handleEnable() {

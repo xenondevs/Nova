@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.world.block.tileentity.network.task
 
 import jdk.jfr.Event
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.format.NetworkState
@@ -20,6 +21,6 @@ internal sealed class ProtectedNodeNetworkTask(state: NetworkState) : NetworkTas
     abstract val node: NetworkNode
     override val chunkPos: ChunkPos
         get() = node.pos.chunkPos
-    lateinit var result: ProtectionResult
+    var protectionResult = CubeFaceSet.NONE // is reassigned to actual result before accessed in task
     
 }

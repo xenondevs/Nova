@@ -34,11 +34,11 @@ class EnergySideConfigMenu(
     }
     
     override fun getConnectionType(face: BlockFace): NetworkConnectionType {
-        return holder.connectionConfig[face]!!
+        return holder.connectionConfig[face]
     }
     
     override fun setConnectionType(face: BlockFace, type: NetworkConnectionType) {
-        holder.connectionConfig[face] = type
+        holder.connectionConfig = holder.connectionConfig.with(face, type)
     }
     
 }

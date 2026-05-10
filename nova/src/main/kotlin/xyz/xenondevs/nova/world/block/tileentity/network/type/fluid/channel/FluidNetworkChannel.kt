@@ -2,16 +2,25 @@ package xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.channel
 
 import org.bukkit.block.BlockFace
 import xyz.xenondevs.commons.collections.pollFirstWhere
-import xyz.xenondevs.commons.collections.selectValues
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
 import java.util.*
 
+private fun CubeFaceMap<Int>.maxIn(faces: CubeFaceSet): Int {
+    var max = Int.MIN_VALUE
+    faces.forEach { face ->
+        max = maxOf(max, this[face])
+    }
+    return max
+}
+
 internal sealed interface FluidConfiguration {
     
     val fluidHolder: FluidHolder
-    val faces: Set<BlockFace>
+    val faces: CubeFaceSet
     val container: NetworkedFluidContainer
     val type: NetworkConnectionType
     
@@ -19,7 +28,7 @@ internal sealed interface FluidConfiguration {
 
 private class DefaultFluidConfiguration(
     override val fluidHolder: FluidHolder,
-    override val faces: Set<BlockFace>,
+    override val faces: CubeFaceSet,
     override val container: NetworkedFluidContainer,
     override val type: NetworkConnectionType
 ) : FluidConfiguration {
@@ -28,7 +37,7 @@ private class DefaultFluidConfiguration(
         NetworkConnectionType.INSERT -> fluidHolder.insertPriorities
         NetworkConnectionType.EXTRACT -> fluidHolder.extractPriorities
         else -> throw IllegalArgumentException()
-    }.selectValues(faces).maxOrNull()!!
+    }.maxIn(faces)
     
     fun component1() = container
     fun component2() = priority
@@ -45,7 +54,7 @@ private class DefaultFluidConfiguration(
  */
 private class FluidBufferConfiguration(
     override val fluidHolder: FluidHolder,
-    override val faces: Set<BlockFace>,
+    override val faces: CubeFaceSet,
     override val container: NetworkedFluidContainer,
 ) : FluidConfiguration {
     
@@ -68,8 +77,8 @@ private class FluidBufferConfiguration(
     val bufferPriority: Int
     
     init {
-        val insertPriority = fluidHolder.insertPriorities.selectValues(faces).maxOrNull()!!
-        val extractPriority = fluidHolder.extractPriorities.selectValues(faces).maxOrNull()!!
+        val insertPriority = fluidHolder.insertPriorities.maxIn(faces)
+        val extractPriority = fluidHolder.extractPriorities.maxIn(faces)
         
         if (insertPriority != extractPriority) {
             if (insertPriority > extractPriority) {
@@ -96,11 +105,11 @@ private class FluidBufferConfiguration(
 }
 
 private fun createFluidConfiguration(fluidHolder: FluidHolder, face: BlockFace): FluidConfiguration =
-    createFluidConfiguration(fluidHolder, setOf(face), fluidHolder.containerConfig[face]!!, fluidHolder.connectionConfig[face]!!)
+    createFluidConfiguration(fluidHolder, CubeFaceSet.NONE + face, fluidHolder.containerConfig[face]!!, fluidHolder.connectionConfig[face])
 
 private fun createFluidConfiguration(
     fluidHolder: FluidHolder,
-    faces: Set<BlockFace>,
+    faces: CubeFaceSet,
     container: NetworkedFluidContainer,
     type: NetworkConnectionType
 ): FluidConfiguration {

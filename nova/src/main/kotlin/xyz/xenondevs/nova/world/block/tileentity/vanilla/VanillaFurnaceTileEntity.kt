@@ -1,17 +1,14 @@
 package xyz.xenondevs.nova.world.block.tileentity.vanilla
 
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
-import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.StaticVanillaItemHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.NetworkedInventory
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.NetworkedNMSInventory
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.SimpleItemStackContainer
-import java.util.*
 
 internal class VanillaFurnaceTileEntity internal constructor(
     type: Type,
@@ -30,17 +27,20 @@ internal class VanillaFurnaceTileEntity internal constructor(
         super.handleEnable()
     }
     
-    private fun getInventories(furnace: AbstractFurnaceBlockEntity): EnumMap<BlockFace, NetworkedInventory> {
+    private fun getInventories(furnace: AbstractFurnaceBlockEntity): CubeFaceMap<NetworkedInventory> {
         val contents = furnace.contents
         val inputInventory = NetworkedNMSInventory(SimpleItemStackContainer(contents.subList(0, 1)))
         val fuelInventory = NetworkedNMSInventory(SimpleItemStackContainer(contents.subList(1, 2)))
         val outputInventory = NetworkedNMSInventory(SimpleItemStackContainer(contents.subList(2, 3)))
         
-        val inventories = CUBE_FACES.associateWithTo(enumMap<BlockFace, NetworkedInventory>()) { fuelInventory }
-        inventories[BlockFace.UP] = inputInventory
-        inventories[BlockFace.DOWN] = outputInventory
-        
-        return inventories
+        return CubeFaceMap(
+            up = inputInventory,
+            north = fuelInventory,
+            east = fuelInventory,
+            south = fuelInventory,
+            west = fuelInventory,
+            down = outputInventory
+        )
     }
     
 }

@@ -60,7 +60,7 @@ import xyz.xenondevs.nova.ui.menu.explorer.ItemsMenu
 import xyz.xenondevs.nova.ui.menu.explorer.itemTagExplorer
 import xyz.xenondevs.nova.ui.waila.WailaManager
 import xyz.xenondevs.nova.util.BlockUtils
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.CubeFaceSet
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.component.adventure.indent
 import xyz.xenondevs.nova.util.data.UpdatableFile
@@ -604,7 +604,7 @@ internal object NovaCommand : Command() {
         
         for (node in nodes) {
             when (node) {
-                is NetworkBridge -> NetworkManager.queueAddBridge(node, NETWORK_TYPE.entrySet.get(), CUBE_FACES, true)
+                is NetworkBridge -> NetworkManager.queueAddBridge(node, NETWORK_TYPE.entrySet.get(), CubeFaceSet.ALL, true)
                 is NetworkEndPoint -> NetworkManager.queueAddEndPoint(node, true)
             }
         }

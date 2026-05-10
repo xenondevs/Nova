@@ -53,6 +53,30 @@ enum class BlockSide(private val rotation: Int) {
             }
         }
     
+    companion object {
+        
+        /**
+         * Gets the [BlockSide] that corresponds to [face] when [front] is the front direction.
+         */
+        fun of(front: BlockFace, face: BlockFace): BlockSide {
+            require(front in NESW) { "Front must be one of the cardinal directions." }
+            return when (face) {
+                UP -> TOP
+                DOWN -> BOTTOM
+                front -> FRONT
+                else -> {
+                    when ((NESW.indexOf(face) - NESW.indexOf(front)).mod(4)) {
+                        1 -> LEFT
+                        2 -> BACK
+                        3 -> RIGHT
+                        else -> throw AssertionError()
+                    }
+                }
+            }
+        }
+        
+    }
+    
 }
 
 /**

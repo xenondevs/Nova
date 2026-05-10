@@ -4,11 +4,10 @@ import jdk.jfr.Category
 import jdk.jfr.Event
 import jdk.jfr.Label
 import jdk.jfr.Name
-import org.bukkit.block.BlockFace
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.commons.collections.filterIsInstanceValuesTo
-import xyz.xenondevs.commons.collections.toEnumSet
 import xyz.xenondevs.commons.guava.replaceAll
+import xyz.xenondevs.nova.util.CubeFaceMap
+import xyz.xenondevs.nova.util.CubeFaceSet
+import xyz.xenondevs.nova.util.forEachNonNull
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.ProtoNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkBridge
@@ -23,7 +22,7 @@ internal class AddBridgeTask(
     state: NetworkState,
     node: NetworkBridge,
     private val supportedNetworkTypes: Set<NetworkType<*>>,
-    private val bridgeFaces: Set<BlockFace>,
+    private val bridgeFaces: CubeFaceSet,
     updateNodes: Boolean
 ) : AddNodeTask<NetworkBridge>(state, node, updateNodes) {
     
@@ -49,26 +48,26 @@ internal class AddBridgeTask(
                 typeId = node.typeId,
                 owner = node.owner?.uniqueId ?: UUID(0L, 0L),
                 supportedNetworkTypes = HashSet(supportedNetworkTypes),
-                bridgeFaces = bridgeFaces.toEnumSet()
+                bridgeFaces = bridgeFaces
             )
         )
         
-        val allowedFaces: Set<BlockFace> = bridgeFaces.toEnumSet().also { result.removeProtected(it) }
-        val nearbyNodes: Map<BlockFace, NetworkNode> = state.getNearbyNodes(node.pos, allowedFaces)
-        val nearbyBridges: Map<BlockFace, NetworkBridge> = nearbyNodes.filterIsInstanceValuesTo(enumMap())
-        val nearbyEndPoints: Map<BlockFace, NetworkEndPoint> = nearbyNodes.filterIsInstanceValuesTo(enumMap())
+        val allowedFaces: CubeFaceSet = bridgeFaces and protectionResult
+        val nearbyNodes: CubeFaceMap<NetworkNode?> = state.getNearbyNodes(node.pos, allowedFaces)
+        val nearbyBridges: CubeFaceMap<NetworkBridge?> = nearbyNodes.map { it as? NetworkBridge }
+        val nearbyEndPoints: CubeFaceMap<NetworkEndPoint?> = nearbyNodes.map { it as? NetworkEndPoint }
         
         val clustersToInit = HashMap<ProtoNetwork<*>, Collection<NetworkNode>>()
         for (networkType in supportedNetworkTypes) {
-            val availableBridges = nearbyBridges.filterTo(enumMap()) { (face, bridge) ->
+            val availableBridges = nearbyBridges.filter { face, bridge ->
                 face.oppositeFace in state.getAllowedFaces(bridge, networkType) && node.typeId == bridge.typeId
             }
-            val availableEndPoints = nearbyEndPoints.filterTo(enumMap()) { (face, endPoint) ->
+            val availableEndPoints = nearbyEndPoints.filter { face, endPoint ->
                 face.oppositeFace in state.getAllowedFaces(endPoint, networkType)
             }
             
-            nodesToUpdate += availableBridges.values
-            nodesToUpdate += availableEndPoints.values
+            availableBridges.forEachNonNull(nodesToUpdate::add)
+            availableEndPoints.forEachNonNull(nodesToUpdate::add)
             
             val network = connectBridgeToBridges(node, availableBridges, networkType)
             connectBridgeToEndPoints(node, availableEndPoints, network)
@@ -86,11 +85,11 @@ internal class AddBridgeTask(
      */
     private suspend fun connectBridgeToEndPoints(
         self: NetworkBridge,
-        neighbors: Map<BlockFace, NetworkEndPoint>,
+        neighbors: CubeFaceMap<NetworkEndPoint?>,
         network: ProtoNetwork<*>
     ) {
         val networkType = network.type
-        for ((face, neighbor) in neighbors) {
+        neighbors.forEachNonNull { face, neighbor ->
             val oppositeFace = face.oppositeFace
             
             // add endpoint to network
@@ -110,11 +109,11 @@ internal class AddBridgeTask(
      */
     private suspend fun <T : Network<T>> connectBridgeToBridges(
         self: NetworkBridge,
-        neighbors: Map<BlockFace, NetworkBridge>,
+        neighbors: CubeFaceMap<NetworkBridge?>,
         networkType: NetworkType<T>
     ): ProtoNetwork<T> {
         val previousNetworks = HashSet<ProtoNetwork<T>>()
-        for ((face, neighbor) in neighbors) {
+        neighbors.forEachNonNull { face, neighbor ->
             previousNetworks += state.getNetwork(neighbor, networkType)!!
             
             // remember connection in self and neighbor

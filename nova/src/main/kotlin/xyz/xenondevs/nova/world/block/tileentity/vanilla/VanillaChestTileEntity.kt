@@ -5,10 +5,8 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.ChestBlockEntity
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.ChestType
-import org.bukkit.block.BlockFace
 import xyz.xenondevs.cbf.Compound
-import xyz.xenondevs.commons.collections.enumMap
-import xyz.xenondevs.nova.util.CUBE_FACES
+import xyz.xenondevs.nova.util.CubeFaceMap
 import xyz.xenondevs.nova.util.concurrent.checkServerThread
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkManager
@@ -20,7 +18,6 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.van
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.NetworkedNMSInventory
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.vanilla.SimpleItemStackContainer
 import xyz.xenondevs.nova.world.format.WorldDataManager
-import java.util.*
 
 internal class VanillaChestTileEntity internal constructor(
     type: Type,
@@ -28,8 +25,8 @@ internal class VanillaChestTileEntity internal constructor(
     data: Compound
 ) : ItemStorageVanillaTileEntity(type, pos, data) {
     
-    private lateinit var inventories: EnumMap<BlockFace, NetworkedInventory>
-    private lateinit var allowedConnectionTypes: HashMap<NetworkedInventory, NetworkConnectionType>
+    private lateinit var inventories: CubeFaceMap<NetworkedInventory>
+    private lateinit var allowedConnectionTypes: Map<NetworkedInventory, NetworkConnectionType>
     override lateinit var itemHolder: ItemHolder
     
     private var chestType: ChestType = ChestType.SINGLE
@@ -126,8 +123,8 @@ internal class VanillaChestTileEntity internal constructor(
     }
     
     private fun setInventory(inventory: NetworkedInventory) {
-        inventories = CUBE_FACES.associateWithTo(enumMap()) { inventory }
-        allowedConnectionTypes = inventories.entries.associateTo(HashMap()) { (_, inv) -> inv to NetworkConnectionType.BUFFER }
+        inventories = CubeFaceMap(inventory) 
+        allowedConnectionTypes = mapOf(inventory to NetworkConnectionType.BUFFER)
     }
     
 }
