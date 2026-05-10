@@ -25,29 +25,41 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.Fluid
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemNetwork
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemNetworkGroup
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.holder.ItemHolder
-import kotlin.reflect.KClass
-
-internal typealias NetworkConstructor<T> = (NetworkData<T>) -> T
-internal typealias NetworkGroupConstructor<T> = (NetworkGroupData<T>) -> NetworkGroup<T>
-internal typealias LocalValidator = (NetworkEndPoint, NetworkEndPoint, BlockFace) -> Boolean
 
 /**
- * A [Network] type.
- *
- * @param id The unique identifier of this [NetworkType].
- * @param createNetwork The constructor to instantiate a [Network] of this [NetworkType].
- * @param tickDelay The delay between [network ticks][NetworkGroup.tick].
- * @param holderTypes The types of [EndPointDataHolders][EndPointDataHolder]
- * that are required for end points of this [NetworkType].
+ * Typealias for a local network validator. The lambda is called to check whether a local (a network of just two end points)
+ * can be created by connecting `from` to `to` through `face`.
+ */
+typealias LocalValidator = (from: NetworkEndPoint, to: NetworkEndPoint, face: BlockFace) -> Boolean
+
+/**
+ * A network type. Specifies how and when to create a [Network] and the associated [NetworkGroup].
  */
 @Serializable(with = NetworkTypeSerializer::class)
 class NetworkType<T : Network<T>> internal constructor(
     override val entry: RegistryEntry.Nova<NetworkType<T>>,
-    val createNetwork: NetworkConstructor<T>,
-    val createGroup: NetworkGroupConstructor<T>,
+    /**
+     * The constructor to instantiate a [Network] of this type.
+     */
+    val createNetwork: (NetworkData<T>) -> T,
+    /**
+     * The constructor to instantiate a [NetworkGroup] of this type.
+     */
+    val createGroup: (NetworkGroupData<T>) -> NetworkGroup<T>,
+    /**
+     * A function that checks whether a local network can be created between two end points.
+     */
     val validateLocal: LocalValidator,
+    /**
+     * A function that gets the required [data holders][EndPointDataHolder] from an [end point's holders][NetworkEndPoint.holders].
+     * Only if all returned [data holders][EndPointDataHolder] [allow a connection at a face][EndPointDataHolder.allowedFaces]
+     * a network will be created there. Can return `null` if the given end point does not support this network type.
+     */
+    val extractHolders: (NetworkEndPoint) -> List<EndPointDataHolder>?,
+    /**
+     * The delay between network ticks.
+     */
     tickDelay: Provider<Int>,
-    val holderTypes: Set<KClass<out EndPointDataHolder>>
 ) : NovaRegistryElement<NetworkType<T>> {
     
     /**
@@ -75,9 +87,11 @@ object DefaultNetworkTypes {
      */
     val ENERGY = registerNetworkType(
         "energy",
-        ::EnergyNetwork, ::EnergyNetworkGroup, EnergyNetwork::validateLocal,
+        ::EnergyNetwork,
+        ::EnergyNetworkGroup,
+        EnergyNetwork::validateLocal,
+        EnergyNetwork::extractHolders,
         EnergyNetwork.TICK_DELAY_PROVIDER,
-        EnergyHolder::class
     )
     
     /**
@@ -85,9 +99,11 @@ object DefaultNetworkTypes {
      */
     val ITEM = registerNetworkType(
         "item",
-        ::ItemNetwork, ::ItemNetworkGroup, ItemNetwork::validateLocal,
+        ::ItemNetwork,
+        ::ItemNetworkGroup,
+        ItemNetwork::validateLocal,
+        ItemNetwork::extractHolders,
         ItemNetwork.TICK_DELAY_PROVIDER,
-        ItemHolder::class
     )
     
     /**
@@ -95,9 +111,11 @@ object DefaultNetworkTypes {
      */
     val FLUID = registerNetworkType(
         "fluid",
-        ::FluidNetwork, ::FluidNetworkGroup, FluidNetwork::validateLocal,
+        ::FluidNetwork,
+        ::FluidNetworkGroup,
+        FluidNetwork::validateLocal,
+        FluidNetwork::extractHolders,
         FluidNetwork.TICK_DELAY_PROVIDER,
-        FluidHolder::class
     )
     
 }

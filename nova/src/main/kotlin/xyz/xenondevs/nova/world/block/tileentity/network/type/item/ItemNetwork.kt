@@ -9,6 +9,7 @@ import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.config.node
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
+import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.channel.ItemChannelsBuilder
@@ -89,7 +90,7 @@ class ItemNetwork internal constructor(
         val CHANNEL_AMOUNT: Int by ITEM_NETWORK.entry<Int>("channel_amount")
         val MAX_COMPLEXITY: Int by ITEM_NETWORK.entry<Int>("max_complexity")
         
-        fun validateLocal(from: NetworkEndPoint, to: NetworkEndPoint, face: BlockFace): Boolean {
+        internal fun validateLocal(from: NetworkEndPoint, to: NetworkEndPoint, face: BlockFace): Boolean {
             val itemHolderFrom = from.holders.firstInstanceOfOrNull<ItemHolder>() ?: return false
             val itemHolderTo = to.holders.firstInstanceOfOrNull<ItemHolder>() ?: return false
             val conFrom = itemHolderFrom.connectionConfig[face]
@@ -97,6 +98,9 @@ class ItemNetwork internal constructor(
             
             return conFrom != conTo || conFrom == NetworkConnectionType.BUFFER
         }
+        
+        internal fun extractHolders(endPoint: NetworkEndPoint): List<EndPointDataHolder>? =
+            endPoint.holders.firstInstanceOfOrNull<ItemHolder>()?.let(::listOf)
         
     }
     

@@ -65,10 +65,12 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.TileEntityConstructor
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
+import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
+import xyz.xenondevs.nova.world.block.tileentity.network.NetworkGroup
+import xyz.xenondevs.nova.world.block.tileentity.network.NetworkGroupData
 import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
+import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.LocalValidator
-import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConstructor
-import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkGroupConstructor
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilter
 import xyz.xenondevs.nova.world.block.tileentity.network.type.item.ItemFilterSerializer
@@ -299,18 +301,13 @@ abstract class Registrar internal constructor() : Namespaced {
     //<editor-fold desc="network types">
     fun <T : Network<T>> registerNetworkType(
         name: String,
-        createNetwork: NetworkConstructor<T>,
-        createGroup: NetworkGroupConstructor<T>,
+        createNetwork: (NetworkData<T>) -> T,
+        createGroup: (NetworkGroupData<T>) -> NetworkGroup<T>,
         validateLocal: LocalValidator,
-        tickDelay: Provider<Int>,
-        vararg holderTypes: KClass<out EndPointDataHolder>
+        extractHolders: (NetworkEndPoint) -> List<EndPointDataHolder>?,
+        tickDelay: Provider<Int>
     ): RegistryEntry.Nova<NetworkType<T>> = RegistryLoader.enqueueNova(NovaRegistries.INTERNAL_NETWORK_TYPE, key(this, name)) {
-        NetworkType(
-            it,
-            createNetwork, createGroup, validateLocal,
-            tickDelay,
-            holderTypes.toHashSet()
-        )
+        NetworkType(it, createNetwork, createGroup, validateLocal, extractHolders, tickDelay)
     }
     
     fun networkTypeTag(name: String, configure: TagBuilder.Nova<NetworkType<*>>.() -> Unit): RegistryEntrySet.Nova.Tag<NetworkType<*>> =

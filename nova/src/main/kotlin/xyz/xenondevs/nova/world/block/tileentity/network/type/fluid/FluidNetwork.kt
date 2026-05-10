@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.config.node
 import xyz.xenondevs.nova.world.block.tileentity.network.Network
 import xyz.xenondevs.nova.world.block.tileentity.network.NetworkData
+import xyz.xenondevs.nova.world.block.tileentity.network.node.EndPointDataHolder
 import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkConnectionType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.channel.FluidNetworkChannel
@@ -113,6 +114,9 @@ class FluidNetwork internal constructor(
             
             return conFrom != conTo || conFrom == NetworkConnectionType.BUFFER
         }
+        
+        internal fun extractHolders(endPoint: NetworkEndPoint): List<EndPointDataHolder>? =
+            endPoint.holders.firstInstanceOfOrNull<FluidHolder>()?.let(::listOf)
         
     }
     

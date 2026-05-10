@@ -28,7 +28,6 @@ import xyz.xenondevs.nova.world.format.chunk.NetworkChunk
 import xyz.xenondevs.nova.world.format.chunk.NetworkEndPointData
 import xyz.xenondevs.nova.world.format.chunk.NetworkNodeData
 import java.util.*
-import kotlin.reflect.full.isSuperclassOf
 
 /**
  * Contains or links to all network-related data for a specific [World].
@@ -41,6 +40,7 @@ class NetworkState internal constructor(
 ) {
     
     private val networksById = HashMap<UUID, ProtoNetwork<*>>()
+    
     @PublishedApi
     internal val nodesByPos = HashMap<BlockPos, NetworkNode>()
     
@@ -516,16 +516,16 @@ class NetworkState internal constructor(
     /**
      * Computes a set of allowed [BlockFaces][BlockFace] with which [endPoint]
      * is allowed to connect to [Networks][Network] of the given [type].
-     * Will be empty if the [NetworkEndPoint] does not contain all [required holder types][NetworkType.holderTypes].
+     * Will be empty if the [NetworkEndPoint] does not support the given [type], which is implied by [NetworkType.extractHolders] returning `null`.
      */
     fun getAllowedFaces(endPoint: NetworkEndPoint, type: NetworkType<*>): CubeFaceSet {
-        val holders = endPoint.holders
-        if (!type.holderTypes.all { requiredType -> holders.any { holder -> requiredType.isSuperclassOf(holder::class) } })
-            return CubeFaceSet.NONE
-        
-        return holders.asSequence()
-            .filter { holder -> type.holderTypes.any { requiredType -> requiredType.isSuperclassOf(holder::class) } }
-            .fold(CubeFaceSet.NONE) { faces, holder -> faces + holder.allowedFaces }
+        var allowedFaces = CubeFaceSet.ALL
+        val holders = type.extractHolders(endPoint)
+            ?: return CubeFaceSet.NONE
+        for (holder in holders) {
+            allowedFaces = allowedFaces and holder.allowedFaces
+        }
+        return allowedFaces
     }
     
     /**
