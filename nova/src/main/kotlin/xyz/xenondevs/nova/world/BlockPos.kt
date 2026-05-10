@@ -10,6 +10,9 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.BlockState
 import org.joml.Vector3i
+import org.joml.primitives.AABBd
+import org.joml.primitives.AABBf
+import org.joml.primitives.AABBi
 import xyz.xenondevs.nova.util.Location
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.block.state.NovaBlockState
@@ -76,6 +79,21 @@ data class BlockPos(val world: World, val x: Int, val y: Int, val z: Int) {
     fun playSound(sound: Sound, volume: Float, pitch: Float) {
         world.playSound(Location(world, x + .5, y + .5, z + .5), sound, volume, pitch)
     }
+    
+    /**
+     * Converts this [BlockPos] to an [AABBi] from `(x, y, z)` to `(x + 1, y + 1, z + 1)`.
+     */
+    fun toAABBi() = AABBi(x, y, z, x + 1, y + 1, z + 1)
+    
+    /**
+     * Converts this [BlockPos] to an [AABBd] from `(x, y, z)` to `(x + 1, y + 1, z + 1)`.
+     */
+    fun toAABBd() = AABBd(x.toDouble(), y.toDouble(), z.toDouble(), x + 1.0, y + 1.0, z + 1.0)
+    
+    /**
+     * Converts this [BlockPos] to an [AABBf] from `(x, y, z)` to `(x + 1, y + 1, z + 1)`.
+     */
+    fun toAABBf() = AABBf(x.toFloat(), y.toFloat(), z.toFloat(), x + 1.0f, y + 1.0f, z + 1.0f)
     
     override fun toString(): String {
         return "BlockPos(world=${world.name}, x=$x, y=$y, z=$z)"
