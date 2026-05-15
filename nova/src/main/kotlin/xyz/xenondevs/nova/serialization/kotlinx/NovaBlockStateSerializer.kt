@@ -59,9 +59,12 @@ internal object NovaBlockStateSerializer : KSerializer<NovaBlockState> {
             for ((propertyId, propertyValueStr) in properties) {
                 val property = block.stateProperties.firstOrNull { it.property.id.toString() == propertyId } as ScopedBlockStateProperty<Any>?
                     ?: throw SerializationException("Unknown property '$propertyId'")
-                val propertyValue = property.stringToValue(propertyValueStr)
                 
-                blockState = blockState.with(property.property, propertyValue)
+                try {
+                    blockState = blockState.with(property.property, property.stringToValue(propertyValueStr))
+                } catch (e: Exception) {
+                    throw SerializationException(e)
+                }
             }
             
             return@decodeStructure blockState
