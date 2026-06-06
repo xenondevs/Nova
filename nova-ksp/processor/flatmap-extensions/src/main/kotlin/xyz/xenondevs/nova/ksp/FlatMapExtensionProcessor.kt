@@ -20,6 +20,7 @@ import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
@@ -27,6 +28,8 @@ import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 import com.squareup.kotlinpoet.ksp.writeTo
 import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
+
+private val BOOTSTRAP_FLAT_MAP = MemberName("xyz.xenondevs.nova.registry", "bootstrapFlatMap")
 
 class FlatMapExtensionProcessor(
     private val codeGenerator: CodeGenerator
@@ -83,10 +86,10 @@ class FlatMapExtensionProcessor(
             
             val propertySpec = PropertySpec.builder(propertyName, returnType)
                 .receiver(receiverType)
-                .addKdoc("Shortcut to [flatMap][Provider.flatMap] to [%L.%L].", clazzName, propertyName)
+                .addKdoc("Shortcut to [bootstrapFlatMap][%M] to [%L.%L].", BOOTSTRAP_FLAT_MAP, clazzName, propertyName)
                 .getter(
                     FunSpec.getterBuilder()
-                        .addStatement("return flatMap { it.%L }", propertyName)
+                        .addStatement("return %M { it.%L }", BOOTSTRAP_FLAT_MAP, propertyName)
                         .build()
                 )
                 .build()
@@ -114,8 +117,8 @@ class FlatMapExtensionProcessor(
                 .receiver(receiverType)
                 .addParameters(parameters)
                 .returns(returnType)
-                .addKdoc("Shortcut to [flatMap][Provider.flatMap] to [%L.%L].", clazzName, functionName)
-                .addStatement("return flatMap { it.%L(%L) }", functionName, callArgs)
+                .addKdoc("Shortcut to [bootstrapFlatMap][%M] to [%L.%L].", BOOTSTRAP_FLAT_MAP, clazzName, functionName)
+                .addStatement("return %M { it.%L(%L) }", BOOTSTRAP_FLAT_MAP, functionName, callArgs)
                 .build()
             
             fileSpec.addFunction(funSpec)

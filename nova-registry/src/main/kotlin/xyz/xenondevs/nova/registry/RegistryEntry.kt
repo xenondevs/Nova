@@ -217,6 +217,50 @@ inline fun <reified N : NovaRegistryElement<N>, reified P : Keyed, R> RegistryEn
     }
 }
 
+/**
+ * Flat-maps the value of this registry entry to a value of type [R] using either [transformNova] or [transformPaper],
+ * depending on whether the entry is from a Nova registry or a Paper registry.
+ * During [bootstrap phase][RegistryContext.isInBootstrapPhase], uses [Provider.flatMap], otherwise [Provider.immediateFlatMap].
+ * This allows creating flat-mapped providers based off of [RegistryEntries][RegistryEntry] lazily during bootstrap phase,
+ * where resolving their value is not possible, without paying for the extra overhead post-bootstrap, where [immediateFlatMap] can be used.
+ * 
+ * The idea behind this is that for non-reloadable registries, [immediateFlatMap] basically just calls `transform(get())`, so no intemediate
+ * flat-mapping provider needs to be created. For reloadable registries, the difference behind [flatMap] and [immediateFlatMap] should be negligible.
+ */
+inline fun <reified N : NovaRegistryElement<N>, reified P : Keyed, R> RegistryEntry.Either<N, P>.bootstrapFlatMap(
+    crossinline transformNova: (N) -> Provider<R>,
+    crossinline transformPaper: (P) -> Provider<R>
+): Provider<R> = bootstrapFlatMap { value ->
+    when (value) {
+        is N -> transformNova(value)
+        is P -> transformPaper(value)
+        else -> throw AssertionError("Value $value is neither ${N::class.java} nor ${P::class.java}")
+    }
+}
+
+/**
+ * Flat-maps the value of this provider via [transform].
+ * During [bootstrap phase][RegistryContext.isInBootstrapPhase], uses [Provider.flatMap], otherwise [Provider.immediateFlatMap].
+ * This allows creating flat-mapped providers based off of [RegistryEntries][RegistryEntry] lazily during bootstrap phase,
+ * where resolving their value is not possible, without paying for the extra overhead post-bootstrap, where [immediateFlatMap] can be used.
+ * 
+ * The idea behind this is that for non-reloadable registries, [immediateFlatMap] basically just calls `transform(get())`, so no intemediate
+ * flat-mapping provider needs to be created. For reloadable registries, the difference behind [flatMap] and [immediateFlatMap] should be negligible.
+ */
+fun <T, R> Provider<T>.bootstrapFlatMap(transform: (T) -> Provider<R>): Provider<R> =
+    if (RegistryContext.isInBootstrapPhase) flatMap(transform) else immediateFlatMap(transform)
+
+/**
+ * Flattens the value of this provider.
+ * During [bootstrap phase][RegistryContext.isInBootstrapPhase], uses [Provider.flatMap], otherwise [Provider.immediateFlatMap].
+ * This allows creating flat-mapped providers based off of [RegistryEntries][RegistryEntry] lazily during bootstrap phase,
+ * where resolving their value is not possible, without paying for the extra overhead post-bootstrap, where [immediateFlatMap] can be used.
+ * 
+ * The idea behind this is that for non-reloadable registries, [immediateFlatMap] basically just calls `transform(get())`, so no intemediate
+ * flat-mapping provider needs to be created. For reloadable registries, the difference behind [flatMap] and [immediateFlatMap] should be negligible.
+ */
+fun <T> Provider<Provider<T>>.bootstrapFlatten(): Provider<T> = bootstrapFlatMap { it }
+
 private fun comparisonRegistryKey(entry: RegistryEntry<*>): Key = when (entry) {
     is RegistryEntry.Paper -> entry.key.registryKey().key()
     is RegistryEntry.Nova -> entry.registry.key

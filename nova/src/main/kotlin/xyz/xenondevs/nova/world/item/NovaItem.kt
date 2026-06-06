@@ -50,7 +50,7 @@ import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.asMixed
-import xyz.xenondevs.nova.registry.flatMap
+import xyz.xenondevs.nova.registry.bootstrapFlatMap
 import xyz.xenondevs.nova.registry.map
 import xyz.xenondevs.nova.serialization.kotlinx.ItemTypeEitherEntrySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ItemTypeMixedEntrySetSerializer
@@ -150,7 +150,7 @@ fun RegistryEntry.Either<NovaItem, ItemType>.mapToItemStack(amount: Int = 1): Pr
  * Can be called during bootstrap (pre-registry-freeze).
  */
 val RegistryEntry.Either<NovaItem, ItemType>.clientsideProvider: Provider<ItemProvider>
-    get() = flatMap({ it.clientsideProvider }, { provider(ItemWrapper(it.createItemStack())) })
+    get() = bootstrapFlatMap({ it.clientsideProvider }, { provider(ItemWrapper(it.createItemStack())) })
 
 /**
  * Serializable type alias for `RegistryEntry.Nova<NovaItem>` using [NovaItemEntrySerializer].

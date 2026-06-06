@@ -89,7 +89,7 @@ fun itemProvider(base: RegistryEntry.Either<NovaItem, ItemType>, itemProvider: I
         base.map(
             { it.clientsideProvider.map(ItemProvider::get) },
             { provider(it.createItemStack()) }
-        ).flatten(),
+        ).immediateFlatten(),
         itemProvider
     )
 }
@@ -102,7 +102,7 @@ fun itemProvider(base: NovaItem, itemProvider: ItemProviderDsl.() -> Unit): Prov
 @JvmName("by1")
 context(dsl: ItemProviderDsl)
 infix fun ProviderDslProperty<ItemType?>.by(type: Provider<Provider<NovaItem>>) {
-    dsl.base by type.flatten().clientsideProvider.map(ItemProvider::get)
+    dsl.base by type.immediateFlatten().clientsideProvider.map(ItemProvider::get)
     dsl.type by null
 }
 
@@ -117,7 +117,7 @@ infix fun ProviderDslProperty<ItemType>.by(type: RegistryEntry.Either<NovaItem, 
     dsl.base by type.map(
         { it.clientsideProvider.map(ItemProvider::get) },
         { provider(it.createItemStack()) }
-    ).flatten()
+    ).immediateFlatten()
     dsl.type by null
 }
 
@@ -139,7 +139,7 @@ infix fun ProviderDslProperty<in ItemProvider>.by(novaItem: Provider<NovaItem>):
 
 @JvmName("by1")
 infix fun ProviderDslProperty<in ItemProvider>.by(novaItem: Provider<Provider<NovaItem>>): Unit =
-    by(novaItem.flatten().clientsideProvider)
+    by(novaItem.immediateFlatten().clientsideProvider)
 
 context(dsl: WindowDsl)
 infix fun ProviderDslProperty<Component>.by(guiTexture: RegistryEntry.Nova<GuiTexture>): Unit =
