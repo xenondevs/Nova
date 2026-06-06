@@ -259,21 +259,30 @@ abstract class TileEntity(
      *
      * If the inventory is not [persistent], it will also be registered as a drop provider, i.e. it's contents
      * will be dropped when the [TileEntity] is destroyed.
-     *
-     * Note that [size] and [maxStackSizes] are only used when creating a new inventory, which means that the
-     * inventory retrieved may not necessarily be of that size or have those max stack sizes.
      */
     fun storedInventory(
         name: String,
         size: Int,
         persistent: Boolean = false,
-        maxStackSizes: IntArray = IntArray(size) { 64 },
+        maxStackSizes: IntArray = IntArray(size) { 99 },
         preUpdateHandler: ((ItemPreUpdateEvent) -> Unit)? = null,
         postUpdateHandler: ((ItemPostUpdateEvent) -> Unit)? = null,
     ): VirtualInventory {
-        val inventory = storedValue(name, persistent) {
+        var inventory by storedValue(name, persistent) {
             VirtualInventory(UUID.nameUUIDFromBytes(name.toByteArray()), size, null, maxStackSizes)
-        }.get()
+        }
+        
+        if (inventory.size != size) {
+            val prevItems = inventory.items
+            inventory = VirtualInventory(
+                inventory.uuid,
+                size,
+                Array(size) { prevItems.getOrNull(it) },
+                maxStackSizes
+            )
+        }
+        
+        inventory.maxStackSizes = maxStackSizes
         
         if (preUpdateHandler != null)
             inventory.addPreUpdateHandler(preUpdateHandler)
@@ -291,9 +300,6 @@ abstract class TileEntity(
      *
      * The inventory will also be registered as a drop provider, i.e. it's contents will be dropped when the
      * [TileEntity] is destroyed.
-     *
-     * Note that [size] is only used when creating a new inventory, which means that the inventory retrieved may
-     * not necessarily be of that size.
      */
     fun storedInventory(
         name: String,
