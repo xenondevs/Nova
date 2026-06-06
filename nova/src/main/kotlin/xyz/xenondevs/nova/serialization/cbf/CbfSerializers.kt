@@ -16,6 +16,7 @@ internal object CbfSerializers {
     fun register() {
         Cbf.registerSerializer(NamespacedCompoundBinarySerializer)
         Cbf.registerSerializer(ColorBinarySerializer)
+        Cbf.registerSerializer(BukkitColorBinarySerializer)
         Cbf.registerSerializer(LocationBinarySerializer)
         Cbf.registerSerializer(NamespacedKeyBinarySerializer)
         Cbf.registerSerializer(IdentifierBinarySerializer)
