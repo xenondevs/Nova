@@ -5,8 +5,8 @@ import io.papermc.paper.datacomponent.item.CustomModelData.customModelData
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.invui.dsl.ClickDsl
 import xyz.xenondevs.invui.dsl.ItemProviderDsl
-import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.dsl.by
+import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.gui.SlotElement
 import xyz.xenondevs.invui.gui.SlotElementSupplier
 import xyz.xenondevs.invui.item.Item
@@ -57,6 +57,7 @@ fun verticalBar(
     }
 }
 
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 abstract class VerticalBar(
     private val height: Int,
     private val customModelDataIndex: Int = 0

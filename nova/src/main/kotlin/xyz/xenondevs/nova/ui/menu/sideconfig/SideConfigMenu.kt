@@ -27,10 +27,13 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.item.inventory.Net
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.clientsideProvider
 
+private const val USE_DSL_SIDE_CONFIG_ITEM = "Use openSideConfigItem(...) with menu configuration directly."
+
 /**
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [inventories] with their localized names.
  */
+@Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuItem")
 fun SideConfigMenu(
     endPoint: NetworkEndPoint,
@@ -42,6 +45,7 @@ fun SideConfigMenu(
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [inventories] with their localized names.
  */
+@Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuItem")
 fun SideConfigMenu(
     endPoint: NetworkEndPoint,
@@ -53,6 +57,7 @@ fun SideConfigMenu(
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [containers] with their localized names.
  */
+@Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuFluid")
 fun SideConfigMenu(
     endPoint: NetworkEndPoint,
@@ -64,6 +69,7 @@ fun SideConfigMenu(
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [containers] with their localized names.
  */
+@Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuFluid")
 fun SideConfigMenu(
     endPoint: NetworkEndPoint,
@@ -75,7 +81,7 @@ fun SideConfigMenu(
  * The built-in implementation of a side-config menu that supports all built-in
  * network types (energy, item, fluid).
  */
-class SideConfigMenu(
+class SideConfigMenu @Deprecated(USE_DSL_SIDE_CONFIG_ITEM) constructor(
     private val endPoint: NetworkEndPoint,
     inventories: Map<NetworkedInventory, String>? = null,
     containers: Map<NetworkedFluidContainer, String>? = null,
@@ -86,6 +92,7 @@ class SideConfigMenu(
      * Creates a new [SideConfigMenu] for [endPoint] using the given
      * [inventories] and [containers] with their localized names.
      */
+    @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
     constructor(
         endPoint: NetworkEndPoint,
         inventories: Map<NetworkedInventory, String>? = null,
@@ -96,6 +103,7 @@ class SideConfigMenu(
     /**
      * Creates a new [SideConfigMenu] for [endPoint].
      */
+    @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
     constructor(
         endPoint: NetworkEndPoint,
         openPrevious: (Player) -> Unit
@@ -104,6 +112,7 @@ class SideConfigMenu(
     /**
      * Creates a new [SideConfigMenu] for [endPoint].
      */
+    @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
     constructor(
         endPoint: NetworkEndPoint,
         openPrevious: () -> Unit
@@ -204,17 +213,6 @@ class SideConfigMenu(
 }
 
 /**
- * A UI item that opens the [sideConfigMenu] when clicked.
- */
-fun openSideConfigItem(sideConfigMenu: SideConfigMenu): Item = item {
-    itemProvider by DefaultGuiItems.SIDE_CONFIG_BTN.clientsideProvider
-    onClick {
-        player.playClickSound()
-        sideConfigMenu.openWindow(player)
-    }
-}
-
-/**
  * A UI item that creates, memorizes, and opens a [SideConfigMenu] for the given [endPoint] and [containers] when clicked.
  * 
  * Uses the [window from the context][windowDsl] as the previous window.
@@ -250,5 +248,11 @@ fun openSideConfigItem(
 }
 
 @Suppress("FunctionName")
-@Deprecated("", ReplaceWith("openSideConfigItem(sideConfigMenu)"))
-fun OpenSideConfigItem(sideConfigMenu: SideConfigMenu) = openSideConfigItem(sideConfigMenu)
+@Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
+fun OpenSideConfigItem(sideConfigMenu: SideConfigMenu): Item = item {
+    itemProvider by DefaultGuiItems.SIDE_CONFIG_BTN.clientsideProvider
+    onClick {
+        player.playClickSound()
+        sideConfigMenu.openWindow(player)
+    }
+}

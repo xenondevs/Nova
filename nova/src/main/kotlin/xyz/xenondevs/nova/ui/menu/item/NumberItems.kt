@@ -15,6 +15,7 @@ import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.nova.ui.menu.LEGACY_NON_DSL_INVUI_DEPRECATION
 import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.util.playItemPickupSound
@@ -135,6 +136,7 @@ fun displayNumberItem(
     onClick(onClick)
 }
 
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 open class ChangeNumberItem(
     private val sizeModifier: Int,
     private val shiftSizeModifier: Int,
@@ -173,6 +175,7 @@ open class ChangeNumberItem(
     
 }
 
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class DisplayNumberItem(private val getNumber: () -> Int, private val localizedName: String? = null) : AbstractItem() {
     
     constructor(getNumber: () -> Int) : this(getNumber, null)
@@ -213,6 +216,7 @@ class AddNumberItem(
     DefaultGuiItems.PLUS_BTN_OFF.clientsideProvider
 )
 
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class RemoveNumberItem(
     getRange: () -> IntRange,
     getNumber: () -> Int,
@@ -230,6 +234,7 @@ class RemoveNumberItem(
     DefaultGuiItems.MINUS_BTN_OFF.clientsideProvider
 )
 
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 open class AioNumberItem(
     private val numberModifier: Int,
     private val shiftNumberModifier: Int,

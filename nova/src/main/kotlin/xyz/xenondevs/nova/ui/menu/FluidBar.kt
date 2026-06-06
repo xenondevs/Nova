@@ -144,6 +144,7 @@ private fun ItemBuilder.setFluidDisplayName(amount: Long, capacity: Long): ItemB
 /**
  * A multi-item gui component for displaying fluid levels.
  */
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class FluidBar(
     height: Int,
     fluidHolder: FluidHolder,
@@ -213,6 +214,7 @@ class FluidBar(
 /**
  * A multi-item gui component for displaying a constant fluid level.
  */
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class StaticFluidBar(
     height: Int,
     private val capacity: Long,

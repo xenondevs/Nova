@@ -6,8 +6,10 @@ import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.gui.TabGui
 import xyz.xenondevs.invui.item.AbstractTabGuiBoundItem
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.nova.ui.menu.LEGACY_NON_DSL_INVUI_DEPRECATION
 import xyz.xenondevs.nova.util.playClickSound
 
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class ClickyTabItem(private val tab: Int, private val itemProvider: (TabGui) -> ItemProvider) : AbstractTabGuiBoundItem() {
     
     override fun getItemProvider(player: Player): ItemProvider {

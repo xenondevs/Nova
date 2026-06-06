@@ -16,6 +16,7 @@ import xyz.xenondevs.invui.item.AbstractPagedGuiBoundItem
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.nova.ui.menu.LEGACY_NON_DSL_INVUI_DEPRECATION
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.clientsideProvider
@@ -127,6 +128,7 @@ fun pageForwardItem(
 /**
  * A UI item for [PagedGuis][PagedGui] that goes back one page on left-click.
  */
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class PageBackItem(
     private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_ON.clientsideProvider,
     private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_OFF.clientsideProvider
@@ -165,6 +167,7 @@ class PageBackItem(
 /**
  * A UI item for [PagedGuis][PagedGui] that goes forward one page on left-click.
  */
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class PageForwardItem(
     private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_ON.clientsideProvider,
     private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_OFF.clientsideProvider

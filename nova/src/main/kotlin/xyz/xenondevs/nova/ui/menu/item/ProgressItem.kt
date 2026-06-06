@@ -11,6 +11,7 @@ import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.nova.ui.menu.LEGACY_NON_DSL_INVUI_DEPRECATION
 import xyz.xenondevs.nova.util.item.setCustomModelDataFloat
 import xyz.xenondevs.nova.world.item.NovaItem
 
@@ -43,6 +44,7 @@ fun progressItem(
  * Its unnamed clientside providers will be used to display the progress.
  * @param customModelDataIndex The custom model data index that the progress value should be written to.
  */
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 open class ProgressItem(
     val item: NovaItem,
     private val customModelDataIndex: Int = 0

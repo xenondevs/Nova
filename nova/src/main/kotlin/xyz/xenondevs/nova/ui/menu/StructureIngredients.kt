@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.dsl.ProviderDslProperty
-import xyz.xenondevs.commons.provider.flatten
+import xyz.xenondevs.commons.provider.immediateFlatten
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.IngredientsDsl
 import xyz.xenondevs.invui.dsl.InventoryWithBackgroundProvider
@@ -37,6 +37,11 @@ import xyz.xenondevs.nova.world.item.clientsideProvider
 import java.util.*
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+
+internal const val LEGACY_NON_DSL_INVUI_DEPRECATION = "A replacement UI component for InvUI's DSL API is available. " +
+    "The DSL API should be preferred as it works better with reactive features such as config- and registry reloading. " +
+    "The replacement UI components can typically be found as lowerCamelCase functions, e.g. `BackItem(...)` -> `backItem(...)`. " +
+    "This legacy UI component will be removed in a future Nova version."
 
 internal fun setGlobalIngredients() {
     addGlobalIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)

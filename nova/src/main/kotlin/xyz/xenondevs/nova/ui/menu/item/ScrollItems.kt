@@ -13,6 +13,7 @@ import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.item.AbstractScrollGuiBoundItem
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.nova.ui.menu.LEGACY_NON_DSL_INVUI_DEPRECATION
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import xyz.xenondevs.nova.world.item.clientsideProvider
@@ -179,6 +180,7 @@ fun scrollDownItem(
 /**
  * A UI item for [ScrollGuis][ScrollGui] that scrolls up one line on left-click.
  */
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class ScrollUpItem(
     private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_UP_ON.clientsideProvider,
     private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_UP_OFF.clientsideProvider
@@ -206,6 +208,7 @@ class ScrollUpItem(
 /**
  * A UI item for [ScrollGuis][ScrollGui] that scrolls down one line on left-click.
  */
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class ScrollDownItem(
     private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_DOWN_ON.clientsideProvider,
     private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_DOWN_OFF.clientsideProvider
@@ -233,6 +236,7 @@ class ScrollDownItem(
 /**
  * A UI item for [ScrollGuis][ScrollGui] that scrolls left one column on left-click.
  */
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class ScrollLeftItem(
     private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_ON.clientsideProvider,
     private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_LEFT_OFF.clientsideProvider
@@ -260,6 +264,7 @@ class ScrollLeftItem(
 /**
  * A UI item for [ScrollGuis][ScrollGui] that scrolls right one column on left-click.
  */
+@Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class ScrollRightItem(
     private val on: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_ON.clientsideProvider,
     private val off: Provider<ItemProvider> = DefaultGuiItems.ARROW_RIGHT_OFF.clientsideProvider
