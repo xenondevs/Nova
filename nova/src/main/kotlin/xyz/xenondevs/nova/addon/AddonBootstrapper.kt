@@ -18,11 +18,9 @@ import kotlin.io.path.notExists
 @Suppress("unused") // called by generated bootstrap code
 internal object AddonBootstrapper {
     
-    private val _addons = ArrayList<Addon>()
-    
     @JvmStatic
     val addons: List<Addon>
-        get() = _addons
+        field = ArrayList()
     
     @JvmStatic
     fun bootstrap(context: BootstrapContext, classLoader: ClassLoader) {
@@ -38,7 +36,7 @@ internal object AddonBootstrapper {
         addon.dataFolder = Path("plugins", context.pluginMeta.name)
         addon.logger = context.logger
         
-        _addons += addon
+        addons += addon
         BOOTSTRAPPER.handleAddonBootstrap(context)
     }
     

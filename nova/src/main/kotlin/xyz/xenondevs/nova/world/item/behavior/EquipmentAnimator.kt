@@ -40,8 +40,8 @@ internal object EquipmentAnimator {
         BukkitEquipmentSlot.BODY
     )
     
-    private val _tick = mutableProvider(0)
-    val tick: Provider<Int> get() = _tick
+    val tick: Provider<Int>
+        field = mutableProvider(0)
     
     val animatedBehaviors: MutableSet<ItemBehavior> = concurrentHashSet()
     
@@ -54,7 +54,7 @@ internal object EquipmentAnimator {
         if (animatedBehaviors.isEmpty())
             return
         
-        _tick.set(_tick.get() + 1)
+        tick.set(tick.get() + 1)
         
         Bukkit.getWorlds().asSequence()
             .flatMap { it.livingEntities }

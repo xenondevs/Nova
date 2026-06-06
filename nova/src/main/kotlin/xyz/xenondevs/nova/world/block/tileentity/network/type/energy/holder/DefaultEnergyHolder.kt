@@ -31,9 +31,6 @@ class DefaultEnergyHolder(
     defaultConnectionConfig: CubeFaceMap<NetworkConnectionType>
 ) : EnergyHolder {
     
-    private val _energyProvider: MutableProvider<Long> = energy
-    private val _energyMinusProvider = mutableProvider(0L)
-    private val _energyPlusProvider = mutableProvider(0L)
     private var activeEnergyMinus = 0L
     private var activeEnergyPlus = 0L
     
@@ -53,21 +50,22 @@ class DefaultEnergyHolder(
     /**
      * A [Provider] for the current energy amount.
      */
-    val energyProvider: Provider<Long> get() = _energyProvider
+    val energyProvider: Provider<Long>
+        field = energy
     
     /**
      * A [Provider] containing the amount of energy that was extracted between the second-to-last and last energy network tick.
      * For visualization, this value should be normalized by dividing it by the number of game ticks between energy network ticks.
      */
     val energyMinusProvider: Provider<Long>
-        get() = _energyMinusProvider
+        field = mutableProvider(0L)
     
     /**
      * A [Provider] containing the amount of energy that was inserted between the second-to-last and last energy network tick.
      * For visualization, this value should be normalized by dividing it by the number of game ticks between energy network ticks.
      */
     val energyPlusProvider: Provider<Long>
-        get() = _energyPlusProvider
+        field = mutableProvider(0L)
     
     /**
      * The amount of energy that was extracted between the second-to-last and last energy network tick.
@@ -82,18 +80,18 @@ class DefaultEnergyHolder(
     val energyPlus: Long by energyPlusProvider
     
     override var energy: Long
-        get() = _energyProvider.get()
+        get() = energyProvider.get()
         set(value) {
             val capped = max(min(value, maxEnergy), 0)
-            if (_energyProvider.get() != capped) {
-                val energyDelta = capped - _energyProvider.get()
+            if (energyProvider.get() != capped) {
+                val energyDelta = capped - energyProvider.get()
                 if (energyDelta > 0) {
                     activeEnergyPlus += energyDelta
                 } else {
                     activeEnergyMinus -= energyDelta
                 }
                 
-                _energyProvider.set(capped)
+                energyProvider.set(capped)
             }
         }
     
@@ -102,8 +100,8 @@ class DefaultEnergyHolder(
      * energy plus and minus values to [energyPlus] and [energyMinus].
      */
     fun postTick() {
-        _energyMinusProvider.set(activeEnergyMinus)
-        _energyPlusProvider.set(activeEnergyPlus)
+        energyMinusProvider.set(activeEnergyMinus)
+        energyPlusProvider.set(activeEnergyPlus)
         activeEnergyMinus = 0L
         activeEnergyPlus = 0L
     }

@@ -13,8 +13,8 @@ import net.minecraft.world.phys.Vec3
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import xyz.xenondevs.nova.LOGGER
-import xyz.xenondevs.nova.network.packet.PacketIds
 import xyz.xenondevs.nova.network.RegistryFriendlyByteBuf
+import xyz.xenondevs.nova.network.packet.PacketIds
 import xyz.xenondevs.nova.network.send
 import xyz.xenondevs.nova.util.fromFixedPoint
 import xyz.xenondevs.nova.util.positionEquals
@@ -42,9 +42,8 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     protected abstract val entityType: EntityType<*>
     
     private var registered = false
-    private val _viewers = Collections.newSetFromMap<Player>(WeakHashMap())
     val viewers: Set<Player>
-        get() = _viewers
+        field = Collections.newSetFromMap(WeakHashMap())
     
     val entityId = location.world.serverLevel.nextEntityId
     private val uuid = UUID.randomUUID()
@@ -101,7 +100,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
             player.send(spawnBuf, dataBuf, equipmentBuf)
         }
         
-        _viewers += player
+        viewers += player
         spawnHandler?.invoke(player)
     }
     
@@ -110,7 +109,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
      */
     fun despawn(player: Player) {
         player.send(despawnBuf)
-        _viewers -= player
+        viewers -= player
         despawnHandler?.invoke(player)
     }
     

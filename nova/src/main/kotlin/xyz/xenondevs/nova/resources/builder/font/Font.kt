@@ -22,56 +22,56 @@ class Font(
     providers: List<FontProvider> = emptyList()
 ) {
     
-    private val _providers = providers.toMutableList()
-    val providers: List<FontProvider> get() = _providers
+    val providers: List<FontProvider>
+        field = providers.toMutableList()
     
     /**
      * Adds the given [provider] to the start of the list.
      */
     fun addFirst(provider: FontProvider) {
-        _providers.add(0, provider)
+        providers.add(0, provider)
     }
     
     /**
      * Adds the given [provider] to the end of the list.
      */
     fun add(provider: FontProvider) {
-        _providers += provider
+        providers += provider
     }
     
     /**
      * Adds all [providers] of the given font to the end of the list.
      */
     fun addAll(other: Font) {
-        _providers += other.providers
+        providers += other.providers
     }
     
     /**
      * Adds the given [provider] to the end of the list.
      */
     operator fun plusAssign(provider: FontProvider) {
-        _providers += provider
+        providers += provider
     }
     
     /**
      * Adds the given [providers] to the end of the list.
      */
     operator fun plusAssign(providers: Iterable<FontProvider>) {
-        _providers += providers
+        this.providers += providers
     }
     
     /**
      * Adds all [providers] of the given font to the end of the list.
      */
     operator fun plusAssign(font: Font) {
-        _providers += font.providers
+        providers += font.providers
     }
     
     /**
      * Removes the given [provider] from the list.
      */
     fun remove(provider: FontProvider) {
-        _providers -= provider
+        providers -= provider
     }
     
     /**

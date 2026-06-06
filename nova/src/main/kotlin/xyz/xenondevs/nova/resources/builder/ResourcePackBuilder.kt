@@ -116,13 +116,11 @@ class ResourcePackBuilder internal constructor(
         internal val MCASSETS_DIR: Path = DATA_FOLDER.resolve("resource_pack/.mcassets")
         private val MCASSETS_DOWNLOAD_MUTEX = Mutex()
         
-        private val _configurations = ConcurrentHashMap<Key, ResourcePackConfiguration>()
-        
         /**
          * The registered [ResourcePackConfigurations][ResourcePackConfiguration] by their [id][Key].
          */
         val configurations: Map<Key, ResourcePackConfiguration>
-            get() = _configurations
+            field: MutableMap<Key, ResourcePackConfiguration> = ConcurrentHashMap()
         
         init {
             register(CORE_PACK_ID) {
@@ -203,7 +201,7 @@ class ResourcePackBuilder internal constructor(
          */
         fun register(id: Key, configure: ResourcePackConfiguration.() -> Unit) {
             require(id !in configurations) { "Id $id is already in use" }
-            _configurations[id] = ResourcePackConfiguration(id).apply(configure)
+            configurations[id] = ResourcePackConfiguration(id).apply(configure)
         }
         
         /**

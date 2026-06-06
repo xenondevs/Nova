@@ -27,7 +27,9 @@ kotlin {
         )
         
         freeCompilerArgs.addAll(
-            "-Xcontext-parameters"
+            // IntelliJ seems to not know that these are default in 2.4
+            "-Xcontext-parameters",
+            "-Xexplicit-backing-fields"
         )
         
         if (!project.hasProperty("release")) {

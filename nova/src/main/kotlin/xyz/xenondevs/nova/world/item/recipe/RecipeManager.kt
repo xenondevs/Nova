@@ -57,11 +57,10 @@ object RecipeManager : Listener, PacketListener {
     
     private val registeredVanillaRecipes = HashMap<ResourceKey<MojangRecipe<*>>, RecipeHolder<*>>()
     private val customVanillaRecipes = HashMap<ResourceKey<MojangRecipe<*>>, MojangRecipe<*>>()
-    private val _novaRecipes = HashMap<RecipeType<*>, HashMap<Key, NovaRecipe>>()
     private val hardcodedRecipes = ArrayList<Any>()
     
     val novaRecipes: Map<RecipeType<*>, Map<Key, NovaRecipe>>
-        get() = _novaRecipes
+        field = HashMap<RecipeType<*>, HashMap<Key, NovaRecipe>>()
     
     @InitFun
     private fun init() {
@@ -96,12 +95,12 @@ object RecipeManager : Listener, PacketListener {
     
     @Suppress("UNCHECKED_CAST")
     fun <T : ConversionNovaRecipe> getConversionRecipeFor(type: RecipeType<T>, input: ItemStack): T? {
-        return _novaRecipes[type]?.values?.firstOrNull { (it as ConversionNovaRecipe).input.test(input) } as T?
+        return novaRecipes[type]?.values?.firstOrNull { (it as ConversionNovaRecipe).input.test(input) } as T?
     }
     
     @Suppress("UNCHECKED_CAST")
     fun <T : NovaRecipe> getRecipe(type: RecipeType<T>, id: Key): T? {
-        return _novaRecipes[type]?.get(id) as T?
+        return novaRecipes[type]?.get(id) as T?
     }
     
     private fun loadRecipes() {
@@ -133,7 +132,7 @@ object RecipeManager : Listener, PacketListener {
                 customVanillaRecipes[key] = nmsRecipe
             }
             
-            is NovaRecipe -> _novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.id] = recipe
+            is NovaRecipe -> novaRecipes.getOrPut(recipe.type) { HashMap() }[recipe.id] = recipe
             
             else -> throw UnsupportedOperationException("Unsupported Recipe Type: ${recipe::class.java}")
         }
@@ -147,7 +146,7 @@ object RecipeManager : Listener, PacketListener {
         }
         
         customVanillaRecipes.clear()
-        _novaRecipes.clear()
+        novaRecipes.clear()
         
         loadRecipes()
         RecipeRegistry.indexRecipes()

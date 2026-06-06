@@ -32,33 +32,32 @@ import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object VanillaGuiTextureInjector : PacketListener {
     
-    private val _requiredVerticalOffsets = hashSetOf(
-        GuiTextureAlignment.ANVIL_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.BLAST_FURNACE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.BREWING_STAND_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.CARTOGRAPHY_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.CRAFTER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.CRAFTING_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.ENCHANTMENT_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.FURNACE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.GENERIC_9x1_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.GENERIC_9x2_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.GENERIC_9x3_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.GENERIC_9x4_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.GENERIC_9x5_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.GENERIC_9x6_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.GENERIC_3x3_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.GRINDSTONE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.HOPPER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.LOOM_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.SHULKER_BOX_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.SMITHING_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.SMOKER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
-        GuiTextureAlignment.STONECUTTER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y()
-    )
     val requiredVerticalOffsets: Set<Int>
-        get() = _requiredVerticalOffsets
-
+        field = hashSetOf(
+            GuiTextureAlignment.ANVIL_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.BLAST_FURNACE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.BREWING_STAND_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.CARTOGRAPHY_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.CRAFTER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.CRAFTING_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.ENCHANTMENT_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.FURNACE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.GENERIC_9x1_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.GENERIC_9x2_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.GENERIC_9x3_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.GENERIC_9x4_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.GENERIC_9x5_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.GENERIC_9x6_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.GENERIC_3x3_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.GRINDSTONE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.HOPPER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.LOOM_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.SHULKER_BOX_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.SMITHING_TABLE_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.SMOKER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y(),
+            GuiTextureAlignment.STONECUTTER_INVENTORY_LABEL_OFFSET_FROM_TITLE.y()
+        )
+    
     @InitFun
     private fun init() {
         registerPacketListener()

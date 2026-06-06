@@ -15,28 +15,25 @@ import kotlin.io.path.walk
  */
 class FontContent : PackBuildData {
     
-    private val _vanillaFonts = HashMap<ResourcePath<ResourceType.Font>, Font>()
-    private val _customFonts = HashMap<ResourcePath<ResourceType.Font>, Font>()
-    
     /**
      * The fonts of the vanilla assets
      */
     val vanillaFonts: Map<ResourcePath<ResourceType.Font>, Font>
-        get() = _vanillaFonts
+        field = HashMap()
     
     /**
      * The fonts defined in the resource pack
      */
     val customFonts: Map<ResourcePath<ResourceType.Font>, Font>
-        get() = _customFonts
+        field = HashMap()
     
     /**
      * A merged view of [vanillaFonts] and [customFonts].
      */
     val mergedFonts: Map<ResourcePath<ResourceType.Font>, Font>
         get() {
-            val map = HashMap(_customFonts)
-            for ((id, font) in _vanillaFonts) {
+            val map = HashMap(customFonts)
+            for ((id, font) in vanillaFonts) {
                 val fontOverride = map[id]
                 if (fontOverride != null) {
                     map[id] = Font(id, fontOverride.providers + font.providers)
@@ -52,56 +49,56 @@ class FontContent : PackBuildData {
      * Gets the font under [id] or `null` if no such font exists.
      */
     operator fun get(id: ResourcePath<ResourceType.Font>): Font? {
-        return _customFonts[id]
+        return customFonts[id]
     }
     
     /**
      * Gets the font under [id] or creates and registers a new [Font] with the given [id] if no such font exists.
      */
     fun getOrCreate(id: ResourcePath<ResourceType.Font>): Font {
-        return _customFonts.getOrPut(id) { Font(id) }
+        return customFonts.getOrPut(id) { Font(id) }
     }
     
     /**
      * Adds [font] to the fonts of this resource pack.
      */
     fun add(font: Font) {
-        _customFonts[font.id] = font
+        customFonts[font.id] = font
     }
     
     /**
      * Adds [font] to the fonts of this resource pack.
      */
     operator fun plusAssign(font: Font) {
-        _customFonts[font.id] = font
+        customFonts[font.id] = font
     }
     
     /**
      * Removes the font with the given [id] from the fonts of this resource pack.
      */
     fun remove(id: ResourcePath<ResourceType.Font>) {
-        _customFonts.remove(id)
+        customFonts.remove(id)
     }
     
     /**
      * Removes the font with the given [id] from the fonts of this resource pack.
      */
     operator fun minusAssign(id: ResourcePath<ResourceType.Font>) {
-        _customFonts.remove(id)
+        customFonts.remove(id)
     }
     
     /**
      * Removes [font] from the fonts of this resource pack.
      */
     fun remove(font: Font) {
-        _customFonts.remove(font.id)
+        customFonts.remove(font.id)
     }
     
     /**
      * Removes [font] from the fonts of this resource pack.
      */
     operator fun minusAssign(font: Font) {
-        _customFonts.remove(font.id)
+        customFonts.remove(font.id)
     }
     
     /**
@@ -112,8 +109,8 @@ class FontContent : PackBuildData {
         override val runsAfter = setOf(ExtractTask::class)
         
         override suspend fun run() {
-            discoverFonts(builder.resolveVanilla("assets/"), _vanillaFonts)
-            discoverFonts(builder.resolve("assets/"), _customFonts)
+            discoverFonts(builder.resolveVanilla("assets/"), vanillaFonts)
+            discoverFonts(builder.resolve("assets/"), customFonts)
         }
         
         private fun discoverFonts(assetsDir: Path, map: MutableMap<ResourcePath<ResourceType.Font>, Font>) {
@@ -140,7 +137,7 @@ class FontContent : PackBuildData {
         override val runsAfter = setOf(LoadAll::class)
         
         override suspend fun run() {
-            _customFonts.values.forEach { it.write(builder) }
+            customFonts.values.forEach { it.write(builder) }
         }
         
     }

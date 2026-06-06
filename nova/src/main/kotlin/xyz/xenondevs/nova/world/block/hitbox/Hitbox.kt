@@ -26,12 +26,10 @@ abstract class Hitbox<L, R> internal constructor(
     protected var height: Float
 ) {
     
-    private val _leftClickHandlers = ArrayList<L>(1)
     val leftClickHandlers: List<L>
-        get() = _leftClickHandlers
-    private val _rightClickHandlers = ArrayList<R>(1)
+        field = ArrayList(1)
     val rightClickHandlers: List<R>
-        get() = _rightClickHandlers
+        field = ArrayList(1)
     
     /**
      * Adds the [Hitbox] to the world.
@@ -51,14 +49,14 @@ abstract class Hitbox<L, R> internal constructor(
      * Adds a handler to this [Hitbox] that is called when a player left-clicks the hitbox
      */
     fun addLeftClickHandler(handler: L) {
-        _leftClickHandlers += handler
+        leftClickHandlers += handler
     }
     
     /**
      * Adds a handler to this [Hitbox] that is called when a player right-clicks the hitbox.
      */
     fun addRightClickHandler(handler: R) {
-        _rightClickHandlers += handler
+        rightClickHandlers += handler
     }
     
     /**

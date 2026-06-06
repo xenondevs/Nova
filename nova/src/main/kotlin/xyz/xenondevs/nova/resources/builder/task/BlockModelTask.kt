@@ -300,8 +300,8 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
     
     internal companion object {
         
-        private val _requests = HashMap<RegistryEntry.Nova<NovaBlock>, Pair<BlockModelLayout, List<NovaBlockState>>>()
-        val requests: Map<RegistryEntry.Nova<NovaBlock>, Pair<BlockModelLayout, List<NovaBlockState>>> get() = _requests
+        val requests: Map<RegistryEntry.Nova<NovaBlock>, Pair<BlockModelLayout, List<NovaBlockState>>>
+            field = HashMap()
         
         /**
          * Requests the generation and assignment of models for all [states] of [entry] using [layout].
@@ -312,7 +312,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
             layout: BlockModelLayout,
             states: List<NovaBlockState>,
         ) {
-            _requests[entry] = layout to states
+            requests[entry] = layout to states
         }
         
     }
