@@ -2,11 +2,39 @@ package xyz.xenondevs.nova.ui.menu.item
 
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.invui.Click
+import xyz.xenondevs.invui.dsl.ClickDsl
+import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.nova.util.item.setCustomModelDataFloat
 import xyz.xenondevs.nova.world.item.NovaItem
+
+/**
+ * A [UI item][Item] that changes its appearance based on a progres value in `[0, 1]`.
+ * Applies [progress] to the float at [customModelDataIndex], using [itemProvider] as the base.
+ * 
+ * Also allows defining an optional [onClick] action.
+ */
+fun progressItem(
+    itemProvider: Provider<ItemProvider>,
+    progress: Provider<Double>,
+    customModelDataIndex: Int = 0,
+    onClick: ClickDsl.() -> Unit = {}
+) = item {
+    this.itemProvider by combinedProvider(
+        itemProvider, progress
+    ) { itemProvider, progress -> 
+        itemProvider.get()
+            .apply { setCustomModelDataFloat(customModelDataIndex, progress.toFloat().coerceIn(0f..1f)) }
+            .let(::ItemWrapper)
+    }
+    onClick(onClick)
+}
 
 /**
  * An ui [Item] that changes its appearance based on a progress percentage.
