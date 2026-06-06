@@ -6,6 +6,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.Click
 import xyz.xenondevs.invui.item.AbstractItem
+import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
@@ -15,7 +16,7 @@ import xyz.xenondevs.nova.world.region.VisualRegion
 import java.util.*
 
 /**
- * An ui item for visualizing regions via [VisualRegion].
+ * A [UI Item][Item] for visualizing regions via [VisualRegion].
  *
  * @param regionUuid the [UUID] of the region to visualize
  * @param getRegion a function to receive the [Region]
