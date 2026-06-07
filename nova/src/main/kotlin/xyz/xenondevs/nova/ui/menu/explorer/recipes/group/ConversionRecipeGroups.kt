@@ -12,11 +12,12 @@ import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.gui
+import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.set
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.nova.ui.menu.asUiItem
+import xyz.xenondevs.nova.ui.menu.by
 import xyz.xenondevs.nova.ui.menu.explorer.recipes.createRecipeChoiceItem
 import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
@@ -61,7 +62,7 @@ abstract class ConversionRecipeGroup<T : Any> : RecipeGroup<T>() {
 internal abstract class LitRecipeGroup<T : Any> : ConversionRecipeGroup<T>() {
     override fun createGui(recipe: T): Gui {
         val gui = super.createGui(recipe)
-        gui[2, 2] = DefaultGuiItems.TP_LIT_PROGRESS.asUiItem()
+        gui[2, 2] = item { itemProvider by DefaultGuiItems.TP_LIT_PROGRESS }
         return gui
     }
 }

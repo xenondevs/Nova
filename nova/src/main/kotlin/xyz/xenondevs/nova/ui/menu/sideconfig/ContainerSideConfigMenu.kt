@@ -136,7 +136,7 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
         val (_, face) = getFaceFromSide(side)
         
         itemProvider by itemProvider {
-            type by containersAtFace[face]!!.map { container ->
+            type by containersAtFace[face]!!.flatMap { container ->
                 if (container != null)
                     TP_BUTTON_COLORS[containers.indexOf(container)]
                 else DefaultGuiItems.GRAY_BTN
