@@ -13,10 +13,13 @@ import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.NULL_PROVIDER
 import xyz.xenondevs.commons.provider.combinedProvider
+import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.mapEach
 import xyz.xenondevs.commons.provider.mapEachIndexed
 import xyz.xenondevs.commons.provider.mutableProvider
-import xyz.xenondevs.invui.dsl.by
+import xyz.xenondevs.invui.dsl.ScrollGuiDsl
+import xyz.xenondevs.invui.dsl.WindowDsl
+import xyz.xenondevs.invui.dsl.gui
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.dsl.scrollItemsGui
@@ -29,9 +32,10 @@ import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.entries.ItemTypeTags
 import xyz.xenondevs.nova.registry.registryEntrySetOf
-import xyz.xenondevs.nova.ui.menu.item.scrollLeftItem
-import xyz.xenondevs.nova.ui.menu.item.scrollRightItem
-import xyz.xenondevs.nova.ui.menu.item.scrollerItem
+import xyz.xenondevs.nova.ui.menu.item.installItemScrollSupport
+import xyz.xenondevs.nova.ui.menu.item.scrollBar
+import xyz.xenondevs.nova.ui.menu.item.scrollableItemProvider
+import xyz.xenondevs.nova.ui.overlay.guitexture.DefaultGuiTextures
 import xyz.xenondevs.nova.util.PlayerMapManager
 import xyz.xenondevs.nova.util.playClickSound
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
@@ -53,43 +57,50 @@ private fun createItemTagExplorer(player: Player) = window(player) {
         }.sortedBy { it.asString() }.map { registryEntrySetOf(it, NovaRegistries.ITEM, RegistryKey.ITEM) }
     }
     
-    title by combinedProvider(tags, tab) { tags, tab -> "#" + tags[tab].tagKey.asString() }
-    upperGui by scrollItemsGui(
-        "x x x # t t t t t",
-        "x x x # t t t t t",
-        "x x x # t t t t t",
-        "x x x # t t t t t",
-        "x x x # t t t t t",
-        "< s > # t t t t t",
+    title by combinedProvider(DefaultGuiTextures.TAGS, tags, tab) { texture, tags, tab -> 
+        texture.getTitle(Component.text("#" + tags[tab].tagKey.asString())) 
+    }.flatten()
+    upperGui by gui(
+        "k k k k . v v v v",
+        "k k k k . v v v v",
+        "k k k k . v v v v",
+        "k k k k . v v v v",
+        "k k k k . v v v v",
+        "k k k k . v v v v",
     ) {
         'x' by Markers.CONTENT_LIST_SLOT_VERTICAL
-        '<' by scrollLeftItem(DefaultGuiItems.ARROW_LEFT_ON.clientsideProvider, DefaultGuiItems.ARROW_LEFT_OFF.clientsideProvider)
-        's' by scrollerItem(DefaultGuiItems.SCROLLER_HORIZONTAL.clientsideProvider)
-        '>' by scrollRightItem(DefaultGuiItems.ARROW_RIGHT_ON.clientsideProvider, DefaultGuiItems.ARROW_RIGHT_OFF.clientsideProvider)
         
-        content by tags.mapEachIndexed { i, tag -> showTagButton(tag, i, tab) }
+        'k' by scrollItemsGui(
+            "x x x x",
+            "x x x x",
+            "x x x x",
+            "x x x x",
+            "x x x x",
+            "- - - -"
+        ) {
+            '-' by scrollBar(offset = 2)
+            content by tags.mapEachIndexed { i, tag -> showTagButton(tag, i, tab) }
+        }
         
-        't' by tabGui(
-            "x x x x x",
-            "x x x x x",
-            "x x x x x",
-            "x x x x x",
-            "x x x x x",
-            "x x x x x"
+        'v' by tabGui(
+            "x x x x",
+            "x x x x",
+            "x x x x",
+            "x x x x",
+            "x x x x",
+            "x x x x"
         ) {
             tabs by tags.mapEach { tag ->
                 scrollItemsGui(
-                    "x x x x x",
-                    "x x x x x",
-                    "x x x x x",
-                    "x x x x x",
-                    "x x x x x",
-                    "# < s > #",
+                    "x x x x",
+                    "x x x x",
+                    "x x x x",
+                    "x x x x",
+                    "x x x x",
+                    "- - - -",
                 ) {
-                    '<' by scrollLeftItem(DefaultGuiItems.ARROW_LEFT_ON.clientsideProvider, DefaultGuiItems.ARROW_LEFT_OFF.clientsideProvider)
-                    's' by scrollerItem(DefaultGuiItems.SCROLLER_HORIZONTAL.clientsideProvider)
-                    '>' by scrollRightItem(DefaultGuiItems.ARROW_RIGHT_ON.clientsideProvider, DefaultGuiItems.ARROW_RIGHT_OFF.clientsideProvider)
-                    content by tag.entries.mapEach(::itemTypeItem)
+                    '-' by scrollBar(offset = 2)
+                    content by tag.entries.mapEach { itemTypeItem(it) }
                     background by DefaultGuiItems.DISABLED_SLOT.clientsideProvider
                 }
             }
@@ -99,11 +110,13 @@ private fun createItemTagExplorer(player: Player) = window(player) {
     
 }
 
+context(windowDsl: WindowDsl, guiDsl: ScrollGuiDsl<*>)
 private fun showTagButton(tag: RegistryEntrySet.Mixed.Tag<NovaItem, ItemType>, tab: Int, activeTab: MutableProvider<Int>) = item {
     itemProvider by itemProvider {
         base by tag.entries
             .flatMap { it.firstOrNull()?.clientsideProvider ?: NULL_PROVIDER }
             .map { it?.get() ?: ItemStack.empty() }
+            .map { scrollableItemProvider(it).get() }
         name by Component.text("#" + tag.tagKey.asString(), NamedTextColor.GRAY)
         lore by emptyList()
         data[DataComponentTypes.TOOLTIP_DISPLAY] by TooltipDisplay
@@ -118,10 +131,12 @@ private fun showTagButton(tag: RegistryEntrySet.Mixed.Tag<NovaItem, ItemType>, t
             activeTab.set(tab)
         }
     }
+    installItemScrollSupport()
 }
 
+context(windowDsl: WindowDsl, guiDsl: ScrollGuiDsl<*>)
 private fun itemTypeItem(type: RegistryEntry.Either<NovaItem, ItemType>) = item {
-    itemProvider by type.clientsideProvider
+    itemProvider by type.clientsideProvider.map { scrollableItemProvider(it) }
     onClick {
         val itemStack = type.createItemStack()
         when (clickType) {
@@ -143,4 +158,5 @@ private fun itemTypeItem(type: RegistryEntry.Either<NovaItem, ItemType>) = item 
             else -> Unit
         }
     }
+    installItemScrollSupport()
 }
