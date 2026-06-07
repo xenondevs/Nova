@@ -142,8 +142,7 @@ internal class NovaItemBuilderImpl(
                 provider(style),
                 provider(lore),
                 tooltipStyle ?: NULL_PROVIDER,
-                provider(maxStackSize),
-                config
+                provider(maxStackSize)
             )
             block?.let { this += BlockItemBehavior(it) }
             

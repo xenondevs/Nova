@@ -1,30 +1,21 @@
 package xyz.xenondevs.nova.world.item.behavior
 
 import io.papermc.paper.datacomponent.DataComponentTypes
-import io.papermc.paper.datacomponent.item.ItemAttributeModifiers
-import io.papermc.paper.datacomponent.item.ItemAttributeModifiers.itemAttributes
 import io.papermc.paper.datacomponent.item.ItemEnchantments.itemEnchantments
 import io.papermc.paper.datacomponent.item.ItemLore.lore
 import io.papermc.paper.datacomponent.item.TooltipDisplay.tooltipDisplay
-import io.papermc.paper.datacomponent.item.attribute.AttributeModifierDisplay
-import kotlinx.serialization.Serializable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.minecraft.core.component.DataComponents
-import org.bukkit.attribute.Attribute
-import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.nova.config.ConfigProvider
-import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
@@ -33,7 +24,6 @@ import xyz.xenondevs.nova.util.item.update
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.serverPlayer
-import xyz.xenondevs.nova.util.toNamespacedKey
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.InteractionResult
 import xyz.xenondevs.nova.world.item.DataComponentMap
@@ -49,15 +39,14 @@ internal class DefaultBehavior(
     style: Provider<Style>,
     lore: Provider<List<Component>>,
     tooltipStyle: Provider<TooltipStyle?>,
-    maxStackSize: Provider<Int>,
-    config: ConfigProvider,
+    maxStackSize: Provider<Int>
 ) : ItemBehavior {
     
     private val style by style.map { it.toNmsStyle() }
     
     override val baseDataComponents: Provider<DataComponentMap> = combinedProvider(
-        name, style, lore, tooltipStyle, maxStackSize, loadConfiguredAttributeModifiers(id, config)
-    ) { name, style, lore, tooltipStyle, maxStackSize, attributeModifiers ->
+        name, style, lore, tooltipStyle, maxStackSize
+    ) { name, style, lore, tooltipStyle, maxStackSize ->
         buildDataComponentMap {
             if (name != null) {
                 this[DataComponentTypes.ITEM_NAME] = name.style(style)
@@ -73,7 +62,6 @@ internal class DefaultBehavior(
                 this[DataComponentTypes.TOOLTIP_STYLE] = tooltipStyle.key
             }
             
-            this[DataComponentTypes.ATTRIBUTE_MODIFIERS] = attributeModifiers
             this[DataComponentTypes.MAX_STACK_SIZE] = maxStackSize
             this[DataComponentTypes.ITEM_MODEL] = id
             
@@ -147,33 +135,3 @@ internal class DefaultBehavior(
     }
     
 }
-
-@Serializable
-private class AttributesSurrogate(
-    val id: Key? = null,
-    val attribute: Attribute,
-    val operation: AttributeModifier.Operation,
-    val value: Double,
-    val display: AttributeModifierDisplay = AttributeModifierDisplay.reset()
-)
-
-private fun loadConfiguredAttributeModifiers(key: Key, config: ConfigProvider): Provider<ItemAttributeModifiers> =
-    config.entry<Map<EquipmentSlotGroup, AttributesSurrogate>>(emptyMap(), "attribute_modifiers").map {
-        val builder = itemAttributes()
-        for ((slotGroup, attributes) in it) {
-            val id = attributes.id
-                ?: Key.key(key.namespace(), "${key.value()}_${slotGroup.toString().lowercase()}")
-            
-            builder.addModifier(
-                attributes.attribute,
-                AttributeModifier(
-                    id.toNamespacedKey(),
-                    attributes.value,
-                    attributes.operation,
-                    slotGroup
-                ),
-                attributes.display
-            )
-        }
-        return@map builder.build()
-    }
