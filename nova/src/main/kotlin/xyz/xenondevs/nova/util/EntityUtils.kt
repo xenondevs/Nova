@@ -12,6 +12,7 @@ import net.minecraft.tags.FluidTags
 import net.minecraft.util.ProblemReporter
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.EntitySpawnReason
+import net.minecraft.world.entity.EntitySpawnRequest
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.storage.TagValueOutput
 import org.bukkit.Bukkit
@@ -239,7 +240,7 @@ object EntityUtils {
         if (nbtModifier != null) compoundTag = nbtModifier.invoke(compoundTag)
         
         val entities = ArrayList<MojangEntity>()
-        NMSEntityType.loadEntityRecursive(compoundTag, level, spawnReason) { entity ->
+        NMSEntityType.loadEntityRecursive(compoundTag, level, EntitySpawnRequest(spawnReason, false)) { entity ->
             // assign new uuid
             entity.uuid = UUID.randomUUID()
             
@@ -298,7 +299,7 @@ class FakePlayer(
 ) : ServerPlayer(server, level, profile, ClientInformation.createDefault()) {
     
     init {
-        advancements.stopListening()
+        advancements.clearTriggers()
     }
     
     override fun onEffectAdded(effect: MobEffectInstance, source: MojangEntity?) {

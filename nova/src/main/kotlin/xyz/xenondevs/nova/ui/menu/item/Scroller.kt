@@ -3,17 +3,16 @@ package xyz.xenondevs.nova.ui.menu.item
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.BundleContents.bundleContents
 import net.kyori.adventure.key.Key
-import org.bukkit.Material
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.item
-import xyz.xenondevs.invui.internal.util.ItemUtils2
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.util.ItemUtils
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
 import kotlin.random.Random
 
@@ -35,7 +34,7 @@ fun scrollerItem(
 ): Item = item {
     this.itemProvider by combinedProvider(line, maxLine, itemProvider) { line, maxLine, itemProvider ->
         val progress = (line + 1.0) / (maxLine + 1.0)
-        ItemBuilder(ItemUtils2.asType(itemProvider.get(), Material.BUNDLE))
+        ItemBuilder(ItemUtils.asType(itemProvider.get(), ItemType.BUNDLE))
             .set(DataComponentTypes.BUNDLE_CONTENTS, bundleContents(listOf(
                 ItemType.STONE.createItemStack(((progress * 64).toInt() - 2).coerceIn(1..64)),
                 ItemType.STONE.createItemStack(),

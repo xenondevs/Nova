@@ -5,12 +5,12 @@ import net.minecraft.advancements.Advancement
 import net.minecraft.advancements.AdvancementHolder
 import net.minecraft.advancements.AdvancementRequirements
 import net.minecraft.advancements.AdvancementType
-import net.minecraft.advancements.Criterion
 import net.minecraft.advancements.DisplayInfo
-import net.minecraft.advancements.criterion.DataComponentMatchers
-import net.minecraft.advancements.criterion.InventoryChangeTrigger
-import net.minecraft.advancements.criterion.ItemPredicate
-import net.minecraft.advancements.criterion.NbtPredicate
+import net.minecraft.advancements.predicates.DataComponentMatchers
+import net.minecraft.advancements.predicates.ItemPredicate
+import net.minecraft.advancements.predicates.NbtPredicate
+import net.minecraft.advancements.triggers.Criterion
+import net.minecraft.advancements.triggers.InventoryChangeTrigger
 import net.minecraft.core.component.predicates.CustomDataPredicate
 import net.minecraft.core.component.predicates.DataComponentPredicates
 import net.minecraft.nbt.CompoundTag

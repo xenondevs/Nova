@@ -81,7 +81,7 @@ interface CrossbowLogic {
         }
         
         override fun handleDrawTick(entity: LivingEntity, crossbow: ItemStack, tick: Int) {
-            val chargingSounds = crossbowItem.getChargingSounds(crossbow.unwrap())
+            val chargingSounds = CrossbowItem.getChargingSounds(crossbow.unwrap())
             val chargeTime = getDrawTime(entity, crossbow)
             
             if (tick == (chargeTime * 0.2).toInt())
@@ -101,7 +101,7 @@ interface CrossbowLogic {
             val dummyCrossbow = createDummyCrossbow(entity.activeItem)
             
             if (CrossbowItem.tryLoadProjectiles(entity.nmsEntity, dummyCrossbow.unwrap(), event.shouldConsumeItem())) {
-                val chargingSounds = crossbowItem.getChargingSounds(crossbow.unwrap())
+                val chargingSounds = CrossbowItem.getChargingSounds(crossbow.unwrap())
                 playSoundIfPresent(entity, chargingSounds.end)
             }
             

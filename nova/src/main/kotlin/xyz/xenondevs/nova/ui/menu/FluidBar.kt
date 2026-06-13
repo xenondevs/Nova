@@ -4,10 +4,10 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
-import xyz.xenondevs.invui.internal.util.InventoryUtils
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.setItemProvider
+import xyz.xenondevs.invui.util.InventoryUtils
 import xyz.xenondevs.nova.util.NumberFormatUtils
 import xyz.xenondevs.nova.util.addItemCorrectly
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty

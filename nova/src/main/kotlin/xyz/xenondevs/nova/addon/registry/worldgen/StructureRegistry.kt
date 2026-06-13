@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.addon.registry.worldgen
 
+import com.mojang.serialization.MapCodec
 import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.level.levelgen.structure.StructureSet
 import net.minecraft.world.level.levelgen.structure.StructureType
@@ -11,7 +12,6 @@ import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType
 import xyz.xenondevs.nova.addon.REGISTRIES_DEPRECATION
 import xyz.xenondevs.nova.addon.registry.AddonGetter
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
@@ -41,7 +41,7 @@ interface StructureRegistry : AddonGetter {
     
     @Deprecated(REGISTRIES_DEPRECATION)
     @ExperimentalWorldGen
-    fun <P : StructureProcessor> registerStructureProcessorType(name: String, structureProcessorType: StructureProcessorType<P>): StructureProcessorType<P> =
+    fun <P : StructureProcessor> registerStructureProcessorType(name: String, structureProcessorType: MapCodec<out P>): MapCodec<out P> =
         addon.registerStructureProcessorType(name, structureProcessorType)
     
     @Deprecated(REGISTRIES_DEPRECATION)

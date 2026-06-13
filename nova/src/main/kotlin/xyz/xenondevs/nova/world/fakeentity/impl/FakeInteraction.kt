@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.world.fakeentity.impl
 
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.entity.Interaction
 import org.bukkit.Location
 import xyz.xenondevs.nova.world.fakeentity.FakeEntity
@@ -13,7 +14,7 @@ class FakeInteraction(
     override val metadata: InteractionMetadata
 ) : FakeEntity<InteractionMetadata>(location) {
     
-    override val entityType: EntityType<Interaction> = EntityType.INTERACTION
+    override val entityType: EntityType<Interaction> = EntityTypes.INTERACTION
     
     constructor(location: Location, autoRegister: Boolean = true, beforeSpawn: ((FakeInteraction, InteractionMetadata) -> Unit)? = null) :
         this(location, autoRegister, beforeSpawn, InteractionMetadata())

@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.world.fakeentity.impl
 
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.entity.monster.Shulker
 import org.bukkit.Location
 import xyz.xenondevs.nova.world.fakeentity.FakeEntity
@@ -13,7 +14,7 @@ class FakeShulker(
     override val metadata: ShulkerMetadata
 ) : FakeEntity<ShulkerMetadata>(location) {
     
-    override val entityType: EntityType<Shulker> = EntityType.SHULKER
+    override val entityType: EntityType<Shulker> = EntityTypes.SHULKER
     
     constructor(location: Location, autoRegister: Boolean = true, beforeSpawn: ((FakeShulker, ShulkerMetadata) -> Unit)? = null) :
         this(location, autoRegister, beforeSpawn, ShulkerMetadata())

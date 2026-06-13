@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.world.generation.builder
 import net.kyori.adventure.key.Key
 import net.minecraft.core.HolderSet
 import net.minecraft.core.WritableRegistry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.tags.BlockTags
 import net.minecraft.tags.TagKey
 import net.minecraft.util.valueproviders.IntProvider
@@ -15,7 +16,7 @@ import net.minecraft.world.level.dimension.DimensionType.MonsterSettings
 import xyz.xenondevs.nova.registry.RegistryElementBuilder
 import xyz.xenondevs.nova.registry.RegistryElementBuilderDsl
 import xyz.xenondevs.nova.world.generation.ExperimentalWorldGen
-import java.util.Optional
+import java.util.*
 
 /**
  * Builder for [DimensionTypes][DimensionType].
@@ -184,7 +185,7 @@ class DimensionTypeBuilder internal constructor(
             minY,
             height,
             logicalHeight,
-            infiniBurn,
+            BuiltInRegistries.BLOCK.getOrThrow(infiniBurn),
             ambientLight,
             monsterSettings ?: MonsterSettingsBuilder().build(),
             DimensionType.Skybox.OVERWORLD, // TODO: expose skybox

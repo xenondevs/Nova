@@ -7,7 +7,6 @@ import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.util.Brightness
 import org.bukkit.entity.Display
 import org.bukkit.entity.Display.Billboard
-import org.joml.Matrix3f
 import org.joml.Matrix4f
 import org.joml.Matrix4fc
 import org.joml.Quaternionf
@@ -31,13 +30,16 @@ abstract class DisplayMetadata : EntityMetadata() {
             .scale(scale)
             .rotate(leftRotation)
         set(value) {
-            val f = 1f / value.m33()
-            val triple = MatrixUtil.svdDecompose(Matrix3f(value).scale(f))
+            val newTranslation = Vector3f()
+            val newLeftRotation = Quaternionf()
+            val newScale = Vector3f()
+            val newRightRotation = Quaternionf()
+            MatrixUtil.svdDecompose(value, newTranslation, newLeftRotation, newScale, newRightRotation)
             
-            translation = value.getTranslation(Vector3f()).mul(f)
-            leftRotation = triple.left
-            scale = triple.middle
-            rightRotation = triple.right
+            translation = newTranslation
+            leftRotation = newLeftRotation
+            scale = newScale
+            rightRotation = newRightRotation
         }
     var billboardConstraints: Billboard by entry(15, EntityDataSerializers.BYTE, Billboard.FIXED) { it.ordinal.toByte() }
     var brightness: Display.Brightness? by entry(16, EntityDataSerializers.INT, null as Display.Brightness?) { it?.let { Brightness(it.blockLight, it.skyLight).pack() } ?: -1 }

@@ -13,9 +13,9 @@ import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonDecoder
-import org.joml.Matrix3f
 import org.joml.Matrix4f
 import org.joml.Matrix4fc
+import org.joml.Quaternionf
 import org.joml.Quaternionfc
 import org.joml.Vector3f
 import org.joml.Vector3fc
@@ -89,13 +89,11 @@ internal object Matrix4fcAsSingularValueDecompositionMultiFormatSerializer : KSe
     }
     
     override fun serialize(encoder: Encoder, value: Matrix4fc) {
-        val f = 1f / value.m33()
-        val triple = MatrixUtil.svdDecompose(Matrix3f(value).scale(f))
-        
-        val translation = value.getTranslation(Vector3f()).mul(f)
-        val leftRotation = triple.left
-        val scale = triple.middle
-        val rightRotation = triple.right
+        val translation = Vector3f()
+        val leftRotation = Quaternionf()
+        val scale = Vector3f()
+        val rightRotation = Quaternionf()
+        MatrixUtil.svdDecompose(value, translation, leftRotation, scale, rightRotation)
         
         encoder.encodeStructure(descriptor) {
             encodeSerializableElement(descriptor, 0, QuaternionfMultiFormatSerializer, rightRotation)

@@ -534,7 +534,7 @@ abstract class Addon : AddonGetter {
     }
     
     @ExperimentalWorldGen
-    fun <P : StructureProcessor> registerStructureProcessorType(name: String, structureProcessorType: StructureProcessorType<P>): StructureProcessorType<P> {
+    fun <P : StructureProcessor> registerStructureProcessorType(name: String, structureProcessorType: MapCodec<out P>): MapCodec<out P> {
         val id = Identifier(addon, name)
         Registries.STRUCTURE_PROCESSOR[id] = structureProcessorType
         return structureProcessorType

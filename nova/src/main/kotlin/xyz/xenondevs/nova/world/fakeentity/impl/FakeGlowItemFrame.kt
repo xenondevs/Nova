@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.world.fakeentity.impl
 
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EntityTypes
 import net.minecraft.world.entity.decoration.GlowItemFrame
 import org.bukkit.Location
 import xyz.xenondevs.nova.world.fakeentity.FakeEntity
@@ -13,7 +14,7 @@ class FakeGlowItemFrame(
     override val metadata: ItemFrameMetadata
 ) : FakeEntity<ItemFrameMetadata>(location) {
     
-    override val entityType: EntityType<GlowItemFrame> = EntityType.GLOW_ITEM_FRAME
+    override val entityType: EntityType<GlowItemFrame> = EntityTypes.GLOW_ITEM_FRAME
     
     constructor(location: Location, autoRegister: Boolean = true, beforeSpawn: ((FakeGlowItemFrame, ItemFrameMetadata) -> Unit)? = null) :
         this(location, autoRegister, beforeSpawn, ItemFrameMetadata())

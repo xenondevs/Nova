@@ -4,7 +4,6 @@ import io.netty.buffer.Unpooled
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
-import net.minecraft.world.entity.Entity.ENTITY_COUNTER
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
@@ -17,6 +16,7 @@ import xyz.xenondevs.nova.network.send
 import xyz.xenondevs.nova.util.RegistryFriendlyByteBuf
 import xyz.xenondevs.nova.util.fromFixedPoint
 import xyz.xenondevs.nova.util.positionEquals
+import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.util.toFixedPoint
 import xyz.xenondevs.nova.util.toPackedByte
 import xyz.xenondevs.nova.util.unwrap
@@ -39,7 +39,7 @@ abstract class FakeEntity<M : Metadata> internal constructor(location: Location)
     val viewers: Set<Player>
         get() = _viewers
     
-    val entityId = ENTITY_COUNTER.incrementAndGet()
+    val entityId = location.world.serverLevel.nextEntityId
     private val uuid = UUID.randomUUID()
     
     private var spawnBuf: FriendlyByteBuf? = null

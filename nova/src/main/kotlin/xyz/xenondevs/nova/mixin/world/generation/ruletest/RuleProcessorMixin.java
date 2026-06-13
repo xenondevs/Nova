@@ -1,6 +1,5 @@
 package xyz.xenondevs.nova.mixin.world.generation.ruletest;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.RandomSource;
@@ -23,18 +22,16 @@ abstract class RuleProcessorMixin {
         method = "processBlock",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/level/levelgen/structure/templatesystem/ProcessorRule;test(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)Z"
-        )
+            target = "Lnet/minecraft/world/level/levelgen/structure/templatesystem/ProcessorRule;test(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;Lnet/minecraft/util/RandomSource;)Z")
     )
     private boolean inject(
         ProcessorRule rule,
+        LevelReader level,
         BlockState inputState,
-        BlockState existingState,
-        BlockPos localPos,
-        BlockPos relativePos,
-        BlockPos structurePos,
-        RandomSource random,
-        @Local(argsOnly = true) LevelReader level
+        BlockPos inTemplatePos,
+        BlockPos worldPos,
+        BlockPos reference,
+        RandomSource random
     ) {
         if (rule.inputPredicate instanceof NovaRuleTest)
             throw new IllegalArgumentException("Input predicate of ProcessorRule must not be a NovaRuleTest"); // TODO
@@ -43,14 +40,14 @@ abstract class RuleProcessorMixin {
             return false;
         
         if (rule.locPredicate instanceof NovaRuleTest locPredicate) {
-            if (level instanceof WorldGenRegion wgr && !locPredicate.test(wgr.getLevel(), relativePos, existingState, random)) {
+            if (level instanceof WorldGenRegion wgr && !locPredicate.test(wgr.getLevel(), inTemplatePos, inputState, random)) {
                 return false;
             }
-        } else if (!rule.locPredicate.test(existingState, random)) {
+        } else if (!rule.locPredicate.test(inputState, random)) {
             return false;
         }
         
-        return rule.posPredicate.test(localPos, relativePos, structurePos, random);
+        return rule.posPredicate.test(inTemplatePos, worldPos, reference, random);
     }
     
 }

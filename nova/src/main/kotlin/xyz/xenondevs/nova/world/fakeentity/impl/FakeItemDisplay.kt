@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.world.fakeentity.impl
 
 import net.minecraft.world.entity.Display.ItemDisplay
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.EntityTypes
 import org.bukkit.Location
 import xyz.xenondevs.nova.world.fakeentity.FakeEntity
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemDisplayMetadata
@@ -13,7 +14,7 @@ class FakeItemDisplay(
     override val metadata: ItemDisplayMetadata
 ) : FakeEntity<ItemDisplayMetadata>(location) {
     
-    override val entityType: EntityType<ItemDisplay> = EntityType.ITEM_DISPLAY
+    override val entityType: EntityType<ItemDisplay> = EntityTypes.ITEM_DISPLAY
     
     constructor(location: Location, autoRegister: Boolean = true, beforeSpawn: ((FakeItemDisplay, ItemDisplayMetadata) -> Unit)? = null) :
         this(location, autoRegister, beforeSpawn, ItemDisplayMetadata())

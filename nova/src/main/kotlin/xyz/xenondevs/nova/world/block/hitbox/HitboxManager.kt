@@ -94,8 +94,8 @@ object HitboxManager : Listener, PacketListener {
     
     private fun addPhysicalHitbox(hitbox: PhysicalHitbox) {
         val fakeInteraction = hitbox.createInteractionEntity()
-        physicalHitboxes += hitbox to fakeInteraction
-        physicalHitboxesById += fakeInteraction.entityId to hitbox
+        physicalHitboxes[hitbox] = fakeInteraction
+        physicalHitboxesById[fakeInteraction.entityId] = hitbox
     }
     
     private fun removePhysicalHitbox(hitbox: PhysicalHitbox) {
