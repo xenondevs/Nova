@@ -8,6 +8,7 @@ plugins {
 kotlin {
     compilerOptions {
         jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
+        moduleName = project.name
         
         optIn.addAll(
             "kotlin.io.path.ExperimentalPathApi",
