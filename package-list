@@ -39,6 +39,7 @@ xyz.xenondevs.nova.resources.builder.task.basepack
 xyz.xenondevs.nova.serialization
 xyz.xenondevs.nova.serialization.cbf
 xyz.xenondevs.nova.serialization.json.serializer
+xyz.xenondevs.nova.serialization.kotlinx
 xyz.xenondevs.nova.serialization.persistentdata
 xyz.xenondevs.nova.ui.menu
 xyz.xenondevs.nova.ui.menu.explorer.recipes
