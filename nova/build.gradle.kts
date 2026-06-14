@@ -50,7 +50,7 @@ origami {
 }
 
 val mcVersion = libs.versions.paper.map { 
-    val versionRegex = Regex("""(\d+\.\d+(?:\.\d+)?).*""")
+    val versionRegex = Regex("""(\d+\.\d+(?:\.\d+)?(?:-(?:rc|pre|snapshot)-\d+)?).*""")
     versionRegex.matchEntire(it)!!.groupValues[1]
 }
 

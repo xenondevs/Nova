@@ -7,7 +7,7 @@ catalog {
     versionCatalog {
         version("kotlin", libs.versions.kotlin.get())
         version("nova", project.version.toString())
-        val versionRegex = Regex("""(\d+\.\d+(?:\.\d+)?).*""")
+        val versionRegex = Regex("""(\d+\.\d+(?:\.\d+)?(?:-(?:rc|pre|snapshot)-\d+)?).*""")
         val paperVersion = libs.versions.paper.get()
         val mcVersion = versionRegex.matchEntire(paperVersion)!!.groupValues[1]
         version("paper", paperVersion)
