@@ -45,13 +45,10 @@ object ModelRotationMultiFormatSerializer : JsonTransformingSerializer<Model.Ele
             singleAxis = "z"
         }
         
-        if (singleAxis == null)
-            return element
-        
         return JsonObject(buildMap {
             putAll(element)
-            put("axis", JsonPrimitive(singleAxis))
-            put("angle", remove(singleAxis)!!)
+            put("axis", JsonPrimitive(singleAxis ?: "x"))
+            put("angle", remove(singleAxis ?: "x") ?: JsonPrimitive(0))
         })
     }
     
