@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.resources.builder.model.transform
 import org.joml.Math
 import org.joml.Matrix2d
 import org.joml.Matrix4d
+import org.joml.Quaterniond
 import org.joml.Vector2d
 import org.joml.Vector3d
 import org.joml.Vector3dc
@@ -18,11 +19,8 @@ import xyz.xenondevs.nova.util.component1
 import xyz.xenondevs.nova.util.component2
 import xyz.xenondevs.nova.util.component3
 import xyz.xenondevs.nova.util.component4
-import xyz.xenondevs.nova.util.firstNonZeroAxis
-import xyz.xenondevs.nova.util.get
 import xyz.xenondevs.nova.util.rotate
 import xyz.xenondevs.nova.util.round
-import xyz.xenondevs.nova.util.set
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -63,15 +61,10 @@ internal data class RotationTransform(
     private fun rotatedElements(elements: List<Element>): List<Element> = elements.map { element ->
         var rotation = element.rotation
         
-        var rot = rot % 360
-        if (rotation != null) {
-            if (rotation.axis == axis && rotation.origin == pivot) {
-                rot += rotation.angle
-                rotation = null // consumed
-            } else if (rot % 90 != 0.0) {
-                throw ElementTransformException("Rotation angle $rot requires rotation property, " +
-                    "but it is already occupied by a different axis or pivot.", this, element)
-            }
+        val rot = rot % 360
+        if (rotation != null && rotation.origin != pivot && rot % 90 != 0.0) {
+            throw ElementTransformException("Rotation angle $rot requires rotation property, " +
+                "but it is already occupied by a different pivot.", this, element)
         }
         
         var fullRots = (rot / 90).toInt()
@@ -94,23 +87,15 @@ internal data class RotationTransform(
         }
         
         if (rotation != null) {
-            // the rotation was either consumed, not present, or would've thrown before
-            check(angle == 0.0)
-            
-            val direction = Vector3d()
-            direction.set(rotation.axis, rotation.angle)
-            direction.rotate(axis, Math.PI / 2 * fullRots)
-            
-            val newAxis = direction.firstNonZeroAxis()
-            check(newAxis != null)
-            
-            rotation = rotation.copy(
-                origin = rotated(rotation.origin, fullRots),
-                axis = newAxis,
-                angle = direction.get(newAxis)
-            )
+            rotation = transformedRotation(rotation, axis, fullRots, angle, rescale).copy(
+                origin = rotated(rotation.origin, fullRots)
+            ).takeUnless { it.isIdentity }
         } else if (angle != 0.0) {
-            rotation = Rotation(angle, axis, pivot, rescale)
+            rotation = when (axis) {
+                Axis.X -> Rotation(angle, 0.0, 0.0, pivot, rescale)
+                Axis.Y -> Rotation(0.0, angle, 0.0, pivot, rescale)
+                Axis.Z -> Rotation(0.0, 0.0, angle, pivot, rescale)
+            }
         }
         
         element.copy(
@@ -275,39 +260,61 @@ internal data class RotationTransform(
         return result
     }
     
-    companion object {
-        
-        private val AROUND_X = listOf(Direction.NORTH, Direction.UP, Direction.SOUTH, Direction.DOWN)
-        private val AROUND_Y = listOf(Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST)
-        private val AROUND_Z = listOf(Direction.UP, Direction.WEST, Direction.DOWN, Direction.EAST)
-        
-        private fun directionsAround(axis: Axis) = when (axis) {
-            Axis.X -> AROUND_X
-            Axis.Y -> AROUND_Y
-            Axis.Z -> AROUND_Z
-        }
-        
-        private fun dirSign(dir: Direction) = when (dir) {
-            Direction.SOUTH, Direction.EAST, Direction.UP -> 1
-            Direction.NORTH, Direction.WEST, Direction.DOWN -> -1
-        }
-        
-        private fun sort(a: Vector3dc, b: Vector3dc): Pair<Vector3dc, Vector3dc> {
-            val min = Vector3d(
-                min(a.x(), b.x()),
-                min(a.y(), b.y()),
-                min(a.z(), b.z())
-            )
-            
-            val max = Vector3d(
-                max(a.x(), b.x()),
-                max(a.y(), b.y()),
-                max(a.z(), b.z())
-            )
-            
-            return min to max
-        }
-        
-    }
-    
 }
+
+private val AROUND_X = listOf(Direction.NORTH, Direction.UP, Direction.SOUTH, Direction.DOWN)
+private val AROUND_Y = listOf(Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST)
+private val AROUND_Z = listOf(Direction.UP, Direction.WEST, Direction.DOWN, Direction.EAST)
+
+private fun directionsAround(axis: Axis) = when (axis) {
+    Axis.X -> AROUND_X
+    Axis.Y -> AROUND_Y
+    Axis.Z -> AROUND_Z
+}
+
+private fun dirSign(dir: Direction) = when (dir) {
+    Direction.SOUTH, Direction.EAST, Direction.UP -> 1
+    Direction.NORTH, Direction.WEST, Direction.DOWN -> -1
+}
+
+private fun sort(a: Vector3dc, b: Vector3dc): Pair<Vector3dc, Vector3dc> {
+    val min = Vector3d(
+        min(a.x(), b.x()),
+        min(a.y(), b.y()),
+        min(a.z(), b.z())
+    )
+
+    val max = Vector3d(
+        max(a.x(), b.x()),
+        max(a.y(), b.y()),
+        max(a.z(), b.z())
+    )
+
+    return min to max
+}
+
+private fun transformedRotation(rotation: Rotation, axis: Axis, fullRots: Int, angle: Double, rescale: Boolean): Rotation {
+    val fullRotRadians = Math.PI / 2 * fullRots
+    // Minecraft applies element Euler rotations in X -> Y -> Z order.
+    // The baked right-angle rotation changes the element's local coordinate system.
+    val quaternion = Quaterniond()
+        .rotate(axis, Math.toRadians(angle))
+        .rotate(axis, fullRotRadians)
+        .rotateXYZ(Math.toRadians(rotation.x), Math.toRadians(rotation.y), Math.toRadians(rotation.z))
+        .rotate(axis, -fullRotRadians)
+    val angles = quaternion.getEulerAnglesXYZ(Vector3d())
+        .mul(180.0 / Math.PI)
+        .round(10)
+    
+    return rotation.copy(x = angles.x, y = angles.y, z = angles.z, rescale = rotation.rescale || rescale)
+}
+
+private val Rotation.isIdentity: Boolean
+    get() = abs(x) < 1e-6 && abs(y) < 1e-6 && abs(z) < 1e-6
+
+private fun Quaterniond.rotate(axis: Axis, angle: Double): Quaterniond =
+    when (axis) {
+        Axis.X -> rotateX(angle)
+        Axis.Y -> rotateY(angle)
+        Axis.Z -> rotateZ(angle)
+    }

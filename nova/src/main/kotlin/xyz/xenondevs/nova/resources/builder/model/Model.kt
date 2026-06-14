@@ -16,6 +16,7 @@ import xyz.xenondevs.commons.collections.enumMapOf
 import xyz.xenondevs.nova.resources.ResourcePath
 import xyz.xenondevs.nova.resources.ResourceType
 import xyz.xenondevs.nova.resources.builder.task.ModelContent
+import xyz.xenondevs.nova.serialization.kotlinx.ModelRotationMultiFormatSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ModelTextureMultiFormatSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.Vector3dcAsArraySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.Vector4dcAsArraySerializer
@@ -161,10 +162,12 @@ data class Model(
          * @param rescale Whether the model should be rescaled to fit the new size.
          * (for example a 45° rotation stretches the element by sqrt(2))
          */
-        @Serializable
+        @KeepGeneratedSerializer
+        @Serializable(with = ModelRotationMultiFormatSerializer::class)
         data class Rotation(
-            val angle: Double,
-            val axis: Axis,
+            val x: Double = 0.0,
+            val y: Double = 0.0,
+            val z: Double = 0.0,
             val origin: Vector3dc,
             val rescale: Boolean = false
         )

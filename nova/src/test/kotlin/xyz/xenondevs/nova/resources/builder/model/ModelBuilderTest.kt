@@ -175,6 +175,20 @@ class ModelBuilderTest {
         builder.rotateZ(67.5)
         assertEquals(deserializeModel("half_cube/rotated/y22.5_x180.0_y67.5_z67.5"), builder.buildScaled(null))
     }
+
+    @Test
+    fun testRotateMultiAxisElementRotation() {
+        val builder = ModelBuilder(deserializeModel("multi_axis_rotation/model"))
+        builder.rotateY(22.5)
+        assertEquals(deserializeModel("multi_axis_rotation/rotated/y22.5"), builder.buildScaled(null))
+    }
+
+    @Test
+    fun testRotateMultiAxisElementRotationByRightAngle() {
+        val builder = ModelBuilder(deserializeModel("multi_axis_rotation/model"))
+        builder.rotateX(90.0)
+        assertEquals(deserializeModel("multi_axis_rotation/rotated/x90.0"), builder.buildScaled(null))
+    }
     
     @Test
     fun testRotateCullface() {

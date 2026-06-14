@@ -11,9 +11,10 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonPrimitive
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -71,9 +72,16 @@ class DtoSerializationTest {
             "assets/minecraft/models/",
             discardKeys = setOf("__comment", "name", "groups", "texture_size"),
             conditionalRemovals = mapOf(
-                "translation" to { it is JsonArray && it.size == 3 && it.all { e -> (e as? JsonPrimitive)?.contentOrNull?.toDoubleOrNull() == 0.0 } },
-                "rotation" to { it is JsonArray && it.size == 3 && it.all { e -> (e as? JsonPrimitive)?.contentOrNull?.toDoubleOrNull() == 0.0 } },
-                "scale" to { it is JsonArray && it.size == 3 && it.all { e -> (e as? JsonPrimitive)?.contentOrNull?.toDoubleOrNull() == 1.0 } },
+                "translation" to { it is JsonArray && it.size == 3 && it.all { e -> (e as? JsonPrimitive)?.doubleOrNull == 0.0 } },
+                "rotation" to {
+                    when (it) {
+                        is JsonArray -> it.size == 3 && it.all { e -> (e as? JsonPrimitive)?.doubleOrNull == 0.0 }
+                        is JsonObject if "angle" in it -> it["angle"]?.jsonPrimitive?.doubleOrNull == 0.0
+                        is JsonObject if "angle" !in it -> listOf("x", "y", "z").all { a -> (it[a]?.jsonPrimitive?.doubleOrNull ?: 0.0) == 0.0 }
+                        else -> false
+                    }
+                },
+                "scale" to { it is JsonArray && it.size == 3 && it.all { e -> (e as? JsonPrimitive)?.doubleOrNull == 1.0 } },
                 "rescale" to { it is JsonPrimitive && it.booleanOrNull == false }
             )
         )
@@ -118,6 +126,7 @@ class DtoSerializationTest {
                     }
                     
                     val actual = Json.encodeToJsonElement(Json.decodeFromJsonElement<T>(content))
+                        .removeConditionally(conditionalRemovals)
                     
                     assertJsonEquals(
                         expected,
