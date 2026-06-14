@@ -216,6 +216,7 @@ private val MATERIAL_TEXTURES: Map<Material, String> = enumMapOf(
     Material.BARRIER to "item/barrier",
     Material.STRUCTURE_VOID to "item/structure_void",
     Material.POINTED_DRIPSTONE to "item/pointed_dripstone",
+    Material.SULFUR_SPIKE to "item/sulfur_spike",
     Material.RAIL to "block/rail",
     Material.REDSTONE_WIRE to "item/redstone",
     Material.BELL to "item/bell"
