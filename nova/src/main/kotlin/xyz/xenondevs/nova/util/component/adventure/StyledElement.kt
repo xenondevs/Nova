@@ -70,6 +70,7 @@ fun Component.elements(
                 yieldAll(key().styledCodePoints(style))
             }
         }
+        else -> Unit
     }
     for (child in children()) {
         yieldAll(child.elements(translate, style))

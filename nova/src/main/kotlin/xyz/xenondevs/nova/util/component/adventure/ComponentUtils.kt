@@ -5,7 +5,6 @@ package xyz.xenondevs.nova.util.component.adventure
 import com.mojang.serialization.JsonOps
 import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentBuilder
 import net.kyori.adventure.text.TranslatableComponent
@@ -181,7 +180,7 @@ internal fun MojangComponent.isEmpty(): Boolean {
  * 
  * Equivalent to `font(Key.key(font))`.
  */
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.font(font: String): B {
+fun <C : Component, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.font(font: String): B {
     return font(Key.key(font))
 }
 
@@ -190,7 +189,7 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
  * 
  * Equivalent to `color(TextColor.color(color.rgb))`.
  */
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.color(color: Color): B {
+fun <C : Component, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.color(color: Color): B {
     return color(TextColor.color(color.rgb))
 }
 
@@ -199,14 +198,14 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
  * 
  * Equivalent to `append(fontChar.component)`.
  */
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.append(fontChar: FontChar): B {
+fun <C : Component, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.append(fontChar: FontChar): B {
     return append(fontChar.component)
 }
 
 /**
  * Moves the cursor by [distance] gui-scale-affected pixels.
  */
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.move(distance: Number): B {
+fun <C : Component, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.move(distance: Number): B {
     return append(MoveCharacters.getMovingComponent(distance))
 }
 
@@ -214,7 +213,7 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
  * Moves the cursor to the beginning of the text,
  * using [lang] to localize all potential [translatable components][TranslatableComponent].
  */
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveToStart(lang: String = "en_us"): B {
+fun <C : Component, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveToStart(lang: String = "en_us"): B {
     return move(-CharSizes.calculateComponentWidth(build(), lang))
 }
 
@@ -222,7 +221,7 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
  * Moves the cursor to the center of the text,
  * using [lang] to localize all potential [translatable components][TranslatableComponent].
  */
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveToCenter(lang: String = "en_us"): B {
+fun <C : Component, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveToCenter(lang: String = "en_us"): B {
     return move(-CharSizes.calculateComponentWidth(build(), lang) / 2)
 }
 
@@ -230,14 +229,14 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
  * Moves the cursor to [afterStart] pixels after the beginning of the text,
  * using [lang] to localize all potential [translatable components][TranslatableComponent].
  */
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveTo(afterStart: Number, lang: String = "en_us"): B {
+fun <C : Component, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.moveTo(afterStart: Number, lang: String = "en_us"): B {
     return move(-CharSizes.calculateComponentWidth(build(), lang) + afterStart.toFloat())
 }
 
 /**
  * Moves the cursor by half the width of the [component] to the left, then appends the [component].
  */
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.appendCentered(component: Component, lang: String = "en_us"): B {
+fun <C : Component, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.appendCentered(component: Component, lang: String = "en_us"): B {
     move(CharSizes.calculateComponentWidth(component, lang) / -2f)
     return append(component)
 }
@@ -245,6 +244,6 @@ fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<
 /**
  * Appends a [spaces] number of space characters to this component.
  */
-internal fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.indent(spaces: Int): B {
+internal fun <C : Component, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.indent(spaces: Int): B {
     return append(Component.text(" ".repeat(spaces)))
 } 

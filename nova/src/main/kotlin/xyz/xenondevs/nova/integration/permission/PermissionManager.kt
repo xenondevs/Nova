@@ -95,7 +95,7 @@ object PermissionManager {
     }
     
     private fun hasOfflinePermission(world: World, player: OfflinePlayer, permission: String): Boolean {
-        require(Thread.currentThread() != MINECRAFT_SERVER.serverThread) { "Offline player permissions should never be checked from the main thread" }
+        require(Thread.currentThread() != MINECRAFT_SERVER.runningThread) { "Offline player permissions should never be checked from the main thread" }
         if (integrations.isEmpty())
             return false
         return integrations[0].hasPermission(world, player, permission).get() ?: false

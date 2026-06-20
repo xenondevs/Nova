@@ -4,6 +4,7 @@ import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.NewChunkHolder;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,7 +32,7 @@ abstract class NewChunkHolderMixin {
         CallbackInfoReturnable<Boolean> cir,
         @Local LevelChunk chunk
     ) {
-        var pos = new ChunkPos(chunk.level.uuid, chunk.locX, chunk.locZ);
+        var pos = new ChunkPos(((ServerLevel) chunk.getLevel()).uuid, chunk.locX, chunk.locZ);
         WorldDataManager.INSTANCE.startTicking$nova(pos);
     }
     
@@ -48,7 +49,7 @@ abstract class NewChunkHolderMixin {
         CallbackInfoReturnable<Boolean> cir,
         @Local LevelChunk chunk
     ) {
-        var pos = new ChunkPos(chunk.level.uuid, chunk.locX, chunk.locZ);
+        var pos = new ChunkPos(((ServerLevel) chunk.getLevel()).uuid, chunk.locX, chunk.locZ);
         WorldDataManager.INSTANCE.stopTicking$nova(pos);
     }
     
