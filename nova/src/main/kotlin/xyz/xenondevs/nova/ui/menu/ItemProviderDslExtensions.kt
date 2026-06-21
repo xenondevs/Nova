@@ -27,13 +27,22 @@ inline fun itemProvider(base: Provider<NovaItem>, itemProvider: ItemProviderDsl.
     return itemProvider(base.clientsideProvider, itemProvider)
 }
 
-fun itemProvider(base: RegistryEntry.Either<NovaItem, ItemType>, itemProvider: ItemProviderDsl.() -> Unit): Provider<ItemProvider> {
+fun itemProvider(type: RegistryEntry.Either<NovaItem, ItemType>, itemProvider: ItemProviderDsl.() -> Unit): Provider<ItemProvider> {
     contract { callsInPlace(itemProvider, InvocationKind.EXACTLY_ONCE) }
     return itemProvider(
-        base.map(
+        type.map(
             { it.clientsideProvider.map(ItemProvider::get) },
             { provider(it.createItemStack()) }
         ).immediateFlatten(),
+        itemProvider
+    )
+}
+
+@JvmName("itemProvider2")
+fun itemProvider(type: Provider<RegistryEntry.Either<NovaItem, ItemType>>, itemProvider: ItemProviderDsl.() -> Unit): Provider<ItemProvider> {
+    contract { callsInPlace(itemProvider, InvocationKind.EXACTLY_ONCE) }
+    return itemProvider(
+        type.flatMap { it.clientsideProvider.map(ItemProvider::get) },
         itemProvider
     )
 }
@@ -50,10 +59,17 @@ infix fun DslProperty<ItemType?>.by(type: Provider<NovaItem>) {
 }
 
 context(dsl: ItemProviderDsl)
-infix fun DslProperty<ItemType>.by(type: RegistryEntry.Either<NovaItem, ItemType>) {
+infix fun DslProperty<ItemType?>.by(type: RegistryEntry.Either<NovaItem, ItemType>) {
     dsl.base by type.map(
         { it.clientsideProvider.map(ItemProvider::get) },
         { provider(it.createItemStack()) }
     ).immediateFlatten()
+    dsl.type by null
+}
+
+@JvmName("by1")
+context(dsl: ItemProviderDsl)
+infix fun DslProperty<ItemType?>.by(type: Provider<RegistryEntry.Either<NovaItem, ItemType>>) {
+    dsl.base by type.flatMap { it.clientsideProvider.map(ItemProvider::get) }
     dsl.type by null
 }
