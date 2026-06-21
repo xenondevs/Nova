@@ -2,6 +2,7 @@
 
 package xyz.xenondevs.nova.world.item
 
+import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
 import io.papermc.paper.registry.RegistryKey
 import kotlinx.serialization.Serializable
@@ -127,7 +128,7 @@ fun RegistryEntry.Paper<ItemType>.createItemStack(amount: Int = 1): ItemStack =
  * Cannot be called during bootstrap (pre-registry-freeze).
  */
 fun RegistryEntry.Either<NovaItem, ItemType>.createItemStack(amount: Int = 1): ItemStack =
-    when(val value = get()) {
+    when (val value = get()) {
         is NovaItem -> value.createItemStack(amount)
         is ItemType -> value.createItemStack(amount)
         else -> throw AssertionError()
@@ -151,6 +152,13 @@ fun RegistryEntry.Either<NovaItem, ItemType>.mapToItemStack(amount: Int = 1): Pr
  */
 val RegistryEntry.Either<NovaItem, ItemType>.clientsideProvider: Provider<ItemProvider>
     get() = bootstrapFlatMap({ it.clientsideProvider }, { provider(ItemWrapper(it.createItemStack())) })
+
+/**
+ * Maps [this][RegistryEntry.Either] to a [Provider] of a [Component] that is either the
+ * [NovaItem.name] if it is a [NovaItem], or the item type's default [DataComponentTypes.ITEM_NAME] if it is an [ItemType].
+ */
+val RegistryEntry.Either<NovaItem, ItemType>.name: Provider<Component>
+    get() = map({ it.name ?: Component.empty() }, { it.getDefaultData(DataComponentTypes.ITEM_NAME) ?: Component.empty() })
 
 /**
  * Serializable type alias for `RegistryEntry.Nova<NovaItem>` using [NovaItemEntrySerializer].
