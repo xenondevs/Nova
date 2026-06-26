@@ -35,18 +35,20 @@ fun callEvent(event: Event) {
 }
 
 /**
- * Shortcut for [PluginManager.registerEvents], registered under the Nova plugin.
+ * Shortcut for registering [listener] under the Nova plugin via [PluginManager.registerEvents].
  */
-fun Listener.registerEvents() {
+context(listener: Listener)
+fun registerEvents() {
     check(PLUGIN_READY) { "Events cannot be registered this early! Use a post-world initialization stage for this." }
-    Bukkit.getPluginManager().registerEvents(this, Nova)
+    Bukkit.getPluginManager().registerEvents(listener, Nova)
 }
 
 /**
- * Unregisters this [Listener] from all events.
+ * Unregisters the [listener] from all events.
  */
-fun Listener.unregisterEvents() {
-    HandlerList.unregisterAll(this)
+context(listener: Listener)
+fun unregisterEvents() {
+    HandlerList.unregisterAll(listener)
 }
 
 /**

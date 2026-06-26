@@ -8,17 +8,19 @@ package xyz.xenondevs.nova.network.event
 interface PacketListener
 
 /**
- * Registers this packet listener to receive packet events.
+ * Registers the [packet listener][listener] to receive packet events.
  * After registering, methods annotated with [PacketHandler] will be called for packet events.
  */
-fun PacketListener.registerPacketListener() {
-    PacketEventManager.registerListener(this)
+context(listener: PacketListener)
+fun registerPacketListener() {
+    PacketEventManager.registerListener(listener)
 }
 
 /**
- * Unregisters this packet listener from receiving packet events.
+ * Unregisters the [packet listener][listener] from receiving packet events.
  * After unregistering, methods annotated with [PacketHandler] will no longer be called for packet events.
  */
-fun PacketListener.unregisterPacketListener() {
-    PacketEventManager.unregisterListener(this)
+context(listener: PacketListener)
+fun unregisterPacketListener() {
+    PacketEventManager.unregisterListener(listener)
 }

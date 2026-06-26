@@ -74,7 +74,7 @@ internal object Nova : JavaPlugin(), INova {
             Languages.getInstance().enableServerSideTranslations(false)
             installPacketHandler(this)
             initPacketEntityManager(this)
-            Initializer.registerEvents()
+            context(Initializer) { registerEvents() }
         } catch (t: Throwable) {
             if (t is InitializationException)
                 LOGGER.error(t.message)
