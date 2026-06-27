@@ -33,7 +33,7 @@ internal data class ScaleTransform(
             element.copy(
                 from = scaled(element.from), to = scaled(element.to),
                 rotation = element.rotation?.let { it.copy(origin = scaled(it.origin)) },
-                faces = element.faces.mapValues { (direction, face) ->
+                faces = element.faces.mapValues { [direction, face] ->
                     var uv = face.uv ?: element.generateUV(direction)
                     if (scaleUV)
                         uv = scaledUV(direction, element.from, element.to, uv, face.rotation)
@@ -47,7 +47,7 @@ internal data class ScaleTransform(
             val inverseScale = Vector3d(1.0, 1.0, 1.0).div(scale, Vector3d())
             display = display
                 .toEffectiveMap()
-                .mapValues { (_, dp) -> dp.copy(scale = dp.scale.mul(inverseScale, Vector3d())) }
+                .mapValues { [_, dp] -> dp.copy(scale = dp.scale.mul(inverseScale, Vector3d())) }
                 .let(Model.Display::of)
         }
         
@@ -61,7 +61,7 @@ internal data class ScaleTransform(
      * Adjusts the [uv] for [face] with [rotation] of an element with positions [from] and [to].
      */
     private fun scaledUV(face: Model.Direction, from: Vector3dc, to: Vector3dc, uv: Vector4dc, rotation: Int): Vector4dc {
-        val (uv0, uAxis, vAxis) = getUVAxes(face, rotation)
+        val [uv0, uAxis, vAxis] = getUVAxes(face, rotation)
         
         val elementSize = Vector3d(to).sub(from)
         val relPivot = Vector3d(pivot)

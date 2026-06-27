@@ -49,7 +49,7 @@ internal class GuiTextureBuilderImpl(
                 ResourcePath(ResourceType.Font, "minecraft", "default"),
                 setOf(titlePosition.offset.y())
             )
-            for ((text, position) in extraLines) {
+            for ([text, position] in extraLines) {
                 for (font in text.getFontsRecursively()) {
                     mfc.requestMovedFonts(
                         ResourcePath.of(ResourceType.Font, font),

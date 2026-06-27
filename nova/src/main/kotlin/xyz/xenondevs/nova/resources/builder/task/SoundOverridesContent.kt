@@ -72,7 +72,7 @@ class SoundOverridesContent(private val builder: ResourcePackBuilder) : PackBuil
                 novaSoundIndex.writeToFile(builder.resolve("assets/nova/sounds.json"))
                 
                 val mcSoundIndex = JsonObject()
-                index.forEach { (soundEvent, soundEventObj) ->
+                index.forEach { [soundEvent, soundEventObj] ->
                     if (soundEvent in soundEvents) {
                         // replace sounds of lower packs
                         soundEventObj.addProperty("replace", true)
@@ -121,7 +121,7 @@ class SoundOverridesContent(private val builder: ResourcePackBuilder) : PackBuil
             
             val otherJsons = soundJsons.subList(0, soundJsons.size)
             otherJsons.forEach { mainObj ->
-                mainObj.entrySet().forEach { (soundEvent, soundEventObj) ->
+                mainObj.entrySet().forEach { [soundEvent, soundEventObj] ->
                     soundEventObj as JsonObject
                     
                     val mergedSoundEventObj = merged.getOrPut(soundEvent, ::JsonObject)

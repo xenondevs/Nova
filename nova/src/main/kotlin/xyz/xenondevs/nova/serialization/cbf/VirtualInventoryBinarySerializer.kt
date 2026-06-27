@@ -78,7 +78,7 @@ internal object VirtualInventoryBinarySerializer : VersionedBinarySerializer<Vir
         writer.writeVarInt(size)
         
         val itemsMask = BitSet(size)
-        for ((slot, itemStack) in items.withIndex()) {
+        for ([slot, itemStack] in items.withIndex()) {
             if (!itemStack.isNullOrEmpty())
                 itemsMask.set(slot)
         }

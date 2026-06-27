@@ -67,7 +67,7 @@ internal object Initializer : Listener {
     }
     
     private fun collectAndRegisterRunnables(file: Path, classLoader: ClassLoader) {
-        val (initializables, disableables) = collectRunnables(file, classLoader)
+        val [initializables, disableables] = collectRunnables(file, classLoader)
         addRunnables(initializables, disableables)
     }
     
@@ -91,28 +91,28 @@ internal object Initializer : Listener {
         val initFuncs = result.functions[InitFun::class] ?: emptyMap()
         val disableFuncs = result.functions[DisableFun::class] ?: emptyMap()
         
-        for ((className, annotations) in internalInits) {
+        for ([className, annotations] in internalInits) {
             val clazz = InitializableClass.fromInternalAnnotation(classLoader, className, annotations.first())
             initializables += clazz
             initializableClasses[className] = clazz
         }
-        for ((className, annotations) in inits) {
+        for ([className, annotations] in inits) {
             val clazz = InitializableClass.fromAddonAnnotation(classLoader, className, annotations.first())
             initializables += clazz
             initializableClasses[className] = clazz
         }
         
-        for ((className, annotatedFuncs) in initFuncs) {
+        for ([className, annotatedFuncs] in initFuncs) {
             val clazz = initializableClasses[className]
                 ?: throw IllegalStateException("Class $className is missing an init annotation!")
             
-            for ((methodName, annotations) in annotatedFuncs) {
+            for ([methodName, annotations] in annotatedFuncs) {
                 initializables += InitializableFunction.fromInitAnnotation(clazz, methodName, annotations.first())
             }
         }
         
-        for ((className, annotatedFuncs) in disableFuncs) {
-            for ((methodName, annotations) in annotatedFuncs) {
+        for ([className, annotatedFuncs] in disableFuncs) {
+            for ([methodName, annotations] in annotatedFuncs) {
                 disableables += DisableableFunction.fromInitAnnotation(classLoader, className, methodName, annotations.first())
             }
         }

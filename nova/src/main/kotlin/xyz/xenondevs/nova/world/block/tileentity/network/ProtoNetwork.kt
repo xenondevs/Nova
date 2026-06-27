@@ -51,7 +51,7 @@ class ProtoNetwork<T : Network<T>>(
     fun addAll(network: NetworkData<T>) {
         for ((node, faces) in network.nodes.values) {
             require(node !is GhostNetworkNode)
-            val (_, myFaces) = this.nodes.getOrPut(node.pos) { MutableNetworkNodeConnection(node) }
+            val myFaces = this.nodes.getOrPut(node.pos) { MutableNetworkNodeConnection(node) }.faces
             myFaces += faces
         }
         markDirty()
@@ -226,7 +226,7 @@ class ProtoNetwork<T : Network<T>>(
             cluster += network
             network.cluster = cluster
             
-            for ((node, _) in network.nodes.values) {
+            for ([node, _] in network.nodes.values) {
                 queueWithRelatedNetworks(cluster, queue, node)
             }
         }
@@ -248,7 +248,7 @@ class ProtoNetwork<T : Network<T>>(
         
         when (node) {
             is NetworkEndPoint -> {
-                for ((otherNetworkType, _, otherNetworkId) in state.getNetworks(node)) {
+                for ([otherNetworkType, _, otherNetworkId] in state.getNetworks(node)) {
                     val otherNetwork = state.getNetworkOrThrow(otherNetworkType, otherNetworkId)
                     if (otherNetwork !in cluster)
                         queue += otherNetwork
@@ -256,7 +256,7 @@ class ProtoNetwork<T : Network<T>>(
             }
             
             is NetworkBridge -> {
-                for ((otherNetworkType, otherNetworkId) in state.getNetworks(node)) {
+                for ([otherNetworkType, otherNetworkId] in state.getNetworks(node)) {
                     val otherNetwork = state.getNetworkOrThrow(otherNetworkType, otherNetworkId)
                     if (otherNetwork !in cluster)
                         queue += otherNetwork
@@ -278,7 +278,7 @@ class ProtoNetwork<T : Network<T>>(
     fun immutableCopy(): NetworkData<T> =
         ImmutableNetworkData(
             type, uuid,
-            nodes.mapValuesTo(HashMap(nodes.size)) { (_, con) ->
+            nodes.mapValuesTo(HashMap(nodes.size)) { [_, con] ->
                 con.copy(faces = con.faces.toEnumSet())
             }
         )

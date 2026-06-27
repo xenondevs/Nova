@@ -159,7 +159,7 @@ internal object PacketItems : Listener, PacketListener {
         val player = event.player
         val slots = ArrayList(event.slots).also { event.slots = it }
         
-        for ((i, pair) in slots.withIndex()) {
+        for ([i, pair] in slots.withIndex()) {
             slots[i] = MojangPair(
                 pair.first,
                 getClientSideStack(player, pair.second)
@@ -279,7 +279,7 @@ internal object PacketItems : Listener, PacketListener {
     @PacketHandler
     private fun handleRegistryData(event: ClientboundUpdateTagsPacketEvent) {
         // inject STRUCTURE_VOID into the minecraft:bundles tag for scroll support
-        event.tags = event.tags.mapValues { (key, payloads) ->
+        event.tags = event.tags.mapValues { [key, payloads] ->
             if (key != Registries.ITEM)
                 return@mapValues payloads
             
@@ -295,7 +295,7 @@ internal object PacketItems : Listener, PacketListener {
                 }
             }
             
-            val serialized = tags.entries.associate { (tagKey, tagValues) ->
+            val serialized = tags.entries.associate { [tagKey, tagValues] ->
                 val registry = REGISTRY_ACCESS.lookupOrThrow(tagKey.registry())
                 tagKey.location() to tagValues.mapTo(IntArrayList()) { registry.getId(it.value()) }
             }
@@ -478,7 +478,7 @@ internal object PacketItems : Listener, PacketListener {
     }
     
     private fun mergeIntoClientSidePatch(builder: DataComponentPatch.Builder, patch: DataComponentPatch) {
-        for ((type, valueOpt) in patch.entrySet()) {
+        for ([type, valueOpt] in patch.entrySet()) {
             if (isIrrelevantClientSideComponent(type))
                 continue
             

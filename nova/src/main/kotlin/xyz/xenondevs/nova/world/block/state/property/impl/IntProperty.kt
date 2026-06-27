@@ -26,7 +26,7 @@ internal class ScopedIntProperty(
 ) : ScopedBlockStateProperty<Int>(property, IntOpenHashSet(values), initializer) {
     
     private val idToValue = values.toIntArray()
-    private val valueToId = values.withIndex().associateTo(Int2IntOpenHashMap()) { (index, value) -> value to index }
+    private val valueToId = values.withIndex().associateTo(Int2IntOpenHashMap()) { [index, value] -> value to index }
     
     override fun isValidValue(value: Int): Boolean =
         value in valueToId

@@ -34,7 +34,7 @@ class ItemNetwork internal constructor(
         var transferRate = DEFAULT_TRANSFER_RATE
         var complexity = 0
         val channelsBuilder = ItemChannelsBuilder()
-        for ((pos, con) in nodes) {
+        for ([pos, con] in nodes) {
             val (node, faces) = con
             try {
                 if (node is NetworkEndPoint) {
@@ -85,7 +85,7 @@ class ItemNetwork internal constructor(
         private val ITEM_NETWORK = MAIN_CONFIG.node("network", "item")
         val TICK_DELAY_PROVIDER: Provider<Int> = ITEM_NETWORK.entry<Int>("tick_delay")
         val DEFAULT_TRANSFER_RATE: Int by combinedProvider(ITEM_NETWORK.entry<Double>("default_transfer_rate"), TICK_DELAY_PROVIDER)
-            .map { (defaultTransferRate, tickDelay) -> (defaultTransferRate * tickDelay).roundToInt() }
+            .map { [defaultTransferRate, tickDelay] -> (defaultTransferRate * tickDelay).roundToInt() }
             .map { defaultTransferRate -> if (defaultTransferRate < 0) Int.MAX_VALUE else defaultTransferRate }
         val CHANNEL_AMOUNT: Int by ITEM_NETWORK.entry<Int>("channel_amount")
         val MAX_COMPLEXITY: Int by ITEM_NETWORK.entry<Int>("max_complexity")

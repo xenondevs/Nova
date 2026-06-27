@@ -33,7 +33,7 @@ internal open class NetworkedNMSInventory(
         }
         
         // add to empty slots
-        for ((slot, current) in container.withIndex()) {
+        for ([slot, current] in container.withIndex()) {
             if (remaining <= 0)
                 break
             
@@ -75,7 +75,7 @@ internal open class NetworkedNMSInventory(
     }
     
     override fun copyContents(destination: Array<BukkitStack>) {
-        for ((index, item) in container.withIndex()) {
+        for ([index, item] in container.withIndex()) {
             destination[index] = item.copy().asBukkitMirror()
         }
     }

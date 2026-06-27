@@ -21,7 +21,7 @@ internal class LangFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(base
         val sourceObj = source.parseJson() as? JsonObject ?: return
         val destObj = destination.parseJson() as? JsonObject ?: return
         
-        sourceObj.entrySet().forEach { (key, value) -> if (!destObj.has(key)) destObj[key] = value }
+        sourceObj.entrySet().forEach { [key, value] -> if (!destObj.has(key)) destObj[key] = value }
         
         destination.writeText(GSON.toJson(destObj))
     }

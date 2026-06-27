@@ -79,7 +79,7 @@ internal class NovaBootstrapper : PluginBootstrap {
         
         // count addons
         remainingAddons = LaunchEntryPointHandler.INSTANCE.storage.asSequence()
-            .flatMap { (_, storage) -> storage.registeredProviders }
+            .flatMap { [_, storage] -> storage.registeredProviders }
             .filterIsInstance<PaperPluginParent.PaperBootstrapProvider>()
             .count { it.source.useZip { it.resolve("nova-addon.yml").exists() } }
         

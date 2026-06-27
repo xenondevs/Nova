@@ -78,7 +78,7 @@ internal object EventlessHandSwinging : PacketListener, Listener {
     
     @PacketHandler
     private fun handleSwingPacket(event: ServerboundSwingPacketEvent) {
-        val (main, off) = toDrop[event.player.uniqueId] ?: return
+        val [main, off] = toDrop[event.player.uniqueId] ?: return
         if (event.hand == InteractionHand.MAIN_HAND && main.decrementIfGreaterThanZero()) {
             event.isCancelled = true
         } else if (event.hand == InteractionHand.OFF_HAND && off.decrementIfGreaterThanZero()) {
@@ -87,7 +87,7 @@ internal object EventlessHandSwinging : PacketListener, Listener {
     }
     
     fun registerDrop(player: Player, mainHand: Boolean) {
-        val (main, off) = toDrop.computeIfAbsent(player.uniqueId) { AtomicInteger() to AtomicInteger() }
+        val [main, off] = toDrop.computeIfAbsent(player.uniqueId) { AtomicInteger() to AtomicInteger() }
         if (mainHand) {
             main.incrementAndGet()
         } else {

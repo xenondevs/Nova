@@ -288,7 +288,7 @@ class NetworkState internal constructor(
      * @see removeConnection
      */
     suspend fun getConnectedNode(node: NetworkNode, face: BlockFace): NetworkNode? {
-        if (getNodeData(node).connections.none { (_, faces) -> face in faces })
+        if (getNodeData(node).connections.none { [_, faces] -> face in faces })
             return null
         
         return resolveNode(node.pos.advance(face))
@@ -329,7 +329,7 @@ class NetworkState internal constructor(
      * @see removeConnection
      */
     suspend fun hasConnection(node: NetworkNode, face: BlockFace): Boolean =
-        getNodeData(node).connections.any { (_, faces) -> face in faces }
+        getNodeData(node).connections.any { [_, faces] -> face in faces }
     
     /**
      * Iterates over all [NetworkNodes][NetworkNode] connected to [node], calling [action] for each connection.
@@ -340,7 +340,7 @@ class NetworkState internal constructor(
      */
     suspend inline fun forEachConnectedNode(node: NetworkNode, action: (NetworkType<*>, BlockFace, NetworkNode) -> Unit) {
         val connections = getNodeData(node).connections
-        for ((networkType, faces) in connections) {
+        for ([networkType, faces] in connections) {
             faces.forEach { face ->
                 val connectedNode = resolveNode(node.pos.advance(face))
                 action(networkType, face, connectedNode)
@@ -458,7 +458,7 @@ class NetworkState internal constructor(
      */
     suspend inline fun forEachNetwork(bridge: NetworkBridge, action: (NetworkType<*>, ProtoNetwork<*>) -> Unit) {
         val networks = getNetworks(bridge)
-        for ((networkType, networkId) in networks) {
+        for ([networkType, networkId] in networks) {
             val network = getNetworkOrThrow(networkType, networkId)
             action(networkType, network)
         }
@@ -474,7 +474,7 @@ class NetworkState internal constructor(
      */
     suspend inline fun forEachNetwork(endPoint: NetworkEndPoint, action: (NetworkType<*>, BlockFace, ProtoNetwork<*>) -> Unit) {
         val networks = getNetworks(endPoint)
-        for ((networkType, face, networkId) in networks) {
+        for ([networkType, face, networkId] in networks) {
             val network = getNetworkOrThrow(networkType, networkId)
             action(networkType, face, network)
         }
@@ -489,7 +489,7 @@ class NetworkState internal constructor(
      */
     suspend inline fun <T : Network<T>> forEachNetwork(endPoint: NetworkEndPoint, networkType: NetworkType<T>, action: (BlockFace, ProtoNetwork<T>) -> Unit) {
         val networks = getNetworks(endPoint).row(networkType)
-        for ((face, networkId) in networks) {
+        for ([face, networkId] in networks) {
             val network = getNetworkOrThrow(networkType, networkId)
             action(face, network)
         }

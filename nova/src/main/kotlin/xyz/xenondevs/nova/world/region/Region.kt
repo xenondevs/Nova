@@ -136,7 +136,7 @@ class Region(min: Location, max: Location) {
                 add(0.0, translateY.toDouble() + height.toDouble(), 0.0)
             }
             
-            val (min, max) = LocationUtils.sort(pos1, pos2)
+            val [min, max] = LocationUtils.sort(pos1, pos2)
             return Region(min, max)
         }
         

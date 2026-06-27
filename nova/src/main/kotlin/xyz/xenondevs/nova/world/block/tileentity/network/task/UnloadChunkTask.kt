@@ -50,7 +50,7 @@ internal class UnloadChunkTask(
         if (networkNodes.isEmpty())
             return false
         
-        for ((pos, data) in networkNodes) {
+        for ([pos, data] in networkNodes) {
             val node = chunkNodes[pos]
             if (node == null || node !in state)
                 continue

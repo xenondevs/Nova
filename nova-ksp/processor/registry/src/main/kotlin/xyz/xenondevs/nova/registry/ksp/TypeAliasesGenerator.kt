@@ -53,7 +53,7 @@ internal class TypeAliasesGenerator(private val codeGenerator: CodeGenerator) {
                 val keyTypeDeclaration = keyType.declaration as KSClassDeclaration
                 val typeName = keyTypeDeclaration.toClassName().simpleNames.joinToString("")
                 
-                for ((suffix, typeProvider) in typeAliasEntries) {
+                for ([suffix, typeProvider] in typeAliasEntries) {
                     val serializerClassName = ClassName(serializationPackage, "${typeName}${suffix}Serializer")
                     val serializableAnnotation = AnnotationSpec.builder(serializableClass)
                         .addMember("%T::class", serializerClassName)

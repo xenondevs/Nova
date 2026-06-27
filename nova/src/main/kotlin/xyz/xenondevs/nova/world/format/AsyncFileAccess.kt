@@ -18,10 +18,7 @@ import kotlin.io.path.name
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeBytes
 
-private class SerializedFile(val path: Path, val bin: ByteArray) {
-    operator fun component1(): Path = path
-    operator fun component2(): ByteArray = bin
-}
+private class SerializedFile(val path: Path, val bin: ByteArray)
 
 internal class AsyncFileAccess {
     

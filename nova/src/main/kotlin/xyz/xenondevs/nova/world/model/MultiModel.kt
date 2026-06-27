@@ -48,7 +48,7 @@ class MovableMultiModel : MultiModel() {
     }
     
     fun removeIf(predicate: (FakeItemDisplay) -> Boolean) {
-        models.removeIf { (_, display) ->
+        models.removeIf { [_, display] ->
             if (predicate(display)) {
                 display.remove()
                 true
@@ -63,7 +63,7 @@ class FixedMultiModel : MultiModel() {
     
     fun replaceModels(newModels: Set<Model>) {
         val availableDisplays = HashMap<Location, HashSet<FakeItemDisplay>>()
-        for ((model, itemDisplay) in models) {
+        for ([model, itemDisplay] in models) {
             availableDisplays.getOrPut(model.location, ::HashSet) += itemDisplay
         }
         models.clear()
@@ -96,7 +96,7 @@ class FixedMultiModel : MultiModel() {
     }
     
     fun removeIf(predicate: (Model, FakeItemDisplay) -> Boolean) {
-        models.removeIf { (model, display) ->
+        models.removeIf { [model, display] ->
             if (predicate(model, display)) {
                 display.remove()
                 true

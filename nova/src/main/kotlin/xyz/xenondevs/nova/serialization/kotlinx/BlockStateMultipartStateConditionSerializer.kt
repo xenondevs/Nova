@@ -13,12 +13,12 @@ internal object BlockStateMultipartStateConditionSerializer : KSerializer<State>
     override val descriptor = delegate.descriptor
     
     override fun serialize(encoder: Encoder, value: State) {
-        delegate.serialize(encoder, value.properties.mapValues { (_, v) -> v.joinToString("|") })
+        delegate.serialize(encoder, value.properties.mapValues { [_, v] -> v.joinToString("|") })
     }
     
     override fun deserialize(decoder: Decoder): State {
         val map = delegate.deserialize(decoder)
-        return State(map.mapValues { (_, v) -> v.split("|").toSet() })
+        return State(map.mapValues { [_, v] -> v.split("|").toSet() })
     }
     
 }

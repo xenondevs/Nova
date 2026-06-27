@@ -103,7 +103,7 @@ internal class EntityDataGenerator {
 
         val result = linkedMapOf<String, EntityClassData>()
 
-        for ((className, calls) in defineIdCalls) {
+        for ([className, calls] in defineIdCalls) {
             val startIndex = ancestorFieldCount(className)
             val fields = calls.mapIndexed { i, call ->
                 val defaultValue = defaults["${call.targetClass}/${call.fieldName}"] ?: DefaultValue.Unknown

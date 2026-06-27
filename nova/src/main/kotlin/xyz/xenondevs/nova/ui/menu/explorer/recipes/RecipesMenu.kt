@@ -116,7 +116,7 @@ internal class RecipesMenu(
                 '<' by tabPageBackItem(page, pageCount)
                 '>' by tabPageForwardItem(page, pageCount)
                 content by buildList {
-                    addAll(recipes.mapIndexed { i, (group, _) -> recipeGroupTabButton(i, group, tab) })
+                    addAll(recipes.mapIndexed { i, [group, _] -> recipeGroupTabButton(i, group, tab) })
                     if (info != null)
                         add(itemInfoButton(info))
                 }
@@ -124,7 +124,7 @@ internal class RecipesMenu(
             
             // tab content
             this.tab by tab
-            tabs by recipes.map { (group, recipes) ->
+            tabs by recipes.map { [group, recipes] ->
                 pagedGuisGui(
                     "< . . . . . . . >",
                     "x x x x x x x x x",

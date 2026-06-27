@@ -33,13 +33,13 @@ internal object BiomeInjector {
                 val biomes = biomeInjection.resolveAffectedBiomes(biomeRegistry)
                 for (biome in biomes) {
                     val featuresPerStep = toInject.getOrPut(biome) { Array(GENERATION_STEPS) { HashSet() } }
-                    for ((i, features) in biomeInjection.features.withIndex()) {
+                    for ([i, features] in biomeInjection.features.withIndex()) {
                         featuresPerStep[i] += features
                     }
                 }
             }
             
-            for ((biome, injections) in toInject) {
+            for ([biome, injections] in toInject) {
                 val key = biomeRegistry.getKey(biome) ?: throw IllegalStateException("Biome $biome is not registered")
                 if (LOG_INJECTIONS)
                     LOGGER.info("Injecting ${injections.contentToString()} into $key")

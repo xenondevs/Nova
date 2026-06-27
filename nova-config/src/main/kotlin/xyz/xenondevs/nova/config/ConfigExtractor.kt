@@ -81,7 +81,7 @@ class ConfigExtractor(private val extractedConfigs: MutableMap<Key, String>) {
             }
             
             // update comments
-            serverCfg.get(path)!!.also { (serverKeyNode, serverValueNode) ->
+            serverCfg.get(path)!!.also { [serverKeyNode, serverValueNode] ->
                 serverKeyNode.blockComments = internalKeyNode.blockComments
                 serverKeyNode.inLineComments = internalKeyNode.inLineComments
                 serverKeyNode.endComments = internalKeyNode.endComments

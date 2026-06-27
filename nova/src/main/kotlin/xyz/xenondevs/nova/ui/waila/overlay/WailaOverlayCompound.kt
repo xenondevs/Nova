@@ -26,7 +26,7 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
     override var hasChanged = false
     
     override val positioning by combinedProvider(MARGIN_TOP, MARGIN_BOTTOM, MATCH_ABOVE, MATCH_BELOW)
-        .map { (marginTop, marginBottom, matchAbove, matchBelow) ->
+        .map { [marginTop, marginBottom, matchAbove, matchBelow] ->
             BarPositioning.Dynamic(marginTop, marginBottom, BAR_MATCH_INFO, matchAbove, matchBelow)
         }
     
@@ -44,7 +44,7 @@ internal class WailaOverlayCompound(private val player: Player) : BossBarOverlay
         overlays += imageOverlay
         
         val iconChar = ResourceLookups.wailaData[icon]
-        val (beginX, centerX) = imageOverlay.update(iconChar, lines.size, lines.maxOf { CharSizes.calculateComponentWidth(it.text, player.locale) })
+        val [beginX, centerX] = imageOverlay.update(iconChar, lines.size, lines.maxOf { CharSizes.calculateComponentWidth(it.text, player.locale) })
         
         // re-add line overlays
         lineOverlays.forEachIndexed { idx, overlay ->

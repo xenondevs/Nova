@@ -31,10 +31,10 @@ internal object TableRecipeGroup : RecipeGroup<Recipe>() {
         
         if (recipe is ShapedRecipe) {
             val shape = recipe.shape
-            for ((rowNumber, row) in shape.withIndex()) {
+            for ([rowNumber, row] in shape.withIndex()) {
                 if (row.isBlank()) continue
                 
-                for ((charNumber, char) in row.toCharArray().withIndex()) {
+                for ([charNumber, char] in row.toCharArray().withIndex()) {
                     val choiceItem = recipe.choiceMap[char]?.let(::createRecipeChoiceItem)
                     if (choiceItem != null) gui.setItem(
                         charNumber + 1 + (row.length == 1).intValue,
@@ -51,7 +51,7 @@ internal object TableRecipeGroup : RecipeGroup<Recipe>() {
                 SlotUtils.getSlotsRect(1, 0, 3, 3, 9)
                     .take(choiceItems.size)
                     .withIndex()
-                    .forEach { (index, slot) -> gui.setItem(slot, choiceItems[index]) }
+                    .forEach { [index, slot] -> gui.setItem(slot, choiceItems[index]) }
             }
         }
         

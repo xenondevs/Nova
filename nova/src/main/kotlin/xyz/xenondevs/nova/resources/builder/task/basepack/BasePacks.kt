@@ -63,7 +63,7 @@ class BasePacks internal constructor(internal val builder: ResourcePackBuilder) 
                 }
             }
             
-            val occupiedBlockStates: Set<BlockState> = occupiedSolidIds.entries.map { (type, ids) ->
+            val occupiedBlockStates: Set<BlockState> = occupiedSolidIds.entries.map { [type, ids] ->
                 buildSet {
                     for (id in ids) {
                         add(type.of(id, false).vanillaBlockState)

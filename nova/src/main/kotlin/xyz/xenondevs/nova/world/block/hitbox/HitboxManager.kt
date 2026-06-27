@@ -165,7 +165,7 @@ object HitboxManager : Listener, PacketListener {
                 wrappedEvent.actionPerformed = true
                 
                 // check protection integrations & invoke handler
-                val (hitbox, relHitLoc) = hitboxResult
+                val [hitbox, relHitLoc] = hitboxResult
                 val clickedBlockPos = hitbox.baseCenter
                     .add(relHitLoc, Vector3f())
                     .toLocation(player.location.world).pos

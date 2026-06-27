@@ -24,7 +24,7 @@ class EntityVariantTask(private val builder: ResourcePackBuilder) : PackTask {
     
     override suspend fun run() {
         val layouts: Map<Pair<Key, Key>, EntityVariantLayout> = layoutGenerators
-            .mapValues { (_, makeLayout) -> makeLayout(builder) }
+            .mapValues { [_, makeLayout] -> makeLayout(builder) }
         ResourceLookups.entityVariantAssetsLookup.set(layouts)
     }
     

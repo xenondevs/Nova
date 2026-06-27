@@ -142,7 +142,7 @@ internal class ItemDistributor(
                 var hasProvided = false
                 
                 // find the first item that can be extracted into the current consumer and perform the extraction
-                for ((slot, itemStack) in providerContent.withIndex()) {
+                for ([slot, itemStack] in providerContent.withIndex()) {
                     if (itemStack.isEmpty || consumer.denies(itemStack) || !provider.inventory.canTake(slot, 1))
                         continue
                     
@@ -180,7 +180,7 @@ internal class ItemDistributor(
      */
     private fun createIgnoredConsumers(consumers: List<FilteredNetworkedInventory>): BitSet {
         val bitSet = BitSet(consumers.size)
-        for ((idx, consumer) in consumers.withIndex()) {
+        for ([idx, consumer] in consumers.withIndex()) {
             if (consumer.inventory.isFull())
                 bitSet.set(idx)
         }
@@ -203,7 +203,7 @@ internal class ItemDistributor(
             return transferAmount
         
         var transfersLeft = transferAmount
-        for ((slot, itemStack) in providerSnapshot.withIndex()) {
+        for ([slot, itemStack] in providerSnapshot.withIndex()) {
             if (itemStack.isEmpty || consumer.denies(itemStack))
                 continue
             

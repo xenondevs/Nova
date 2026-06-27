@@ -96,7 +96,7 @@ class GuiTextureTask(
      */
     private fun overwriteInventoryTitle() {
         val lc = builder.getBuildData<LanguageContent>()
-        for ((lang, _) in lc.vanillaLangs) {
+        for ([lang, _] in lc.vanillaLangs) {
             val translation = lc.getTranslation(lang, "container.inventory")
             lc.setTranslation(lang, "container.inventory", "")
             lc.setTranslation(lang, "container.nova.inventory", translation)
@@ -112,7 +112,7 @@ class GuiTextureTask(
         val guiTextures = HashMap<RegistryEntry.Nova<GuiTexture>, GuiTextureData>()
         val guiTexturesByFontChar = HashMap<FontChar, RegistryEntry.Nova<GuiTexture>>()
         
-        for ((guiTexture, makeLayout) in requests) {
+        for ([guiTexture, makeLayout] in requests) {
             val layout = makeLayout(builder)
             val texture = layout.texture.toType(ResourceType.FontTexture)
             val dim = builder.resolve(texture).readImageDimensions()

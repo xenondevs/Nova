@@ -44,7 +44,7 @@ object BlockStateSearcher {
                 val palette = data.palette()
                 var storage: BitStorage? = null
                 
-                for ((queryIdx, query) in queries.withIndex()) {
+                for ([queryIdx, query] in queries.withIndex()) {
                     val ids = palette.findIds(query)
                     if (ids.isEmpty())
                         continue
@@ -100,7 +100,7 @@ object BlockStateSearcher {
         // values is an Object[], not a T[] (assigned via uncheck cast)
         // treating it as BlockState[] will cause ClassCastException
         val values: Array<out Any> = values
-        for ((idx, value) in values.withIndex()) {
+        for ([idx, value] in values.withIndex()) {
             if (value !is BlockState)
                 continue
             
@@ -115,7 +115,7 @@ object BlockStateSearcher {
     private fun HashMapPalette<BlockState>.findIdsHashMap(query: ChunkSearchQuery): Int2ObjectMap<BlockState> {
         val result = Int2ObjectOpenHashMap<BlockState>()
         
-        for ((idx, value) in values.withIndex()) {
+        for ([idx, value] in values.withIndex()) {
             if (query(value)) {
                 result.put(idx, value)
             }
@@ -128,7 +128,7 @@ object BlockStateSearcher {
         return globalPaletteCache.getOrPut(query) {
             val result = Int2ObjectOpenHashMap<BlockState>()
             
-            for ((idx, value) in Block.BLOCK_STATE_REGISTRY.withIndex()) {
+            for ([idx, value] in Block.BLOCK_STATE_REGISTRY.withIndex()) {
                 if (query(value)) {
                     result.put(idx, value)
                 }

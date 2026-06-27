@@ -547,7 +547,7 @@ class MobSpawnSettingsBuilder internal constructor() {
     internal fun build(): MobSpawnSettings {
         return MobSpawnSettings(
             creatureGenerationProbability,
-            spawners.mapValues { (_, v) -> WeightedList.of(v) },
+            spawners.mapValues { [_, v] -> WeightedList.of(v) },
             mobSpawnCosts
         )
     }

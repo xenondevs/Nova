@@ -88,12 +88,12 @@ class ItemModelContent(val builder: ResourcePackBuilder) : PackBuildData {
         override val runsBefore = setOf(ModelContent.Write::class, Write::class)
         
         override suspend fun run() {
-            for ((itemId, configureDefinition) in novaItemDefinitions) {
+            for ([itemId, configureDefinition] in novaItemDefinitions) {
                 val definition = ItemModelDefinitionBuilder(
                     builder
                 ) { modelSelector ->
                     val scope = ItemModelSelectorScope(itemId, builder, modelContent)
-                    val (model, _) = modelSelector(scope).buildScaled(modelContent)
+                    val model = modelSelector(scope).buildScaled(modelContent).model
                     val id = modelContent.getOrPutGenerated(model)
                     modelContent.rememberUsage(id)
                     id
@@ -112,7 +112,7 @@ class ItemModelContent(val builder: ResourcePackBuilder) : PackBuildData {
     inner class Write : PackTask {
         
         override suspend fun run() {
-            for ((path, def) in customDefsByPath) {
+            for ([path, def] in customDefsByPath) {
                 builder.writeJson(path, def)
             }
         }

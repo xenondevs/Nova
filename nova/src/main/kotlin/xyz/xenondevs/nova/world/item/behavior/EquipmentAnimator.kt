@@ -71,7 +71,7 @@ internal object EquipmentAnimator {
     private fun updatePlayerArmor(player: Player) {
         val serverPlayer = player.serverPlayer
         val updatedEquipment = HashMap<EquipmentSlot, ItemStack>()
-        for ((armorSlot, armorStack) in player.equipment.armorContents.withIndex()) {
+        for ([armorSlot, armorStack] in player.equipment.armorContents.withIndex()) {
             if (armorStack?.novaItem?.behaviors?.any { it in animatedBehaviors } == true) {
                 serverPlayer.inventoryMenu.setRemoteSlot(8 - armorSlot, ItemStack.EMPTY) // mark as dirty, force update
                 updatedEquipment[EquipmentSlot.entries[armorSlot + 2]] = armorStack.unwrap()

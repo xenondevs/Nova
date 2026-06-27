@@ -22,11 +22,11 @@ internal open class AliasedEnumSerializer<E : Enum<E>>(
     
     private val byName = HashMap<String, E>().also { map ->
         entries.associateByTo(map) { it.name.lowercase() }
-        extraMappings.forEach { (k, v) -> map[k.lowercase()] = v }
+        extraMappings.forEach { [k, v] -> map[k.lowercase()] = v }
     }
     
     private val possibleValues = entries.joinToString { entry ->
-        val aliases = extraMappings.entries.filter { (_, v) -> v == entry }.map { (k, _) -> k }
+        val aliases = extraMappings.entries.filter { [_, v] -> v == entry }.map { [k, _] -> k }
         if (aliases.isEmpty()) entry.name else "${entry.name} (${aliases.joinToString()})"
     }
     

@@ -55,7 +55,7 @@ internal object FakeEntityManager : Listener {
     @DisableFun
     private fun disable() {
         synchronized(FakeEntityManager) {
-            chunkEntities.forEach { (chunk, entities) ->
+            chunkEntities.forEach { [chunk, entities] ->
                 val viewers = chunkViewers[chunk] ?: return@forEach
                 entities.forEach { entity -> viewers.forEach { viewer -> entity.despawn(viewer) } }
             }

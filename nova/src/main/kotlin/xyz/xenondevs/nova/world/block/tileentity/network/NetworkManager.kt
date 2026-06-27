@@ -79,7 +79,7 @@ object NetworkManager : Listener {
     
     @DisableFun(dispatcher = Dispatcher.ASYNC)
     private suspend fun disable() {
-        for ((_, configurator) in configurators) {
+        for ([_, configurator] in configurators) {
             configurator.awaitShutdown()
         }
         SUPERVISOR.cancel("NetworkManager disabled")

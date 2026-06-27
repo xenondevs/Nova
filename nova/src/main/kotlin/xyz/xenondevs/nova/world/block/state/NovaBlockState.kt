@@ -76,7 +76,7 @@ open class NovaBlockState internal constructor(
      */
     fun <T : Any> with(property: BlockStateProperty<T>, value: T): NovaBlockState {
         val tree = tree ?: throw IllegalStateException("Block state has no properties tree")
-        val (nodeIdx, scopedProperty) = tree.find(property)
+        (val nodeIdx = index, val scopedProperty = value) = tree.find(property)
         return tree.get(path, nodeIdx, scopedProperty.valueToId(value))
     }
     
@@ -95,14 +95,14 @@ open class NovaBlockState internal constructor(
      */
     fun cycle(property: BlockStateProperty<*>): NovaBlockState {
         val tree = tree ?: throw IllegalStateException("Block state has no properties tree")
-        val (depth, scopedProperty) = tree.find(property)
+        (val depth = index, val scopedProperty = value) = tree.find(property)
         val valueId = (path[depth] + 1) % scopedProperty.values.size
         return tree.get(path, depth, valueId)
     }
     
     @Suppress("UNCHECKED_CAST")
     override fun toString(): String {
-        val propertiesStr = scopedValues.entries.joinToString { (property, value) ->
+        val propertiesStr = scopedValues.entries.joinToString { [property, value] ->
             val valStr = (property as ScopedBlockStateProperty<Any>).valueToString(value)
             "$property=$valStr"
         }

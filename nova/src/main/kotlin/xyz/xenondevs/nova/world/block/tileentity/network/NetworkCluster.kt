@@ -14,7 +14,7 @@ class NetworkCluster(val uuid: UUID, val networks: List<Network<*>>) {
     
     private val tickOffset: Int // load balancing
     private val groups = networks.groupBy { it.type }
-        .map { (type, networks) -> createGroup(type, networks) }
+        .map { [type, networks] -> createGroup(type, networks) }
     
     @Volatile
     private var isValid: Boolean = false

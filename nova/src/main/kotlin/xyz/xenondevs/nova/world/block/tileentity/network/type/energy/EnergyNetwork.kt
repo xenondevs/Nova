@@ -33,7 +33,7 @@ class EnergyNetwork internal constructor(
         var transferRate = DEFAULT_TRANSFER_RATE
         var complexity = 0
         
-        for ((pos, con) in networkData.nodes) {
+        for ([pos, con] in networkData.nodes) {
             val (node, faces) = con
             try {
                 if (node is NetworkEndPoint) {
@@ -154,7 +154,7 @@ class EnergyNetwork internal constructor(
             if (energyPerHolder <= 0)
                 break
             
-            for ((idx, holder) in holders.withIndex()) {
+            for ([idx, holder] in holders.withIndex()) {
                 if (ignored[idx])
                     continue
                 
@@ -170,7 +170,7 @@ class EnergyNetwork internal constructor(
         // The remaining energy is smaller than the non-ignored holder count and can thus not be distributed equally to all holders.
         // Instead, the remaining energy is just given to the first holders that can take it.
         if (remaining > 0) {
-            for ((idx, holder) in holders.withIndex()) {
+            for ([idx, holder] in holders.withIndex()) {
                 if (ignored[idx])
                     continue
                 
@@ -239,7 +239,7 @@ class EnergyNetwork internal constructor(
         private val ENERGY_NETWORK = MAIN_CONFIG.node("network", "energy")
         val TICK_DELAY_PROVIDER: Provider<Int> = ENERGY_NETWORK.entry<Int>("tick_delay")
         val DEFAULT_TRANSFER_RATE: Long by combinedProvider(ENERGY_NETWORK.entry<Double>("default_transfer_rate"), TICK_DELAY_PROVIDER)
-            .map { (defaultTransferRate, tickDelay) -> (defaultTransferRate * tickDelay).roundToLong() }
+            .map { [defaultTransferRate, tickDelay] -> (defaultTransferRate * tickDelay).roundToLong() }
             .map { defaultTransferRate -> if (defaultTransferRate < 0) Long.MAX_VALUE else defaultTransferRate }
         val MAX_COMPLEXITY: Int by ENERGY_NETWORK.entry<Int>("max_complexity")
         

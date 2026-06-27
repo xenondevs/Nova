@@ -29,7 +29,9 @@ kotlin {
         freeCompilerArgs.addAll(
             // IntelliJ seems to not know that these are default in 2.4
             "-Xcontext-parameters",
-            "-Xexplicit-backing-fields"
+            "-Xexplicit-backing-fields",
+            
+            "-Xname-based-destructuring=complete"
         )
         
         if (!project.hasProperty("release")) {

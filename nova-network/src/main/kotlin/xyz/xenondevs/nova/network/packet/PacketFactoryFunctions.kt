@@ -43,6 +43,6 @@ fun ServerboundPlaceRecipePacket(containerId: Int, recipe: Identifier, shiftDown
 }
 
 fun ClientboundSetEquipmentPacket(entityId: Int, equipment: Map<EquipmentSlot, ItemStack>): ClientboundSetEquipmentPacket {
-    val equipmentList = equipment.map { (slot, itemStack) -> Pair(slot, itemStack) }
+    val equipmentList = equipment.map { [slot, itemStack] -> Pair(slot, itemStack) }
     return ClientboundSetEquipmentPacket(entityId, equipmentList)
 }

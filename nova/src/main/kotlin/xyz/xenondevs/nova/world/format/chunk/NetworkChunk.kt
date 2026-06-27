@@ -67,13 +67,13 @@ internal class NetworkChunk(
             return false
         
         writer.writeVarInt(bridges.size)
-        for ((pos, data) in bridges) {
+        for ([pos, data] in bridges) {
             writer.writeInt(packBlockPos(pos))
             data.write(writer)
         }
         
         writer.writeVarInt(endPoints.size)
-        for ((pos, data) in endPoints) {
+        for ([pos, data] in endPoints) {
             writer.writeInt(packBlockPos(pos))
             data.write(writer)
         }

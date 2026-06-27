@@ -40,7 +40,7 @@ internal class RemoveBridgeTask(
     //</editor-fold>
     
     override suspend fun remove() {
-        for ((networkType, currentNetworkId) in state.getNetworks(node)) {
+        for ([networkType, currentNetworkId] in state.getNetworks(node)) {
             val currentNetwork = state.getNetworkOrThrow(networkType, currentNetworkId)
             
             val connectedBridges = HashSet<NetworkBridge>()
@@ -51,7 +51,7 @@ internal class RemoveBridgeTask(
                 val recalculatedNetworkLayouts = recalculateNetworks(node, connectedBridges, networkType)
                 if (recalculatedNetworkLayouts != null) { // null means no split in networks
                     val recalculatedNetworks = recalculatedNetworkLayouts.map { nodes ->
-                        ProtoNetwork(state, networkType, nodes = nodes.filterTo(HashMap()) { (_, con) -> con.node !is GhostNetworkNode })
+                        ProtoNetwork(state, networkType, nodes = nodes.filterTo(HashMap()) { [_, con] -> con.node !is GhostNetworkNode })
                     }
                     state -= currentNetwork
                     state += recalculatedNetworks
@@ -130,7 +130,7 @@ internal class RemoveBridgeTask(
         layouts: List<Map<BlockPos, MutableNetworkNodeConnection>>,
         networks: List<ProtoNetwork<*>>
     ) {
-        for ((i, layout) in layouts.withIndex()) {
+        for ([i, layout] in layouts.withIndex()) {
             val network = networks[i]
             for ((node, faces) in layout.values) {
                 when (node) {
@@ -169,7 +169,7 @@ internal class RemoveBridgeTask(
             exploredNodes += startNode
             
             while (queue.isNotEmpty()) {
-                val (approachingFace, currentNode) = queue.poll()
+                val [approachingFace, currentNode] = queue.poll()
                 
                 if (currentNode is NetworkBridge) {
                     // if we can reach all previously connected bridges in one side iteration, the networks will not be split

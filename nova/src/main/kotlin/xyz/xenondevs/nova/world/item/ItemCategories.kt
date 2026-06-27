@@ -46,7 +46,7 @@ internal object ItemCategories {
         return NovaRegistries.ITEM.entrySet.map { items ->
             items
                 .groupBy { it.key.namespace() }
-                .mapValuesNotNull { (namespace, items) ->
+                .mapValuesNotNull { [namespace, items] ->
                     val name = addonNamesById[namespace]
                     val visibleItems = items.filterNot(NovaItem::isHidden)
                     if (name != null && visibleItems.isNotEmpty())

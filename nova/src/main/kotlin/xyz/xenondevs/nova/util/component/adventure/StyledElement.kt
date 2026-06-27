@@ -106,7 +106,7 @@ private fun elements(
         FSTR_PATTERN.findAll(fstr).forEach { result ->
             yieldAll(fstr.substring(i, result.range.first).styledCodePoints(style))
             
-            val (explicitArgIdx, formatType) = result.destructured
+            val [explicitArgIdx, formatType] = result.destructured
             when (formatType) {
                 "%" -> yield(StyledElement.CodePoint(style, '%'.code))
                 "s" if explicitArgIdx.isNotEmpty() -> {
@@ -135,7 +135,7 @@ private fun elements(
 private fun checkFstrIsInvalid(matches: List<MatchResult>, args: Int): Boolean {
     var currentArgIdx = 0
     for (result in matches) {
-        val (explicitArgIdx, formatType) = result.destructured
+        val [explicitArgIdx, formatType] = result.destructured
         
         if (formatType != "%" && formatType != "s")
             return true

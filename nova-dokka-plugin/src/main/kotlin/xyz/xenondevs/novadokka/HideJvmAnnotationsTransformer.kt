@@ -101,7 +101,7 @@ class HideJvmAnnotationsTransformer(ctx: DokkaContext) : PreMergeDocumentableTra
     
     @Suppress("DEPRECATION")
     private fun filterAnnotations(annotations: Annotations): Annotations = annotations.copy(
-        myContent = annotations.content.mapValues { (_, annotations) ->
+        myContent = annotations.content.mapValues { [_, annotations] ->
             annotations.filter(::isAnnotationAllowed)
         }
     )

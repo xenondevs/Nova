@@ -265,7 +265,7 @@ internal class MetadataDslGenerator(
         val fileSpec = FileSpec.builder(GENERATED_PACKAGE, "EntityMetadataDsl")
             .addAnnotation(AnnotationSpec.builder(Suppress::class).addMember("%S", "unused").build())
 
-        for ((_, classData) in entityData) {
+        for ([_, classData] in entityData) {
             val parentName = findNearestAncestorWithFields(classData.className, entityData, superclasses)
             fileSpec.addType(buildInterface(classData, parentName, overrides, matchedOverrides))
             fileSpec.addType(buildMutableInterface(classData, parentName, overrides, matchedOverrides))
@@ -275,7 +275,7 @@ internal class MetadataDslGenerator(
         }
 
         val unmatchedOverrides = overrides.keys - matchedOverrides
-        for ((owner, property) in unmatchedOverrides) {
+        for ([owner, property] in unmatchedOverrides) {
             logger.error("Entity data property override does not match a generated property: $owner.$property")
         }
 

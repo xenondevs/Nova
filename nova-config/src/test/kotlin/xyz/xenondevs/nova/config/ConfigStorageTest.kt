@@ -22,7 +22,7 @@ class ConfigStorageTest {
     private val testId = Key.key("test", "config")
     
     private fun jsonObj(vararg pairs: Pair<String, Any>): JsonObject =
-        JsonObject(pairs.associate { (k, v) ->
+        JsonObject(pairs.associate { [k, v] ->
             k to when (v) {
                 is String -> JsonPrimitive(v)
                 is Int -> JsonPrimitive(v)

@@ -315,11 +315,11 @@ class ModelBuilder(private val base: Model) {
         
         for (action in actions) {
             when (action) {
-                is Transform -> models.forEach { (_, matrix) -> action.apply(matrix) }
+                is Transform -> models.forEach { [_, matrix] -> action.apply(matrix) }
                 is FlatteningAction -> Unit // flattening should not be required for display entity models (?)
                 is CombinationAction -> models += action.other.buildDisplayEntity(context)
-                    .map { (model, matrix) -> model to Matrix4d(matrix) }
-                is CullAction -> models.replaceAll { (model, matrix) -> action.apply(model) to matrix }
+                    .map { [model, matrix] -> model to Matrix4d(matrix) }
+                is CullAction -> models.replaceAll { [model, matrix] -> action.apply(model) to matrix }
             }
         }
         

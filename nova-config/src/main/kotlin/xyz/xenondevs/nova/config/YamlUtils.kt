@@ -24,14 +24,14 @@ internal fun Node.walk(consume: (path: List<String>, keyNode: ScalarNode, valueN
     }
     
     while (stack.isNotEmpty()) {
-        val (path, keyValueNodes) = stack.removeFirst()
-        val (keyNode, valueNode) = keyValueNodes
+        val [path, keyValueNodes] = stack.removeFirst()
+        val [keyNode, valueNode] = keyValueNodes
         val decision = consume(path, keyNode, valueNode)
         
         when (decision) {
             NodeWalkDecision.CONTINUE -> {
                 if (valueNode is MappingNode) {
-                    for ((subKeyNode, subValueNode) in valueNode.value.asReversed()) {
+                    for ([subKeyNode, subValueNode] in valueNode.value.asReversed()) {
                         subKeyNode as ScalarNode
                         stack.addFirst(path + subKeyNode.value to (subKeyNode to subValueNode))
                     }
@@ -84,7 +84,7 @@ internal fun Node.get(path: List<String>): Pair<ScalarNode, Node>? {
         node = tuple.keyNode as ScalarNode to tuple.valueNode
     }
     
-    return node?.let { (first, second) -> Pair(first!!, second) }
+    return node?.let { [first, second] -> Pair(first!!, second) }
 }
 
 /**

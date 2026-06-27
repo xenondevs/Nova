@@ -132,7 +132,7 @@ object ActionbarOverlayManager : PacketListener {
         // append intercepted actionbar text
         val interceptedActionbar = interceptedActionbars[uuid]
         if (interceptedActionbar != null) {
-            val (text, time) = interceptedActionbar
+            val [text, time] = interceptedActionbar
             if (System.currentTimeMillis() - time < 3000) {
                 builder.append(text)
             } else interceptedActionbars -= uuid

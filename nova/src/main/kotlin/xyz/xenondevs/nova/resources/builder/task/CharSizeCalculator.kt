@@ -43,7 +43,7 @@ class CharSizeCalculator(private val builder: ResourcePackBuilder) : PackTask {
                 val table = CharSizeTable()
                 for (provider in font.providers.reversed()) {
                     // skip providers that have mismatching filters
-                    if (provider.filter.any { (filterKey, filterValue) -> filterValue != filterKey in SETTINGS })
+                    if (provider.filter.any { [filterKey, filterValue] -> filterValue != filterKey in SETTINGS })
                         continue
                     
                     if (provider is ReferenceProvider) {

@@ -44,7 +44,7 @@ abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal construct
     }
     
     open fun refresh(state: NetworkState) {
-        connectionTypes.forEach { (face, type) -> type.set(getConnectionType(face)) }
+        connectionTypes.forEach { [face, type] -> type.set(getConnectionType(face)) }
     }
     
     private fun queueCycleConnectionType(face: BlockFace, move: Int) {
@@ -69,7 +69,7 @@ abstract class AbstractSideConfigMenu<H : EndPointDataHolder> internal construct
     protected abstract fun setConnectionType(face: BlockFace, type: NetworkConnectionType)
     
     protected fun connectionConfigItem(side: BlockSide) = item {
-        val (side, face) = getFaceFromSide(side)
+        val [side, face] = getFaceFromSide(side)
         val connectionType = connectionTypes[face]!!
         
         val btnType = connectionType.map { type ->

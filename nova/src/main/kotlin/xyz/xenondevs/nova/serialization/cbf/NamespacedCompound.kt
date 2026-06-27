@@ -24,7 +24,7 @@ class NamespacedCompound internal constructor(
 ) {
     
     val keys: Set<Key>
-        get() = map.flatMapTo(HashSet()) { (namespace, compound) -> compound.keys.map { Key.key(namespace, it) } }
+        get() = map.flatMapTo(HashSet()) { [namespace, compound] -> compound.keys.map { Key.key(namespace, it) } }
     
     constructor() : this(HashMap())
     
@@ -140,13 +140,13 @@ class NamespacedCompound internal constructor(
     
     
     fun putAll(other: NamespacedCompound) {
-        for ((namespace, otherCompound) in other.map) {
+        for ([namespace, otherCompound] in other.map) {
             val compound = map.getOrPut(namespace, ::Compound)
             compound.putAll(otherCompound)
         }
     }
     
-    fun copy(): NamespacedCompound = NamespacedCompound(map.mapValuesTo(HashMap()) { (_, value) -> value.copy() })
+    fun copy(): NamespacedCompound = NamespacedCompound(map.mapValuesTo(HashMap()) { [_, value] -> value.copy() })
     
     fun isEmpty(): Boolean = map.isEmpty()
     
@@ -156,7 +156,7 @@ class NamespacedCompound internal constructor(
         val builder = StringBuilder()
         builder.append("{")
         
-        map.entries.forEach { (key, value) ->
+        map.entries.forEach { [key, value] ->
             builder.append("\n\"$key\": $value")
         }
         
@@ -177,7 +177,7 @@ class NamespacedCompound internal constructor(
             // count serialized elements instead of obj.size to prevent concurrent modifications from causing corrupted data
             var size = 0
             val temp = byteWriter {
-                for ((key, data) in obj.map) {
+                for ([key, data] in obj.map) {
                     writeString(key)
                     compoundSerializer.write(data, this)
                     size++

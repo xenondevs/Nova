@@ -102,7 +102,7 @@ internal object PacketEventManager {
     }
     
     private fun callEvent(event: PacketEvent<*>) {
-        listeners[event::class]?.forEach { (handle, _, ignoreIfCancelled) ->
+        listeners[event::class]?.forEach { (handle, ignoreIfCancelled) ->
             if (!ignoreIfCancelled || !event.isCancelled) {
                 try {
                     handle.invoke(event)
@@ -146,7 +146,7 @@ internal object PacketEventManager {
     fun unregisterListener(listener: PacketListener): Unit = LOCK.withLock {
         val toRemove = listenerInstances[listener]?.toHashSet() ?: return
         
-        listeners.entries.removeIf { (_, list) ->
+        listeners.entries.removeIf { [_, list] ->
             list.removeIf { it in toRemove }
             return@removeIf list.isEmpty()
         }

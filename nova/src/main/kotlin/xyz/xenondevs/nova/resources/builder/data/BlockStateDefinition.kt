@@ -47,7 +47,7 @@ data class BlockStateDefinition(
             data class State(val properties: Map<String, Set<String>>) : Condition {
                 
                 override fun matches(properties: Map<String, String>): Boolean {
-                    for ((key, values) in this.properties) {
+                    for ([key, values] in this.properties) {
                         val actualValue = properties[key] ?: return false
                         if (actualValue !in values) return false
                     }
@@ -91,7 +91,7 @@ data class BlockStateDefinition(
         val models = ArrayList<List<Model>>()
         
         // variants take precedence over multipart
-        for ((variant, variantModels) in variants) {
+        for ([variant, variantModels] in variants) {
             if (properties.containsAll(variant.properties)) {
                 models += variantModels
             }

@@ -271,7 +271,7 @@ class WailaTask(
                 true
             )
             
-            CustomItemServiceManager.getBlockItemModelPaths().forEach { (id, path) ->
+            CustomItemServiceManager.getBlockItemModelPaths().forEach { [id, path] ->
                 try {
                     val file = builder.resolve("assets/nova/textures/waila_generated/${id.namespace()}/${id.value()}.png")
                     file.parent.createDirectories()
@@ -302,7 +302,7 @@ class WailaTask(
             return to
         }
         
-        MATERIAL_TEXTURES.forEach { (material, texture) ->
+        MATERIAL_TEXTURES.forEach { [material, texture] ->
             val name = material.name.lowercase()
             val path = ResourcePath.of(ResourceType.FontTexture, "$texture.png")
             addEntry(Key.key("minecraft", name), copyMCTexture(path), SIZE, ASCENT)

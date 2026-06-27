@@ -33,7 +33,7 @@ class FontContent : PackBuildData {
     val mergedFonts: Map<ResourcePath<ResourceType.Font>, Font>
         get() {
             val map = HashMap(customFonts)
-            for ((id, font) in vanillaFonts) {
+            for ([id, font] in vanillaFonts) {
                 val fontOverride = map[id]
                 if (fontOverride != null) {
                     map[id] = Font(id, fontOverride.providers + font.providers)

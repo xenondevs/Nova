@@ -114,7 +114,7 @@ object Bucketable : BlockBehavior {
     }
     
     private fun selectContainerInsert(fluidHolder: FluidHolder, fluidType: FluidType): NetworkedFluidContainer? {
-        for ((container, conType) in fluidHolder.containers.entries) {
+        for ([container, conType] in fluidHolder.containers.entries) {
             if (!conType.insert)
                 continue
             if (!container.accepts(fluidType, 1000))
@@ -127,7 +127,7 @@ object Bucketable : BlockBehavior {
     }
     
     private fun selectContainerExtract(fluidHolder: FluidHolder): NetworkedFluidContainer? {
-        for ((container, conType) in fluidHolder.containers.entries) {
+        for ([container, conType] in fluidHolder.containers.entries) {
             if (!conType.extract)
                 continue
             if (container.type == null || container.amount < 1000)

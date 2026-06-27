@@ -28,7 +28,7 @@ internal data class BlockLimiters(
     }
 
     private fun parseAmountMap(map: Map<String, Int>): Map<Key?, Int> =
-        map.entries.associate { (key, value) ->
+        map.entries.associate { [key, value] ->
             (if (key == "*") null else Key.key(key)) to value
         }
 

@@ -229,20 +229,20 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
                 reset()
                 configure()
                 freeze()
-                entryValues = entryProviders.entries.associate { (key, provider) ->
+                entryValues = entryProviders.entries.associate { [key, provider] ->
                     provider as MutableProvider<T>
                     provider to DeferredValue.Direct(getValueOrThrow(key))
                 }
-                optionalEntryValues = optionalEntryProviders.entries.associate { (key, provider) ->
+                optionalEntryValues = optionalEntryProviders.entries.associate { [key, provider] ->
                     provider as MutableProvider<RegistryEntry.Nova<T>?>
                     provider to DeferredValue.Direct(entries[key])
                 }
-                tagValues = tagProviders.entries.associate { (key, provider) ->
+                tagValues = tagProviders.entries.associate { [key, provider] ->
                     provider as MutableProvider<Set<RegistryEntry.Nova<T>>>
                     provider to DeferredValue.Direct(flattenedTagEntriesByKey[key]
                         ?: throw NoSuchElementException("No tag found for key $key"))
                 }
-                optionalTagValues = optionalTagProviders.entries.associate { (key, provider) ->
+                optionalTagValues = optionalTagProviders.entries.associate { [key, provider] ->
                     provider as MutableProvider<RegistryEntrySet.Nova.Tag<T>?>
                     provider to DeferredValue.Direct(tagsByKey[key])
                 }
@@ -256,10 +256,10 @@ internal class ReloadableNovaRegistry<T : NovaRegistryElement<T>>(key: Key) : Ab
         }
         
         // update providers outside of lock as updating may run arbitrary code from observers
-        entryValues.forEach { (provider, value) -> provider.update(value) }
-        optionalEntryValues.forEach { (provider, value) -> provider.update(value) }
-        tagValues.forEach { (provider, value) -> provider.update(value) }
-        optionalTagValues.forEach { (provider, value) -> provider.update(value) }
+        entryValues.forEach { [provider, value] -> provider.update(value) }
+        optionalEntryValues.forEach { [provider, value] -> provider.update(value) }
+        tagValues.forEach { [provider, value] -> provider.update(value) }
+        optionalTagValues.forEach { [provider, value] -> provider.update(value) }
         (tags as MutableProvider).update(allTags)
     }
     

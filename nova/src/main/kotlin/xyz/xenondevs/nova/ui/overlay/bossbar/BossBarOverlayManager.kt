@@ -77,7 +77,7 @@ object BossBarOverlayManager : Listener, PacketListener {
             
             if (!ENABLED) {
                 // re-add tracked boss bars as real boss bars
-                trackedBars.forEach { (player, bars) ->
+                trackedBars.forEach { [player, bars] ->
                     bars.values.forEach { bar -> player.send(bar.addPacket) }
                 }
                 
@@ -118,7 +118,7 @@ object BossBarOverlayManager : Listener, PacketListener {
     }
     
     private fun handleTick() {
-        overlays.forEach { (uuid, overlays) ->
+        overlays.forEach { [uuid, overlays] ->
             if (uuid in changes || overlays.any { it.hasChanged }) {
                 if (remakeBars(uuid)) changes -= uuid
             }
@@ -160,7 +160,7 @@ object BossBarOverlayManager : Listener, PacketListener {
                 return@forEachIndexed
             
             val builder = Component.text()
-            barLevelOverlays.forEach { (overlay, offset) ->
+            barLevelOverlays.forEach { [overlay, offset] ->
                 
                 val centerX = overlay.centerX
                 var width = overlay.getWidth(player.locale)
@@ -266,7 +266,7 @@ object BossBarOverlayManager : Listener, PacketListener {
         val player = event.player
         
         // remove tracked bars and associated fake bar overlays
-        trackedBars.remove(player)?.forEach { (_, bar) ->
+        trackedBars.remove(player)?.forEach { [_, bar] ->
             val compound = vanillaBarOverlays.remove(bar)
             if (compound != null)
                 unregisterOverlay(player, compound)

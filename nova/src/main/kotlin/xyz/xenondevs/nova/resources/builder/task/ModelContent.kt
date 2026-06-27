@@ -164,7 +164,7 @@ class ModelContent(private val builder: ResourcePackBuilder) : PackBuildData, It
             }
             
             customModels.forEach {
-                it.awaitAll().forEach { (path, model) ->
+                it.awaitAll().forEach { [path, model] ->
                     customModelsByPath[path] = model
                     customModelsByModel.getOrPut(model, ::HashSet) += path
                 }
@@ -186,7 +186,7 @@ class ModelContent(private val builder: ResourcePackBuilder) : PackBuildData, It
     inner class Write(private val builder: ResourcePackBuilder) : PackTask {
         
         override suspend fun run() = coroutineScope {
-            for ((id, model) in customModelsByPath) {
+            for ([id, model] in customModelsByPath) {
                 if (id !in rememberedUsages)
                     continue
                 

@@ -67,7 +67,7 @@ internal class SerializersGenerator(private val codeGenerator: CodeGenerator) {
         
         // Generate serializer objects
         for (info in typeInfos) {
-            for ((suffix, superclass) in serializerSuperclasses) {
+            for ([suffix, superclass] in serializerSuperclasses) {
                 fileSpec.addType(
                     TypeSpec.objectBuilder("${info.typeName}${suffix}Serializer")
                         .addKdoc(

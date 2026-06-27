@@ -40,7 +40,7 @@ internal class PacketEntityDslGenerator(private val codeGenerator: CodeGenerator
                     .build()
             )
 
-        for ((_, classData) in analysisResult.entityData) {
+        for ([_, classData] in analysisResult.entityData) {
             val entityTypeFieldName = analysisResult.entityTypes[classData.className] ?: continue
             fileSpec.addTypeAlias(buildPacketEntityTypeAlias(classData))
             fileSpec.addFunction(buildFunction(classData, entityTypeFieldName))
@@ -107,7 +107,7 @@ internal class PacketEntityDslGenerator(private val codeGenerator: CodeGenerator
             .addModifiers(KModifier.SEALED)
             .addAnnotation(PACKET_ENTITY_DSL_MARKER)
         
-        for ((_, classData) in analysisResult.entityData) {
+        for ([_, classData] in analysisResult.entityData) {
             val entityTypeFieldName = analysisResult.entityTypes[classData.className] ?: continue
             builder.addFunction(buildPassengerFunction(classData, entityTypeFieldName))
         }

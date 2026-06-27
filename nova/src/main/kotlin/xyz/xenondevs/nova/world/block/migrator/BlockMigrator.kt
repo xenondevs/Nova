@@ -175,7 +175,7 @@ internal object BlockMigrator : Listener {
             if (result == null)
                 return@forEach
             
-            for ((pos, blockState) in result) {
+            for ([pos, blockState] in result) {
                 if (WorldDataManager.getBlockState(pos) == null &&
                     CustomItemServiceManager.getBlockType(pos.block) == null
                 ) {

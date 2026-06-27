@@ -65,7 +65,7 @@ internal abstract class SidedBackingStateConfigType<T : SidedBackingStateConfig>
     }
     
     final override fun of(properties: Map<String, String>): T {
-        val faces = properties.entries.mapNotNullTo(enumSet()) { (face, enabled) ->
+        val faces = properties.entries.mapNotNullTo(enumSet()) { [face, enabled] ->
             BlockFace.valueOf(face.uppercase()).takeIf { enabled.toBoolean() }
         }
         

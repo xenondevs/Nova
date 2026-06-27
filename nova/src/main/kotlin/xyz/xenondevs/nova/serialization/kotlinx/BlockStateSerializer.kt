@@ -59,7 +59,7 @@ internal object BlockStateSerializer : KSerializer<BlockState> {
                 throw SerializationException("Missing property 'block'")
             
             val allPropertiesByName = block.defaultBlockState().properties.associateBy { it.name }
-            return@decodeStructure properties.entries.fold(block.defaultBlockState()) { blockState, (name, value) ->
+            return@decodeStructure properties.entries.fold(block.defaultBlockState()) { blockState, [name, value] ->
                 blockState.setValue<String, String>(allPropertiesByName, name, value)
             }
         }

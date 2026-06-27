@@ -84,7 +84,7 @@ internal class RegionChunk(
      * Initializes the [VanillaTileEntities][VanillaTileEntity] in this chunk.
      */
     private fun initVanillaTileEntities() {
-        for ((pos, data) in vanillaTileEntityData) {
+        for ([pos, data] in vanillaTileEntityData) {
             try {
                 val type: VanillaTileEntity.Type? = data["type"]
                 if (type == null) {
@@ -102,7 +102,7 @@ internal class RegionChunk(
      * Initializes the [TileEntities][TileEntity] in this chunk.
      */
     private fun initNovaTileEntities() {
-        for ((pos, data) in tileEntityData) {
+        for ([pos, data] in tileEntityData) {
             val blockState = getBlockState(pos)
             if (blockState == null) {
                 LOGGER.error("Failed to initialize tile entity at $pos because there is no block state")
@@ -167,7 +167,7 @@ internal class RegionChunk(
      * for each of them.
      */
     fun forEachNonEmpty(action: (pos: BlockPos, blockState: NovaBlockState) -> Unit): Unit = lock.withLock {
-        for ((idx, section) in sections.withIndex()) {
+        for ([idx, section] in sections.withIndex()) {
             if (section.isEmpty())
                 continue
             val bottomY = (idx shl 4) + minHeight
@@ -333,14 +333,14 @@ internal class RegionChunk(
                 return
             
             // remove vanilla tile entities that have de-synced from the block type
-            vanillaTileEntities.removeIf { (pos, vte) ->
+            vanillaTileEntities.removeIf { [pos, vte] ->
                 val invalid = pos.block.type !in vte.type.materials
                 if (invalid) vanillaTileEntityData.remove(pos)
                 invalid
             }
             
             // load models
-            for ((i, section) in sections.withIndex()) {
+            for ([i, section] in sections.withIndex()) {
                 val sectionY = minHeight + (i shl 4)
                 section.forEachNonEmpty { x, y, z, blockState ->
                     val pos = pos.blockPos(x, sectionY + y, z)
@@ -392,7 +392,7 @@ internal class RegionChunk(
                 stopTicking()
             
             // unload models
-            for ((i, section) in sections.withIndex()) {
+            for ([i, section] in sections.withIndex()) {
                 val sectionY = minHeight + (i shl 4)
                 section.forEachNonEmpty { x, y, z, blockState ->
                     val pos = pos.blockPos(x, sectionY + y, z)
@@ -404,7 +404,7 @@ internal class RegionChunk(
                 }
             }
             
-            for ((_, tileEntity) in tileEntities) {
+            for ([_, tileEntity] in tileEntities) {
                 tileEntity.isEnabled = false
                 try {
                     tileEntity.handleDisable()
@@ -466,7 +466,7 @@ internal class RegionChunk(
         
         val chunkSupervisor = SupervisorJob(AsyncExecutor.SUPERVISOR)
         coroutineSupervisor = chunkSupervisor
-        for ((_, tileEntity) in tileEntities) {
+        for ([_, tileEntity] in tileEntities) {
             if (tileEntity.block.tickrate <= 0)
                 continue
             
@@ -493,7 +493,7 @@ internal class RegionChunk(
         
         coroutineSupervisor?.cancel("Ticking disabled")
         
-        for ((_, tileEntity) in tileEntities) {
+        for ([_, tileEntity] in tileEntities) {
             if (tileEntity.block.tickrate <= 0)
                 continue
             
@@ -539,7 +539,7 @@ internal class RegionChunk(
             return
         val randomTickSpeed = level.gameRules.get(GameRules.RANDOM_TICK_SPEED)
         if (randomTickSpeed > 0) {
-            for ((sectionIdx, section) in sections.withIndex()) {
+            for ([sectionIdx, section] in sections.withIndex()) {
                 if (randomTickBlockCounts[sectionIdx] > 0) {
                     repeat(randomTickSpeed) {
                         val rand = Random.nextInt()
@@ -574,7 +574,7 @@ internal class RegionChunk(
         val sectionBitmask = BitSet(sections.size)
         val sectionsBuffer = ByteArrayOutputStream()
         val sectionsWriter = ByteWriter.fromStream(sectionsBuffer)
-        for ((sectionIdx, section) in sections.withIndex()) {
+        for ([sectionIdx, section] in sections.withIndex()) {
             sectionBitmask.set(sectionIdx, section.write(sectionsWriter))
         }
         writer.writeBytes(sectionBitmask.toByteArray().copyOf(sections.size.ceilDiv(8)))
@@ -584,12 +584,12 @@ internal class RegionChunk(
         vanillaTileEntities.values.forEach(VanillaTileEntity::saveData)
         tileEntities.values.forEach(TileEntity::saveData)
         writer.writeVarInt(vanillaTileEntityData.size)
-        for ((pos, data) in vanillaTileEntityData) {
+        for ([pos, data] in vanillaTileEntityData) {
             writer.writeInt(packBlockPos(pos))
             COMPOUND_SERIALIZER.write(data, writer)
         }
         writer.writeVarInt(tileEntityData.size)
-        for ((pos, data) in tileEntityData) {
+        for ([pos, data] in tileEntityData) {
             writer.writeInt(packBlockPos(pos))
             COMPOUND_SERIALIZER.write(data, writer)
         }

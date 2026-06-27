@@ -61,7 +61,7 @@ internal object ResourceGeneration {
                 // Build resource pack
                 LOGGER.info("Building resource pack(s)")
                 coroutineScope {
-                    for ((_, config) in ResourcePackBuilder.configurations) {
+                    for ([_, config] in ResourcePackBuilder.configurations) {
                         val builder = config.create()
                         activeBuilders += builder
                         launch { builder.buildPackPreWorld() }

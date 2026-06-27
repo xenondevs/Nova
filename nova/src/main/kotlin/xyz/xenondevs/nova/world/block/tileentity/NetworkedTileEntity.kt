@@ -162,7 +162,7 @@ abstract class NetworkedTileEntity(
         val availableInventories: MutableMap<UUID, NetworkedInventory> =
             allInventories.keys.associateTo(HashMap()) { it.uuid to NetworkedVirtualInventory(it) }
         val allowedConnectionTypes: MutableMap<NetworkedInventory, NetworkConnectionType> =
-            allInventories.mapKeysTo(HashMap()) { (vi, _) -> availableInventories[vi.uuid]!! }
+            allInventories.mapKeysTo(HashMap()) { [vi, _] -> availableInventories[vi.uuid]!! }
         
         val mergedInventory = NetworkedMultiVirtualInventory(DefaultItemHolder.ALL_INVENTORY_UUID, allInventories)
         availableInventories[DefaultItemHolder.ALL_INVENTORY_UUID] = mergedInventory

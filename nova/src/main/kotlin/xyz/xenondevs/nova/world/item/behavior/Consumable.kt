@@ -194,7 +194,7 @@ class Consumable(
                 .animation(animation)
                 .sound(sound)
                 .hasConsumeParticles(particles)
-                .addEffects(possibleEffects.map { (potionEffect, probability) ->
+                .addEffects(possibleEffects.map { [potionEffect, probability] ->
                     ConsumeEffect.applyStatusEffects(listOf(potionEffect), probability)
                 })
                 .build()

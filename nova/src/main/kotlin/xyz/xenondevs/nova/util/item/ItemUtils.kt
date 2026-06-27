@@ -364,7 +364,7 @@ object ItemUtils {
         val components = HashMap<DataComponentType<Any>, ArrayList<Optional<Any>>>()
         
         for (dataComponentPatch in dataComponentPatches) {
-            for ((type, newValueOpt) in dataComponentPatch.entrySet()) {
+            for ([type, newValueOpt] in dataComponentPatch.entrySet()) {
                 type as DataComponentType<Any>
                 newValueOpt as Optional<Any>
                 components.getOrPut(type, ::ArrayList) += newValueOpt
@@ -372,7 +372,7 @@ object ItemUtils {
         }
         
         val builder = DataComponentPatch.builder()
-        for ((type, valueOpts) in components) {
+        for ([type, valueOpts] in components) {
             // only merge in data components that were added after the last unset (empty optional)
             val valuesAfterUnset = ArrayList<Any>()
             for (valueOpt in valueOpts) {
@@ -405,7 +405,7 @@ object ItemUtils {
         }
         
         val builder = DataComponentMap.builder()
-        for ((type, values) in components) {
+        for ([type, values] in components) {
             builder.set(type, mergeDataComponents(type, values))
         }
         return builder.build()
@@ -461,7 +461,7 @@ object ItemUtils {
     internal fun mergeEnchantments(values: List<ItemEnchantments>): ItemEnchantments {
         val enchantments = ItemEnchantments.Mutable(ItemEnchantments.EMPTY)
         for (itemEnchantments in values) {
-            for ((enchantment, level) in itemEnchantments.entrySet()) {
+            for ([enchantment, level] in itemEnchantments.entrySet()) {
                 enchantments.set(enchantment, max(enchantments.getLevel(enchantment), level))
             }
         }

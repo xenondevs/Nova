@@ -88,7 +88,7 @@ private fun <T> ItemStack.setCustomModelData(
     while (elements.size <= (offset + patch.size - 1)) {
         elements.add(default)
     }
-    for ((i, s) in patch.withIndex()) {
+    for ([i, s] in patch.withIndex()) {
         elements[offset + i] = s
     }
     

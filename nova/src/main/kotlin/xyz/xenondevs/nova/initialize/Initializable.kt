@@ -103,7 +103,7 @@ internal class InitializableClass(
             val stage = (annotation["stage"] as Array<String>?)?.get(1)
                 ?.let { enumValueOf<InitStage>(it) }
                 ?: throw IllegalStateException("Init annotation on $clazz does not contain a stage!")
-            val (dispatcher, runBefore, runAfter) = readAnnotationCommons(annotation)
+            val [dispatcher, runBefore, runAfter] = readAnnotationCommons(annotation)
             runBefore += stage.runBefore
             runAfter += stage.runAfter
             
@@ -119,7 +119,7 @@ internal class InitializableClass(
             val stage = (annotation["stage"] as Array<String>?)?.get(1)
                 ?.let { enumValueOf<InternalInitStage>(it) }
                 ?: throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")
-            val (dispatcher, runBefore, runAfter) = readAnnotationCommons(annotation)
+            val [dispatcher, runBefore, runAfter] = readAnnotationCommons(annotation)
             
             return InitializableClass(
                 classLoader, clazz,
@@ -165,7 +165,7 @@ internal class InitializableFunction(
     companion object {
         
         fun fromInitAnnotation(clazz: InitializableClass, methodName: String, annotation: Map<String, Any?>): InitializableFunction {
-            val (dispatcher, runBefore, runAfter) = readAnnotationCommons(annotation)
+            val [dispatcher, runBefore, runAfter] = readAnnotationCommons(annotation)
             val func = InitializableFunction(
                 clazz, methodName,
                 dispatcher?.dispatcher ?: clazz.dispatcher,

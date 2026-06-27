@@ -84,7 +84,7 @@ internal object UpdateReminder : Listener {
         if (needsUpdate.isNotEmpty()) {
             needsUpdate.asSequence()
                 .filter { it.key !in alreadyNotified }
-                .forEach { (addon, resourcePage) ->
+                .forEach { [addon, resourcePage] ->
                     val name = addon?.name ?: "Nova"
                     LOGGER.warn("You're running an outdated version of $name. Please download the latest version at $resourcePage")
                     alreadyNotified += addon
@@ -123,7 +123,7 @@ internal object UpdateReminder : Listener {
     private fun handleJoin(event: PlayerJoinEvent) {
         val player = event.player
         if (player.hasPermission("nova.misc.updateReminder") && needsUpdate.isNotEmpty()) {
-            needsUpdate.forEach { (addon, resourcePage) ->
+            needsUpdate.forEach { [addon, resourcePage] ->
                 val name = addon?.name ?: "Nova"
                 val msg = Component.translatable(
                     "nova.outdated_version",

@@ -84,7 +84,7 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
     override fun refresh(state: NetworkState) {
         super.refresh(state)
         isSimpleConfiguration.set(isSimpleConfiguration())
-        containersAtFace.forEach { (face, container) -> container.set(holder.containerConfig[face]) }
+        containersAtFace.forEach { [face, container] -> container.set(holder.containerConfig[face]) }
     }
     
     private fun queueCycleContainer(face: BlockFace, move: Int) {
@@ -133,7 +133,7 @@ abstract class ContainerSideConfigMenu<C : EndPointContainer, H : ContainerEndPo
     protected abstract fun isSimpleConfiguration(): Boolean
     
     private fun containerConfigItem(side: BlockSide) = item {
-        val (_, face) = getFaceFromSide(side)
+        val [_, face] = getFaceFromSide(side)
         
         itemProvider by itemProvider {
             type by containersAtFace[face]!!.flatMap { container ->

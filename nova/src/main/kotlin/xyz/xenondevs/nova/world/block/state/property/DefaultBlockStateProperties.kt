@@ -72,7 +72,7 @@ object DefaultScopedBlockStateProperties {
     val FACING_VERTICAL: ScopedBlockStateProperty<BlockFace> =
         DefaultBlockStateProperties.FACING.scope(BlockFace.UP, BlockFace.DOWN) { ctx ->
             ctx[BlockPlace.SOURCE_DIRECTION]?.calculateYawPitch()
-                ?.let { (_, pitch) -> if (pitch < 0) BlockFace.UP else BlockFace.DOWN }
+                ?.let { [_, pitch] -> if (pitch < 0) BlockFace.UP else BlockFace.DOWN }
                 ?: BlockFace.UP
         }
     
@@ -86,7 +86,7 @@ object DefaultScopedBlockStateProperties {
         ) { ctx ->
             ctx[BlockPlace.SOURCE_DIRECTION]
                 ?.calculateYawPitch()
-                ?.let { (yaw, pitch) -> BlockFaceUtils.toCartesianFace(yaw, pitch) }
+                ?.let { [yaw, pitch] -> BlockFaceUtils.toCartesianFace(yaw, pitch) }
                 ?.oppositeFace
                 ?: BlockFace.NORTH
         }

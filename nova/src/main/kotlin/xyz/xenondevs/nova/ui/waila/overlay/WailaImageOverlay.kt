@@ -56,7 +56,7 @@ internal class WailaImageOverlay : BossBarOverlay {
     fun update(icon: FontChar?, lines: Int, longestLineLength: Float): Pair<Float, Float> {
         require(lines in MIN_LINES..MAX_LINES) { "Unsupported line amount: $lines" }
         
-        val (components, textBeginX, textCenterX) = overlayCache.get(OverlayCacheKey(icon, lines, longestLineLength)) {
+        val (component, textBeginX, textCenterX) = overlayCache.get(OverlayCacheKey(icon, lines, longestLineLength)) {
             // left margin (2) + icon size (32) + distance between icon and text + right margin (2)
             // (margins are not counting start and end textures)
             var optimalWidth = TEXT_MARGIN_LEFT + longestLineLength + TEXT_MARGIN_RIGHT
@@ -102,7 +102,7 @@ internal class WailaImageOverlay : BossBarOverlay {
             return@get OverlayData(component, textMin, textCenterX)
         }
         
-        this.component = components
+        this.component = component
         
         return textBeginX to textCenterX
     }

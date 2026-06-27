@@ -75,7 +75,7 @@ internal class AddBridgeTask(
         }
         
         // init or enlarge the network clusters
-        for ((network, endPoints) in clustersToInit) {
+        for ([network, endPoints] in clustersToInit) {
             network.enlargeCluster(endPoints)
         }
     }
@@ -166,7 +166,7 @@ internal class AddBridgeTask(
     ) {
         val queue = LinkedList<NetworkNode>()
         val exploredNodes = HashSet<NetworkNode>()
-        for ((_, con) in mergedNetwork.nodes) {
+        for ([_, con] in mergedNetwork.nodes) {
             val node = con.node
             queue += node
             exploredNodes += node

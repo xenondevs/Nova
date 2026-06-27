@@ -130,7 +130,6 @@ pluginPublish {
         incompatibleDependency("z4HZZnLr") // FastAsyncWorldEdit
     }
 }
-
 publishing {
     publications {
         named<MavenPublication>("maven") {

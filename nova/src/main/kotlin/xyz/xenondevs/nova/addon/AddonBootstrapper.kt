@@ -70,7 +70,7 @@ internal object AddonBootstrapper {
     
     private fun checkRequiredNovaVersion(context: PluginProviderContext, addonMeta: ConfigurationNode) {
         val novaVersion = LaunchEntryPointHandler.INSTANCE.storage.asSequence()
-            .flatMap { (_, storage) -> storage.registeredProviders }
+            .flatMap { [_, storage] -> storage.registeredProviders }
             .first { it.meta.name == "Nova" }
             .meta.version
             .let(::Version)

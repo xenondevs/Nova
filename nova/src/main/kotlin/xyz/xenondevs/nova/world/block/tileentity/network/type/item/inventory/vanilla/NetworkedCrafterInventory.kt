@@ -18,7 +18,7 @@ internal class NetworkedCrafterInventory(
         var remaining = amount
         outer@ while (remaining > 0) {
             var bestPartial: MojangStack? = null
-            for ((slot, slotStack) in container.withIndex()) {
+            for ([slot, slotStack] in container.withIndex()) {
                 if (entity.isSlotDisabled(slot))
                     continue
                 

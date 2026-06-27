@@ -66,7 +66,7 @@ class EquipmentTask(private val builder: ResourcePackBuilder) : PackTask {
     private var generatedCount = 0
     
     override suspend fun run() {
-        ResourceLookups.equipment = requests.mapValues { (entry, makeLayout) ->
+        ResourceLookups.equipment = requests.mapValues { [entry, makeLayout] ->
             val path = ResourcePath.of(ResourceType.Equipment, entry.key)
             when (val layout = makeLayout(builder)) {
                 is StaticEquipmentLayout -> generatedStaticEquipmentModel(path, layout)
@@ -76,7 +76,7 @@ class EquipmentTask(private val builder: ResourcePackBuilder) : PackTask {
     }
     
     private fun generatedStaticEquipmentModel(id: ResourcePath<ResourceType.Equipment>, layout: StaticEquipmentLayout): RuntimeEquipmentData {
-        for ((equipmentType, layers) in layout.types) {
+        for ([equipmentType, layers] in layout.types) {
             for (layer in layers) {
                 if (layer.emissivityMap != null) {
                     applyEmissivityMap(layer.texture, layer.emissivityMap, "textures/entity/equipment/$equipmentType/")
@@ -120,7 +120,7 @@ class EquipmentTask(private val builder: ResourcePackBuilder) : PackTask {
         // generate all animations (merge with emissivity map, apply interpolation)
         // [equipmentType][layer][frame]
         val animations: Map<EquipmentDefinition.Type, List<List<ResourcePath<ResourceType.EquipmentTexture>>>> =
-            layout.types.mapValues { (_, layers) -> layers.map(::generateLayerAnimation) }
+            layout.types.mapValues { [_, layers] -> layers.map(::generateLayerAnimation) }
         
         // find the total frame count needed to display all animations using a single frame number
         // (least common multiple of all frame counts)
@@ -133,8 +133,8 @@ class EquipmentTask(private val builder: ResourcePackBuilder) : PackTask {
             textureFrames += path
             
             val equipmentDefinitionForFrame = EquipmentDefinition(
-                layout.types.mapValues { (equipmentType, layers) ->
-                    layers.withIndex().map { (layerIdx, layer) ->
+                layout.types.mapValues { [equipmentType, layers] ->
+                    layers.withIndex().map { [layerIdx, layer] ->
                         val layerFrames = animations[equipmentType]!![layerIdx]
                         val texture = layerFrames[frame % layerFrames.size]
                         EquipmentDefinition.Layer(texture, false, layer.dyeable)
@@ -228,13 +228,13 @@ class EquipmentTask(private val builder: ResourcePackBuilder) : PackTask {
      * pointing to the (generated) textures.
      */
     private fun <T : ResourceType.PngFile> generateTextureAnimation(animation: Animation<T>, location: T): List<ResourcePath<T>> {
-        val (keyFrames, ticksPerFrame, interpolationMode) = animation
+        (val keyFrames = frames, val ticksPerFrame, val interpolationMode) = animation
         if (interpolationMode == InterpolationMode.NONE) {
             return keyFrames.eachRepeated(ticksPerFrame)
         }
         
         val frames = ArrayList<ResourcePath<T>>(keyFrames.size * ticksPerFrame)
-        for ((keyFrameId, keyFrame) in keyFrames.withIndex()) {
+        for ([keyFrameId, keyFrame] in keyFrames.withIndex()) {
             frames += keyFrame
             frames += writeImages(
                 generateInterpolatedImages(
@@ -252,14 +252,14 @@ class EquipmentTask(private val builder: ResourcePackBuilder) : PackTask {
      * Generates a sequence of [BufferedImages][BufferedImage] representing the [animation] by interpolating between the key frames.
      */
     private fun generateTextureAnimationImages(animation: Animation<*>): List<BufferedImage> {
-        val (keyFrames, ticksPerFrame, interpolationMode) = animation
+        (val keyFrames = frames, val ticksPerFrame, val interpolationMode) = animation
         
         val keyFrameImages = keyFrames.map { textureContent.getImage(it) }
         if (interpolationMode == InterpolationMode.NONE)
             return keyFrameImages.eachRepeated(ticksPerFrame).map(ImageUtils::copyToARGB)
         
         val frames = ArrayList<BufferedImage>(keyFrames.size * ticksPerFrame)
-        for ((keyFrameId, keyFrame) in keyFrames.withIndex()) {
+        for ([keyFrameId, keyFrame] in keyFrames.withIndex()) {
             frames += textureContent.getImage(keyFrame)
             
             frames += generateInterpolatedImages(
@@ -316,7 +316,7 @@ class EquipmentTask(private val builder: ResourcePackBuilder) : PackTask {
      * Checks whether all textures referenced in [model] exist and throws an exception if not.
      */
     private fun validateEquipmentModel(model: EquipmentDefinition) {
-        for ((_, layers) in model.layers) {
+        for ([_, layers] in model.layers) {
             for (layer in layers) {
                 builder.findOrThrow(layer.texture)
             }

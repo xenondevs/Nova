@@ -31,7 +31,7 @@ internal object ResourceKeySerializer : KSerializer<ResourceKey<*>> {
     }
     
     override fun deserialize(decoder: Decoder): ResourceKey<*> {
-        val (namespace1, name1, namespace2, name2) = decoder.decodeString().split(":")
+        val [namespace1, name1, namespace2, name2] = decoder.decodeString().split(":")
         return ResourceKey.create(
             ResourceKey.createRegistryKey<Any>(Identifier.fromNamespaceAndPath(namespace1, name1)),
             Identifier.fromNamespaceAndPath(namespace2, name2)

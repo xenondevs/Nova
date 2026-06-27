@@ -101,7 +101,7 @@ internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
         
         val ingredients = json.get("ingredients")
         if (ingredients is JsonObject) {
-            ingredients.entrySet().forEach { (char, value) -> ingredientMap[char[0]] = parseRecipeChoice(value) }
+            ingredients.entrySet().forEach { [char, value] -> ingredientMap[char[0]] = parseRecipeChoice(value) }
         } else if (ingredients is JsonArray) {
             // legacy support
             ingredients.forEach {
@@ -114,7 +114,7 @@ internal object ShapedRecipeDeserializer : RecipeDeserializer<ShapedRecipe> {
         
         val recipe = ShapedRecipe(getRecipeKey(file), result)
         recipe.shape(*shape.toTypedArray())
-        ingredientMap.forEach { (key, material) -> recipe.setIngredient(key, material) }
+        ingredientMap.forEach { [key, material] -> recipe.setIngredient(key, material) }
         
         val category = json.getStringOrNull("category")
             ?.let { CraftingBookCategory.valueOf(it.uppercase()) }
@@ -139,7 +139,7 @@ internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe
         val ingredientsMap = HashMap<RecipeChoice, Int>()
         val ingredients = json.get("ingredients")
         if (ingredients is JsonObject) {
-            ingredients.entrySet().forEach { (key, value) ->
+            ingredients.entrySet().forEach { [key, value] ->
                 val choice = ItemUtils.getRecipeChoice(listOf(key))
                 ingredientsMap[choice] = value.asInt
             }
@@ -154,7 +154,7 @@ internal object ShapelessRecipeDeserializer : RecipeDeserializer<ShapelessRecipe
         }
         
         val recipe = ShapelessRecipe(getRecipeKey(file), result)
-        ingredientsMap.forEach { (material, count) ->
+        ingredientsMap.forEach { [material, count] ->
             var amountLeft = count
             while (amountLeft-- > 0) {
                 recipe.addIngredient(material)

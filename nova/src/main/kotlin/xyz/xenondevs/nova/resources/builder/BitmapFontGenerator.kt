@@ -52,7 +52,7 @@ internal class BitmapFontGenerator(
      * Also writes their bitmap textures to the resource pack build directory.
      */
     private fun convertUnihexProvider(provider: UnihexProvider): List<BitmapProvider<IntArray>> =
-        provider.glyphRasters.map { (width, glyphRasters) ->
+        provider.glyphRasters.map { [width, glyphRasters] ->
             val bitmapProvider = buildBitmapProvider(provider, width, glyphRasters)
             bitmapProvider.write(builder)
             return@map bitmapProvider
@@ -73,7 +73,7 @@ internal class BitmapFontGenerator(
         glyphRasters.int2ObjectEntrySet().asSequence()
             .sortedBy { it.intKey } // sorting the glyphs by code point decreases file size by about 30% due to better png compression
             .withIndex()
-            .forEach { (i, entry) ->
+            .forEach { [i, entry] ->
                 codePoints[i] = entry.intKey
                 val glyphRaster = entry.value
                 for (y in 0..<GLYPH_HEIGHT) {

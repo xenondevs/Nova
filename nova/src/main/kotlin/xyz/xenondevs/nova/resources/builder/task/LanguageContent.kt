@@ -93,12 +93,12 @@ class LanguageContent(private val builder: ResourcePackBuilder) : PackBuildData 
             
             val mergedCustom = mutableMapOf<ResourcePath<ResourceType.Lang>, MutableMap<String, String>>()
             for (map in custom) {
-                for ((path, deferred) in map) {
+                for ([path, deferred] in map) {
                     mergedCustom.getOrPut(path) { mutableMapOf() } += deferred.await()
                 }
             }
             
-            vanillaLangs = vanilla.mapValues { (_, v) -> v.await() }
+            vanillaLangs = vanilla.mapValues { [_, v] -> v.await() }
             customLangs = mergedCustom
         }
         
@@ -129,10 +129,10 @@ class LanguageContent(private val builder: ResourcePackBuilder) : PackBuildData 
             extractRomanNumerals()
             
             // create language lookup
-            ResourceLookups.language = customLangs.mapKeys { (path, _) -> path.path }
+            ResourceLookups.language = customLangs.mapKeys { [path, _] -> path.path }
             
             // write custom langs to disk
-            for ((path, content) in customLangs) {
+            for ([path, content] in customLangs) {
                 if (content.isEmpty())
                     continue
                 builder.writeJson(path, content)

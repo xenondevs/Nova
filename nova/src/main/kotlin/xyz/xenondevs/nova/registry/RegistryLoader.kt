@@ -185,7 +185,7 @@ object RegistryLoader {
         // prepare nova builders by creating and configuring them
         NovaRegistries.registries.values.forEach(::prepareNovaBuilders)
         
-        for ((registryKey, factories) in vanillaBuilderFactories) {
+        for ([registryKey, factories] in vanillaBuilderFactories) {
             val factories = factories.toMutableMap()
             val registryResourceKey = registryKey.toResourceKey<Any>()
             
@@ -199,7 +199,7 @@ object RegistryLoader {
             }
             
             // enqueue build & registration of entries
-            for ((key, factory) in factories) {
+            for ([key, factory] in factories) {
                 val builder = factory() // prepare builder now
                 
                 // enqueue build & registration (on nms registry freeze)
@@ -224,7 +224,7 @@ object RegistryLoader {
      * This reads from [novaBuilderFactories] and writes to [novaBuilders].
      */
     private fun prepareNovaBuilders(registry: MutableNovaRegistry<*>) {
-        novaBuilders[registry] = novaBuilderFactories[registry]?.mapValues { (_, factory) -> factory() } ?: emptyMap()
+        novaBuilders[registry] = novaBuilderFactories[registry]?.mapValues { [_, factory] -> factory() } ?: emptyMap()
     }
     
     @InitFun(runAfter = [ResourceGeneration.PreWorld::class])
@@ -254,10 +254,10 @@ object RegistryLoader {
         }
         
         // build elements
-        for ((key, builder) in builders) {
+        for ([key, builder] in builders) {
             registry[key] = builder.build()
         }
-        for ((key, build) in rawBuilders) {
+        for ([key, build] in rawBuilders) {
             registry[key] = build(registry[key])
         }
         
@@ -265,7 +265,7 @@ object RegistryLoader {
         knownRegistryEntries.getOrPut(registry.key, ::HashSet) += presentKeys
         
         // build tags
-        for ((key, tagConfigs) in (novaTagConfigurations[registry] ?: emptyMap())) {
+        for ([key, tagConfigs] in (novaTagConfigurations[registry] ?: emptyMap())) {
             registry[key] = buildNovaTagEntries { tagConfigs.forEach { it() } }
         }
     }

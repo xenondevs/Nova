@@ -71,7 +71,7 @@ class MovedFontContent : PackBuildData {
             }
             
             while (queue.isNotEmpty()) {
-                val (font, y) = queue.poll()
+                val [font, y] = queue.poll()
                 
                 val movedFont = Font(ResourcePath(ResourceType.Font, font.namespace, font.path + "/$y"))
                 val bitmapFont = getBitmapFont(font)

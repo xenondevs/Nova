@@ -113,14 +113,14 @@ object AttachmentManager : Listener, PacketListener {
     
     @PacketHandler
     private fun handlePassengersSet(event: ClientboundSetPassengersPacketEvent) {
-        val attachments = (activeAttachments.entries.firstOrNull { (player, _) -> player.entityId == event.vehicle } ?: return).value.values
+        val attachments = (activeAttachments.entries.firstOrNull { [player, _] -> player.entityId == event.vehicle } ?: return).value.values
         event.passengers += attachments.map(Attachment::passengerId)
     }
     
     private fun deactivateAttachments(player: Player) {
         val attachmentsMap = activeAttachments[player] ?: return
         val inactive = inactiveAttachments.getOrPut(player, ::HashSet)
-        attachmentsMap.forEach { (type, attachment) ->
+        attachmentsMap.forEach { [type, attachment] ->
             inactive += type.key
             attachment.despawn()
         }

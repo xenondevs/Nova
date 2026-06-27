@@ -50,7 +50,7 @@ internal class NovaItemBuilderImpl(
         // note that this does not use NovaBlock.name as that would require making the name a Provider
         name(Component.translatable("block.${block.key.namespace()}.${block.key.value()}"))
         modelDefinition {
-            val (layout, blockStates) = BlockModelTask.requests[block]!!
+            val [layout, blockStates] = BlockModelTask.requests[block]!!
             
             val modelContent = resourcePackBuilder.getBuildData<ModelContent>()
             val scope = BlockModelSelectorScope(blockStates[0], resourcePackBuilder, modelContent)
@@ -60,7 +60,7 @@ internal class NovaItemBuilderImpl(
                 is BlockModelLayout.SimpleEntityBacked -> buildModel { layout.modelSelector(scope) }
                 is BlockModelLayout.ItemEntityBacked -> {
                     val builder = ItemModelDefinitionBuilder(resourcePackBuilder) { modelSelector ->
-                        val (model, _) = modelSelector(scope).buildScaled(modelContent)
+                        val model = modelSelector(scope).buildScaled(modelContent).model
                         val id = modelContent.getOrPutGenerated(model)
                         modelContent.rememberUsage(id)
                         id

@@ -55,14 +55,14 @@ internal class ModelFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(bas
         val occupiedModelData = basePacks.occupiedModelData.getOrPut(material, ::HashSet)
         
         array.forEach { element ->
-            val (customModelData, model) = getModelConfig(element) ?: return@forEach
+            val [customModelData, model] = getModelConfig(element) ?: return@forEach
             
             overrides[customModelData] = model
             occupiedModelData += customModelData
         }
         
         val sortedArray = JsonArray()
-        overrides.forEach { (customModelData, model) ->
+        overrides.forEach { [customModelData, model] ->
             sortedArray.add(createModelDataEntry(customModelData, model))
         }
         
@@ -74,12 +74,12 @@ internal class ModelFileMerger(basePacks: BasePacks) : FileInDirectoryMerger(bas
         fun sortOverrides(array: JsonArray): JsonArray {
             val overrides = TreeMap<Int, String>()
             array.forEach {
-                val (customModelData, model) = getModelConfig(it) ?: return@forEach
+                val [customModelData, model] = getModelConfig(it) ?: return@forEach
                 overrides[customModelData] = model
             }
             
             val sortedArray = JsonArray()
-            overrides.forEach { (customModelData, model) ->
+            overrides.forEach { [customModelData, model] ->
                 sortedArray.add(createModelDataEntry(customModelData, model))
             }
             

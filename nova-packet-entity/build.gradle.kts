@@ -14,12 +14,6 @@ dependencies {
     ksp(project(":nova-ksp:processor:packet-entity"))
 }
 
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xname-based-destructuring=complete")
-    }
-}
-
 ksp {
     arg("entityDataClasspath", configurations.named("compileClasspath").map { config ->
         config.files.joinToString(File.pathSeparator) { it.absolutePath }

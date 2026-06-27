@@ -72,8 +72,8 @@ object VisualRegion {
     }
     
     private fun getEdgeDisplays(min: Location, max: Location, color: Int, viewers: Set<UUID>): List<PacketItemDisplay> {
-        val (world, minX, minY, minZ) = min
-        val (_, maxX, maxY, maxZ) = max
+        val [world, minX, minY, minZ] = min
+        val [_, maxX, maxY, maxZ] = max
         
         // linearly weighted line width between MIN_LINE_WIDTH and MAX_LINE_WIDTH, depending on the diagonal length of the region
         val lineWidth = (min.distance(max) / DIAGONAL_THRESHOLD).coerceIn(0.0, 1.0) * (MAX_LINE_WIDTH - MIN_LINE_WIDTH) + MIN_LINE_WIDTH

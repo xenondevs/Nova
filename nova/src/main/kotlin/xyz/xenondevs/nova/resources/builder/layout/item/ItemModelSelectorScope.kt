@@ -135,7 +135,7 @@ class ItemModelSelectorScope internal constructor(
         if (background) {
             textures["background"] = Model.Texture("nova:item/gui/inventory_part")
         }
-        for ((idx, layer) in layers.withIndex()) {
+        for ([idx, layer] in layers.withIndex()) {
             val name = if (idx == 0) "particle" else idx.toString()
             textures[name] = Model.Texture(layer.toString())
         }

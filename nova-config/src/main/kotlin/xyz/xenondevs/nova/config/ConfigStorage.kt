@@ -69,7 +69,7 @@ class ConfigStorage(
     fun reload(): Set<Key> {
         val reloaded = mutableSetOf<Key>()
         synchronized(this) {
-            for ((id, provider) in configProviders) {
+            for ([id, provider] in configProviders) {
                 val lastModified = backend.getLastModified(id)
                 if (lastModified <= (readTimes[id] ?: 0L))
                     continue
@@ -91,7 +91,7 @@ class ConfigStorage(
      * causing serialization errors to be reported to the [backend][ConfigBackend.onError].
      */
     fun resolveEntries() {
-        for ((_, provider) in configProviders) {
+        for ([_, provider] in configProviders) {
             provider.resolveEntries()
         }
     }

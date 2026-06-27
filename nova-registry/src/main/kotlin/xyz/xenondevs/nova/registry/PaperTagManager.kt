@@ -49,18 +49,18 @@ internal object PaperTagManager {
     }
     
     private fun reloadTags() {
-        for ((registryAccess, tagStorage) in tags) {
-            for ((tagKey, provider) in tagStorage.tagValues) {
+        for ([registryAccess, tagStorage] in tags) {
+            for ([tagKey, provider] in tagStorage.tagValues) {
                 tagKey as TagKey<Keyed>
                 provider.set(resolve(tagKey, registryAccess, false))
             }
             
-            for ((tagKey, provider) in tagStorage.optionalTagValues) {
+            for ([tagKey, provider] in tagStorage.optionalTagValues) {
                 tagKey as TagKey<Keyed>
                 provider.set(resolveOptional(tagKey, registryAccess))
             }
             
-            for ((registryKey, provider) in tagStorage.allTags) {
+            for ([registryKey, provider] in tagStorage.allTags) {
                 registryKey as RegistryKey<Keyed>
                 provider.set(resolveAllTags(registryKey, registryAccess))
             }

@@ -80,10 +80,10 @@ class GuiTexture internal constructor(
             .move(-data.width - 1)
         
         sequenceOf(title to titlePosition, *extraLines.toTypedArray())
-            .filterNot { (text, _) -> text.isEmpty(locale) }
+            .filterNot { [text, _] -> text.isEmpty(locale) }
             // render server-side to prevent client-side translation mismatch from impacting alignment
-            .map { (text, position) -> LocaleManager.render(text, locale) to position }
-            .forEach { (text, position) ->
+            .map { [text, position] -> LocaleManager.render(text, locale) to position }
+            .forEach { [text, position] ->
                 val textWidth = CharSizes.calculateComponentWidth(text, locale.toMinecraftLocaleCode()).roundToInt()
                 when (position.alignment) {
                     TitlePosition.Alignment.DEFAULT -> {

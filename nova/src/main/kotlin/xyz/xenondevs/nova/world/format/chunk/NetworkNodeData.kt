@@ -129,7 +129,7 @@ private fun ByteReader.readNetworkTypeCubeFaceSetMap(): MutableMap<NetworkType<*
 
 private fun ByteWriter.writeNetworkTypeCubeFaceSetMap(map: Map<NetworkType<*>, CubeFaceSet>) {
     writeVarInt(map.size)
-    for ((networkType, set) in map) {
+    for ([networkType, set] in map) {
         writeString(networkType.key.toString())
         // FIXME !!!!!!!! LEGACY CONVERSION: BIT ORDER IS NOW REVERSED
         writeByte(set.data)
@@ -152,7 +152,7 @@ private fun ByteReader.readNetworkTypeBlockFaceUUIDTable(): Table<NetworkType<*>
 
 private fun ByteWriter.writeNetworkTypeBlockFaceUUIDTable(table: Table<NetworkType<*>, BlockFace, UUID>) {
     writeVarInt(table.size())
-    for ((networkType, face, uuid) in table) {
+    for ([networkType, face, uuid] in table) {
         writeString(networkType.key.toString())
         writeByte(face.ordinal.toByte())
         writeUUID(uuid)
@@ -161,7 +161,7 @@ private fun ByteWriter.writeNetworkTypeBlockFaceUUIDTable(table: Table<NetworkTy
 
 private fun ByteWriter.writeNetworkTypeUUIDMap(map: Map<NetworkType<*>, UUID>) {
     writeVarInt(map.size)
-    for ((networkType, uuid) in map) {
+    for ([networkType, uuid] in map) {
         writeString(networkType.key.toString())
         writeUUID(uuid)
     }

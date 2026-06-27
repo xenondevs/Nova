@@ -60,7 +60,7 @@ object LocaleManager : Listener {
             .filter { it.name != "deprecated.json" }
             .associate { file -> file.nameWithoutExtension to async { file.readJson<Map<String, String>>() } }
             .toMap()
-            .mapValues { (_, v) -> v.await() }
+            .mapValues { [_, v] -> v.await() }
         
         Language.inject(NovaLanguage)
     }

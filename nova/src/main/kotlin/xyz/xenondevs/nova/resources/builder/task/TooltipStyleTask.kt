@@ -13,7 +13,7 @@ class TooltipStyleTask(private val builder: ResourcePackBuilder) : PackTask {
     override val stage = BuildStage.PRE_WORLD
     
     override suspend fun run() {
-        for ((_, makeLayout) in requests) {
+        for ([_, makeLayout] in requests) {
             val layout = makeLayout.invoke(builder)
             
             if (layout.backgroundMeta != null)

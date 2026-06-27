@@ -35,7 +35,7 @@ class FluidNetwork internal constructor(
         var transferRate = DEFAULT_TRANSFER_RATE
         var complexity = 0
         
-        for ((pos, con) in networkData.nodes) {
+        for ([pos, con] in networkData.nodes) {
             val (node, faces) = con
             try {
                 if (node is NetworkEndPoint) {
@@ -101,7 +101,7 @@ class FluidNetwork internal constructor(
         private val FLUID_NETWORK = MAIN_CONFIG.node("network", "fluid")
         val TICK_DELAY_PROVIDER: Provider<Int> = FLUID_NETWORK.entry<Int>("tick_delay")
         val DEFAULT_TRANSFER_RATE: Long by combinedProvider(FLUID_NETWORK.entry<Double>("default_transfer_rate"), TICK_DELAY_PROVIDER)
-            .map { (defaultTransferRate, tickDelay) -> (defaultTransferRate * tickDelay).roundToLong() }
+            .map { [defaultTransferRate, tickDelay] -> (defaultTransferRate * tickDelay).roundToLong() }
             .map { defaultTransferRate -> if (defaultTransferRate < 0) Long.MAX_VALUE else defaultTransferRate }
         val CHANNEL_AMOUNT: Int by FLUID_NETWORK.entry<Int>("channel_amount")
         val MAX_COMPLEXITY: Int by FLUID_NETWORK.entry<Int>("max_complexity")

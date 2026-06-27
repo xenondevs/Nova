@@ -55,7 +55,7 @@ private inline fun <reified B : Keyed, S : Any> flattenInfoProviders(): Provider
             infoProviders.map { wip -> wip.blocks.map { entries -> entries to wip } }
         ) { list: List<Pair<Set<Any>, WailaInfoProvider<*, *>>> ->
             buildMap {
-                for ((values: Set<Any>, wip: WailaInfoProvider<*, *>) in list) {
+                for ([values: Set<Any>, wip: WailaInfoProvider<*, *>] in list) {
                     for (value in values) {
                         if (value !is B)
                             continue
@@ -67,7 +67,7 @@ private inline fun <reified B : Keyed, S : Any> flattenInfoProviders(): Provider
                         ) += wip as WailaInfoProvider<B, S>
                     }
                 }
-            }.mapValues { (_, infoProviders) -> infoProviders.maxBy { it.priority } }
+            }.mapValues { [_, infoProviders] -> infoProviders.maxBy { it.priority } }
         }
     }
 
@@ -163,7 +163,7 @@ internal class Waila(val player: Player) {
     }
     
     private fun isBlacklisted(id: Key) =
-        BLACKLISTED_BLOCKS.any { (namespaceRegex, nameRegex) ->
+        BLACKLISTED_BLOCKS.any { [namespaceRegex, nameRegex] ->
             namespaceRegex.matches(id.namespace()) && nameRegex.matches(id.value())
         }
     

@@ -51,7 +51,7 @@ internal class PropertiesTree<E>(
             }
             
             val propertyValues = HashMap<ScopedBlockStateProperty<*>, Any>()
-            for ((nodeIdx, id) in path.withIndex()) {
+            for ([nodeIdx, id] in path.withIndex()) {
                 val scopedProperty = scopedProperties[nodeIdx]
                 propertyValues[scopedProperty] = scopedProperty.idToValue(id) as Any
             }
@@ -112,8 +112,8 @@ internal class PropertiesTree<E>(
     
     private fun pathOf(propertyValues: Map<BlockStateProperty<*>, Any>): IntArray {
         val path = IntArray(propertiesCount)
-        for ((property, value) in propertyValues) {
-            val (nodeIdx, scopedProperty) = find(property)
+        for ([property, value] in propertyValues) {
+            (val nodeIdx = index, val scopedProperty = value) = find(property)
             path[nodeIdx] = (scopedProperty as ScopedBlockStateProperty<Any>).valueToId(value)
         }
         

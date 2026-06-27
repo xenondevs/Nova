@@ -122,7 +122,7 @@ internal object BlockBreaking : Listener, PacketListener {
     }
     
     private fun handleTick() {
-        playerBreakers.removeIf { (_, breaker) ->
+        playerBreakers.removeIf { [_, breaker] ->
             try {
                 if (!breaker.isStopped)
                     breaker.handleTick()

@@ -7,7 +7,7 @@ internal class CullAction(private val cull: Set<Model.Direction>) : NonContextua
     
     override fun apply(model: Model): Model {
         return model.copy(elements = model.elements?.map { element ->
-            element.copy(faces = element.faces.filterTo(enumMap()) { (_, face) -> face.cullface !in cull })
+            element.copy(faces = element.faces.filterTo(enumMap()) { [_, face] -> face.cullface !in cull })
         })
     }
     

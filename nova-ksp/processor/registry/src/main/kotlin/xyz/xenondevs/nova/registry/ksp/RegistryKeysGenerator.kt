@@ -29,7 +29,7 @@ internal class RegistryKeysGenerator(private val codeGenerator: CodeGenerator) {
         val initializer = CodeBlock.builder()
             .add("setOf(\n")
             .indent()
-        for ((index, property) in properties.withIndex()) {
+        for ([index, property] in properties.withIndex()) {
             val separator = if (index < properties.size - 1) "," else ""
             initializer.add("%T.%L$separator\n", registryKeyClass, property.simpleName.asString())
         }

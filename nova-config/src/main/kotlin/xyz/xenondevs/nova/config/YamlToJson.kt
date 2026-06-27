@@ -61,7 +61,7 @@ private fun yamlToJson(
     is Char -> JsonPrimitive(value.toString())
     is String -> JsonPrimitive(value)
     is Iterable<*> -> JsonArray(value.map { yamlToJson(it) })
-    is Map<*, *> -> JsonObject(value.entries.associate { (k, v) -> k.toString() to yamlToJson(v) })
+    is Map<*, *> -> JsonObject(value.entries.associate { [k, v] -> k.toString() to yamlToJson(v) })
     else -> throw IllegalArgumentException("Unexpected value: $value")
 }
 
@@ -77,5 +77,5 @@ private fun jsonToJavaTree(
     }
     
     is JsonArray -> element.map { jsonToJavaTree(it) }
-    is JsonObject -> element.entries.associate { (k, v) -> k to jsonToJavaTree(v) }
+    is JsonObject -> element.entries.associate { [k, v] -> k to jsonToJavaTree(v) }
 }

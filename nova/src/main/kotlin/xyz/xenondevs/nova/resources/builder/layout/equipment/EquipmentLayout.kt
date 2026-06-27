@@ -14,7 +14,7 @@ internal data class StaticEquipmentLayout(
 ) : EquipmentLayout {
     
     fun toEquipmentModel() = EquipmentDefinition(
-        types.mapValues { (_, layers) ->
+        types.mapValues { [_, layers] ->
             layers.map { layer ->
                 EquipmentDefinition.Layer(layer.texture, layer.usePlayerTexture, layer.dyeable)
             }

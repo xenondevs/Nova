@@ -46,7 +46,7 @@ internal class LoadChunkTask(
         val networkChunk = state.storage.getOrLoadRegionizedChunk(chunkPos)
         val networkNodes = networkChunk.getData()
         
-        for ((pos, data) in networkNodes) {
+        for ([pos, data] in networkNodes) {
             val node = chunkNodes[pos]
             
             // the network data of unknown nodes should not be removed in order to prevent data loss of addons that weren't loaded
@@ -61,7 +61,7 @@ internal class LoadChunkTask(
                 
                 node is NetworkBridge && data is NetworkBridgeData -> {
                     val networks = data.networks
-                    for ((type, id) in networks) {
+                    for ([type, id] in networks) {
                         val network = state.getOrCreateNetwork(type, id)
                         network.addBridge(node)
                         updatedNetworks.getOrPut(network, ::HashSet) += node
@@ -70,7 +70,7 @@ internal class LoadChunkTask(
                 
                 node is NetworkEndPoint && data is NetworkEndPointData -> {
                     val networks = data.networks
-                    for ((type, face, id) in networks) {
+                    for ([type, face, id] in networks) {
                         val network = state.getOrCreateNetwork(type, id)
                         network.addEndPoint(node, face)
                         updatedNetworks.getOrPut(network, ::HashSet) += node
@@ -88,7 +88,7 @@ internal class LoadChunkTask(
             state += node
         }
         
-        for ((network, nodes) in updatedNetworks) {
+        for ([network, nodes] in updatedNetworks) {
             for (node in nodes) {
                 node.handleNetworkLoaded(state)
             }

@@ -36,7 +36,7 @@ private fun onlyIfAirAbove(ctx: Context<BlockInteract>): Boolean {
 object Tilling : ItemBehavior {
     
     override fun useOnBlock(itemStack: ItemStack, block: org.bukkit.block.Block, ctx: Context<BlockInteract>): InteractionResult {
-        val (check, newType, drops) = TILLABLES[block.type] ?: return InteractionResult.Pass
+        val [check, newType, drops] = TILLABLES[block.type] ?: return InteractionResult.Pass
         if (!check.invoke(ctx))
             return InteractionResult.Pass
         

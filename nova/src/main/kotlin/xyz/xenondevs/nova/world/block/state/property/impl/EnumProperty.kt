@@ -29,7 +29,7 @@ internal class ScopedEnumProperty<E : Enum<E>>(
 ) : ScopedBlockStateProperty<E>(property, EnumSet.copyOf(values), initializer) {
     
     private val idToValue: List<E> = values.toList()
-    private val valueToId: Map<E, Int> = idToValue.withIndex().associateTo(EnumMap(enumClass)) { (index, value) -> value to index }
+    private val valueToId: Map<E, Int> = idToValue.withIndex().associateTo(EnumMap(enumClass)) { [index, value] -> value to index }
     private val stringToValue: Map<String, E> = idToValue.associateByTo(HashMap()) { it.name.lowercase() }
     
     override fun isValidValue(value: E): Boolean =

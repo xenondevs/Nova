@@ -39,9 +39,6 @@ private class DefaultFluidConfiguration(
         else -> throw IllegalArgumentException()
     }.maxIn(faces)
     
-    fun component1() = container
-    fun component2() = priority
-    
 }
 
 /**

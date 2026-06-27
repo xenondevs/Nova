@@ -49,7 +49,7 @@ interface Network<S : Network<S>> : NetworkData<S> {
      * Checks whether this [Network] is valid, i.e. if it is allowed to tick.
      */
     fun isValid(): Boolean {
-        for ((_, con) in nodes) {
+        for ([_, con] in nodes) {
             if (!con.node.isValid)
                 return false
         }

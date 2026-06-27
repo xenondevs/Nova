@@ -173,7 +173,7 @@ internal data class RotationTransform(
         val mirrorU = uv.x() > uv.z()
         val mirrorV = uv.y() > uv.w()
         
-        val (u0, v0, u1, v1) = rotatedUv(uv, rots)
+        val [u0, v0, u1, v1] = rotatedUv(uv, rots)
         
         // sort uv vertices, then reapply original mirroring
         val minU = min(u0, u1)

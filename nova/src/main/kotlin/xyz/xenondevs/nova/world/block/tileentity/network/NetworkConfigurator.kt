@@ -183,7 +183,7 @@ internal class NetworkConfigurator(private val world: World, private val ticker:
             
             CompletableFuture.allOf(*results).thenApply {
                 var data = 0
-                for ((i, result) in results.withIndex()) {
+                for ([i, result] in results.withIndex()) {
                     if (result.get())
                         data = data or (1 shl i)
                 }

@@ -120,7 +120,7 @@ abstract class UnihexProvider internal constructor(
                 val codePoint = entry.intKey
                 val glyph = entry.value
                 
-                val (left, right) = calculateBounds(codePoint, width, glyph) ?: continue
+                val [left, right] = calculateBounds(codePoint, width, glyph) ?: continue
                 val imgWidth = right - left + 1
                 
                 // getOrPut boxes int
@@ -151,8 +151,8 @@ abstract class UnihexProvider internal constructor(
                 val codePoint = entry.intKey
                 val glyph = entry.value
                 
-                val (left, right) = calculateBounds(codePoint, width, glyph) ?: continue
-                val (top, bottom) = UnihexGlyphs.findHorizontalBorders(glyph) ?: continue
+                val [left, right] = calculateBounds(codePoint, width, glyph) ?: continue
+                val [top, bottom] = UnihexGlyphs.findHorizontalBorders(glyph) ?: continue
                 
                 sizes.put(codePoint, floatArrayOf(
                     // +1 because bounds are inclusive

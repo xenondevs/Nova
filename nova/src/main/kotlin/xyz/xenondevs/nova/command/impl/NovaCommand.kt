@@ -25,7 +25,6 @@ import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.world.level.block.Block
 import org.bukkit.Bukkit
-import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.joml.Matrix4f
 import org.joml.Vector3f
@@ -33,7 +32,6 @@ import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
-import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.command.Command
@@ -56,7 +54,6 @@ import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.packetentity.MAX_PACKET_ENTITY_RENDER_DISTANCE
 import xyz.xenondevs.nova.packetentity.MIN_PACKET_ENTITY_RENDER_DISTANCE
 import xyz.xenondevs.nova.packetentity.packetEntityRenderDistance
-import xyz.xenondevs.nova.packetentity.packetSheep
 import xyz.xenondevs.nova.registry.MutableNovaRegistry
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
@@ -77,7 +74,6 @@ import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.novaBlock
 import xyz.xenondevs.nova.util.runTaskLater
-import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.world.BlockPos
@@ -649,8 +645,8 @@ internal object NovaCommand : Command() {
                         Component.text(network.type.key.toString(), NamedTextColor.AQUA),
                         Component.text(id.toString(), NamedTextColor.AQUA),
                         Component.text(network.nodes.size, NamedTextColor.AQUA),
-                        Component.text(network.nodes.values.count { (node, _) -> node is NetworkBridge }, NamedTextColor.AQUA),
-                        Component.text(network.nodes.values.count { (node, _) -> node is NetworkEndPoint }, NamedTextColor.AQUA)
+                        Component.text(network.nodes.values.count { [node, _] -> node is NetworkBridge }, NamedTextColor.AQUA),
+                        Component.text(network.nodes.values.count { [node, _] -> node is NetworkEndPoint }, NamedTextColor.AQUA)
                     )
                 }
                 
@@ -707,7 +703,7 @@ internal object NovaCommand : Command() {
                             ))
                             .appendNewline()
                         
-                        for ((type, id) in networks) {
+                        for ([type, id] in networks) {
                             builder
                                 .indent(4)
                                 .append(Component.translatable(
@@ -733,7 +729,7 @@ internal object NovaCommand : Command() {
                             ))
                             .appendNewline()
                         
-                        for ((type, face, id) in networks) {
+                        for ([type, face, id] in networks) {
                             builder
                                 .indent(4)
                                 .append(Component.translatable(
@@ -759,7 +755,7 @@ internal object NovaCommand : Command() {
                     )
                     .appendNewline()
                 
-                for ((type, face, connectedNode) in connectedNodes) {
+                for ([type, face, connectedNode] in connectedNodes) {
                     builder
                         .indent(4)
                         .append(Component.translatable(
@@ -899,7 +895,7 @@ internal object NovaCommand : Command() {
         for (xOff in -range..range) {
             for (zOff in -range..range) {
                 val chunkPos = ChunkPos(center.worldUUID, center.x + xOff, center.z + zOff)
-                BlockStateSearcher.searchChunk(chunkPos, listOf { it.block == block })[0]?.forEach { (pos, _) ->
+                BlockStateSearcher.searchChunk(chunkPos, listOf { it.block == block })[0]?.forEach { [pos, _] ->
                     sendBlockSearchResult(ctx, Component.translatable(block.descriptionId), pos.x, pos.y, pos.z)
                 }
             }
@@ -1005,7 +1001,7 @@ internal object NovaCommand : Command() {
         val builder = Component.text()
         val addons = AddonBootstrapper.addons
         builder.append(Component.translatable("command.nova.addons.header", Component.text(addons.size)))
-        for ((i, addon) in addons.withIndex()) {
+        for ([i, addon] in addons.withIndex()) {
             val meta = addon.pluginMeta
             
             builder.append(

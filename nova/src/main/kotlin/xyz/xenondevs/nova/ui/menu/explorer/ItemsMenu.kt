@@ -94,7 +94,7 @@ internal class ItemsMenu private constructor(val player: Player) {
         cheatMode.subscribe { cheatMode -> player.persistentDataContainer.set(CHEAT_MODE_KEY, PersistentDataType.BOOLEAN, cheatMode) }
         
         val filteredItems: Provider<List<CategorizedItem>> = combinedProvider(filter, ItemCategories.obtainableItems)
-            .map { (filter, obtainableItems) -> filterItems(player, filter, obtainableItems) }
+            .map { [filter, obtainableItems] -> filterItems(player, filter, obtainableItems) }
         
         mainWindow = provider {
             mergedWindow(player) {
@@ -265,7 +265,7 @@ private fun filterItems(player: Player, filter: String, obtainableItems: List<Ca
     val names = obtainableItems
         .asSequence()
         .map { it to it.getPlainTextName(player.locale()) }
-        .filter { (_, name) -> name.contains(filter, true) }
+        .filter { [_, name] -> name.contains(filter, true) }
         .toMap(HashMap())
     val scores = FuzzySearch.extractAll(filter, names.values).associateTo(HashMap()) { it.string to it.score }
     return names.keys.sortedWith { o1, o2 ->

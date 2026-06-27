@@ -86,7 +86,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
                     return@forEach
                 }
                 
-                for ((variant, models) in bsd.variants) {
+                for ([variant, models] in bsd.variants) {
                     if (variant.properties.keys != type.properties) {
                         builder.logger.warn("Variant '$variant' in block state file $bsdId does not specify all properties explicitly " +
                             "(got ${variant.properties.keys}, expected ${type.properties}). " +
@@ -118,9 +118,9 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
         // 2. amount of available states (ascending)
         // 3. id
         assignBlockModels<BlockModelLayout.StateBacked>(
-            compareByDescending<Pair<RegistryEntry.Nova<NovaBlock>, BlockModelLayout.StateBacked>> { (_, layout) -> layout.priority }
-                .thenBy { (_, layout) -> layout.configTypes.sumOf { it.maxId - it.blockedIds.size } }
-                .thenBy { (block, _) -> block.key }
+            compareByDescending<Pair<RegistryEntry.Nova<NovaBlock>, BlockModelLayout.StateBacked>> { [_, layout] -> layout.priority }
+                .thenBy { [_, layout] -> layout.configTypes.sumOf { it.maxId - it.blockedIds.size } }
+                .thenBy { [block, _] -> block.key }
         ) { blockState, layout, scope ->
             val modelBuilder = layout.modelSelector(scope)
             val cfg = assignModelToVanillaBlockState(layout, modelBuilder, blockState[WATERLOGGED] == true)
@@ -165,16 +165,16 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
     }
     
     private inline fun <reified L : BlockModelLayout> assignBlockModels(
-        comparator: Comparator<Pair<RegistryEntry.Nova<NovaBlock>, L>> = compareBy { (block, _) -> block.key },
+        comparator: Comparator<Pair<RegistryEntry.Nova<NovaBlock>, L>> = compareBy { [block, _] -> block.key },
         assigner: (blockState: NovaBlockState, layout: L, scope: BlockModelSelectorScope) -> Unit
     ) {
         requests.entries
-            .mapNotNull { (block, pair) ->
-                val (layout, blockStates) = pair
+            .mapNotNull { [block, pair] ->
+                val [layout, blockStates] = pair
                 if (layout is L) Triple(block, layout, blockStates) else null
             }
-            .sortedWith(compareBy(comparator) { (block, layout, _) -> block to layout })
-            .forEach { (_, layout, blockStates) ->
+            .sortedWith(compareBy(comparator) { [block, layout, _] -> block to layout })
+            .forEach { [_, layout, blockStates] ->
                 for (blockState in blockStates) {
                     try {
                         val scope = BlockModelSelectorScope(blockState, builder, modelContent)
@@ -192,7 +192,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
      * Then returns the [BackingStateConfig] the model was assigned to, or null if it wasn't assigned to any.
      */
     private fun assignModelToVanillaBlockState(layout: BlockModelLayout.StateBacked, modelBuilder: ModelBuilder, waterlogged: Boolean): BackingStateConfig? {
-        val (model, rotations) = modelBuilder.buildBlockStateVariant(modelContent)
+        val [model, rotations] = modelBuilder.buildBlockStateVariant(modelContent)
         val variant = BlockStateDefinition.Model(modelContent.getOrPutGenerated(model), rotations.x(), rotations.y())
         
         var cfg: BackingStateConfig? = null
@@ -261,7 +261,7 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
      * all display entity configurations required to display the given [modelBuilder] using an item display entity.
      */
     private fun assignModelToItem(modelBuilder: ModelBuilder): List<DisplayEntityBlockModelData.Model> {
-        return modelBuilder.buildDisplayEntity(modelContent).map { (model, transform) ->
+        return modelBuilder.buildDisplayEntity(modelContent).map { [model, transform] ->
             val modelId = modelContent.getOrPutGenerated(model)
             modelContent.rememberUsage(modelId)
             
@@ -278,10 +278,10 @@ class BlockModelTask(private val builder: ResourcePackBuilder) : PackTask {
     private fun writeBlockStateFiles() {
         variantByConfig.entries
             // group by file id, because some backing state config types share the same file
-            .groupBy { (cfg, _) -> ResourcePath.of(ResourceType.BlockStateDefinition, cfg.type.fileName) }
-            .forEach { (bsdId, cfgModelEntries) ->
+            .groupBy { [cfg, _] -> ResourcePath.of(ResourceType.BlockStateDefinition, cfg.type.fileName) }
+            .forEach { [bsdId, cfgModelEntries] ->
                 blockStateContent[bsdId] = BlockStateDefinition(
-                    variants = cfgModelEntries.associate { (cfg, model) ->
+                    variants = cfgModelEntries.associate { [cfg, model] ->
                         BlockStateDefinition.Variant(cfg.variantMap) to listOf(model)
                     }
                 )

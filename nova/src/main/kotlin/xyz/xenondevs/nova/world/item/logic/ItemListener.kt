@@ -48,7 +48,7 @@ internal object ItemListener : Listener, PacketListener {
     
     private fun handleTick() {
         for (player in Bukkit.getOnlinePlayers()) {
-            for ((slot, itemStack) in player.inventory.contents.withIndex()) {
+            for ([slot, itemStack] in player.inventory.contents.withIndex()) {
                 val novaItem = itemStack?.novaItem
                     ?: continue
                 novaItem.handleInventoryTick(player, itemStack, slot)
@@ -92,7 +92,7 @@ internal object ItemListener : Listener, PacketListener {
         val player = event.entity as? Player
             ?: return
         
-        for ((slot, change) in event.equipmentChanges) {
+        for ([slot, change] in event.equipmentChanges) {
             val oldNovaItem = change.oldItem().novaItem
             val newNovaItem = change.newItem().novaItem
             if (oldNovaItem == newNovaItem)

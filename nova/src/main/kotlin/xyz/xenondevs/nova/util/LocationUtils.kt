@@ -317,7 +317,7 @@ fun Location.getRectangle(to: Location, omitCorners: Boolean): Map<Axis, List<Lo
 inline fun Location.fullCuboidTo(to: Location, run: (Location) -> Boolean) {
     Preconditions.checkArgument(world != null && to.world == world)
     
-    val (min, max) = LocationUtils.sort(this, to)
+    val [min, max] = LocationUtils.sort(this, to)
     for (x in min.blockX..max.blockX) {
         for (y in min.blockY..max.blockY) {
             for (z in min.blockZ..max.blockZ) {
@@ -375,7 +375,7 @@ fun Location.getFullCuboid(other: Location): List<Location> {
     Preconditions.checkArgument(world != null && other.world == world)
     
     val list = ArrayList<Location>()
-    val (min, max) = LocationUtils.sort(this, other)
+    val [min, max] = LocationUtils.sort(this, other)
     for (x in min.blockX..max.blockX) {
         for (y in min.blockY..max.blockY) {
             for (z in min.blockZ..max.blockZ) {

@@ -30,7 +30,7 @@ internal object NovaBlockStateSerializer : KSerializer<NovaBlockState> {
             encodeSerializableElement(
                 descriptor, 1,
                 MapSerializer(String.serializer(), String.serializer()),
-                map.entries.associate { (property, value) -> property.property.id.toString() to property.valueToString(value) }
+                map.entries.associate { [property, value] -> property.property.id.toString() to property.valueToString(value) }
             )
         }
     }
@@ -56,7 +56,7 @@ internal object NovaBlockStateSerializer : KSerializer<NovaBlockState> {
                 throw SerializationException("Missing property 'block'")
             
             var blockState = block.defaultBlockState
-            for ((propertyId, propertyValueStr) in properties) {
+            for ([propertyId, propertyValueStr] in properties) {
                 val property = block.stateProperties.firstOrNull { it.property.id.toString() == propertyId } as ScopedBlockStateProperty<Any>?
                     ?: throw SerializationException("Unknown property '$propertyId'")
                 

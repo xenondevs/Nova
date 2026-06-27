@@ -43,7 +43,7 @@ internal abstract class RegionizedFile<T : RegionizedChunk>(
         val chunksBuffer = ByteArrayOutputStream()
         compressionType.wrapOutput(chunksBuffer).use { compOut ->
             val chunksWriter = ByteWriter.fromStream(compOut)
-            for ((chunkIdx, chunk) in _chunks.withIndex()) {
+            for ([chunkIdx, chunk] in _chunks.withIndex()) {
                 chunkBitmask.set(chunkIdx, chunk.write(chunksWriter))
             }
         }
@@ -72,7 +72,7 @@ internal abstract class RegionizedFileReader<C : RegionizedChunk, F : Regionized
 ) {
     
     private val legacyReaders: Byte2ObjectMap<LegacyRegionizedFileReader<C, F>> =
-        legacyReaders.associateTo(Byte2ObjectOpenHashMap()) { (version, reader) -> version.toByte() to reader }
+        legacyReaders.associateTo(Byte2ObjectOpenHashMap()) { [version, reader] -> version.toByte() to reader }
     
     fun read(reader: ByteReader?, world: World, regionX: Int, regionZ: Int): F {
         if (reader != null) {
