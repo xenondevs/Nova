@@ -44,6 +44,7 @@ fun progressItem(
  * Its unnamed clientside providers will be used to display the progress.
  * @param customModelDataIndex The custom model data index that the progress value should be written to.
  */
+@Suppress("DEPRECATION")
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 open class ProgressItem(
     val item: NovaItem,

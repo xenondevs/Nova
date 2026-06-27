@@ -31,7 +31,6 @@ internal class ItemChannelsBuilder {
     fun addHolder(holder: ItemHolder, faces: Set<BlockFace>) {
         for (face in faces) {
             val channel = holder.channels[face]
-                ?: throw IllegalStateException("$holder is missing channel for $face")
             channels.getOrSet(channel, ::ItemDistributorBuilder).addHolder(holder, face)
         }
     }
@@ -47,7 +46,7 @@ internal class ItemDistributorBuilder {
     private val consumers = TreeMap<Int, MutableList<FilteredNetworkedInventory>>(Comparator.reverseOrder())
     
     fun addHolder(holder: ItemHolder, face: BlockFace) {
-        val conType = holder.connectionConfig[face] ?: return
+        val conType = holder.connectionConfig[face]
         
         when (conType) {
             NetworkConnectionType.INSERT -> addConsumer(holder, face)
@@ -65,7 +64,6 @@ internal class ItemDistributorBuilder {
         val inventory = holder.containerConfig[face]
             ?: throw IllegalStateException("$holder is missing container config for $face")
         val priority = holder.extractPriorities[face]
-            ?: throw IllegalStateException("$holder is missing extract priority for $face")
         val filter = holder.extractFilters[face]
         
         val filteredInventory = FilteredNetworkedInventory(inventory, filter)
@@ -78,7 +76,6 @@ internal class ItemDistributorBuilder {
         val inventory = holder.containerConfig[face]
             ?: throw IllegalStateException("$holder is missing consumer container config for $face")
         val priority = holder.insertPriorities[face]
-            ?: throw IllegalStateException("$holder is missing insert priority for $face")
         val filter = holder.insertFilters[face]
         
         val filteredInventory = FilteredNetworkedInventory(inventory, filter)

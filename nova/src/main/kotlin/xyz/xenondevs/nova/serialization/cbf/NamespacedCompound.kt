@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.serialization.cbf
 
 import net.kyori.adventure.key.Key
@@ -14,11 +16,13 @@ import java.util.*
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
-@Deprecated("""
+internal const val NAMESPACED_COMPOUND_DEPRECATION = """
     Namespaced compounds will be removed in a future version.
     Use the store/retrieve extension functions on ItemStack instead, or use persistent data containers.
     The contents of NamespacedCompound will be merged into the persistent data container in the future, so make sure to not create any conflicting keys.
-""")
+"""
+
+@Deprecated(NAMESPACED_COMPOUND_DEPRECATION)
 class NamespacedCompound internal constructor(
     private val map: MutableMap<String, Compound>
 ) {

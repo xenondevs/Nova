@@ -33,6 +33,7 @@ private const val USE_DSL_SIDE_CONFIG_ITEM = "Use openSideConfigItem(...) with m
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [inventories] with their localized names.
  */
+@Suppress("DEPRECATION")
 @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuItem")
 fun SideConfigMenu(
@@ -45,6 +46,7 @@ fun SideConfigMenu(
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [inventories] with their localized names.
  */
+@Suppress("DEPRECATION")
 @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuItem")
 fun SideConfigMenu(
@@ -57,6 +59,7 @@ fun SideConfigMenu(
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [containers] with their localized names.
  */
+@Suppress("DEPRECATION")
 @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuFluid")
 fun SideConfigMenu(
@@ -69,6 +72,7 @@ fun SideConfigMenu(
  * Creates a new [SideConfigMenu] for [endPoint] using the given
  * [containers] with their localized names.
  */
+@Suppress("DEPRECATION")
 @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
 @JvmName("SideConfigMenuFluid")
 fun SideConfigMenu(
@@ -92,6 +96,7 @@ class SideConfigMenu @Deprecated(USE_DSL_SIDE_CONFIG_ITEM) constructor(
      * Creates a new [SideConfigMenu] for [endPoint] using the given
      * [inventories] and [containers] with their localized names.
      */
+    @Suppress("DEPRECATION")
     @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
     constructor(
         endPoint: NetworkEndPoint,
@@ -103,6 +108,7 @@ class SideConfigMenu @Deprecated(USE_DSL_SIDE_CONFIG_ITEM) constructor(
     /**
      * Creates a new [SideConfigMenu] for [endPoint].
      */
+    @Suppress("DEPRECATION")
     @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
     constructor(
         endPoint: NetworkEndPoint,
@@ -112,6 +118,7 @@ class SideConfigMenu @Deprecated(USE_DSL_SIDE_CONFIG_ITEM) constructor(
     /**
      * Creates a new [SideConfigMenu] for [endPoint].
      */
+    @Suppress("DEPRECATION")
     @Deprecated(USE_DSL_SIDE_CONFIG_ITEM)
     constructor(
         endPoint: NetworkEndPoint,
@@ -229,6 +236,7 @@ fun openSideConfigItem(
  * 
  * Uses the [end point from the context][endPoint] to retrieve the [EndPointDataHolders][EndPointDataHolder].
  */
+@Suppress("DEPRECATION")
 context(windowDsl: WindowDsl, endPoint: NetworkEndPoint)
 fun openSideConfigItem(
     inventories: Map<NetworkedInventory, String>? = null,

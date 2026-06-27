@@ -92,7 +92,7 @@ object ToolUtils {
             blockBreakSpeed = player.getAttribute(Attribute.BLOCK_BREAK_SPEED)?.value ?: 1.0,
             submergedMiningSpeed = player.getAttribute(Attribute.SUBMERGED_MINING_SPEED)?.value ?: 0.2,
             isOnGround = player.isOnGround,
-            isUnderWater = player.eyeInWater && player.inventory.helmet?.containsEnchantment(Enchantment.AQUA_AFFINITY) != true
+            isUnderWater = player.eyeInWater && !player.inventory.helmet.containsEnchantment(Enchantment.AQUA_AFFINITY)
         )
         
         val novaItem = tool?.novaItem

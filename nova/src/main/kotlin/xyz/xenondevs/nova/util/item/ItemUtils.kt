@@ -38,6 +38,7 @@ import xyz.xenondevs.nova.integration.customitems.CustomItemServiceManager
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.entry
+import xyz.xenondevs.nova.serialization.cbf.NAMESPACED_COMPOUND_DEPRECATION
 import xyz.xenondevs.nova.serialization.cbf.NamespacedCompound
 import xyz.xenondevs.nova.util.REGISTRY_ACCESS
 import xyz.xenondevs.nova.util.bukkitMaterial
@@ -179,12 +180,16 @@ internal fun ItemStack.clientsideCopy(): ItemStack =
     PacketItems.getClientSideStack(null, unwrap(), true).asBukkitMirror()
 
 //<editor-fold desc="Nova Compound", defaultstate="collapsed">
+@Suppress("DEPRECATION")
+@Deprecated(NAMESPACED_COMPOUND_DEPRECATION)
 var ItemStack.novaCompound: NamespacedCompound?
     get() = unwrap().novaCompound
     set(novaCompound) {
         CraftItemStack.unwrap(this).novaCompound = novaCompound
     }
 
+@Suppress("DEPRECATION")
+@Deprecated(NAMESPACED_COMPOUND_DEPRECATION)
 var MojangStack.novaCompound: NamespacedCompound?
     get() = unsafeCustomData
         ?.getByteArrayOrNull("nova_cbf")

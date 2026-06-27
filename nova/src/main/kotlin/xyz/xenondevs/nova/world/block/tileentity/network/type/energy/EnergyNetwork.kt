@@ -44,7 +44,6 @@ class EnergyNetwork internal constructor(
                     var extract = false
                     for (face in faces) {
                         val connectionType = energyHolder.connectionConfig[face]
-                            ?: throw IllegalArgumentException("Missing connection config for $face")
                         insert = insert || connectionType.insert
                         extract = extract || connectionType.extract
                     }

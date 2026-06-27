@@ -10,7 +10,7 @@ import xyz.xenondevs.nova.util.component.adventure.append
 import xyz.xenondevs.nova.util.component.adventure.font
 import xyz.xenondevs.nova.util.component.adventure.move
 import xyz.xenondevs.nova.util.component.adventure.moveTo
-import java.util.concurrent.TimeUnit
+import java.time.Duration
 import kotlin.math.ceil
 
 private const val WAILA_FONT = "nova:waila"
@@ -31,7 +31,7 @@ private const val MAX_LINES = 10
 
 private val overlayCache: Cache<OverlayCacheKey, OverlayData> = CacheBuilder.newBuilder()
     .concurrencyLevel(1)
-    .expireAfterAccess(5, TimeUnit.MINUTES)
+    .expireAfterAccess(Duration.ofMinutes(5))
     .build()
 
 private data class OverlayCacheKey(val icon: FontChar?, val lines: Int, val longestLineLength: Float)

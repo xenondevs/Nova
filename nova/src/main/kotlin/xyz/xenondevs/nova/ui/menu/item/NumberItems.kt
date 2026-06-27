@@ -175,6 +175,7 @@ open class ChangeNumberItem(
     
 }
 
+@Suppress("DEPRECATION")
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class DisplayNumberItem(private val getNumber: () -> Int, private val localizedName: String? = null) : AbstractItem() {
     
@@ -198,6 +199,7 @@ class DisplayNumberItem(private val getNumber: () -> Int, private val localizedN
     
 }
 
+@Suppress("DEPRECATION")
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class AddNumberItem(
     getRange: () -> IntRange,
@@ -216,6 +218,7 @@ class AddNumberItem(
     DefaultGuiItems.PLUS_BTN_OFF.clientsideProvider
 )
 
+@Suppress("DEPRECATION")
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class RemoveNumberItem(
     getRange: () -> IntRange,

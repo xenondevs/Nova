@@ -57,6 +57,7 @@ fun verticalBar(
     }
 }
 
+@Suppress("DEPRECATION")
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 abstract class VerticalBar(
     private val height: Int,

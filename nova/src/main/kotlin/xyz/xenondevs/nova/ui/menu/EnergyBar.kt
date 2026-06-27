@@ -82,6 +82,7 @@ fun energyBar(
 /**
  * A multi-item gui component for displaying energy levels.
  */
+@Suppress("DEPRECATION")
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 class EnergyBar(
     height: Int,

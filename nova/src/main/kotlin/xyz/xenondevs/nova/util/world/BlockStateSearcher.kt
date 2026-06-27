@@ -33,8 +33,6 @@ object BlockStateSearcher {
         
         val result: Array<ArrayList<Pair<BlockPos, BlockState>>?> = arrayOfNulls(queries.size)
         for (section in world.serverLevel.getChunk(pos.x, pos.z).sections) {
-            section
-            
             val container = section.states
             container.acquire()
             
