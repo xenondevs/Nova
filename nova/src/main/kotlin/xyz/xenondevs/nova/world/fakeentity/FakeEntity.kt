@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.world.fakeentity
 
 import io.netty.buffer.Unpooled
@@ -26,9 +28,14 @@ import xyz.xenondevs.nova.world.item.logic.PacketItems
 import java.util.*
 import org.bukkit.inventory.ItemStack as BukkitStack
 
+internal const val FAKE_ENTITY_DEPRECATION = "Superseded by nova-packet-entity. " +
+    "Create a PacketEntity via packetEntityType { }, e.g. packetItemDisplay { }. " +
+    "The FakeEntity system will be removed in a future Nova version."
+
 /**
  * A fake entity that does not exist in the world and can be updated asynchronously.
  */
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 abstract class FakeEntity<M : Metadata> internal constructor(location: Location) {
     
     abstract val metadata: M

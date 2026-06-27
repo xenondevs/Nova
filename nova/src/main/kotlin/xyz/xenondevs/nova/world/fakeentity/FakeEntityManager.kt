@@ -1,7 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.world.fakeentity
 
 import org.bukkit.Bukkit
-import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -11,43 +12,30 @@ import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerRespawnEvent
 import org.bukkit.event.player.PlayerTeleportEvent
-import org.bukkit.persistence.PersistentDataType
-import xyz.xenondevs.nova.config.MAIN_CONFIG
-import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.initialize.DisableFun
 import xyz.xenondevs.nova.initialize.Dispatcher
 import xyz.xenondevs.nova.initialize.InitFun
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
+import xyz.xenondevs.nova.packetentity.packetEntityRenderDistance
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runAsyncTask
 import xyz.xenondevs.nova.util.runAsyncTaskLater
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.chunkPos
-import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.DEFAULT_RENDER_DISTANCE
-import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MAX_RENDER_DISTANCE
-import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MIN_RENDER_DISTANCE
-import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.RENDER_DISTANCE_KEY
 import java.util.concurrent.CopyOnWriteArrayList
 
+@Deprecated(FAKE_ENTITY_DEPRECATION, ReplaceWith("packetEntityRenderDistance"))
 var Player.fakeEntityRenderDistance: Int
-    get() = (persistentDataContainer.get(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER) ?: DEFAULT_RENDER_DISTANCE)
-        .coerceIn(MIN_RENDER_DISTANCE..MAX_RENDER_DISTANCE)
-    set(value) {
-        persistentDataContainer.set(RENDER_DISTANCE_KEY, PersistentDataType.INTEGER, value)
-        FakeEntityManager.updateRenderDistance(this)
-    }
+    get() = packetEntityRenderDistance
+    set(value) { packetEntityRenderDistance = value }
 
 @InternalInit(
     stage = InternalInitStage.POST_WORLD,
     dispatcher = Dispatcher.ASYNC
 )
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 internal object FakeEntityManager : Listener {
-    
-    val RENDER_DISTANCE_KEY = NamespacedKey("nova", "entity_render_distance")
-    val DEFAULT_RENDER_DISTANCE by MAIN_CONFIG.entry<Int>("entity_render_distance", "default")
-    val MIN_RENDER_DISTANCE by MAIN_CONFIG.entry<Int>("entity_render_distance", "min")
-    val MAX_RENDER_DISTANCE by MAIN_CONFIG.entry<Int>("entity_render_distance", "max")
     
     private val renderDistance = HashMap<Player, Int>()
     private val visibleChunks = HashMap<Player, Set<ChunkPos>>()
@@ -146,7 +134,7 @@ internal object FakeEntityManager : Listener {
     
     @Synchronized
     internal fun updateRenderDistance(player: Player) {
-        renderDistance[player] = player.fakeEntityRenderDistance
+        renderDistance[player] = player.packetEntityRenderDistance
     }
     
     @Synchronized

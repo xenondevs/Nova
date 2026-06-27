@@ -54,13 +54,6 @@ resource_pack:
     # Possible values: "note_block", "mushroom_block", "leaves", "tripwire_unattached", "tripwire_attached"
     disabled_backing_state_categories: [ ]
 
-# The render distance for fake (packet-based) entities from Nova, in chunks.
-# Note that the render distance is also limited by the entity render distance of the client.
-entity_render_distance:
-  min: 1
-  max: 6
-  default: 4
-
 overlay:
   actionbar:
     # Enable / disable all action bar overlays.

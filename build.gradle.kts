@@ -8,5 +8,6 @@ dependencies {
     dokka(project(":nova-config"))
     dokka(project(":nova-gradle-plugin"))
     dokka(project(":nova-network"))
+    dokka(project(":nova-packet-entity"))
     dokka(project(":nova-registry"))
 }

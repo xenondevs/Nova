@@ -1,9 +1,13 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.world.fakeentity.metadata.impl
 
 import net.minecraft.network.syncher.EntityDataSerializers
 import org.bukkit.DyeColor
 import org.bukkit.block.BlockFace
+import xyz.xenondevs.nova.world.fakeentity.FAKE_ENTITY_DEPRECATION
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 class ShulkerMetadata : MobMetadata() {
     
     var attachedFace: BlockFace by entry(16, EntityDataSerializers.BYTE, BlockFace.NORTH) { it.ordinal.toByte() }

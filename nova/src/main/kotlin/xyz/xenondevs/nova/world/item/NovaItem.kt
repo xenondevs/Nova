@@ -102,7 +102,7 @@ fun RegistryEntrySet.Paper.Direct<ItemType>.asMixed(): RegistryEntrySet.Mixed.Di
     asMixed(NovaRegistries.ITEM)
 
 /**
- * Creates an [ItemStack] for the [NovaItem] without resolving the [RegistryEntry],
+ * Creates an [ItemStack] for the [NovaItem] without tying to the concrete [NovaItem] instance,
  * meaning that changes due to registry reloading will be reflected in the returned [ItemStack].
  * 
  * Cannot be called during bootstrap (pre-registry-freeze).

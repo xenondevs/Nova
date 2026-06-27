@@ -4,9 +4,9 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.joml.Vector3f
 import org.joml.Vector3fc
+import xyz.xenondevs.nova.packetentity.packetInteraction
 import xyz.xenondevs.nova.util.toLocation
 import xyz.xenondevs.nova.util.toVector3f
-import xyz.xenondevs.nova.world.fakeentity.impl.FakeInteraction
 
 @Suppress("DuplicatedCode")
 fun PhysicalHitbox(from: Location, to: Location): PhysicalHitbox {
@@ -52,10 +52,12 @@ class PhysicalHitbox internal constructor(
         height.toFloat()
     )
     
-    internal fun createInteractionEntity(): FakeInteraction =
-        FakeInteraction(centerLocation) { _, data ->
-            data.width = xWidth // xWidth == zWidth in PhysicalHitbox
-            data.height = height
+    internal fun createInteractionEntity() = packetInteraction { 
+        location by centerLocation
+        metadata { 
+            width by xWidth // xWidth == zWidth in PhysicalHitbox
+            height by this@PhysicalHitbox.height
         }
+    }
     
 }

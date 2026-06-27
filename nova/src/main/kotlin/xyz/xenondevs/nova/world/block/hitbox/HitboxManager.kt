@@ -21,6 +21,7 @@ import xyz.xenondevs.nova.network.event.PacketListener
 import xyz.xenondevs.nova.network.event.registerPacketListener
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundAttackPacketEvent
 import xyz.xenondevs.nova.network.event.serverbound.ServerboundInteractPacketEvent
+import xyz.xenondevs.nova.packetentity.PacketInteraction
 import xyz.xenondevs.nova.util.registerEvents
 import xyz.xenondevs.nova.util.runTask
 import xyz.xenondevs.nova.util.serverLevel
@@ -28,7 +29,6 @@ import xyz.xenondevs.nova.util.toLocation
 import xyz.xenondevs.nova.util.toNovaPos
 import xyz.xenondevs.nova.util.toVec3
 import xyz.xenondevs.nova.world.BlockPos
-import xyz.xenondevs.nova.world.fakeentity.impl.FakeInteraction
 import xyz.xenondevs.nova.world.player.WrappedPlayerInteractEvent
 import xyz.xenondevs.nova.world.pos
 import xyz.xenondevs.nova.world.region.Region
@@ -38,7 +38,7 @@ import org.bukkit.event.block.Action as BlockAction
 
 object HitboxManager : Listener, PacketListener {
     
-    private val physicalHitboxes = HashMap<PhysicalHitbox, FakeInteraction>()
+    private val physicalHitboxes = HashMap<PhysicalHitbox, PacketInteraction>()
     private val physicalHitboxesById = HashMap<Int, PhysicalHitbox>()
     
     private val virtualHitboxes = HashSet<VirtualHitbox>()
@@ -95,13 +95,13 @@ object HitboxManager : Listener, PacketListener {
     private fun addPhysicalHitbox(hitbox: PhysicalHitbox) {
         val fakeInteraction = hitbox.createInteractionEntity()
         physicalHitboxes[hitbox] = fakeInteraction
-        physicalHitboxesById[fakeInteraction.entityId] = hitbox
+        physicalHitboxesById[fakeInteraction.id] = hitbox
     }
     
     private fun removePhysicalHitbox(hitbox: PhysicalHitbox) {
         val fakeInteraction = physicalHitboxes.remove(hitbox) ?: return
-        fakeInteraction.remove()
-        physicalHitboxesById -= fakeInteraction.entityId
+        fakeInteraction.despawn()
+        physicalHitboxesById -= fakeInteraction.id
     }
     
     private fun addVirtualHitbox(hitbox: VirtualHitbox) {

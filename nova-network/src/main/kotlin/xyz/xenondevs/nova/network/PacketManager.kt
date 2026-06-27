@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import net.minecraft.network.Connection
 import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.network.protocol.Packet
 import net.minecraft.server.level.ServerPlayer
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.entity.Player
@@ -38,6 +39,24 @@ fun Player.send(vararg bufs: FriendlyByteBuf, retain: Boolean = true, flush: Boo
     }
     
     if (flush) packetHandler.channel.flush()
+}
+
+fun Player.send(vararg packets: Packet<*>) {
+    val connection = (this as CraftPlayer).handle.connection
+    packets.forEach { connection.send(it) }
+}
+
+fun Player.send(packets: Iterable<Packet<*>>) {
+    val connection = (this as CraftPlayer).handle.connection
+    packets.forEach { connection.send(it) }
+}
+
+fun Packet<*>.sendTo(vararg players: Player) {
+    players.forEach { it.send(this) }
+}
+
+fun Packet<*>.sendTo(players: Iterable<Player>) {
+    players.forEach { it.send(this) }
 }
 
 /**

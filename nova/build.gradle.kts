@@ -25,8 +25,9 @@ dependencies {
     api(origamiLibs.mixin)
     api(origamiLibs.mixinextras)
     api(project(":nova-config"))
-    api(project(":nova-registry"))
     api(project(":nova-network"))
+    api(project(":nova-packet-entity"))
+    api(project(":nova-registry"))
     
     // internal dependencies
     compileOnly(project(":nova-api"))
@@ -82,6 +83,7 @@ loaderJar {
         ":nova-api", 
         ":nova-config", 
         ":nova-network", 
+        ":nova-packet-entity",
         ":nova-registry",
     ).map { projectName -> project(projectName).tasks.withType<Jar>().matching { it.name == "jar" } }
     val hookJars = rootProject.subprojects

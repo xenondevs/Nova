@@ -5,6 +5,7 @@ include("nova")
 include("nova-api")
 include("nova-config")
 include("nova-network")
+include("nova-packet-entity")
 include("nova-registry")
 
 // hooks
@@ -27,6 +28,7 @@ include("nova-ksp:annotations")
 include("nova-ksp:processor:flatmap-extensions")
 include("nova-ksp:processor:registry")
 include("nova-ksp:processor:network")
+include("nova-ksp:processor:packet-entity")
 
 // tooling
 include("nova-detekt-rules")

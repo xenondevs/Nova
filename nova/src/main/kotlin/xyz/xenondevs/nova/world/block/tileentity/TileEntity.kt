@@ -20,6 +20,7 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
+import xyz.xenondevs.nova.packetentity.PacketItemDisplay
 import xyz.xenondevs.nova.serialization.DataHolder
 import xyz.xenondevs.nova.util.item.storeData
 import xyz.xenondevs.nova.util.salt
@@ -33,7 +34,6 @@ import xyz.xenondevs.nova.world.block.state.model.DisplayEntityBlockModelProvide
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.FluidContainer
 import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
-import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.item.createItemStack
 import xyz.xenondevs.nova.world.region.DynamicRegion
@@ -94,9 +94,9 @@ abstract class TileEntity(
         get() = blockState.block as NovaTileEntityBlock
     
     /**
-     * The [FakeItemDisplay(s)][FakeItemDisplay] used to display the model of this [TileEntity], if it is entity-backed.
+     * The [PacketItemDisplay(s)][PacketItemDisplay] used to display the model of this [TileEntity], if it is entity-backed.
      */
-    val displayEntities: List<FakeItemDisplay>?
+    val displayEntities: List<PacketItemDisplay>?
         get() = DisplayEntityBlockModelProvider.entities[pos]
     
     /**

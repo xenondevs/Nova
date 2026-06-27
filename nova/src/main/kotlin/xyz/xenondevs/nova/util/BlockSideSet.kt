@@ -24,6 +24,25 @@ inline fun BlockSideSet(init: (side: BlockSide) -> Boolean): BlockSideSet =
 value class BlockSideSet(val data: Byte) {
     
     /**
+     * Creates a new [BlockSideSet] with the sides that are set to `true`.
+     */
+    constructor(
+        front: Boolean = false,
+        left: Boolean = false,
+        back: Boolean = false,
+        right: Boolean = false,
+        top: Boolean = false,
+        bottom: Boolean = false
+    ) : this(
+        ((if (front) 0b000001 else 0) or
+            (if (left) 0b000010 else 0) or
+            (if (back) 0b000100 else 0) or
+            (if (right) 0b001000 else 0) or
+            (if (top) 0b010000 else 0) or
+            (if (bottom) 0b100000 else 0)).toByte()
+    )
+    
+    /**
      * Checks whether [side] is contained in this set.
      */
     operator fun contains(side: BlockSide): Boolean =

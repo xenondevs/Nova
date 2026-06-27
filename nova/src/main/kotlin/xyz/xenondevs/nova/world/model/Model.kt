@@ -10,6 +10,7 @@ import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemDisplayMetadata
 import xyz.xenondevs.nova.world.item.NovaItem
 
+@Deprecated(MULTI_MODEL_DEPRECATION)
 data class Model(
     val itemStack: ItemStack?,
     val location: Location,

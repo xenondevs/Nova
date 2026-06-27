@@ -1,12 +1,16 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.world.fakeentity.metadata.impl
 
 import net.minecraft.core.Rotations
 import net.minecraft.network.syncher.EntityDataSerializers
 import org.joml.Vector3f
 import org.joml.Vector3fc
+import xyz.xenondevs.nova.world.fakeentity.FAKE_ENTITY_DEPRECATION
 
 private fun Vector3fc.toRotations(): Rotations = Rotations(x(), y(), z())
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 class ArmorStandMetadata : LivingEntityMetadata() {
     
     private val sharedFlags = sharedFlags(15)

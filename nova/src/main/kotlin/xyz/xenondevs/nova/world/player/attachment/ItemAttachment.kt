@@ -12,9 +12,9 @@ import org.joml.Vector3f
 import org.joml.Vector3fc
 import xyz.xenondevs.commons.collections.mapToIntArray
 import xyz.xenondevs.nova.network.packet.ClientboundSetPassengersPacket
-import xyz.xenondevs.nova.util.runTaskLater
-import xyz.xenondevs.nova.util.send
-import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
+import xyz.xenondevs.nova.network.send
+import xyz.xenondevs.nova.packetentity.PacketItemDisplay
+import xyz.xenondevs.nova.packetentity.packetItemDisplay
 
 /**
  * An item model that attaches to a [Player] by using an [ArmorStand] as a passenger.
@@ -30,51 +30,63 @@ open class ItemAttachment(
 ) : Attachment {
     
     final override var passengerId: Int
-    protected var passenger: FakeItemDisplay
+    protected var passenger: PacketItemDisplay
+    
+    private var world = player.world
     
     init {
         passenger = createPassenger()
-        passengerId = passenger.entityId
-        passenger.register()
+        passengerId = passenger.id
+        passenger.spawn()
     }
     
-    private fun createPassenger(): FakeItemDisplay {
-        val spawnLoc = player.location.apply { yaw = 0f; pitch = 0f }
-        return FakeItemDisplay(spawnLoc, false) { entity, data ->
-            entity.spawnHandler = {
-                runTaskLater(1) {
-                    // This packet will be modified in AbilityManager to include all attachment entities
-                    it.send(ClientboundSetPassengersPacket(player.entityId, player.passengers.mapToIntArray(Entity::getEntityId)))
-                }
+    private fun createPassenger(): PacketItemDisplay {
+        return packetItemDisplay {
+            location by player.location.apply { y += 1.75; yaw = 0f; pitch = 0f }
+            sendMovementPackets = false
+            metadata {
+                itemStack by this@ItemAttachment.itemStack
             }
-            
-            data.itemStack = itemStack
+            onSpawn {
+                // This packet will be modified in AbilityManager to include all attachment entities
+                viewer.send(ClientboundSetPassengersPacket(viewer.entityId, viewer.passengers.mapToIntArray(Entity::getEntityId)))
+            }
         }
     }
     
     final override fun despawn() {
-        passenger.remove()
+        passenger.despawn()
     }
     
     override fun handleTick() {
-        val playerLocation = player.location
-        
-        val rotation = Quaternionf().rotateY(-Math.toRadians(playerLocation.yaw))
-        val translate = Vector3f(translation).rotate(rotation)
-        
-        passenger.updateEntityData(true) {
-            scale = Vector3f(this@ItemAttachment.scale)
-            leftRotation = rotation
-            translation = translate
+        updatePassengerLocation(player)
+    }
+    
+    private fun updatePassengerLocation(player: Player) {
+        if (player.world != world) {
+            handleTeleport()
+            world = player.world
+        } else {
+            val playerLocation = player.location
+            
+            val rotation = Quaternionf().rotateY(-Math.toRadians(playerLocation.yaw))
+            val translate = Vector3f(translation).rotate(rotation)
+            
+            passenger.metadata.apply {
+                scale = Vector3f(this@ItemAttachment.scale)
+                leftRotation = rotation
+                translation = translate
+            }
+            
+            passenger.location = playerLocation.apply { y += 1.75; yaw = 0f; pitch = 0f }
         }
-        
-        passenger.updateLocationSilently(playerLocation.apply { yaw = 0f; pitch = 0f })
     }
     
     override fun handleTeleport() {
-        passenger.remove()
-        passenger.updateLocationSilently(player.location.apply { yaw = 0f; pitch = 0f })
-        passenger.register()
+        passenger.despawn()
+        passenger = createPassenger()
+        passengerId = passenger.id
+        passenger.spawn()
     }
     
 }

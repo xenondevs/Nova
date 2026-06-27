@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.ui.menu
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.dsl.ProviderDslProperty
 import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.dsl.IngredientsDsl
@@ -10,7 +11,6 @@ import xyz.xenondevs.invui.dsl.InventoryWithBackgroundProvider
 import xyz.xenondevs.invui.dsl.ItemProviderDsl
 import xyz.xenondevs.invui.dsl.WindowDsl
 import xyz.xenondevs.invui.dsl.itemProvider
-import xyz.xenondevs.invui.dsl.ProviderDslProperty
 import xyz.xenondevs.invui.gui.IngredientMapper
 import xyz.xenondevs.invui.gui.InventoryLink
 import xyz.xenondevs.invui.gui.Markers

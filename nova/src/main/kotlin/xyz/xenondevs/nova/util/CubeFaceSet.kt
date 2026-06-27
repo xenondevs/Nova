@@ -26,6 +26,25 @@ inline fun CubeFaceSet(init: (face: BlockFace) -> Boolean): CubeFaceSet =
 value class CubeFaceSet(val data: Byte) {
     
     /**
+     * Creates a new [CubeFaceSet] with the faces that are set to `true`.
+     */
+    constructor(
+        north: Boolean = false,
+        east: Boolean = false,
+        south: Boolean = false,
+        west: Boolean = false,
+        up: Boolean = false,
+        down: Boolean = false
+    ) : this(
+        ((if (north) 0b000001 else 0) or
+            (if (east) 0b000010 else 0) or
+            (if (south) 0b000100 else 0) or
+            (if (west) 0b001000 else 0) or
+            (if (up) 0b010000 else 0) or
+            (if (down) 0b100000 else 0)).toByte()
+    )
+    
+    /**
      * Checks whether [face] is contained in this set.
      */
     operator fun contains(face: BlockFace): Boolean =

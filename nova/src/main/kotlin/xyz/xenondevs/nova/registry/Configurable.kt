@@ -3,6 +3,9 @@ package xyz.xenondevs.nova.registry
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.config.ConfigProvider
 
+/**
+ * Shortcut for `map { it.config }`.
+ */
 val Provider<Configurable>.config: Provider<ConfigProvider>
     get() = map { it.config }
 

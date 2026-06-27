@@ -12,6 +12,10 @@ import org.bukkit.inventory.ItemStack
 import org.joml.Matrix4f
 import org.joml.Matrix4fc
 import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.nova.packetentity.ItemDisplayMetadata
+import xyz.xenondevs.nova.packetentity.PacketItemDisplay
+import xyz.xenondevs.nova.packetentity.packetItemDisplay
+import xyz.xenondevs.nova.packetentity.transform
 import xyz.xenondevs.nova.serialization.kotlinx.DisplayEntityBlockModelDataSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.KeySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.Matrix4fcAsArraySerializer
@@ -24,9 +28,6 @@ import xyz.xenondevs.nova.util.setBlockStateSilently
 import xyz.xenondevs.nova.util.withoutBlockMigration
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.BlockUpdateMethod
-import xyz.xenondevs.nova.world.fakeentity.FakeEntity
-import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
-import xyz.xenondevs.nova.world.fakeentity.metadata.impl.ItemDisplayMetadata
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
@@ -66,7 +67,7 @@ internal class DisplayEntityBlockModelData(
 internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModelData) : BlockModelProvider {
     
     companion object {
-        val entities = ConcurrentHashMap<BlockPos, List<FakeItemDisplay>>()
+        val entities = ConcurrentHashMap<BlockPos, List<PacketItemDisplay>>()
     }
     
     override fun set(pos: BlockPos, method: BlockUpdateMethod) {
@@ -88,23 +89,20 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         if (pos in entities.keys)
             throw IllegalStateException("ItemDisplay already exists at $pos")
         
-        val models = info.models.mapTo(ArrayList()) { model ->
-            FakeItemDisplay(pos.location.toCenterLocation()) { _, data -> setMetadata(data, model) }
-        }
-        if (info.waterlogged) {
-            models += FakeItemDisplay(pos.location.toCenterLocation()) { _, data -> setWaterlogMetadata(data, pos) }
-        }
+        val models = info.models.mapTo(ArrayList()) { createDisplay(pos, it) }
+        if (info.waterlogged)
+            models += createWaterlogDisplay(pos)
         
         entities[pos] = models
     }
     
     override fun remove(pos: BlockPos, method: BlockUpdateMethod) {
         super.remove(pos, method)
-        entities.remove(pos)?.forEach(FakeEntity<*>::remove)
+        entities.remove(pos)?.forEach(PacketItemDisplay::despawn)
     }
     
     override fun unload(pos: BlockPos) {
-        entities.remove(pos)?.forEach(FakeEntity<*>::remove)
+        entities.remove(pos)?.forEach(PacketItemDisplay::despawn)
     }
     
     override fun replace(pos: BlockPos, method: BlockUpdateMethod) {
@@ -112,29 +110,44 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
         
         // re-use as many existing entities as possible
         val prevEntities = entities[pos] ?: emptyList()
-        val newEntities = ArrayList<FakeItemDisplay>()
+        val newEntities = ArrayList<PacketItemDisplay>()
         
         var i = 0
         for (model in info.models) {
             newEntities += prevEntities.getOrNull(i++)
-                ?.also { prevEntity -> prevEntity.updateEntityData(true) { setMetadata(this, model) } }
-                ?: FakeItemDisplay(pos.location.toCenterLocation()) { _, data -> setMetadata(data, model) }
+                ?.also { prevEntity -> setMetadata(prevEntity.metadata, model) }
+                ?: createDisplay(pos, model)
         }
         if (info.waterlogged) {
             newEntities += prevEntities.getOrNull(i)
-                ?.also { prevEntity -> prevEntity.updateEntityData(true) { setWaterlogMetadata(this, pos) } }
-                ?: FakeItemDisplay(pos.location.toCenterLocation()) { _, data -> setWaterlogMetadata(data, pos) }
+                ?.also { prevEntity -> setWaterlogMetadata(prevEntity.metadata, pos) }
+                ?: createWaterlogDisplay(pos)
         }
         
         entities[pos] = newEntities
     }
     
     fun updateWaterlogEntity(pos: BlockPos) {
-        entities[pos]?.lastOrNull()?.updateEntityData(true) { setWaterlogMetadata(this, pos) }
+        entities[pos]?.lastOrNull()?.metadata?.let { setWaterlogMetadata(it, pos) }
+    }
+    
+    private fun createDisplay(pos: BlockPos, model: DisplayEntityBlockModelData.Model) = packetItemDisplay {
+        location by pos.location.toCenterLocation()
+    }.apply {
+        setMetadata(metadata, model)
+        spawn()
+    }
+    
+    private fun createWaterlogDisplay(pos: BlockPos) = packetItemDisplay {
+        location by pos.location.toCenterLocation()
+    }.apply {
+        setWaterlogMetadata(metadata, pos)
+        spawn()
     }
     
     private fun setWaterlogMetadata(data: ItemDisplayMetadata, pos: BlockPos) {
-        data.brightness = null
+        data.brightnessOverride = null
+        @Suppress("DEPRECATION")
         data.itemStack = DefaultBlockOverlays.WATERLOGGED.get().createClientsideItemBuilder()
             .setCustomModelData(0, pos.world.getFluidData(pos.x, pos.y + 1, pos.z).fluidType == Fluid.WATER)
             .setCustomModelData(0, Color(pos.world.serverLevel.getBiome(pos.nmsPos).value().waterColor))
@@ -145,7 +158,7 @@ internal class DisplayEntityBlockModelProvider(val info: DisplayEntityBlockModel
     private fun setMetadata(data: ItemDisplayMetadata, model: DisplayEntityBlockModelData.Model) {
         // TODO: proper light level
         if (info.collider.material.requiresLight) {
-            data.brightness = Brightness(15, 15)
+            data.brightnessOverride = Brightness(15, 15)
         }
         
         data.itemStack = model.itemStack

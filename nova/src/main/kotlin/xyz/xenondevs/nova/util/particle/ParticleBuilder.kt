@@ -26,10 +26,10 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import org.joml.Vector3f
+import xyz.xenondevs.nova.network.send
 import xyz.xenondevs.nova.util.blockPos
 import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.util.nmsEntity
-import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.unwrap
 import java.awt.Color
 import java.util.function.Predicate

@@ -3,6 +3,7 @@ package xyz.xenondevs.nova.util
 import net.minecraft.network.protocol.Packet
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
+import xyz.xenondevs.nova.network.send
 
 /**
  * A task that sends the given [packets] to all players from [getViewers]

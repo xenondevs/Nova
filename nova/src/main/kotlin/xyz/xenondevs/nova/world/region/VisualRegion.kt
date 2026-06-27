@@ -3,20 +3,18 @@ package xyz.xenondevs.nova.world.region
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.joml.Vector3f
+import xyz.xenondevs.nova.packetentity.PacketItemDisplay
+import xyz.xenondevs.nova.packetentity.isGlowing
+import xyz.xenondevs.nova.packetentity.packetItemDisplay
+import xyz.xenondevs.nova.ui.menu.by
 import xyz.xenondevs.nova.util.component1
 import xyz.xenondevs.nova.util.component2
 import xyz.xenondevs.nova.util.component3
 import xyz.xenondevs.nova.util.component4
-import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.world.item.clientsideProvider
 import java.awt.Color
 import java.util.*
-
-private fun Iterable<FakeItemDisplay>.spawn(viewer: Player) = forEach { it.spawn(viewer) }
-private fun Iterable<FakeItemDisplay>.spawn(viewers: Iterable<Player>) = forEach { display -> viewers.forEach { display.spawn(it) } }
-private fun Iterable<FakeItemDisplay>.despawn(viewer: Player) = forEach { it.despawn(viewer) }
-private fun Iterable<FakeItemDisplay>.despawn(viewers: Iterable<Player>) = forEach { display -> viewers.forEach { display.despawn(it) } }
 
 private const val MIN_LINE_WIDTH = 0.005
 private const val MAX_LINE_WIDTH = 0.05
@@ -24,10 +22,10 @@ private const val DIAGONAL_THRESHOLD = 10.0
 
 object VisualRegion {
     
-    private val regions = HashMap<UUID, Pair<List<FakeItemDisplay>, MutableSet<Player>>>()
+    private val regions = HashMap<UUID, List<PacketItemDisplay>>()
     
     fun isVisible(player: Player, regionId: UUID) =
-        regions[regionId]?.second?.contains(player) ?: false
+        regions[regionId]?.get(0)?.viewerWhitelist?.contains(player.uniqueId) ?: false
     
     fun toggleView(player: Player, regionId: UUID, region: Region) {
         if (isVisible(player, regionId)) {
@@ -36,52 +34,44 @@ object VisualRegion {
     }
     
     fun showRegion(player: Player, regionId: UUID, region: Region) {
-        val (outline, viewers) = getOrCreateVisualRegion(regionId, region)
-        if (player !in viewers) {
-            outline.spawn(player)
-            viewers.add(player)
-        }
+        val outline = regions.getOrPut(regionId) { createOutline(regionId, region, emptySet()) }
+        val newViewers = (outline[0].viewerWhitelist ?: emptySet()) + player.uniqueId
+        outline.forEach { it.viewerWhitelist = newViewers }
     }
     
     fun hideRegion(player: Player, regionId: UUID) {
-        val (outline, viewers) = regions[regionId] ?: return
-        outline.despawn(player)
-        viewers.remove(player)
+        val outline = regions[regionId] ?: return
+        val currentViewers = outline[0].viewerWhitelist ?: emptySet()
         
-        if (viewers.isEmpty())
+        if (currentViewers.isEmpty() || currentViewers.size == 1 && currentViewers.first() == player.uniqueId) {
             removeRegion(regionId)
-    }
-    
-    fun removeRegion(regionId: UUID) {
-        val (outline, viewers) = regions.remove(regionId) ?: return
-        outline.despawn(viewers)
-    }
-    
-    fun updateRegion(regionId: UUID, region: Region) {
-        val (outline, viewers) = regions[regionId] ?: return
-        outline.despawn(viewers)
-        val newOutline = createOutline(regionId, region)
-        newOutline.spawn(viewers)
-        regions[regionId] = newOutline to viewers
-    }
-    
-    private fun getOrCreateVisualRegion(regionId: UUID, region: Region): Pair<List<FakeItemDisplay>, MutableSet<Player>> {
-        return regions.getOrPut(regionId) {
-            val outline = createOutline(regionId, region)
-            val viewers = Collections.newSetFromMap<Player>(WeakHashMap())
-            outline to viewers
+        } else {
+            val newViewers = currentViewers + player.uniqueId
+            outline.forEach { it.viewerWhitelist = newViewers }
         }
     }
     
-    private fun createOutline(regionId: UUID, region: Region): List<FakeItemDisplay> {
+    fun removeRegion(regionId: UUID) {
+        val outline = regions.remove(regionId) ?: return
+        outline.forEach { it.despawn() }
+    }
+    
+    fun updateRegion(regionId: UUID, region: Region) {
+        val outline = regions[regionId] ?: return
+        val viewers = outline[0].viewerWhitelist ?: emptySet()
+        removeRegion(regionId)
+        regions[regionId] = createOutline(regionId, region, viewers)
+    }
+    
+    private fun createOutline(regionId: UUID, region: Region, viewers: Set<UUID>): List<PacketItemDisplay> {
         val min = region.min
         val max = region.max
         val color = Color(regionId.hashCode()).rgb
         
-        return getEdgeDisplays(min, max, color)
+        return getEdgeDisplays(min, max, color, viewers)
     }
     
-    private fun getEdgeDisplays(min: Location, max: Location, color: Int): List<FakeItemDisplay> {
+    private fun getEdgeDisplays(min: Location, max: Location, color: Int, viewers: Set<UUID>): List<PacketItemDisplay> {
         val (world, minX, minY, minZ) = min
         val (_, maxX, maxY, maxZ) = max
         
@@ -89,7 +79,7 @@ object VisualRegion {
         val lineWidth = (min.distance(max) / DIAGONAL_THRESHOLD).coerceIn(0.0, 1.0) * (MAX_LINE_WIDTH - MIN_LINE_WIDTH) + MIN_LINE_WIDTH
         
         fun createLine(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2: Double) =
-            createLine(Location(world, x1, y1, z1), Location(world, x2, y2, z2), lineWidth, color)
+            createLine(Location(world, x1, y1, z1), Location(world, x2, y2, z2), lineWidth, color, viewers)
         
         return listOf(
             // minX -> maxX
@@ -110,19 +100,19 @@ object VisualRegion {
         )
     }
     
-    private fun createLine(from: Location, to: Location, lineWidth: Double, color: Int): FakeItemDisplay {
-        val center = from.clone().add(to).multiply(0.5)
-        
-        return FakeItemDisplay(center, false) { _, data ->
-            data.itemStack = DefaultBlockOverlays.TRANSPARENT_BLOCK.clientsideProvider.get().get()
-            data.scale = Vector3f(
+    private fun createLine(from: Location, to: Location, lineWidth: Double, color: Int, viewers: Set<UUID>) = packetItemDisplay {
+        viewerWhitelist by viewers
+        location by from.clone().add(to).multiply(0.5)
+        metadata {
+            itemStack by DefaultBlockOverlays.TRANSPARENT_BLOCK.clientsideProvider
+            scale by Vector3f(
                 (to.x - from.x + lineWidth).toFloat(),
                 (to.y - from.y + lineWidth).toFloat(),
                 (to.z - from.z + lineWidth).toFloat(),
             )
-            data.isGlowing = true
-            data.glowColor = color
+            isGlowing by true
+            glowColorOverride by org.bukkit.Color.fromARGB(color)
         }
-    }
+    }.apply { spawn() }
     
 }

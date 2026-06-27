@@ -5,8 +5,10 @@ import net.minecraft.network.syncher.EntityDataSerializers
 import org.bukkit.entity.Pose
 import xyz.xenondevs.nova.util.component.adventure.toNMSComponent
 import xyz.xenondevs.nova.util.nmsPose
+import xyz.xenondevs.nova.world.fakeentity.FAKE_ENTITY_DEPRECATION
 import xyz.xenondevs.nova.world.fakeentity.metadata.Metadata
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 open class EntityMetadata internal constructor() : Metadata() {
     
     private val sharedFlags = sharedFlags(0)

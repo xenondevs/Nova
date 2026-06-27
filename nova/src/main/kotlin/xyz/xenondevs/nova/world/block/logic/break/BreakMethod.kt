@@ -1,14 +1,20 @@
 package xyz.xenondevs.nova.world.block.logic.`break`
 
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.CustomModelData.customModelData
 import org.bukkit.Material
 import org.bukkit.block.Block
-import org.bukkit.entity.ItemDisplay.ItemDisplayTransform
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.provider.mutableProvider
+import xyz.xenondevs.commons.provider.provider
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.nova.packetentity.packetItemDisplay
+import xyz.xenondevs.nova.ui.menu.itemProvider
 import xyz.xenondevs.nova.util.broadcastDestructionStage
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.Breakable
-import xyz.xenondevs.nova.world.fakeentity.impl.FakeItemDisplay
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import xyz.xenondevs.nova.world.pos
 import kotlin.random.Random
@@ -80,27 +86,32 @@ internal class PacketBreakMethod(pos: BlockPos, private val entityId: Int = Rand
 
 internal class DisplayEntityBreakMethod(pos: BlockPos) : VisibleBreakMethod(pos) {
     
-    private val itemDisplay = FakeItemDisplay(pos.location.add(.5, .5, .5), true) { _, data ->
-        data.itemDisplay = ItemDisplayTransform.HEAD
+    private val _breakStage = mutableProvider(-1)
+    override var breakStage by _breakStage
+    
+    private val itemDisplay = packetItemDisplay {
+        location by pos.location.add(.5, .5, .5)
+        metadata { itemStack by _breakStage.flatMap { items.getOrNull(it) ?: provider(ItemStack.empty()) }}
     }
     
-    override var breakStage: Int = -1
-        set(stage) {
-            if (field == stage) return
-            
-            field = stage
-            itemDisplay.updateEntityData(true) {
-                if (stage in 0..9) {
-                    itemStack = DefaultBlockOverlays.BREAK_STAGE_OVERLAY.get()
-                        .createClientsideItemBuilder()
-                        .addCustomModelData(stage)
-                        .get()
-                } else null
-            }
-        }
+    init {
+        itemDisplay.spawn()
+    }
     
     override fun stop() {
-        itemDisplay.remove()
+        itemDisplay.despawn()
+    }
+    
+    companion object {
+        
+        private val items = (0..9).map { stage ->
+            itemProvider(DefaultBlockOverlays.BREAK_STAGE_OVERLAY) {
+                data[DataComponentTypes.CUSTOM_MODEL_DATA] by customModelData()
+                    .addFloat(stage.toFloat())
+                    .build()
+            }.map(ItemProvider::get)
+        }
+        
     }
     
 }

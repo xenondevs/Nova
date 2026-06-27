@@ -1,16 +1,20 @@
+@file:Suppress("DEPRECATION")
+
 package xyz.xenondevs.nova.world.fakeentity.metadata
 
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.network.syncher.EntityDataSerializers
-import xyz.xenondevs.nova.network.packet.PacketIds
 import xyz.xenondevs.nova.network.RegistryFriendlyByteBuf
+import xyz.xenondevs.nova.network.packet.PacketIds
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.fakeentity.FAKE_ENTITY_DEPRECATION
 import xyz.xenondevs.nova.world.item.logic.PacketItems
 import java.util.*
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
+@Deprecated(FAKE_ENTITY_DEPRECATION)
 abstract class Metadata internal constructor() {
     
     private val entries = ArrayList<MetadataEntry<*>>()

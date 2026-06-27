@@ -17,11 +17,12 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.util.BlockUtils
+import xyz.xenondevs.nova.util.MINECRAFT_SERVER
+import xyz.xenondevs.nova.util.broadcast
 import xyz.xenondevs.nova.util.callEvent
 import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.particle.noteColor
 import xyz.xenondevs.nova.util.particle.particle
-import xyz.xenondevs.nova.util.send
 import xyz.xenondevs.nova.util.serverLevel
 import xyz.xenondevs.nova.world.BlockPos
 import xyz.xenondevs.nova.world.InteractionResult
@@ -29,7 +30,6 @@ import xyz.xenondevs.nova.world.block.state.NovaBlockState
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.NOTE_BLOCK_INSTRUMENT
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.NOTE_BLOCK_NOTE
 import xyz.xenondevs.nova.world.block.state.property.DefaultBlockStateProperties.POWERED
-import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import kotlin.random.Random
 
@@ -126,7 +126,7 @@ internal object NoteBlockBehavior : BlockBehavior {
     
     private fun spawnParticle(pos: BlockPos, note: Int) {
         val packet = particle(ParticleTypes.NOTE, pos.block.location.add(0.5, 1.0, 0.5)) { noteColor(note) }
-        FakeEntityManager.getChunkViewers(pos.chunkPos).forEach { it.send(packet) }
+        MINECRAFT_SERVER.playerList.broadcast(pos.block, 32.0, packet)
     }
     
     override fun getDrops(pos: BlockPos, state: NovaBlockState, ctx: Context<BlockBreak>): List<ItemStack> {

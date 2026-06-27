@@ -3,6 +3,7 @@ format.version = "1.1"
 
 [versions]
 bytebase = "0.4.8"
+commons-provider = "2.0.0-alpha.11"
 detekt = "2.0.0-alpha.2"
 dokka = "2.2.0"
 jgrapht = "1.5.3"
@@ -23,7 +24,8 @@ caffeine = { group = "com.github.ben-manes.caffeine", name = "caffeine", version
 commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "xenondevs-commons" }
 commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "xenondevs-commons" }
 commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "xenondevs-commons" }
-commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version = "2.0.0-alpha.10" }
+commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version.ref = "commons-provider" }
+commons-provider-dsl = { group = "xyz.xenondevs.commons", name = "commons-provider-dsl", version.ref = "commons-provider" }
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "xenondevs-commons" }
 commons-version = { group = "xyz.xenondevs.commons", name = "commons-version", version.ref = "xenondevs-commons" }
 configurate-yaml = { group = "org.spongepowered", name = "configurate-yaml", version = "4.2.0" }

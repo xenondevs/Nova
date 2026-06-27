@@ -25,6 +25,7 @@ import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.world.level.block.Block
 import org.bukkit.Bukkit
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.joml.Matrix4f
 import org.joml.Vector3f
@@ -32,6 +33,7 @@ import xyz.xenondevs.commons.guava.component1
 import xyz.xenondevs.commons.guava.component2
 import xyz.xenondevs.commons.guava.component3
 import xyz.xenondevs.commons.guava.iterator
+import xyz.xenondevs.commons.provider.mutableProvider
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.addon.AddonBootstrapper
 import xyz.xenondevs.nova.command.Command
@@ -51,6 +53,10 @@ import xyz.xenondevs.nova.config.CONFIGS
 import xyz.xenondevs.nova.config.NovaConfigBackend
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
+import xyz.xenondevs.nova.packetentity.MAX_PACKET_ENTITY_RENDER_DISTANCE
+import xyz.xenondevs.nova.packetentity.MIN_PACKET_ENTITY_RENDER_DISTANCE
+import xyz.xenondevs.nova.packetentity.packetEntityRenderDistance
+import xyz.xenondevs.nova.packetentity.packetSheep
 import xyz.xenondevs.nova.registry.MutableNovaRegistry
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistries.NETWORK_TYPE
@@ -71,6 +77,7 @@ import xyz.xenondevs.nova.util.item.novaItem
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.util.novaBlock
 import xyz.xenondevs.nova.util.runTaskLater
+import xyz.xenondevs.nova.util.runTaskTimer
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.util.world.BlockStateSearcher
 import xyz.xenondevs.nova.world.BlockPos
@@ -91,9 +98,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkNode
 import xyz.xenondevs.nova.world.block.tileentity.network.type.NetworkType
 import xyz.xenondevs.nova.world.block.tileentity.vanilla.VanillaTileEntity
 import xyz.xenondevs.nova.world.chunkPos
-import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MAX_RENDER_DISTANCE
-import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager.MIN_RENDER_DISTANCE
-import xyz.xenondevs.nova.world.fakeentity.fakeEntityRenderDistance
+import xyz.xenondevs.nova.world.fakeentity.FakeEntityManager
 import xyz.xenondevs.nova.world.format.WorldDataManager
 import xyz.xenondevs.nova.world.item.NovaItem
 import xyz.xenondevs.nova.world.item.logic.AdvancedTooltips
@@ -208,7 +213,7 @@ internal object NovaCommand : Command() {
         .then(literal("renderDistance")
             .requiresPlayer()
             .requiresPermission("nova.command.renderDistance")
-            .then(argument("distance", IntegerArgumentType.integer(MIN_RENDER_DISTANCE, MAX_RENDER_DISTANCE))
+            .then(argument("distance", IntegerArgumentType.integer(MIN_PACKET_ENTITY_RENDER_DISTANCE, MAX_PACKET_ENTITY_RENDER_DISTANCE))
                 .executes0(::setRenderDistance)))
         .then(literal("addons")
             .requiresPermission("nova.command.addons")
@@ -986,7 +991,8 @@ internal object NovaCommand : Command() {
     private fun setRenderDistance(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         val distance: Int = ctx["distance"]
-        player.fakeEntityRenderDistance = distance
+        player.packetEntityRenderDistance = distance
+        FakeEntityManager.updateRenderDistance(player)
         
         ctx.source.sender.sendMessage(Component.translatable(
             "command.nova.render_distance",
