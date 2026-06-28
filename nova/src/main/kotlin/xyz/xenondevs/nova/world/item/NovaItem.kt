@@ -44,7 +44,6 @@ import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.EntityInteract
 import xyz.xenondevs.nova.context.intention.ItemUse
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 import xyz.xenondevs.nova.registry.Configurable
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistryElement
@@ -181,9 +180,14 @@ typealias NovaItemEntrySet = @Serializable(with = NovaItemEntrySetSerializer::cl
 typealias MixedItemTypeEntrySet = @Serializable(with = ItemTypeMixedEntrySetSerializer::class) RegistryEntrySet.Mixed<NovaItem, ItemType>
 
 /**
+ * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [NovaItem.clientsideProvider].
+ */
+val Provider<NovaItem>.clientsideProvider: Provider<ItemProvider>
+    get() = bootstrapFlatMap { it.clientsideProvider }
+
+/**
  * Represents a custom Nova item type.
  */
-@GenerateFlatMapExtensions
 @Serializable(with = NovaItemSerializer::class)
 class NovaItem internal constructor(
     override val entry: RegistryEntry.Nova<NovaItem>,

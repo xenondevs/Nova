@@ -24,8 +24,6 @@ include("nova-hooks:nova-hook-worldedit")
 include("nova-hooks:nova-hook-worldguard")
 
 // ksp
-include("nova-ksp:annotations")
-include("nova-ksp:processor:flatmap-extensions")
 include("nova-ksp:processor:registry")
 include("nova-ksp:processor:network")
 include("nova-ksp:processor:packet-entity")

@@ -9,9 +9,9 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.nova.i18n.LocaleManager
-import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
+import xyz.xenondevs.nova.registry.bootstrapFlatMap
 import xyz.xenondevs.nova.resources.CharSizes
 import xyz.xenondevs.nova.resources.builder.task.GuiTextureData
 import xyz.xenondevs.nova.serialization.kotlinx.GuiTextureSerializer
@@ -22,7 +22,30 @@ import xyz.xenondevs.nova.util.component.adventure.toMinecraftLocaleCode
 import java.util.*
 import kotlin.math.roundToInt
 
-@GenerateFlatMapExtensions
+/**
+ * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [GuiTexture.component].
+ */
+val Provider<GuiTexture>.component: Provider<Component>
+    get() = bootstrapFlatMap { it.component }
+
+/**
+ * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [GuiTexture.getTitle].
+ */
+fun Provider<GuiTexture>.getTitle(locale: Provider<Locale>): Provider<Component> =
+    bootstrapFlatMap { it.getTitle(locale) }
+
+/**
+ * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [GuiTexture.getTitle].
+ */
+fun Provider<GuiTexture>.getTitle(translate: String, locale: Provider<Locale>): Provider<Component> =
+    bootstrapFlatMap { it.getTitle(translate, locale) }
+
+/**
+ * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [GuiTexture.getTitle].
+ */
+fun Provider<GuiTexture>.getTitle(title: Component, locale: Provider<Locale>): Provider<Component> =
+    bootstrapFlatMap { it.getTitle(title, locale) }
+
 @Serializable(with = GuiTextureSerializer::class)
 class GuiTexture internal constructor(
     override val entry: RegistryEntry.Nova<GuiTexture>,

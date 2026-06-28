@@ -10,10 +10,10 @@ import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
+import xyz.xenondevs.nova.registry.bootstrapFlatMap
 import xyz.xenondevs.nova.serialization.kotlinx.ToolTierEntrySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolTierEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolTierSerializer
@@ -33,7 +33,12 @@ typealias NovaToolTierEntry = @Serializable(with = ToolTierEntrySerializer::clas
  */
 typealias NovaToolTierEntrySet = @Serializable(with = ToolTierEntrySetSerializer::class) RegistryEntrySet.Nova<ToolTier>
 
-@GenerateFlatMapExtensions
+/**
+ * Shortcut to [bootstrapFlatMap][bootstrapFlatMap] to [ToolTier.levelValue].
+ */
+val Provider<ToolTier>.levelValue: Provider<Double>
+    get() = bootstrapFlatMap { it.levelValue }
+
 @Serializable(with = ToolTierSerializer::class)
 class ToolTier(
     override val entry: RegistryEntry.Nova<ToolTier>,

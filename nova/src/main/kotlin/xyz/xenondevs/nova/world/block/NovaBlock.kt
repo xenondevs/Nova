@@ -24,7 +24,6 @@ import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockInteract
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.integration.protection.ProtectionManager
-import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 import xyz.xenondevs.nova.registry.Configurable
 import xyz.xenondevs.nova.registry.NovaRegistries
 import xyz.xenondevs.nova.registry.NovaRegistryElement
@@ -90,7 +89,6 @@ typealias MixedBlockTypeEntrySet = @Serializable(with = BlockTypeMixedEntrySetSe
 /**
  * Represents a custom Nova block type.
  */
-@GenerateFlatMapExtensions
 @Serializable(with = NovaBlockSerializer::class)
 open class NovaBlock internal constructor(
     override val entry: RegistryEntry.Nova<NovaBlock>,

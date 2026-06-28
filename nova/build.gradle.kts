@@ -4,17 +4,12 @@ plugins {
     id("nova.publish-conventions-java")
     id("nova.detekt-conventions")
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.ksp)
     id("nova.origami-conventions")
     alias(libs.plugins.pluginPublish)
     id("xyz.xenondevs.bundler-jar-plugin")
 }
 
 dependencies {
-    // ksp
-    compileOnly(project(":nova-ksp:annotations"))
-    ksp(project(":nova-ksp:processor:flatmap-extensions"))
-    
     // api dependencies
     novaLoaderApi(libs.bundles.kotlin)
     novaLoaderApi(libs.bundles.cbf)

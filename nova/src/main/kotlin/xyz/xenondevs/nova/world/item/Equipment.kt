@@ -2,7 +2,6 @@ package xyz.xenondevs.nova.world.item
 
 import kotlinx.serialization.Serializable
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.nova.ksp.annotation.GenerateFlatMapExtensions
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
@@ -24,7 +23,6 @@ typealias NovaEquipmentEntrySet = @Serializable(with = EquipmentEntrySetSerializ
 /**
  * Represents a custom armor texture.
  */
-@GenerateFlatMapExtensions
 @Serializable(with = EquipmentSerializer::class)
 class Equipment internal constructor(
     override val entry: RegistryEntry.Nova<Equipment>,
