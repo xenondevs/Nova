@@ -7,7 +7,7 @@ dokka = "2.2.0"
 jgrapht = "1.5.3"
 kotlin = "2.4.0"
 kotlinx-coroutines = "1.11.0"
-ktor = "3.5.0"
+ktor = "3.5.1"
 paper = "26.2.build.+"
 xenondevs-commons = "1.37"
 
