@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.ui.menu.explorer.recipes.group
 
 import net.kyori.adventure.text.Component
-import org.bukkit.Material
 import org.bukkit.inventory.BlastingRecipe
 import org.bukkit.inventory.CampfireRecipe
 import org.bukkit.inventory.CookingRecipe

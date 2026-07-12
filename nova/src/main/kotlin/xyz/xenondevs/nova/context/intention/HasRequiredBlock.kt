@@ -14,6 +14,7 @@ import xyz.xenondevs.nova.context.intention.HasRequiredBlock.Companion.BLOCK_STA
 import xyz.xenondevs.nova.context.intention.HasRequiredBlock.Companion.BLOCK_TYPE
 import xyz.xenondevs.nova.context.intention.HasRequiredBlock.Companion.BLOCK_WORLD
 import xyz.xenondevs.nova.util.novaKey
+import xyz.xenondevs.nova.world.block.blockType
 
 /**
  * A [ContextIntention] that has required parameters about a block in a world.
@@ -96,7 +97,7 @@ interface HasRequiredBlock<I : HasRequiredBlock<I>> : ContextIntention<I> {
             require(BLOCK_WORLD)
             require(BLOCK_TYPE)
             addAutofiller(BLOCK_WORLD, Autofiller.from(BLOCK, Block::getWorld))
-            addAutofiller(BLOCK_TYPE, Autofiller.from(BLOCK_STATE) { it.material.asBlockType() })
+            addAutofiller(BLOCK_TYPE, Autofiller.from(BLOCK_STATE) { it.blockType })
         }
         
     }

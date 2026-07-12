@@ -1,13 +1,12 @@
 package xyz.xenondevs.nova.world.block.behavior
 
 import org.bukkit.GameMode
-import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.collections.firstInstanceOfOrNull
 import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockInteract
@@ -23,6 +22,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.node.NetworkEndPoint
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.FluidType
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
+import xyz.xenondevs.nova.world.item.itemType
 
 /**
  * Allows filling and emptying fluid containers of [TileEntities][TileEntity]
@@ -43,7 +43,7 @@ object Bucketable : BlockBehavior {
             ?: return InteractionResult.Pass
         val clickedFace = ctx[BlockInteract.CLICKED_BLOCK_FACE]
         
-        if (item.type == Material.BUCKET) {
+        if (item.itemType == ItemType.BUCKET) {
             // move fluid from tile-entity to bucket
             val container = selectContainerExtract(fluidHolder, clickedFace)
                 ?: return InteractionResult.Pass
@@ -57,7 +57,7 @@ object Bucketable : BlockBehavior {
             }
             block.playSound(sound, 1f, 1f)
         } else {
-            val fluidType = FluidType.entries.firstOrNull { it.bucket.type == item.type }
+            val fluidType = FluidType.entries.firstOrNull { it.bucket.itemType == item.itemType }
                 ?: return InteractionResult.Pass
             
             // move fluid from bucket to tile-entity
@@ -142,7 +142,7 @@ object Bucketable : BlockBehavior {
     
     internal fun emptyBucketInHand(player: Player, hand: EquipmentSlot) {
         val itemStack = player.inventory.getItem(hand)
-        val bucket = ItemStack(Material.BUCKET)
+        val bucket = ItemType.BUCKET.createItemStack()
         if (itemStack.amount > 1) {
             itemStack.amount--
             player.addToInventoryOrDrop(bucket)

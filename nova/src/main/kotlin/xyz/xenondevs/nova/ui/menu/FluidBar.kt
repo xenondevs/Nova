@@ -1,7 +1,5 @@
 package xyz.xenondevs.nova.ui.menu
 
-import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
@@ -24,6 +22,7 @@ import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.Fl
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.container.NetworkedFluidContainer
 import xyz.xenondevs.nova.world.block.tileentity.network.type.fluid.holder.FluidHolder
 import xyz.xenondevs.nova.world.item.DefaultGuiItems
+import xyz.xenondevs.nova.world.item.itemType
 
 private val DEFAULT_FLUID_BAR_ITEMS = mapOf(
     null to DefaultGuiItems.BAR_BLUE,
@@ -73,8 +72,8 @@ fun fluidBar(
     onClick: ClickDsl.() -> Unit = {}
 ): SlotElementSupplier = fluidBar(type, amount, capacity, barTypes) {
     val cursor = player.itemOnCursor.takeUnlessEmpty()
-    when (cursor?.type) {
-        Material.BUCKET -> if (allowedConnectionType.extract && container.amount >= 1000) {
+    when (cursor?.itemType) {
+        ItemType.BUCKET -> if (allowedConnectionType.extract && container.amount >= 1000) {
             val bucket = container.type!!.bucket
             if (cursor.amount > 1) {
                 cursor.amount -= 1
@@ -84,13 +83,13 @@ fun fluidBar(
             container.takeFluid(1000)
         }
         
-        Material.WATER_BUCKET -> if (allowedConnectionType.insert && container.accepts(FluidType.WATER, 1000)) {
-            player.setItemOnCursor(ItemStack(Material.BUCKET))
+        ItemType.WATER_BUCKET -> if (allowedConnectionType.insert && container.accepts(FluidType.WATER, 1000)) {
+            player.setItemOnCursor(ItemType.BUCKET.createItemStack())
             container.addFluid(FluidType.WATER, 1000)
         }
         
-        Material.LAVA_BUCKET -> if (allowedConnectionType.insert && container.accepts(FluidType.LAVA, 1000)) {
-            player.setItemOnCursor(ItemStack(Material.BUCKET))
+        ItemType.LAVA_BUCKET -> if (allowedConnectionType.insert && container.accepts(FluidType.LAVA, 1000)) {
+            player.setItemOnCursor(ItemType.BUCKET.createItemStack())
             container.addFluid(FluidType.LAVA, 1000)
         }
         
@@ -184,8 +183,8 @@ class FluidBar(
         
         onClick {
             val cursor = player.itemOnCursor.takeUnlessEmpty()
-            when (cursor?.type) {
-                Material.BUCKET -> if (allowedConnectionType.extract && fluidContainer.amount >= 1000) {
+            when (cursor?.itemType) {
+                ItemType.BUCKET -> if (allowedConnectionType.extract && fluidContainer.amount >= 1000) {
                     val bucket = fluidContainer.type!!.bucket
                     if (cursor.amount > 1) {
                         cursor.amount -= 1
@@ -195,13 +194,13 @@ class FluidBar(
                     fluidContainer.takeFluid(1000)
                 }
                 
-                Material.WATER_BUCKET -> if (allowedConnectionType.insert && fluidContainer.accepts(FluidType.WATER, 1000)) {
-                    player.setItemOnCursor(ItemStack(Material.BUCKET))
+                ItemType.WATER_BUCKET -> if (allowedConnectionType.insert && fluidContainer.accepts(FluidType.WATER, 1000)) {
+                    player.setItemOnCursor(ItemType.BUCKET.createItemStack())
                     fluidContainer.addFluid(FluidType.WATER, 1000)
                 }
                 
-                Material.LAVA_BUCKET -> if (allowedConnectionType.insert && fluidContainer.accepts(FluidType.LAVA, 1000)) {
-                    player.setItemOnCursor(ItemStack(Material.BUCKET))
+                ItemType.LAVA_BUCKET -> if (allowedConnectionType.insert && fluidContainer.accepts(FluidType.LAVA, 1000)) {
+                    player.setItemOnCursor(ItemType.BUCKET.createItemStack())
                     fluidContainer.addFluid(FluidType.LAVA, 1000)
                 }
                 

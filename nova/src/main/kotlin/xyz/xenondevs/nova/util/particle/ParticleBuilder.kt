@@ -19,16 +19,17 @@ import net.minecraft.world.level.gameevent.EntityPositionSource
 import net.minecraft.world.phys.Vec3
 import org.bukkit.Axis
 import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.craftbukkit.util.CraftMagicNumbers
+import org.bukkit.block.BlockType
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.util.Vector
 import org.joml.Vector3f
 import xyz.xenondevs.nova.network.send
 import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.util.nmsEntity
+import xyz.xenondevs.nova.util.nmsItem
 import xyz.xenondevs.nova.util.nmsPos
 import xyz.xenondevs.nova.util.unwrap
 import java.awt.Color
@@ -194,8 +195,8 @@ fun <T : ParticleOptions> particle(particle: ParticleType<T>, config: ParticleBu
 
 //<editor-fold desc="Options extension functions" defaultstate="collapsed">
 
-fun ParticleBuilder<BlockParticleOption>.block(material: Material) = options {
-    BlockParticleOption(it, material.nmsBlock.defaultBlockState())
+fun ParticleBuilder<BlockParticleOption>.block(type: BlockType) = options {
+    BlockParticleOption(it, type.nmsBlock.defaultBlockState())
 }
 
 fun ParticleBuilder<BlockParticleOption>.block(block: MojangBlock) = options {
@@ -230,8 +231,8 @@ fun ParticleBuilder<ItemParticleOption>.item(itemStack: MojangStack) = options {
     ItemParticleOption(it, itemStack.item)
 }
 
-fun ParticleBuilder<ItemParticleOption>.item(material: Material) = options {
-    ItemParticleOption(it, CraftMagicNumbers.getItem(material))
+fun ParticleBuilder<ItemParticleOption>.item(type: ItemType) = options {
+    ItemParticleOption(it, type.nmsItem)
 }
 
 fun ParticleBuilder<ItemParticleOption>.item(item: Item) = options {

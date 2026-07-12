@@ -37,7 +37,7 @@ internal object NovaRecipeCommand : Command() {
     private fun showCurrentRecipe(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         val item = player.inventory.itemInMainHand
-        if (!item.type.isAir) {
+        if (!item.isEmpty) {
             if (!player.showRecipes(item)) {
                 ctx.source.sender.sendMessage(Component.translatable("command.nova.recipe.no-recipe", NamedTextColor.RED))
             }

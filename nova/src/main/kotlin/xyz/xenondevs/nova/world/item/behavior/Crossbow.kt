@@ -10,7 +10,6 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.item.CrossbowItem
 import net.minecraft.world.item.Items
-import org.bukkit.Material
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -138,7 +137,7 @@ interface CrossbowLogic {
         }
         
         private fun createDummyCrossbow(novaCrossbow: ItemStack): ItemStack {
-            val dummyCrossbow = ItemStack.of(Material.CROSSBOW)
+            val dummyCrossbow = ItemType.CROSSBOW.createItemStack()
             novaCrossbow.getData(DataComponentTypes.ENCHANTMENTS)
                 ?.let { dummyCrossbow.setData(DataComponentTypes.ENCHANTMENTS, it) }
             return dummyCrossbow

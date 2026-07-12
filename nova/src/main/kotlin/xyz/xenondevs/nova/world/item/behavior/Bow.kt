@@ -7,8 +7,6 @@ import net.minecraft.world.item.BowItem
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.ProjectileWeaponItem
 import org.bukkit.GameMode
-import org.bukkit.Material
-import org.bukkit.Tag
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -16,10 +14,12 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
+import xyz.xenondevs.nova.registry.entries.ItemTypeTags
 import xyz.xenondevs.nova.util.nmsEntity
 import xyz.xenondevs.nova.util.nmsInteractionHand
 import xyz.xenondevs.nova.util.novaKey
 import xyz.xenondevs.nova.util.unwrap
+import xyz.xenondevs.nova.world.item.itemType
 
 /**
  * Defines how [Bow] behaves.
@@ -51,14 +51,14 @@ interface BowLogic {
                 return true
             
             return entity is InventoryHolder
-                && entity.inventory.any { it != null && Tag.ITEMS_ARROWS.isTagged(it.type) }
+                && entity.inventory.any { it != null &&  it.itemType in ItemTypeTags.ARROWS }
         }
         
         override fun handleDrawTick(entity: LivingEntity, bow: ItemStack, tick: Int) = Unit
         
         override fun shoot(entity: LivingEntity, hand: EquipmentSlot, bow: ItemStack, chargeTime: Int): ItemStack {
             val nmsEntity = entity.nmsEntity
-            val projectile = nmsEntity.getProjectile(ItemStack.of(Material.BOW).unwrap())
+            val projectile = nmsEntity.getProjectile(ItemType.BOW.createItemStack().unwrap())
             if (projectile.isEmpty)
                 return bow
             

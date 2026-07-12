@@ -12,7 +12,7 @@ internal abstract class FileMerger(protected val basePacks: BasePacks) {
     companion object {
         
         private val MERGER_TYPES = listOf(
-            ::ModelFileMerger, ::BlockStateFileMerger, ::FontFileMerger, ::LangFileMerger, ::AtlasFileMerger
+            ::BlockStateFileMerger, ::FontFileMerger, ::LangFileMerger, ::AtlasFileMerger
         )
         
         fun createMergers(basePacks: BasePacks): List<FileMerger> = MERGER_TYPES.map { it(basePacks) }

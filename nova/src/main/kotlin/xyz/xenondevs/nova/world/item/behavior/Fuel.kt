@@ -1,6 +1,7 @@
 package xyz.xenondevs.nova.world.item.behavior
 
 import org.bukkit.Material
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.nova.config.entry
 import xyz.xenondevs.nova.util.MINECRAFT_SERVER
@@ -43,15 +44,15 @@ class Fuel(burnTime: Provider<Int>) : ItemBehavior {
         /**
          * Checks if the given [Material] is a fuel item.
          */
-        fun isFuel(material: Material): Boolean =
-            isFuel(BukkitStack.of(material))
+        fun isFuel(type: ItemType): Boolean =
+            isFuel(type.createItemStack())
         
         /**
          * Gets the burn time of the given [Material] in ticks,
          * or 0 if the material is not a fuel item.
          */
-        fun getBurnTime(material: Material): Int =
-            getBurnTime(BukkitStack.of(material))
+        fun getBurnTime(type: ItemType): Int =
+            getBurnTime(type.createItemStack())
         
         /**
          * Checks if the given [BukkitStack] is a fuel item,

@@ -12,7 +12,9 @@ class NovaRuleSetProvider : RuleSetProvider {
     override fun instance() = RuleSet(
         ruleSetId,
         mapOf(
-            RuleName("RegistryEntryComparison") to ::RegistryEntryComparisonRule
+            RuleName("RegistryEntryComparison") to ::RegistryEntryComparisonRule,
+            RuleName("MaterialUsage") to ::MaterialUsageRule,
+            RuleName("KeyToString") to ::KeyToStringRule
         )
     )
     

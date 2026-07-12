@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
@@ -249,7 +250,7 @@ private fun recipeGroupTabButton(tab: Int, group: RecipeGroup<*>, activeTab: Mut
 }
 
 private fun itemInfoButton(info: String): Item = item {
-    itemProvider by ItemBuilder(Material.KNOWLEDGE_BOOK)
+    itemProvider by ItemBuilder(ItemType.KNOWLEDGE_BOOK)
         .setName(Component.translatable("menu.nova.recipe.item_info"))
     onClick {
         if (clickType.isLeftClick) {

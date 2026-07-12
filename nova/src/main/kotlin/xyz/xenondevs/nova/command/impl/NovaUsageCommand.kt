@@ -37,7 +37,7 @@ internal object NovaUsageCommand : Command() {
     private fun showCurrentUsage(ctx: CommandContext<CommandSourceStack>) {
         val player = ctx.player
         val item = player.inventory.itemInMainHand
-        if (!item.type.isAir) {
+        if (!item.isEmpty) {
             if (!player.showUsages(item)) {
                 ctx.source.sender.sendMessage(Component.translatable("command.nova.usage.no-usage", NamedTextColor.RED))
             }

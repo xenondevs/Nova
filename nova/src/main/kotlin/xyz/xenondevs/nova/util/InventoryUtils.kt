@@ -30,7 +30,7 @@ fun VirtualInventory.addAll(reason: UpdateReason?, items: List<ItemStack>) =
  */
 fun Inventory.isFull(): Boolean {
     for (item in contents)
-        if (item == null || item.amount < item.type.maxStackSize)
+        if (item == null || item.amount < item.maxStackSize)
             return false
     return true
 }

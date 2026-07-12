@@ -8,10 +8,10 @@ import net.minecraft.world.level.gamerules.GameRules
 import net.minecraft.world.phys.Vec3
 import org.bukkit.Axis
 import org.bukkit.GameMode
-import org.bukkit.Material
 import org.bukkit.SoundCategory
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.block.BlockType
 import org.bukkit.craftbukkit.event.CraftEventFactory
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
@@ -45,6 +45,7 @@ import xyz.xenondevs.nova.world.block.NovaBlockState
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.event.BlockBreakActionEvent
+import xyz.xenondevs.nova.world.block.getBehaviorOrThrow
 import xyz.xenondevs.nova.world.block.logic.sound.SoundEngine
 import xyz.xenondevs.nova.world.block.novaBlock
 import xyz.xenondevs.nova.world.block.sound.SoundGroup
@@ -58,15 +59,15 @@ internal class NovaBlockBreaker(
     blockedUntil: Int
 ) : BlockBreaker(player, block, sequence, blockedUntil) {
     
-    val blockType = blockState.novaBlock
+    val blockType = blockState.blockType
     private val breakable = blockType.getBehaviorOrThrow<Breakable>()
     
     override fun createBreakMethod(): BreakMethod =
-        BreakMethod.of(this@NovaBlockBreaker.block, blockType, null)
+        BreakMethod.of(block, blockType, null)
     
     override fun handleBreakTick() {
         // spawn hit particles if not rendered clientside
-        if (this@NovaBlockBreaker.block.type == Material.BARRIER)
+        if (block.blockType == BlockType.BARRIER)
             spawnHitParticles()
     }
     
@@ -93,7 +94,7 @@ internal class VanillaBlockBreaker(
     blockedUntil: Int
 ) : BlockBreaker(player, block, sequence, blockedUntil) {
     
-    override fun createBreakMethod(): BreakMethod = PacketBreakMethod(this@VanillaBlockBreaker.block)
+    override fun createBreakMethod(): BreakMethod = PacketBreakMethod(block)
     
     override fun handleBreakTick() = Unit
     
@@ -138,7 +139,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             player,
             block,
             BlockFaceUtils.determineBlockFaceLookingAt(player.eyeLocation) ?: BlockFace.NORTH,
-            tool ?: ItemStack(Material.AIR),
+            tool ?: ItemStack.empty(),
             damage > 1
         )
         callEvent(damageEvent)
@@ -189,15 +190,15 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
         val ctx = ctxBuilder.build()
         
         val level = block.world.serverLevel
-        val Block = block.nmsPos
+        val pos = block.nmsPos
         
         //<editor-fold desc="break event", defaultstate="collapsed">
         val event = BlockBreakEvent(block, player)
         event.expToDrop = when (this) {
-            is NovaBlockBreaker -> blockType.getExp(block, blockState, ctxBuilder.build())
+            is NovaBlockBreaker -> blockState.novaBlock.getExp(block, blockState, ctxBuilder.build())
             is VanillaBlockBreaker -> {
                 if (ctx[BlockBreak.BLOCK_EXP_DROPS])
-                    BlockUtils.getVanillaBlockExp(level, Block, tool.unwrap().copy())
+                    BlockUtils.getVanillaBlockExp(level, pos, tool.unwrap().copy())
                 else 0
             }
         }
@@ -212,12 +213,12 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
             if (level.gameRules.get(GameRules.BLOCK_DROPS)) {
                 val exp = event.expToDrop
                 if (exp > 0) {
-                    ExperienceOrb.award(level, Vec3.atCenterOf(Block), event.expToDrop)
+                    ExperienceOrb.award(level, Vec3.atCenterOf(pos), event.expToDrop)
                 }
             }
             
             // furnace experience has its own event
-            val furnace = level.getBlockEntity(Block) as? AbstractFurnaceBlockEntity
+            val furnace = level.getBlockEntity(pos) as? AbstractFurnaceBlockEntity
             if (furnace != null) {
                 val exp = BlockExpEvent(block, BlockUtils.getVanillaFurnaceExp(furnace))
                     .also(::callEvent)
@@ -225,7 +226,7 @@ internal sealed class BlockBreaker(val player: Player, val block: Block, val sta
                 
                 if (exp > 0) {
                     // vanilla Minecraft does not check the block drops gamerule here, so we won't either
-                    ExperienceOrb.award(level, Vec3.atCenterOf(Block), exp)
+                    ExperienceOrb.award(level, Vec3.atCenterOf(pos), exp)
                 }
             }
             //</editor-fold>

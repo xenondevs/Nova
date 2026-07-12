@@ -1,13 +1,14 @@
 package xyz.xenondevs.nova.ui.waila.info
 
 import io.papermc.paper.registry.keys.BlockTypeKeys
-import org.bukkit.Material
+import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
 import org.bukkit.block.data.type.PistonHead
 import org.bukkit.block.data.type.TechnicalPiston
 import xyz.xenondevs.nova.initialize.InternalInit
 import xyz.xenondevs.nova.initialize.InternalInitStage
 import xyz.xenondevs.nova.registry.RegistryLoader
+import xyz.xenondevs.nova.world.block.blockType
 
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
@@ -23,13 +24,13 @@ object DefaultWailaInfoProviders {
 //        priority = -1
 //        blocks = registryEntrySetOf(RegistryKey.BLOCK)
 //        infoProvider { player, pos, blockState ->
-//            val mainMaterial = getMainMaterial(blockState)
+//            val mainBlockType = getMainBlockType(blockState)
 //            
 //            val lines = buildList {
 //                this += WailaLine(
 //                    Component.translatable(
-//                        mainMaterial.localizedName
-//                            ?: "block.minecraft.${mainMaterial.name.lowercase()}"
+//                        mainBlockType.localizedName
+//                            ?: "block.minecraft.${mainBlockType.name.lowercase()}"
 //                    ),
 //                    WailaLine.Alignment.CENTERED
 //                )
@@ -44,7 +45,7 @@ object DefaultWailaInfoProviders {
 //                this += ToolLine.getToolLine(player, pos)
 //            }
 //            
-//            return@infoProvider WailaInfo(Key.key(mainMaterial.name.lowercase()), lines)
+//            return@infoProvider WailaInfo(Key.key(mainBlockType.name.lowercase()), lines)
 //        }
 //    }
 //    
@@ -287,72 +288,71 @@ private val MAX_TEXTURE_STAGES = mapOf(
     BlockTypeKeys.TORCHFLOWER_CROP to 2
 )
 
-private fun getMainMaterial(blockState: BlockData): Material {
-    return when (val material = blockState.material) {
+private fun getMainBlockType(blockState: BlockData): BlockType {
+    return when (val type = blockState.blockType) {
         // infested blocks
-        Material.INFESTED_CHISELED_STONE_BRICKS -> Material.CHISELED_STONE_BRICKS
-        Material.INFESTED_COBBLESTONE -> Material.COBBLESTONE
-        Material.INFESTED_CRACKED_STONE_BRICKS -> Material.STONE_BRICKS
-        Material.INFESTED_DEEPSLATE -> Material.DEEPSLATE
-        Material.INFESTED_MOSSY_STONE_BRICKS -> Material.MOSSY_STONE_BRICKS
-        Material.INFESTED_STONE -> Material.STONE
-        Material.INFESTED_STONE_BRICKS -> Material.STONE_BRICKS
+        BlockType.INFESTED_CHISELED_STONE_BRICKS -> BlockType.CHISELED_STONE_BRICKS
+        BlockType.INFESTED_COBBLESTONE -> BlockType.COBBLESTONE
+        BlockType.INFESTED_CRACKED_STONE_BRICKS -> BlockType.STONE_BRICKS
+        BlockType.INFESTED_DEEPSLATE -> BlockType.DEEPSLATE
+        BlockType.INFESTED_MOSSY_STONE_BRICKS -> BlockType.MOSSY_STONE_BRICKS
+        BlockType.INFESTED_STONE -> BlockType.STONE
+        BlockType.INFESTED_STONE_BRICKS -> BlockType.STONE_BRICKS
         
         // signs
-        Material.OAK_WALL_SIGN -> Material.OAK_SIGN
-        Material.SPRUCE_WALL_SIGN -> Material.SPRUCE_SIGN
-        Material.BIRCH_WALL_SIGN -> Material.BIRCH_SIGN
-        Material.JUNGLE_WALL_SIGN -> Material.JUNGLE_SIGN
-        Material.ACACIA_WALL_SIGN -> Material.ACACIA_SIGN
-        Material.DARK_OAK_WALL_SIGN -> Material.DARK_OAK_SIGN
-        Material.MANGROVE_WALL_SIGN -> Material.MANGROVE_SIGN
-        Material.CRIMSON_WALL_SIGN -> Material.CRIMSON_SIGN
-        Material.WARPED_WALL_SIGN -> Material.WARPED_SIGN
-        Material.BAMBOO_WALL_SIGN -> Material.BAMBOO_SIGN
-        Material.CHERRY_WALL_SIGN -> Material.CHERRY_SIGN
-        Material.OAK_WALL_HANGING_SIGN -> Material.OAK_HANGING_SIGN
-        Material.SPRUCE_WALL_HANGING_SIGN -> Material.SPRUCE_HANGING_SIGN
-        Material.BIRCH_WALL_HANGING_SIGN -> Material.BIRCH_HANGING_SIGN
-        Material.JUNGLE_WALL_HANGING_SIGN -> Material.JUNGLE_HANGING_SIGN
-        Material.ACACIA_WALL_HANGING_SIGN -> Material.ACACIA_HANGING_SIGN
-        Material.DARK_OAK_WALL_HANGING_SIGN -> Material.DARK_OAK_HANGING_SIGN
-        Material.MANGROVE_WALL_HANGING_SIGN -> Material.MANGROVE_HANGING_SIGN
-        Material.CRIMSON_WALL_HANGING_SIGN -> Material.CRIMSON_HANGING_SIGN
-        Material.WARPED_WALL_HANGING_SIGN -> Material.WARPED_HANGING_SIGN
-        Material.BAMBOO_WALL_HANGING_SIGN -> Material.BAMBOO_HANGING_SIGN
-        Material.CHERRY_WALL_HANGING_SIGN -> Material.CHERRY_HANGING_SIGN
+        BlockType.OAK_WALL_SIGN -> BlockType.OAK_SIGN
+        BlockType.SPRUCE_WALL_SIGN -> BlockType.SPRUCE_SIGN
+        BlockType.BIRCH_WALL_SIGN -> BlockType.BIRCH_SIGN
+        BlockType.JUNGLE_WALL_SIGN -> BlockType.JUNGLE_SIGN
+        BlockType.ACACIA_WALL_SIGN -> BlockType.ACACIA_SIGN
+        BlockType.DARK_OAK_WALL_SIGN -> BlockType.DARK_OAK_SIGN
+        BlockType.MANGROVE_WALL_SIGN -> BlockType.MANGROVE_SIGN
+        BlockType.CRIMSON_WALL_SIGN -> BlockType.CRIMSON_SIGN
+        BlockType.WARPED_WALL_SIGN -> BlockType.WARPED_SIGN
+        BlockType.BAMBOO_WALL_SIGN -> BlockType.BAMBOO_SIGN
+        BlockType.CHERRY_WALL_SIGN -> BlockType.CHERRY_SIGN
+        BlockType.OAK_WALL_HANGING_SIGN -> BlockType.OAK_HANGING_SIGN
+        BlockType.SPRUCE_WALL_HANGING_SIGN -> BlockType.SPRUCE_HANGING_SIGN
+        BlockType.BIRCH_WALL_HANGING_SIGN -> BlockType.BIRCH_HANGING_SIGN
+        BlockType.JUNGLE_WALL_HANGING_SIGN -> BlockType.JUNGLE_HANGING_SIGN
+        BlockType.ACACIA_WALL_HANGING_SIGN -> BlockType.ACACIA_HANGING_SIGN
+        BlockType.DARK_OAK_WALL_HANGING_SIGN -> BlockType.DARK_OAK_HANGING_SIGN
+        BlockType.MANGROVE_WALL_HANGING_SIGN -> BlockType.MANGROVE_HANGING_SIGN
+        BlockType.CRIMSON_WALL_HANGING_SIGN -> BlockType.CRIMSON_HANGING_SIGN
+        BlockType.WARPED_WALL_HANGING_SIGN -> BlockType.WARPED_HANGING_SIGN
+        BlockType.BAMBOO_WALL_HANGING_SIGN -> BlockType.BAMBOO_HANGING_SIGN
+        BlockType.CHERRY_WALL_HANGING_SIGN -> BlockType.CHERRY_HANGING_SIGN
         
         // plant
-        Material.WEEPING_VINES_PLANT -> Material.WEEPING_VINES
-        Material.TWISTING_VINES_PLANT -> Material.TWISTING_VINES
-        Material.KELP_PLANT -> Material.KELP
-        Material.ATTACHED_MELON_STEM -> Material.MELON_STEM
-        Material.ATTACHED_PUMPKIN_STEM -> Material.PUMPKIN_STEM
+        BlockType.WEEPING_VINES_PLANT -> BlockType.WEEPING_VINES
+        BlockType.TWISTING_VINES_PLANT -> BlockType.TWISTING_VINES
+        BlockType.KELP_PLANT -> BlockType.KELP
+        BlockType.ATTACHED_MELON_STEM -> BlockType.MELON_STEM
+        BlockType.ATTACHED_PUMPKIN_STEM -> BlockType.PUMPKIN_STEM
         
         // torch
-        Material.WALL_TORCH -> Material.TORCH
-        Material.REDSTONE_WALL_TORCH -> Material.REDSTONE_TORCH
-        Material.SOUL_WALL_TORCH -> Material.SOUL_TORCH
-        Material.COPPER_WALL_TORCH -> Material.COPPER_TORCH
+        BlockType.WALL_TORCH -> BlockType.TORCH
+        BlockType.REDSTONE_WALL_TORCH -> BlockType.REDSTONE_TORCH
+        BlockType.SOUL_WALL_TORCH -> BlockType.SOUL_TORCH
+        BlockType.COPPER_WALL_TORCH -> BlockType.COPPER_TORCH
         
         // head / skull
-        Material.ZOMBIE_WALL_HEAD -> Material.ZOMBIE_HEAD
-        Material.CREEPER_WALL_HEAD -> Material.CREEPER_HEAD
-        Material.PLAYER_WALL_HEAD -> Material.PLAYER_HEAD
-        Material.SKELETON_WALL_SKULL -> Material.SKELETON_SKULL
-        Material.WITHER_SKELETON_WALL_SKULL -> Material.WITHER_SKELETON_SKULL
-        Material.DRAGON_WALL_HEAD -> Material.DRAGON_HEAD
+        BlockType.ZOMBIE_WALL_HEAD -> BlockType.ZOMBIE_HEAD
+        BlockType.CREEPER_WALL_HEAD -> BlockType.CREEPER_HEAD
+        BlockType.PLAYER_WALL_HEAD -> BlockType.PLAYER_HEAD
+        BlockType.SKELETON_WALL_SKULL -> BlockType.SKELETON_SKULL
+        BlockType.WITHER_SKELETON_WALL_SKULL -> BlockType.WITHER_SKELETON_SKULL
+        BlockType.DRAGON_WALL_HEAD -> BlockType.DRAGON_HEAD
         
         // misc
-        Material.BIG_DRIPLEAF_STEM -> Material.BIG_DRIPLEAF
-        Material.TRIPWIRE -> Material.STRING
-        Material.PISTON_HEAD -> {
+        BlockType.BIG_DRIPLEAF_STEM -> BlockType.BIG_DRIPLEAF
+        BlockType.PISTON_HEAD -> {
             blockState as PistonHead
             if (blockState.type == TechnicalPiston.Type.STICKY)
-                Material.STICKY_PISTON
-            else Material.PISTON
+                BlockType.STICKY_PISTON
+            else BlockType.PISTON
         }
         
-        else -> material
+        else -> type
     }
 }

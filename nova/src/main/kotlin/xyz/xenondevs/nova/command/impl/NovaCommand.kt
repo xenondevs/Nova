@@ -474,7 +474,7 @@ internal object NovaCommand : Command() {
                     "command.nova.show_block_model_data.display_entity",
                     NamedTextColor.GRAY,
                     Component.text(blockState.asString, NamedTextColor.AQUA),
-                    Component.translatable(info.collider.material.blockTranslationKey ?: "", NamedTextColor.AQUA),
+                    info.collider.blockType.name.color(NamedTextColor.AQUA),
                     Component.text(modelComponents.size),
                     Component.join(JoinConfiguration.newlines(), modelComponents)
                 )

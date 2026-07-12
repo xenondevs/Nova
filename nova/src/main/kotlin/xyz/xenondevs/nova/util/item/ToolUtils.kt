@@ -140,7 +140,7 @@ object ToolUtils {
             return 1.0
         
         val toolComponent = tool.unwrap().get(DataComponents.TOOL)
-        val toolBehavior = tool.novaItem?.getBehaviorOrNull<Tool>()
+        val toolBehavior = tool.itemType.getBehaviorOrNull<Tool>()
         if (toolBehavior != null) {
             // Nova tool, Nova/Vanilla block 
             val itemCategories = toolBehavior.categories

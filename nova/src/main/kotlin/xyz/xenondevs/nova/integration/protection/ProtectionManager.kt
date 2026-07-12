@@ -150,7 +150,7 @@ object ProtectionManager {
      */
     suspend fun canPlace(ctx: Context<BlockPlace>): Boolean {
         val block = ctx[BlockPlace.BLOCK]
-        val blockItem = ctx[BlockPlace.BLOCK_ITEM_STACK] ?: ItemStack(Material.AIR)
+        val blockItem = ctx[BlockPlace.BLOCK_ITEM_STACK] ?: ItemStack.empty()
         
         val tileEntity = ctx[BlockPlace.SOURCE_TILE_ENTITY]
         if (tileEntity != null)

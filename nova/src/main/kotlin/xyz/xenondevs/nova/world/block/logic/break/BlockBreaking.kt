@@ -9,7 +9,6 @@ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ai.attributes.Attributes
 import org.bukkit.GameMode
-import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.craftbukkit.event.CraftEventFactory
 import org.bukkit.entity.Player
@@ -20,6 +19,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.collections.removeIf
 import xyz.xenondevs.nova.LOGGER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
@@ -48,6 +48,7 @@ import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.hasBehavior
 import xyz.xenondevs.nova.world.block.novaBlockState
 import xyz.xenondevs.nova.world.format.WorldDataManager
+import xyz.xenondevs.nova.world.item.itemType
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.max
 
@@ -90,7 +91,7 @@ internal object BlockBreaking : Listener, PacketListener {
         
         // create a new break method if there isn't one
         if (method == null) {
-            method = BreakMethod.of(block, blockState.novaBlock, entityId) as? VisibleBreakMethod ?: return
+            method = BreakMethod.of(block, blockState.blockType, entityId) as? VisibleBreakMethod ?: return
             internalBreakers[entityId] = method
         }
         
@@ -139,7 +140,7 @@ internal object BlockBreaking : Listener, PacketListener {
         // - the block is from a custom item service
         // - the player is using a debug stick
         if (CustomItemServiceManager.getBlockType(block) != null
-            || (player.gameMode == GameMode.CREATIVE && player.inventory.itemInMainHand.type == Material.DEBUG_STICK)
+            || (player.gameMode == GameMode.CREATIVE && player.inventory.itemInMainHand.itemType == ItemType.DEBUG_STICK)
         ) {
             player.packetHandler?.injectIncoming(packet)
             return

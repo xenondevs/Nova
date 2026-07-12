@@ -1,10 +1,8 @@
 package xyz.xenondevs.nova.world.format.chunk
 
-import xyz.xenondevs.nova.world.*
-
+import org.bukkit.block.Block
 import xyz.xenondevs.cbf.io.ByteReader
 import xyz.xenondevs.cbf.io.ByteWriter
-import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.ChunkPos
 import xyz.xenondevs.nova.world.format.chunk.RegionizedChunk.Companion.packBlockPos
 
@@ -102,17 +100,17 @@ internal class NetworkChunk(
             val bridgeSize = reader.readVarInt()
             val bridges = HashMap<Block, NetworkBridgeData>(bridgeSize)
             repeat(bridgeSize) {
-                val Block = unpackBlockPos(pos, reader.readInt())
+                val block = unpackBlockPos(pos, reader.readInt())
                 val data = NetworkBridgeData.read(reader)
-                bridges[Block] = data
+                bridges[block] = data
             }
             
             val endPointSize = reader.readVarInt()
             val endPoints = HashMap<Block, NetworkEndPointData>(endPointSize)
             repeat(endPointSize) {
-                val Block = unpackBlockPos(pos, reader.readInt())
+                val block = unpackBlockPos(pos, reader.readInt())
                 val data = NetworkEndPointData.read(reader)
-                endPoints[Block] = data
+                endPoints[block] = data
             }
             
             return NetworkChunk(bridges, endPoints)

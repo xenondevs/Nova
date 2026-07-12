@@ -31,6 +31,8 @@ import xyz.xenondevs.nova.world.item.novaItem
 import org.bukkit.block.Block
 import xyz.xenondevs.nova.world.block.logic.`break`.BlockBreaking
 import xyz.xenondevs.nova.world.item.behavior.Damageable
+import xyz.xenondevs.nova.world.item.getBehaviorOrNull
+import xyz.xenondevs.nova.world.item.itemType
 import xyz.xenondevs.nova.world.item.tool.ToolCategory
 import xyz.xenondevs.nova.world.item.tool.VanillaToolCategory
 import java.io.ByteArrayInputStream
@@ -95,11 +97,9 @@ fun BukkitLivingEntity.damageToolAttackEntity() = damageToolInMainHand(Damageabl
 
 private inline fun BukkitLivingEntity.damageToolInMainHand(getNovaDamage: (Damageable) -> Int, getVanillaDamage: (VanillaToolCategory) -> Int) {
     val itemStack = nmsEntity.mainHandItem
-    val novaItem = itemStack.novaItem
-    
     val damage: Int
-    if (novaItem != null) {
-        val damageable = novaItem.getBehaviorOrNull<Damageable>() ?: return
+    if (itemStack.novaItem != null) {
+        val damageable = itemStack.asBukkitMirror().itemType.getBehaviorOrNull<Damageable>() ?: return
         damage = getNovaDamage(damageable)
     } else {
         val toolCategory = ToolCategory.ofItem(itemStack.asBukkitMirror()).firstInstanceOfOrNull<VanillaToolCategory>() ?: return

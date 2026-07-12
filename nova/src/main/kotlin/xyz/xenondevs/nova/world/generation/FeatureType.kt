@@ -12,6 +12,7 @@ import net.minecraft.world.level.levelgen.feature.Feature
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration
 import org.bukkit.Material
+import org.bukkit.block.BlockType
 import xyz.xenondevs.nova.util.nmsBlock
 import xyz.xenondevs.nova.world.block.NovaBlock
 import java.util.function.Predicate
@@ -27,8 +28,8 @@ abstract class FeatureType<FC : FeatureConfiguration>(codec: Codec<FC>) : Featur
     /**
      * Sets the block at the given position to the given [Material]. This method uses the block change flag `3`.
      */
-    protected fun setBlock(level: WorldGenLevel, pos: BlockPos, material: Material) {
-        level.setBlock(pos, material.nmsBlock.defaultBlockState(), 3)
+    protected fun setBlock(level: WorldGenLevel, pos: BlockPos, type: BlockType) {
+        level.setBlock(pos, type.nmsBlock.defaultBlockState(), 3)
     }
     
     /**
@@ -36,8 +37,8 @@ abstract class FeatureType<FC : FeatureConfiguration>(codec: Codec<FC>) : Featur
      * in Minecraft's [Block] class for the `flags` parameter. Check out [Sponge's constants class](https://github.com/SpongePowered/Sponge/blob/b146b4d66f5b150e1f1425b34c57c8b0c3624963/src/main/java/org/spongepowered/common/util/Constants.java#L942)
      * for more information. Generally it's recommended to use `3`/`2` as flags.
      */
-    protected fun setBlock(level: WorldGenLevel, pos: BlockPos, material: Material, flags: Int) {
-        level.setBlock(pos, material.nmsBlock.defaultBlockState(), flags)
+    protected fun setBlock(level: WorldGenLevel, pos: BlockPos, type: BlockType, flags: Int) {
+        level.setBlock(pos, type.nmsBlock.defaultBlockState(), flags)
     }
     
     //<editor-fold desc="Overrides for better param names" defaultstate="collapsed">

@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.resources.builder.task.basepack
 
 import net.minecraft.world.level.block.state.BlockState
-import org.bukkit.Material
 import xyz.xenondevs.nova.DATA_FOLDER
 import xyz.xenondevs.nova.config.MAIN_CONFIG
 import xyz.xenondevs.nova.config.entry
@@ -49,7 +48,6 @@ class BasePacks internal constructor(internal val builder: ResourcePackBuilder) 
         .mapTo(HashSet()) { it.absoluteFile } // deduplicate
     
     val packAmount = packs.size
-    val occupiedModelData = HashMap<Material, HashSet<Int>>()
     internal val occupiedSolidIds = HashMap<BackingStateConfigType<*>, HashSet<Int>>()
     
     inner class Include : PackTask {

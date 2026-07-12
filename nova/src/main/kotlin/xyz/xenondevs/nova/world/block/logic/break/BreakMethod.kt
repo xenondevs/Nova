@@ -2,8 +2,8 @@ package xyz.xenondevs.nova.world.block.logic.`break`
 
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.CustomModelData.customModelData
-import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.provider.mutableProvider
@@ -12,8 +12,9 @@ import xyz.xenondevs.invui.dsl.itemProvider
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.nova.packetentity.packetItemDisplay
 import xyz.xenondevs.nova.util.broadcastDestructionStage
-import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.behavior.Breakable
+import xyz.xenondevs.nova.world.block.blockType
+import xyz.xenondevs.nova.world.block.getBehaviorOrThrow
 import xyz.xenondevs.nova.world.item.DefaultBlockOverlays
 import kotlin.random.Random
 
@@ -31,17 +32,17 @@ internal interface BreakMethod {
             override fun stop() {}
         }
         
-        fun of(block: Block, material: NovaBlock, entityId: Int = Random.nextInt()): BreakMethod =
-            of(block, material, null, entityId)
+        fun of(block: Block, type: BlockType, entityId: Int = Random.nextInt()): BreakMethod =
+            of(block, type, null, entityId)
         
         fun of(
             block: Block,
-            type: NovaBlock,
+            type: BlockType,
             predictionPlayer: Player?,
             entityId: Int = predictionPlayer?.entityId ?: Random.nextInt()
         ): BreakMethod {
             return if (type.getBehaviorOrThrow<Breakable>().showBreakAnimation)
-                if (block.type == Material.BARRIER) DisplayEntityBreakMethod(block)
+                if (block.blockType == BlockType.BARRIER) DisplayEntityBreakMethod(block)
                 else PacketBreakMethod(block, entityId, predictionPlayer)
             else INVISIBLE
         }
@@ -71,9 +72,9 @@ internal class PacketBreakMethod(block: Block, private val entityId: Int = Rando
     
     private fun sendBreakStage(stage: Int) {
         if (predictionPlayer != null) {
-            this@PacketBreakMethod.block.broadcastDestructionStage(predictionPlayer, stage)
+            block.broadcastDestructionStage(predictionPlayer, stage)
         } else {
-            this@PacketBreakMethod.block.broadcastDestructionStage(entityId, stage)
+            block.broadcastDestructionStage(entityId, stage)
         }
     }
     

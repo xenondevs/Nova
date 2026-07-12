@@ -51,7 +51,6 @@ import xyz.xenondevs.nova.context.Context
 import xyz.xenondevs.nova.context.intention.BlockBreak
 import xyz.xenondevs.nova.context.intention.BlockPlace
 import xyz.xenondevs.nova.context.intention.ImplicitIntentions
-import xyz.xenondevs.nova.world.item.itemType
 import xyz.xenondevs.nova.util.item.playPlaceSoundEffect
 import xyz.xenondevs.nova.util.item.takeUnlessEmpty
 import xyz.xenondevs.nova.world.block.NovaBlockState
@@ -518,7 +517,7 @@ object BlockUtils {
     
     private fun Block.getMainHalf(): Block {
         val data = blockData
-        val nmsBlock = type.nmsBlock
+        val nmsBlock = nmsBlockState.block
         if (nmsBlock is TallFlowerBlock || nmsBlock is DoorBlock) { // 2 block tall
             data as Bisected
             if (data.half == Bisected.Half.TOP) {

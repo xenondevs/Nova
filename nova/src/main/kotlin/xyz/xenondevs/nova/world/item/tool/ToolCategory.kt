@@ -5,25 +5,26 @@ import net.kyori.adventure.key.Key
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
 import net.minecraft.tags.BlockTags
-import org.bukkit.Material
-import org.bukkit.Tag
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.nova.registry.NovaRegistryElement
 import xyz.xenondevs.nova.registry.RegistryEntry
 import xyz.xenondevs.nova.registry.RegistryEntrySet
 import xyz.xenondevs.nova.registry.entries.BlockTypeTags
+import xyz.xenondevs.nova.registry.entries.ItemTypeTags
 import xyz.xenondevs.nova.serialization.kotlinx.ToolCategoryEntrySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolCategoryEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolCategorySerializer
-import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.getBehaviorOrNull
 import xyz.xenondevs.nova.world.block.isNova
 import xyz.xenondevs.nova.world.item.behavior.Tool
+import xyz.xenondevs.nova.world.item.getBehaviorOrNull
+import xyz.xenondevs.nova.world.item.itemType
 
 /**
  * Serializable type alias for `RegistryEntry.Nova<ToolCategory>` using [ToolCategoryEntrySerializer].
@@ -57,7 +58,7 @@ open class ToolCategory internal constructor(
             if (item == null)
                 return emptySet()
             
-            val novaCategory = item.novaItem?.getBehaviorOrNull(Tool::class)?.categories
+            val novaCategory = item.itemType.getBehaviorOrNull<Tool>()?.categories
             if (novaCategory != null)
                 return novaCategory
             
@@ -84,18 +85,18 @@ open class ToolCategory internal constructor(
             }
             
             // read type from type tags
-            val type = item.type
-            if (Tag.ITEMS_SHOVELS.isTagged(type))
+            val type = item.itemType
+            if (type in ItemTypeTags.SHOVELS)
                 categories += VanillaToolCategories.SHOVEL.get()
-            if (Tag.ITEMS_PICKAXES.isTagged(type))
+            if (type in ItemTypeTags.PICKAXES)
                 categories += VanillaToolCategories.PICKAXE.get()
-            if (Tag.ITEMS_AXES.isTagged(type))
+            if (type in ItemTypeTags.AXES)
                 categories += VanillaToolCategories.AXE.get()
-            if (Tag.ITEMS_HOES.isTagged(type))
+            if (type in ItemTypeTags.HOES)
                 categories += VanillaToolCategories.HOE.get()
-            if (Tag.ITEMS_SWORDS.isTagged(type))
+            if (type in ItemTypeTags.SWORDS)
                 categories += VanillaToolCategories.SWORD.get()
-            if (type == Material.SHEARS)
+            if (type == ItemType.SHEARS)
                 categories += VanillaToolCategories.SHEARS.get()
             
             return categories

@@ -2,6 +2,7 @@ package xyz.xenondevs.nova.ui.menu.item
 
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.combinedProvider
 import xyz.xenondevs.invui.Click
@@ -9,6 +10,7 @@ import xyz.xenondevs.invui.dsl.ClickDsl
 import xyz.xenondevs.invui.dsl.item
 import xyz.xenondevs.invui.item.AbstractItem
 import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemBuilder
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.nova.ui.menu.LEGACY_NON_DSL_INVUI_DEPRECATION
@@ -47,7 +49,7 @@ fun progressItem(
 @Suppress("DEPRECATION")
 @Deprecated(LEGACY_NON_DSL_INVUI_DEPRECATION)
 open class ProgressItem(
-    val item: NovaItem,
+    val item: ItemType,
     private val customModelDataIndex: Int = 0
 ) : AbstractItem() {
     
@@ -68,7 +70,7 @@ open class ProgressItem(
         }
     
     override fun getItemProvider(player: Player): ItemProvider {
-        return item.createClientsideItemBuilder().setCustomModelData(customModelDataIndex, percentage)
+        return ItemBuilder(item).setCustomModelData(customModelDataIndex, percentage)
     }
     
     override fun handleClick(clickType: ClickType, player: Player, click: Click) = Unit

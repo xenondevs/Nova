@@ -48,7 +48,6 @@ import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.Color
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.attribute.Attribute
@@ -347,9 +346,6 @@ val ItemUseAnimation.nmsItemUseAnimation: MojangItemUseAnimation
         ItemUseAnimation.TRIDENT -> MojangItemUseAnimation.TRIDENT
     }
 
-val Material.nmsBlock: MojangBlock
-    get() = CraftMagicNumbers.getBlock(this)
-
 val BlockType.nmsBlock: MojangBlock
     get() = (this as CraftBlockType<*>).handle
 
@@ -362,20 +358,11 @@ val PistonMoveReaction.nmsPushReaction: PushReaction
         PistonMoveReaction.PUSH_ONLY -> PushReaction.PUSH_ONLY
     }
 
-val Material.nmsItem: MojangItem
-    get() = CraftMagicNumbers.getItem(this)
-
 val ItemType.nmsItem: MojangItem
     get() = (this as CraftItemType<*>).handle
 
 val MojangItem.bukkitItemType: ItemType
     get() = CraftItemType.minecraftToBukkitNew(this)
-
-val MojangBlock.bukkitMaterial: Material
-    get() = CraftMagicNumbers.getMaterial(this)
-
-val MojangItem.bukkitMaterial: Material
-    get() = CraftMagicNumbers.getMaterial(this)
 
 val Block.nmsPos: MojangBlockPos
     get() = MojangBlockPos(x, y, z)

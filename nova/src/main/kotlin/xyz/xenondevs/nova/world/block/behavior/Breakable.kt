@@ -1,6 +1,6 @@
 package xyz.xenondevs.nova.world.block.behavior
 
-import org.bukkit.Material
+import org.bukkit.inventory.ItemType
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.flatten
 import xyz.xenondevs.commons.provider.orElse
@@ -43,7 +43,7 @@ fun Breakable(
     toolCategories: RegistryEntrySet.Nova<ToolCategory> = emptyRegistryEntrySet(NovaRegistries.TOOL_CATEGORY),
     toolTier: RegistryEntry.Nova<ToolTier>? = null,
     requiresToolForDrops: Boolean = true,
-    breakParticles: Material? = null,
+    breakParticles: RegistryEntry.Paper<ItemType>? = null,
     showBreakAnimation: Boolean = true
 ) = BlockBehaviorFactory { _, cfg ->
     Breakable(
@@ -51,7 +51,7 @@ fun Breakable(
         cfg.entry<RegistryEntrySet.Nova<ToolCategory>>(toolCategories, "tool_categories").flatten(),
         cfg.optionalEntry<RegistryEntry.Nova<ToolTier>>("tool_tier").orElse(toolTier).flatten(),
         cfg.entry(requiresToolForDrops, "requires_tool_for_drops"),
-        cfg.optionalEntry<Material>("break_particles").orElse(breakParticles),
+        cfg.optionalEntry<RegistryEntry.Paper<ItemType>>("break_particles").orElse(breakParticles).flatten(),
         cfg.optionalEntry<Boolean>("show_break_animation").orElse(showBreakAnimation)
     )
 }
@@ -64,7 +64,7 @@ class Breakable(
     toolCategories: Provider<Set<ToolCategory>>,
     toolTier: Provider<ToolTier?>,
     requiresToolForDrops: Provider<Boolean>,
-    breakParticles: Provider<Material?>,
+    breakParticles: Provider<ItemType?>,
     showBreakAnimation: Provider<Boolean>
 ) : BlockBehavior {
     
@@ -93,7 +93,7 @@ class Breakable(
     /**
      * The type of break particles to spawn in case the block is entity-backed or model-less with no vanilla particles.
      */
-    val breakParticles: Material? by breakParticles
+    val breakParticles: ItemType? by breakParticles
     
     /**
      * Whether the break animation should be shown.

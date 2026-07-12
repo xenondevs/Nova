@@ -1,7 +1,6 @@
 package xyz.xenondevs.nova.ui.menu.explorer.recipes.group
 
-import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.inventory.SmithingTransformRecipe
 import xyz.xenondevs.commons.provider.provider
 import xyz.xenondevs.invui.gui.Gui
@@ -13,7 +12,7 @@ internal object SmithingTransformRecipeGroup : RecipeGroup<SmithingTransformReci
     
     override val priority = 3
     override val texture = DefaultGuiTextures.RECIPE_SMITHING
-    override val icon = provider { ItemWrapper(ItemStack(Material.SMITHING_TABLE)) }
+    override val icon = provider { ItemWrapper(ItemType.SMITHING_TABLE.createItemStack()) }
     
     override fun createGui(recipe: SmithingTransformRecipe): Gui {
         return Gui.builder()

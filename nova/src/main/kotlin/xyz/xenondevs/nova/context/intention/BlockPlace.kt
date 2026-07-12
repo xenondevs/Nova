@@ -16,7 +16,6 @@ import xyz.xenondevs.nova.world.block.NovaBlock
 import xyz.xenondevs.nova.world.block.blockTypeOrNull
 import xyz.xenondevs.nova.world.block.novaBlock
 import xyz.xenondevs.nova.world.item.itemType
-import xyz.xenondevs.nova.world.item.novaItem
 import kotlin.jvm.optionals.getOrNull
 
 /**
@@ -58,7 +57,7 @@ object BlockPlace :
      */
     val BLOCK_ITEM_STACK = ContextParamType<ItemStack, BlockPlace>(
         novaKey("block_item_stack"),
-        validate = { it.type.isBlock || it.novaItem?.block != null },
+        validate = { it.itemType.hasBlockType() },
         copy = ItemStack::clone
     )
     

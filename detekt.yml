@@ -5,3 +5,9 @@ NovaRuleSet:
   RegistryEntryComparison:
     active: true
     severity: error
+  MaterialUsage:
+    active: true
+    severity: error
+  KeyToString:
+    active: true
+    severity: error

@@ -74,23 +74,10 @@ internal val ItemStack.namelessCopyOrSelf: ItemStack
     }
 
 /**
- * The [ItemStack] that remains in the crafting slots after using it in a recipe.
- * Empty if there is no remaining item.
- */
-val ItemStack.craftingRemainingItem: ItemStack
-    get() {
-        val novaItem = novaItem
-        if (novaItem != null)
-            return novaItem.craftingRemainingItem
-        
-        return type.craftingRemainingItem?.let(::ItemStack) ?: ItemStack.empty()
-    }
-
-/**
  * Returns `null` if [this][ItemStack] [is empty][isEmpty], otherwise returns [this][ItemStack].
  */
 fun ItemStack.takeUnlessEmpty(): ItemStack? =
-    if (type.isAir || amount <= 0) null else this
+    if (isEmpty) null else this
 
 /**
  * Returns `true` if [this][ItemStack] is either null or an empty item stack,

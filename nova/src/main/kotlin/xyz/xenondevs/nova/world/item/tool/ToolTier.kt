@@ -17,13 +17,14 @@ import xyz.xenondevs.nova.registry.entries.BlockTypeTags
 import xyz.xenondevs.nova.serialization.kotlinx.ToolTierEntrySerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolTierEntrySetSerializer
 import xyz.xenondevs.nova.serialization.kotlinx.ToolTierSerializer
-import xyz.xenondevs.nova.world.item.novaItem
 import xyz.xenondevs.nova.util.unwrap
 import xyz.xenondevs.nova.world.block.behavior.Breakable
 import xyz.xenondevs.nova.world.block.blockType
 import xyz.xenondevs.nova.world.block.getBehaviorOrNull
 import xyz.xenondevs.nova.world.block.isNova
 import xyz.xenondevs.nova.world.item.behavior.Tool
+import xyz.xenondevs.nova.world.item.getBehaviorOrNull
+import xyz.xenondevs.nova.world.item.itemType
 
 /**
  * Serializable type alias for `RegistryEntry.Nova<ToolTier>` using [ToolTierEntrySerializer].
@@ -84,7 +85,7 @@ class ToolTier(
             if (item == null)
                 return null
             
-            val novaLevel = item.novaItem?.getBehaviorOrNull<Tool>()?.tier
+            val novaLevel = item.itemType.getBehaviorOrNull<Tool>()?.tier
             if (novaLevel != null)
                 return novaLevel
             
